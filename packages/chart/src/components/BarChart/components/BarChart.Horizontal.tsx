@@ -149,8 +149,6 @@ export const BarChartHorizontal = () => {
                     return barColor
                   }
 
-                  const iconPadding = 12 + suppressedBarWidth
-
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
@@ -202,7 +200,7 @@ export const BarChartHorizontal = () => {
                               y={config.barHeight / 2 + config.barHeight * bar.index}
                               fill={'#000'}
                               dy={config.barHeight / 5}
-                              dx={`${iconPadding}px`}
+                              dx={`${suppressedBarWidth * 5}px`}
                               verticalAnchor={getVerticalAnchor(pd.symbol)}
                               textAnchor={'middle'}
                             >
