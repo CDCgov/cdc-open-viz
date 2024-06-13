@@ -37,7 +37,7 @@ const BarChartStackedVertical = () => {
                 const xAxisValue = isDateAxisType ? formatDate(parseDate(rawXValue)) : rawXValue
                 const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
                 if (!yAxisValue) return
-                const barX = xScale(isDateAxisType ? parseDate(rawXValue) : rawXValue) - (isDateAxisType && config.xAxis.sortDates ? barThicknessAdjusted / 2 : 0)
+                const barX = xScale(isDateAxisType ? parseDate(rawXValue) : rawXValue) - (isDateAxisType ? barThickness / 2 : 0)
                 const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                 const additionalColTooltip = getAdditionalColumn(hoveredBar)
                 const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
