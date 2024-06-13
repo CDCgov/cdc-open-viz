@@ -206,7 +206,7 @@ const LineChart = (props: LineChartProps) => {
                 <>
                   {/* STANDARD LINE */}
                   <LinePath
-                    curve={allCurves[seriesData[0].lineType]}
+                    curve={config.visualizationType == "Bump Chart" ? allCurves.curveMonotoneX : allCurves[seriesData[0].lineType]}
                     data={
                       config.visualizationType == "Bump Chart" ? data : 
                       config.xAxis.type === 'date-time'

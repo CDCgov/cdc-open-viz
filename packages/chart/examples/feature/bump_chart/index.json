@@ -37,7 +37,7 @@
     "hideTicks": true,
     "size": "125",
     "gridLines": true,
-    "enablePadding": true,
+    "enablePadding": false,
     "min": "0",
     "max": "2",
     "labelColor": "#333",
@@ -100,7 +100,7 @@
   "xAxis": {
     "sortDates": false,
     "anchors": [],
-    "type": "categorical",
+    "type": "date-time",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
@@ -122,7 +122,7 @@
     "dataKey": "year",
     "tickWidthMax": 41,
     "dateParseFormat": "%Y",
-    "padding": 6,
+    "padding": 0,
     "dateDisplayFormat": "%Y"
   },
   "table": {
