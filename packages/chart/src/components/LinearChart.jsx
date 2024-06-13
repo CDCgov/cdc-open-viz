@@ -129,8 +129,8 @@ const LinearChart = props => {
 
   const countNumOfTicks = axis => {
     let { numTicks } = runtime[axis]
-    if(runtime[axis].viewportNumTicks && runtime[axis].viewportNumTicks[currentViewport]){
-      numTicks = runtime[axis].viewportNumTicks[currentViewport];
+    if (runtime[axis].viewportNumTicks && runtime[axis].viewportNumTicks[currentViewport]) {
+      numTicks = runtime[axis].viewportNumTicks[currentViewport]
     }
     let tickCount = undefined
 
@@ -229,10 +229,10 @@ const LinearChart = props => {
 
   const getManualStep = () => {
     let manualStep = config.xAxis.manualStep
-    if(config.xAxis.viewportStepCount && config.xAxis.viewportStepCount[currentViewport]){
-      manualStep = config.xAxis.viewportStepCount[currentViewport];
+    if (config.xAxis.viewportStepCount && config.xAxis.viewportStepCount[currentViewport]) {
+      manualStep = config.xAxis.viewportStepCount[currentViewport]
     }
-    return manualStep;
+    return manualStep
   }
 
   const onMouseMove = event => {
@@ -741,7 +741,7 @@ const LinearChart = props => {
             })}
           {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}
           {/* prettier-ignore */}
-          {(config.visualizationType !== 'Bar' || !checkLineToBarGraph()) && config.visualizationType !== 'Combo' && (
+          {config.visualizationType !== 'Bar' && config.visualizationType !== 'Combo' && (
             <Regions xScale={xScale} handleTooltipClick={handleTooltipClick} handleTooltipMouseOff={handleTooltipMouseOff} handleTooltipMouseOver={handleTooltipMouseOver} showTooltip={showTooltip} hideTooltip={hideTooltip} tooltipData={tooltipData} yMax={yMax} width={width} />
           )}
           {chartHasTooltipGuides && showTooltip && tooltipData && config.visual.verticalHoverLine && (
