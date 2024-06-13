@@ -748,7 +748,7 @@ const LinearChart = props => {
             })}
           {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}
           {/* prettier-ignore */}
-          {(config.visualizationType !== 'Bar' || !checkLineToBarGraph()) && config.visualizationType !== 'Combo' && (
+          {config.visualizationType !== 'Bar' && config.visualizationType !== 'Combo' && (
             <Regions xScale={xScale} handleTooltipClick={handleTooltipClick} handleTooltipMouseOff={handleTooltipMouseOff} handleTooltipMouseOver={handleTooltipMouseOver} showTooltip={showTooltip} hideTooltip={hideTooltip} tooltipData={tooltipData} yMax={yMax} width={width} />
           )}
           {chartHasTooltipGuides && showTooltip && tooltipData && config.visual.verticalHoverLine && (
