@@ -74,7 +74,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         label: true
       },
       seriesKey: '',
-      x: Number(newSvgDims?.[0]) / 2,
+      x: (Number(newSvgDims?.[0]) + 350) / 2,
       y: Number(newSvgDims?.[1] / 2),
       xKey: config.xAxis.type === 'date' ? new Date(config?.data?.[0]?.[config.xAxis.dataKey]).getTime() : config.xAxis.type === 'categorical' ? '1/15/2016' : '',
       yKey: '',
