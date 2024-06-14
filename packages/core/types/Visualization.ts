@@ -9,6 +9,7 @@ import { ConfigureData } from './ConfigureData'
 import { VizFilter } from './VizFilter'
 import { FilterBehavior } from './FilterBehavior'
 import { General } from './General'
+import { Runtime } from './Runtime'
 
 export type Visualization = ConfigureData & {
   autoLoad: boolean
@@ -22,13 +23,14 @@ export type Visualization = ConfigureData & {
   filterBehavior: FilterBehavior
   filters: VizFilter[]
   general: General
-  hide: any[]
+  hide: number[]
   legend: Legend
   multiDashboards?: any[]
   newViz: boolean
   openModal: boolean
   orientation: 'vertical' | 'horizontal'
   originalFormattedData: any
+  runtime?: Runtime
   series: Series
   showEditorPanel: boolean
   table: Table
@@ -40,4 +42,5 @@ export type Visualization = ConfigureData & {
   visualizationSubType: string
   visualizationType: string
   xAxis: Axis
+  preliminaryData: { type: 'effect' | 'suppression'; value: string }[]
 }

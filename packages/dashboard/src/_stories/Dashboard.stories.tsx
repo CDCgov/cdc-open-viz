@@ -15,6 +15,9 @@ import { type DashboardConfig as Config } from '../types/DashboardConfig'
 import { userEvent, within } from '@storybook/testing-library'
 import ToggleExampleConfig from './_mock/toggle-example.json'
 import _ from 'lodash'
+import { footnotesSymbols } from '@cdc/core/helpers/footnoteSymbols'
+import FootnotesConfig from '@cdc/core/types/Footnotes'
+import { ConfigRow } from '../types/ConfigRow'
 
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Pages/Dashboard',
@@ -89,8 +92,13 @@ countries.forEach((country, i) => {
   })
 })
 
+const footnoteData = countries.map((country, i) => {
+  return { Country: country, symbol: footnotesSymbols[i][0], text: faker.lorem.sentence() }
+})
+
 const multiVizData = {
-  'valid-world-data.json': { data }
+  'valid-world-data.json': { data },
+  'footnote-data.json': { data: footnoteData }
 }
 
 export const MultiVisualization: Story = {
@@ -103,6 +111,16 @@ export const MultiVisualization: Story = {
 export const MultiDashboard: Story = {
   args: {
     config: MultiDashboardConfig,
+    isEditor: false
+  }
+}
+
+const FNrows: ConfigRow[] = [{ ...MultiVizConfig.rows[0], footnotesId: 'footnote123' }]
+const footnoteConfig: Partial<FootnotesConfig> = { dataKey: 'footnote-data.json', dynamicFootnotes: { symbolColumn: 'symbol', textColumn: 'text' }, staticFootnotes: [{ symbol: '**', text: 'This is a static Footnote' }] }
+const FNViz = { ...MultiVizConfig.visualizations, footnote123: footnoteConfig }
+export const Footnotes: Story = {
+  args: {
+    config: { ...MultiVizConfig, datasets: multiVizData, rows: FNrows, visualizations: FNViz },
     isEditor: false
   }
 }
@@ -133,35 +151,18 @@ const fetchMock = {
         body: [{ IndicatorID: 'indicatorID', Indicator: 'Some Indicator' }]
       }
     },
-    {
-      matcher: {
-        name: 'filters',
-        url: 'path:/api/POC/Filters'
-      },
-      response: {
-        status: 200,
-        body: {
-          Years: [{ Year: 1999 }],
-          DataValueTypes: [{ DataValueType: 'Some Data Value Type', DataValueTypeId: 'dataValueTypeId' }],
-          StratificationCategories: [{ StratificationCategoryId: 'stratCategoryId', StratificationCategory: 'Some Strat Category' }]
+    ...['Year', 'DataValueType', 'StratificationCategory', 'Stratification'].map(filter => {
+      return {
+        matcher: {
+          name: 'filters' + filter,
+          url: 'path:/api/POC/Filters/' + filter
+        },
+        response: {
+          status: 200,
+          body: _.times(5, i => ({ [filter]: `Some ${filter} ${i}` }))
         }
       }
-    },
-    {
-      matcher: {
-        name: 'stratifications',
-        url: 'path:/api/POC/stratifications'
-      },
-      response: {
-        status: 200,
-        body: [
-          {
-            StratificationId: 'stratId',
-            Stratification: 'Some Strat'
-          }
-        ]
-      }
-    },
+    }),
     {
       matcher: {
         name: 'locations',
@@ -213,7 +214,8 @@ const fetchMock = {
 
 export const APIFiltersMap: Story = {
   args: {
-    config: APIFiltersMapData as unknown as Config
+    config: APIFiltersMapData as unknown as Config,
+    isEditor: false
   },
   parameters: {
     fetchMock
@@ -230,18 +232,19 @@ export const APIFiltersMap: Story = {
     const indicatorsFilter = canvas.getByLabelText('Indicator', { selector: 'select' })
     await user.selectOptions(indicatorsFilter, ['indicatorID'])
     const yearsFilter = canvas.getByLabelText('Year', { selector: 'select' })
-    await user.selectOptions(yearsFilter, ['1999'])
+    await user.selectOptions(yearsFilter, ['Some Year 0'])
     const stratCategoryFilter = canvas.getByLabelText('View By', { selector: 'select' })
-    await user.selectOptions(stratCategoryFilter, ['stratCategoryId'])
+    await user.selectOptions(stratCategoryFilter, ['Some StratificationCategory 0'])
     const stratFilter = canvas.getByLabelText('Stratification', { selector: 'select' })
-    await user.selectOptions(stratFilter, ['stratId'])
+    await user.selectOptions(stratFilter, ['Some Stratification 0'])
     await user.click(canvas.getByText('GO!'))
   }
 }
 
 export const APIFiltersChart: Story = {
   args: {
-    config: APIFiltersChartData as unknown as Config
+    config: APIFiltersChartData as unknown as Config,
+    isEditor: false
   },
   parameters: {
     fetchMock
@@ -260,8 +263,9 @@ export const APIFiltersChart: Story = {
     const indicatorsFilter = canvas.getByLabelText('Indicator', { selector: 'select' })
     await user.selectOptions(indicatorsFilter, ['indicatorID'])
     await user.click(canvas.getByText('GO!'))
+    await sleep(1000)
     const yearFilter = canvas.getByLabelText('Year', { selector: 'select' })
-    await user.selectOptions(yearFilter, ['1999'])
+    await user.selectOptions(yearFilter, ['Some Year 1'])
   }
 }
 

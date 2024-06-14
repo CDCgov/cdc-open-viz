@@ -28,7 +28,7 @@ const createBlankDashboard: () => BlankMultiConfig = () => ({
 
 export type DashboardState = {
   config: MultiDashboardConfig
-  data: Object
+  data: Record<string, any[]>
   filteredData: Object
   loading: boolean
   preview: boolean
@@ -37,6 +37,11 @@ export type DashboardState = {
 
 const reducer = (state: DashboardState, action: DashboardActions): DashboardState => {
   switch (action.type) {
+    case 'ADD_FOOTNOTE': {
+      const { id, rowIndex, config } = action.payload
+      const newRows = state.config.rows.map((row, i) => (i === rowIndex ? { ...row, footnotesId: id } : row))
+      return { ...state, config: { ...state.config, rows: newRows, visualizations: { ...state.config.visualizations, [id]: config } } }
+    }
     case 'ADD_NEW_DASHBOARD': {
       const currentMultiDashboards = state.config.multiDashboards
       const label = 'New Dashboard ' + (currentMultiDashboards.length + 1)
@@ -48,7 +53,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       return { ...state, config, filteredData }
     }
     case 'SET_CONFIG': {
-      return { ...state, config: action.payload }
+      return { ...state, config: { ...state.config, ...action.payload } }
     }
     case 'SET_DATA': {
       return { ...state, data: action.payload }
@@ -61,6 +66,11 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     }
     case 'SET_PREVIEW': {
       return { ...state, preview: action.payload }
+    }
+    case 'SET_SHARED_FILTERS': {
+      const newSharedFilters = action.payload
+      const newDashboardConfig = { ...state.config.dashboard, sharedFilters: newSharedFilters }
+      return { ...state, config: { ...state.config, dashboard: newDashboardConfig } }
     }
     case 'SET_TAB_SELECTED': {
       return { ...state, tabSelected: action.payload }

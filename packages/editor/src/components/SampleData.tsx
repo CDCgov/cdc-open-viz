@@ -3,6 +3,7 @@ import SampleDataContext from '../samples/SampleDataContext'
 
 // Data Samples
 import validMapData from './../samples/valid-data-map.csv?raw'
+import validMapDataFootnotes from './../samples/valid-data-map-footnotes.csv?raw'
 import validChartData from './../samples/valid-data-chart.csv?raw'
 import validCountyMapData from './../samples/valid-county-data.csv?raw'
 import validGeoPoint from './../samples/valid-geo-point.csv?raw'
@@ -11,7 +12,6 @@ import validBoxPlotData from './../samples/valid-boxplot.csv?raw'
 import validAreaChart from './../samples/valid-area-chart.json?raw'
 import validWorldGeocodeData from './../samples/valid-world-geocode.json?raw'
 import validForecastData from './../samples/valid-forecast-data.csv?raw'
-import validForestPlotData from './../samples/valid-forest-plot-data.csv?raw'
 import vaidWorldData from './../samples/valid-world-data.json?raw'
 import validRegionData from './../samples/valid-region-data.json?raw'
 import validSankeyData from './../samples/valid-sankey-data.json?raw'
@@ -44,11 +44,6 @@ const sampleData = {
       fileName: 'valid-forecast-data.csv',
       data: validForecastData
     },
-    // {
-    //   text: 'Forest Plot Data',
-    //   fileName: 'valid-forest-plot-data.csv',
-    //   data: validForestPlotData
-    // },
     {
       text: 'Sankey Chart Data',
       fileName: 'valid-sankey-data.json',
@@ -60,6 +55,11 @@ const sampleData = {
       text: 'United States: State Sample Data',
       fileName: 'valid-data-map.csv',
       data: validMapData
+    },
+    {
+      text: 'United States: State Sample Data Footnotes',
+      fileName: 'valid-data-map-footnotes.csv',
+      data: validMapDataFootnotes
     },
     {
       text: 'United States: County Sample Data',

@@ -13,7 +13,9 @@ import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
 import { type PreliminaryDataItem } from '../components/LineChart/LineChartProps'
 import { VizFilter } from '@cdc/core/types/VizFilter'
+import { type Annotation } from '@cdc/core/types/Annotation'
 
+export type ViewportSize = 'sm' | 'xs' | 'xxs' | 'lg'
 export type ChartColumns = Record<string, Column>
 
 type DataFormat = {
@@ -71,6 +73,7 @@ type Visual = {
 }
 
 type AllChartsConfig = {
+  annotations: Annotation[]
   animate: boolean
   general: General
   barHasBorder: 'true' | 'false'
@@ -188,8 +191,10 @@ export type ForestPlotConfig = {
 } & AllChartsConfig
 
 export type LineChartConfig = {
-  visualizationType: 'Line'
+  allowLineToBarGraph: boolean
+  convertLineToBarGraph: boolean
   lineDatapointStyle: 'hidden' | 'always show' | 'hover'
+  visualizationType: 'Line'
 } & AllChartsConfig
 
 export type ChartConfig = LineChartConfig | ForestPlotConfig | AllChartsConfig
