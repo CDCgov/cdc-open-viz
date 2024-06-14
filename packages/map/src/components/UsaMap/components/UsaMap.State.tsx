@@ -175,7 +175,7 @@ const UsaMap = () => {
           data-tooltip-id={`tooltip__${tooltipId}`}
           data-tooltip-html={toolTip}
           territory={territory}
-          // territoryData={territoryData}
+          territoryData={territoryData}
           tabIndex={-1}
         />
       )
