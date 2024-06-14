@@ -30,7 +30,7 @@ const useColorScale = () => {
     })
   }
   if (visualizationType === 'Bar' && visualizationSubType === 'regular' && series?.length === 1 && legend?.colorCode) {
-    const set = new Set(data.map(d => d[legend.colorCode]))
+    const set = new Set(data?.map(d => d[legend.colorCode]))
     colorScale = scaleOrdinal({
       domain: [...set],
       range: generatePalette([...set].length)
