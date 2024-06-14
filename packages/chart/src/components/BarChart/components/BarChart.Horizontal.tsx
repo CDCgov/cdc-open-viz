@@ -13,6 +13,7 @@ import { BarGroup } from '@visx/shape'
 // CDC core components and helpers
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import createBarElement from '@cdc/core/components/createBarElement'
+import { getBarDimensions } from '../helpers'
 
 // Third party libraries
 import chroma from 'chroma-js'
@@ -68,8 +69,7 @@ export const BarChartHorizontal = () => {
               <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} top={barGroup.y}>
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
-                  const { suppresedBarHeight: suppresedBarWidth, getIconSize, getIconPadding, getVerticalAnchor, isSuppressed } = composeSuppressionBars({ bar })
-
+                  const { suppressedBarHeight: suppressedBarWidth, getIconSize, getVerticalAnchor, isSuppressed } = composeSuppressionBars({ bar })
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
@@ -80,27 +80,29 @@ export const BarChartHorizontal = () => {
                     numbericBarHeight = 25
                   }
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(scaleVal)
-                  const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
-                  // const suppresedBarWidth = config.xAxis.showSuppressedLine ? 4 : 0
+                  const defaultBarWidth = Math.abs(xScale(bar.value) - xScale(scaleVal))
                   const isPositiveBar = bar.value >= 0 && isNumber(bar.value)
-                  let barWidth = isSuppressed ? suppresedBarWidth : barWidthHorizontal
+                  const showMissingDataLabel = config.general.showMissingDataLabel && !bar.value
+                  const showZeroValueDataLabel = config.general.showZeroValueDataLabel && bar.value && Number(bar.value) === 0
+
+                  const { barWidth } = getBarDimensions({ isSuppressed, defaultBarWidth, suppressedBarWidth, showMissingDataLabel, showZeroValueDataLabel })
                   const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const yAxisValue = formatNumber(bar.value, 'left')
                   const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                   const barPosition = !isPositiveBar ? 'below' : 'above'
-                  const barValueLabel = isSuppressed ? '' : yAxisValue
+                  const barLabel = isSuppressed ? '' : Number(yAxisValue) === 0 ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
-                  let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                  let textFits = Number(textWidth) < barWidthHorizontal - 5 // minus padding 5
+                  const textWidth = (getTextWidth as any)(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                  const textFits = Number(textWidth) < defaultBarWidth - 5
 
                   // control text position
                   let textAnchor = textFits ? 'end' : 'start'
                   let textAnchorLollipop = 'start'
                   let textPadding = textFits ? -5 : 5
                   let textPaddingLollipop = 10
-                  // if bars are negative we change positions of text
+                  //if bars are negative we change positions of text
                   if (barPosition === 'below') {
                     textAnchor = textFits ? 'start' : 'end'
                     textPadding = textFits ? 5 : -5
@@ -147,8 +149,6 @@ export const BarChartHorizontal = () => {
                     return barColor
                   }
 
-                  const iconPadding = symbol => (symbol === 'Asterisk' ? '3px' : symbol === 'Double Asterisks' ? '4px' : '12px')
-
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
@@ -187,20 +187,20 @@ export const BarChartHorizontal = () => {
                           // compare entered suppressed value with data value
                           const isValueMatch = String(pd.value) === String(tableData[barGroup.index][bar.key]) && pd.value !== ''
                           const isSuppressed = isValueMatch && selectedSuppressionColumn
-                          if (!isSuppressed || barHeight < 10 || !config.xAxis.showSuppressedSymbol) {
+                          if (!isSuppressed || barHeight < 10 || !config.general.showSuppressedSymbol) {
                             return
                           }
                           return (
                             <Text // prettier-ignore
                               key={index}
                               fontSize={getIconSize(pd.symbol, barHeight)}
-                              angle={90}
                               display={displayBar ? 'block' : 'none'}
                               opacity={transparentBar ? 0.5 : 1}
                               x={barX}
                               y={config.barHeight / 2 + config.barHeight * bar.index}
                               fill={'#000'}
-                              dx={iconPadding(pd.symbol)}
+                              dy={config.barHeight / 5}
+                              dx={`${suppressedBarWidth * 5}px`}
                               verticalAnchor={getVerticalAnchor(pd.symbol)}
                               textAnchor={'middle'}
                             >
@@ -208,6 +208,31 @@ export const BarChartHorizontal = () => {
                             </Text>
                           )
                         })}
+
+                        <Text // prettier-ignore
+                          display={displayBar ? 'block' : 'none'}
+                          x={bar.y}
+                          opacity={transparentBar ? 0.5 : 1}
+                          y={config.barHeight / 2 + config.barHeight * bar.index}
+                          fill={labelColor}
+                          dx={10}
+                          verticalAnchor='middle'
+                          textAnchor={'start'}
+                        >
+                          {showMissingDataLabel ? 'N/A' : ''}
+                        </Text>
+                        <Text // prettier-ignore
+                          display={displayBar ? 'block' : 'none'}
+                          x={bar.y}
+                          opacity={transparentBar ? 0.5 : 1}
+                          y={config.barHeight / 2 + config.barHeight * bar.index}
+                          fill={labelColor}
+                          dx={15}
+                          verticalAnchor='middle'
+                          textAnchor={'start'}
+                        >
+                          {showZeroValueDataLabel ? '0' : ''}
+                        </Text>
 
                         {!config.isLollipopChart && displayNumbersOnBar && (
                           <Text // prettier-ignore
@@ -219,7 +244,7 @@ export const BarChartHorizontal = () => {
                             verticalAnchor='middle'
                             textAnchor={textAnchor}
                           >
-                            {barValueLabel}
+                            {barLabel}
                           </Text>
                         )}
                         {config.isLollipopChart && displayNumbersOnBar && (
@@ -233,7 +258,7 @@ export const BarChartHorizontal = () => {
                             verticalAnchor='middle'
                             fontWeight={'normal'}
                           >
-                            {barValueLabel}
+                            {barLabel}
                           </Text>
                         )}
                         {isLabelBelowBar && !config.yAxis.hideLabel && (

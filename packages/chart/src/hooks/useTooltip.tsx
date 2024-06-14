@@ -139,12 +139,14 @@ export const useTooltip = props => {
           ...getIncludedTooltipSeries()
             ?.filter(seriesKey => config.series?.find(item => item.dataKey === seriesKey && item?.tooltip) || config.xAxis?.dataKey == seriesKey)
             ?.flatMap(seriesKey => {
+              const shoMissingDataValue = config.general.showMissingDataLabel && !resolvedScaleValues[0]?.[seriesKey]
               let formattedValue = seriesKey === config.xAxis.dataKey ? resolvedScaleValues[0]?.[seriesKey] : formatNumber(resolvedScaleValues[0]?.[seriesKey], getAxisPosition(seriesKey))
+              formattedValue = shoMissingDataValue ? 'N/A' : formattedValue
               const suppressed = config.preliminaryData?.find(pd => pd.label && pd.type === 'suppression' && pd.displayTooltip && resolvedScaleValues[0]?.[seriesKey] === pd.value && (!pd.column || seriesKey === pd.column))
               if (suppressed) {
                 formattedValue = suppressed.label
               }
-              return resolvedScaleValues?.[0]?.[seriesKey] ? [[seriesKey, formattedValue, getAxisPosition(seriesKey)]] : []
+              return [[seriesKey, formattedValue, getAxisPosition(seriesKey)]]
             })
         )
       }

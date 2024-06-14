@@ -15,7 +15,7 @@ const AreaChart = props => {
   const { xScale, yScale, yMax, xMax, handleTooltipMouseOver, handleTooltipMouseOff, isDebug, children } = props
   // import data from context
   let { transformedData, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight, colorScale, rawData, brushConfig } = useContext(ConfigContext)
-  const data = config.brush.active && brushConfig.data?.length ? brushConfig.data : transformedData
+  const data = config.brush?.active && brushConfig.data?.length ? brushConfig.data : transformedData
 
   if (!data) return
 

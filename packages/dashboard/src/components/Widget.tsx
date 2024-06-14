@@ -76,7 +76,7 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
         isDragging: monitor.isDragging()
       })
     },
-    [config.activeDashboard, config.rows]
+    [config.activeDashboard, config.rows, config.dashboard.sharedFilters]
   )
 
   const deleteWidget = () => {

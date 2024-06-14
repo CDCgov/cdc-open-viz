@@ -74,7 +74,15 @@ const useScales = (properties: useScaleProps) => {
     })
 
     xScale.type = scaleTypes.TIME
-    seriesScale = composeScaleBand(seriesDomain, [0, config.barThickness * xMax], 0)
+
+    let minDistance = Number.MAX_VALUE;
+    for(let i = 0; i < xAxisDataMapped.length - 1; i++){
+      let distance = xScale(xAxisDataMapped[i + 1]) - xScale(xAxisDataMapped[i]);
+
+      if(distance < minDistance) minDistance = distance;
+    }
+
+    seriesScale = composeScaleBand(seriesDomain, [0, (config.barThickness || 1) * minDistance], 0)
   }
 
   // handle Deviation bar

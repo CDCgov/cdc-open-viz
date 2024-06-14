@@ -10,6 +10,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
+import Annotation from '../../Annotation'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -238,8 +239,16 @@ const CountyMap = props => {
         }
       }
 
+      let focusIndex = -1;
+      for(let i = 0; i < topoData.mapData.length; i++){
+        if(topoData.mapData[i].id === clickedState.id){
+          focusIndex = i;
+          break;
+        }
+      }
+
       // Redraw with focus on state
-      setFocus({ id: clickedState.id, center: geoCentroid(clickedState) })
+      setFocus({ id: clickedState.id, index: focusIndex, center: geoCentroid(clickedState) })
     }
 
     if (state.general.type === 'us-geocode') {
@@ -271,12 +280,13 @@ const CountyMap = props => {
     const currentTooltipIndex = parseInt(tooltipRef.current.getAttribute('data-index'))
     const geoRadius = (state.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
 
+    const context = canvas.getContext('2d')
+    const path = geoPath(topoData.projection, context)
+
     // Handle standard county map hover
     if (state.general.type !== 'us-geocode') {
       //If no tooltip is shown, or if the current geo associated with the tooltip shown is no longer containing the mouse, then rerender the tooltip
       if (isNaN(currentTooltipIndex) || !geoContains(topoData.mapData[currentTooltipIndex], pointCoordinates)) {
-        const context = canvas.getContext('2d')
-        const path = geoPath(topoData.projection, context)
         if (!isNaN(currentTooltipIndex) && applyLegendToRow(data[topoData.mapData[currentTooltipIndex].id])) {
           context.fillStyle = applyLegendToRow(data[topoData.mapData[currentTooltipIndex].id])[0]
           context.strokeStyle = geoStrokeColor
@@ -349,7 +359,7 @@ const CountyMap = props => {
       let hoveredGeoIndex
       for (let i = 0; i < runtimeKeys.length; i++) {
         const pixelCoords = topoData.projection([data[runtimeKeys[i]][state.columns.longitude.name], data[runtimeKeys[i]][state.columns.latitude.name]])
-        if (state.visual.cityStyle === 'circle' && pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
+        if (state.visual.cityStyle === 'circle' && pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius && applyLegendToRow(data[runtimeKeys[i]])) {
           hoveredGeo = data[runtimeKeys[i]]
           hoveredGeoIndex = i
           break
@@ -357,7 +367,7 @@ const CountyMap = props => {
 
         if (state.visual.cityStyle === 'pin' && pixelCoords) {
           const distance = Math.hypot(pixelCoords[0] - x, pixelCoords[1] - y)
-          if (distance < 15) {
+          if (distance < 15 && applyLegendToRow(data[runtimeKeys[i]])) {
             hoveredGeo = data[runtimeKeys[i]]
             hoveredGeoIndex = i
             break
@@ -365,7 +375,7 @@ const CountyMap = props => {
         }
       }
 
-      if (hoveredGeo && applyLegendToRow(hoveredGeo)) {
+      if (hoveredGeo) {
         tooltipRef.current.style.display = 'block'
         tooltipRef.current.style.top = e.clientY + 'px'
         tooltipRef.current.style.left = e.clientX + 'px'
@@ -375,6 +385,14 @@ const CountyMap = props => {
         tooltipRef.current.style.display = 'none'
         tooltipRef.current.setAttribute('data-index', null)
       }
+    }
+
+    if (focus.index !== -1) {
+      context.strokeStyle = 'black'
+      context.lineWidth = 1
+      context.beginPath()
+      path(topoData.mapData[focus.index])
+      context.stroke()
     }
   }
 
@@ -411,7 +429,6 @@ const CountyMap = props => {
       context.strokeStyle = geoStrokeColor
       context.lineWidth = lineWidth
 
-      let focusIndex = -1
       // Iterates through each state/county topo and renders it
       topoData.mapData.forEach((geo, i) => {
         // If invalid geo item, don't render
@@ -424,11 +441,6 @@ const CountyMap = props => {
         // Gets numeric data associated with the topo data for this state/county
         const geoData = data[geo.id]
 
-        // Marks that the focused state was found for the logic below
-        if (geo.id === focus.id) {
-          focusIndex = i
-        }
-
         // Renders state/county
         const legendValues = geoData !== undefined ? applyLegendToRow(geoData) : false
         context.fillStyle = legendValues && state.general.type !== 'us-geocode' ? legendValues[0] : '#EEE'
@@ -439,11 +451,11 @@ const CountyMap = props => {
       })
 
       // If the focused state is found in the geo data, render it with a thicker outline
-      if (focusIndex !== -1) {
+      if (focus.index !== -1) {
         context.strokeStyle = 'black'
         context.lineWidth = 2
         context.beginPath()
-        path(topoData.mapData[focusIndex])
+        path(topoData.mapData[focus.index])
         context.stroke()
       }
 

@@ -1,4 +1,5 @@
 import { ConfigureData } from '@cdc/core/types/ConfigureData'
+import Footnotes from '@cdc/core/types/Footnotes'
 
 type Col = {
   equalHeight?: boolean
@@ -14,4 +15,5 @@ export type ConfigRow = {
   toggle?: boolean
   equalHeight?: boolean
   multiVizColumn?: string
+  footnotesId?: string // id for the footnotes in the vizConfig section
 } & ConfigureData

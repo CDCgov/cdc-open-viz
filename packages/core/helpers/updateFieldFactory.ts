@@ -1,7 +1,7 @@
 import { UpdateFieldFunc } from '../types/UpdateFieldFunc'
 
 export const updateFieldFactory =
-  (config, updateConfig, legacy = false): UpdateFieldFunc<any> =>
+  <T>(config, updateConfig, legacy = false): UpdateFieldFunc<T> =>
   (section, subsection, fieldName, newValue) => {
     // Top level
     if (null === section && null === subsection) {

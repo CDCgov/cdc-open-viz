@@ -1,5 +1,6 @@
 import { ChartConfig } from '../types/ChartConfig'
 import _ from 'lodash'
+import { isConvertLineToBarGraph } from '../helpers/isConvertLineToBarGraph'
 
 type UseMinMaxProps = {
   /** config - standard chart config */
@@ -28,6 +29,10 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
 
   if (!data) {
     return { min, max }
+  }
+
+  const checkLineToBarGraph = () => {
+    return isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph)
   }
 
   const { visualizationType, series } = config
@@ -126,10 +131,10 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   }
 
   // this should not apply to bar charts if there is negative CI data
-  if ((visualizationType === 'Bar' || (visualizationType === 'Combo' && !isAllLine)) && min > 0) {
+  if ((visualizationType === 'Bar' || checkLineToBarGraph() || (visualizationType === 'Combo' && !isAllLine)) && min > 0) {
     min = 0
   }
-  if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min < 0) {
+  if ((config.visualizationType === 'Bar' || checkLineToBarGraph() || (config.visualizationType === 'Combo' && !isAllLine)) && min < 0) {
     min = min * 1.1
   }
 
@@ -148,7 +153,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
     min = enteredMinValue && isMinValid ? enteredMinValue : 0
   }
 
-  if (config.visualizationType === 'Line') {
+  if (config.visualizationType === 'Line' && !checkLineToBarGraph()) {
     const isMinValid = config.useLogScale ? enteredMinValue >= 0 && enteredMinValue < minValue : enteredMinValue < minValue
     // update minValue for (0) Suppression points
     const suppressedMinValue = tableData?.some((dataItem, index) => {

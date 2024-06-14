@@ -14,4 +14,5 @@ export type TableConfig = Visualization & {
   xAxis?: Axis
   yAxis?: Axis
   preliminaryData: PreliminaryDataItem[]
+  brush: { active: boolean }
 }

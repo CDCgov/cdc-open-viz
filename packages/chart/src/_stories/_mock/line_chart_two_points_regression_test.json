@@ -1,0 +1,127 @@
+{
+  "type": "chart",
+  "visualizationType": "Line",
+  "xAxis": {
+    "dataKey": "STATE"
+  },
+  "series": [
+    {
+      "dataKey": "Rate"
+    }
+  ],
+  "filters": [
+    {
+      "values": ["Home", "School", "Vehicle", "Work"],
+      "active": "Home",
+      "order": "asc",
+      "columnName": "Location",
+      "setByQueryParameter": "location"
+    }
+  ],
+  "data": [
+    {
+      "STATE": "AL",
+      "Rate": "10",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "AK",
+      "Rate": "12",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "FL",
+      "Rate": "10",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "GA",
+      "Rate": "12",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "AL",
+      "Rate": "10",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "AK",
+      "Rate": "12",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    }
+  ],
+  "dataFileName": "hex-data.csv",
+  "dataFileSourceType": "file",
+  "formattedData": [
+    {
+      "STATE": "AL",
+      "Rate": "10",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "AK",
+      "Rate": "12",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "AL",
+      "Rate": "10",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "AK",
+      "Rate": "12",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "FL",
+      "Rate": "10",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "GA",
+      "Rate": "12",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    }
+  ],
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  }
+}

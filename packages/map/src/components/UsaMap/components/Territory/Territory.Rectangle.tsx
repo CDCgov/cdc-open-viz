@@ -9,7 +9,7 @@ const TerritoryRectangle = ({ label, text, stroke, strokeWidth, textColor, hasPa
   const { state, supportedTerritories } = useContext<MapContext>(ConfigContext)
 
   return (
-    <svg viewBox='0 0 45 28'>
+    <svg viewBox='0 0 45 28' key={territory} className={territory}>
       <g {...props} strokeLinejoin='round' tabIndex={-1}>
         <path
           stroke={stroke}

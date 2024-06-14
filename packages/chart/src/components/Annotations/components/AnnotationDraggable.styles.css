@@ -1,0 +1,18 @@
+.cdc-open-viz-module .annotation__desktop-label {
+  display: none;
+}
+
+.cdc-open-viz-module {
+  .annotation__mobile-label-circle {
+    stroke-width: 2;
+  }
+}
+
+@container content (min-width: 700px) {
+  .cdc-open-viz-module .annotation__mobile-label {
+    display: none;
+  }
+  .cdc-open-viz-module .annotation__desktop-label {
+    display: block;
+  }
+}

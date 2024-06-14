@@ -9,7 +9,7 @@ export const createFormatLabels =
   (defaultLabels: Label[]): Label[] => {
     const { visualizationType, visualizationSubType, series, runtime } = config
 
-    const reverseLabels = labels => (config.legend.reverseLabelOrder && config.legend.position === 'bottom' ? labels.reverse() : labels)
+    const reverseLabels = labels => (config.legend.reverseLabelOrder && config.legend?.position === 'bottom' ? labels.reverse() : labels)
     const colorCode = config.legend?.colorCode
     if (visualizationType === 'Deviation Bar') {
       const [belowColor, aboveColor] = twoColorPalette[config.twoColor.palette]
