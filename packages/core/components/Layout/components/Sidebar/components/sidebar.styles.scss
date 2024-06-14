@@ -601,7 +601,7 @@
       /* clicking anywhere will focus the input */
       cursor: text;
 
-      span:not(.cove-tooltip) {
+      span:not(.cove-tooltip, .cove-icon) {
         display: inline;
       }
     }
