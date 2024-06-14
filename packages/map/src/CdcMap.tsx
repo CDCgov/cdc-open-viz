@@ -683,12 +683,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
         let scale = d3
           .scaleQuantile()
-          .domain([...new Set(dataSet.map(item => Math.round(item[state.columns.primary.name])))]) // min/max values
+          .domain([...new Set(dataSet.map(item => Number(item[state.columns.primary.name]).toFixed(Number(config?.columns?.primary?.roundToPlace ? config?.columns?.primary?.roundToPlace : 0))))]) // min/max values
           .range(colorRange) // set range to our colors array
 
-        let breaks = scale.quantiles()
-
-        breaks = breaks.map(item => Math.round(item))
+        const breaks = scale.quantiles().map(b => Number(b)?.toFixed(Number(config?.columns?.primary?.roundToPlace ? config?.columns?.primary?.roundToPlace : 0)))
 
         // if seperating zero force it into breaks
         if (breaks[0] !== 0) {
@@ -717,8 +715,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             return min
           }
 
+          const getDecimalPlace = n => {
+            return Math.pow(10, -n)
+          }
+
           const setMax = (index, min) => {
-            let max = breaks[index + 1] - 1
+            let max = Number(breaks[index + 1]) - getDecimalPlace(Number(state?.columns?.primary?.roundToPlace))
 
             // check if min and max range are the same
             // if (min === max + 1) {
