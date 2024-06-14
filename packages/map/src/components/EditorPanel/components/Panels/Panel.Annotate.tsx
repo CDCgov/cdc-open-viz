@@ -12,7 +12,6 @@ import ConfigContext from '../../../../context'
 
 const PanelAnnotate: React.FC = props => {
   const { state: config, setState: updateConfig, dimensions } = useContext<MapContext>(ConfigContext)
-  console.log('config', config)
   const getColumns = (filter = true) => {
     const columns = {}
     config.data.forEach(row => {
