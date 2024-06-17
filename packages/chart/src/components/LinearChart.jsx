@@ -37,7 +37,7 @@ import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import ZoomBrush from './ZoomBrush'
 
 const LinearChart = props => {
-  const { transformedData: data, tableData, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, getTextWidth, brushConfig } = useContext(ConfigContext)
+  const { transformedData: data, tableData, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, getTextWidth, brushConfig, colorScale, seriesHighlight } = useContext(ConfigContext)
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
 
@@ -378,11 +378,12 @@ const LinearChart = props => {
                           )}
 
                           {orientation === 'vertical' && visualizationType === 'Bump Chart' && !config.yAxis.hideLabel && (
+                            <>
                             <Text
                               display={config.useLogScale ? showTicks : 'block'}
                               dx={config.useLogScale ? -6 : 0}
-                              x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
-                              y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                              x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x - 20}
+                              y={tick.to.y - 12 + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                               angle={-Number(config.yAxis.tickRotation) || 0}
                               verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}
                               textAnchor={config.runtime.horizontal ? 'start' : 'end'}
@@ -390,8 +391,13 @@ const LinearChart = props => {
                             >
                               {config.runtime.seriesLabelsAll[tick.formattedValue - 1]}
                             </Text>
+                            
+                            {(seriesHighlight.length === 0 || seriesHighlight.includes(config.runtime.seriesLabelsAll[tick.formattedValue - 1])) && 
+                              <rect x={0 - Number(config.yAxis.size)}  y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)} width={Number(config.yAxis.size)+ xScale(xScale.domain()[0])} height="2" fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])}/> 
+                            }
+                            </>
+                            
                           )}
-
                           {orientation === 'vertical' && visualizationType !== 'Paired Bar' && visualizationType !== 'Bump Chart' && !config.yAxis.hideLabel && (
                             <Text
                               display={config.useLogScale ? showTicks : 'block'}
@@ -542,12 +548,27 @@ const LinearChart = props => {
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                           {runtime.xAxis.gridLines ? <Line key={`${tick.value}--hide-hideGridLines`} display={(config.useLogScale && showTicks).toString()} from={{ x: tick.from.x, y: tick.from.y - yMax }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
                           {!config.xAxis.hideTicks && <Line from={tick.from} to={orientation === 'horizontal' && config.useLogScale ? to : tick.to} stroke={config.xAxis.tickColor} strokeWidth={showTick === 'block' && config.useLogScale ? 1.3 : 1} />}
-                          {!config.xAxis.hideLabel && (
+                          {!config.xAxis.hideLabel && visualizationType !== 'Bump Chart' &&  (
                             <Text
                               dy={config.orientation === 'horizontal' && config.useLogScale ? 8 : 0}
                               display={config.orientation === 'horizontal' && config.useLogScale ? showTick : 'block'}
                               x={tick.to.x}
                               y={tick.to.y}
+                              angle={tickRotation}
+                              verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
+                              textAnchor={tickRotation ? 'end' : 'middle'}
+                              width={areTicksTouching && !config.isResponsiveTicks && !Number(config[section].tickRotation) ? limitedWidth : undefined}
+                              fill={config.xAxis.tickLabelColor}
+                            >
+                              {tick.formattedValue}
+                            </Text>
+                          )}
+                          {!config.xAxis.hideLabel && visualizationType === 'Bump Chart' && (
+                            <Text
+                              dy={config.orientation === 'horizontal' && config.useLogScale ? 8 : 0}
+                              display={config.orientation === 'horizontal' && config.useLogScale ? showTick : 'block'}
+                              x={tick.to.x}
+                              y={tick.to.y + 15}
                               angle={tickRotation}
                               verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
                               textAnchor={tickRotation ? 'end' : 'middle'}
