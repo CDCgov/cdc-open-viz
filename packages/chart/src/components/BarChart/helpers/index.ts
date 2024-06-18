@@ -16,7 +16,7 @@ export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, i
   let barHeight = defaultBarHeight
 
   let barWidthHorizontal = defaultBarWidth
-  // label for vertical/horizontal bars
+
   let barLabel = ''
   let isSuppressed = false
   let showMissingDataLabel = false
@@ -27,9 +27,7 @@ export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, i
     const hasColumn = !pd.column || pd.column === bar.key
     if (hasColumn && pd.type === 'suppression' && pd.value && String(pd.value) === String(bar.value)) {
       if (!pd.hideBarSymbol && showSuppressedSymbol) {
-        const labelWidth = getTextWidth(barLabel, `normal ${barWidth / 2}px sans-serif`)
-        const labelFits = labelWidth < barWidth && barWidth > 10
-        barHeight = labelFits ? heightMini : 0
+        barHeight = barWidth > 10 ? heightMini : 0
         barWidthHorizontal = heightMini
         isSuppressed = true
       } else {
@@ -47,8 +45,6 @@ export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, i
     showMissingDataLabel = true
     barHeight = labelFits ? heightMini : 0
     barWidthHorizontal = heightMini
-    // check if label fits to the bar width else hide
-    barLabel = labelFits && isVertical ? 'N/A' : !isVertical ? 'N/A' : ''
   }
   // handle zero values
   if (!isSuppressed && String(bar.value) === '0' && config.general.showZeroValueDataLabel) {
@@ -57,8 +53,6 @@ export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, i
     barHeight = labelFits ? heightMini : 0
     barWidthHorizontal = heightMini
     showZeroValueDataLabel = true
-    // check if label fits to the bar width else hide
-    barLabel = labelFits && isVertical ? '0' : !isVertical ? '0' : ''
   }
 
   const getBarY = (defaultBarY, yScale) => {
@@ -92,5 +86,5 @@ export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, i
     return labelFits && isVertical ? label : !isVertical ? label : ''
   }
 
-  return { barWidthHorizontal, barHeight, barLabel, isSuppressed, showMissingDataLabel, showZeroValueDataLabel, getBarY, getBarLabel }
+  return { barWidthHorizontal, barHeight, isSuppressed, showMissingDataLabel, showZeroValueDataLabel, getBarY, getBarLabel }
 }
