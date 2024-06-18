@@ -212,7 +212,7 @@ export const BarChartVertical = () => {
                             return
                           }
                           const hasAsterisk = String(pd.symbol).includes('Asterisk')
-                          const yPadding = hasAsterisk ? -5 : -3
+                          const yPadding = hasAsterisk ? -5 : -8
                           const verticalAnchor = hasAsterisk ? 'middle' : 'end'
                           const iconSize = pd.symbol === 'Asterisk' ? barWidth * 1.2 : pd.symbol === 'Double Asterisk' ? barWidth : barWidth / 1.5
 
