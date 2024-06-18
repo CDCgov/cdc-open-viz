@@ -65,13 +65,13 @@ export const BarChartHorizontal = () => {
                   const defaultBarWidth = Math.abs(xScale(bar.value) - xScale(scaleVal))
                   const isPositiveBar = bar.value >= 0 && isNumber(bar.value)
 
-                  const { barWidthHorizontal: barWidth, isSuppressed, barLabel } = getBarConfig({ bar, defaultBarWidth, config, isNumber, getTextWidth, isVertical: false })
+                  const { barWidthHorizontal: barWidth, isSuppressed, getBarLabel } = getBarConfig({ bar, defaultBarWidth, config, isNumber, getTextWidth, isVertical: false })
                   const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const yAxisValue = formatNumber(bar.value, 'left')
                   const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                   const barPosition = !isPositiveBar ? 'below' : 'above'
-                  const defaultBarLabel = String(yAxisValue) === '0' ? '' : yAxisValue
+                  const barLabel = getBarLabel(yAxisValue)
 
                   // check if bar text/value string fits into  each bars.
                   const textWidth = (getTextWidth as any)(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
@@ -194,30 +194,18 @@ export const BarChartHorizontal = () => {
                           )
                         })}
 
-                        <Text // prettier-ignore
-                          display={displayBar ? 'block' : 'none'}
-                          x={bar.y}
-                          opacity={transparentBar ? 0.5 : 1}
-                          y={config.barHeight / 2 + config.barHeight * bar.index}
-                          fill={labelColor}
-                          dx={10}
-                          verticalAnchor='middle'
-                          textAnchor={'start'}
-                        >
-                          {barLabel}
-                        </Text>
-
-                        {!config.isLollipopChart && displayNumbersOnBar && (
+                        {!config.isLollipopChart && (
                           <Text // prettier-ignore
                             display={displayBar ? 'block' : 'none'}
                             x={bar.y}
+                            opacity={transparentBar ? 0.5 : 1}
                             y={config.barHeight / 2 + config.barHeight * bar.index}
                             fill={labelColor}
-                            dx={textPadding}
+                            dx={barLabel === 'N/A' ? 20 : textPadding}
                             verticalAnchor='middle'
-                            textAnchor={textAnchor}
+                            textAnchor={barLabel === 'N/A' ? 'middle' : textAnchor}
                           >
-                            {defaultBarLabel}
+                            {barLabel}
                           </Text>
                         )}
                         {config.isLollipopChart && displayNumbersOnBar && (

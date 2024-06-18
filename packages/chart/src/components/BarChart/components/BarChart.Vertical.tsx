@@ -27,7 +27,19 @@ export const BarChartVertical = () => {
   const [barWidth, setBarWidth] = useState(0)
   const [totalBarsInGroup, setTotalBarsInGroup] = useState(0)
   // prettier-ignore
-  const { assignColorsToValues, barBorderWidth, getAdditionalColumn, getHighlightedBarByValue, getHighlightedBarColorByValue, lollipopBarWidth, lollipopShapeSize, onMouseLeaveBar, onMouseOverBar, section,} = useBarChart()
+  const {
+    // prettier-ignore
+    assignColorsToValues,
+    barBorderWidth,
+    getAdditionalColumn,
+    getHighlightedBarByValue,
+    getHighlightedBarColorByValue,
+    lollipopBarWidth,
+    lollipopShapeSize,
+    onMouseLeaveBar,
+    onMouseOverBar,
+    section
+  } = useBarChart()
 
   // prettier-ignore
   const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig, getTextWidth } = useContext<ChartContext>(ConfigContext)
@@ -110,9 +122,10 @@ export const BarChartVertical = () => {
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
 
-                  const { barHeight, barLabel, isSuppressed, showMissingDataLabel, showZeroValueDataLabel } = getBarConfig({ bar, defaultBarHeight, config, isNumber, getTextWidth, barWidth, isVertical: true })
-                  const defaultBarLabel = isSuppressed ? '' : String(yAxisValue) === '0' ? '' : yAxisValue
-                  const barY = isSuppressed || showMissingDataLabel || showZeroValueDataLabel ? yScale(scaleVal) - 3 : defaultBarY
+                  const { barHeight, isSuppressed, getBarY, getBarLabel } = getBarConfig({ bar, defaultBarHeight, config, isNumber, getTextWidth, barWidth, isVertical: true, yAxisValue })
+
+                  const barLabel = getBarLabel(yAxisValue)
+                  const barY = getBarY(defaultBarY, yScale(scaleVal))
                   const displaylollipopShape = isSuppressed ? 'none' : 'block'
                   const getBarBackgroundColor = (barColor: string, filteredOutColor?: string): string => {
                     let _barColor = barColor
@@ -220,17 +233,6 @@ export const BarChartVertical = () => {
                             </Text>
                           )
                         })}
-
-                        <Text // prettier-ignore
-                          display={config.labels && displayBar ? 'block' : 'none'}
-                          opacity={transparentBar ? 0.5 : 1}
-                          x={barX + barWidth / 2}
-                          y={barY - 5}
-                          fill={labelColor}
-                          textAnchor='middle'
-                        >
-                          {defaultBarLabel}
-                        </Text>
 
                         <Text // prettier-ignore
                           display={displayBar ? 'block' : 'none'}
