@@ -446,7 +446,7 @@ const UsaMap = () => {
             {({ features, projection }) => constructGeoJsx(features, projection)}
           </AlbersUsa>
         )}
-        {state.annotations.length > 0 && <Annotation.Draggable />}
+        {false && state.annotations.length > 0 && <Annotation.Draggable />}
       </svg>
 
       {territories.length > 0 && (
