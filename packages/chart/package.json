@@ -1,6 +1,6 @@
 {
   "name": "@cdc/chart",
-  "version": "4.24.3",
+  "version": "4.24.5",
   "description": "React component for visualizing tabular data in various types of charts",
   "moduleName": "CdcChart",
   "main": "dist/cdcchart",
