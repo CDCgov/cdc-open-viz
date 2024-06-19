@@ -219,7 +219,7 @@ export const BarChartHorizontal = () => {
                             verticalAnchor='middle'
                             fontWeight={'normal'}
                           >
-                            {defaultBarLabel}
+                            {barLabel}
                           </Text>
                         )}
                         {isLabelBelowBar && !config.yAxis.hideLabel && (
