@@ -82,6 +82,10 @@ const useScales = (properties: useScaleProps) => {
       if(distance < minDistance) minDistance = distance;
     }
 
+    if(xAxisDataMapped.length === 1 || minDistance > xMax / 4){
+      minDistance = xMax / 4
+    }
+
     seriesScale = composeScaleBand(seriesDomain, [0, (config.barThickness || 1) * minDistance], 0)
   }
 
