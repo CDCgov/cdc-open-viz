@@ -16,7 +16,7 @@ export const addValuesToSharedFilters = (sharedFilters: SharedFilter[], data: Re
       if (queryStringFilterValue) {
         filterCopy.active = queryStringFilterValue
       } else {
-        filterCopy.active = filterCopy.active || defaultValues
+        filterCopy.active = filterCopy.active && filterValues.includes(filterCopy.active) ? filterCopy.active : defaultValues
       }
     }
     return filterCopy
