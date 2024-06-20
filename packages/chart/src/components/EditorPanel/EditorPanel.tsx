@@ -108,7 +108,9 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
       displayTable: true,
       symbol: '',
       iconCode: '',
-      lineCode: ''
+      lineCode: '',
+      hideBarSymbol: false,
+      hideLineStyle: false
     }
     preliminaryData.push(defaultValues)
     updateConfig({ ...config, preliminaryData })
@@ -134,7 +136,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   return (
     <>
       {config.preliminaryData &&
-        config.preliminaryData?.map(({ column, displayLegend, displayTable, displayTooltip, label, seriesKey, style, symbol, type, value }, i) => {
+        config.preliminaryData?.map(({ column, displayLegend, displayTable, displayTooltip, label, seriesKey, style, symbol, type, value, hideBarSymbol, hideLineStyle }, i) => {
           return (
             <div key={`preliminaryData-${i}`} className='edit-block'>
               <p> {type === 'suppression' ? 'Suppressed' : 'Effect'} Data</p>
@@ -159,7 +161,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>If no “Data Series" is selected, the symbol will be applied to "all" suppressed values indicated in the dataset.</p>
+                          <p> If no “Data Series" is selected, the symbol will be applied to "all" suppressed values indicated in the dataset. If you select a particular data series, there's no need to fill in “suppression line style” and “suppression symbol” below.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
@@ -172,45 +174,51 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                   />
                   <TextField value={value} fieldName='value' label='Suppressed Data  Value' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
                   {(hasComboLineSeries || config.visualizationType === 'Line') && (
-                    <Select
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>The recommended approach for presenting data is to include a footnote indicating any data suppression.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                      value={style}
-                      initial='Select'
-                      fieldName='style'
-                      label={'suppression line style'}
-                      updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                      options={getStyleOptions(type)}
-                    />
+                    <>
+                      <Select
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>The recommended approach for presenting data is to include a footnote indicating any data suppression.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        value={style}
+                        initial='Select'
+                        fieldName='style'
+                        label={'suppression line style'}
+                        updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                        options={getStyleOptions(type)}
+                      />
+                      <CheckBox value={hideLineStyle} fieldName='hideLineStyle' label='Hide Suppressed line Style' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                    </>
                   )}
 
                   {(hasComboBarSeries || config.visualizationType === 'Bar') && (
-                    <Select
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>The suggested method for presenting suppressed data is to use "double asterisks". If "double asterisks" are already used elsewhere (e.g., footnotes), please select an alternative symbol from the menu to denote data suppression.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                      value={symbol}
-                      initial='Select'
-                      fieldName='symbol'
-                      label={config.visualizationType === 'Combo' ? 'suppression bar symbol' : 'suppression symbol'}
-                      updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                      options={getSymbolOptions()}
-                    />
+                    <>
+                      <Select
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>The suggested method for presenting suppressed data is to use "double asterisks". If "double asterisks" are already used elsewhere (e.g., footnotes), please select an alternative symbol from the menu to denote data suppression.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        value={symbol}
+                        initial='Select'
+                        fieldName='symbol'
+                        label={config.visualizationType === 'Combo' ? 'suppression bar symbol' : 'suppression symbol'}
+                        updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                        options={getSymbolOptions()}
+                      />
+                      <CheckBox value={hideBarSymbol} fieldName='hideBarSymbol' label='Hide Suppressed Bar Symbol  ' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                    </>
                   )}
 
                   <TextField
