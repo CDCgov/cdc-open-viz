@@ -37,7 +37,7 @@
     "hideTicks": true,
     "size": "125",
     "gridLines": true,
-    "enablePadding": false,
+    "enablePadding": true,
     "min": "0",
     "max": "2",
     "labelColor": "#333",
@@ -52,7 +52,7 @@
     "rightAxisTickColor": "#333",
     "numTicks": "11",
     "axisPadding": 0,
-    "scalePadding": 10,
+    "scalePadding": 5,
     "tickRotation": 0,
     "anchors": [],
     "label": "",
@@ -172,6 +172,72 @@
       "dataKey": "Representative",
       "name": "Representative Sentence",
       "dataTable": true,
+      "tooltips": false
+    },
+    "Sibling": {
+      "dataKey": "Sibling",
+      "name": "Sibling",
+      "dataTable": false,
+      "tooltips": false
+    },
+    "Neck": {
+      "dataKey": "Neck",
+      "name": "Neck",
+      "dataTable": false,
+      "tooltips": false
+    },
+    "Girlfriend": {
+      "dataKey": "Girlfriend",
+      "name": "Girlfriend",
+      "dataTable": false,
+      "tooltips": false
+    },
+    "Bullying": {
+      "dataKey": "Bullying",
+      "name": "Bullying",
+      "dataTable": false,
+      "tooltips": false
+    },
+    "Mother": {
+      "dataKey": "Mother",
+      "name": "Mother",
+      "dataTable": false,
+      "tooltips": false
+    },
+    "Overdose": {
+      "dataKey": "Overdose",
+      "name": "Overdose",
+      "dataTable": false,
+      "tooltips": false
+    },
+    "Depression": {
+      "dataKey": "Depression",
+      "name": "Depression",
+      "dataTable": false,
+      "tooltips": false
+    },
+    "Vehicle": {
+      "dataKey": "Vehicle",
+      "name": "Vehicle",
+      "dataTable": false,
+      "tooltips": false
+    },
+    "Friends": {
+      "dataKey": "Friends",
+      "name": "Friends",
+      "dataTable": false,
+      "tooltips": false
+    },
+    "Head": {
+      "dataKey": "Head",
+      "name": "Head",
+      "dataTable": false,
+      "tooltips": false
+    },
+    "year": {
+      "dataKey": "year",
+      "name": "year",
+      "dataTable": false,
       "tooltips": false
     }
   },

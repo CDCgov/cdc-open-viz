@@ -548,27 +548,12 @@ const LinearChart = props => {
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                           {runtime.xAxis.gridLines ? <Line key={`${tick.value}--hide-hideGridLines`} display={(config.useLogScale && showTicks).toString()} from={{ x: tick.from.x, y: tick.from.y - yMax }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
                           {!config.xAxis.hideTicks && <Line from={tick.from} to={orientation === 'horizontal' && config.useLogScale ? to : tick.to} stroke={config.xAxis.tickColor} strokeWidth={showTick === 'block' && config.useLogScale ? 1.3 : 1} />}
-                          {!config.xAxis.hideLabel && visualizationType !== 'Bump Chart' &&  (
+                          {!config.xAxis.hideLabel && visualizationType &&  (
                             <Text
                               dy={config.orientation === 'horizontal' && config.useLogScale ? 8 : 0}
                               display={config.orientation === 'horizontal' && config.useLogScale ? showTick : 'block'}
                               x={tick.to.x}
                               y={tick.to.y}
-                              angle={tickRotation}
-                              verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
-                              textAnchor={tickRotation ? 'end' : 'middle'}
-                              width={areTicksTouching && !config.isResponsiveTicks && !Number(config[section].tickRotation) ? limitedWidth : undefined}
-                              fill={config.xAxis.tickLabelColor}
-                            >
-                              {tick.formattedValue}
-                            </Text>
-                          )}
-                          {!config.xAxis.hideLabel && visualizationType === 'Bump Chart' && (
-                            <Text
-                              dy={config.orientation === 'horizontal' && config.useLogScale ? 8 : 0}
-                              display={config.orientation === 'horizontal' && config.useLogScale ? showTick : 'block'}
-                              x={tick.to.x}
-                              y={tick.to.y + 15}
                               angle={tickRotation}
                               verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
                               textAnchor={tickRotation ? 'end' : 'middle'}
