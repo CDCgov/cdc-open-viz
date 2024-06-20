@@ -314,7 +314,7 @@ export const BarChartVertical = () => {
               let upperPos
               let lowerPos
               let tickWidth = 5
-              xPos = xScale(getXAxisData(d)) + (config.xAxis.type !== 'date' || config.xAxis.type !== 'date-time' ? seriesScale.range()[1] / 2 : 0)
+              xPos = xScale(getXAxisData(d)) + (config.xAxis.type !== 'date-time' ? seriesScale.range()[1] / 2 : 0)
               upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
               lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
               return (
