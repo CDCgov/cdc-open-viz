@@ -16,7 +16,7 @@ import ChooseTab from './components/ChooseTab'
 import ConfigureTab from './components/ConfigureTab'
 import TabPane from './components/TabPane'
 import { GlobalTabs as Tabs } from './components/Tabs'
-import { formatConfigBeforeSave as stripConfig } from './helpers/formatConfigBeforeSave'
+import { formatConfigBeforeSave as stripConfig } from '@cdc/core/helpers/formatConfigBeforeSave'
 import { saveConfigToWindow as updateVizConfig } from './helpers/saveConfigToWindow'
 import { legacyConfigSupport } from './helpers/legacyConfigSupport'
 
@@ -45,7 +45,7 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
   const [state, dispatch] = useReducer(editorReducer, initialState)
 
   const setTempConfigAndUpdate = config => {
-    updateVizConfig(JSON.parse(JSON.stringify(config)))
+    updateVizConfig(_.cloneDeep(config))
     dispatch({ type: 'EDITOR_TEMP_SAVE', payload: config })
   }
 

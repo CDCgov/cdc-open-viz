@@ -7,15 +7,6 @@ $red: #f74242;
   margin-left: calc($editorWidth + 1em);
 }
 
-.visualizations-panel {
-  background-color: #fff;
-  padding: 1em;
-  width: $editorWidth;
-  border-right: #c7c7c7 1px solid;
-  z-index: 1;
-  overflow-y: scroll;
-}
-
 .hidden.editor-panel + .builder-grid {
   margin-left: 0 !important;
 }
