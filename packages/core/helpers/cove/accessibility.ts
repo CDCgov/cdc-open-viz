@@ -9,6 +9,7 @@ import chroma from 'chroma-js'
 export const WCAG_CONTRAST_RATIO = 4.5
 
 export const getContrastColor = (textColor: string, bgColor: string) => {
+  if (!bgColor) return
   if (chroma.contrast(textColor, bgColor) < WCAG_CONTRAST_RATIO) {
     switch (textColor) {
       case '#FFF':

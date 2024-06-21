@@ -29,7 +29,7 @@ export const useBarChart = () => {
       updateConfig({
         ...config,
         yAxis: {
-          ...config,
+          ...config.yAxis,
           labelPlacement: 'Below Bar'
         }
       })

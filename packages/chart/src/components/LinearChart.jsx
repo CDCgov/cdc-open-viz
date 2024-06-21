@@ -58,9 +58,13 @@ const LinearChart = props => {
   const { horizontal: heightHorizontal } = config.heights
   const isHorizontal = orientation === 'horizontal' || config.visualizationType === 'Forest Plot'
   const shouldAbbreviate = true
+  const xLabelOffset = isNaN(parseInt(runtime.xAxis.labelOffset)) ? 0 : parseInt(runtime.xAxis.labelOffset)
+  const yLabelOffset = isNaN(parseInt(runtime.yAxis.labelOffset)) ? 0 : parseInt(runtime.yAxis.labelOffset)
+  const xAxisSize = isNaN(parseInt(runtime.xAxis.size)) ? 0 : parseInt(runtime.xAxis.size)
   let height = config.aspectRatio ? width * config.aspectRatio : config.visualizationType === 'Forest Plot' ? config.heights['vertical'] : config.heights[orientation]
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
-  let yMax = height - (orientation === 'horizontal' ? 0 : runtime.xAxis.padding || 0)
+  let yMax = height - (orientation === 'horizontal' ? 0 : xAxisSize)
+  height += orientation === 'horizontal' ? xAxisSize : 0
 
   if (config.visualizationType === 'Forest Plot') {
     height = height + config.data.length * config.forestPlot.rowHeight
@@ -220,7 +224,7 @@ const LinearChart = props => {
     return false
   }
 
-  const padding = orientation === 'horizontal' ? Number(config.xAxis.padding) : Number(config.yAxis.size)
+  const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
   const fontSize = { small: 16, medium: 18, large: 20 }
 
   const handleNumTicks = () => {
@@ -319,7 +323,7 @@ const LinearChart = props => {
                   {!runtime.yAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
                 </Group>
                 <Group>
-                  <Text x={xMax / 2} y={axisMaxHeight + 20} stroke='#333' textAnchor={'middle'} verticalAnchor='start'>
+                  <Text x={xMax / 2} y={axisMaxHeight + 20 + xLabelOffset} stroke='#333' textAnchor={'middle'} verticalAnchor='start'>
                     {runtime.xAxis.label}
                   </Text>
                 </Group>
@@ -364,12 +368,13 @@ const LinearChart = props => {
                       const showTicks = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
                       const tickLength = showTicks === 'block' ? 7 : 0
                       const to = { x: tick.to.x - tickLength, y: tick.to.y }
+                      const displayFirstGridLine = tick.index !== 0 || config.xAxis.hideAxis
 
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                           {!runtime.yAxis.hideTicks && <Line key={`${tick.value}--hide-hideTicks`} from={tick.from} to={config.useLogScale ? to : tick.to} stroke={config.yAxis.tickColor} display={orientation === 'horizontal' ? 'none' : 'block'} />}
 
-                          {runtime.yAxis.gridLines ? <Line key={`${tick.value}--hide-hideGridLines`} display={(config.useLogScale && showTicks).toString()} from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
+                          {runtime.yAxis.gridLines && displayFirstGridLine ? <Line key={`${tick.value}--hide-hideGridLines`} display={(config.useLogScale && showTicks).toString()} from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
 
                           {orientation === 'horizontal' && visualizationSubType !== 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
                             <Text
@@ -418,7 +423,7 @@ const LinearChart = props => {
                     {!config.yAxis.hideAxis && <Line from={props.axisFromPoint} to={runtime.horizontal ? { x: 0, y: config.visualizationType === 'Forest Plot' ? height : Number(heightHorizontal) } : props.axisToPoint} stroke='#000' />}
                     {yScale.domain()[0] < 0 && <Line from={{ x: props.axisFromPoint.x, y: yScale(0) }} to={{ x: xMax, y: yScale(0) }} stroke='#333' />}
                     {visualizationType === 'Bar' && orientation === 'horizontal' && xScale.domain()[0] < 0 && <Line from={{ x: xScale(0), y: 0 }} to={{ x: xScale(0), y: yMax }} stroke='#333' strokeWidth={2} />}
-                    <Text className='y-label' textAnchor='middle' verticalAnchor='start' transform={`translate(${-1 * runtime.yAxis.size}, ${axisCenter}) rotate(-90)`} fontWeight='bold' fill={config.yAxis.labelColor}>
+                    <Text className='y-label' textAnchor='middle' verticalAnchor='start' transform={`translate(${-1 * runtime.yAxis.size + yLabelOffset}, ${axisCenter}) rotate(-90)`} fontWeight='bold' fill={config.yAxis.labelColor}>
                       {props.label}
                     </Text>
                   </Group>
@@ -566,7 +571,7 @@ const LinearChart = props => {
                       )
                     })}
                     {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-                    <Text x={axisCenter} y={axisMaxHeight + 20} textAnchor='middle' verticalAnchor='start' fontWeight='bold' fill={config.xAxis.labelColor}>
+                    <Text x={axisCenter} y={axisMaxHeight + 20 + xLabelOffset} textAnchor='middle' verticalAnchor='start' fontWeight='bold' fill={config.xAxis.labelColor}>
                       {props.label}
                     </Text>
                   </Group>
@@ -682,7 +687,7 @@ const LinearChart = props => {
             />
           )}
           {/*Zoom Brush */}
-          {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && !isHorizontal && <ZoomBrush xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />}
+          {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && false && !isHorizontal && <ZoomBrush xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
           {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(visualizationType) && !checkLineToBarGraph() && (
@@ -743,7 +748,7 @@ const LinearChart = props => {
             })}
           {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}
           {/* prettier-ignore */}
-          {(config.visualizationType !== 'Bar' || !checkLineToBarGraph()) && config.visualizationType !== 'Combo' && (
+          {config.visualizationType !== 'Bar' && config.visualizationType !== 'Combo' && (
             <Regions xScale={xScale} handleTooltipClick={handleTooltipClick} handleTooltipMouseOff={handleTooltipMouseOff} handleTooltipMouseOver={handleTooltipMouseOver} showTooltip={showTooltip} hideTooltip={hideTooltip} tooltipData={tooltipData} yMax={yMax} width={width} />
           )}
           {chartHasTooltipGuides && showTooltip && tooltipData && config.visual.verticalHoverLine && (

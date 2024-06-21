@@ -1174,7 +1174,26 @@ const EditorPanel = () => {
                       {config.runtime.seriesKeys && config.runtime.seriesKeys.length === 1 && !['Box Plot', 'Deviation Bar', 'Forest Plot'].includes(config.visualizationType) && (
                         <CheckBox value={config.isLegendValue} fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />
                       )}
-                      <TextField value={config.yAxis.numTicks} placeholder='Auto' type='number' section='yAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
+                      <TextField
+                        value={config.yAxis.numTicks}
+                        placeholder='Auto'
+                        type='number'
+                        section='yAxis'
+                        fieldName='numTicks'
+                        label='Number of ticks'
+                        className='number-narrow'
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Apporoximate number of ticks. Other factors such as space available and data may change the exact number of ticks used.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        updateField={updateField}
+                      />
                       <TextField
                         value={config.yAxis.size}
                         type='number'
@@ -1194,6 +1213,7 @@ const EditorPanel = () => {
                           </Tooltip>
                         }
                       />
+                      <TextField value={config.yAxis.labelOffset} section='yAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />
                       {config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
                       {(config.orientation === 'vertical' || !config.isResponsiveTicks) && <TextField value={config.yAxis.tickRotation || 0} type='number' min={0} section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
                       {config.isResponsiveTicks && config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && (
@@ -1221,7 +1241,6 @@ const EditorPanel = () => {
 
                       {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                       {/* <TextField value={config.yAxis.axisPadding} type='number' max={10} min={0} section='yAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
-                      {config.orientation === 'horizontal' && <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />}
                       {visSupportsValueAxisGridLines() && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Show Gridlines' updateField={updateField} />}
                       <CheckBox value={config.yAxis.enablePadding} section='yAxis' fieldName='enablePadding' label='Add Padding to Value Axis Scale' updateField={updateField} />
                       {config.yAxis.enablePadding && <TextField type='number' section='yAxis' fieldName='scalePadding' label='Padding Percentage' className='number-narrow' updateField={updateField} value={config.yAxis.scalePadding} />}
@@ -1933,7 +1952,25 @@ const EditorPanel = () => {
                         }
                         updateField={updateField}
                       />
-                      {visHasBrushChart && <CheckBox value={config.brush?.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />}
+                      {false && visHasBrushChart && (
+                        <CheckBox
+                          value={config.brush?.active}
+                          section='brush'
+                          fieldName='active'
+                          label='Brush Slider '
+                          updateField={updateField}
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>Use the brush slider to narrow down your data view to specific values along the axis. This tool is useful for examining detailed data segments within the larger dataset. </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
+                      )}
 
                       {config.exclusions.active && (
                         <>
@@ -2066,7 +2103,8 @@ const EditorPanel = () => {
                           </div>
                         </>
                       )}
-                      {visSupportsDateCategoryHeight() && <TextField value={config.xAxis.padding} type='number' min={0} section='xAxis' fieldName='padding' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />}
+                      {visSupportsDateCategoryHeight() && <TextField value={config.xAxis.size} type='number' min={0} section='xAxis' fieldName='size' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />}
+                      <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />
 
                       {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                       {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}

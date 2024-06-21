@@ -16,6 +16,7 @@ import { ViewPort } from '@cdc/core/types/ViewPort'
 import { getFootnotesVizConfig, getVizConfig } from '../helpers/getVizConfig'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
+import { Visualization } from '@cdc/core/types/Visualization'
 
 type VizRowProps = {
   filteredDataOverride?: Object[]
@@ -36,7 +37,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
     setShow(show.map((_, i) => i === colIndex))
   }
   const inNoDataState = useMemo(() => {
-    const vals = Object.values(rawData)
+    const vals = Object.values(rawData).flatMap(val => val)
     if (!vals.length) return true
     return vals.some(val => val === undefined)
   }, [rawData])
@@ -62,6 +63,17 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
     return null
   }, [config, row, rawData, dashboardFilteredData])
 
+  const applyButtonNotClicked = (vizConfig: Visualization): boolean => {
+    if (config.filterBehavior === FilterBehavior.Apply && vizConfig.autoLoad && vizConfig.hide) {
+      return vizConfig.hide.some(index => {
+        const { queuedActive, active } = config.dashboard.sharedFilters[index]
+        if (!active && !queuedActive) return true
+        if (!queuedActive) return false
+        return queuedActive !== active
+      })
+    }
+    return false
+  }
   return (
     <div className={`row mb-5 ${row.equalHeight ? 'equal-height' : ''} ${row.toggle ? 'toggle' : ''}`} key={`row__${index}`}>
       {row.toggle && <Toggle row={row} visualizations={config.visualizations} active={show.indexOf(true)} setToggled={setToggled} />}
@@ -84,7 +96,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
               {visualizationConfig.dataKey} (Go to Table)
             </a>
           )
-          const hideFilter = visualizationConfig.autoLoad && inNoDataState
+          const hideFilter = inNoDataState && applyButtonNotClicked(visualizationConfig)
 
           const shouldShow = row.toggle === undefined || (row.toggle && show[colIndex])
           return (

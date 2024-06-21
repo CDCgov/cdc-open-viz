@@ -23,7 +23,7 @@ export type Visualization = ConfigureData & {
   filterBehavior: FilterBehavior
   filters: VizFilter[]
   general: General
-  hide: any[]
+  hide: number[]
   legend: Legend
   multiDashboards?: any[]
   newViz: boolean

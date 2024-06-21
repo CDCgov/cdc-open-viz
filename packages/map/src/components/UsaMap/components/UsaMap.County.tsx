@@ -359,7 +359,7 @@ const CountyMap = props => {
       let hoveredGeoIndex
       for (let i = 0; i < runtimeKeys.length; i++) {
         const pixelCoords = topoData.projection([data[runtimeKeys[i]][state.columns.longitude.name], data[runtimeKeys[i]][state.columns.latitude.name]])
-        if (state.visual.cityStyle === 'circle' && pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
+        if (state.visual.cityStyle === 'circle' && pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius && applyLegendToRow(data[runtimeKeys[i]])) {
           hoveredGeo = data[runtimeKeys[i]]
           hoveredGeoIndex = i
           break
@@ -367,7 +367,7 @@ const CountyMap = props => {
 
         if (state.visual.cityStyle === 'pin' && pixelCoords) {
           const distance = Math.hypot(pixelCoords[0] - x, pixelCoords[1] - y)
-          if (distance < 15) {
+          if (distance < 15 && applyLegendToRow(data[runtimeKeys[i]])) {
             hoveredGeo = data[runtimeKeys[i]]
             hoveredGeoIndex = i
             break
@@ -375,7 +375,7 @@ const CountyMap = props => {
         }
       }
 
-      if (hoveredGeo && applyLegendToRow(hoveredGeo)) {
+      if (hoveredGeo) {
         tooltipRef.current.style.display = 'block'
         tooltipRef.current.style.top = e.clientY + 'px'
         tooltipRef.current.style.left = e.clientX + 'px'
