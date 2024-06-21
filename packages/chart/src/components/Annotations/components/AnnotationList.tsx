@@ -18,7 +18,7 @@ const AnnotationList = () => {
     )
   })
 
-  return <ul className='annotation-list'>{annotationListItems}</ul>
+  return <ul className='annotation-list d-block d-md-none'>{annotationListItems}</ul>
 }
 
 export default AnnotationList

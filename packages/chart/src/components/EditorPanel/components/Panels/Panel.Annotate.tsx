@@ -285,6 +285,22 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     </label>
                   )}
 
+                  <label>
+                    Display Annotation Dropdown
+                    <input
+                      type='checkbox'
+                      checked={config?.annotations[index]?.displayDropdown}
+                      onClick={e => {
+                        const updatedAnnotations = _.cloneDeep(config?.annotations)
+                        updatedAnnotations[index].displayDropdown = e.target.checked
+                        updateConfig({
+                          ...config,
+                          annotations: updatedAnnotations
+                        })
+                      }}
+                    />
+                  </label>
+
                   <Button className='warn btn-warn btn btn-remove delete' onClick={() => handleRemoveAnnotation(index)}>
                     Delete Annotation
                   </Button>

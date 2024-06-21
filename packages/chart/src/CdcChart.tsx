@@ -1224,6 +1224,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                   colorScale={colorScale}
                 />
               )}
+              {config?.annotations?.length > 0 && <Annotation.Dropdown />}
               {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
               {/* show pdf or image button */}
             </div>
