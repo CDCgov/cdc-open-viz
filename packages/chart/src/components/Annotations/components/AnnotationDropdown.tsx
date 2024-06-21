@@ -14,21 +14,12 @@ const AnnotationDropdown = () => {
     config: { annotations }
   } = useContext(ConfigContext)
 
+  if (!config?.general?.showAnnotationDropdown) return
+
   const limitHeight = {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
     OverflowY: 'scroll'
   }
-
-  const annotationListItems = annotations.map((annotation, annotationIndex) => {
-    return (
-      <li key={`annotation-dropdown__li`}>
-        <div className='annotation__dropdown-title-wrapper'>
-          <div className='annotation__dropdown-title-circle'>{annotationIndex + 1}</div>
-        </div>
-        <p className='annotation__dropdown-subtext'>{annotation.text}</p>
-      </li>
-    )
-  })
 
   const handleAccordionClassName = () => {
     const classNames = ['data-table-heading', 'annotation__dropdown-list']
@@ -61,7 +52,7 @@ const AnnotationDropdown = () => {
         </div>
         {expanded && (
           <div className='table-container annotation-dropdown__panel' style={limitHeight}>
-            <Annotation.List />
+            <Annotation.List useBootstrapVisibilityClasses={false} />
           </div>
         )}
       </section>

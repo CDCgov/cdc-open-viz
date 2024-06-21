@@ -42,9 +42,3 @@
     container-name: content;
   }
 }
-
-@container content (min-width: 700px) {
-  .cdc-open-viz-module .annotation-list {
-    display: none;
-  }
-}

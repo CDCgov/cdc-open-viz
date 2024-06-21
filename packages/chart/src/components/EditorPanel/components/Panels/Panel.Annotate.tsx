@@ -104,6 +104,22 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   return (
     <Accordion>
       <Accordion.Section title={props.name}>
+        <label>
+          Show Annotation Dropdown
+          <input
+            type='checkbox'
+            checked={config?.general?.showAnnotationDropdown}
+            onClick={e => {
+              updateConfig({
+                ...config,
+                general: {
+                  ...config.general,
+                  showAnnotationDropdown: e.target.checked
+                }
+              })
+            }}
+          />
+        </label>
         {config?.annotations &&
           config?.annotations.map((annotation, index) => (
             <Accordion>

@@ -2,10 +2,22 @@ import React, { useContext } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import './AnnotationList.styles.css'
 
-const AnnotationList = () => {
+type AnnotationListProps = {
+  useBootstrapVisibilityClasses?: boolean
+}
+
+const AnnotationList: React.FC<AnnotationListProps> = ({ useBootstrapVisibilityClasses = true }) => {
   const {
     config: { annotations }
   } = useContext(ConfigContext)
+
+  const ulClasses = () => {
+    const classes = ['annotation-list']
+    if (useBootstrapVisibilityClasses) {
+      classes.push('d-block', 'd-md-none')
+    }
+    return classes.join(' ')
+  }
 
   const annotationListItems = annotations.map((annotation, annotationIndex) => {
     return (
@@ -18,7 +30,7 @@ const AnnotationList = () => {
     )
   })
 
-  return <ul className='annotation-list d-block d-md-none'>{annotationListItems}</ul>
+  return <ul className={ulClasses()}>{annotationListItems}</ul>
 }
 
 export default AnnotationList

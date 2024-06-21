@@ -1,5 +1,6 @@
 import { useContext, useState, useEffect, useRef } from 'react'
 import ConfigContext from '../../../ConfigContext'
+import DOMPurify from 'dompurify'
 
 // helpers
 import { findNearestDatum } from './findNearestDatum'
@@ -71,6 +72,13 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
   return (
     annotations &&
     annotations.map((annotation, index) => {
+      const text = annotation.text || ''
+
+      // sanitize the text for setting dangerouslySetInnerHTML
+      const sanitizedData = () => ({
+        __html: DOMPurify.sanitize(text)
+      })
+
       const points = createPoints(annotation, xScale, yScale, config)
       const categoricalOffsetCheck = +(config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0)
 
@@ -157,8 +165,14 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                       // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                       tabIndex={0}
                       aria-label={`Annotation text that reads: ${annotation.text}`}
-                      dangerouslySetInnerHTML={{ __html: annotation.text }}
-                    />
+                    >
+                      {config?.general?.showAnnotationDropdown && (
+                        <>
+                          <span className='annotation__has-dropdown-number'>{index + 1}</span>
+                        </>
+                      )}
+                      <div dangerouslySetInnerHTML={sanitizedData()} />
+                    </div>
                   </HtmlLabel>
                   {annotation.connectionType === 'line' && <Connector type='line' pathProps={{ markerStart: 'url(#marker-start)' }} />}
                   {annotation.connectionType === 'elbow' && <Connector type='elbow' pathProps={{ markerStart: 'url(#marker-start)' }} />}
