@@ -24,6 +24,7 @@ export default {
   tipRounding: 'top',
   isResponsiveTicks: false,
   general: {
+    annotationDropdownText: 'Annotations',
     showDownloadButton: false,
     showMissingDataLabel: true,
     showSuppressedSymbol: true,

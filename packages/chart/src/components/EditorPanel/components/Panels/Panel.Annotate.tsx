@@ -120,6 +120,24 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
             }}
           />
         </label>
+
+        <label>
+          Annotation Dropdown Title:
+          <input
+            type='text'
+            style={{ marginBottom: '10px' }}
+            value={config?.general?.annotationDropdownText}
+            onChange={e => {
+              updateConfig({
+                ...config,
+                general: {
+                  ...config.general,
+                  annotationDropdownText: e.target.value
+                }
+              })
+            }}
+          />
+        </label>
         {config?.annotations &&
           config?.annotations.map((annotation, index) => (
             <Accordion>

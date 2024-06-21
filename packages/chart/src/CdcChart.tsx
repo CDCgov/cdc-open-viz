@@ -1198,7 +1198,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {/* Description */}
 
               {description && config.visualizationType !== 'Spark Line' && <div className={getChartSubTextClasses().join('')}>{parse(description)}</div>}
-              <Annotation.List />
 
               {/* buttons */}
               <MediaControls.Section classes={['download-buttons']}>

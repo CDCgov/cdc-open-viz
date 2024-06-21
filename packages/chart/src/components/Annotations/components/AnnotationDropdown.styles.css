@@ -9,6 +9,6 @@
   }
 
   .data-table-heading.annotation__dropdown-list {
-    border-bottom: #c7c7c7 1px solid;
+    margin-top: 10px;
   }
 }

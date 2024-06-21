@@ -23,6 +23,7 @@ import { Drag, raise } from '@visx/drag'
 import { MarkerArrow } from '@visx/marker'
 import { LinePath } from '@visx/shape'
 import * as allCurves from '@visx/curve'
+import { fontSizes } from '@cdc/core/helpers/cove/fontSettings'
 
 // styles
 import './AnnotationDraggable.styles.css'
@@ -151,12 +152,16 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                   onTouchEnd={dragEnd}
                   anchorPosition={'auto'}
                 >
-                  <HtmlLabel width={200} className='annotation__desktop-label' showAnchorLine={false} horizontalAnchor={handleConnectionHorizontalType(annotation, xScale, config)} verticalAnchor={handleConnectionVerticalType(annotation, xScale, config)}>
+                  <HtmlLabel className='annotation__desktop-label' showAnchorLine={false} horizontalAnchor={handleConnectionHorizontalType(annotation, xScale, config)} verticalAnchor={handleConnectionVerticalType(annotation, xScale, config)}>
                     <div
                       style={{
                         borderRadius: 5, // Optional: set border radius
                         backgroundColor: `rgba(255, 255, 255, ${annotation?.opacity ? Number(annotation?.opacity) / 100 : 1})`,
-                        padding: '10px'
+                        padding: '10px',
+                        width: 'auto',
+                        display: config.general.showAnnotationDropdown ? 'inline-flex' : 'flex',
+                        justifyContent: 'start',
+                        flexDirection: 'row'
                       }}
                       role='presentation'
                       // ! IMPORTANT: Workaround for 508
@@ -168,10 +173,12 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                     >
                       {config?.general?.showAnnotationDropdown && (
                         <>
-                          <span className='annotation__has-dropdown-number'>{index + 1}</span>
+                          <p className='annotation__has-dropdown-number' style={{ margin: '2px 6px' }}>
+                            {index + 1}
+                          </p>
                         </>
                       )}
-                      <div dangerouslySetInnerHTML={sanitizedData()} />
+                      <div style={{ fontSize: fontSizes[config.fontSize] }} dangerouslySetInnerHTML={sanitizedData()} />
                     </div>
                   </HtmlLabel>
                   {annotation.connectionType === 'line' && <Connector type='line' pathProps={{ markerStart: 'url(#marker-start)' }} />}

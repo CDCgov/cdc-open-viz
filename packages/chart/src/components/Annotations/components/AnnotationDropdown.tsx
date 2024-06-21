@@ -3,18 +3,17 @@ import ConfigContext from '../../../ConfigContext'
 import './AnnotationDropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
 import Annotation from '..'
+import { fontSizes } from '@cdc/core/helpers/cove/fontSettings'
 
 const AnnotationDropdown = () => {
   const { currentViewport: viewport, config } = useContext(ConfigContext)
   const [expanded, setExpanded] = useState(false)
-  const fontSizes = { small: 16, medium: 18, large: 20 }
+
   const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${fontSizes[config?.fontSize]}px`
 
   const {
     config: { annotations }
   } = useContext(ConfigContext)
-
-  if (!config?.general?.showAnnotationDropdown) return
 
   const limitHeight = {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
@@ -30,9 +29,18 @@ const AnnotationDropdown = () => {
     return classNames.join(' ')
   }
 
+  const handleSectionClasses = () => {
+    const classes = [`data-table-container`, viewport, `d-block`, `d-lg-none`]
+
+    if (config.general.showAnnotationDropdown) {
+      classes.push('d-lg-block')
+    }
+    return classes.join(' ')
+  }
+
   return (
     <>
-      <section className={`data-table-container ${viewport} d-none d-md-block`}>
+      <section className={handleSectionClasses()}>
         <div
           style={{ fontSize: titleFontSize }}
           role='button'
@@ -48,7 +56,7 @@ const AnnotationDropdown = () => {
           }}
         >
           <Icon display={expanded ? 'minus' : 'plus'} base />
-          Annotation Items
+          {config.general.annotationDropdownText === '' ? 'Annotations' : config?.general?.annotationDropdownText}
         </div>
         {expanded && (
           <div className='table-container annotation-dropdown__panel' style={limitHeight}>
