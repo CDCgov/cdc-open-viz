@@ -11,7 +11,7 @@ import ConfigContext from '../../../../context'
 // styles
 
 const PanelAnnotate: React.FC = props => {
-  const { state: config, setState: updateConfig, dimensions } = useContext<MapContext>(ConfigContext)
+  const { state: config, setState: updateConfig, dimensions, isDraggingAnnotation } = useContext<MapContext>(ConfigContext)
   const getColumns = (filter = true) => {
     const columns = {}
     config.data.forEach(row => {
@@ -101,6 +101,8 @@ const PanelAnnotate: React.FC = props => {
   return (
     <Accordion>
       <Accordion.Section title={props.name}>
+        <p>Dragging state: {isDraggingAnnotation ? 'Dragging' : 'Not dragging'}</p>
+
         <label>
           Show Annotation Dropdown
           <input

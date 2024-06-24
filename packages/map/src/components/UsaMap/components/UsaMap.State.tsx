@@ -65,7 +65,8 @@ const UsaMap = () => {
       state,
       supportedTerritories,
       titleCase,
-      tooltipId
+      tooltipId,
+      handleDragStateChange
     } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
@@ -446,7 +447,7 @@ const UsaMap = () => {
             {({ features, projection }) => constructGeoJsx(features, projection)}
           </AlbersUsa>
         )}
-        {state.annotations.length > 0 && <Annotation.Draggable />}
+        {state.annotations.length > 0 && <Annotation.Draggable onDragStateChange={handleDragStateChange} />}
       </svg>
 
       {territories.length > 0 && (

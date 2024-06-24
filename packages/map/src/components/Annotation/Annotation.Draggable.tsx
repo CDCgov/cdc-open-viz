@@ -16,9 +16,9 @@ import './Annotation.Draggable.styles.css'
 import ConfigContext from '../../context'
 import { MapContext } from '../../types/MapContext'
 
-const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
+const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
   const [draggingItems, setDraggingItems] = useState([])
-  const { state: config, dimensions, setState: updateConfig, isEditor } = useContext<MapContext>(ConfigContext)
+  const { state: config, dimensions, setState: updateConfig, isEditor, isDraggingAnnotation } = useContext<MapContext>(ConfigContext)
   const [width, height] = dimensions
   const { annotations } = config
   // const { colorScale } = useColorScale()
@@ -144,7 +144,10 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                     y={annotation.y}
                     canEditLabel={annotation.edit.label || false}
                     canEditSubject={annotation.edit.subject || false}
+                    labelDragHandleProps={{ r: 15, stroke: isDraggingAnnotation ? 'red' : 'var(--primary)' }}
+                    subjectDragHandleProps={{ r: 15, stroke: isDraggingAnnotation ? 'red' : 'var(--primary)' }}
                     onDragEnd={props => {
+                      onDragStateChange(false)
                       const updatedAnnotations = annotations.map((annotation, idx) => {
                         if (idx === index) {
                           const nearestDatum = annotation
@@ -172,6 +175,9 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                     onTouchMove={dragMove}
                     onTouchEnd={dragEnd}
                     anchorPosition={'auto'}
+                    onDragStart={() => {
+                      onDragStateChange(true)
+                    }}
                   >
                     <HtmlLabel className='' showAnchorLine={false}>
                       <div
