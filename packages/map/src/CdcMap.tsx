@@ -1699,6 +1699,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
               />
               <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
+              {state?.annotations?.length > 0 && <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />}
 
               {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
@@ -1778,6 +1779,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 />
               )}
 
+              {state.annotations.length > 0 && <Annotation.Dropdown />}
+
               {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
             </section>
           )}
@@ -1785,6 +1788,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           <div aria-live='assertive' className='cdcdataviz-sr-only'>
             {accessibleStatus}
           </div>
+
           {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
             <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
           )}

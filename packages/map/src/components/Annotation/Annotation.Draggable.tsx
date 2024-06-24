@@ -180,6 +180,13 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                           borderRadius: 5, // Optional: set border radius
                           backgroundColor: `rgba(255, 255, 255, ${annotation?.opacity ? Number(annotation?.opacity) / 100 : 1})`
                         }}
+                        role='presentation'
+                        // ! IMPORTANT: Workaround for 508
+                        // - HTML needs to be set from the editor and we need a wrapper with the tabIndex
+                        // - TabIndex is only supposed to be used on interactive elements. This is a workaround.
+                        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+                        tabIndex={0}
+                        aria-label={`Annotation text that reads: ${annotation.text}`}
                         dangerouslySetInnerHTML={{ __html: annotation.text }}
                       />
                     </HtmlLabel>

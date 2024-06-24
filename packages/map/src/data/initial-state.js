@@ -1,6 +1,7 @@
 export default {
   annotations: [],
   general: {
+    annotationDropdownText: 'Annotations',
     geoBorderColor: 'darkGray',
     headerColor: 'theme-blue',
     title: '',
