@@ -12,7 +12,7 @@ import { type PanelProps } from './../PanelProps'
 import './../panels.scss'
 
 const PanelAnnotate: React.FC<PanelProps> = props => {
-  const { updateConfig, config, unfilteredData, dimensions } = useContext(ConfigContext)
+  const { updateConfig, config, unfilteredData, dimensions, isDraggingAnnotation } = useContext(ConfigContext)
 
   const getColumns = (filter = true) => {
     const columns = {}
@@ -104,6 +104,8 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   return (
     <Accordion>
       <Accordion.Section title={props.name}>
+        <p>Dragging state: {isDraggingAnnotation ? 'Dragging' : 'Not dragging'}</p>
+
         <label>
           Show Annotation Dropdown
           <input

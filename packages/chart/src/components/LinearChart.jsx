@@ -41,7 +41,25 @@ import Annotation from './Annotations'
 import ZoomBrush from './ZoomBrush'
 
 const LinearChart = props => {
-  const { transformedData: data, tableData, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, getTextWidth, brushConfig } = useContext(ConfigContext)
+  // prettier-ignore
+  const {
+    brushConfig,
+    config,
+    currentViewport,
+    dimensions,
+    formatDate,
+    formatNumber,
+    getTextWidth,
+    handleChartAriaLabels,
+    handleLineType,
+    handleDragStateChange,
+    parseDate,
+    tableData,
+    transformedData: data,
+    updateConfig,
+    isDraggingAnnotation
+  } = useContext(ConfigContext)
+
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
 
@@ -353,7 +371,7 @@ const LinearChart = props => {
           ref={svgRef}
           style={{ overflow: 'visible' }}
         >
-          <Bar width={width} height={height} fill={'transparent'}></Bar> {/* Highlighted regions */}
+          {!isDraggingAnnotation && <Bar width={width} height={height} fill={'transparent'}></Bar>} {/* Highlighted regions */}
           {/* Y axis */}
           {!['Spark Line', 'Forest Plot'].includes(visualizationType) && (
             <AxisLeft scale={yScale} tickLength={config.useLogScale ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.label || runtime.yAxis.label} stroke='#333' tickFormat={(tick, i) => handleLeftTickFormatting(tick, i)} numTicks={handleNumTicks()}>
@@ -776,9 +794,9 @@ const LinearChart = props => {
               <Line from={{ x: point.x, y: 0 }} to={{ x: point.x, y: yMax }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />
             </Group>
           )}
-          <Annotation.Draggable xScale={xScale} yScale={yScale} xMax={xMax} svgRef={svgRef} />
+          <Annotation.Draggable xScale={xScale} yScale={yScale} xMax={xMax} svgRef={svgRef} onDragStateChange={handleDragStateChange} />
         </svg>
-        {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && !config.tooltips.singleSeries && (
+        {!isDraggingAnnotation && tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && !config.tooltips.singleSeries && (
           <>
             <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100}) !important;`}</style>
             <style>{`.tooltip {max-width:300px} !important; word-wrap: break-word; `}</style>
@@ -787,8 +805,7 @@ const LinearChart = props => {
             </TooltipWithBounds>
           </>
         )}
-
-        {visSupportsReactTooltip() && <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />}
+        {visSupportsReactTooltip() && !isDraggingAnnotation && <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />}
         <div className='animation-trigger' ref={triggerRef} />
       </div>
     </ErrorBoundary>

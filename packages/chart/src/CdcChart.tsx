@@ -64,6 +64,7 @@ import { Label } from './types/Label'
 import { type ViewportSize } from './types/ChartConfig'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
+import { i } from 'vitest/dist/reporters-1evA5lom'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
@@ -79,6 +80,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [externalFilters, setExternalFilters] = useState<any[]>()
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
+  const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [dynamicLegendItems, setDynamicLegendItems] = useState<any[]>([])
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
   const [brushConfig, setBrushConfig] = useState({
@@ -90,6 +92,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   let legendMemo = useRef(new Map()) // map collection
   let innerContainerRef = useRef()
   const legendRef = useRef(null)
+
+  const handleDragStateChange = isDragging => {
+    setIsDraggingAnnotation(isDragging)
+  }
 
   if (isDebug) console.log('Chart config, isEditor', config, isEditor)
 
@@ -1267,6 +1273,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     imageId,
     isDashboard,
     isDebug,
+    isDraggingAnnotation,
+    handleDragStateChange,
     isEditor,
     isNumber,
     legend,

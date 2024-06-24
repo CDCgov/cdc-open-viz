@@ -27,10 +27,11 @@ import { fontSizes } from '@cdc/core/helpers/cove/fontSettings'
 
 // styles
 import './AnnotationDraggable.styles.css'
+import { fa } from '@faker-js/faker'
 
-const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
+const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
   const [draggingItems, setDraggingItems] = useState([])
-  const { config, dimensions, updateConfig, isEditor, currentViewport } = useContext(ConfigContext)
+  const { config, dimensions, updateConfig, isEditor, currentViewport, isDraggingAnnotation } = useContext(ConfigContext)
   const [width, height] = dimensions
   const { annotations } = config
   const { colorScale } = useColorScale()
@@ -91,9 +92,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
           x={annotation.x} // subject x
           y={annotation.y} // subject y
           restrict={restrictedArea}
-          onDragStart={() => {
-            setDraggingItems(raise(annotations, index))
-          }}
+          resetOnStart
         >
           {({ dragStart, dragEnd, dragMove, isDragging, x, y, dx, dy }) => {
             return (
@@ -108,6 +107,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                   canEditLabel={annotation.edit.label || false}
                   canEditSubject={(annotation.edit.subject && annotation.connectionType !== 'none') || false}
                   onDragEnd={props => {
+                    onDragStateChange(false)
                     const updatedAnnotations = annotations.map((annotation, idx) => {
                       if (idx === index) {
                         const nearestDatum = findNearestDatum(
@@ -151,6 +151,9 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                   onTouchMove={dragMove}
                   onTouchEnd={dragEnd}
                   anchorPosition={'auto'}
+                  onDragStart={() => onDragStateChange(true)}
+                  labelDragHandleProps={{ r: 15, stroke: isDraggingAnnotation ? 'red' : 'var(--primary)' }}
+                  subjectDragHandleProps={{ r: 15, stroke: isDraggingAnnotation ? 'red' : 'var(--primary)' }}
                 >
                   <HtmlLabel className='annotation__desktop-label' showAnchorLine={false} horizontalAnchor={handleConnectionHorizontalType(annotation, xScale, config)} verticalAnchor={handleConnectionVerticalType(annotation, xScale, config)}>
                     <div
