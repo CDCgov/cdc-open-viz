@@ -132,7 +132,7 @@ export default function DataImport() {
       throw errorMessages.failedFetch
     }
 
-    if(config.type === 'dashboard'){
+    if (config.type === 'dashboard') {
       setExternalURL('')
     }
 
@@ -585,7 +585,7 @@ export default function DataImport() {
     </>
   )
 
-  const showDataDesigner = config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot'
+  const showDataDesigner = !['Box Plot', 'Scatter Plot', 'Sankey'].includes(config?.visualizationType)
 
   return (
     <>
