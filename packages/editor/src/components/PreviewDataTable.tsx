@@ -71,37 +71,36 @@ const PreviewDataTable = () => {
 
   const dispatch = useContext(EditorDispatchContext)
 
-  const fetchAsyncData = async () => {
-    if (config.type === 'dashboard') {
-      Object.keys(config.datasets).forEach(async datasetKey => {
-        if (config.datasets[datasetKey].preview) {
-          if (config.datasets[datasetKey].dataUrl) {
-            const remoteData = await fetchRemoteData(config.datasets[datasetKey].dataUrl)
-            if (Array.isArray(remoteData)) {
-              setTableData(remoteData)
+  useEffect(() => {
+    const fetchAsyncData = async () => {
+      if (config.type === 'dashboard') {
+        Object.keys(config.datasets).forEach(async datasetKey => {
+          if (config.datasets[datasetKey].preview) {
+            if (config.datasets[datasetKey].dataUrl) {
+              const remoteData = await fetchRemoteData(config.datasets[datasetKey].dataUrl)
+              if (Array.isArray(remoteData)) {
+                setTableData(remoteData)
+              }
+            } else if (Array.isArray(config.datasets[datasetKey].data)) {
+              setTableData(config.datasets[datasetKey].data)
             }
-          } else if (Array.isArray(config.datasets[datasetKey].data)) {
-            setTableData(config.datasets[datasetKey].data)
           }
-        }
-      })
-    } else {
-      if (config.dataUrl) {
-        const remoteData = await fetchRemoteData(config.dataUrl)
-        if (Array.isArray(remoteData)) {
-          setTableData(remoteData)
+        })
+      } else {
+        if (config.dataUrl) {
+          const remoteData = await fetchRemoteData(config.dataUrl)
+          if (Array.isArray(remoteData)) {
+            setTableData(remoteData)
+          }
         }
       }
     }
-  }
-
-  useEffect(() => {
     if (!config.data) {
       fetchAsyncData()
     } else {
       setTableData(previewData)
     }
-  }, [config.data, previewData]) // eslint-disable-line
+  }, [config, previewData, config.data]) // eslint-disable-line
 
   const tableColumns = useMemo(() => {
     if (!tableData) return []
