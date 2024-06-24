@@ -17,8 +17,7 @@ export const Equal_Interval_Map: Story = {
 
 export const Equal_Number_Opt_In: Story = {
   args: {
-    config: EqualNumberOptInExample,
-    isEditor: true
+    config: EqualNumberOptInExample
   }
 }
 

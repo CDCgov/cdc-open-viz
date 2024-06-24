@@ -47,7 +47,8 @@
       "prefix": "",
       "suffix": "",
       "name": "Percent Vaccinated",
-      "label": ""
+      "label": "",
+      "roundToPlace": 2
     },
     "navigate": {
       "name": ""

@@ -681,12 +681,28 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         let colors = colorPalettes[state.color]
         let colorRange = colors.slice(0, state.legend.numberOfItems)
 
+        const getDomain = () => {
+          // backwards compatibility
+          if (state?.columns?.primary?.roundToPlace !== undefined && state?.general?.equalNumberOptIn) {
+            return [...new Set(dataSet.map(item => Number(item[state.columns.primary.name]).toFixed(Number(state?.columns?.primary?.roundToPlace))))]
+          }
+          return [...new Set(dataSet.map(item => Math.round(Number(item[state.columns.primary.name]))))]
+        }
+
+        const getBreaks = scale => {
+          // backwards compatibility
+          if (state?.columns?.primary?.roundToPlace !== undefined && state?.general?.equalNumberOptIn) {
+            return scale.quantiles().map(b => Number(b)?.toFixed(Number(state?.columns?.primary?.roundToPlace)))
+          }
+          return scale.quantiles().map(item => Number(Math.round(item)))
+        }
+
         let scale = d3
           .scaleQuantile()
-          .domain([...new Set(dataSet.map(item => Number(item[state.columns.primary.name]).toFixed(Number(config?.columns?.primary?.roundToPlace ? config?.columns?.primary?.roundToPlace : 0))))]) // min/max values
+          .domain(getDomain()) // min/max values
           .range(colorRange) // set range to our colors array
 
-        const breaks = scale.quantiles().map(b => Number(b)?.toFixed(Number(config?.columns?.primary?.roundToPlace ? config?.columns?.primary?.roundToPlace : 0)))
+        const breaks = getBreaks(scale)
 
         // if seperating zero force it into breaks
         if (breaks[0] !== 0) {
