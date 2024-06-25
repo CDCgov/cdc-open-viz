@@ -1,4 +1,4 @@
-import { generateColorsArray } from '../helpers/generateColorsArray'
+import { generateColorsArray } from '../generateColorsArray'
 
 describe('generateColorsArray', () => {
   it('should return an array of colors', () => {

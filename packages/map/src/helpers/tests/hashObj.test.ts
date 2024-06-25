@@ -1,4 +1,4 @@
-import { hashObj } from '../helpers/hashObj'
+import { hashObj } from '../hashObj'
 
 describe('hashObj', () => {
   it('should return a hash value for a given object', () => {
