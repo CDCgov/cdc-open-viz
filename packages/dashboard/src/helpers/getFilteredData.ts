@@ -33,7 +33,7 @@ export const getFilteredData = (state: DashboardState, initialFilteredData = {},
 
         newFilteredData[index] = filterData(applicableFilters, formattedData)
       } else {
-        newFilteredData[index] = state.data[row.dataKey] || row.data
+        newFilteredData[index] = state.data[row.dataKey] || row.data || []
       }
     }
   })
