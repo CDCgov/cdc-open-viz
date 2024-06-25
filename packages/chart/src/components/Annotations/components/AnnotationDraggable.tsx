@@ -59,7 +59,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
         const newX = (annotation.originalX * trueDimensions[0]) / Number(annotation.savedDimensions[0])
         return {
           ...annotation,
-          x: newX - 17 // 17 is 1rem in pixels for the margin offset.
+          x: newX
         }
       })
       if (updatedAnnotations === annotations) return

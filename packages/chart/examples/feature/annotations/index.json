@@ -28,8 +28,8 @@
         "label": true
       },
       "seriesKey": "",
-      "x": 356.69140625,
-      "y": 244.7265625,
+      "x": 369.7073491888894,
+      "y": 130.7265625,
       "xKey": 1458025200000,
       "dx": -50,
       "dy": -41,
@@ -38,9 +38,9 @@
         761.39,
         559.1875
       ],
-      "originalX": 356.69140625,
+      "originalX": 369.7073491888894,
       "originalDX": -50,
-      "originalY": 244.7265625
+      "originalY": 130.7265625
     }
   ],
   "type": "chart",
@@ -66,7 +66,11 @@
   "tipRounding": "top",
   "isResponsiveTicks": false,
   "general": {
-    "showDownloadButton": false
+    "annotationDropdownText": "Annotations",
+    "showDownloadButton": false,
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueDataLabel": true
   },
   "padding": {
     "left": 5,
@@ -98,6 +102,8 @@
     "scalePadding": 10,
     "tickRotation": 0,
     "anchors": [],
+    "shoMissingDataLabel": true,
+    "showMissingDataLine": true,
     "label": "Y-Axis Example Label"
   },
   "boxplot": {
@@ -183,6 +189,8 @@
     "download": true,
     "showVertical": false,
     "dateDisplayFormat": "",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
     "show": true
   },
   "orientation": "vertical",
