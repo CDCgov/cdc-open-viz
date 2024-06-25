@@ -52,7 +52,7 @@
     "rightAxisTickColor": "#333",
     "numTicks": "11",
     "axisPadding": 0,
-    "scalePadding": 5,
+    "scalePadding": 6,
     "tickRotation": 0,
     "anchors": [],
     "label": "",
