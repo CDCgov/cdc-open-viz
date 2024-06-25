@@ -55,7 +55,7 @@ const cleanDashboardData = (config: DashboardConfig) => {
 }
 
 const cleanSharedFilters = (config: DashboardConfig) => {
-  if (config.dashboard.sharedFilters) {
+  if (config.dashboard?.sharedFilters) {
     config.dashboard.sharedFilters.forEach((filter, index) => {
       delete config.dashboard.sharedFilters[index].active
       if (filter.type === 'urlfilter') {
