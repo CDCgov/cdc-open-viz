@@ -56,7 +56,15 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     case 'APPLY_CONFIG': {
       // using advanced editor. Wipe all existing data and apply new config
       const [config, filteredData] = getUpdateConfig(state)(...action.payload)
-      return { ...initialState, config, filteredData }
+      // get the default data state
+      const data = [...Object.values(config.visualizations), ...config.rows]
+        .map(viz => viz.dataKey)
+        .reduce((acc, key) => {
+          const data = state.data[key] || state.config.datasets[key]?.data
+          if (data) acc[key] = data
+          return acc
+        }, {})
+      return { ...initialState, config, filteredData, data }
     }
     case 'SET_CONFIG': {
       return { ...state, config: { ...state.config, ...action.payload } }

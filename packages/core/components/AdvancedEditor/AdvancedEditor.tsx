@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { JsonEditor } from 'json-edit-react'
+import { JsonEditor, UpdateFunction } from 'json-edit-react'
 import MapIcon from '../../assets/map-folded.svg'
 import ChartIcon from '../../assets/icon-chart-bar.svg'
 import MarkupIncludeIcon from '../../assets/icon-code.svg'
@@ -15,8 +15,8 @@ export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExp
     onExpandCollapse()
   }
 
-  const onUpdate = val => {
-    setConfigTextbox(JSON.stringify(val))
+  const onUpdate: UpdateFunction = val => {
+    setConfigTextbox(JSON.stringify(val.newData))
   }
 
   useEffect(() => {
@@ -70,7 +70,13 @@ export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExp
               Copy to Clipboard
             </button>
             <JsonEditor className='advanced-json-editor' data={JSON.parse(configTextboxValue)} onUpdate={onUpdate} rootName='' />
-            <button className='btn full-width' onClick={() => loadConfig(JSON.parse(configTextboxValue))}>
+            <button
+              className='btn full-width'
+              onClick={() => {
+                loadConfig(JSON.parse(configTextboxValue))
+                setAdvancedToggle(!advancedToggle)
+              }}
+            >
               Apply
             </button>
           </React.Fragment>
