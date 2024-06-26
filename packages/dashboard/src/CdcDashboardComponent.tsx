@@ -585,21 +585,20 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                         {Object.keys(dataGroups).map(groupName => {
                           const dataValue = dataGroups[groupName]
                           return (
-                            <React.Fragment key={`row__${index}__${groupName}`}>
-                              <VisualizationRow
-                                allExpanded={allExpanded}
-                                filteredDataOverride={dataValue}
-                                groupName={groupName}
-                                row={row}
-                                rowIndex={index}
-                                setSharedFilter={setSharedFilter}
-                                updateChildConfig={updateChildConfig}
-                                applyFilters={applyFilters}
-                                apiFilterDropdowns={apiFilterDropdowns}
-                                handleOnChange={handleOnChange}
-                                currentViewport={currentViewport}
-                              />
-                            </React.Fragment>
+                            <VisualizationRow
+                              key={`row__${index}__${groupName}`}
+                              allExpanded={allExpanded}
+                              filteredDataOverride={dataValue}
+                              groupName={groupName}
+                              row={row}
+                              rowIndex={index}
+                              setSharedFilter={setSharedFilter}
+                              updateChildConfig={updateChildConfig}
+                              applyFilters={applyFilters}
+                              apiFilterDropdowns={apiFilterDropdowns}
+                              handleOnChange={handleOnChange}
+                              currentViewport={currentViewport}
+                            />
                           )
                         })}
                       </>
@@ -631,22 +630,20 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
             {/* Data Table */}
             {config.table?.show && config.data && (
-              <>
-                <DataTable
-                  config={config}
-                  rawData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data}
-                  runtimeData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data || []}
-                  expandDataTable={config.table.expanded}
-                  showDownloadButton={config.table.download}
-                  tableTitle={config.dashboard.title || ''}
-                  viewport={currentViewport}
-                  tabbingId={config.dashboard.title || ''}
-                  outerContainerRef={outerContainerRef}
-                  imageRef={imageId}
-                  isDebug={isDebug}
-                  isEditor={isEditor}
-                />
-              </>
+              <DataTable
+                config={config}
+                rawData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data}
+                runtimeData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data || []}
+                expandDataTable={config.table.expanded}
+                showDownloadButton={config.table.download}
+                tableTitle={config.dashboard.title || ''}
+                viewport={currentViewport}
+                tabbingId={config.dashboard.title || ''}
+                outerContainerRef={outerContainerRef}
+                imageRef={imageId}
+                isDebug={isDebug}
+                isEditor={isEditor}
+              />
             )}
             {config.table?.show &&
               config.datasets &&
