@@ -90,27 +90,19 @@ const PreviewDataTable = () => {
     }
   }
 
-  const handleEditordData = async dataUrl => {
-    const remoteData = await fetchRemoteData(dataUrl)
-    if (Array.isArray(remoteData)) {
-      setTableData(remoteData)
-    }
-  }
-
-  const fetchAsyncData = async () => {
-    if (config.type === 'dashboard') {
-      await handleDashboardData(config.datasets)
-    } else {
-      if (config.dataUrl) {
-        await handleEditordData(config.dataUrl)
-      }
-    }
-  }
-
   useEffect(() => {
     const loadData = async () => {
       if (!config.data) {
-        await fetchAsyncData()
+        if (config.type === 'dashboard') {
+          await handleDashboardData(config.datasets)
+        } else {
+          if (config.dataUrl) {
+            const remoteData = await fetchRemoteData(config.dataUrl)
+            if (Array.isArray(remoteData)) {
+              setTableData(remoteData)
+            }
+          }
+        }
       } else {
         setTableData(previewData)
       }
