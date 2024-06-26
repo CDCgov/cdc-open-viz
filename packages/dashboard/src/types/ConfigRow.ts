@@ -11,6 +11,7 @@ type Col = {
 
 export type ConfigRow = {
   columns: Col[]
+  expandCollapseAllButtons: boolean
   uuid?: string | number
   toggle?: boolean
   equalHeight?: boolean
