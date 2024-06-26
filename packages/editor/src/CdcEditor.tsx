@@ -45,15 +45,15 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
   const [state, dispatch] = useReducer(editorReducer, initialState)
 
   const setTempConfigAndUpdate = config => {
-    updateVizConfig(JSON.parse(JSON.stringify(config)))
+    updateVizConfig(_.cloneDeep(config))
     dispatch({ type: 'EDITOR_TEMP_SAVE', payload: config })
   }
 
   const resizeObserver = new ResizeObserver(entries => {
     const container = entries[0]
-    let { width } = container.contentRect
-    let newViewport = getViewport(width)
-    dispatch({ type: 'EDITOR_SET_VIEWPORT', payload: newViewport })
+    const { width } = container.contentRect
+    const newViewport = getViewport(width)
+    if (state.currentViewport !== newViewport) dispatch({ type: 'EDITOR_SET_VIEWPORT', payload: newViewport })
   })
 
   const outerContainerRef = useCallback(node => {
