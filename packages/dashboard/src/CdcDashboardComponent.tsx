@@ -65,6 +65,7 @@ import * as reloadURLHelpers from './helpers/reloadURLHelpers'
 import { getAutoLoadVisualization } from './helpers/getAutoLoadVisualization'
 import { changeFilterActive } from './helpers/changeFilterActive'
 import { addValuesToSharedFilters } from './helpers/addValuesToSharedFilters'
+import ExpandCollapseButtons from './components/ExpandCollapseButtons'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -545,20 +546,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     const { config } = state
     const { title, description } = config.dashboard || {}
 
-    const ExpandCollapseButtons: React.FC = () => {
-      return (
-        <div className='d-block '>
-          <div className='d-flex flex-row-reverse mb-2'>
-            <button className='btn expand-collapse-buttons' onClick={() => setAllExpanded(false)}>
-              - Collapse All
-            </button>
-            <button className='btn expand-collapse-buttons mr-2' onClick={() => setAllExpanded(true)}>
-              + Expand All
-            </button>
-          </div>
-        </div>
-      )
-    }
     body = (
       <>
         {isEditor && <Header />}
@@ -594,7 +581,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                     return (
                       <>
                         {/* Expand/Collapse All */}
-                        {row.expandCollapseAllButtons === true && <ExpandCollapseButtons />}
+                        {row.expandCollapseAllButtons === true && <ExpandCollapseButtons setAllExpanded={setAllExpanded} />}
                         {Object.keys(dataGroups).map(groupName => {
                           const dataValue = dataGroups[groupName]
                           return (
