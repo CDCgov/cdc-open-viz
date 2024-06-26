@@ -71,37 +71,53 @@ const PreviewDataTable = () => {
 
   const dispatch = useContext(EditorDispatchContext)
 
-  const fetchAsyncData = async () => {
-    if (config.type === 'dashboard') {
-      Object.keys(config.datasets).forEach(async datasetKey => {
-        if (config.datasets[datasetKey].preview) {
-          if (config.datasets[datasetKey].dataUrl) {
-            const remoteData = await fetchRemoteData(config.datasets[datasetKey].dataUrl)
-            if (Array.isArray(remoteData)) {
-              setTableData(remoteData)
-            }
-          } else if (Array.isArray(config.datasets[datasetKey].data)) {
-            setTableData(config.datasets[datasetKey].data)
-          }
-        }
-      })
-    } else {
-      if (config.dataUrl) {
-        const remoteData = await fetchRemoteData(config.dataUrl)
+  const fetchDatasetData = async (datasetKey, datasetConfig) => {
+    if (datasetConfig.preview) {
+      if (datasetConfig.dataUrl) {
+        const remoteData = await fetchRemoteData(datasetConfig.dataUrl)
         if (Array.isArray(remoteData)) {
           setTableData(remoteData)
         }
+      } else if (Array.isArray(datasetConfig.data)) {
+        setTableData(datasetConfig.data)
+      }
+    }
+  }
+
+  const handleDashboardData = async datasets => {
+    for (const datasetKey of Object.keys(datasets)) {
+      await fetchDatasetData(datasetKey, datasets[datasetKey])
+    }
+  }
+
+  const handleEditordData = async dataUrl => {
+    const remoteData = await fetchRemoteData(dataUrl)
+    if (Array.isArray(remoteData)) {
+      setTableData(remoteData)
+    }
+  }
+
+  const fetchAsyncData = async () => {
+    if (config.type === 'dashboard') {
+      await handleDashboardData(config.datasets)
+    } else {
+      if (config.dataUrl) {
+        await handleEditordData(config.dataUrl)
       }
     }
   }
 
   useEffect(() => {
-    if (!config.data) {
-      fetchAsyncData()
-    } else {
-      setTableData(previewData)
+    const loadData = async () => {
+      if (!config.data) {
+        await fetchAsyncData()
+      } else {
+        setTableData(previewData)
+      }
     }
-  }, [config.data, previewData]) // eslint-disable-line
+
+    loadData()
+  }, [config, config.data, previewData]) // eslint-disable-line
 
   const tableColumns = useMemo(() => {
     if (!tableData) return []
