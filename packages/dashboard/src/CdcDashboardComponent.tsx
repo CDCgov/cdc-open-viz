@@ -94,15 +94,15 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     return state.config.dashboard.sharedFilters.map((f, i) => i).filter(i => !autoLoadViz.hide.includes(i))
   }, [state.config.dashboard.sharedFilters, state.config.visualizations])
 
-  const setAutoLoadDefaultValue = (sharedFilterIndex: number, filterDropdowns: DropdownOptions, sharedFilters): SharedFilter => {
+  const setAutoLoadDefaultValue = (sharedFilterIndex: number, dropdownOptions: DropdownOptions, sharedFilters): SharedFilter => {
     const sharedFilter = _.cloneDeep(sharedFilters[sharedFilterIndex])
-    if (!autoLoadFilterIndexes.length || !filterDropdowns) return sharedFilter // no autoLoading happening
+    if (!autoLoadFilterIndexes.length || !dropdownOptions) return sharedFilter // no autoLoading happening
     if (!sharedFilter.active && autoLoadFilterIndexes.includes(sharedFilterIndex)) {
       const filterParents = sharedFilters.filter(f => sharedFilter.parents?.includes(f.key))
       const notAllParentFiltersSelected = filterParents.some(p => !(p.active || p.queuedActive))
       if (filterParents && notAllParentFiltersSelected) return sharedFilter
-      const defaultFilterDropdown = filterDropdowns.find(({ value }) => value === sharedFilter.apiFilter!.defaultValue)
-      const defaultValue = defaultFilterDropdown?.value || filterDropdowns[0].value
+      const defaultFilterDropdown = dropdownOptions.find(({ value }) => value === sharedFilter.apiFilter!.defaultValue)
+      const defaultValue = defaultFilterDropdown?.value || dropdownOptions[0].value
       sharedFilter.active = defaultValue
     }
     return sharedFilter
@@ -131,7 +131,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                 newDropdowns[_key] = _filterValues
                 const newDefaultSelectedFilter = setAutoLoadDefaultValue(index, _filterValues, sharedFilters)
                 sharedFilters[index] = newDefaultSelectedFilter
-                //resolve([index, newDefaultSelectedFilter])
               })
               .catch(console.error)
               .finally(() => {
@@ -160,8 +159,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     const filters = newFilters || config.dashboard.sharedFilters
     const datasetKeys = Object.keys(config.datasets)
 
-    const newData = { ...state.data }
-    const newDatasets = { ...config.datasets }
+    const newData = _.cloneDeep(state.data)
+    const newDatasets = _.cloneDeep(config.datasets)
     let dataWasFetched = false
     let newFileName = ''
 
@@ -566,7 +565,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                 .filter(row => row.columns.filter(col => col.widget).length !== 0)
                 .map((row, index) => {
                   if (row.multiVizColumn && (isPreview || !isEditor)) {
-                    const filteredData = getFilteredData(state, state.data)
+                    const filteredData = getFilteredData(state, _.cloneDeep(state.data))
                     const data = filteredData[index] ?? row.formattedData
                     const dataGroups = {}
                     data.forEach(d => {
