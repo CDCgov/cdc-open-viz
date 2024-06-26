@@ -71,6 +71,11 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
     }
   }
 
+  const setExpandCollapseAllButtons = (selection: boolean) => {
+    dispatch({ type: 'UPDATE_ROW', payload: { rowIndex, rowData: { expandCollapseAllButtons: selection } } })
+    setCanContinue(true)
+  }
+
   return (
     <Modal>
       <Modal.Content>
@@ -121,15 +126,10 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
               }}
             />
           ) : (
-            <InputSelect
-              options={Object.keys(config.datasets[configureData.dataKey]?.data[0] || {})}
-              value={config.rows[rowIndex].multiVizColumn}
-              label='Multi-Visualization Column'
-              initial='--Select--'
-              fieldName=''
-              updateField={(section, subsection, fieldName, value) => setMultiVizColumn(value)}
-              required
-            />
+            <>
+              <InputSelect options={Object.keys(config.datasets[configureData.dataKey]?.data[0] || {})} value={config.rows[rowIndex].multiVizColumn} label='Multi-Visualization Column' initial='--Select--' updateField={(section, subsection, fieldName, value) => setMultiVizColumn(value)} required />
+              <CheckBox value={config.rows[rowIndex].expandCollapseAllButtons} label=' Add Expand/Collapse All buttons' fieldName='' updateField={(section, subsection, fieldName, value) => setExpandCollapseAllButtons(value)} />
+            </>
           )
         ) : (
           <></>

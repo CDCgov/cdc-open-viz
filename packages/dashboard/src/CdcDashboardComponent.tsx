@@ -58,6 +58,7 @@ import { getVizConfig } from './helpers/getVizConfig'
 import { getFilteredData } from './helpers/getFilteredData'
 import { getVizRowColumnLocator } from './helpers/getVizRowColumnLocator'
 import Layout from '@cdc/core/components/Layout'
+import CollapsibleVisualizationRow from './components/CollapsibleVisualizationRow'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import * as apiFilterHelpers from './helpers/apiFilterHelpers'
 import * as reloadURLHelpers from './helpers/reloadURLHelpers'
@@ -75,6 +76,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   const [apiFilterDropdowns, setAPIFilterDropdowns] = useState<APIFilterDropdowns>({})
   const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+  const [allExpanded, setAllExpanded] = useState(true)
 
   const isPreview = state.tabSelected === 'Dashboard Preview'
 
@@ -542,6 +544,21 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   } else {
     const { config } = state
     const { title, description } = config.dashboard || {}
+
+    const ExpandCollapseButtons: React.FC = () => {
+      return (
+        <div className='d-block '>
+          <div className='d-flex flex-row-reverse mb-2'>
+            <button className='btn expand-collapse-buttons' onClick={() => setAllExpanded(false)}>
+              - Collapse All
+            </button>
+            <button className='btn expand-collapse-buttons mr-2' onClick={() => setAllExpanded(true)}>
+              + Expand All
+            </button>
+          </div>
+        </div>
+      )
+    }
     body = (
       <>
         {isEditor && <Header />}
@@ -574,28 +591,47 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                       if (!dataGroups[groupKey]) dataGroups[groupKey] = []
                       dataGroups[groupKey].push(d)
                     })
-                    return Object.keys(dataGroups).map(groupName => {
-                      const dataValue = dataGroups[groupName]
-                      return (
-                        <React.Fragment key={`row__${index}__${groupName}`}>
-                          <h1 className='h4'>{groupName}</h1>
-                          <VisualizationRow
-                            filteredDataOverride={dataValue}
-                            row={row}
-                            rowIndex={index}
-                            setSharedFilter={setSharedFilter}
-                            updateChildConfig={updateChildConfig}
-                            applyFilters={applyFilters}
-                            apiFilterDropdowns={apiFilterDropdowns}
-                            handleOnChange={handleOnChange}
-                            currentViewport={currentViewport}
-                          />
-                        </React.Fragment>
-                      )
-                    })
+                    return (
+                      <>
+                        {/* Expand/Collapse All */}
+                        {row.expandCollapseAllButtons === true && <ExpandCollapseButtons />}
+                        {Object.keys(dataGroups).map(groupName => {
+                          const dataValue = dataGroups[groupName]
+                          return (
+                            <React.Fragment key={`row__${index}__${groupName}`}>
+                              <VisualizationRow
+                                allExpanded={allExpanded}
+                                filteredDataOverride={dataValue}
+                                groupName={groupName}
+                                row={row}
+                                rowIndex={index}
+                                setSharedFilter={setSharedFilter}
+                                updateChildConfig={updateChildConfig}
+                                applyFilters={applyFilters}
+                                apiFilterDropdowns={apiFilterDropdowns}
+                                handleOnChange={handleOnChange}
+                                currentViewport={currentViewport}
+                              />
+                            </React.Fragment>
+                          )
+                        })}
+                      </>
+                    )
                   } else {
                     return (
-                      <VisualizationRow key={`row__${index}`} row={row} rowIndex={index} setSharedFilter={setSharedFilter} updateChildConfig={updateChildConfig} applyFilters={applyFilters} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} currentViewport={currentViewport} />
+                      <VisualizationRow
+                        key={`row__${index}`}
+                        allExpanded={false}
+                        groupName={''}
+                        row={row}
+                        rowIndex={index}
+                        setSharedFilter={setSharedFilter}
+                        updateChildConfig={updateChildConfig}
+                        applyFilters={applyFilters}
+                        apiFilterDropdowns={apiFilterDropdowns}
+                        handleOnChange={handleOnChange}
+                        currentViewport={currentViewport}
+                      />
                     )
                   }
                 })}
@@ -608,20 +644,22 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
             {/* Data Table */}
             {config.table?.show && config.data && (
-              <DataTable
-                config={config}
-                rawData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data}
-                runtimeData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data || []}
-                expandDataTable={config.table.expanded}
-                showDownloadButton={config.table.download}
-                tableTitle={config.dashboard.title || ''}
-                viewport={currentViewport}
-                tabbingId={config.dashboard.title || ''}
-                outerContainerRef={outerContainerRef}
-                imageRef={imageId}
-                isDebug={isDebug}
-                isEditor={isEditor}
-              />
+              <>
+                <DataTable
+                  config={config}
+                  rawData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data}
+                  runtimeData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data || []}
+                  expandDataTable={config.table.expanded}
+                  showDownloadButton={config.table.download}
+                  tableTitle={config.dashboard.title || ''}
+                  viewport={currentViewport}
+                  tabbingId={config.dashboard.title || ''}
+                  outerContainerRef={outerContainerRef}
+                  imageRef={imageId}
+                  isDebug={isDebug}
+                  isEditor={isEditor}
+                />
+              </>
             )}
             {config.table?.show &&
               config.datasets &&

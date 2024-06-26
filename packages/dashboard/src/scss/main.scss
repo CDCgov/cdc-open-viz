@@ -156,6 +156,13 @@
       z-index: -1;
       position: relative;
     }
+
+    // Expand and Collapse Buttons for Multiviz Dashboard
+    &.expand-collapse-buttons {
+      background-color: var(--lightestGray);
+      border: 1px var(--lightGray) solid;
+      color: black;
+    }
   }
 
   .warning-icon {
@@ -178,6 +185,40 @@
     margin: 0;
     @include breakpointClass(md) {
       margin: 15px 0;
+    }
+  }
+
+  .collapsable-multiviz-container {
+    position: relative;
+    border: $lightGray 1px solid;
+    clear: both;
+    margin-bottom: 20px;
+    .multi-visualiation-heading {
+      position: relative;
+      background: var(--lightestGray);
+      padding: 0.5em 0.7em;
+      cursor: pointer;
+      svg {
+        position: absolute;
+        height: 100%;
+        width: 15px;
+        top: 0;
+        right: 1em;
+      }
+
+      &:focus {
+        z-index: 2;
+        position: relative;
+      }
+      @include breakpoint(xs) {
+        font-size: $font-small + 0.2em;
+      }
+    }
+    .data-table-heading {
+      display: none;
+    }
+    .table-container {
+      margin: 0 1em;
     }
   }
 
