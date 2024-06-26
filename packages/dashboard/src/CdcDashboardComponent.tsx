@@ -357,8 +357,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
         if (Array.isArray(value)) throw Error(`Cannot set active values on urlfilters. expected: ${JSON.stringify(value)} to be a single value.`)
         newSharedFilters[index].queuedActive = value
         // setData to empty object because we no longer have a data state.
-        // Freeze object to ensure no side effects.
-        dispatch({ type: 'SET_DATA', payload: Object.freeze({}) })
+        dispatch({ type: 'SET_DATA', payload: {} })
         dispatch({ type: 'SET_FILTERED_DATA', payload: {} })
         loadAPIFilters(newSharedFilters)
       }

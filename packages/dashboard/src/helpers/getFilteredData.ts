@@ -26,14 +26,14 @@ export const getFilteredData = (state: DashboardState, initialFilteredData = {},
   config.rows.forEach((row, index) => {
     if (row.dataKey) {
       const applicableFilters = getApplicableFilters(config.dashboard, index)
+      const { dataKey, data, dataDescription } = row
+      const _data = state.data[dataKey] || data
       if (applicableFilters) {
-        const { dataKey, data, dataDescription } = row
-        const _data = state.data[dataKey] || data
         const formattedData = dataOverride?.[dataKey] ?? dataDescription ? getFormattedData(_data, dataDescription) : _data
 
         newFilteredData[index] = filterData(applicableFilters, formattedData)
       } else {
-        newFilteredData[index] = state.data[row.dataKey] || row.data || []
+        newFilteredData[index] = _data || []
       }
     }
   })
