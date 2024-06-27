@@ -54,5 +54,29 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
     }
   }
 
-  return cellValue
+  // suppress cell value
+  config.preliminaryData?.forEach(pd => {
+    // check entered suppression value against cell value
+    const isValueMatch = String(pd.value) === String(labelValue)
+    // check entered suppression column against table key
+    const isColumnMatch = !pd.column || pd.column === column
+    const barSeriesExist = config.runtime?.barSeriesKeys?.includes(column)
+    const lineSeriesExist = config.runtime?.lineSeriesKeys?.includes(column)
+    const showSymbol = config.table.showSuppressedSymbol
+    if (isValueMatch && isColumnMatch && pd.displayTable && pd.type === 'suppression') {
+      switch (config.visualizationType) {
+        case 'Combo':
+          cellValue = barSeriesExist && showSymbol ? pd.iconCode : lineSeriesExist && showSymbol ? pd.lineCode : ''
+          break
+        case 'Bar':
+          cellValue = !showSymbol ? '' : pd.iconCode
+          break
+        case 'Line':
+          cellValue = !showSymbol ? '' : pd.lineCode
+          break
+      }
+    }
+  })
+  const shoMissingDataCellValue = config.table.showMissingDataLabel && !labelValue
+  return shoMissingDataCellValue ? 'N/A' : cellValue
 }

@@ -76,7 +76,7 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
         isDragging: monitor.isDragging()
       })
     },
-    [config.activeDashboard, config.rows]
+    [config.activeDashboard, config.rows, config.dashboard.sharedFilters]
   )
 
   const deleteWidget = () => {
@@ -168,7 +168,7 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
 
   let isConfigurationReady = false
   const dataConfiguredForRow = !!rows[data?.rowIdx]?.dataKey
-  if (dataConfiguredForRow || ['markup-include', 'filter-dropdowns'].includes(type)) {
+  if (dataConfiguredForRow || ['filter-dropdowns', 'markup-include'].includes(type)) {
     isConfigurationReady = true
   } else {
     if (data?.formattedData) {
@@ -182,7 +182,7 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
     }
   }
 
-  const needsDataConfiguration = !dataConfiguredForRow && type !== 'markup-include'
+  const needsDataConfiguration = !dataConfiguredForRow
 
   return (
     <>

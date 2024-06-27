@@ -1,5 +1,6 @@
 export default {
   annotations: [],
+  allowLineToBarGraph: undefined,
   type: 'chart',
   debugSvg: false,
   chartMessage: {
@@ -23,15 +24,16 @@ export default {
   tipRounding: 'top',
   isResponsiveTicks: false,
   general: {
-    showDownloadButton: false
+    showDownloadButton: false,
+    showMissingDataLabel: true,
+    showSuppressedSymbol: true,
+    showZeroValueDataLabel: true
   },
   padding: {
     left: 5,
     right: 5
   },
-  suppressedData: [],
   preliminaryData: [],
-
   yAxis: {
     hideAxis: false,
     displayNumbersOnBar: false,
@@ -56,7 +58,9 @@ export default {
     axisPadding: 0,
     scalePadding: 10,
     tickRotation: 0,
-    anchors: []
+    anchors: [],
+    shoMissingDataLabel: true,
+    showMissingDataLine: true
   },
   boxplot: {
     plots: [],
@@ -132,7 +136,9 @@ export default {
     indexLabel: '',
     download: false,
     showVertical: true,
-    dateDisplayFormat: ''
+    dateDisplayFormat: '',
+    showMissingDataLabel: true,
+    showSuppressedSymbol: true
   },
   orientation: 'vertical',
   color: 'pinkpurple',
@@ -155,11 +161,11 @@ export default {
     lineMode: false,
     verticalSorted: false,
     highlightOnHover: false,
+    hideSuppressedLabels: false,
     seriesHighlight: []
   },
   brush: {
     height: 25,
-    data: [],
     active: false
   },
   exclusions: {

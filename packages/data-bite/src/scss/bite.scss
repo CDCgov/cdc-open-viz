@@ -69,9 +69,11 @@
 // TODO after v2 refactor remove header reference colors
 // Use .font-color/.bg-color, etc. in color definitions or something similar
 // Remove box shadows if we're no longer using them
-.sidebar + .cove-component__content .bite-content-container:not(.component--hide-background-color) {
-  margin: 3em auto 0;
-  max-width: 35em;
+&.cdc-open-viz-module.isEditor .sidebar + .cove-component__content {
+  margin: 3em auto 0 !important;
+  max-width: 35em !important;
+  background-color: initial;
+  height: fit-content;
 }
 
 .sidebar + .cove-component__content .bite-content-container:not(.component--hide-background-color) {

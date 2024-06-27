@@ -22,10 +22,15 @@ type SharedChartContext = {
   legendIsolateValues?: string[]
   setLegendIsolateValues?: Function
   getTextWidth?: () => string | number
+  brushConfig: { data: []; isBrushing: boolean; isActive: boolean }
+  setBrushConfig: Function
+  clean: Function
+  capitalize: (value: string) => string
 }
 
 // Line Chart Specific Context
 type LineChartContext = SharedChartContext & {
+  convertLineToBarGraph: boolean
   dimensions: [screenWidth: number, screenHeight: number]
   formatDate: Function
   formatTooltipsDate: Function

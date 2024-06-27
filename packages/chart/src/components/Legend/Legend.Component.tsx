@@ -5,45 +5,46 @@ import Button from '@cdc/core/components/elements/Button'
 import useLegendClasses from '../../hooks/useLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import { handleLineType } from '../../helpers/handleLineType'
+import { getMarginTop } from './helpers/index'
 import { Line } from '@visx/shape'
 import { Label } from '../../types/Label'
 import { ChartConfig } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
 import { forwardRef } from 'react'
 
-interface LegendProps {
-  config: ChartConfig
+export interface LegendProps {
   colorScale: ColorScale
-  seriesHighlight: string[]
-  highlight: Function
-  highlightReset: Function
+  config: ChartConfig
   currentViewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   formatLabels: (labels: Label[]) => Label[]
+  highlight: Function
+  highlightReset: Function
   ref: React.Ref<() => void>
+  seriesHighlight: string[]
   skipId: string
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHighlight, highlight, highlightReset, currentViewport, formatLabels, skipId = 'legend' }, ref) => {
   const { innerClasses, containerClasses } = useLegendClasses(config)
-  const { runtime, orientation, legend } = config
+  const { runtime, legend } = config
+
   if (!legend) return null
-  const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+  const isBottomOrSmallViewport = legend?.position === 'bottom' || (['sm', 'xs', 'xxs'].includes(currentViewport) && !legend.hide)
 
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
-    marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `${isBottomOrSmallViewport ? config.dynamicMarginTop + 15 : 0}px`
+    marginTop: isBottomOrSmallViewport && config.orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : getMarginTop(isBottomOrSmallViewport, config.brush.active)
   }
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
   let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
-  const fontSize = ['sm', 'xs', 'xxs'].includes(currentViewport) ? { fontSize: '11px' } : null
 
   return (
     <aside ref={ref} style={legendClasses} id={skipId || 'legend'} className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
       {legend.label && <h3>{parse(legend.label)}</h3>}
-      {legend.description && <p style={fontSize}>{parse(legend.description)}</p>}
+      {legend.description && <p>{parse(legend.description)}</p>}
 
       <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
         {labels => {
@@ -101,7 +102,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                         )}
                       </div>
 
-                      <LegendLabel style={fontSize} align='left' margin='0 0 0 4px'>
+                      <LegendLabel align='left' margin='0 0 0 4px'>
                         {label.text}
                       </LegendLabel>
                     </LegendItem>
@@ -143,17 +144,17 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
               </div>
 
               <>
-                {config?.preliminaryData?.some(pd => pd.label) && ['Line', 'Combo'].includes(config.visualizationType) && (
+                {config?.preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style) && ['Line', 'Combo'].includes(config.visualizationType) && (
                   <>
                     <hr></hr>
                     <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
                       {config?.preliminaryData?.map((pd, index) => {
                         return (
                           <>
-                            {pd.label && (
+                            {pd.label && pd.type === 'effect' && pd.style && (
                               <div key={index} className='legend-preliminary'>
-                                <svg>{pd.style.includes('Dashed') ? <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={'#000'} strokeWidth={2} strokeDasharray={handleLineType(pd.style)} /> : <circle r={6} strokeWidth={2} stroke={'#000'} cx={22} cy={10} fill='transparent' />}</svg>
-                                <span> {pd.label}</span>
+                                <span className={pd.symbol}>{pd.lineCode}</span>
+                                <p> {pd.label}</p>
                               </div>
                             )}
                           </>
@@ -162,6 +163,56 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                     </div>
                   </>
                 )}
+                {!config.legend.hideSuppressedLabels &&
+                  config?.preliminaryData?.some(pd => pd.label && pd.displayLegend && pd.type === 'suppression' && pd.value && (pd?.style || pd.symbol)) &&
+                  ((config.visualizationType === 'Bar' && config.visualizationSubType === 'regular') || config.visualizationType === 'Line' || config.visualizationType === 'Combo') && (
+                    <>
+                      <hr></hr>
+                      <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
+                        {config?.preliminaryData?.map(
+                          (pd, index) =>
+                            pd.displayLegend &&
+                            pd.type === 'suppression' && (
+                              <>
+                                {config.visualizationType === 'Bar' && (
+                                  <>
+                                    <div key={index + 'Bar'} className={`legend-preliminary ${pd.symbol}`}>
+                                      <span className={pd.symbol}>{pd.iconCode}</span>
+                                      <p className={pd.type}>{pd.label}</p>
+                                    </div>
+                                  </>
+                                )}
+                                {config.visualizationType === 'Line' && (
+                                  <>
+                                    <div key={index + 'Line'} className={`legend-preliminary `}>
+                                      <span>{pd.lineCode}</span>
+                                      <p className={pd.type}>{pd.label}</p>
+                                    </div>
+                                  </>
+                                )}
+                                {config.visualizationType === 'Combo' && (
+                                  <>
+                                    {pd.symbol && pd.iconCode && (
+                                      <div key={index + 'Combo'} className={`legend-preliminary ${pd.symbol}`}>
+                                        <span className={pd.symbol}>{pd.iconCode}</span>
+                                        <p className={pd.type}>{pd.label}</p>
+                                      </div>
+                                    )}
+
+                                    {pd.style && pd.lineCode && (
+                                      <div key={index + 'Combo'} className='legend-preliminary'>
+                                        <span>{pd.lineCode}</span>
+                                        <p>{pd.label}</p>
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+                              </>
+                            )
+                        )}
+                      </div>
+                    </>
+                  )}
               </>
             </>
           )

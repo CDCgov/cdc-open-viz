@@ -15,6 +15,7 @@ import { type PreliminaryDataItem } from '../components/LineChart/LineChartProps
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 
+export type ViewportSize = 'sm' | 'xs' | 'xxs' | 'lg'
 export type ChartColumns = Record<string, Column>
 
 type DataFormat = {
@@ -71,7 +72,7 @@ type Visual = {
   horizontalHoverLine?: boolean
 }
 
-type AllChartsConfig = {
+export type AllChartsConfig = {
   annotations: Annotation[]
   animate: boolean
   general: General
@@ -152,6 +153,7 @@ type AllChartsConfig = {
   twoColor: { palette: string }
   type: 'chart' | 'dashboard'
   useLogScale: boolean
+  uid: string | number
   visual: Visual
   visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting' | 'Sankey'
   visualizationSubType: string
@@ -189,8 +191,52 @@ export type ForestPlotConfig = {
 } & AllChartsConfig
 
 export type LineChartConfig = {
-  visualizationType: 'Line'
+  allowLineToBarGraph: boolean
+  convertLineToBarGraph: boolean
   lineDatapointStyle: 'hidden' | 'always show' | 'hover'
+  visualizationType: 'Line'
 } & AllChartsConfig
 
-export type ChartConfig = LineChartConfig | ForestPlotConfig | AllChartsConfig
+export type SankeyLink = {
+  depth: number
+  height: number
+  id: string
+  index: number
+  layer: number
+  sourceLinks: SankeyLink[]
+  targetLinks: SankeyLink[]
+  value: number
+  x0: number
+  x1: number
+  y0: number
+  y1: number
+}
+
+type StoryNode = {
+  StoryNode: string
+  segmentTextAfter: string
+  segmentTextBefore: string
+}
+
+export type SankeyChartConfig = {
+  enableTooltips: boolean
+  data: [
+    {
+      tooltips: Object[]
+      // data to display in the sankey chart tooltips
+      tooltipData: Object[]
+      // data to display in the data table, bypasses the default data table output
+      tableData: Object[]
+      links: {
+        source: SankeyLink
+        target: SankeyLink
+        value: number
+      }[],
+      storyNodeText: StoryNode[]
+:
+    }
+  ]
+  visualizationType: 'Sankey'
+} & AllChartsConfig
+
+export type ChartConfig = SankeyChartConfig | LineChartConfig | ForestPlotConfig | AllChartsConfig

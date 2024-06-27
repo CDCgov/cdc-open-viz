@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { SharedFilter } from '../../types/SharedFilter'
 import { filterData } from '../filterData'
 
@@ -36,48 +37,6 @@ describe('filterData', () => {
     expect(result).toEqual([{ name: 'John', age: 30 }])
   })
 
-  it('causes sideEffects to filters', () => {
-    // the side effect is not desired, but current functionality depends on the sideEffect.
-    // hopefully the side effect will be refactored in the future to be a returned value.
-    const filters = [
-      { columnName: 'name', active: 'John', queuedActive: 'John', fileName: 'abc', key: 'name' },
-      { columnName: 'age', fileName: 'abc', key: 'age' },
-      { columnName: 'color', fileName: 'abc', key: 'color', parents: ['age'] }
-    ] as SharedFilter[]
-    const data = [
-      { name: 'John', age: 30, color: 'blue' },
-      { name: 'Jane', age: 25, color: 'red' },
-      { name: 'John', age: 35, color: 'yellow' },
-      { name: 'Jane', age: 30, color: 'green' }
-    ]
-
-    const result = filterData(filters, data)
-
-    expect(result).toEqual([{ name: 'John', age: 30, color: 'blue' }])
-
-    const sideEffectOfFiltering = [
-      {
-        columnName: 'name',
-        active: 'John',
-        queuedActive: 'John',
-        fileName: 'abc',
-        key: 'name',
-        tier: 1
-      },
-      { columnName: 'age', fileName: 'abc', key: 'age', tier: 1 },
-      {
-        columnName: 'color',
-        fileName: 'abc',
-        key: 'color',
-        parents: ['age'],
-        tier: 2,
-        values: ['blue', 'yellow'],
-        active: 'blue'
-      }
-    ]
-    expect(filters).toEqual(sideEffectOfFiltering)
-  })
-
   it('should not include data that does not meet the filter criteria', () => {
     const filters = [
       //{ columnName: 'apple', fileName: 'abc', key: 'banana' },
@@ -97,7 +56,7 @@ describe('filterData', () => {
   })
 
   it('should pivot data based on the provided filters', () => {
-    const filters = [{ key: 'Race', type: 'datafilter', showDropdown: true, columnName: 'Race', pivot: 'Age-adjusted rate', usedBy: ['table1707935263149'] }] as SharedFilter[]
+    const filter = { key: 'Race', type: 'datafilter', showDropdown: true, columnName: 'Race', pivot: 'Age-adjusted rate', usedBy: ['table1707935263149'] } as SharedFilter
     const data = [
       {
         Race: 'Hispanic or Latino',
@@ -131,7 +90,9 @@ describe('filterData', () => {
       }
     ]
 
-    expect(filterData(filters, data)).toEqual([
+    filter.values = _.uniq(data.map(row => row[filter.columnName]))
+    filter.active = ['Hispanic or Latino', 'Non-Hispanic American Indian', 'Non-Hispanic Black']
+    expect(filterData([filter], data)).toEqual([
       {
         'Hispanic or Latino': '644.2',
         'Non-Hispanic American Indian': '636.1',

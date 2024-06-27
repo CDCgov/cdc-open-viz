@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useId } from 'react'
 import * as d3 from 'd3'
 import Layout from '@cdc/core/components/Layout'
 import Waiting from '@cdc/core/components/Waiting'
+import Annotation from './components/Annotation'
 import Error from './components/EditorPanel/components/Error'
 
 // IE11
@@ -16,6 +17,10 @@ import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 
 // Helpers
+import { hashObj } from './helpers/hashObj'
+import { generateRuntimeLegendHash } from './helpers/generateRuntimeLegendHash'
+import { generateColorsArray } from './helpers/generateColorsArray'
+import { getUniqueValues } from './helpers/getUniqueValues'
 import { publish } from '@cdc/core/helpers/events'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
@@ -28,7 +33,7 @@ import colorPalettes from '@cdc/core/data/colorPalettes'
 import initialState from './data/initial-state'
 
 // Assets
-import ExternalIcon from './images/external-link.svg'
+import ExternalIcon from './images/external-link.svg?react'
 
 // Sass
 import './scss/main.scss'
@@ -42,7 +47,6 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import getViewport from '@cdc/core/helpers/getViewport'
 import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
-import Loading from '@cdc/core/components/Loading'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
 
@@ -68,34 +72,6 @@ const countryKeys = Object.keys(supportedCountries)
 const countyKeys = Object.keys(supportedCounties)
 const cityKeys = Object.keys(supportedCities)
 
-const generateColorsArray = (color = '#000000', special = false) => {
-  let colorObj = chroma(color)
-  let hoverColor = special ? colorObj.brighten(0.5).hex() : colorObj.saturate(1.3).hex()
-
-  return [color, hoverColor, colorObj.darken(0.3).hex()]
-}
-
-const hashObj = row => {
-  try {
-    if (!row) throw new Error('No row supplied to hashObj')
-
-    let str = JSON.stringify(row)
-    let hash = 0
-
-    if (str.length === 0) return hash
-
-    for (let i = 0; i < str.length; i++) {
-      let char = str.charCodeAt(i)
-      hash = (hash << 5) - hash + char
-      hash = hash & hash
-    }
-
-    return hash
-  } catch (e) {
-    console.error('COVE: ', e) // eslint-disable-line
-  }
-}
-
 const indexOfIgnoreType = (arr, item) => {
   for (let i = 0; i < arr.length; i++) {
     if (item === arr[i]) {
@@ -103,23 +79,6 @@ const indexOfIgnoreType = (arr, item) => {
     }
   }
   return -1
-}
-
-// returns string[]
-const getUniqueValues = (data, columnName) => {
-  let result = {}
-
-  for (let i = 0; i < data.length; i++) {
-    let val = data[i][columnName]
-
-    if (undefined === val) continue
-
-    if (undefined === result[val]) {
-      result[val] = true
-    }
-  }
-
-  return Object.keys(result)
 }
 
 const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, link }) => {
@@ -149,8 +108,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   let legendMemo = useRef(new Map())
   let legendSpecialClassLastMemo = useRef(new Map())
   let innerContainerRef = useRef()
-
-  if (isDebug) console.log('CdcMap state=', state) // <eslint-disable-line></eslint-disable-line>
 
   const columnsRequiredChecker = useCallback(() => {
     let columnList = []
@@ -218,28 +175,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       setPosition(state.mapPosition)
     }
   }, [state.mapPosition, setPosition])
-
-  const generateRuntimeLegendHash = () => {
-    return hashObj({
-      unified: state.legend.unified ?? false,
-      equalNumberOptIn: state.general.equalNumberOptIn ?? false,
-      specialClassesLast: state.legend.showSpecialClassesLast ?? false,
-      color: state.color,
-      customColors: state.customColors,
-      numberOfItems: state.legend.numberOfItems,
-      type: state.legend.type,
-      separateZero: state.legend.separateZero ?? false,
-      primary: state.columns.primary.name,
-      categoryValuesOrder: state.legend.categoryValuesOrder,
-      specialClasses: state.legend.specialClasses,
-      geoType: state.general.geoType,
-      data: state.data,
-      ...runtimeFilters,
-      filters: {
-        ...state.filters
-      }
-    })
-  }
 
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -1531,7 +1466,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
     }
 
-    const hashLegend = generateRuntimeLegendHash()
+    const hashLegend = generateRuntimeLegendHash(state, runtimeFilters)
 
     const hashData = hashObj({
       data: state.data,
@@ -1558,7 +1493,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }, [state]) // eslint-disable-line
 
   useEffect(() => {
-    const hashLegend = generateRuntimeLegendHash()
+    const hashLegend = generateRuntimeLegendHash(state, runtimeFilters)
 
     // Legend - Update when runtimeData does
     const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
@@ -1587,7 +1522,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   if (!table.label || table.label === '') table.label = 'Data Table'
 
   // Map container classes
-  let mapContainerClasses = ['map-container', state.legend.position, state.general.type, state.general.geoType, 'outline-none']
+  let mapContainerClasses = ['map-container', state.legend?.position, state.general.type, state.general.geoType, 'outline-none']
 
   if (modal) {
     mapContainerClasses.push('modal-background')
@@ -1607,6 +1542,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     content: modal,
     currentViewport,
     data: runtimeData,
+    dimensions,
     displayDataAsText,
     displayGeoName,
     filteredCountryCode,
@@ -1675,8 +1611,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // this only shows in Dashboard config mode and only if Show Table is also set
   const tableLink = (
-    <a href={`#data-table-${state.general.dataKey}`} className='margin-left-href'>
-      {state.general.dataKey} (Go to Table)
+    <a href={`#data-table-${state.dataKey}`} className='margin-left-href'>
+      {state.dataKey} (Go to Table)
     </a>
   )
 
@@ -1689,9 +1625,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           {requiredColumns && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
           {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
             <section className={`cove-component__content cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-              {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
-                <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
-              )}
               {/* prettier-ignore */}
               <Title
                 title={title}
@@ -1704,7 +1637,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
               {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
               {/* prettier-ignore */}
-              {state?.filters?.length > 0 && <Filters config={state} setConfig={setState} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
+              {state?.filters?.length > 0 && <Filters config={state} setConfig={setState} getUniqueValues={getUniqueValues} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
 
               <div
                 role='region'
@@ -1786,6 +1719,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           <div aria-live='assertive' className='cdcdataviz-sr-only'>
             {accessibleStatus}
           </div>
+          {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
+            <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
+          )}
         </Layout.Responsive>
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>

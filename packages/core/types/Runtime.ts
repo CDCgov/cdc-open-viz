@@ -7,13 +7,8 @@ export type ForecastingSeriesKey = {
   }[]
 }
 
-export type BarSeriesKey = {
-  key: string
-  color: string
-}
-
 export type Runtime = {
-  barSeriesKeys?: BarSeriesKey[]
+  barSeriesKeys?: string[]
   forecastingSeriesKeys?: ForecastingSeriesKey[]
   originalXAxis: {
     dataKey: string
@@ -26,6 +21,7 @@ export type Runtime = {
   seriesLabels: Record<string, any>
   seriesLabelsAll: string[]
   editorErrorMessage: string
-  lineSeriesKeys: any[]
+  lineSeriesKeys?: string[]
   horizontal: boolean
+  uniqueId: number | string
 }

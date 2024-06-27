@@ -12,11 +12,13 @@ import createBarElement from '@cdc/core/components/createBarElement'
 
 const BarChartStackedVertical = () => {
   const [barWidth, setBarWidth] = useState(0)
-  const { xScale, yScale, xMax, yMax } = useContext(BarChartContext)
+  const { xScale, yScale, seriesScale, xMax, yMax } = useContext(BarChartContext)
   const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter } = useContext(ConfigContext)
   const { isHorizontal, barBorderWidth, applyRadius, hoveredBar, getAdditionalColumn, onMouseLeaveBar, onMouseOverBar, barStackedSeriesKeys } = useBarChart()
   const { orientation } = config
-  const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
+
+  const data = config.brush?.active && config.brush.data?.length ? config.brush.data : transformedData
+  const isDateAxisType = config.runtime.xAxis.type === 'date-time' || config.runtime.xAxis.type === 'date'
 
   return (
     config.visualizationSubType === 'stacked' &&
@@ -28,16 +30,14 @@ const BarChartStackedVertical = () => {
               barStack.bars.map(bar => {
                 let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                 let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                let barThickness = config.xAxis.type === 'date-time' ? config.barThickness * (xScale.range()[1] - xScale.range()[0]) : xMax / barStack.bars.length
-                let barThicknessAdjusted = barThickness * (config.xAxis.type === 'date-time' ? 1 : config.barThickness || 0.8)
-                let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
+                let barThickness = isDateAxisType ? (seriesScale.range()[1] - seriesScale.range()[0]) : (xMax / barStack.bars.length)
+                if(config.runtime.xAxis.type !==  'date') barThickness = config.barThickness * barThickness
                 // tooltips
                 const rawXValue = bar.bar.data[config.runtime.xAxis.dataKey]
-                const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(rawXValue)) : rawXValue
+                const xAxisValue = isDateAxisType ? formatDate(parseDate(rawXValue)) : rawXValue
                 const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
                 if (!yAxisValue) return
-                const barX = xScale(config.runtime.xAxis.type === 'date' ? parseDate(rawXValue) : rawXValue) - (config.xAxis.type === 'date' && config.xAxis.sortDates ? barThicknessAdjusted / 2 : 0)
-                const style = applyRadius(barStack.index)
+                const barX = xScale(isDateAxisType ? parseDate(rawXValue) : rawXValue) - (isDateAxisType ? barThickness / 2 : 0)
                 const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                 const additionalColTooltip = getAdditionalColumn(hoveredBar)
                 const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
@@ -47,7 +47,7 @@ const BarChartStackedVertical = () => {
                   <li class="tooltip-body ">${additionalColTooltip}</li>
                     </li></ul>`
 
-                setBarWidth(barThicknessAdjusted)
+                setBarWidth(barThickness)
 
                 return (
                   <Group key={`${barStack.index}--${bar.index}--${orientation}`}>
@@ -63,7 +63,7 @@ const BarChartStackedVertical = () => {
                         borderColor: '#333',
                         borderStyle: 'solid',
                         borderWidth: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px`,
-                        width: barThicknessAdjusted,
+                        width: barThickness,
                         height: bar.height,
                         x: barX,
                         y: bar.y,
@@ -80,7 +80,7 @@ const BarChartStackedVertical = () => {
                         },
                         styleOverrides: {
                           animationDelay: `${barStack.index * 0.5}s`,
-                          transformOrigin: `${barThicknessAdjusted / 2}px ${bar.y + bar.height}px`,
+                          transformOrigin: `${barThickness / 2}px ${bar.y + bar.height}px`,
                           opacity: transparentBar ? 0.2 : 1,
                           display: displayBar ? 'block' : 'none'
                         }

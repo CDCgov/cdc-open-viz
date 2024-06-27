@@ -7,6 +7,7 @@ import ExampleConfig_2 from './_mock/dashboard-2.json'
 import ExampleConfig_3 from './_mock/dashboard_no_filter.json'
 import Dashboard_Filter from './_mock/dashboard-filter.json'
 import MultiVizConfig from './_mock/multi-viz.json'
+import MultiDashboardConfig from './_mock/multi-dashboards.json'
 import Dashboard from '../CdcDashboard'
 import StandaloneTable from './_mock/standalone-table.json'
 import PivotFitlerConfig from './_mock/pivot-filter.json'
@@ -14,6 +15,9 @@ import { type DashboardConfig as Config } from '../types/DashboardConfig'
 import { userEvent, within } from '@storybook/testing-library'
 import ToggleExampleConfig from './_mock/toggle-example.json'
 import _ from 'lodash'
+import { footnotesSymbols } from '@cdc/core/helpers/footnoteSymbols'
+import FootnotesConfig from '@cdc/core/types/Footnotes'
+import { ConfigRow } from '../types/ConfigRow'
 
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Pages/Dashboard',
@@ -88,13 +92,35 @@ countries.forEach((country, i) => {
   })
 })
 
+const footnoteData = countries.map((country, i) => {
+  return { Country: country, symbol: footnotesSymbols[i][0], text: faker.lorem.sentence() }
+})
+
 const multiVizData = {
-  'valid-world-data.json': { data }
+  'valid-world-data.json': { data },
+  'footnote-data.json': { data: footnoteData }
 }
 
 export const MultiVisualization: Story = {
   args: {
     config: { ...MultiVizConfig, datasets: multiVizData },
+    isEditor: false
+  }
+}
+
+export const MultiDashboard: Story = {
+  args: {
+    config: MultiDashboardConfig,
+    isEditor: false
+  }
+}
+
+const FNrows: ConfigRow[] = [{ ...MultiVizConfig.rows[0], footnotesId: 'footnote123' }]
+const footnoteConfig: Partial<FootnotesConfig> = { dataKey: 'footnote-data.json', dynamicFootnotes: { symbolColumn: 'symbol', textColumn: 'text' }, staticFootnotes: [{ symbol: '**', text: 'This is a static Footnote' }] }
+const FNViz = { ...MultiVizConfig.visualizations, footnote123: footnoteConfig }
+export const Footnotes: Story = {
+  args: {
+    config: { ...MultiVizConfig, datasets: multiVizData, rows: FNrows, visualizations: FNViz },
     isEditor: false
   }
 }
@@ -188,7 +214,8 @@ const fetchMock = {
 
 export const APIFiltersMap: Story = {
   args: {
-    config: APIFiltersMapData as unknown as Config
+    config: APIFiltersMapData as unknown as Config,
+    isEditor: false
   },
   parameters: {
     fetchMock
@@ -216,7 +243,8 @@ export const APIFiltersMap: Story = {
 
 export const APIFiltersChart: Story = {
   args: {
-    config: APIFiltersChartData as unknown as Config
+    config: APIFiltersChartData as unknown as Config,
+    isEditor: false
   },
   parameters: {
     fetchMock

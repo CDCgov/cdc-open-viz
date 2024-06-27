@@ -10,12 +10,12 @@ import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
 import TabPane from './TabPane'
 import Tabs from './Tabs'
 import PreviewDataTable from './PreviewDataTable'
-import LinkIcon from '../assets/icons/link.svg'
+import LinkIcon from '../assets/icons/link.svg?react'
 import SampleDataContext from './../samples/SampleDataContext'
 import SampleData from './SampleData'
 
-import FileUploadIcon from '../assets/icons/file-upload-solid.svg'
-import CloseIcon from '@cdc/core/assets/icon-close.svg'
+import FileUploadIcon from '../assets/icons/file-upload-solid.svg?react'
+import CloseIcon from '@cdc/core/assets/icon-close.svg?react'
 
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
@@ -130,6 +130,10 @@ export default function DataImport() {
       }
 
       throw errorMessages.failedFetch
+    }
+
+    if (config.type === 'dashboard') {
+      setExternalURL('')
     }
 
     return responseBlob
@@ -581,7 +585,7 @@ export default function DataImport() {
     </>
   )
 
-  const showDataDesigner = config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot'
+  const showDataDesigner = !['Box Plot', 'Scatter Plot', 'Sankey'].includes(config?.visualizationType)
 
   return (
     <>

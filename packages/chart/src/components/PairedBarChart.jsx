@@ -18,7 +18,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
   const offset = 1.02 // Offset of the left bar from the Axis
 
   const groupOne = {
-    parentKey: config.dataDescription.seriesKey,
+    parentKey: config.dataDescription?.seriesKey,
     dataKey: config.series[0].dataKey,
     dataKeyLabel: config.runtime.seriesLabels[config.series[0].dataKey] || config.series[0].dataKey,
     color: colorScale(config.runtime.seriesLabels[config.series[0].dataKey]),
@@ -30,7 +30,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
   }
 
   const groupTwo = {
-    parentKey: config.dataDescription.seriesKey,
+    parentKey: config.dataDescription?.seriesKey,
     dataKey: config.series[1].dataKey,
     dataKeyLabel: config.runtime.seriesLabels[config.series[1].dataKey] || config.series[1].dataKey,
     color: colorScale(config.runtime.seriesLabels[config.series[1].dataKey]),
@@ -54,7 +54,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
 
   const dataTipOne = d => {
     return `<p>
-				${config.dataDescription.seriesKey}: ${groupOne.dataKeyLabel}<br/>
+				${config.dataDescription?.seriesKey}: ${groupOne.dataKeyLabel}<br/>
 				${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
 				${label}${formatNumber(d[groupOne.dataKey], 'left')}
 			</p>`
@@ -62,7 +62,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
 
   const dataTipTwo = d => {
     return `<p>
-				${config.dataDescription.seriesKey}: ${groupTwo.dataKeyLabel}<br/>
+				${config.dataDescription?.seriesKey}: ${groupTwo.dataKeyLabel}<br/>
 				${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
 				${label}${formatNumber(d[groupTwo.dataKey], 'left')}
 			</p>`
@@ -102,9 +102,9 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                   <>
                     <Group key={`group-${groupOne.dataKey}-${d[config.xAxis.dataKey]}`} className='horizontal'>
                       <Bar
-                        id={`bar-${groupOne.dataKey}-${d[config.dataDescription.xKey]}`}
+                        id={`bar-${groupOne.dataKey}-${d[config.dataDescription?.xKey]}`}
                         className='bar group-1'
-                        key={`bar-${groupOne.dataKey}-${d[config.dataDescription.xKey]}`}
+                        key={`bar-${groupOne.dataKey}-${d[config.dataDescription?.xKey]}`}
                         x={halfWidth - barWidth}
                         y={y}
                         width={xScale(d[config.series[0].dataKey])}
@@ -152,11 +152,11 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                       }
 							      `}
                     </style>
-                    <Group key={`group-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`} className='horizontal'>
+                    <Group key={`group-${groupTwo.dataKey}-${d[config.dataDescription?.xKey]}`} className='horizontal'>
                       <Bar
-                        id={`bar-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`}
+                        id={`bar-${groupTwo.dataKey}-${d[config.dataDescription?.xKey]}`}
                         className='bar group-2'
-                        key={`bar-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`}
+                        key={`bar-${groupTwo.dataKey}-${d[config.dataDescription?.xKey]}`}
                         x={halfWidth}
                         y={y}
                         width={xScale(d[config.series[1].dataKey])}

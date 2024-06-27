@@ -1,11 +1,23 @@
-// todo: improve base config to extend from
-// todo: theme type is different from waffle chart so its been assigned to any for now.
+import { Runtime } from '@cdc/core/types/Runtime'
+import { Variable } from './Variable'
+
 export type Config = {
-  title: string
-  showHeader: boolean
-  type: string
-  srcUrl: string
+  contentEditor: {
+    // Changing the base config object creates an infinite loop, nesting it is a workaround
+    inlineHTML: string
+    markupVariables: Variable[]
+    showHeader: boolean
+    srcUrl: string
+    title: string
+    useInlineHTML: boolean
+  }
+  data?: Object[]
+  legend: {}
+  newViz?: boolean
+  runtime?: Runtime
   theme: any
+  type: string
+  showEditorPanel?: boolean
   visual: {
     border: boolean
     accent: boolean

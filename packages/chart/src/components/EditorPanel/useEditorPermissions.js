@@ -76,6 +76,12 @@ export const useEditorPermissions = () => {
     return false
   }
 
+  const visHasaAdditionalLabelsOnBars = () => {
+    if (config.visualizationType === 'Bar' && config.visualizationSubType === 'stacked') return false
+    if (['Bar', 'Combo'].includes(config.visualizationType)) return true
+    return false
+  }
+
   const visHasAnchors = () => {
     switch (visualizationType) {
       case 'Area Chart':
@@ -301,8 +307,11 @@ export const useEditorPermissions = () => {
     if (visualizationType === 'Line') {
       return true
     }
+    if (visualizationType === 'Bar' && visualizationSubType === 'regular') {
+      return true
+    }
 
-    if (visualizationType === 'Combo' && lineExist) {
+    if (visualizationType === 'Combo') {
       return true
     }
     return false
@@ -321,6 +330,7 @@ export const useEditorPermissions = () => {
     visHasLegendAxisAlign,
     visHasBrushChart,
     visHasNumbersOnBars,
+    visHasaAdditionalLabelsOnBars,
     visSupportsBarSpace,
     visSupportsBarThickness,
     visSupportsChartHeight,

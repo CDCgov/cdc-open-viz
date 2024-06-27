@@ -10,6 +10,7 @@ import { Mercator } from '@visx/geo'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import topoJSON from '../data/us-regions-topo-2.json'
 import ConfigContext from '../../../context'
+import Annotation from '../../Annotation'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.regions)
 
@@ -252,6 +253,7 @@ const UsaRegionMap = props => {
         <Mercator data={focusedStates} scale={620} translate={[1500, 735]}>
           {({ features, projection }) => constructGeoJsx(features, projection)}
         </Mercator>
+        {false && state.annotations.length > 0 && <Annotation.Draggable />}
       </svg>
       {territories.length > 0 && (
         <section className='territories'>

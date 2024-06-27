@@ -15,7 +15,7 @@ import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import Layout from '@cdc/core/components/Layout'
 
 import '@cdc/core/styles/v2/components/editor.scss'
-import WarningImage from '../images/warning.svg'
+import WarningImage from '../images/warning.svg?react'
 
 import { DATA_OPERATORS, DATA_FUNCTIONS } from '../CdcWaffleChart'
 

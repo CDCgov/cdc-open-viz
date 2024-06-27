@@ -1,19 +1,26 @@
 import _ from 'lodash'
 import { getUpdateConfig } from '../helpers/getUpdateConfig'
-import { MultiDashboardConfig } from '../types/MultiDashboard'
+import { MultiDashboard, MultiDashboardConfig } from '../types/MultiDashboard'
 import DashboardActions from './dashboard.actions'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 import { Tab } from '../types/Tab'
+import { DashboardConfig } from '../types/DashboardConfig'
+import { ConfigRow } from '../types/ConfigRow'
 
-const createBlankDashboard = () => ({
-  dashboard: {
-    theme: 'theme-blue'
-  },
-  rows: [[{ width: 12 }, {}, {}]],
+type BlankMultiConfig = {
+  dashboard: Partial<DashboardConfig>
+  rows: Partial<ConfigRow>[]
+  visualizations: Record<string, Object>
+  table: Object
+}
+
+const createBlankDashboard: () => BlankMultiConfig = () => ({
+  dashboard: {},
+  rows: [{ columns: [{ width: 12 }] }],
   visualizations: {},
   table: {
     label: 'Data Table',
-    show: true,
+    show: false,
     showDownloadUrl: false,
     showVertical: true
   }
@@ -21,7 +28,7 @@ const createBlankDashboard = () => ({
 
 export type DashboardState = {
   config: MultiDashboardConfig
-  data: Object
+  data: Record<string, any[]>
   filteredData: Object
   loading: boolean
   preview: boolean
@@ -30,6 +37,11 @@ export type DashboardState = {
 
 const reducer = (state: DashboardState, action: DashboardActions): DashboardState => {
   switch (action.type) {
+    case 'ADD_FOOTNOTE': {
+      const { id, rowIndex, config } = action.payload
+      const newRows = state.config.rows.map((row, i) => (i === rowIndex ? { ...row, footnotesId: id } : row))
+      return { ...state, config: { ...state.config, rows: newRows, visualizations: { ...state.config.visualizations, [id]: config } } }
+    }
     case 'ADD_NEW_DASHBOARD': {
       const currentMultiDashboards = state.config.multiDashboards
       const label = 'New Dashboard ' + (currentMultiDashboards.length + 1)
@@ -54,6 +66,11 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     }
     case 'SET_PREVIEW': {
       return { ...state, preview: action.payload }
+    }
+    case 'SET_SHARED_FILTERS': {
+      const newSharedFilters = action.payload
+      const newDashboardConfig = { ...state.config.dashboard, sharedFilters: newSharedFilters }
+      return { ...state, config: { ...state.config, dashboard: newDashboardConfig } }
     }
     case 'SET_TAB_SELECTED': {
       return { ...state, tabSelected: action.payload }
@@ -91,11 +108,6 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const toSave = _.pick(state.config, ['dashboard', 'visualizations', 'rows'])
       newMultiDashboards[saveSlot] = { ...toSave, label }
       return applyMultiDashboards(state, newMultiDashboards)
-    }
-    case 'SET_SHARED_FILTERS': {
-      const newSharedFilters = action.payload
-      const newDashboardConfig = { ...state.config.dashboard, sharedFilters: newSharedFilters }
-      return { ...state, config: { ...state.config, dashboard: newDashboardConfig } }
     }
     case 'INITIALIZE_MULTIDASHBOARDS': {
       const label = 'New Dashboard 1'

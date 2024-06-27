@@ -2,16 +2,17 @@ import React from 'react'
 import { Visualization } from '../../types/Visualization'
 import { ViewPort } from '../../types/ViewPort'
 import './editor-wrapper.style.css'
-import { Accordion } from 'react-accessible-accordion'
 
 type StandAloneComponentProps = {
   visualizationKey: string
-  config: Visualization
-  setConfig: Function
+  config
+  updateConfig: (Visualization) => void
   configUrl: string
   setEditing: Function
   hostname: string
   viewport?: ViewPort
+
+  [key: string]: any
 }
 
 type EditorProps = {
@@ -19,7 +20,7 @@ type EditorProps = {
   type: string
   visualizationKey: string
   visualizationConfig: Visualization
-  updateConfig: Function
+  updateConfig: (Visualization) => void
   viewport?: ViewPort
 }
 
@@ -33,12 +34,10 @@ const EditorWrapper: React.FC<React.PropsWithChildren<EditorProps>> = ({ childre
           <div aria-level={2} role='heading' className='heading-2'>
             Configure {type}
           </div>
-          <section>
-            <Accordion allowZeroExpanded={true}>{children}</Accordion>
-          </section>
+          <section>{children}</section>
         </section>
         <div className='preview-wrapper'>
-          <Component visualizationKey={visualizationKey} config={visualizationConfig} setConfig={updateConfig} configUrl={undefined} setEditing={undefined} hostname={undefined} viewport={viewport} />
+          <Component visualizationKey={visualizationKey} config={visualizationConfig} updateConfig={updateConfig} configUrl={undefined} setEditing={undefined} hostname={undefined} viewport={viewport} />
         </div>
       </div>
     </>

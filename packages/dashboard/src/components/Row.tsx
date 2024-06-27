@@ -6,17 +6,18 @@ import Icon from '@cdc/core/components/ui/Icon'
 
 import Column from './Column'
 
-import OneColIcon from '../images/icon-col-12.svg'
-import TwoColIcon from '../images/icon-col-6.svg'
-import ThreeColIcon from '../images/icon-col-4.svg'
-import FourEightColIcon from '../images/icon-col-4-8.svg'
-import EightFourColIcon from '../images/icon-col-8-4.svg'
-import ToggleIcon from '../images/icon-toggle.svg'
+import OneColIcon from '../images/icon-col-12.svg?react'
+import TwoColIcon from '../images/icon-col-6.svg?react'
+import ThreeColIcon from '../images/icon-col-4.svg?react'
+import FourEightColIcon from '../images/icon-col-4-8.svg?react'
+import EightFourColIcon from '../images/icon-col-8-4.svg?react'
+import ToggleIcon from '../images/icon-toggle.svg?react'
 import { ConfigRow } from '../types/ConfigRow'
 import { DataDesignerModal } from './DataDesignerModal'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import { iconHash } from '../helpers/iconHash'
 import _ from 'lodash'
+import { Visualization } from '@cdc/core/types/Visualization'
 
 type RowMenuProps = {
   rowIdx: number
@@ -104,9 +105,20 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
   }
 
   const deleteRow = () => {
-    rows.splice(rowIdx, 1) // Just delete the row. Don't delete the instantiated widgets for now.
+    let newVisualizations = { ...config.visualizations }
 
-    updateConfig({ ...config, rows })
+    //delete the instantiated widgets
+    if (rows[rowIdx] && rows[rowIdx].columns && rows[rowIdx].columns.length && config.visualizations) {
+      rows[rowIdx].columns.forEach(column => {
+        if (column.widget) {
+          delete newVisualizations[column.widget]
+        }
+      })
+    }
+
+    rows.splice(rowIdx, 1) // delete the row
+
+    updateConfig({ ...config, rows, visualizations: newVisualizations })
   }
 
   const layoutList = [
@@ -149,31 +161,52 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
   )
 }
 
-const Row = ({ row, idx: rowIdx, uuid }) => {
-  const { overlay } = useGlobalContext()
-  return (
-    <div className='builder-row' data-row-id={rowIdx}>
-      <RowMenu rowIdx={rowIdx} />
-      <div className='column-container'>
-        <>
-          <button
-            title='Configure Data'
-            className='btn btn-configure-row'
-            onClick={() => {
-              overlay?.actions.openOverlay(<DataDesignerModal rowIndex={rowIdx} />)
-            }}
-          >
-            {iconHash['gear']}
-          </button>
+type RowProps = { row: ConfigRow; idx: number; uuid: number | string }
 
+const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
+  const { overlay } = useGlobalContext()
+  const dispatch = useContext(DashboardDispatchContext)
+
+  const configureFootnotes = () => {
+    if (!row.footnotesId) {
+      const type = 'footnotes'
+      const uid = type + Date.now()
+      const newVisualizationConfig = {
+        uid,
+        type,
+        visualizationType: type,
+        editing: true
+      }
+      dispatch({ type: 'ADD_FOOTNOTE', payload: { id: uid, rowIndex: rowIdx, config: newVisualizationConfig as Visualization } })
+    } else {
+      dispatch({ type: 'UPDATE_VISUALIZATION', payload: { vizKey: row.footnotesId, configureData: { editing: true } } })
+    }
+  }
+  return (
+    <>
+      <div className='builder-row' data-row-id={rowIdx}>
+        <RowMenu rowIdx={rowIdx} />
+        <button
+          title='Configure Data'
+          className='btn btn-configure-row'
+          onClick={() => {
+            overlay?.actions.openOverlay(<DataDesignerModal rowIndex={rowIdx} />)
+          }}
+        >
+          {iconHash['gear']}
+        </button>
+        <div className='column-container'>
           {row.columns
             .filter(column => column.width)
             .map((column, colIdx) => (
               <Column data={column} key={`row-${uuid}-col-${colIdx}`} rowIdx={rowIdx} colIdx={colIdx} />
             ))}
-        </>
+        </div>
+        <button className='btn btn-primary footnotes' onClick={configureFootnotes}>
+          {row.footnotesId ? 'Edit' : 'Add'} Footnotes
+        </button>
       </div>
-    </div>
+    </>
   )
 }
 
