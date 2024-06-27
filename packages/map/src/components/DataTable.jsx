@@ -1,7 +1,7 @@
 import React, { useEffect, useState, memo } from 'react'
 
 import Papa from 'papaparse'
-import ExternalIcon from '../images/external-link.svg' // TODO: Move to Icon component
+import ExternalIcon from '../images/external-link.svg?react' // TODO: Move to Icon component
 import Icon from '@cdc/core/components/ui/Icon'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'

@@ -5,8 +5,9 @@
   "moduleName": "CdcCore",
   "main": "dist/cdccore",
   "scripts": {
-    "test": "vitest watch --reporter verbose --globals true",
-    "test:ui": "vitest --ui"
+    "test": "vitest run --reporter verbose",
+    "test-watch": "vitest watch --reporter verbose",
+    "test-watch:ui": "vitest --ui"
   },
   "repository": {
     "type": "git",
