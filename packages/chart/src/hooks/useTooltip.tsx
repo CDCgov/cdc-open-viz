@@ -9,9 +9,10 @@ import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
 
 export const useTooltip = props => {
-  const { tableData: data, config, formatNumber, capitalize, formatDate, formatTooltipsDate, parseDate, setSharedFilter } = useContext<ChartContext>(ConfigContext)
+  const { tableData: data, config, formatNumber, capitalize, formatDate, formatTooltipsDate, parseDate, setSharedFilter, isDraggingAnnotation } = useContext<ChartContext>(ConfigContext)
   const { xScale, yScale, showTooltip, hideTooltip } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
+
   /**
    * Provides the tooltip information based on the tooltip data array and svg cursor coordinates
    * @function getTooltipInformation
@@ -46,6 +47,8 @@ export const useTooltip = props => {
    */
   const handleTooltipMouseOver = (e, additionalChartData) => {
     e.stopPropagation()
+    if (isDraggingAnnotation) return
+
     const eventSvgCoords = localPoint(e)
     const { x, y } = eventSvgCoords
 

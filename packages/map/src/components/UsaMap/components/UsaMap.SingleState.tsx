@@ -297,7 +297,7 @@ const SingleStateMap = props => {
               )
             }}
           </CustomProjection>
-          {false && state.annotations.length > 0 && <Annotation.Draggable />}
+          {state.annotations.length > 0 && <Annotation.Draggable />}
         </svg>
       )}
       {!state.general.statePicked && 'No State Picked'}
