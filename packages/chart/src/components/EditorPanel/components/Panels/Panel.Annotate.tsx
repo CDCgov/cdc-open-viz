@@ -12,7 +12,7 @@ import { type PanelProps } from './../PanelProps'
 import './../panels.scss'
 
 const PanelAnnotate: React.FC<PanelProps> = props => {
-  const { updateConfig, config, unfilteredData, dimensions } = useContext(ConfigContext)
+  const { updateConfig, config, unfilteredData, dimensions, isDraggingAnnotation } = useContext(ConfigContext)
 
   const getColumns = (filter = true) => {
     const columns = {}
@@ -104,6 +104,42 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   return (
     <Accordion>
       <Accordion.Section title={props.name}>
+        <p>Dragging state: {isDraggingAnnotation ? 'Dragging' : 'Not dragging'}</p>
+
+        <label>
+          Show Annotation Dropdown
+          <input
+            type='checkbox'
+            checked={config?.general?.showAnnotationDropdown}
+            onClick={e => {
+              updateConfig({
+                ...config,
+                general: {
+                  ...config.general,
+                  showAnnotationDropdown: e.target.checked
+                }
+              })
+            }}
+          />
+        </label>
+
+        <label>
+          Annotation Dropdown Title:
+          <input
+            type='text'
+            style={{ marginBottom: '10px' }}
+            value={config?.general?.annotationDropdownText}
+            onChange={e => {
+              updateConfig({
+                ...config,
+                general: {
+                  ...config.general,
+                  annotationDropdownText: e.target.value
+                }
+              })
+            }}
+          />
+        </label>
         {config?.annotations &&
           config?.annotations.map((annotation, index) => (
             <Accordion>
@@ -284,6 +320,22 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                       </select>
                     </label>
                   )}
+
+                  <label>
+                    Display Annotation Dropdown
+                    <input
+                      type='checkbox'
+                      checked={config?.annotations[index]?.displayDropdown}
+                      onClick={e => {
+                        const updatedAnnotations = _.cloneDeep(config?.annotations)
+                        updatedAnnotations[index].displayDropdown = e.target.checked
+                        updateConfig({
+                          ...config,
+                          annotations: updatedAnnotations
+                        })
+                      }}
+                    />
+                  </label>
 
                   <Button className='warn btn-warn btn btn-remove delete' onClick={() => handleRemoveAnnotation(index)}>
                     Delete Annotation

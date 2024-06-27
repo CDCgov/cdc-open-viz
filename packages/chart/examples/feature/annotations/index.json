@@ -2,7 +2,9 @@
   "annotations": [
     {
       "text": "New Annotation",
+      "snapToNearestPoint": false,
       "fontSize": 16,
+      "bezier": 10,
       "show": {
         "desktop": true,
         "tablet": true,
@@ -20,24 +22,26 @@
         "vertical": false,
         "horizontal": false
       },
-      "connectionType": "line",
       "marker": "arrow",
       "edit": {
         "subject": true,
         "label": true
       },
-      "seriesKey": "Data 1",
-      "x": 150.7454887218045,
-      "y": 223,
-      "xKey": 1455523200000,
-      "yKey": "40",
-      "dx": -64.05048929710738,
-      "dy": -57,
-      "opacity": 100,
+      "seriesKey": "",
+      "x": 253.2890625,
+      "y": 189.7265625,
+      "xKey": 1458025200000,
+      "dx": -46,
+      "dy": -50,
+      "opacity": "100",
       "savedDimensions": [
-        660.65,
-        344.546875
-      ]
+        498.59,
+        560.1875
+      ],
+      "connectionType": "line",
+      "originalX": 253.2890625,
+      "originalDX": -46,
+      "originalY": 189.7265625
     }
   ],
   "type": "chart",
@@ -63,13 +67,16 @@
   "tipRounding": "top",
   "isResponsiveTicks": false,
   "general": {
-    "showDownloadButton": false
+    "annotationDropdownText": "Annotations",
+    "showDownloadButton": false,
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueDataLabel": true
   },
   "padding": {
     "left": 5,
     "right": 5
   },
-  "suppressedData": [],
   "preliminaryData": [],
   "yAxis": {
     "hideAxis": false,
@@ -96,6 +103,8 @@
     "scalePadding": 10,
     "tickRotation": 0,
     "anchors": [],
+    "shoMissingDataLabel": true,
+    "showMissingDataLine": true,
     "label": "Y-Axis Example Label"
   },
   "boxplot": {
@@ -179,6 +188,8 @@
     "download": true,
     "showVertical": false,
     "dateDisplayFormat": "",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
     "show": true
   },
   "orientation": "vertical",
@@ -200,12 +211,14 @@
     "lineMode": false,
     "verticalSorted": false,
     "highlightOnHover": false,
+    "hideSuppressedLabels": false,
     "seriesHighlight": [],
     "position": "right",
     "label": "Type of Data"
   },
   "brush": {
     "height": 25,
+    "active": false,
     "data": [
       {
         "Date": "1/15/2016",
@@ -262,7 +275,6 @@
         "Data 6": "300"
       }
     ],
-    "active": false,
     "pattern_id": "brush_pattern",
     "accent_color": "#ddd"
   },
@@ -403,6 +415,7 @@
     },
     "data": []
   },
+  "suppressedData": [],
   "showChartBrush": false,
   "height": "375",
   "data": [
@@ -525,5 +538,5 @@
     "series": false
   },
   "dynamicMarginTop": 0,
-  "version": "4.24.3"
+  "version": "4.24.4"
 }

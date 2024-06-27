@@ -1,5 +1,6 @@
-import { useContext, useState, useEffect, useRef } from 'react'
+import { useContext, useState, useEffect, useRef, useMemo } from 'react'
 import ConfigContext from '../../../ConfigContext'
+import DOMPurify from 'dompurify'
 
 // helpers
 import { findNearestDatum } from './findNearestDatum'
@@ -22,18 +23,21 @@ import { Drag, raise } from '@visx/drag'
 import { MarkerArrow } from '@visx/marker'
 import { LinePath } from '@visx/shape'
 import * as allCurves from '@visx/curve'
+import { fontSizes } from '@cdc/core/helpers/cove/fontSettings'
 
 // styles
 import './AnnotationDraggable.styles.css'
+import { fa } from '@faker-js/faker'
 
-const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
+const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
   const [draggingItems, setDraggingItems] = useState([])
-  const { config, dimensions, updateConfig, isEditor, currentViewport } = useContext(ConfigContext)
+  const { config, dimensions, updateConfig, isEditor, currentViewport, isDraggingAnnotation, isLegendBottom } = useContext(ConfigContext)
   const [width, height] = dimensions
   const { annotations } = config
   const { colorScale } = useColorScale()
   const prevDimensions = useRef(dimensions)
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
+  const trueDimensions: [number, number] = [svgRef?.current?.getBoundingClientRect()?.width, Number(svgRef?.current?.getBoundingClientRect()?.height)]
 
   const restrictedArea = { xMin: 0 + config.yAxis.size, xMax: xMax - config.yAxis.size / 2, yMax: config.heights.vertical - config.xAxis.size, yMin: 0 }
 
@@ -46,17 +50,21 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
      */
     if (config.annotations.length < 1) return
     const threshold: number = 0.05
-    const trueDimensions: [number, number] = [svgRef.current.getBoundingClientRect().width, Number(svgRef.current.getBoundingClientRect().height)]
+
     const widthChange: number = Math.abs(trueDimensions[0] - prevDimensions.current[0])
     const heightChange: number = Math.abs(trueDimensions[1] - prevDimensions.current[1])
+    const marginOffset = isLegendBottom ? 35 : 35
 
-    // Only update if the dimensions have changed significantly
+    // Only update if the dimensions have changed by more than the threshold
     if (widthChange > threshold || heightChange > threshold) {
       const updatedAnnotations = annotations.map((annotation, idx) => {
-        const newX = (annotation.originalX * trueDimensions[0]) / Number(annotation.savedDimensions[0])
+        const ySize = Number(config.yAxis.size)
+        const newX = (annotation.originalX * Number(trueDimensions[0])) / Number(annotation.savedDimensions[0])
+
         return {
           ...annotation,
-          x: newX - 17 // 17 is 1rem in pixels for the margin offset.
+          // keep annotation.x at the sample location when the screen is resized
+          x: newX
         }
       })
       if (updatedAnnotations === annotations) return
@@ -66,11 +74,18 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
       })
       prevDimensions.current = [trueDimensions[0], trueDimensions[1]]
     }
-  }, [dimensions, annotations, updateConfig, config, currentViewport, svgRef])
+  }, [dimensions, annotations, updateConfig, config, currentViewport, svgRef, isLegendBottom])
 
   return (
     annotations &&
     annotations.map((annotation, index) => {
+      const text = annotation.text || ''
+
+      // sanitize the text for setting dangerouslySetInnerHTML
+      const sanitizedData = () => ({
+        __html: DOMPurify.sanitize(text)
+      })
+
       const points = createPoints(annotation, xScale, yScale, config)
       const categoricalOffsetCheck = +(config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0)
 
@@ -79,12 +94,12 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
           key={`annotation--${index}`}
           width={width}
           height={height}
+          dx={annotation.dx} // label x position
+          dy={annotation.dy} // label y postion
           x={annotation.x} // subject x
           y={annotation.y} // subject y
           restrict={restrictedArea}
-          onDragStart={() => {
-            setDraggingItems(raise(annotations, index))
-          }}
+          resetOnStart
         >
           {({ dragStart, dragEnd, dragMove, isDragging, x, y, dx, dy }) => {
             return (
@@ -99,6 +114,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                   canEditLabel={annotation.edit.label || false}
                   canEditSubject={(annotation.edit.subject && annotation.connectionType !== 'none') || false}
                   onDragEnd={props => {
+                    onDragStateChange(false)
                     const updatedAnnotations = annotations.map((annotation, idx) => {
                       if (idx === index) {
                         const nearestDatum = findNearestDatum(
@@ -142,16 +158,38 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                   onTouchMove={dragMove}
                   onTouchEnd={dragEnd}
                   anchorPosition={'auto'}
+                  onDragStart={() => onDragStateChange(true)}
+                  labelDragHandleProps={{ r: 15, stroke: isDraggingAnnotation ? 'red' : 'var(--primary)' }}
+                  subjectDragHandleProps={{ r: 15, stroke: isDraggingAnnotation ? 'red' : 'var(--primary)' }}
                 >
-                  <HtmlLabel width={200} className='annotation__desktop-label' showAnchorLine={false} horizontalAnchor={handleConnectionHorizontalType(annotation, xScale, config)} verticalAnchor={handleConnectionVerticalType(annotation, xScale, config)}>
+                  <HtmlLabel className='annotation__desktop-label' showAnchorLine={false} horizontalAnchor={handleConnectionHorizontalType(annotation, xScale, config)} verticalAnchor={handleConnectionVerticalType(annotation, xScale, config)}>
                     <div
                       style={{
                         borderRadius: 5, // Optional: set border radius
                         backgroundColor: `rgba(255, 255, 255, ${annotation?.opacity ? Number(annotation?.opacity) / 100 : 1})`,
-                        padding: '10px'
+                        padding: '10px',
+                        width: 'auto',
+                        display: config.general.showAnnotationDropdown ? 'inline-flex' : 'flex',
+                        justifyContent: 'start',
+                        flexDirection: 'row'
                       }}
-                      dangerouslySetInnerHTML={{ __html: annotation.text }}
-                    />
+                      role='presentation'
+                      // ! IMPORTANT: Workaround for 508
+                      // - HTML needs to be set from the editor and we need a wrapper with the tabIndex
+                      // - TabIndex is only supposed to be used on interactive elements. This is a workaround.
+                      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+                      tabIndex={0}
+                      aria-label={`Annotation text that reads: ${annotation.text}`}
+                    >
+                      {config?.general?.showAnnotationDropdown && (
+                        <>
+                          <p className='annotation__has-dropdown-number' style={{ margin: '2px 6px' }}>
+                            {index + 1}
+                          </p>
+                        </>
+                      )}
+                      <div style={{ fontSize: fontSizes[config.fontSize] }} dangerouslySetInnerHTML={sanitizedData()} />
+                    </div>
                   </HtmlLabel>
                   {annotation.connectionType === 'line' && <Connector type='line' pathProps={{ markerStart: 'url(#marker-start)' }} />}
                   {annotation.connectionType === 'elbow' && <Connector type='elbow' pathProps={{ markerStart: 'url(#marker-start)' }} />}
@@ -181,8 +219,8 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                     {index + 1}
                   </text>
                   {/* ANCHORS */}
-                  {annotation.anchor.horizontal && <LineSubject orientation={'horizontal'} stroke={'gray'} min={config.yAxis.size} max={xMax + Number(config.yAxis.size) + categoricalOffsetCheck} />}
-                  {annotation.anchor.vertical && <LineSubject orientation={'vertical'} stroke={'gray'} min={config.heights.vertical - config.xAxis.size} max={0} />}
+                  {/* {annotation.anchor.horizontal && <LineSubject orientation={'horizontal'} stroke={'gray'} min={config.yAxis.size} max={xMax + Number(config.yAxis.size) + categoricalOffsetCheck} />} */}
+                  {/* {annotation.anchor.vertical && <LineSubject orientation={'vertical'} stroke={'gray'} min={config.heights.vertical - config.xAxis.size} max={0} />} */}
                 </AnnotationComponent>
               </>
             )

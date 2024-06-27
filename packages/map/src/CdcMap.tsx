@@ -84,6 +84,7 @@ const indexOfIgnoreType = (arr, item) => {
 const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, link }) => {
   const transform = new DataTransform()
   const [state, setState] = useState({ ...initialState })
+  const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [loading, setLoading] = useState(true)
   const [displayPanel, setDisplayPanel] = useState(true)
   const [currentViewport, setCurrentViewport] = useState()
@@ -108,6 +109,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   let legendMemo = useRef(new Map())
   let legendSpecialClassLastMemo = useRef(new Map())
   let innerContainerRef = useRef()
+
+  if (isDebug) console.log('CdcMap state=', state) // <eslint-disable-line></eslint-disable-line>
+
+  const handleDragStateChange = isDragging => {
+    setIsDraggingAnnotation(isDragging)
+  }
 
   const columnsRequiredChecker = useCallback(() => {
     let columnList = []
@@ -1534,6 +1541,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // Props passed to all map types
   const mapProps = {
+    isDraggingAnnotation,
+    handleDragStateChange,
     applyLegendToRow,
     applyTooltipsToGeo,
     capitalize: state.tooltips?.capitalizeLabels,
@@ -1633,6 +1642,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
               />
               <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
+              {state?.annotations?.length > 0 && <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />}
 
               {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
@@ -1712,6 +1722,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 />
               )}
 
+              {state.annotations.length > 0 && <Annotation.Dropdown />}
+
               {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
             </section>
           )}
@@ -1719,7 +1731,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           <div aria-live='assertive' className='cdcdataviz-sr-only'>
             {accessibleStatus}
           </div>
-          {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
+
+          {!isDraggingAnnotation && !window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
             <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
           )}
         </Layout.Responsive>
