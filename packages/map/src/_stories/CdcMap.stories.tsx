@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import CdcMap from '../CdcMap'
+import EqualNumberOptInExample from './_mock/DEV-7286.json'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map',
@@ -11,6 +12,12 @@ type Story = StoryObj<typeof CdcMap>
 export const Equal_Interval_Map: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/page-elements/equal-interval-map.json'
+  }
+}
+
+export const Equal_Number_Opt_In: Story = {
+  args: {
+    config: EqualNumberOptInExample
   }
 }
 
