@@ -20,6 +20,7 @@ export const getFootnotesVizConfig = (vizKey: string, rowNumber: number, config:
 }
 
 export const getVizConfig = (visualizationKey: string, rowNumber: number, config: MultiDashboardConfig, data: Object, filteredData?: Object) => {
+  if(rowNumber === undefined) return {}
   const visualizationConfig = _.cloneDeep(config.visualizations[visualizationKey])
   const rowData = config.rows[rowNumber]
   if (rowData.footnotesId && rowData.footnotesId === visualizationKey) {
