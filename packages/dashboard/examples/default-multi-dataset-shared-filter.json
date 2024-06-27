@@ -1,0 +1,1729 @@
+{
+  "dashboard": {
+    "sharedFilters": [
+      {
+        "key": "Wind",
+        "type": "datafilter",
+        "showDropdown": true,
+        "usedBy": [
+          "chart1"
+        ],
+        "columnName": "wind",
+        "values": [
+          "Include Wind",
+          "Don't Include Wind"
+        ],
+        "active": "Include Wind",
+        "tier": 1
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart1"
+        },
+        {},
+        {}
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "map1"
+        },
+        {},
+        {}
+      ]
+    }
+  ],
+  "visualizations": {
+    "chart1": {
+      "annotations": [],
+      "type": "chart",
+      "debugSvg": false,
+      "chartMessage": {
+        "noData": "No Data Available"
+      },
+      "title": "Average Temperature By City (Line Example)",
+      "showTitle": true,
+      "showDownloadMediaButton": false,
+      "theme": "theme-blue",
+      "animate": false,
+      "fontSize": "large",
+      "lineDatapointStyle": "hover",
+      "lineDatapointColor": "Same as Line",
+      "barHasBorder": "false",
+      "isLollipopChart": false,
+      "lollipopShape": "circle",
+      "lollipopColorStyle": "two-tone",
+      "visualizationSubType": "regular",
+      "barStyle": "flat",
+      "roundingStyle": "standard",
+      "tipRounding": "top",
+      "isResponsiveTicks": false,
+      "general": {
+        "showDownloadButton": false,
+        "showMissingDataLabel": true,
+        "showSuppressedSymbol": true,
+        "showZeroValueDataLabel": true
+      },
+      "padding": {
+        "left": 15,
+        "right": 15
+      },
+      "preliminaryData": [],
+      "yAxis": {
+        "hideAxis": false,
+        "displayNumbersOnBar": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 50,
+        "gridLines": false,
+        "enablePadding": false,
+        "min": "",
+        "max": "",
+        "labelColor": "#333",
+        "tickLabelColor": "#333",
+        "tickColor": "#333",
+        "rightHideAxis": true,
+        "rightAxisSize": 0,
+        "rightLabel": "",
+        "rightLabelOffsetSize": 0,
+        "rightAxisLabelColor": "#333",
+        "rightAxisTickLabelColor": "#333",
+        "rightAxisTickColor": "#333",
+        "numTicks": "",
+        "axisPadding": 0,
+        "scalePadding": 10,
+        "tickRotation": 0,
+        "anchors": [],
+        "shoMissingDataLabel": true,
+        "showMissingDataLine": true,
+        "label": "Temperature",
+        "paddingPercent": 0.15
+      },
+      "boxplot": {
+        "plots": [],
+        "borders": "true",
+        "firstQuartilePercentage": 25,
+        "thirdQuartilePercentage": 75,
+        "boxWidthPercentage": 40,
+        "plotOutlierValues": false,
+        "plotNonOutlierValues": true,
+        "legend": {
+          "showHowToReadText": false,
+          "howToReadText": ""
+        },
+        "labels": {
+          "q1": "Lower Quartile",
+          "q2": "q2",
+          "q3": "Upper Quartile",
+          "q4": "q4",
+          "minimum": "Minimum",
+          "maximum": "Maximum",
+          "mean": "Mean",
+          "median": "Median",
+          "sd": "Standard Deviation",
+          "iqr": "Interquartile Range",
+          "total": "Total",
+          "outliers": "Outliers",
+          "values": "Values",
+          "lowerBounds": "Lower Bounds",
+          "upperBounds": "Upper Bounds"
+        }
+      },
+      "topAxis": {
+        "hasLine": false
+      },
+      "isLegendValue": false,
+      "barThickness": 0.35,
+      "barHeight": 25,
+      "barSpace": 15,
+      "heights": {
+        "vertical": 300,
+        "horizontal": 750
+      },
+      "xAxis": {
+        "sortDates": false,
+        "anchors": [],
+        "type": "date",
+        "showTargetLabel": true,
+        "targetLabel": "Target",
+        "hideAxis": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 75,
+        "tickRotation": 50,
+        "min": "",
+        "max": "",
+        "labelColor": "#333",
+        "tickLabelColor": "#333",
+        "tickColor": "#333",
+        "numTicks": 8,
+        "labelOffset": 65,
+        "axisPadding": 200,
+        "target": 0,
+        "maxTickRotation": 0,
+        "label": "Date",
+        "dataKey": "date",
+        "dateParseFormat": "%Y-%m-%d",
+        "dateDisplayFormat": "%b %d",
+        "tickWidthMax": 59,
+        "padding": 6
+      },
+      "table": {
+        "label": "Data Table",
+        "expanded": false,
+        "limitHeight": false,
+        "height": "",
+        "caption": "",
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "indexLabel": "",
+        "download": true,
+        "showVertical": false,
+        "dateDisplayFormat": "",
+        "showMissingDataLabel": true,
+        "showSuppressedSymbol": true,
+        "show": false
+      },
+      "orientation": "vertical",
+      "color": "pinkpurple",
+      "columns": {},
+      "legend": {
+        "hide": false,
+        "behavior": "isolate",
+        "axisAlign": true,
+        "singleRow": true,
+        "colorCode": "",
+        "reverseLabelOrder": false,
+        "description": "",
+        "dynamicLegend": false,
+        "dynamicLegendDefaultText": "Show All",
+        "dynamicLegendItemLimit": 5,
+        "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+        "dynamicLegendChartMessage": "Select Options from the Legend",
+        "lineMode": false,
+        "verticalSorted": false,
+        "highlightOnHover": false,
+        "hideSuppressedLabels": false,
+        "seriesHighlight": [],
+        "label": "Legend",
+        "above": true,
+        "left": true
+      },
+      "brush": {
+        "height": 25,
+        "active": false
+      },
+      "exclusions": {
+        "active": false,
+        "keys": []
+      },
+      "palette": "qualitative-bold",
+      "isPaletteReversed": false,
+      "twoColor": {
+        "palette": "monochrome-1",
+        "isPaletteReversed": false
+      },
+      "labels": false,
+      "dataFormat": {
+        "commas": false,
+        "prefix": "",
+        "suffix": "°",
+        "abbreviated": false,
+        "bottomSuffix": "",
+        "bottomPrefix": "",
+        "bottomAbbreviated": false
+      },
+      "confidenceKeys": {},
+      "visual": {
+        "border": true,
+        "accent": true,
+        "background": true,
+        "verticalHoverLine": false,
+        "horizontalHoverLine": false
+      },
+      "useLogScale": false,
+      "filterBehavior": "Filter Change",
+      "highlightedBarValues": [],
+      "series": [
+        {
+          "dataKey": "New York",
+          "type": "Line",
+          "axis": "Left",
+          "tooltip": true
+        },
+        {
+          "dataKey": "San Francisco",
+          "type": "Line",
+          "axis": "Left",
+          "tooltip": true
+        },
+        {
+          "dataKey": "Austin",
+          "type": "Line",
+          "axis": "Left",
+          "tooltip": true
+        }
+      ],
+      "tooltips": {
+        "opacity": 90,
+        "singleSeries": false,
+        "dateDisplayFormat": ""
+      },
+      "forestPlot": {
+        "startAt": 0,
+        "colors": {
+          "line": "",
+          "shape": ""
+        },
+        "lineOfNoEffect": {
+          "show": true
+        },
+        "type": "",
+        "pooledResult": {
+          "diamondHeight": 5,
+          "column": ""
+        },
+        "estimateField": "",
+        "estimateRadius": "",
+        "shape": "square",
+        "rowHeight": 20,
+        "description": {
+          "show": true,
+          "text": "description",
+          "location": 0
+        },
+        "result": {
+          "show": true,
+          "text": "result",
+          "location": 100
+        },
+        "radius": {
+          "min": 2,
+          "max": 10,
+          "scalingColumn": ""
+        },
+        "regression": {
+          "lower": 0,
+          "upper": 0,
+          "estimateField": 0
+        },
+        "leftWidthOffset": 0,
+        "rightWidthOffset": 0,
+        "showZeroLine": false,
+        "leftLabel": "",
+        "rightLabel": ""
+      },
+      "area": {
+        "isStacked": false
+      },
+      "sankey": {
+        "title": {
+          "defaultColor": "black"
+        },
+        "iterations": 1,
+        "rxValue": 0.9,
+        "overallSize": {
+          "width": 900,
+          "height": 700
+        },
+        "margin": {
+          "margin_y": 25,
+          "margin_x": 0
+        },
+        "nodeSize": {
+          "nodeWidth": 26,
+          "nodeHeight": 40
+        },
+        "nodePadding": 55,
+        "nodeFontColor": "black",
+        "nodeColor": {
+          "default": "#ff8500",
+          "inactive": "#808080"
+        },
+        "linkColor": {
+          "default": "#ffc900",
+          "inactive": "#D3D3D3"
+        },
+        "opacity": {
+          "nodeOpacityDefault": 1,
+          "nodeOpacityInactive": 0.1,
+          "LinkOpacityDefault": 1,
+          "LinkOpacityInactive": 0.1
+        },
+        "storyNodeFontColor": "#006778",
+        "storyNodeText": [],
+        "nodeValueStyle": {
+          "textBefore": "(",
+          "textAfter": ")"
+        },
+        "data": []
+      },
+      "uid": "chart1",
+      "dataKey": "data2",
+      "description": "<p>Average temperature from October 1st through August 29th in:</p><ul><li>New York</li><li>San Francisco</li><li>Austin</li></ul>",
+      "visualizationType": "Line",
+      "filters": [
+        {
+          "label": "Humidity",
+          "columnName": "humidity",
+          "values": [
+            "Don't Include Humidiy",
+            "Include Humidiy"
+          ],
+          "active": "Don't Include Humidiy",
+          "filterStyle": "dropdown",
+          "order": "asc"
+        }
+      ],
+      "seriesLabel": "City",
+      "regions": [
+        {
+          "label": "Region",
+          "color": "black",
+          "background": "green",
+          "from": "2011-10-02",
+          "to": "2011-10-03"
+        }
+      ],
+      "formattedData": [
+        {
+          "date": "2011-10-01",
+          "New York": "89.4",
+          "San Francisco": "26.7",
+          "Austin": "34.2",
+          "wind": "Include Winderwall",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-02",
+          "New York": "54.0",
+          "San Francisco": "59.9",
+          "Austin": "68.7",
+          "wind": "Include Winderwall",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-03",
+          "New York": "51.3",
+          "San Francisco": "53.1",
+          "Austin": "64.4",
+          "wind": "Include Winderwall",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-04",
+          "New York": "34.7",
+          "San Francisco": "56.8",
+          "Austin": "98.0",
+          "wind": "Include Winderwall",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-01",
+          "New York": "32.4",
+          "San Francisco": "43.7",
+          "Austin": "54.2",
+          "wind": "Don't Include Wind",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-02",
+          "New York": "65.0",
+          "San Francisco": "76.9",
+          "Austin": "87.7",
+          "wind": "Don't Include Wind",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-03",
+          "New York": "53.3",
+          "San Francisco": "59.1",
+          "Austin": "69.4",
+          "wind": "Don't Include Wind",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-04",
+          "New York": "55.7",
+          "San Francisco": "58.8",
+          "Austin": "68.0",
+          "wind": "Don't Include Wind",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-01",
+          "New York": "63.4",
+          "San Francisco": "62.7",
+          "Austin": "72.2",
+          "wind": "Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-02",
+          "New York": "58.0",
+          "San Francisco": "59.9",
+          "Austin": "67.7",
+          "wind": "Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-03",
+          "New York": "53.3",
+          "San Francisco": "59.1",
+          "Austin": "69.4",
+          "wind": "Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-04",
+          "New York": "55.7",
+          "San Francisco": "58.8",
+          "Austin": "68.0",
+          "wind": "Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-01",
+          "New York": "63.4",
+          "San Francisco": "62.7",
+          "Austin": "87.2",
+          "wind": "Don't Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-02",
+          "New York": "98.0",
+          "San Francisco": "59.9",
+          "Austin": "67.7",
+          "wind": "Don't Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-03",
+          "New York": "53.3",
+          "San Francisco": "59.1",
+          "Austin": "69.4",
+          "wind": "Don't Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-04",
+          "New York": "55.7",
+          "San Francisco": "54.8",
+          "Austin": "68.0",
+          "wind": "Don't Include Wind",
+          "humidity": "Don't Include Humidiy"
+        }
+      ],
+      "editing": false,
+      "originalFormattedData": [
+        {
+          "date": "2011-10-01",
+          "New York": "89.4",
+          "San Francisco": "26.7",
+          "Austin": "34.2",
+          "wind": "Include Winderwall",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-02",
+          "New York": "54.0",
+          "San Francisco": "59.9",
+          "Austin": "68.7",
+          "wind": "Include Winderwall",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-03",
+          "New York": "51.3",
+          "San Francisco": "53.1",
+          "Austin": "64.4",
+          "wind": "Include Winderwall",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-04",
+          "New York": "34.7",
+          "San Francisco": "56.8",
+          "Austin": "98.0",
+          "wind": "Include Winderwall",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-01",
+          "New York": "32.4",
+          "San Francisco": "43.7",
+          "Austin": "54.2",
+          "wind": "Don't Include Wind",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-02",
+          "New York": "65.0",
+          "San Francisco": "76.9",
+          "Austin": "87.7",
+          "wind": "Don't Include Wind",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-03",
+          "New York": "53.3",
+          "San Francisco": "59.1",
+          "Austin": "69.4",
+          "wind": "Don't Include Wind",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-04",
+          "New York": "55.7",
+          "San Francisco": "58.8",
+          "Austin": "68.0",
+          "wind": "Don't Include Wind",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-01",
+          "New York": "63.4",
+          "San Francisco": "62.7",
+          "Austin": "72.2",
+          "wind": "Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-02",
+          "New York": "58.0",
+          "San Francisco": "59.9",
+          "Austin": "67.7",
+          "wind": "Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-03",
+          "New York": "53.3",
+          "San Francisco": "59.1",
+          "Austin": "69.4",
+          "wind": "Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-04",
+          "New York": "55.7",
+          "San Francisco": "58.8",
+          "Austin": "68.0",
+          "wind": "Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-01",
+          "New York": "63.4",
+          "San Francisco": "62.7",
+          "Austin": "87.2",
+          "wind": "Don't Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-02",
+          "New York": "98.0",
+          "San Francisco": "59.9",
+          "Austin": "67.7",
+          "wind": "Don't Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-03",
+          "New York": "53.3",
+          "San Francisco": "59.1",
+          "Austin": "69.4",
+          "wind": "Don't Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-04",
+          "New York": "55.7",
+          "San Francisco": "54.8",
+          "Austin": "68.0",
+          "wind": "Don't Include Wind",
+          "humidity": "Don't Include Humidiy"
+        }
+      ],
+      "data": [
+        {
+          "date": "2011-10-01",
+          "New York": "89.4",
+          "San Francisco": "26.7",
+          "Austin": "34.2",
+          "wind": "Include Winderwall",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-02",
+          "New York": "54.0",
+          "San Francisco": "59.9",
+          "Austin": "68.7",
+          "wind": "Include Winderwall",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-03",
+          "New York": "51.3",
+          "San Francisco": "53.1",
+          "Austin": "64.4",
+          "wind": "Include Winderwall",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-04",
+          "New York": "34.7",
+          "San Francisco": "56.8",
+          "Austin": "98.0",
+          "wind": "Include Winderwall",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-01",
+          "New York": "32.4",
+          "San Francisco": "43.7",
+          "Austin": "54.2",
+          "wind": "Don't Include Wind",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-02",
+          "New York": "65.0",
+          "San Francisco": "76.9",
+          "Austin": "87.7",
+          "wind": "Don't Include Wind",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-03",
+          "New York": "53.3",
+          "San Francisco": "59.1",
+          "Austin": "69.4",
+          "wind": "Don't Include Wind",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-04",
+          "New York": "55.7",
+          "San Francisco": "58.8",
+          "Austin": "68.0",
+          "wind": "Don't Include Wind",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-01",
+          "New York": "63.4",
+          "San Francisco": "62.7",
+          "Austin": "72.2",
+          "wind": "Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-02",
+          "New York": "58.0",
+          "San Francisco": "59.9",
+          "Austin": "67.7",
+          "wind": "Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-03",
+          "New York": "53.3",
+          "San Francisco": "59.1",
+          "Austin": "69.4",
+          "wind": "Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-04",
+          "New York": "55.7",
+          "San Francisco": "58.8",
+          "Austin": "68.0",
+          "wind": "Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-01",
+          "New York": "63.4",
+          "San Francisco": "62.7",
+          "Austin": "87.2",
+          "wind": "Don't Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-02",
+          "New York": "98.0",
+          "San Francisco": "59.9",
+          "Austin": "67.7",
+          "wind": "Don't Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-03",
+          "New York": "53.3",
+          "San Francisco": "59.1",
+          "Austin": "69.4",
+          "wind": "Don't Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-04",
+          "New York": "55.7",
+          "San Francisco": "54.8",
+          "Austin": "68.0",
+          "wind": "Don't Include Wind",
+          "humidity": "Don't Include Humidiy"
+        }
+      ],
+      "version": "4.24.4",
+      "dynamicMarginTop": 0
+    },
+    "map1": {
+      "uid": "map1",
+      "type": "map",
+      "defaultData": false,
+      "dataKey": "data1",
+      "general": {
+        "title": "Map Example",
+        "subtext": "",
+        "territoriesLabel": "Territories",
+        "type": "data",
+        "geoType": "us",
+        "headerColor": "theme-blue",
+        "showSidebar": true,
+        "showTitle": true,
+        "geoBorderColor": "darkGray",
+        "showDownloadButton": true,
+        "expandDataTable": true
+      },
+      "color": "pinkpurple",
+      "columns": {
+        "geo": {
+          "name": "state",
+          "label": "Location",
+          "tooltip": false,
+          "dataTable": true
+        },
+        "primary": {
+          "name": "Insured Rate",
+          "label": "Data Label",
+          "prefix": "",
+          "suffix": "%",
+          "dataTable": true,
+          "tooltip": true
+        },
+        "navigate": {
+          "name": "link",
+          "tooltip": false,
+          "dataTable": false
+        }
+      },
+      "legend": {
+        "numberOfItems": 3,
+        "position": "side",
+        "title": "Legend Title",
+        "description": "Legend Text",
+        "type": "equalnumber",
+        "specialClasses": [
+          "N/A"
+        ]
+      },
+      "filters": [
+        {
+          "label": "Filter 2",
+          "columnName": "filter2"
+        }
+      ],
+      "formattedData": [
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "43",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "75",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "83",
+          "state": "Florida"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "100",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "83",
+          "state": "Florida"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "0",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "83",
+          "state": "Florida"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "43",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "83",
+          "state": "Florida"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "43",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "83",
+          "state": "Florida"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "43",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "83",
+          "state": "Florida"
+        }
+      ]
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showVertical": true
+  },
+  "type": "dashboard",
+  "datasets": {
+    "data1": {
+      "data": [
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "43",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "75",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "83",
+          "state": "Florida"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "100",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "83",
+          "state": "Florida"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "0",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "83",
+          "state": "Florida"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "43",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "83",
+          "state": "Florida"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "43",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "83",
+          "state": "Florida"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "43",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "83",
+          "state": "Florida"
+        }
+      ]
+    },
+    "data2": {
+      "dataUrl": "../examples/temp-example-data.json",
+      "data": [
+        {
+          "date": "2011-10-01",
+          "New York": "89.4",
+          "San Francisco": "26.7",
+          "Austin": "34.2",
+          "wind": "Include Winderwall",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-02",
+          "New York": "54.0",
+          "San Francisco": "59.9",
+          "Austin": "68.7",
+          "wind": "Include Winderwall",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-03",
+          "New York": "51.3",
+          "San Francisco": "53.1",
+          "Austin": "64.4",
+          "wind": "Include Winderwall",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-04",
+          "New York": "34.7",
+          "San Francisco": "56.8",
+          "Austin": "98.0",
+          "wind": "Include Winderwall",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-01",
+          "New York": "32.4",
+          "San Francisco": "43.7",
+          "Austin": "54.2",
+          "wind": "Don't Include Wind",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-02",
+          "New York": "65.0",
+          "San Francisco": "76.9",
+          "Austin": "87.7",
+          "wind": "Don't Include Wind",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-03",
+          "New York": "53.3",
+          "San Francisco": "59.1",
+          "Austin": "69.4",
+          "wind": "Don't Include Wind",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-04",
+          "New York": "55.7",
+          "San Francisco": "58.8",
+          "Austin": "68.0",
+          "wind": "Don't Include Wind",
+          "humidity": "Include Humidiy"
+        },
+        {
+          "date": "2011-10-01",
+          "New York": "63.4",
+          "San Francisco": "62.7",
+          "Austin": "72.2",
+          "wind": "Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-02",
+          "New York": "58.0",
+          "San Francisco": "59.9",
+          "Austin": "67.7",
+          "wind": "Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-03",
+          "New York": "53.3",
+          "San Francisco": "59.1",
+          "Austin": "69.4",
+          "wind": "Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-04",
+          "New York": "55.7",
+          "San Francisco": "58.8",
+          "Austin": "68.0",
+          "wind": "Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-01",
+          "New York": "63.4",
+          "San Francisco": "62.7",
+          "Austin": "87.2",
+          "wind": "Don't Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-02",
+          "New York": "98.0",
+          "San Francisco": "59.9",
+          "Austin": "67.7",
+          "wind": "Don't Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-03",
+          "New York": "53.3",
+          "San Francisco": "59.1",
+          "Austin": "69.4",
+          "wind": "Don't Include Wind",
+          "humidity": "Don't Include Humidiy"
+        },
+        {
+          "date": "2011-10-04",
+          "New York": "55.7",
+          "San Francisco": "54.8",
+          "Austin": "68.0",
+          "wind": "Don't Include Wind",
+          "humidity": "Don't Include Humidiy"
+        }
+      ]
+    }
+  },
+  "runtime": {},
+  "version": "4.24.4"
+}
