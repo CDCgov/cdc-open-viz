@@ -33,7 +33,7 @@ import colorPalettes from '@cdc/core/data/colorPalettes'
 import initialState from './data/initial-state'
 
 // Assets
-import ExternalIcon from './images/external-link.svg'
+import ExternalIcon from './images/external-link.svg?react'
 
 // Sass
 import './scss/main.scss'

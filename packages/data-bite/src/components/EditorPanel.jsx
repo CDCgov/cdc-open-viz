@@ -4,7 +4,7 @@ import { Accordion, AccordionItem, AccordionItemButton, AccordionItemHeading, Ac
 
 import { useDebounce } from 'use-debounce'
 import Context from '../context'
-import WarningImage from '@cdc/core/assets/icon-warning-circle.svg'
+import WarningImage from '@cdc/core/assets/icon-warning-circle.svg?react'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'

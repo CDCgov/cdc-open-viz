@@ -11,8 +11,9 @@
     "preview": "vite preview",
     "graph": "nx graph",
     "prepublishOnly": "lerna run --scope @cdc/data-bite build",
-    "test": "vitest watch --reporter verbose",
-    "test:ui": "vitest --ui"
+    "test": "vitest run --reporter verbose",
+    "test-watch": "vitest watch --reporter verbose",
+    "test-watch:ui": "vitest --ui"
   },
   "repository": {
     "type": "git",
