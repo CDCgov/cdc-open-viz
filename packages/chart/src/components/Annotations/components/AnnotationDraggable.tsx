@@ -36,11 +36,12 @@ const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
   const { colorScale } = useColorScale()
   const prevDimensions = useRef(dimensions)
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
+
   const [trueDimensions, setTrueDimensions] = useState<[width: number, height: number]>([width, height])
   const restrictedArea = { xMin: 0 + config.yAxis.size, xMax: xMax - config.yAxis.size / 2, yMax: config.heights.vertical - config.xAxis.size, yMin: 0 }
 
   useEffect(() => {
-    setTrueDimensions([svgRef?.current?.getBoundingClientRect()?.width, Number(svgRef?.current?.getBoundingClientRect()?.height)])
+    setTrueDimensions([svgRef.current.clientWidth, svgRef.current.clientHeight])
   }, [dimensions])
 
   useEffect(() => {
@@ -59,13 +60,25 @@ const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
     // Only update if the dimensions have changed by more than the threshold
     if (widthChange > threshold || heightChange > threshold) {
       const updatedAnnotations = annotations.map((annotation, idx) => {
-        const ySize = Number(config.yAxis.size)
-        const newX = (annotation.originalX * Number(trueDimensions[0])) / Number(annotation.savedDimensions[0])
+        const DEBUG = true
+        DEBUG &&
+          console.table({
+            'Saved x value': annotation.originalX,
+            'Resized x value': annotation.x,
+            'Saved Dimensions': `Width: ${annotation.savedDimensions[0]}, Height: ${annotation.savedDimensions[1]}`
+          })
+        const getNewX = () => {
+          if (isEditor) {
+            // update saved dimensions after a few seconds time out.
+            return (annotation.originalX * Number(trueDimensions[0])) / Number(annotation.savedDimensions[0])
+          } else {
+            return (annotation.originalX * Number(trueDimensions[0])) / Number(annotation.savedDimensions[0])
+          }
+        }
 
         return {
           ...annotation,
-          // keep annotation.x at the sample location when the screen is resized
-          x: newX
+          x: getNewX()
         }
       })
       if (updatedAnnotations === annotations) return
@@ -140,7 +153,8 @@ const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
                           originalY: annotation.snapToNearestPoint && nearestDatum.y ? yScale(nearestDatum.y) : Number(props.y) ? Number(props.y) : 0,
                           y: annotation.snapToNearestPoint && nearestDatum.y ? yScale(nearestDatum.y) : Number(props.y) ? Number(props.y) : 0,
                           dx: props.dx,
-                          dy: props.dy
+                          dy: props.dy,
+                          savedDimensions: trueDimensions
                         }
                       }
                       return annotation
