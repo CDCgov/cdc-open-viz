@@ -28,6 +28,10 @@ type SharedChartContext = {
   capitalize: (value: string) => string
   // whether or not the legend is appearing below the chart
   isLegendBottom?: boolean
+  // whether or not the chart is viewed within the editor screen
+  isEditor?: boolean
+  // whether or not the user is dragging an annotation
+  isDraggingAnnotation?: boolean
 }
 
 // Line Chart Specific Context
