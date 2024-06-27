@@ -361,7 +361,6 @@ const LinearChart = props => {
       {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
       <div style={{ width: `${width}px`, overflow: 'visible' }} className='tooltip-boundary'>
         <svg
-          // onMouseLeave={() => setPoint(null)}
           onMouseMove={onMouseMove}
           width={'100%'}
           height={height}

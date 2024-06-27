@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useRef } from 'react'
+import { useContext, useState, useEffect, useRef, useMemo } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import DOMPurify from 'dompurify'
 
@@ -31,12 +31,13 @@ import { fa } from '@faker-js/faker'
 
 const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
   const [draggingItems, setDraggingItems] = useState([])
-  const { config, dimensions, updateConfig, isEditor, currentViewport, isDraggingAnnotation } = useContext(ConfigContext)
+  const { config, dimensions, updateConfig, isEditor, currentViewport, isDraggingAnnotation, isLegendBottom } = useContext(ConfigContext)
   const [width, height] = dimensions
   const { annotations } = config
   const { colorScale } = useColorScale()
   const prevDimensions = useRef(dimensions)
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
+  const trueDimensions: [number, number] = [svgRef?.current?.getBoundingClientRect()?.width, Number(svgRef?.current?.getBoundingClientRect()?.height)]
 
   const restrictedArea = { xMin: 0 + config.yAxis.size, xMax: xMax - config.yAxis.size / 2, yMax: config.heights.vertical - config.xAxis.size, yMin: 0 }
 
@@ -49,16 +50,20 @@ const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
      */
     if (config.annotations.length < 1) return
     const threshold: number = 0.05
-    const trueDimensions: [number, number] = [svgRef.current.getBoundingClientRect().width, Number(svgRef.current.getBoundingClientRect().height)]
+
     const widthChange: number = Math.abs(trueDimensions[0] - prevDimensions.current[0])
     const heightChange: number = Math.abs(trueDimensions[1] - prevDimensions.current[1])
+    const marginOffset = isLegendBottom ? 35 : 35
 
-    // Only update if the dimensions have changed significantly
+    // Only update if the dimensions have changed by more than the threshold
     if (widthChange > threshold || heightChange > threshold) {
       const updatedAnnotations = annotations.map((annotation, idx) => {
-        const newX = (annotation.originalX * trueDimensions[0]) / Number(annotation.savedDimensions[0])
+        const ySize = Number(config.yAxis.size)
+        const newX = (annotation.originalX * Number(trueDimensions[0])) / Number(annotation.savedDimensions[0])
+
         return {
           ...annotation,
+          // keep annotation.x at the sample location when the screen is resized
           x: newX
         }
       })
@@ -69,7 +74,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
       })
       prevDimensions.current = [trueDimensions[0], trueDimensions[1]]
     }
-  }, [dimensions, annotations, updateConfig, config, currentViewport, svgRef])
+  }, [dimensions, annotations, updateConfig, config, currentViewport, svgRef, isLegendBottom])
 
   return (
     annotations &&
@@ -89,6 +94,8 @@ const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
           key={`annotation--${index}`}
           width={width}
           height={height}
+          dx={annotation.dx} // label x position
+          dy={annotation.dy} // label y postion
           x={annotation.x} // subject x
           y={annotation.y} // subject y
           restrict={restrictedArea}
@@ -212,8 +219,8 @@ const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
                     {index + 1}
                   </text>
                   {/* ANCHORS */}
-                  {annotation.anchor.horizontal && <LineSubject orientation={'horizontal'} stroke={'gray'} min={config.yAxis.size} max={xMax + Number(config.yAxis.size) + categoricalOffsetCheck} />}
-                  {annotation.anchor.vertical && <LineSubject orientation={'vertical'} stroke={'gray'} min={config.heights.vertical - config.xAxis.size} max={0} />}
+                  {/* {annotation.anchor.horizontal && <LineSubject orientation={'horizontal'} stroke={'gray'} min={config.yAxis.size} max={xMax + Number(config.yAxis.size) + categoricalOffsetCheck} />} */}
+                  {/* {annotation.anchor.vertical && <LineSubject orientation={'vertical'} stroke={'gray'} min={config.heights.vertical - config.xAxis.size} max={0} />} */}
                 </AnnotationComponent>
               </>
             )

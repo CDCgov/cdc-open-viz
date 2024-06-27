@@ -1272,6 +1272,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     highlightReset,
     imageId,
     isDashboard,
+    isLegendBottom: legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport),
     isDebug,
     isDraggingAnnotation,
     handleDragStateChange,
