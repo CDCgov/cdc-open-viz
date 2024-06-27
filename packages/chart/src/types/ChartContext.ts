@@ -26,6 +26,8 @@ type SharedChartContext = {
   setBrushConfig: Function
   clean: Function
   capitalize: (value: string) => string
+  // whether or not the legend is appearing below the chart
+  isLegendBottom?: boolean
 }
 
 // Line Chart Specific Context

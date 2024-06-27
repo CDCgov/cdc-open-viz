@@ -18,8 +18,8 @@ import {
 import useColorScale from '../../../hooks/useColorScale'
 
 // visx
-import { HtmlLabel, CircleSubject, LineSubject, EditableAnnotation, Connector, Annotation as VisxAnnotation } from '@visx/annotation'
-import { Drag, raise } from '@visx/drag'
+import { HtmlLabel, CircleSubject, EditableAnnotation, Connector, Annotation as VisxAnnotation } from '@visx/annotation'
+import { Drag } from '@visx/drag'
 import { MarkerArrow } from '@visx/marker'
 import { LinePath } from '@visx/shape'
 import * as allCurves from '@visx/curve'
@@ -30,16 +30,18 @@ import './AnnotationDraggable.styles.css'
 import { fa } from '@faker-js/faker'
 
 const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
-  const [draggingItems, setDraggingItems] = useState([])
   const { config, dimensions, updateConfig, isEditor, currentViewport, isDraggingAnnotation, isLegendBottom } = useContext(ConfigContext)
   const [width, height] = dimensions
   const { annotations } = config
   const { colorScale } = useColorScale()
   const prevDimensions = useRef(dimensions)
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
-  const trueDimensions: [number, number] = [svgRef?.current?.getBoundingClientRect()?.width, Number(svgRef?.current?.getBoundingClientRect()?.height)]
-
+  const [trueDimensions, setTrueDimensions] = useState<[width: number, height: number]>([width, height])
   const restrictedArea = { xMin: 0 + config.yAxis.size, xMax: xMax - config.yAxis.size / 2, yMax: config.heights.vertical - config.xAxis.size, yMin: 0 }
+
+  useEffect(() => {
+    setTrueDimensions([svgRef?.current?.getBoundingClientRect()?.width, Number(svgRef?.current?.getBoundingClientRect()?.height)])
+  }, [dimensions])
 
   useEffect(() => {
     /*
@@ -53,7 +55,6 @@ const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
 
     const widthChange: number = Math.abs(trueDimensions[0] - prevDimensions.current[0])
     const heightChange: number = Math.abs(trueDimensions[1] - prevDimensions.current[1])
-    const marginOffset = isLegendBottom ? 35 : 35
 
     // Only update if the dimensions have changed by more than the threshold
     if (widthChange > threshold || heightChange > threshold) {
@@ -218,9 +219,6 @@ const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
                   <text x={handleTextX(annotation, xScale, config)} y={handleTextY(annotation, yScale, config)} className='annotation__mobile-label'>
                     {index + 1}
                   </text>
-                  {/* ANCHORS */}
-                  {/* {annotation.anchor.horizontal && <LineSubject orientation={'horizontal'} stroke={'gray'} min={config.yAxis.size} max={xMax + Number(config.yAxis.size) + categoricalOffsetCheck} />} */}
-                  {/* {annotation.anchor.vertical && <LineSubject orientation={'vertical'} stroke={'gray'} min={config.heights.vertical - config.xAxis.size} max={0} />} */}
                 </AnnotationComponent>
               </>
             )
