@@ -4,7 +4,7 @@ import { useContext, FC } from 'react'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import { Select, CheckBox, TextField } from '@cdc/core/components/EditorPanel/Inputs'
-import WarningImage from '../../../../images/warning.svg'
+import WarningImage from '../../../../images/warning.svg?react'
 
 // contexts
 import ConfigContext from '../../../../ConfigContext'

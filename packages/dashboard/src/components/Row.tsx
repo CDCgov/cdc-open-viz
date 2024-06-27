@@ -6,12 +6,12 @@ import Icon from '@cdc/core/components/ui/Icon'
 
 import Column from './Column'
 
-import OneColIcon from '../images/icon-col-12.svg'
-import TwoColIcon from '../images/icon-col-6.svg'
-import ThreeColIcon from '../images/icon-col-4.svg'
-import FourEightColIcon from '../images/icon-col-4-8.svg'
-import EightFourColIcon from '../images/icon-col-8-4.svg'
-import ToggleIcon from '../images/icon-toggle.svg'
+import OneColIcon from '../images/icon-col-12.svg?react'
+import TwoColIcon from '../images/icon-col-6.svg?react'
+import ThreeColIcon from '../images/icon-col-4.svg?react'
+import FourEightColIcon from '../images/icon-col-4-8.svg?react'
+import EightFourColIcon from '../images/icon-col-8-4.svg?react'
+import ToggleIcon from '../images/icon-toggle.svg?react'
 import { ConfigRow } from '../types/ConfigRow'
 import { DataDesignerModal } from './DataDesignerModal'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
@@ -105,17 +105,17 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
   }
 
   const deleteRow = () => {
-    let newVisualizations = {...config.visualizations}
+    let newVisualizations = { ...config.visualizations }
 
     //delete the instantiated widgets
-    if(rows[rowIdx] && rows[rowIdx].columns && rows[rowIdx].columns.length && config.visualizations) {
+    if (rows[rowIdx] && rows[rowIdx].columns && rows[rowIdx].columns.length && config.visualizations) {
       rows[rowIdx].columns.forEach(column => {
-        if(column.widget){
+        if (column.widget) {
           delete newVisualizations[column.widget]
         }
       })
     }
-    
+
     rows.splice(rowIdx, 1) // delete the row
 
     updateConfig({ ...config, rows, visualizations: newVisualizations })

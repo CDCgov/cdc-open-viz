@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import MapIcon from '../assets/map-folded.svg'
-import ChartIcon from '../assets/icon-chart-bar.svg'
-import MarkupIncludeIcon from '../assets/icon-code.svg'
+import MapIcon from '../assets/map-folded.svg?react'
+import ChartIcon from '../assets/icon-chart-bar.svg?react'
+import MarkupIncludeIcon from '../assets/icon-code.svg?react'
 
 export const AdvancedEditor = ({ loadConfig, state, convertStateToConfig }) => {
   const [advancedToggle, setAdvancedToggle] = useState(false)

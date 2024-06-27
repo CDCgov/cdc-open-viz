@@ -8,8 +8,9 @@
   "scripts": {
     "start": "vite --open",
     "build": "vite build",
-    "test": "vitest watch --reporter verbose",
-    "test:ui": "vitest --ui",
+    "test": "vitest run --reporter verbose",
+    "test-watch": "vitest watch --reporter verbose",
+    "test-watch:ui": "vitest --ui",
     "preview": "vite preview",
     "graph": "nx graph",
     "prepublishOnly": "lerna run --scope @cdc/map build"
