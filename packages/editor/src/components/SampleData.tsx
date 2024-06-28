@@ -15,6 +15,7 @@ import validForecastData from './../samples/valid-forecast-data.csv?raw'
 import vaidWorldData from './../samples/valid-world-data.json?raw'
 import validRegionData from './../samples/valid-region-data.json?raw'
 import validSankeyData from './../samples/valid-sankey-data.json?raw'
+import pivotData from './../samples/pivotData.json?raw'
 
 // Add additional data to samples
 const sampleData = {
@@ -48,6 +49,11 @@ const sampleData = {
       text: 'Sankey Chart Data',
       fileName: 'valid-sankey-data.json',
       data: validSankeyData
+    },
+    {
+      text: 'Pivot Table Data',
+      fileName: 'pivotData.json',
+      data: pivotData
     }
   ],
   maps: [

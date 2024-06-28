@@ -21,8 +21,8 @@ interface MultiSelectProps {
   limit?: number
 }
 
-const MultiSelect: React.FC<MultiSelectProps> = ({ section = null, subsection = null, fieldName, label, options, updateField, selected, limit }) => {
-  const preselectedItems = options.filter(opt => selected?.includes(opt.value)).slice(0, limit)
+const MultiSelect: React.FC<MultiSelectProps> = ({ section = null, subsection = null, fieldName, label, options, updateField, selected = [], limit }) => {
+  const preselectedItems = options.filter(opt => selected.includes(opt.value)).slice(0, limit)
   const [selectedItems, setSelectedItems] = useState<Option[]>(preselectedItems)
   const [expanded, setExpanded] = useState(false)
   const multiSelectRef = useRef(null)
@@ -115,7 +115,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ section = null, subsection = 
           </Tooltip>
         )}
       </div>
-      <ul className={'dropdown' + (expanded ? '' : ' hide')}>
+      <ul className={'dropdown' + (expanded ? '' : ' d-none')}>
         {options
           .filter(option => !selectedItems.find(item => item.value === option.value))
           .map(option => (

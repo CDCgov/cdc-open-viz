@@ -1,3 +1,8 @@
+type Pivot = {
+  columnName: string
+  valueColumn: string
+}
+
 export type Table = {
   caption?: string
   cellMinWidth?: number
@@ -14,6 +19,7 @@ export type Table = {
   indexLabel?: string
   label?: string
   limitHeight?: boolean
+  pivot?: Pivot
   show?: boolean
   showDataTableLink?: boolean
   showDownloadImgButton?: boolean

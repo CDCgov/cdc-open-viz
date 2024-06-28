@@ -63,7 +63,7 @@ import * as apiFilterHelpers from './helpers/apiFilterHelpers'
 import * as reloadURLHelpers from './helpers/reloadURLHelpers'
 import { getAutoLoadVisualization } from './helpers/getAutoLoadVisualization'
 import { changeFilterActive } from './helpers/changeFilterActive'
-import { addValuesToSharedFilters } from './helpers/addValuesToSharedFilters'
+import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -217,7 +217,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
     if (dataWasFetched) {
       dispatch({ type: 'SET_DATA', payload: newData })
-      const filtersWithNewValues = addValuesToSharedFilters(filters, newData)
+      const filtersWithNewValues = addValuesToFilters<SharedFilter>(filters, newData)
       const dashboardConfig = newFilters ? { ...config.dashboard, sharedFilters: filtersWithNewValues } : config.dashboard
       const filteredData = getFilteredData({ ...state, config: { ...state.config, dashboard: dashboardConfig } }, {}, newData)
       dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
