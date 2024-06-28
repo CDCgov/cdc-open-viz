@@ -1,6 +1,8 @@
 {
   "dashboard": {
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "description": "",
+    "title": "Bump Chart"
   },
   "rows": [
     {
@@ -36,7 +38,7 @@
         "noData": "No Data Available"
       },
       "title": "Bump Chart",
-      "showTitle": true,
+      "showTitle": false,
       "showDownloadMediaButton": false,
       "theme": "theme-blue",
       "animate": false,
