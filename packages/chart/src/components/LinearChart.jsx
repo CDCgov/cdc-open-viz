@@ -8,7 +8,7 @@ import { Text } from '@visx/text'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
-
+import BrushChart from './BrushChart'
 // CDC Components
 import { AreaChart, AreaChartStacked } from './AreaChart'
 import BarChart from './BarChart'
@@ -688,7 +688,8 @@ const LinearChart = props => {
             />
           )}
           {/*Zoom Brush */}
-          {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && false && !isHorizontal && <ZoomBrush xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />}
+          <BrushChart xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} xScale={xScale} seriesScale={seriesScale} />
+          {/* {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && true && !isHorizontal && <ZoomBrush xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />} */}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
           {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(visualizationType) && !checkLineToBarGraph() && (
