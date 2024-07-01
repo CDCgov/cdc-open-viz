@@ -117,7 +117,7 @@ const LinearChart = props => {
   const properties = { data, tableData, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax }
   const { min, max, leftMax, rightMax } = useMinMax(properties)
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
-  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush } = useScales({ ...properties, min, max, leftMax, rightMax, dimensions })
+  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush, xScaleAnnotation } = useScales({ ...properties, min, max, leftMax, rightMax, dimensions })
 
   // sets the portal x/y for where tooltips should appear on the page.
   const [chartPosition, setChartPosition] = useState(null)
@@ -365,7 +365,7 @@ const LinearChart = props => {
           onMouseMove={onMouseMove}
           width={'100%'}
           height={height}
-          className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`}
+          className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'} ${isDraggingAnnotation && 'dragging-annotation'}`}
           role='img'
           aria-label={handleChartAriaLabels(config)}
           ref={svgRef}
@@ -794,7 +794,9 @@ const LinearChart = props => {
               <Line from={{ x: point.x, y: 0 }} to={{ x: point.x, y: yMax }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />
             </Group>
           )}
-          <Annotation.Draggable xScale={xScale} yScale={yScale} xMax={xMax} svgRef={svgRef} onDragStateChange={handleDragStateChange} />
+          <Group left={Number(config.runtime.yAxis.size)}>
+            <Annotation.Draggable xScale={xScale} yScale={yScale} xScaleAnnotation={xScaleAnnotation} xMax={xMax} svgRef={svgRef} onDragStateChange={handleDragStateChange} />
+          </Group>
         </svg>
         {!isDraggingAnnotation && tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && !config.tooltips.singleSeries && (
           <>

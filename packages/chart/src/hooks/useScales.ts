@@ -44,6 +44,10 @@ const useScales = (properties: useScaleProps) => {
   let seriesScale = null
   let xScaleNoPadding = null
   let xScaleBrush = null
+  let xScaleAnnotation = scaleLinear({
+    domain: [0, 100],
+    range: [0, xMax]
+  })
 
   // handle  Horizontal bars
   if (isHorizontal) {
@@ -246,7 +250,7 @@ const useScales = (properties: useScaleProps) => {
       }
     }
   }
-  return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush }
+  return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush, xScaleAnnotation }
 }
 
 export default useScales
