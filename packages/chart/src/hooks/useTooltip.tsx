@@ -38,7 +38,7 @@ export const useTooltip = props => {
     return tooltipInformation
   }
 
-  function checkZeroOrNullValues(config, formattedValue, seriesKey) {
+  const checkZeroOrNullValues = (config, formattedValue, seriesKey) => {
     let hideTooltip = false
     config.series.forEach(item => {
       if (item.hideZeroValue) {
