@@ -85,3 +85,10 @@
 .annotation-group {
   border: 1px solid black;
 }
+
+// add margin to middle child
+.input-group {
+  &:nth-child(2) {
+    margin: 5px 0;
+  }
+}
