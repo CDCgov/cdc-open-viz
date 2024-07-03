@@ -310,7 +310,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                     updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                   />
                   <Select value={style} initial='Select' fieldName='style' label='Style' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getStyleOptions(type)} />
-                  {style.includes('Circles') && <TextField type='number' value={circleSize} fieldName='circleSize' label='Adjust circle size' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />}
+                  {style.includes('Circles') && <TextField className='number-narrow' type='number' value={circleSize} fieldName='circleSize' label='circle size' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />}
                   {style !== 'Filled Circles' && <TextField value={label} fieldName='label' label='Label' placeholder='' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />}
                 </>
               )}
