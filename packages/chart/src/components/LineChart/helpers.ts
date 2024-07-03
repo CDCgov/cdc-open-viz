@@ -29,16 +29,30 @@ export const createStyles = (props: StyleProps): Style[] => {
 
 export const filterCircles = (preliminaryData: PreliminaryDataItem[], data: DataItem[], seriesKey: string): DataItem[] => {
   // Filter and map preliminaryData to get circlesFiltered
-  const circlesFiltered = preliminaryData?.filter(item => item.style === 'Open Circles' && item.type === 'effect').map(item => ({ column: item.column, value: item.value, seriesKey: item.seriesKey }))
-  const filteredData: DataItem[] = []
+  const circlesFiltered = preliminaryData?.filter(item => item.style.includes('Circles') && item.type === 'effect').map(item => ({ column: item.column, value: item.value, seriesKey: item.seriesKey, circleSize: item.circleSize, style: item.style }))
+  const filteredData = []
   // Process data to find matching items
   data.forEach(item => {
     circlesFiltered.forEach(fc => {
-      if (item[fc.column] === fc.value && fc.seriesKey === seriesKey) {
-        filteredData.push(item)
+      if (item[fc.column] === fc.value && fc.seriesKey === seriesKey && item[seriesKey] && fc.style === 'Open Circles') {
+        let result = {
+          data: item,
+          size: fc.circleSize,
+          isFilled: false
+        }
+        filteredData.push(result)
+      }
+      if ((!fc.value || item[fc.column] === fc.value) && fc.seriesKey === seriesKey && item[seriesKey] && fc.style === 'Filled Circles') {
+        let result = {
+          data: item,
+          size: fc.circleSize,
+          isFilled: true
+        }
+        filteredData.push(result)
       }
     })
   })
+
   return filteredData
 }
 
