@@ -300,7 +300,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>If 'Filled Circle' is selected as the style, this field is optional, and the style 'Filled Circle' will apply to all series within the data.</p>
+                          <p>If 'Filled Circles' is selected as the style, this field is optional, and the style 'Filled Circles' will apply to all points within the associated series data.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
