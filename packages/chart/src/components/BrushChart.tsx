@@ -45,27 +45,29 @@ function BrushChart({ xMax: max, yMax }) {
           .attr('x', d => (d.side === 'left' ? 0 : -textWidth))
           .attr('y', 30)
           .text(d => (d.side === 'left' ? firstDate : lastDate))
-        handleGroup // ignore
-          .append('path')
-          .attr('class', 'handle--custom')
-          .attr('cursor', 'ew-resize')
-          .attr('fill', 'blue')
-          .attr('d', d => (d.side === 'left' ? rightHandlePath : leftHandlePath))
-          .attr('transform', (d, i) => `scale(1.2),  translate(${d.side === 'left' ? '-9' : '0'} ,-12)`)
+          .style('pointer-events', 'all')
+
+        // handleGroup // ignore
+        //   .append('path')
+        //   .attr('class', 'handle--custom')
+        //   .attr('cursor', 'ew-resize')
+        //   .attr('fill', 'blue')
+        //   .attr('d', d => (d.side === 'left' ? rightHandlePath : leftHandlePath))
+        //   .attr('transform', (d, i) => `scale(1.2),  translate(${d.side === 'left' ? '-9' : '0'} ,-12)`)
+        //   .style('pointer-events', 'all')
 
         return handleGroup
       })
 
       .attr('display', 'block')
-
       .attr('transform', selection === null ? null : (d, i) => `translate(${selection[i]},${'10'})`)
+      .style('pointer-events', 'all')
   }
-
-  //;<path class='sliderHandles' cursor='ew-resize' d='M0.5,10A6,6 0 0 1 6.5,16V14A6,6 0 0 1 0.5,20ZM2.5,18V12M4.5,18V12' transform='translate(375.9017876923077,-5)'></path>
 
   useEffect(() => {
     const svg = d3 // prettier-ignore
       .select(svgRef.current)
+      .attr('overflow', 'visible')
 
     // append background rect
     svg
@@ -83,7 +85,7 @@ function BrushChart({ xMax: max, yMax }) {
     const x = d3
       .scaleTime()
       .domain(d3.extent(tableData, d => parseDate(d[config.runtime.originalXAxis.dataKey])))
-      .range([0, xMax])
+      .range([0, xMax + 50])
 
     const brushHanlder = event => {
       const selection = event?.selection
@@ -97,10 +99,9 @@ function BrushChart({ xMax: max, yMax }) {
         const lastDate = newFilteredData[newFilteredData.length - 1][config.runtime.originalXAxis.dataKey] ?? ''
         // add custom blue colored handlers to each corners of brush
         svg.selectAll('.handle--custom').remove()
-        //  d3.select(this).call(brushHandle, selection)
+        svg.selectAll('.handle--custom').remove()
         // append handler
         svg.call(brushHandle, selection, firstDate, lastDate)
-
         // update the brush state to add filtered data based on selection
         setBrushConfig(prev => {
           return {
@@ -122,11 +123,11 @@ function BrushChart({ xMax: max, yMax }) {
       .brushX()
       .extent([
         [0, 0],
-        [xMax, brushheight]
+        [xMax + 20, brushheight]
       ])
       .on('start brush end', brushHanlder)
 
-    const defaultSelection = [0, xMax]
+    const defaultSelection = [0, xMax + 20]
 
     const gb = svg.append('g').call(brush).call(brush.move, defaultSelection)
     gb.select('.overlay').style('pointer-events', 'none')
@@ -144,7 +145,7 @@ function BrushChart({ xMax: max, yMax }) {
       <Text pointerEvents='visiblePainted' display={tooltip ? 'block' : 'none'} fontSize={16} x={(Number(xMax) - Number(textWidth)) / 2} y={-10}>
         Drag edges to focus on a specific segment
       </Text>
-      <svg width={xMax + 333} height={brushheight * 3} ref={svgRef}></svg>
+      <svg width={xMax + 300} height={brushheight * 3} ref={svgRef}></svg>
     </Group>
   )
 }
