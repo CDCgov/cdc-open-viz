@@ -48,6 +48,7 @@ function BrushChart({ xMax, yMax }) {
           .attr('x', d => (d.side === 'left' ? 0 : -textWidth))
           .attr('y', 30)
           .text(d => (d.side === 'left' ? firstDate : lastDate))
+          .attr('font-size', '13px')
 
         // handleGroup // ignore
         //   .append('path')
@@ -145,7 +146,7 @@ function BrushChart({ xMax, yMax }) {
       <Text pointerEvents='visiblePainted' display={tooltip ? 'block' : 'none'} fontSize={16} x={(Number(xMax) - Number(textWidth)) / 2} y={-10}>
         Drag edges to focus on a specific segment
       </Text>
-      <svg width={xMax + 300} height={brushheight * 3} ref={svgRef}></svg>
+      <svg width={'100%'} height={brushheight * 3} ref={svgRef}></svg>
     </Group>
   )
 }
