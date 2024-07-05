@@ -86,6 +86,7 @@ const LinearChart = props => {
 
   // refs
   const triggerRef = useRef()
+  const axisBottomRef = useRef(null)
   const svgRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
@@ -479,6 +480,7 @@ const LinearChart = props => {
           {/* X axis */}
           {visualizationType !== 'Paired Bar' && visualizationType !== 'Spark Line' && (
             <AxisBottom
+              innerRef={axisBottomRef}
               top={runtime.horizontal && config.visualizationType !== 'Forest Plot' ? Number(heightHorizontal) + Number(config.xAxis.axisPadding) : config.visualizationType === 'Forest Plot' ? yMax + Number(config.xAxis.axisPadding) : yMax}
               left={config.visualizationType !== 'Forest Plot' ? Number(runtime.yAxis.size) : 0}
               label={config[section].label}
@@ -512,6 +514,9 @@ const LinearChart = props => {
                   // plus the width of the previous tick and the space
                   positions[i] = positions[i - 1] + textWidths[i - 1] + spaceBetweenEachTick
                 }
+                // calculate the end of x axis box
+                const axisBBox = axisBottomRef?.current?.getBBox().height
+                config.xAxis.axisBBox = axisBBox
 
                 // Check if ticks are overlapping
                 let areTicksTouching = false

@@ -4,17 +4,20 @@ import ConfigContext from '../ConfigContext'
 import * as d3 from 'd3'
 import { Text } from '@visx/text'
 
-function BrushChart({ xMax: max, yMax }) {
-  const xMax = max
+function BrushChart({ xMax, yMax }) {
   const { tableData, config, parseDate, setBrushConfig, getTextWidth } = useContext(ConfigContext)
   const [brushState, setBrushState] = useState({ isBrushing: false, selection: [] })
-  const svgRef = useRef()
   const [tooltip, showTooltip] = useState(false)
+  const svgRef = useRef()
   const brushheight = 25
   const borderRadius = 15
 
   const tooltipText = 'Drag edges to focus on a specific segment '
   const textWidth = getTextWidth(tooltipText, `normal ${16 / 1.1}px sans-serif`)
+
+  const calculateGroupTop = (): number => {
+    return Number(yMax) + config.xAxis.axisBBox + brushheight * 1.5
+  }
 
   const handleMouseOver = () => {
     // show tooltip text only once before brush triggered
@@ -45,7 +48,6 @@ function BrushChart({ xMax: max, yMax }) {
           .attr('x', d => (d.side === 'left' ? 0 : -textWidth))
           .attr('y', 30)
           .text(d => (d.side === 'left' ? firstDate : lastDate))
-          .style('pointer-events', 'all')
 
         // handleGroup // ignore
         //   .append('path')
@@ -61,7 +63,6 @@ function BrushChart({ xMax: max, yMax }) {
 
       .attr('display', 'block')
       .attr('transform', selection === null ? null : (d, i) => `translate(${selection[i]},${'10'})`)
-      .style('pointer-events', 'all')
   }
 
   useEffect(() => {
@@ -85,7 +86,7 @@ function BrushChart({ xMax: max, yMax }) {
     const x = d3
       .scaleTime()
       .domain(d3.extent(tableData, d => parseDate(d[config.runtime.originalXAxis.dataKey])))
-      .range([0, xMax + 50])
+      .range([0, xMax])
 
     const brushHanlder = event => {
       const selection = event?.selection
@@ -123,17 +124,17 @@ function BrushChart({ xMax: max, yMax }) {
       .brushX()
       .extent([
         [0, 0],
-        [xMax + 20, brushheight]
+        [xMax, brushheight]
       ])
       .on('start brush end', brushHanlder)
 
-    const defaultSelection = [0, xMax + 20]
+    const defaultSelection = [0, xMax]
 
-    const gb = svg.append('g').call(brush).call(brush.move, defaultSelection)
-    gb.select('.overlay').style('pointer-events', 'none')
+    const brushGroup = svg.append('g').call(brush).call(brush.move, defaultSelection)
+    brushGroup.select('.overlay').style('pointer-events', 'none')
     // svg.call(brushHandle, selection, firstDate, lastDate)
 
-    gb.selectAll('.selection').attr('fill', '#474747').attr('fill-opacity', 1).attr('rx', borderRadius).attr('ry', borderRadius)
+    brushGroup.selectAll('.selection').attr('fill', '#474747').attr('fill-opacity', 1).attr('rx', borderRadius).attr('ry', borderRadius)
 
     return () => {
       svg.selectAll('*').remove() // Cleanup on component unmount
@@ -141,7 +142,7 @@ function BrushChart({ xMax: max, yMax }) {
   }, [config])
 
   return (
-    <Group onMouseLeave={handleMouseLeave} onMouseOver={handleMouseOver} className='brush-container' left={Number(config.runtime.yAxis.size)} top={yMax + 120}>
+    <Group onMouseLeave={handleMouseLeave} onMouseOver={handleMouseOver} className='brush-container' left={Number(config.runtime.yAxis.size)} top={calculateGroupTop()}>
       <Text pointerEvents='visiblePainted' display={tooltip ? 'block' : 'none'} fontSize={16} x={(Number(xMax) - Number(textWidth)) / 2} y={-10}>
         Drag edges to focus on a specific segment
       </Text>
