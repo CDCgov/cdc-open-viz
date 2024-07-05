@@ -73,10 +73,9 @@ function BrushChart({ xMax, yMax }) {
     // append background rect
     svg
       .append('rect') // prettier-ignore
-      .attr('fill', '#fff')
+      .attr('fill', '#949494')
       .attr('stroke', '#c5c5c5')
       .attr('stroke-width', 2)
-
       .attr('ry', borderRadius)
       .attr('rx', borderRadius)
       .attr('height', brushheight)
