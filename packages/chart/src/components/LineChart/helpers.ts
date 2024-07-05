@@ -35,7 +35,7 @@ export const filterCircles = (preliminaryData: PreliminaryDataItem[], data: Data
   data.forEach(item => {
     circlesFiltered.forEach(fc => {
       if (item[fc.column] === fc.value && fc.seriesKey === seriesKey && item[seriesKey] && fc.style === 'Open Circles') {
-        let result = {
+        const result = {
           data: item,
           size: fc.circleSize,
           isFilled: false
@@ -43,7 +43,7 @@ export const filterCircles = (preliminaryData: PreliminaryDataItem[], data: Data
         filteredData.push(result)
       }
       if ((!fc.value || item[fc.column] === fc.value) && fc.seriesKey === seriesKey && item[seriesKey] && fc.style === 'Filled Circles') {
-        let result = {
+        const result = {
           data: item,
           size: fc.circleSize,
           isFilled: true
