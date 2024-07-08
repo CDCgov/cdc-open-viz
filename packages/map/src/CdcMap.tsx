@@ -143,6 +143,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
 
   const legendRef = useRef(null)
+  const tooltipRef = useRef(null)
   const legendId = useId()
   const tooltipId = useId()
 
@@ -1605,6 +1606,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     capitalize: state.tooltips?.capitalizeLabels,
     closeModal,
     columnsInData: state?.data?.[0] ? Object.keys(state.data[0]) : [],
+    container,
     content: modal,
     currentViewport,
     data: runtimeData,
@@ -1644,7 +1646,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     titleCase,
     type: general.type,
     viewport: currentViewport,
-    tooltipId
+    tooltipId,
+    tooltipRef
   }
 
   if (!mapProps.data || !state.data) return <></>
@@ -1788,6 +1791,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
             <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
           )}
+          <div ref={tooltipRef} id={`tooltip__${tooltipId}-canvas`} className='tooltip' style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})`, position: 'absolute', whiteSpace: 'nowrap' }}></div>
         </Layout.Responsive>
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>
