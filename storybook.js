@@ -28,19 +28,19 @@ p.setChannel(i);
 window.__STORYBOOK_ADDONS_CHANNEL__ = i;
 window.CONFIG_TYPE === "DEVELOPMENT" && (window.__STORYBOOK_SERVER_CHANNEL__ = i);
 const _ = {
-  "./_stories/Guide.NewComponents.stories.mdx": async () => import("./storybook-Guide.NewComponents.stories-uO6w_DNv.es.js"),
-  "./_stories/Guide.NewIcons.stories.mdx": async () => import("./storybook-Guide.NewIcons.stories-BVzbEL9f.es.js"),
-  "./_stories/Guide.NewStories.stories.mdx": async () => import("./storybook-Guide.NewStories.stories-Cwrwz-lk.es.js"),
-  "./packages/chart/src/_stories/Chart.stories.tsx": async () => import("./storybook-Chart.stories-BTzKZXUf.es.js"),
-  "./packages/chart/src/_stories/Chart.tooltip.stories.tsx": async () => import("./storybook-Chart.tooltip.stories-DBVZNoii.es.js"),
-  "./packages/chart/src/_stories/ChartAnnotation.stories.tsx": async () => import("./storybook-ChartAnnotation.stories-DsXpLQrX.es.js"),
-  "./packages/chart/src/_stories/ChartBrush.stories.tsx": async () => import("./storybook-ChartBrush.stories-DcKWqx3q.es.js"),
-  "./packages/chart/src/_stories/ChartEditor.stories.tsx": async () => import("./storybook-ChartEditor.stories-DqG2Uy7k.es.js"),
+  "./_stories/Guide.NewComponents.stories.mdx": async () => import("./storybook-Guide.NewComponents.stories-DoAmZVa1.es.js"),
+  "./_stories/Guide.NewIcons.stories.mdx": async () => import("./storybook-Guide.NewIcons.stories-Dj9QH6T8.es.js"),
+  "./_stories/Guide.NewStories.stories.mdx": async () => import("./storybook-Guide.NewStories.stories-DoBVayQO.es.js"),
+  "./packages/chart/src/_stories/Chart.stories.tsx": async () => import("./storybook-Chart.stories-tdmxr2Kk.es.js"),
+  "./packages/chart/src/_stories/Chart.tooltip.stories.tsx": async () => import("./storybook-Chart.tooltip.stories-Bliqf1mX.es.js"),
+  "./packages/chart/src/_stories/ChartAnnotation.stories.tsx": async () => import("./storybook-ChartAnnotation.stories-D7_WZBj2.es.js"),
+  "./packages/chart/src/_stories/ChartBrush.stories.tsx": async () => import("./storybook-ChartBrush.stories-B_ash9iz.es.js"),
+  "./packages/chart/src/_stories/ChartEditor.stories.tsx": async () => import("./storybook-ChartEditor.stories-BJZ0gh0b.es.js"),
   "./packages/core/components/_stories/DataTable.stories.tsx": async () => import("./storybook-DataTable.stories-lZlZniyK.es.js"),
   "./packages/core/components/_stories/EditorPanel.stories.tsx": async () => import("./storybook-EditorPanel.stories-C6FLXTxy.es.js"),
   "./packages/core/components/_stories/Footnotes.stories.tsx": async () => import("./storybook-Footnotes.stories-BhZlnFUp.es.js"),
   "./packages/core/components/_stories/Inputs.stories.tsx": async () => import("./storybook-Inputs.stories-BesxHuDT.es.js"),
-  "./packages/core/components/_stories/MultiSelect.stories.tsx": async () => import("./storybook-MultiSelect.stories-B27WtMP9.es.js"),
+  "./packages/core/components/_stories/MultiSelect.stories.tsx": async () => import("./storybook-MultiSelect.stories-Nh4-v4OQ.es.js"),
   "./packages/core/components/_stories/NestedDropdown.stories.tsx": async () => import("./storybook-NestedDropdown.stories-CiHGPOOw.es.js"),
   "./packages/core/components/_stories/Table.stories.tsx": async () => import("./storybook-Table.stories-DQhM0KwQ.es.js"),
   "./packages/core/components/elements/_stories/Button.stories.tsx": async () => import("./storybook-Button.stories-BqBb60_d.es.js"),
@@ -50,10 +50,10 @@ const _ = {
   "./packages/core/components/ui/_stories/Colors.stories.tsx": async () => import("./storybook-Colors.stories-Ca-rdTVx.es.js"),
   "./packages/core/components/ui/_stories/Icon.stories.tsx": async () => import("./storybook-Icon.stories-B97cG3co.es.js"),
   "./packages/core/components/ui/_stories/Title.stories.tsx": async () => import("./storybook-Title.stories-CGuKTDGs.es.js"),
-  "./packages/dashboard/src/_stories/Dashboard.stories.tsx": async () => import("./storybook-Dashboard.stories-BAGuWZFT.es.js"),
+  "./packages/dashboard/src/_stories/Dashboard.stories.tsx": async () => import("./storybook-Dashboard.stories-eQbful44.es.js"),
   "./packages/data-bite/src/_stories/DataBite.stories.tsx": async () => import("./storybook-DataBite.stories-BWYQYBU-.es.js"),
-  "./packages/editor/src/_stories/Editor.stories.tsx": async () => import("./storybook-Editor.stories-DNYwqEhr.es.js"),
-  "./packages/map/src/_stories/CdcMap.stories.tsx": async () => import("./storybook-CdcMap.stories-DecKqbGA.es.js"),
+  "./packages/editor/src/_stories/Editor.stories.tsx": async () => import("./storybook-Editor.stories-ByMHxC4q.es.js"),
+  "./packages/map/src/_stories/CdcMap.stories.tsx": async () => import("./storybook-CdcMap.stories-1hcPK2cA.es.js"),
   "./packages/markup-include/src/_stories/MarkupInclude.stories.tsx": async () => import("./storybook-MarkupInclude.stories-DvIpqHCI.es.js"),
   "./packages/waffle-chart/src/_stories/WaffleChart.stories.tsx": async () => import("./storybook-WaffleChart.stories-6yZNrivu.es.js")
 };
@@ -66,15 +66,15 @@ const { composeConfigs: O, PreviewWeb: d, ClientApi: l } = __STORYBOOK_MODULE_PR
     import("./storybook-entry-preview-CUV0d-4-.es.js"),
     import("./storybook-entry-preview-docs-DyWBqjd3.es.js"),
     import("./storybook-preview-B9FzuURt.es.js"),
-    import("./storybook-preview-BWikf5Si.es.js"),
+    import("./storybook-preview-CVcD2oVh.es.js"),
     import("./storybook-preview-Cg6EjISu.es.js"),
     import("./storybook-preview-Cn4Mwf-G.es.js"),
     import("./storybook-preview-eIaUbfhd.es.js"),
     import("./storybook-preview-BchW2Y6H.es.js"),
     import("./storybook-preview-B0wDSSzu.es.js"),
-    import("./storybook-preview-C7nJpnST.es.js"),
-    import("./storybook-preview-Cgeay03y.es.js"),
-    import("./storybook-preview-CJodRptZ.es.js")
+    import("./storybook-preview-DjP-M6e5.es.js"),
+    import("./storybook-preview-CQTrSSWl.es.js"),
+    import("./storybook-preview-ClbHXfFR.es.js")
   ]);
   return O(o);
 };
