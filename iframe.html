@@ -19,7 +19,7 @@
     window.FRAMEWORK_OPTIONS = {};
     window.CHANNEL_OPTIONS = {};
     window.FEATURES = {"warnOnLegacyHierarchySeparator":true,"buildStoriesJson":false,"storyStoreV7":true,"argTypeTargetsV7":true,"legacyDecoratorFileOrder":false,"disallowImplicitActionsInRenderV8":false};
-    window.STORIES = [{"titlePrefix":"","directory":"./_stories","files":"*.mdx","importPathMatcher":"^\\.[\\\\/](?:_stories[\\\\/](?!\\.)(?=.)[^\\\\/]*?\\.mdx)$"},{"titlePrefix":"","directory":"./packages","files":"**/_stories/*.stories.@(js|jsx|ts|tsx)","importPathMatcher":"^\\.[\\\\/](?:packages(?:[\\\\/](?!\\.)(?:(?:(?!(?:^|[\\\\/])\\.).)*?)[\\\\/]|[\\\\/]|$)_stories[\\\\/](?!\\.)(?=.)[^\\\\/]*?\\.stories\\.(js|jsx|ts|tsx))$"}];
+    window.STORIES = [{"titlePrefix":"","directory":"./_stories","files":"*.mdx","importPathMatcher":"^\\.[\\\\/](?:_stories\\/(?!\\.)(?=.)[^/]*?\\.mdx)$"},{"titlePrefix":"","directory":"./packages","files":"**/_stories/*.stories.@(js|jsx|ts|tsx)","importPathMatcher":"^\\.[\\\\/](?:packages(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)\\/|\\/|$)_stories\\/(?!\\.)(?=.)[^/]*?\\.stories\\.(js|jsx|ts|tsx))$"}];
     window.DOCS_OPTIONS = {"defaultName":"Docs","autodocs":"tag"};
 
     
@@ -382,7 +382,7 @@
 <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/contrib/libs/bootstrap/latest/css/bootstrap.min.css?_=39423">
 <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/4.0/assets/css/app.min.css?_=39423">
   <script type="module" crossorigin src="./storybook.js"></script>
-  <link rel="stylesheet" crossorigin href="./style.css">
+  <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
@@ -476,6 +476,8 @@
 
   <div id="storybook-root"></div>
   <div id="storybook-docs"></div>
+  
+  
 </body>
 
 </html>
