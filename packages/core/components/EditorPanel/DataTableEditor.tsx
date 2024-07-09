@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '../ui/Icon'
-import { CheckBox, TextField } from './Inputs'
+import { CheckBox, TextField, Select } from './Inputs'
 import MultiSelect from '../MultiSelect'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import { Visualization } from '../../types/Visualization'
@@ -26,15 +26,13 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
       .map(([key]) => key)
   }, [config.columns])
 
-  const getGroupableColumns = () => {
+  const groupPivotColumns = useMemo(() => {
     const columns: string[] = config.data.flatMap(Object.keys)
-    const configuredColumns = Object.values(config.columns).map(col => col.name)
     const cols = _.uniq(columns).filter(key => {
-      if (configuredColumns.includes(key)) return false
       return true
     })
     return cols
-  }
+  }, [config.data])
 
   const changeGroupBy = (value: string) => {
     if (value === PLACEHOLDER) value = undefined
@@ -230,11 +228,53 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
             changeGroupBy(event.target.value)
           }}
         >
-          {[PLACEHOLDER, ...getGroupableColumns()].map(option => (
+          {[PLACEHOLDER, ...groupPivotColumns.filter(col => col !== config.table.pivot?.columnName && col !== config.table.pivot?.valueColumn)].map(option => (
             <option key={option}>{option}</option>
           ))}
         </select>
       </label>
+      <Select
+        label='Pivot Column: '
+        tooltip={
+          <Tooltip style={{ textTransform: 'none' }}>
+            <Tooltip.Target>
+              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+            </Tooltip.Target>
+            <Tooltip.Content>
+              <p>Select a Column whos data values will be pivoted to Column Values.</p>
+            </Tooltip.Content>
+          </Tooltip>
+        }
+        value={config.table.pivot?.columnName}
+        options={groupPivotColumns.filter(col => col !== config.table.groupBy && col !== config.table.pivot?.valueColumn)}
+        initial='-Select-'
+        section='table'
+        subsection='pivot'
+        fieldName='columnName'
+        updateField={updateField}
+      />
+      {config.table.pivot?.columnName && (
+        <Select
+          label='Pivot Value Column: '
+          tooltip={
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>The column whos values will be pivoted under the column selected as the Filter.</p>
+              </Tooltip.Content>
+            </Tooltip>
+          }
+          value={config.table.pivot?.valueColumn}
+          initial='-Select-'
+          section='table'
+          options={groupPivotColumns.filter(col => col !== config.table.pivot?.columnName && col !== config.table.groupBy)}
+          subsection='pivot'
+          fieldName='valueColumn'
+          updateField={updateField}
+        />
+      )}
     </>
   )
 }

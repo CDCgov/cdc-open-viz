@@ -22,60 +22,26 @@ function getMaxTierAndSetFilterTiers(filters: SharedFilter[]): number {
   return maxTier
 }
 
-function filter(data, filters, condition) {
-  return data
-    ? data.filter(row => {
-        const found = filters.find(filter => {
-          if (filter.pivot) return false
-          const currentValue = row[filter.columnName]
-          const selectedValue = filter.queuedActive || filter.active
-          const isNotTheSelectedValue = selectedValue && currentValue != selectedValue
-          const isFirstOccurrenceOfTier = filter.tier === condition
-          if (filter.type !== 'urlfilter' && isFirstOccurrenceOfTier && isNotTheSelectedValue) {
-            return true
-          }
-        })
-        return !found
-      })
-    : []
-}
-
-function setFilterValuesAndActiveFilter(filters: SharedFilter[], filteredData: Object[], i: number) {
-  filters.forEach(sharedFilter => {
-    if (sharedFilter.pivot) {
-      sharedFilter.values = _.uniq(filteredData.map(row => row[sharedFilter.columnName]))
-    } else if (sharedFilter.tier === i + 2 && !Array.isArray(sharedFilter.active)) {
-      sharedFilter.values = _.uniq(filteredData.map(row => row[sharedFilter.columnName]))
-      const valueAlreadySelected = sharedFilter.values.includes(sharedFilter.active)
-      if (!valueAlreadySelected && sharedFilter.values.length > 0) {
-        sharedFilter.active = sharedFilter.values[0]
+function filter(data = [], filters: SharedFilter[], condition) {
+  return data.filter(row => {
+    const foundMatchingFilter = filters.find(filter => {
+      const currentValue = row[filter.columnName]
+      const selectedValue = filter.queuedActive || filter.active
+      let isNotTheSelectedValue = true
+      if (Array.isArray(selectedValue)) {
+        isNotTheSelectedValue = !selectedValue.includes(currentValue)
+      } else {
+        isNotTheSelectedValue = selectedValue && currentValue != selectedValue
       }
-    }
+      const isFirstOccurrenceOfTier = filter.tier === condition
+      if (filter.type !== 'urlfilter' && isFirstOccurrenceOfTier && isNotTheSelectedValue) {
+        return true
+      }
+    })
+    return !foundMatchingFilter
   })
 }
 
-const pivotData = (data, pivotFilter: SharedFilter) => {
-  const pivotActive = pivotFilter.active as string[]
-  const inactive = pivotFilter.values.filter(value => !pivotActive.includes(value))
-  const pivotColumn = pivotFilter.columnName
-  const valueColumn = pivotFilter.pivot
-  const grouped = _.groupBy(data, val => val[pivotColumn])
-  const newData = []
-  for (const key in grouped) {
-    const group = grouped[key]
-
-    group.forEach((val, index) => {
-      const row = newData[index] || {}
-      if (!inactive.includes(key)) row[key] = val[valueColumn]
-      const toAdd = _.omit(val, [pivotColumn, valueColumn, ...inactive])
-      newData[index] = { ...toAdd, ...row }
-    })
-  }
-  return newData
-}
-
-/** This function returns filtered data.
- * It also manipulates the filters by adding: tiers, filterOptions, and default selections */
 export const filterData = (filters: SharedFilter[], _data: Object[]): Object[] => {
   const maxTier = getMaxTierAndSetFilterTiers(filters)
 
@@ -84,13 +50,7 @@ export const filterData = (filters: SharedFilter[], _data: Object[]): Object[] =
 
     const filteredData = filter(_data, filters, i + 1)
 
-    setFilterValuesAndActiveFilter(_.cloneDeep(filters), filteredData, i)
-
     if (lastIteration) {
-      const pivotFilter = filters.find(filter => filter.pivot)
-      if (pivotFilter) {
-        return pivotData(filteredData, pivotFilter)
-      }
       // not sure if this last run of filter() function is necessary.
       return filter(filteredData, filters, maxTier - 1)
     }
