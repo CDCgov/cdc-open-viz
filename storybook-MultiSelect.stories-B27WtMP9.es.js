@@ -1,5 +1,5 @@
 import { M as i } from "./storybook-MultiSelect-Bb0EhWsv.es.js";
-import { w as r, u as c } from "./storybook-index-2XWyk1bu.es.js";
+import { w as r, u as c } from "./storybook-index-DnFMvCff.es.js";
 const p = {
   title: "Components/Molecules/MultiSelect",
   component: i
