@@ -265,6 +265,10 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     loadAPIFilters(config.dashboard.sharedFilters)
   }, [isEditor, isPreview])
 
+  useEffect(() => {
+    updateDataFilters()
+  }, [state.config?.activeDashboard])
+
   const updateChildConfig = (visualizationKey, newConfig) => {
     const config = _.cloneDeep(state.config)
     const updatedConfig = _.pick(config, ['visualizations', 'multiDashboards'])
@@ -334,6 +338,13 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   }
 
   const updateFilteredData = (sharedFilters?) => {
+    const clonedState = _.cloneDeep(state)
+    if (sharedFilters) clonedState.config.dashboard.sharedFilters = sharedFilters
+    const newFilteredData = getFilteredData(clonedState)
+    dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+  }
+
+  const updateDataFilters = (sharedFilters = undefined) => {
     const clonedState = _.cloneDeep(state)
     if (sharedFilters) clonedState.config.dashboard.sharedFilters = sharedFilters
     const newFilteredData = getFilteredData(clonedState)
