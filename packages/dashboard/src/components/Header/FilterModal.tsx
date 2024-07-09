@@ -366,35 +366,6 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
                 </select>
               </label>
               <label>
-                <span className='edit-label column-heading'>
-                  Pivot:{' '}
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>The column whos values will be pivoted under the column selected as the Filter.</p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                </span>
-                <select
-                  value={filter.pivot}
-                  onChange={e => {
-                    updateFilterProp('pivot', e.target.value)
-                    updateFilterProp('showDropdown', true)
-                  }}
-                >
-                  <option value=''>- Select Option -</option>
-                  {columns
-                    .filter(col => filter.columnName !== col)
-                    .map(dataKey => (
-                      <option value={dataKey} key={`filter-column-select-item-${dataKey}`}>
-                        {dataKey}
-                      </option>
-                    ))}
-                </select>
-              </label>
-              <label>
                 <span className='edit-label column-heading'>Label: </span>
                 <input
                   type='text'
@@ -404,18 +375,16 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
                   }}
                 />
               </label>
-              {!filter.pivot && (
-                <label>
-                  <span className='edit-label column-heading'>Show Dropdown</span>
-                  <input
-                    type='checkbox'
-                    defaultChecked={filter.showDropdown === true}
-                    onChange={e => {
-                      updateFilterProp('showDropdown', !filter.showDropdown)
-                    }}
-                  />
-                </label>
-              )}
+              <label>
+                <span className='edit-label column-heading'>Show Dropdown</span>
+                <input
+                  type='checkbox'
+                  defaultChecked={filter.showDropdown === true}
+                  onChange={e => {
+                    updateFilterProp('showDropdown', !filter.showDropdown)
+                  }}
+                />
+              </label>
 
               <label>
                 <span className='edit-label column-heading'>Set By: </span>
