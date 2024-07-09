@@ -4,7 +4,7 @@
 
 ## Related Issue
 
-<!-- If applicable, reference related issues -->
+<!-- If applicable, reference related issues in JIRA -->
 
 ## Changes
 
