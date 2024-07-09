@@ -4,6 +4,7 @@ import Layout from '@cdc/core/components/Layout'
 import Waiting from '@cdc/core/components/Waiting'
 import Annotation from './components/Annotation'
 import Error from './components/EditorPanel/components/Error'
+import _ from 'lodash'
 
 // IE11
 import 'whatwg-fetch'
@@ -684,9 +685,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         const getDomain = () => {
           // backwards compatibility
           if (state?.columns?.primary?.roundToPlace !== undefined && state?.general?.equalNumberOptIn) {
-            return [...new Set(dataSet.map(item => Number(item[state.columns.primary.name]).toFixed(Number(state?.columns?.primary?.roundToPlace))))]
+            return _.uniq(dataSet.map(item => Number(item[state.columns.primary.name]).toFixed(Number(state?.columns?.primary?.roundToPlace))))
           }
-          return [...new Set(dataSet.map(item => Math.round(Number(item[state.columns.primary.name]))))]
+          return _.uniq(dataSet.map(item => Math.round(Number(item[state.columns.primary.name]))))
         }
 
         const getBreaks = scale => {
