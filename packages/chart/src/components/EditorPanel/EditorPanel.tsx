@@ -24,7 +24,7 @@ import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
 import useRightAxis from '../../hooks/useRightAxis'
-import WarningImage from '../../images/warning.svg?react'
+import WarningImage from '../../images/warning.svg'
 import useMinMax from '../../hooks/useMinMax'
 
 import { type ChartContext } from '../../types/ChartContext'
