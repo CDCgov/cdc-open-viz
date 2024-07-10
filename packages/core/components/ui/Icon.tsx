@@ -34,6 +34,7 @@ import iconTable from '../../assets/icon-table.svg?react'
 import iconSankey from '../../assets/icon-sankey.svg?react'
 import iconRotateLeft from '../../assets/icon-rotate-left.svg?react'
 import iconCommand from '../../assets/icon-command.svg?react'
+//test
 
 import '../../styles/v2/components/icon.scss'
 
