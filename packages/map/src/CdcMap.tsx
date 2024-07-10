@@ -4,6 +4,7 @@ import Layout from '@cdc/core/components/Layout'
 import Waiting from '@cdc/core/components/Waiting'
 import Annotation from './components/Annotation'
 import Error from './components/EditorPanel/components/Error'
+import _ from 'lodash'
 
 // IE11
 import 'whatwg-fetch'
@@ -33,7 +34,7 @@ import colorPalettes from '@cdc/core/data/colorPalettes'
 import initialState from './data/initial-state'
 
 // Assets
-import ExternalIcon from './images/external-link.svg?react'
+import ExternalIcon from './images/external-link.svg'
 
 // Sass
 import './scss/main.scss'
@@ -615,14 +616,28 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         let colors = colorPalettes[state.color]
         let colorRange = colors.slice(0, state.legend.numberOfItems)
 
+        const getDomain = () => {
+          // backwards compatibility
+          if (state?.columns?.primary?.roundToPlace !== undefined && state?.general?.equalNumberOptIn) {
+            return _.uniq(dataSet.map(item => Number(item[state.columns.primary.name]).toFixed(Number(state?.columns?.primary?.roundToPlace))))
+          }
+          return _.uniq(dataSet.map(item => Math.round(Number(item[state.columns.primary.name]))))
+        }
+
+        const getBreaks = scale => {
+          // backwards compatibility
+          if (state?.columns?.primary?.roundToPlace !== undefined && state?.general?.equalNumberOptIn) {
+            return scale.quantiles().map(b => Number(b)?.toFixed(Number(state?.columns?.primary?.roundToPlace)))
+          }
+          return scale.quantiles().map(item => Number(Math.round(item)))
+        }
+
         let scale = d3
           .scaleQuantile()
-          .domain([...new Set(dataSet.map(item => Math.round(item[state.columns.primary.name])))]) // min/max values
+          .domain(getDomain()) // min/max values
           .range(colorRange) // set range to our colors array
 
-        let breaks = scale.quantiles()
-
-        breaks = breaks.map(item => Math.round(item))
+        const breaks = getBreaks(scale)
 
         // if seperating zero force it into breaks
         if (breaks[0] !== 0) {
@@ -651,8 +666,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             return min
           }
 
+          const getDecimalPlace = n => {
+            return Math.pow(10, -n)
+          }
+
           const setMax = (index, min) => {
-            let max = breaks[index + 1] - 1
+            let max = Number(breaks[index + 1]) - getDecimalPlace(Number(state?.columns?.primary?.roundToPlace))
 
             // check if min and max range are the same
             // if (min === max + 1) {
