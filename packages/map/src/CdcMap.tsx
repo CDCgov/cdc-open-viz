@@ -18,6 +18,10 @@ import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 
 // Helpers
+import { hashObj } from './helpers/hashObj'
+import { generateRuntimeLegendHash } from './helpers/generateRuntimeLegendHash'
+import { generateColorsArray } from './helpers/generateColorsArray'
+import { getUniqueValues } from './helpers/getUniqueValues'
 import { publish } from '@cdc/core/helpers/events'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
@@ -30,7 +34,7 @@ import colorPalettes from '@cdc/core/data/colorPalettes'
 import initialState from './data/initial-state'
 
 // Assets
-import ExternalIcon from './images/external-link.svg'
+import ExternalIcon from './images/external-link.svg?react'
 
 // Sass
 import './scss/main.scss'
@@ -44,7 +48,6 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import getViewport from '@cdc/core/helpers/getViewport'
 import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
-import Loading from '@cdc/core/components/Loading'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
 
@@ -70,34 +73,6 @@ const countryKeys = Object.keys(supportedCountries)
 const countyKeys = Object.keys(supportedCounties)
 const cityKeys = Object.keys(supportedCities)
 
-const generateColorsArray = (color = '#000000', special = false) => {
-  let colorObj = chroma(color)
-  let hoverColor = special ? colorObj.brighten(0.5).hex() : colorObj.saturate(1.3).hex()
-
-  return [color, hoverColor, colorObj.darken(0.3).hex()]
-}
-
-const hashObj = row => {
-  try {
-    if (!row) throw new Error('No row supplied to hashObj')
-
-    let str = JSON.stringify(row)
-    let hash = 0
-
-    if (str.length === 0) return hash
-
-    for (let i = 0; i < str.length; i++) {
-      let char = str.charCodeAt(i)
-      hash = (hash << 5) - hash + char
-      hash = hash & hash
-    }
-
-    return hash
-  } catch (e) {
-    console.error('COVE: ', e) // eslint-disable-line
-  }
-}
-
 const indexOfIgnoreType = (arr, item) => {
   for (let i = 0; i < arr.length; i++) {
     if (item === arr[i]) {
@@ -105,23 +80,6 @@ const indexOfIgnoreType = (arr, item) => {
     }
   }
   return -1
-}
-
-// returns string[]
-const getUniqueValues = (data, columnName) => {
-  let result = {}
-
-  for (let i = 0; i < data.length; i++) {
-    let val = data[i][columnName]
-
-    if (undefined === val) continue
-
-    if (undefined === result[val]) {
-      result[val] = true
-    }
-  }
-
-  return Object.keys(result)
 }
 
 const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, link }) => {
@@ -151,8 +109,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   let legendMemo = useRef(new Map())
   let legendSpecialClassLastMemo = useRef(new Map())
   let innerContainerRef = useRef()
-
-  if (isDebug) console.log('CdcMap state=', state) // <eslint-disable-line></eslint-disable-line>
 
   const columnsRequiredChecker = useCallback(() => {
     let columnList = []
@@ -220,28 +176,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       setPosition(state.mapPosition)
     }
   }, [state.mapPosition, setPosition])
-
-  const generateRuntimeLegendHash = () => {
-    return hashObj({
-      unified: state.legend.unified ?? false,
-      equalNumberOptIn: state.general.equalNumberOptIn ?? false,
-      specialClassesLast: state.legend.showSpecialClassesLast ?? false,
-      color: state.color,
-      customColors: state.customColors,
-      numberOfItems: state.legend.numberOfItems,
-      type: state.legend.type,
-      separateZero: state.legend.separateZero ?? false,
-      primary: state.columns.primary.name,
-      categoryValuesOrder: state.legend.categoryValuesOrder,
-      specialClasses: state.legend.specialClasses,
-      geoType: state.general.geoType,
-      data: state.data,
-      ...runtimeFilters,
-      filters: {
-        ...state.filters
-      }
-    })
-  }
 
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -1551,7 +1485,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
     }
 
-    const hashLegend = generateRuntimeLegendHash()
+    const hashLegend = generateRuntimeLegendHash(state, runtimeFilters)
 
     const hashData = hashObj({
       data: state.data,
@@ -1578,7 +1512,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }, [state]) // eslint-disable-line
 
   useEffect(() => {
-    const hashLegend = generateRuntimeLegendHash()
+    const hashLegend = generateRuntimeLegendHash(state, runtimeFilters)
 
     // Legend - Update when runtimeData does
     const legend = generateRuntimeLegend(state, runtimeData, hashLegend)

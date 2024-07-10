@@ -56,7 +56,7 @@ const handleFirstIndex = (data, seriesKey, preliminaryData) => {
 
   // Function to check if a data item matches the suppression criteria
   const isSuppressed = pd => {
-    if (pd.type === 'effect') return
+    if (pd.type === 'effect' || pd.hideLineStyle) return
     return pd.type == 'suppression' && pd.value === firstIndexDataItem[seriesKey] && (!pd.column || pd.column === seriesKey)
   }
 
@@ -93,7 +93,7 @@ const handleLastIndex = (data, seriesKey, preliminaryData) => {
   let lastAddedIndex = -1 // Tracks the last index added to the result
   preliminaryData?.forEach(pd => {
     if (pd.type === 'effect') return
-    if (data[data.length - 1][seriesKey] === pd.value && pd.style && (!pd.column || pd.column === seriesKey) && pd.type == 'suppression') {
+    if (data[data.length - 1][seriesKey] === pd.value && pd.style && (!pd.column || pd.column === seriesKey) && pd.type == 'suppression' && !pd.hideLineStyle) {
       const lastIndex = data.length - 1
       const modifiedItem = { ...data[lastIndex], [seriesKey]: 0 }
       result.data.push(modifiedItem)
@@ -123,7 +123,7 @@ function handleMiddleIndices(data, seriesKey, dataKey, preliminaryData) {
   const isValidMiddleIndex = index => index > 0 && index < data.length - 1
 
   preliminaryData?.forEach(pd => {
-    if (pd.type === 'effect') return
+    if (pd.type === 'effect' || pd.hideLineStyle) return
     const targetValue = pd.value
 
     // Find all indices
