@@ -1,4 +1,4 @@
-import ExternalIcon from '@cdc/core/assets/external-link.svg?react'
+import ExternalIcon from '@cdc/core/assets/external-link.svg'
 import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 
 // Optionally wrap cell with anchor if config defines a navigation url

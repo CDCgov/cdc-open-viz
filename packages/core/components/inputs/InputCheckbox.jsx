@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo } from 'react'
 import PropTypes from 'prop-types'
 
-import Check from '../../assets/icon-check.svg?react'
+import Check from '../../assets/icon-check.svg'
 import '../../styles/v2/components/input/index.scss'
 
 const InputCheckbox = memo(
