@@ -65,13 +65,11 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   }
 
   const getStyleOptions = type => {
-    if (config.visualizationType === 'Line' || isCombo) {
-      const options = Object.keys(lineCodes)
-      if (type === 'suppression') {
-        return options.slice(0, -1)
-      } else {
-        return options
-      }
+    const options = Object.keys(lineCodes)
+    if (type === 'suppression') {
+      return options.slice(0, -1)
+    } else {
+      return options
     }
   }
 
