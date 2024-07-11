@@ -37,7 +37,7 @@ const PanelGeneral: FC<PanelProps> = props => {
         <AccordionItemButton>General</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        <Select value={visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={enabledChartTypes} />
+        {config?.visualizationType !== 'Sankey' && <Select value={visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={enabledChartTypes} />}
         {visSupportsChartHeight() && config.orientation === 'vertical' && (
           <TextField
             type='number'
