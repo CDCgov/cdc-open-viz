@@ -41,4 +41,6 @@ export type Annotation = {
   snapToSubject: boolean
   // savedDimensions - the original dimensions of the svg when the svg was saved
   savedDimensions: [width: number, height: number]
+  // displayDropdown - whether or not to show the mobile dropdown on desktop for annotations
+  displayDropdown?: boolean
 }

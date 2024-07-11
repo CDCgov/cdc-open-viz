@@ -144,7 +144,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
               </div>
 
               <>
-                {config?.preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style) && ['Line', 'Combo'].includes(config.visualizationType) && (
+                {config?.preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style === 'Open Circles') && ['Line', 'Combo'].includes(config.visualizationType) && (
                   <>
                     <hr></hr>
                     <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>

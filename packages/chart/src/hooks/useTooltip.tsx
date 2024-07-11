@@ -9,9 +9,10 @@ import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
 
 export const useTooltip = props => {
-  const { tableData: data, config, formatNumber, capitalize, formatDate, formatTooltipsDate, parseDate, setSharedFilter } = useContext<ChartContext>(ConfigContext)
+  const { tableData: data, config, formatNumber, capitalize, formatDate, formatTooltipsDate, parseDate, setSharedFilter, isDraggingAnnotation } = useContext<ChartContext>(ConfigContext)
   const { xScale, yScale, showTooltip, hideTooltip } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
+
   /**
    * Provides the tooltip information based on the tooltip data array and svg cursor coordinates
    * @function getTooltipInformation
@@ -38,6 +39,23 @@ export const useTooltip = props => {
     return tooltipInformation
   }
 
+  const checkZeroOrNullValues = (config, formattedValue, seriesKey) => {
+    let hideTooltip = false
+    config.series.forEach(item => {
+      if (item.hideZeroValue) {
+        if (formattedValue === '0' && seriesKey === item.dataKey) {
+          hideTooltip = true
+        }
+      }
+      if (item.hideNullValue) {
+        if (isNaN(formattedValue) && seriesKey === item.dataKey) {
+          hideTooltip = true
+        }
+      }
+    })
+    return hideTooltip
+  }
+
   /**
    * Handles the mouse over event for the tooltip.
    * @function handleTooltipMouseOver
@@ -46,6 +64,8 @@ export const useTooltip = props => {
    */
   const handleTooltipMouseOver = (e, additionalChartData) => {
     e.stopPropagation()
+    if (isDraggingAnnotation) return
+
     const eventSvgCoords = localPoint(e)
     const { x, y } = eventSvgCoords
 
@@ -137,7 +157,7 @@ export const useTooltip = props => {
       if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot') {
         tooltipItems.push(
           ...getIncludedTooltipSeries()
-            ?.filter(seriesKey => config.series?.find(item => item.dataKey === seriesKey && item?.tooltip) || config.xAxis?.dataKey == seriesKey)
+            ?.filter(seriesKey => config.series?.find(item => item.dataKey === seriesKey && item.tooltip) || config.xAxis?.dataKey == seriesKey)
             ?.flatMap(seriesKey => {
               const shoMissingDataValue = config.general.showMissingDataLabel && !resolvedScaleValues[0]?.[seriesKey]
               let formattedValue = seriesKey === config.xAxis.dataKey ? resolvedScaleValues[0]?.[seriesKey] : formatNumber(resolvedScaleValues[0]?.[seriesKey], getAxisPosition(seriesKey))
@@ -146,7 +166,10 @@ export const useTooltip = props => {
               if (suppressed) {
                 formattedValue = suppressed.label
               }
-              return [[seriesKey, formattedValue, getAxisPosition(seriesKey)]]
+
+              const hideTooltip = checkZeroOrNullValues(config, formattedValue, seriesKey)
+
+              return hideTooltip ? [] : [[seriesKey, formattedValue, getAxisPosition(seriesKey)]]
             })
         )
       }

@@ -21,10 +21,10 @@ import InputToggle from '@cdc/core/components/inputs/InputToggle'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 
 // Assets
-import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg?react'
-import UsaRegionGraphic from '@cdc/core/assets/usa-region-graphic.svg?react'
-import WorldGraphic from '@cdc/core/assets/icon-map-world.svg?react'
-import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg?react'
+import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg'
+import UsaRegionGraphic from '@cdc/core/assets/usa-region-graphic.svg'
+import WorldGraphic from '@cdc/core/assets/icon-map-world.svg'
+import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
 import worldDefaultConfig from '../../../../examples/default-world.json'
 import usaDefaultConfig from '../../../../examples/default-usa.json'
 import countyDefaultConfig from '../../../../examples/default-county.json'
@@ -3055,9 +3055,9 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             </AccordionItemPanel>
           </AccordionItem>
           {state.general.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}
-          {false && state.general.geoType !== 'us-county' && <Panels.Annotate name='Text Annotations' />}
+          {state.general.geoType !== 'us-county' && <Panels.Annotate name='Text Annotations' />}
         </Accordion>
-        <AdvancedEditor loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
+        <AdvancedEditor loadConfig={loadConfig} config={state} convertStateToConfig={convertStateToConfig} />
       </Layout.Sidebar>
     </ErrorBoundary>
   )

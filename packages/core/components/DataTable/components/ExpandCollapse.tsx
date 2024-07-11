@@ -1,7 +1,7 @@
 import Icon from '../../ui/Icon'
+import { fontSizes } from '../../../helpers/cove/fontSettings'
 
 const ExpandCollapse = ({ expanded, setExpanded, tableTitle, fontSize, viewport }) => {
-  const fontSizes = { small: 16, medium: 18, large: 20 }
   const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${fontSizes[fontSize]}px`
   return (
     <div
