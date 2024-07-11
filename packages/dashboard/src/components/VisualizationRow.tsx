@@ -79,7 +79,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
       {row.toggle && <Toggle row={row} visualizations={config.visualizations} active={show.indexOf(true)} setToggled={setToggled} />}
       {row.columns.map((col, colIndex) => {
         if (col.width) {
-          if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`col-${col.width}`}></div>
+          if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`col-md-${col.width}`}></div>
 
           const visualizationConfig = getVizConfig(col.widget, index, config, rawData, dashboardFilteredData)
           if (filteredDataOverride) {
@@ -101,7 +101,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
           const shouldShow = row.toggle === undefined || (row.toggle && show[colIndex])
           return (
             <React.Fragment key={`vis__${index}__${colIndex}`}>
-              <div className={`col-${col.width} ${!shouldShow ? 'd-none' : ''}`}>
+              <div className={`col-md-${col.width} ${!shouldShow ? 'd-none' : ''}`}>
                 {visualizationConfig.type === 'chart' && (
                   <CdcChart
                     key={col.widget}

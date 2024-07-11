@@ -1,16 +1,7 @@
 {
   "dashboard": {
     "theme": "theme-blue",
-    "sharedFilters": [
-      {
-        "key": "Race",
-        "type": "datafilter",
-        "showDropdown": true,
-        "columnName": "Race",
-        "pivot": "Age-adjusted rate",
-        "usedBy": ["table1707935263149"]
-      }
-    ]
+    "sharedFilters": []
   },
   "rows": [
     [
@@ -32,7 +23,11 @@
         "show": true,
         "showDownloadUrl": false,
         "showVertical": true,
-        "expanded": true
+        "expanded": true,
+        "pivot": {
+          "columnName": "Race",
+          "valueColumn": "Age-adjusted rate"
+        }
       },
       "columns": {},
       "dataFormat": {},
@@ -41,7 +36,14 @@
         "horizontal": false,
         "series": false
       },
-      "filters": [],
+      "filters": [
+        {
+          "filterStyle": "multi-select",
+          "label": "Race",
+          "columnName": "Race",
+          "showDropdown": true
+        }
+      ],
       "filterBehavior": "Filter Change",
       "formattedData": [
         {

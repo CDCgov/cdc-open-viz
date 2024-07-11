@@ -37,7 +37,27 @@ const PanelGeneral: FC<PanelProps> = props => {
         <AccordionItemButton>General</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        <Select value={visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={enabledChartTypes} />
+        {config?.visualizationType !== 'Sankey' && <Select value={visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={enabledChartTypes} />}
+        {visSupportsChartHeight() && config.orientation === 'vertical' && (
+          <TextField
+            type='number'
+            value={config.heights.vertical}
+            section='heights'
+            fieldName='vertical'
+            label='Chart Height'
+            updateField={updateField}
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>For some visualization types, such as the sankey diagram, it may be necessary to adjust to chart height for optimal display.</p>
+                </Tooltip.Content>
+              </Tooltip>
+            }
+          />
+        )}
         {(visualizationType === 'Bar' || visualizationType === 'Combo' || visualizationType === 'Area Chart') && <Select value={visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />}
         {visualizationType === 'Area Chart' && visualizationSubType === 'stacked' && <Select value={config.stackedAreaChartLineType || 'Linear'} fieldName='stackedAreaChartLineType' label='Stacked Area Chart Line Type' updateField={updateField} options={Object.keys(approvedCurveTypes)} />}
         {visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
@@ -260,8 +280,6 @@ const PanelGeneral: FC<PanelProps> = props => {
             }
           />
         )}
-
-        {visSupportsChartHeight() && config.orientation === 'vertical' && <TextField type='number' value={config.heights.vertical} section='heights' fieldName='vertical' label='Chart Height' updateField={updateField} />}
       </AccordionItemPanel>
     </AccordionItem>
   )

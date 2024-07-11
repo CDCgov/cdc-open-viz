@@ -1,4 +1,3 @@
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import iconCaretUp from '../../assets/icon-caret-up.svg'
