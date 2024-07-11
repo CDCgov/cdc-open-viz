@@ -29,16 +29,30 @@ export const createStyles = (props: StyleProps): Style[] => {
 
 export const filterCircles = (preliminaryData: PreliminaryDataItem[], data: DataItem[], seriesKey: string): DataItem[] => {
   // Filter and map preliminaryData to get circlesFiltered
-  const circlesFiltered = preliminaryData?.filter(item => item.style === 'Open Circles' && item.type === 'effect').map(item => ({ column: item.column, value: item.value, seriesKey: item.seriesKey }))
-  const filteredData: DataItem[] = []
+  const circlesFiltered = preliminaryData?.filter(item => item.style.includes('Circles') && item.type === 'effect').map(item => ({ column: item.column, value: item.value, seriesKey: item.seriesKey, circleSize: item.circleSize, style: item.style }))
+  const filteredData = []
   // Process data to find matching items
   data.forEach(item => {
     circlesFiltered.forEach(fc => {
-      if (item[fc.column] === fc.value && fc.seriesKey === seriesKey) {
-        filteredData.push(item)
+      if (item[fc.column] === fc.value && fc.seriesKey === seriesKey && item[seriesKey] && fc.style === 'Open Circles') {
+        const result = {
+          data: item,
+          size: fc.circleSize,
+          isFilled: false
+        }
+        filteredData.push(result)
+      }
+      if ((!fc.value || item[fc.column] === fc.value) && fc.seriesKey === seriesKey && item[seriesKey] && fc.style === 'Filled Circles') {
+        const result = {
+          data: item,
+          size: fc.circleSize,
+          isFilled: true
+        }
+        filteredData.push(result)
       }
     })
   })
+
   return filteredData
 }
 
@@ -56,7 +70,7 @@ const handleFirstIndex = (data, seriesKey, preliminaryData) => {
 
   // Function to check if a data item matches the suppression criteria
   const isSuppressed = pd => {
-    if (pd.type === 'effect') return
+    if (pd.type === 'effect' || pd.hideLineStyle) return
     return pd.type == 'suppression' && pd.value === firstIndexDataItem[seriesKey] && (!pd.column || pd.column === seriesKey)
   }
 
@@ -93,7 +107,7 @@ const handleLastIndex = (data, seriesKey, preliminaryData) => {
   let lastAddedIndex = -1 // Tracks the last index added to the result
   preliminaryData?.forEach(pd => {
     if (pd.type === 'effect') return
-    if (data[data.length - 1][seriesKey] === pd.value && pd.style && (!pd.column || pd.column === seriesKey) && pd.type == 'suppression') {
+    if (data[data.length - 1][seriesKey] === pd.value && pd.style && (!pd.column || pd.column === seriesKey) && pd.type == 'suppression' && !pd.hideLineStyle) {
       const lastIndex = data.length - 1
       const modifiedItem = { ...data[lastIndex], [seriesKey]: 0 }
       result.data.push(modifiedItem)
@@ -123,7 +137,7 @@ function handleMiddleIndices(data, seriesKey, dataKey, preliminaryData) {
   const isValidMiddleIndex = index => index > 0 && index < data.length - 1
 
   preliminaryData?.forEach(pd => {
-    if (pd.type === 'effect') return
+    if (pd.type === 'effect' || pd.hideLineStyle) return
     const targetValue = pd.value
 
     // Find all indices
