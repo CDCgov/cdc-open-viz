@@ -109,7 +109,7 @@ export const useEditorPermissions = () => {
   }
 
   const visHasBarBorders = () => {
-    const disabledCharts = ['Box Plot', 'Scatter Plot', 'Pie']
+    const disabledCharts = ['Box Plot', 'Scatter Plot', 'Pie', 'Line']
     if (disabledCharts.includes(visualizationType)) return false
     return series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar' || series.type === 'Deviation Bar')
   }
