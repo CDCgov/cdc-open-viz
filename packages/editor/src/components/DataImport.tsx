@@ -439,11 +439,16 @@ export default function DataImport() {
 
   let configureData,
     readyToConfigure = false
+
   if (config.type === 'dashboard') {
     readyToConfigure = Object.keys(config.datasets).length > 0
   } else {
     configureData = config
     readyToConfigure = !!config.formattedData || (config.data && config.dataDescription && transform.autoStandardize(config.data))
+  }
+
+  if (config.visualizationType === 'Sankey' && config.data) {
+    readyToConfigure = true
   }
 
   // Box plots skip the data description steps.
