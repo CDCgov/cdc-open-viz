@@ -175,7 +175,7 @@ const UsaMap = () => {
           data-tooltip-id={`tooltip__${tooltipId}`}
           data-tooltip-html={toolTip}
           territory={territory}
-          // territoryData={territoryData}
+          territoryData={territoryData}
           tabIndex={-1}
         />
       )
@@ -446,7 +446,7 @@ const UsaMap = () => {
             {({ features, projection }) => constructGeoJsx(features, projection)}
           </AlbersUsa>
         )}
-        {state.annotations.length > 0 && <Annotation.Draggable />}
+        {false && state.annotations.length > 0 && <Annotation.Draggable />}
       </svg>
 
       {territories.length > 0 && (
