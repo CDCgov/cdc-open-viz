@@ -9420,11 +9420,7 @@ iterator.prototype@^1.1.2:
     reflect.getprototypeof "^1.0.4"
     set-function-name "^2.0.1"
 
-<<<<<<< HEAD
 jackspeak@2.1.1, jackspeak@^2.3.5, jackspeak@^3.1.2:
-=======
-jackspeak@2.1.1, jackspeak@^2.3.5:
->>>>>>> 1c74576a (fixed imports in svg imports)
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/jackspeak/-/jackspeak-2.1.1.tgz#2a42db4cfbb7e55433c28b6f75d8b796af9669cd"
   integrity sha512-juf9stUEwUaILepraGOWIJTLwg48bUnBmRqd2ln2Os1sW987zeoj/hzhbvRB95oMuS2ZTpjULmdwHNX4rzZIZw==
