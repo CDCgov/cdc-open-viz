@@ -106,8 +106,6 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   return (
     <Accordion key={props.name}>
       <Accordion.Section title={props.name} key={props.name}>
-        <p>Dragging state: {isDraggingAnnotation ? 'Dragging' : 'Not dragging'}</p>
-
         <label key={`key-1`}>
           Show Annotation Dropdown
           <input
@@ -125,23 +123,25 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
           />
         </label>
 
-        <label key={`key-2`}>
-          Annotation Dropdown Title:
-          <input
-            type='text'
-            style={{ marginBottom: '10px' }}
-            value={config?.general?.annotationDropdownText}
-            onChange={e => {
-              updateConfig({
-                ...config,
-                general: {
-                  ...config.general,
-                  annotationDropdownText: e.target.value
-                }
-              })
-            }}
-          />
-        </label>
+        {config.general.showAnnotationDropdown && (
+          <label key={`key-2`}>
+            Annotation Dropdown Title:
+            <input
+              type='text'
+              style={{ marginBottom: '10px' }}
+              value={config?.general?.annotationDropdownText}
+              onChange={e => {
+                updateConfig({
+                  ...config,
+                  general: {
+                    ...config.general,
+                    annotationDropdownText: e.target.value
+                  }
+                })
+              }}
+            />
+          </label>
+        )}
         {config?.annotations &&
           config?.annotations.map((annotation, index) => (
             <Accordion key={index}>
@@ -286,62 +286,6 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     </select>
                   </label>
 
-                  <label>
-                    Snap to Nearest Point
-                    <input
-                      type='checkbox'
-                      checked={config?.annotations[index]?.snapToNearestPoint}
-                      onChange={e => {
-                        const updatedAnnotations = _.cloneDeep(config?.annotations)
-                        updatedAnnotations[index].snapToNearestPoint = e.target.checked
-                        updateConfig({
-                          ...config,
-                          annotations: updatedAnnotations
-                        })
-                      }}
-                    />
-                  </label>
-
-                  {annotation.snapToNearestPoint && (
-                    <label>
-                      Associated Series:
-                      <select
-                        key='annotation-series'
-                        onChange={e => {
-                          const updatedAnnotations = _.cloneDeep(config?.annotations)
-                          updatedAnnotations[index].seriesKey = e.target.value
-                          updateConfig({
-                            ...config,
-                            annotations: updatedAnnotations
-                          })
-                        }}
-                      >
-                        <option key='none' value='none'>
-                          None
-                        </option>
-                        {getColumns(false).map((column, columnIndex) => {
-                          return <option key={`col-${columnIndex}`}>{column}</option>
-                        })}
-                      </select>
-                    </label>
-                  )}
-
-                  <label>
-                    Display Annotation Dropdown
-                    <input
-                      type='checkbox'
-                      checked={config?.annotations[index]?.displayDropdown || false}
-                      onChange={e => {
-                        const updatedAnnotations = _.cloneDeep(config?.annotations)
-                        updatedAnnotations[index].displayDropdown = e.target.checked
-                        updateConfig({
-                          ...config,
-                          annotations: updatedAnnotations
-                        })
-                      }}
-                    />
-                  </label>
-
                   <Button className='warn btn-warn btn btn-remove delete' onClick={() => handleRemoveAnnotation(index)}>
                     Delete Annotation
                   </Button>
@@ -349,7 +293,11 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
               </Accordion.Section>
             </Accordion>
           ))}
-        {config?.annotations?.length < 3 && <Button onClick={handleAddAnnotation}>Add Annotation</Button>}
+        {config?.annotations?.length < 3 && (
+          <Button onClick={handleAddAnnotation} className='mt-2'>
+            Add Annotation
+          </Button>
+        )}
       </Accordion.Section>
     </Accordion>
   )
