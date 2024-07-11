@@ -32,7 +32,6 @@ import { abbreviateNumber } from './helpers/abbreviateNumber'
 import { handleChartTabbing } from './helpers/handleChartTabbing'
 import { getQuartiles } from './helpers/getQuartiles'
 import { sortAsc, sortDesc } from './helpers/sort'
-import { filterData } from './helpers/filterData'
 import { handleChartAriaLabels } from './helpers/handleChartAriaLabels'
 import { lineOptions } from './helpers/lineOptions'
 import { handleLineType } from './helpers/handleLineType'
@@ -64,6 +63,7 @@ import { Label } from './types/Label'
 import { type ViewportSize } from './types/ChartConfig'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
+import { filterVizData } from '@cdc/core/helpers/filterVizData'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
@@ -112,7 +112,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const legendId = useId()
 
   const checkLineToBarGraph = () => {
-    return isConvertLineToBarGraph(config.visualizationType, filterData, config.allowLineToBarGraph)
+    return isConvertLineToBarGraph(config.visualizationType, filteredData, config.allowLineToBarGraph)
   }
 
   const reloadURLData = async () => {
@@ -176,7 +176,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       if (data) {
         setStateData(data)
         setExcludedData(data)
-        setFilteredData(filterData(config.filters, data))
+        setFilteredData(filterVizData(config.filters, data))
       }
     }
   }
@@ -327,7 +327,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         newConfig.filters[index].active = newConfig.filters[index].active || filterValues[0]
         newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle ? newConfig.filters[index].filterStyle : 'dropdown'
       })
-      currentData = filterData(newConfig.filters, newExcludedData)
+      currentData = filterVizData(newConfig.filters, newExcludedData)
       setFilteredData(currentData)
     }
 
@@ -506,6 +506,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.xAxis = newConfig.xAxis
       newConfig.runtime.yAxis = newConfig.yAxis
       newConfig.runtime.horizontal = false
+      newConfig.series.forEach(series => {
+        if (series.hideNullValue === null || series.hideNullValue === undefined) series.hideNullValue = true
+        if (series.hideZeroValue === null || series.hideZeroValue === undefined) series.hideZeroValue = true
+      })
     }
 
     newConfig.runtime.uniqueId = Date.now()
@@ -638,14 +642,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         let configCopy = { ...config }
         delete configCopy['filters']
         setConfig(configCopy)
-        setFilteredData(filterData(externalFilters, excludedData))
+        setFilteredData(filterVizData(externalFilters, excludedData))
       }
     }
 
     if (externalFilters && externalFilters.length > 0 && externalFilters.length > 0 && externalFilters[0].hasOwnProperty('active')) {
       let newConfigHere = { ...config, filters: externalFilters }
       setConfig(newConfigHere)
-      setFilteredData(filterData(externalFilters, excludedData))
+      setFilteredData(filterVizData(externalFilters, excludedData))
     }
   }, [externalFilters]) // eslint-disable-line
 
@@ -1178,7 +1182,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 {/* Sparkline */}
                 {config.visualizationType === 'Spark Line' && (
                   <>
-                    <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />
+                    <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterVizData} dimensions={dimensions} />
                     {config?.introText && (
                       <section className='introText' style={{ padding: '0px 0 35px' }}>
                         {parse(config.introText)}
@@ -1214,7 +1218,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {((config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey') || (config.visualizationType === 'Sankey' && config.table.show)) && (
                 <DataTable
                   config={config}
-                  rawData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : config.table.customTableConfig ? filterData(config.filters, config.data) : config.data}
+                  rawData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : config.table.customTableConfig ? filterVizData(config.filters, config.data) : config.data}
                   runtimeData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : filteredData || excludedData}
                   expandDataTable={config.table.expanded}
                   columns={config.columns}
@@ -1259,7 +1263,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     dimensions,
     dynamicLegendItems,
     excludedData: excludedData,
-    filterData,
     formatDate,
     formatNumber,
     formatTooltipsDate,

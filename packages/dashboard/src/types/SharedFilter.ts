@@ -1,5 +1,6 @@
+import { FilterBase } from '@cdc/core/types/VizFilter'
 import { APIFilter } from './APIFilter'
-export type SharedFilter = {
+export type SharedFilter = FilterBase & {
   type?: 'urlfilter' | 'datafilter' | ''
   fileName?: string
   filterBy?: 'Query String' | 'File Name'
@@ -9,15 +10,11 @@ export type SharedFilter = {
   queuedActive?: string
   usedBy?: (string | number)[] // if number used by whole row, else used by specific viz
   parents?: string[]
-  pivot?: string
   setBy?: string
   selectLimit?: number
-  columnName?: string
   resetLabel?: string
-  showDropdown?: boolean
   labels?: Record<string, any>
   key: string
-  values?: string[]
   apiFilter?: APIFilter
   datasetKey?: string
   tier?: number
