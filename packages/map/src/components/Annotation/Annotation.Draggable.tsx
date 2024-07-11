@@ -16,80 +16,14 @@ import './Annotation.Draggable.styles.css'
 import ConfigContext from '../../context'
 import { MapContext } from '../../types/MapContext'
 
-const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
+const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
   const [draggingItems, setDraggingItems] = useState([])
-  const { state: config, dimensions, setState: updateConfig, isEditor } = useContext<MapContext>(ConfigContext)
+  const { state: config, dimensions, setState: updateConfig, isEditor, isDraggingAnnotation } = useContext<MapContext>(ConfigContext)
   const [width, height] = dimensions
   const { annotations } = config
   // const { colorScale } = useColorScale()
   const prevDimensions = useRef(dimensions)
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
-
-  // Store the initial SVG dimensions and the initial relative position of the annotation
-  // const initialRelativePositions = useRef(
-  //   annotations.map(annotation => ({
-  //     dx: annotation.dx / annotation.savedDimensions[0],
-  //     dy: annotation.dy / annotation.savedDimensions[1]
-  //   }))
-  // )
-
-  // useEffect(() => {
-  //   if (config.annotations.length < 1) return
-  //   const threshold: number = 0.25
-  //   const widthChange: number = Math.abs(dimensions[0] - prevDimensions.current[0])
-  //   const heightChange: number = Math.abs(dimensions[1] - prevDimensions.current[1])
-
-  //   // Only update if the dimensions have changed significantly
-  //   if (widthChange > threshold || heightChange > threshold) {
-  //     const updatedAnnotations: Annotation[] = annotations.map((annotation: Annotation, index: number) => {
-  //       // Calculate new dx based on the initial relative position and the new dimensions
-  //       let newDx: number
-  //       let newX: number
-
-  //       if (prevDimensions.current[0] !== 0) {
-  //         // If the previous width is not 0, scale the dx (label) value to the new width
-  //         const oldWidth: number = prevDimensions.current[0]
-  //         const newWidth: number = dimensions[0]
-  //         const oldDx: number = annotation.dx
-  //         const oldX: number = annotation.x
-
-  //         newDx = (oldDx / oldWidth) * newWidth
-  //         newX = (oldX / oldWidth) * newWidth
-  //       } else {
-  //         // If the previous width is 0, use the current dx value
-  //         newDx = annotation.dx
-  //         newX = annotation.x
-  //       }
-
-  //       // If the initial relative dx position is less than config.yAxis.size, add a buffer to newDx
-  //       // if (initialRelativePositions.current[index]?.dx < config.yAxis.size) {
-  //       //   // Calculate the buffer based on the new dimensions of the SVG
-  //       //   const annotationWidthBuffer: number = dimensions[0] * 0.1 // 10% of the SVG's width
-  //       //   newDx += Number(config.yAxis.size) + annotationWidthBuffer + 200
-  //       //   newX += Number(config.yAxis.size) + annotationWidthBuffer + 200
-  //       // }
-
-  //       const newDy: number = prevDimensions.current[1] !== 0 ? (annotation.dy / prevDimensions.current[1]) * dimensions[1] : annotation.dy
-  //       const newY: number = prevDimensions.current[1] !== 0 ? (annotation.y / prevDimensions.current[1]) * dimensions[1] : annotation.y
-
-  //       return {
-  //         ...annotation,
-  //         dx: newDx,
-  //         dy: newDy,
-  //         x: newX,
-  //         y: newY
-  //       }
-  //     })
-
-  //     updateConfig({
-  //       ...config,
-  //       annotations: updatedAnnotations
-  //     })
-
-  //     // Update the previous dimensions to the current dimensions
-  //     prevDimensions.current = dimensions
-  //   }
-  // }, [dimensions, annotations, updateConfig, config])
 
   const handleMobileXPosition = annotation => {
     if (annotation.snapToNearestPoint) {
@@ -144,7 +78,10 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                     y={annotation.y}
                     canEditLabel={annotation.edit.label || false}
                     canEditSubject={annotation.edit.subject || false}
+                    labelDragHandleProps={{ r: 15, stroke: isDraggingAnnotation ? 'red' : 'var(--primary)' }}
+                    subjectDragHandleProps={{ r: 15, stroke: isDraggingAnnotation ? 'red' : 'var(--primary)' }}
                     onDragEnd={props => {
+                      onDragStateChange(false)
                       const updatedAnnotations = annotations.map((annotation, idx) => {
                         if (idx === index) {
                           const nearestDatum = annotation
@@ -172,6 +109,9 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                     onTouchMove={dragMove}
                     onTouchEnd={dragEnd}
                     anchorPosition={'auto'}
+                    onDragStart={() => {
+                      onDragStateChange(true)
+                    }}
                   >
                     <HtmlLabel className='' showAnchorLine={false}>
                       <div
@@ -180,6 +120,13 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                           borderRadius: 5, // Optional: set border radius
                           backgroundColor: `rgba(255, 255, 255, ${annotation?.opacity ? Number(annotation?.opacity) / 100 : 1})`
                         }}
+                        role='presentation'
+                        // ! IMPORTANT: Workaround for 508
+                        // - HTML needs to be set from the editor and we need a wrapper with the tabIndex
+                        // - TabIndex is only supposed to be used on interactive elements. This is a workaround.
+                        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+                        tabIndex={0}
+                        aria-label={`Annotation text that reads: ${annotation.text}`}
                         dangerouslySetInnerHTML={{ __html: annotation.text }}
                       />
                     </HtmlLabel>
