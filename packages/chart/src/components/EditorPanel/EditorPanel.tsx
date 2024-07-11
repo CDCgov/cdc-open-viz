@@ -2525,7 +2525,7 @@ const EditorPanel = () => {
             <Panels.Regions name='Regions' />
 
             {/* Columns */}
-            {config.visualizationType !== 'Box Plot' && (
+            {config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Sankey' && (
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Columns</AccordionItemButton>
