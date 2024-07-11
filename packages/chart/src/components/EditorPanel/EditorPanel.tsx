@@ -1958,7 +1958,7 @@ const EditorPanel = () => {
                         }
                         updateField={updateField}
                       />
-                      {true && visHasBrushChart && (
+                      {visHasBrushChart && (
                         <CheckBox
                           value={config.brush?.active}
                           section='brush'

@@ -38,7 +38,6 @@ import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 
 // styles
-import ZoomBrush from './ZoomBrush'
 
 const LinearChart = props => {
   const { transformedData: data, tableData, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, getTextWidth, brushConfig } = useContext(ConfigContext)

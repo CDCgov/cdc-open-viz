@@ -33,7 +33,7 @@ function BrushChart({ xMax, yMax }) {
     showTooltip(false)
   }
 
-  let brushHandle = (g, selection, firstDate, lastDate) => {
+  const brushHandle = (g, selection, firstDate, lastDate) => {
     const textWidth = getTextWidth(firstDate, `normal ${16 / 1.1}px sans-serif`)
     return g
       .selectAll('.handle--custom')
