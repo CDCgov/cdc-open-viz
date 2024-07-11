@@ -46,17 +46,16 @@ const PanelGeneral: FC<PanelProps> = props => {
             fieldName='vertical'
             label='Chart Height'
             updateField={updateField}
-            // TODO: when PMs have a decision on content here we can update the tooltip
-            // tooltip={
-            //   <Tooltip style={{ textTransform: 'none' }}>
-            //     <Tooltip.Target>
-            //       <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-            //     </Tooltip.Target>
-            //     <Tooltip.Content>
-            //       <p>Adjust the height of the chart area.</p>
-            //     </Tooltip.Content>
-            //   </Tooltip>
-            // }
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>For some visualization types, such as the sankey diagram, it may be necessary to adjust to chart height for optimal display.</p>
+                </Tooltip.Content>
+              </Tooltip>
+            }
           />
         )}
         {(visualizationType === 'Bar' || visualizationType === 'Combo' || visualizationType === 'Area Chart') && <Select value={visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />}
