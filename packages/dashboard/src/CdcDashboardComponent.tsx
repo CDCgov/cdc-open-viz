@@ -529,7 +529,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
         <DndProvider backend={HTML5Backend}>
           <div className='header-container'>
             <Header />
-            <VisualizationsPanel />
+            <VisualizationsPanel loadConfig={newConfig => dispatch({ type: 'UPDATE_CONFIG', payload: [newConfig] })} config={state.config} />
           </div>
 
           <div className='layout-container'>

@@ -1,12 +1,11 @@
 import _ from 'lodash'
 import { getUpdateConfig } from '../helpers/getUpdateConfig'
-import { MultiDashboardConfig } from '../types/MultiDashboard'
+import { MultiDashboard, MultiDashboardConfig } from '../types/MultiDashboard'
 import DashboardActions from './dashboard.actions'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 import { Tab } from '../types/Tab'
 import { DashboardConfig } from '../types/DashboardConfig'
 import { ConfigRow } from '../types/ConfigRow'
-import { initialState } from '../DashboardContext'
 
 type BlankMultiConfig = {
   dashboard: Partial<DashboardConfig>
@@ -52,19 +51,6 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     case 'UPDATE_CONFIG': {
       const [config, filteredData] = getUpdateConfig(state)(...action.payload)
       return { ...state, config, filteredData }
-    }
-    case 'APPLY_CONFIG': {
-      // using advanced editor. Wipe all existing data and apply new config
-      const [config, filteredData] = getUpdateConfig(state)(...action.payload)
-      // get the default data state
-      const data = [...Object.values(config.visualizations), ...config.rows]
-        .map(viz => viz.dataKey)
-        .reduce((acc, key) => {
-          const data = state.data[key] || state.config.datasets[key]?.data
-          if (data) acc[key] = data
-          return acc
-        }, {})
-      return { ...initialState, config, filteredData, data }
     }
     case 'SET_CONFIG': {
       return { ...state, config: { ...state.config, ...action.payload } }
