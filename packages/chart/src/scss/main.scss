@@ -284,6 +284,14 @@
       margin-bottom: 2.5em;
     }
 
+    svg.dragging-annotation * {
+      user-select: none;
+    }
+
+    svg.dragging-annotation path {
+      pointer-events: none;
+    }
+
     > svg {
       overflow: visible;
       font-size: 14px;
