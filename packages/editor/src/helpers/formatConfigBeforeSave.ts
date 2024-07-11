@@ -46,30 +46,19 @@ const cleanDashboardData = (config: DashboardConfig) => {
     })
   }
   if (config.rows) {
-    config.rows.forEach((row, i) => {
+    config.rows.forEach(row => {
       if (row.dataKey) {
-        config.rows[i] = _.omit(row, ['data', 'formattedData'])
-      }
-    })
-  }
-}
-
-const cleanSharedFilters = (config: DashboardConfig) => {
-  if (config.dashboard?.sharedFilters) {
-    config.dashboard.sharedFilters.forEach((filter, index) => {
-      delete config.dashboard.sharedFilters[index].active
-      if (filter.type === 'urlfilter') {
-        delete config.dashboard.sharedFilters[index].values
+        row = _.omit(row, ['data', 'formattedData'])
       }
     })
   }
 }
 
 export const formatConfigBeforeSave = configToStrip => {
-  let strippedConfig = _.cloneDeep(configToStrip)
+  let strippedConfig = { ...configToStrip }
   if (strippedConfig.type === 'dashboard') {
     cleanDashboardData(strippedConfig)
-    cleanSharedFilters(strippedConfig)
+
     cleanDashboardFootnotes(strippedConfig)
   } else {
     delete strippedConfig.runtime

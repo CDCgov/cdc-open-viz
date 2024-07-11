@@ -7,7 +7,6 @@ import Footnotes from '@cdc/core/types/Footnotes'
 import { SharedFilter } from '../types/SharedFilter'
 
 type ADD_FOOTNOTE = Action<'ADD_FOOTNOTE', { id: string; rowIndex: number; config: Footnotes }>
-type APPLY_CONFIG = Action<'APPLY_CONFIG', [Config, Object?]>
 type SET_CONFIG = Action<'SET_CONFIG', Partial<Config>>
 type UPDATE_CONFIG = Action<'UPDATE_CONFIG', [Config, Object?]>
 type SET_DATA = Action<'SET_DATA', Record<string, any[]>>
@@ -29,7 +28,6 @@ type UPDATE_ROW = Action<'UPDATE_ROW', { rowIndex: number; rowData: Partial<Conf
 
 type DashboardActions =
   | ADD_FOOTNOTE
-  | APPLY_CONFIG
   | ADD_NEW_DASHBOARD
   | SET_CONFIG
   | UPDATE_CONFIG
