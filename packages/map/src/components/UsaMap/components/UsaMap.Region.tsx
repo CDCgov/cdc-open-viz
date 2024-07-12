@@ -253,7 +253,7 @@ const UsaRegionMap = props => {
         <Mercator data={focusedStates} scale={620} translate={[1500, 735]}>
           {({ features, projection }) => constructGeoJsx(features, projection)}
         </Mercator>
-        {false && state.annotations.length > 0 && <Annotation.Draggable />}
+        {state.annotations.length > 0 && <Annotation.Draggable />}
       </svg>
       {territories.length > 0 && (
         <section className='territories'>

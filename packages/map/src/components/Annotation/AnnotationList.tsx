@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import ConfigContext from '../../../ConfigContext'
+import ConfigContext from './../../context'
 import './AnnotationList.styles.css'
 import DOMPurify from 'dompurify'
 
@@ -8,7 +8,7 @@ type AnnotationListProps = {
 }
 
 const AnnotationList: React.FC<AnnotationListProps> = ({ useBootstrapVisibilityClasses = true }) => {
-  const { config } = useContext(ConfigContext)
+  const { state: config } = useContext(ConfigContext)
   const annotations = config.annotations || []
 
   const ulClasses = () => {
