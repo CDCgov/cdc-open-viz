@@ -6,7 +6,6 @@ import defaults from './data/initial-state'
 import { processData } from './helpers/processData'
 import { getVizKeys } from './helpers/getVizKeys'
 import { processDataLegacy } from './helpers/processDataLegacy'
-import { addValuesToSharedFilters } from './helpers/addValuesToSharedFilters'
 import { WCMSProps } from '@cdc/core/types/WCMSProps'
 import { initialState } from './DashboardContext'
 import { getUpdateConfig } from './helpers/getUpdateConfig'
@@ -74,10 +73,6 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, confi
     Object.keys(datasets).forEach(key => {
       newConfig.datasets[key].data = datasets[key]
     })
-
-    if(newConfig.dashboard && newConfig.dashboard.sharedFilters && newConfig.dashboard.sharedFilters.length > 0){
-      newConfig.dashboard.sharedFilters = addValuesToSharedFilters(newConfig.dashboard.sharedFilters, datasets)
-    }
 
     return { newConfig, datasets }
   }
