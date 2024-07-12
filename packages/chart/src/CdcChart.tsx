@@ -1161,7 +1161,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
 
               {/* Filters */}
-              {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
+              {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterVizData} dimensions={dimensions} />}
               <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
               {config.annotations?.length > 0 && <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage={`Skip over annotations`} key={`skip-annotations`} />}
 
