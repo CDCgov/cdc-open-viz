@@ -1208,7 +1208,7 @@ const EditorPanel = () => {
                       {visSupportsValueAxisGridLines() && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Show Gridlines' updateField={updateField} />}
                       <CheckBox value={config.yAxis.enablePadding} section='yAxis' fieldName='enablePadding' label='Add Padding to Value Axis Scale' updateField={updateField} />
                       {config.yAxis.enablePadding && <TextField type='number' section='yAxis' fieldName='scalePadding' label='Padding Percentage' className='number-narrow' updateField={updateField} value={config.yAxis.scalePadding} />}
-                      {config.visualizationSubType === 'regular' && config.visualizationType !== 'Forest Plot' && <CheckBox value={config.useLogScale} fieldName='useLogScale' label='use logarithmic scale' updateField={updateField} />}
+                      {config.visualizationSubType === 'regular' && config.visualizationType !== 'Forest Plot' && config.visualizationType !== 'Bump Chart' && <CheckBox value={config.useLogScale} fieldName='useLogScale' label='use logarithmic scale' updateField={updateField} />}
                     </>
                   )}
                   <span className='divider-heading'>Number Formatting</span>
@@ -1674,8 +1674,8 @@ const EditorPanel = () => {
                                 })
                               }
                             >
-                              <option value='categorical'>Categorical (Linear Scale)</option>
-                              <option value='date'>Date (Linear Scale)</option>
+                              {config.visualizationType !== 'Bump Chart' && <option value='categorical'>Categorical (Linear Scale)</option>}
+                              {config.visualizationType !== 'Bump Chart' && <option value='date'>Date (Linear Scale)</option>}                           
                               <option value='date-time'>Date (Date Time Scale)</option>
                               {config.visualizationType === 'Scatter Plot' && <option value={'continuous'}>Continuous</option>}
                             </select>

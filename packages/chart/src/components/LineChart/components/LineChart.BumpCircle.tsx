@@ -31,7 +31,7 @@ const LineChartBumpCircle = props => {
       console.log('c', column)
       listItems.push(
         `<li className='tooltip-body'>
-          ${column?.name}: ${dataRow[column.name]}
+          <strong>${column?.name}</strong>: ${dataRow[column.name]}
         </li>`
       )
     })
