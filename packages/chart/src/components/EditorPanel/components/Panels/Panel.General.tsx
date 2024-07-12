@@ -115,7 +115,7 @@ const PanelGeneral: FC<PanelProps> = props => {
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p> Selecting this option will display "N/A" on the Date/Category Axis as an indication of missing or undefined data values.</p>
+                    <p>Selecting this option will display 'N/A' on the Date/Category Axis, in the tooltip hover, and in the data table to indicate missing or undefined data values.</p>
                   </Tooltip.Content>
                 </Tooltip>
               }
