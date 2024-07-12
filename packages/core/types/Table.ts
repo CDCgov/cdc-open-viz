@@ -26,6 +26,4 @@ export type Table = {
   showDownloadPdfButton?: boolean
   showDownloadUrl?: boolean
   showVertical?: boolean
-  showMissingDataLabel: boolean
-  showSuppressedSymbol: boolean
 }

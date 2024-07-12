@@ -122,44 +122,6 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
         />
       )}
 
-      <>
-        <CheckBox
-          tooltip={
-            <Tooltip style={{ textTransform: 'none' }}>
-              <Tooltip.Target>
-                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-              </Tooltip.Target>
-              <Tooltip.Content>
-                <p> Selecting this option will display 'N/A' on the data table as an indication of missing or undefined data values.</p>
-              </Tooltip.Content>
-            </Tooltip>
-          }
-          value={config.table.showMissingDataLabel}
-          section='table'
-          fieldName='showMissingDataLabel'
-          label='Display "Missing Data" Label'
-          updateField={updateField}
-        />
-        {config?.preliminaryData?.some(pd => pd.value && pd.type === 'suppression') && (
-          <CheckBox
-            tooltip={
-              <Tooltip style={{ textTransform: 'none' }}>
-                <Tooltip.Target>
-                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                </Tooltip.Target>
-                <Tooltip.Content>
-                  <p>Selecting this option will display "suppressed data symbol" on the data table where suppressed data values are indicated in the Data Series, unless a different symbol was chosen from the data series (e.g., suppression symbol) menu.</p>
-                </Tooltip.Content>
-              </Tooltip>
-            }
-            value={config.table.showSuppressedSymbol}
-            section='table'
-            fieldName='showSuppressedSymbol'
-            label='Display "suppressed data" symbol'
-            updateField={updateField}
-          />
-        )}
-      </>
       {config.type !== 'table' && (
         <TextField
           value={config.table.indexLabel}
