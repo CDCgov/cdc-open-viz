@@ -501,6 +501,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.xAxis = newConfig.xAxis
       newConfig.runtime.yAxis = newConfig.yAxis
       newConfig.runtime.horizontal = false
+      newConfig.series.forEach(series => {
+        if (series.hideNullValue === null || series.hideNullValue === undefined) series.hideNullValue = true
+        if (series.hideZeroValue === null || series.hideZeroValue === undefined) series.hideZeroValue = true
+      })
     }
 
     newConfig.runtime.uniqueId = Date.now()

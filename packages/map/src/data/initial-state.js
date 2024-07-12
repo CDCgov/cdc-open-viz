@@ -45,7 +45,8 @@ export default {
       prefix: '',
       suffix: '',
       name: '',
-      label: ''
+      label: '',
+      roundToPlace: 0
     },
     navigate: {
       name: ''

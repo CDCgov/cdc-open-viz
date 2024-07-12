@@ -24,7 +24,7 @@ import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
 import useRightAxis from '../../hooks/useRightAxis'
-import WarningImage from '../../images/warning.svg?react'
+import WarningImage from '../../images/warning.svg'
 import useMinMax from '../../hooks/useMinMax'
 
 import { type ChartContext } from '../../types/ChartContext'
@@ -61,7 +61,8 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
     'Dashed Small': '\u002D \u002D \u002D',
     'Dashed Medium': '\u2013 \u2013',
     'Dashed Large': '\u2014 \u2013',
-    'Open Circles': '\u25EF'
+    'Open Circles': '\u25EF',
+    'Filled Circles': ''
   }
 
   const getStyleOptions = type => {
@@ -108,7 +109,8 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
       iconCode: '',
       lineCode: '',
       hideBarSymbol: false,
-      hideLineStyle: false
+      hideLineStyle: false,
+      circleSize: 6
     }
     preliminaryData.push(defaultValues)
     updateConfig({ ...config, preliminaryData })
@@ -134,7 +136,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   return (
     <>
       {config.preliminaryData &&
-        config.preliminaryData?.map(({ column, displayLegend, displayTable, displayTooltip, label, seriesKey, style, symbol, type, value, hideBarSymbol, hideLineStyle }, i) => {
+        config.preliminaryData?.map(({ circleSize, column, displayLegend, displayTable, displayTooltip, label, seriesKey, style, symbol, type, value, hideBarSymbol, hideLineStyle }, i) => {
           return (
             <div key={`preliminaryData-${i}`} className='edit-block'>
               <p> {type === 'suppression' ? 'Suppressed' : 'Effect'} Data</p>
@@ -289,9 +291,25 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                 <>
                   <Select value={seriesKey} initial='Select' fieldName='seriesKey' label='ASSOCIATE TO SERIES' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={config.runtime.lineSeriesKeys ?? config.runtime?.seriesKeys} />
                   <Select value={column} initial='Select' fieldName='column' label='COLUMN WITH CONFIGURATION VALUE' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getColumnOptions()} />
-                  <TextField value={value} fieldName='value' label='VALUE TO TRIGGER' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                  <TextField
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>If 'Filled Circles' is selected as the style, this field is optional, and the style 'Filled Circles' will apply to all points within the associated series data.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    value={value}
+                    fieldName='value'
+                    label='VALUE TO TRIGGER'
+                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                  />
                   <Select value={style} initial='Select' fieldName='style' label='Style' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getStyleOptions(type)} />
-                  <TextField value={label} fieldName='label' label='Label' placeholder='' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                  {style.includes('Circles') && <TextField className='number-narrow' type='number' value={circleSize} fieldName='circleSize' label='circle size' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />}
+                  {style !== 'Filled Circles' && <TextField value={label} fieldName='label' label='Label' placeholder='' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />}
                 </>
               )}
             </div>
@@ -2507,7 +2525,7 @@ const EditorPanel = () => {
             <Panels.Regions name='Regions' />
 
             {/* Columns */}
-            {config.visualizationType !== 'Box Plot' && (
+            {config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Sankey' && (
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Columns</AccordionItemButton>
