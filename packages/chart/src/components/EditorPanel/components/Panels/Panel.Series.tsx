@@ -511,9 +511,12 @@ const SeriesDisplayInTooltip = props => {
 
   if (['Paired Bar', 'Scatter Plot', 'Deviation Bar'].includes(config.visualizationType)) return
 
-  const toggleTooltip = (seriesIndex, fieldName) => {
+  const toggleTooltip = seriesIndex => {
     let copiedSeries = [...config.series]
-    copiedSeries[seriesIndex][fieldName] = !copiedSeries[seriesIndex][fieldName]
+
+    const showInTooltip = copiedSeries[seriesIndex].tooltip ? copiedSeries[seriesIndex].tooltip : false
+
+    copiedSeries[seriesIndex].tooltip = !copiedSeries[seriesIndex].tooltip
 
     updateConfig({
       ...config,
@@ -522,39 +525,17 @@ const SeriesDisplayInTooltip = props => {
   }
 
   return (
-    <div className='input-group-wrapper'>
+    <>
       <div className='input-group'>
         <label htmlFor={`series-tooltip--${index}`}>Show In Tooltip</label>
-        <div className={'cove-input__checkbox--small'} onClick={e => toggleTooltip(index, 'tooltip')}>
+        <div className={'cove-input__checkbox--small'} onClick={e => toggleTooltip(index)}>
           <div className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`} style={{ backgroundColor: '' }}>
             {series.tooltip && <Check className='' style={{ fill: '#025eaa' }} />}
           </div>
           <input className='cove-input--hidden' type='checkbox' name={`series-tooltip--${index}`} checked={series.tooltip ? series.tooltip : false} readOnly />
         </div>
       </div>
-      {series.tooltip && (
-        <>
-          <div className='input-group'>
-            <label htmlFor={`series-hideZeroValue--${index}`}>Hide zero Values In Tooltip</label>
-            <div className={'cove-input__checkbox--small'} onClick={e => toggleTooltip(index, 'hideZeroValue')}>
-              <div className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`} style={{ backgroundColor: '' }}>
-                {series.hideZeroValue && <Check className='' style={{ fill: '#025eaa' }} />}
-              </div>
-              <input className='cove-input--hidden' type='checkbox' name={`series-hideZeroValue--${index}`} checked={series.hideZeroValue ? series.hideZeroValue : false} readOnly />
-            </div>
-          </div>
-          <div className='input-group'>
-            <label htmlFor={`series-hideNullValue--${index}`}>Hide Null In Tooltip</label>
-            <div className={'cove-input__checkbox--small'} onClick={e => toggleTooltip(index, 'hideNullValue')}>
-              <div className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`} style={{ backgroundColor: '' }}>
-                {series.hideNullValue && <Check className='' style={{ fill: '#025eaa' }} />}
-              </div>
-              <input className='cove-input--hidden' type='checkbox' name={`series-hideNullValue--${index}`} checked={series.hideNullValue ? series.hideNullValue : false} readOnly />
-            </div>
-          </div>
-        </>
-      )}
-    </div>
+    </>
   )
 }
 
