@@ -1,4 +1,4 @@
-import { formatConfigBeforeSave } from './formatConfigBeforeSave'
+import { formatConfigBeforeSave } from '@cdc/core/helpers/formatConfigBeforeSave'
 
 export const saveConfigToWindow = newTempConfig => {
   if (null !== newTempConfig) {
