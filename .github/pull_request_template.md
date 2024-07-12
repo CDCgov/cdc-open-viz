@@ -1,24 +1,18 @@
-## Brief Description
+## [Replace With Ticket Number]
 
 <!-- Provide a brief description of the changes made in this PR -->
 
-## Related Issue
+## Testing Steps
 
-<!-- If applicable, reference related issues -->
+<!-- Provide testing steps and reference storybook stories if necessary -->
+<!-- Add applicable configs to JIRA ticket for testers-->
 
-## Changes
+## Self Review
 
-- <!-- List changes made in this PR -->
-
-## Checklist
-
-- [ ] My code follows the style guidelines of this project
-- [ ] I have performed a self-review of my code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
+- I have added testing steps for reviewers
+- I have commented my code, particularly in hard-to-understand areas
+- My changes generate no new warnings
+- New and existing unit tests pass are passing
 
 ## Screenshots (if applicable)
 
