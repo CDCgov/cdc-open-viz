@@ -12,7 +12,7 @@
 - I have added testing steps for reviewers
 - I have commented my code, particularly in hard-to-understand areas
 - My changes generate no new warnings
-- New and existing unit tests pass are passing
+- New and existing unit tests are passing
 
 ## Screenshots (if applicable)
 
