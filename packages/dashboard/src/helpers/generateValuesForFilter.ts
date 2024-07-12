@@ -5,7 +5,7 @@ export const generateValuesForFilter = (columnName, _data) => {
   Object.keys(_data).forEach(key => {
     _data[key]?.forEach(row => {
       const value = row[columnName]
-      if (!values.includes(value)) {
+      if (value && !values.includes(value)) {
         values.push(value)
       }
     })
