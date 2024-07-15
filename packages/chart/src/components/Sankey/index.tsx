@@ -115,6 +115,8 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
   }
 
   const activeConnection = (id: String) => {
+    if (!sankeyData?.nodes) return { sourceNodes: [], activeLinks: [] }
+
     const currentNode = sankeyData.nodes.find(node => node.id === id)
 
     const sourceNodes = []
@@ -143,12 +145,12 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
     return { sourceNodes, activeLinks }
   }
 
-  const tooltipVal = `${(data?.tooltips.find(item => item.node === tooltipID) || {}).value}`
-  const tooltipSummary = `${(data?.tooltips.find(item => item.node === tooltipID) || {}).summary}`
-  const tooltipColumn1Label = (data?.tooltips.find(item => item.node === tooltipID) || {}).column1Label
-  const tooltipColumn2Label = (data?.tooltips.find(item => item.node === tooltipID) || {}).column2Label
-  const tooltipColumn1 = (data?.tooltips.find(item => item.node === tooltipID) || {}).column1
-  const tooltipColumn2 = (data?.tooltips.find(item => item.node === tooltipID) || {}).column2
+  const tooltipVal = `${(data?.tooltips?.find(item => item.node === tooltipID) || {}).value}`
+  const tooltipSummary = `${(data?.tooltips?.find(item => item.node === tooltipID) || {}).summary}`
+  const tooltipColumn1Label = (data?.tooltips?.find(item => item.node === tooltipID) || {}).column1Label
+  const tooltipColumn2Label = (data?.tooltips?.find(item => item.node === tooltipID) || {}).column2Label
+  const tooltipColumn1 = (data?.tooltips?.find(item => item.node === tooltipID) || {}).column1
+  const tooltipColumn2 = (data?.tooltips?.find(item => item.node === tooltipID) || {}).column2
 
   const ColumnList = ({ columnData }) => {
     return (
