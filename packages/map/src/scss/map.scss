@@ -159,10 +159,13 @@ $medium: 768px;
     @extend .territories;
     width: 60%;
   }
-}
 
-@media screen and (max-width: $small) {
-  .territories {
+  &--tablet {
+    @extend .territories;
+    width: 70%;
+    svg {
+      margin-bottom: 0.2em;
+    }
   }
 }
 
