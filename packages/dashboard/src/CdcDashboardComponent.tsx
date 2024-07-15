@@ -263,11 +263,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       reloadURLData()
     }
     loadAPIFilters(config.dashboard.sharedFilters)
-  }, [isEditor, isPreview])
-
-  useEffect(() => {
     updateDataFilters()
-  }, [state.config?.activeDashboard])
+  }, [isEditor, isPreview, state.config?.activeDashboard])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
     const config = _.cloneDeep(state.config)
