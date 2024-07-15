@@ -23,6 +23,9 @@
   a:not(:last-child) {
     margin-right: 10px;
   }
+  & a {
+    font-size: 1em !important;
+  }
 }
 
 // odd wrapper thats different on dashboards
