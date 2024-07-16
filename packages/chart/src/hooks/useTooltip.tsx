@@ -20,6 +20,44 @@ export const useTooltip = props => {
    * @param {Object} eventSvgCoords - The object containing the SVG coordinates of the event.
    * @return {Object} - The tooltip information with tooltip data.
    */
+
+  // function handles only Single series hovred data tooltips
+  function findDataKeyByThreshold(mouseY, datapoint) {
+    let sum = 0
+    let threshold = Number(yScale.invert(mouseY))
+    let hoveredKey = null
+    let hoveredValue = null
+
+    for (let key of config.runtime?.seriesKeys) {
+      if (datapoint.hasOwnProperty(key)) {
+        sum += Number(datapoint[key])
+        if (sum >= threshold) {
+          hoveredValue = datapoint[key]
+          hoveredKey = key
+          break
+        }
+      }
+    }
+
+    // Return null if no matching data is found
+    return [hoveredKey, hoveredValue]
+  }
+
+  const getFormattedValue = (seriesKey, value, config, getAxisPosition) => {
+    // handle case where data is missing
+    const showMissingDataValue = config.general.showMissingDataLabel && !value
+    let formattedValue = seriesKey === config.xAxis.dataKey ? value : formatNumber(value, getAxisPosition(seriesKey))
+    formattedValue = showMissingDataValue ? 'N/A' : formattedValue
+
+    const suppressed = config.preliminaryData?.find(pd => pd.label && pd.type === 'suppression' && pd.displayTooltip && value === pd.value && (!pd.column || seriesKey === pd.column))
+
+    if (suppressed) {
+      formattedValue = suppressed.label
+    }
+
+    return formattedValue
+  }
+
   const getTooltipInformation = (tooltipDataArray, eventSvgCoords) => {
     const { x, y } = eventSvgCoords
     let initialTooltipData = tooltipDataArray || {}
@@ -136,22 +174,27 @@ export const useTooltip = props => {
       if (visualizationType === 'Forest Plot') {
         tooltipItems.push([config.xAxis.dataKey, getClosestYValue(y)])
       }
-
-      if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot') {
+      // handle tooltip for all  hovered series
+      if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot' && !config.tooltips.singleSeries) {
         tooltipItems.push(
           ...getIncludedTooltipSeries()
             ?.filter(seriesKey => config.series?.find(item => item.dataKey === seriesKey && item?.tooltip) || config.xAxis?.dataKey == seriesKey)
             ?.flatMap(seriesKey => {
-              const shoMissingDataValue = config.general.showMissingDataLabel && !resolvedScaleValues[0]?.[seriesKey]
-              let formattedValue = seriesKey === config.xAxis.dataKey ? resolvedScaleValues[0]?.[seriesKey] : formatNumber(resolvedScaleValues[0]?.[seriesKey], getAxisPosition(seriesKey))
-              formattedValue = shoMissingDataValue ? 'N/A' : formattedValue
-              const suppressed = config.preliminaryData?.find(pd => pd.label && pd.type === 'suppression' && pd.displayTooltip && resolvedScaleValues[0]?.[seriesKey] === pd.value && (!pd.column || seriesKey === pd.column))
-              if (suppressed) {
-                formattedValue = suppressed.label
-              }
+              const value = resolvedScaleValues[0]?.[seriesKey]
+              const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
               return [[seriesKey, formattedValue, getAxisPosition(seriesKey)]]
             })
         )
+      }
+
+      // handle tooltip for single hovered series
+      if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot' && config.tooltips.singleSeries) {
+        const [seriesKey, value] = findDataKeyByThreshold(y, resolvedScaleValues[0])
+        if (seriesKey && value) {
+          tooltipItems.push([config.xAxis.dataKey, config.xAxis.type === 'date' ? formatDate(parseDate(closestXScaleValue)) : closestXScaleValue])
+          const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
+          tooltipItems.push([seriesKey, formattedValue])
+        }
       }
 
       return [...tooltipItems, ...additionalTooltipItems]
