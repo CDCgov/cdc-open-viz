@@ -73,6 +73,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, confi
     Object.keys(datasets).forEach(key => {
       newConfig.datasets[key].data = datasets[key]
     })
+
     return { newConfig, datasets }
   }
 

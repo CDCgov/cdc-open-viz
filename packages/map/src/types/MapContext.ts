@@ -14,6 +14,8 @@ export type MapContext = {
   generateRuntimeData
   geoClickHandler
   handleCircleClick: Function
+  handleDragStateChange: Function
+  isDraggingAnnotation: boolean
   handleMapAriaLabels
   hasZoom
   innerContainerRef

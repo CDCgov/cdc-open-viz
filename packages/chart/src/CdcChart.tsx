@@ -29,6 +29,7 @@ import Legend from './components/Legend'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
+import { handleChartTabbing } from './helpers/handleChartTabbing'
 import { getQuartiles } from './helpers/getQuartiles'
 import { sortAsc, sortDesc } from './helpers/sort'
 import { handleChartAriaLabels } from './helpers/handleChartAriaLabels'
@@ -78,6 +79,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [externalFilters, setExternalFilters] = useState<any[]>()
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
+  const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [dynamicLegendItems, setDynamicLegendItems] = useState<any[]>([])
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
   const [brushConfig, setBrushConfig] = useState({
@@ -89,6 +91,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   let legendMemo = useRef(new Map()) // map collection
   let innerContainerRef = useRef()
   const legendRef = useRef(null)
+
+  const handleDragStateChange = isDragging => {
+    setIsDraggingAnnotation(isDragging)
+  }
 
   if (isDebug) console.log('Chart config, isEditor', config, isEditor)
 
@@ -104,7 +110,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
   const legendId = useId()
-  const handleChartTabbing = !config.legend?.hide ? legendId : config?.title ? `dataTableSection__${config.title.replace(/\s/g, '')}` : `dataTableSection`
 
   const checkLineToBarGraph = () => {
     return isConvertLineToBarGraph(config.visualizationType, filteredData, config.allowLineToBarGraph)
@@ -501,10 +506,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.xAxis = newConfig.xAxis
       newConfig.runtime.yAxis = newConfig.yAxis
       newConfig.runtime.horizontal = false
-      newConfig.series.forEach(series => {
-        if (series.hideNullValue === null || series.hideNullValue === undefined) series.hideNullValue = true
-        if (series.hideZeroValue === null || series.hideZeroValue === undefined) series.hideZeroValue = true
-      })
     }
 
     newConfig.runtime.uniqueId = Date.now()
@@ -1161,7 +1162,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
               {/* Filters */}
               {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterVizData} dimensions={dimensions} />}
-              <SkipTo skipId={handleChartTabbing} skipMessage='Skip Over Chart Container' />
+              <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
+              {config.annotations?.length > 0 && <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage={`Skip over annotations`} key={`skip-annotations`} />}
+
               {/* Visualization */}
               {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
 
@@ -1193,7 +1196,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 )}
                 {/* Sankey */}
                 {config.visualizationType === 'Sankey' && <ParentSize aria-hidden='true'>{parent => <SankeyChart runtime={config.runtime} width={parent.width} height={parent.height} />}</ParentSize>}
-                {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend ref={legendRef} />}
+                {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend ref={legendRef} skipId={handleChartTabbing(config, legendId)} />}
               </div>
               {/* Link */}
               {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
@@ -1222,10 +1225,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                   indexTitle={config.table.indexLabel}
                   vizTitle={title}
                   viewport={currentViewport}
-                  tabbingId={handleChartTabbing}
+                  tabbingId={handleChartTabbing(config, legendId)}
                   colorScale={colorScale}
                 />
               )}
+              {config?.annotations?.length > 0 && <Annotation.Dropdown />}
               {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
               {/* show pdf or image button */}
             </div>
@@ -1267,7 +1271,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     highlightReset,
     imageId,
     isDashboard,
+    isLegendBottom: legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport),
     isDebug,
+    isDraggingAnnotation,
+    handleDragStateChange,
     isEditor,
     isNumber,
     legend,
