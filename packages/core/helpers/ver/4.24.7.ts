@@ -1,8 +1,9 @@
 import _ from 'lodash'
 import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
 import { MultiDashboardConfig } from '@cdc/dashboard/src/types/MultiDashboard'
+import { AnyVisualization } from '../../types/Visualization'
 
-const dashboardFiltersMigrate = config => {
+export const dashboardFiltersMigrate = config => {
   if (!config.dashboard) return config
   const dashboardConfig = config as MultiDashboardConfig
   const newVisualizations = {}
@@ -37,6 +38,26 @@ const dashboardFiltersMigrate = config => {
     if (viz.visualizationType === 'filter-dropdowns') viz.visualizationType = 'dashboardFilters'
     newVisualizations[vizKey] = viz
   })
+
+  if (config.dashboard.sharedFilters.length && !Object.values(newVisualizations).find((v: AnyVisualization) => v.type === 'dashboardFilters')) {
+    const newViz = {
+      type: 'dashboardFilters',
+      visualizationType: 'dashboardFilters',
+      sharedFilterIndexes: config.dashboard.sharedFilters.map((_sf, i) => i),
+      filterBehavior: config.filterBehavior || 'Filter Change'
+    }
+    const key = 'legacySharedFilters'
+    newVisualizations[key] = newViz
+    const newRow = {
+      columns: [
+        {
+          width: 12,
+          widget: key
+        }
+      ]
+    }
+    config.rows = [newRow, ...config.rows]
+  }
   // if there's no dashboardFilters visualization but there are sharedFilters create a visualization and update rows.
 
   config.visualizations = newVisualizations

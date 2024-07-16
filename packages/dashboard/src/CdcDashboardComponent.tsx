@@ -312,6 +312,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     getVizKeys(state.config).forEach(visualizationKey => {
       const rowNumber = vizRowColumnLocator[visualizationKey]?.row
       const visualizationConfig = getVizConfig(visualizationKey, rowNumber, state.config, state.data, state.filteredData)
+      visualizationConfig.uid = visualizationKey
       if (visualizationConfig.type === 'footnotes') visualizationConfig.formattedData = undefined
       const setsSharedFilter = state.config.dashboard.sharedFilters && state.config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey).length > 0
       const setSharedFilterValue = setsSharedFilter ? state.config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey)[0].active : undefined
@@ -458,19 +459,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             <Title title={title} isDashboard={true} classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]} />
             {/* Description */}
             {description && <div className='subtext'>{parse(description)}</div>}
-
-            {/* Deprecated -> Legacy Filters Support */}
-            {config.dashboard.sharedFilters && Object.values(config.visualizations || {}).filter(viz => viz.visualizationType === 'dashboardFilters').length === 0 && (
-              <DashboardSharedFilters
-                isEditor={false}
-                visualizationConfig={{ sharedFilterIndexes: config.dashboard.sharedFilters.map((f, i) => i), filterBehavior: config.filterBehavior, type: 'dashboardFilters' }}
-                apiFilterDropdowns={apiFilterDropdowns}
-                setConfig={() => {}}
-                currentViewport={currentViewport}
-              />
-            )}
-            {/* Deprecated End */}
-
             {/* Visualizations */}
             {config.rows &&
               config.rows

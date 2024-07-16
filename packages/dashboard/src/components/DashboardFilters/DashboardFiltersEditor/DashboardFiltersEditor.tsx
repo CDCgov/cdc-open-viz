@@ -1,16 +1,18 @@
 import { Accordion, AccordionItem, AccordionItemButton, AccordionItemHeading, AccordionItemPanel } from 'react-accessible-accordion'
-import { useContext, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import { CheckBox, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import FieldSetWrapper from '@cdc/core/components/EditorPanel/FieldSetWrapper'
-import FilterEditor from './FilterEditor'
+import FilterEditor from './components/FilterEditor'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { DashboardContext, DashboardDispatchContext } from '../../../DashboardContext'
 import _ from 'lodash'
 import { DashboardFilters } from '../../../types/DashboardFilters'
 import { SharedFilter } from '../../../types/SharedFilter'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
+import { useGlobalContext } from '@cdc/core/components/GlobalContext'
+import DeleteFilterModal from './components/DeleteFilterModal'
 
 type DashboardFitlersEditorProps = {
   vizConfig: DashboardFilters
@@ -19,13 +21,23 @@ type DashboardFitlersEditorProps = {
 
 const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConfig, updateConfig }) => {
   const { config, loadAPIFilters, data } = useContext(DashboardContext)
+  const { overlay } = useGlobalContext()
   const {
     dashboard: { sharedFilters },
     visualizations
   } = config
   const dispatch = useContext(DashboardDispatchContext)
 
+  const existingOptions = useMemo(() => {
+    const sharedFilterIndexes = (config.visualizations[vizConfig.uid] as DashboardFilters).sharedFilterIndexes.map(Number)
+    return config.dashboard.sharedFilters
+      .map<[number, string]>(({ key }, i) => [i, key])
+      .filter(([filterIndex]) => !sharedFilterIndexes.includes(filterIndex)) // filter out already added filters
+      .map(([filterIndex, filterName]) => <option key={filterIndex} value={filterIndex}>{`${filterIndex} - ${filterName}`}</option>)
+  }, [config.visualizations, vizConfig.uid])
+
   const openControls = useState({})
+  const [canAddExisting, setCanAddExisting] = useState(false)
 
   const updateFilterProp = (prop: string, index: number, value) => {
     const newSharedFilters = _.cloneDeep(sharedFilters)
@@ -133,7 +145,24 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
           {vizConfig.sharedFilterIndexes.map(index => {
             const filter = sharedFilters[index]
             return (
-              <FieldSetWrapper key={filter.key + index} fieldName={filter.key} fieldKey={index} fieldType='Dashboard Filter' controls={openControls} deleteField={() => removeFilter(index)}>
+              <FieldSetWrapper
+                key={filter.key + index}
+                fieldName={filter.key}
+                fieldKey={index}
+                fieldType='Dashboard Filter'
+                controls={openControls}
+                deleteField={() => {
+                  overlay?.actions.openOverlay(
+                    <DeleteFilterModal
+                      removeFilterCompletely={removeFilter}
+                      removeFilterFromViz={index => {
+                        updateConfig({ ...vizConfig, sharedFilterIndexes: vizConfig.sharedFilterIndexes.filter(i => i !== index) })
+                      }}
+                      filterIndex={index}
+                    />
+                  )
+                }}
+              >
                 <FilterEditor
                   filter={filter}
                   updateFilterProp={(name, value) => {
@@ -144,9 +173,42 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
               </FieldSetWrapper>
             )
           })}
-          <button type='button' onClick={addNewFilter} className='btn btn-primary full-width'>
+          <button onClick={addNewFilter} className='btn btn-primary full-width'>
             Add Filter
           </button>
+          {canAddExisting ? (
+            <label>
+              <span className='edit-label column-heading'>
+                Select Existing Dashboard Filter
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>This feature is indentended to support legacy functionality. Be advised that any change to the filter in this editor will reflect on the whole dashboard. </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              </span>
+              <select
+                value={''}
+                onChange={e => {
+                  updateConfig({ ...vizConfig, sharedFilterIndexes: [...vizConfig.sharedFilterIndexes, e.target.value] })
+                  setCanAddExisting(false)
+                }}
+              >
+                {[
+                  <option key='select' value=''>
+                    Select
+                  </option>,
+                  ...existingOptions
+                ]}
+              </select>
+            </label>
+          ) : (
+            <button onClick={() => setCanAddExisting(true)} className='btn btn-primary full-width'>
+              Add Exiting Dashboard Filter
+            </button>
+          )}
         </AccordionItemPanel>
       </AccordionItem>
     </Accordion>

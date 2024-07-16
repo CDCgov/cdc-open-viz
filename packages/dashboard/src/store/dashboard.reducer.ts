@@ -7,6 +7,7 @@ import { Tab } from '../types/Tab'
 import { DashboardConfig } from '../types/DashboardConfig'
 import { ConfigRow } from '../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { initialState } from '../DashboardContext'
 
 type BlankMultiConfig = {
   dashboard: Partial<DashboardConfig>
