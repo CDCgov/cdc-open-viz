@@ -65,7 +65,8 @@ const UsaMap = () => {
       state,
       supportedTerritories,
       titleCase,
-      tooltipId
+      tooltipId,
+      handleDragStateChange
     } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
@@ -118,6 +119,14 @@ const UsaMap = () => {
   }, [data, state.general.territoriesAlwaysShow])
 
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+
+  const getTerritoriesClasses = () => {
+    const screenWidth = window?.visualViewport?.width
+    let className = 'territories'
+    if (screenWidth < 700) return 'territories--mobile'
+    if (screenWidth < 900) return 'territories--tablet'
+    return className
+  }
 
   const territories = territoriesData.map((territory, territoryIndex) => {
     const Shape = isHex ? Territory.Hexagon : Territory.Rectangle
@@ -446,7 +455,7 @@ const UsaMap = () => {
             {({ features, projection }) => constructGeoJsx(features, projection)}
           </AlbersUsa>
         )}
-        {false && state.annotations.length > 0 && <Annotation.Draggable />}
+        {state.annotations.length > 0 && <Annotation.Draggable onDragStateChange={handleDragStateChange} />}
       </svg>
 
       {territories.length > 0 && (
@@ -456,7 +465,7 @@ const UsaMap = () => {
               <span className='territories-label label'>{state.general.territoriesLabel}</span>
             </div>
             <div>
-              <span className={window.visualViewport.width < 700 ? 'territories--mobile' : 'territories'}>{territories}</span>
+              <span className={getTerritoriesClasses()}>{territories}</span>
             </div>
           </div>
         </>

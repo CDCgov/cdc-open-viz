@@ -62,7 +62,7 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
     const isColumnMatch = !pd.column || pd.column === column
     const barSeriesExist = config.runtime?.barSeriesKeys?.includes(column)
     const lineSeriesExist = config.runtime?.lineSeriesKeys?.includes(column)
-    const showSymbol = config.table.showSuppressedSymbol
+    const showSymbol = config.general.showSuppressedSymbol
     if (isValueMatch && isColumnMatch && pd.displayTable && pd.type === 'suppression') {
       switch (config.visualizationType) {
         case 'Combo':
@@ -77,6 +77,6 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
       }
     }
   })
-  const shoMissingDataCellValue = config.table.showMissingDataLabel && !labelValue
+  const shoMissingDataCellValue = config.general?.showMissingDataLabel && !labelValue
   return shoMissingDataCellValue ? 'N/A' : cellValue
 }

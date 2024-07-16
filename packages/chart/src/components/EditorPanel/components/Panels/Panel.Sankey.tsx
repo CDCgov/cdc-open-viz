@@ -97,7 +97,7 @@ const SankeySettings = () => {
             Add StoryNode
           </button>
         )}
-        <CheckBox value={config.enableTooltips} fieldName='enableTooltips' label='Enable Tooltips' updateField={updateField} />
+        {config.enableTooltips && config.data?.tooltips?.length > 0 && <CheckBox value={config.enableTooltips} fieldName='enableTooltips' label='Enable Tooltips' updateField={updateField} />}
       </AccordionItemPanel>
     </AccordionItem>
   )

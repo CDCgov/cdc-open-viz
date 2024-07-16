@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import closeIcon from '../images/close.svg?react?inline'
+import closeIcon from '../images/close.svg?inline'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 import ConfigContext from '../context'
 

@@ -35,9 +35,9 @@
     "@visx/group": "^3.0.0",
     "@visx/heatmap": "^3.0.0",
     "@visx/scale": "^3.0.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "@vitest/coverage-c8": "^0.33.0",
-    "@vitest/ui": "^1.6.0",
+    "@vitejs/plugin-react": "^3.1.0",
+    "@vitest/coverage-c8": "^0.29.2",
+    "@vitest/ui": "^0.29.2",
     "babel-eslint": "^10.1.0",
     "d3-composite-projections": "^1.4.0",
     "eslint": "^8.44.0",
@@ -76,11 +76,11 @@
     "storybook": "^7.4.6",
     "storybook-addon-fetch-mock": "^1.0.1",
     "use-debounce": "^7.0.1",
-    "vite": "^5.2.13",
-    "vite-plugin-css-injected-by-js": "^3.5.1",
+    "vite": "^4.4.11",
+    "vite-plugin-css-injected-by-js": "^2.4.0",
     "vite-plugin-md": "^0.21.5",
-    "vite-plugin-svgr": "^4.2.0",
-    "vitest": "^1.6.0",
+    "vite-plugin-svgr": "^2.4.0",
+    "vitest": "^1.2.2",
     "whatwg-fetch": "^3.6.2"
   },
   "lint-staged": {
@@ -104,7 +104,8 @@
     "@visx/legend": "^3.0.0",
     "@visx/pattern": "^3.0.0",
     "@visx/responsive": "^2.10.0",
-    "@vitest/coverage-v8": "^1.2.2"
+    "@vitest/coverage-v8": "^1.2.2",
+    "dompurify": "^3.1.5"
   },
   "resolutions": {
     "jackspeak": "2.1.1"

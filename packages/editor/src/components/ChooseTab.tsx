@@ -4,28 +4,29 @@ import '../scss/choose-vis-tab.scss'
 import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 
-import InfoIcon from '@cdc/core/assets/icon-info.svg?react'
-import DashboardIcon from '@cdc/core/assets/icon-dashboard.svg?react'
-import BarIcon from '@cdc/core/assets/icon-chart-bar.svg?react'
-import LineIcon from '@cdc/core/assets/icon-chart-line.svg?react'
-import PieIcon from '@cdc/core/assets/icon-chart-pie.svg?react'
-import GlobeIcon from '@cdc/core/assets/icon-map-world.svg?react'
-import UsaIcon from '@cdc/core/assets/icon-map-usa.svg?react'
-import UsaRegionIcon from '@cdc/core/assets/usa-region-graphic.svg?react'
-import DataBiteIcon from '@cdc/core/assets/icon-databite.svg?react'
-import WaffleChartIcon from '@cdc/core/assets/icon-grid.svg?react'
-import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg?react'
-import PairedBarIcon from '@cdc/core/assets/icon-chart-bar-paired.svg?react'
-import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg?react'
-import ScatterPlotIcon from '@cdc/core/assets/icon-chart-scatterplot.svg?react'
-import BoxPlotIcon from '@cdc/core/assets/icon-chart-box-whisker.svg?react'
-import AreaChartIcon from '@cdc/core/assets/icon-area-chart.svg?react'
-import GaugeChartIcon from '@cdc/core/assets/icon-linear-gauge.svg?react'
-import ForestPlotIcon from '@cdc/core/assets/icon-chart-forest-plot.svg?react'
-import ForecastIcon from '@cdc/core/assets/icon-chart-forecast.svg?react'
-import DeviationIcon from '@cdc/core/assets/icon-deviation-bar.svg?react'
-import SankeyIcon from '@cdc/core/assets/icon-sankey.svg?react'
+import InfoIcon from '@cdc/core/assets/icon-info.svg'
+import DashboardIcon from '@cdc/core/assets/icon-dashboard.svg'
+import BarIcon from '@cdc/core/assets/icon-chart-bar.svg'
+import LineIcon from '@cdc/core/assets/icon-chart-line.svg'
+import PieIcon from '@cdc/core/assets/icon-chart-pie.svg'
+import GlobeIcon from '@cdc/core/assets/icon-map-world.svg'
+import UsaIcon from '@cdc/core/assets/icon-map-usa.svg'
+import UsaRegionIcon from '@cdc/core/assets/usa-region-graphic.svg'
+import DataBiteIcon from '@cdc/core/assets/icon-databite.svg'
+import WaffleChartIcon from '@cdc/core/assets/icon-grid.svg'
+import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
+import PairedBarIcon from '@cdc/core/assets/icon-chart-bar-paired.svg'
+import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
+import ScatterPlotIcon from '@cdc/core/assets/icon-chart-scatterplot.svg'
+import BoxPlotIcon from '@cdc/core/assets/icon-chart-box-whisker.svg'
+import AreaChartIcon from '@cdc/core/assets/icon-area-chart.svg'
+import GaugeChartIcon from '@cdc/core/assets/icon-linear-gauge.svg'
+import ForestPlotIcon from '@cdc/core/assets/icon-chart-forest-plot.svg'
+import ForecastIcon from '@cdc/core/assets/icon-chart-forecast.svg'
+import DeviationIcon from '@cdc/core/assets/icon-deviation-bar.svg'
+import SankeyIcon from '@cdc/core/assets/icon-sankey.svg'
 import { Visualization } from '@cdc/core/types/Visualization'
+import Icon from '@cdc/core/components/ui/Icon'
 
 export default function ChooseTab() {
   const { config, tempConfig } = useContext(ConfigContext)
@@ -68,17 +69,17 @@ export default function ChooseTab() {
       classNames = config.type === type && isSubType && !isHorizontalStackedChart ? 'active' : ''
     }
 
-    let setTypes = () => {
+    const setTypes = () => {
       if (type === config.type) {
         if (subType !== config.visualizationType) {
           dispatch({ type: 'EDITOR_SET_CONFIG', payload: { ...config, newViz: true, visualizationType: subType } })
         }
         dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
       } else {
-        let confirmation = !config.type || window.confirm('Changing visualization type will clear configuration settings. Do you want to continue?')
+        const confirmation = !config.type || window.confirm('Changing visualization type will clear configuration settings. Do you want to continue?')
 
         if (confirmation) {
-          let newConfig = {
+          const newConfig = {
             newViz: true,
             datasets: {},
             type
@@ -110,6 +111,22 @@ export default function ChooseTab() {
         <span className='mt-1'>{label}</span>
       </button>
     )
+  }
+
+  const handleUpload = e => {
+    const file = e.target.files[0]
+    const reader = new FileReader()
+    reader.onload = e => {
+      const text = e.target.result
+      try {
+        const newConfig = JSON.parse(text as string)
+        dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
+        dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
+      } catch (e) {
+        alert('Invalid JSON')
+      }
+    }
+    reader.readAsText(file)
   }
 
   return (
@@ -309,6 +326,21 @@ export default function ChooseTab() {
           </Tooltip>
         </li>
       </ul>
+      <hr />
+      <div className='form-group'>
+        <label htmlFor='uploadConfig'>
+          Upload Custom Configuration{' '}
+          <Tooltip style={{ textTransform: 'none' }}>
+            <Tooltip.Target>
+              <Icon display='warningCircle' style={{ marginLeft: '0.5rem' }} />
+            </Tooltip.Target>
+            <Tooltip.Content>
+              <p>Make sure you have properly validated the configuration before uploading.</p>
+            </Tooltip.Content>
+          </Tooltip>
+        </label>
+        <input type='file' accept='.txt,.json' className='form-control-file' id='uploadConfig' onChange={handleUpload} />
+      </div>
     </div>
   )
 }
