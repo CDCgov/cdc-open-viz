@@ -945,7 +945,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
 
     // if string of letters like 'Home' then dont need to format as a number
-    if (typeof value === 'string' && value.length > 0 && state.legend.type === 'equalnumber') {
+    if (typeof value === 'string' && value.length > 0 && /[a-zA-Z]/.test(value) && state.legend.type === 'equalnumber') {
       return value
     }
 
