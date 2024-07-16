@@ -19,6 +19,6 @@ export type GeneralFilter = FilterBase & {
 export type MultiSelectFilter = {
   active: string[]
   selectLimit: number
-} & GeneralFilter
+} & Omit<GeneralFilter, 'active'>
 
 export type VizFilter = GeneralFilter | MultiSelectFilter

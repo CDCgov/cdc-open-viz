@@ -1,5 +1,4 @@
 import { ConfigureData } from '@cdc/core/types/ConfigureData'
-import Footnotes from '@cdc/core/types/Footnotes'
 
 type Col = {
   equalHeight?: boolean

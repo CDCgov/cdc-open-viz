@@ -8,7 +8,7 @@ type FieldSetProps = {
   fieldType: string
   controls: OpenControls
   deleteField: Function
-  children: React.ReactElement[]
+  children: React.ReactNode
 }
 
 const FieldSet: React.FC<FieldSetProps> = ({ fieldName, fieldKey, fieldType, controls, deleteField, children }) => {

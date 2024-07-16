@@ -2,7 +2,7 @@ import type { DashboardConfig as Config } from '../types/DashboardConfig'
 import { type Action } from '@cdc/core/types/Action'
 import { Tab } from '../types/Tab'
 import { ConfigRow } from '../types/ConfigRow'
-import { Visualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '@cdc/core/types/Visualization'
 import Footnotes from '@cdc/core/types/Footnotes'
 import { SharedFilter } from '../types/SharedFilter'
 
@@ -24,7 +24,7 @@ type ADD_NEW_DASHBOARD = Action<'ADD_NEW_DASHBOARD', undefined>
 type SAVE_CURRENT_CHANGES = Action<'SAVE_CURRENT_CHANGES', undefined>
 type SWITCH_CONFIG = Action<'SWITCH_CONFIG', number>
 type TOGGLE_ROW = Action<'TOGGLE_ROW', { rowIndex: number; colIndex: number }>
-type UPDATE_VISUALIZATION = Action<'UPDATE_VISUALIZATION', { vizKey: string; configureData: Partial<Visualization> }>
+type UPDATE_VISUALIZATION = Action<'UPDATE_VISUALIZATION', { vizKey: string; configureData: Partial<AnyVisualization> }>
 type UPDATE_ROW = Action<'UPDATE_ROW', { rowIndex: number; rowData: Partial<ConfigRow> }>
 
 type DashboardActions =

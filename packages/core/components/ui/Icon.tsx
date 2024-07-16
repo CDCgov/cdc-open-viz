@@ -67,7 +67,7 @@ const iconHash = {
   plus: iconPlus,
   minus: iconMinus,
   'filtered-text': iconText,
-  'filter-dropdowns': iconDropdowns,
+  dashboardFilters: iconDropdowns,
   table: iconTable,
   sankey: iconSankey,
   rotateLeft: iconRotateLeft,
