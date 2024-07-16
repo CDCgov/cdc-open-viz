@@ -22,7 +22,7 @@ export const useTooltip = props => {
    */
 
   // function handles only Single series hovred data tooltips
-  function findDataKeyByThreshold(mouseY, datapoint) {
+  const findDataKeyByThreshold = (mouseY, datapoint) => {
     let sum = 0
     let threshold = Number(yScale.invert(mouseY))
     let hoveredKey = null
