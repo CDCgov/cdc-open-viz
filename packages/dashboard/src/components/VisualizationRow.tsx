@@ -1,11 +1,11 @@
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
-import React, { useContext, useMemo } from 'react'
+import React, { MouseEventHandler, useContext, useMemo, useState } from 'react'
 import Toggle from './Toggle'
 import _ from 'lodash'
 import { ConfigRow } from '../types/ConfigRow'
-import CdcMap from '@cdc/map'
 import CdcChart from '@cdc/chart'
 import CdcDataBite from '@cdc/data-bite'
+import CdcMap from '@cdc/map'
 import CdcWaffleChart from '@cdc/waffle-chart'
 import CdcMarkupInclude from '@cdc/markup-include'
 import CdcFilteredText from '@cdc/filtered-text'
@@ -16,10 +16,37 @@ import { ViewPort } from '@cdc/core/types/ViewPort'
 import { getFootnotesVizConfig, getVizConfig } from '../helpers/getVizConfig'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
+import { Visualization } from '@cdc/core/types/Visualization'
+import CollapsibleVisualizationRow from './CollapsibleVisualizationRow'
+
+type VisualizationWrapperProps = {
+  allExpanded: boolean
+  children: React.ReactNode
+  currentViewport: ViewPort
+  groupName: string
+  row: ConfigRow
+}
+
+const VisualizationWrapper: React.FC<VisualizationWrapperProps> = ({ allExpanded, currentViewport, groupName, row, children }) => {
+  return row.expandCollapseAllButtons ? (
+    <div className='collapsable-multiviz-container'>
+      <CollapsibleVisualizationRow allExpanded={allExpanded} fontSize={'26px'} groupName={groupName} currentViewport={currentViewport}>
+        {children}
+      </CollapsibleVisualizationRow>
+    </div>
+  ) : (
+    <>
+      <h3>{groupName}</h3>
+      {children}
+    </>
+  )
+}
 import { DashboardFilters } from '../types/DashboardFilters'
 
 type VizRowProps = {
+  allExpanded: boolean
   filteredDataOverride?: Object[]
+  groupName: string
   row: ConfigRow
   rowIndex: number
   setSharedFilter: Function
@@ -28,7 +55,7 @@ type VizRowProps = {
   currentViewport: ViewPort
 }
 
-const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, rowIndex: index, setSharedFilter, updateChildConfig, apiFilterDropdowns, currentViewport }) => {
+const VisualizationRow: React.FC<VizRowProps> = ({ allExpanded, filteredDataOverride, groupName, row, rowIndex: index, setSharedFilter, updateChildConfig, applyFilters, apiFilterDropdowns, handleOnChange, currentViewport }) => {
   const { config, filteredData: dashboardFilteredData, data: rawData } = useContext(DashboardContext)
   const [show, setShow] = React.useState(row.columns.map((col, i) => i === 0))
   const setToggled = (colIndex: number) => {
@@ -92,9 +119,12 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
           const hideFilter = inNoDataState && visualizationConfig.type === 'dashboardFilters' && applyButtonNotClicked(visualizationConfig)
 
           const shouldShow = row.toggle === undefined || (row.toggle && show[colIndex])
+
+          const body = <></>
+
           return (
-            <React.Fragment key={`vis__${index}__${colIndex}`}>
-              <div className={`col-md-${col.width} ${!shouldShow ? 'd-none' : ''}`}>
+            <div key={`vis__${index}__${colIndex}`} className={`col-${col.width} ${!shouldShow ? 'd-none' : ''}`}>
+              <VisualizationWrapper allExpanded={allExpanded} currentViewport={currentViewport} groupName={groupName} row={row}>
                 {visualizationConfig.type === 'chart' && (
                   <CdcChart
                     key={col.widget}
@@ -198,8 +228,8 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
                   />
                 )}
                 {visualizationConfig.type === 'footnotes' && <FootnotesStandAlone key={col.widget} visualizationKey={col.widget} config={visualizationConfig} viewport={currentViewport} />}
-              </div>
-            </React.Fragment>
+              </VisualizationWrapper>
+            </div>
           )
         }
         return <React.Fragment key={`vis__${index}__${colIndex}`}></React.Fragment>
