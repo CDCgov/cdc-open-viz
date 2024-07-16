@@ -77,6 +77,6 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
       }
     }
   })
-  const shoMissingDataCellValue = config.general.showMissingDataLabel && !labelValue
+  const shoMissingDataCellValue = config.general?.showMissingDataLabel && !labelValue
   return shoMissingDataCellValue ? 'N/A' : cellValue
 }
