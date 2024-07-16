@@ -29,11 +29,19 @@ const LineChartBumpCircle = props => {
     Object.values(config.columns)?.forEach(column => {
       if (!column.tooltips) return
       console.log('c', column)
-      listItems.push(
-        `<li className='tooltip-body'>
-          <strong>${column?.name}</strong>: ${dataRow[column.name]}
-        </li>`
-      )
+      if (!column.label) {
+        listItems.push(
+          `<li className='tooltip-body'>
+            <strong>${column?.name}</strong>: ${dataRow[column.name]}
+          </li>`
+        )
+      } else {
+        listItems.push(
+          `<li className='tooltip-body'>
+            <strong>${column?.label}</strong>: ${dataRow[column.name]}
+          </li>`
+        )
+      }
     })
     return listItems.join(' ')
   }
