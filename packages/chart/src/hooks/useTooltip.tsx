@@ -191,7 +191,7 @@ export const useTooltip = props => {
       if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot' && config.tooltips.singleSeries) {
         const [seriesKey, value] = findDataKeyByThreshold(y, resolvedScaleValues[0])
         if (seriesKey && value) {
-          tooltipItems.push([config.xAxis.dataKey, config.xAxis.type === 'date' ? formatDate(parseDate(closestXScaleValue)) : closestXScaleValue])
+          tooltipItems.push([config.xAxis.dataKey, closestXScaleValue])
           const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
           tooltipItems.push([seriesKey, formattedValue])
         }
