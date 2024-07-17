@@ -1,18 +1,19 @@
 // main visualization wrapper
 import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
-import React, { forwardRef, useRef } from 'react'
+import React, { forwardRef } from 'react'
 import { Config as DataBiteConfig } from '@cdc/data-bite/src/types/Config'
 import './visualizations.scss'
 import { Config as WaffleChartConfig } from '@cdc/waffle-chart/src/types/Config'
 import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
+import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
 
 type VisualizationWrapper = {
   children: React.ReactNode
-  config: ChartConfig | DataBiteConfig | WaffleChartConfig | MarkupIncludeConfig
-  currentViewport: string
-  imageId: string
+  config: ChartConfig | DataBiteConfig | WaffleChartConfig | MarkupIncludeConfig | DashboardFilters
+  currentViewport?: string
+  imageId?: string
   isEditor: boolean
-  showEditorPanel: boolean
+  showEditorPanel?: boolean
 }
 
 const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) => {

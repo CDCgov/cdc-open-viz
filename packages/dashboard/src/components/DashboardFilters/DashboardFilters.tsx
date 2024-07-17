@@ -1,20 +1,14 @@
-import { SharedFilter } from '../types/SharedFilter'
+import { SharedFilter } from '../../types/SharedFilter'
+import { APIFilterDropdowns } from './DashboardFiltersWrapper'
 
-export type DropdownOptions = Record<'value' | 'text', string>[]
-
-export type APIFilterDropdowns = {
-  // null means still loading
-  [filtername: string]: null | DropdownOptions
-}
-
-type FilterProps = {
-  hide?: number[]
+type DashboardFilterProps = {
+  show: number[]
   filters: SharedFilter[]
   apiFilterDropdowns: APIFilterDropdowns
   handleOnChange: Function
 }
 
-const Filters: React.FC<FilterProps> = ({ hide, filters, apiFilterDropdowns, handleOnChange }) => {
+const DashboardFilters: React.FC<DashboardFilterProps> = ({ show, filters, apiFilterDropdowns, handleOnChange }) => {
   const nullVal = (singleFilter: SharedFilter) => {
     const val = singleFilter.queuedActive || singleFilter.active
     return val === null || val === undefined || val === ''
@@ -22,7 +16,7 @@ const Filters: React.FC<FilterProps> = ({ hide, filters, apiFilterDropdowns, han
   return (
     <>
       {filters.map((singleFilter, filterIndex) => {
-        if ((singleFilter.type !== 'urlfilter' && !singleFilter.showDropdown) || (hide && hide.indexOf(filterIndex) !== -1)) return <></>
+        if ((singleFilter.type !== 'urlfilter' && !singleFilter.showDropdown) || (show && !show.includes(filterIndex))) return <></>
         const values: JSX.Element[] = []
         const multiValues = []
         if (singleFilter.resetLabel) {
@@ -83,4 +77,4 @@ const Filters: React.FC<FilterProps> = ({ hide, filters, apiFilterDropdowns, han
   )
 }
 
-export default Filters
+export default DashboardFilters
