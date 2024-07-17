@@ -57,12 +57,17 @@ import { getVizConfig } from './helpers/getVizConfig'
 import { getFilteredData } from './helpers/getFilteredData'
 import { getVizRowColumnLocator } from './helpers/getVizRowColumnLocator'
 import Layout from '@cdc/core/components/Layout'
+import CollapsibleVisualizationRow from './components/CollapsibleVisualizationRow'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import * as apiFilterHelpers from './helpers/apiFilterHelpers'
 import * as reloadURLHelpers from './helpers/reloadURLHelpers'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { DashboardFilters } from './types/DashboardFilters'
 import DashboardSharedFilters from './components/DashboardFilters'
+import { getAutoLoadVisualization } from './helpers/getAutoLoadVisualization'
+import { changeFilterActive } from './helpers/changeFilterActive'
+import { addValuesToSharedFilters } from './helpers/addValuesToSharedFilters'
+import ExpandCollapseButtons from './components/ExpandCollapseButtons'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -74,6 +79,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   const [apiFilterDropdowns, setAPIFilterDropdowns] = useState<APIFilterDropdowns>({})
   const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+  const [allExpanded, setAllExpanded] = useState(true)
 
   const isPreview = state.tabSelected === 'Dashboard Preview'
 
@@ -458,6 +464,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   } else {
     const { config } = state
     const { title, description } = config.dashboard || {}
+
     body = (
       <>
         {isEditor && <Header />}
@@ -481,17 +488,31 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                       if (!dataGroups[groupKey]) dataGroups[groupKey] = []
                       dataGroups[groupKey].push(d)
                     })
-                    return Object.keys(dataGroups).map(groupName => {
-                      const dataValue = dataGroups[groupName]
-                      return (
-                        <React.Fragment key={`row__${index}__${groupName}`}>
-                          <h1 className='h4'>{groupName}</h1>
-                          <VisualizationRow filteredDataOverride={dataValue} row={row} rowIndex={index} setSharedFilter={setSharedFilter} updateChildConfig={updateChildConfig} apiFilterDropdowns={apiFilterDropdowns} currentViewport={currentViewport} />
-                        </React.Fragment>
-                      )
-                    })
+                    return (
+                      <>
+                        {/* Expand/Collapse All */}
+                        {row.expandCollapseAllButtons === true && <ExpandCollapseButtons setAllExpanded={setAllExpanded} />}
+                        {Object.keys(dataGroups).map(groupName => {
+                          const dataValue = dataGroups[groupName]
+                          return (
+                            <VisualizationRow
+                              key={`row__${index}__${groupName}`}
+                              allExpanded={allExpanded}
+                              filteredDataOverride={dataValue}
+                              groupName={groupName}
+                              row={row}
+                              rowIndex={index}
+                              setSharedFilter={setSharedFilter}
+                              updateChildConfig={updateChildConfig}
+                              apiFilterDropdowns={apiFilterDropdowns}
+                              currentViewport={currentViewport}
+                            />
+                          )
+                        })}
+                      </>
+                    )
                   } else {
-                    return <VisualizationRow key={`row__${index}`} row={row} rowIndex={index} setSharedFilter={setSharedFilter} updateChildConfig={updateChildConfig} apiFilterDropdowns={apiFilterDropdowns} currentViewport={currentViewport} />
+                    return <VisualizationRow key={`row__${index}`} allExpanded={false} groupName={''} row={row} rowIndex={index} setSharedFilter={setSharedFilter} updateChildConfig={updateChildConfig} apiFilterDropdowns={apiFilterDropdowns} currentViewport={currentViewport} />
                   }
                 })}
 
