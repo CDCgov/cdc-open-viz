@@ -206,7 +206,7 @@ export const BarChartHorizontal = () => {
                             verticalAnchor='middle'
                             textAnchor='end'
                           >
-                            {barDefaultLabel === '0' ? '' : barDefaultLabel}
+                            {/^0(\.0)?$/.test(bar.value.toString()) ? '' : barDefaultLabel}
                           </Text>
                         )}
                         {!config.isLollipopChart && (
@@ -234,7 +234,7 @@ export const BarChartHorizontal = () => {
                             verticalAnchor='middle'
                             fontWeight={'normal'}
                           >
-                            {barLabel}
+                            {barDefaultLabel}
                           </Text>
                         )}
                         {isLabelBelowBar && !config.yAxis.hideLabel && (

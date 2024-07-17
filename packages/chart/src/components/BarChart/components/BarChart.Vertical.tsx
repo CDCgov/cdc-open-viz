@@ -243,7 +243,7 @@ export const BarChartVertical = () => {
                           fill={labelColor}
                           textAnchor='middle'
                         >
-                          {barDefaultLabel === '0' ? '' : barDefaultLabel}
+                          {/^0(\.0)?$/.test(bar.value.toString()) ? '' : barDefaultLabel}
                         </Text>
                         <Text // prettier-ignore
                           display={displayBar ? 'block' : 'none'}
