@@ -81,7 +81,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({ apiFilterDro
 
   const handleOnChange = (index: number, value: string | string[]) => {
     const newConfig = _.cloneDeep(dashboardConfig)
-    let newSharedFilters = changeFilterActive(index, value, newConfig)
+    let newSharedFilters = changeFilterActive(index, value, newConfig.dashboard.sharedFilters, visualizationConfig)
 
     if (dashboardConfig.filterBehavior === FilterBehavior.Apply) {
       const isAutoSelectFilter = visualizationConfig.autoLoad
