@@ -22,7 +22,8 @@ const PanelVisual: FC<PanelProps> = props => {
   const { config, updateConfig, colorPalettes, twoColorPalette } = useContext<ChartContext>(ConfigContext)
   const { visual } = config
   const { setLollipopShape, updateField } = useEditorPanelContext()
-  const { visHasBarBorders, visCanAnimate, visSupportsNonSequentialPallete, headerColors, visSupportsTooltipOpacity, visSupportsTooltipLines, visSupportsBarSpace, visSupportsBarThickness, visHasDataCutoff, visSupportsSequentialPallete, visSupportsReverseColorPalette } = useEditorPermissions()
+  const { visHasBarBorders, visCanAnimate, visSupportsNonSequentialPallete, headerColors, visSupportsTooltipOpacity, visSupportsTooltipLines, visSupportsBarSpace, visSupportsBarThickness, visHasDataCutoff, visSupportsSequentialPallete, visSupportsReverseColorPalette, visHasSingleSeriesTooltip } =
+    useEditorPermissions()
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
 
   const updateColor = (property, _value) => {
@@ -312,7 +313,7 @@ const PanelVisual: FC<PanelProps> = props => {
             />
           </label>
         )}
-        {config.visualizationType === 'Bar' && <CheckBox value={config.tooltips.singleSeries} fieldName='singleSeries' section='tooltips' label='SHOW HOVER FOR SINGLE DATA SERIES' updateField={updateField} />}
+        {visHasSingleSeriesTooltip() && <CheckBox value={config.tooltips.singleSeries} fieldName='singleSeries' section='tooltips' label='SHOW HOVER FOR SINGLE DATA SERIES' updateField={updateField} />}
 
         <label>
           <span className='edit-label column-heading'>No Data Message</span>
