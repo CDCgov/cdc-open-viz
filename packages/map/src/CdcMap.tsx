@@ -1652,10 +1652,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       <Layout.VisualizationWrapper config={state} isEditor={isEditor} ref={outerContainerRef} imageId={imageId} showEditorPanel={state.showEditorPanel}>
         {isEditor && <EditorPanel columnsRequiredChecker={columnsRequiredChecker} />}
         <Layout.Responsive isEditor={isEditor}>
-          {state?.runtime?.editorErrorMessage.length > 0 && <Error state={state} />}
           {requiredColumns && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
           {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
-            <section className={`cove-component__content cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
+            <section className={`cove-component__content cdc-map-inner-container ${currentViewport} ${`type-map--has-error`}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
+              {state?.runtime?.editorErrorMessage.length > 0 && <Error state={state} />}
               {/* prettier-ignore */}
               <Title
                 title={title}

@@ -23,7 +23,7 @@ import Territory from './Territory'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { MapContext } from '../../../types/MapContext'
-import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { checkColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -66,7 +66,8 @@ const UsaMap = () => {
       supportedTerritories,
       titleCase,
       tooltipId,
-      handleDragStateChange
+      handleDragStateChange,
+      setState,
     } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
@@ -117,6 +118,51 @@ const UsaMap = () => {
       setTerritoriesData(territoriesList)
     }
   }, [data, state.general.territoriesAlwaysShow])
+
+  useEffect(() => {
+    unitedStates.map(geo => {
+      state.map.patterns.map((patternData, patternIndex) => {
+        const { pattern, dataKey, size } = patternData
+        let geoKey = geo.properties.iso
+        if (!geoKey) return
+        let legendColors
+        const geoData = data[geoKey]
+        if (geoData !== undefined) {
+          legendColors = applyLegendToRow(geoData)
+        }
+        const currentFill = legendColors[0]
+        const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
+        const patternColor = patternData.color || getContrastColor('#000', currentFill)
+
+        if (!hasMatchingValues) return
+        const passesContrastCheck = checkColorContrast(currentFill, patternColor)
+
+        setState({
+          ...state,
+          runtime: {
+            ...state.runtime,
+            editorErrorMessage: !passesContrastCheck ? 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.' : ''
+          },
+          map: {
+            ...state.map,
+            patterns: state.map.patterns.map((pattern, i) => {
+              if (i === patternIndex) {
+                return {
+                  ...pattern,
+                  dataValue: geoData[patternData.dataKey],
+                  color: patternData.color,
+                  size: patternData.size,
+                  pattern: patternData.pattern,
+                  contrastCheck: passesContrastCheck
+                }
+              }
+              return pattern
+            })
+          }
+        })
+      })
+    })
+  }, [state.map.patterns, data])
 
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
@@ -335,15 +381,16 @@ const UsaMap = () => {
                 const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
                 const patternColor = patternData.color || getContrastColor('#000', currentFill)
 
+                if (!hasMatchingValues) return
+                checkColorContrast(currentFill, patternColor)
+
                 return (
-                  hasMatchingValues && (
-                    <>
-                      {pattern === 'waves' && <PatternWaves id={`${dataKey}--${geoIndex}`} height={patternSizes[size] ?? 10} width={patternSizes[size] ?? 10} fill={patternColor} />}
-                      {pattern === 'circles' && <PatternCircles id={`${dataKey}--${geoIndex}`} height={patternSizes[size] ?? 10} width={patternSizes[size] ?? 10} fill={patternColor} />}
-                      {pattern === 'lines' && <PatternLines id={`${dataKey}--${geoIndex}`} height={patternSizes[size] ?? 6} width={patternSizes[size] ?? 6} stroke={patternColor} strokeWidth={1} orientation={['diagonalRightToLeft']} />}
-                      <path className={`pattern-geoKey--${dataKey}`} tabIndex={-1} stroke='transparent' d={path} fill={`url(#${dataKey}--${geoIndex})`} />
-                    </>
-                  )
+                  <>
+                    {pattern === 'waves' && <PatternWaves id={`${dataKey}--${geoIndex}`} height={patternSizes[size] ?? 10} width={patternSizes[size] ?? 10} fill={patternColor} />}
+                    {pattern === 'circles' && <PatternCircles id={`${dataKey}--${geoIndex}`} height={patternSizes[size] ?? 10} width={patternSizes[size] ?? 10} fill={patternColor} />}
+                    {pattern === 'lines' && <PatternLines id={`${dataKey}--${geoIndex}`} height={patternSizes[size] ?? 6} width={patternSizes[size] ?? 6} stroke={patternColor} strokeWidth={1} orientation={['diagonalRightToLeft']} />}
+                    <path className={`pattern-geoKey--${dataKey}`} tabIndex={-1} stroke='transparent' d={path} fill={`url(#${dataKey}--${geoIndex})`} />
+                  </>
                 )
               })}
               {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}

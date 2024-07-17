@@ -5,6 +5,17 @@
 @import 'filters';
 @import '@cdc/core/styles/v2/components/ui/tooltip';
 
+.type-map--has-error {
+  overflow: hidden !important;
+  height: 100vh;
+
+  .waiting {
+    display: flex;
+    align-content: center;
+    flex-wrap: wrap;
+  }
+}
+
 .cdc-map-outer-container {
   position: relative;
   display: flex; // Needed for the main content

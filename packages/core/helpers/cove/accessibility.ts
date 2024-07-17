@@ -22,3 +22,8 @@ export const getContrastColor = (textColor: string, bgColor: string) => {
   }
   return textColor
 }
+
+export const checkColorContrast = (color1: string, color2: string) => {
+  if (!chroma.valid(color1) || !chroma.valid(color2)) return false
+  return chroma.contrast(color1, color2) >= WCAG_CONTRAST_RATIO
+}

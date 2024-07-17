@@ -6,6 +6,7 @@ import Button from '@cdc/core/components/elements/Button'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import './Panel.PatternSettings-style.css'
+import { IoMdCheckmarkCircleOutline } from 'react-icons/io'
 
 type PanelProps = {
   name: string
@@ -60,12 +61,39 @@ const PatternSettings = ({ name }: PanelProps) => {
     })
   }
 
+  const checkPatternContrasts = () => {
+    let passesContrast = true
+    state.map.patterns.forEach((pattern, index) => {
+      if (pattern.contrastCheck === false) passesContrast = false
+    })
+    return passesContrast
+  }
+
   return (
     <AccordionItem>
       <AccordionItemHeading>
         <AccordionItemButton>{name}</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
+        <p>
+          Pattern colors must comply with <br /> <a href='https://www.w3.org/TR/WCAG21/'>WCAG 2.1</a> 3:1 contrast ratio.
+        </p>
+        <br />
+        {checkPatternContrasts() ? (
+          <div>
+            <div class='alert alert-success' role='alert' style={{ padding: '5px' }}>
+              <IoMdCheckmarkCircleOutline size={24} />
+              {' All Patterns Passing Contrast Checks'}
+            </div>
+          </div>
+        ) : (
+          <div class='alert alert-danger' role='alert' style={{ padding: '5px' }}>
+            {' '}
+            <IoMdCheckmarkCircleOutline />
+            {' Some patterns failing checks'}
+          </div>
+        )}{' '}
+        <br />
         {patterns &&
           patterns.map((pattern, patternIndex) => {
             const dataValueOptions = [...new Set(data?.map(d => d?.[pattern?.dataKey]))]
@@ -84,6 +112,20 @@ const PatternSettings = ({ name }: PanelProps) => {
                   </AccordionItemHeading>
                   <AccordionItemPanel>
                     <>
+                      {pattern.contrastCheck ?? true ? (
+                        <div>
+                          <div class='alert alert-success' role='alert' style={{ padding: '5px' }}>
+                            <IoMdCheckmarkCircleOutline size={24} />
+                            {' All Patterns Passing Contrast Checks'}
+                          </div>
+                        </div>
+                      ) : (
+                        <div class='alert alert-danger' role='alert' style={{ padding: '5px' }}>
+                          {' '}
+                          <IoMdCheckmarkCircleOutline />
+                          {' Some patterns failing checks'}
+                        </div>
+                      )}{' '}
                       <label htmlFor={`pattern-dataKey--${patternIndex}`}>Data Key:</label>
                       <select id={`pattern-dataKey--${patternIndex}`} value={pattern.dataKey !== '' ? pattern.dataKey : 'Select'} onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'dataKey')}>
                         {/* TODO: sort these? */}
@@ -95,17 +137,14 @@ const PatternSettings = ({ name }: PanelProps) => {
                           )
                         })}
                       </select>
-
                       <label htmlFor={`pattern-dataValue--${patternIndex}`}>
                         Data Value:
                         <input type='text' onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'dataValue')} id={`pattern-dataValue--${patternIndex}`} value={pattern.dataValue === '' ? '' : pattern.dataValue} />
                       </label>
-
                       <label htmlFor={`pattern-label--${patternIndex}`}>
                         Label (optional):
                         <input type='text' onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'label')} id={`pattern-dataValue--${patternIndex}`} value={pattern.label === '' ? '' : pattern.label} />
                       </label>
-
                       <label htmlFor={`pattern-type--${patternIndex}`}>Pattern Type:</label>
                       <select id={`pattern-type--${patternIndex}`} value={pattern?.pattern} onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'pattern')}>
                         {patternTypes.map((patternName, index) => (
@@ -114,7 +153,6 @@ const PatternSettings = ({ name }: PanelProps) => {
                           </option>
                         ))}
                       </select>
-
                       <label htmlFor={`pattern-size--${patternIndex}`}>Pattern Size:</label>
                       <select id={`pattern-size--${patternIndex}`} value={pattern?.size} onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'size')}>
                         {['small', 'medium', 'large'].map((size, index) => (
