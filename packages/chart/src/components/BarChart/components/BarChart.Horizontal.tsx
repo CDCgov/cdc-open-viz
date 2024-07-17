@@ -75,7 +75,7 @@ export const BarChartHorizontal = () => {
                   const barDefaultLabel = !config.yAxis.displayNumbersOnBar ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
-                  const textWidth = (getTextWidth as any)(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                  const textWidth = (getTextWidth as any)(barDefaultLabel, `normal ${fontSize[config.fontSize]}px sans-serif`)
                   const textFits = Number(textWidth) < defaultBarWidth - 5
 
                   // control text position
@@ -203,9 +203,9 @@ export const BarChartHorizontal = () => {
                             opacity={transparentBar ? 0.5 : 1}
                             y={config.barHeight / 2 + config.barHeight * bar.index}
                             fill={labelColor}
-                            dx={-10}
+                            dx={textPadding}
                             verticalAnchor='middle'
-                            textAnchor='end'
+                            textAnchor={textAnchor}
                           >
                             {testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
