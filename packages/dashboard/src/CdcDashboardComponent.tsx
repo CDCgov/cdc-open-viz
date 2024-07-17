@@ -270,7 +270,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
     const sharedFiltersWithValues = addValuesToFilters<SharedFilter>(config.dashboard.sharedFilters, state.data)
     loadAPIFilters(sharedFiltersWithValues)
-    updateDataFilters()
+    updateFilteredData()
   }, [isEditor, isPreview, state.config?.activeDashboard])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
@@ -294,7 +294,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     }
   }
 
-  const updateDataFilters = (sharedFilters = undefined) => {
+  const updateFilteredData = (sharedFilters = undefined) => {
     const clonedState = _.cloneDeep(state)
     if (sharedFilters) clonedState.config.dashboard.sharedFilters = sharedFilters
     const newFilteredData = getFilteredData(clonedState)
