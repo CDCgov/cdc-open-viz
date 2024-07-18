@@ -137,27 +137,32 @@ const UsaMap = () => {
         if (!hasMatchingValues) return
         const passesContrastCheck = checkColorContrast(currentFill, patternColor)
 
-        setState({
-          ...state,
-          runtime: {
-            ...state.runtime,
-            editorErrorMessage: !passesContrastCheck ? 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.' : ''
-          },
-          map: {
-            ...state.map,
-            patterns: state.map.patterns.map((pattern, i) => {
-              if (i === patternIndex) {
-                return {
-                  ...pattern,
-                  dataValue: geoData[patternData.dataKey],
-                  color: patternData.color,
-                  size: patternData.size,
-                  pattern: patternData.pattern,
-                  contrastCheck: passesContrastCheck
+        setState(prevState => {
+          if (prevState.map.patterns[patternIndex].contrastCheck === passesContrastCheck) {
+            return prevState
+          }
+          return {
+            ...prevState,
+            runtime: {
+              ...state.runtime,
+              editorErrorMessage: !passesContrastCheck ? 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.' : ''
+            },
+            map: {
+              ...prevState.map,
+              patterns: prevState.map.patterns.map((pattern, i) => {
+                if (i === patternIndex) {
+                  return {
+                    ...pattern,
+                    dataValue: geoData[patternData.dataKey],
+                    color: patternData.color,
+                    size: patternData.size,
+                    pattern: patternData.pattern,
+                    contrastCheck: passesContrastCheck
+                  }
                 }
-              }
-              return pattern
-            })
+                return pattern
+              })
+            }
           }
         })
       })

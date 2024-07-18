@@ -1503,6 +1503,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       geo: state.columns.geo.name,
       primary: state.columns.primary.name,
       mapPosition: state.mapPosition,
+      map: state.map,
       ...runtimeFilters
     })
 
@@ -1647,6 +1648,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     </a>
   )
 
+  const sectionClassNames = () => {
+    let classes = ['cove-component__content', 'cdc-map-inner-container', `${currentViewport}`]
+    if (config?.runtime?.editorErrorMessage.length > 0) classes.push('type-map--has-error')
+    return classes.join(' ')
+  }
+
   return (
     <ConfigContext.Provider value={mapProps}>
       <Layout.VisualizationWrapper config={state} isEditor={isEditor} ref={outerContainerRef} imageId={imageId} showEditorPanel={state.showEditorPanel}>
@@ -1654,7 +1661,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         <Layout.Responsive isEditor={isEditor}>
           {requiredColumns && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
           {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
-            <section className={`cove-component__content cdc-map-inner-container ${currentViewport} ${`type-map--has-error`}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
+            <section className={sectionClassNames()} aria-label={'Map: ' + title} ref={innerContainerRef}>
               {state?.runtime?.editorErrorMessage.length > 0 && <Error state={state} />}
               {/* prettier-ignore */}
               <Title

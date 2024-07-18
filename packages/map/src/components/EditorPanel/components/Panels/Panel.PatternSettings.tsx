@@ -6,7 +6,7 @@ import Button from '@cdc/core/components/elements/Button'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import './Panel.PatternSettings-style.css'
-import { IoMdCheckmarkCircleOutline } from 'react-icons/io'
+import Alert from '@cdc/core/components/Alert'
 
 type PanelProps = {
   name: string
@@ -75,25 +75,9 @@ const PatternSettings = ({ name }: PanelProps) => {
         <AccordionItemButton>{name}</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        <p>
-          Pattern colors must comply with <br /> <a href='https://www.w3.org/TR/WCAG21/'>WCAG 2.1</a> 3:1 contrast ratio.
-        </p>
+        <Alert type={checkPatternContrasts() ? 'success' : 'danger'} message='Pattern colors must comply with <br /> <a href="https://www.w3.org/TR/WCAG21/">WCAG 2.1</a> 3:1 contrast ratio.' />
         <br />
-        {checkPatternContrasts() ? (
-          <div>
-            <div class='alert alert-success' role='alert' style={{ padding: '5px' }}>
-              <IoMdCheckmarkCircleOutline size={24} />
-              {' All Patterns Passing Contrast Checks'}
-            </div>
-          </div>
-        ) : (
-          <div class='alert alert-danger' role='alert' style={{ padding: '5px' }}>
-            {' '}
-            <IoMdCheckmarkCircleOutline />
-            {' Some patterns failing checks'}
-          </div>
-        )}{' '}
-        <br />
+
         {patterns &&
           patterns.map((pattern, patternIndex) => {
             const dataValueOptions = [...new Set(data?.map(d => d?.[pattern?.dataKey]))]
@@ -105,27 +89,14 @@ const PatternSettings = ({ name }: PanelProps) => {
             dataKeyOptions.sort()
 
             return (
-              <Accordion allowZeroExpanded>
+              <Accordion allowZeroExpanded key={`accordion-pattern--${patternIndex}`}>
                 <AccordionItem>
                   <AccordionItemHeading>
                     <AccordionItemButton>{pattern.dataKey ? `${pattern.dataKey}: ${pattern.dataValue ?? 'No Value'}` : 'Select Column'}</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
                     <>
-                      {pattern.contrastCheck ?? true ? (
-                        <div>
-                          <div class='alert alert-success' role='alert' style={{ padding: '5px' }}>
-                            <IoMdCheckmarkCircleOutline size={24} />
-                            {' All Patterns Passing Contrast Checks'}
-                          </div>
-                        </div>
-                      ) : (
-                        <div class='alert alert-danger' role='alert' style={{ padding: '5px' }}>
-                          {' '}
-                          <IoMdCheckmarkCircleOutline />
-                          {' Some patterns failing checks'}
-                        </div>
-                      )}{' '}
+                      {pattern.contrastCheck ?? true ? <Alert type='success' message='This pattern passes contrast checks' /> : <Alert type='danger' message='Error: <a href="https://webaim.org/resources/contrastchecker/" target="_blank"> Review Color Contrast</a>' />}{' '}
                       <label htmlFor={`pattern-dataKey--${patternIndex}`}>Data Key:</label>
                       <select id={`pattern-dataKey--${patternIndex}`} value={pattern.dataKey !== '' ? pattern.dataKey : 'Select'} onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'dataKey')}>
                         {/* TODO: sort these? */}
