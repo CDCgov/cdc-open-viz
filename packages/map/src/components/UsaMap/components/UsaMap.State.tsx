@@ -162,7 +162,7 @@ const UsaMap = () => {
         })
       })
     })
-  }, [state.map.patterns, data])
+  }, [state.map.patterns, data, state, setState, applyLegendToRow])
 
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
