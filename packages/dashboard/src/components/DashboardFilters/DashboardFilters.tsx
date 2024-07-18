@@ -1,3 +1,4 @@
+import MultiSelect from '@cdc/core/components/MultiSelect'
 import { SharedFilter } from '../../types/SharedFilter'
 import { APIFilterDropdowns } from './DashboardFiltersWrapper'
 
@@ -8,25 +9,30 @@ type DashboardFilterProps = {
   handleOnChange: Function
 }
 
-const DashboardFilters: React.FC<DashboardFilterProps> = ({ show, filters, apiFilterDropdowns, handleOnChange }) => {
-  const nullVal = (singleFilter: SharedFilter) => {
-    const val = singleFilter.queuedActive || singleFilter.active
+const DashboardFilters: React.FC<DashboardFilterProps> = ({ show, filters: sharedFilters, apiFilterDropdowns, handleOnChange }) => {
+  const nullVal = (filter: SharedFilter) => {
+    const val = filter.queuedActive || filter.active
     return val === null || val === undefined || val === ''
   }
+
+  const updateField = (_section, _subsection, fieldName, value) => {
+    handleOnChange(fieldName, value)
+  }
+
   return (
     <>
-      {filters.map((singleFilter, filterIndex) => {
-        if ((singleFilter.type !== 'urlfilter' && !singleFilter.showDropdown) || (show && !show.includes(filterIndex))) return <></>
+      {sharedFilters.map((filter, filterIndex) => {
+        if ((filter.type !== 'urlfilter' && !filter.showDropdown) || (show && !show.includes(filterIndex))) return <></>
         const values: JSX.Element[] = []
         const multiValues = []
-        if (singleFilter.resetLabel) {
+        if (filter.resetLabel) {
           values.push(
-            <option key={`${singleFilter.resetLabel}-option`} value={singleFilter.resetLabel}>
-              {singleFilter.resetLabel}
+            <option key={`${filter.resetLabel}-option`} value={filter.resetLabel}>
+              {filter.resetLabel}
             </option>
           )
         }
-        const _key = singleFilter.apiFilter?.apiEndpoint
+        const _key = filter.apiFilter?.apiEndpoint
         if (_key && apiFilterDropdowns[_key]) {
           // URL Filter
           apiFilterDropdowns[_key].forEach(({ text, value }, index) => {
@@ -35,13 +41,14 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({ show, filters, apiFi
                 {text}
               </option>
             )
+            multiValues.push({ value, label: text })
           })
         } else {
           // Data Filter
-          singleFilter.values?.forEach((filterOption, index) => {
-            const labeledOpt = singleFilter.labels && singleFilter.labels[filterOption]
+          filter.values?.forEach((filterOption, index) => {
+            const labeledOpt = filter.labels && filter.labels[filterOption]
             values.push(
-              <option key={`${singleFilter.key}-option-${index}`} value={filterOption}>
+              <option key={`${filter.key}-option-${index}`} value={filterOption}>
                 {labeledOpt || filterOption}
               </option>
             )
@@ -49,20 +56,22 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({ show, filters, apiFi
           })
         }
 
-        return (
-          <div className='cove-dashboard-filters' key={`${singleFilter.key}-filtersection-${filterIndex}`}>
+        return filter.multiSelect ? (
+          <MultiSelect label={filter.key} options={multiValues} fieldName={filterIndex} updateField={updateField} selected={filter.active as string[]} limit={filter.selectLimit || 5} />
+        ) : (
+          <div className='cove-dashboard-filters' key={`${filter.key}-filtersection-${filterIndex}`}>
             <section className='dashboard-filters-section'>
-              <label htmlFor={`filter-${filterIndex}`}>{singleFilter.key}</label>
+              <label htmlFor={`filter-${filterIndex}`}>{filter.key}</label>
               <select
                 id={`filter-${filterIndex}`}
                 className='filter-select'
                 data-index='0'
-                value={singleFilter.queuedActive || singleFilter.active}
+                value={filter.queuedActive || filter.active}
                 onChange={val => {
                   handleOnChange(filterIndex, val.target.value)
                 }}
               >
-                {nullVal(singleFilter) && !singleFilter.resetLabel && (
+                {nullVal(filter) && !filter.resetLabel && (
                   <option value='' key='select'>
                     {'-Select-'}
                   </option>
