@@ -1,9 +1,9 @@
 import chroma from 'chroma-js'
 
 /**
- * WCAG 2.1 Standard requires 4.5:1 contrast ratio
- * TEXT: https://www.w3.org/TR/WCAG20-TECHS/G18.html
- * NON-TEXT: https://www.w3.org/TR/WCAG20-TECHS/G145.html
+ * WCAG 2.1 CONSTANTS
+ * TEXT (4.5 Contrast Ratio): https://www.w3.org/TR/WCAG20-TECHS/G18.html
+ * NON-TEXT (3.5 Contrast Ratio): https://www.w3.org/TR/WCAG20-TECHS/G145.html
  *
  * !important - DO NOT CHANGE.
  */
