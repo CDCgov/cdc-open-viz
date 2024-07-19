@@ -178,7 +178,7 @@ export const useTooltip = props => {
       if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot' && !config.tooltips.singleSeries) {
         tooltipItems.push(
           ...getIncludedTooltipSeries()
-            ?.filter(seriesKey => config.series?.find(item => item.dataKey === seriesKey && item?.tooltip) || config.xAxis?.dataKey == seriesKey)
+            ?.filter(seriesKey => config.series?.find(item => item.dataKey === seriesKey && item?.tooltip) || config.xAxis?.dataKey == seriesKey || visualizationType === 'Forecasting')
             ?.flatMap(seriesKey => {
               const value = resolvedScaleValues[0]?.[seriesKey]
               const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
@@ -371,7 +371,6 @@ export const useTooltip = props => {
       const yScaleValues = dataToSearch.map(object => {
         return Object.fromEntries(Object.entries(object).filter(([key, value]) => includedSeries.includes(key)))
       })
-
       return yScaleValues
     } catch (error) {
       console.error('COVE', error)
