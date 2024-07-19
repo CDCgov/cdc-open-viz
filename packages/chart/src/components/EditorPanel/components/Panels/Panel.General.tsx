@@ -150,7 +150,7 @@ const PanelGeneral: FC<PanelProps> = props => {
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p>Selecting this option will display "suppressed data symbol" on the Date/Category Axis where suppressed data values are indicated in the Data Series, unless a different symbol was chosen from the data series (e.g., suppression symbol) menu.</p>
+                    <p>Selecting this option will display the 'suppressed data symbol' on the Date/Category Axis, in the tooltip hover, and in the data table where suppressed data values are indicated in the Data Series</p>
                   </Tooltip.Content>
                 </Tooltip>
               }

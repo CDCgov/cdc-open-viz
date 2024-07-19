@@ -5,7 +5,7 @@ import BarChartContext, { type BarChartContextValues } from './context'
 // Local hooks
 import { useBarChart } from '../../../hooks/useBarChart'
 import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
-import { getBarConfig } from '../helpers'
+import { getBarConfig, testZeroValue } from '../helpers'
 import { isConvertLineToBarGraph } from '../../../helpers/isConvertLineToBarGraph'
 // VisX library imports
 import { Group } from '@visx/group'
@@ -127,7 +127,7 @@ export const BarChartVertical = () => {
                   const absentDataLabel = getAbsentDataLabel(yAxisValue)
                   const barDefaultLabel = !config.labels ? '' : yAxisValue
                   const barY = getBarY(defaultBarY, yScale(scaleVal))
-                  const displaylollipopShape = isSuppressed ? 'none' : 'block'
+                  const displaylollipopShape = testZeroValue(bar.value) ? 'none' : 'block'
                   const getBarBackgroundColor = (barColor: string, filteredOutColor?: string): string => {
                     let _barColor = barColor
                     let _filteredOutColor = filteredOutColor || '#f2f2f2'
@@ -243,7 +243,7 @@ export const BarChartVertical = () => {
                           fill={labelColor}
                           textAnchor='middle'
                         >
-                          {barDefaultLabel === '0' ? '' : barDefaultLabel}
+                          {testZeroValue(bar.value) ? '' : barDefaultLabel}
                         </Text>
                         <Text // prettier-ignore
                           display={displayBar ? 'block' : 'none'}
@@ -252,7 +252,7 @@ export const BarChartVertical = () => {
                           y={barY - 5}
                           fill={labelColor}
                           textAnchor='middle'
-                          fontSize={barWidth / 2}
+                          fontSize={config.isLollipopChart ? null : barWidth / 2}
                         >
                           {absentDataLabel}
                         </Text>
