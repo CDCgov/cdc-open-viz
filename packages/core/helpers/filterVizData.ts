@@ -1,8 +1,13 @@
 export const filterVizData = (filters, data) => {
+  if (!data) {
+    console.warn('COVE: No data to filter')
+    return []
+  }
+
   if (!filters) return data
   const filteredData: any[] = []
 
-  data.forEach(row => {
+  data?.forEach(row => {
     let add = true
     filters
       .filter(filter => filter.type !== 'url')
