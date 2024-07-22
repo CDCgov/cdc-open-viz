@@ -5,6 +5,7 @@
   "moduleName": "CdcCore",
   "main": "dist/cdccore",
   "scripts": {
+    "build": "echo 'no build required for @cdc/core'",
     "test": "vitest run --reporter verbose",
     "test-watch": "vitest watch --reporter verbose",
     "test-watch:ui": "vitest --ui"
