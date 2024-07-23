@@ -19,12 +19,6 @@
     },
     {
       "YearStart": 2015,
-      "Data_Value": 36.2,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "50-64 years"
-    },
-    {
-      "YearStart": 2015,
       "Data_Value": 56.4,
       "StratficationCategory1": "Age Group 2",
       "Stratification1": "65 years or older"
@@ -38,18 +32,6 @@
     {
       "YearStart": 2021,
       "Data_Value": 52.3,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2021,
-      "Data_Value": 52.3,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2015,
-      "Data_Value": 47.4,
       "StratficationCategory1": "Age Group",
       "Stratification1": "Overall"
     },
@@ -71,28 +53,11 @@
       "StratficationCategory1": "Age Group",
       "Stratification1": "65 years or older"
     },
-    {
-      "YearStart": 2017,
-      "Data_Value": 57.2,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "65 years or older"
-    },
+
     {
       "YearStart": 2017,
       "Data_Value": 48.5,
       "StratficationCategory1": "Age Group 3",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2021,
-      "Data_Value": 41.1,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2021,
-      "Data_Value": 41.1,
-      "StratficationCategory1": "Age Group",
       "Stratification1": "Overall"
     },
     {
@@ -101,51 +66,24 @@
       "StratficationCategory1": "Age Group",
       "Stratification1": "50-64 years"
     },
-    {
-      "YearStart": 2019,
-      "Data_Value": 42.2,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "50-64 years"
-    },
+
     {
       "YearStart": 2019,
       "Data_Value": 50.1,
       "StratficationCategory1": "Age Group",
       "Stratification1": "65 years or older"
     },
-    {
-      "YearStart": 2019,
-      "Data_Value": 56.2,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "65 years or older"
-    },
+
     {
       "YearStart": 2019,
       "Data_Value": 48.6,
       "StratficationCategory1": "Age Group",
       "Stratification1": "Overall"
     },
-    {
-      "YearStart": 2020,
-      "Data_Value": 54.7,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2020,
-      "Data_Value": 54.7,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
+
     {
       "YearStart": 2020,
       "Data_Value": 35.4,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "50-64 years"
-    },
-    {
-      "YearStart": 2020,
-      "Data_Value": 41.9,
       "StratficationCategory1": "Age Group",
       "Stratification1": "50-64 years"
     },
@@ -157,37 +95,14 @@
     },
     {
       "YearStart": 2020,
-      "Data_Value": 56.9,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "65 years or older"
-    },
-    {
-      "YearStart": 2020,
-      "Data_Value": 49,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2020,
       "Data_Value": 42.5,
       "StratficationCategory1": "Age Group",
       "Stratification1": "Overall"
     },
-    {
-      "YearStart": 2020,
-      "Data_Value": 42.5,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
+
     {
       "YearStart": 2021,
       "Data_Value": 34.6,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "50-64 years"
-    },
-    {
-      "YearStart": 2021,
-      "Data_Value": 40.4,
       "StratficationCategory1": "Age Group",
       "Stratification1": "50-64 years"
     },
@@ -198,38 +113,8 @@
       "Stratification1": "65 years or older"
     },
     {
-      "YearStart": 2021,
-      "Data_Value": 48.7,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "65 years or older"
-    },
-    {
-      "YearStart": 2021,
-      "Data_Value": 47.1,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2015,
-      "Data_Value": 52.7,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2015,
-      "Data_Value": 52.7,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
       "YearStart": 2022,
       "Data_Value": 39.1,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "50-64 years"
-    },
-    {
-      "YearStart": 2022,
-      "Data_Value": 33.6,
       "StratficationCategory1": "Age Group",
       "Stratification1": "50-64 years"
     },
@@ -241,91 +126,7 @@
     },
     {
       "YearStart": 2022,
-      "Data_Value": 56.5,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "65 years or older"
-    },
-    {
-      "YearStart": 2022,
       "Data_Value": 47.7,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2019,
-      "Data_Value": 53.5,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2019,
-      "Data_Value": 53.5,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2015,
-      "Data_Value": 41.4,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2015,
-      "Data_Value": 41.4,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2017,
-      "Data_Value": 53.5,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2017,
-      "Data_Value": 53.5,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2019,
-      "Data_Value": 43.1,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2019,
-      "Data_Value": 43.1,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2017,
-      "Data_Value": 42.9,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2017,
-      "Data_Value": 42.9,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2022,
-      "Data_Value": 41.4,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2022,
-      "Data_Value": 41.4,
-      "StratficationCategory1": "Age Group",
-      "Stratification1": "Overall"
-    },
-    {
-      "YearStart": 2022,
-      "Data_Value": 53.1,
       "StratficationCategory1": "Age Group",
       "Stratification1": "Overall"
     },
