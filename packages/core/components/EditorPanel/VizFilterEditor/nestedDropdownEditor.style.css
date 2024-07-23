@@ -1,0 +1,9 @@
+.nesteddropdown-editor {
+  .edit-label.column-heading {
+    margin-top: 10px;
+  }
+
+  .edit-filterOrder.column-heading {
+    display: none;
+  }
+}

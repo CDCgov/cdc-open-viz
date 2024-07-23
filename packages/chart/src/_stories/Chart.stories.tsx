@@ -5,6 +5,7 @@ import Chart from '../CdcChart'
 import lineChartTwoPointsRegressionTest from './_mock/line_chart_two_points_regression_test.json'
 import lineChartTwoPointsNewChart from './_mock/line_chart_two_points_new_chart.json'
 import lollipop from './_mock/lollipop.json'
+import nestedDropdownSample from './_mock/nested_dropdown_sample.json'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',
@@ -23,6 +24,12 @@ export const line_Chart_Two_Points_New_Chart: Story = {
   args: {
     config: lineChartTwoPointsNewChart,
     isEditor: false
+  }
+}
+export const nested_dropdown_sample: Story = {
+  args: {
+    config: nestedDropdownSample,
+    isEditor: true
   }
 }
 
