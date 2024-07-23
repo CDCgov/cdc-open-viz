@@ -130,7 +130,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({ apiFilterDro
       )}
 
       <Layout.Responsive isEditor={isEditor}>
-        <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''} col-12`}>
+        <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''} cove-component__content col-12`}>
           <Filters show={visualizationConfig?.sharedFilterIndexes?.map(Number)} filters={dashboardConfig.dashboard.sharedFilters || []} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} />
           {visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad && <button onClick={applyFilters}>GO!</button>}
         </div>
