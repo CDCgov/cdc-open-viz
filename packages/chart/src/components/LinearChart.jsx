@@ -392,8 +392,8 @@ const LinearChart = props => {
                               {config.runtime.seriesLabelsAll[tick.formattedValue - 1]}
                             </Text>
                             
-                            {(seriesHighlight.length === 0 || seriesHighlight.includes(config.runtime.seriesLabelsAll[tick.formattedValue - 1])) && 
-                              <rect x={0 - Number(config.yAxis.size)}  y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)} width={Number(config.yAxis.size)+ xScale(xScale.domain()[0])} height="2" fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])}/> 
+                            {(seriesHighlight.length === 0 || seriesHighlight.includes(config.runtime.seriesLabelsAll[tick.formattedValue - 1])) &&
+                              <rect x={0 - Number(config.yAxis.size)}  y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)} width={Number(config.yAxis.size) + xScale(xScale.domain()[0])} height="2" fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])}/> 
                             }
                             </>
                             

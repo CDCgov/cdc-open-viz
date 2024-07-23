@@ -1,1 +1,39 @@
 // Line Chart Styles...
+
+.cdc-open-viz-module .bump-chart {
+  --font-size-small: 8px;
+  --font-size-medium: 10px;
+  --font-size-large: 12px;
+
+/* Autoscaling */
+  //large - default
+  @media only screen and (min-width: 1200px) {
+    min-width: none;
+    .node-text {
+      font-size: var(--font-size-large);
+    }
+  }
+  //medium
+  @media only screen and (max-width: 1199px) {
+    .node-text {
+      font-size: var(--font-size-medium);
+    }
+  }
+
+  //small
+  @media only screen and (max-width: 799px) {
+    .node-text {
+      font-size: var(--font-size-small);
+    }
+  }
+
+  //x-small
+  @media only screen and (max-width: 600px) {
+    .popup {
+      display: block; /* Show the popup on smaller screens */
+    }
+    .sankey-chart__diagram {
+      opacity: .1;
+    }
+  }
+}
