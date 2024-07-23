@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react'
-import type { Visualization } from '@cdc/core/types/Visualization'
+import type { AnyVisualization } from '@cdc/core/types/Visualization'
 import Widget from '../Widget'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import { Table } from '@cdc/core/types/Table'
@@ -9,7 +9,7 @@ import './visualizations-panel-styles.css'
 
 const addVisualization = (type, subType) => {
   const modalWillOpen = type !== 'markup-include'
-  const newVisualizationConfig: Partial<Visualization> = {
+  const newVisualizationConfig: Partial<AnyVisualization> = {
     filters: [],
     filterBehavior: 'Filter Change',
     newViz: type !== 'table',
@@ -57,6 +57,11 @@ const addVisualization = (type, subType) => {
       newVisualizationConfig.visualizationType = type
 
       break
+    case 'dashboardFilters': {
+      newVisualizationConfig.sharedFilterIndexes = []
+      newVisualizationConfig.visualizationType = type
+      break
+    }
     default:
       newVisualizationConfig.visualizationType = type
       break
@@ -92,7 +97,7 @@ const VisualizationsPanel = () => {
         <Widget addVisualization={() => addVisualization('waffle-chart', '')} type='waffle-chart' />
         <Widget addVisualization={() => addVisualization('markup-include', '')} type='markup-include' />
         <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
-        <Widget addVisualization={() => addVisualization('filter-dropdowns', '')} type='filter-dropdowns' />
+        <Widget addVisualization={() => addVisualization('dashboardFilters', '')} type='dashboardFilters' />
         <Widget addVisualization={() => addVisualization('table', '')} type='table' />
       </div>
       <span className='subheading-3'>Advanced</span>

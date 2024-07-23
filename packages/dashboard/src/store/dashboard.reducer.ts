@@ -6,6 +6,7 @@ import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 import { Tab } from '../types/Tab'
 import { DashboardConfig } from '../types/DashboardConfig'
 import { ConfigRow } from '../types/ConfigRow'
+import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { initialState } from '../DashboardContext'
 
 type BlankMultiConfig = {
@@ -148,7 +149,8 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     }
     case 'UPDATE_VISUALIZATION': {
       const { vizKey, configureData } = action.payload
-      return { ...state, config: { ...state.config, visualizations: { ...state.config.visualizations, [vizKey]: { ...state.config.visualizations[vizKey], ...configureData } } } }
+      const updatedViz = { ...state.config.visualizations[vizKey], ...configureData } as AnyVisualization
+      return { ...state, config: { ...state.config, visualizations: { ...state.config.visualizations, [vizKey]: updatedViz } } }
     }
     case 'UPDATE_ROW': {
       const { rowIndex, rowData } = action.payload

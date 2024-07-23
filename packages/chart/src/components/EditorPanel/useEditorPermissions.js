@@ -317,6 +317,16 @@ export const useEditorPermissions = () => {
     return false
   }
 
+  const visHasSingleSeriesTooltip = () => {
+    if (visualizationType === 'Bar' || visualizationType === 'Line') {
+      return true
+    }
+    if (visualizationType === 'Area Chart' && visualizationSubType === 'stacked') {
+      return true
+    }
+    return false
+  }
+
   return {
     enabledChartTypes,
     headerColors,
@@ -362,6 +372,7 @@ export const useEditorPermissions = () => {
     visSupportsValueAxisTicks,
     visSupportsReactTooltip,
     visSupportsValueAxisMax,
-    visSupportsValueAxisMin
+    visSupportsValueAxisMin,
+    visHasSingleSeriesTooltip
   }
 }

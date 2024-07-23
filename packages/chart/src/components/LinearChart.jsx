@@ -802,7 +802,7 @@ const LinearChart = props => {
             <Annotation.Draggable xScale={xScale} yScale={yScale} xScaleAnnotation={xScaleAnnotation} xMax={xMax} svgRef={svgRef} onDragStateChange={handleDragStateChange} />
           </Group>
         </svg>
-        {!isDraggingAnnotation && tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && !config.tooltips.singleSeries && (
+        {!isDraggingAnnotation && tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
           <>
             <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100}) !important;`}</style>
             <style>{`.tooltip {max-width:300px} !important; word-wrap: break-word; `}</style>

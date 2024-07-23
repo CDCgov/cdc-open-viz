@@ -1,5 +1,4 @@
 import { ConfigureData } from '@cdc/core/types/ConfigureData'
-import Footnotes from '@cdc/core/types/Footnotes'
 
 type Col = {
   equalHeight?: boolean
@@ -11,6 +10,7 @@ type Col = {
 
 export type ConfigRow = {
   columns: Col[]
+  expandCollapseAllButtons: boolean
   uuid?: string | number
   toggle?: boolean
   equalHeight?: boolean
