@@ -2,9 +2,10 @@ import { Group } from '@visx/group'
 import { useContext, useEffect, useRef, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import * as d3 from 'd3'
+import { scaleTime } from '@visx/scale'
 import { Text } from '@visx/text'
 
-function BrushChart({ xMax, yMax }) {
+function BrushChart({ xMax, yMax, xScaleBrush: x }) {
   const { tableData, config, parseDate, setBrushConfig, getTextWidth } = useContext(ConfigContext)
   const [brushState, setBrushState] = useState({ isBrushing: false, selection: [] })
   const [tooltip, showTooltip] = useState(false)
@@ -82,40 +83,41 @@ function BrushChart({ xMax, yMax }) {
       .attr('height', brushheight)
       .attr('width', xMax)
 
-    // calculate x
-    const x = d3
-      .scaleTime()
-      .domain(d3.extent(tableData, d => parseDate(d[config.runtime.originalXAxis.dataKey])))
-      .range([0, xMax])
+    const safeInvert = (xScale, value) => {
+      if (xScale && typeof xScale.invert === 'function') {
+        return xScale.invert(value)
+      } else {
+        return null
+      }
+    }
 
     const brushHanlder = event => {
+      if (!event) {
+        return
+      }
       const selection = event?.selection
 
-      if (selection) {
+      if (selection && selection.length > 0) {
         // invert pixel values into data values
-        const [x0, x1] = selection.map(x.invert)
+        const [x0, x1] = selection.map(value => safeInvert(x, value))
         // filter out data based on inverted data values
-        const newFilteredData = tableData.filter(d => parseDate(d[config.runtime.originalXAxis.dataKey]) >= x0 && parseDate(d[config.runtime.originalXAxis.dataKey]) <= x1)
-        const firstDate = newFilteredData[0][config.runtime.originalXAxis.dataKey] ?? ''
-        const lastDate = newFilteredData[newFilteredData.length - 1][config.runtime.originalXAxis.dataKey] ?? ''
+        const newFilteredData = tableData.filter(d => new Date(d[config.runtime.originalXAxis.dataKey]) >= x0 && new Date(d[config.runtime.originalXAxis.dataKey]) <= x1)
+
+        const firstDate = (newFilteredData.length && newFilteredData[0][config?.runtime?.originalXAxis?.dataKey]) ?? ''
+        const lastDate = (newFilteredData.length && newFilteredData[newFilteredData.length - 1][config?.runtime?.originalXAxis?.dataKey]) ?? ''
         // add custom blue colored handlers to each corners of brush
-        svg.selectAll('.handle--custom').remove()
         svg.selectAll('.handle--custom').remove()
         // append handler
         svg.call(brushHandle, selection, firstDate, lastDate)
         // update the brush state to add filtered data based on selection
-        setBrushConfig(prev => {
-          return {
-            ...prev,
-            isBrushing: true,
-            data: newFilteredData
-          }
+        setBrushConfig({
+          active: true,
+          isBrushing: true,
+          data: newFilteredData
         })
-        setBrushState(() => {
-          return {
-            isBrushing: true,
-            selection
-          }
+        setBrushState({
+          isBrushing: true,
+          selection
         })
       }
     }
@@ -139,7 +141,8 @@ function BrushChart({ xMax, yMax }) {
     return () => {
       svg.selectAll('*').remove() // Cleanup on component unmount
     }
-  }, [config])
+  }, [config, config.brush.active])
+  console.log(config.brush.active, 'ace')
 
   return (
     <Group onMouseLeave={handleMouseLeave} onMouseOver={handleMouseOver} className='brush-container' left={Number(config.runtime.yAxis.size)} top={calculateGroupTop()}>

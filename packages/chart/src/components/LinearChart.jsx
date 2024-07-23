@@ -112,7 +112,7 @@ const LinearChart = props => {
   // getters & functions
   const getXAxisData = d => (isDateScale(config.runtime.xAxis) ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
-  const xAxisDataMapped = config.brush?.active && brushConfig.data?.length ? brushConfig.data.map(d => getXAxisData(d)) : data.map(d => getXAxisData(d))
+  const xAxisDataMapped = config.brush.active && brushConfig.data?.length ? brushConfig.data.map(d => getXAxisData(d)) : data.map(d => getXAxisData(d))
   const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
   const properties = { data, tableData, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax }
   const { min, max, leftMax, rightMax } = useMinMax(properties)
@@ -708,9 +708,8 @@ const LinearChart = props => {
               config={config}
             />
           )}
-          {/*Zoom Brush */}
-          <BrushChart xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} xScale={xScale} seriesScale={seriesScale} />
-          {/* {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && true && !isHorizontal && <ZoomBrush xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />} */}
+          {/*Brush chart */}
+          {config.brush.active && config.xAxis.type !== 'categorical' && <BrushChart xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} xScale={xScale} seriesScale={seriesScale} />}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
           {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(visualizationType) && !checkLineToBarGraph() && (
