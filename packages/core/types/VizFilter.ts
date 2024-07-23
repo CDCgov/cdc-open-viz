@@ -22,17 +22,14 @@ export type MultiSelectFilter = {
 } & Omit<GeneralFilter, 'active'>
 
 export type NestedDropdownFilter = {
-  parent?: NestedDropdownFilter
-  parentLabel?: string
-  parentUsedColumns?: string[]
   subGroupingFilter: {
     active: string
     columnName: string
     order: 'asc' | 'desc' | 'cust'
-    orderedValues?: [string[]]
+    orderedValues?: string[][]
     queryParameter?: string
     setByQueryParameter?: string
-    values: [string[]]
+    values: string[][]
   }
   useQueryParameter: boolean
 } & GeneralFilter
