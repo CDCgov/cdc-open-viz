@@ -206,7 +206,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
             </label>
           ) : (
             <button onClick={() => setCanAddExisting(true)} className='btn btn-primary full-width'>
-              Add Exiting Dashboard Filter
+              Add Existing Dashboard Filter
             </button>
           )}
         </AccordionItemPanel>
