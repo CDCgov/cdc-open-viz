@@ -27,7 +27,7 @@
     font-weight: normal;
     white-space: nowrap;
 
-    & .checkMark {
+    & .check-mark {
       position: absolute;
       left: 0px;
     }
@@ -56,10 +56,6 @@
     position: absolute;
     z-index: 3;
     width: 325px;
-
-    & .groupTitle {
-      font-weight: bold;
-    }
   }
 
   .hide {

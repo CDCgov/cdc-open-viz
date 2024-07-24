@@ -13,6 +13,7 @@ import { MultiSelectFilter, NestedDropdownFilter, VizFilter } from '../types/Viz
 import { filterVizData } from '../helpers/filterVizData'
 import { addValuesToFilters } from '../helpers/addValuesToFilters'
 import NestedDropdown from './NestedDropdown'
+import _ from 'lodash'
 
 export const filterStyleOptions = ['dropdown', 'nested-dropdown', 'pill', 'tab', 'tab bar', 'multi-select']
 
@@ -113,7 +114,7 @@ export const useFilters = props => {
       setShowApplyButton(true)
     } else {
       const newFilter = newFilters[index]
-      if (!Array.isArray(value)) {
+      if (newFilter.filterStyle !== 'nested-dropdown') {
         newFilter.active = value
       } else {
         newFilter.active = value[0]
@@ -431,7 +432,7 @@ const Filters = (props: FilterProps) => {
         })
 
         const sortNestedDropdownValues = (values, order) => {
-          const valuesArray = values
+          const valuesArray = _.cloneDeep(values)
           if (order !== 'cust') {
             valuesArray.sort()
           }
@@ -441,24 +442,8 @@ const Filters = (props: FilterProps) => {
           return valuesArray
         }
 
-        const nestedDropdownData = []
         const currentFilter = filters[outerIndex]
-        const tierOne = currentFilter.columnName
-        const tierTwo = currentFilter.subGroupingFilter?.columnName
         if (filterStyle === 'nested-dropdown') {
-          const newNestedDropdownData = visualizationConfig.data
-            .filter(record => record[tierOne] !== '' && record[tierOne] !== 'N/A' && record[tierTwo] !== '' && record[tierTwo] !== 'N/A')
-            .map(record => {
-              return {
-                [tierOne]: record[tierOne],
-                [tierTwo]: record[tierTwo],
-                tierOneActive: currentFilter.active,
-                tierTwoActive: currentFilter.subGroupingFilter?.active
-              }
-            })
-
-          nestedDropdownData.push(...newNestedDropdownData)
-
           currentFilter.values = sortNestedDropdownValues(currentFilter.values, currentFilter.order)
           currentFilter.subGroupingFilter?.values.map(valueArray => {
             return sortNestedDropdownValues(valueArray, currentFilter.subGroupingFilter?.order)
@@ -484,7 +469,7 @@ const Filters = (props: FilterProps) => {
                 />
               )}
               {filterStyle === 'nested-dropdown' && (
-                <NestedDropdown data={nestedDropdownData} currentFilter={currentFilter} index={outerIndex} listLlabel={label} handleSelectedItems={changeFilterActive} valueOrder={currentFilter.values} subGroupingValueOrder={currentFilter.subGroupingFilter?.values} />
+                <NestedDropdown currentFilter={currentFilter} filterIndex={outerIndex} listLlabel={label} handleSelectedItems={value => changeFilterActive(outerIndex, value)} valueOrder={currentFilter.values} subGroupingValueOrder={currentFilter.subGroupingFilter?.values} />
               )}
             </>
           </div>

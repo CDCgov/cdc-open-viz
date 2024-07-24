@@ -10,8 +10,7 @@ const Options: React.FC<{
   tierOneIndex: number
   userSelectedTierTwoLabel: string
   userSearchTerm: string
-}> = ({ currentOptions, label, handleSecondTierSelect, tierOneIndex, userSelectedTierTwoLabel, userSearchTerm }) => {
-  if (currentOptions === undefined) return
+}> = ({ currentOptions = [], label, handleSecondTierSelect, tierOneIndex, userSelectedTierTwoLabel, userSearchTerm }) => {
   const [isTierOneExpanded, setIsTierOneExpanded] = useState(true)
   const checkMark = <>&#10004;</>
 
@@ -38,7 +37,7 @@ const Options: React.FC<{
   return (
     <>
       <li role='treeitem' key={label} tabIndex={0} aria-label={label} onClick={handleGroupClick} onKeyUp={handleKeyUp} className='nested-dropdown-group'>
-        <span className={'groupTitle'}>{label} </span>
+        <span className={'font-weight-bold'}>{label} </span>
         {
           <span className='list-arrow' aria-hidden='true'>
             {isTierOneExpanded ? <Icon display='caretFilledUp' /> : <Icon display='caretFilledDown' />}
@@ -63,7 +62,7 @@ const Options: React.FC<{
                 }}
               >
                 {isSelected ? (
-                  <span className='checkMark' aria-hidden='true'>
+                  <span className='check-mark' aria-hidden='true'>
                     {checkMark}
                   </span>
                 ) : (
@@ -81,17 +80,15 @@ const Options: React.FC<{
 }
 
 interface NestedDropdownProps {
-  data: Record<string, string | number>[]
-  index: number
   isEditor?: boolean
-  currentFilter: NestedDropdownFilter // index 0  is the parent index 1 is the child
+  currentFilter: NestedDropdownFilter
   listLabel: string
   handleSelectedItems: Function
   valueOrder: string[]
   subGroupingValueOrder?: Record<string, (string | number)[]>
 }
 
-const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, index, currentFilter, listLabel, handleSelectedItems, valueOrder = [], subGroupingValueOrder = [] }) => {
+const NestedDropdown: React.FC<NestedDropdownProps> = ({ currentFilter, listLabel, handleSelectedItems, valueOrder = [], subGroupingValueOrder = [] }) => {
   const optsMemo: Record<string, (string | number)[]> = {}
   const groupFilterActive = currentFilter.active
   const subGroupFilterActive = currentFilter.subGroupingFilter?.active ?? ''
@@ -114,7 +111,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, index, currentFil
     setUserSearchTerm('')
     setIsListOpened(false)
     setInputValue(selectedItemValue)
-    handleSelectedItems(index, [tierOne, tierTwo])
+    handleSelectedItems([tierOne, tierTwo])
   }
 
   const handleKeyUp = e => {

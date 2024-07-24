@@ -6,8 +6,8 @@ import SubGroupingFilterOrder from './components/SubGroupingFilterOrder'
 import './nestedDropdownEditor.style.css'
 
 type NestedDropdownEditorProps = {
-  allFilters: NestedDropdownFilter[]
-  dataColumns: any
+  allFilters: VizFilter[]
+  dataColumns: string[]
   filter: NestedDropdownFilter
   filterIndex: number
   handleNameChange: Function
@@ -30,7 +30,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ allFilters,
 
   const listOfUsedColumnNames: string[] = []
 
-  allFilters.map((filter, index) => {
+  allFilters.forEach((filter: NestedDropdownFilter, index) => {
     if (filterIndex === index) return
     listOfUsedColumnNames.push(filter.columnName)
     if (filter.subGroupingFilter?.columnName) listOfUsedColumnNames.push(filter.subGroupingFilter.columnName)
@@ -69,10 +69,10 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ allFilters,
     updateSubFilterProp(newSubGrouping)
   }
 
-  const handleSubGroupFilterOrderChange = (idx1, idx2, subGroupingFitlerOrder: string[], groupIndex) => {
+  const handleSubGroupFilterOrderChange = (movedItemIndex, indexWhereItemDropped, subGroupingFitlerOrder: string[], groupIndex) => {
     const updatedGroupOrderedValues = subGroupingFitlerOrder
-    const [movedItem] = updatedGroupOrderedValues.splice(idx1, 1)
-    updatedGroupOrderedValues.splice(idx2, 0, movedItem)
+    const [movedItem] = updatedGroupOrderedValues.splice(movedItemIndex, 1)
+    updatedGroupOrderedValues.splice(indexWhereItemDropped, 0, movedItem)
     const newValues = subGrouping.values
     newValues[groupIndex] = updatedGroupOrderedValues
 
@@ -83,7 +83,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ allFilters,
   return (
     <div className='nesteddropdown-editor'>
       <label>
-        <span className='edit-label column-heading'>Label</span>
+        <span className='edit-label column-heading mt-2'>Label</span>
         <input
           type='text'
           value={filter.label}
@@ -94,7 +94,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ allFilters,
       </label>
 
       <label>
-        <div className='edit-label column-heading'>
+        <div className='edit-label column-heading mt-2'>
           Filter Grouping
           <span></span>
         </div>
@@ -113,7 +113,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ allFilters,
         </select>
       </label>
       <label>
-        <div className='edit-label column-heading'>
+        <div className='edit-label column-heading mt-2'>
           Filter SubGrouping
           <span></span>
         </div>
@@ -148,7 +148,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ allFilters,
         <span> Create query parameters</span>
         {filter.useQueryParameter && (
           <>
-            <span className='edit-label column-heading'>Default Value Set By Query String Parameter</span>
+            <span className='edit-label column-heading mt-2'>Default Value Set By Query String Parameter</span>
             <input
               type='text'
               value={filter.setByQueryParameter}
@@ -161,14 +161,14 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ allFilters,
       </label>
 
       <label>
-        <div className='edit-label column-heading float-left'>Group</div>
+        <div className='edit-label column-heading float-left mt-2'>Group</div>
         <div className='edit-label column-heading float-right'>{filter.columnName} </div>
         <FilterOrder filterIndex={filterIndex} filter={filter} updateFilterProp={updateFilterProp} handleFilterOrder={handleFilterOrder} />
       </label>
 
       {filter.subGroupingFilter && filter.subGroupingFilter.columnName && (
         <label>
-          <div className='edit-label column-heading float-left'>Subgroup</div>
+          <div className='edit-label column-heading float-left mt-2'>Subgroup</div>
           <div className='edit-label column-heading float-right'>{filter.subGroupingFilter.columnName} </div>
           <SubGroupingFilterOrder filter={filter} updateSubFilterProp={updateSubFilterProp} handleSubGroupFilterOrderChange={handleSubGroupFilterOrderChange} />
         </label>
