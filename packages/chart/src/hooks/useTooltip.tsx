@@ -45,7 +45,7 @@ export const useTooltip = props => {
 
   const getFormattedValue = (seriesKey, value, config, getAxisPosition) => {
     // handle case where data is missing
-    const showMissingDataValue = config.general.showMissingDataLabel && !value
+    const showMissingDataValue = config.general.showMissingDataLabel && (!value || value === 'null')
     let formattedValue = seriesKey === config.xAxis.dataKey ? value : formatNumber(value, getAxisPosition(seriesKey))
     formattedValue = showMissingDataValue ? 'N/A' : formattedValue
 
