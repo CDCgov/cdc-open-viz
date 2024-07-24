@@ -373,7 +373,7 @@ const LinearChart = props => {
         >
           {!isDraggingAnnotation && <Bar width={width} height={height} fill={'transparent'}></Bar>} {/* Highlighted regions */}
           {/* Y axis */}
-          {!['Spark Line', 'Forest Plot'].includes(visualizationType) && (
+          {!['Spark Line', 'Forest Plot', 'Line'].includes(visualizationType) && (
             <AxisLeft scale={yScale} tickLength={config.useLogScale ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.label || runtime.yAxis.label} stroke='#333' tickFormat={(tick, i) => handleLeftTickFormatting(tick, i)} numTicks={handleNumTicks()}>
               {props => {
                 const axisCenter = config.orientation === 'horizontal' ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
