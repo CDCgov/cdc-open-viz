@@ -382,8 +382,8 @@ const LinearChart = props => {
                             <Text
                               display={config.useLogScale ? showTicks : 'block'}
                               dx={config.useLogScale ? -6 : 0}
-                              x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x - 20}
-                              y={tick.to.y - 12 + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                              x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x - 8.5}
+                              y={tick.to.y - 13 + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                               angle={-Number(config.yAxis.tickRotation) || 0}
                               verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}
                               textAnchor={config.runtime.horizontal ? 'start' : 'end'}

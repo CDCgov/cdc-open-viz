@@ -53,7 +53,7 @@
       "barStyle": "",
       "roundingStyle": "standard",
       "tipRounding": "top",
-      "isResponsiveTicks": false,
+      "isResponsiveTicks": true,
       "general": {
         "showDownloadButton": false
       },
@@ -67,7 +67,7 @@
         "displayNumbersOnBar": false,
         "hideLabel": false,
         "hideTicks": true,
-        "size": "125",
+        "size": "93",
         "gridLines": true,
         "enablePadding": true,
         "min": "0",
@@ -84,7 +84,7 @@
         "rightAxisTickColor": "#333",
         "numTicks": "11",
         "axisPadding": 0,
-        "scalePadding": "6",
+        "scalePadding": "5",
         "tickRotation": 0,
         "anchors": []
       },
@@ -149,7 +149,7 @@
         "labelOffset": 65,
         "axisPadding": 200,
         "target": 0,
-        "maxTickRotation": 0,
+        "maxTickRotation": 50,
         "showSuppressedSymbol": true,
         "showSuppressedLine": true,
         "padding": "0",

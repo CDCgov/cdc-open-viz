@@ -69,7 +69,7 @@ const LineChartBumpCircle = props => {
                   x={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey])))) - 7}
                   y={Number(yScale(d[series.dataKey])) + 4}
                   fill='#000000'
-                  fontSize={12}
+                  fontSize={11.5}
                   >
                   {d[series.dataKey]}
                 </text>
@@ -79,7 +79,7 @@ const LineChartBumpCircle = props => {
                   x={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey])))) - 4}
                   y={Number(yScale(d[series.dataKey])) + 4}
                   fill='#000000'
-                  fontSize={12}
+                  fontSize={11.5}
                   onMouseOver={() => handleClick(series.dataKey, d[config.xAxis.dataKey])}>
                   {d[series.dataKey]}
                 </text>
