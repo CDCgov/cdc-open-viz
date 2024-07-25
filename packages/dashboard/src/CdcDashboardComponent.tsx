@@ -27,7 +27,7 @@ import CdcMarkupInclude from '@cdc/markup-include'
 import CdcFilteredText from '@cdc/filtered-text'
 
 import Grid from './components/Grid'
-import Header, { FilterBehavior } from './components/Header/Header'
+import Header from './components/Header/Header'
 import DataTable from '@cdc/core/components/DataTable'
 import MediaControls from '@cdc/core/components/MediaControls'
 
@@ -57,17 +57,14 @@ import { getVizConfig } from './helpers/getVizConfig'
 import { getFilteredData } from './helpers/getFilteredData'
 import { getVizRowColumnLocator } from './helpers/getVizRowColumnLocator'
 import Layout from '@cdc/core/components/Layout'
-import CollapsibleVisualizationRow from './components/CollapsibleVisualizationRow'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import * as apiFilterHelpers from './helpers/apiFilterHelpers'
 import * as reloadURLHelpers from './helpers/reloadURLHelpers'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { DashboardFilters } from './types/DashboardFilters'
 import DashboardSharedFilters from './components/DashboardFilters'
-import { getAutoLoadVisualization } from './helpers/getAutoLoadVisualization'
-import { changeFilterActive } from './helpers/changeFilterActive'
-import { addValuesToSharedFilters } from './helpers/addValuesToSharedFilters'
 import ExpandCollapseButtons from './components/ExpandCollapseButtons'
+import { hasDashboardApplyBehavior } from './helpers/hasDashboardApplyBehavior'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -264,7 +261,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   useEffect(() => {
     if (isEditor && !isPreview) return
     const { config } = state
-    if (config.filterBehavior !== FilterBehavior.Apply) {
+    if (!hasDashboardApplyBehavior(config.visualizations)) {
       reloadURLData()
     }
 

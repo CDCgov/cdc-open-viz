@@ -1,5 +1,5 @@
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
-import React, { MouseEventHandler, useContext, useMemo, useState } from 'react'
+import React, { useContext, useMemo } from 'react'
 import Toggle from './Toggle'
 import _ from 'lodash'
 import { ConfigRow } from '../types/ConfigRow'
@@ -10,14 +10,14 @@ import CdcWaffleChart from '@cdc/waffle-chart'
 import CdcMarkupInclude from '@cdc/markup-include'
 import CdcFilteredText from '@cdc/filtered-text'
 import DashboardSharedFilters, { APIFilterDropdowns } from './DashboardFilters'
-import { FilterBehavior } from './Header/Header'
 import { DashboardContext } from '../DashboardContext'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import { getFootnotesVizConfig, getVizConfig } from '../helpers/getVizConfig'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
-import { Visualization } from '@cdc/core/types/Visualization'
 import CollapsibleVisualizationRow from './CollapsibleVisualizationRow'
+import { DashboardFilters } from '../types/DashboardFilters'
+import { hasDashboardApplyBehavior } from '../helpers/hasDashboardApplyBehavior'
 
 type VisualizationWrapperProps = {
   allExpanded: boolean
@@ -41,7 +41,6 @@ const VisualizationWrapper: React.FC<VisualizationWrapperProps> = ({ allExpanded
     </>
   )
 }
-import { DashboardFilters } from '../types/DashboardFilters'
 
 type VizRowProps = {
   allExpanded: boolean
@@ -84,7 +83,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({ allExpanded, filteredDataOver
   const applyButtonNotClicked = (vizConfig: DashboardFilters): boolean => {
     const dashboardFilters = Object.values(config.visualizations).filter(v => v.type === 'dashboardFilters') as DashboardFilters[]
     const applyFilters = dashboardFilters.filter(v => !v.autoLoad).flatMap(v => v.sharedFilterIndexes)
-    if (config.filterBehavior === FilterBehavior.Apply && vizConfig.autoLoad) {
+    if (hasDashboardApplyBehavior(config.visualizations) && vizConfig.autoLoad) {
       return applyFilters.some(index => {
         const { queuedActive, active } = config.dashboard.sharedFilters[index]
         if (!active && !queuedActive) return true

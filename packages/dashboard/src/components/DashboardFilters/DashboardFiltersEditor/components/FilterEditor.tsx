@@ -8,10 +8,10 @@ import { SharedFilter } from '../../../../types/SharedFilter'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
-import { FilterBehavior } from '../../../Header/Header'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { DashboardConfig } from '../../../../types/DashboardConfig'
 import { Visualization } from '@cdc/core/types/Visualization'
+import { hasDashboardApplyBehavior } from '../../../../helpers/hasDashboardApplyBehavior'
 
 type FilterEditorProps = {
   config: DashboardConfig
@@ -130,7 +130,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
       {filter.type === 'urlfilter' && (
         <>
           <TextField label='Label' value={filter.key} updateField={(_section, _subSection, _key, value) => updateFilterProp('key', value)} />
-          {config.filterBehavior !== FilterBehavior.Apply && (
+          {!hasDashboardApplyBehavior(config.visualizations) && (
             <>
               <label>
                 <span className='edit-label column-heading'>URL to Filter: </span>

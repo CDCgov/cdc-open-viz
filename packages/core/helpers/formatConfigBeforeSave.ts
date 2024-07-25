@@ -68,6 +68,13 @@ const cleanSharedFilters = (config: DashboardConfig) => {
 export const formatConfigBeforeSave = configToStrip => {
   let strippedConfig = _.cloneDeep(configToStrip)
   if (strippedConfig.type === 'dashboard') {
+    if (strippedConfig.multiDashboards) {
+      strippedConfig.multiDashboards.forEach((multiDashboard, i) => {
+        cleanDashboardData(strippedConfig.multiDashboards[i])
+        cleanSharedFilters(strippedConfig.multiDashboards[i])
+        cleanDashboardFootnotes(strippedConfig.multiDashboards[i])
+      })
+    }
     cleanDashboardData(strippedConfig)
     cleanSharedFilters(strippedConfig)
     cleanDashboardFootnotes(strippedConfig)

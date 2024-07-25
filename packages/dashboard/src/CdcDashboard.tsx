@@ -13,6 +13,7 @@ import { InitialState } from './types/InitialState'
 import { DashboardConfig } from './types/DashboardConfig'
 import { coveUpdateWorker } from '@cdc/core/helpers/coveUpdateWorker'
 import _ from 'lodash'
+import { hasDashboardApplyBehavior } from './helpers/hasDashboardApplyBehavior'
 
 type MultiDashboardProps = Omit<WCMSProps, 'configUrl'> & {
   configUrl?: string
@@ -58,7 +59,9 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, confi
     let datasets: Record<string, Object[]> = {}
     await Promise.all(
       Object.keys(initialConfig.datasets).map(async key => {
-        const data = await processData(initialConfig.datasets[key], initialConfig.filterBehavior)
+        const legacySupportApply = (initialConfig as any).filterBehavior === 'Apply Button'
+        const hasApplyBehavior = hasDashboardApplyBehavior(initialConfig.visualizations) || legacySupportApply
+        const data = await processData(initialConfig.datasets[key], !hasApplyBehavior)
         datasets[key] = data || []
       })
     )

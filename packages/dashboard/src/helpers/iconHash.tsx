@@ -1,5 +1,5 @@
 import Icon from '@cdc/core/components/ui/Icon'
-import { Visualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '@cdc/core/types/Visualization'
 
 export const iconHash = {
   'data-bite': <Icon display='databite' base />,
@@ -21,7 +21,7 @@ export const iconHash = {
   Sankey: <Icon display='sankey' base />
 }
 
-export const getIcon = (visualization: Visualization) => {
+export const getIcon = (visualization: AnyVisualization) => {
   const { type, visualizationType, general } = visualization
   if (visualizationType) return iconHash[visualizationType]
   if (general?.geoType) {
