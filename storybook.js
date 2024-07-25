@@ -31,12 +31,12 @@ const _ = {
   "./_stories/Guide.NewComponents.stories.mdx": async () => import("./storybook-Guide.NewComponents.stories-65859a80.es.js"),
   "./_stories/Guide.NewIcons.stories.mdx": async () => import("./storybook-Guide.NewIcons.stories-b63b0079.es.js"),
   "./_stories/Guide.NewStories.stories.mdx": async () => import("./storybook-Guide.NewStories.stories-40d54746.es.js"),
-  "./packages/chart/src/_stories/Chart.stories.tsx": async () => import("./storybook-Chart.stories-7a1c224c.es.js"),
-  "./packages/chart/src/_stories/Chart.tooltip.stories.tsx": async () => import("./storybook-Chart.tooltip.stories-96dca9b4.es.js"),
-  "./packages/chart/src/_stories/ChartAnnotation.stories.tsx": async () => import("./storybook-ChartAnnotation.stories-9d8f08b9.es.js"),
-  "./packages/chart/src/_stories/ChartBrush.stories.tsx": async () => import("./storybook-ChartBrush.stories-9dfc14df.es.js"),
-  "./packages/chart/src/_stories/ChartEditor.stories.tsx": async () => import("./storybook-ChartEditor.stories-aea5b400.es.js"),
-  "./packages/core/components/_stories/DataTable.stories.tsx": async () => import("./storybook-DataTable.stories-d5886f24.es.js"),
+  "./packages/chart/src/_stories/Chart.stories.tsx": async () => import("./storybook-Chart.stories-62b70e4c.es.js"),
+  "./packages/chart/src/_stories/Chart.tooltip.stories.tsx": async () => import("./storybook-Chart.tooltip.stories-8215fc9e.es.js"),
+  "./packages/chart/src/_stories/ChartAnnotation.stories.tsx": async () => import("./storybook-ChartAnnotation.stories-c792070f.es.js"),
+  "./packages/chart/src/_stories/ChartBrush.stories.tsx": async () => import("./storybook-ChartBrush.stories-b0be8245.es.js"),
+  "./packages/chart/src/_stories/ChartEditor.stories.tsx": async () => import("./storybook-ChartEditor.stories-a53c247d.es.js"),
+  "./packages/core/components/_stories/DataTable.stories.tsx": async () => import("./storybook-DataTable.stories-30159052.es.js"),
   "./packages/core/components/_stories/EditorPanel.stories.tsx": async () => import("./storybook-EditorPanel.stories-deac7e89.es.js"),
   "./packages/core/components/_stories/Footnotes.stories.tsx": async () => import("./storybook-Footnotes.stories-89fc11aa.es.js"),
   "./packages/core/components/_stories/Inputs.stories.tsx": async () => import("./storybook-Inputs.stories-596a5a5d.es.js"),
@@ -50,12 +50,12 @@ const _ = {
   "./packages/core/components/ui/_stories/Colors.stories.tsx": async () => import("./storybook-Colors.stories-849ebf3c.es.js"),
   "./packages/core/components/ui/_stories/Icon.stories.tsx": async () => import("./storybook-Icon.stories-0cb45d4a.es.js"),
   "./packages/core/components/ui/_stories/Title.stories.tsx": async () => import("./storybook-Title.stories-0a9ecc18.es.js"),
-  "./packages/dashboard/src/_stories/Dashboard.stories.tsx": async () => import("./storybook-Dashboard.stories-ce7e112f.es.js"),
-  "./packages/data-bite/src/_stories/DataBite.stories.tsx": async () => import("./storybook-DataBite.stories-69968b1e.es.js"),
-  "./packages/editor/src/_stories/Editor.stories.tsx": async () => import("./storybook-Editor.stories-637ef4bd.es.js"),
-  "./packages/map/src/_stories/CdcMap.stories.tsx": async () => import("./storybook-CdcMap.stories-46cd4a38.es.js"),
-  "./packages/markup-include/src/_stories/MarkupInclude.stories.tsx": async () => import("./storybook-MarkupInclude.stories-8dd1434c.es.js"),
-  "./packages/waffle-chart/src/_stories/WaffleChart.stories.tsx": async () => import("./storybook-WaffleChart.stories-2f5b91ce.es.js")
+  "./packages/dashboard/src/_stories/Dashboard.stories.tsx": async () => import("./storybook-Dashboard.stories-2c8c3df7.es.js"),
+  "./packages/data-bite/src/_stories/DataBite.stories.tsx": async () => import("./storybook-DataBite.stories-74d3f707.es.js"),
+  "./packages/editor/src/_stories/Editor.stories.tsx": async () => import("./storybook-Editor.stories-98931d53.es.js"),
+  "./packages/map/src/_stories/CdcMap.stories.tsx": async () => import("./storybook-CdcMap.stories-42b6642b.es.js"),
+  "./packages/markup-include/src/_stories/MarkupInclude.stories.tsx": async () => import("./storybook-MarkupInclude.stories-ee986032.es.js"),
+  "./packages/waffle-chart/src/_stories/WaffleChart.stories.tsx": async () => import("./storybook-WaffleChart.stories-07d4dca5.es.js")
 };
 async function m(o) {
   return _[o]();
