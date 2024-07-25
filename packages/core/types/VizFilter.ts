@@ -34,4 +34,4 @@ export type NestedDropdownFilter = {
   useQueryParameter: boolean
 } & GeneralFilter
 
-export type VizFilter = GeneralFilter | MultiSelectFilter
+export type VizFilter = GeneralFilter | MultiSelectFilter | NestedDropdownFilter

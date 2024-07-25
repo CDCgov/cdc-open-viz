@@ -3,7 +3,6 @@ import _ from 'lodash'
 import { NestedDropdownFilter, VizFilter } from '../../../types/VizFilter'
 import FilterOrder from './components/FilterOrder'
 import SubGroupingFilterOrder from './components/SubGroupingFilterOrder'
-import './nestedDropdownEditor.style.css'
 
 type NestedDropdownEditorProps = {
   allFilters: VizFilter[]
@@ -163,14 +162,14 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ allFilters,
       <label>
         <div className='edit-label column-heading float-left mt-2'>Group</div>
         <div className='edit-label column-heading float-right'>{filter.columnName} </div>
-        <FilterOrder filterIndex={filterIndex} filter={filter} updateFilterProp={updateFilterProp} handleFilterOrder={handleFilterOrder} />
+        <FilterOrder filter={filter} filterIndex={filterIndex} updateFilterProp={updateFilterProp} handleFilterOrder={handleFilterOrder} />
       </label>
 
       {filter.subGroupingFilter && filter.subGroupingFilter.columnName && (
         <label>
           <div className='edit-label column-heading float-left mt-2'>Subgroup</div>
           <div className='edit-label column-heading float-right'>{filter.subGroupingFilter.columnName} </div>
-          <SubGroupingFilterOrder filter={filter} updateSubFilterProp={updateSubFilterProp} handleSubGroupFilterOrderChange={handleSubGroupFilterOrderChange} />
+          <FilterOrder filter={filter} filterIndex={filterIndex} isSubFilter={true} updateSubFilterProp={updateSubFilterProp} handleSubGroupFilterOrderChange={handleSubGroupFilterOrderChange} />
         </label>
       )}
     </div>

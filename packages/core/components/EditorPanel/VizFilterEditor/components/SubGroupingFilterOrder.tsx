@@ -1,4 +1,3 @@
-import { NestedDropdownFilter, VizFilter } from '../../../../types/VizFilter'
 import { filterOrderOptions } from '../../../Filters'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 

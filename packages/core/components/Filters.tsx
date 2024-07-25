@@ -445,10 +445,13 @@ const Filters = (props: FilterProps) => {
         const currentFilter = filters[outerIndex]
         if (filterStyle === 'nested-dropdown') {
           currentFilter.values = sortNestedDropdownValues(currentFilter.values, currentFilter.order)
-          currentFilter.subGroupingFilter?.values.map(valueArray => {
-            return sortNestedDropdownValues(valueArray, currentFilter.subGroupingFilter?.order)
-          })
+          if (currentFilter.subGroupingFilter?.values) {
+            currentFilter.subGroupingFilter?.values.map(valueArray => {
+              sortNestedDropdownValues(valueArray, currentFilter.subGroupingFilter?.order)
+            })
+          }
         }
+
         const classList = ['single-filters', mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`]
 
         return (
