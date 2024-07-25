@@ -36,7 +36,7 @@ const generateValuesForFilter = (columnName, data: any[] | Record<string, any[]>
 }
 
 export const addValuesToFilters = <T>(filters: Filter[], data: any[] | Record<string, any[]>): Array<T> => {
-  return filters.map(filter => {
+  return filters?.map(filter => {
     const filterCopy = _.cloneDeep(filter)
 
     const filterValues = generateValuesForFilter(filter.columnName, data)
