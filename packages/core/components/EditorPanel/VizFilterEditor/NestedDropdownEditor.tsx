@@ -2,7 +2,6 @@ import { useState } from 'react'
 import _ from 'lodash'
 import { NestedDropdownFilter, VizFilter } from '../../../types/VizFilter'
 import FilterOrder from './components/FilterOrder'
-import SubGroupingFilterOrder from './components/SubGroupingFilterOrder'
 
 type NestedDropdownEditorProps = {
   allFilters: VizFilter[]
@@ -23,7 +22,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ allFilters,
     active: string
     columnName: string
     order?: string
-    values?: [string[]]
+    values?: string[][]
   }
   const [subGrouping, setSubGrouping] = useState<SubGroupingType>(filter.subGroupingFilter)
 
