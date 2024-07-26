@@ -155,6 +155,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({ allExpanded, filteredDataOver
                     setSharedFilterValue={setSharedFilterValue}
                     isDashboard={true}
                     link={config.table && config.table.show && config.datasets && visualizationConfig.table && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
+                    dashboardConfig={config}
                   />
                 )}
                 {visualizationConfig.type === 'data-bite' && (

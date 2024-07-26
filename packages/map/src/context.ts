@@ -1,5 +1,6 @@
 import { createContext } from 'react'
 import { MapConfig } from './types/MapConfig'
+import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 
 type MapContext = {
   applyLegendToRow
@@ -8,6 +9,7 @@ type MapContext = {
   columnsInData
   currentViewport
   data
+  dashboardConfig: DashboardConfig
   displayDataAsText
   displayGeoName
   filteredCountryCode

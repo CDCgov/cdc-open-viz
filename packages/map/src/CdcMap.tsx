@@ -82,7 +82,7 @@ const indexOfIgnoreType = (arr, item) => {
   return -1
 }
 
-const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, link }) => {
+const CdcMap = ({ dashboardConfig, className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, link }) => {
   const transform = new DataTransform()
   const [state, setState] = useState({ ...initialState })
   const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
@@ -1562,6 +1562,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // Props passed to all map types
   const mapProps = {
+    dashboardConfig,
     isDraggingAnnotation,
     handleDragStateChange,
     applyLegendToRow,
@@ -1688,7 +1689,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                   {currentViewport && (
                     <>
                       {modal && <Modal />}
-                      {'single-state' === geoType && <UsaMap.SingleState />}
+                      {'single-state' === geoType && <UsaMap.SingleState dashboardConfig={dashboardConfig} />}
                       {'us' === geoType && 'us-geocode' !== state.general.type && <UsaMap.State />}
                       {'us-region' === geoType && <UsaMap.Region />}
                       {'us-county' === geoType && <UsaMap.County />}
@@ -1758,7 +1759,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           {!isDraggingAnnotation && !window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
             <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
           )}
-          <div ref={tooltipRef} id={`tooltip__${tooltipId}-canvas`} className='tooltip' style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})`, position: 'absolute', whiteSpace: 'nowrap' }}></div>
+          <div ref={tooltipRef} id={`tooltip__${tooltipId}-canvas`} className='tooltip' style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})`, position: 'absolute', whiteSpace: 'nowrap', display: 'none' }}></div>
         </Layout.Responsive>
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>
