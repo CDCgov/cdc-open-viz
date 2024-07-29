@@ -29,7 +29,6 @@ export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExp
     if (config.type !== 'dashboard') {
       parsedConfig = convertStateToConfig()
     }
-    //const formattedConfig = JSON.stringify(parsedConfig, undefined, 2)
 
     setConfigTextbox(parsedConfig)
   }, [config])
