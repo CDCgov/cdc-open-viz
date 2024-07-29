@@ -56,8 +56,8 @@ const LineChart = (props: LineChartProps) => {
         {' '}
         {/* left - expects a number not a string */}
         {(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => {
-          let lineType = config.series.filter(item => item.dataKey === seriesKey)[0].type
-          const seriesData = config.series.filter(item => item.dataKey === seriesKey)
+          let lineType = config.runtime.series.filter(item => item.dataKey === seriesKey)[0].type
+          const seriesData = config.runtime.series.filter(item => item.dataKey === seriesKey)
           const seriesAxis = seriesData[0].axis ? seriesData[0].axis : 'left'
           let displayArea = legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
           const circleData = filterCircles(config?.preliminaryData, tableD, seriesKey)
@@ -76,8 +76,8 @@ const LineChart = (props: LineChartProps) => {
               display={legend.behavior === 'highlight' || (seriesHighlight.length === 0 && !legend.dynamicLegend) || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
             >
               {data.map((d, dataIndex) => {
-                // Find the series object from the config.series array that has a dataKey matching the seriesKey variable.
-                const series = config.series.find(({ dataKey }) => dataKey === seriesKey)
+                // Find the series object from the config.runtime.series array that has a dataKey matching the seriesKey variable.
+                const series = config.runtime.series.find(({ dataKey }) => dataKey === seriesKey)
                 const { axis } = series
 
                 const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1

@@ -120,10 +120,17 @@ export const useFilters = props => {
         updateQueryString(queryParams)
       }
     }
-    setConfig({
-      ...visualizationConfig,
-      filters: newFilters
-    })
+
+    
+    
+    if(!visualizationConfig.dynamicSeries) {
+      setConfig({
+        ...visualizationConfig,
+        filters: newFilters
+      })
+    }
+
+    
 
     // Used for setting active filter, fromHash breaks the filteredData functionality.
     if (visualizationConfig.type === 'map' && visualizationConfig.filterBehavior === 'Filter Change') {
@@ -132,7 +139,39 @@ export const useFilters = props => {
 
     // If we're on a chart and not using the apply button
     if (hasStandardFilterBehavior.includes(visualizationConfig.type) && visualizationConfig.filterBehavior === 'Filter Change') {
-      setFilteredData(filterVizData(newFilters, excludedData))
+      const newFilteredData = filterVizData(newFilters, excludedData)
+      setFilteredData(newFilteredData)
+
+      if(visualizationConfig.dynamicSeries){
+        const runtime = visualizationConfig.runtime || {}
+        runtime.series = []
+        runtime.seriesLabels = {}
+        runtime.seriesLabelsAll = []
+  
+        if(newFilteredData && newFilteredData.length && newFilteredData.length > 0){
+          Object.keys(newFilteredData[0]).forEach(seriesKey => {
+            if(seriesKey !== visualizationConfig.xAxis.dataKey && newFilteredData[0][seriesKey] && visualizationConfig.filters?.filter(filter => filter.columnName === seriesKey).length === 0){
+              runtime.series.push({
+                "dataKey": seriesKey
+              })
+            }
+          })
+        }
+  
+        runtime.seriesKeys = runtime.series
+          ? runtime.series.map(series => {
+              runtime.seriesLabels[series.dataKey] = series.name || series.label || series.dataKey
+              runtime.seriesLabelsAll.push(series.name || series.dataKey)
+              return series.dataKey
+            })
+          : []
+  
+          setConfig({
+            ...visualizationConfig,
+            filters: newFilters,
+            runtime
+          })
+      }
     }
   }
 

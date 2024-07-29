@@ -337,16 +337,30 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {}
+    newConfig.runtime.series = newConfig.dynamicSeries ? [] : newConfig.series
     newConfig.runtime.seriesLabels = {}
     newConfig.runtime.seriesLabelsAll = []
     newConfig.runtime.originalXAxis = newConfig.xAxis
+
+    if(newConfig.dynamicSeries){
+      let finalData = dataOverride || newConfig.formattedData || newConfig.data
+      if(finalData && finalData.length && finalData.length > 0){
+        Object.keys(finalData[0]).forEach(seriesKey => {
+          if(seriesKey !== newConfig.xAxis.dataKey && finalData[0][seriesKey] && newConfig.filters?.filter(filter => filter.columnName === seriesKey).length === 0){
+            newConfig.runtime.series.push({
+              "dataKey": seriesKey
+            })
+          }
+        })
+      }
+    }
 
     if (newConfig.visualizationType === 'Pie') {
       newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey])
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
     } else {
-      newConfig.runtime.seriesKeys = newConfig.series
-        ? newConfig.series.map(series => {
+      newConfig.runtime.seriesKeys = newConfig.runtime.series
+        ? newConfig.runtime.series.map(series => {
             newConfig.runtime.seriesLabels[series.dataKey] = series.name || series.label || series.dataKey
             newConfig.runtime.seriesLabelsAll.push(series.name || series.dataKey)
             return series.dataKey
