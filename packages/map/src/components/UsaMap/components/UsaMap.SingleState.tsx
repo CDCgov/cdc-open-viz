@@ -73,12 +73,7 @@ const SingleStateMap = props => {
     const _statePicked = getFilterControllingStatePicked()
     const _statePickedData = topoData.states.find(s => s.properties.name === _statePicked)
     if (!_statePickedData) return
-    setState(prevState => {
-      if (prevState.general.statePicked?.fipsCode !== _statePickedData?.id) {
-        setStateToShow(_statePickedData)
-      }
-      return prevState
-    })
+    setStateToShow(_statePickedData)
     const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
     const newProjection = projection.fitExtent(
       [
@@ -96,6 +91,7 @@ const SingleStateMap = props => {
 
     setTranslate([x, y])
     setScale(newScaleWithHypot)
+
     setState(prevState => {
       if (prevState.general.statePicked?.fipsCode !== _statePickedData?.id) {
         return {
@@ -108,7 +104,20 @@ const SingleStateMap = props => {
       }
       return prevState
     })
-  }, [state.general.statePicked, dashboardConfig?.dashboard?.sharedFilters])
+  }, [state.general.statePicked, dashboardConfig.dashboard.sharedFilters])
+
+  useEffect(() => {
+    const _statePicked = getFilterControllingStatePicked()
+    const _statePickedData = topoData?.states?.find(s => s.properties.name === _statePicked)
+
+    setState({
+      ...state,
+      general: {
+        ...state.general,
+        statePicked: { fipsCode: _statePickedData?.id, stateName: _statePickedData?.properties?.name }
+      }
+    })
+  }, [topoData])
 
   useEffect(() => {
     let currentYear = getCurrentTopoYear(state, runtimeFilters)
@@ -158,7 +167,7 @@ const SingleStateMap = props => {
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
-    const statePassed = geographies[0].feature.states
+    const statePassed = getFilterControllingStatePicked() || geographies[0].feature.states
     const counties = geographies[0].feature.counties
 
     let geosJsx = []

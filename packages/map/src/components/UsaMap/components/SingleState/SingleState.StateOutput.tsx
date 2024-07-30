@@ -26,6 +26,8 @@ const StateOutput: React.FC<StateOutputProps> = ({ topoData, statePassed, path, 
   const { state } = useContext(ConfigContext)
   if (!topoData?.objects?.states) return null
   let geo = topoData.objects.states.geometries.filter(s => {
+    console.log('s', s)
+    console.log('statePassed', statePassed)
     return s.id === statePassed.id
   })
 

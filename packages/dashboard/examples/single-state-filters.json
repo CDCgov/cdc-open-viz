@@ -67,7 +67,11 @@
         "hideGeoColumnInTooltip": false,
         "hidePrimaryColumnInTooltip": false,
         "expandDataTable": false,
-        "filterControlsStatePicked": "State"
+        "filterControlsStatePicked": "State",
+        "statePicked": {
+          "fipsCode": "01",
+          "stateName": "Alabama"
+        }
       },
       "type": "map",
       "color": "pinkpurple",
@@ -91,10 +95,10 @@
           "name": ""
         },
         "latitude": {
-          "name": ""
+          "name": "Latitude"
         },
         "longitude": {
-          "name": ""
+          "name": "Longitude"
         }
       },
       "legend": {
@@ -140,7 +144,7 @@
         "cityStyleLabel": "",
         "showBubbleZeros": false,
         "additionalCityStyles": [],
-        "geoCodeCircleSize": 8
+        "geoCodeCircleSize": "2"
       },
       "mapPosition": {
         "coordinates": [
