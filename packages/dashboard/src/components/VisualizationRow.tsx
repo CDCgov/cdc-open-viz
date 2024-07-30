@@ -1,36 +1,60 @@
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
-import React, { MouseEventHandler, useContext, useMemo } from 'react'
+import React, { useContext, useMemo } from 'react'
 import Toggle from './Toggle'
 import _ from 'lodash'
 import { ConfigRow } from '../types/ConfigRow'
-import CdcMap from '@cdc/map'
 import CdcChart from '@cdc/chart'
 import CdcDataBite from '@cdc/data-bite'
+import CdcMap from '@cdc/map'
 import CdcWaffleChart from '@cdc/waffle-chart'
 import CdcMarkupInclude from '@cdc/markup-include'
 import CdcFilteredText from '@cdc/filtered-text'
-import Filters, { APIFilterDropdowns } from './Filters'
-import { FilterBehavior } from './Header/Header'
+import DashboardSharedFilters, { APIFilterDropdowns } from './DashboardFilters'
 import { DashboardContext } from '../DashboardContext'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import { getFootnotesVizConfig, getVizConfig } from '../helpers/getVizConfig'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
-import { Visualization } from '@cdc/core/types/Visualization'
+import CollapsibleVisualizationRow from './CollapsibleVisualizationRow'
+import { DashboardFilters } from '../types/DashboardFilters'
+import { hasDashboardApplyBehavior } from '../helpers/hasDashboardApplyBehavior'
+
+type VisualizationWrapperProps = {
+  allExpanded: boolean
+  children: React.ReactNode
+  currentViewport: ViewPort
+  groupName: string
+  row: ConfigRow
+}
+
+const VisualizationWrapper: React.FC<VisualizationWrapperProps> = ({ allExpanded, currentViewport, groupName, row, children }) => {
+  return row.expandCollapseAllButtons ? (
+    <div className='collapsable-multiviz-container'>
+      <CollapsibleVisualizationRow allExpanded={allExpanded} fontSize={'26px'} groupName={groupName} currentViewport={currentViewport}>
+        {children}
+      </CollapsibleVisualizationRow>
+    </div>
+  ) : (
+    <>
+      <h3>{groupName}</h3>
+      {children}
+    </>
+  )
+}
 
 type VizRowProps = {
+  allExpanded: boolean
   filteredDataOverride?: Object[]
+  groupName: string
   row: ConfigRow
   rowIndex: number
   setSharedFilter: Function
   updateChildConfig: Function
-  applyFilters: MouseEventHandler<HTMLButtonElement>
   apiFilterDropdowns: APIFilterDropdowns
-  handleOnChange: Function
   currentViewport: ViewPort
 }
 
-const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, rowIndex: index, setSharedFilter, updateChildConfig, applyFilters, apiFilterDropdowns, handleOnChange, currentViewport }) => {
+const VisualizationRow: React.FC<VizRowProps> = ({ allExpanded, filteredDataOverride, groupName, row, rowIndex: index, setSharedFilter, updateChildConfig, applyFilters, apiFilterDropdowns, handleOnChange, currentViewport }) => {
   const { config, filteredData: dashboardFilteredData, data: rawData } = useContext(DashboardContext)
   const [show, setShow] = React.useState(row.columns.map((col, i) => i === 0))
   const setToggled = (colIndex: number) => {
@@ -41,13 +65,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
     if (!vals.length) return true
     return vals.some(val => val === undefined)
   }, [rawData])
-
-  const GoButton = ({ autoLoad }: { autoLoad?: boolean }) => {
-    if (config.filterBehavior === FilterBehavior.Apply && !autoLoad) {
-      return <button onClick={applyFilters}>GO!</button>
-    }
-    return null
-  }
 
   const footnotesConfig = useMemo(() => {
     if (row.footnotesId) {
@@ -63,9 +80,11 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
     return null
   }, [config, row, rawData, dashboardFilteredData])
 
-  const applyButtonNotClicked = (vizConfig: Visualization): boolean => {
-    if (config.filterBehavior === FilterBehavior.Apply && vizConfig.autoLoad && vizConfig.hide) {
-      return vizConfig.hide.some(index => {
+  const applyButtonNotClicked = (vizConfig: DashboardFilters): boolean => {
+    const dashboardFilters = Object.values(config.visualizations).filter(v => v.type === 'dashboardFilters') as DashboardFilters[]
+    const applyFilters = dashboardFilters.filter(v => !v.autoLoad).flatMap(v => v.sharedFilterIndexes)
+    if (hasDashboardApplyBehavior(config.visualizations) && vizConfig.autoLoad) {
+      return applyFilters.some(index => {
         const { queuedActive, active } = config.dashboard.sharedFilters[index]
         if (!active && !queuedActive) return true
         if (!queuedActive) return false
@@ -96,12 +115,15 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
               {visualizationConfig.dataKey} (Go to Table)
             </a>
           )
-          const hideFilter = inNoDataState && applyButtonNotClicked(visualizationConfig)
+          const hideFilter = inNoDataState && visualizationConfig.type === 'dashboardFilters' && applyButtonNotClicked(visualizationConfig)
 
           const shouldShow = row.toggle === undefined || (row.toggle && show[colIndex])
+
+          const body = <></>
+
           return (
-            <React.Fragment key={`vis__${index}__${colIndex}`}>
-              <div className={`col-md-${col.width} ${!shouldShow ? 'd-none' : ''}`}>
+            <div key={`vis__${index}__${colIndex}`} className={`col-${col.width} ${!shouldShow ? 'd-none' : ''}`}>
+              <VisualizationWrapper allExpanded={allExpanded} currentViewport={currentViewport} groupName={groupName} row={row}>
                 {visualizationConfig.type === 'chart' && (
                   <CdcChart
                     key={col.widget}
@@ -182,11 +204,16 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
                     configUrl={undefined}
                   />
                 )}
-                {visualizationConfig.type === 'filter-dropdowns' && !hideFilter && (
-                  <React.Fragment key={col.widget}>
-                    <Filters hide={visualizationConfig.hide} filters={config.dashboard.sharedFilters} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} />
-                    <GoButton autoLoad={visualizationConfig.autoLoad} />
-                  </React.Fragment>
+                {visualizationConfig.type === 'dashboardFilters' && !hideFilter && (
+                  <DashboardSharedFilters
+                    setConfig={newConfig => {
+                      updateChildConfig(col.widget, newConfig)
+                    }}
+                    key={col.widget}
+                    visualizationConfig={visualizationConfig as DashboardFilters}
+                    apiFilterDropdowns={apiFilterDropdowns}
+                    currentViewport={currentViewport}
+                  />
                 )}
                 {visualizationConfig.type === 'table' && (
                   <DataTableStandAlone
@@ -200,8 +227,8 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
                   />
                 )}
                 {visualizationConfig.type === 'footnotes' && <FootnotesStandAlone key={col.widget} visualizationKey={col.widget} config={visualizationConfig} viewport={currentViewport} />}
-              </div>
-            </React.Fragment>
+              </VisualizationWrapper>
+            </div>
           )
         }
         return <React.Fragment key={`vis__${index}__${colIndex}`}></React.Fragment>

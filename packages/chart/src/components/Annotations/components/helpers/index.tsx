@@ -15,36 +15,6 @@ const handleConnectionVerticalType = (annotation, xScale, config) => {
   return xScale(annotation.xKey) + annotation.dx < config.yAxis.size ? 'end' : null
 }
 
-const createPoints = (annotation, xScale, yScale, config) => {
-  const draggableCircleDiameter = 16
-  const { x, y, dx, dy, xKey, yKey, snapToNearest } = annotation
-  const controlX = x + dx / 2
-  const controlY = y + dy
-  const padding = 0
-
-  const checkSnapToNearestX = () => {
-    if (snapToNearest) {
-      return xScale(xKey)
-    }
-    return x - config.yAxis.size - draggableCircleDiameter
-  }
-
-  const checkSnapToNearestY = () => {
-    if (snapToNearest) {
-      return yScale(yKey)
-    }
-    return y
-  }
-
-  const points = [
-    { xPos: checkSnapToNearestX() + (dx < 0 ? -padding : padding), yPos: checkSnapToNearestY() + (dy < 0 ? -padding : padding) },
-    { xPos: controlX, yPos: controlY },
-    { xPos: checkSnapToNearestX() + dx - draggableCircleDiameter, yPos: checkSnapToNearestY() + dy }
-  ]
-
-  return points
-}
-
 const handleMobileXPosition = (annotation, xScale, config) => {
   if (annotation.snapToNearestPoint) {
     return Number(annotation.dx) + xScale(annotation.xKey) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size)
@@ -73,4 +43,4 @@ const handleTextY = (annotation, yScale, config) => {
   return Number(annotation.y) + Number(annotation.dy) + 16 / 3
 }
 
-export { applyBandScaleOffset, handleConnectionHorizontalType, handleConnectionVerticalType, createPoints, handleMobileXPosition, handleMobileYPosition, handleTextX, handleTextY }
+export { applyBandScaleOffset, handleConnectionHorizontalType, handleConnectionVerticalType, handleMobileXPosition, handleMobileYPosition, handleTextX, handleTextY }

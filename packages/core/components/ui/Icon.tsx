@@ -1,4 +1,3 @@
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import iconCaretUp from '../../assets/icon-caret-up.svg'
@@ -68,7 +67,7 @@ const iconHash = {
   plus: iconPlus,
   minus: iconMinus,
   'filtered-text': iconText,
-  'filter-dropdowns': iconDropdowns,
+  dashboardFilters: iconDropdowns,
   table: iconTable,
   sankey: iconSankey,
   rotateLeft: iconRotateLeft,

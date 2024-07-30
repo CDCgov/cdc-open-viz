@@ -1,4 +1,5 @@
 import { previewTheme } from './coveSbThemes'
+import * as React from 'react'
 
 export const parameters = {
   options: {

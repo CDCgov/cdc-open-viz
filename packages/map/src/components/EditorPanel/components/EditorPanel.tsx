@@ -3055,9 +3055,9 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             </AccordionItemPanel>
           </AccordionItem>
           {state.general.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}
-          {false && state.general.geoType !== 'us-county' && <Panels.Annotate name='Text Annotations' />}
+          {state.general.geoType !== 'us-county' && <Panels.Annotate name='Text Annotations' />}
         </Accordion>
-        <AdvancedEditor loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
+        <AdvancedEditor loadConfig={loadConfig} config={state} convertStateToConfig={convertStateToConfig} />
       </Layout.Sidebar>
     </ErrorBoundary>
   )

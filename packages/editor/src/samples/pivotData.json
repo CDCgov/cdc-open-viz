@@ -1,0 +1,11 @@
+[
+  { "Year": 2019, "Country": "USA", "Rate": 2.5 },
+  { "Year": 2019, "Country": "Canada", "Rate": 3.2 },
+  { "Year": 2019, "Country": "Germany", "Rate": 1.8 },
+  { "Year": 2020, "Country": "USA", "Rate": 2.7 },
+  { "Year": 2020, "Country": "Canada", "Rate": 3.5 },
+  { "Year": 2020, "Country": "Germany", "Rate": 2.1 },
+  { "Year": 2021, "Country": "USA", "Rate": 3.0 },
+  { "Year": 2021, "Country": "Canada", "Rate": 3.8 },
+  { "Year": 2021, "Country": "Germany", "Rate": 2.4 }
+]

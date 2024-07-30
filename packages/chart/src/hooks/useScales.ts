@@ -44,6 +44,10 @@ const useScales = (properties: useScaleProps) => {
   let seriesScale = null
   let xScaleNoPadding = null
   let xScaleBrush = null
+  let xScaleAnnotation = scaleLinear({
+    domain: [0, 100],
+    range: [0, xMax]
+  })
 
   // handle  Horizontal bars
   if (isHorizontal) {
@@ -62,7 +66,12 @@ const useScales = (properties: useScaleProps) => {
     seriesScale = composeScaleBand(seriesDomain, [0, xScale.bandwidth()], 0)
   }
 
-  // handle Area chart
+  // handle Linear scaled viz
+  if (config.xAxis.type === 'date' && !isHorizontal) {
+    const xAxisDataMappedSorted = xAxisDataMapped ? xAxisDataMapped.sort() : []
+    xScale = composeScaleBand(xAxisDataMappedSorted, [0, xMax], 1 - config.barThickness)
+  }
+
   if (config.xAxis.type === 'date-time') {
     let xAxisMin = Math.min(...xAxisDataMapped)
     let xAxisMax = Math.max(...xAxisDataMapped)
@@ -75,15 +84,15 @@ const useScales = (properties: useScaleProps) => {
 
     xScale.type = scaleTypes.TIME
 
-    let minDistance = Number.MAX_VALUE;
+    let minDistance = Number.MAX_VALUE
     let xAxisDataMappedSorted = xAxisDataMapped ? xAxisDataMapped.sort() : []
-    for(let i = 0; i < xAxisDataMappedSorted.length - 1; i++){
-      let distance = xScale(xAxisDataMappedSorted[i + 1]) - xScale(xAxisDataMappedSorted[i]);
+    for (let i = 0; i < xAxisDataMappedSorted.length - 1; i++) {
+      let distance = xScale(xAxisDataMappedSorted[i + 1]) - xScale(xAxisDataMappedSorted[i])
 
-      if(distance < minDistance) minDistance = distance;
+      if (distance < minDistance) minDistance = distance
     }
 
-    if(xAxisDataMapped.length === 1 || minDistance > xMax / 4){
+    if (xAxisDataMapped.length === 1 || minDistance > xMax / 4) {
       minDistance = xMax / 4
     }
 
@@ -246,7 +255,7 @@ const useScales = (properties: useScaleProps) => {
       }
     }
   }
-  return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush }
+  return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush, xScaleAnnotation }
 }
 
 export default useScales
