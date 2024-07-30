@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, memo, useContext } from 'react'
 import { DragDropContext, Droppable } from '@hello-pangea/dnd'
+import chroma from 'chroma-js'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import Layout from '@cdc/core/components/Layout'
@@ -323,6 +324,117 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   )
 }
 
+interface CategoricalAxisProps {
+  config: ChartConfig
+  updateConfig: Function
+  display: boolean
+}
+
+const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig, display }) => {
+  const maxHeight = config?.yAxis?.maxValue
+
+  const totalEnteredHeight = config?.yAxis?.categories?.reduce((sum, obj) => sum + (parseFloat(obj.height) || 0), 0) || 0
+
+  let removeColumn = i => {
+    let categories = []
+
+    if (config.yAxis.categories) {
+      categories = [...config.yAxis.categories]
+    }
+
+    categories.splice(i, 1)
+
+    updateConfig({ ...config, yAxis: { ...config.yAxis, categories } })
+  }
+
+  function getDarkerColor() {
+    const timesDarkened = config.yAxis?.categories?.length
+    const darkeningFactor = 0.4
+    let baseColor = '#ddd'
+    return chroma(baseColor)
+      .darken(darkeningFactor * timesDarkened)
+      .hex()
+  }
+
+  let addColumn = () => {
+    let categories = config.yAxis.categories ? [...config.yAxis.categories] : []
+    const defaultValues = {
+      label: 'Label ' + Number(categories.length + 1),
+      height: '',
+      color: getDarkerColor()
+    }
+    categories.push(defaultValues)
+    updateConfig({ ...config, yAxis: { ...config.yAxis, categories: categories } })
+  }
+
+  let update = (fieldName, value, i) => {
+    let categories = []
+
+    if (config.yAxis.categories) {
+      categories = [...config.yAxis.categories]
+    }
+
+    categories[i][fieldName] = value
+
+    updateConfig({ ...config, yAxis: { ...config.yAxis, categories } })
+  }
+  const lastIndex = config?.yAxis?.categories?.length + 1
+
+  if (!display) {
+    return <></>
+  }
+
+  return (
+    <>
+      {config.yAxis.type === 'categorical' &&
+        config.yAxis.categories?.map(({ label, color, height }, i) => {
+          return (
+            <div key={`preliminaryData-${i}`} className='edit-block'>
+              <p>Axis Category {i + 1}</p>
+              <button
+                type='button'
+                className='remove-column'
+                onClick={event => {
+                  event.preventDefault()
+                  removeColumn(i)
+                }}
+              >
+                Remove
+              </button>
+              <TextField
+                tooltip={
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p> Category Height will be ignored for the last category. The last category will fill the rest of the axis height.</p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                }
+                type='number'
+                value={height}
+                fieldName='height'
+                label='Category Height'
+                updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+              />
+              {Number(totalEnteredHeight) > Number(maxHeight) && config.yAxis.categories.length - 1 === i && <span style={{ color: 'red', display: 'block', fontSize: '15px' }}>Update Max value to show all categories</span>}
+
+              <div className='two-col-inputs'>
+                <TextField value={color} fieldName='color' label='Color' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                <TextField value={label} fieldName='label' label='Label' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+              </div>
+            </div>
+          )
+        })}
+
+      <button type='button' onClick={addColumn} className='btn full-width'>
+        Add Axis Category
+      </button>
+    </>
+  )
+}
+
 const EditorPanel = () => {
   const {
     config,
@@ -394,7 +506,8 @@ const EditorPanel = () => {
     visSupportsRankByValue,
     visSupportsResponsiveTicks,
     visSupportsDateCategoryHeight,
-    visHasDataSuppression
+    visHasDataSuppression,
+    visHasCategoricalAxis
   } = useEditorPermissions()
 
   // when the visualization type changes we
@@ -1194,11 +1307,42 @@ const EditorPanel = () => {
                   )}
                   {config.visualizationType !== 'Pie' && (
                     <>
-                      <TextField value={config.yAxis.label} section='yAxis' fieldName='label' label='Label ' updateField={updateField} />
+                      <label>
+                        <span className='edit-label'>
+                          Axis Type
+                          <Tooltip style={{ textTransform: 'none', display: 'inline-block' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>Select 'Numeric (Linear Scale)' for uniform scaling, 'Numeric (Logarithmic Scale)' for exponential data, or 'Categorical' for discrete categories.</Tooltip.Content>
+                          </Tooltip>
+                        </span>
+                        <select
+                          value={config.yAxis.type}
+                          onChange={e =>
+                            updateConfig({
+                              ...config,
+                              yAxis: {
+                                ...config.yAxis,
+                                type: e.target.value
+                              }
+                            })
+                          }
+                        >
+                          <option value='linear'>Numeric (Linear Scale)</option>
+                          {config.visualizationSubType !== 'stacked' && <option value='logarithmic'>Numeric (Logarithmic Scale)</option>}
+                          {config.orientation !== 'horizontal' && <option value='categorical'>Categorical</option>}
+                        </select>
+                      </label>
+                      <CategoricalAxis config={config} updateConfig={updateConfig} data={data} display={visHasCategoricalAxis()} />
+
+                      <TextField display={!visHasCategoricalAxis()} value={config.yAxis.label} section='yAxis' fieldName='label' label='Label ' updateField={updateField} />
                       {config.runtime.seriesKeys && config.runtime.seriesKeys.length === 1 && !['Box Plot', 'Deviation Bar', 'Forest Plot'].includes(config.visualizationType) && (
                         <CheckBox value={config.isLegendValue} fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />
                       )}
+
                       <TextField
+                        display={!visHasCategoricalAxis()}
                         value={config.yAxis.numTicks}
                         placeholder='Auto'
                         type='number'
@@ -1237,9 +1381,11 @@ const EditorPanel = () => {
                           </Tooltip>
                         }
                       />
-                      <TextField value={config.yAxis.labelOffset} section='yAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />
+                      <TextField display={!visHasCategoricalAxis()} value={config.yAxis.labelOffset} section='yAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />
                       {config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
-                      {(config.orientation === 'vertical' || !config.isResponsiveTicks) && <TextField value={config.yAxis.tickRotation || 0} type='number' min={0} section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
+                      {(config.orientation === 'vertical' || !config.isResponsiveTicks) && (
+                        <TextField display={!visHasCategoricalAxis()} value={config.yAxis.tickRotation || 0} type='number' min={0} section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />
+                      )}
                       {config.isResponsiveTicks && config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && (
                         <TextField
                           value={config.xAxis.maxTickRotation}
@@ -1268,7 +1414,6 @@ const EditorPanel = () => {
                       {visSupportsValueAxisGridLines() && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Show Gridlines' updateField={updateField} />}
                       <CheckBox value={config.yAxis.enablePadding} section='yAxis' fieldName='enablePadding' label='Add Padding to Value Axis Scale' updateField={updateField} />
                       {config.yAxis.enablePadding && <TextField type='number' section='yAxis' fieldName='scalePadding' label='Padding Percentage' className='number-narrow' updateField={updateField} value={config.yAxis.scalePadding} />}
-                      {config.visualizationSubType === 'regular' && config.visualizationType !== 'Forest Plot' && <CheckBox value={config.useLogScale} fieldName='useLogScale' label='use logarithmic scale' updateField={updateField} />}
                     </>
                   )}
                   <span className='divider-heading'>Number Formatting</span>
@@ -1290,6 +1435,7 @@ const EditorPanel = () => {
                     }
                   />
                   <CheckBox
+                    display={!visHasCategoricalAxis()}
                     value={config.dataFormat.abbreviated}
                     section='dataFormat'
                     fieldName='abbreviated'
@@ -1366,9 +1512,9 @@ const EditorPanel = () => {
                   ) : (
                     config.visualizationType !== 'Pie' && (
                       <>
-                        <CheckBox value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />
-                        <CheckBox value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Tick Labels' updateField={updateField} />
-                        <CheckBox value={config.yAxis.hideTicks} section='yAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
+                        <CheckBox display={!visHasCategoricalAxis()} value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />
+                        <CheckBox display={!visHasCategoricalAxis()} value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Tick Labels' updateField={updateField} />
+                        <CheckBox display={!visHasCategoricalAxis()} value={config.yAxis.hideTicks} section='yAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
 
                         <TextField value={config.yAxis.max} section='yAxis' fieldName='max' type='number' label='left axis max value' placeholder='Auto' updateField={updateField} />
                         <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>

@@ -30,8 +30,8 @@ const BarChartStackedVertical = () => {
               barStack.bars.map(bar => {
                 let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                 let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                let barThickness = isDateAxisType ? (seriesScale.range()[1] - seriesScale.range()[0]) : (xMax / barStack.bars.length)
-                if(config.runtime.xAxis.type !==  'date') barThickness = config.barThickness * barThickness
+                let barThickness = isDateAxisType ? seriesScale.range()[1] - seriesScale.range()[0] : xMax / barStack.bars.length
+                if (config.runtime.xAxis.type !== 'date') barThickness = config.barThickness * barThickness
                 // tooltips
                 const rawXValue = bar.bar.data[config.runtime.xAxis.dataKey]
                 const xAxisValue = isDateAxisType ? formatDate(parseDate(rawXValue)) : rawXValue
@@ -52,9 +52,6 @@ const BarChartStackedVertical = () => {
                 return (
                   <Group key={`${barStack.index}--${bar.index}--${orientation}`}>
                     <Group key={`bar-stack-${barStack.index}-${bar.index}`} id={`barStack${barStack.index}-${bar.index}`} className='stack vertical'>
-                      <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barX + barWidth / 2} y={bar.y - 5} fill={'#000'} textAnchor='middle'>
-                        {yAxisValue}
-                      </Text>
                       {createBarElement({
                         config: config,
                         seriesHighlight,

@@ -8,7 +8,6 @@ import { Text } from '@visx/text'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
-
 // CDC Components
 import { AreaChart, AreaChartStacked } from './AreaChart'
 import BarChart from './BarChart'
@@ -23,6 +22,7 @@ import ForestPlot from './ForestPlot'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './../hooks/useIntersectionObserver'
 import Regions from './Regions'
+import CategoricalYAxis from './Axis/Categorical.Axis'
 
 // Helpers
 import { isConvertLineToBarGraph } from '../helpers/isConvertLineToBarGraph'
@@ -76,6 +76,7 @@ const LinearChart = props => {
   const { horizontal: heightHorizontal } = config.heights
   const isHorizontal = orientation === 'horizontal' || config.visualizationType === 'Forest Plot'
   const shouldAbbreviate = true
+  const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   const xLabelOffset = isNaN(parseInt(runtime.xAxis.labelOffset)) ? 0 : parseInt(runtime.xAxis.labelOffset)
   const yLabelOffset = isNaN(parseInt(runtime.yAxis.labelOffset)) ? 0 : parseInt(runtime.yAxis.labelOffset)
   const xAxisSize = isNaN(parseInt(runtime.xAxis.size)) ? 0 : parseInt(runtime.xAxis.size)
@@ -126,7 +127,7 @@ const LinearChart = props => {
   }, [svgRef, config.legend])
 
   const handleLeftTickFormatting = (tick, index) => {
-    if (config.useLogScale && tick === 0.1) {
+    if (isLogarithmicAxis && tick === 0.1) {
       //when logarithmic scale applied change value of first tick
       tick = 0
     }
@@ -140,7 +141,7 @@ const LinearChart = props => {
   }
 
   const handleBottomTickFormatting = tick => {
-    if (config.useLogScale && tick === 0.1) {
+    if (isLogarithmicAxis && tick === 0.1) {
       // when logarithmic scale applied change value FIRST  of  tick
       tick = 0
     }
@@ -233,6 +234,12 @@ const LinearChart = props => {
       }, 500)
     }
   }, [dataRef?.isIntersecting, config.animate])
+
+  useEffect(() => {
+    if (max) {
+      updateConfig({ ...config, yAxis: { ...config.yAxis, maxValue: max } })
+    }
+  }, [max])
 
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
@@ -373,8 +380,8 @@ const LinearChart = props => {
         >
           {!isDraggingAnnotation && <Bar width={width} height={height} fill={'transparent'}></Bar>} {/* Highlighted regions */}
           {/* Y axis */}
-          {!['Spark Line', 'Forest Plot', 'Line'].includes(visualizationType) && (
-            <AxisLeft scale={yScale} tickLength={config.useLogScale ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.label || runtime.yAxis.label} stroke='#333' tickFormat={(tick, i) => handleLeftTickFormatting(tick, i)} numTicks={handleNumTicks()}>
+          {!['Spark Line', 'Forest Plot'].includes(visualizationType) && config.yAxis.type !== 'categorical' && (
+            <AxisLeft scale={yScale} tickLength={isLogarithmicAxis ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.label || runtime.yAxis.label} stroke='#333' tickFormat={(tick, i) => handleLeftTickFormatting(tick, i)} numTicks={handleNumTicks()}>
               {props => {
                 const axisCenter = config.orientation === 'horizontal' ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
                 const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
@@ -390,9 +397,9 @@ const LinearChart = props => {
 
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                          {!runtime.yAxis.hideTicks && <Line key={`${tick.value}--hide-hideTicks`} from={tick.from} to={config.useLogScale ? to : tick.to} stroke={config.yAxis.tickColor} display={orientation === 'horizontal' ? 'none' : 'block'} />}
+                          {!runtime.yAxis.hideTicks && <Line key={`${tick.value}--hide-hideTicks`} from={tick.from} to={isLogarithmicAxis ? to : tick.to} stroke={config.yAxis.tickColor} display={orientation === 'horizontal' ? 'none' : 'block'} />}
 
-                          {runtime.yAxis.gridLines && displayFirstGridLine ? <Line key={`${tick.value}--hide-hideGridLines`} display={(config.useLogScale && showTicks).toString()} from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
+                          {runtime.yAxis.gridLines && displayFirstGridLine ? <Line key={`${tick.value}--hide-hideGridLines`} display={(isLogarithmicAxis && showTicks).toString()} from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
 
                           {orientation === 'horizontal' && visualizationSubType !== 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
                             <Text
@@ -423,8 +430,8 @@ const LinearChart = props => {
 
                           {orientation === 'vertical' && visualizationType !== 'Paired Bar' && !config.yAxis.hideLabel && (
                             <Text
-                              display={config.useLogScale ? showTicks : 'block'}
-                              dx={config.useLogScale ? -6 : 0}
+                              display={isLogarithmicAxis ? showTicks : 'block'}
+                              dx={isLogarithmicAxis ? -6 : 0}
                               x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
                               y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                               angle={-Number(config.yAxis.tickRotation) || 0}
@@ -449,6 +456,7 @@ const LinearChart = props => {
               }}
             </AxisLeft>
           )}
+          {config.yAxis.type === 'categorical' && config.orientation === 'vertical' && <CategoricalYAxis max={max} maxValue={maxValue} height={height} xMax={xMax} yMax={yMax} leftSize={Number(runtime.yAxis.size) - config.yAxis.axisPadding} />}
           {/* Right Axis */}
           {hasRightAxis && (
             <AxisRight scale={yScaleRight} left={Number(width - config.yAxis.rightAxisSize)} label={config.yAxis.rightLabel} tickFormat={tick => formatNumber(tick, 'right')} numTicks={runtime.yAxis.rightNumTicks || undefined} labelOffset={45}>
@@ -569,11 +577,11 @@ const LinearChart = props => {
 
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                          {!config.xAxis.hideTicks && <Line from={tick.from} to={orientation === 'horizontal' && config.useLogScale ? to : tick.to} stroke={config.xAxis.tickColor} strokeWidth={showTick === 'block' && config.useLogScale ? 1.3 : 1} />}
+                          {!config.xAxis.hideTicks && <Line from={tick.from} to={orientation === 'horizontal' && isLogarithmicAxis ? to : tick.to} stroke={config.xAxis.tickColor} strokeWidth={showTick === 'block' && isLogarithmicAxis ? 1.3 : 1} />}
                           {!config.xAxis.hideLabel && (
                             <Text
-                              dy={config.orientation === 'horizontal' && config.useLogScale ? 8 : 0}
-                              display={config.orientation === 'horizontal' && config.useLogScale ? showTick : 'block'}
+                              dy={config.orientation === 'horizontal' && isLogarithmicAxis ? 8 : 0}
+                              display={config.orientation === 'horizontal' && isLogarithmicAxis ? showTick : 'block'}
                               x={tick.to.x}
                               y={tick.to.y}
                               angle={tickRotation}
