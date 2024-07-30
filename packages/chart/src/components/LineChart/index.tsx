@@ -207,7 +207,7 @@ const LineChart = (props: LineChartProps) => {
                   <LinePath
                     curve={allCurves[seriesData[0].lineType]}
                     data={
-                      config.xAxis.type === 'date-time'
+                      config.xAxis.type === 'date-time' || config.xAxis.type === 'date'
                         ? data.sort((d1, d2) => {
                             let x1 = getXAxisData(d1)
                             let x2 = getXAxisData(d2)
@@ -232,16 +232,16 @@ const LineChart = (props: LineChartProps) => {
               )}
 
               {/* circles for preliminaryData data */}
-              {circleData.map((d, i) => {
+              {circleData.map((item, i) => {
                 return (
                   <circle
                     key={i}
-                    cx={xPos(d)}
-                    cy={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey)))}
-                    r={6}
+                    cx={xPos(item.data)}
+                    cy={seriesAxis === 'Right' ? yScaleRight(getYAxisData(item.data, seriesKey)) : yScale(Number(getYAxisData(item.data, seriesKey)))}
+                    r={item.size}
                     strokeWidth={seriesData[0].weight || 2}
                     stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'}
-                    fill='#fff'
+                    fill={item.isFilled ? (colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000') : '#fff'}
                   />
                 )
               })}

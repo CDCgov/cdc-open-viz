@@ -1,5 +1,5 @@
 import { gatherQueryParams } from '@cdc/core/helpers/gatherQueryParams'
-import { APIFilterDropdowns, DropdownOptions } from '../components/Filters'
+import { APIFilterDropdowns, DropdownOptions } from '../components/DashboardFilters'
 import { APIFilter } from '../types/APIFilter'
 import { SharedFilter } from '../types/SharedFilter'
 

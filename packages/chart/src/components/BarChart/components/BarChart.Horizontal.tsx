@@ -13,7 +13,7 @@ import { BarGroup } from '@visx/shape'
 // CDC core components and helpers
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import createBarElement from '@cdc/core/components/createBarElement'
-import { getBarConfig } from '../helpers'
+import { getBarConfig, testZeroValue } from '../helpers'
 
 // Third party libraries
 import chroma from 'chroma-js'
@@ -65,16 +65,17 @@ export const BarChartHorizontal = () => {
                   const defaultBarWidth = Math.abs(xScale(bar.value) - xScale(scaleVal))
                   const isPositiveBar = bar.value >= 0 && isNumber(bar.value)
 
-                  const { barWidthHorizontal: barWidth, isSuppressed, getBarLabel } = getBarConfig({ bar, defaultBarWidth, config, isNumber, getTextWidth, isVertical: false })
+                  const { barWidthHorizontal: barWidth, isSuppressed, getAbsentDataLabel } = getBarConfig({ bar, defaultBarWidth, config, isNumber, getTextWidth, isVertical: false })
                   const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const yAxisValue = formatNumber(bar.value, 'left')
                   const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                   const barPosition = !isPositiveBar ? 'below' : 'above'
-                  const barLabel = getBarLabel(yAxisValue)
+                  const absentDataLabel = getAbsentDataLabel(yAxisValue)
+                  const barDefaultLabel = !config.yAxis.displayNumbersOnBar ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
-                  const textWidth = (getTextWidth as any)(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                  const textWidth = (getTextWidth as any)(barDefaultLabel, `normal ${fontSize[config.fontSize]}px sans-serif`)
                   const textFits = Number(textWidth) < defaultBarWidth - 5
 
                   // control text position
@@ -116,7 +117,8 @@ export const BarChartHorizontal = () => {
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
-                  const displaylollipopShape = isSuppressed ? 'none' : 'block'
+                  const displaylollipopShape = testZeroValue(bar.value) ? 'none' : 'block'
+
                   // update label color
                   if (barColor && labelColor && textFits) {
                     labelColor = getContrastColor('#000', barColor)
@@ -201,14 +203,28 @@ export const BarChartHorizontal = () => {
                             opacity={transparentBar ? 0.5 : 1}
                             y={config.barHeight / 2 + config.barHeight * bar.index}
                             fill={labelColor}
-                            dx={barLabel === 'N/A' ? 20 : textPadding}
+                            dx={textPadding}
                             verticalAnchor='middle'
-                            textAnchor={barLabel === 'N/A' ? 'middle' : textAnchor}
+                            textAnchor={textAnchor}
                           >
-                            {barLabel}
+                            {testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
                         )}
-                        {config.isLollipopChart && displayNumbersOnBar && (
+                        <Text // prettier-ignore
+                          display={displayBar ? 'block' : 'none'}
+                          x={bar.y}
+                          opacity={transparentBar ? 0.5 : 1}
+                          y={config.barHeight / 2 + config.barHeight * bar.index}
+                          fill={labelColor}
+                          dx={absentDataLabel === 'N/A' ? 20 : textPadding}
+                          dy={config.isLollipopChart ? -10 : 0}
+                          verticalAnchor='middle'
+                          textAnchor={absentDataLabel === 'N/A' ? 'middle' : textAnchor}
+                        >
+                          {absentDataLabel}
+                        </Text>
+
+                        {config.isLollipopChart && (
                           <Text // prettier-ignore
                             display={displayBar ? 'block' : 'none'}
                             x={bar.y}
@@ -219,7 +235,7 @@ export const BarChartHorizontal = () => {
                             verticalAnchor='middle'
                             fontWeight={'normal'}
                           >
-                            {barLabel}
+                            {testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
                         )}
                         {isLabelBelowBar && !config.yAxis.hideLabel && (

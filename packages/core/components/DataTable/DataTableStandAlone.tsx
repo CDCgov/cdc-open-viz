@@ -5,6 +5,7 @@ import DataTable from './DataTable'
 import DataTableEditorPanel from './components/DataTableEditorPanel'
 import Filters from '../Filters'
 import { TableConfig } from './types/TableConfig'
+import { filterVizData } from '../../helpers/filterVizData'
 
 type StandAloneProps = {
   visualizationKey: string
@@ -14,34 +15,12 @@ type StandAloneProps = {
   updateConfig?: (Visualization) => void
 }
 
-// filterData is copied from ./packages/chart/src/helpers/filterData.ts
-// consider moving this to a shared location
-const filterData = (filters, data) => {
-  if (!filters) return data
-  const filteredData: any[] = []
-
-  data.forEach(row => {
-    let add = true
-    filters
-      .filter(filter => filter.type !== 'url')
-      .forEach(filter => {
-        if (row[filter.columnName] != filter.active) {
-          add = false
-        }
-      })
-
-    if (add) filteredData.push(row)
-  })
-
-  return filteredData
-}
-
 const DataTableStandAlone: React.FC<StandAloneProps> = ({ visualizationKey, config, updateConfig, viewport, isEditor }) => {
-  const [filteredData, setFilteredData] = useState<Record<string, any>[]>(filterData(config.filters, config.formattedData))
+  const [filteredData, setFilteredData] = useState<Record<string, any>[]>(filterVizData(config.filters, config.formattedData))
 
   useEffect(() => {
     // when using editor changes to filter should update the data
-    setFilteredData(filterData(config.filters, config.formattedData))
+    setFilteredData(filterVizData(config.filters, config?.formattedData?.length > 0 ? config.formattedData : config.data))
   }, [config.filters])
 
   if (isEditor)
@@ -53,7 +32,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({ visualizationKey, conf
 
   return (
     <>
-      <Filters config={config} setConfig={updateConfig} setFilteredData={setFilteredData} filterData={filterData} filteredData={filteredData} excludedData={config.formattedData} />
+      <Filters config={config} setConfig={updateConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={config.formattedData} />
       <DataTable expandDataTable={true} config={config} rawData={config.data} runtimeData={filteredData} tabbingId={visualizationKey} tableTitle={config.table.label} viewport={viewport || 'lg'} />
     </>
   )

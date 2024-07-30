@@ -25,7 +25,7 @@ const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateCo
     })
   }
 
-  const columns = Object.keys(config.originalFormattedData[0] || {})
+  const columns = Object.keys(config.originalFormattedData?.[0] || {})
   return (
     <Accordion allowZeroExpanded={true}>
       <AccordionItem>

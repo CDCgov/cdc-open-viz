@@ -1,14 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useId } from 'react'
 
 // CDC
-import Button from '@cdc/core/components/elements/Button'
-import { getQueryParams, updateQueryString } from '@cdc/core/helpers/queryStringUtils'
+import Button from './elements/Button'
+import { getQueryParams, updateQueryString } from '../helpers/queryStringUtils'
 
 // Third Party
 import PropTypes from 'prop-types'
+import MultiSelect from './MultiSelect'
+import { Visualization } from '../types/Visualization'
+import { MultiSelectFilter, VizFilter } from '../types/VizFilter'
+import { filterVizData } from '../helpers/filterVizData'
+import { addValuesToFilters } from '../helpers/addValuesToFilters'
 
-export const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar']
+export const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar', 'multi-select']
 
 export const filterOrderOptions = [
   {
@@ -57,7 +62,7 @@ export const useFilters = props => {
 
   // Desconstructing: notice, adding more descriptive visualizationConfig name over config
   // visualizationConfig feels more robust for all vis types so that its not confused with config/state/etc.
-  const { config: visualizationConfig, setConfig, filteredData, setFilteredData, excludedData, filterData, getUniqueValues } = props
+  const { config: visualizationConfig, setConfig, filteredData, setFilteredData, excludedData, getUniqueValues } = props
   const { type, data } = visualizationConfig
 
   /**
@@ -127,7 +132,7 @@ export const useFilters = props => {
 
     // If we're on a chart and not using the apply button
     if (hasStandardFilterBehavior.includes(visualizationConfig.type) && visualizationConfig.filterBehavior === 'Filter Change') {
-      setFilteredData(filterData(newFilters, excludedData))
+      setFilteredData(filterVizData(newFilters, excludedData))
     }
   }
 
@@ -155,7 +160,7 @@ export const useFilters = props => {
     }
 
     if (hasStandardFilterBehavior.includes(visualizationConfig.type)) {
-      setFilteredData(filterData(newFilters, excludedData))
+      setFilteredData(filterVizData(newFilters, excludedData))
     }
 
     setShowApplyButton(false)
@@ -169,11 +174,10 @@ export const useFilters = props => {
     let needsQueryUpdate = false
     const queryParams = getQueryParams()
     newFilters.forEach((filter, i) => {
-      if(!filter.values || filter.values.length === 0){
+      if (!filter.values || filter.values.length === 0) {
         filter.values = getUniqueValues(data, filter.columnName)
       }
       newFilters[i].active = handleSorting(filter).values[0]
-
 
       if (filter.setByQueryParameter && queryParams[filter.setByQueryParameter] !== filter.active) {
         queryParams[filter.setByQueryParameter] = filter.active
@@ -190,9 +194,8 @@ export const useFilters = props => {
     if (type === 'map') {
       setFilteredData(newFilters, excludedData)
     } else {
-      setFilteredData(filterData(newFilters, excludedData))
+      setFilteredData(filterVizData(newFilters, excludedData))
     }
-
   }
 
   const filterConstants = {
@@ -217,11 +220,17 @@ export const useFilters = props => {
   }
 }
 
-const Filters = props => {
-  const { config: visualizationConfig, filteredData, dimensions, getUniqueValues } = props
-  const { filters, type, general, theme, filterBehavior, data } = visualizationConfig
+type FilterProps = {
+  filteredData
+  dimensions
+  config: Visualization
+}
+
+const Filters = (props: FilterProps) => {
+  const { config: visualizationConfig, filteredData, dimensions } = props
+  const { filters, type, general, theme, filterBehavior } = visualizationConfig
   const [mobileFilterStyle, setMobileFilterStyle] = useState(false)
-  const [selectedFilter, setSelectedFilter] = useState('')
+  const [selectedFilter, setSelectedFilter] = useState<EventTarget>(null)
   const id = useId()
 
   // useFilters hook provides data and logic for handling various filter functions
@@ -247,7 +256,7 @@ const Filters = props => {
 
   useEffect(() => {
     if (selectedFilter) {
-      let el = document.getElementById(selectedFilter.id)
+      const el = document.getElementById(selectedFilter.id)
       if (el) el.focus()
     }
   }, [changeFilterActive, selectedFilter])
@@ -256,21 +265,21 @@ const Filters = props => {
 
   const filterSectionClassList = ['filters-section', type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme]
   // Exterior Section Wrapper
-  Filters.Section = props => {
+  Filters.Section = ({ children }) => {
     return (
       visualizationConfig?.filters && (
         <section className={filterSectionClassList.join(' ')}>
           <p className='filters-section__intro-text'>
             {filters?.some(f => f.active) ? filterConstants.introText : ''} {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
           </p>
-          <div className='filters-section__wrapper'>{props.children}</div>
+          <div className='filters-section__wrapper'>{children}</div>
         </section>
       )
     )
   }
 
   // Apply/Reset Buttons
-  Filters.ApplyBehavior = props => {
+  Filters.ApplyBehavior = () => {
     if (filterBehavior !== 'Apply Button') return
     const applyButtonClasses = [general?.headerColor ? general.headerColor : theme, 'apply']
     return (
@@ -348,7 +357,7 @@ const Filters = props => {
       // Remove fromHash if it exists on filters to loop so we can loop nicely
       delete filtersToLoop.fromHash
 
-      return filtersToLoop.map((singleFilter, outerIndex) => {
+      return addValuesToFilters<VizFilter>(filtersToLoop, visualizationConfig.data).map((singleFilter: VizFilter, outerIndex) => {
         if (singleFilter.showDropdown === false) return
 
         const values = []
@@ -356,11 +365,11 @@ const Filters = props => {
         const tabValues = []
         const tabBarValues = []
 
-        const { active, queuedActive, label, filterStyle } = singleFilter
+        const { active, queuedActive, label, filterStyle } = singleFilter as VizFilter
 
         handleSorting(singleFilter)
 
-        singleFilter.values.forEach((filterOption, index) => {
+        singleFilter.values?.forEach((filterOption, index) => {
           const pillClassList = ['pill', active === filterOption ? 'pill--active' : null, theme && theme]
           const tabClassList = ['tab', active === filterOption && 'tab--active', theme && theme]
 
@@ -424,6 +433,15 @@ const Filters = props => {
               {filterStyle === 'pill' && !mobileFilterStyle && <Filters.Pills pills={pillValues} />}
               {filterStyle === 'tab bar' && !mobileFilterStyle && <Filters.TabBar filter={singleFilter} index={outerIndex} />}
               {(filterStyle === 'dropdown' || mobileFilterStyle) && <Filters.Dropdown filter={singleFilter} index={outerIndex} label={label} active={queuedActive || active} filters={values} />}
+              {filterStyle === 'multi-select' && (
+                <MultiSelect
+                  options={singleFilter.values.map(v => ({ value: v, label: v }))}
+                  fieldName={outerIndex}
+                  updateField={(_section, _subSection, fieldName, value) => changeFilterActive(fieldName, value)}
+                  selected={singleFilter.active as string[]}
+                  limit={(singleFilter as MultiSelectFilter).selectLimit || 5}
+                />
+              )}
             </>
           </div>
         )
@@ -453,8 +471,6 @@ Filters.propTypes = {
   setConfig: PropTypes.func,
   // exclusions
   excludedData: PropTypes.array,
-  // function for filtering the data
-  filterData: PropTypes.func,
   dimensions: PropTypes.array
 }
 

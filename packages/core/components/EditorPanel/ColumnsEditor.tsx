@@ -1,4 +1,3 @@
-import { AccordionItem, AccordionItemButton, AccordionItemHeading, AccordionItemPanel } from 'react-accessible-accordion'
 import Tooltip from '../ui/Tooltip'
 import Icon from '../ui/Icon'
 import { TextField } from './Inputs'
@@ -7,6 +6,7 @@ import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import { Column } from '../../types/Column'
 import _ from 'lodash'
 import React, { useState } from 'react'
+import FieldSetWrapper from './FieldSetWrapper'
 
 interface ColumnsEditorProps {
   config: Partial<Visualization>
@@ -18,10 +18,6 @@ type OpenControls = [Record<string, boolean>, Function] // useState type
 
 const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenControls }> = ({ config, deleteColumn, updateField, colKey, controls }) => {
   const [openControls, setOpenControls] = controls
-  const show = openControls[colKey]
-  const setShow = (key, value) => {
-    setOpenControls({ ...openControls, [key]: value })
-  }
 
   const editColumn = (key, value) => {
     if (key === 'dataTable' && value === true) {
@@ -66,31 +62,8 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
 
   const colName = config.columns[colKey]?.name
 
-  if (!show)
-    return (
-      <div className='mb-1'>
-        <button onClick={() => setShow(colKey, true)}>
-          <Icon display='caretDown' />
-        </button>
-        <span> {colName ? `${colName}` : 'New Column'}</span>
-      </div>
-    )
   return (
-    <fieldset className='edit-block mb-1' key={colKey}>
-      <div className='d-flex justify-content-between'>
-        <button onClick={() => setShow(colKey, false)}>
-          <Icon display='caretUp' />
-        </button>
-        <button
-          className='btn btn-danger btn-sm'
-          onClick={event => {
-            event.preventDefault()
-            deleteColumn(colKey)
-          }}
-        >
-          Remove
-        </button>
-      </div>
+    <FieldSetWrapper fieldName={colName} fieldKey={colKey} fieldType='Column' controls={controls} deleteField={() => deleteColumn(colKey)}>
       <label>
         <span className='edit-label column-heading'>Column</span>
         <select
@@ -231,7 +204,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
         <span className='edit-label column-heading'>Order</span>
         <input onWheel={e => e.currentTarget.blur()} type='number' min='1' value={config.columns[colKey].order} onChange={e => updateField('columns', colKey, 'order', parseInt(e.target.value))} />
       </label>
-    </fieldset>
+    </FieldSetWrapper>
   )
 }
 

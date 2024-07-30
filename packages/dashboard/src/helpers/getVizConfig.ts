@@ -3,6 +3,7 @@ import { MultiDashboardConfig } from '../types/MultiDashboard'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { getApplicableFilters } from './getFilteredData'
 import { filterData } from './filterData'
+import Footnotes from '@cdc/core/types/Footnotes'
 
 const transform = new DataTransform()
 
@@ -16,11 +17,11 @@ export const getFootnotesVizConfig = (vizKey: string, rowNumber: number, config:
     visualizationConfig.formattedData = filterData(filters, data)
   }
   visualizationConfig.data = data
-  return visualizationConfig
+  return visualizationConfig as Footnotes
 }
 
 export const getVizConfig = (visualizationKey: string, rowNumber: number, config: MultiDashboardConfig, data: Object, filteredData?: Object) => {
-  if(rowNumber === undefined) return {}
+  if (rowNumber === undefined) return {}
   const visualizationConfig = _.cloneDeep(config.visualizations[visualizationKey])
   const rowData = config.rows[rowNumber]
   if (rowData.footnotesId && rowData.footnotesId === visualizationKey) {
@@ -36,13 +37,13 @@ export const getVizConfig = (visualizationKey: string, rowNumber: number, config
   const filteredVizData = filteredData?.[rowNumber] ?? filteredData?.[visualizationKey]
 
   if (filteredVizData) {
-    visualizationConfig.data = filteredVizData
+    visualizationConfig.data = filteredVizData || []
     if (visualizationConfig.formattedData) {
       visualizationConfig.formattedData = visualizationConfig.data
     }
   } else {
     const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
-    visualizationConfig.data = data[dataKey]
+    visualizationConfig.data = data[dataKey] || []
     if (visualizationConfig.formattedData) {
       visualizationConfig.formattedData = transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) || visualizationConfig.data
     }

@@ -1,9 +1,8 @@
 import _ from 'lodash'
-import { DashboardConfig } from '../types/DashboardConfig'
-import { getAutoLoadVisualization } from './getAutoLoadVisualization'
 import { FilterBehavior } from '../components/Header/Header'
 import { getQueryParams, updateQueryString } from '@cdc/core/helpers/queryStringUtils'
 import { SharedFilter } from '../types/SharedFilter'
+import { DashboardFilters } from '../types/DashboardFilters'
 
 const handleChildren = (sharedFilters: SharedFilter[], parentIndex: number) => {
   const parentKey = sharedFilters[parentIndex].key
@@ -13,23 +12,19 @@ const handleChildren = (sharedFilters: SharedFilter[], parentIndex: number) => {
   }
 }
 
-export const changeFilterActive = (index: number, value: string | string[], config: DashboardConfig): SharedFilter[] => {
-  const sharedFilters = _.cloneDeep(config.dashboard.sharedFilters)
-  const filterActive = sharedFilters[index]
-  const nonAutoLoadFilterIndexes = getAutoLoadVisualization(config.visualizations)?.hide
-  const isAutoLoad = nonAutoLoadFilterIndexes && !nonAutoLoadFilterIndexes.includes(index)
-
-  if (config.filterBehavior !== FilterBehavior.Apply || isAutoLoad) {
-    sharedFilters[index].active = value
-    handleChildren(sharedFilters, index)
+export const changeFilterActive = (filterIndex: number, value: string | string[], sharedFilters: SharedFilter[], vizConfig: DashboardFilters): SharedFilter[] => {
+  const sharedFiltersCopy = _.cloneDeep(sharedFilters)
+  const currentFilter = sharedFilters[filterIndex]
+  if (vizConfig.filterBehavior !== FilterBehavior.Apply || vizConfig.autoLoad) {
+    sharedFiltersCopy[filterIndex].active = value
+    handleChildren(sharedFiltersCopy, filterIndex)
     const queryParams = getQueryParams()
-    if (filterActive.setByQueryParameter && queryParams[filterActive.setByQueryParameter] !== filterActive.active) {
-      queryParams[filterActive.setByQueryParameter] = filterActive.active
+    if (currentFilter.setByQueryParameter && queryParams[currentFilter.setByQueryParameter] !== currentFilter.active) {
+      queryParams[currentFilter.setByQueryParameter] = currentFilter.active
       updateQueryString(queryParams)
     }
   } else {
-    if (Array.isArray(value)) throw Error(`Cannot set active values on urlfilters. expected: ${JSON.stringify(value)} to be a single value.`)
-    sharedFilters[index].queuedActive = value
+    sharedFiltersCopy[filterIndex].queuedActive = value
   }
-  return sharedFilters
+  return sharedFiltersCopy
 }

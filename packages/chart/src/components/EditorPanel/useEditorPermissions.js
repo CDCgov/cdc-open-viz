@@ -77,8 +77,7 @@ export const useEditorPermissions = () => {
   }
 
   const visHasaAdditionalLabelsOnBars = () => {
-    if (config.visualizationType === 'Bar' && config.visualizationSubType === 'stacked') return false
-    if (['Bar', 'Combo'].includes(config.visualizationType)) return true
+    if (['Bar', 'Combo', 'Line'].includes(config.visualizationType)) return true
     return false
   }
 
@@ -109,7 +108,7 @@ export const useEditorPermissions = () => {
   }
 
   const visHasBarBorders = () => {
-    const disabledCharts = ['Box Plot', 'Scatter Plot', 'Pie']
+    const disabledCharts = ['Box Plot', 'Scatter Plot', 'Pie', 'Line']
     if (disabledCharts.includes(visualizationType)) return false
     return series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar' || series.type === 'Deviation Bar')
   }
@@ -317,6 +316,16 @@ export const useEditorPermissions = () => {
     return false
   }
 
+  const visHasSingleSeriesTooltip = () => {
+    if (visualizationType === 'Bar' || visualizationType === 'Line') {
+      return true
+    }
+    if (visualizationType === 'Area Chart' && visualizationSubType === 'stacked') {
+      return true
+    }
+    return false
+  }
+
   return {
     enabledChartTypes,
     headerColors,
@@ -362,6 +371,7 @@ export const useEditorPermissions = () => {
     visSupportsValueAxisTicks,
     visSupportsReactTooltip,
     visSupportsValueAxisMax,
-    visSupportsValueAxisMin
+    visSupportsValueAxisMin,
+    visHasSingleSeriesTooltip
   }
 }

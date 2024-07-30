@@ -105,17 +105,17 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
   }
 
   const deleteRow = () => {
-    let newVisualizations = {...config.visualizations}
+    let newVisualizations = { ...config.visualizations }
 
     //delete the instantiated widgets
-    if(rows[rowIdx] && rows[rowIdx].columns && rows[rowIdx].columns.length && config.visualizations) {
+    if (rows[rowIdx] && rows[rowIdx].columns && rows[rowIdx].columns.length && config.visualizations) {
       rows[rowIdx].columns.forEach(column => {
-        if(column.widget){
+        if (column.widget) {
           delete newVisualizations[column.widget]
         }
       })
     }
-    
+
     rows.splice(rowIdx, 1) // delete the row
 
     updateConfig({ ...config, rows, visualizations: newVisualizations })
