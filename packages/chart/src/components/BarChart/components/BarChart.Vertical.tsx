@@ -125,7 +125,7 @@ export const BarChartVertical = () => {
                   const { barHeight, isSuppressed, getBarY, getAbsentDataLabel } = getBarConfig({ bar, defaultBarHeight, config, isNumber, getTextWidth, barWidth, isVertical: true, yAxisValue })
 
                   const absentDataLabel = getAbsentDataLabel(yAxisValue)
-                  const barDefaultLabel = !config.labels ? '' : yAxisValue
+                  const barDefaultLabel = isSuppressed || !config.labels ? '' : yAxisValue
                   const barY = getBarY(defaultBarY, yScale(scaleVal))
                   const displaylollipopShape = testZeroValue(bar.value) ? 'none' : 'block'
                   const getBarBackgroundColor = (barColor: string, filteredOutColor?: string): string => {

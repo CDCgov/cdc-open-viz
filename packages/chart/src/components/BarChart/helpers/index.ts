@@ -94,6 +94,9 @@ export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, i
 }
 
 export const testZeroValue = value => {
+  if (value === undefined || value === null) {
+    return
+  }
   const regex = /^0(\.0)?$/
   return regex.test(value.toString())
 }

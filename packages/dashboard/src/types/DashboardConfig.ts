@@ -4,7 +4,6 @@ import { DataSet } from './DataSet'
 import { ConfigRow } from './ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { Table } from '@cdc/core/types/Table'
-import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 import { Dashboard } from './Dashboard'
 
 export type DashboardConfig = DataSet & {
@@ -16,7 +15,6 @@ export type DashboardConfig = DataSet & {
   dataFileName: string
   table: Table
   rows: ConfigRow[]
-  filterBehavior: FilterBehavior
   runtime: Runtime
   downloadImageButton: boolean
   downloadPdfButton: boolean

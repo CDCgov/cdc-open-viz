@@ -20,4 +20,11 @@ describe('testZeroValue', () => {
   test('returns false for 999 as number', () => {
     expect(testZeroValue(999)).toBe(false)
   })
+  // test for null & undefined cases
+  test('returns undefined for a null', () => {
+    expect(testZeroValue(null)).toBe(undefined)
+  })
+  test('returns undefined for a undefined', () => {
+    expect(testZeroValue(undefined)).toBe(undefined)
+  })
 })
