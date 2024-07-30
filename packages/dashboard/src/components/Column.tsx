@@ -40,7 +40,7 @@ const Column = ({ data, rowIdx, colIdx }) => {
   return (
     <div className={classNames.join(' ')} ref={drop}>
       {widget ? (
-        <Widget data={{ rowIdx, colIdx, ...widget }} type={widget.visualizationType ?? widget.general?.geoType} />
+        <Widget widgetConfig={{ rowIdx, colIdx, ...widget }} type={widget.visualizationType ?? widget.general?.geoType} />
       ) : (
         <p className='builder-column__text'>
           Drag and drop <br /> visualization

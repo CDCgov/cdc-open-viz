@@ -29,6 +29,9 @@ export interface PreliminaryDataItem {
   symbol: string
   type: 'effect' | 'suppression'
   value: string
+  hideBarSymbol: boolean
+  hideLineStyle: boolean
+  circleSize: number
 }
 
 export interface DataItem {

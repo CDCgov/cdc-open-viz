@@ -7,15 +7,6 @@ $red: #f74242;
   margin-left: calc($editorWidth + 1em);
 }
 
-.visualizations-panel {
-  background-color: #fff;
-  padding: 1em;
-  width: $editorWidth;
-  border-right: #c7c7c7 1px solid;
-  z-index: 1;
-  overflow-y: scroll;
-}
-
 .hidden.editor-panel + .builder-grid {
   margin-left: 0 !important;
 }
@@ -30,30 +21,16 @@ $red: #f74242;
   padding: 5em 3em 3em;
 }
 
-.column-container {
-  display: flex;
-  flex-flow: row;
-  width: 100%;
-  position: relative;
-  padding: 2em 1em 1em;
-  border: 1px solid #c2c2c2;
-  transition: border 300ms cubic-bezier(0.16, 1, 0.3, 1);
-  background-color: #f2f2f2;
-  user-select: none;
-
-  &.can-drop {
-    border-color: $blue-light;
-  }
-}
-
 .row-menu {
   display: flex;
   align-items: flex-start;
   transition: opacity 300ms cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
-  position: relative;
+  position: absolute;
   z-index: 1;
-  bottom: -1px;
+  top: -27px;
+  width: 100%;
+  left: 0;
 
   > li:not(.spacer) + li:not(.spacer) {
     margin-left: 0.3em;
@@ -337,6 +314,35 @@ $red: #f74242;
     top: 0;
   }
 
+  .footnotes {
+    margin: 0.5rem;
+    margin-bottom: 0;
+    width: calc(100% - 1rem);
+    border: 1px solid #c2c2c2;
+    transition: background-color 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    background-color: #c2c2c2;
+    &:hover {
+      border-color: $blue;
+      background-color: $blue;
+    }
+  }
+  
+  padding: 2em 1em 1em;
+  border: 1px solid #c2c2c2;
+  transition: border 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: #f2f2f2;
+  user-select: none;
+
+  &.can-drop {
+    border-color: $blue-light;
+  }
+
+  .column-container {
+    display: flex;
+    flex-flow: row;
+    width: 100%;
+  }
+
   .widget__content {
     padding: 0 2em;
 
@@ -369,5 +375,6 @@ $red: #f74242;
     .column-container {
       border-color: $blue;
     }
+    border-color: $blue;
   }
 }

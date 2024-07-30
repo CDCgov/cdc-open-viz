@@ -17,9 +17,14 @@
   padding: 0px 1em;
   display: flex;
   justify-content: flex-end;
-
+  &.brush-active {
+    margin-top: 2em;
+  }
   a:not(:last-child) {
     margin-right: 10px;
+  }
+  & a {
+    font-size: 16px;
   }
 }
 

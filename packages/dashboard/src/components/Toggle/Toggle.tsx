@@ -1,7 +1,5 @@
-import { useContext } from 'react'
-import { DashboardDispatchContext } from '../../DashboardContext'
 import { ConfigRow } from '../../types/ConfigRow'
-import { Visualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { getIcon } from '../../helpers/iconHash'
 import './toggle-style.css'
 import _ from 'lodash'
@@ -9,7 +7,7 @@ import _ from 'lodash'
 type ToggleProps = {
   active: number
   row: ConfigRow
-  visualizations: Record<string, Visualization>
+  visualizations: Record<string, AnyVisualization>
   setToggled: (colIndex: number) => void
 }
 const Toggle: React.FC<ToggleProps> = ({ active, row, visualizations, setToggled }) => {

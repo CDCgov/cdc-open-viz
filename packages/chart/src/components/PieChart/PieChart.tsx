@@ -33,7 +33,7 @@ type TooltipData = {
 }
 
 const PieChart = props => {
-  const { transformedData: data, config, colorScale, currentViewport, dimensions, highlight, highlightReset, seriesHighlight } = useContext(ConfigContext)
+  const { transformedData: data, config, colorScale, currentViewport, dimensions, highlight, highlightReset, seriesHighlight, isDraggingAnnotation } = useContext(ConfigContext)
   const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip<TooltipData>()
   const { handleTooltipMouseOver, handleTooltipMouseOff, TooltipListItem } = useCoveTooltip({
     xScale: false,
@@ -208,8 +208,8 @@ const PieChart = props => {
   return (
     <>
       <ErrorBoundary component='PieChart'>
-        <svg width={width} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
-          <Group top={centerY} left={centerX}>
+        <svg width={radius * 2} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
+          <Group top={centerY} left={radius}>
             {/* prettier-ignore */}
             <Pie
             data={filteredData || _data}
@@ -223,7 +223,7 @@ const PieChart = props => {
           </Group>
         </svg>
         <div ref={triggerRef} />
-        {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
+        {!isDraggingAnnotation && tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
           <>
             <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100}) !important`}</style>
             <TooltipWithBounds key={Math.random()} className={'tooltip cdc-open-viz-module'} left={tooltipLeft} top={tooltipTop}>

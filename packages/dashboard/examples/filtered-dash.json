@@ -8,15 +8,9 @@
         "columnName": "Year",
         "showDropdown": true,
         "setBy": "chart1699383531543",
-        "usedBy": [
-          "map1699383540561"
-        ],
+        "usedBy": ["map1699383540561"],
         "resetLabel": "Reset",
-        "values": [
-          "2019",
-          "2020",
-          "2021"
-        ],
+        "values": ["2019", "2020", "2021"],
         "active": "2021",
         "tier": 1
       }
@@ -359,11 +353,7 @@
           "order": "asc"
         },
         {
-          "values": [
-            "Federal",
-            "Local",
-            "State"
-          ],
+          "values": ["Federal", "Local", "State"],
           "active": "Federal",
           "filterStyle": "dropdown",
           "columnName": "Type",
@@ -3614,10 +3604,7 @@
         "showBubbleZeros": false
       },
       "mapPosition": {
-        "coordinates": [
-          0,
-          30
-        ],
+        "coordinates": [0, 30],
         "zoom": 1
       },
       "map": {
@@ -9921,9 +9908,7 @@
       ]
     },
     "runtime": {
-      "editorErrorMessage": [
-        "No data"
-      ]
+      "editorErrorMessage": ["No data"]
     }
   },
   "table": {

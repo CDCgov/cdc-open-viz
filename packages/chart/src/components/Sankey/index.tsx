@@ -13,13 +13,16 @@ import 'react-tooltip/dist/react-tooltip.css'
 import ConfigContext from '@cdc/chart/src/ConfigContext'
 import { ChartContext } from '../../types/ChartContext'
 import type { SankeyNode, SankeyProps } from './types'
+import { SankeyChartConfig, AllChartsConfig } from '../../types/ChartConfig'
 
 const Sankey = ({ width, height, runtime }: SankeyProps) => {
-  const DEBUG = true
   const { config } = useContext<ChartContext>(ConfigContext)
   const { sankey: sankeyConfig } = config
-  // !info - changed config.sankey.data here to work with our current upload pattern saved on config.data
-  const data = config?.data[0]
+
+  const isSankeyChartConfig = (config: AllChartsConfig | SankeyChartConfig): config is SankeyChartConfig => {
+    return config.visualizationType === 'Sankey'
+  }
+
   const [largestGroupWidth, setLargestGroupWidth] = useState(0)
   const groupRefs = useRef([])
 
@@ -59,6 +62,9 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
     })
     setLargestGroupWidth(largest)
   }, [groupRefs, sankeyConfig, window.innerWidth])
+
+  if (!isSankeyChartConfig(config)) return
+  const data = config?.data[0]
 
   //Retrieve all the unique values for the Nodes
   const uniqueNodes = Array.from(new Set(data?.links?.flatMap(link => [link.source, link.target])))
@@ -109,6 +115,8 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
   }
 
   const activeConnection = (id: String) => {
+    if (!sankeyData?.nodes) return { sourceNodes: [], activeLinks: [] }
+
     const currentNode = sankeyData.nodes.find(node => node.id === id)
 
     const sourceNodes = []
@@ -137,12 +145,12 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
     return { sourceNodes, activeLinks }
   }
 
-  const tooltipVal = `${(data?.tooltips.find(item => item.node === tooltipID) || {}).value}`
-  const tooltipSummary = `${(data?.tooltips.find(item => item.node === tooltipID) || {}).summary}`
-  const tooltipColumn1Label = (data?.tooltips.find(item => item.node === tooltipID) || {}).column1Label
-  const tooltipColumn2Label = (data?.tooltips.find(item => item.node === tooltipID) || {}).column2Label
-  const tooltipColumn1 = (data?.tooltips.find(item => item.node === tooltipID) || {}).column1
-  const tooltipColumn2 = (data?.tooltips.find(item => item.node === tooltipID) || {}).column2
+  const tooltipVal = `${(data?.tooltips?.find(item => item.node === tooltipID) || {}).value}`
+  const tooltipSummary = `${(data?.tooltips?.find(item => item.node === tooltipID) || {}).summary}`
+  const tooltipColumn1Label = (data?.tooltips?.find(item => item.node === tooltipID) || {}).column1Label
+  const tooltipColumn2Label = (data?.tooltips?.find(item => item.node === tooltipID) || {}).column2Label
+  const tooltipColumn1 = (data?.tooltips?.find(item => item.node === tooltipID) || {}).column1
+  const tooltipColumn2 = (data?.tooltips?.find(item => item.node === tooltipID) || {}).column2
 
   const ColumnList = ({ columnData }) => {
     return (
@@ -229,12 +237,27 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               */
               fill={sankeyConfig.nodeFontColor}
               fontWeight='bold' // font weight
-              style={{ pointerEvents: 'none' }}
               className='node-text'
+              style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
+              onClick={() => handleNodeClick(node.id)}
+              data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
+              data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
             >
               {(data?.storyNodeText?.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}
             </Text>
-            <Text verticalAnchor='end' className={classStyle} x={node.x0! + textPositionHorizontal} y={(node.y1! + node.y0! + 25) / 2} fill={sankeyConfig.storyNodeFontColor || sankeyConfig.nodeFontColor} fontWeight='bold' textAnchor='start' style={{ pointerEvents: 'none' }}>
+            <Text
+              verticalAnchor='end'
+              className={classStyle}
+              x={node.x0! + textPositionHorizontal}
+              y={(node.y1! + node.y0! + 25) / 2}
+              fill={sankeyConfig.storyNodeFontColor || sankeyConfig.nodeFontColor}
+              fontWeight='bold'
+              textAnchor='start'
+              style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
+              onClick={() => handleNodeClick(node.id)}
+              data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
+              data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
+            >
               {typeof node.value === 'number' ? node.value.toLocaleString() : node.value}
             </Text>
             <Text
@@ -244,20 +267,32 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               fill={sankeyConfig.nodeFontColor}
               fontWeight='bold'
               textAnchor={sankeyData.nodes.length === i ? 'end' : 'start'}
-              style={{ pointerEvents: 'none' }}
               className='node-text'
               verticalAnchor='end'
+              style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
+              onClick={() => handleNodeClick(node.id)}
+              data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
+              data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
             >
               {(data?.storyNodeText?.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextAfter}
             </Text>
           </>
         ) : (
           <>
-            <text x={node.x0! + textPositionHorizontal} y={(node.y1! + node.y0!) / 2 + textPositionVertical} dominantBaseline='text-before-edge' fill={sankeyConfig.nodeFontColor} fontWeight='bold' textAnchor='start' style={{ pointerEvents: 'none' }}>
-              <tspan id={node.id} className='node-id'>
-                {node.id}
-              </tspan>
-            </text>
+            <Text
+              style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
+              onClick={() => handleNodeClick(node.id)}
+              data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
+              data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
+              x={node.x0! + textPositionHorizontal}
+              y={(node.y1! + node.y0!) / 2 + textPositionVertical}
+              dominantBaseline='text-before-edge'
+              fill={sankeyConfig.nodeFontColor}
+              fontWeight='bold'
+              textAnchor='start'
+            >
+              {node.id}
+            </Text>
             <text
               x={node.x0! + textPositionHorizontal}
               /* adding 30 allows the node value to be on the next line underneath the node id */
@@ -267,7 +302,10 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               //fontSize={16}
               fontWeight='bold'
               textAnchor='start'
-              style={{ pointerEvents: 'none' }}
+              style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
+              onClick={() => handleNodeClick(node.id)}
+              data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
+              data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
             >
               <tspan className={classStyle}>{sankeyConfig.nodeValueStyle.textBefore + (typeof node.value === 'number' ? node.value.toLocaleString() : node.value) + sankeyConfig.nodeValueStyle.textAfter}</tspan>
             </text>
@@ -291,7 +329,20 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
       opacityValue = sankeyConfig.opacity.LinkOpacityInactive
     }
 
-    return <path key={i} d={path!} stroke={strokeColor} fill='none' strokeOpacity={opacityValue} strokeWidth={link.width! + 2} />
+    return (
+      <path
+        key={i}
+        d={path!}
+        stroke={strokeColor}
+        fill='none'
+        strokeOpacity={opacityValue}
+        strokeWidth={link.width! + 2}
+        style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
+        onClick={() => handleNodeClick(link.target.id || null)}
+        data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
+        data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
+      />
+    )
   })
 
   // max depth - calculates how many nodes deep the chart goes.
@@ -393,7 +444,9 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               textAnchor='start'
               style={{ pointerEvents: 'none' }}
             >
-              <tspan className={classStyle}>{sankeyConfig.nodeValueStyle.textBefore + (typeof node.value === 'number' ? node.value.toLocaleString() : node.value) + sankeyConfig.nodeValueStyle.textAfter}</tspan>
+              <tspan onClick={() => handleNodeClick(node.id)} className={classStyle}>
+                {sankeyConfig.nodeValueStyle.textBefore + (typeof node.value === 'number' ? node.value.toLocaleString() : node.value) + sankeyConfig.nodeValueStyle.textAfter}
+              </tspan>
             </text>
           </>
         )}

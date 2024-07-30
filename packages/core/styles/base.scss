@@ -77,6 +77,10 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
   @import 'series-list';
   @import 'typography';
 
+  input[type='range'] {
+    appearance: auto !important;
+  }
+
   // Force printing chart images
   -webkit-print-color-adjust: exact !important; /* Chrome, Safari 6 – 15.3, Edge */
   color-adjust: exact !important; /* Firefox 48 – 96 */

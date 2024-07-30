@@ -1,1 +1,5 @@
 $editorWidth: 350px;
+
+:root {
+  --editorWidth: #{$editorWidth};
+}

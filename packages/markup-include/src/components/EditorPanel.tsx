@@ -187,7 +187,7 @@ const EditorPanel: React.FC = () => {
     </Accordion>
   )
 
-  if (loading) return null
+  if (loading && !config?.showEditorPanel) return null
 
   return (
     <ErrorBoundary component='EditorPanel'>

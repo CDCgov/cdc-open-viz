@@ -51,9 +51,6 @@
     overflow-y: scroll;
     min-width: 200px;
     z-index: 4;
-    &.hide {
-      display: none;
-    }
 
     :is(li) {
       cursor: pointer;

@@ -1,18 +1,32 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../ConfigContext'
 import { Group } from '@visx/group'
+import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 
-const ScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
-  const { colorScale, transformedData: data, config, formatNumber, seriesHighlight, colorPalettes } = useContext(ConfigContext)
+const ScatterPlot = ({ xScale, yScale }) => {
+  const { transformedData: data, config, tableData, formatNumber, seriesHighlight, colorPalettes } = useContext(ConfigContext)
 
   // TODO: copied from line chart should probably be a constant somewhere.
-  let circleRadii = 4.5
+  const circleRadii = 4.5
   const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
-
-  const handleTooltip = (item, s) => `<div>
+  // tooltips for additional columns
+  const additionalColumns = Object.entries(config.columns)
+    .filter(([_, value]) => value.tooltips)
+    .map(([_, value]) => [
+      value.label || value.name,
+      value.name,
+      {
+        addColPrefix: value.prefix,
+        addColSuffix: value.suffix,
+        addColRoundTo: value.roundToPlace,
+        addColCommas: value.commas
+      }
+    ])
+  const handleTooltip = (item, s, dataIndex) => `<div>
     ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[s] || ''}<br/>` : ''}
     ${config.xAxis.label}: ${formatNumber(item[config.xAxis.dataKey], 'bottom')} <br/>
-    ${config.yAxis.label}: ${formatNumber(item[s], 'left')}
+    ${config.yAxis.label}: ${formatNumber(item[s], 'left')}<br/>
+   ${additionalColumns.map(([label, name, options]) => `${label} : ${formatColNumber(tableData[dataIndex][name], 'left', false, config, options)}<br/>`).join('')}
 </div>`
 
   return (
@@ -37,9 +51,9 @@ const ScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
               cx={xScale(item[config.xAxis.dataKey])}
               cy={yScale(item[s])}
               fill={displayArea ? seriesColor : 'transparent'}
-              fillOpacity={transparentArea ? .25 : 1}
+              fillOpacity={transparentArea ? 0.25 : 1}
               style={pointStyles}
-              data-tooltip-html={handleTooltip(item, s)}
+              data-tooltip-html={handleTooltip(item, s, dataIndex)}
               data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
               tabIndex={-1}
             />
