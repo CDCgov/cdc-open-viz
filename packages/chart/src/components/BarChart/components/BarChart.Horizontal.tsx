@@ -13,6 +13,7 @@ import { BarGroup } from '@visx/shape'
 // CDC core components and helpers
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import createBarElement from '@cdc/core/components/createBarElement'
+import { getBarConfig, testZeroValue } from '../helpers'
 
 // Third party libraries
 import chroma from 'chroma-js'
@@ -24,25 +25,8 @@ import { ChartContext } from '../../../types/ChartContext'
 export const BarChartHorizontal = () => {
   const { xScale, yScale, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
   const { transformedData: data, tableData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getTextWidth, getYAxisData, getXAxisData } = useContext<ChartContext>(ConfigContext)
-  const {
-    isHorizontal,
-    barBorderWidth,
-    updateBars,
-    assignColorsToValues,
-    section,
-    fontSize,
-    isLabelBelowBar,
-    displayNumbersOnBar,
-    lollipopBarWidth,
-    lollipopShapeSize,
-    getHighlightedBarColorByValue,
-    getHighlightedBarByValue,
-    getAdditionalColumn,
-    hoveredBar,
-    onMouseLeaveBar,
-    onMouseOverBar,
-    composeSuppressionBars
-  } = useBarChart()
+  const { isHorizontal, barBorderWidth, updateBars, assignColorsToValues, section, fontSize, isLabelBelowBar, displayNumbersOnBar, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue, getAdditionalColumn, hoveredBar, onMouseLeaveBar, onMouseOverBar } =
+    useBarChart()
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
@@ -68,8 +52,6 @@ export const BarChartHorizontal = () => {
               <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} top={barGroup.y}>
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
-                  const { suppresedBarHeight: suppresedBarWidth, getIconSize, getIconPadding, getVerticalAnchor, isSuppressed } = composeSuppressionBars({ bar })
-
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
@@ -80,27 +62,28 @@ export const BarChartHorizontal = () => {
                     numbericBarHeight = 25
                   }
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(scaleVal)
-                  const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
-                  // const suppresedBarWidth = config.xAxis.showSuppressedLine ? 4 : 0
+                  const defaultBarWidth = Math.abs(xScale(bar.value) - xScale(scaleVal))
                   const isPositiveBar = bar.value >= 0 && isNumber(bar.value)
-                  let barWidth = isSuppressed ? suppresedBarWidth : barWidthHorizontal
+
+                  const { barWidthHorizontal: barWidth, isSuppressed, getAbsentDataLabel } = getBarConfig({ bar, defaultBarWidth, config, isNumber, getTextWidth, isVertical: false })
                   const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const yAxisValue = formatNumber(bar.value, 'left')
                   const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                   const barPosition = !isPositiveBar ? 'below' : 'above'
-                  const barValueLabel = isSuppressed ? '' : yAxisValue
+                  const absentDataLabel = getAbsentDataLabel(yAxisValue)
+                  const barDefaultLabel = !config.yAxis.displayNumbersOnBar ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
-                  let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                  let textFits = Number(textWidth) < barWidthHorizontal - 5 // minus padding 5
+                  const textWidth = (getTextWidth as any)(barDefaultLabel, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                  const textFits = Number(textWidth) < defaultBarWidth - 5
 
                   // control text position
                   let textAnchor = textFits ? 'end' : 'start'
                   let textAnchorLollipop = 'start'
                   let textPadding = textFits ? -5 : 5
                   let textPaddingLollipop = 10
-                  // if bars are negative we change positions of text
+                  //if bars are negative we change positions of text
                   if (barPosition === 'below') {
                     textAnchor = textFits ? 'start' : 'end'
                     textPadding = textFits ? 5 : -5
@@ -134,7 +117,8 @@ export const BarChartHorizontal = () => {
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
-                  const displaylollipopShape = isSuppressed ? 'none' : 'block'
+                  const displaylollipopShape = testZeroValue(bar.value) ? 'none' : 'block'
+
                   // update label color
                   if (barColor && labelColor && textFits) {
                     labelColor = getContrastColor('#000', barColor)
@@ -146,8 +130,6 @@ export const BarChartHorizontal = () => {
                     if (isHighlightedBar) return 'transparent'
                     return barColor
                   }
-
-                  const iconPadding = symbol => (symbol === 'Asterisk' ? '3px' : symbol === 'Double Asterisks' ? '4px' : '12px')
 
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
@@ -185,44 +167,64 @@ export const BarChartHorizontal = () => {
                           // check if user selected column
                           const selectedSuppressionColumn = !pd.column || pd.column === bar.key
                           // compare entered suppressed value with data value
-                          const isValueMatch = String(pd.value) === String(tableData[barGroup.index][bar.key]) && pd.value !== ''
+                          const isValueMatch = String(pd.value) === String(bar.value) && pd.value !== ''
                           const isSuppressed = isValueMatch && selectedSuppressionColumn
-                          if (!isSuppressed || barHeight < 10 || !config.xAxis.showSuppressedSymbol) {
+
+                          if (!isSuppressed || pd.hideBarSymbol || !config.general.showSuppressedSymbol) {
                             return
                           }
+
+                          const hasAsterisk = String(pd.symbol).includes('Asterisk')
+                          const verticalAnchor = hasAsterisk ? 'middle' : 'end'
+                          const iconSize = pd.symbol === 'Asterisk' ? barHeight * 1.2 : pd.symbol === 'Double Asterisk' ? barHeight : barHeight / 1.5
                           return (
                             <Text // prettier-ignore
                               key={index}
-                              fontSize={getIconSize(pd.symbol, barHeight)}
-                              angle={90}
+                              fontSize={iconSize}
                               display={displayBar ? 'block' : 'none'}
                               opacity={transparentBar ? 0.5 : 1}
                               x={barX}
                               y={config.barHeight / 2 + config.barHeight * bar.index}
                               fill={'#000'}
-                              dx={iconPadding(pd.symbol)}
-                              verticalAnchor={getVerticalAnchor(pd.symbol)}
-                              textAnchor={'middle'}
+                              dy={config.barHeight / 5}
+                              dx={10}
+                              textAnchor='start'
+                              verticalAnchor={verticalAnchor}
                             >
                               {pd.iconCode}
                             </Text>
                           )
                         })}
 
-                        {!config.isLollipopChart && displayNumbersOnBar && (
+                        {!config.isLollipopChart && (
                           <Text // prettier-ignore
                             display={displayBar ? 'block' : 'none'}
                             x={bar.y}
+                            opacity={transparentBar ? 0.5 : 1}
                             y={config.barHeight / 2 + config.barHeight * bar.index}
                             fill={labelColor}
                             dx={textPadding}
                             verticalAnchor='middle'
                             textAnchor={textAnchor}
                           >
-                            {barValueLabel}
+                            {testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
                         )}
-                        {config.isLollipopChart && displayNumbersOnBar && (
+                        <Text // prettier-ignore
+                          display={displayBar ? 'block' : 'none'}
+                          x={bar.y}
+                          opacity={transparentBar ? 0.5 : 1}
+                          y={config.barHeight / 2 + config.barHeight * bar.index}
+                          fill={labelColor}
+                          dx={absentDataLabel === 'N/A' ? 20 : textPadding}
+                          dy={config.isLollipopChart ? -10 : 0}
+                          verticalAnchor='middle'
+                          textAnchor={absentDataLabel === 'N/A' ? 'middle' : textAnchor}
+                        >
+                          {absentDataLabel}
+                        </Text>
+
+                        {config.isLollipopChart && (
                           <Text // prettier-ignore
                             display={displayBar ? 'block' : 'none'}
                             x={bar.y}
@@ -233,7 +235,7 @@ export const BarChartHorizontal = () => {
                             verticalAnchor='middle'
                             fontWeight={'normal'}
                           >
-                            {barValueLabel}
+                            {testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
                         )}
                         {isLabelBelowBar && !config.yAxis.hideLabel && (

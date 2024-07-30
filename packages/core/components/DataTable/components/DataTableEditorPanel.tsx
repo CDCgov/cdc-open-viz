@@ -1,4 +1,4 @@
-import { AccordionItem, AccordionItemButton, AccordionItemHeading, AccordionItemPanel } from 'react-accessible-accordion'
+import { Accordion, AccordionItem, AccordionItemButton, AccordionItemHeading, AccordionItemPanel } from 'react-accessible-accordion'
 import DataTableEditor from '../../EditorPanel/DataTableEditor'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
@@ -25,9 +25,9 @@ const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateCo
     })
   }
 
-  const columns = Object.keys(config.originalFormattedData[0] || {})
+  const columns = Object.keys(config.originalFormattedData?.[0] || {})
   return (
-    <>
+    <Accordion allowZeroExpanded={true}>
       <AccordionItem>
         <AccordionItemHeading>
           <AccordionItemButton>Filters</AccordionItemButton>
@@ -52,7 +52,7 @@ const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateCo
           <DataTableEditor config={config} columns={columns} updateField={updateField} isDashboard={true} />
         </AccordionItemPanel>
       </AccordionItem>
-    </>
+    </Accordion>
   )
 }
 

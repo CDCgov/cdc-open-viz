@@ -64,6 +64,7 @@ const SankeySettings = () => {
         <AccordionItemButton>Sankey Settings</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
+        <p>Node stories can provide additional details to support public health messaging. COVE can display a maximum of 3 node stories.</p>
         {data?.storyNodeText &&
           data?.storyNodeText.map(({ StoryNode, segmentTextBefore, segmentTextAfter }, i) => (
             <div key={i} style={{ border: '1px solid black', margin: '15px auto', padding: '15px', borderRadius: '10px' }}>
@@ -84,7 +85,6 @@ const SankeySettings = () => {
               </Button>
             </div>
           ))}
-        {`Total Story Nodes: ${data?.storyNodeText?.length}`}
         {data?.storyNodeText?.length < 3 && (
           <button
             type='button'
@@ -97,8 +97,7 @@ const SankeySettings = () => {
             Add StoryNode
           </button>
         )}
-
-        <CheckBox value={config.enableTooltips} fieldName='enableTooltips' label='Enable Tooltips' updateField={updateField} />
+        {config.enableTooltips && config.data?.tooltips?.length > 0 && <CheckBox value={config.enableTooltips} fieldName='enableTooltips' label='Enable Tooltips' updateField={updateField} />}
       </AccordionItemPanel>
     </AccordionItem>
   )

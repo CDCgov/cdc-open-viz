@@ -29,9 +29,9 @@ import Legend from './components/Legend'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
+import { handleChartTabbing } from './helpers/handleChartTabbing'
 import { getQuartiles } from './helpers/getQuartiles'
 import { sortAsc, sortDesc } from './helpers/sort'
-import { filterData } from './helpers/filterData'
 import { handleChartAriaLabels } from './helpers/handleChartAriaLabels'
 import { lineOptions } from './helpers/lineOptions'
 import { handleLineType } from './helpers/handleLineType'
@@ -39,6 +39,7 @@ import { generateColorsArray } from './helpers/generateColorsArray'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
+import Annotation from './components/Annotations'
 
 // Helpers
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
@@ -50,6 +51,7 @@ import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
+import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
 
 import './scss/main.scss'
 // load both then config below determines which to use
@@ -58,8 +60,10 @@ import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import Title from '@cdc/core/components/ui/Title'
 import { ChartConfig } from './types/ChartConfig'
 import { Label } from './types/Label'
+import { type ViewportSize } from './types/ChartConfig'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
+import { filterVizData } from '@cdc/core/helpers/filterVizData'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
@@ -70,11 +74,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
   const [seriesHighlight, setSeriesHighlight] = useState<string[]>(configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : [])
-  const [currentViewport, setCurrentViewport] = useState('lg')
+  const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
   const [dimensions, setDimensions] = useState<[number?, number?]>([])
   const [externalFilters, setExternalFilters] = useState<any[]>()
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
+  const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [dynamicLegendItems, setDynamicLegendItems] = useState<any[]>([])
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
   const [brushConfig, setBrushConfig] = useState({
@@ -86,6 +91,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   let legendMemo = useRef(new Map()) // map collection
   let innerContainerRef = useRef()
   const legendRef = useRef(null)
+
+  const handleDragStateChange = isDragging => {
+    setIsDraggingAnnotation(isDragging)
+  }
 
   if (isDebug) console.log('Chart config, isEditor', config, isEditor)
 
@@ -101,7 +110,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
   const legendId = useId()
-  const handleChartTabbing = !config.legend?.hide ? legendId : config?.title ? `dataTableSection__${config.title.replace(/\s/g, '')}` : `dataTableSection`
+
+  const checkLineToBarGraph = () => {
+    return isConvertLineToBarGraph(config.visualizationType, filteredData, config.allowLineToBarGraph)
+  }
 
   const reloadURLData = async () => {
     if (config.dataUrl) {
@@ -164,7 +176,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       if (data) {
         setStateData(data)
         setExcludedData(data)
-        setFilteredData(filterData(config.filters, data))
+        setFilteredData(filterVizData(config.filters, data))
       }
     }
   }
@@ -251,7 +263,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       if (!series.axis) series.axis = 'Left'
     })
 
-    if (!newConfig.data && data) {
+    if (data) {
       newConfig.data = data
     }
 
@@ -312,17 +324,15 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
 
-        newConfig.filters[index].active = newConfig.filters[index].active || filterValues[0]
+        newConfig.filters[index].active = !newConfig.filters[index].active || filterValues.indexOf(newConfig.filters[index].active) === -1 ? filterValues[0] : newConfig.filters[index].active
         newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle ? newConfig.filters[index].filterStyle : 'dropdown'
       })
-      currentData = filterData(newConfig.filters, newExcludedData)
+      currentData = filterVizData(newConfig.filters, newExcludedData)
       setFilteredData(currentData)
     }
 
-    if (newConfig.xAxis.type === 'date-time' && newConfig.barThickness > 0.1) {
-      newConfig.barThickness = 0.035
-    } else if (newConfig.xAxis.type !== 'date-time' && newConfig.barThickness < 0.1) {
-      newConfig.barThickness = 0.35
+    if (newConfig.xAxis.type === 'date-time' && config.orientation === 'horizontal') {
+      newConfig.xAxis.type = 'date'
     }
 
     //Enforce default values that need to be calculated at runtime
@@ -487,7 +497,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'horizontal'
-    } else if (['Box Plot', 'Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType)) {
+    } else if (['Box Plot', 'Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType) && !checkLineToBarGraph()) {
       newConfig.runtime.xAxis = newConfig.xAxis
       newConfig.runtime.yAxis = newConfig.yAxis
       newConfig.runtime.horizontal = false
@@ -628,14 +638,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         let configCopy = { ...config }
         delete configCopy['filters']
         setConfig(configCopy)
-        setFilteredData(filterData(externalFilters, excludedData))
+        setFilteredData(filterVizData(externalFilters, excludedData))
       }
     }
 
     if (externalFilters && externalFilters.length > 0 && externalFilters.length > 0 && externalFilters[0].hasOwnProperty('active')) {
       let newConfigHere = { ...config, filters: externalFilters }
       setConfig(newConfigHere)
-      setFilteredData(filterData(externalFilters, excludedData))
+      setFilteredData(filterVizData(externalFilters, excludedData))
     }
   }, [externalFilters]) // eslint-disable-line
 
@@ -913,7 +923,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   // Select appropriate chart type
-  const chartComponents = {
+  const ChartComponents = {
     'Paired Bar': <LinearChart />,
     Forecasting: <LinearChart />,
     Bar: <LinearChart />,
@@ -1107,14 +1117,30 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Prevent render if loading
   let body = <Loading />
 
+  const makeClassName = string => {
+    if (!string || !string.toLowerCase) return
+    return string.toLowerCase().replaceAll(/ /g, '-')
+  }
+
   const getChartWrapperClasses = () => {
+    const isLegendOnBottom = legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
     const classes = ['chart-container', 'p-relative']
-    if (config.legend.position === 'bottom') classes.push('bottom')
-    if (config.legend.hide) classes.push('legend-hidden')
+    if (config.legend?.position === 'bottom') classes.push('bottom')
+    if (config.legend?.hide) classes.push('legend-hidden')
     if (lineDatapointClass) classes.push(lineDatapointClass)
     if (!config.barHasBorder) classes.push('chart-bar--no-border')
-    if (isDebug) classes.push('debug')
+    if (config.brush?.active && dashboardConfig?.type === 'dashboard' && (!isLegendOnBottom || config.legend.hide)) classes.push('dashboard-brush')
     classes.push(...contentClasses)
+    return classes
+  }
+
+  const getChartSubTextClasses = () => {
+    const classes = ['subtext ']
+    const isLegendOnBottom = legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+
+    if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
+    if (config.brush?.active && !isLegendOnBottom) classes.push('subtext--brush-active ')
+    if (config.brush?.active && config.legend.hide) classes.push('subtext--brush-active ')
     return classes
   }
 
@@ -1131,21 +1157,28 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           {config.newViz && <Confirm />}
           {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && <Error />}
           {!missingRequiredSections() && !config.newViz && (
-            <div className='cdc-chart-inner-container cove-component__content' aria-label={handleChartAriaLabels(config)} tabIndex={0}>
+            <div className={`cdc-chart-inner-container cove-component__content type-${makeClassName(config.visualizationType)}`} aria-label={handleChartAriaLabels(config)} tabIndex={0}>
               <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
 
               {/* Filters */}
-              {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
-              <SkipTo skipId={handleChartTabbing} skipMessage='Skip Over Chart Container' />
+              {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterVizData} dimensions={dimensions} />}
+              <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
+              {config.annotations?.length > 0 && <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage={`Skip over annotations`} key={`skip-annotations`} />}
+
               {/* Visualization */}
               {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
+
               <div className={getChartWrapperClasses().join(' ')}>
-                {/* All charts except sparkline */}
-                {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
+                {/* All charts except line and sparkline */}
+                {config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Line' && ChartComponents[config.visualizationType]}
+
+                {/* Line Chart */}
+                {config.visualizationType === 'Line' && (checkLineToBarGraph() ? ChartComponents['Bar'] : ChartComponents['Line'])}
+
                 {/* Sparkline */}
                 {config.visualizationType === 'Spark Line' && (
                   <>
-                    <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />
+                    <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterVizData} dimensions={dimensions} />
                     {config?.introText && (
                       <section className='introText' style={{ padding: '0px 0 35px' }}>
                         {parse(config.introText)}
@@ -1163,12 +1196,15 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 )}
                 {/* Sankey */}
                 {config.visualizationType === 'Sankey' && <ParentSize aria-hidden='true'>{parent => <SankeyChart runtime={config.runtime} width={parent.width} height={parent.height} />}</ParentSize>}
-                {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend ref={legendRef} />}
+                {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend ref={legendRef} skipId={handleChartTabbing(config, legendId)} />}
               </div>
               {/* Link */}
               {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
               {/* Description */}
-              {description && config.visualizationType !== 'Spark Line' && <div className={'column ' + config.isResponsiveTicks ? 'subtext--responsive-ticks' : 'subtext'}>{parse(description)}</div>}
+
+              {description && config.visualizationType !== 'Spark Line' && <div className={getChartSubTextClasses().join('')}>{parse(description)}</div>}
+              {false && <Annotation.List />}
+
               {/* buttons */}
               <MediaControls.Section classes={['download-buttons']}>
                 {config.table.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
@@ -1178,7 +1214,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {((config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey') || (config.visualizationType === 'Sankey' && config.table.show)) && (
                 <DataTable
                   config={config}
-                  rawData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : config.table.customTableConfig ? filterData(config.filters, config.data) : config.data}
+                  rawData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : config.table.customTableConfig ? filterVizData(config.filters, config.data) : config.data}
                   runtimeData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : filteredData || excludedData}
                   expandDataTable={config.table.expanded}
                   columns={config.columns}
@@ -1189,10 +1225,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                   indexTitle={config.table.indexLabel}
                   vizTitle={title}
                   viewport={currentViewport}
-                  tabbingId={handleChartTabbing}
+                  tabbingId={handleChartTabbing(config, legendId)}
                   colorScale={colorScale}
                 />
               )}
+              {config?.annotations?.length > 0 && <Annotation.Dropdown />}
               {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
               {/* show pdf or image button */}
             </div>
@@ -1211,54 +1248,57 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const contextValues = {
     brushConfig,
-    setBrushConfig,
     capitalize,
-    getXAxisData,
-    getYAxisData,
-    config,
-    setConfig,
-    rawData: stateData ?? {},
-    excludedData: excludedData,
-    transformedData: clean(filteredData || excludedData), // do this right before passing to components
-    tableData: filteredData || excludedData, // do not clean table data
-    unfilteredData: stateData,
-    seriesHighlight,
-    colorScale,
-    dimensions,
-    currentViewport,
-    parseDate,
-    formatDate,
-    formatTooltipsDate,
-    formatNumber,
-    loading,
-    updateConfig,
+    clean,
     colorPalettes,
-    isDashboard,
-    setParentConfig,
-    missingRequiredSections,
-    setEditing,
-    setFilteredData,
-    handleChartAriaLabels,
-    highlight,
-    highlightReset,
-    legend,
-    setSeriesHighlight,
-    dynamicLegendItems,
-    setDynamicLegendItems,
-    filterData,
-    imageId,
-    handleLineType,
-    lineOptions,
-    isNumber,
-    getTextWidth,
-    twoColorPalette,
-    isEditor,
-    isDebug,
-    setSharedFilter,
-    setSharedFilterValue,
+    colorScale,
+    config,
+    currentViewport,
     dashboardConfig,
     debugSvg: isDebug,
-    clean
+    dimensions,
+    dynamicLegendItems,
+    excludedData: excludedData,
+    formatDate,
+    formatNumber,
+    formatTooltipsDate,
+    getTextWidth,
+    getXAxisData,
+    getYAxisData,
+    handleChartAriaLabels,
+    handleLineType,
+    highlight,
+    highlightReset,
+    imageId,
+    isDashboard,
+    isLegendBottom: legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport),
+    isDebug,
+    isDraggingAnnotation,
+    handleDragStateChange,
+    isEditor,
+    isNumber,
+    legend,
+    lineOptions,
+    loading,
+    missingRequiredSections,
+    outerContainerRef,
+    parseDate,
+    rawData: stateData ?? {},
+    seriesHighlight,
+    setBrushConfig,
+    setConfig,
+    setDynamicLegendItems,
+    setEditing,
+    setFilteredData,
+    setParentConfig,
+    setSeriesHighlight,
+    setSharedFilter,
+    setSharedFilterValue,
+    tableData: filteredData || excludedData, // do not clean table data
+    transformedData: clean(filteredData || excludedData), // do this right before passing to components
+    twoColorPalette,
+    unfilteredData: stateData,
+    updateConfig
   }
 
   return (

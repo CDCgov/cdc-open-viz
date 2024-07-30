@@ -1,0 +1,14 @@
+.cdc-open-viz-module {
+  .annotation__dropdown-list {
+    border: 1px solid red;
+    list-style: none;
+  }
+
+  .annotation-dropdown__panel {
+    padding: 10px;
+  }
+
+  .data-table-heading.annotation__dropdown-list {
+    margin-top: 10px;
+  }
+}

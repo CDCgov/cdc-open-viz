@@ -1,6 +1,7 @@
 import { type ChartConfig } from './ChartConfig'
 import { PickD3Scale } from '@visx/scale'
 import { type SharedFilter } from '@cdc/dashboard/src/types/SharedFilter'
+import { type Annotation } from '@cdc/core/types/Annotation'
 
 export type ColorScale = PickD3Scale<'ordinal', any, any>
 
@@ -25,10 +26,17 @@ type SharedChartContext = {
   setBrushConfig: Function
   clean: Function
   capitalize: (value: string) => string
+  // whether or not the legend is appearing below the chart
+  isLegendBottom?: boolean
+  // whether or not the chart is viewed within the editor screen
+  isEditor?: boolean
+  // whether or not the user is dragging an annotation
+  isDraggingAnnotation?: boolean
 }
 
 // Line Chart Specific Context
 type LineChartContext = SharedChartContext & {
+  convertLineToBarGraph: boolean
   dimensions: [screenWidth: number, screenHeight: number]
   formatDate: Function
   formatTooltipsDate: Function
@@ -50,6 +58,7 @@ type LineChartContext = SharedChartContext & {
 export type ChartContext =
   | LineChartContext
   | (SharedChartContext & {
+      annotations: Annotation[]
       dimensions: [screenWidth: number, screenHeight: number]
       formatDate?: Function
       formatTooltipsDate: Function

@@ -91,6 +91,15 @@
   .subtext--responsive-ticks,
   .section-subtext {
     padding: 0 1rem;
+    &--brush-active {
+      margin-top: 2.5em;
+    }
+  }
+
+  .type-pie {
+    svg.animated-pie {
+      width: auto !important;
+    }
   }
 
   .legend-container {
@@ -141,9 +150,6 @@
         word-wrap: break-word;
         white-space: pre-wrap;
         word-break: break-word;
-        @include breakpoint(xs) {
-          font-size: $font-small;
-        }
       }
     }
 
@@ -159,20 +165,13 @@
 
     h3 {
       font-size: 1.3rem;
-      @include breakpoint(xs) {
-        font-size: $font-small + 0.4em;
-      }
     }
 
     h3,
     p {
       margin-bottom: 0.8em;
     }
-    p {
-      @include breakpoint(xs) {
-        font-size: $font-small;
-      }
-    }
+
     & div.legend-item {
       margin-bottom: 0.5em !important;
 
@@ -226,9 +225,6 @@
     vertical-align: middle;
     margin-bottom: 0.5em;
 
-    @include breakpoint(xs) {
-      font-size: $font-small;
-    }
     & > span {
       display: flex;
       justify-items: center;
@@ -283,6 +279,17 @@
     }
     &.legend-hidden > svg {
       width: 100% !important;
+    }
+    &.dashboard-brush {
+      margin-bottom: 2.5em;
+    }
+
+    svg.dragging-annotation * {
+      user-select: none;
+    }
+
+    svg.dragging-annotation path {
+      pointer-events: none;
     }
 
     > svg {

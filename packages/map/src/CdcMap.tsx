@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef, useCallback, useId } from 'react'
 import * as d3 from 'd3'
 import Layout from '@cdc/core/components/Layout'
 import Waiting from '@cdc/core/components/Waiting'
+import Annotation from './components/Annotation'
 import Error from './components/EditorPanel/components/Error'
+import _ from 'lodash'
 
 // IE11
 import 'whatwg-fetch'
@@ -16,6 +18,10 @@ import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 
 // Helpers
+import { hashObj } from './helpers/hashObj'
+import { generateRuntimeLegendHash } from './helpers/generateRuntimeLegendHash'
+import { generateColorsArray } from './helpers/generateColorsArray'
+import { getUniqueValues } from './helpers/getUniqueValues'
 import { publish } from '@cdc/core/helpers/events'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
@@ -42,7 +48,6 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import getViewport from '@cdc/core/helpers/getViewport'
 import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
-import Loading from '@cdc/core/components/Loading'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
 
@@ -68,34 +73,6 @@ const countryKeys = Object.keys(supportedCountries)
 const countyKeys = Object.keys(supportedCounties)
 const cityKeys = Object.keys(supportedCities)
 
-const generateColorsArray = (color = '#000000', special = false) => {
-  let colorObj = chroma(color)
-  let hoverColor = special ? colorObj.brighten(0.5).hex() : colorObj.saturate(1.3).hex()
-
-  return [color, hoverColor, colorObj.darken(0.3).hex()]
-}
-
-const hashObj = row => {
-  try {
-    if (!row) throw new Error('No row supplied to hashObj')
-
-    let str = JSON.stringify(row)
-    let hash = 0
-
-    if (str.length === 0) return hash
-
-    for (let i = 0; i < str.length; i++) {
-      let char = str.charCodeAt(i)
-      hash = (hash << 5) - hash + char
-      hash = hash & hash
-    }
-
-    return hash
-  } catch (e) {
-    console.error('COVE: ', e) // eslint-disable-line
-  }
-}
-
 const indexOfIgnoreType = (arr, item) => {
   for (let i = 0; i < arr.length; i++) {
     if (item === arr[i]) {
@@ -105,26 +82,10 @@ const indexOfIgnoreType = (arr, item) => {
   return -1
 }
 
-// returns string[]
-const getUniqueValues = (data, columnName) => {
-  let result = {}
-
-  for (let i = 0; i < data.length; i++) {
-    let val = data[i][columnName]
-
-    if (undefined === val) continue
-
-    if (undefined === result[val]) {
-      result[val] = true
-    }
-  }
-
-  return Object.keys(result)
-}
-
 const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, link }) => {
   const transform = new DataTransform()
   const [state, setState] = useState({ ...initialState })
+  const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [loading, setLoading] = useState(true)
   const [displayPanel, setDisplayPanel] = useState(true)
   const [currentViewport, setCurrentViewport] = useState()
@@ -142,6 +103,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
 
   const legendRef = useRef(null)
+  const tooltipRef = useRef(null)
   const legendId = useId()
   const tooltipId = useId()
 
@@ -151,6 +113,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   let innerContainerRef = useRef()
 
   if (isDebug) console.log('CdcMap state=', state) // <eslint-disable-line></eslint-disable-line>
+
+  const handleDragStateChange = isDragging => {
+    setIsDraggingAnnotation(isDragging)
+  }
 
   const columnsRequiredChecker = useCallback(() => {
     let columnList = []
@@ -218,28 +184,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       setPosition(state.mapPosition)
     }
   }, [state.mapPosition, setPosition])
-
-  const generateRuntimeLegendHash = () => {
-    return hashObj({
-      unified: state.legend.unified ?? false,
-      equalNumberOptIn: state.general.equalNumberOptIn ?? false,
-      specialClassesLast: state.legend.showSpecialClassesLast ?? false,
-      color: state.color,
-      customColors: state.customColors,
-      numberOfItems: state.legend.numberOfItems,
-      type: state.legend.type,
-      separateZero: state.legend.separateZero ?? false,
-      primary: state.columns.primary.name,
-      categoryValuesOrder: state.legend.categoryValuesOrder,
-      specialClasses: state.legend.specialClasses,
-      geoType: state.general.geoType,
-      data: state.data,
-      ...runtimeFilters,
-      filters: {
-        ...state.filters
-      }
-    })
-  }
 
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -680,14 +624,28 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         let colors = colorPalettes[state.color]
         let colorRange = colors.slice(0, state.legend.numberOfItems)
 
+        const getDomain = () => {
+          // backwards compatibility
+          if (state?.columns?.primary?.roundToPlace !== undefined && state?.general?.equalNumberOptIn) {
+            return _.uniq(dataSet.map(item => Number(item[state.columns.primary.name]).toFixed(Number(state?.columns?.primary?.roundToPlace))))
+          }
+          return _.uniq(dataSet.map(item => Math.round(Number(item[state.columns.primary.name]))))
+        }
+
+        const getBreaks = scale => {
+          // backwards compatibility
+          if (state?.columns?.primary?.roundToPlace !== undefined && state?.general?.equalNumberOptIn) {
+            return scale.quantiles().map(b => Number(b)?.toFixed(Number(state?.columns?.primary?.roundToPlace)))
+          }
+          return scale.quantiles().map(item => Number(Math.round(item)))
+        }
+
         let scale = d3
           .scaleQuantile()
-          .domain([...new Set(dataSet.map(item => Math.round(item[state.columns.primary.name])))]) // min/max values
+          .domain(getDomain()) // min/max values
           .range(colorRange) // set range to our colors array
 
-        let breaks = scale.quantiles()
-
-        breaks = breaks.map(item => Math.round(item))
+        const breaks = getBreaks(scale)
 
         // if seperating zero force it into breaks
         if (breaks[0] !== 0) {
@@ -716,8 +674,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             return min
           }
 
+          const getDecimalPlace = n => {
+            return Math.pow(10, -n)
+          }
+
           const setMax = (index, min) => {
-            let max = breaks[index + 1] - 1
+            let max = Number(breaks[index + 1]) - getDecimalPlace(Number(state?.columns?.primary?.roundToPlace))
 
             // check if min and max range are the same
             // if (min === max + 1) {
@@ -983,7 +945,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
 
     // if string of letters like 'Home' then dont need to format as a number
-    if (typeof value === 'string' && value.length > 0 && state.legend.type === 'equalnumber') {
+    if (typeof value === 'string' && value.length > 0 && /[a-zA-Z]/.test(value) && state.legend.type === 'equalnumber') {
       return value
     }
 
@@ -1129,7 +1091,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const formatLegendLocation = key => {
     let value = key
     let formattedName = ''
-    let stateName = stateFipsToTwoDigit[key.substring(0, 2)]
+    let stateName = stateFipsToTwoDigit[key?.substring(0, 2)]
 
     if (stateName) {
       formattedName += stateName
@@ -1531,7 +1493,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
     }
 
-    const hashLegend = generateRuntimeLegendHash()
+    const hashLegend = generateRuntimeLegendHash(state, runtimeFilters)
 
     const hashData = hashObj({
       data: state.data,
@@ -1558,7 +1520,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }, [state]) // eslint-disable-line
 
   useEffect(() => {
-    const hashLegend = generateRuntimeLegendHash()
+    const hashLegend = generateRuntimeLegendHash(state, runtimeFilters)
 
     // Legend - Update when runtimeData does
     const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
@@ -1587,7 +1549,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   if (!table.label || table.label === '') table.label = 'Data Table'
 
   // Map container classes
-  let mapContainerClasses = ['map-container', state.legend.position, state.general.type, state.general.geoType, 'outline-none']
+  let mapContainerClasses = ['map-container', state.legend?.position, state.general.type, state.general.geoType, 'outline-none']
 
   if (modal) {
     mapContainerClasses.push('modal-background')
@@ -1599,14 +1561,18 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // Props passed to all map types
   const mapProps = {
+    isDraggingAnnotation,
+    handleDragStateChange,
     applyLegendToRow,
     applyTooltipsToGeo,
     capitalize: state.tooltips?.capitalizeLabels,
     closeModal,
     columnsInData: state?.data?.[0] ? Object.keys(state.data[0]) : [],
+    container,
     content: modal,
     currentViewport,
     data: runtimeData,
+    dimensions,
     displayDataAsText,
     displayGeoName,
     filteredCountryCode,
@@ -1642,7 +1608,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     titleCase,
     type: general.type,
     viewport: currentViewport,
-    tooltipId
+    tooltipId,
+    tooltipRef
   }
 
   if (!mapProps.data || !state.data) return <></>
@@ -1689,9 +1656,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           {requiredColumns && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
           {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
             <section className={`cove-component__content cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-              {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
-                <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
-              )}
               {/* prettier-ignore */}
               <Title
                 title={title}
@@ -1700,6 +1664,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
               />
               <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
+              {state?.annotations?.length > 0 && <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />}
 
               {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
@@ -1779,6 +1744,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 />
               )}
 
+              {state.annotations.length > 0 && <Annotation.Dropdown />}
+
               {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
             </section>
           )}
@@ -1786,6 +1753,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           <div aria-live='assertive' className='cdcdataviz-sr-only'>
             {accessibleStatus}
           </div>
+
+          {!isDraggingAnnotation && !window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
+            <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
+          )}
+          <div ref={tooltipRef} id={`tooltip__${tooltipId}-canvas`} className='tooltip' style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})`, position: 'absolute', whiteSpace: 'nowrap' }}></div>
         </Layout.Responsive>
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>
