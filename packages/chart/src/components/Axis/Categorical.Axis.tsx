@@ -8,7 +8,7 @@ import chroma from 'chroma-js'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { useBarChart } from '../../hooks/useBarChart'
 
-const CategoricalYAxis = ({ yMax, leftSize, xMax, maxValue, max }) => {
+const CategoricalYAxis = ({ yMax, leftSize, max }) => {
   const { config, getTextWidth } = useContext(ConfigContext)
   const { fontSize } = useBarChart()
 
