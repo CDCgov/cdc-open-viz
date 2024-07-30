@@ -8,7 +8,7 @@ import CityList from '../../CityList'
 import ConfigContext from '../../../context'
 import Annotation from '../../Annotation'
 import SingleState from './SingleState'
-import { getTopoData, getCurrentTopoYear, isTopoReady } from './../helpers/map'
+import { getTopoData, getCurrentTopoYear, isTopoReady, getFilterControllingStatePicked } from './../helpers/map'
 import { type Topology } from 'topojson-client'
 
 // SVG ITEMS
@@ -55,22 +55,9 @@ const SingleStateMap = props => {
     }
   }, [state.general.countyCensusYear, state.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
 
-  const getFilterControllingStatePicked = () => {
-    if (!dashboardConfig?.dashboard?.sharedFilters) return false
-    // only support dashboards for now
-    const filters = dashboardConfig?.dashboard?.sharedFilters
-    let activeFilter = ''
-    filters?.forEach(f => {
-      if (f.columnName === state.general.filterControlsStatePicked) {
-        activeFilter = f.active ? f.active : f.values[0]
-      }
-    })
-    return activeFilter
-  }
-
   useEffect(() => {
     if (!isTopoReady(topoData, state, runtimeFilters)) return
-    const _statePicked = getFilterControllingStatePicked()
+    const _statePicked = getFilterControllingStatePicked(state, dashboardConfig)
     const _statePickedData = topoData.states.find(s => s.properties.name === _statePicked)
     if (!_statePickedData) return
     setStateToShow(_statePickedData)
@@ -93,7 +80,7 @@ const SingleStateMap = props => {
     setScale(newScaleWithHypot)
 
     setState(prevState => {
-      if (prevState.general.statePicked?.fipsCode !== _statePickedData?.id) {
+      if (prevState.general.statePicked?.stateName !== _statePickedData?.properties?.name && _statePickedData) {
         return {
           ...prevState,
           general: {
@@ -104,20 +91,7 @@ const SingleStateMap = props => {
       }
       return prevState
     })
-  }, [state.general.statePicked, dashboardConfig.dashboard.sharedFilters])
-
-  useEffect(() => {
-    const _statePicked = getFilterControllingStatePicked()
-    const _statePickedData = topoData?.states?.find(s => s.properties.name === _statePicked)
-
-    setState({
-      ...state,
-      general: {
-        ...state.general,
-        statePicked: { fipsCode: _statePickedData?.id, stateName: _statePickedData?.properties?.name }
-      }
-    })
-  }, [topoData])
+  }, [state?.general?.statePicked.stateName, dashboardConfig?.dashboard?.sharedFilters])
 
   useEffect(() => {
     let currentYear = getCurrentTopoYear(state, runtimeFilters)
@@ -129,12 +103,27 @@ const SingleStateMap = props => {
     }
   }, [state.general.countyCensusYear, state.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
 
+  useEffect(() => {
+    const _statePicked = getFilterControllingStatePicked(state, dashboardConfig)
+    const _statePickedData = topoData?.states?.find(s => s.properties.name === _statePicked)
+
+    if (_statePickedData?.id) {
+      setState({
+        ...state,
+        general: {
+          ...state.general,
+          statePicked: { fipsCode: _statePickedData?.id, stateName: _statePickedData?.properties?.name }
+        }
+      })
+    }
+  }, [topoData])
+
   // When choosing a state changes...
   useEffect(() => {
     if (!isTopoReady(topoData, state, runtimeFilters)) return
     if (state.general.hasOwnProperty('statePicked')) {
-      let statePicked = getFilterControllingStatePicked() || state.general.statePicked.stateName
-      let statePickedData = topoData.states.find(s => s.properties.name === statePicked)
+      const statePicked = getFilterControllingStatePicked(state, dashboardConfig)
+      const statePickedData = topoData.states.find(s => s.properties.name === statePicked)
       setStateToShow(statePickedData)
 
       const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
@@ -167,7 +156,7 @@ const SingleStateMap = props => {
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
-    const statePassed = getFilterControllingStatePicked() || geographies[0].feature.states
+    const statePassed = geographies[0].feature.states
     const counties = geographies[0].feature.counties
 
     let geosJsx = []

@@ -79,3 +79,16 @@ export const isTopoReady = (topoData, state, runtimeFilters) => {
 
   return topoData.year && (!currentYear || currentYear === topoData.year)
 }
+
+export const getFilterControllingStatePicked = (state, dashboardConfig) => {
+  if (!dashboardConfig?.dashboard?.sharedFilters) return state?.general?.statePicked?.stateName
+  // only support dashboards for now
+  const filters = dashboardConfig?.dashboard?.sharedFilters
+  let activeFilter = ''
+  filters?.forEach(f => {
+    if (f.columnName === state.general.filterControlsStatePicked) {
+      activeFilter = f.active ? f.active : f.values[0]
+    }
+  })
+  return activeFilter
+}
