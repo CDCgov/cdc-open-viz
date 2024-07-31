@@ -2,11 +2,17 @@ import { Group } from '@visx/group'
 import { useContext, useEffect, useRef, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import * as d3 from 'd3'
-import { scaleTime } from '@visx/scale'
+import { invertValue } from '@cdc/core/helpers/scaling'
 import { Text } from '@visx/text'
 
-function BrushChart({ xMax, yMax, xScaleBrush: x }) {
-  const { tableData, config, parseDate, setBrushConfig, getTextWidth } = useContext(ConfigContext)
+interface BrushChartProps {
+  xMax: number
+  yMax: number
+  xScaleBrush: Function
+}
+
+const BrushChart = ({ xMax, yMax, xScaleBrush: x }: BrushChartProps) => {
+  const { tableData, config, setBrushConfig, getTextWidth } = useContext(ConfigContext)
   const [brushState, setBrushState] = useState({ isBrushing: false, selection: [] })
   const [tooltip, showTooltip] = useState(false)
   const svgRef = useRef()
@@ -41,36 +47,21 @@ function BrushChart({ xMax, yMax, xScaleBrush: x }) {
       .data([{ side: 'left' }, { side: 'right' }])
       .join(enter => {
         const handleGroup = enter.append('g').attr('class', 'handle--custom')
-        // Define the path data for left and right handles
-        const leftHandlePath = 'M0.5,10A6,6 0 0 1 6.5,16V14A6,6 0 0 1 0.5,20ZM2.5,18V12M4.5,18V12'
-        const rightHandlePath = 'M6.5,10A6,6 0 0 0 0.5,16V14A6,6 0 0 0 6.5,20ZM4.5,18V12M2.5,18V12'
         handleGroup
           .append('text')
           .attr('x', d => (d.side === 'left' ? 0 : -textWidth))
           .attr('y', 30)
           .text(d => (d.side === 'left' ? firstDate : lastDate))
           .attr('font-size', '13px')
-
-        // handleGroup // ignore
-        //   .append('path')
-        //   .attr('class', 'handle--custom')
-        //   .attr('cursor', 'ew-resize')
-        //   .attr('fill', 'blue')
-        //   .attr('d', d => (d.side === 'left' ? rightHandlePath : leftHandlePath))
-        //   .attr('transform', (d, i) => `scale(1.2),  translate(${d.side === 'left' ? '-9' : '0'} ,-12)`)
-        //   .style('pointer-events', 'all')
-
         return handleGroup
       })
 
       .attr('display', 'block')
-      .attr('transform', selection === null ? null : (d, i) => `translate(${selection[i]},${'10'})`)
+      .attr('transform', selection === null ? null : (_, i) => `translate(${selection[i]},${'10'})`)
   }
 
   useEffect(() => {
-    const svg = d3 // prettier-ignore
-      .select(svgRef.current)
-      .attr('overflow', 'visible')
+    const svg = d3.select(svgRef.current).attr('overflow', 'visible')
 
     // append background rect
     svg
@@ -83,14 +74,6 @@ function BrushChart({ xMax, yMax, xScaleBrush: x }) {
       .attr('height', brushheight)
       .attr('width', xMax)
 
-    const safeInvert = (xScale, value) => {
-      if (xScale && typeof xScale.invert === 'function') {
-        return xScale.invert(value)
-      } else {
-        return null
-      }
-    }
-
     const brushHanlder = event => {
       if (!event) {
         return
@@ -99,7 +82,7 @@ function BrushChart({ xMax, yMax, xScaleBrush: x }) {
 
       if (selection && selection.length > 0) {
         // invert pixel values into data values
-        const [x0, x1] = selection.map(value => safeInvert(x, value))
+        const [x0, x1] = selection.map(value => invertValue(x, value))
         // filter out data based on inverted data values
         const newFilteredData = tableData.filter(d => new Date(d[config.runtime.originalXAxis.dataKey]) >= x0 && new Date(d[config.runtime.originalXAxis.dataKey]) <= x1)
 
