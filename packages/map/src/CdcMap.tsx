@@ -274,7 +274,7 @@ const CdcMap = ({ dashboardConfig, className, config, navigationHandler: customN
       }
 
       if (!uid && state.columns.latitude?.name && state.columns.longitude?.name && row[state.columns.latitude?.name] && row[state.columns.longitude?.name]) {
-        uid = `${row[state.columns.geo.name]}-${index}`
+        uid = `${row[state.columns.geo.name]}`
       }
 
       if (uid) {
@@ -884,7 +884,7 @@ const CdcMap = ({ dashboardConfig, className, config, navigationHandler: customN
         if (undefined === row.uid) return false // No UID for this row, we can't use for mapping
 
         // When on a single state map filter runtime data by state
-        if (!(String(row[obj.columns.geo.name]).substring(0, 2) === obj.general?.statePicked?.fipsCode) && obj.general.geoType !== 'single-state' && obj.general.type !== 'us-geocode') {
+        if (!(String(row[obj.columns.geo.name]).substring(0, 2) === obj.general?.statePicked?.fipsCode) && obj.general.geoType !== 'single-state' && obj.general.type !== 'us-geocode' && obj.general.geoType !== 'world') {
           return false
         }
 

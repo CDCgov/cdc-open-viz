@@ -15,9 +15,10 @@ type ZoomControlsProps = {
   generateRuntimeData: any
   handleZoomIn: any
   handleZoomOut: any
+  handleReset: any
 }
 
-const ZoomControls: React.FC<ZoomControlsProps> = ({ position, setPosition, state, setState, setRuntimeData, generateRuntimeData, handleZoomIn, handleZoomOut }) => {
+const ZoomControls: React.FC<ZoomControlsProps> = ({ position, setPosition, state, setState, setRuntimeData, generateRuntimeData, handleZoomIn, handleZoomOut, handleReset }) => {
   if (!state.general.allowMapZoom) return
   return (
     <div className='zoom-controls' data-html2canvas-ignore>
@@ -37,7 +38,7 @@ const ZoomControls: React.FC<ZoomControlsProps> = ({ position, setPosition, stat
           Reset Filters
         </button>
       )}
-      {state.general.type === 'world-geocode' && (
+      {(state.general.type === 'world-geocode' || state.general.geoType === 'single-state') && (
         <button onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)} className='reset' aria-label='Reset Zoom'>
           Reset Zoom
         </button>

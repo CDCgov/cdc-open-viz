@@ -2900,7 +2900,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   <span className='edit-label'>Show Data with Zero's on Bubble Map</span>
                 </label>
               )}
-              {state.general.geoType === 'world' && (
+              {(state.general.geoType === 'world' || state.general.geoType === 'single-state') && (
                 <label className='checkbox'>
                   <input
                     type='checkbox'

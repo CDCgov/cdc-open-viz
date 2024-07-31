@@ -145,7 +145,7 @@ const WorldMap = () => {
       }
 
       // Default return state, just geo with no additional information
-      return <Geo additionalData={additionalData} geoData={geoData} state={state} key={i + '-geo'} stroke={geoStrokeColor} strokeWidth={strokeWidth} style={styles} path={path} />
+      return <Geo additionaldata={JSON.stringify(additionalData)} geodata={JSON.stringify(geoData)} state={state} key={i + '-geo'} stroke={geoStrokeColor} strokeWidth={strokeWidth} style={styles} path={path} />
     })
 
     // Cities

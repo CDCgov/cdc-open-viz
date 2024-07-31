@@ -11,6 +11,7 @@ import SingleState from './SingleState'
 import { getTopoData, getCurrentTopoYear, isTopoReady, getFilterControllingStatePicked } from './../helpers/map'
 import { type Topology } from 'topojson-client'
 import ZoomableGroup from '../../ZoomableGroup'
+import ZoomControls from '../../ZoomControls'
 
 // SVG ITEMS
 const WIDTH = 880
@@ -33,13 +34,13 @@ const SingleStateMap = props => {
     runtimeFilters,
     tooltipId,
     dashboardConfig,
-    setParentConfig,
     setState,
     position,
-    setPosition
+    setPosition,
+    generateRuntimeData,
+    setRuntimeData
   } = useContext(ConfigContext)
 
-  console.log('position', position)
   const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
   const cityListProjection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
@@ -49,6 +50,16 @@ const SingleStateMap = props => {
   const [topoData, setTopoData] = useState<Topology | {}>({})
 
   const path = geoPath().projection(projection)
+
+  const handleZoomIn = (position, setPosition) => {
+    if (position.zoom >= 4) return
+    setPosition(pos => ({ ...pos, zoom: pos.zoom * 1.5 }))
+  }
+
+  const handleZoomOut = (position, setPosition) => {
+    if (position.zoom <= 1) return
+    setPosition(pos => ({ ...pos, zoom: pos.zoom / 1.5 }))
+  }
 
   const handleMoveEnd = position => {
     setPosition(position)
@@ -63,6 +74,37 @@ const SingleStateMap = props => {
       })
     }
   }, [state.general.countyCensusYear, state.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
+
+  // from state?.general?.statePicked.stateName get the center coordinates
+  const handleReset = useCallback(() => {
+    if (!isTopoReady(topoData, state, runtimeFilters)) return
+
+    const _statePicked = getFilterControllingStatePicked(state, dashboardConfig)
+    const _statePickedData = topoData.states.find(s => s.properties.name === _statePicked)
+    const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
+    const newProjection = projection.fitExtent(
+      [
+        [PADDING, PADDING],
+        [WIDTH - PADDING, HEIGHT - PADDING]
+      ],
+      _statePickedData
+    )
+
+    const newScale = newProjection.scale()
+    const newScaleWithHypot = newScale / 1070
+
+    let [x, y] = newProjection.translate()
+    x = x - WIDTH
+    y = y - HEIGHT / 2
+
+    setTranslate([x, y])
+    setScale(newScaleWithHypot)
+
+    // get state center coordinates
+    const featureCenter = path.centroid(stateToShow)
+    const stateCenter = newProjection.invert(featureCenter)
+    setPosition({ coordinates: stateCenter, zoom: 1 })
+  }, [state.general.allowMapZoom])
 
   useEffect(() => {
     if (!isTopoReady(topoData, state, runtimeFilters)) return
@@ -216,9 +258,9 @@ const SingleStateMap = props => {
 
   return (
     <ErrorBoundary component='SingleStateMap'>
-      {stateToShow && (
+      {stateToShow && state.general.allowMapZoom && (
         <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' role='img' aria-label={handleMapAriaLabels(state)}>
-          <ZoomableGroup zoom={position.zoom} center={position.coordinates || [0, 30]} onMoveEnd={handleMoveEnd} maxZoom={4} projection={projection} width={880} height={500}>
+          <ZoomableGroup zoom={position.zoom} center={position.coordinates} onMoveEnd={handleMoveEnd} maxZoom={4} projection={projection} width={880} height={500}>
             <rect className='background center-container ocean' width={WIDTH} height={HEIGHT} fillOpacity={1} fill='white'></rect>
             <CustomProjection
               data={[{ states: stateToShow?.states, counties: topoData.counties.filter(c => c.id.substring(0, 2) === state.general.statePicked.fipsCode) }]}
@@ -243,7 +285,44 @@ const SingleStateMap = props => {
           </ZoomableGroup>
         </svg>
       )}
+      {stateToShow && !state.general.allowMapZoom && (
+        <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' role='img' aria-label={handleMapAriaLabels(state)}>
+          <rect className='background center-container ocean' width={WIDTH} height={HEIGHT} fillOpacity={1} fill='white'></rect>
+          <CustomProjection
+            data={[{ states: stateToShow?.states, counties: topoData.counties.filter(c => c.id.substring(0, 2) === state.general.statePicked.fipsCode) }]}
+            projection={geoAlbersUsaTerritories}
+            fitExtent={[
+              [
+                [PADDING, PADDING],
+                [WIDTH - PADDING, HEIGHT - PADDING]
+              ],
+              stateToShow
+            ]}
+          >
+            {({ features, projection }) => {
+              return (
+                <g id='mapGroup' className={`countyMapGroup ${state.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''}`} transform={`translate(${translate}) scale(${scale})`} data-scale='' key='countyMapGroup'>
+                  {constructGeoJsx(features, projection)}
+                </g>
+              )
+            }}
+          </CustomProjection>
+          {state.annotations.length > 0 && <Annotation.Draggable />}
+        </svg>
+      )}
       {!state.general.statePicked && 'No State Picked'}
+      <ZoomControls
+        // prettier-ignore
+        generateRuntimeData={generateRuntimeData}
+        handleZoomIn={handleZoomIn}
+        handleZoomOut={handleZoomOut}
+        handleReset={handleReset}
+        position={position}
+        setPosition={setPosition}
+        setRuntimeData={setRuntimeData}
+        setState={setState}
+        state={state}
+      />
     </ErrorBoundary>
   )
 }
