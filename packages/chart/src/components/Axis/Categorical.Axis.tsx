@@ -70,7 +70,8 @@ const CategoricalYAxis = ({ yMax, leftSize, max }) => {
 
   const yScale = scaleLinear({
     domain: [0, max],
-    range: [yMax, 0]
+    range: [yMax, 0],
+    clamp: true
   })
 
   const colorScale = scaleOrdinal({
