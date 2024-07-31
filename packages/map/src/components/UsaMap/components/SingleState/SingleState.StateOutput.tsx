@@ -32,6 +32,7 @@ const StateOutput: React.FC<StateOutputProps> = ({ topoData, statePassed, path, 
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
   let stateLines = path(mesh(topoData, geo[0]))
+
   return (
     <g key={'single-state'} className='single-state' style={{ fill: '#E6E6E6' }} stroke={geoStrokeColor} strokeWidth={0.95 / scale}>
       <path tabIndex={-1} className='state-path' d={stateLines} />

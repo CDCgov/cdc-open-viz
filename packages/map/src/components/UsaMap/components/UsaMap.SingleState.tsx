@@ -48,7 +48,6 @@ const SingleStateMap = props => {
   const [translate, setTranslate] = useState()
   const [scale, setScale] = useState()
   const [topoData, setTopoData] = useState<Topology | {}>({})
-
   const path = geoPath().projection(projection)
 
   const handleZoomIn = (position, setPosition) => {
@@ -76,7 +75,7 @@ const SingleStateMap = props => {
   }, [state.general.countyCensusYear, state.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
 
   // from state?.general?.statePicked.stateName get the center coordinates
-  const handleReset = useCallback(() => {
+  const handleReset = () => {
     if (!isTopoReady(topoData, state, runtimeFilters)) return
 
     const _statePicked = getFilterControllingStatePicked(state, dashboardConfig)
@@ -104,44 +103,10 @@ const SingleStateMap = props => {
     const featureCenter = path.centroid(stateToShow)
     const stateCenter = newProjection.invert(featureCenter)
     setPosition({ coordinates: stateCenter, zoom: 1 })
-  }, [state.general.allowMapZoom])
+  }
 
   useEffect(() => {
-    if (!isTopoReady(topoData, state, runtimeFilters)) return
-    const _statePicked = getFilterControllingStatePicked(state, dashboardConfig)
-    const _statePickedData = topoData.states.find(s => s.properties.name === _statePicked)
-    if (!_statePickedData) return
-    setStateToShow(_statePickedData)
-    const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
-    const newProjection = projection.fitExtent(
-      [
-        [PADDING, PADDING],
-        [WIDTH - PADDING, HEIGHT - PADDING]
-      ],
-      _statePickedData
-    )
-    const newScale = newProjection.scale()
-    const newScaleWithHypot = newScale / 1070
-
-    let [x, y] = newProjection.translate()
-    x = x - WIDTH / 2
-    y = y - HEIGHT / 2
-
-    setTranslate([x, y])
-    setScale(newScaleWithHypot)
-
-    setState(prevState => {
-      if (prevState.general.statePicked?.stateName !== _statePickedData?.properties?.name && _statePickedData) {
-        return {
-          ...prevState,
-          general: {
-            ...prevState.general,
-            statePicked: { fipsCode: _statePickedData?.id, stateName: _statePickedData?.properties?.name }
-          }
-        }
-      }
-      return prevState
-    })
+    setScaleAndTranslate()
   }, [state?.general?.statePicked.stateName, dashboardConfig?.dashboard?.sharedFilters])
 
   useEffect(() => {
@@ -155,27 +120,16 @@ const SingleStateMap = props => {
   }, [state.general.countyCensusYear, state.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
 
   useEffect(() => {
-    const _statePicked = getFilterControllingStatePicked(state, dashboardConfig)
-    const _statePickedData = topoData?.states?.find(s => s.properties.name === _statePicked)
-
-    if (_statePickedData?.id) {
-      setState({
-        ...state,
-        general: {
-          ...state.general,
-          statePicked: { fipsCode: _statePickedData?.id, stateName: _statePickedData?.properties?.name }
-        }
-      })
-    }
+    setScaleAndTranslate()
   }, [topoData])
 
   // When choosing a state changes...
-  useEffect(() => {
+  const setScaleAndTranslate = useCallback(() => {
     if (!isTopoReady(topoData, state, runtimeFilters)) return
-    if (state.general.hasOwnProperty('statePicked')) {
-      const statePicked = getFilterControllingStatePicked(state, dashboardConfig)
-      const statePickedData = topoData.states.find(s => s.properties.name === statePicked)
-      setStateToShow(statePickedData)
+    if (state.general?.statePicked) {
+      const _statePicked = getFilterControllingStatePicked(state, dashboardConfig)
+      const _statePickedData = topoData.states.find(s => s.properties.name === _statePicked)
+      setStateToShow(_statePickedData)
 
       const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
       const newProjection = projection.fitExtent(
@@ -183,7 +137,7 @@ const SingleStateMap = props => {
           [PADDING, PADDING],
           [WIDTH - PADDING, HEIGHT - PADDING]
         ],
-        statePickedData
+        _statePickedData
       )
       const newScale = newProjection.scale()
       const newScaleWithHypot = newScale / 1070
@@ -194,8 +148,25 @@ const SingleStateMap = props => {
 
       setTranslate([x, y])
       setScale(newScaleWithHypot)
+
+      setState(prevState => {
+        if (prevState.general.statePicked?.stateName !== _statePickedData?.properties?.name && _statePickedData) {
+          return {
+            ...prevState,
+            general: {
+              ...prevState.general,
+              statePicked: { fipsCode: _statePickedData?.id, stateName: _statePickedData?.properties?.name }
+            }
+          }
+        }
+        return prevState
+      })
     }
-  }, [state.general.statePicked, topoData.year])
+  }, [dashboardConfig, runtimeFilters, state, topoData, state.general.statePicked])
+
+  useEffect(() => {
+    setScaleAndTranslate()
+  }, [state.general.statePicked, topoData.year, state.general.allowMapZoom, setScaleAndTranslate])
 
   if (!isTopoReady(topoData, state, runtimeFilters)) {
     return (
