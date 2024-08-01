@@ -65,14 +65,14 @@ const Tab = ({ name, handleClick, tabs, index, active }) => {
 
   return (
     <li className='nav-item'>
-      <a className={`edit nav-link${active ? ' active' : ''}`} aria-current={active ? 'page' : null} href='#' onClick={onClick}>
+      <div className={`edit nav-link${active ? ' active' : ''}`} aria-current={active ? 'page' : null} onClick={onClick}>
         {canMoveLeft && <button onClick={() => handleReorder(index, -1)}>{'<'}</button>}
         {editing ? <input type='text' defaultValue={name} onBlur={onBlur} ref={inputRef} /> : <>{name}</>}
         {canMoveRight && <button onClick={() => handleReorder(index, 1)}>{'>'}</button>}
         <button className='remove' onClick={handleRemove}>
           X
         </button>
-      </a>
+      </div>
     </li>
   )
 }
@@ -95,9 +95,9 @@ const MultiConfigTabs = () => {
         <Tab key={tab + index} name={tab} tabs={tabs} index={index} handleClick={() => saveAndLoad(index)} active={index === activeTab} />
       ))}
       <li className='nav-item'>
-        <a className='nav-link add' href='#' onClick={() => dispatch({ type: 'ADD_NEW_DASHBOARD' })}>
+        <button className='nav-link add' onClick={() => dispatch({ type: 'ADD_NEW_DASHBOARD' })}>
           +
-        </a>
+        </button>
       </li>
     </ul>
   )

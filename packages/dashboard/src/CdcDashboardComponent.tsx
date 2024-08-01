@@ -27,7 +27,7 @@ import CdcMarkupInclude from '@cdc/markup-include'
 import CdcFilteredText from '@cdc/filtered-text'
 
 import Grid from './components/Grid'
-import Header, { FilterBehavior } from './components/Header/Header'
+import Header from './components/Header/Header'
 import DataTable from '@cdc/core/components/DataTable'
 import MediaControls from '@cdc/core/components/MediaControls'
 
@@ -57,17 +57,14 @@ import { getVizConfig } from './helpers/getVizConfig'
 import { getFilteredData } from './helpers/getFilteredData'
 import { getVizRowColumnLocator } from './helpers/getVizRowColumnLocator'
 import Layout from '@cdc/core/components/Layout'
-import CollapsibleVisualizationRow from './components/CollapsibleVisualizationRow'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import * as apiFilterHelpers from './helpers/apiFilterHelpers'
 import * as reloadURLHelpers from './helpers/reloadURLHelpers'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { DashboardFilters } from './types/DashboardFilters'
 import DashboardSharedFilters from './components/DashboardFilters'
-import { getAutoLoadVisualization } from './helpers/getAutoLoadVisualization'
-import { changeFilterActive } from './helpers/changeFilterActive'
-import { addValuesToSharedFilters } from './helpers/addValuesToSharedFilters'
 import ExpandCollapseButtons from './components/ExpandCollapseButtons'
+import { hasDashboardApplyBehavior } from './helpers/hasDashboardApplyBehavior'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -264,13 +261,13 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   useEffect(() => {
     if (isEditor && !isPreview) return
     const { config } = state
-    if (config.filterBehavior !== FilterBehavior.Apply) {
+    if (!hasDashboardApplyBehavior(config.visualizations)) {
       reloadURLData()
     }
 
     const sharedFiltersWithValues = addValuesToFilters<SharedFilter>(config.dashboard.sharedFilters, state.data)
     loadAPIFilters(sharedFiltersWithValues)
-    updateDataFilters()
+    updateFilteredData()
   }, [isEditor, isPreview, state.config?.activeDashboard])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
@@ -294,96 +291,11 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     }
   }
 
-  const applyFilters = () => {
-    const dashboardConfig = _.cloneDeep(state.config.dashboard)
-    const autoLoadViz = getAutoLoadVisualization(state.config.visualizations)
-    const nonAutoLoadFilterIndexes = autoLoadViz?.hide || []
-    const allRequiredFiltersSelected = !dashboardConfig.sharedFilters.some((filter, filterIndex) => {
-      if (nonAutoLoadFilterIndexes.includes(filterIndex)) {
-        return !filter.active && !filter.queuedActive
-      } else {
-        // autoload filters don't need to be selected to apply filters
-        return false
-      }
-    })
-    if (allRequiredFiltersSelected) {
-      if (state.config.filterBehavior === FilterBehavior.Apply) {
-        const queryParams = getQueryParams()
-        let needsQueryUpdate = false
-        dashboardConfig.sharedFilters.forEach((sharedFilter, index) => {
-          if (sharedFilter.queuedActive) {
-            dashboardConfig.sharedFilters[index].active = sharedFilter.queuedActive
-            delete dashboardConfig.sharedFilters[index].queuedActive
-
-            if (sharedFilter.setByQueryParameter && queryParams[sharedFilter.setByQueryParameter] !== sharedFilter.active) {
-              queryParams[sharedFilter.setByQueryParameter] = sharedFilter.active
-              needsQueryUpdate = true
-            }
-          }
-        })
-
-        if (needsQueryUpdate) {
-          updateQueryString(queryParams)
-        }
-      }
-
-      dispatch({ type: 'SET_SHARED_FILTERS', payload: dashboardConfig.sharedFilters })
-      updateFilteredData()
-      loadAPIFilters(dashboardConfig.sharedFilters)
-        .then(newFilters => {
-          reloadURLData(newFilters)
-        })
-        .catch(e => {
-          console.error(e)
-        })
-    } else {
-      // TODO noftify of required fields
-    }
-  }
-
-  const updateFilteredData = (sharedFilters?) => {
+  const updateFilteredData = (sharedFilters = undefined) => {
     const clonedState = _.cloneDeep(state)
     if (sharedFilters) clonedState.config.dashboard.sharedFilters = sharedFilters
     const newFilteredData = getFilteredData(clonedState)
     dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
-  }
-
-  const updateDataFilters = (sharedFilters = undefined) => {
-    const clonedState = _.cloneDeep(state)
-    if (sharedFilters) clonedState.config.dashboard.sharedFilters = sharedFilters
-    const newFilteredData = getFilteredData(clonedState)
-    dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
-  }
-
-  const handleOnChange = (index: number, value: string | string[]) => {
-    const config = _.cloneDeep(state.config)
-    let newSharedFilters = changeFilterActive(index, value, config)
-
-    if (config.filterBehavior === FilterBehavior.Apply) {
-      const isAutoSelectFilter = autoLoadFilterIndexes.includes(index)
-      const missingFilterSelections = config.dashboard.sharedFilters.some(f => !f.active)
-      if (isAutoSelectFilter && !missingFilterSelections) {
-        // a dropdown has been selected that doesn't
-        // require the Go Button
-        loadAPIFilters(newSharedFilters).then(filters => {
-          reloadURLData(filters)
-        })
-      } else {
-        if (Array.isArray(value)) throw Error(`Cannot set active values on urlfilters. expected: ${JSON.stringify(value)} to be a single value.`)
-        newSharedFilters[index].queuedActive = value
-        // setData to empty object because we no longer have a data state.
-        dispatch({ type: 'SET_DATA', payload: {} })
-        dispatch({ type: 'SET_FILTERED_DATA', payload: {} })
-        loadAPIFilters(newSharedFilters)
-      }
-    } else {
-      if (newSharedFilters[index].apiFilter) {
-        reloadURLData(newSharedFilters)
-      } else {
-        updateFilteredData(newSharedFilters)
-        dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
-      }
-    }
   }
 
   const resizeObserver = new ResizeObserver(entries => {

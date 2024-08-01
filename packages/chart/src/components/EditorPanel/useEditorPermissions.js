@@ -320,6 +320,16 @@ export const useEditorPermissions = () => {
     return visualizationType === 'Line' || visualizationType === 'Bar' || visualizationType === 'Scatter Plot' || visualizationType === 'Area Chart'
   }
 
+  const visHasSingleSeriesTooltip = () => {
+    if (visualizationType === 'Bar' || visualizationType === 'Line') {
+      return true
+    }
+    if (visualizationType === 'Area Chart' && visualizationSubType === 'stacked') {
+      return true
+    }
+    return false
+  }
+
   return {
     enabledChartTypes,
     headerColors,
@@ -366,6 +376,7 @@ export const useEditorPermissions = () => {
     visSupportsReactTooltip,
     visSupportsValueAxisMax,
     visSupportsValueAxisMin,
-    visSupportsDynamicSeries
+    visSupportsDynamicSeries,
+    visHasSingleSeriesTooltip
   }
 }

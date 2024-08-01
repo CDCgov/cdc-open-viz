@@ -23,7 +23,6 @@ type DeprecatedVisualizationType = {
   dataFileSourceType: string
   dataFormat: any
   datasets: Record<string, any>
-  filterBehavior: FilterBehavior
   filters: VizFilter[]
   general: General
   legend: Legend
@@ -54,6 +53,7 @@ export type CommonVisualizationProperties = Partial<StatefulProperties> & {
   showEditorPanel?: boolean
   uid?: string // this is the actual key of the visualization object
   visualizationType?: string
+  filterBehavior: FilterBehavior
 } & Partial<ConfigureData>
 
 export type Visualization = DeprecatedVisualizationType & CommonVisualizationProperties

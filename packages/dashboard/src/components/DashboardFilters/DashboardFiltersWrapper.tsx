@@ -10,6 +10,7 @@ import { getQueryParams, updateQueryString } from '@cdc/core/helpers/queryString
 import Layout from '@cdc/core/components/Layout'
 import DashboardFiltersEditor from './DashboardFiltersEditor'
 import { ViewPort } from '@cdc/core/types/ViewPort'
+import { hasDashboardApplyBehavior } from '../../helpers/hasDashboardApplyBehavior'
 
 export type DropdownOptions = Record<'value' | 'text', string>[]
 
@@ -45,7 +46,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({ apiFilterDro
       }
     })
     if (allRequiredFiltersSelected) {
-      if (state.config.filterBehavior === FilterBehavior.Apply) {
+      if (hasDashboardApplyBehavior(state.config.visualizations)) {
         const queryParams = getQueryParams()
         let needsQueryUpdate = false
         dashboardConfig.sharedFilters.forEach((sharedFilter, index) => {
@@ -83,7 +84,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({ apiFilterDro
     const newConfig = _.cloneDeep(dashboardConfig)
     let newSharedFilters = changeFilterActive(index, value, newConfig.dashboard.sharedFilters, visualizationConfig)
 
-    if (dashboardConfig.filterBehavior === FilterBehavior.Apply) {
+    if (hasDashboardApplyBehavior(dashboardConfig.visualizations)) {
       const isAutoSelectFilter = visualizationConfig.autoLoad
       const missingFilterSelections = newConfig.dashboard.sharedFilters.some(f => !f.active)
       if (isAutoSelectFilter && !missingFilterSelections) {
@@ -130,8 +131,8 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({ apiFilterDro
       )}
 
       <Layout.Responsive isEditor={isEditor}>
-        <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''} col-12`}>
-          <Filters show={visualizationConfig.sharedFilterIndexes.map(Number)} filters={dashboardConfig.dashboard.sharedFilters || []} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} />
+        <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''} cove-component__content col-12`}>
+          <Filters show={visualizationConfig?.sharedFilterIndexes?.map(Number)} filters={dashboardConfig.dashboard.sharedFilters || []} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} />
           {visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad && <button onClick={applyFilters}>GO!</button>}
         </div>
       </Layout.Responsive>

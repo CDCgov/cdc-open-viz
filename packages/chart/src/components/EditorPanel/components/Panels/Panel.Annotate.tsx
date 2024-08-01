@@ -58,7 +58,6 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         tablet: true,
         mobile: true
       },
-      markerType: 'arrow',
       connectorType: 'line',
       colors: {
         label: 'black',
@@ -271,6 +270,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     Marker
                     <select
                       key='annotation-marker'
+                      value={annotation.marker}
                       onChange={e => {
                         const updatedAnnotations = _.cloneDeep(config?.annotations)
                         updatedAnnotations[index].marker = e.target.value
@@ -280,7 +280,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                         })
                       }}
                     >
-                      {['circle', 'arrow'].map((column, columnIndex) => {
+                      {['arrow', 'circle'].map((column, columnIndex) => {
                         return <option key={`col-${columnIndex}`}>{column}</option>
                       })}
                     </select>

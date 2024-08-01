@@ -50,14 +50,21 @@ export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, i
   if (!isSuppressed && String(bar.value) === '0' && config.general.showZeroValueDataLabel) {
     const labelWidth = getTextWidth(barLabel, `normal ${barWidth / 2}px sans-serif`)
     const labelFits = labelWidth < barWidth && barWidth > 10
-    barHeight = labelFits ? heightMini : 0
+    barHeight = config.isLollipopChart ? heightMini * 2 : !config.isLollipopChart && labelFits ? heightMini : 0
     barWidthHorizontal = heightMini
     showZeroValueDataLabel = true
   }
 
   const getBarY = (defaultBarY, yScale) => {
     // calculate Y position of small bars (suppressed,N/A,Zero valued) bars
-    return isSuppressed || showMissingDataLabel || showZeroValueDataLabel ? yScale - heightMini : defaultBarY
+    if (isSuppressed || showMissingDataLabel || showZeroValueDataLabel) {
+      if (config.isLollipopChart) {
+        return yScale - heightMini * 2
+      } else {
+        return yScale - heightMini
+      }
+    }
+    return defaultBarY
   }
 
   // Function to determine the label for a bar in a bar chart vertical/Horizontal
@@ -76,8 +83,20 @@ export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, i
     // determine label width in pixels & check if it fits to the bar width
     const labelWidth = getTextWidth(barLabel, `normal ${barWidth / 2}px sans-serif`)
     const labelFits = labelWidth < barWidth && barWidth > 10
-    return labelFits && isVertical ? label : !isVertical ? label : ''
+    if (config.isLollipopChart) {
+      return label
+    } else {
+      return labelFits && isVertical ? label : !isVertical ? label : ''
+    }
   }
 
   return { barWidthHorizontal, barHeight, isSuppressed, showMissingDataLabel, showZeroValueDataLabel, getBarY, getAbsentDataLabel }
+}
+
+export const testZeroValue = value => {
+  if (value === undefined || value === null) {
+    return
+  }
+  const regex = /^0(\.0)?$/
+  return regex.test(value.toString())
 }

@@ -263,7 +263,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       if (!series.axis) series.axis = 'Left'
     })
 
-    if (!newConfig.data && data) {
+    if (data) {
       newConfig.data = data
     }
 
@@ -324,7 +324,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
 
-        newConfig.filters[index].active = newConfig.filters[index].active || filterValues[0]
+        newConfig.filters[index].active = !newConfig.filters[index].active || filterValues.indexOf(newConfig.filters[index].active) === -1 ? filterValues[0] : newConfig.filters[index].active
         newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle ? newConfig.filters[index].filterStyle : 'dropdown'
       })
       currentData = filterVizData(newConfig.filters, newExcludedData)
