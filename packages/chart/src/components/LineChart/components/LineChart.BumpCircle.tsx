@@ -24,11 +24,9 @@ const LineChartBumpCircle = props => {
   }
 
   const getListItems = dataRow => {
-    console.log('dataRow', dataRow)
     const listItems = []
     Object.values(config.columns)?.forEach(column => {
       if (!column.tooltips) return
-      console.log('c', column)
       if (!column.label) {
         listItems.push(
           `<li className='tooltip-body'>
@@ -80,7 +78,7 @@ const LineChartBumpCircle = props => {
                   y={Number(yScale(d[series.dataKey])) + 4}
                   fill='#000000'
                   fontSize={11.5}
-                  onMouseOver={() => handleClick(series.dataKey, d[config.xAxis.dataKey])}>
+                  >
                   {d[series.dataKey]}
                 </text>
                 )}
