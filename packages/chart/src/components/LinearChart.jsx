@@ -24,6 +24,9 @@ import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './../hooks/useIntersectionObserver'
 import Regions from './Regions'
 
+// Helpers
+import { isConvertLineToBarGraph } from '../helpers/isConvertLineToBarGraph'
+
 // Hooks
 import useMinMax from '../hooks/useMinMax'
 import useReduceData from '../hooks/useReduceData'
@@ -32,14 +35,39 @@ import useScales, { getTickValues } from '../hooks/useScales'
 import useTopAxis from '../hooks/useTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
+import Annotation from './Annotations'
 
 // styles
 import ZoomBrush from './ZoomBrush'
 
 const LinearChart = props => {
-  const { transformedData: data, tableData, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, getTextWidth, brushConfig, colorScale, seriesHighlight } = useContext(ConfigContext)
+  // prettier-ignore
+  const {
+    brushConfig,
+    config,
+    currentViewport,
+    dimensions,
+    formatDate,
+    formatNumber,
+    getTextWidth,
+    handleChartAriaLabels,
+    handleLineType,
+    handleDragStateChange,
+    parseDate,
+    tableData,
+    transformedData: data,
+    updateConfig,
+    isDraggingAnnotation,
+    seriesHighlight,
+    colorScale
+  } = useContext(ConfigContext)
+
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
+
+  const checkLineToBarGraph = () => {
+    return isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph)
+  }
 
   // configure width
   let [width] = dimensions
@@ -50,9 +78,14 @@ const LinearChart = props => {
   const { horizontal: heightHorizontal } = config.heights
   const isHorizontal = orientation === 'horizontal' || config.visualizationType === 'Forest Plot'
   const shouldAbbreviate = true
+  const xLabelOffset = isNaN(parseInt(runtime.xAxis.labelOffset)) ? 0 : parseInt(runtime.xAxis.labelOffset)
+  const yLabelOffset = isNaN(parseInt(runtime.yAxis.labelOffset)) ? 0 : parseInt(runtime.yAxis.labelOffset)
+  const xAxisSize = isNaN(parseInt(runtime.xAxis.size)) ? 0 : parseInt(runtime.xAxis.size)
   let height = config.aspectRatio ? width * config.aspectRatio : config.visualizationType === 'Forest Plot' ? config.heights['vertical'] : config.heights[orientation]
+  height = Number(height)
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
-  let yMax = height - (orientation === 'horizontal' ? 0 : runtime.xAxis.padding || 0)
+  let yMax = height - (orientation === 'horizontal' ? 0 : xAxisSize)
+  height += orientation === 'horizontal' ? xAxisSize : 0
 
   if (config.visualizationType === 'Forest Plot') {
     height = height + config.data.length * config.forestPlot.rowHeight
@@ -69,6 +102,7 @@ const LinearChart = props => {
   const { hasTopAxis } = useTopAxis(config)
   const [animatedChart, setAnimatedChart] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
+  const annotationRefs = useRef(null)
 
   // refs
   const triggerRef = useRef()
@@ -85,7 +119,7 @@ const LinearChart = props => {
   const properties = { data, tableData, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax }
   const { min, max, leftMax, rightMax } = useMinMax(properties)
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
-  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush } = useScales({ ...properties, min, max, leftMax, rightMax, dimensions })
+  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush, xScaleAnnotation } = useScales({ ...properties, min, max, leftMax, rightMax, dimensions })
 
   // sets the portal x/y for where tooltips should appear on the page.
   const [chartPosition, setChartPosition] = useState(null)
@@ -102,6 +136,7 @@ const LinearChart = props => {
     if (config.data && !config.data[index] && visualizationType === 'Forest Plot') return
     if (config.visualizationType === 'Forest Plot') return config.data[index][config.xAxis.dataKey]
     if (isDateScale(runtime.yAxis)) return formatDate(parseDate(tick))
+    if (orientation === 'vertical' && max - min < 3) return formatNumber(tick, 'left', shouldAbbreviate, false, false, '1')
     if (orientation === 'vertical') return formatNumber(tick, 'left', shouldAbbreviate)
     return tick
   }
@@ -120,7 +155,10 @@ const LinearChart = props => {
   }
 
   const countNumOfTicks = axis => {
-    const { numTicks } = runtime[axis]
+    let { numTicks } = runtime[axis]
+    if (runtime[axis].viewportNumTicks && runtime[axis].viewportNumTicks[currentViewport]) {
+      numTicks = runtime[axis].viewportNumTicks[currentViewport]
+    }
     let tickCount = undefined
 
     if (axis === 'yAxis') {
@@ -207,13 +245,21 @@ const LinearChart = props => {
     return false
   }
 
-  const padding = orientation === 'horizontal' ? Number(config.xAxis.padding) : Number(config.yAxis.size)
+  const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
   const fontSize = { small: 16, medium: 18, large: 20 }
 
   const handleNumTicks = () => {
     // On forest plots we need to return every "study" or y axis value.
     if (config.visualizationType === 'Forest Plot') return config.data.length
     return countNumOfTicks('yAxis')
+  }
+
+  const getManualStep = () => {
+    let manualStep = config.xAxis.manualStep
+    if (config.xAxis.viewportStepCount && config.xAxis.viewportStepCount[currentViewport]) {
+      manualStep = config.xAxis.viewportStepCount[currentViewport]
+    }
+    return manualStep
   }
 
   const onMouseMove = event => {
@@ -298,7 +344,7 @@ const LinearChart = props => {
                   {!runtime.yAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
                 </Group>
                 <Group>
-                  <Text x={xMax / 2} y={axisMaxHeight + 20} stroke='#333' textAnchor={'middle'} verticalAnchor='start'>
+                  <Text x={xMax / 2} y={axisMaxHeight + 20 + xLabelOffset} stroke='#333' textAnchor={'middle'} verticalAnchor='start'>
                     {runtime.xAxis.label}
                   </Text>
                 </Group>
@@ -318,17 +364,16 @@ const LinearChart = props => {
       {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
       <div style={{ width: `${width}px`, overflow: 'visible' }} className='tooltip-boundary'>
         <svg
-          // onMouseLeave={() => setPoint(null)}
           onMouseMove={onMouseMove}
           width={'100%'}
           height={height}
-          className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`}
+          className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'} ${isDraggingAnnotation && 'dragging-annotation'}`}
           role='img'
           aria-label={handleChartAriaLabels(config)}
           ref={svgRef}
           style={{ overflow: 'visible' }}
         >
-          <Bar width={width} height={height} fill={'transparent'}></Bar> {/* Highlighted regions */}
+          {!isDraggingAnnotation && <Bar width={width} height={height} fill={'transparent'}></Bar>} {/* Highlighted regions */}
           {/* Y axis */}
           {!['Spark Line', 'Forest Plot'].includes(visualizationType) && (
             <AxisLeft scale={yScale} tickLength={config.useLogScale ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.label || runtime.yAxis.label} stroke='#333' tickFormat={(tick, i) => handleLeftTickFormatting(tick, i)} numTicks={handleNumTicks()}>
@@ -343,12 +388,13 @@ const LinearChart = props => {
                       const showTicks = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
                       const tickLength = showTicks === 'block' ? 7 : 0
                       const to = { x: tick.to.x - tickLength, y: tick.to.y }
+                      const displayFirstGridLine = tick.index !== 0 || config.xAxis.hideAxis
 
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                           {!runtime.yAxis.hideTicks && <Line key={`${tick.value}--hide-hideTicks`} from={tick.from} to={config.useLogScale ? to : tick.to} stroke={config.yAxis.tickColor} display={orientation === 'horizontal' ? 'none' : 'block'} />}
 
-                          {runtime.yAxis.gridLines ? <Line key={`${tick.value}--hide-hideGridLines`} display={(config.useLogScale && showTicks).toString()} from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
+                          {runtime.yAxis.gridLines && displayFirstGridLine ? <Line key={`${tick.value}--hide-hideGridLines`} display={(config.useLogScale && showTicks).toString()} from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
 
                           {orientation === 'horizontal' && visualizationSubType !== 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
                             <Text
@@ -418,7 +464,7 @@ const LinearChart = props => {
                     {!config.yAxis.hideAxis && <Line from={props.axisFromPoint} to={runtime.horizontal ? { x: 0, y: config.visualizationType === 'Forest Plot' ? height : Number(heightHorizontal) } : props.axisToPoint} stroke='#000' />}
                     {yScale.domain()[0] < 0 && <Line from={{ x: props.axisFromPoint.x, y: yScale(0) }} to={{ x: xMax, y: yScale(0) }} stroke='#333' />}
                     {visualizationType === 'Bar' && orientation === 'horizontal' && xScale.domain()[0] < 0 && <Line from={{ x: xScale(0), y: 0 }} to={{ x: xScale(0), y: yMax }} stroke='#333' strokeWidth={2} />}
-                    <Text className='y-label' textAnchor='middle' verticalAnchor='start' transform={`translate(${-1 * runtime.yAxis.size}, ${axisCenter}) rotate(-90)`} fontWeight='bold' fill={config.yAxis.labelColor}>
+                    <Text className='y-label' textAnchor='middle' verticalAnchor='start' transform={`translate(${-1 * runtime.yAxis.size + yLabelOffset}, ${axisCenter}) rotate(-90)`} fontWeight='bold' fill={config.yAxis.labelColor}>
                       {props.label}
                     </Text>
                   </Group>
@@ -481,7 +527,7 @@ const LinearChart = props => {
               stroke='#333'
               numTicks={countNumOfTicks('xAxis')}
               tickStroke='#333'
-              tickValues={config.xAxis.manual ? getTickValues(xAxisDataMapped, xScale, config.xAxis.type === 'date-time' ? countNumOfTicks('xAxis') : config.xAxis.manualStep) : undefined}
+              tickValues={config.xAxis.manual ? getTickValues(xAxisDataMapped, xScale, config.xAxis.type === 'date-time' ? countNumOfTicks('xAxis') : getManualStep()) : undefined}
             >
               {props => {
                 const axisCenter = config.visualizationType !== 'Forest Plot' ? (props.axisToPoint.x - props.axisFromPoint.x) / 2 : dimensions[0] / 2
@@ -567,7 +613,7 @@ const LinearChart = props => {
                       )
                     })}
                     {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-                    <Text x={axisCenter} y={axisMaxHeight + 20} textAnchor='middle' verticalAnchor='start' fontWeight='bold' fill={config.xAxis.labelColor}>
+                    <Text x={axisCenter} y={axisMaxHeight + 20 + xLabelOffset} textAnchor='middle' verticalAnchor='start' fontWeight='bold' fill={config.xAxis.labelColor}>
                       {props.label}
                     </Text>
                   </Group>
@@ -604,7 +650,7 @@ const LinearChart = props => {
           {((visualizationType === 'Area Chart' && config.visualizationSubType === 'stacked') || visualizationType === 'Combo') && (
             <AreaChartStacked xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
           )}
-          {(visualizationType === 'Bar' || visualizationType === 'Combo') && (
+          {(visualizationType === 'Bar' || visualizationType === 'Combo' || checkLineToBarGraph()) && (
             <BarChart
               xScale={xScale}
               yScale={yScale}
@@ -623,7 +669,7 @@ const LinearChart = props => {
               chartRef={svgRef}
             />
           )}
-          {(visualizationType === 'Line' || visualizationType === 'Combo' || visualizationType === 'Bump Chart') && (
+          {((visualizationType === 'Line' && !checkLineToBarGraph()) || visualizationType === 'Combo' || visualizationType === 'Bump Chart') && (
             <LineChart
               xScale={xScale}
               yScale={yScale}
@@ -683,10 +729,10 @@ const LinearChart = props => {
             />
           )}
           {/*Zoom Brush */}
-          {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && !isHorizontal && <ZoomBrush xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />}
+          {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && false && !isHorizontal && <ZoomBrush xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
-          {visualizationType !== 'Bar' && visualizationType !== 'Paired Bar' && visualizationType !== 'Box Plot' && visualizationType !== 'Area Chart' && visualizationType !== 'Scatter Plot' && visualizationType !== 'Deviation Bar' && visualizationType !== 'Forecasting' && (
+          {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(visualizationType) && !checkLineToBarGraph() && (
             <>
               <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
             </>
@@ -705,13 +751,13 @@ const LinearChart = props => {
               return (
                 // prettier-ignore
                 <Line
-                key={`yAxis-${anchor.value}--${index}`}
-                strokeDasharray={handleLineType(anchor.lineStyle)}
-                stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                className='anchor-y'
-                from={{ x: 0 + padding, y: anchorPosition - middleOffset}}
-                to={{ x: width - config.yAxis.rightAxisSize, y: anchorPosition - middleOffset }}
-              />
+                  key={`yAxis-${anchor.value}--${index}`}
+                  strokeDasharray={handleLineType(anchor.lineStyle)}
+                  stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                  className='anchor-y'
+                  from={{ x: 0 + padding, y: anchorPosition - middleOffset}}
+                  to={{ x: width - config.yAxis.rightAxisSize, y: anchorPosition - middleOffset }}
+                />
               )
             })}
           {/* x anchors */}
@@ -762,18 +808,21 @@ const LinearChart = props => {
               {config.chartMessage.noData}
             </Text>
           )}
-          {config.visualizationType === 'Bar' && config.tooltips.singleSeries && config.visual.horizontalHoverLine && (
+          {(config.visualizationType === 'Bar' || checkLineToBarGraph()) && config.tooltips.singleSeries && config.visual.horizontalHoverLine && (
             <Group key='tooltipLine-horizontal' className='horizontal-tooltip-line' left={config.yAxis.size ? config.yAxis.size : 0}>
               <Line from={{ x: 0, y: point.y }} to={{ x: xMax, y: point.y }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='horizontal-tooltip-line' />
             </Group>
           )}
-          {config.visualizationType === 'Bar' && config.tooltips.singleSeries && config.visual.verticalHoverLine && (
+          {(config.visualizationType === 'Bar' || checkLineToBarGraph()) && config.tooltips.singleSeries && config.visual.verticalHoverLine && (
             <Group key='tooltipLine-vertical' className='vertical-tooltip-line'>
               <Line from={{ x: point.x, y: 0 }} to={{ x: point.x, y: yMax }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />
             </Group>
           )}
+          <Group left={Number(config.runtime.yAxis.size)}>
+            <Annotation.Draggable xScale={xScale} yScale={yScale} xScaleAnnotation={xScaleAnnotation} xMax={xMax} svgRef={svgRef} onDragStateChange={handleDragStateChange} />
+          </Group>
         </svg>
-        {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && !config.tooltips.singleSeries && (
+        {!isDraggingAnnotation && tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
           <>
             <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100}) !important;`}</style>
             <style>{`.tooltip {max-width:300px} !important; word-wrap: break-word; `}</style>
@@ -782,10 +831,7 @@ const LinearChart = props => {
             </TooltipWithBounds>
           </>
         )}
-
-        {visSupportsReactTooltip() && <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />}
-        {config.visualizationType === 'Bump Chart' && <ReactTooltip id={`bump-chart`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />}
-
+        {visSupportsReactTooltip() && !isDraggingAnnotation && <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />}
         <div className='animation-trigger' ref={triggerRef} />
       </div>
     </ErrorBoundary>

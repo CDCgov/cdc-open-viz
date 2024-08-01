@@ -60,19 +60,23 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
     const isValueMatch = String(pd.value) === String(labelValue)
     // check entered suppression column against table key
     const isColumnMatch = !pd.column || pd.column === column
+    const barSeriesExist = config.runtime?.barSeriesKeys?.includes(column)
+    const lineSeriesExist = config.runtime?.lineSeriesKeys?.includes(column)
+    const showSymbol = config.general.showSuppressedSymbol
     if (isValueMatch && isColumnMatch && pd.displayTable && pd.type === 'suppression') {
       switch (config.visualizationType) {
         case 'Combo':
-          cellValue = config.runtime.barSeriesKeys.includes(column) ? pd.iconCode : config.runtime.lineSeriesKeys.includes(column) ? pd.lineCode : ''
+          cellValue = barSeriesExist && showSymbol ? pd.iconCode : lineSeriesExist && showSymbol ? pd.lineCode : ''
           break
         case 'Bar':
-          cellValue = pd.iconCode
+          cellValue = !showSymbol ? '' : pd.iconCode
           break
         case 'Line':
-          cellValue = pd.lineCode
+          cellValue = !showSymbol ? '' : pd.lineCode
           break
       }
     }
   })
-  return cellValue
+  const shoMissingDataCellValue = config.general?.showMissingDataLabel && (!labelValue || labelValue === 'null')
+  return shoMissingDataCellValue ? 'N/A' : cellValue
 }

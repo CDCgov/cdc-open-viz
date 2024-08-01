@@ -96,6 +96,12 @@
     }
   }
 
+  .type-pie {
+    svg.animated-pie {
+      width: auto !important;
+    }
+  }
+
   .legend-container {
     background: #fff;
     width: 100%;
@@ -273,6 +279,17 @@
     }
     &.legend-hidden > svg {
       width: 100% !important;
+    }
+    &.dashboard-brush {
+      margin-bottom: 2.5em;
+    }
+
+    svg.dragging-annotation * {
+      user-select: none;
+    }
+
+    svg.dragging-annotation path {
+      pointer-events: none;
     }
 
     > svg {

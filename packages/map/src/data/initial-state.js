@@ -1,5 +1,7 @@
 export default {
+  annotations: [],
   general: {
+    annotationDropdownText: 'Annotations',
     geoBorderColor: 'darkGray',
     headerColor: 'theme-blue',
     title: '',
@@ -44,7 +46,8 @@ export default {
       prefix: '',
       suffix: '',
       name: '',
-      label: ''
+      label: '',
+      roundToPlace: 0
     },
     navigate: {
       name: ''

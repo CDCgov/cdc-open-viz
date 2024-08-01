@@ -21,8 +21,8 @@ interface MultiSelectProps {
   limit?: number
 }
 
-const MultiSelect: React.FC<MultiSelectProps> = ({ section = null, subsection = null, fieldName, label, options, updateField, selected, limit }) => {
-  const preselectedItems = options.filter(opt => selected?.includes(opt.value)).slice(0, limit)
+const MultiSelect: React.FC<MultiSelectProps> = ({ section = null, subsection = null, fieldName, label, options, updateField, selected = [], limit }) => {
+  const preselectedItems = options.filter(opt => selected.includes(opt.value)).slice(0, limit)
   const [selectedItems, setSelectedItems] = useState<Option[]>(preselectedItems)
   const [expanded, setExpanded] = useState(false)
   const multiSelectRef = useRef(null)
@@ -68,22 +68,39 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ section = null, subsection = 
   return (
     <div ref={multiSelectRef} className='cove-multiselect'>
       {label && (
-        <label id={multiID} className='cove-input__label'>
+        <span id={multiID} className='edit-label column-heading'>
           {label}
-        </label>
+        </span>
       )}
 
       <div className='wrapper'>
         <div className='selected'>
           {selectedItems.map(item => (
-            <div key={item.value} aria-labelledby={label ? multiID : undefined} role='button' onClick={() => handleItemRemove(item)} onKeyUp={e => handleItemRemove(item, e)}>
+            <div key={item.value} aria-labelledby={label ? multiID : undefined}>
               {item.label}
-              <button aria-label='Remove' onClick={() => handleItemRemove(item)}>
+              <button
+                aria-label='Remove'
+                onClick={e => {
+                  e.preventDefault()
+                  handleItemRemove(item)
+                }}
+                onKeyUp={e => {
+                  handleItemRemove(item, e)
+                }}
+              >
                 x
               </button>
             </div>
           ))}
-          <button aria-label={expanded ? 'Collapse' : 'Expand'} aria-labelledby={label ? multiID : undefined} className='expand' onClick={() => setExpanded(!expanded)}>
+          <button
+            aria-label={expanded ? 'Collapse' : 'Expand'}
+            aria-labelledby={label ? multiID : undefined}
+            className='expand'
+            onClick={e => {
+              e.preventDefault()
+              setExpanded(!expanded)
+            }}
+          >
             <Icon display={expanded ? 'caretDown' : 'caretUp'} style={{ cursor: 'pointer' }} />
           </button>
         </div>
@@ -98,11 +115,21 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ section = null, subsection = 
           </Tooltip>
         )}
       </div>
-      <ul className={'dropdown' + (expanded ? '' : ' hide')}>
+      <ul className={'dropdown' + (expanded ? '' : ' d-none')}>
         {options
           .filter(option => !selectedItems.find(item => item.value === option.value))
           .map(option => (
-            <li className='cove-multiselect-li' key={option.value} role='option' tabIndex={0} onClick={() => handleItemSelect(option)} onKeyUp={e => handleItemSelect(option, e)}>
+            <li
+              className='cove-multiselect-li'
+              key={option.value}
+              role='option'
+              tabIndex={0}
+              onClick={e => {
+                e.preventDefault()
+                handleItemSelect(option, e)
+              }}
+              onKeyUp={e => handleItemSelect(option, e)}
+            >
               {option.label}
             </li>
           ))}

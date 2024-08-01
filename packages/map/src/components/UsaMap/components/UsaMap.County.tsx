@@ -10,6 +10,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
+import Annotation from '../../Annotation'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -129,7 +130,8 @@ const CountyMap = props => {
       state,
       runtimeFilters,
       tooltipId,
-      isEditor
+      tooltipRef,
+      container
   } = useContext(ConfigContext)
 
   // CREATE STATE LINES
@@ -186,7 +188,6 @@ const CountyMap = props => {
 
   const resetButton = useRef()
   const canvasRef = useRef()
-  const tooltipRef = useRef()
 
   // If runtimeData is not defined, show loader
   if (!data || !isTopoReady(topoData, state, runtimeFilters)) {
@@ -274,6 +275,9 @@ const CountyMap = props => {
     const canvasBounds = canvas.getBoundingClientRect()
     const x = e.clientX - canvasBounds.left
     const y = e.clientY - canvasBounds.top
+    const containerBounds = container?.getBoundingClientRect()
+    const tooltipX = e.clientX - (containerBounds?.left || 0)
+    const tooltipY = e.clientY - (containerBounds?.top || 0)
     let pointCoordinates = topoData.projection.invert([x, y])
 
     const currentTooltipIndex = parseInt(tooltipRef.current.getAttribute('data-index'))
@@ -332,8 +336,14 @@ const CountyMap = props => {
           }
 
           tooltipRef.current.style.display = 'block'
-          tooltipRef.current.style.top = e.clientY + 'px'
-          tooltipRef.current.style.left = isEditor ? Number(e.clientX - 350) + 'px' : e.clientX + 'px'
+          tooltipRef.current.style.top = tooltipY + 'px'
+        if(tooltipX > containerBounds.width / 2) {
+          tooltipRef.current.style.transform = 'translate(-100%, -50%)'
+          tooltipRef.current.style.left = (tooltipX - 5) + 'px'
+        } else {
+          tooltipRef.current.style.transform = 'translate(0, -50%)'
+          tooltipRef.current.style.left = (tooltipX + 5) + 'px'
+        }
           tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(county.id), data[county.id])
           tooltipRef.current.setAttribute('data-index', countyIndex)
         } else {
@@ -358,7 +368,7 @@ const CountyMap = props => {
       let hoveredGeoIndex
       for (let i = 0; i < runtimeKeys.length; i++) {
         const pixelCoords = topoData.projection([data[runtimeKeys[i]][state.columns.longitude.name], data[runtimeKeys[i]][state.columns.latitude.name]])
-        if (state.visual.cityStyle === 'circle' && pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
+        if (state.visual.cityStyle === 'circle' && pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius && applyLegendToRow(data[runtimeKeys[i]])) {
           hoveredGeo = data[runtimeKeys[i]]
           hoveredGeoIndex = i
           break
@@ -366,7 +376,7 @@ const CountyMap = props => {
 
         if (state.visual.cityStyle === 'pin' && pixelCoords) {
           const distance = Math.hypot(pixelCoords[0] - x, pixelCoords[1] - y)
-          if (distance < 15) {
+          if (distance < 15 && applyLegendToRow(data[runtimeKeys[i]])) {
             hoveredGeo = data[runtimeKeys[i]]
             hoveredGeoIndex = i
             break
@@ -374,10 +384,16 @@ const CountyMap = props => {
         }
       }
 
-      if (hoveredGeo && applyLegendToRow(hoveredGeo)) {
+      if (hoveredGeo) {
         tooltipRef.current.style.display = 'block'
-        tooltipRef.current.style.top = e.clientY + 'px'
-        tooltipRef.current.style.left = e.clientX + 'px'
+        tooltipRef.current.style.top = tooltipY + 'px'
+        if(tooltipX > containerBounds.width / 2) {
+          tooltipRef.current.style.transform = 'translate(-100%, -50%)'
+          tooltipRef.current.style.left = (tooltipX - 5) + 'px'
+        } else {
+          tooltipRef.current.style.transform = 'translate(0, -50%)'
+          tooltipRef.current.style.left = (tooltipX + 5) + 'px'
+        }
         tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(hoveredGeo[state.columns.geo.name]), hoveredGeo)
         tooltipRef.current.setAttribute('data-index', hoveredGeoIndex)
       } else {
@@ -492,6 +508,7 @@ const CountyMap = props => {
       }
 
       const drawCircle = (circle, context) => {
+        context.lineWidth = lineWidth
         context.fillStyle = circle.color
         context.beginPath()
         context.arc(circle.x, circle.y, circle.geoRadius, 0, 2 * Math.PI)
@@ -535,7 +552,6 @@ const CountyMap = props => {
         onClick={canvasClick}
         className='county-map-canvas'
       ></canvas>
-      <div ref={tooltipRef} id={`tooltip__${tooltipId}`} className='tooltip' style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})` }}></div>
       <button className={`btn btn--reset`} onClick={onReset} ref={resetButton} tabIndex='0'>
         Reset Zoom
       </button>

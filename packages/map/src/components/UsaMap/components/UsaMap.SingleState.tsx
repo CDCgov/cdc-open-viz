@@ -10,6 +10,7 @@ import colorPalettes from '@cdc/core/data/colorPalettes'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import CityList from '../../CityList'
 import ConfigContext from '../../../context'
+import Annotation from '../../Annotation'
 
 // SVG ITEMS
 const WIDTH = 880
@@ -296,6 +297,7 @@ const SingleStateMap = props => {
               )
             }}
           </CustomProjection>
+          {state.annotations.length > 0 && <Annotation.Draggable />}
         </svg>
       )}
       {!state.general.statePicked && 'No State Picked'}

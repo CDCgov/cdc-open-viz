@@ -19,6 +19,7 @@ import boxplotCellMatrix from './helpers/boxplotCellMatrix'
 import removeNullColumns from './helpers/removeNullColumns'
 import { TableConfig } from './types/TableConfig'
 import { Column } from '../../types/Column'
+import { pivotData } from '../../helpers/pivotData'
 
 export type DataTableProps = {
   applyLegendToRow?: Function
@@ -53,7 +54,17 @@ export type DataTableProps = {
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = (props: DataTableProps) => {
   const { config, dataConfig, tableTitle, vizTitle, rawData, runtimeData: parentRuntimeData, headerColor, expandDataTable, columns, viewport, formatLegendLocation, tabbingId, wrapColumns } = props
-  const runtimeData = removeNullColumns(parentRuntimeData)
+  const runtimeData = useMemo(() => {
+    const data = removeNullColumns(parentRuntimeData)
+    if (config.table.pivot) {
+      const { columnName, valueColumn } = config.table.pivot
+      if (columnName && valueColumn) {
+        return pivotData(data, columnName, valueColumn)
+      }
+    }
+    return data
+  }, [parentRuntimeData, config.table.pivot?.columnName, config.table.pivot?.valueColumn])
+
   const [expanded, setExpanded] = useState(expandDataTable)
 
   const [sortBy, setSortBy] = useState<any>({ column: config.type === 'map' ? 'geo' : 'date', asc: false, colIndex: null })
@@ -178,7 +189,7 @@ const DataTable = (props: DataTableProps) => {
 
     const getMediaControlsClasses = () => {
       const classes = ['download-links']
-      const isLegendOnBottom = config.legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(viewport)
+      const isLegendOnBottom = config?.legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(viewport)
       if (config.brush?.active && !isLegendOnBottom) classes.push('brush-active')
       if (config.brush?.active && config.legend.hide) classes.push('brush-active')
       return classes

@@ -249,7 +249,7 @@
     }
     &.checkbox {
       display: flex;
-      span {
+      span:not(.cove-icon) {
         display: inline;
       }
       input {

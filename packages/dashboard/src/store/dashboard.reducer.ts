@@ -1,11 +1,13 @@
 import _ from 'lodash'
 import { getUpdateConfig } from '../helpers/getUpdateConfig'
-import { MultiDashboard, MultiDashboardConfig } from '../types/MultiDashboard'
+import { MultiDashboardConfig } from '../types/MultiDashboard'
 import DashboardActions from './dashboard.actions'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 import { Tab } from '../types/Tab'
 import { DashboardConfig } from '../types/DashboardConfig'
 import { ConfigRow } from '../types/ConfigRow'
+import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { initialState } from '../DashboardContext'
 
 type BlankMultiConfig = {
   dashboard: Partial<DashboardConfig>
@@ -28,7 +30,7 @@ const createBlankDashboard: () => BlankMultiConfig = () => ({
 
 export type DashboardState = {
   config: MultiDashboardConfig
-  data: Object
+  data: Record<string, any[]>
   filteredData: Object
   loading: boolean
   preview: boolean
@@ -37,6 +39,11 @@ export type DashboardState = {
 
 const reducer = (state: DashboardState, action: DashboardActions): DashboardState => {
   switch (action.type) {
+    case 'ADD_FOOTNOTE': {
+      const { id, rowIndex, config } = action.payload
+      const newRows = state.config.rows.map((row, i) => (i === rowIndex ? { ...row, footnotesId: id } : row))
+      return { ...state, config: { ...state.config, rows: newRows, visualizations: { ...state.config.visualizations, [id]: config } } }
+    }
     case 'ADD_NEW_DASHBOARD': {
       const currentMultiDashboards = state.config.multiDashboards
       const label = 'New Dashboard ' + (currentMultiDashboards.length + 1)
@@ -47,8 +54,21 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const [config, filteredData] = getUpdateConfig(state)(...action.payload)
       return { ...state, config, filteredData }
     }
+    case 'APPLY_CONFIG': {
+      // using advanced editor. Wipe all existing data and apply new config
+      const [config, filteredData] = getUpdateConfig(state)(...action.payload)
+      // get the default data state
+      const data = [...Object.values(config.visualizations), ...config.rows]
+        .map(viz => viz.dataKey)
+        .reduce((acc, key) => {
+          const data = state.data[key] || state.config.datasets[key]?.data
+          if (data) acc[key] = data
+          return acc
+        }, {})
+      return { ...initialState, config, filteredData, data }
+    }
     case 'SET_CONFIG': {
-      return { ...state, config: action.payload }
+      return { ...state, config: { ...state.config, ...action.payload } }
     }
     case 'SET_DATA': {
       return { ...state, data: action.payload }
@@ -61,6 +81,11 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     }
     case 'SET_PREVIEW': {
       return { ...state, preview: action.payload }
+    }
+    case 'SET_SHARED_FILTERS': {
+      const newSharedFilters = action.payload
+      const newDashboardConfig = { ...state.config.dashboard, sharedFilters: newSharedFilters }
+      return { ...state, config: { ...state.config, dashboard: newDashboardConfig } }
     }
     case 'SET_TAB_SELECTED': {
       return { ...state, tabSelected: action.payload }
@@ -124,7 +149,8 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     }
     case 'UPDATE_VISUALIZATION': {
       const { vizKey, configureData } = action.payload
-      return { ...state, config: { ...state.config, visualizations: { ...state.config.visualizations, [vizKey]: { ...state.config.visualizations[vizKey], ...configureData } } } }
+      const updatedViz = { ...state.config.visualizations[vizKey], ...configureData } as AnyVisualization
+      return { ...state, config: { ...state.config, visualizations: { ...state.config.visualizations, [vizKey]: updatedViz } } }
     }
     case 'UPDATE_ROW': {
       const { rowIndex, rowData } = action.payload

@@ -34,7 +34,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
 
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
-    marginTop: getMarginTop(isBottomOrSmallViewport, config.brush?.active)
+    marginTop: isBottomOrSmallViewport && config.orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : getMarginTop(isBottomOrSmallViewport, config.brush.active)
   }
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
@@ -144,7 +144,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
               </div>
 
               <>
-                {config?.preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style) && ['Line', 'Combo'].includes(config.visualizationType) && (
+                {config?.preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style === 'Open Circles') && ['Line', 'Combo'].includes(config.visualizationType) && (
                   <>
                     <hr></hr>
                     <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>

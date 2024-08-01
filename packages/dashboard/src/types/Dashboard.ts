@@ -7,5 +7,5 @@ export type Dashboard = {
   description: any
   title: any
   theme: any
-  filters: any
+  filters: any // deprecate
 }

@@ -16,6 +16,7 @@ import { geoAlbersUsa } from 'd3-composite-projections'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import HexIcon from './HexIcon'
 import { patternSizes } from '../helpers/patternSizes'
+import Annotation from '../../Annotation'
 
 import Territory from './Territory'
 
@@ -64,7 +65,8 @@ const UsaMap = () => {
       state,
       supportedTerritories,
       titleCase,
-      tooltipId
+      tooltipId,
+      handleDragStateChange
     } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
@@ -118,7 +120,15 @@ const UsaMap = () => {
 
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
-  const territories = territoriesData.map(territory => {
+  const getTerritoriesClasses = () => {
+    const screenWidth = window?.visualViewport?.width
+    let className = 'territories'
+    if (screenWidth < 700) return 'territories--mobile'
+    if (screenWidth < 900) return 'territories--tablet'
+    return className
+  }
+
+  const territories = territoriesData.map((territory, territoryIndex) => {
     const Shape = isHex ? Territory.Hexagon : Territory.Rectangle
 
     const territoryData = data[territory]
@@ -163,22 +173,20 @@ const UsaMap = () => {
       }
 
       return (
-        <>
-          <Shape
-            key={label}
-            label={label}
-            style={styles}
-            text={styles.color}
-            strokeWidth={1.5}
-            textColor={textColor}
-            onClick={() => geoClickHandler(territory, territoryData)}
-            data-tooltip-id={`tooltip__${tooltipId}`}
-            data-tooltip-html={toolTip}
-            territory={territory}
-            territoryData={territoryData}
-            tabIndex={-1}
-          />
-        </>
+        <Shape
+          key={`label__${territoryIndex}`}
+          label={label}
+          style={styles}
+          text={styles.color}
+          strokeWidth={1.5}
+          textColor={textColor}
+          onClick={() => geoClickHandler(territory, territoryData)}
+          data-tooltip-id={`tooltip__${tooltipId}`}
+          data-tooltip-html={toolTip}
+          territory={territory}
+          territoryData={territoryData}
+          tabIndex={-1}
+        />
       )
     }
   })
@@ -447,6 +455,7 @@ const UsaMap = () => {
             {({ features, projection }) => constructGeoJsx(features, projection)}
           </AlbersUsa>
         )}
+        {state.annotations.length > 0 && <Annotation.Draggable onDragStateChange={handleDragStateChange} />}
       </svg>
 
       {territories.length > 0 && (
@@ -456,7 +465,7 @@ const UsaMap = () => {
               <span className='territories-label label'>{state.general.territoriesLabel}</span>
             </div>
             <div>
-              <span className={window.visualViewport.width < 700 ? 'territories--mobile' : 'territories'}>{territories}</span>
+              <span className={getTerritoriesClasses()}>{territories}</span>
             </div>
           </div>
         </>

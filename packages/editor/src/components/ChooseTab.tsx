@@ -26,6 +26,7 @@ import ForecastIcon from '@cdc/core/assets/icon-chart-forecast.svg'
 import DeviationIcon from '@cdc/core/assets/icon-deviation-bar.svg'
 import SankeyIcon from '@cdc/core/assets/icon-sankey.svg'
 import { Visualization } from '@cdc/core/types/Visualization'
+import Icon from '@cdc/core/components/ui/Icon'
 
 export default function ChooseTab() {
   const { config, tempConfig } = useContext(ConfigContext)
@@ -68,17 +69,17 @@ export default function ChooseTab() {
       classNames = config.type === type && isSubType && !isHorizontalStackedChart ? 'active' : ''
     }
 
-    let setTypes = () => {
+    const setTypes = () => {
       if (type === config.type) {
         if (subType !== config.visualizationType) {
           dispatch({ type: 'EDITOR_SET_CONFIG', payload: { ...config, newViz: true, visualizationType: subType } })
         }
         dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
       } else {
-        let confirmation = !config.type || window.confirm('Changing visualization type will clear configuration settings. Do you want to continue?')
+        const confirmation = !config.type || window.confirm('Changing visualization type will clear configuration settings. Do you want to continue?')
 
         if (confirmation) {
-          let newConfig = {
+          const newConfig = {
             newViz: true,
             datasets: {},
             type
@@ -110,6 +111,22 @@ export default function ChooseTab() {
         <span className='mt-1'>{label}</span>
       </button>
     )
+  }
+
+  const handleUpload = e => {
+    const file = e.target.files[0]
+    const reader = new FileReader()
+    reader.onload = e => {
+      const text = e.target.result
+      try {
+        const newConfig = JSON.parse(text as string)
+        dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
+        dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
+      } catch (e) {
+        alert('Invalid JSON')
+      }
+    }
+    reader.readAsText(file)
   }
 
   return (
@@ -309,6 +326,21 @@ export default function ChooseTab() {
           </Tooltip>
         </li>
       </ul>
+      <hr />
+      <div className='form-group'>
+        <label htmlFor='uploadConfig'>
+          Upload Custom Configuration{' '}
+          <Tooltip style={{ textTransform: 'none' }}>
+            <Tooltip.Target>
+              <Icon display='warningCircle' style={{ marginLeft: '0.5rem' }} />
+            </Tooltip.Target>
+            <Tooltip.Content>
+              <p>Make sure you have properly validated the configuration before uploading.</p>
+            </Tooltip.Content>
+          </Tooltip>
+        </label>
+        <input type='file' accept='.txt,.json' className='form-control-file' id='uploadConfig' onChange={handleUpload} />
+      </div>
     </div>
   )
 }
