@@ -81,8 +81,14 @@ export const isTopoReady = (topoData, state, runtimeFilters) => {
 }
 
 export const getFilterControllingStatePicked = (state, dashboardConfig) => {
-  if (!dashboardConfig?.dashboard?.sharedFilters) return state?.general?.statePicked?.stateName
-  // only support dashboards for now
+  debugger
+  if (!dashboardConfig?.dashboard?.sharedFilters) {
+    if (state.general.filterControlsStatePicked === '' && !state.general.statePicked.stateName) {
+      return 'Alabama'
+    } else {
+      return state.general.statePicked.stateName
+    }
+  }
   const filters = dashboardConfig?.dashboard?.sharedFilters
   let activeFilter = ''
   filters?.forEach(f => {
