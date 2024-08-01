@@ -1,7 +1,3 @@
-## [Replace With Ticket Number]
-
-<!-- Provide a brief description of the changes made in this PR -->
-
 ## Testing Steps
 
 <!-- Provide testing steps and reference storybook stories if necessary -->
