@@ -19,7 +19,7 @@ const migrateMarkupInclude = newConfig => {
 }
 
 const update_4_24_4 = config => {
-  const ver = '4.24.4'
+  const ver = '4.24.5'
 
   const newConfig = _.cloneDeep(config)
 
