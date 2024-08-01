@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Group } from '@visx/group'
+import { type Column } from '@cdc/core/types/Column'
 import '../index.scss'
 
 const LineChartBumpCircle = props => {
@@ -25,7 +26,8 @@ const LineChartBumpCircle = props => {
 
   const getListItems = dataRow => {
     const listItems = []
-    Object.values(config.columns)?.forEach(column => {
+
+    Object.values(config.columns)?.forEach((column: Column) => {
       if (!column.tooltips) return
       if (!column.label) {
         listItems.push(
