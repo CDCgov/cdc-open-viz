@@ -10,6 +10,7 @@ import versionNeedsUpdate from './ver/versionNeedsUpdate'
 export const coveUpdateWorker = config => {
   if (config.multiDashboards) {
     config.multiDashboards.forEach((dashboard, index) => {
+      dashboard.type = 'dashboard'
       config.multiDashboards[index] = coveUpdateWorker(dashboard)
     })
   }
