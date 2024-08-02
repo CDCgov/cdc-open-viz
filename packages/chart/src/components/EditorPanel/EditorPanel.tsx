@@ -335,7 +335,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
 
   const totalEnteredHeight = config?.yAxis?.categories?.reduce((sum, obj) => sum + (parseFloat(obj.height) || 0), 0) || 0
 
-  let removeColumn = i => {
+  const removeColumn = i => {
     let categories = []
 
     if (config.yAxis.categories) {
@@ -347,17 +347,17 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
     updateConfig({ ...config, yAxis: { ...config.yAxis, categories } })
   }
 
-  function getDarkerColor() {
+  const getDarkerColor = () => {
     const timesDarkened = config.yAxis?.categories?.length
     const darkeningFactor = 0.4
-    let baseColor = '#ddd'
+    const baseColor = '#ddd'
     return chroma(baseColor)
       .darken(darkeningFactor * timesDarkened)
       .hex()
   }
 
-  let addColumn = () => {
-    let categories = config.yAxis.categories ? [...config.yAxis.categories] : []
+  const addColumn = () => {
+    const categories = config.yAxis.categories ? [...config.yAxis.categories] : []
     const defaultValues = {
       label: 'Label ' + Number(categories.length + 1),
       height: '',
@@ -367,7 +367,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
     updateConfig({ ...config, yAxis: { ...config.yAxis, categories: categories } })
   }
 
-  let update = (fieldName, value, i) => {
+  const update = (fieldName, value, i) => {
     let categories = []
 
     if (config.yAxis.categories) {
@@ -378,7 +378,6 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
 
     updateConfig({ ...config, yAxis: { ...config.yAxis, categories } })
   }
-  const lastIndex = config?.yAxis?.categories?.length + 1
 
   if (!display) {
     return <></>
