@@ -5,6 +5,7 @@ import APIFiltersChartData from './_mock/api-filter-chart.json'
 import ExampleConfig_1 from './_mock/dashboard-gallery.json'
 import ExampleConfig_2 from './_mock/dashboard-2.json'
 import ExampleConfig_3 from './_mock/dashboard_no_filter.json'
+import SingleStateDashboardFilters from './_mock/single-state-dashboard-filters.json'
 import Dashboard_Filter from './_mock/dashboard-filter.json'
 import MultiVizConfig from './_mock/multi-viz.json'
 import MultiDashboardConfig from './_mock/multi-dashboards.json'
@@ -71,6 +72,13 @@ export const ToggleExample: Story = {
 export const PivotFilter: Story = {
   args: {
     config: PivotFitlerConfig,
+    isEditor: false
+  }
+}
+
+export const SingleStateDashboardWithFilters: Story = {
+  args: {
+    config: SingleStateDashboardFilters,
     isEditor: false
   }
 }
