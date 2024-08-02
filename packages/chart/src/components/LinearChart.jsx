@@ -396,7 +396,7 @@ const LinearChart = props => {
 
                           {orientation === 'horizontal' && visualizationSubType !== 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
                             <Text
-                              transform={`translate(${tick.to.x - 5}, ${config.isLollipopChart ? tick.to.y - minY : tick.to.y - minY + (Number(config.barHeight * config.series.length) - barMinHeight) / 2}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation || 0 : 0})`}
+                              transform={`translate(${tick.to.x - 5}, ${config.isLollipopChart ? tick.to.y - minY : tick.to.y - minY + (Number(config.barHeight * config.runtime.series.length) - barMinHeight) / 2}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation || 0 : 0})`}
                               verticalAnchor={'start'}
                               textAnchor={'end'}
                             >
@@ -602,7 +602,7 @@ const LinearChart = props => {
             </AxisBottom>
           )}
           {visualizationType === 'Paired Bar' && generatePairedBarAxis()}
-          {visualizationType === 'Deviation Bar' && config.series?.length === 1 && <DeviationBar animatedChart={animatedChart} xScale={xScale} yScale={yScale} width={xMax} height={yMax} />}
+          {visualizationType === 'Deviation Bar' && config.runtime.series?.length === 1 && <DeviationBar animatedChart={animatedChart} xScale={xScale} yScale={yScale} width={xMax} height={yMax} />}
           {visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
           {visualizationType === 'Scatter Plot' && (
             <ScatterPlot
@@ -653,7 +653,7 @@ const LinearChart = props => {
               getYAxisData={getYAxisData}
               xMax={xMax}
               yMax={yMax}
-              seriesStyle={config.series}
+              seriesStyle={config.runtime.series}
               handleTooltipMouseOver={handleTooltipMouseOver}
               handleTooltipMouseOff={handleTooltipMouseOff}
               handleTooltipClick={handleTooltipClick}
@@ -710,7 +710,7 @@ const LinearChart = props => {
           {/* TODO: Make this just line or combo? */}
           {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(visualizationType) && !checkLineToBarGraph() && (
             <>
-              <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
+              <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.runtime.series} />
             </>
           )}
           {/* y anchors */}

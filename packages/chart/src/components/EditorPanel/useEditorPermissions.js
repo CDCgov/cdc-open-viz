@@ -316,6 +316,10 @@ export const useEditorPermissions = () => {
     return false
   }
 
+  const visSupportsDynamicSeries = () => {
+    return visualizationType === 'Line' || visualizationType === 'Bar' || visualizationType === 'Scatter Plot' || visualizationType === 'Area Chart'
+  }
+
   const visHasSingleSeriesTooltip = () => {
     if (visualizationType === 'Bar' || visualizationType === 'Line') {
       return true
@@ -372,6 +376,7 @@ export const useEditorPermissions = () => {
     visSupportsReactTooltip,
     visSupportsValueAxisMax,
     visSupportsValueAxisMin,
+    visSupportsDynamicSeries,
     visHasSingleSeriesTooltip
   }
 }
