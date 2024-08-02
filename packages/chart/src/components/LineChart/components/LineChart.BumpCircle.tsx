@@ -60,6 +60,7 @@ const LineChartBumpCircle = props => {
             {d[series.dataKey] && (
               <>
                 <circle 
+                  key={`bump-circle-${d[series.dataKey]}-${dataIndex}`}
                   data-tooltip-html={getTooltip(d)} 
                   data-tooltip-id={`bump-chart`} 
                   r={10} 
