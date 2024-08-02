@@ -89,6 +89,7 @@ export default function useZoomPan({
     if (lon === lastPosition.current.x && lat === lastPosition.current.y && zoom === lastPosition.current.k) return
 
     const coords = projection([lon, lat])
+    if (!coords) return
     const x = coords[0] * zoom
     const y = coords[1] * zoom
     const svg = d3Select(mapRef.current)

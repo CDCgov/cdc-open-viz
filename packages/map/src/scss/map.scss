@@ -258,6 +258,10 @@ $medium: 768px;
   stroke: none !important;
 }
 
+.countyMapGroup--no-transition {
+  transition: none !important;
+}
+
 // .state {
 // 	display: none;
 // }
@@ -373,4 +377,10 @@ canvas {
   background-color: white;
   pointer-events: none;
   display: none;
+}
+
+// remove small square box appearing for canvas tooltip
+// create selector for this #tooltip__\:rl\:-canvas
+[id$='-canvas'].tooltip {
+  display: none !important;
 }
