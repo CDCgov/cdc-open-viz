@@ -6,6 +6,7 @@ import update_4_24_5 from './ver/4.24.5'
 import update_4_24_7 from './ver/4.24.7'
 import update_4_24_9 from './ver/4.24.9'
 import versionNeedsUpdate from './ver/versionNeedsUpdate'
+import { UpdateFunction } from 'json-edit-react'
 
 export const coveUpdateWorker = config => {
   if (config.multiDashboards) {
@@ -16,25 +17,23 @@ export const coveUpdateWorker = config => {
   }
   let genConfig = config
 
-  if (!genConfig.version) {
-    genConfig.version = '0.0.1'
+  const runVersionUpdates = () => {
+    const versions = [
+      ['4.24.3', update_4_24_3],
+      ['4.24.4', update_4_24_4],
+      ['4.24.5', update_4_24_5],
+      ['4.24.7', update_4_24_7],
+      ['4.24.9', update_4_24_9]
+    ]
+
+    versions.forEach(([version, updateFunction]: [string, UpdateFunction]) => {
+      if (versionNeedsUpdate(genConfig.version, version)) {
+        genConfig = updateFunction(genConfig)
+      }
+    })
   }
 
-  if (versionNeedsUpdate(genConfig.version, '4.24.3')) {
-    genConfig = update_4_24_3(genConfig)
-  }
-  if (versionNeedsUpdate(genConfig.version, '4.24.4')) {
-    genConfig = update_4_24_4(genConfig)
-  }
-  if (versionNeedsUpdate(genConfig.version, '4.24.5')) {
-    genConfig = update_4_24_5(genConfig)
-  }
-  if (versionNeedsUpdate(genConfig.version, '4.24.7')) {
-    genConfig = update_4_24_7(genConfig)
-  }
-  if (versionNeedsUpdate(genConfig.version, '4.24.9')) {
-    genConfig = update_4_24_9(genConfig)
-  }
+  runVersionUpdates()
 
   return genConfig
 }

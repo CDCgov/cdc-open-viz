@@ -54,7 +54,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     setState,
     state,
     tooltipId,
-    dashboardConfig
+    runtimeData
   } = useContext<MapContext>(ConfigContext)
 
   const { general, columns, legend, table, tooltips } = state
@@ -1552,7 +1552,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                 </label>
               )}
 
-              {state.general.geoType === 'single-state' && dashboardConfig?.dashboard?.sharedFilters && (
+              {state.general.geoType === 'single-state' && runtimeData && (
                 <label>
                   <span className='edit-label column-heading'>Filter Controlling State Picked</span>
                   <select
@@ -1562,7 +1562,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     }}
                   >
                     <option value=''>None</option>
-                    {dashboardConfig?.dashboard?.sharedFilters && dashboardConfig?.dashboard?.sharedFilters?.map(filter => <option>{filter.columnName}</option>)}
+                    {runtimeData && columnsInData?.map(col => <option>{col}</option>)}
                   </select>
                 </label>
               )}

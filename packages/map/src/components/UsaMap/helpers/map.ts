@@ -80,21 +80,13 @@ export const isTopoReady = (topoData, state, runtimeFilters) => {
   return topoData.year && (!currentYear || currentYear === topoData.year)
 }
 
-export const getFilterControllingStatePicked = (state, dashboardConfig) => {
-  debugger
-  if (!dashboardConfig?.dashboard?.sharedFilters) {
-    if (state.general.filterControlsStatePicked === '' && !state.general.statePicked.stateName) {
-      return 'Alabama'
-    } else {
-      return state.general.statePicked.stateName
-    }
+export const getFilterControllingStatePicked = (state, data) => {
+  if (state.general.filterControlsStatePicked) {
+    const statePicked = Object.values(data).map(county => {
+      return county?.[state.general.filterControlsStatePicked]
+    })?.[0]
+    return statePicked
+  } else {
+    return state.general.statePicked.stateName
   }
-  const filters = dashboardConfig?.dashboard?.sharedFilters
-  let activeFilter = ''
-  filters?.forEach(f => {
-    if (f.columnName === state.general.filterControlsStatePicked) {
-      activeFilter = f.active ? f.active : f.values[0]
-    }
-  })
-  return activeFilter
 }

@@ -16,13 +16,13 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
     <>
       {counties.map(county => {
         // Map the name from the geo data with the appropriate key for the processed data
-        let geoKey = county.id
+        const geoKey = county.id
 
         if (!geoKey) return null
 
-        let countyPath = path(county)
+        const countyPath = path(county)
 
-        let geoData = data[county.id]
+        const geoData = data[county.id]
         let legendColors
 
         // Once we receive data for this geographic item, setup variables.
@@ -38,7 +38,7 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
         const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
 
         if (legendColors && legendColors[0] !== '#000000') {
-          let styles = {
+          const styles = {
             fill: legendColors[0],
             cursor: 'default',
             '&:hover': {

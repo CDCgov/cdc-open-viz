@@ -33,12 +33,12 @@ const SingleStateMap = props => {
     isFilterValueSupported,
     runtimeFilters,
     tooltipId,
-    dashboardConfig,
     setState,
     position,
     setPosition,
     generateRuntimeData,
-    setRuntimeData
+    setRuntimeData,
+    runtimeData
   } = useContext(ConfigContext)
 
   const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
@@ -77,8 +77,7 @@ const SingleStateMap = props => {
   // from state?.general?.statePicked.stateName get the center coordinates
   const handleReset = () => {
     if (!isTopoReady(topoData, state, runtimeFilters)) return
-
-    const _statePicked = getFilterControllingStatePicked(state, dashboardConfig)
+    const _statePicked = getFilterControllingStatePicked(state, runtimeData)
     const _statePickedData = topoData.states.find(s => s.properties.name === _statePicked)
     const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
     const newProjection = projection.fitExtent(
@@ -107,7 +106,7 @@ const SingleStateMap = props => {
 
   useEffect(() => {
     setScaleAndTranslate()
-  }, [state?.general?.statePicked.stateName, dashboardConfig?.dashboard?.sharedFilters])
+  }, [state?.general?.statePicked.stateName])
 
   useEffect(() => {
     let currentYear = getCurrentTopoYear(state, runtimeFilters)
@@ -127,7 +126,7 @@ const SingleStateMap = props => {
   const setScaleAndTranslate = useCallback(() => {
     if (!isTopoReady(topoData, state, runtimeFilters)) return
     if (state.general?.statePicked) {
-      const _statePicked = getFilterControllingStatePicked(state, dashboardConfig)
+      const _statePicked = getFilterControllingStatePicked(state, runtimeData)
       const _statePickedData = topoData.states.find(s => s.properties.name === _statePicked)
       setStateToShow(_statePickedData)
 
@@ -162,7 +161,7 @@ const SingleStateMap = props => {
         return prevState
       })
     }
-  }, [dashboardConfig, runtimeFilters, state, topoData, state.general.statePicked])
+  }, [runtimeFilters, state, topoData, state.general.statePicked])
 
   useEffect(() => {
     setScaleAndTranslate()

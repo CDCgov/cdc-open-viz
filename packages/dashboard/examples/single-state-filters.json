@@ -11,7 +11,10 @@
         ],
         "type": "datafilter",
         "columnName": "State",
-        "tier": 1
+        "tier": 1,
+        "usedBy": [
+          "map1721943918271"
+        ]
       }
     ]
   },
@@ -188,7 +191,7 @@
         {
           "Insured Rate": 8,
           "Coverage Status": "Insured",
-          "FIPS Codes": "06071",
+          "FIPS Codes": "12057",
           "Year (Good filter option)": "2010",
           "link": "",
           "Latitude": "",
@@ -213,7 +216,7 @@
           "link": "",
           "Latitude": "",
           "Longitude": "",
-          "State": "California"
+          "State": "Florida"
         },
         {
           "Insured Rate": 25,
@@ -295,7 +298,7 @@
         {
           "Insured Rate": 8,
           "Coverage Status": "Insured",
-          "FIPS Codes": "06071",
+          "FIPS Codes": "12057",
           "Year (Good filter option)": "2010",
           "link": "",
           "Latitude": "",
@@ -320,7 +323,7 @@
           "link": "",
           "Latitude": "",
           "Longitude": "",
-          "State": "California"
+          "State": "Florida"
         },
         {
           "Insured Rate": 25,
@@ -382,6 +385,6 @@
   },
   "type": "dashboard",
   "runtime": {},
-  "version": "4.24.7",
+  "version": "4.24.9",
   "uuid": 1721943961122
 }
