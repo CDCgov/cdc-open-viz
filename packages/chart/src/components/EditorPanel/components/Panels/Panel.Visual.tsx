@@ -57,30 +57,30 @@ const PanelVisual: FC<PanelProps> = props => {
         <AccordionItemButton>Visual</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        {config.isLollipopChart && (
-          <>
-            <fieldset className='header'>
-              <legend className='edit-label'>Lollipop Shape</legend>
-              <div
-                onChange={e => {
-                  setLollipopShape(e.target.value)
-                }}
-              >
-                <label className='radio-label'>
-                  <input type='radio' name='lollipopShape' value='circle' checked={config.lollipopShape === 'circle'} />
-                  Circle
-                </label>
-                <label className='radio-label'>
-                  <input type='radio' name='lollipopShape' value='square' checked={config.lollipopShape === 'square'} />
-                  Square
-                </label>
-              </div>
-            </fieldset>
-            <Select value={config.lollipopColorStyle ? config.lollipopColorStyle : 'two-tone'} fieldName='lollipopColorStyle' label='Lollipop Color Style' updateField={updateField} options={['regular', 'two-tone']} />
-            <Select value={config.lollipopSize ? config.lollipopSize : 'small'} fieldName='lollipopSize' label='Lollipop Size' updateField={updateField} options={['small', 'medium', 'large']} />
-          </>
-        )}
-
+        {config.barStyle === 'lollipop' ||
+          (config.isLollipopChart && (
+            <>
+              <fieldset className='header'>
+                <legend className='edit-label'>Lollipop Shape</legend>
+                <div
+                  onChange={e => {
+                    setLollipopShape(e.target.value)
+                  }}
+                >
+                  <label className='radio-label'>
+                    <input type='radio' name='lollipopShape' value='circle' checked={config.lollipopShape === 'circle'} />
+                    Circle
+                  </label>
+                  <label className='radio-label'>
+                    <input type='radio' name='lollipopShape' value='square' checked={config.lollipopShape === 'square'} />
+                    Square
+                  </label>
+                </div>
+              </fieldset>
+              <Select value={config.lollipopColorStyle ? config.lollipopColorStyle : 'two-tone'} fieldName='lollipopColorStyle' label='Lollipop Color Style' updateField={updateField} options={['regular', 'two-tone']} />
+              <Select value={config.lollipopSize ? config.lollipopSize : 'small'} fieldName='lollipopSize' label='Lollipop Size' updateField={updateField} options={['small', 'medium', 'large']} />
+            </>
+          ))}
         {config.visualizationType === 'Box Plot' && (
           <fieldset className='fieldset fieldset--boxplot'>
             <legend className=''>Box Plot Settings</legend>
@@ -89,20 +89,16 @@ const PanelVisual: FC<PanelProps> = props => {
             <CheckBox value={config.boxplot.plotNonOutlierValues} fieldName='plotNonOutlierValues' section='boxplot' label='Plot non-outlier values' updateField={updateField} />
           </fieldset>
         )}
-
         <Select value={config.fontSize} fieldName='fontSize' label='Font Size' updateField={updateField} options={['small', 'medium', 'large']} />
         {visHasBarBorders() && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
         {visCanAnimate() && <CheckBox value={config.animate} fieldName='animate' label='Animate Visualization' updateField={updateField} />}
-
         {/*<CheckBox value={config.animateReplay} fieldName="animateReplay" label="Replay Animation When Filters Are Changed" updateField={updateField} />*/}
-
         {((config.series?.some(series => series.type === 'Line' || series.type === 'dashed-lg' || series.type === 'dashed-sm' || series.type === 'dashed-md') && config.visualizationType === 'Combo') || config.visualizationType === 'Line') && (
           <>
             <Select value={config.lineDatapointStyle} fieldName='lineDatapointStyle' label='Line Datapoint Style' updateField={updateField} options={['hidden', 'hover', 'always show']} />
             <Select value={config.lineDatapointColor} fieldName='lineDatapointColor' label='Line Datapoint Color' updateField={updateField} options={['Same as Line', 'Lighter than Line']} />
           </>
         )}
-
         {/* eslint-disable */}
         <label className='header'>
           <span className='edit-label'>Header Theme</span>
@@ -248,7 +244,6 @@ const PanelVisual: FC<PanelProps> = props => {
             </ul>
           </>
         )}
-
         {visHasDataCutoff() && (
           <>
             <TextField
@@ -275,7 +270,6 @@ const PanelVisual: FC<PanelProps> = props => {
         {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') && <TextField value={config.barThickness} type='number' fieldName='barThickness' label='Bar Thickness' updateField={updateField} />}
         {visSupportsBarSpace() && <TextField type='number' value={config.barSpace || '15'} fieldName='barSpace' label='Bar Space' updateField={updateField} min={0} />}
         {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <CheckBox value={config.topAxis.hasLine} section='topAxis' fieldName='hasLine' label='Add Top Axis Line' updateField={updateField} />}
-
         {config.visualizationType === 'Spark Line' && (
           <div className='cove-accordion__panel-section checkbox-group'>
             <CheckBox value={visual?.border} section='visual' fieldName='border' label='Show Border' updateField={updateField} />
@@ -285,10 +279,8 @@ const PanelVisual: FC<PanelProps> = props => {
             <CheckBox value={visual?.hideBackgroundColor} section='visual' fieldName='hideBackgroundColor' label='Hide Background Color' updateField={updateField} />
           </div>
         )}
-
         {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <CheckBox value={config.showLineSeriesLabels} fieldName='showLineSeriesLabels' label='Append Series Name to End of Line Charts' updateField={updateField} />}
         {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && config.showLineSeriesLabels && <CheckBox value={config.colorMatchLineSeriesLabels} fieldName='colorMatchLineSeriesLabels' label='Match Series Color to Name at End of Line Charts' updateField={updateField} />}
-
         {visSupportsTooltipLines() && (
           <>
             <CheckBox value={visual.verticalHoverLine} fieldName='verticalHoverLine' section='visual' label='Vertical Hover Line' updateField={updateField} />
@@ -314,7 +306,6 @@ const PanelVisual: FC<PanelProps> = props => {
           </label>
         )}
         {visHasSingleSeriesTooltip() && <CheckBox value={config.tooltips.singleSeries} fieldName='singleSeries' section='tooltips' label='SHOW HOVER FOR SINGLE DATA SERIES' updateField={updateField} />}
-
         <label>
           <span className='edit-label column-heading'>No Data Message</span>
           <input
