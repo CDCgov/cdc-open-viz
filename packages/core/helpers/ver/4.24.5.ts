@@ -18,8 +18,8 @@ const migrateMarkupInclude = newConfig => {
   }
 }
 
-const update_4_24_4 = config => {
-  const ver = '4.24.4'
+const update_4_24_5 = config => {
+  const ver = '4.24.5'
 
   const newConfig = _.cloneDeep(config)
 
@@ -29,4 +29,4 @@ const update_4_24_4 = config => {
   return newConfig
 }
 
-export default update_4_24_4
+export default update_4_24_5

@@ -53,7 +53,8 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     setRuntimeFilters,
     setState,
     state,
-    tooltipId
+    tooltipId,
+    runtimeData
   } = useContext<MapContext>(ConfigContext)
 
   const { general, columns, legend, table, tooltips } = state
@@ -809,6 +810,15 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           }
         })
         break
+      case 'filterControlsStatePicked':
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            filterControlsStatePicked: value
+          }
+        })
+        break
       case 'filterBehavior':
         setState({
           ...state,
@@ -1541,6 +1551,22 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   </select>
                 </label>
               )}
+
+              {state.general.geoType === 'single-state' && runtimeData && (
+                <label>
+                  <span className='edit-label column-heading'>Filter Controlling State Picked</span>
+                  <select
+                    value={state.general.filterControlsStatePicked || ''}
+                    onChange={event => {
+                      handleEditorChanges('filterControlsStatePicked', event.target.value)
+                    }}
+                  >
+                    <option value=''>None</option>
+                    {runtimeData && columnsInData?.map(col => <option>{col}</option>)}
+                  </select>
+                </label>
+              )}
+
               {/* Type */}
               {/* Select > Filter a state */}
               {state.general.geoType === 'single-state' && (
@@ -2874,7 +2900,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   <span className='edit-label'>Show Data with Zero's on Bubble Map</span>
                 </label>
               )}
-              {state.general.geoType === 'world' && (
+              {(state.general.geoType === 'world' || state.general.geoType === 'single-state') && (
                 <label className='checkbox'>
                   <input
                     type='checkbox'
