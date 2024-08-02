@@ -3,7 +3,6 @@ import { useContext } from 'react'
 import ConfigContext from '../ConfigContext'
 import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
-import { formatDate, parseDate } from '@cdc/core/helpers/cove/date'
 
 const scaleTypes = {
   TIME: 'time',
@@ -316,7 +315,7 @@ const composeYScale = ({ min, max, yMax, config, leftMax }) => {
 
   if (config.visualizationType === 'Combo') max = leftMax
 
-  const yRange = config.visualizationType === 'Bump Chart' ?  [30,yMax] : [yMax,1]
+  const yRange = config.visualizationType === 'Bump Chart' ?  [30,yMax] : [yMax,0]
   const domainSet = config.visualizationType === 'Bump Chart' ?  [1, max] : [min, max]
   // Return the configured scale function
   return scaleFunc({

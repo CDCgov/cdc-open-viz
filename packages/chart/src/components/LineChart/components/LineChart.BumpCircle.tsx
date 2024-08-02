@@ -1,12 +1,10 @@
 import { useState } from 'react'
 import { Group } from '@visx/group'
 import { type Column } from '@cdc/core/types/Column'
-import '../index.scss'
 
 const LineChartBumpCircle = props => {
   const { config, xScale, yScale, parseDate } = props
-  const [tooltipID, setTooltipID] = useState<string>('')
-  const [yearDate, setYearDate] = useState<string>('')
+  const [tooltipID] = useState<string>('')
 
   const handleX = xValue => {
     if (config.xAxis.type === 'date') {
@@ -46,7 +44,6 @@ const LineChartBumpCircle = props => {
     return listItems.join(' ')
   }
 
-  // console.log('getListItems', getListItems())
   const getTooltip = dataRow => `<ul>
                   <li class="tooltip-heading">${tooltipID}</li>
                   ${getListItems(dataRow)}
@@ -62,7 +59,16 @@ const LineChartBumpCircle = props => {
           <Group left={Number(config.runtime.yAxis.size)}>
             {d[series.dataKey] && (
               <>
-                <circle data-tooltip-html={getTooltip(d)} data-tooltip-id={`bump-chart`} r={10} cx={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey]))))} cy={Number(yScale(d[series.dataKey]))} stroke='#CACACA' strokeWidth={1} fill='#E5E4E2' />
+                <circle 
+                  data-tooltip-html={getTooltip(d)} 
+                  data-tooltip-id={`bump-chart`} 
+                  r={10} 
+                  cx={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey]))))} 
+                  cy={Number(yScale(d[series.dataKey]))} 
+                  stroke='#CACACA' 
+                  strokeWidth={1} 
+                  fill='#E5E4E2' 
+                />
                 {d[series.dataKey].toString().length === 2 ? (
                   // prettier-ignore
                   <text
