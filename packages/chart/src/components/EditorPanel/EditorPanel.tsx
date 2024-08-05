@@ -1238,8 +1238,8 @@ const EditorPanel = () => {
                         }
                       />
                       <TextField value={config.yAxis.labelOffset} section='yAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />
-                      {config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
-                      {(config.orientation === 'vertical' || !config.isResponsiveTicks) && <TextField value={config.yAxis.tickRotation || 0} type='number' min={0} section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
+                      {config.orientation === 'horizontal' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
+                      {config.isResponsiveTicks && <TextField value={config.yAxis.tickRotation || 0} type='number' min={0} section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
                       {config.isResponsiveTicks && config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && (
                         <TextField
                           value={config.xAxis.maxTickRotation}
