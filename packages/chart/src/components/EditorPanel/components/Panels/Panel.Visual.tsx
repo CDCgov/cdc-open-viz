@@ -57,30 +57,29 @@ const PanelVisual: FC<PanelProps> = props => {
         <AccordionItemButton>Visual</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        {config.barStyle === 'lollipop' ||
-          (config.isLollipopChart && (
-            <>
-              <fieldset className='header'>
-                <legend className='edit-label'>Lollipop Shape</legend>
-                <div
-                  onChange={e => {
-                    setLollipopShape(e.target.value)
-                  }}
-                >
-                  <label className='radio-label'>
-                    <input type='radio' name='lollipopShape' value='circle' checked={config.lollipopShape === 'circle'} />
-                    Circle
-                  </label>
-                  <label className='radio-label'>
-                    <input type='radio' name='lollipopShape' value='square' checked={config.lollipopShape === 'square'} />
-                    Square
-                  </label>
-                </div>
-              </fieldset>
-              <Select value={config.lollipopColorStyle ? config.lollipopColorStyle : 'two-tone'} fieldName='lollipopColorStyle' label='Lollipop Color Style' updateField={updateField} options={['regular', 'two-tone']} />
-              <Select value={config.lollipopSize ? config.lollipopSize : 'small'} fieldName='lollipopSize' label='Lollipop Size' updateField={updateField} options={['small', 'medium', 'large']} />
-            </>
-          ))}
+        {(config.barStyle === 'lollipop' || config.isLollipopChart) && (
+          <>
+            <fieldset className='header'>
+              <legend className='edit-label'>Lollipop Shape</legend>
+              <div
+                onChange={e => {
+                  setLollipopShape(e.target.value)
+                }}
+              >
+                <label className='radio-label'>
+                  <input type='radio' name='lollipopShape' value='circle' checked={config.lollipopShape === 'circle'} />
+                  Circle
+                </label>
+                <label className='radio-label'>
+                  <input type='radio' name='lollipopShape' value='square' checked={config.lollipopShape === 'square'} />
+                  Square
+                </label>
+              </div>
+            </fieldset>
+            <Select value={config.lollipopColorStyle ? config.lollipopColorStyle : 'two-tone'} fieldName='lollipopColorStyle' label='Lollipop Color Style' updateField={updateField} options={['regular', 'two-tone']} />
+            <Select value={config.lollipopSize ? config.lollipopSize : 'small'} fieldName='lollipopSize' label='Lollipop Size' updateField={updateField} options={['small', 'medium', 'large']} />
+          </>
+        )}
         {config.visualizationType === 'Box Plot' && (
           <fieldset className='fieldset fieldset--boxplot'>
             <legend className=''>Box Plot Settings</legend>
