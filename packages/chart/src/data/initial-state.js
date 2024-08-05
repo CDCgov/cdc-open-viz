@@ -61,7 +61,8 @@ export default {
     tickRotation: 0,
     anchors: [],
     shoMissingDataLabel: true,
-    showMissingDataLine: true
+    showMissingDataLine: true,
+    categories: []
   },
   boxplot: {
     plots: [],
