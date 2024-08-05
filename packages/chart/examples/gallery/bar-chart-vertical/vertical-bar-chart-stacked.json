@@ -339,21 +339,21 @@
   "data": [
     {
       "Year": "2015",
-      "Data 1": "25",
+      "Data 1": null,
       "Data 2": "20",
       "Data 3": "55"
     },
     {
       "Year": "2016",
-      "Data 1": "35",
+      "Data 1": "NULLL",
       "Data 2": "30",
       "Data 3": "35"
     },
     {
       "Year": "2017",
-      "Data 1": "22",
-      "Data 2": "38",
-      "Data 3": "40"
+      "Data 1": "ABC",
+      "Data 2": "HELLO",
+      "Data 3": null
     },
     {
       "Year": "2018",

@@ -1,8 +1,8 @@
 export default function createBarElement(props) {
-  const { config, index, id, className, background, borderColor, borderWidth, width, height, x, y, onMouseOver, onMouseLeave, onClick, tooltipHtml, tooltipId, styleOverrides, seriesHighlight } = props
+  const { config, index, id, className, background, borderColor, borderWidth, width, height, x, y, onMouseOver, onMouseLeave, onClick, tooltipHtml, tooltipId, styleOverrides, seriesHighlight, type } = props
 
-  const adjustedWidth = Math.max(0, width);
-  const adjustedHeight = Math.max(0, height);
+  const adjustedWidth = Math.max(0, width)
+  const adjustedHeight = Math.max(0, height)
 
   const isHorizontal = config.orientation === 'horizontal'
   const isRounded = config.barStyle === 'rounded'
@@ -79,7 +79,7 @@ export default function createBarElement(props) {
   }
 
   let path
-  if (index === undefined || index === null || !isRounded) {
+  if (index === undefined || index === null || !isRounded || type == 'axisBar') {
     path = nonRounded()
   } else {
     path = nonRounded()
