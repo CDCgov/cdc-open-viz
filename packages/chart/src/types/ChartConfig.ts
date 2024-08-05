@@ -79,7 +79,7 @@ export type AllChartsConfig = {
   barHasBorder: 'true' | 'false'
   barHeight: number
   barSpace: number
-  barStyle: string
+  barStyle: 'lollipop'|'rounded'|'flat'
   barThickness: number
   boxplot: BoxPlot
   brush: {
