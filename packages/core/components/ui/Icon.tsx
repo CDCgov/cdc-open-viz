@@ -25,6 +25,7 @@ import iconUpload from '../../assets/icon-upload.svg'
 import iconWarningCircle from '../../assets/icon-warning-circle.svg'
 import iconWarningTriangle from '../../assets/icon-warning-triangle.svg'
 import iconGear from '../../assets/icon-gear.svg'
+import iconGearMulti from '../../assets/icon-gear-multi.svg'
 import iconTools from '../../assets/icon-tools.svg'
 import iconText from '../../assets/icon-filtered-text.svg'
 import iconDropdowns from '../../assets/icon-filter-dropdowns.svg'
@@ -63,6 +64,7 @@ const iconHash = {
   warningCircle: iconWarningCircle,
   warningTriangle: iconWarningTriangle,
   gear: iconGear,
+  gearMulti: iconGearMulti,
   tools: iconTools,
   plus: iconPlus,
   minus: iconMinus,
