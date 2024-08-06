@@ -79,6 +79,12 @@ const mapUpdates = newConfig => {
   return newConfig
 }
 
+const updateLogarithmicConfig = newConfig => {
+  if (newConfig.useLogScale) {
+    newConfig.yAxis.type === 'logarithmic'
+  }
+}
+
 const update_4_24_7 = config => {
   const ver = '4.24.7'
 
@@ -86,6 +92,7 @@ const update_4_24_7 = config => {
 
   mapUpdates(newConfig)
   dashboardFiltersMigrate(newConfig)
+  updateLogarithmicConfig(newConfig)
   newConfig.version = ver
   return newConfig
 }
