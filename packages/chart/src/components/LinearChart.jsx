@@ -309,12 +309,11 @@ const LinearChart = props => {
                 {props.ticks.map((tick, i) => {
                   const textWidth = getTextWidth(formatNumber(tick.value, 'left'), `normal ${fontSize[config.fontSize]}px sans-serif`)
                   const isTicksOverlapping = getTickPositions(props.ticks, g1xScale)
+                  const maxTickRotation = Number(config.xAxis.maxTickRotation) || 90
                   const isResponsiveTicks = config.isResponsiveTicks && isTicksOverlapping
-                  const angle = isResponsiveTicks && tick.index !== 0 ? 90 : 0
+                  const angle = tick.index !== 0 && (isResponsiveTicks ? maxTickRotation : Number(config.yAxis.tickRotation))
                   const axisHeight = textWidth * Math.sin(angle * (Math.PI / 180)) + 25
-                  const textAnchor = tick.index !== 0 && isResponsiveTicks ? 'start' : 'middle'
-                  const verticalAnchor = isResponsiveTicks ? 'middle' : 'start'
-                  const dy = isResponsiveTicks ? textWidth : 0
+                  const textAnchor = angle && tick.index !== 0 ? 'end' : 'middle'
 
                   if (axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
 
@@ -322,7 +321,14 @@ const LinearChart = props => {
                     <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                       {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                       {!runtime.yAxis.hideLabel && (
-                        <Text x={tick.to.x} y={tick.to.y} dy={dy - 4} angle={-angle} verticalAnchor={verticalAnchor} textAnchor={textAnchor}>
+                        <Text // prettier-ignore
+                          x={tick.to.x}
+                          y={tick.to.y}
+                          angle={-angle}
+                          dy={tick.index === 0 ? 5 : 0}
+                          verticalAnchor={'middle'}
+                          textAnchor={textAnchor}
+                        >
                           {formatNumber(tick.value, 'left')}
                         </Text>
                       )}
@@ -351,12 +357,12 @@ const LinearChart = props => {
                   {props.ticks.map((tick, i) => {
                     const textWidth = getTextWidth(formatNumber(tick.value, 'left'), `normal ${fontSize[config.fontSize]}px sans-serif`)
                     const isTicksOverlapping = getTickPositions(props.ticks, g2xScale)
+                    const maxTickRotation = Number(config.xAxis.maxTickRotation) || 90
                     const isResponsiveTicks = config.isResponsiveTicks && isTicksOverlapping
-                    const angle = isResponsiveTicks && tick.index !== 0 ? 90 : 0
+                    const angle = tick.index !== 0 && (isResponsiveTicks ? maxTickRotation : Number(config.yAxis.tickRotation))
+                    console.log(config.yAxis.tickRotation, 'fkfkf')
                     const axisHeight = textWidth * Math.sin(angle * (Math.PI / 180)) + 25
-                    const textAnchor = tick.index !== 0 && isResponsiveTicks ? 'start' : 'middle'
-                    const verticalAnchor = isResponsiveTicks ? 'middle' : 'start'
-                    const dy = isResponsiveTicks ? textWidth : 0
+                    const textAnchor = angle && tick.index !== 0 ? 'end' : 'middle'
 
                     if (axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
 
@@ -364,7 +370,14 @@ const LinearChart = props => {
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                         {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                         {!runtime.yAxis.hideLabel && (
-                          <Text x={tick.to.x} y={tick.to.y} dy={dy} angle={-angle} verticalAnchor={verticalAnchor} textAnchor={textAnchor}>
+                          <Text // prettier-ignore
+                            x={tick.to.x}
+                            y={tick.to.y}
+                            dy={tick.index === 0 ? 5 : 0}
+                            angle={-angle}
+                            verticalAnchor={'middle'}
+                            textAnchor={textAnchor}
+                          >
                             {formatNumber(tick.value, 'left')}
                           </Text>
                         )}
