@@ -5,6 +5,7 @@ export type Anchor = {
 }
 
 export type Axis = {
+  categories: [{ label: string; height: string; color: string }]
   scalePadding: number
   anchors?: Anchor[]
   dataKey: string
@@ -44,4 +45,5 @@ export type Axis = {
   tickWidthMax?: number
   type: string
   axisBBox: number
+  maxValue: string
 }

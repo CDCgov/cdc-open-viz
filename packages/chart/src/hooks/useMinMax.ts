@@ -38,10 +38,10 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   const { visualizationType, series } = config
   const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
   const minRequiredCIPadding = 1.15 // regardless of Editor if CI data, there must be 10% padding added
-
+  const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   // do validation bafore applying t0 charts
   const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0
-  const isMinValid = config.useLogScale ? enteredMinValue >= 0 : (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
+  const isMinValid = isLogarithmicAxis ? enteredMinValue >= 0 : (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
 
   min = enteredMinValue && isMinValid ? enteredMinValue : minValue
   max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
@@ -143,7 +143,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
       min = 0
     }
     if (enteredMinValue) {
-      const isMinValid = config.useLogScale ? enteredMinValue >= 0 && enteredMinValue < minValue : enteredMinValue < minValue
+      const isMinValid = isLogarithmicAxis ? enteredMinValue >= 0 && enteredMinValue < minValue : enteredMinValue < minValue
       min = enteredMinValue && isMinValid ? enteredMinValue : minValue
     }
   }
@@ -154,7 +154,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   }
 
   if (config.visualizationType === 'Line' && !checkLineToBarGraph()) {
-    const isMinValid = config.useLogScale ? enteredMinValue >= 0 && enteredMinValue < minValue : enteredMinValue < minValue
+    const isMinValid = isLogarithmicAxis ? enteredMinValue >= 0 && enteredMinValue < minValue : enteredMinValue < minValue
     // update minValue for (0) Suppression points
     const suppressedMinValue = tableData?.some((dataItem, index) => {
       return config.preliminaryData?.some(pd => {

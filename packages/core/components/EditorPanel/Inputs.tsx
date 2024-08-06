@@ -9,6 +9,7 @@ export type Input = {
   subsection?: any
   updateField?: Function
   fieldName?: string
+  display?: boolean
 }
 
 export type TextFieldProps = {
@@ -39,7 +40,7 @@ export type SelectProps = {
 } & Input
 
 const TextField = memo((props: TextFieldProps) => {
-  const { label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'text', i = null, min = null, ...attributes } = props
+  const { display = true, label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'text', i = null, min = null, ...attributes } = props
   const [value, setValue] = useState(stateValue)
   const [debouncedValue] = useDebounce(value, 500)
 
@@ -76,6 +77,9 @@ const TextField = memo((props: TextFieldProps) => {
   if ('date' === type) {
     formElement = <input type='date' name={name} onChange={onChange} {...attributes} value={value} />
   }
+  if (!display) {
+    return <></>
+  }
 
   return (
     <label>
@@ -89,8 +93,10 @@ const TextField = memo((props: TextFieldProps) => {
 })
 
 const CheckBox = memo((props: CheckboxProps) => {
-  const { label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes } = props
-
+  const { display = true, label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes } = props
+  if (!display) {
+    return <></>
+  }
   return (
     <label className='checkbox column-heading'>
       <input
@@ -111,7 +117,7 @@ const CheckBox = memo((props: CheckboxProps) => {
 })
 
 const Select = memo((props: SelectProps) => {
-  const { label, value, options, fieldName, section = null, subsection = null, required = false, tooltip, updateField, initial: initialValue, ...attributes } = props
+  const { display = true, label, value, options, fieldName, section = null, subsection = null, required = false, tooltip, updateField, initial: initialValue, ...attributes } = props
   let optionsJsx = options.map((optionName, index) => (
     <option value={optionName} key={index}>
       {optionName}
@@ -124,6 +130,9 @@ const Select = memo((props: SelectProps) => {
         {initialValue}
       </option>
     )
+  }
+  if (!display) {
+    return <></>
   }
 
   return (
