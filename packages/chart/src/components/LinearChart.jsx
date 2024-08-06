@@ -325,8 +325,7 @@ const LinearChart = props => {
                           x={tick.to.x}
                           y={tick.to.y}
                           angle={-angle}
-                          dy={tick.index === 0 ? 5 : 0}
-                          verticalAnchor={'middle'}
+                          verticalAnchor={angle ? 'middle' : 'start'}
                           textAnchor={textAnchor}
                         >
                           {formatNumber(tick.value, 'left')}
@@ -360,7 +359,6 @@ const LinearChart = props => {
                     const maxTickRotation = Number(config.xAxis.maxTickRotation) || 90
                     const isResponsiveTicks = config.isResponsiveTicks && isTicksOverlapping
                     const angle = tick.index !== 0 && (isResponsiveTicks ? maxTickRotation : Number(config.yAxis.tickRotation))
-                    console.log(config.yAxis.tickRotation, 'fkfkf')
                     const axisHeight = textWidth * Math.sin(angle * (Math.PI / 180)) + 25
                     const textAnchor = angle && tick.index !== 0 ? 'end' : 'middle'
 
@@ -373,9 +371,8 @@ const LinearChart = props => {
                           <Text // prettier-ignore
                             x={tick.to.x}
                             y={tick.to.y}
-                            dy={tick.index === 0 ? 5 : 0}
                             angle={-angle}
-                            verticalAnchor={'middle'}
+                            verticalAnchor={angle ? 'middle' : 'start'}
                             textAnchor={textAnchor}
                           >
                             {formatNumber(tick.value, 'left')}
