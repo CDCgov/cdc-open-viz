@@ -82,7 +82,7 @@
         "rightAxisLabelColor": "#333",
         "rightAxisTickLabelColor": "#333",
         "rightAxisTickColor": "#333",
-        "numTicks": "11",
+        "numTicks": "10",
         "axisPadding": 0,
         "scalePadding": "5",
         "tickRotation": 0,
@@ -169,7 +169,7 @@
         "indexLabel": "",
         "download": true,
         "showVertical": true,
-        "dateDisplayFormat": "%Y",
+        "dateDisplayFormat": "",
         "show": true,
         "collapsible": true
       },
