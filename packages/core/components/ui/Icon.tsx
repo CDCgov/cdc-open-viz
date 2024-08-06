@@ -76,9 +76,25 @@ const iconHash = {
   command: iconCommand
 }
 
+export type IconType = keyof typeof iconHash
+
 export const ICON_TYPES = Object.keys(iconHash)
 
-const Icon = ({ display = '', base = undefined, alt = '', size = undefined, color = undefined, style = undefined, ...attributes }) => {
+type IconProps = {
+  /* Define the icon to display */
+  display: keyof typeof iconHash
+  /* Returns icon data as plain svg */
+  base?: boolean
+  /* Sets alt text for the icon */
+  alt: string
+  /* Override the width of the icon (scales height proportionally)*/
+  size?: number
+  /* Override the color of the icon */
+  color?: string
+  style?: string
+}
+
+const Icon: React.FC<IconProps> = ({ display = '', base = undefined, alt = '', size = undefined, color = undefined, style = undefined, ...attributes }) => {
   const IconObj = iconHash[display] || null
 
   const filteredAttrs = { ...attributes }
@@ -102,19 +118,6 @@ const Icon = ({ display = '', base = undefined, alt = '', size = undefined, colo
       )}
     </>
   )
-}
-
-Icon.propTypes = {
-  /* Define the icon to display */
-  display: PropTypes.oneOf(Object.keys(iconHash)),
-  /* Returns icon data as plain svg */
-  base: PropTypes.bool,
-  /* Sets alt text for the icon */
-  alt: PropTypes.string,
-  /* Override the width of the icon (scales height proportionally)*/
-  size: PropTypes.number,
-  /* Override the color of the icon */
-  color: PropTypes.string
 }
 
 export default Icon
