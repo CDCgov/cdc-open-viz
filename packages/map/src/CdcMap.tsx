@@ -1092,7 +1092,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const formatLegendLocation = key => {
     let value = key
     let formattedName = ''
-    let stateName = stateFipsToTwoDigit[key?.substring(0, 2)]
+    let stateName = stateFipsToTwoDigit[key?.substring(0, 2)] ? stateFipsToTwoDigit[key?.substring(0, 2)] : key ? runtimeData?.[key]?.[state.columns.geo.name] : ''
 
     if (stateName) {
       formattedName += stateName
