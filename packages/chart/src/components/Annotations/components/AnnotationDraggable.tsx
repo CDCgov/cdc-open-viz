@@ -113,7 +113,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
                 justifyContent: 'start',
                 flexDirection: 'row'
               }}
-              role='presentation'
+              // role='presentation'
               tabIndex={0}
               aria-label={`Annotation text that reads: ${annotation.text}`}
             >
