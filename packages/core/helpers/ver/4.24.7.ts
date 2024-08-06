@@ -34,13 +34,7 @@ export const dashboardFiltersMigrate = config => {
       delete viz.hide
     }
     // 'filter-dropdowns' was renamed to 'dashboardFilters' for clarity
-    if (viz.type === 'filter-dropdowns') {
-      viz.type = 'dashboardFilters'
-      if (!viz.sharedFilterIndexes) {
-        viz.sharedFilterIndexes = config.dashboard.sharedFilters.map((_sf, i) => i)
-        viz.filterBehavior = config.filterBehavior || 'Filter Change'
-      }
-    }
+    if (viz.type === 'filter-dropdowns') viz.type = 'dashboardFilters'
     if (viz.visualizationType === 'filter-dropdowns') viz.visualizationType = 'dashboardFilters'
     newVisualizations[vizKey] = viz
   })

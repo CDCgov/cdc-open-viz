@@ -267,7 +267,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
     const sharedFiltersWithValues = addValuesToFilters<SharedFilter>(config.dashboard.sharedFilters, state.data)
     loadAPIFilters(sharedFiltersWithValues)
-    updateFilteredData(sharedFiltersWithValues)
+    updateFilteredData()
   }, [isEditor, isPreview, state.config?.activeDashboard])
 
   const updateChildConfig = (visualizationKey, newConfig) => {

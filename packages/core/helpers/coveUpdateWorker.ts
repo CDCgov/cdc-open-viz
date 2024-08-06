@@ -22,12 +22,12 @@ export const coveUpdateWorker = config => {
       ['4.24.3', update_4_24_3],
       ['4.24.4', update_4_24_4],
       ['4.24.5', update_4_24_5],
-      ['4.24.7', update_4_24_7, true],
+      ['4.24.7', update_4_24_7],
       ['4.24.9', update_4_24_9]
     ]
 
-    versions.forEach(([version, updateFunction, alwaysRun]: [string, UpdateFunction, boolean?]) => {
-      if (versionNeedsUpdate(genConfig.version, version) || alwaysRun) {
+    versions.forEach(([version, updateFunction]: [string, UpdateFunction]) => {
+      if (versionNeedsUpdate(genConfig.version, version)) {
         genConfig = updateFunction(genConfig)
       }
     })
