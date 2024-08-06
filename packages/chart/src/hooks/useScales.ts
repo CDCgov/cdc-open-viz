@@ -52,7 +52,7 @@ const useScales = (properties: useScaleProps) => {
   // handle  Horizontal bars
   if (isHorizontal) {
     xScale = composeXScale({ min: min * 1.03, ...properties })
-    xScale.type = config.useLogScale ? scaleTypes.LOG : scaleTypes.LINEAR
+    xScale.type = config.yAxis.type === 'logarithmic' ? scaleTypes.LOG : scaleTypes.LINEAR
     yScale = getYScaleFunction(xAxisType, xAxisDataMapped)
     yScale.rangeRound([0, yMax])
     seriesScale = composeScalePoint(seriesDomain, [0, yMax])
@@ -295,34 +295,37 @@ export const getTickValues = (xAxisDataMapped, xScale, num) => {
 /// helper functions
 const composeXScale = ({ min, max, xMax, config }) => {
   // Adjust min value if using logarithmic scale
-  min = config.useLogScale && min >= 0 && min < 1 ? min + 0.1 : min
+  const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
+  min = isLogarithmicAxis && min >= 0 && min < 1 ? min + 0.1 : min
   // Select the appropriate scale function
-  const scaleFunc = config.useLogScale ? scaleLog : scaleLinear
+  const scaleFunc = isLogarithmicAxis ? scaleLog : scaleLinear
   // Return the configured scale function
   return scaleFunc({
     domain: [min, max],
     range: [0, xMax],
-    nice: config.useLogScale,
-    zero: config.useLogScale
+    nice: isLogarithmicAxis,
+    zero: isLogarithmicAxis
   })
 }
 
 const composeYScale = ({ min, max, yMax, config, leftMax }) => {
   // Adjust min value if using logarithmic scale
-  min = config.useLogScale && min >= 0 && min < 1 ? min + 0.1 : min
+  const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
+  min = isLogarithmicAxis && min >= 0 && min < 1 ? min + 0.1 : min
   // Select the appropriate scale function
-  const scaleFunc = config.useLogScale ? scaleLog : scaleLinear
+  const scaleFunc = isLogarithmicAxis ? scaleLog : scaleLinear
 
   if (config.visualizationType === 'Combo') max = leftMax
 
-  const yRange = config.visualizationType === 'Bump Chart' ?  [30,yMax] : [yMax,0]
+  // If the visualization type is a bump chart then the domain and range need different values
   const domainSet = config.visualizationType === 'Bump Chart' ?  [1, max] : [min, max]
+  const yRange = config.visualizationType === 'Bump Chart' ?  [30,yMax] : [yMax,0]
   // Return the configured scale function
   return scaleFunc({
     domain: domainSet,
     range: yRange,
-    nice: config.useLogScale,
-    zero: config.useLogScale
+    nice: isLogarithmicAxis,
+    zero: isLogarithmicAxis
   })
 }
 

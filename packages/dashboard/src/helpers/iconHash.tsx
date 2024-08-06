@@ -15,6 +15,7 @@ export const iconHash = {
   world: <Icon display='mapWorld' base />,
   'single-state': <Icon display='mapAl' base />,
   gear: <Icon display='gear' base />,
+  gearMulti: <Icon display='gearMulti' base />,
   tools: <Icon display='tools' base />,
   'filtered-text': <Icon display='filtered-text' base />,
   dashboardFilters: <Icon display='dashboardFilters' base />,

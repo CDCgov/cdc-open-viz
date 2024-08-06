@@ -497,6 +497,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'horizontal'
+      // remove after  COVE supports categorical axis on horizonatal bars
+      newConfig.yAxis.type = newConfig.yAxis.type === 'categorical' ? 'linear' : newConfig.yAxis.type
     } else if (['Box Plot', 'Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType) && !checkLineToBarGraph()) {
       newConfig.runtime.xAxis = newConfig.xAxis
       newConfig.runtime.yAxis = newConfig.yAxis

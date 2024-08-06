@@ -298,6 +298,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsReactTooltip = () => {
+    if (config.yAxis.type === 'categorical') return true
     if (['Deviation Bar', 'Box Plot', 'Scatter Plot', 'Paired Bar'].includes(visualizationType) || (visualizationType === 'Bar' && config.tooltips.singleSeries)) {
       return true
     }
@@ -327,6 +328,10 @@ export const useEditorPermissions = () => {
       return true
     }
     return false
+  }
+
+  const visHasCategoricalAxis = () => {
+    if ((visualizationType === 'Line' || visualizationType === 'Bar' || visualizationType === 'Combo' || visualizationType === 'Area Chart') && config.yAxis.type === 'categorical' && orientation === 'vertical') return true
   }
 
   return {
@@ -375,6 +380,7 @@ export const useEditorPermissions = () => {
     visSupportsReactTooltip,
     visSupportsValueAxisMax,
     visSupportsValueAxisMin,
-    visHasSingleSeriesTooltip
+    visHasSingleSeriesTooltip,
+    visHasCategoricalAxis
   }
 }

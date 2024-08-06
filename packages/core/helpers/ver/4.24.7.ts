@@ -34,7 +34,13 @@ export const dashboardFiltersMigrate = config => {
       delete viz.hide
     }
     // 'filter-dropdowns' was renamed to 'dashboardFilters' for clarity
-    if (viz.type === 'filter-dropdowns') viz.type = 'dashboardFilters'
+    if (viz.type === 'filter-dropdowns') {
+      viz.type = 'dashboardFilters'
+      if (!viz.sharedFilterIndexes) {
+        viz.sharedFilterIndexes = config.dashboard.sharedFilters.map((_sf, i) => i)
+        viz.filterBehavior = config.filterBehavior || 'Filter Change'
+      }
+    }
     if (viz.visualizationType === 'filter-dropdowns') viz.visualizationType = 'dashboardFilters'
     newVisualizations[vizKey] = viz
   })
@@ -79,6 +85,12 @@ const mapUpdates = newConfig => {
   return newConfig
 }
 
+const updateLogarithmicConfig = newConfig => {
+  if (newConfig.useLogScale) {
+    newConfig.yAxis.type === 'logarithmic'
+  }
+}
+
 const update_4_24_7 = config => {
   const ver = '4.24.7'
 
@@ -86,6 +98,7 @@ const update_4_24_7 = config => {
 
   mapUpdates(newConfig)
   dashboardFiltersMigrate(newConfig)
+  updateLogarithmicConfig(newConfig)
   newConfig.version = ver
   return newConfig
 }
