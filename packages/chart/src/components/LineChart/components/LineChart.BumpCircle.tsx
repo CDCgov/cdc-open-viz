@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Group } from '@visx/group'
 import { type Column } from '@cdc/core/types/Column'
+import React from 'react'
+
 
 const LineChartBumpCircle = props => {
   const { config, xScale, yScale, parseDate } = props
@@ -52,11 +54,11 @@ const LineChartBumpCircle = props => {
   // get xScale and yScale...
   if (!config.series) return
 
-  const circles = config?.series.map((series, seriesIndex) => {
+  const circles = config?.series.map((series) => {
     return config.data.map((d, dataIndex) => {
       return (
-        <>
-          <Group left={Number(config.runtime.yAxis.size)}>
+        <React.Fragment key={`bump-circle-${d[series.dataKey]}-${dataIndex}`}>
+          <Group left={Number(config.runtime.yAxis.size)}> 
             {d[series.dataKey] && (
               <>
                 <circle 
@@ -94,7 +96,7 @@ const LineChartBumpCircle = props => {
               </>
             )}
           </Group>
-        </>
+        </React.Fragment>
       )
     })
   })
