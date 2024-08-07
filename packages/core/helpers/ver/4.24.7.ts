@@ -67,6 +67,7 @@ export const dashboardFiltersMigrate = config => {
   // if there's no dashboardFilters visualization but there are sharedFilters create a visualization and update rows.
 
   config.visualizations = newVisualizations
+  delete config.filterBehavior // deprecated
 }
 
 const mapUpdates = newConfig => {

@@ -7,13 +7,14 @@ export type SharedFilter = FilterBase & {
   queryParameter?: string
   setByQueryParameter?: string
   active?: string | string[]
-  queuedActive?: string
+  queuedActive?: string | string[]
   usedBy?: (string | number)[] // if number used by whole row, else used by specific viz
   parents?: string[]
   setBy?: string
   selectLimit?: number
   resetLabel?: string
   labels?: Record<string, any>
+  multiSelect?: boolean
   key: string
   apiFilter?: APIFilter
   datasetKey?: string
