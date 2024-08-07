@@ -2,21 +2,26 @@ import React, { useState, useEffect } from 'react'
 import MapIcon from '../../assets/map-folded.svg'
 import ChartIcon from '../../assets/icon-chart-bar.svg'
 import MarkupIncludeIcon from '../../assets/icon-code.svg'
-import { JsonEditor, UpdateFunction } from 'json-edit-react'
+import { FilterFunction, JsonEditor, UpdateFunction } from 'json-edit-react'
 import { formatConfigBeforeSave as stripConfig } from '../../helpers/formatConfigBeforeSave'
 import './advanced-editor-styles.css'
 import _ from 'lodash'
 
 export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExpandCollapse = () => {} }) => {
   const [advancedToggle, _setAdvancedToggle] = useState(false)
-  const [configTextboxValue, setConfigTextbox] = useState('')
+  const [configTextboxValue, setConfigTextbox] = useState<Record<string, any>>({})
   const setAdvancedToggle = val => {
     _setAdvancedToggle(val)
     onExpandCollapse()
   }
 
+  const collapseFields: FilterFunction = input => {
+    if (['datasets', 'data', 'originalFormattedData', 'formattedData'].includes(String(input.key))) return true
+    return false
+  }
+
   const onUpdate: UpdateFunction = val => {
-    setConfigTextbox(JSON.stringify(val.newData))
+    setConfigTextbox(val.newData)
   }
 
   useEffect(() => {
@@ -24,9 +29,8 @@ export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExp
     if (config.type !== 'dashboard') {
       parsedConfig = convertStateToConfig()
     }
-    const formattedConfig = JSON.stringify(parsedConfig, undefined, 2)
 
-    setConfigTextbox(formattedConfig)
+    setConfigTextbox(parsedConfig)
   }, [config])
 
   const typeLookup = {
@@ -64,16 +68,16 @@ export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExp
             <button
               className='btn '
               onClick={() => {
-                navigator.clipboard.writeText(configTextboxValue)
+                navigator.clipboard.writeText(JSON.stringify(configTextboxValue))
               }}
             >
               Copy to Clipboard
             </button>
-            <JsonEditor className='advanced-json-editor' data={JSON.parse(configTextboxValue)} onUpdate={onUpdate} rootName='' />
+            <JsonEditor className='advanced-json-editor' data={configTextboxValue} onUpdate={onUpdate} rootName='' collapse={collapseFields} />
             <button
               className='btn full-width'
               onClick={() => {
-                loadConfig(JSON.parse(configTextboxValue))
+                loadConfig(configTextboxValue)
                 setAdvancedToggle(!advancedToggle)
               }}
             >
