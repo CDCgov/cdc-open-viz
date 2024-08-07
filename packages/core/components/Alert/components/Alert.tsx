@@ -1,6 +1,11 @@
 import { IoMdCheckmarkCircleOutline, IoIosCloseCircle, IoIosInformationCircle } from 'react-icons/io'
+
+import Icon from '../../ui/Icon'
+
 import DOMPurify from 'dompurify'
 import React from 'react'
+
+import './Alert.styles.css'
 
 type AlertProps = {
   // type of alert for styling the alert box
@@ -25,9 +30,9 @@ const Alert: React.FC<AlertProps> = ({ type = 'info', message = '', iconSize = 2
   return (
     <div className={`alert alert-${type} p-1`} role='alert'>
       {heading && <h4 className='alert-heading'>{heading}</h4>}
-      {type === 'success' && <IoMdCheckmarkCircleOutline size={iconSize} style={styleResets} />}
-      {type === 'danger' && <IoIosCloseCircle size={iconSize} style={styleResets} />}
-      {type === 'info' && <IoIosInformationCircle size={iconSize} style={styleResets} />}
+      {type === 'success' && <Icon display='check' size={iconSize} />}
+      {type === 'danger' && <Icon display='warningCircle' size={iconSize} />}
+      {type === 'info' && <Icon display='info' size={iconSize} />}
       <span dangerouslySetInnerHTML={sanitizedData()} />
     </div>
   )

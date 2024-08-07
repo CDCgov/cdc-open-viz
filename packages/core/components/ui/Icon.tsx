@@ -7,6 +7,7 @@ import iconCaretFilledDown from '../../assets/icon-caret-filled-down.svg'
 import iconChartBar from '../../assets/icon-chart-bar.svg'
 import iconChartLine from '../../assets/icon-chart-line.svg'
 import iconChartPie from '../../assets/icon-chart-pie.svg'
+import iconCheck from '../../assets/icon-check.svg'
 import iconClose from '../../assets/icon-close.svg'
 import iconCode from '../../assets/icon-code.svg'
 import iconDataBite from '../../assets/icon-databite.svg'
@@ -44,6 +45,7 @@ const iconHash = {
   caretFilledDown: iconCaretFilledDown,
   chartBar: iconChartBar,
   chartLine: iconChartLine,
+  check: iconCheck,
   chartPie: iconChartPie,
   close: iconClose,
   code: iconCode,
