@@ -23,7 +23,7 @@ const Alert: React.FC<AlertProps> = ({ type = 'info', message = '', iconSize = 2
   const styleResets = { width: 'unset', height: 'unset', paddingRight: '5px' }
 
   return (
-    <div className={`alert alert-${type}`} role='alert' style={{ padding: '5px' }}>
+    <div className={`alert alert-${type} p-1`} role='alert'>
       {heading && <h4 className='alert-heading'>{heading}</h4>}
       {type === 'success' && <IoMdCheckmarkCircleOutline size={iconSize} style={styleResets} />}
       {type === 'danger' && <IoIosCloseCircle size={iconSize} style={styleResets} />}

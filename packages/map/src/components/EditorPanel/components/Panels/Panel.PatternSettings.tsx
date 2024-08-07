@@ -62,11 +62,7 @@ const PatternSettings = ({ name }: PanelProps) => {
   }
 
   const checkPatternContrasts = () => {
-    let passesContrast = true
-    state.map.patterns.forEach((pattern, index) => {
-      if (pattern.contrastCheck === false) passesContrast = false
-    })
-    return passesContrast
+    return state.map.patterns.every(pattern => pattern.contrastCheck !== false)
   }
 
   return (

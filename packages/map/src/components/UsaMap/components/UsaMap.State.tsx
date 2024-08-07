@@ -119,55 +119,53 @@ const UsaMap = () => {
     }
   }, [data, state.general.territoriesAlwaysShow])
 
-  useEffect(() => {
-    unitedStates.map(geo => {
-      state.map.patterns.map((patternData, patternIndex) => {
-        const { pattern, dataKey, size } = patternData
-        let geoKey = geo.properties.iso
-        if (!geoKey) return
-        let legendColors
-        const geoData = data[geoKey]
-        if (geoData !== undefined) {
-          legendColors = applyLegendToRow(geoData)
-        }
-        const currentFill = legendColors[0]
-        const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
-        const patternColor = patternData.color || getContrastColor('#000', currentFill)
+  // useEffect(() => {
+  //   unitedStates.map(geo => {
+  //     state.map.patterns.map((patternData, patternIndex) => {
+  //       const { pattern, dataKey, size } = patternData
+  //       const geoKey = geo.properties.iso
+  //       if (!geoKey) return
+  //       const legendColors = data[geoKey] ? applyLegendToRow(data[geoKey]) : undefined
+  //       const geoData = data[geoKey]
 
-        if (!hasMatchingValues) return
-        const passesContrastCheck = checkColorContrast(currentFill, patternColor)
+  //       const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
+  //       if (!hasMatchingValues) return
 
-        setState(prevState => {
-          if (prevState.map.patterns[patternIndex].contrastCheck === passesContrastCheck) {
-            return prevState
-          }
-          return {
-            ...prevState,
-            runtime: {
-              ...state.runtime,
-              editorErrorMessage: !passesContrastCheck ? 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.' : ''
-            },
-            map: {
-              ...prevState.map,
-              patterns: prevState.map.patterns.map((pattern, i) => {
-                if (i === patternIndex) {
-                  return {
-                    ...pattern,
-                    dataValue: geoData[patternData.dataKey],
-                    color: patternData.color,
-                    size: patternData.size,
-                    pattern: patternData.pattern,
-                    contrastCheck: passesContrastCheck
-                  }
-                }
-                return pattern
-              })
-            }
-          }
-        })
-      })
-    })
-  }, [state.map.patterns, data, state, setState, applyLegendToRow])
+  //       const currentFill = legendColors[0]
+  //       const patternColor = patternData.color || getContrastColor('#000', currentFill)
+  //       const passesContrastCheck = checkColorContrast(currentFill, patternColor)
+
+  //       setState(prevState => {
+  //         if (prevState.map.patterns[patternIndex].contrastCheck === passesContrastCheck) {
+  //           return prevState
+  //         }
+  //         return {
+  //           ...prevState,
+  //           runtime: {
+  //             ...state.runtime,
+  //             editorErrorMessage: !passesContrastCheck ? 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.' : ''
+  //           },
+  //           map: {
+  //             ...prevState.map,
+  //             patterns: prevState.map.patterns.map((pattern, i) => {
+  //               if (i === patternIndex) {
+  //                 return {
+  //                   ...pattern,
+  //                   dataValue: geoData[patternData.dataKey],
+  //                   color: patternData.color,
+  //                   size: patternData.size,
+  //                   pattern: patternData.pattern,
+  //                   contrastCheck: passesContrastCheck
+  //                 }
+  //               }
+  //               return pattern
+  //             })
+  //           }
+  //         }
+  //       })
+  //     })
+  //   })
+  // }, [state.map.patterns, data, state, setState, applyLegendToRow])
 
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
