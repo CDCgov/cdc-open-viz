@@ -6,7 +6,6 @@ import React from 'react'
 
 const LineChartBumpCircle = props => {
   const { config, xScale, yScale, parseDate } = props
-  const [tooltipID] = useState<string>('')
 
   const handleX = xValue => {
     if (config.xAxis.type === 'date') {
@@ -46,10 +45,7 @@ const LineChartBumpCircle = props => {
     return listItems.join(' ')
   }
 
-  const getTooltip = dataRow => `<ul>
-                  <li class="tooltip-heading">${tooltipID}</li>
-                  ${getListItems(dataRow)}
-</ul>`
+  const getTooltip = dataRow => `<ul> ${getListItems(dataRow)} </ul>`
 
   // get xScale and yScale...
   if (!config.series) return
