@@ -3,7 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/core",
+    "packages/chart",
+    "packages/map",
+    "packages/filtered-text",
+    "packages/markup-include",
+    "packages/waffle-chart",
+    "packages/data-bite",
+    "packages/dashboard",
+    "packages/editor"
   ],
   "devDependencies": {
     "@babel/core": "^7.23.2",
