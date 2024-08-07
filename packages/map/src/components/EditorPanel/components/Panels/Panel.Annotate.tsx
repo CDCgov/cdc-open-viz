@@ -223,26 +223,6 @@ const PanelAnnotate: React.FC = props => {
                       }}
                     />
                   </label>
-                  <label>
-                    Associated Series:
-                    <select
-                      onChange={e => {
-                        const updatedAnnotations = [...config?.annotations]
-                        updatedAnnotations[index].seriesKey = e.target.value
-                        updateConfig({
-                          ...config,
-                          annotations: updatedAnnotations
-                        })
-                      }}
-                    >
-                      <option key='none' value='none'>
-                        None
-                      </option>
-                      {getColumns(false).map((column, columnIndex) => {
-                        return <option>{column}</option>
-                      })}
-                    </select>
-                  </label>
 
                   <label>
                     Connection Type:
