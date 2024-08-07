@@ -8,10 +8,10 @@ import { Table } from '@cdc/core/types/Table'
 import { BoxPlot } from '@cdc/core/types/BoxPlot'
 import { General } from '@cdc/core/types/General'
 import { type Link } from './../components/Sankey/types'
-import { Legend } from '@cdc/core/types/Legend'
+
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
-import { type PreliminaryDataItem } from '../components/LineChart/LineChartProps'
+
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 

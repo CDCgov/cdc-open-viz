@@ -1,13 +1,8 @@
 import React from 'react'
-import { type PreliminaryDataItem, Legend } from '../../types/ChartConfig'
+import { ChartConfig } from '../../types/ChartConfig'
 
 interface LegendProps {
-  config: {
-    preliminaryData: PreliminaryDataItem[]
-    legend: Legend
-    visualizationType: string
-    visualizationSubType: 'regular' | 'stacked'
-  }
+  config: ChartConfig
   isBottomOrSmallViewport: boolean
 }
 
