@@ -5,7 +5,7 @@
   "moduleName": "CdcCore",
   "main": "dist/cdccore",
   "scripts": {
-    "test": "vitest run --reporter verbose",
+    "test": "vitest run --environment jsdom --reporter verbose",
     "test-watch": "vitest watch --reporter verbose",
     "test-watch:ui": "vitest --ui"
   },

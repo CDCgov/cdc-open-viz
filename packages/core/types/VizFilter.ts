@@ -2,6 +2,8 @@ export type FilterBase = {
   columnName: string
   values: string[]
   showDropdown: boolean
+  id: number
+  parents: number[]
 }
 
 export type GeneralFilter = FilterBase & {
