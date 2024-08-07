@@ -175,8 +175,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
         const currentQSParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
         const updatedQSParams = {}
         filters.forEach(filter => {
-          // filter.active is always a string when filter.type is 'urlfilter'
-          if (filter.type === 'urlfilter' && !Array.isArray(filter.active)) {
+          if (filter.type === 'urlfilter') {
             if (filter.filterBy === 'File Name') {
               newFileName = reloadURLHelpers.getNewFileName(newFileName, filter, datasetKey)
             }

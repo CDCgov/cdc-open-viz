@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { FilterBehavior } from '../components/Header/Header'
+import { FilterBehavior } from '../helpers/FilterBehavior'
 import { getQueryParams, updateQueryString } from '@cdc/core/helpers/queryStringUtils'
 import { SharedFilter } from '../types/SharedFilter'
 import { DashboardFilters } from '../types/DashboardFilters'
