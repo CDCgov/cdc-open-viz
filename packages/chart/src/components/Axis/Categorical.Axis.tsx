@@ -22,7 +22,7 @@ const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
     }
   }
 
-  const categories = config.yAxis.categories
+  const categories = config.yAxis?.categories
 
   const createDataShape = categories => {
     const categoryObj = [...categories].reduce((acc, item) => {
@@ -76,7 +76,7 @@ const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
 
   const colorScale = scaleOrdinal({
     domain: categories.map(d => d?.label),
-    range: categories.map(d => getValidColor(d?.color))
+    range: categories.map(d => getValidColor(d?.color?.trim()))
   })
 
   const keys = Object.keys(transformedData[0])
@@ -126,7 +126,7 @@ const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
                       {bar.key}
                     </Text>
                     {/* gridLines */}
-                    {config.runtime.yAxis.gridLines && <Line from={{ x: bar.x + xMax, y: bar.y }} to={{ x: bar.x, y: bar.y }} stroke='rgba(0,0,0,0.3)' />}
+                    {config.runtime.yAxis.gridLines && <Line from={{ x: bar.x + xScale.bandwidth(), y: bar.y }} to={{ x: xMax + xScale.bandwidth(), y: bar.y }} stroke='rgba(0,0,0,0.3)' />}
                     {/* White background spacing between stackes */}
                     {!isLastIndex && <rect x={bar.x} y={bar.y} width={bar.width} height={1} fill={'#fff'}></rect>}
                     {/* Right side Axis line */}
