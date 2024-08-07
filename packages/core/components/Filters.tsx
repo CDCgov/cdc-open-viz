@@ -270,7 +270,7 @@ const Filters = (props: FilterProps) => {
       visualizationConfig?.filters && (
         <section className={filterSectionClassList.join(' ')}>
           <p className='filters-section__intro-text'>
-            {filters?.some(f => f.active) ? filterConstants.introText : ''} {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
+            {filters?.some(f => f.active && f.showDropdown) ? filterConstants.introText : ''} {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
           </p>
           <div className='filters-section__wrapper'>{children}</div>
         </section>
