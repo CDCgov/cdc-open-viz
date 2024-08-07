@@ -71,7 +71,7 @@ const PatternSettings = ({ name }: PanelProps) => {
         <AccordionItemButton>{name}</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        <Alert type={checkPatternContrasts() ? 'success' : 'danger'} message='Pattern colors must comply with <br /> <a href="https://www.w3.org/TR/WCAG21/">WCAG 2.1</a> 3:1 contrast ratio.' />
+        {patterns.length > 0 && <Alert type={checkPatternContrasts() ? 'success' : 'danger'} message='Pattern colors must comply with <br /> <a href="https://www.w3.org/TR/WCAG21/">WCAG 2.1</a> 3:1 contrast ratio.' />}
         <br />
 
         {patterns &&

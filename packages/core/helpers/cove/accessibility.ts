@@ -29,3 +29,8 @@ export const checkColorContrast = (color1: string, color2: string) => {
   if (!chroma.valid(color1) || !chroma.valid(color2)) return false
   return chroma.contrast(color1, color2) >= WCAG_NON_TEXT_CONTRAST_RATIO
 }
+
+export const getColorContrast = (color1: string, color2: string) => {
+  if (!chroma.valid(color1) || !chroma.valid(color2)) return false
+  return chroma.contrast(color1, color2)
+}

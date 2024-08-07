@@ -23,7 +23,7 @@ import Territory from './Territory'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { MapContext } from '../../../types/MapContext'
-import { checkColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { checkColorContrast, getContrastColor, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -120,52 +120,75 @@ const UsaMap = () => {
   }, [data, state.general.territoriesAlwaysShow])
 
   useEffect(() => {
-    unitedStates.map(geo => {
-      state.map.patterns.map((patternData, patternIndex) => {
-        const { pattern, dataKey, size } = patternData
+    const passesContrastCheck = []
+    const updatedPatterns = state.map.patterns.map((patternData, patternIndex) => {
+      let updatedPattern = { ...patternData }
+
+      unitedStates.forEach(geo => {
         const geoKey = geo.properties.iso
         if (!geoKey) return
+
         const legendColors = data[geoKey] ? applyLegendToRow(data[geoKey]) : undefined
         const geoData = data[geoKey]
+        if (!geoData) return
 
         const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
         if (!hasMatchingValues) return
 
         const currentFill = legendColors[0]
         const patternColor = patternData.color || getContrastColor('#000', currentFill)
-        const passesContrastCheck = checkColorContrast(currentFill, patternColor)
+        const contrastCheck = checkColorContrast(currentFill, patternColor)
 
-        setState(prevState => {
-          if (prevState.map.patterns[patternIndex].contrastCheck === passesContrastCheck) {
-            return prevState
-          }
-          return {
-            ...prevState,
-            runtime: {
-              ...state.runtime,
-              editorErrorMessage: !passesContrastCheck ? 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.' : ''
-            },
-            map: {
-              ...prevState.map,
-              patterns: prevState.map.patterns.map((pattern, i) => {
-                if (i === patternIndex) {
-                  return {
-                    ...pattern,
-                    dataValue: geoData[patternData.dataKey],
-                    color: patternData.color,
-                    size: patternData.size,
-                    pattern: patternData.pattern,
-                    contrastCheck: passesContrastCheck
-                  }
-                }
-                return pattern
-              })
-            }
-          }
-        })
+        // Share with the developer which color is failing as needed...
+        if (contrastCheck === false) {
+          console.warn(`COVE: pattern contrast check failed on ${geoData?.[state.columns.geo.name]} for ${patternData.dataKey} with:
+            pattern color: ${patternColor}
+            contrast: ${getColorContrast(currentFill, patternColor)}
+          `)
+        }
+
+        passesContrastCheck[patternIndex] = contrastCheck
+
+        updatedPattern = {
+          ...updatedPattern,
+          dataValue: geoData[patternData.dataKey],
+          color: patternData.color,
+          size: patternData.size,
+          pattern: patternData.pattern,
+          contrastCheck
+        }
       })
+
+      return updatedPattern
     })
-  }, [state.map.patterns, data, state, setState, applyLegendToRow])
+
+    const editorErrorMessage = passesContrastCheck.includes(false) ? 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.' : ''
+
+    setState(prevState => {
+      // Check if the new editor error message should show or not and update state.runtime
+      const newRuntime = {
+        ...prevState.runtime,
+        editorErrorMessage
+      }
+
+      // If color contrast changes update state.map section
+      const newMap = {
+        ...prevState.map,
+        patterns: updatedPatterns
+      }
+
+      // Only update the state if there are actual changes
+      if (JSON.stringify(prevState.runtime) !== JSON.stringify(newRuntime) || JSON.stringify(prevState.map.patterns) !== JSON.stringify(newMap.patterns)) {
+        return {
+          ...prevState,
+          runtime: newRuntime,
+          map: newMap
+        }
+      }
+
+      return prevState
+    })
+  }, [state.map.patterns, data, applyLegendToRow, state.runtime])
 
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
