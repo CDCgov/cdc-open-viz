@@ -44,5 +44,6 @@ export type Axis = {
   tickRotation?: number
   tickWidthMax?: number
   type: string
+  axisBBox: number
   maxValue: string
 }
