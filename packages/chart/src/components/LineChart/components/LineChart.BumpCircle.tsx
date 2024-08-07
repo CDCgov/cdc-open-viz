@@ -2,10 +2,20 @@ import { useState } from 'react'
 import { Group } from '@visx/group'
 import { type Column } from '@cdc/core/types/Column'
 import React from 'react'
+import { type ChartConfig } from '../../../types/ChartConfig'
 
+type LineChartBumpCircleProp = {
+    config: ChartConfig, 
+    xScale: any, 
+    yScale: any, 
+    parseDate: any 
+  }
 
-const LineChartBumpCircle = props => {
+const LineChartBumpCircle = (props: LineChartBumpCircleProp) => {
   const { config, xScale, yScale, parseDate } = props
+
+  // get xScale and yScale...
+  if (!config.series) return
 
   const handleX = xValue => {
     if (config.xAxis.type === 'date') {
@@ -22,6 +32,15 @@ const LineChartBumpCircle = props => {
   const checkBandScale = xValue => {
     return xScale.bandwidth ? xScale.bandwidth() / 2 + Number(xValue) : Number(xValue)
   }
+
+  
+  // const getListItems = dataRow => {
+  //   const columns: Column[] = config.columns || [] as Column[]
+  //   return Object.values(columns).filter(col => col.tooltips).map(column => {
+  //     const label = column.label || column.name;
+  //     return <li className='tooltip-body'> <strong>${label}</strong>: ${dataRow[column.name]} </li>
+  //   })
+  // }
 
   const getListItems = dataRow => {
     const listItems = []
@@ -47,46 +66,45 @@ const LineChartBumpCircle = props => {
 
   const getTooltip = dataRow => `<ul> ${getListItems(dataRow)} </ul>`
 
-  // get xScale and yScale...
-  if (!config.series) return
-
-  const circles = config?.series.map((series) => {
+  const circles = config.series.map((series) => {
     return config.data.map((d, dataIndex) => {
+      let series_dataKey = d[series.dataKey]
+      let axis_dataKey = d[config.xAxis.dataKey]
       return (
-        <React.Fragment key={`bump-circle-${d[series.dataKey]}-${dataIndex}`}>
+        <React.Fragment key={`bump-circle-${series_dataKey}-${dataIndex}`}>
           <Group left={Number(config.runtime.yAxis.size)}> 
-            {d[series.dataKey] && (
+            {series_dataKey && (
               <>
                 <circle 
-                  key={`bump-circle-${d[series.dataKey]}-${dataIndex}`}
+                  key={`bump-circle-${series_dataKey}-${dataIndex}`}
                   data-tooltip-html={getTooltip(d)} 
                   data-tooltip-id={`bump-chart`} 
                   r={10} 
-                  cx={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey]))))} 
-                  cy={Number(yScale(d[series.dataKey]))} 
+                  cx={Number(checkBandScale(xScale(handleX(axis_dataKey))))} 
+                  cy={Number(yScale(series_dataKey))} 
                   stroke='#CACACA' 
                   strokeWidth={1} 
                   fill='#E5E4E2' 
                 />
-                {d[series.dataKey].toString().length === 2 ? (
+                {series_dataKey.toString().length === 2 ? (
                   // prettier-ignore
                   <text
-                  x={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey])))) - 7}
-                  y={Number(yScale(d[series.dataKey])) + 4}
+                  x={Number(checkBandScale(xScale(handleX(axis_dataKey)))) - 7}
+                  y={Number(yScale(series_dataKey)) + 4}
                   fill='#000000'
                   fontSize={11.5}
                   >
-                  {d[series.dataKey]}
+                  {series_dataKey}
                 </text>
                 ) : (
                   // prettier-ignore
                   <text
-                  x={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey])))) - 4}
-                  y={Number(yScale(d[series.dataKey])) + 4}
+                  x={Number(checkBandScale(xScale(handleX(axis_dataKey)))) - 4}
+                  y={Number(yScale(series_dataKey)) + 4}
                   fill='#000000'
                   fontSize={11.5}
                   >
-                  {d[series.dataKey]}
+                  {series_dataKey}
                 </text>
                 )}
               </>
