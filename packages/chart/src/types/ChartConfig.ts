@@ -18,6 +18,25 @@ import { type Annotation } from '@cdc/core/types/Annotation'
 export type ViewportSize = 'sm' | 'xs' | 'xxs' | 'lg'
 export type ChartColumns = Record<string, Column>
 
+export interface PreliminaryDataItem {
+  column: string
+  displayLegend: boolean
+  displayTable: boolean
+  displayTooltip: boolean
+  iconCode: string
+  label: string
+  lineCode: string
+  seriesKey: string
+  style: string
+  symbol: string
+  type: 'effect' | 'suppression'
+  value: string
+  hideBarSymbol: boolean
+  hideLineStyle: boolean
+  circleSize: number
+  displayGray: boolean
+}
+
 type DataFormat = {
   abbreviated: boolean
   bottomAbbreviated: boolean
@@ -60,6 +79,7 @@ export type Legend = {
   singleRow: boolean
   type: string
   verticalSorted: boolean
+  hideSuppressedLabels:boolean
 }
 
 type Visual = {

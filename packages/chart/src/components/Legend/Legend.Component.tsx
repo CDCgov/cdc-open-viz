@@ -11,6 +11,7 @@ import { Label } from '../../types/Label'
 import { ChartConfig } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
 import { forwardRef } from 'react'
+import LegendSuppression from './Legend.Suppression'
 
 export interface LegendProps {
   colorScale: ColorScale
@@ -143,77 +144,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                 })}
               </div>
 
-              <>
-                {config?.preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style === 'Open Circles') && ['Line', 'Combo'].includes(config.visualizationType) && (
-                  <>
-                    <hr></hr>
-                    <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
-                      {config?.preliminaryData?.map((pd, index) => {
-                        return (
-                          <>
-                            {pd.label && pd.type === 'effect' && pd.style && (
-                              <div key={index} className='legend-preliminary'>
-                                <span className={pd.symbol}>{pd.lineCode}</span>
-                                <p> {pd.label}</p>
-                              </div>
-                            )}
-                          </>
-                        )
-                      })}
-                    </div>
-                  </>
-                )}
-                {!config.legend.hideSuppressedLabels &&
-                  config?.preliminaryData?.some(pd => pd.label && pd.displayLegend && pd.type === 'suppression' && pd.value && (pd?.style || pd.symbol)) &&
-                  ((config.visualizationType === 'Bar' && config.visualizationSubType === 'regular') || config.visualizationType === 'Line' || config.visualizationType === 'Combo') && (
-                    <>
-                      <hr></hr>
-                      <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
-                        {config?.preliminaryData?.map(
-                          (pd, index) =>
-                            pd.displayLegend &&
-                            pd.type === 'suppression' && (
-                              <>
-                                {config.visualizationType === 'Bar' && (
-                                  <>
-                                    <div key={index + 'Bar'} className={`legend-preliminary ${pd.symbol}`}>
-                                      <span className={pd.symbol}>{pd.iconCode}</span>
-                                      <p className={pd.type}>{pd.label}</p>
-                                    </div>
-                                  </>
-                                )}
-                                {config.visualizationType === 'Line' && (
-                                  <>
-                                    <div key={index + 'Line'} className={`legend-preliminary `}>
-                                      <span>{pd.lineCode}</span>
-                                      <p className={pd.type}>{pd.label}</p>
-                                    </div>
-                                  </>
-                                )}
-                                {config.visualizationType === 'Combo' && (
-                                  <>
-                                    {pd.symbol && pd.iconCode && (
-                                      <div key={index + 'Combo'} className={`legend-preliminary ${pd.symbol}`}>
-                                        <span className={pd.symbol}>{pd.iconCode}</span>
-                                        <p className={pd.type}>{pd.label}</p>
-                                      </div>
-                                    )}
-
-                                    {pd.style && pd.lineCode && (
-                                      <div key={index + 'Combo'} className='legend-preliminary'>
-                                        <span>{pd.lineCode}</span>
-                                        <p>{pd.label}</p>
-                                      </div>
-                                    )}
-                                  </>
-                                )}
-                              </>
-                            )
-                        )}
-                      </div>
-                    </>
-                  )}
-              </>
+              <LegendSuppression config={config} isBottomOrSmallViewport={isBottomOrSmallViewport} />
             </>
           )
         }}
