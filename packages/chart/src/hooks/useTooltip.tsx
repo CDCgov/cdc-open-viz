@@ -49,12 +49,6 @@ export const useTooltip = props => {
     let formattedValue = seriesKey === config.xAxis.dataKey ? value : formatNumber(value, getAxisPosition(seriesKey))
     formattedValue = showMissingDataValue ? 'N/A' : formattedValue
 
-    const suppressed = config.preliminaryData?.find(pd => pd.label && pd.type === 'suppression' && pd.displayTooltip && value === pd.value && (!pd.column || seriesKey === pd.column))
-
-    if (suppressed) {
-      formattedValue = suppressed.label
-    }
-
     return formattedValue
   }
 
@@ -484,7 +478,22 @@ export const useTooltip = props => {
     if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${isDateScale(xAxis) ? formattedDate : value}`}</li>
 
     // TOOLTIP BODY
-    return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${value}`}</li>
+    const suppressed = config.preliminaryData?.find(pd => pd.label && pd.type === 'suppression' && pd.displayTooltip && value === pd.value && (!pd.column || key === pd.column))
+    let newValue = value
+    const style = {}
+
+    if (suppressed) {
+      newValue = suppressed.label
+    }
+
+    // highlight in gray suppressed data
+    config.preliminaryData.forEach(pd => {
+      if (pd.displayGray && pd.column === key && value === pd.value) {
+        style['color'] = 'red'
+      }
+    })
+
+    return <li style={style} className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${newValue}`}</li>
   }
 
   return {

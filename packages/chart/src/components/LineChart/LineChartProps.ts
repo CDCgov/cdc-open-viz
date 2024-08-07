@@ -32,6 +32,7 @@ export interface PreliminaryDataItem {
   hideBarSymbol: boolean
   hideLineStyle: boolean
   circleSize: number
+  displayGray: boolean
 }
 
 export interface DataItem {

@@ -111,7 +111,8 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
       lineCode: '',
       hideBarSymbol: false,
       hideLineStyle: false,
-      circleSize: 6
+      circleSize: 6,
+      displayGray: true
     }
     preliminaryData.push(defaultValues)
     updateConfig({ ...config, preliminaryData })
@@ -137,7 +138,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   return (
     <>
       {config.preliminaryData &&
-        config.preliminaryData?.map(({ circleSize, column, displayLegend, displayTable, displayTooltip, label, seriesKey, style, symbol, type, value, hideBarSymbol, hideLineStyle }, i) => {
+        config.preliminaryData?.map(({ displayGray, circleSize, column, displayLegend, displayTable, displayTooltip, label, seriesKey, style, symbol, type, value, hideBarSymbol, hideLineStyle }, i) => {
           return (
             <div key={`preliminaryData-${i}`} className='edit-block'>
               <p> {type === 'suppression' ? 'Suppressed' : 'Effect'} Data</p>
@@ -285,6 +286,22 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                     value={displayTable}
                     fieldName='displayTable'
                     label='Display in table'
+                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                  />
+                  <CheckBox
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Selecting this option will apply to chart, tooltip hover, legend, and data table.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    value={displayGray}
+                    fieldName='displayGray'
+                    label='Highlight Suppressed Data In Gray'
                     updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                   />
                 </>
