@@ -101,8 +101,6 @@ const PanelAnnotate: React.FC = props => {
   return (
     <Accordion>
       <Accordion.Section title={props.name}>
-        <p>Dragging state: {isDraggingAnnotation ? 'Dragging' : 'Not dragging'}</p>
-
         <label>
           Show Annotation Dropdown
           <input
