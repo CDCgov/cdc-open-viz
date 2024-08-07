@@ -3,13 +3,14 @@ import Tooltip from '../../ui/Tooltip'
 import Icon from '../../ui/Icon'
 import { Visualization } from '../../../types/Visualization'
 import { UpdateFieldFunc } from '../../../types/UpdateFieldFunc'
-import _ from 'lodash'
-import { MultiSelectFilter, VizFilter } from '../../../types/VizFilter'
+import _, { filter } from 'lodash'
+import { MultiSelectFilter, NestedDropdownFilter, VizFilter } from '../../../types/VizFilter'
 import { filterStyleOptions, handleSorting } from '../../Filters'
 import FieldSetWrapper from '../FieldSetWrapper'
 
 import FilterOrder from './components/FilterOrder'
 import { useMemo, useState } from 'react'
+import NestedDropdownEditor from './NestedDropdownEditor'
 
 type VizFilterProps = {
   config: Visualization
@@ -79,8 +80,18 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
     // Overwrite filterItem.values since thats what we map through in the editor panel
     filterItem.values = updatedValues
     filterItem.orderedValues = updatedValues
-    filterItem.active = updatedValues[0]
+    if (filter.filterStyle !== 'nested-dropdown') {
+      filterItem.active = updatedValues[0]
+    }
     filterItem.order = 'cust'
+
+    if (filter.filterStyle === 'nested-dropdown') {
+      const updatedSubGroupValues = [...filter.subGroupingFilter.values]
+      const [movedItem] = updatedSubGroupValues.splice(idx1, 1)
+      updatedSubGroupValues.splice(idx2, 0, movedItem)
+
+      filterItem.subGroupingFilter.values = updatedSubGroupValues
+    }
 
     // Update the filters
     filtersCopy[filterIndex] = filterItem
@@ -119,34 +130,6 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
               return (
                 <FieldSetWrapper fieldName={filter.columnName} fieldKey={index} fieldType='Filter' controls={openControls} deleteField={() => removeFilter(index)}>
                   <label>
-                    <span className='edit-label column-heading'>Filter</span>
-                    <select
-                      value={filter.columnName}
-                      onChange={e => {
-                        handleNameChange(index, e.target.value)
-                      }}
-                    >
-                      <option value=''>- Select Option -</option>
-                      {dataColumns.map((dataKey, index) => (
-                        <option value={dataKey} key={index}>
-                          {dataKey}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label>
-                    <span className='edit-showDropdown column-heading'>Show Filter Input</span>
-                    <input
-                      type='checkbox'
-                      checked={filter.showDropdown === undefined ? true : filter.showDropdown}
-                      onChange={e => {
-                        updateFilterProp('showDropdown', index, e.target.checked)
-                      }}
-                    />
-                  </label>
-
-                  <label>
                     <span className='edit-label column-heading'>Filter Style</span>
 
                     <select
@@ -165,51 +148,98 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                     </select>
                   </label>
 
-                  <label>
-                    <span className='edit-label column-heading'>Label</span>
-                    <input
-                      type='text'
-                      value={filter.label}
-                      onChange={e => {
-                        updateFilterProp('label', index, e.target.value)
-                      }}
-                    />
-                  </label>
+                  {filter.filterStyle !== 'nested-dropdown' ? (
+                    <>
+                      <label>
+                        <span className='edit-label column-heading'>Filter</span>
+                        <select
+                          value={filter.columnName}
+                          onChange={e => {
+                            handleNameChange(index, e.target.value)
+                          }}
+                        >
+                          <option value=''>- Select Option -</option>
+                          {dataColumns.map((dataKey, index) => (
+                            <option value={dataKey} key={index}>
+                              {dataKey}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
 
-                  {filter.filterStyle === 'multi-select' && (
-                    <TextField
-                      label='Select Limit'
-                      value={(filter as MultiSelectFilter).selectLimit}
+                      <label>
+                        <span className='edit-showDropdown column-heading'>Show Filter Input</span>
+                        <input
+                          type='checkbox'
+                          checked={filter.showDropdown === undefined ? true : filter.showDropdown}
+                          onChange={e => {
+                            updateFilterProp('showDropdown', index, e.target.checked)
+                          }}
+                        />
+                      </label>
+
+                      <label>
+                        <span className='edit-label column-heading'>Label</span>
+                        <input
+                          type='text'
+                          value={filter.label}
+                          onChange={e => {
+                            updateFilterProp('label', index, e.target.value)
+                          }}
+                        />
+                      </label>
+
+                      {filter.filterStyle === 'multi-select' && (
+                        <TextField
+                          label='Select Limit'
+                          value={(filter as MultiSelectFilter).selectLimit}
+                          updateField={updateField}
+                          section='filters'
+                          subsection={index}
+                          fieldName='selectLimit'
+                          type='number'
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>The maximum number of items that can be selected.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
+                      )}
+
+                      <label>
+                        <span className='edit-label column-heading'>Default Value Set By Query String Parameter</span>
+                        <input
+                          type='text'
+                          value={filter.setByQueryParameter}
+                          onChange={e => {
+                            updateFilterProp('setByQueryParameter', index, e.target.value)
+                          }}
+                        />
+                      </label>
+
+                      <FilterOrder filterIndex={index} filter={filter} updateFilterProp={updateFilterProp} handleFilterOrder={handleFilterOrder} />
+                    </>
+                  ) : (
+                    <NestedDropdownEditor
+                      allFilters={config.filters}
+                      dataColumns={dataColumns}
+                      filter={filter as NestedDropdownFilter}
+                      filterIndex={index}
+                      filterStyleOptions={filterStyleOptions}
+                      handleFilterOrder={handleFilterOrder}
+                      handleNameChange={handleNameChange}
+                      handleSorting={handleSorting}
+                      rawData={rawData}
                       updateField={updateField}
-                      section='filters'
-                      subsection={index}
-                      fieldName='selectLimit'
-                      type='number'
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>The maximum number of items that can be selected.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
+                      updateFilterProp={updateFilterProp}
+                      updateFilterStyle={updateFilterStyle}
                     />
                   )}
-
-                  <label>
-                    <span className='edit-label column-heading'>Default Value Set By Query String Parameter</span>
-                    <input
-                      type='text'
-                      value={filter.setByQueryParameter}
-                      onChange={e => {
-                        updateFilterProp('setByQueryParameter', index, e.target.value)
-                      }}
-                    />
-                  </label>
-
-                  <FilterOrder filterIndex={index} filter={filter} updateFilterProp={updateFilterProp} handleFilterOrder={handleFilterOrder} />
                 </FieldSetWrapper>
               )
             })}

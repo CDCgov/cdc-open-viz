@@ -22,7 +22,7 @@ export const line_Chart_Two_Points_Regression_Test: Story = {
 export const line_Chart_Two_Points_New_Chart: Story = {
   args: {
     config: lineChartTwoPointsNewChart,
-    isEditor: false
+    isEditor: true
   }
 }
 
