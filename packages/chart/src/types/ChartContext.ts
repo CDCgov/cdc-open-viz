@@ -21,7 +21,7 @@ type SharedChartContext = {
   highlightReset?: Function
   legendIsolateValues?: string[]
   setLegendIsolateValues?: Function
-  getTextWidth?: () => string | number
+  getTextWidth?: (a: string, b: string) => string
   brushConfig: { data: []; isBrushing: boolean; isActive: boolean }
   setBrushConfig: Function
   clean: Function

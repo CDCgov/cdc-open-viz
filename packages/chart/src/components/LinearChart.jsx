@@ -8,6 +8,7 @@ import { Text } from '@visx/text'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
+import BrushChart from './BrushChart'
 // CDC Components
 import { AreaChart, AreaChartStacked } from './AreaChart'
 import BarChart from './BarChart'
@@ -38,7 +39,6 @@ import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 
 // styles
-import ZoomBrush from './ZoomBrush'
 
 const LinearChart = props => {
   // prettier-ignore
@@ -105,6 +105,7 @@ const LinearChart = props => {
 
   // refs
   const triggerRef = useRef()
+  const axisBottomRef = useRef(null)
   const svgRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
@@ -113,7 +114,7 @@ const LinearChart = props => {
   // getters & functions
   const getXAxisData = d => (isDateScale(config.runtime.xAxis) ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
-  const xAxisDataMapped = config.brush?.active && brushConfig.data?.length ? brushConfig.data.map(d => getXAxisData(d)) : data.map(d => getXAxisData(d))
+  const xAxisDataMapped = config.brush.active && brushConfig.data?.length ? brushConfig.data.map(d => getXAxisData(d)) : data.map(d => getXAxisData(d))
   const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
   const properties = { data, tableData, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax }
   const { min, max, leftMax, rightMax } = useMinMax(properties)
@@ -504,6 +505,7 @@ const LinearChart = props => {
           {/* X axis */}
           {visualizationType !== 'Paired Bar' && visualizationType !== 'Spark Line' && (
             <AxisBottom
+              innerRef={axisBottomRef}
               top={runtime.horizontal && config.visualizationType !== 'Forest Plot' ? Number(heightHorizontal) + Number(config.xAxis.axisPadding) : config.visualizationType === 'Forest Plot' ? yMax + Number(config.xAxis.axisPadding) : yMax}
               left={config.visualizationType !== 'Forest Plot' ? Number(runtime.yAxis.size) : 0}
               label={config[section].label}
@@ -537,6 +539,9 @@ const LinearChart = props => {
                   // plus the width of the previous tick and the space
                   positions[i] = positions[i - 1] + textWidths[i - 1] + spaceBetweenEachTick
                 }
+                // calculate the end of x axis box
+                const axisBBox = axisBottomRef?.current?.getBBox().height
+                config.xAxis.axisBBox = axisBBox
 
                 // Check if ticks are overlapping
                 let areTicksTouching = false
@@ -712,8 +717,8 @@ const LinearChart = props => {
               config={config}
             />
           )}
-          {/*Zoom Brush */}
-          {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && false && !isHorizontal && <ZoomBrush xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />}
+          {/*Brush chart */}
+          {config.brush.active && config.xAxis.type !== 'categorical' && <BrushChart xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} xScale={xScale} seriesScale={seriesScale} />}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
           {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(visualizationType) && !checkLineToBarGraph() && (

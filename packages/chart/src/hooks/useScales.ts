@@ -3,7 +3,7 @@ import { useContext } from 'react'
 import ConfigContext from '../ConfigContext'
 import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
-
+import * as d3 from 'd3'
 const scaleTypes = {
   TIME: 'time',
   LOG: 'log',
@@ -60,7 +60,10 @@ const useScales = (properties: useScaleProps) => {
 
   // handle  Vertical bars
   if (!isHorizontal) {
-    xScaleBrush = composeScalePoint(xAxisDataKeysMapped, [0, xMax], 0.5)
+    xScaleBrush = scaleTime({
+      domain: d3.extent(data, d => new Date(d[config.runtime.originalXAxis.dataKey])),
+      range: [0, xMax]
+    })
     xScale = composeScaleBand(xAxisDataMapped, [0, xMax], 1 - config.barThickness)
     yScale = composeYScale(properties)
     seriesScale = composeScaleBand(seriesDomain, [0, xScale.bandwidth()], 0)

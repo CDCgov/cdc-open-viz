@@ -104,6 +104,7 @@ export const useEditorPermissions = () => {
     }
   }
   const visHasBrushChart = () => {
+    if (config.xAxis.type === 'categorical') return false
     return ['Line', 'Bar', 'Area Chart', 'Combo'].includes(visualizationType) && orientation === 'vertical'
   }
 
