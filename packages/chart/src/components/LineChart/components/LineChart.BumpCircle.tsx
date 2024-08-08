@@ -46,29 +46,6 @@ const LineChartBumpCircle = (props: LineChartBumpCircleProp) => {
     .join(' ');
   }  
 
-
-  // const getListItems = dataRow => {
-  //   const listItems = []
-
-  //   Object.values(config.columns)?.forEach((column: Column) => {
-  //     if (!column.tooltips) return
-  //     if (!column.label) {
-  //       listItems.push(
-  //         `<li className='tooltip-body'>
-  //           <strong>${column?.name}</strong>: ${dataRow[column.name]}
-  //         </li>`
-  //       )
-  //     } else {
-  //       listItems.push(
-  //         `<li className='tooltip-body'>
-  //           <strong>${column?.label}</strong>: ${dataRow[column.name]}
-  //         </li>`
-  //       )
-  //     }
-  //   })
-  //   return listItems.join(' ')
-  // }
-
   const getTooltip = dataRow => `<ul> ${getListItems(dataRow)} </ul>`
 
   const circles = config.series.map((series) => {
