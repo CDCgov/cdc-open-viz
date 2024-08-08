@@ -8,12 +8,17 @@ import Icon from '@cdc/core/components/ui/Icon'
 import './Panel.PatternSettings-style.css'
 import Alert from '@cdc/core/components/Alert'
 
+// topojson helpers for checking color contrasts
+import { feature } from 'topojson-client'
+import { checkColorContrast, getContrastColor, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
+import topoJSON from '../../../UsaMap/data/us-topo.json'
+
 type PanelProps = {
   name: string
 }
 
 const PatternSettings = ({ name }: PanelProps) => {
-  const { state, setState } = useContext<MapContext>(ConfigContext)
+  const { state, setState, applyLegendToRow, runtimeData } = useContext<MapContext>(ConfigContext)
   const defaultPattern = 'circles'
   const patternTypes = ['circles', 'waves', 'lines']
 
@@ -25,7 +30,7 @@ const PatternSettings = ({ name }: PanelProps) => {
   /** Updates the map config with a new pattern item */
   const handleAddGeoPattern = () => {
     let patterns = [...state.map.patterns]
-    patterns.push({ dataKey: '', pattern: defaultPattern })
+    patterns.push({ dataKey: '', pattern: defaultPattern, contrastCheck: true })
     setState({
       ...state,
       map: {
@@ -37,16 +42,56 @@ const PatternSettings = ({ name }: PanelProps) => {
 
   /** Updates the map pattern at a given index */
   const handleUpdateGeoPattern = (value: string, index: number, keyToUpdate: 'dataKey' | 'pattern' | 'dataValue' | 'size' | 'label' | 'color') => {
+    const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
     const updatedPatterns = [...state.map.patterns]
+
+    // Update the specific pattern with the new value
     updatedPatterns[index] = { ...updatedPatterns[index], [keyToUpdate]: value }
 
-    setState({
-      ...state,
-      map: {
-        ...state.map,
-        patterns: updatedPatterns
-      }
+    // Iterate over each state feature
+    unitedStates.forEach(geo => {
+      const geoKey = geo.properties.iso
+      if (!geoKey || !runtimeData) return
+
+      const legendColors = runtimeData[geoKey] ? applyLegendToRow(runtimeData[geoKey]) : undefined
+      const geoData = runtimeData[geoKey]
+      if (!geoData) return
+
+      // Iterate over each pattern
+      state.map.patterns.forEach((patternData, patternIndex) => {
+        const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
+        if (!hasMatchingValues) return
+
+        const currentFill = legendColors[0]
+        const patternColor = keyToUpdate === 'color' && value !== '' ? value : getContrastColor('#000', currentFill)
+        const contrastCheck = checkColorContrast(currentFill, patternColor)
+
+        // Log a warning if the contrast check fails
+        if (!contrastCheck) {
+          console.warn(`COVE: pattern contrast check failed on ${geoData?.[state.columns.geo.name]} for ${patternData.dataKey} with:
+            pattern color: ${patternColor}
+            contrast: ${getColorContrast(currentFill, patternColor)}
+          `)
+        }
+
+        updatedPatterns[index] = { ...updatedPatterns[index], [keyToUpdate]: value, contrastCheck }
+      })
     })
+
+    const editorErrorMessage = updatedPatterns.some(pattern => pattern.contrastCheck === false) ? 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.' : ''
+
+    // Update the state with the new patterns and error message
+    setState(prevState => ({
+      ...prevState,
+      map: {
+        ...prevState.map,
+        patterns: updatedPatterns
+      },
+      runtime: {
+        ...prevState.runtime,
+        editorErrorMessage
+      }
+    }))
   }
 
   const handleRemovePattern = index => {
