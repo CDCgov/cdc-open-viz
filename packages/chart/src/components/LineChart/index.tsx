@@ -16,6 +16,7 @@ import useRightAxis from '../../hooks/useRightAxis'
 // Local helpers and components
 import { filterCircles, createStyles, createDataSegments } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
+import LineChartBumpCircle from './components/LineChart.BumpCircle'
 
 // Types
 import { type ChartContext } from '../../types/ChartContext'
@@ -209,6 +210,7 @@ const LineChart = (props: LineChartProps) => {
                   <LinePath
                     curve={allCurves[seriesData[0].lineType]}
                     data={
+                      config.visualizationType == "Bump Chart" ? data :
                       config.xAxis.type === 'date-time' || config.xAxis.type === 'date'
                         ? data.sort((d1, d2) => {
                             let x1 = getXAxisData(d1)
@@ -295,6 +297,7 @@ const LineChart = (props: LineChartProps) => {
           </Text>
         )}
       </Group>
+      {config.visualizationType === 'Bump Chart' && <LineChartBumpCircle config={config} xScale={xScale} yScale={yScale} />}
     </ErrorBoundary>
   )
 }

@@ -59,7 +59,7 @@ const SeriesDropdownLineType = props => {
   const supportsLineType = () => {
     let supported = false
     if (config.visualizationSubType === 'stacked') return supported
-    const supportedCharts = ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart']
+    const supportedCharts = ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart', 'Bump Chart']
     if (supportedCharts.some(item => item.includes(series.type))) {
       supported = true
     }
@@ -111,7 +111,7 @@ const SeriesDropdownSeriesType = props => {
         Forecasting: 'Forecasting'
       }
     }
-    if (config.visualizationType === 'Line') {
+    if (config.visualizationType === 'Line' || config.visualizationType === 'Bump Chart') {
       return {
         Line: 'Line',
         'dashed-sm': 'Small Dashed',
@@ -122,7 +122,7 @@ const SeriesDropdownSeriesType = props => {
   }
 
   // Allowable changes
-  if (!['Line', 'Combo'].includes(config.visualizationType)) return
+  if (!['Line', 'Combo', 'Bump Chart'].includes(config.visualizationType)) return
   return (
     <InputSelect
       initial='Select an option'
@@ -468,7 +468,7 @@ const SeriesInputWeight = props => {
 const SeriesInputName = props => {
   const { series, index: i } = props
   const { config, updateConfig } = useContext(ConfigContext)
-  const adjustableNameSeriesTypes = ['Bar', 'Line', 'Area Chart', 'Combo', 'Deviation Bar', 'Paired Bar', 'Scatter Plot', 'dashed-sm', 'dashed-md', 'dashed-lg']
+  const adjustableNameSeriesTypes = ['Bump Chart', 'Bar', 'Line', 'Area Chart', 'Combo', 'Deviation', 'Paired', 'Scatter', 'dashed-sm', 'dashed-md', 'dashed-lg']
 
   if (!adjustableNameSeriesTypes.includes(series.type)) return
 

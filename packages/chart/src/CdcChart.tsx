@@ -936,7 +936,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     'Area Chart': <LinearChart />,
     'Scatter Plot': <LinearChart />,
     'Deviation Bar': <LinearChart />,
-    'Forest Plot': <LinearChart />
+    'Forest Plot': <LinearChart />,
+    'Bump Chart': <LinearChart />
   }
 
   const missingRequiredSections = () => {

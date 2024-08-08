@@ -18,6 +18,7 @@ const labelHash = {
   Bar: 'Bar',
   Line: 'Line',
   'Spark Line': 'Spark Line',
+  'Bump Chart': 'Bump Chart',
   Pie: 'Pie',
   us: 'United States (State- or County-Level)',
   'us-county': 'United States (State- or County-Level)',

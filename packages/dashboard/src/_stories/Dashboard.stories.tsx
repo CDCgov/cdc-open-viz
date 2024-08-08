@@ -19,6 +19,7 @@ import _ from 'lodash'
 import { footnotesSymbols } from '@cdc/core/helpers/footnoteSymbols'
 import FootnotesConfig from '@cdc/core/types/Footnotes'
 import { ConfigRow } from '../types/ConfigRow'
+import BumpChartConfig from './_mock/bump-chart.json'
 
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Pages/Dashboard',
@@ -44,6 +45,13 @@ export const Example_2: Story = {
 export const Example_3: Story = {
   args: {
     config: ExampleConfig_3,
+    isEditor: false
+  }
+}
+
+export const Bump_Chart_Dashboard: Story = {
+  args: {
+    config: BumpChartConfig,
     isEditor: false
   }
 }

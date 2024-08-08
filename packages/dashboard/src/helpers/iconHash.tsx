@@ -5,6 +5,7 @@ export const iconHash = {
   'data-bite': <Icon display='databite' base />,
   Bar: <Icon display='chartBar' base />,
   'Spark Line': <Icon display='chartLine' />,
+  'Bump Chart': <Icon display='chartLine' />,
   'waffle-chart': <Icon display='grid' base />,
   'markup-include': <Icon display='code' base />,
   Line: <Icon display='chartLine' base />,
