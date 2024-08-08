@@ -6,13 +6,19 @@ import Button from '@cdc/core/components/elements/Button'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import './Panel.PatternSettings-style.css'
+import Alert from '@cdc/core/components/Alert'
+
+// topojson helpers for checking color contrasts
+import { feature } from 'topojson-client'
+import { checkColorContrast, getContrastColor, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
+import topoJSON from '../../../UsaMap/data/us-topo.json'
 
 type PanelProps = {
   name: string
 }
 
 const PatternSettings = ({ name }: PanelProps) => {
-  const { state, setState } = useContext<MapContext>(ConfigContext)
+  const { state, setState, applyLegendToRow, runtimeData } = useContext<MapContext>(ConfigContext)
   const defaultPattern = 'circles'
   const patternTypes = ['circles', 'waves', 'lines']
 
@@ -24,7 +30,7 @@ const PatternSettings = ({ name }: PanelProps) => {
   /** Updates the map config with a new pattern item */
   const handleAddGeoPattern = () => {
     let patterns = [...state.map.patterns]
-    patterns.push({ dataKey: '', pattern: defaultPattern })
+    patterns.push({ dataKey: '', pattern: defaultPattern, contrastCheck: true })
     setState({
       ...state,
       map: {
@@ -36,16 +42,56 @@ const PatternSettings = ({ name }: PanelProps) => {
 
   /** Updates the map pattern at a given index */
   const handleUpdateGeoPattern = (value: string, index: number, keyToUpdate: 'dataKey' | 'pattern' | 'dataValue' | 'size' | 'label' | 'color') => {
+    const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
     const updatedPatterns = [...state.map.patterns]
+
+    // Update the specific pattern with the new value
     updatedPatterns[index] = { ...updatedPatterns[index], [keyToUpdate]: value }
 
-    setState({
-      ...state,
-      map: {
-        ...state.map,
-        patterns: updatedPatterns
-      }
+    // Iterate over each state feature
+    unitedStates.forEach(geo => {
+      const geoKey = geo.properties.iso
+      if (!geoKey || !runtimeData) return
+
+      const legendColors = runtimeData[geoKey] ? applyLegendToRow(runtimeData[geoKey]) : undefined
+      const geoData = runtimeData[geoKey]
+      if (!geoData) return
+
+      // Iterate over each pattern
+      state.map.patterns.forEach((patternData, patternIndex) => {
+        const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
+        if (!hasMatchingValues) return
+
+        const currentFill = legendColors[0]
+        const patternColor = keyToUpdate === 'color' && value !== '' ? value : getContrastColor('#000', currentFill)
+        const contrastCheck = checkColorContrast(currentFill, patternColor)
+
+        // Log a warning if the contrast check fails
+        if (!contrastCheck) {
+          console.warn(`COVE: pattern contrast check failed on ${geoData?.[state.columns.geo.name]} for ${patternData.dataKey} with:
+            pattern color: ${patternColor}
+            contrast: ${getColorContrast(currentFill, patternColor)}
+          `)
+        }
+
+        updatedPatterns[index] = { ...updatedPatterns[index], [keyToUpdate]: value, contrastCheck }
+      })
     })
+
+    const editorErrorMessage = updatedPatterns.some(pattern => pattern.contrastCheck === false) ? 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.' : ''
+
+    // Update the state with the new patterns and error message
+    setState(prevState => ({
+      ...prevState,
+      map: {
+        ...prevState.map,
+        patterns: updatedPatterns
+      },
+      runtime: {
+        ...prevState.runtime,
+        editorErrorMessage
+      }
+    }))
   }
 
   const handleRemovePattern = index => {
@@ -60,12 +106,19 @@ const PatternSettings = ({ name }: PanelProps) => {
     })
   }
 
+  const checkPatternContrasts = () => {
+    return state.map.patterns.every(pattern => pattern.contrastCheck !== false)
+  }
+
   return (
     <AccordionItem>
       <AccordionItemHeading>
         <AccordionItemButton>{name}</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
+        {patterns.length > 0 && <Alert type={checkPatternContrasts() ? 'success' : 'danger'} message='Pattern colors must comply with <br /> <a href="https://www.w3.org/TR/WCAG21/">WCAG 2.1</a> 3:1 contrast ratio.' />}
+        <br />
+
         {patterns &&
           patterns.map((pattern, patternIndex) => {
             const dataValueOptions = [...new Set(data?.map(d => d?.[pattern?.dataKey]))]
@@ -77,13 +130,14 @@ const PatternSettings = ({ name }: PanelProps) => {
             dataKeyOptions.sort()
 
             return (
-              <Accordion allowZeroExpanded>
+              <Accordion allowZeroExpanded key={`accordion-pattern--${patternIndex}`}>
                 <AccordionItem>
                   <AccordionItemHeading>
                     <AccordionItemButton>{pattern.dataKey ? `${pattern.dataKey}: ${pattern.dataValue ?? 'No Value'}` : 'Select Column'}</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
                     <>
+                      {pattern.contrastCheck ?? true ? <Alert type='success' message='This pattern passes contrast checks' /> : <Alert type='danger' message='Error: <a href="https://webaim.org/resources/contrastchecker/" target="_blank"> Review Color Contrast</a>' />}{' '}
                       <label htmlFor={`pattern-dataKey--${patternIndex}`}>Data Key:</label>
                       <select id={`pattern-dataKey--${patternIndex}`} value={pattern.dataKey !== '' ? pattern.dataKey : 'Select'} onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'dataKey')}>
                         {/* TODO: sort these? */}
@@ -95,17 +149,14 @@ const PatternSettings = ({ name }: PanelProps) => {
                           )
                         })}
                       </select>
-
                       <label htmlFor={`pattern-dataValue--${patternIndex}`}>
                         Data Value:
                         <input type='text' onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'dataValue')} id={`pattern-dataValue--${patternIndex}`} value={pattern.dataValue === '' ? '' : pattern.dataValue} />
                       </label>
-
                       <label htmlFor={`pattern-label--${patternIndex}`}>
                         Label (optional):
                         <input type='text' onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'label')} id={`pattern-dataValue--${patternIndex}`} value={pattern.label === '' ? '' : pattern.label} />
                       </label>
-
                       <label htmlFor={`pattern-type--${patternIndex}`}>Pattern Type:</label>
                       <select id={`pattern-type--${patternIndex}`} value={pattern?.pattern} onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'pattern')}>
                         {patternTypes.map((patternName, index) => (
@@ -114,7 +165,6 @@ const PatternSettings = ({ name }: PanelProps) => {
                           </option>
                         ))}
                       </select>
-
                       <label htmlFor={`pattern-size--${patternIndex}`}>Pattern Size:</label>
                       <select id={`pattern-size--${patternIndex}`} value={pattern?.size} onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'size')}>
                         {['small', 'medium', 'large'].map((size, index) => (

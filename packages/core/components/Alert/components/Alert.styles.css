@@ -1,0 +1,15 @@
+.cdc-open-viz-module {
+  .accordion__panel > .alert {
+    margin-bottom: 15px;
+  }
+
+  .alert {
+    align-items: center;
+    justify-content: center;
+    display: inline-flex;
+
+    .cove-icon {
+      margin: 5px;
+    }
+  }
+}

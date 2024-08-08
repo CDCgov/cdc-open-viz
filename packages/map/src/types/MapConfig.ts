@@ -33,6 +33,7 @@ type PatternSelection = {
   label: string
   // size of pattern
   size: 'small' | 'medium' | 'large'
+  contrastCheck: boolean
 }
 
 export type GeoColumnProperties = Pick<EditorColumnProperties, 'name' | 'label' | 'tooltip' | 'dataTable'>
