@@ -10,12 +10,11 @@ type ZoomControlsProps = {
   state: MapConfig
   // Set the map config
   setState: () => MapConfig
-  // TODO: update types below this line.
-  setRuntimeData: any
-  generateRuntimeData: any
-  handleZoomIn: any
-  handleZoomOut: any
-  handleReset: any
+  setRuntimeData: Function
+  generateRuntimeData: Function
+  handleZoomIn: (coordinates: [Number, Number], setPosition: Function) => void
+  handleZoomOut: (coordinates: [Number, Number], setPosition: Function) => void
+  handleReset: (coordinates: [Number, Number], setPosition: Function) => void
 }
 
 const ZoomControls: React.FC<ZoomControlsProps> = ({ position, setPosition, state, setState, setRuntimeData, generateRuntimeData, handleZoomIn, handleZoomOut, handleReset }) => {

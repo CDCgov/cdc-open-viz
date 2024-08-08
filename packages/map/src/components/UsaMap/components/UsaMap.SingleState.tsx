@@ -19,45 +19,76 @@ const HEIGHT = 500
 const PADDING = 25
 
 const SingleStateMap = props => {
-  // prettier-ignore
-  const {
-    state,
-    applyTooltipsToGeo,
-    data,
-    geoClickHandler,
-    applyLegendToRow,
-    displayGeoName,
-    handleMapAriaLabels,
-    titleCase,
-    setSharedFilterValue,
-    isFilterValueSupported,
-    runtimeFilters,
-    tooltipId,
-    setState,
-    position,
-    setPosition,
-    generateRuntimeData,
-    setRuntimeData,
-    runtimeData
-  } = useContext(ConfigContext)
-
+  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported, runtimeFilters, tooltipId, setState, position, setPosition, generateRuntimeData, setRuntimeData, runtimeData } =
+    useContext(ConfigContext)
   const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
   const cityListProjection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
   const [stateToShow, setStateToShow] = useState(null)
-  const [translate, setTranslate] = useState()
-  const [scale, setScale] = useState()
+  const [translate, setTranslate] = useState([0, 0])
+  const [scale, setScale] = useState(1)
   const [topoData, setTopoData] = useState<Topology | {}>({})
   const path = geoPath().projection(projection)
 
   const handleZoomIn = (position, setPosition) => {
     if (position.zoom >= 4) return
-    setPosition(pos => ({ ...pos, zoom: pos.zoom * 1.5 }))
+    if (!isTopoReady(topoData, state, runtimeFilters)) return
+    const _statePicked = getFilterControllingStatePicked(state, runtimeData)
+    const _statePickedData = topoData.states.find(s => s.properties.name === _statePicked)
+    const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
+    const newProjection = projection.fitExtent(
+      [
+        [PADDING, PADDING],
+        [WIDTH - PADDING, HEIGHT - PADDING]
+      ],
+      _statePickedData
+    )
+
+    const newScale = newProjection.scale()
+    const newScaleWithHypot = newScale / 1070
+
+    let [x, y] = newProjection.translate()
+    x = x - WIDTH
+    y = y - HEIGHT / 2
+
+    setTranslate([x, y])
+    setScale(newScaleWithHypot)
+
+    // get state center coordinates
+    const featureCenter = path.centroid(stateToShow)
+    const stateCenter = newProjection.invert(featureCenter)
+    setPosition(pos => ({ ...pos, coordinates: stateCenter, zoom: pos.zoom * 1.5 }))
   }
 
   const handleZoomOut = (position, setPosition) => {
     if (position.zoom <= 1) return
-    setPosition(pos => ({ ...pos, zoom: pos.zoom / 1.5 }))
+    if (position.zoom >= 4) return
+    if (!isTopoReady(topoData, state, runtimeFilters)) return
+    const _statePicked = getFilterControllingStatePicked(state, runtimeData)
+    const _statePickedData = topoData.states.find(s => s.properties.name === _statePicked)
+    const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
+    const newProjection = projection.fitExtent(
+      [
+        [PADDING, PADDING],
+        [WIDTH - PADDING, HEIGHT - PADDING]
+      ],
+      _statePickedData
+    )
+
+    const newScale = newProjection.scale()
+    const newScaleWithHypot = newScale / 1070
+
+    let [x, y] = newProjection.translate()
+    x = x - WIDTH
+    y = y - HEIGHT / 2
+
+    setTranslate([x, y])
+    setScale(newScaleWithHypot)
+
+    // get state center coordinates
+    const featureCenter = path.centroid(stateToShow)
+    const stateCenter = newProjection.invert(featureCenter)
+    setPosition(pos => ({ ...pos, coordinates: stateCenter, zoom: pos.zoom / 1.5 }))
   }
 
   const handleMoveEnd = position => {
@@ -105,10 +136,6 @@ const SingleStateMap = props => {
   }
 
   useEffect(() => {
-    setScaleAndTranslate()
-  }, [state?.general?.statePicked.stateName])
-
-  useEffect(() => {
     let currentYear = getCurrentTopoYear(state, runtimeFilters)
 
     if (currentYear !== topoData.year) {
@@ -117,10 +144,6 @@ const SingleStateMap = props => {
       })
     }
   }, [state.general.countyCensusYear, state.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
-
-  useEffect(() => {
-    setScaleAndTranslate()
-  }, [topoData])
 
   // When choosing a state changes...
   const setScaleAndTranslate = useCallback(() => {
@@ -230,10 +253,15 @@ const SingleStateMap = props => {
     <ErrorBoundary component='SingleStateMap'>
       {stateToShow && state.general.allowMapZoom && (
         <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' role='img' aria-label={handleMapAriaLabels(state)}>
-          <ZoomableGroup zoom={position.zoom} center={position.coordinates} onMoveEnd={handleMoveEnd} maxZoom={4} projection={projection} width={880} height={500}>
+          <ZoomableGroup center={position.coordinates} height={500} maxZoom={4} onMoveEnd={handleMoveEnd} projection={projection} width={880} zoom={position.zoom}>
             <rect className='background center-container ocean' width={WIDTH} height={HEIGHT} fillOpacity={1} fill='white'></rect>
             <CustomProjection
-              data={[{ states: stateToShow?.states, counties: topoData.counties.filter(c => c.id.substring(0, 2) === state.general.statePicked.fipsCode) }]}
+              data={[
+                {
+                  states: stateToShow?.states,
+                  counties: topoData.counties.filter(c => c.id.substring(0, 2) === state.general.statePicked.fipsCode)
+                }
+              ]}
               projection={geoAlbersUsaTerritories}
               fitExtent={[
                 [
@@ -259,7 +287,12 @@ const SingleStateMap = props => {
         <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' role='img' aria-label={handleMapAriaLabels(state)}>
           <rect className='background center-container ocean' width={WIDTH} height={HEIGHT} fillOpacity={1} fill='white'></rect>
           <CustomProjection
-            data={[{ states: stateToShow?.states, counties: topoData.counties.filter(c => c.id.substring(0, 2) === state.general.statePicked.fipsCode) }]}
+            data={[
+              {
+                states: stateToShow?.states,
+                counties: topoData.counties.filter(c => c.id.substring(0, 2) === state.general.statePicked.fipsCode)
+              }
+            ]}
             projection={geoAlbersUsaTerritories}
             fitExtent={[
               [
@@ -281,18 +314,7 @@ const SingleStateMap = props => {
         </svg>
       )}
       {!state.general.statePicked && 'No State Picked'}
-      <ZoomControls
-        // prettier-ignore
-        generateRuntimeData={generateRuntimeData}
-        handleZoomIn={handleZoomIn}
-        handleZoomOut={handleZoomOut}
-        handleReset={handleReset}
-        position={position}
-        setPosition={setPosition}
-        setRuntimeData={setRuntimeData}
-        setState={setState}
-        state={state}
-      />
+      <ZoomControls generateRuntimeData={generateRuntimeData} handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} handleReset={handleReset} position={position} setPosition={setPosition} setRuntimeData={setRuntimeData} setState={setState} state={state} />
     </ErrorBoundary>
   )
 }

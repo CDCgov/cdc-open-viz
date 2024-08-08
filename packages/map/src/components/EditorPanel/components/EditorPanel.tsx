@@ -269,6 +269,10 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           general: {
             ...state.general,
             allowMapZoom: value
+          },
+          mapPosition: {
+            coordinates: state.general.geoType === 'world' ? [0, 30] : [0, 0],
+            zoom: 1
           }
         })
         break
