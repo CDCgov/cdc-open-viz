@@ -1,5 +1,5 @@
 import Icon from '@cdc/core/components/ui/Icon'
-import { Visualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '@cdc/core/types/Visualization'
 
 export const iconHash = {
   'data-bite': <Icon display='databite' base />,
@@ -14,6 +14,7 @@ export const iconHash = {
   world: <Icon display='mapWorld' base />,
   'single-state': <Icon display='mapAl' base />,
   gear: <Icon display='gear' base />,
+  gearMulti: <Icon display='gearMulti' base />,
   tools: <Icon display='tools' base />,
   'filtered-text': <Icon display='filtered-text' base />,
   dashboardFilters: <Icon display='dashboardFilters' base />,
@@ -21,7 +22,7 @@ export const iconHash = {
   Sankey: <Icon display='sankey' base />
 }
 
-export const getIcon = (visualization: Visualization) => {
+export const getIcon = (visualization: AnyVisualization) => {
   const { type, visualizationType, general } = visualization
   if (visualizationType) return iconHash[visualizationType]
   if (general?.geoType) {

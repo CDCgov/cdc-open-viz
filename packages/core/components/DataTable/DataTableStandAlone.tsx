@@ -20,8 +20,9 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({ visualizationKey, conf
 
   useEffect(() => {
     // when using editor changes to filter should update the data
-    setFilteredData(filterVizData(config.filters, config.formattedData))
+    setFilteredData(filterVizData(config.filters, config?.formattedData?.length > 0 ? config.formattedData : config.data))
   }, [config.filters])
+
   if (isEditor)
     return (
       <EditorWrapper component={DataTableStandAlone} visualizationKey={visualizationKey} visualizationConfig={config} updateConfig={updateConfig} type={'Table'} viewport={viewport}>

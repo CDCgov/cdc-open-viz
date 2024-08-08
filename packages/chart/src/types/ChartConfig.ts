@@ -79,7 +79,7 @@ export type AllChartsConfig = {
   barHasBorder: 'true' | 'false'
   barHeight: number
   barSpace: number
-  barStyle: string
+  barStyle: 'lollipop'|'rounded'|'flat'
   barThickness: number
   boxplot: BoxPlot
   brush: {
@@ -152,7 +152,6 @@ export type AllChartsConfig = {
   topAxis: { hasLine: boolean }
   twoColor: { palette: string }
   type: 'chart' | 'dashboard'
-  useLogScale: boolean
   uid: string | number
   visual: Visual
   visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting' | 'Sankey'

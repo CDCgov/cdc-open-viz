@@ -20,8 +20,12 @@ export const isUpdateNeeded = (filters: SharedFilter[], currentQueryParams: Reco
   return needsUpdate
 }
 
-export const getDataURL = (updatedQSParams: Record<string, string>, dataUrl: URL, newFileName: string) => {
-  const _params = Object.keys(updatedQSParams).map(key => ({ key, value: updatedQSParams[key] }))
+export const getDataURL = (updatedQSParams: Record<string, string | string[]>, dataUrl: URL, newFileName: string) => {
+  const _params = Object.keys(updatedQSParams).flatMap(key => {
+    const value = updatedQSParams[key]
+    if (Array.isArray(value)) return value.map(v => ({ key, value: v }))
+    return { key, value }
+  })
   const baseURL = dataUrl.origin + dataUrl.pathname
   let dataUrlFinal = `${baseURL}${gatherQueryParams(baseURL, _params)}`
 

@@ -37,13 +37,13 @@ export const getVizConfig = (visualizationKey: string, rowNumber: number, config
   const filteredVizData = filteredData?.[rowNumber] ?? filteredData?.[visualizationKey]
 
   if (filteredVizData) {
-    visualizationConfig.data = filteredVizData
+    visualizationConfig.data = filteredVizData || []
     if (visualizationConfig.formattedData) {
       visualizationConfig.formattedData = visualizationConfig.data
     }
   } else {
     const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
-    visualizationConfig.data = data[dataKey]
+    visualizationConfig.data = data[dataKey] || []
     if (visualizationConfig.formattedData) {
       visualizationConfig.formattedData = transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) || visualizationConfig.data
     }

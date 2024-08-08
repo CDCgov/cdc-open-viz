@@ -13,11 +13,6 @@ type HeaderProps = {
   visualizationKey?: string
 }
 
-export const FilterBehavior = {
-  Apply: 'Apply Button',
-  OnChange: 'Filter Change'
-}
-
 const Header = (props: HeaderProps) => {
   const tabs: Tab[] = ['Dashboard Description', 'Data Table Settings', 'Dashboard Preview']
   const { visualizationKey, subEditor } = props

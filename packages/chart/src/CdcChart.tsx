@@ -263,7 +263,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       if (!series.axis) series.axis = 'Left'
     })
 
-    if (!newConfig.data && data) {
+    if (data) {
       newConfig.data = data
     }
 
@@ -324,7 +324,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
 
-        newConfig.filters[index].active = newConfig.filters[index].active || filterValues[0]
+        newConfig.filters[index].active = !newConfig.filters[index].active || filterValues.indexOf(newConfig.filters[index].active) === -1 ? filterValues[0] : newConfig.filters[index].active
         newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle ? newConfig.filters[index].filterStyle : 'dropdown'
       })
       currentData = filterVizData(newConfig.filters, newExcludedData)
@@ -497,6 +497,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'horizontal'
+      // remove after  COVE supports categorical axis on horizonatal bars
+      newConfig.yAxis.type = newConfig.yAxis.type === 'categorical' ? 'linear' : newConfig.yAxis.type
     } else if (['Box Plot', 'Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType) && !checkLineToBarGraph()) {
       newConfig.runtime.xAxis = newConfig.xAxis
       newConfig.runtime.yAxis = newConfig.yAxis

@@ -20,7 +20,7 @@ type VizFilterProps = {
 const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawData }) => {
   const openControls = useState({})
   const dataColumns = useMemo(() => {
-    return _.uniq(_.flatten(rawData.map(row => Object.keys(row))))
+    return _.uniq(_.flatten(rawData?.map(row => Object.keys(row))))
   }, [rawData])
 
   const removeFilter = index => {

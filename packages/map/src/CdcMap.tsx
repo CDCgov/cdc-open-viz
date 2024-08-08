@@ -204,7 +204,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
   // eslint-disable-next-line
   const addUIDs = useCallback((obj, fromColumn) => {
-    obj.data.forEach(row => {
+    obj.data.forEach((row, index) => {
       let uid = null
 
       if (row.uid) row.uid = null // Wipe existing UIDs
@@ -274,7 +274,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
 
       if (!uid && state.columns.latitude?.name && state.columns.longitude?.name && row[state.columns.latitude?.name] && row[state.columns.longitude?.name]) {
-        uid = row[state.columns.geo.name]
+        uid = `${row[state.columns.geo.name]}`
       }
 
       if (uid) {
@@ -293,6 +293,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     const newLegendMemo = new Map() // Reset memoization
     const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
     let primaryCol = obj.columns.primary.name,
+      isSingleState = obj.general.geoType === 'single-state',
       isBubble = obj.general.type === 'bubble',
       categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
       type = obj.legend.type,
@@ -883,7 +884,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         if (undefined === row.uid) return false // No UID for this row, we can't use for mapping
 
         // When on a single state map filter runtime data by state
-        if (!(String(row[obj.columns.geo.name]).substring(0, 2) === obj.general?.statePicked?.fipsCode) && obj.general.geoType === 'single-state' && obj.general.type !== 'us-geocode') {
+        if (!(String(row[obj.columns.geo.name]).substring(0, 2) === obj.general?.statePicked?.fipsCode) && obj.general.geoType !== 'single-state' && obj.general.type !== 'us-geocode' && obj.general.geoType !== 'world') {
           return false
         }
 
@@ -1091,7 +1092,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const formatLegendLocation = key => {
     let value = key
     let formattedName = ''
-    let stateName = stateFipsToTwoDigit[key.substring(0, 2)]
+    let stateName = stateFipsToTwoDigit[key?.substring(0, 2)]
 
     if (stateName) {
       formattedName += stateName
@@ -1765,7 +1766,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           {!isDraggingAnnotation && !window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
             <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
           )}
-          <div ref={tooltipRef} id={`tooltip__${tooltipId}-canvas`} className='tooltip' style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})`, position: 'absolute', whiteSpace: 'nowrap' }}></div>
+          <div ref={tooltipRef} id={`tooltip__${tooltipId}-canvas`} className='tooltip d-none' style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})`, position: 'absolute', whiteSpace: 'nowrap' }}></div>
         </Layout.Responsive>
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>
