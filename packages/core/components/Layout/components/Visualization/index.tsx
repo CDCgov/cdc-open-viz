@@ -47,6 +47,7 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
     }
     if (config.type === 'map') {
       classes.push(`type-map`)
+      if (config?.runtime?.editorErrorMessage.length !== 0) classes.push('type-map--has-error')
     }
 
     if (config.type === 'data-bite') {
