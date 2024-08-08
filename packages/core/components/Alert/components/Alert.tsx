@@ -1,5 +1,3 @@
-import { IoMdCheckmarkCircleOutline, IoIosCloseCircle, IoIosInformationCircle } from 'react-icons/io'
-
 import Icon from '../../ui/Icon'
 
 import DOMPurify from 'dompurify'
