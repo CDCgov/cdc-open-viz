@@ -33,36 +33,41 @@ const LineChartBumpCircle = (props: LineChartBumpCircleProp) => {
     return xScale.bandwidth ? xScale.bandwidth() / 2 + Number(xValue) : Number(xValue)
   }
 
-  
-  // const getListItems = dataRow => {
-  //   const columns: Column[] = config.columns || [] as Column[]
-  //   return Object.values(columns).filter(col => col.tooltips).map(column => {
-  //     const label = column.label || column.name;
-  //     return <li className='tooltip-body'> <strong>${label}</strong>: ${dataRow[column.name]} </li>
-  //   })
-  // }
-
+ 
   const getListItems = dataRow => {
-    const listItems = []
-
-    Object.values(config.columns)?.forEach((column: Column) => {
-      if (!column.tooltips) return
-      if (!column.label) {
-        listItems.push(
-          `<li className='tooltip-body'>
-            <strong>${column?.name}</strong>: ${dataRow[column.name]}
-          </li>`
-        )
-      } else {
-        listItems.push(
-          `<li className='tooltip-body'>
-            <strong>${column?.label}</strong>: ${dataRow[column.name]}
-          </li>`
-        )
-      }
+    return Object.values(config.columns)
+    ?.filter(column => column.tooltips).map(column => {
+      const label = column.label || column.name;
+      return `
+        <li className='tooltip-body'>
+          <strong>${label}</strong>: ${dataRow[column.name]}
+        </li>`; 
     })
-    return listItems.join(' ')
-  }
+    .join(' ');
+  }  
+
+
+  // const getListItems = dataRow => {
+  //   const listItems = []
+
+  //   Object.values(config.columns)?.forEach((column: Column) => {
+  //     if (!column.tooltips) return
+  //     if (!column.label) {
+  //       listItems.push(
+  //         `<li className='tooltip-body'>
+  //           <strong>${column?.name}</strong>: ${dataRow[column.name]}
+  //         </li>`
+  //       )
+  //     } else {
+  //       listItems.push(
+  //         `<li className='tooltip-body'>
+  //           <strong>${column?.label}</strong>: ${dataRow[column.name]}
+  //         </li>`
+  //       )
+  //     }
+  //   })
+  //   return listItems.join(' ')
+  // }
 
   const getTooltip = dataRow => `<ul> ${getListItems(dataRow)} </ul>`
 
