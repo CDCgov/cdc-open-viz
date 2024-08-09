@@ -150,7 +150,7 @@ export const useFilters = props => {
   
         if(newFilteredData && newFilteredData.length && newFilteredData.length > 0){
           Object.keys(newFilteredData[0]).forEach(seriesKey => {
-            if(seriesKey !== visualizationConfig.xAxis.dataKey && newFilteredData[0][seriesKey] && visualizationConfig.filters?.filter(filter => filter.columnName === seriesKey).length === 0 && (!visualizationConfig.columns || Object.keys(visualizationConfig.columns).indexOf(seriesKey) === -1)){
+            if(seriesKey !== visualizationConfig.xAxis.dataKey && newFilteredData[0][seriesKey] && (!visualizationConfig.filters || visualizationConfig.filters?.filter(filter => filter.columnName === seriesKey).length === 0) && (!visualizationConfig.columns || Object.keys(visualizationConfig.columns).indexOf(seriesKey) === -1)){
               runtime.series.push({
                 dataKey: seriesKey,
                 tooltip: true

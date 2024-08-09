@@ -346,9 +346,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       let finalData = dataOverride || newConfig.formattedData || newConfig.data
       if(finalData && finalData.length && finalData.length > 0){
         Object.keys(finalData[0]).forEach(seriesKey => {
-          if(seriesKey !== newConfig.xAxis.dataKey && finalData[0][seriesKey] && newConfig.filters?.filter(filter => filter.columnName === seriesKey).length === 0 && (!newConfig.columns || Object.keys(newConfig.columns).indexOf(seriesKey) === -1)){
+          if(seriesKey !== newConfig.xAxis.dataKey && finalData[0][seriesKey] && (!newConfig.filters || newConfig.filters.filter(filter => filter.columnName === seriesKey).length === 0) && (!newConfig.columns || Object.keys(newConfig.columns).indexOf(seriesKey) === -1)){
             newConfig.runtime.series.push({
-              "dataKey": seriesKey,
+              dataKey: seriesKey,
               tooltip: true
             })
           }
@@ -961,7 +961,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         return true
       }
     } else {
-      if (undefined === config?.series || false === config?.series.length > 0) {
+      if ((undefined === config?.series || false === config?.series.length > 0) && !config?.dynamicSeries) {
         return true
       }
     }

@@ -1099,12 +1099,12 @@ const EditorPanel = () => {
             {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && config.visualizationType !== 'Sankey' && (
               <AccordionItem>
                 <AccordionItemHeading>
-                  <AccordionItemButton>Data Series {(!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && <WarningImage width='25' className='warning-icon' />}</AccordionItemButton>
+                  <AccordionItemButton>Data Series {((!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && !config.dynamicSeries) && <WarningImage width='25' className='warning-icon' />}</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   {visSupportsDynamicSeries() && <CheckBox value={config.dynamicSeries} fieldName='dynamicSeries' label='Dynamically generate series' updateField={updateField} />}
                   {(!visSupportsDynamicSeries() || !config.dynamicSeries) && <>
-                    {(!config.series || config.series.length === 0) && config.visualizationType !== 'Paired Bar' && <p className='warning'>At least one series is required</p>}
+                    {((!config.series || config.series.length === 0) && !config.dynamicSeries) && config.visualizationType !== 'Paired Bar' && <p className='warning'>At least one series is required</p>}
                     {(!config.series || config.series.length === 0 || config.series.length < 2) && config.visualizationType === 'Paired Bar' && <p className='warning'>Select two data series for paired bar chart (e.g., Male and Female).</p>}
                     <>
                       <Select
