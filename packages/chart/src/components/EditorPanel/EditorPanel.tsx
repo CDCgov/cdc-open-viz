@@ -111,7 +111,8 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
       lineCode: '',
       hideBarSymbol: false,
       hideLineStyle: false,
-      circleSize: 6
+      circleSize: 6,
+      displayGray: true
     }
     preliminaryData.push(defaultValues)
     updateConfig({ ...config, preliminaryData })
@@ -137,7 +138,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   return (
     <>
       {config.preliminaryData &&
-        config.preliminaryData?.map(({ circleSize, column, displayLegend, displayTable, displayTooltip, label, seriesKey, style, symbol, type, value, hideBarSymbol, hideLineStyle }, i) => {
+        config.preliminaryData?.map(({ displayGray, circleSize, column, displayLegend, displayTable, displayTooltip, label, seriesKey, style, symbol, type, value, hideBarSymbol, hideLineStyle }, i) => {
           return (
             <div key={`preliminaryData-${i}`} className='edit-block'>
               <p> {type === 'suppression' ? 'Suppressed' : 'Effect'} Data</p>
@@ -285,6 +286,22 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                     value={displayTable}
                     fieldName='displayTable'
                     label='Display in table'
+                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                  />
+                  <CheckBox
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Selecting this option will apply to chart, tooltip hover, legend, and data table.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    value={displayGray}
+                    fieldName='displayGray'
+                    label='Highlight Suppressed Data In Gray'
                     updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                   />
                 </>
@@ -2717,6 +2734,7 @@ const EditorPanel = () => {
                     }
                   />
                   <CheckBox
+                    display={config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)}
                     value={config.legend.hideSuppressedLabels}
                     section='legend'
                     fieldName='hideSuppressedLabels'
@@ -2729,6 +2747,24 @@ const EditorPanel = () => {
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Hiding suppressed labels will not override the 'Special Class' assigned to line chart indicating "suppressed" data in the Data Series Panel.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                  <CheckBox
+                    display={config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)}
+                    value={config.legend.hideSuppressionLink}
+                    section='legend'
+                    fieldName='hideSuppressionLink'
+                    label='Hide Suppression Definition Link'
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Selecting this option will provide the definition of suppressed data below the legend.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }

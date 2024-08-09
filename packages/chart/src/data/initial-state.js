@@ -164,6 +164,7 @@ export default {
     verticalSorted: false,
     highlightOnHover: false,
     hideSuppressedLabels: false,
+    hideSuppressionLink: false,
     seriesHighlight: []
   },
   brush: {

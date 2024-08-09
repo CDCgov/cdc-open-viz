@@ -218,6 +218,7 @@ export const BarChartVertical = () => {
                           const yPadding = hasAsterisk ? -5 : -8
                           const verticalAnchor = hasAsterisk ? 'middle' : 'end'
                           const iconSize = pd.symbol === 'Asterisk' ? barWidth * 1.2 : pd.symbol === 'Double Asterisk' ? barWidth : barWidth / 1.5
+                          const fillColor = pd.displayGray ? '#8b8b8a' : '#000'
 
                           return (
                             <Text // prettier-ignore
@@ -228,7 +229,7 @@ export const BarChartVertical = () => {
                               x={barX + barWidth / 2}
                               y={barY}
                               verticalAnchor={verticalAnchor}
-                              fill={labelColor}
+                              fill={fillColor}
                               textAnchor='middle'
                               fontSize={`${iconSize}px`}
                             >

@@ -2,7 +2,7 @@ import { Axis } from '../../../types/Axis'
 import { Runtime } from '../../../types/Runtime'
 import { Region } from '../../../types/Region'
 import { BoxPlot } from '../../../types/BoxPlot'
-import { PreliminaryDataItem } from '@cdc/chart/src/components/LineChart/LineChartProps'
+import { type PreliminaryDataItem } from '@cdc/chart/src/types/ChartConfig'
 import { Visualization } from '../../../types/Visualization'
 
 export type TableConfig = Visualization & {

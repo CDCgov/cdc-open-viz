@@ -206,6 +206,7 @@ const DataTable = (props: DataTableProps) => {
           {config.table.collapsible !== false && <ExpandCollapse expanded={expanded} setExpanded={setExpanded} fontSize={config.fontSize} tableTitle={tableTitle} viewport={viewport} />}
           <div className='table-container' style={limitHeight}>
             <Table
+              preliminaryData={config.preliminaryData}
               viewport={viewport}
               wrapColumns={wrapColumns}
               childrenMatrix={config.type === 'map' ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData, viewport }) : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })}

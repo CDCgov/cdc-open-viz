@@ -8,15 +8,34 @@ import { Table } from '@cdc/core/types/Table'
 import { BoxPlot } from '@cdc/core/types/BoxPlot'
 import { General } from '@cdc/core/types/General'
 import { type Link } from './../components/Sankey/types'
-import { Legend } from '@cdc/core/types/Legend'
+
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
-import { type PreliminaryDataItem } from '../components/LineChart/LineChartProps'
+
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 
 export type ViewportSize = 'sm' | 'xs' | 'xxs' | 'lg'
 export type ChartColumns = Record<string, Column>
+
+export interface PreliminaryDataItem {
+  column: string
+  displayLegend: boolean
+  displayTable: boolean
+  displayTooltip: boolean
+  iconCode: string
+  label: string
+  lineCode: string
+  seriesKey: string
+  style: string
+  symbol: string
+  type: 'effect' | 'suppression'
+  value: string
+  hideBarSymbol: boolean
+  hideLineStyle: boolean
+  circleSize: number
+  displayGray: boolean
+}
 
 type DataFormat = {
   abbreviated: boolean
@@ -60,6 +79,8 @@ export type Legend = {
   singleRow: boolean
   type: string
   verticalSorted: boolean
+  hideSuppressedLabels:boolean
+  hideSuppressionLink:boolean
 }
 
 type Visual = {

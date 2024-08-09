@@ -189,6 +189,23 @@
         transition: 0.2s all;
       }
     }
+
+    &__outer {
+      &.definition-link {
+        display: flex;
+        flex-direction: row;
+        position: absolute;
+        left: 0%;
+        top: 108%;
+        & > * {
+          margin: 0;
+        }
+        & > p,
+        a {
+          margin-left: 5px;
+        }
+      }
+    }
   }
 
   .dynamic-legend-list {
