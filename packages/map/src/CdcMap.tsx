@@ -1433,13 +1433,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }, [state, container]) // eslint-disable-line
 
   useEffect(() => {
-    if (state.data) {
-      let newData = generateRuntimeData(state)
-      setRuntimeData(newData)
-    }
-  }, [state.general.statePicked]) // eslint-disable-line
-
-  useEffect(() => {
     // When geotype changes - add UID
     if (state.data && state.columns.geo.name) {
       addUIDs(state, state.columns.geo.name)
