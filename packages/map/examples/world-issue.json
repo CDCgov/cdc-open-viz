@@ -1,0 +1,186 @@
+{
+  "annotations": [],
+  "general": {
+    "geoType": "world",
+    "type": "data",
+    "geoBorderColor": "darkGray",
+    "headerColor": "theme-blue",
+    "title": "Our Global Presence",
+    "showTitle": true,
+    "showSidebar": false,
+    "showDownloadButton": true,
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": false,
+    "territoriesLabel": "Territories",
+    "territoriesAlwaysShow": false,
+    "language": "en",
+    "geoLabelOverride": "Country",
+    "hasRegions": false,
+    "fullBorder": false,
+    "convertFipsCodes": true,
+    "palette": {
+      "isReversed": false
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": true,
+    "statePicked": {
+      "fipsCode": "01",
+      "stateName": "Alabama"
+    },
+    "introText": "",
+    "expandDataTable": true
+  },
+  "type": "map",
+  "color": "qualitative1",
+  "columns": {
+    "geo": {
+      "name": "Country",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "dataTable": false,
+      "tooltip": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Number of CDC staff",
+      "label": "Number of CDC staff"
+    },
+    "navigate": {
+      "name": "To learn more"
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    },
+    "additionalColumn1": {
+      "label": "Type of Presence",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Type of presence",
+      "tooltip": true
+    },
+    "additionalColumn2": {
+      "label": "To learn more",
+      "dataTable": false,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "To learn more",
+      "tooltip": false
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": false,
+    "singleColumn": true,
+    "singleRow": false,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false,
+    "dynamicDescription": false,
+    "type": "equalnumber",
+    "numberOfItems": 1,
+    "position": "bottom",
+    "title": "Our Global Presence"
+  },
+  "filters": [],
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": true,
+    "indexLabel": "",
+    "wrapColumns": false
+  },
+  "tooltips": {
+    "appearanceType": "click",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": true,
+    "opacity": 90
+  },
+  "visual": {
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle",
+    "geoCodeCircleSize": 2,
+    "showBubbleZeros": false,
+    "cityStyleLabel": "",
+    "additionalCityStyles": []
+  },
+  "mapPosition": {
+    "coordinates": [
+      0,
+      30
+    ],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
+  "datasets": {},
+  "data": [
+    {
+      "Country": "Afghanistan",
+      "Number of CDC staff": 0,
+      "Type of presence": "Middle East/North Africa Regional Office",
+      "To learn more": "/global-health/regional/middle-east-north-africa.html",
+      "latitude": 33.93911,
+      "longitude": 67.709953
+    },
+    {
+      "Country": "Algeria",
+      "Number of CDC staff": 0,
+      "Type of presence": "Middle East/North Africa Regional Office",
+      "To learn more": "/global-health/regional/middle-east-north-africa.html",
+      "latitude": 28.0339,
+      "longitude": 1.6596
+    },
+    {
+      "Country": "Angola",
+      "Number of CDC staff": 2,
+      "Type of presence": "Country Office",
+      "To learn more": "/global-health/countries/angola.html",
+      "latitude": -11.2027,
+      "longitude": 17.8739
+    }
+  ],
+  "dataFileName": "2024-07-24-Our Global Presence-wout-regions.csv",
+  "dataFileSourceType": "file",
+  "validated": "4.24.3",
+  "version": "4.24.4"
+}

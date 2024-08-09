@@ -61,6 +61,14 @@
     },
     "longitude": {
       "name": "Longitude"
+    },
+    "additionalColumn1": {
+      "label": "New Column",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "State"
     }
   },
   "legend": {
@@ -86,7 +94,7 @@
   },
   "filters": [
     {
-      "label": "",
+      "label": "State",
       "values": [],
       "columnName": "State"
     }
