@@ -1034,7 +1034,7 @@ const EditorPanel = () => {
     if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
-  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting', 'Scatter Plot', 'Paired Bar', 'Deviation Bar']
+  const chartsWithOptions = ['Bump Chart', 'Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting', 'Scatter Plot', 'Paired Bar', 'Deviation Bar']
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -1398,11 +1398,11 @@ const EditorPanel = () => {
                         }
                       />
                       <TextField display={!visHasCategoricalAxis()} value={config.yAxis.labelOffset} section='yAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />
-                      {config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
+                      {config.orientation === 'horizontal' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
                       {(config.orientation === 'vertical' || !config.isResponsiveTicks) && (
                         <TextField display={!visHasCategoricalAxis()} value={config.yAxis.tickRotation || 0} type='number' min={0} section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />
                       )}
-                      {config.isResponsiveTicks && config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && (
+                      {config.isResponsiveTicks && config.orientation === 'horizontal' && (
                         <TextField
                           value={config.xAxis.maxTickRotation}
                           type='number'
@@ -1896,8 +1896,8 @@ const EditorPanel = () => {
                                 })
                               }
                             >
-                              <option value='categorical'>Categorical (Linear Scale)</option>
-                              <option value='date'>Date (Linear Scale)</option>
+                              {config.visualizationType !== 'Bump Chart' && <option value='categorical'>Categorical (Linear Scale)</option>}
+                              {config.visualizationType !== 'Bump Chart' && <option value='date'>Date (Linear Scale)</option>}                           
                               <option value='date-time'>Date (Date Time Scale)</option>
                               {config.visualizationType === 'Scatter Plot' && <option value={'continuous'}>Continuous</option>}
                             </select>

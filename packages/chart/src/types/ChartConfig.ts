@@ -175,7 +175,7 @@ export type AllChartsConfig = {
   type: 'chart' | 'dashboard'
   uid: string | number
   visual: Visual
-  visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting' | 'Sankey'
+  visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting' | 'Sankey' | 'Bump Chart'
   visualizationSubType: string
   xAxis: Axis
   yAxis: Axis

@@ -190,14 +190,12 @@
     "#FFFFFF",
     "#B4B4B4"
   ],
-  "dataFileName": "../../wcms/vizdata/NCEZID_DIDRI/NWSSStateMap.json",
   "dataFileSourceType": "url",
   "dataDescription": {
     "horizontal": false,
     "series": false
   },
   "validated": 4.23,
-  "dataUrl": "../../wcms/vizdata/NCEZID_DIDRI/NWSSStateMap.json",
   "data": [
     {
       "state_name": "Utah",

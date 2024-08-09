@@ -6,7 +6,7 @@ import './multiselect.styles.css'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 
 interface Option {
-  value: string
+  value: string | number
   label: string
 }
 
@@ -17,7 +17,7 @@ interface MultiSelectProps {
   options: Option[]
   updateField: UpdateFieldFunc<string[]>
   label?: string
-  selected?: string[]
+  selected?: (string | number)[]
   limit?: number
 }
 

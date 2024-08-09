@@ -57,7 +57,9 @@ const LinearChart = props => {
     tableData,
     transformedData: data,
     updateConfig,
-    isDraggingAnnotation
+    isDraggingAnnotation,
+    seriesHighlight,
+    colorScale
   } = useContext(ConfigContext)
 
   // todo: start destructuring this file for conciseness
@@ -282,6 +284,32 @@ const LinearChart = props => {
   const generatePairedBarAxis = () => {
     let axisMaxHeight = 40
 
+    const getTickPositions = (ticks, xScale) => {
+      if (!ticks.length) return false
+      // filterout first index
+      const filteredTicks = ticks.filter(tick => tick.index !== 0)
+      const numberOfTicks = filteredTicks?.length
+      const xMaxHalf = xScale.range()[0] || xMax / 2
+      const tickWidthAll = filteredTicks.map(tick => getTextWidth(formatNumber(tick.value, 'left'), `normal ${fontSize[config.fontSize]}px sans-serif`))
+      const accumulator = 100
+      const sumOfTickWidth = tickWidthAll.reduce((a, b) => a + b, accumulator)
+      const spaceBetweenEachTick = (xMaxHalf - sumOfTickWidth) / numberOfTicks
+      // Determine the position of each tick
+      let positions = [0]
+      for (let i = 1; i < tickWidthAll.length; i++) {
+        positions[i] = positions[i - 1] + tickWidthAll[i - 1] + spaceBetweenEachTick
+      }
+
+      // Check if ticks are overlapping
+      let isTicksOverlapping = false
+      tickWidthAll.forEach((_, i) => {
+        if (positions[i] + tickWidthAll[i] > positions[i + 1]) {
+          isTicksOverlapping = true
+          return
+        }
+      })
+      return isTicksOverlapping
+    }
     return (
       <>
         <AxisBottom top={yMax} left={Number(runtime.yAxis.size)} label={runtime.xAxis.label} tickFormat={isDateScale(runtime.xAxis) ? formatDate : formatNumber} scale={g1xScale} stroke='#333' tickStroke='#333' numTicks={runtime.xAxis.numTicks || undefined}>
@@ -289,11 +317,13 @@ const LinearChart = props => {
             return (
               <Group className='bottom-axis'>
                 {props.ticks.map((tick, i) => {
-                  const angle = tick.index !== 0 ? config.yAxis.tickRotation : 0
-                  const textAnchor = tick.index !== 0 && config.yAxis.tickRotation && config.yAxis.tickRotation > 0 ? 'end' : 'middle'
-
-                  const textWidth = getTextWidth(tick.value, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                  const textWidth = getTextWidth(formatNumber(tick.value, 'left'), `normal ${fontSize[config.fontSize]}px sans-serif`)
+                  const isTicksOverlapping = getTickPositions(props.ticks, g1xScale)
+                  const maxTickRotation = Number(config.xAxis.maxTickRotation) || 90
+                  const isResponsiveTicks = config.isResponsiveTicks && isTicksOverlapping
+                  const angle = tick.index !== 0 && (isResponsiveTicks ? maxTickRotation : Number(config.yAxis.tickRotation))
                   const axisHeight = textWidth * Math.sin(angle * (Math.PI / 180)) + 25
+                  const textAnchor = angle && tick.index !== 0 ? 'end' : 'middle'
 
                   if (axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
 
@@ -301,7 +331,13 @@ const LinearChart = props => {
                     <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                       {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                       {!runtime.yAxis.hideLabel && (
-                        <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
+                        <Text // prettier-ignore
+                          x={tick.to.x}
+                          y={tick.to.y}
+                          angle={-angle}
+                          verticalAnchor={angle ? 'middle' : 'start'}
+                          textAnchor={textAnchor}
+                        >
                           {formatNumber(tick.value, 'left')}
                         </Text>
                       )}
@@ -328,11 +364,13 @@ const LinearChart = props => {
               <>
                 <Group className='bottom-axis'>
                   {props.ticks.map((tick, i) => {
-                    const angle = tick.index !== 0 ? config.yAxis.tickRotation : 0
-                    const textAnchor = tick.index !== 0 && config.yAxis.tickRotation && config.yAxis.tickRotation > 0 ? 'end' : 'middle'
-
-                    const textWidth = getTextWidth(tick.value, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                    const textWidth = getTextWidth(formatNumber(tick.value, 'left'), `normal ${fontSize[config.fontSize]}px sans-serif`)
+                    const isTicksOverlapping = getTickPositions(props.ticks, g2xScale)
+                    const maxTickRotation = Number(config.xAxis.maxTickRotation) || 90
+                    const isResponsiveTicks = config.isResponsiveTicks && isTicksOverlapping
+                    const angle = tick.index !== 0 && (isResponsiveTicks ? maxTickRotation : Number(config.yAxis.tickRotation))
                     const axisHeight = textWidth * Math.sin(angle * (Math.PI / 180)) + 25
+                    const textAnchor = angle && tick.index !== 0 ? 'end' : 'middle'
 
                     if (axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
 
@@ -340,7 +378,13 @@ const LinearChart = props => {
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                         {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                         {!runtime.yAxis.hideLabel && (
-                          <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
+                          <Text // prettier-ignore
+                            x={tick.to.x}
+                            y={tick.to.y}
+                            angle={-angle}
+                            verticalAnchor={angle ? 'middle' : 'start'}
+                            textAnchor={textAnchor}
+                          >
                             {formatNumber(tick.value, 'left')}
                           </Text>
                         )}
@@ -429,7 +473,33 @@ const LinearChart = props => {
                             </Text>
                           )}
 
-                          {orientation === 'vertical' && visualizationType !== 'Paired Bar' && !config.yAxis.hideLabel && (
+                          {orientation === 'vertical' && visualizationType === 'Bump Chart' && !config.yAxis.hideLabel && (      
+                            <>
+                              <Text
+                                display={config.useLogScale ? showTicks : 'block'}
+                                dx={config.useLogScale ? -6 : 0}
+                                x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x - 8.5}
+                                y={tick.to.y - 13 + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                                angle={-Number(config.yAxis.tickRotation) || 0}
+                                verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}
+                                textAnchor={config.runtime.horizontal ? 'start' : 'end'}
+                                fill={config.yAxis.tickLabelColor}
+                              >
+                                {config.runtime.seriesLabelsAll[tick.formattedValue - 1]}
+                              </Text>
+
+                              {(seriesHighlight.length === 0 || seriesHighlight.includes(config.runtime.seriesLabelsAll[tick.formattedValue - 1])) && (
+                                <rect 
+                                  x={0 - Number(config.yAxis.size)} 
+                                  y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)} 
+                                  width={Number(config.yAxis.size) + xScale(xScale.domain()[0])} 
+                                  height='2' 
+                                  fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])} 
+                                />
+                              )}
+                            </>
+                          )}
+                          {orientation === 'vertical' && visualizationType !== 'Paired Bar' && visualizationType !== 'Bump Chart' && !config.yAxis.hideLabel && (
                             <Text
                               display={isLogarithmicAxis ? showTicks : 'block'}
                               dx={isLogarithmicAxis ? -6 : 0}
@@ -658,7 +728,7 @@ const LinearChart = props => {
               chartRef={svgRef}
             />
           )}
-          {((visualizationType === 'Line' && !checkLineToBarGraph()) || visualizationType === 'Combo') && (
+          {((visualizationType === 'Line' && !checkLineToBarGraph()) || visualizationType === 'Combo' || visualizationType === 'Bump Chart') && (
             <LineChart
               xScale={xScale}
               yScale={yScale}
@@ -820,6 +890,8 @@ const LinearChart = props => {
             </TooltipWithBounds>
           </>
         )}
+
+        {config.visualizationType === 'Bump Chart' && <ReactTooltip id={`bump-chart`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />}
         {visSupportsReactTooltip() && !isDraggingAnnotation && <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />}
         <div className='animation-trigger' ref={triggerRef} />
       </div>

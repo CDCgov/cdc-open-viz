@@ -10,6 +10,7 @@ import FieldSetWrapper from '../FieldSetWrapper'
 
 import FilterOrder from './components/FilterOrder'
 import { useMemo, useState } from 'react'
+import MultiSelect from '../../MultiSelect'
 
 type VizFilterProps = {
   config: Visualization
@@ -31,8 +32,8 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
     updateField(null, null, 'filters', filters)
   }
 
-  const updateFilterProp = (prop, index, value) => {
-    updateField('filters', index, prop, value)
+  const updateFilterProp = (prop, filterIndex, value) => {
+    updateField('filters', filterIndex, prop, value)
   }
 
   const updateFilterStyle = (index, value) => {
@@ -62,7 +63,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
 
   const addNewFilter = () => {
     const filters = config.filters ? [...config.filters] : []
-    const newVizFilter: VizFilter = { values: [], filterStyle: 'dropdown' } as VizFilter
+    const newVizFilter: VizFilter = { values: [], filterStyle: 'dropdown', id: Date.now() } as VizFilter
     filters.push(newVizFilter)
     updateField(null, null, 'filters', filters)
   }
@@ -86,6 +87,10 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
     filtersCopy[filterIndex] = filterItem
 
     updateField(null, null, 'filters', filtersCopy)
+  }
+
+  const getParentFilterOptions = (index: number): { label: string; value: number }[] => {
+    return config.filters.filter((f, i) => i !== index).map(({ label, columnName, id }) => ({ label: label || columnName, value: id }))
   }
 
   return (
@@ -117,7 +122,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
               if (filter.type === 'url') return <></>
 
               return (
-                <FieldSetWrapper fieldName={filter.columnName} fieldKey={index} fieldType='Filter' controls={openControls} deleteField={() => removeFilter(index)}>
+                <FieldSetWrapper key={filter.columnName} fieldName={filter.columnName} fieldKey={index} fieldType='Filter' controls={openControls} deleteField={() => removeFilter(index)}>
                   <label>
                     <span className='edit-label column-heading'>Filter</span>
                     <select
@@ -206,6 +211,26 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                       onChange={e => {
                         updateFilterProp('setByQueryParameter', index, e.target.value)
                       }}
+                    />
+                  </label>
+                  <label>
+                    <span className='edit-label column-heading'>
+                      Filter Parents{' '}
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>A selected parent's value will be used to filter the available options of this child filter.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    </span>
+                    <MultiSelect
+                      fieldName='parents'
+                      updateField={(_section, _subsection, _fieldname, value) => {
+                        updateFilterProp('parents', index, value)
+                      }}
+                      options={getParentFilterOptions(index)}
                     />
                   </label>
 

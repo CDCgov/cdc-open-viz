@@ -192,7 +192,7 @@ const useScales = (properties: useScaleProps) => {
       nice: true
     })
   }
-
+  
   if (visualizationType === 'Forest Plot') {
     const resolvedYRange = () => {
       if (config.forestPlot.regression.showDiamond || config.forestPlot.regression.description) {
@@ -319,10 +319,14 @@ const composeYScale = ({ min, max, yMax, config, leftMax }) => {
   const scaleFunc = isLogarithmicAxis ? scaleLog : scaleLinear
 
   if (config.visualizationType === 'Combo') max = leftMax
+
+  // If the visualization type is a bump chart then the domain and range need different values
+  const domainSet = config.visualizationType === 'Bump Chart' ?  [1, max] : [min, max]
+  const yRange = config.visualizationType === 'Bump Chart' ?  [30,yMax] : [yMax,0]
   // Return the configured scale function
   return scaleFunc({
-    domain: [min, max],
-    range: [yMax, 0],
+    domain: domainSet,
+    range: yRange,
     nice: isLogarithmicAxis,
     zero: isLogarithmicAxis
   })
