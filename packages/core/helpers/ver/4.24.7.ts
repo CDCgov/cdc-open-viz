@@ -37,12 +37,18 @@ export const dashboardFiltersMigrate = config => {
     // 'filter-dropdowns' was renamed to 'dashboardFilters' for clarity
     if (viz.type === 'filter-dropdowns') {
       viz.type = 'dashboardFilters'
+      viz.visualizationType = 'dashboardFilters'
       if (!viz.sharedFilterIndexes) {
         viz.sharedFilterIndexes = config.dashboard.sharedFilters.map((_sf, i) => i)
         viz.filterBehavior = config.filterBehavior || 'Filter Change'
       }
     }
-    if (viz.visualizationType === 'filter-dropdowns') viz.visualizationType = 'dashboardFilters'
+
+    // Premature convertion to 4.24.7 made us add this fix
+    if (viz.type === 'dashboardFilters' && !viz.sharedFilterIndexes) {
+      viz.sharedFilterIndexes = config.dashboard.sharedFilters.map((_sf, i) => i)
+      viz.filterBehavior = config.filterBehavior || 'Filter Change'
+    }
     newVisualizations[vizKey] = viz
   })
 

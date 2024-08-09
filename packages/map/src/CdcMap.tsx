@@ -883,11 +883,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
         if (undefined === row.uid) return false // No UID for this row, we can't use for mapping
 
-        // When on a single state map filter runtime data by state
-        if (!(String(row[obj.columns.geo.name]).substring(0, 2) === obj.general?.statePicked?.fipsCode) && obj.general.geoType !== 'single-state' && obj.general.type !== 'us-geocode' && obj.general.geoType !== 'world') {
-          return false
-        }
-
         if (row[obj.columns.primary.name]) {
           row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name], state)
         }
@@ -1092,7 +1087,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const formatLegendLocation = key => {
     let value = key
     let formattedName = ''
-    let stateName = stateFipsToTwoDigit[key?.substring(0, 2)]
+    let stateName = stateFipsToTwoDigit[key?.substring(0, 2)] ? stateFipsToTwoDigit[key?.substring(0, 2)] : key ? runtimeData?.[key]?.[state.columns.geo.name] : ''
 
     if (stateName) {
       formattedName += stateName
