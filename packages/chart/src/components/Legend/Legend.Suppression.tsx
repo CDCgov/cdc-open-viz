@@ -7,85 +7,101 @@ interface LegendProps {
 }
 
 const LegendSuppression: React.FC<LegendProps> = ({ config, isBottomOrSmallViewport }) => {
-  const findSuppressionData = (config, value, key, additionalCheck = pd => true) => {
-    return config.preliminaryData?.find(pd => pd.label && pd.type === 'suppression' && pd.displayTooltip && value === pd.value && (!pd.column || key === pd.column) && additionalCheck(pd))
-  }
-  //   const isSuppressed = findSuppressionData(config, value, key)
-  //   const isGrayTooltip = findSuppressionData(config, value, key, pd => pd.displayGray)
-  return (
-    <>
-      {/* Efffect legend items */}
-      {config?.preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style === 'Open Circles') && ['Line', 'Combo'].includes(config.visualizationType) && (
-        <>
-          <hr></hr>
-          <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
-            {config?.preliminaryData?.map((pd, index) => {
-              return (
-                <>
-                  {pd.label && pd.type === 'effect' && pd.style && (
-                    <div key={index} className='legend-preliminary'>
-                      <span className={pd.symbol}>{pd.lineCode}</span>
-                      <p> {pd.label}</p>
-                    </div>
-                  )}
-                </>
-              )
-            })}
+  const { preliminaryData, visualizationType, visualizationSubType, legend } = config
+
+  const hasOpenCircleEffects = () => preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style === 'Open Circles') && ['Line', 'Combo'].includes(visualizationType)
+
+  const shouldShowSuppressedLabels = () =>
+    !legend.hideSuppressedLabels && preliminaryData?.some(pd => pd.label && pd.displayLegend && pd.type === 'suppression' && pd.value && (pd?.style || pd.symbol)) && ((visualizationType === 'Bar' && visualizationSubType === 'regular') || visualizationType === 'Line' || visualizationType === 'Combo')
+
+  const renderEffectItems = () =>
+    preliminaryData?.map(
+      (pd, index) =>
+        pd.label &&
+        pd.type === 'effect' &&
+        pd.style && (
+          <div key={index} className='legend-preliminary'>
+            <span className={pd.symbol}>{pd.lineCode}</span>
+            <p>{pd.label}</p>
           </div>
+        )
+    )
+
+  const renderSuppressedItems = () => {
+    const getStyle = displayGray => {
+      if (displayGray) {
+        return {
+          color: '#8b8b8a'
+        }
+      }
+      return null
+    }
+    return preliminaryData?.map((pd, index) => {
+      if (!pd.displayLegend || pd.type !== 'suppression') return null
+
+      const baseClass = 'legend-preliminary'
+      const itemKey = index + visualizationType
+
+      if (visualizationType === 'Bar') {
+        return (
+          <div style={getStyle(pd.displayGray)} key={itemKey} className={`${baseClass} ${pd.symbol}`}>
+            <span className={pd.symbol}>{pd.iconCode}</span>
+            <p className={pd.type}>{pd.label}</p>
+          </div>
+        )
+      }
+
+      if (visualizationType === 'Line') {
+        return (
+          <div style={getStyle(pd.displayGray)} key={itemKey} className={baseClass}>
+            <span>{pd.lineCode}</span>
+            <p className={pd.type}>{pd.label}</p>
+          </div>
+        )
+      }
+
+      if (visualizationType === 'Combo') {
+        return (
+          <>
+            {pd.symbol && pd.iconCode && (
+              <div style={getStyle(pd.displayGray)} key={itemKey} className={`${baseClass} ${pd.symbol}`}>
+                <span className={pd.symbol}>{pd.iconCode}</span>
+                <p className={pd.type}>{pd.label}</p>
+              </div>
+            )}
+
+            {pd.style && pd.lineCode && (
+              <div style={getStyle(pd.displayGray)} key={itemKey} className={baseClass}>
+                <span>{pd.lineCode}</span>
+                <p>{pd.label}</p>
+              </div>
+            )}
+          </>
+        )
+      }
+
+      return null
+    })
+  }
+
+  const getLegendContainerClass = () => (legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : '')
+
+  return (
+    <React.Fragment>
+      {hasOpenCircleEffects() && (
+        <>
+          <hr />
+          <div className={getLegendContainerClass()}>{renderEffectItems()}</div>
         </>
       )}
-      {/* Suppressed legend items */}
-      {!config.legend.hideSuppressedLabels &&
-        config?.preliminaryData?.some(pd => pd.label && pd.displayLegend && pd.type === 'suppression' && pd.value && (pd?.style || pd.symbol)) &&
-        ((config.visualizationType === 'Bar' && config.visualizationSubType === 'regular') || config.visualizationType === 'Line' || config.visualizationType === 'Combo') && (
-          <>
-            <hr></hr>
-            <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
-              {config?.preliminaryData?.map(
-                (pd, index) =>
-                  pd.displayLegend &&
-                  pd.type === 'suppression' && (
-                    <>
-                      {config.visualizationType === 'Bar' && (
-                        <>
-                          <div key={index + 'Bar'} className={`legend-preliminary ${pd.symbol}`}>
-                            <span className={pd.symbol}>{pd.iconCode}</span>
-                            <p className={pd.type}>{pd.label}</p>
-                          </div>
-                        </>
-                      )}
-                      {config.visualizationType === 'Line' && (
-                        <>
-                          <div key={index + 'Line'} className={`legend-preliminary `}>
-                            <span>{pd.lineCode}</span>
-                            <p className={pd.type}>{pd.label}</p>
-                          </div>
-                        </>
-                      )}
-                      {config.visualizationType === 'Combo' && (
-                        <>
-                          {pd.symbol && pd.iconCode && (
-                            <div key={index + 'Combo'} className={`legend-preliminary ${pd.symbol}`}>
-                              <span className={pd.symbol}>{pd.iconCode}</span>
-                              <p className={pd.type}>{pd.label}</p>
-                            </div>
-                          )}
 
-                          {pd.style && pd.lineCode && (
-                            <div key={index + 'Combo'} className='legend-preliminary'>
-                              <span>{pd.lineCode}</span>
-                              <p>{pd.label}</p>
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </>
-                  )
-              )}
-            </div>
-          </>
-        )}
-    </>
+      {shouldShowSuppressedLabels() && (
+        <>
+          <hr />
+          <div className={getLegendContainerClass()}>{renderSuppressedItems()}</div>
+        </>
+      )}
+    </React.Fragment>
   )
 }
 
