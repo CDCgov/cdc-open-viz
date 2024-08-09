@@ -13,8 +13,8 @@
     "showDownloadButton": true,
     "expandDataTable": false,
     "statePicked": {
-      "stateName": "Florida",
-      "fipsCode": "12"
+      "fipsCode": "06",
+      "stateName": "California"
     },
     "annotationDropdownText": "Annotations",
     "showDownloadMediaButton": false,
@@ -61,6 +61,30 @@
     },
     "longitude": {
       "name": "Longitude"
+    },
+    "additionalColumn1": {
+      "label": "New Column",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "State"
+    },
+    "additionalColumn2": {
+      "label": "New Column",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Latitude"
+    },
+    "additionalColumn3": {
+      "label": "New Column",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Longitude"
     }
   },
   "legend": {
@@ -84,13 +108,7 @@
     "showSpecialClassesLast": false,
     "dynamicDescription": false
   },
-  "filters": [
-    {
-      "label": "",
-      "values": [],
-      "columnName": "State"
-    }
-  ],
+  "filters": [],
   "table": {
     "wrapColumns": false,
     "label": "Data Table",
@@ -122,12 +140,12 @@
     "cityStyleLabel": "",
     "showBubbleZeros": false,
     "additionalCityStyles": [],
-    "geoCodeCircleSize": "2"
+    "geoCodeCircleSize": "7"
   },
   "mapPosition": {
     "coordinates": [
       0,
-      30
+      0
     ],
     "zoom": 1
   },

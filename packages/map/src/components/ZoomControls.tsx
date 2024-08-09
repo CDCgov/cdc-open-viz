@@ -1,23 +1,15 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { MapConfig } from '../types/MapConfig'
+import ConfigContext from '../context'
 
 type ZoomControlsProps = {
-  // position on the maps projection
-  position: [lat: Number, long: Number]
-  // set the position on the maps projection
-  setPosition: () => [lat: Number, long: Number]
-  // state of maps
-  state: MapConfig
-  // Set the map config
-  setState: () => MapConfig
-  setRuntimeData: Function
-  generateRuntimeData: Function
   handleZoomIn: (coordinates: [Number, Number], setPosition: Function) => void
   handleZoomOut: (coordinates: [Number, Number], setPosition: Function) => void
   handleReset: (coordinates: [Number, Number], setPosition: Function) => void
 }
 
-const ZoomControls: React.FC<ZoomControlsProps> = ({ position, setPosition, state, setState, setRuntimeData, generateRuntimeData, handleZoomIn, handleZoomOut, handleReset }) => {
+const ZoomControls: React.FC<ZoomControlsProps> = ({ handleZoomIn, handleZoomOut, handleReset }) => {
+  const { state, setState, setRuntimeData, setPosition, position, generateRuntimeData } = useContext<MapContext>(ConfigContext)
   if (!state.general.allowMapZoom) return
   return (
     <div className='zoom-controls' data-html2canvas-ignore>

@@ -1,12 +1,27 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 
 import { jsx } from '@emotion/react'
 import { supportedCities } from '../data/supported-geos'
 import { scaleLinear } from 'd3-scale'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
 
-const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToRow, projection, titleCase, setSharedFilterValue, isFilterValueSupported, tooltipId }) => {
+import ConfigContext from './../context'
+
+const CityList = ({
+  data,
+  geoClickHandler,
+  applyTooltipsToGeo,
+  displayGeoName,
+  applyLegendToRow,
+  titleCase,
+  setSharedFilterValue,
+  isFilterValueSupported,
+  tooltipId,
+  projection
+}) => {
   const [citiesData, setCitiesData] = useState({})
+  const { scale, state } = useContext(ConfigContext)
+  if (!projection) return
 
   useEffect(() => {
     const citiesDictionary = {}
@@ -23,7 +38,9 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
 
   if (state.general.type === 'bubble') {
     const maxDataValue = Math.max(...(data ? Object.keys(data).map(key => data[key][state.columns.primary.name]) : [0]))
-    const sortedRuntimeData = Object.values(data).sort((a, b) => (a[state.columns.primary.name] < b[state.columns.primary.name] ? 1 : -1))
+    const sortedRuntimeData = Object.values(data).sort((a, b) =>
+      a[state.columns.primary.name] < b[state.columns.primary.name] ? 1 : -1
+    )
     if (!sortedRuntimeData) return
 
     // Set bubble sizes
@@ -79,7 +96,12 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
 
     let transform = ''
 
-    if (!geoData?.[state.columns.longitude.name] && !geoData?.[state.columns.latitude.name] && city && supportedCities[city.toUpperCase()]) {
+    if (
+      !geoData?.[state.columns.longitude.name] &&
+      !geoData?.[state.columns.latitude.name] &&
+      city &&
+      supportedCities[city.toUpperCase()]
+    ) {
       transform = `translate(${projection(supportedCities[city.toUpperCase()])})`
     }
 
@@ -91,14 +113,36 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       needsPointer = true
     }
 
+    if (
+      geoData?.[state.columns.longitude.name] &&
+      geoData?.[state.columns.latitude.name] &&
+      state.general.geoType === 'single-state'
+    ) {
+      let coords = [Number(geoData?.[state.columns.longitude.name]), Number(geoData?.[state.columns.latitude.name])]
+      transform = `translate(${projection(coords)})`
+      needsPointer = true
+    }
+
     if (!transform) {
       return
     }
 
     const styles = {
       fill: legendColors[0],
-      opacity: setSharedFilterValue && isFilterValueSupported && data[city] && data[city][state.columns.geo.name] !== setSharedFilterValue ? 0.5 : 1,
-      stroke: setSharedFilterValue && isFilterValueSupported && data[city] && data[city][state.columns.geo.name] === setSharedFilterValue ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.4)',
+      opacity:
+        setSharedFilterValue &&
+        isFilterValueSupported &&
+        data[city] &&
+        data[city][state.columns.geo.name] !== setSharedFilterValue
+          ? 0.5
+          : 1,
+      stroke:
+        setSharedFilterValue &&
+        isFilterValueSupported &&
+        data[city] &&
+        data[city][state.columns.geo.name] === setSharedFilterValue
+          ? 'rgba(0, 0, 0, 1)'
+          : 'rgba(0, 0, 0, 0.4)',
       '&:hover': {
         fill: legendColors[1],
         outline: 0
@@ -111,7 +155,10 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
     }
 
     // If we need to add a cursor pointer
-    if ((state.columns.navigate && geoData?.[state.columns.navigate.name] && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+    if (
+      (state.columns.navigate && geoData?.[state.columns.navigate.name] && geoData[state.columns.navigate.name]) ||
+      state.tooltips.appearanceType === 'click'
+    ) {
       styles.cursor = 'pointer'
     }
 
@@ -148,7 +195,12 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       })
 
     if (cityStyle !== undefined && cityStyle.shape) {
-      if (!geoData?.[state.columns.longitude.name] && !geoData?.[state.columns.latitude.name] && city && supportedCities[city.toUpperCase()]) {
+      if (
+        !geoData?.[state.columns.longitude.name] &&
+        !geoData?.[state.columns.latitude.name] &&
+        city &&
+        supportedCities[city.toUpperCase()]
+      ) {
         let translate = `translate(${projection(supportedCities[city.toUpperCase()])})`
         return (
           <g key={i} transform={translate} style={styles} className='geo-point' tabIndex={-1}>
