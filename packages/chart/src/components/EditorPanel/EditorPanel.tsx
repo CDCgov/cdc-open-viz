@@ -2734,6 +2734,7 @@ const EditorPanel = () => {
                     }
                   />
                   <CheckBox
+                    display={config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)}
                     value={config.legend.hideSuppressedLabels}
                     section='legend'
                     fieldName='hideSuppressedLabels'
@@ -2746,6 +2747,24 @@ const EditorPanel = () => {
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Hiding suppressed labels will not override the 'Special Class' assigned to line chart indicating "suppressed" data in the Data Series Panel.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                  <CheckBox
+                    display={config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)}
+                    value={config.legend.hideSuppressionLink}
+                    section='legend'
+                    fieldName='hideSuppressionLink'
+                    label='Hide Suppression Definition Link'
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Selecting this option will provide the definition of suppressed data below the legend.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }

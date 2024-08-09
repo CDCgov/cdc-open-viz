@@ -34,7 +34,8 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
   const isBottomOrSmallViewport = legend?.position === 'bottom' || (['sm', 'xs', 'xxs'].includes(currentViewport) && !legend.hide)
 
   const legendClasses = {
-    marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
+    marginBottom: (isBottomOrSmallViewport && (legend.hideSuppressionLink ? '15px' : '45px')) || '0px',
+
     marginTop: isBottomOrSmallViewport && config.orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : getMarginTop(isBottomOrSmallViewport, config.brush.active)
   }
 

@@ -80,6 +80,7 @@ export type Legend = {
   type: string
   verticalSorted: boolean
   hideSuppressedLabels:boolean
+  hideSuppressionLink:boolean
 }
 
 type Visual = {
