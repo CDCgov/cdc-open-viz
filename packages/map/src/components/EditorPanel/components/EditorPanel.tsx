@@ -1154,22 +1154,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     }
   }, [runtimeLegend]) // eslint-disable-line
 
-  // if no state choice by default show alabama
-  // useEffect(() => {
-  //   if (!state.general.statePicked) {
-  //     setState({
-  //       ...state,
-  //       general: {
-  //         ...general,
-  //         statePicked: {
-  //           fipsCode: '01',
-  //           stateName: 'Alabama'
-  //         }
-  //       }
-  //     })
-  //   }
-  // }, []) // eslint-disable-line
-
   const columnsOptions = [
     <option value='' key={'Select Option'}>
       - Select Option -
