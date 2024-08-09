@@ -136,7 +136,10 @@
     "additionalCityStyles": []
   },
   "mapPosition": {
-    "coordinates": [0, 30],
+    "coordinates": [
+      0,
+      30
+    ],
     "zoom": 1
   },
   "map": {

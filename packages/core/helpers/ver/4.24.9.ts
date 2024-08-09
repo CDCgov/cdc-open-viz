@@ -11,10 +11,16 @@ const patchSingleStateZoom = config => {
   if (config.type === 'dashboard') {
     Object.values(config?.visualizations || {}).forEach((viz: AnyVisualization) => {
       if (viz.type === 'map' && viz.general?.geoType === 'single-state') {
-        let allowZoom = versionNeedsUpdate(config.version, '4.24.7') ? false : viz.general.allowMapZoom
+        // if the version is less that 4.24.7 then allowMapZoom should be false
+        let allowZoom = versionNeedsUpdate(config.version, '4.24.9') ? false : viz.general.allowMapZoom
         viz.general.allowMapZoom = allowZoom
       }
     })
+  }
+  if (config.type === 'map' && config.general?.geoType === 'single-state') {
+    // if the version is less that 4.24.7 then allowMapZoom should be false
+    let allowZoom = versionNeedsUpdate(config.version, '4.24.9') ? false : config.general.allowMapZoom
+    config.general.allowMapZoom = allowZoom
   }
 }
 

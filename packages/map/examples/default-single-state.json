@@ -13,8 +13,8 @@
     "showDownloadButton": true,
     "expandDataTable": false,
     "statePicked": {
-      "stateName": "California",
-      "fipsCode": "06"
+      "stateName": "Florida",
+      "fipsCode": "12"
     },
     "annotationDropdownText": "Annotations",
     "showDownloadMediaButton": false,
@@ -29,7 +29,7 @@
     "palette": {
       "isReversed": false
     },
-    "allowMapZoom": true,
+    "allowMapZoom": false,
     "hideGeoColumnInTooltip": false,
     "hidePrimaryColumnInTooltip": false
   },
@@ -84,7 +84,13 @@
     "showSpecialClassesLast": false,
     "dynamicDescription": false
   },
-  "filters": [],
+  "filters": [
+    {
+      "label": "",
+      "values": [],
+      "columnName": "State"
+    }
+  ],
   "table": {
     "wrapColumns": false,
     "label": "Data Table",
@@ -156,7 +162,8 @@
       "Year (Good filter option)": "2010",
       "link": "",
       "Latitude": "",
-      "Longitude": ""
+      "Longitude": "",
+      "State": "California"
     },
     {
       "Insured Rate": 25,
@@ -165,7 +172,8 @@
       "Year (Good filter option)": "2010",
       "link": "",
       "Latitude": "",
-      "Longitude": ""
+      "Longitude": "",
+      "State": "California"
     },
     {
       "Insured Rate": 25,
@@ -174,7 +182,8 @@
       "Year (Good filter option)": "2010",
       "link": "",
       "Latitude": "",
-      "Longitude": ""
+      "Longitude": "",
+      "State": "Florida"
     },
     {
       "Insured Rate": 25,
@@ -183,6 +192,7 @@
       "Year (Good filter option)": "2010",
       "link": "",
       "Latitude": "",
+      "State": "California",
       "Longitude": ""
     },
     {
@@ -192,7 +202,8 @@
       "Year (Good filter option)": "2010",
       "link": "",
       "Latitude": "",
-      "Longitude": ""
+      "Longitude": "",
+      "State": "California"
     },
     {
       "Insured Rate": 3,
@@ -201,7 +212,8 @@
       "Year (Good filter option)": "2010",
       "link": "",
       "Latitude": "",
-      "Longitude": ""
+      "Longitude": "",
+      "State": "California"
     },
     {
       "Insured Rate": 25,
@@ -210,7 +222,8 @@
       "Year (Good filter option)": "2010",
       "link": "",
       "Latitude": "",
-      "Longitude": ""
+      "Longitude": "",
+      "State": "California"
     },
     {
       "Insured Rate": 60,
@@ -219,7 +232,8 @@
       "Year (Good filter option)": "2010",
       "link": "",
       "Latitude": "37.865101",
-      "Longitude": "-119.538330"
+      "Longitude": "-119.538330",
+      "State": "California"
     }
   ],
   "version": "4.24.9"
