@@ -14,6 +14,8 @@ type ZoomableGroupProps = {
   onMove: (event: any) => void
   width: number
   height: number
+  children?: React.ReactNode
+  projection: any
 }
 
 const ZoomableGroup: React.FC<ZoomableGroupProps> = ({
@@ -26,7 +28,6 @@ const ZoomableGroup: React.FC<ZoomableGroupProps> = ({
   onMoveStart,
   onMove,
   onMoveEnd,
-  className,
   projection,
   width,
   height,

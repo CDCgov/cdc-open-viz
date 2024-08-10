@@ -13,8 +13,8 @@
     "showDownloadButton": true,
     "expandDataTable": false,
     "statePicked": {
-      "stateName": "Florida",
-      "fipsCode": "12"
+      "fipsCode": "12",
+      "stateName": "Florida"
     },
     "annotationDropdownText": "Annotations",
     "showDownloadMediaButton": false,
@@ -92,13 +92,7 @@
     "showSpecialClassesLast": false,
     "dynamicDescription": false
   },
-  "filters": [
-    {
-      "label": "State",
-      "values": [],
-      "columnName": "State"
-    }
-  ],
+  "filters": [],
   "table": {
     "wrapColumns": false,
     "label": "Data Table",

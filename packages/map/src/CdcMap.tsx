@@ -84,14 +84,18 @@ const indexOfIgnoreType = (arr, item) => {
 
 const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, link }) => {
   const transform = new DataTransform()
+  const [translate, setTranslate] = useState([0, 0])
+  const [scale, setScale] = useState(1)
   const [state, setState] = useState({ ...initialState })
   const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [loading, setLoading] = useState(true)
   const [displayPanel, setDisplayPanel] = useState(true)
   const [currentViewport, setCurrentViewport] = useState()
+  const [topoData, setTopoData] = useState<Topology | {}>({})
   const [runtimeFilters, setRuntimeFilters] = useState([])
   const [runtimeLegend, setRuntimeLegend] = useState([])
   const [runtimeData, setRuntimeData] = useState({ init: true })
+  const [stateToShow, setStateToShow] = useState(null)
   const [modal, setModal] = useState(null)
   const [accessibleStatus, setAccessibleStatus] = useState('')
   const [filteredCountryCode, setFilteredCountryCode] = useState()
@@ -1551,6 +1555,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // Props passed to all map types
   const mapProps = {
+    stateToShow,
+    setStateToShow,
+    setScale,
+    setTranslate,
+    scale,
+    translate,
     isDraggingAnnotation,
     handleDragStateChange,
     applyLegendToRow,
@@ -1600,7 +1610,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     type: general.type,
     viewport: currentViewport,
     tooltipId,
-    tooltipRef
+    tooltipRef,
+    topoData,
+    setTopoData
   }
 
   if (!mapProps.data || !state.data) return <></>
