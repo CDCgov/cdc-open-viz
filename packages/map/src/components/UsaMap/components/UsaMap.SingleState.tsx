@@ -1,4 +1,4 @@
-import { useEffect, memo, useContext, useRef } from 'react'
+import { useEffect, memo, useContext, useRef, useState } from 'react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { geoPath } from 'd3-geo'
 import { CustomProjection } from '@visx/geo'
@@ -8,7 +8,7 @@ import CityList from '../../CityList'
 import ConfigContext from '../../../context'
 import Annotation from '../../Annotation'
 import SingleState from './SingleState'
-import { getTopoData, getCurrentTopoYear, isTopoReady, getFilterControllingStatePicked } from './../helpers/map'
+import { getTopoData, getCurrentTopoYear, isTopoReady } from './../helpers/map'
 import ZoomableGroup from '../../ZoomableGroup'
 import ZoomControls from '../../ZoomControls'
 import { MapContext } from '../../../types/MapContext'
@@ -39,16 +39,15 @@ const SingleStateMap = props => {
     topoData,
     setTopoData,
     scale,
-    translate
+    translate,
+    setStateToShow
   } = useContext<MapContext>(ConfigContext)
 
-  const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset } = useStateZoom(
-    state.general.statePicked.stateName,
-    topoData
-  )
+  const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection, statePicked } = useStateZoom(topoData)
 
-  const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
-  const cityListProjection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
+  const cityListProjection = geoAlbersUsaTerritories()
+    .translate([WIDTH / 2, HEIGHT / 2])
+    .scale(1)
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
   const path = geoPath().projection(projection)
 
@@ -121,7 +120,7 @@ const SingleStateMap = props => {
 
   return (
     <ErrorBoundary component='SingleStateMap'>
-      {stateToShow && state.general.allowMapZoom && (
+      {statePicked && state.general.allowMapZoom && (
         <svg
           viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
           preserveAspectRatio='xMinYMin'
@@ -130,11 +129,10 @@ const SingleStateMap = props => {
           aria-label={handleMapAriaLabels(state)}
         >
           <ZoomableGroup
-            // prettier-ignore
             center={position.coordinates}
             zoom={position.zoom}
-            minZoom={1}
-            maxZoom={4}
+            minZoom={1} // Adjust this value if needed
+            maxZoom={4} // Adjust this value to limit the maximum zoom level
             onMoveEnd={handleMoveEnd}
             projection={projection}
             width={880}
@@ -155,13 +153,6 @@ const SingleStateMap = props => {
                 }
               ]}
               projection={geoAlbersUsaTerritories}
-              fitExtent={[
-                [
-                  [PADDING, PADDING],
-                  [WIDTH - PADDING, HEIGHT - PADDING]
-                ],
-                stateToShow
-              ]}
             >
               {({ features, projection }) => {
                 return (

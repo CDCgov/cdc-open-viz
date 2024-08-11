@@ -13,8 +13,8 @@
     "showDownloadButton": true,
     "expandDataTable": false,
     "statePicked": {
-      "fipsCode": "12",
-      "stateName": "Florida"
+      "fipsCode": "06",
+      "stateName": "California"
     },
     "annotationDropdownText": "Annotations",
     "showDownloadMediaButton": false,
@@ -29,7 +29,7 @@
     "palette": {
       "isReversed": false
     },
-    "allowMapZoom": false,
+    "allowMapZoom": true,
     "hideGeoColumnInTooltip": false,
     "hidePrimaryColumnInTooltip": false
   },
@@ -69,6 +69,22 @@
       "prefix": "",
       "suffix": "",
       "name": "State"
+    },
+    "additionalColumn2": {
+      "label": "New Column",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Latitude"
+    },
+    "additionalColumn3": {
+      "label": "New Column",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Longitude"
     }
   },
   "legend": {
@@ -92,7 +108,19 @@
     "showSpecialClassesLast": false,
     "dynamicDescription": false
   },
-  "filters": [],
+  "filters": [
+    {
+      "order": "asc",
+      "label": "",
+      "columnName": "State",
+      "values": [
+        "California",
+        "Florida"
+      ],
+      "active": "California",
+      "filterStyle": "dropdown"
+    }
+  ],
   "table": {
     "wrapColumns": false,
     "label": "Data Table",
@@ -129,7 +157,7 @@
   "mapPosition": {
     "coordinates": [
       0,
-      30
+      0
     ],
     "zoom": 1
   },

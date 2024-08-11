@@ -1,9 +1,11 @@
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import ConfigContext from '../context'
 import { geoAlbersUsaTerritories, GeoProjection } from 'd3-composite-projections'
 import { MapContext } from '../types/MapContext'
 import { geoPath, GeoPath } from 'd3-geo'
 import _ from 'lodash'
+import { getFilterControllingStatePicked } from './../components/UsaMap/helpers/map'
+import { supportedStatesFipsCodes } from './../data/supported-geos'
 
 interface StateData {
   geometry: { type: 'MultiPolygon'; coordinates: number[][][][] }
@@ -19,19 +21,34 @@ interface Position {
   coordinates: [number, number]
 }
 
-const useSetScaleAndTranslate = (statePicked: string, topoData: { states: StateData[] }) => {
-  const { setTranslate, setScale, setStateToShow, setPosition, state } = useContext<MapContext>(ConfigContext)
+const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
+  const { setTranslate, setScale, setStateToShow, setPosition, state, setState, runtimeFilters } =
+    useContext<MapContext>(ConfigContext)
+  const statePicked = getFilterControllingStatePicked(state, runtimeFilters)
 
-  // If the topodata or state has changed, reset the scale and translate
-  // to focus on the state
   useEffect(() => {
-    switchState()
-  }, [state.general.statePicked, topoData])
+    const fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === statePicked)
+    const stateName = statePicked
+    const stateData = { fipsCode, stateName }
+
+    setState({
+      ...state,
+      general: {
+        ...state.general,
+        statePicked: stateData
+      }
+    })
+  }, [statePicked])
 
   // SVG ITEMS
   const WIDTH = 880
   const HEIGHT = 500
   const PADDING = 50
+  const [projection, setProjection] = useState(() =>
+    geoAlbersUsaTerritories()
+      .translate([WIDTH / 2, HEIGHT / 2])
+      .scale(1)
+  )
 
   /*
     NORMALIZATION_FACTOR NOTES:
@@ -41,7 +58,6 @@ const useSetScaleAndTranslate = (statePicked: string, topoData: { states: StateD
   */
   const NORMALIZATION_FACTOR = 1070
   const _statePickedData = topoData?.states?.find(s => s.properties.name === statePicked)
-  const projection: GeoProjection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
   const newProjection = projection.fitExtent(
     [
       [PADDING, PADDING],
@@ -62,9 +78,8 @@ const useSetScaleAndTranslate = (statePicked: string, topoData: { states: StateD
   const stateCenter = newProjection.invert(featureCenter)
 
   const switchState = () => {
-    setTranslate([x, y]) // needed for state switcher
-    setScale(normalizedScale) // needed for state switcher
     setStateToShow(_statePickedData)
+    setScaleAndTranslate('reset')
   }
 
   const setScaleAndTranslate = (zoomFunction: string = '') => {
@@ -74,12 +89,15 @@ const useSetScaleAndTranslate = (statePicked: string, topoData: { states: StateD
       let newZoom = pos.zoom
       let newCoordinates = pos.coordinates
       if (zoomFunction === 'zoomIn' && pos.zoom < 4) {
+        console.log('zooming in', pos.zoom)
         newZoom = pos.zoom * 1.5
         newCoordinates = pos.coordinates[0] !== 0 && pos.coordinates[1] !== 0 ? pos.coordinates : stateCenter
       } else if (zoomFunction === 'zoomOut' && pos.zoom > 1) {
+        console.log('zooming out', pos.zoom)
         newZoom = pos.zoom / 1.5
         newCoordinates = pos.coordinates[0] !== 0 && pos.coordinates[1] !== 0 ? pos.coordinates : stateCenter
       } else if (zoomFunction === 'reset') {
+        console.log('resetting zoom')
         newZoom = 1
         newCoordinates = stateCenter
       }
@@ -88,7 +106,11 @@ const useSetScaleAndTranslate = (statePicked: string, topoData: { states: StateD
         coordinates: newCoordinates
       }
     })
-    setScale(normalizedScale)
+
+    if (zoomFunction === 'reset') {
+      setTranslate([0, 0]) // needed for state switcher
+      setScale(1) // needed for state switcher
+    }
   }
 
   const handleZoomIn = () => {
@@ -107,7 +129,16 @@ const useSetScaleAndTranslate = (statePicked: string, topoData: { states: StateD
     setScaleAndTranslate('reset')
   }
 
-  return { setScaleAndTranslate, switchState, handleZoomIn, handleZoomOut, handleMoveEnd, handleReset }
+  return {
+    statePicked,
+    setScaleAndTranslate,
+    switchState,
+    handleZoomIn,
+    handleZoomOut,
+    handleMoveEnd,
+    handleReset,
+    projection
+  }
 }
 
 export default useSetScaleAndTranslate

@@ -8,7 +8,7 @@ type StateOutputProps = {
   scale: any
 }
 
-const StateOutput: React.FC<StateOutputProps> = ({ topoData, path, scale }: StateOutputProps) => {
+const StateOutput: React.FC<StateOutputProps> = ({ topoData, path, scale, stateToShow }: StateOutputProps) => {
   const { state } = useContext(ConfigContext)
   if (!topoData?.objects?.states) return null
   let geo = topoData.objects.states.geometries.filter(s => {
