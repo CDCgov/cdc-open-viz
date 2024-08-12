@@ -1751,10 +1751,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {accessibleStatus}
           </div>
 
-          {!isDraggingAnnotation && !window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
-            <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
+          {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
+            <>
+              <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
+              <div ref={tooltipRef} id={`tooltip__${tooltipId}-canvas`} className={`tooltip`} style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})`, whiteSpace: 'nowrap', display: 'none' }}></div>
+            </>
           )}
-          <div ref={tooltipRef} id={`tooltip__${tooltipId}-canvas`} className='tooltip d-none' style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})`, position: 'absolute', whiteSpace: 'nowrap' }}></div>
         </Layout.Responsive>
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>
