@@ -22,9 +22,24 @@ interface Position {
 }
 
 const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
-  const { setTranslate, setScale, setStateToShow, setPosition, state, setState, runtimeFilters } =
-    useContext<MapContext>(ConfigContext)
+  const { setTranslate, setScale, setStateToShow, setPosition, state, setState, runtimeFilters } = useContext<MapContext>(ConfigContext)
   const statePicked = getFilterControllingStatePicked(state, runtimeFilters)
+
+  useEffect(() => {
+    const fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === statePicked)
+    const stateName = statePicked
+    const stateData = { fipsCode, stateName }
+    setScale(1)
+    setTranslate([0, 0])
+    setState({
+      ...state,
+      general: {
+        ...state.general,
+        statePicked: stateData
+      }
+    })
+    setStateToShow(topoData?.states?.find(s => s.properties.name === statePicked))
+  }, [])
 
   useEffect(() => {
     const fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === statePicked)
@@ -44,6 +59,8 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
   const WIDTH = 880
   const HEIGHT = 500
   const PADDING = 50
+
+  // TODO: same as city list projection?
   const [projection, setProjection] = useState(() =>
     geoAlbersUsaTerritories()
       .translate([WIDTH / 2, HEIGHT / 2])

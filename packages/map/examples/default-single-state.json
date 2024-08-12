@@ -29,7 +29,7 @@
     "palette": {
       "isReversed": false
     },
-    "allowMapZoom": true,
+    "allowMapZoom": false,
     "hideGeoColumnInTooltip": false,
     "hidePrimaryColumnInTooltip": false
   },
@@ -108,19 +108,7 @@
     "showSpecialClassesLast": false,
     "dynamicDescription": false
   },
-  "filters": [
-    {
-      "order": "asc",
-      "label": "",
-      "columnName": "State",
-      "values": [
-        "California",
-        "Florida"
-      ],
-      "active": "California",
-      "filterStyle": "dropdown"
-    }
-  ],
+  "filters": [],
   "table": {
     "wrapColumns": false,
     "label": "Data Table",
@@ -152,7 +140,7 @@
     "cityStyleLabel": "",
     "showBubbleZeros": false,
     "additionalCityStyles": [],
-    "geoCodeCircleSize": "2"
+    "geoCodeCircleSize": "7"
   },
   "mapPosition": {
     "coordinates": [

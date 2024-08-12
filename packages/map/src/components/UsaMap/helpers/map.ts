@@ -87,6 +87,11 @@ export const getFilterControllingStatePicked = (state, runtimeFilters) => {
     })?.[0]
     return statePicked
   } else {
-    return state.general.statePicked.stateName || 'Alabama'
+    console.log('state', state)
+    console.log('data', state?.data)
+    console.log('data 0', state?.data?.[0])
+    console.log('picked', state.general.getFilterControllingStatePicked)
+    console.log('filter value', state?.data?.[0]?.[state.general.getFilterControllingStatePicked])
+    return state?.data?.[0]?.[state.general.filterControlsStatePicked] || state.general.statePicked.stateName || 'Alabama'
   }
 }
