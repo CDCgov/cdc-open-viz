@@ -35,7 +35,7 @@ import { useFilters } from '@cdc/core/components/Filters'
 import HexSetting from './HexShapeSettings.jsx'
 import ConfigContext from '../../../context.ts'
 import { MapContext } from '../../../types/MapContext.js'
-import { Checkbox, TextField } from './Inputs'
+import { TextField } from './Inputs'
 
 // Todo: move to useReducer, seperate files out.
 const EditorPanel = ({ columnsRequiredChecker }) => {
@@ -54,7 +54,12 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     setState,
     state,
     tooltipId,
-    runtimeData
+    runtimeData,
+    setRuntimeData,
+    generateRuntimeData,
+    position,
+    topoData,
+
   } = useContext<MapContext>(ConfigContext)
 
   const { general, columns, legend, table, tooltips } = state
@@ -67,7 +72,12 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
 
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
 
-  const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({ config: state, setConfig: setState, filteredData: runtimeFilters, setFilteredData: setRuntimeFilters })
+  const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({
+    config: state,
+    setConfig: setState,
+    filteredData: runtimeFilters,
+    setFilteredData: setRuntimeFilters
+  })
 
   const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
@@ -269,6 +279,10 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           general: {
             ...state.general,
             allowMapZoom: value
+          },
+          mapPosition: {
+            coordinates: state.general.geoType === 'world' ? [0, 30] : [0, 0],
+            zoom: 1
           }
         })
         break
@@ -773,6 +787,11 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             statePicked: stateData
           }
         })
+
+        if (state) {
+          const newData = generateRuntimeData(state)
+          setRuntimeData(newData)
+        }
         break
       case 'classificationType':
         setState({
@@ -1149,22 +1168,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
       }
     }
   }, [runtimeLegend]) // eslint-disable-line
-
-  // if no state choice by default show alabama
-  // useEffect(() => {
-  //   if (!state.general.statePicked) {
-  //     setState({
-  //       ...state,
-  //       general: {
-  //         ...general,
-  //         statePicked: {
-  //           fipsCode: '01',
-  //           stateName: 'Alabama'
-  //         }
-  //       }
-  //     })
-  //   }
-  // }, []) // eslint-disable-line
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -2032,7 +2035,11 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                         <select
                           value={specialClass.value}
                           onChange={e => {
-                            editColumn('primary', 'specialClassEdit', { prop: 'value', index: i, value: e.target.value })
+                            editColumn('primary', 'specialClassEdit', {
+                              prop: 'value',
+                              index: i,
+                              value: e.target.value
+                            })
                           }}
                         >
                           <option value=''>- Select Value -</option>
@@ -2045,7 +2052,11 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                           type='text'
                           value={specialClass.label}
                           onChange={e => {
-                            editColumn('primary', 'specialClassEdit', { prop: 'label', index: i, value: e.target.value })
+                            editColumn('primary', 'specialClassEdit', {
+                              prop: 'label',
+                              index: i,
+                              value: e.target.value
+                            })
                           }}
                         />
                       </label>

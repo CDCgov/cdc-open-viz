@@ -84,14 +84,18 @@ const indexOfIgnoreType = (arr, item) => {
 
 const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, link }) => {
   const transform = new DataTransform()
+  const [translate, setTranslate] = useState([0, 0])
+  const [scale, setScale] = useState(1)
   const [state, setState] = useState({ ...initialState })
   const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [loading, setLoading] = useState(true)
   const [displayPanel, setDisplayPanel] = useState(true)
   const [currentViewport, setCurrentViewport] = useState()
+  const [topoData, setTopoData] = useState<Topology | {}>({})
   const [runtimeFilters, setRuntimeFilters] = useState([])
   const [runtimeLegend, setRuntimeLegend] = useState([])
   const [runtimeData, setRuntimeData] = useState({ init: true })
+  const [stateToShow, setStateToShow] = useState(null)
   const [modal, setModal] = useState(null)
   const [accessibleStatus, setAccessibleStatus] = useState('')
   const [filteredCountryCode, setFilteredCountryCode] = useState()
@@ -101,6 +105,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
   const [dimensions, setDimensions] = useState()
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
+  const [projection, setProjection] = useState(null)
 
   const legendRef = useRef(null)
   const tooltipRef = useRef(null)
@@ -1433,13 +1438,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }, [state, container]) // eslint-disable-line
 
   useEffect(() => {
-    if (state.data) {
-      let newData = generateRuntimeData(state)
-      setRuntimeData(newData)
-    }
-  }, [state.general.statePicked]) // eslint-disable-line
-
-  useEffect(() => {
     // When geotype changes - add UID
     if (state.data && state.columns.geo.name) {
       addUIDs(state, state.columns.geo.name)
@@ -1499,6 +1497,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       geo: state.columns.geo.name,
       primary: state.columns.primary.name,
       mapPosition: state.mapPosition,
+      map: state.map,
       ...runtimeFilters
     })
 
@@ -1557,6 +1556,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // Props passed to all map types
   const mapProps = {
+    projection,
+    setProjection,
+    stateToShow,
+    setStateToShow,
+    setScale,
+    setTranslate,
+    scale,
+    translate,
     isDraggingAnnotation,
     handleDragStateChange,
     applyLegendToRow,
@@ -1606,7 +1613,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     type: general.type,
     viewport: currentViewport,
     tooltipId,
-    tooltipRef
+    tooltipRef,
+    topoData,
+    setTopoData
   }
 
   if (!mapProps.data || !state.data) return <></>
@@ -1644,15 +1653,21 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     </a>
   )
 
+  const sectionClassNames = () => {
+    const classes = ['cove-component__content', 'cdc-map-inner-container', `${currentViewport}`]
+    if (config?.runtime?.editorErrorMessage.length > 0) classes.push('type-map--has-error')
+    return classes.join(' ')
+  }
+
   return (
     <ConfigContext.Provider value={mapProps}>
       <Layout.VisualizationWrapper config={state} isEditor={isEditor} ref={outerContainerRef} imageId={imageId} showEditorPanel={state.showEditorPanel}>
         {isEditor && <EditorPanel columnsRequiredChecker={columnsRequiredChecker} />}
         <Layout.Responsive isEditor={isEditor}>
-          {state?.runtime?.editorErrorMessage.length > 0 && <Error state={state} />}
           {requiredColumns && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
           {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
-            <section className={`cove-component__content cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
+            <section className={sectionClassNames()} aria-label={'Map: ' + title} ref={innerContainerRef}>
+              {state?.runtime?.editorErrorMessage.length > 0 && <Error state={state} />}
               {/* prettier-ignore */}
               <Title
                 title={title}
@@ -1751,12 +1766,20 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {accessibleStatus}
           </div>
 
-          {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
-            <>
-              <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
-            </>
+          {!isDraggingAnnotation && !window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
+            <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
           )}
-          <div ref={tooltipRef} id={`tooltip__${tooltipId}-canvas`} className={`tooltip`} style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})`, whiteSpace: 'nowrap', display: 'none' }}></div>
+          <div
+            ref={tooltipRef}
+            id={`tooltip__${tooltipId}-canvas`}
+            className='tooltip'
+            style={{
+              background: `rgba(255,255,255,${state.tooltips.opacity / 100})`,
+              position: 'absolute',
+              whiteSpace: 'nowrap',
+              display: 'none' // can't use d-none here
+            }}
+          ></div>
         </Layout.Responsive>
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>
