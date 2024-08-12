@@ -52,6 +52,12 @@ const SingleStateMap = props => {
   const path = geoPath().projection(projection)
 
   useEffect(() => {
+    // setStateToShow(topoData?.states?.find(s => s.properties.name === state.general.statePicked.stateName))
+  }, [statePicked])
+
+  console.log('stateToShow', stateToShow)
+
+  useEffect(() => {
     let currentYear = getCurrentTopoYear(state, runtimeFilters)
 
     if (currentYear !== topoData.year) {
@@ -117,7 +123,6 @@ const SingleStateMap = props => {
 
     return geosJsx
   }
-
   return (
     <ErrorBoundary component='SingleStateMap'>
       {statePicked && state.general.allowMapZoom && (
@@ -148,7 +153,7 @@ const SingleStateMap = props => {
             <CustomProjection
               data={[
                 {
-                  states: stateToShow?.states,
+                  states: topoData?.states,
                   counties: topoData.counties.filter(c => c.id.substring(0, 2) === state.general.statePicked.fipsCode)
                 }
               ]}
@@ -174,7 +179,7 @@ const SingleStateMap = props => {
           </ZoomableGroup>
         </svg>
       )}
-      {stateToShow && !state.general.allowMapZoom && (
+      {statePicked && !state.general.allowMapZoom && (
         <svg
           viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
           preserveAspectRatio='xMinYMin'
@@ -192,7 +197,7 @@ const SingleStateMap = props => {
           <CustomProjection
             data={[
               {
-                states: stateToShow?.states,
+                states: topoData?.states,
                 counties: topoData.counties.filter(c => c.id.substring(0, 2) === state.general.statePicked.fipsCode)
               }
             ]}

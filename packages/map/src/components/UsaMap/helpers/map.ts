@@ -81,7 +81,7 @@ export const isTopoReady = (topoData, state, runtimeFilters) => {
 }
 
 export const getFilterControllingStatePicked = (state, runtimeFilters) => {
-  if (runtimeFilters && runtimeFilters.length > 0) {
+  if (!state.general.getFilterControllingStatePicked && runtimeFilters && runtimeFilters.length > 0) {
     const statePicked = Object.values(runtimeFilters).map(f => {
       return f?.active
     })?.[0]
@@ -92,6 +92,9 @@ export const getFilterControllingStatePicked = (state, runtimeFilters) => {
     console.log('data 0', state?.data?.[0])
     console.log('picked', state.general.getFilterControllingStatePicked)
     console.log('filter value', state?.data?.[0]?.[state.general.getFilterControllingStatePicked])
-    return state?.data?.[0]?.[state.general.filterControlsStatePicked] || state.general.statePicked.stateName || 'Alabama'
+    let statePicked =
+      state?.data?.[0]?.[state.general.filterControlsStatePicked] || state.general.statePicked.stateName || 'Alabama'
+    console.log('statePicked', statePicked)
+    return statePicked
   }
 }
