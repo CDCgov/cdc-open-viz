@@ -163,7 +163,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p> If no “Data Series" is selected, the symbol will be applied to "all" suppressed values indicated in the dataset. If you select a particular data series, there's no need to fill in “suppression line style” and “suppression symbol” below.</p>
+                          <p> Without a selected "Data Series", the suppression symbol will be applied for all series in the current dataset visualization. However, choosing a specific "data series" will isolate the suppression to that series.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
@@ -208,7 +208,9 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                               <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
-                              <p>The suggested method for presenting suppressed data is to use "double asterisks". If "double asterisks" are already used elsewhere (e.g., footnotes), please select an alternative symbol from the menu to denote data suppression.</p>
+                              <p>
+                                A symbol is <i>required</i> to indicate suppressed data. We suggest "double asterisks." If "double asterisks" are already used elsewhere (e.g., footnotes), please select an alternative symbol from the menu to denote data suppression.
+                              </p>
                             </Tooltip.Content>
                           </Tooltip>
                         }
@@ -247,7 +249,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>Enabling this tooltip will provide a clearer indication of 'suppressed' or 'zero data' values, whichever is applicable. Deselecting 'Display In Tooltip' indicates that you do not want to display 'suppressed' or 'zero data' values in tooltips when hovering over them.</p>
+                          <p>Deselecting the "Display In Tooltips" option prevents suppressed values from appearing in tooltips.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
@@ -1897,7 +1899,7 @@ const EditorPanel = () => {
                               }
                             >
                               {config.visualizationType !== 'Bump Chart' && <option value='categorical'>Categorical (Linear Scale)</option>}
-                              {config.visualizationType !== 'Bump Chart' && <option value='date'>Date (Linear Scale)</option>}                           
+                              {config.visualizationType !== 'Bump Chart' && <option value='date'>Date (Linear Scale)</option>}
                               <option value='date-time'>Date (Date Time Scale)</option>
                               {config.visualizationType === 'Scatter Plot' && <option value={'continuous'}>Continuous</option>}
                             </select>
