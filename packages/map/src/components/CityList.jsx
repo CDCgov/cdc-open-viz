@@ -1,12 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 
 import { jsx } from '@emotion/react'
 import { supportedCities } from '../data/supported-geos'
 import { scaleLinear } from 'd3-scale'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
 
-const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToRow, projection, titleCase, setSharedFilterValue, isFilterValueSupported, tooltipId }) => {
+import ConfigContext from './../context'
+
+const CityList = ({ data, geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToRow, titleCase, setSharedFilterValue, isFilterValueSupported, tooltipId, projection }) => {
   const [citiesData, setCitiesData] = useState({})
+  const { scale, state } = useContext(ConfigContext)
+  if (!projection) return
 
   useEffect(() => {
     const citiesDictionary = {}
@@ -86,6 +90,12 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
     let needsPointer = false
 
     if (geoData?.[state.columns.longitude.name] && geoData?.[state.columns.latitude.name]) {
+      let coords = [Number(geoData?.[state.columns.longitude.name]), Number(geoData?.[state.columns.latitude.name])]
+      transform = `translate(${projection(coords)})`
+      needsPointer = true
+    }
+
+    if (geoData?.[state.columns.longitude.name] && geoData?.[state.columns.latitude.name] && state.general.geoType === 'single-state') {
       let coords = [Number(geoData?.[state.columns.longitude.name]), Number(geoData?.[state.columns.latitude.name])]
       transform = `translate(${projection(coords)})`
       needsPointer = true

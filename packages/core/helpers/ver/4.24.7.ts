@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
 import { MultiDashboardConfig } from '@cdc/dashboard/src/types/MultiDashboard'
 import { AnyVisualization } from '../../types/Visualization'
+import versionNeedsUpdate from './versionNeedsUpdate'
 
 export const dashboardFiltersMigrate = config => {
   if (!config.dashboard) return config
@@ -105,7 +106,7 @@ const update_4_24_7 = config => {
   mapUpdates(newConfig)
   dashboardFiltersMigrate(newConfig)
   updateLogarithmicConfig(newConfig)
-  newConfig.version = ver
+  newConfig.version = versionNeedsUpdate(config.version, ver) ? ver : config.version
   return newConfig
 }
 export default update_4_24_7
