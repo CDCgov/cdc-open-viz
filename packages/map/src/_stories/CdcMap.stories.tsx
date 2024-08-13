@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import CdcMap from '../CdcMap'
 import EqualNumberOptInExample from './_mock/DEV-7286.json'
+import SingleStateWithFilters from './_mock/DEV-8942.json'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map',
@@ -88,6 +89,12 @@ export const Custom_Map_Layers: Story = {
 export const Geocode: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-u-s-geo-code-dat.json'
+  }
+}
+
+export const Single_State_With_Filters: Story = {
+  args: {
+    config: SingleStateWithFilters
   }
 }
 
