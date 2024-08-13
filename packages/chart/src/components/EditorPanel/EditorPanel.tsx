@@ -477,6 +477,7 @@ const EditorPanel = () => {
     visCanAnimate,
     visHasLegend,
     visHasLegendAxisAlign,
+    visHasLegendColorCategory,
     visHasBrushChart,
     visSupportsDateCategoryAxis,
     visSupportsValueAxisMin,
@@ -776,9 +777,24 @@ const EditorPanel = () => {
     return Object.keys(columns)
   }
 
-  const getDataValueOptions = data => {
+  const getLegendStyloptions = option => {
+    const styles = []
+    if (option === 'style') {
+      styles.push('circles', 'boxes')
+      if (config.visualizationType === 'Bar') {
+        styles.push('gradient')
+      }
+    }
+    if (option === 'subStyle') {
+      styles.push('linear blocks', 'smooth')
+    }
+
+    return styles
+  }
+
+  const getDataValueOptions = (data: Record<string, any>[]): string[] => {
     if (!data) return []
-    const set = new Set()
+    const set = new Set<string>()
     for (let i = 0; i < data.length; i++) {
       for (const [key] of Object.entries(data[i])) {
         set.add(key)
@@ -1880,7 +1896,7 @@ const EditorPanel = () => {
                               }
                             >
                               {config.visualizationType !== 'Bump Chart' && <option value='categorical'>Categorical (Linear Scale)</option>}
-                              {config.visualizationType !== 'Bump Chart' && <option value='date'>Date (Linear Scale)</option>}                           
+                              {config.visualizationType !== 'Bump Chart' && <option value='date'>Date (Linear Scale)</option>}
                               <option value='date-time'>Date (Date Time Scale)</option>
                               {config.visualizationType === 'Scatter Plot' && <option value={'continuous'}>Continuous</option>}
                             </select>
@@ -2687,6 +2703,26 @@ const EditorPanel = () => {
                   <AccordionItemButton>Legend</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  <Select
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p> If using gradient style, limit legend to five items for better visibility on mobile.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    display={!config.legend.hide}
+                    value={config.legend.style}
+                    section='legend'
+                    fieldName='style'
+                    label='Legend Style'
+                    updateField={updateField}
+                    options={getLegendStyloptions('style')}
+                  />
+                  <Select display={!config.legend.hide && config.legend.style === 'gradient'} value={config.legend.subStyle} section='legend' fieldName='subStyle' label='Legend Sub Style' updateField={updateField} options={getLegendStyloptions('subStyle')} />
                   <CheckBox value={config.legend.reverseLabelOrder} section='legend' fieldName='reverseLabelOrder' label='Reverse Labels' updateField={updateField} />
                   {/* <fieldset className="checkbox-group">
                     <CheckBox value={config.legend.dynamicLegend} section="legend" fieldName="dynamicLegend" label="Dynamic Legend" updateField={updateField}/>
@@ -2717,6 +2753,7 @@ const EditorPanel = () => {
                     }
                   />
                   <CheckBox
+                    display={!config.legend.hide && config.preliminaryData.some(pd => pd.type === 'suppression' && pd.label && pd.symbol)}
                     value={config.legend.hideSuppressedLabels}
                     section='legend'
                     fieldName='hideSuppressedLabels'
@@ -2740,14 +2777,10 @@ const EditorPanel = () => {
                     </>
                   } */}
                   {config.visualizationType === 'Line' && <CheckBox value={config.legend.lineMode} section='legend' fieldName='lineMode' label='Show Lined Style Legend' updateField={updateField} />}
-                  {config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1 && (
-                    <Select value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
-                  )}
+                  <Select display={visHasLegendColorCategory()} value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
                   <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={(...[section, , fieldName, value]) => updateBehavior(section, fieldName, value)} options={['highlight', 'isolate']} />
                   {visHasLegendAxisAlign() && <CheckBox value={config.legend.axisAlign} fieldName='axisAlign' section='legend' label='Align to Axis on Isolate' updateField={updateField} />}
-
                   {config.legend.behavior === 'highlight' && config.tooltips.singleSeries && <CheckBox value={config.legend.highlightOnHover} section='legend' fieldName='highlightOnHover' label='HIGHLIGHT DATA SERIES ON HOVER' updateField={updateField} />}
-
                   {/* start: isolated values */}
                   {visHasSelectableLegendValues && config.legend.behavior === 'isolate' && !colorCodeByCategory && (
                     <fieldset className='primary-fieldset edit-block' key={'additional-highlight-values'}>
@@ -2816,7 +2849,6 @@ const EditorPanel = () => {
                   )}
                   {/* end: isolated values */}
 
-                  <TextField value={config.legend.label} section='legend' fieldName='label' label='Title' updateField={updateField} />
                   <Select value={config.legend?.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom']} />
                   {config.legend.position === 'bottom' && (
                     <>
@@ -2824,6 +2856,7 @@ const EditorPanel = () => {
                       <CheckBox value={config.legend.verticalSorted} section='legend' fieldName='verticalSorted' label='Vertical sorted Legend' updateField={updateField} />
                     </>
                   )}
+                  <TextField value={config.legend.label} section='legend' fieldName='label' label='Title' updateField={updateField} />
                   <TextField type='textarea' value={config.legend.description} updateField={updateField} section='legend' fieldName='description' label='Legend Description' />
                 </AccordionItemPanel>
               </AccordionItem>
