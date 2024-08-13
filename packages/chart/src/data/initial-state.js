@@ -164,7 +164,9 @@ export default {
     verticalSorted: false,
     highlightOnHover: false,
     hideSuppressedLabels: false,
-    seriesHighlight: []
+    seriesHighlight: [],
+    style: 'circles',
+    subStyle: 'linear blocks'
   },
   brush: {
     height: 25,

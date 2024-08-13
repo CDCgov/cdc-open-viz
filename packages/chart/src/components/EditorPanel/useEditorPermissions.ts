@@ -136,6 +136,9 @@ export const useEditorPermissions = () => {
   const visHasLegendAxisAlign = () => {
     return visualizationType === 'Bar' && visualizationSubType === 'stacked' && config.legend.behavior === 'isolate'
   }
+  const visHasLegendColorCategory = () => {
+    return visualizationType === 'Bar' && visualizationSubType === 'regular' && config.series?.length === 1
+  }
 
   const visSupportsTooltipOpacity = () => {
     const disabledCharts = ['Spark Line', 'Sankey']
@@ -346,6 +349,7 @@ export const useEditorPermissions = () => {
     visHasDataSuppression,
     visHasLegend,
     visHasLegendAxisAlign,
+    visHasLegendColorCategory,
     visHasBrushChart,
     visHasNumbersOnBars,
     visHasaAdditionalLabelsOnBars,
