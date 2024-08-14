@@ -80,14 +80,13 @@ export const isTopoReady = (topoData, state, runtimeFilters) => {
   return topoData.year && (!currentYear || currentYear === topoData.year)
 }
 
-export const getFilterControllingStatePicked = (state, runtimeFilters) => {
-  if (!state.general.getFilterControllingStatePicked && runtimeFilters && runtimeFilters.length > 0) {
-    const statePicked = Object.values(runtimeFilters).map(f => {
-      return f?.active
-    })?.[0]
+export const getFilterControllingStatePicked = (state, runtimeData) => {
+  if (!state.general.filterControlsStatePicked || !runtimeData) {
+    const statePicked = state?.general?.statePicked?.stateName
     return statePicked
   } else {
-    const statePicked = state?.data?.[0]?.[state.general.filterControlsStatePicked] || state.general.statePicked.stateName || 'Alabama'
+    let statePickedFromFilter = Object.values(runtimeData)?.map(s => s[state.general.filterControlsStatePicked])?.[0]
+    const statePicked = statePickedFromFilter || state.general.statePicked.stateName || 'Alabama'
     return statePicked
   }
 }

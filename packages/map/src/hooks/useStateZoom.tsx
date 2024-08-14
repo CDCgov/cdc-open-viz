@@ -22,8 +22,8 @@ interface Position {
 }
 
 const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
-  const { setTranslate, setScale, setStateToShow, setPosition, state, setState, runtimeFilters } = useContext<MapContext>(ConfigContext)
-  const statePicked = getFilterControllingStatePicked(state, runtimeFilters)
+  const { setTranslate, setScale, setStateToShow, setPosition, state, setState, runtimeData } = useContext<MapContext>(ConfigContext)
+  const statePicked = getFilterControllingStatePicked(state, runtimeData)
   const defaultStateToShow = 'Alabama'
   useEffect(() => {
     const fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === statePicked)
