@@ -29,24 +29,19 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
 
   const [usedByNameLookup, usedByOptions] = useMemo(() => {
     const nameLookup = {}
-    const vizOptions = Object.keys(config.visualizations)
-      .filter(vizKey => {
-        const vizLookup = vizRowColumnLocator[vizKey]
-        if (!vizLookup) return false
-        const viz = config.visualizations[vizKey]
-        if (viz.type === 'dashboardFilters') return false
-        const notAdded = !filter.usedBy || filter.usedBy.indexOf(vizKey) === -1
-        const usesSharedFilter = viz.usesSharedFilter
-        const rowIndex = vizLookup.row
-        const dataConfiguredOnRow = config.rows[rowIndex].dataKey
-        return filter.setBy !== vizKey && notAdded && !usesSharedFilter && !dataConfiguredOnRow
-      })
-      .map(vizKey => {
-        const viz = config.visualizations[vizKey] as Visualization
-        const vizName = viz.general?.title || viz.title || vizKey
-        nameLookup[vizKey] = vizName
-        return vizKey
-      })
+    const vizOptions = Object.keys(config.visualizations).filter(vizKey => {
+      const vizLookup = vizRowColumnLocator[vizKey]
+      if (!vizLookup) return false
+      const viz = config.visualizations[vizKey] as Visualization
+      if (viz.type === 'dashboardFilters') return false
+      const vizName = viz.general?.title || viz.title || vizKey
+      nameLookup[vizKey] = vizName
+      const notAdded = !filter.usedBy || filter.usedBy.indexOf(vizKey) === -1
+      const usesSharedFilter = viz.usesSharedFilter
+      const rowIndex = vizLookup.row
+      const dataConfiguredOnRow = config.rows[rowIndex].dataKey
+      return filter.setBy !== vizKey && notAdded && !usesSharedFilter && !dataConfiguredOnRow
+    })
     const rowOptions: number[] = []
 
     config.rows.forEach((row, rowIndex) => {
@@ -256,6 +251,26 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
               }}
             />
           )}
+
+          <MultiSelect
+            label='Used By: (optional)'
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>Select if you would like specific visualizations or rows to use this filter. Otherwise the filter will be added to all api requests.</p>
+                </Tooltip.Content>
+              </Tooltip>
+            }
+            options={[...usedByOptions, ...filter.usedBy].map(opt => ({ value: opt, label: usedByNameLookup[opt] }))}
+            fieldName='usedBy'
+            selected={filter.usedBy}
+            updateField={(_section, _subsection, _fieldname, newItems) => {
+              updateFilterProp('usedBy', newItems)
+            }}
+          />
 
           <TextField label='Reset Label: ' value={filter.resetLabel || ''} updateField={(_section, _subSection, _key, value) => updateFilterProp('resetLabel', value)} />
 

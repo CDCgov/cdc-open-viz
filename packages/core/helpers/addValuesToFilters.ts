@@ -11,7 +11,7 @@ type Filter = {
 }
 
 // Gets filter values from dataset
-const generateValuesForFilter = (columnName, data: any[] | Record<string, any[]>) => {
+const generateValuesForFilter = (columnName, data: any[]) => {
   const values: string[] = []
 
   if (Array.isArray(data)) {
@@ -24,6 +24,7 @@ const generateValuesForFilter = (columnName, data: any[] | Record<string, any[]>
   } else {
     // data is a dataset this loops through ALL datasets to find matching values
     // not sure if this is desired behavior
+    // Maps Only
     if (!data) return values
     Object.values(data).forEach((rows: any[]) => {
       rows.forEach(row => {
@@ -53,13 +54,12 @@ const handleVizParents = (filter: VizFilter, data: any[], filtersLookup: Record<
   return filteredData
 }
 
-export const addValuesToFilters = <T>(filters: Filter[], data: any[] | Record<string, any[]>): Array<T> => {
+export const addValuesToFilters = (filters: VizFilter[], data: any[]): Array<VizFilter> => {
   const filtersLookup = _.keyBy(filters, 'id')
   return filters?.map(filter => {
     const filterCopy = _.cloneDeep(filter)
     let filteredData = data
-    if (Array.isArray(data) && filter.parents?.length) {
-      // handling VizFilter data
+    if (filter.parents?.length) {
       filteredData = handleVizParents(filter as VizFilter, data, filtersLookup)
     }
     const filterValues = generateValuesForFilter(filter.columnName, filteredData)
@@ -70,13 +70,14 @@ export const addValuesToFilters = <T>(filters: Filter[], data: any[] | Record<st
         filterCopy.active = queryStringFilterValue
       } else if (filterCopy.filterStyle === 'multi-select') {
         const defaultValues = filterCopy.values
-        const active: (string | number)[] = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
+        const active = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
         filterCopy.active = active.filter(val => defaultValues.includes(val))
       } else {
         const defaultValue = filterCopy.values[0]
-        filterCopy.active = filterCopy.values.includes(filterCopy.active as string | number) ? filterCopy.active : defaultValue
+        const active = Array.isArray(filterCopy.active) ? filterCopy.active[0] : filterCopy.active
+        filterCopy.active = filterCopy.values.includes(active) ? active : defaultValue
       }
     }
     return filterCopy
-  }) as Array<T>
+  })
 }
