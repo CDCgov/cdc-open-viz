@@ -35,7 +35,9 @@ const WorldMap = () => {
     state,
     supportedCountries,
     titleCase,
-    tooltipId
+    tooltipId,
+    setScale,
+    setTranslate
   } = useContext(ConfigContext)
 
   // TODO Refactor - state should be set together here to avoid rerenders
@@ -199,6 +201,7 @@ const WorldMap = () => {
           setRuntimeData={setRuntimeData}
           setState={setState}
           state={state}
+          handleReset={handleReset}
         />
       )}
     </ErrorBoundary>

@@ -378,9 +378,3 @@ canvas {
   pointer-events: none;
   display: none;
 }
-
-// remove small square box appearing for canvas tooltip
-// create selector for this #tooltip__\:rl\:-canvas
-[id$='-canvas'].tooltip {
-  display: none !important;
-}

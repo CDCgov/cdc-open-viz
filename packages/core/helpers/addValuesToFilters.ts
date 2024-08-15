@@ -24,6 +24,7 @@ const generateValuesForFilter = (columnName, data: any[] | Record<string, any[]>
   } else {
     // data is a dataset this loops through ALL datasets to find matching values
     // not sure if this is desired behavior
+    if (!data) return values
     Object.values(data).forEach((rows: any[]) => {
       rows.forEach(row => {
         const value = row[columnName]
