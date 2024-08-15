@@ -4,8 +4,8 @@
 name: Storybook Deploy
 
 on:
-  pull_request:
-    branches: ['dev']
+  push:
+    branches: ['test']
 
 jobs:
   build:
