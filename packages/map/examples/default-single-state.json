@@ -152,6 +152,15 @@
     {
       "Insured Rate": 8,
       "Coverage Status": "Insured",
+      "FIPS Codes": "SLT",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "38.9399",
+      "Longitude": "-119.9772"
+    },
+    {
+      "Insured Rate": 8,
+      "Coverage Status": "Insured",
       "FIPS Codes": "06071",
       "Year (Good filter option)": "2010",
       "link": "",
@@ -220,6 +229,51 @@
       "link": "",
       "Latitude": "37.865101",
       "Longitude": "-119.538330"
+    },
+    {
+      "Insured Rate": 60,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "LA",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "34.0549",
+      "Longitude": "-118.2426"
+    },
+    {
+      "Insured Rate": 60,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "BH",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "34.0736",
+      "Longitude": "-118.4004"
+    },
+    {
+      "Insured Rate": 60,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "Santa Monica",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "34.0195",
+      "Longitude": "-118.4912"
+    },
+    {
+      "Insured Rate": 60,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "LA",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "34.0549",
+      "Longitude": "-118.2426"
+    },
+    {
+      "Insured Rate": 60,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "LA",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "34.0549",
+      "Longitude": "-118.2426"
     }
   ],
   "version": "4.24.7"

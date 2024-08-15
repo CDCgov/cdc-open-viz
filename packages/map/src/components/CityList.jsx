@@ -4,12 +4,13 @@ import { jsx } from '@emotion/react'
 import { supportedCities } from '../data/supported-geos'
 import { scaleLinear } from 'd3-scale'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
+import { getFilterControllingStatePicked } from './../components/UsaMap/helpers/map'
 
 import ConfigContext from './../context'
 
 const CityList = ({ data, geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToRow, titleCase, setSharedFilterValue, isFilterValueSupported, tooltipId, projection }) => {
   const [citiesData, setCitiesData] = useState({})
-  const { scale, state } = useContext(ConfigContext)
+  const { scale, state, topoData, runtimeData, position } = useContext(ConfigContext)
   if (!projection) return
 
   useEffect(() => {
@@ -96,8 +97,23 @@ const CityList = ({ data, geoClickHandler, applyTooltipsToGeo, displayGeoName, a
     }
 
     if (geoData?.[state.columns.longitude.name] && geoData?.[state.columns.latitude.name] && state.general.geoType === 'single-state') {
+      const statePicked = getFilterControllingStatePicked(state, runtimeData)
+      const _statePickedData = topoData?.states?.find(s => s.properties.name === statePicked)
+      // SVG ITEMS
+      const WIDTH = 880
+      const HEIGHT = 500
+      const PADDING = 50
+
+      const newProjection = projection.fitExtent(
+        [
+          [PADDING, PADDING],
+          [WIDTH - PADDING, HEIGHT - PADDING]
+        ],
+        _statePickedData
+      )
       let coords = [Number(geoData?.[state.columns.longitude.name]), Number(geoData?.[state.columns.latitude.name])]
-      transform = `translate(${projection(coords)})`
+      console.log('COORDINATES', coords)
+      transform = `translate(${newProjection(coords)}) scale(${state.visual.geoCodeCircleSize / (position.zoom > 1 ? position.zoom : 1)})`
       needsPointer = true
     }
 
