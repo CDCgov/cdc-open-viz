@@ -21,7 +21,7 @@ import Forecasting from './Forecasting'
 import LineChart from './LineChart'
 import ForestPlot from './ForestPlot'
 import PairedBarChart from './PairedBarChart'
-import useIntersectionObserver from './../hooks/useIntersectionObserver'
+import useIntersectionObserver from '../hooks/useIntersectionObserver'
 import Regions from './Regions'
 import CategoricalYAxis from './Axis/Categorical.Axis'
 
@@ -38,9 +38,12 @@ import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 
-// styles
+type LinearChartProps = {
+  parentWidth: number
+  parentHeight: number
+}
 
-const LinearChart = props => {
+const LinearChart: React.FC<LinearChartProps> = props => {
   // prettier-ignore
   const {
     brushConfig,
@@ -121,7 +124,7 @@ const LinearChart = props => {
   const properties = { data, tableData, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax }
   const { min, max, leftMax, rightMax } = useMinMax(properties)
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
-  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush, xScaleAnnotation } = useScales({ ...properties, min, max, leftMax, rightMax, dimensions })
+  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush, xScaleAnnotation } = useScales({ ...properties, min, max, leftMax, rightMax, dimensions, xMax: props.parentWidth - Number(config.yAxis.size) })
 
   // sets the portal x/y for where tooltips should appear on the page.
   const [chartPosition, setChartPosition] = useState(null)
@@ -412,18 +415,18 @@ const LinearChart = props => {
   ) : (
     <ErrorBoundary component='LinearChart'>
       {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
-      <div style={{ width: `${width}px`, overflow: 'visible' }} className='tooltip-boundary'>
+      <div style={{ width: `${props.parentWidth}px`, overflow: 'visible' }} className='tooltip-boundary'>
         <svg
           onMouseMove={onMouseMove}
-          width={'100%'}
-          height={height}
+          width={props.parentWidth}
+          height={props.parentHeight}
           className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'} ${isDraggingAnnotation && 'dragging-annotation'}`}
           role='img'
           aria-label={handleChartAriaLabels(config)}
           ref={svgRef}
           style={{ overflow: 'visible' }}
         >
-          {!isDraggingAnnotation && <Bar width={width} height={height} fill={'transparent'}></Bar>} {/* Highlighted regions */}
+          {!isDraggingAnnotation && <Bar width={props.parentWidth} height={props.parentHeight} fill={'transparent'}></Bar>} {/* Highlighted regions */}
           {/* Y axis */}
           {!['Spark Line', 'Forest Plot'].includes(visualizationType) && config.yAxis.type !== 'categorical' && (
             <AxisLeft scale={yScale} tickLength={isLogarithmicAxis ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.label || runtime.yAxis.label} stroke='#333' tickFormat={(tick, i) => handleLeftTickFormatting(tick, i)} numTicks={handleNumTicks()}>
@@ -473,7 +476,7 @@ const LinearChart = props => {
                             </Text>
                           )}
 
-                          {orientation === 'vertical' && visualizationType === 'Bump Chart' && !config.yAxis.hideLabel && (      
+                          {orientation === 'vertical' && visualizationType === 'Bump Chart' && !config.yAxis.hideLabel && (
                             <>
                               <Text
                                 display={config.useLogScale ? showTicks : 'block'}
@@ -489,13 +492,7 @@ const LinearChart = props => {
                               </Text>
 
                               {(seriesHighlight.length === 0 || seriesHighlight.includes(config.runtime.seriesLabelsAll[tick.formattedValue - 1])) && (
-                                <rect 
-                                  x={0 - Number(config.yAxis.size)} 
-                                  y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)} 
-                                  width={Number(config.yAxis.size) + xScale(xScale.domain()[0])} 
-                                  height='2' 
-                                  fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])} 
-                                />
+                                <rect x={0 - Number(config.yAxis.size)} y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)} width={Number(config.yAxis.size) + xScale(xScale.domain()[0])} height='2' fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])} />
                               )}
                             </>
                           )}

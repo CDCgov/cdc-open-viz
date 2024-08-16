@@ -23,7 +23,7 @@ const Legend = forwardRef((props, ref) => {
   const createLegendLabels = createFormatLabels(config, tableData, data, colorScale)
 
   return (
-    !['Box Plot', 'Pie'].includes(config.visualizationType) && (
+    !['Box Plot'].includes(config.visualizationType) && (
       <LegendComponent ref={ref} skipId={props.skipId || 'legend'} config={config} colorScale={colorScale} seriesHighlight={seriesHighlight} highlight={highlight} highlightReset={highlightReset} currentViewport={currentViewport} formatLabels={createLegendLabels} />
     )
   )

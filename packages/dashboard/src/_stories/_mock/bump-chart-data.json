@@ -1,0 +1,702 @@
+[
+  {
+    "Sibling": "1",
+    "year": "2014",
+    "Name": "Sibling",
+    "Timestamp": "1/1/14",
+    "Rank": "1",
+    "Frequency": "149",
+    "Rank Change": "-",
+    "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
+  },
+  {
+    "Sibling": "2",
+    "year": "2015",
+    "Name": "Sibling",
+    "Timestamp": "1/1/15",
+    "Rank": "2",
+    "Frequency": "172",
+    "Rank Change": "-1",
+    "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
+  },
+  {
+    "Sibling": "2",
+    "year": "2016",
+    "Name": "Sibling",
+    "Timestamp": "1/1/16",
+    "Rank": "2",
+    "Frequency": "230",
+    "Rank Change": "0",
+    "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
+  },
+  {
+    "Sibling": "2",
+    "year": "2017",
+    "Name": "Sibling",
+    "Timestamp": "1/1/17",
+    "Rank": "2",
+    "Frequency": "379",
+    "Rank Change": "0",
+    "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
+  },
+  {
+    "Sibling": "2",
+    "year": "2018",
+    "Name": "Sibling",
+    "Timestamp": "1/1/18",
+    "Rank": "2",
+    "Frequency": "357",
+    "Rank Change": "0",
+    "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
+  },
+  {
+    "Sibling": "2",
+    "year": "2019",
+    "Name": "Sibling",
+    "Timestamp": "1/1/19",
+    "Rank": "2",
+    "Frequency": "358",
+    "Rank Change": "0",
+    "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
+  },
+  {
+    "Sibling": "2",
+    "year": "2020",
+    "Name": "Sibling",
+    "Timestamp": "1/1/20",
+    "Rank": "2",
+    "Frequency": "458",
+    "Rank Change": "0",
+    "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
+  },
+  {
+    "Neck": "2",
+    "year": "2014",
+    "Name": "Neck",
+    "Timestamp": "1/1/14",
+    "Rank": "2",
+    "Frequency": "131",
+    "Rank Change": "-",
+    "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
+  },
+  {
+    "Neck": "1",
+    "year": "2015",
+    "Name": "Neck",
+    "Timestamp": "1/1/15",
+    "Rank": "1",
+    "Frequency": "316",
+    "Rank Change": "1",
+    "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
+  },
+  {
+    "Neck": "1",
+    "year": "2016",
+    "Name": "Neck",
+    "Timestamp": "1/1/16",
+    "Rank": "1",
+    "Frequency": "437",
+    "Rank Change": "0",
+    "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
+  },
+  {
+    "Neck": "1",
+    "year": "2017",
+    "Name": "Neck",
+    "Timestamp": "1/1/17",
+    "Rank": "1",
+    "Frequency": "621",
+    "Rank Change": "0",
+    "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
+  },
+  {
+    "Neck": "1",
+    "year": "2018",
+    "Name": "Neck",
+    "Timestamp": "1/1/18",
+    "Rank": "1",
+    "Frequency": "526",
+    "Rank Change": "0",
+    "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
+  },
+  {
+    "Neck": "1",
+    "year": "2019",
+    "Name": "Neck",
+    "Timestamp": "1/1/19",
+    "Rank": "1",
+    "Frequency": "555",
+    "Rank Change": "0",
+    "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
+  },
+  {
+    "Neck": "1",
+    "year": "2020",
+    "Name": "Neck",
+    "Timestamp": "1/1/20",
+    "Rank": "1",
+    "Frequency": "527",
+    "Rank Change": "0",
+    "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
+  },
+  {
+    "Girlfriend": "3",
+    "year": "2014",
+    "Name": "Girlfriend",
+    "Timestamp": "1/1/14",
+    "Rank": "3",
+    "Frequency": "101",
+    "Rank Change": "-",
+    "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
+  },
+  {
+    "Girlfriend": "4",
+    "year": "2015",
+    "Name": "Girlfriend",
+    "Timestamp": "1/1/15",
+    "Rank": "4",
+    "Frequency": "155",
+    "Rank Change": "-1",
+    "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
+  },
+  {
+    "Girlfriend": "3",
+    "year": "2016",
+    "Name": "Girlfriend",
+    "Timestamp": "1/1/16",
+    "Rank": "3",
+    "Frequency": "219",
+    "Rank Change": "1",
+    "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
+  },
+  {
+    "Girlfriend": "4",
+    "year": "2017",
+    "Name": "Girlfriend",
+    "Timestamp": "1/1/17",
+    "Rank": "4",
+    "Frequency": "260",
+    "Rank Change": "-1",
+    "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
+  },
+  {
+    "Girlfriend": "3",
+    "year": "2018",
+    "Name": "Girlfriend",
+    "Timestamp": "1/1/18",
+    "Rank": "3",
+    "Frequency": "294",
+    "Rank Change": "1",
+    "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
+  },
+  {
+    "Girlfriend": "4",
+    "year": "2019",
+    "Name": "Girlfriend",
+    "Timestamp": "1/1/19",
+    "Rank": "4",
+    "Frequency": "262",
+    "Rank Change": "-1",
+    "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
+  },
+  {
+    "Girlfriend": "4",
+    "year": "2020",
+    "Name": "Girlfriend",
+    "Timestamp": "1/1/20",
+    "Rank": "4",
+    "Frequency": "242",
+    "Rank Change": "0",
+    "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
+  },
+  {
+    "Bullying": "4",
+    "year": "2014",
+    "Name": "Bullying",
+    "Timestamp": "1/1/14",
+    "Rank": "4",
+    "Frequency": "95",
+    "Rank Change": "-",
+    "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
+  },
+  {
+    "Bullying": "8",
+    "year": "2015",
+    "Name": "Bullying",
+    "Timestamp": "1/1/15",
+    "Rank": "8",
+    "Frequency": "90",
+    "Rank Change": "-4",
+    "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
+  },
+  {
+    "Bullying": "5",
+    "year": "2016",
+    "Name": "Bullying",
+    "Timestamp": "1/1/16",
+    "Rank": "5",
+    "Frequency": "144",
+    "Rank Change": "3",
+    "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
+  },
+  {
+    "Bullying": "10",
+    "year": "2017",
+    "Name": "Bullying",
+    "Timestamp": "1/1/17",
+    "Rank": "10",
+    "Frequency": "165",
+    "Rank Change": "-5",
+    "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
+  },
+  {
+    "Bullying": "6",
+    "year": "2018",
+    "Name": "Bullying",
+    "Timestamp": "1/1/18",
+    "Rank": "6",
+    "Frequency": "213",
+    "Rank Change": "-4",
+    "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
+  },
+  {
+    "Bullying": "9",
+    "year": "2019",
+    "Name": "Bullying",
+    "Timestamp": "1/1/19",
+    "Rank": "9",
+    "Frequency": "151",
+    "Rank Change": "-3",
+    "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
+  },
+  {
+    "Bullying": "10",
+    "year": "2020",
+    "Name": "Bullying",
+    "Timestamp": "1/1/20",
+    "Rank": "10",
+    "Frequency": "112",
+    "Rank Change": "-1",
+    "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
+  },
+  {
+    "Mother": "5",
+    "year": "2014",
+    "Name": "Mother",
+    "Timestamp": "1/1/14",
+    "Rank": "5",
+    "Frequency": "89",
+    "Rank Change": "-",
+    "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
+  },
+  {
+    "Mother": "7",
+    "year": "2015",
+    "Name": "Mother",
+    "Timestamp": "1/1/15",
+    "Rank": "7",
+    "Frequency": "104",
+    "Rank Change": "-2",
+    "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
+  },
+  {
+    "Mother": "6",
+    "year": "2016",
+    "Name": "Mother",
+    "Timestamp": "1/1/16",
+    "Rank": "6",
+    "Frequency": "141",
+    "Rank Change": "1",
+    "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
+  },
+  {
+    "Mother": "5",
+    "year": "2017",
+    "Name": "Mother",
+    "Timestamp": "1/1/17",
+    "Rank": "5",
+    "Frequency": "230",
+    "Rank Change": "1",
+    "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
+  },
+  {
+    "Mother": "4",
+    "year": "2018",
+    "Name": "Mother",
+    "Timestamp": "1/1/18",
+    "Rank": "4",
+    "Frequency": "241",
+    "Rank Change": "1",
+    "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
+  },
+  {
+    "Mother": "5",
+    "year": "2019",
+    "Name": "Mother",
+    "Timestamp": "1/1/19",
+    "Rank": "5",
+    "Frequency": "190",
+    "Rank Change": "-1",
+    "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
+  },
+  {
+    "Mother": "6",
+    "year": "2020",
+    "Name": "Mother",
+    "Timestamp": "1/1/20",
+    "Rank": "6",
+    "Frequency": "206",
+    "Rank Change": "-1",
+    "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
+  },
+  {
+    "Overdose": "6",
+    "year": "2014",
+    "Name": "Overdose",
+    "Timestamp": "1/1/14",
+    "Rank": "6",
+    "Frequency": "76",
+    "Rank Change": "-",
+    "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
+  },
+  {
+    "Overdose": "6",
+    "year": "2015",
+    "Name": "Overdose",
+    "Timestamp": "1/1/15",
+    "Rank": "6",
+    "Frequency": "114",
+    "Rank Change": "0",
+    "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
+  },
+  {
+    "Overdose": "7",
+    "year": "2016",
+    "Name": "Overdose",
+    "Timestamp": "1/1/16",
+    "Rank": "7",
+    "Frequency": "137",
+    "Rank Change": "-1",
+    "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
+  },
+  {
+    "Overdose": "6",
+    "year": "2017",
+    "Name": "Overdose",
+    "Timestamp": "1/1/17",
+    "Rank": "6",
+    "Frequency": "227",
+    "Rank Change": "1",
+    "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
+  },
+  {
+    "Overdose": "7",
+    "year": "2018",
+    "Name": "Overdose",
+    "Timestamp": "1/1/18",
+    "Rank": "7",
+    "Frequency": "185",
+    "Rank Change": "-1",
+    "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
+  },
+  {
+    "Overdose": "6",
+    "year": "2019",
+    "Name": "Overdose",
+    "Timestamp": "1/1/19",
+    "Rank": "6",
+    "Frequency": "190",
+    "Rank Change": "1",
+    "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
+  },
+  {
+    "Overdose": "5",
+    "year": "2020",
+    "Name": "Overdose",
+    "Timestamp": "1/1/20",
+    "Rank": "5",
+    "Frequency": "210",
+    "Rank Change": "1",
+    "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
+  },
+  {
+    "Depression": "7",
+    "year": "2014",
+    "Name": "Depression",
+    "Timestamp": "1/1/14",
+    "Rank": "7",
+    "Frequency": "57",
+    "Rank Change": "-",
+    "Representative Sentence": "Victim Has History Of Depression."
+  },
+  {
+    "Depression": "9",
+    "year": "2015",
+    "Name": "Depression",
+    "Timestamp": "1/1/15",
+    "Rank": "9",
+    "Frequency": "89",
+    "Rank Change": "-2",
+    "Representative Sentence": "Victim Has History Of Depression."
+  },
+  {
+    "Depression": "9",
+    "year": "2016",
+    "Name": "Depression",
+    "Timestamp": "1/1/16",
+    "Rank": "9",
+    "Frequency": "125",
+    "Rank Change": "0",
+    "Representative Sentence": "Victim Has History Of Depression."
+  },
+  {
+    "Depression": "7",
+    "year": "2017",
+    "Name": "Depression",
+    "Timestamp": "1/1/17",
+    "Rank": "7",
+    "Frequency": "181",
+    "Rank Change": "2",
+    "Representative Sentence": "Victim Has History Of Depression."
+  },
+  {
+    "Depression": "8",
+    "year": "2018",
+    "Name": "Depression",
+    "Timestamp": "1/1/18",
+    "Rank": "8",
+    "Frequency": "168",
+    "Rank Change": "-1",
+    "Representative Sentence": "Victim Has History Of Depression."
+  },
+  {
+    "Depression": "7",
+    "year": "2019",
+    "Name": "Depression",
+    "Timestamp": "1/1/19",
+    "Rank": "7",
+    "Frequency": "172",
+    "Rank Change": "1",
+    "Representative Sentence": "Victim Has History Of Depression."
+  },
+  {
+    "Depression": "7",
+    "year": "2020",
+    "Name": "Depression",
+    "Timestamp": "1/1/20",
+    "Rank": "8",
+    "Frequency": "206",
+    "Rank Change": "0",
+    "Representative Sentence": "Victim Has History Of Depression."
+  },
+  {
+    "Vehicle": "8",
+    "year": "2014",
+    "Name": "Vehicle",
+    "Timestamp": "1/1/14",
+    "Rank": "8",
+    "Frequency": "55",
+    "Rank Change": "-",
+    "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
+  },
+  {
+    "Vehicle": "3",
+    "year": "2015",
+    "Name": "Vehicle",
+    "Timestamp": "1/1/15",
+    "Rank": "3",
+    "Frequency": "171",
+    "Rank Change": "5",
+    "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
+  },
+  {
+    "Vehicle": "4",
+    "year": "2016",
+    "Name": "Vehicle",
+    "Timestamp": "1/1/16",
+    "Rank": "4",
+    "Frequency": "209",
+    "Rank Change": "-1",
+    "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
+  },
+  {
+    "Vehicle": "3",
+    "year": "2017",
+    "Name": "Vehicle",
+    "Timestamp": "1/1/17",
+    "Rank": "3",
+    "Frequency": "304",
+    "Rank Change": "1",
+    "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
+  },
+  {
+    "Vehicle": "5",
+    "year": "2018",
+    "Name": "Vehicle",
+    "Timestamp": "1/1/18",
+    "Rank": "5",
+    "Frequency": "236",
+    "Rank Change": "-2",
+    "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
+  },
+  {
+    "Vehicle": "3",
+    "year": "2019",
+    "Name": "Vehicle",
+    "Timestamp": "1/1/19",
+    "Rank": "3",
+    "Frequency": "266",
+    "Rank Change": "2",
+    "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
+  },
+  {
+    "Vehicle": "3",
+    "year": "2020",
+    "Name": "Vehicle",
+    "Timestamp": "1/1/20",
+    "Rank": "3",
+    "Frequency": "293",
+    "Rank Change": "0",
+    "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
+  },
+  {
+    "Friends": "9",
+    "year": "2014",
+    "Name": "Friends",
+    "Timestamp": "1/1/14",
+    "Rank": "9",
+    "Frequency": "41",
+    "Rank Change": "-",
+    "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
+  },
+  {
+    "Friends": "10",
+    "year": "2015",
+    "Name": "Friends",
+    "Timestamp": "1/1/15",
+    "Rank": "10",
+    "Frequency": "78",
+    "Rank Change": "-1",
+    "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
+  },
+  {
+    "Friends": "10",
+    "year": "2016",
+    "Name": "Friends",
+    "Timestamp": "1/1/16",
+    "Rank": "10",
+    "Frequency": "87",
+    "Rank Change": "0",
+    "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
+  },
+  {
+    "Friends": "9",
+    "year": "2017",
+    "Name": "Friends",
+    "Timestamp": "1/1/17",
+    "Rank": "9",
+    "Frequency": "170",
+    "Rank Change": "1",
+    "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
+  },
+  {
+    "Friends": "9",
+    "year": "2018",
+    "Name": "Friends",
+    "Timestamp": "1/1/18",
+    "Rank": "9",
+    "Frequency": "165",
+    "Rank Change": "0",
+    "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
+  },
+  {
+    "Friends": "10",
+    "year": "2019",
+    "Name": "Friends",
+    "Timestamp": "1/1/19",
+    "Rank": "10",
+    "Frequency": "127",
+    "Rank Change": "-1",
+    "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
+  },
+  {
+    "Friends": "9",
+    "year": "2020",
+    "Name": "Friends",
+    "Timestamp": "1/1/20",
+    "Rank": "9",
+    "Frequency": "137",
+    "Rank Change": "1",
+    "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
+  },
+  {
+    "Head": "10",
+    "year": "2014",
+    "Name": "Head",
+    "Timestamp": "1/1/14",
+    "Rank": "10",
+    "Frequency": "20",
+    "Rank Change": "-",
+    "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
+  },
+  {
+    "Head": "5",
+    "year": "2015",
+    "Name": "Head",
+    "Timestamp": "1/1/15",
+    "Rank": "5",
+    "Frequency": "119",
+    "Rank Change": "5",
+    "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
+  },
+  {
+    "Head": "8",
+    "year": "2016",
+    "Name": "Head",
+    "Timestamp": "1/1/16",
+    "Rank": "8",
+    "Frequency": "134",
+    "Rank Change": "-3",
+    "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
+  },
+  {
+    "Head": "8",
+    "year": "2017",
+    "Name": "Head",
+    "Timestamp": "1/1/17",
+    "Rank": "8",
+    "Frequency": "171",
+    "Rank Change": "0",
+    "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
+  },
+  {
+    "Head": "10",
+    "year": "2018",
+    "Name": "Head",
+    "Timestamp": "1/1/18",
+    "Rank": "10",
+    "Frequency": "141",
+    "Rank Change": "-2",
+    "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
+  },
+  {
+    "Head": "8",
+    "year": "2019",
+    "Name": "Head",
+    "Timestamp": "1/1/19",
+    "Rank": "8",
+    "Frequency": "152",
+    "Rank Change": "2",
+    "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
+  },
+  {
+    "Head": "8",
+    "year": "2020",
+    "Name": "Head",
+    "Timestamp": "1/1/20",
+    "Rank": "8",
+    "Frequency": "199",
+    "Rank Change": "0",
+    "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
+  }
+]

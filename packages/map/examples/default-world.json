@@ -1,1497 +1,1500 @@
 {
-	"defaultData": true,
-	"general": {
-		"title": "Default World Map",
-		"subtext": "",
-		"type": "bubble",
-		"geoType": "world",
-		"headerColor": "theme-blue",
-		"geoBorderColor": "darkGray",
-		"showSidebar": true,
-		"showTitle": true,
-		"showDownloadButton": true,
-		"expandDataTable": true,
-		"equalNumberOptIn": true
-	},
-	"color": "pinkpurple",
-	"columns": {
-		"geo": {
-			"name": "Country",
-			"label": "Location",
-			"tooltip": false,
-			"dataTable": true
-		},
-		"primary": {
-			"name": "Data",
-			"label": "Data Label",
-			"prefix": "",
-			"suffix": "%",
-			"dataTable": true,
-			"tooltip": true
-		},
-		"navigate": {
-			"name": "Link",
-			"tooltip": false,
-			"dataTable": false
-		}
-	},
-	"legend": {
-		"numberOfItems": 3,
-		"position": "side",
-		"title": "Legend Title",
-		"description": "Legend Text",
-		"type": "equalnumber",
-		"specialClasses": ["N/A"],
-		"separateZero": true
-	},
-	"data": [
-		{
-			"Country": "Atlanta",
-			"Data": 10,
-			"Link": "",
-			"Sample Categories": "Category 1",
-			"Regions": "North America"
-		},
-		{
-			"Country": "Aruba",
-			"Data": 0,
-			"Link": "",
-			"Sample Categories": "Category 1",
-			"Regions": "North America"
-		},
-		{
-			"Country": "Afghanistan",
-			"Data": 59,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Angola",
-			"Data": 65,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Anguilla",
-			"Data": 15,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Albania",
-			"Data": 73,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Åland",
-			"Data": 99,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Andorra",
-			"Data": 75,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "United Arab Emirates",
-			"Data": 62,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Argentina",
-			"Data": 65,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Armenia",
-			"Data": 23,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "American Samoa",
-			"Data": 48,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Ashmore and Cartier Is.",
-			"Data": 22,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Fr. S. Antarctic Lands",
-			"Data": 65,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Antigua and Barb.",
-			"Data": 91,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Australia",
-			"Data": 57,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Austria",
-			"Data": 64,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Azerbaijan",
-			"Data": 60,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Burundi",
-			"Data": 95,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Belgium",
-			"Data": 88,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Benin",
-			"Data": 1,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Burkina Faso",
-			"Data": 29,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Bangladesh",
-			"Data": 46,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Bulgaria",
-			"Data": 85,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Bahrain",
-			"Data": 63,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Bahamas",
-			"Data": 38,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Bosnia and Herz.",
-			"Data": 69,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "St-Barthélemy",
-			"Data": 37,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Belarus",
-			"Data": 35,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Belize",
-			"Data": 52,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Bermuda",
-			"Data": 29,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Bolivia",
-			"Data": 20,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Brazil",
-			"Data": 33,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Barbados",
-			"Data": 12,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Brunei",
-			"Data": 73,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Bhutan",
-			"Data": 2,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Botswana",
-			"Data": 11,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Central African Rep.",
-			"Data": 55,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Canada",
-			"Data": 14,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Switzerland",
-			"Data": 89,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Chile",
-			"Data": 21,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "China",
-			"Data": 70,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Côte d'Ivoire",
-			"Data": 84,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Cameroon",
-			"Data": 65,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Dem. Rep. Congo",
-			"Data": 97,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Congo",
-			"Data": 45,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Cook Is.",
-			"Data": 5,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Colombia",
-			"Data": 92,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Comoros",
-			"Data": 65,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Cabo Verde",
-			"Data": 63,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Costa Rica",
-			"Data": 21,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Cuba",
-			"Data": 0,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Curaçao",
-			"Data": 64,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Cayman Is.",
-			"Data": 56,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "N. Cyprus",
-			"Data": 78,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Cyprus",
-			"Data": 74,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Czechia",
-			"Data": 26,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Germany",
-			"Data": 31,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Djibouti",
-			"Data": 22,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Dominica",
-			"Data": 2,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Denmark",
-			"Data": 51,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Dominican Rep.",
-			"Data": 84,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Algeria",
-			"Data": 58,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Ecuador",
-			"Data": 52,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Egypt",
-			"Data": 29,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Eritrea",
-			"Data": 70,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Spain",
-			"Data": 9,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Estonia",
-			"Data": 13,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Ethiopia",
-			"Data": 17,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Finland",
-			"Data": 9,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Fiji",
-			"Data": 7,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Falkland Is.",
-			"Data": 18,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "France",
-			"Data": 73,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Faeroe Is.",
-			"Data": 60,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Micronesia",
-			"Data": 73,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Gabon",
-			"Data": 72,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "United Kingdom",
-			"Data": 5,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Georgia",
-			"Data": 69,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Guernsey",
-			"Data": 2,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Ghana",
-			"Data": 71,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Guinea",
-			"Data": 32,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Gambia",
-			"Data": 39,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Guinea-Bissau",
-			"Data": 48,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Eq. Guinea",
-			"Data": 74,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Greece",
-			"Data": 17,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Grenada",
-			"Data": 37,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Greenland",
-			"Data": 15,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Guatemala",
-			"Data": 42,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Guam",
-			"Data": 17,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Guyana",
-			"Data": 11,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Hong Kong",
-			"Data": 49,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Heard I. and McDonald Is.",
-			"Data": 32,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Honduras",
-			"Data": 27,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Croatia",
-			"Data": 41,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Haiti",
-			"Data": 33,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Hungary",
-			"Data": 41,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Indonesia",
-			"Data": 4,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Isle of Man",
-			"Data": 63,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "India",
-			"Data": 18,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Indian Ocean Ter.",
-			"Data": 32,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Br. Indian Ocean Ter.",
-			"Data": 66,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Ireland",
-			"Data": 36,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Iran",
-			"Data": 36,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Iraq",
-			"Data": 0,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Iceland",
-			"Data": 85,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Israel",
-			"Data": 75,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Italy",
-			"Data": 0,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Jamaica",
-			"Data": 85,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Jersey",
-			"Data": 99,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Jordan",
-			"Data": 51,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Japan",
-			"Data": 61,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Siachen Glacier",
-			"Data": 5,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Kazakhstan",
-			"Data": 0,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Kenya",
-			"Data": 73,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Kyrgyzstan",
-			"Data": 15,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Cambodia",
-			"Data": 43,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Kiribati",
-			"Data": 16,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "St. Kitts and Nevis",
-			"Data": 85,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "South Korea",
-			"Data": 60,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Kosovo",
-			"Data": 97,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Kuwait",
-			"Data": 31,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Laos",
-			"Data": 8,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Lebanon",
-			"Data": 86,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Liberia",
-			"Data": 58,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Libya",
-			"Data": 87,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Saint Lucia",
-			"Data": 67,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Liechtenstein",
-			"Data": 60,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Sri Lanka",
-			"Data": 55,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Lesotho",
-			"Data": 56,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Lithuania",
-			"Data": 31,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Luxembourg",
-			"Data": 63,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Latvia",
-			"Data": 44,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Macao",
-			"Data": 69,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "St-Martin",
-			"Data": 81,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Morocco",
-			"Data": 69,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Monaco",
-			"Data": 8,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Moldova",
-			"Data": 89,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Madagascar",
-			"Data": 1,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Maldives",
-			"Data": 50,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Mexico",
-			"Data": 1,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Marshall Is.",
-			"Data": 26,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Macedonia",
-			"Data": 61,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Mali",
-			"Data": 45,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Malta",
-			"Data": 89,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Myanmar",
-			"Data": 82,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Montenegro",
-			"Data": 72,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Mongolia",
-			"Data": 51,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "N. Mariana Is.",
-			"Data": 22,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Mozambique",
-			"Data": 20,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Mauritania",
-			"Data": 40,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Montserrat",
-			"Data": 3,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Mauritius",
-			"Data": 2,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Malawi",
-			"Data": 26,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Malaysia",
-			"Data": 89,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Namibia",
-			"Data": 70,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "New Caledonia",
-			"Data": 93,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Niger",
-			"Data": 21,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Norfolk Island",
-			"Data": 5,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Nigeria",
-			"Data": 43,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Nicaragua",
-			"Data": 23,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Niue",
-			"Data": 17,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Netherlands",
-			"Data": 11,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Norway",
-			"Data": 47,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Nepal",
-			"Data": 4,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Nauru",
-			"Data": 21,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "New Zealand",
-			"Data": 4,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Oman",
-			"Data": 65,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Pakistan",
-			"Data": 85,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Panama",
-			"Data": 66,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Pitcairn Is.",
-			"Data": 89,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Peru",
-			"Data": 16,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Philippines",
-			"Data": 49,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Palau",
-			"Data": 37,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Papua New Guinea",
-			"Data": 1,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Poland",
-			"Data": 14,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Puerto Rico",
-			"Data": 62,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "North Korea",
-			"Data": 92,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Portugal",
-			"Data": 77,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Paraguay",
-			"Data": 19,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Palestine",
-			"Data": 28,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Fr. Polynesia",
-			"Data": 69,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Qatar",
-			"Data": 40,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "Romania",
-			"Data": 51,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Russia",
-			"Data": 13,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Rwanda",
-			"Data": 91,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "W. Sahara",
-			"Data": 64,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "Saudi Arabia",
-			"Data": 90,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "Sudan",
-			"Data": 58,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "S. Sudan",
-			"Data": 93,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Senegal",
-			"Data": 15,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "Singapore",
-			"Data": 80,
-			"Link": "",
-			"Sample Categories": "Category 1"
-		},
-		{
-			"Country": "S. Geo. and the Is.",
-			"Data": 90,
-			"Link": "",
-			"Sample Categories": "Category 2"
-		},
-		{
-			"Country": "Saint Helena",
-			"Data": 49,
-			"Link": "",
-			"Sample Categories": "Category 3"
-		},
-		{
-			"Country": "Solomon Is.",
-			"Data": 77,
-			"Link": "",
-			"Sample Categories": "Category 4"
-		},
-		{
-			"Country": "Sierra Leone",
-			"Data": 33,
-			"Link": "",
-			"Sample Categories": "Category 5"
-		},
-		{
-			"Country": "El Salvador",
-			"Data": 18,
-			"Link": "",
-			"Sample Categories": "Category 6"
-		},
-		{
-			"Country": "San Marino",
-			"Data": 42,
-			"Link": "",
-			"Sample Categories": "Category 7"
-		},
-		{
-			"Country": "Somaliland",
-			"Data": 52,
-			"Link": "",
-			"Sample Categories": "Category 8"
-		},
-		{
-			"Country": "Somalia",
-			"Data": 68,
-			"Link": "",
-			"Sample Categories": "Category 9"
-		},
-		{
-			"Country": "St. Pierre and Miquelon",
-			"Data": 12,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Serbia",
-			"Data": 12,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "São Tomé and Principe",
-			"Data": 50,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Suriname",
-			"Data": 54,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Slovakia",
-			"Data": 1,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Slovenia",
-			"Data": 77,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Sweden",
-			"Data": 77,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Swaziland",
-			"Data": 48,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Sint Maarten",
-			"Data": 75,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Seychelles",
-			"Data": 73,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Syria",
-			"Data": 69,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Turks and Caicos Is.",
-			"Data": 73,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Chad",
-			"Data": 16,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Togo",
-			"Data": 83,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Thailand",
-			"Data": 84,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Tajikistan",
-			"Data": 55,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Turkmenistan",
-			"Data": 59,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Timor-Leste",
-			"Data": 45,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Tonga",
-			"Data": 43,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Trinidad and Tobago",
-			"Data": 22,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Tunisia",
-			"Data": 93,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Turkey",
-			"Data": 54,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Taiwan",
-			"Data": 26,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Tanzania",
-			"Data": 54,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Uganda",
-			"Data": 55,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Ukraine",
-			"Data": 57,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Uruguay",
-			"Data": 15,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "United States of America",
-			"Data": 45,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Uzbekistan",
-			"Data": 96,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Vatican",
-			"Data": 87,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "St. Vin. and Gren.",
-			"Data": 12,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Venezuela",
-			"Data": 61,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "British Virgin Is.",
-			"Data": 91,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "U.S. Virgin Is.",
-			"Data": 27,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Vietnam",
-			"Data": 82,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Vanuatu",
-			"Data": 56,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Wallis and Futuna Is.",
-			"Data": 76,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Samoa",
-			"Data": 4,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Yemen",
-			"Data": 39,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "South Africa",
-			"Data": 24,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Zambia",
-			"Data": 38,
-			"Link": "",
-			"Sample Categories": ""
-		},
-		{
-			"Country": "Zimbabwe",
-			"Data": 35,
-			"Link": "https://cdc.gov/",
-			"Sample Categories": ""
-		}
-	]
+  "defaultData": true,
+  "type": "map",
+  "general": {
+    "title": "Default World Map",
+    "subtext": "",
+    "type": "bubble",
+    "geoType": "world",
+    "headerColor": "theme-blue",
+    "geoBorderColor": "darkGray",
+    "showSidebar": true,
+    "showTitle": true,
+    "showDownloadButton": true,
+    "expandDataTable": true,
+    "equalNumberOptIn": true
+  },
+  "color": "pinkpurple",
+  "columns": {
+    "geo": {
+      "name": "Country",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "name": "Data",
+      "label": "Data Label",
+      "prefix": "",
+      "suffix": "%",
+      "dataTable": true,
+      "tooltip": true
+    },
+    "navigate": {
+      "name": "Link",
+      "tooltip": false,
+      "dataTable": false
+    }
+  },
+  "legend": {
+    "numberOfItems": 3,
+    "position": "side",
+    "title": "Legend Title",
+    "description": "Legend Text",
+    "type": "equalnumber",
+    "specialClasses": [
+      "N/A"
+    ],
+    "separateZero": true
+  },
+  "data": [
+    {
+      "Country": "Atlanta",
+      "Data": 10,
+      "Link": "",
+      "Sample Categories": "Category 1",
+      "Regions": "North America"
+    },
+    {
+      "Country": "Aruba",
+      "Data": 0,
+      "Link": "",
+      "Sample Categories": "Category 1",
+      "Regions": "North America"
+    },
+    {
+      "Country": "Afghanistan",
+      "Data": 59,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Angola",
+      "Data": 65,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Anguilla",
+      "Data": 15,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Albania",
+      "Data": 73,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Åland",
+      "Data": 99,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Andorra",
+      "Data": 75,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "United Arab Emirates",
+      "Data": 62,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Argentina",
+      "Data": 65,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Armenia",
+      "Data": 23,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "American Samoa",
+      "Data": 48,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Ashmore and Cartier Is.",
+      "Data": 22,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Fr. S. Antarctic Lands",
+      "Data": 65,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Antigua and Barb.",
+      "Data": 91,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Australia",
+      "Data": 57,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Austria",
+      "Data": 64,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Azerbaijan",
+      "Data": 60,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Burundi",
+      "Data": 95,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Belgium",
+      "Data": 88,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Benin",
+      "Data": 1,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Burkina Faso",
+      "Data": 29,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Bangladesh",
+      "Data": 46,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Bulgaria",
+      "Data": 85,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Bahrain",
+      "Data": 63,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Bahamas",
+      "Data": 38,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Bosnia and Herz.",
+      "Data": 69,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "St-Barthélemy",
+      "Data": 37,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Belarus",
+      "Data": 35,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Belize",
+      "Data": 52,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Bermuda",
+      "Data": 29,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Bolivia",
+      "Data": 20,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Brazil",
+      "Data": 33,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Barbados",
+      "Data": 12,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Brunei",
+      "Data": 73,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Bhutan",
+      "Data": 2,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Botswana",
+      "Data": 11,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Central African Rep.",
+      "Data": 55,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Canada",
+      "Data": 14,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Switzerland",
+      "Data": 89,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Chile",
+      "Data": 21,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "China",
+      "Data": 70,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Côte d'Ivoire",
+      "Data": 84,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Cameroon",
+      "Data": 65,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Dem. Rep. Congo",
+      "Data": 97,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Congo",
+      "Data": 45,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Cook Is.",
+      "Data": 5,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Colombia",
+      "Data": 92,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Comoros",
+      "Data": 65,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Cabo Verde",
+      "Data": 63,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Costa Rica",
+      "Data": 21,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Cuba",
+      "Data": 0,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Curaçao",
+      "Data": 64,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Cayman Is.",
+      "Data": 56,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "N. Cyprus",
+      "Data": 78,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Cyprus",
+      "Data": 74,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Czechia",
+      "Data": 26,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Germany",
+      "Data": 31,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Djibouti",
+      "Data": 22,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Dominica",
+      "Data": 2,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Denmark",
+      "Data": 51,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Dominican Rep.",
+      "Data": 84,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Algeria",
+      "Data": 58,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Ecuador",
+      "Data": 52,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Egypt",
+      "Data": 29,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Eritrea",
+      "Data": 70,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Spain",
+      "Data": 9,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Estonia",
+      "Data": 13,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Ethiopia",
+      "Data": 17,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Finland",
+      "Data": 9,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Fiji",
+      "Data": 7,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Falkland Is.",
+      "Data": 18,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "France",
+      "Data": 73,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Faeroe Is.",
+      "Data": 60,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Micronesia",
+      "Data": 73,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Gabon",
+      "Data": 72,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "United Kingdom",
+      "Data": 5,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Georgia",
+      "Data": 69,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Guernsey",
+      "Data": 2,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Ghana",
+      "Data": 71,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Guinea",
+      "Data": 32,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Gambia",
+      "Data": 39,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Guinea-Bissau",
+      "Data": 48,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Eq. Guinea",
+      "Data": 74,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Greece",
+      "Data": 17,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Grenada",
+      "Data": 37,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Greenland",
+      "Data": 15,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Guatemala",
+      "Data": 42,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Guam",
+      "Data": 17,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Guyana",
+      "Data": 11,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Hong Kong",
+      "Data": 49,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Heard I. and McDonald Is.",
+      "Data": 32,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Honduras",
+      "Data": 27,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Croatia",
+      "Data": 41,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Haiti",
+      "Data": 33,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Hungary",
+      "Data": 41,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Indonesia",
+      "Data": 4,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Isle of Man",
+      "Data": 63,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "India",
+      "Data": 18,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Indian Ocean Ter.",
+      "Data": 32,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Br. Indian Ocean Ter.",
+      "Data": 66,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Ireland",
+      "Data": 36,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Iran",
+      "Data": 36,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Iraq",
+      "Data": 0,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Iceland",
+      "Data": 85,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Israel",
+      "Data": 75,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Italy",
+      "Data": 0,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Jamaica",
+      "Data": 85,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Jersey",
+      "Data": 99,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Jordan",
+      "Data": 51,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Japan",
+      "Data": 61,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Siachen Glacier",
+      "Data": 5,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Kazakhstan",
+      "Data": 0,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Kenya",
+      "Data": 73,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Kyrgyzstan",
+      "Data": 15,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Cambodia",
+      "Data": 43,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Kiribati",
+      "Data": 16,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "St. Kitts and Nevis",
+      "Data": 85,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "South Korea",
+      "Data": 60,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Kosovo",
+      "Data": 97,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Kuwait",
+      "Data": 31,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Laos",
+      "Data": 8,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Lebanon",
+      "Data": 86,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Liberia",
+      "Data": 58,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Libya",
+      "Data": 87,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Saint Lucia",
+      "Data": 67,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Liechtenstein",
+      "Data": 60,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Sri Lanka",
+      "Data": 55,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Lesotho",
+      "Data": 56,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Lithuania",
+      "Data": 31,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Luxembourg",
+      "Data": 63,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Latvia",
+      "Data": 44,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Macao",
+      "Data": 69,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "St-Martin",
+      "Data": 81,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Morocco",
+      "Data": 69,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Monaco",
+      "Data": 8,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Moldova",
+      "Data": 89,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Madagascar",
+      "Data": 1,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Maldives",
+      "Data": 50,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Mexico",
+      "Data": 1,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Marshall Is.",
+      "Data": 26,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Macedonia",
+      "Data": 61,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Mali",
+      "Data": 45,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Malta",
+      "Data": 89,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Myanmar",
+      "Data": 82,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Montenegro",
+      "Data": 72,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Mongolia",
+      "Data": 51,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "N. Mariana Is.",
+      "Data": 22,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Mozambique",
+      "Data": 20,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Mauritania",
+      "Data": 40,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Montserrat",
+      "Data": 3,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Mauritius",
+      "Data": 2,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Malawi",
+      "Data": 26,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Malaysia",
+      "Data": 89,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Namibia",
+      "Data": 70,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "New Caledonia",
+      "Data": 93,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Niger",
+      "Data": 21,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Norfolk Island",
+      "Data": 5,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Nigeria",
+      "Data": 43,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Nicaragua",
+      "Data": 23,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Niue",
+      "Data": 17,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Netherlands",
+      "Data": 11,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Norway",
+      "Data": 47,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Nepal",
+      "Data": 4,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Nauru",
+      "Data": 21,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "New Zealand",
+      "Data": 4,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Oman",
+      "Data": 65,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Pakistan",
+      "Data": 85,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Panama",
+      "Data": 66,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Pitcairn Is.",
+      "Data": 89,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Peru",
+      "Data": 16,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Philippines",
+      "Data": 49,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Palau",
+      "Data": 37,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Papua New Guinea",
+      "Data": 1,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Poland",
+      "Data": 14,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Puerto Rico",
+      "Data": 62,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "North Korea",
+      "Data": 92,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Portugal",
+      "Data": 77,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Paraguay",
+      "Data": 19,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Palestine",
+      "Data": 28,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Fr. Polynesia",
+      "Data": 69,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Qatar",
+      "Data": 40,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "Romania",
+      "Data": 51,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Russia",
+      "Data": 13,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Rwanda",
+      "Data": 91,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "W. Sahara",
+      "Data": 64,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "Saudi Arabia",
+      "Data": 90,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "Sudan",
+      "Data": 58,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "S. Sudan",
+      "Data": 93,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Senegal",
+      "Data": 15,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "Singapore",
+      "Data": 80,
+      "Link": "",
+      "Sample Categories": "Category 1"
+    },
+    {
+      "Country": "S. Geo. and the Is.",
+      "Data": 90,
+      "Link": "",
+      "Sample Categories": "Category 2"
+    },
+    {
+      "Country": "Saint Helena",
+      "Data": 49,
+      "Link": "",
+      "Sample Categories": "Category 3"
+    },
+    {
+      "Country": "Solomon Is.",
+      "Data": 77,
+      "Link": "",
+      "Sample Categories": "Category 4"
+    },
+    {
+      "Country": "Sierra Leone",
+      "Data": 33,
+      "Link": "",
+      "Sample Categories": "Category 5"
+    },
+    {
+      "Country": "El Salvador",
+      "Data": 18,
+      "Link": "",
+      "Sample Categories": "Category 6"
+    },
+    {
+      "Country": "San Marino",
+      "Data": 42,
+      "Link": "",
+      "Sample Categories": "Category 7"
+    },
+    {
+      "Country": "Somaliland",
+      "Data": 52,
+      "Link": "",
+      "Sample Categories": "Category 8"
+    },
+    {
+      "Country": "Somalia",
+      "Data": 68,
+      "Link": "",
+      "Sample Categories": "Category 9"
+    },
+    {
+      "Country": "St. Pierre and Miquelon",
+      "Data": 12,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Serbia",
+      "Data": 12,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "São Tomé and Principe",
+      "Data": 50,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Suriname",
+      "Data": 54,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Slovakia",
+      "Data": 1,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Slovenia",
+      "Data": 77,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Sweden",
+      "Data": 77,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Swaziland",
+      "Data": 48,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Sint Maarten",
+      "Data": 75,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Seychelles",
+      "Data": 73,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Syria",
+      "Data": 69,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Turks and Caicos Is.",
+      "Data": 73,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Chad",
+      "Data": 16,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Togo",
+      "Data": 83,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Thailand",
+      "Data": 84,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Tajikistan",
+      "Data": 55,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Turkmenistan",
+      "Data": 59,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Timor-Leste",
+      "Data": 45,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Tonga",
+      "Data": 43,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Trinidad and Tobago",
+      "Data": 22,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Tunisia",
+      "Data": 93,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Turkey",
+      "Data": 54,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Taiwan",
+      "Data": 26,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Tanzania",
+      "Data": 54,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Uganda",
+      "Data": 55,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Ukraine",
+      "Data": 57,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Uruguay",
+      "Data": 15,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "United States of America",
+      "Data": 45,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Uzbekistan",
+      "Data": 96,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Vatican",
+      "Data": 87,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "St. Vin. and Gren.",
+      "Data": 12,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Venezuela",
+      "Data": 61,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "British Virgin Is.",
+      "Data": 91,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "U.S. Virgin Is.",
+      "Data": 27,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Vietnam",
+      "Data": 82,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Vanuatu",
+      "Data": 56,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Wallis and Futuna Is.",
+      "Data": 76,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Samoa",
+      "Data": 4,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Yemen",
+      "Data": 39,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "South Africa",
+      "Data": 24,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Zambia",
+      "Data": 38,
+      "Link": "",
+      "Sample Categories": ""
+    },
+    {
+      "Country": "Zimbabwe",
+      "Data": 35,
+      "Link": "https://cdc.gov/",
+      "Sample Categories": ""
+    }
+  ]
 }
