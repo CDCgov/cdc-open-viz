@@ -53,15 +53,15 @@ export type Legend = {
   hide: boolean
   highlightOnHover: boolean
   label: string
-  lineMode: boolean
   position: string
   reverseLabelOrder: boolean
   singleRow: boolean
   type: string
   verticalSorted: boolean
-  style:'circles'|'boxes'|'gradient'
+  style:'circles'|'boxes'|'gradient'|'lines'
   subStyle:'linear blocks'|'smooth'
   hideSuppressedLabels:boolean
+  hasBorder:boolean
 }
 
 type Visual = {

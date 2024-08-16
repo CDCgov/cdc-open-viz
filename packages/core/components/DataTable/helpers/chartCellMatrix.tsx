@@ -1,4 +1,4 @@
-import LegendCircle from '@cdc/core/components/LegendCircle'
+import LegendCircle from '../../LegendCircle'
 import { customSort } from './customSort'
 import { getSeriesName } from './getSeriesName'
 import { DataTableProps } from '../DataTable'

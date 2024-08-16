@@ -7,6 +7,7 @@ import { createFormatLabels } from './helpers/createFormatLabels'
 const Legend = forwardRef((props, ref) => {
   // prettier-ignore
   const {
+    // prettier-ignore
     config,
     colorScale,
     seriesHighlight,
@@ -14,7 +15,8 @@ const Legend = forwardRef((props, ref) => {
     tableData,
     highlightReset,
     transformedData: data,
-    currentViewport
+    currentViewport,
+    dimensions
   } = useContext(ConfigContext)
 
   if (!config.legend) return null
@@ -24,7 +26,7 @@ const Legend = forwardRef((props, ref) => {
 
   return (
     !['Box Plot', 'Pie'].includes(config.visualizationType) && (
-      <LegendComponent ref={ref} skipId={props.skipId || 'legend'} config={config} colorScale={colorScale} seriesHighlight={seriesHighlight} highlight={highlight} highlightReset={highlightReset} currentViewport={currentViewport} formatLabels={createLegendLabels} />
+      <LegendComponent dimensions={dimensions} ref={ref} skipId={props.skipId || 'legend'} config={config} colorScale={colorScale} seriesHighlight={seriesHighlight} highlight={highlight} highlightReset={highlightReset} currentViewport={currentViewport} formatLabels={createLegendLabels} />
     )
   )
 })

@@ -8,10 +8,18 @@ export default function useLegendClasses(config) {
   }
   if (config.legend.position === 'bottom') {
     containerClasses.push('bottom')
+    innerClasses.push('double-column')
+    if (!config.legend.hasBorder) containerClasses.push('no-border')
     innerClasses.push('bottom')
   }
+  if (config.legend.position === 'top') {
+    containerClasses.push('top')
+    innerClasses.push('double-column')
+    if (!config.legend.hasBorder) containerClasses.push('no-border')
+    innerClasses.push('top')
+  }
 
-  if (config.legend.position === 'bottom' && config.legend.singleRow) {
+  if (['bottom', 'top'].includes(config.legend.position) && config.legend.singleRow) {
     innerClasses.push('single-row')
   }
 
@@ -20,10 +28,15 @@ export default function useLegendClasses(config) {
     innerClasses.push('d-flex')
     innerClasses.push('flex-column-reverse')
   }
-  if (config.legend.position === 'bottom' && config.legend.verticalSorted) {
+  if (['bottom', 'top'].includes(config.legend.position) && config.legend.verticalSorted) {
     innerClasses.push('vertical-sorted')
   }
-
+  if (config.legend.style === 'gradient') {
+    innerClasses.push('gradient')
+    containerClasses.push('gradient')
+    innerClasses.push('single-row')
+    innerClasses = innerClasses.filter(className => className !== 'double-column')
+  }
   return {
     containerClasses,
     innerClasses
