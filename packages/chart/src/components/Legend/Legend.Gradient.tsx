@@ -2,6 +2,7 @@ import { ChartConfig } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
+import { getGradientLegendWidth } from './helpers'
 
 interface GradientProps {
   colorScale: ColorScale
@@ -9,37 +10,24 @@ interface GradientProps {
   dimensions: [string, string]
   currentViewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   getTextWidth: (text: string, font: string) => string
+  formatLabels: (a: any) => object[]
 }
 
-const LegendGradient: React.FC<GradientProps> = ({ colorScale, config, dimensions, currentViewport, getTextWidth }) => {
+const LegendGradient: React.FC<GradientProps> = ({ colorScale, config, dimensions, currentViewport, getTextWidth, formatLabels }) => {
   const [chartWidth] = dimensions
-  const getLegendWidth = () => {
-    let newWidth = Number(chartWidth)
-    switch (currentViewport) {
-      case 'lg':
-        newWidth = newWidth / 3
-        break
-      case 'md':
-        newWidth = newWidth / 2
-        break
-      case 'sm':
-        newWidth = newWidth / 1.3
-        break
-      case 'xs':
-        newWidth = newWidth / 1.1
-        break
-      case 'xxs':
-        newWidth = newWidth
-        break
-      default:
-        return newWidth
+  let lll = [
+    {
+      datum: 'Data 2',
+      index: 0,
+      text: 'Data 2',
+      value: '#A6CEE3'
     }
-    return newWidth
-  }
-  const width = getLegendWidth()
-  const colors = colorScale?.range() ?? []
+  ]
+
+  const width = getGradientLegendWidth(chartWidth, currentViewport)
+  const colors = config.legend.colorCode ? formatLabels(lll).map(label => label?.value) : colorScale?.range() ?? []
   const numTicks = colors?.length
-  const keys = colorScale?.domain() ?? []
+  const keys = config.legend.colorCode ? formatLabels(lll).map(label => label?.text || label?.datum) : colorScale?.domain() ?? []
   const longestKeyName = keys.reduce((a, b) => (a.length > b.length ? a : b))
   const boxHeight = 20
   let height = 50
@@ -75,7 +63,10 @@ const LegendGradient: React.FC<GradientProps> = ({ colorScale, config, dimension
     )
   })
 
-  if (config.legend.position === 'right' || config.legend.position === 'left') {
+  if (config.legend.position === 'right' || config.legend.position === 'left' || !config.legend.position) {
+    return <> </>
+  }
+  if (config.visualizationType !== 'Bar' || !config.legend.position) {
     return <> </>
   }
 

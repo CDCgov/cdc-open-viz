@@ -2,7 +2,6 @@ import { useContext, forwardRef, Fragment } from 'react'
 import ConfigContext from '../../ConfigContext'
 import LegendComponent from './Legend.Component'
 import { createFormatLabels } from './helpers/createFormatLabels'
-import LegendGradient from './Legend.Gradient'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const Legend = forwardRef((props, ref) => {
@@ -20,7 +19,6 @@ const Legend = forwardRef((props, ref) => {
     dimensions,
     getTextWidth
   } = useContext(ConfigContext)
-
   if (!config.legend) return null
   // create fn to reverse labels while legend is Bottom.  Legend-right , legend-left works by default.
 

@@ -2707,7 +2707,7 @@ const EditorPanel = () => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <Select value={config.legend?.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom', 'top']} />
-                  {(config.legend.position === 'left' || config.legend.position === 'right') && config.legend.style === 'gradient' && <span style={{ color: 'red', fontSize: '14px' }}>Position must be set to top or bottom to use gradient style.</span>}
+                  {(config.legend.position === 'left' || config.legend.position === 'right' || !config.legend.position) && config.legend.style === 'gradient' && <span style={{ color: 'red', fontSize: '14px' }}>Position must be set to top or bottom to use gradient style.</span>}
 
                   <Select
                     tooltip={
@@ -2730,7 +2730,7 @@ const EditorPanel = () => {
                   />
 
                   <Select display={!config.legend.hide && config.legend.style === 'gradient'} value={config.legend.subStyle} section='legend' fieldName='subStyle' label='Gradient Style' updateField={updateField} options={getLegendStyloptions('subStyle')} />
-                  <TextField display={config.legend.style === 'gradient'} className='number-narrow' type='number' value={config.legend.tickRotation} section='legend' fieldName='tickRotation' label='Tick Rotation (Degrees)' updateField={updateField} />
+                  <TextField display={config.legend.style === 'gradient' && !config.legend.hide} className='number-narrow' type='number' value={config.legend.tickRotation} section='legend' fieldName='tickRotation' label='Tick Rotation (Degrees)' updateField={updateField} />
 
                   {/* <fieldset className="checkbox-group">
                     <CheckBox value={config.legend.dynamicLegend} section="legend" fieldName="dynamicLegend" label="Dynamic Legend" updateField={updateField}/>

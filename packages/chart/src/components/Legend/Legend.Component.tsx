@@ -41,15 +41,13 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
   }
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
-
   let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
-
   if (!legend) return null
   return (
     <aside ref={ref} style={legendClasses} id={skipId || 'legend'} className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
       {legend.label && <h3>{parse(legend.label)}</h3>}
       {legend.description && <p>{parse(legend.description)}</p>}
-      <LegendGradient getTextWidth={getTextWidth} config={config} colorScale={colorScale} dimensions={dimensions} currentViewport={currentViewport} />
+      <LegendGradient formatLabels={formatLabels} getTextWidth={getTextWidth} config={config} colorScale={colorScale} dimensions={dimensions} currentViewport={currentViewport} />
 
       <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
         {labels => {
