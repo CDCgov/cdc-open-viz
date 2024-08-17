@@ -25,15 +25,15 @@ export interface LegendProps {
   seriesHighlight: string[]
   skipId: string
   dimensions: [string, string]
+  getTextWidth: (text: string, font: string) => string
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
-const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHighlight, highlight, highlightReset, currentViewport, formatLabels, skipId = 'legend', dimensions }, ref) => {
+const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHighlight, highlight, highlightReset, currentViewport, formatLabels, skipId = 'legend', dimensions, getTextWidth }, ref) => {
   const { innerClasses, containerClasses } = useLegendClasses(config)
   const { runtime, legend } = config
 
-  if (!legend) return null
-  const isBottomOrSmallViewport = legend?.position === 'bottom' || (['sm', 'xs', 'xxs'].includes(currentViewport) && !legend.hide)
+  const isBottomOrSmallViewport = legend?.position === 'bottom' || legend?.position === 'top' || (['sm', 'xs', 'xxs'].includes(currentViewport) && !legend.hide)
 
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
@@ -44,10 +44,12 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
 
   let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
 
+  if (!legend) return null
   return (
     <aside ref={ref} style={legendClasses} id={skipId || 'legend'} className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
       {legend.label && <h3>{parse(legend.label)}</h3>}
       {legend.description && <p>{parse(legend.description)}</p>}
+      <LegendGradient getTextWidth={getTextWidth} config={config} colorScale={colorScale} dimensions={dimensions} currentViewport={currentViewport} />
 
       <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
         {labels => {
@@ -78,7 +80,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                   if (config.legend.style === 'gradient') {
                     className.push('gradient')
                   }
-                  if (config.legend.position === 'top' && config.legend.style === 'gradient') {
+                  if (config.legend.style === 'gradient') {
                     return <></>
                   }
 
@@ -178,7 +180,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                   ((config.visualizationType === 'Bar' && config.visualizationSubType === 'regular') || config.visualizationType === 'Line' || config.visualizationType === 'Combo') && (
                     <>
                       <hr></hr>
-                      <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
+                      <div className={config.legend.singleRow && isBottomOrSmallViewport ? `legend-container__inner ${config.legend.position} single-row` : ''}>
                         {config?.preliminaryData?.map(
                           (pd, index) =>
                             pd.displayLegend &&
@@ -233,7 +235,6 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
           Reset
         </Button>
       )}
-      {config.legend.style === 'gradient' && <LegendGradient config={config} colorScale={colorScale} dimensions={dimensions} currentViewport={currentViewport} />}
     </aside>
   )
 })

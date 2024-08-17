@@ -784,6 +784,9 @@ const EditorPanel = () => {
       if (config.visualizationType === 'Bar') {
         styles.push('gradient')
       }
+      if (config.visualizationType === 'Line') {
+        styles.push('lines')
+      }
     }
     if (option === 'subStyle') {
       styles.push('linear blocks', 'smooth')
@@ -2703,6 +2706,9 @@ const EditorPanel = () => {
                   <AccordionItemButton>Legend</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  <Select value={config.legend?.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom', 'top']} />
+                  {(config.legend.position === 'left' || config.legend.position === 'right') && config.legend.style === 'gradient' && <span style={{ color: 'red', fontSize: '14px' }}>Position must be set to top or bottom to use gradient style.</span>}
+
                   <Select
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
@@ -2710,7 +2716,7 @@ const EditorPanel = () => {
                           <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p> If using gradient style, limit legend to five items for better visibility on mobile.</p>
+                          <p>If using gradient style, limit the legend to five items for better mobile visibility, and position the legend at the top or bottom.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
@@ -2722,8 +2728,10 @@ const EditorPanel = () => {
                     updateField={updateField}
                     options={getLegendStyloptions('style')}
                   />
-                  <Select display={!config.legend.hide && config.legend.style === 'gradient'} value={config.legend.subStyle} section='legend' fieldName='subStyle' label='Legend Sub Style' updateField={updateField} options={getLegendStyloptions('subStyle')} />
-                  <CheckBox value={config.legend.reverseLabelOrder} section='legend' fieldName='reverseLabelOrder' label='Reverse Labels' updateField={updateField} />
+
+                  <Select display={!config.legend.hide && config.legend.style === 'gradient'} value={config.legend.subStyle} section='legend' fieldName='subStyle' label='Gradient Style' updateField={updateField} options={getLegendStyloptions('subStyle')} />
+                  <TextField display={config.legend.style === 'gradient'} className='number-narrow' type='number' value={config.legend.tickRotation} section='legend' fieldName='tickRotation' label='Tick Rotation (Degrees)' updateField={updateField} />
+
                   {/* <fieldset className="checkbox-group">
                     <CheckBox value={config.legend.dynamicLegend} section="legend" fieldName="dynamicLegend" label="Dynamic Legend" updateField={updateField}/>
                     {config.legend.dynamicLegend && (
@@ -2735,23 +2743,7 @@ const EditorPanel = () => {
                       </>
                     )}
                   </fieldset> */}
-                  <CheckBox
-                    value={config.legend.hide ? true : false}
-                    section='legend'
-                    fieldName='hide'
-                    label='Hide Legend'
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
+
                   <CheckBox
                     display={!config.legend.hide && config.preliminaryData.some(pd => pd.type === 'suppression' && pd.label && pd.symbol)}
                     value={config.legend.hideSuppressedLabels}
@@ -2776,9 +2768,16 @@ const EditorPanel = () => {
                       <TextField type='textarea' value={config.boxplot.legend.howToReadText} updateField={updateField} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
                     </>
                   } */}
-                  {config.visualizationType === 'Line' && <CheckBox value={config.legend.lineMode} section='legend' fieldName='lineMode' label='Show Lined Style Legend' updateField={updateField} />}
+                  <Select
+                    display={config.series?.length > 1}
+                    value={config.legend.behavior}
+                    section='legend'
+                    fieldName='behavior'
+                    label='Legend Behavior (When clicked)'
+                    updateField={(...[section, , fieldName, value]) => updateBehavior(section, fieldName, value)}
+                    options={['highlight', 'isolate']}
+                  />
                   <Select display={visHasLegendColorCategory()} value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
-                  <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={(...[section, , fieldName, value]) => updateBehavior(section, fieldName, value)} options={['highlight', 'isolate']} />
                   {visHasLegendAxisAlign() && <CheckBox value={config.legend.axisAlign} fieldName='axisAlign' section='legend' label='Align to Axis on Isolate' updateField={updateField} />}
                   {config.legend.behavior === 'highlight' && config.tooltips.singleSeries && <CheckBox value={config.legend.highlightOnHover} section='legend' fieldName='highlightOnHover' label='HIGHLIGHT DATA SERIES ON HOVER' updateField={updateField} />}
                   {/* start: isolated values */}
@@ -2848,14 +2847,27 @@ const EditorPanel = () => {
                     </fieldset>
                   )}
                   {/* end: isolated values */}
-
-                  <Select value={config.legend?.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom']} />
-                  {config.legend.position === 'bottom' && (
-                    <>
-                      <CheckBox value={config.legend.singleRow} section='legend' fieldName='singleRow' label='Single Row Legend' updateField={updateField} />
-                      <CheckBox value={config.legend.verticalSorted} section='legend' fieldName='verticalSorted' label='Vertical sorted Legend' updateField={updateField} />
-                    </>
-                  )}
+                  <CheckBox display={!config.legend.hide && config.legend.style !== 'gradient'} value={config.legend.reverseLabelOrder} section='legend' fieldName='reverseLabelOrder' label='Reverse Labels' updateField={updateField} />
+                  <CheckBox display={['bottom', 'top'].includes(config.legend.position) && !config.legend.hide} value={config.legend.hasBorder} section='legend' fieldName='hasBorder' label='Display Border' updateField={updateField} />
+                  <CheckBox value={config.legend.singleRow} section='legend' fieldName='singleRow' label='Single Row Legend' updateField={updateField} />
+                  <CheckBox display={['bottom', 'top'].includes(config.legend.position) && !config.legend.hide && config.legend.style !== 'gradient'} value={config.legend.verticalSorted} section='legend' fieldName='verticalSorted' label='Vertical sorted Legend' updateField={updateField} />
+                  <CheckBox
+                    value={config.legend.hide ? true : false}
+                    section='legend'
+                    fieldName='hide'
+                    label='Hide Legend'
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                   <TextField value={config.legend.label} section='legend' fieldName='label' label='Title' updateField={updateField} />
                   <TextField type='textarea' value={config.legend.description} updateField={updateField} section='legend' fieldName='description' label='Legend Description' />
                 </AccordionItemPanel>

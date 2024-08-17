@@ -62,6 +62,7 @@ export type Legend = {
   subStyle:'linear blocks'|'smooth'
   hideSuppressedLabels:boolean
   hasBorder:boolean
+  tickRotation:string
 }
 
 type Visual = {

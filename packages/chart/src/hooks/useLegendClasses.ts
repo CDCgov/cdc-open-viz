@@ -6,6 +6,7 @@ export default function useLegendClasses(config) {
   if (config.legend.position === 'left') {
     containerClasses.push('left')
   }
+
   if (config.legend.position === 'bottom') {
     containerClasses.push('bottom')
     innerClasses.push('double-column')
@@ -31,10 +32,9 @@ export default function useLegendClasses(config) {
   if (['bottom', 'top'].includes(config.legend.position) && config.legend.verticalSorted) {
     innerClasses.push('vertical-sorted')
   }
-  if (config.legend.style === 'gradient') {
+  if (config.legend.style === 'gradient' && config.legend.position !== 'left' && config.legend.position !== 'right') {
     innerClasses.push('gradient')
     containerClasses.push('gradient')
-    innerClasses.push('single-row')
     innerClasses = innerClasses.filter(className => className !== 'double-column')
   }
   return {

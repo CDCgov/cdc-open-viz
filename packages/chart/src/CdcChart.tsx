@@ -1129,6 +1129,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     const isLegendOnBottom = legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
     const classes = ['chart-container', 'p-relative']
     if (config.legend?.position === 'bottom') classes.push('bottom')
+    if (config.legend?.position === 'top') classes.push('top')
+    if (config.legend?.position === 'left') classes.push('left')
     if (config.legend?.hide) classes.push('legend-hidden')
     if (lineDatapointClass) classes.push(lineDatapointClass)
     if (!config.barHasBorder) classes.push('chart-bar--no-border')

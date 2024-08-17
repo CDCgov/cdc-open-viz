@@ -1,7 +1,8 @@
-import { useContext, forwardRef } from 'react'
+import { useContext, forwardRef, Fragment } from 'react'
 import ConfigContext from '../../ConfigContext'
 import LegendComponent from './Legend.Component'
 import { createFormatLabels } from './helpers/createFormatLabels'
+import LegendGradient from './Legend.Gradient'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const Legend = forwardRef((props, ref) => {
@@ -16,7 +17,8 @@ const Legend = forwardRef((props, ref) => {
     highlightReset,
     transformedData: data,
     currentViewport,
-    dimensions
+    dimensions,
+    getTextWidth
   } = useContext(ConfigContext)
 
   if (!config.legend) return null
@@ -26,7 +28,21 @@ const Legend = forwardRef((props, ref) => {
 
   return (
     !['Box Plot', 'Pie'].includes(config.visualizationType) && (
-      <LegendComponent dimensions={dimensions} ref={ref} skipId={props.skipId || 'legend'} config={config} colorScale={colorScale} seriesHighlight={seriesHighlight} highlight={highlight} highlightReset={highlightReset} currentViewport={currentViewport} formatLabels={createLegendLabels} />
+      <Fragment>
+        <LegendComponent
+          getTextWidth={getTextWidth}
+          dimensions={dimensions}
+          ref={ref}
+          skipId={props.skipId || 'legend'}
+          config={config}
+          colorScale={colorScale}
+          seriesHighlight={seriesHighlight}
+          highlight={highlight}
+          highlightReset={highlightReset}
+          currentViewport={currentViewport}
+          formatLabels={createLegendLabels}
+        />
+      </Fragment>
     )
   )
 })
