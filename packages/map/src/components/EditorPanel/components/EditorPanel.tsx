@@ -382,6 +382,15 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           }
         })
         break
+      case 'legendBorder':
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            displayBorder: value
+          }
+        })
+        break
       case 'handleCityStyle':
         setState({
           ...state,
@@ -2382,6 +2391,19 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     ></input>
                   </label>
                 )}
+                {state.legend.position !== 'side' && (
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={legend.displayBorder}
+                      onChange={event => {
+                        handleEditorChanges('legendBorder', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label'>Display Border</span>
+                  </label>
+                )}
+
                 {'side' === legend.position && (
                   <label className='checkbox'>
                     <input
