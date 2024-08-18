@@ -42,6 +42,7 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import Annotation from './components/Annotations'
 
 // Helpers
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import numberFromString from '@cdc/core/helpers/numberFromString'
@@ -764,19 +765,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const formatTooltipsDate = date => {
     return timeFormat(config.tooltips.dateDisplayFormat)(date)
-  }
-
-  // function calculates the width of given text and its font-size
-  function getTextWidth(text: string, font: string): number | undefined {
-    const canvas = document.createElement('canvas')
-    const context = canvas.getContext('2d')
-    if (!context) {
-      console.error('2d context not found')
-      return
-    }
-    context.font = font || getComputedStyle(document.body).font
-
-    return Math.ceil(context.measureText(text).width)
   }
 
   // Format numeric data based on settings in config OR from passed in settings for Additional Columns

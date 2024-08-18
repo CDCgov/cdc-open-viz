@@ -1,4 +1,4 @@
-import LegendCircle from '../../LegendCircle'
+import LegendShape from '@cdc/core/components/LegendShape'
 import { customSort } from './customSort'
 import { getSeriesName } from './getSeriesName'
 import { DataTableProps } from '../DataTable'
@@ -74,7 +74,7 @@ const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorSc
         config.visualizationType !== 'Pie'
           ? [
               <>
-                {colorScale && colorScale(seriesName) && <LegendCircle viewport={viewport} fill={colorScale(seriesName)} />}
+                {colorScale && colorScale(seriesName) && <LegendShape viewport={viewport} fill={colorScale(seriesName)} />}
                 {seriesName}
               </>
             ]

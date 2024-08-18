@@ -1,6 +1,6 @@
 import parse from 'html-react-parser'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
-import LegendCircle from '@cdc/core/components/LegendCircle'
+import LegendShape from '@cdc/core/components/LegendShape'
 import Button from '@cdc/core/components/elements/Button'
 import useLegendClasses from '../../hooks/useLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
@@ -106,7 +106,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                           </svg>
                         ) : (
                           <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <LegendCircle shape={config.legend.style === 'boxes' ? 'square' : 'circle'} viewport={currentViewport} margin='0' fill={label.value} display={true} />
+                            <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} viewport={currentViewport} margin='0' fill={label.value} display={true} />
                           </div>
                         )}
                       </div>
@@ -144,7 +144,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                         highlight(bar.legendLabel)
                       }}
                     >
-                      <LegendCircle shape={config.legend.style === 'boxes' ? 'square' : 'circle'} style={{ borderRadius: '0px' }} fill='transparent' borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`} />{' '}
+                      <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} style={{ borderRadius: '0px' }} fill='transparent' borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`} />{' '}
                       <LegendLabel align='left' margin='0 0 0 4px'>
                         {bar.legendLabel ? bar.legendLabel : bar.value}
                       </LegendLabel>

@@ -3,7 +3,8 @@ import { forwardRef, useContext } from 'react'
 import parse from 'html-react-parser'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import LegendCircle from '@cdc/core/components/LegendCircle'
+import LegendShape from '@cdc/core/components/LegendShape'
+import LegendGradient from './Legend.gradient'
 import LegendItemHex from './LegendItem.Hex'
 import Button from '@cdc/core/components/elements/Button'
 
@@ -11,18 +12,22 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import ConfigContext from '../../../context'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
+import { type ViewportSize } from '../../../types/MapConfig'
 import { Group } from '@visx/group'
 import './index.scss'
 
 type LegendProps = {
   skipId: string
+  currentViewport: ViewportSize
+  dimensions: any
 }
 
-const Legend = forwardRef((props, ref) => {
-  const { skipId } = props
+const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
+  const { skipId, currentViewport, dimensions } = props
+  let [mapWidth] = dimensions
 
-  // prettier-ignore
   const {
+    // prettier-ignore
     displayDataAsText,
     resetLegendToggles,
     runtimeFilters,
@@ -31,6 +36,7 @@ const Legend = forwardRef((props, ref) => {
     setRuntimeLegend,
     state,
     viewport,
+    getTextWidth
   } = useContext(ConfigContext)
 
   const { legend } = state
@@ -54,10 +60,8 @@ const Legend = forwardRef((props, ref) => {
     setAccessibleStatus(`Disabled legend item ${legendLabel ?? ''}. Please reference the data table to see updated values.`)
   }
 
-  const legendList = () => {
-    let legendItems
-
-    legendItems = runtimeLegend.map((entry, idx) => {
+  const getFormattedLegendItems = () => {
+    return runtimeLegend.map((entry, idx) => {
       const entryMax = displayDataAsText(entry.max, 'primary')
 
       const entryMin = displayDataAsText(entry.min, 'primary')
@@ -68,8 +72,6 @@ const Legend = forwardRef((props, ref) => {
       if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
         formattedText = `${entryMin} - < ${entryMax}`
       }
-
-      const { disabled } = entry
 
       if (legend.type === 'category') {
         formattedText = displayDataAsText(entry.value, 'primary')
@@ -85,31 +87,44 @@ const Legend = forwardRef((props, ref) => {
         legendLabel = entry.label || entry.value
       }
 
+      return {
+        color: entry.color,
+        label: legendLabel,
+        disabled: entry.disabled,
+        special: entry.hasOwnProperty('special')
+      }
+    })
+  }
+
+  const legendList = () => {
+    const formattedItems = getFormattedLegendItems()
+    let legendItems
+
+    legendItems = formattedItems.map((item, idx) => {
       const handleListItemClass = () => {
         let classes = ['legend-container__li']
-        if (disabled) classes.push('legend-container__li--disabled')
-        if (entry.hasOwnProperty('special')) classes.push('legend-container__li--special-class')
-        return classes
+        if (item.disabled) classes.push('legend-container__li--disabled')
+        if (item.special) classes.push('legend-container__li--special-class')
+        return classes.join(' ')
       }
 
       return (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
         <li
-          className={handleListItemClass().join(' ')}
+          className={handleListItemClass()}
           key={idx}
-          title={`Legend item ${legendLabel} - Click to disable`}
-          onClick={() => {
-            toggleLegendActive(idx, legendLabel)
-          }}
+          title={`Legend item ${item.label} - Click to disable`}
+          onClick={() => toggleLegendActive(idx, item.label)}
           onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault()
-              toggleLegendActive(idx, legendLabel)
+              toggleLegendActive(idx, item.label)
             }
           }}
           tabIndex={0}
         >
-          <LegendCircle viewport={viewport} fill={entry.color} /> <span>{legendLabel}</span>
+          <LegendShape shape={state.legend.style === 'boxes' ? 'square' : 'circle'} viewport={viewport} fill={item.color} />
+          <span>{item.label}</span>
         </li>
       )
     })
@@ -147,7 +162,6 @@ const Legend = forwardRef((props, ref) => {
 
     return legendItems
   }
-
   const { legendClasses } = useDataVizClasses(state, viewport)
 
   const handleReset = e => {
@@ -196,8 +210,10 @@ const Legend = forwardRef((props, ref) => {
                 }
                 return true
               })}
+
+            <LegendGradient labels={getFormattedLegendItems().map(item => item?.label) ?? []} colors={getFormattedLegendItems().map(item => item?.color) ?? []} dimensions={dimensions} currentViewport={currentViewport} config={state} getTextWidth={getTextWidth} />
             <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
-              {legendList()}
+              {state.legend.style === 'gradient' ? '' : legendList()}
             </ul>
             {(state.visual.additionalCityStyles.some(c => c.label) || state.visual.cityStyleLabel) && (
               <>

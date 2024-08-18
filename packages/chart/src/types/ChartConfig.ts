@@ -14,7 +14,7 @@ import { type PreliminaryDataItem } from '../components/LineChart/LineChartProps
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 
-export type ViewportSize = 'sm' | 'xs' | 'xxs' | 'lg'
+export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 export type ChartColumns = Record<string, Column>
 
 type DataFormat = {

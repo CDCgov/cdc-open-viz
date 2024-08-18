@@ -5,7 +5,7 @@ import ExternalIcon from '../images/external-link.svg' // TODO: Move to Icon com
 import Icon from '@cdc/core/components/ui/Icon'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import LegendCircle from '@cdc/core/components/LegendCircle'
+import LegendShape from '@cdc/core/components/LegendShape'
 import MediaControls from '@cdc/core/components/MediaControls'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 
@@ -274,7 +274,7 @@ const DataTable = props => {
 
                           cellValue = (
                             <>
-                              <LegendCircle fill={legendColor[0]} />
+                              <LegendShape fill={legendColor[0]} />
                               {labelValue}
                             </>
                           )

@@ -1,6 +1,6 @@
 import React from 'react'
 
-interface LegendCircleProps {
+interface LegendShapeProps {
   fill: string
   borderColor?: string
   display?: 'inline-block' | 'block' | 'inline'
@@ -8,7 +8,7 @@ interface LegendCircleProps {
   shape?: 'circle' | 'square' | 'gradient'
 }
 
-const LegendCircle: React.FC<LegendCircleProps> = props => {
+const LegendShape: React.FC<LegendShapeProps> = props => {
   const { fill, borderColor, display = 'inline-block', viewport, shape = 'circle' } = props
   const isGradient = shape === 'gradient'
   const dimensions = isGradient ? { width: '4rem', height: '1.5em' } : { width: '1em', height: '1em' }
@@ -27,4 +27,4 @@ const LegendCircle: React.FC<LegendCircleProps> = props => {
   return <span className='legend-item' style={styles} />
 }
 
-export default LegendCircle
+export default LegendShape
