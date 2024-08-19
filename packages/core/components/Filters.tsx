@@ -33,7 +33,10 @@ export const filterOrderOptions = [
 export const handleSorting = singleFilter => {
   const { order } = singleFilter
 
-  if (order === 'cust') return
+  if (order === 'cust') {
+    singleFilter.values = singleFilter.orderedValues
+    return singleFilter.values
+  }
 
   const sortAsc = (a, b) => {
     return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
