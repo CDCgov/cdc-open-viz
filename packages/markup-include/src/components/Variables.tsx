@@ -4,6 +4,8 @@ import { Variable } from '../types/Variable'
 import { Condition } from '../types/Condition'
 import _ from 'lodash'
 import Icon from '@cdc/core/components/ui/Icon'
+import { CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
 
 type OpenControls = [boolean[], Function] // useState type
 
@@ -29,6 +31,7 @@ const VariableSection: React.FC<VariableSectionProps> = ({ controls, data, delet
   const [selectedColumn, setNewVariableColumnName] = useState(variableConfig.columnName)
   const [conditionsList, setConditionsList] = useState(variableConfig.conditions)
   const [variableName, setVariableName] = useState(variableConfig.name)
+  const [addCommas, setAddCommas] = useState(variableConfig.addCommas)
 
   const conditionLookup: Record<string, string[] | number[]> = useMemo(() => {
     return columnNames.reduce((acc, column) => {
@@ -36,6 +39,10 @@ const VariableSection: React.FC<VariableSectionProps> = ({ controls, data, delet
       return acc
     }, {})
   }, [columnNames])
+
+  const handleUpdateAddCommas = () => {
+    setAddCommas(!addCommas)
+  }
 
   const handleVariableColumnChange = (columnName: string) => {
     setNewVariableColumnName(columnName)
@@ -82,7 +89,8 @@ const VariableSection: React.FC<VariableSectionProps> = ({ controls, data, delet
       columnName: selectedColumn,
       conditions: filteredConditionsList,
       name: variableName,
-      tag: `{{${variableName}}}`
+      tag: `{{${variableName}}}`,
+      addCommas
     }
     updateVariableArray(newVariable, variableIndex)
     setShow(variableIndex, false)
@@ -134,6 +142,23 @@ const VariableSection: React.FC<VariableSectionProps> = ({ controls, data, delet
                 ))}
               </select>
             </label>
+          </div>
+          <div className='pt-2'>
+            <CheckBox
+              value={addCommas}
+              label='Add Commas to Number'
+              updateField={handleUpdateAddCommas}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>{`Selecting this option will add commas to the numeric value.`}</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
           </div>
           <label className='d-block py-2'>
             <span className='edit-label column-heading'>Conditions:</span>
