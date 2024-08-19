@@ -96,10 +96,10 @@ export const useTooltip = props => {
 
     const closestXScaleValue = getXValueFromCoordinate(x - Number(config.yAxis.size || 0))
 
-    const includedSeries = visualizationType !== 'Pie' ? config.series.filter(series => series.tooltip === true).map(item => item.dataKey) : config.series.map(item => item.dataKey)
+    const includedSeries = visualizationType !== 'Pie' ? config.runtime.series.filter(series => series.tooltip === true).map(item => item.dataKey) : config.runtime.series.map(item => item.dataKey)
     includedSeries.push(config.xAxis.dataKey)
     if (config.visualizationType === 'Forecasting') {
-      config.series.map(s => {
+      config.runtime.series.map(s => {
         s.confidenceIntervals.map(c => {
           if (c.showInTooltip) {
             includedSeries.push(c.high)
@@ -126,7 +126,7 @@ export const useTooltip = props => {
     const resolvedScaleValues = orientation === 'vertical' ? yScaleValues : xScaleValues
 
     const getAxisPosition = seriesKey => {
-      const seriesObj = config.series.filter(s => s.dataKey === seriesKey)[0]
+      const seriesObj = config.runtime.series.filter(s => s.dataKey === seriesKey)[0]
       const position = seriesObj?.axis ? String(seriesObj.axis).toLowerCase() : 'left'
       return position
     }
@@ -179,7 +179,7 @@ export const useTooltip = props => {
       if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot' && !config.tooltips.singleSeries) {
         tooltipItems.push(
           ...getIncludedTooltipSeries()
-            ?.filter(seriesKey => config.series?.find(item => item.dataKey === seriesKey && item?.tooltip) || config.xAxis?.dataKey == seriesKey || visualizationType === 'Forecasting')
+            ?.filter(seriesKey => config.runtime.series?.find(item => item.dataKey === seriesKey && item?.tooltip) || config.xAxis?.dataKey == seriesKey || visualizationType === 'Forecasting')
             ?.flatMap(seriesKey => {
               const value = resolvedScaleValues[0]?.[seriesKey]
               const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
@@ -394,7 +394,7 @@ export const useTooltip = props => {
 
       // loop through series for items to add to tooltip.
       // there is probably a better way of doing this.
-      config.series?.forEach(s => {
+      config.runtime.series?.forEach(s => {
         if (s.type === 'Forecasting') {
           stageColumns.push(s.stageColumn)
 
@@ -465,7 +465,7 @@ export const useTooltip = props => {
    * @returns user defined series name.
    */
   const getSeriesNameFromLabel = originalColumnName => {
-    let series = config.series.filter(s => s.dataKey === originalColumnName)
+    let series = config.runtime.series.filter(s => s.dataKey === originalColumnName)
     if (series[0]?.name) return series[0]?.name
     return originalColumnName
   }
