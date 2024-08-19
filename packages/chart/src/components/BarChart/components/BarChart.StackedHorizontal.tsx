@@ -49,7 +49,7 @@ const BarChartStackedHorizontal = () => {
                 const xAxisValue = formatNumber(data[bar.index][bar.key], 'left')
                 const yAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
                 const yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
-                const textWidth = (getTextWidth as any)(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                const textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
                 const additionalColTooltip = getAdditionalColumn(hoveredBar)
                 const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${xAxisValue}`
                 const tooltip = `<ul>

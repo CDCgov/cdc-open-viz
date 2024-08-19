@@ -11,6 +11,7 @@ export const useEditorPermissions = () => {
     'Area Chart',
     'Bar',
     'Box Plot',
+    'Bump Chart',
     'Combo',
     'Deviation Bar',
     'Forecasting',
@@ -44,13 +45,13 @@ export const useEditorPermissions = () => {
   }
 
   const visHasLabelOnData = () => {
-    const disabledCharts = ['Area Chart', 'Box Plot', 'Pie', 'Scatter Plot', 'Forest Plot', 'Spark Line', 'Sankey']
+    const disabledCharts = ['Area Chart', 'Box Plot', 'Pie', 'Scatter Plot', 'Forest Plot', 'Spark Line', 'Sankey', 'Bump Chart']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visCanAnimate = () => {
-    const disabledCharts = ['Area Chart', 'Scatter Plot', 'Box Plot', 'Forest Plot', 'Spark Line', 'Sankey']
+    const disabledCharts = ['Area Chart', 'Scatter Plot', 'Box Plot', 'Forest Plot', 'Spark Line', 'Sankey', 'Bump Chart']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -104,6 +105,7 @@ export const useEditorPermissions = () => {
     }
   }
   const visHasBrushChart = () => {
+    if (config.xAxis.type === 'categorical') return false
     return ['Line', 'Bar', 'Area Chart', 'Combo'].includes(visualizationType) && orientation === 'vertical'
   }
 
@@ -166,7 +168,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryAxisLabel = () => {
-    const disabledCharts = ['Forest Plot', 'Spark Line']
+    const disabledCharts = ['Forest Plot', 'Spark Line', 'Bump Chart']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -248,7 +250,7 @@ export const useEditorPermissions = () => {
 
   // implement later
   const visSupportsValueAxisLabels = () => {
-    const disabledCharts = ['Forest Plot']
+    const disabledCharts = ['Forest Plot', 'Bump Chart']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -285,16 +287,19 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryHeight = () => {
-    const disabledCharts = ['Spark Line', 'Sankey']
+    const disabledCharts = ['Spark Line', 'Sankey', 'Bump Chart']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryAxisPadding = () => {
+    const disabledCharts = ['Bump Chart']
+    if (disabledCharts.includes(visualizationType)) return false
     return config.xAxis.type === 'date-time'
   }
 
   const visSupportsReactTooltip = () => {
+    if (config.yAxis.type === 'categorical') return true
     if (['Deviation Bar', 'Box Plot', 'Scatter Plot', 'Paired Bar'].includes(visualizationType) || (visualizationType === 'Bar' && config.tooltips.singleSeries)) {
       return true
     }
@@ -328,6 +333,10 @@ export const useEditorPermissions = () => {
       return true
     }
     return false
+  }
+
+  const visHasCategoricalAxis = () => {
+    if ((visualizationType === 'Line' || visualizationType === 'Bar' || visualizationType === 'Combo' || visualizationType === 'Area Chart') && config.yAxis.type === 'categorical' && orientation === 'vertical') return true
   }
 
   return {
@@ -377,6 +386,7 @@ export const useEditorPermissions = () => {
     visSupportsValueAxisMax,
     visSupportsValueAxisMin,
     visSupportsDynamicSeries,
-    visHasSingleSeriesTooltip
+    visHasSingleSeriesTooltip,
+    visHasCategoricalAxis
   }
 }

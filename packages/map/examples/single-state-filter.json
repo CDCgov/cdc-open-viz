@@ -1,0 +1,153 @@
+{
+  "general": {
+    "geoType": "single-state",
+    "type": "data",
+    "geoBorderColor": "darkGray",
+    "headerColor": "theme-blue",
+    "title": "Example County Set By Year Filter State Data Map",
+    "showTitle": true,
+    "showSidebar": true,
+    "showDownloadButton": true,
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": false,
+    "territoriesLabel": "Territories",
+    "territoriesAlwaysShow": false,
+    "language": "en",
+    "geoLabelOverride": "",
+    "hasRegions": false,
+    "fullBorder": false,
+    "convertFipsCodes": true,
+    "palette": {
+      "isReversed": false
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "statePicked": {
+      "fipsCode": "02",
+      "stateName": "Alaska"
+    },
+    "expandDataTable": false,
+    "filterControlsCountyYear": "YEAR"
+  },
+  "type": "map",
+  "color": "pinkpurple",
+  "columns": {
+    "geo": {
+      "name": "FIPS",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "dataTable": true,
+      "tooltip": true,
+      "prefix": "",
+      "suffix": "",
+      "name": "VALUE",
+      "label": ""
+    },
+    "navigate": {
+      "name": ""
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": true,
+    "singleColumn": false,
+    "singleRow": false,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false,
+    "dynamicDescription": false,
+    "type": "equalnumber",
+    "numberOfItems": 6,
+    "position": "side",
+    "title": "Legend"
+  },
+  "filters": [
+    {
+      "order": "asc",
+      "label": "Year",
+      "columnName": "YEAR",
+      "values": [
+        "2019",
+        "2020"
+      ],
+      "active": "2019",
+      "filterStyle": "dropdown"
+    }
+  ],
+  "table": {
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": true,
+    "indexLabel": ""
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": true,
+    "opacity": 90
+  },
+  "visual": {
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle",
+    "cityStyleLabel": "",
+    "showBubbleZeros": false,
+    "additionalCityStyles": [],
+    "geoCodeCircleSize": 8
+  },
+  "mapPosition": {
+    "coordinates": [
+      0,
+      30
+    ],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow Up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
+  "datasets": {},
+  "dataFileName": "https://wcms-wp.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data/county-year.csv",
+  "dataFileSourceType": "url",
+  "dataUrl": "http://localhost:8080/examples/county-year.csv",
+  "version": "4.24.4"
+}

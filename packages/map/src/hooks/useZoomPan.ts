@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity } from 'd3-zoom'
 import { select as d3Select } from 'd3-selection'
 
-function getCoords(w, h, t) {
+const getCoords = (w, h, t) => {
   const xOffset = (w * t.k - w) / 2
   const yOffset = (h * t.k - h) / 2
   return [w / 2 - (xOffset + t.x) / t.k, h / 2 - (yOffset + t.y) / t.k]
@@ -39,12 +39,12 @@ export default function useZoomPan({
   useEffect(() => {
     const svg = d3Select(mapRef.current)
 
-    function handleZoomStart(d3Event) {
+    const handleZoomStart = d3Event => {
       if (!onMoveStart || bypassEvents.current) return
       onMoveStart({ coordinates: projection.invert(getCoords(width, height, d3Event.transform)), zoom: d3Event.transform.k }, d3Event)
     }
 
-    function handleZoom(d3Event) {
+    const handleZoom = d3Event => {
       if (bypassEvents.current) return
       const { transform, sourceEvent } = d3Event
       setPosition({ x: transform.x, y: transform.y, k: transform.k, dragging: sourceEvent })
@@ -52,7 +52,7 @@ export default function useZoomPan({
       onMove({ x: transform.x, y: transform.y, k: transform.k, dragging: sourceEvent }, d3Event)
     }
 
-    function handleZoomEnd(d3Event) {
+    const handleZoomEnd = d3Event => {
       if (bypassEvents.current) {
         bypassEvents.current = false
         return
@@ -63,7 +63,7 @@ export default function useZoomPan({
       onMoveEnd({ coordinates: [x, y], zoom: d3Event.transform.k }, d3Event)
     }
 
-    function filterFunc(d3Event) {
+    const filterFunc = d3Event => {
       if (filterZoomEvent) {
         return filterZoomEvent(d3Event)
       }
@@ -89,6 +89,7 @@ export default function useZoomPan({
     if (lon === lastPosition.current.x && lat === lastPosition.current.y && zoom === lastPosition.current.k) return
 
     const coords = projection([lon, lat])
+    if (!coords) return
     const x = coords[0] * zoom
     const y = coords[1] * zoom
     const svg = d3Select(mapRef.current)

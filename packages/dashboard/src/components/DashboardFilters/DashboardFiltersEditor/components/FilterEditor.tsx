@@ -360,6 +360,35 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
           <TextField label='Default Value Set By Query String Parameter: ' value={filter.setByQueryParameter || ''} updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)} />
         </>
       )}
+      <label>
+        <span className='edit-label column-heading'>Multi Select</span>
+        <input
+          type='checkbox'
+          checked={filter.multiSelect}
+          onChange={e => {
+            updateFilterProp('multiSelect', !filter.multiSelect)
+          }}
+        />
+      </label>
+
+      {filter.multiSelect && (
+        <TextField
+          label='Select Limit'
+          value={filter.selectLimit}
+          updateField={(_section, _subSection, _field, value) => updateFilterProp('selectLimit', value)}
+          type='number'
+          tooltip={
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>The maximum number of items that can be selected.</p>
+              </Tooltip.Content>
+            </Tooltip>
+          }
+        />
+      )}
     </>
   )
 }

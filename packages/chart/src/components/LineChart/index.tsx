@@ -16,6 +16,7 @@ import useRightAxis from '../../hooks/useRightAxis'
 // Local helpers and components
 import { filterCircles, createStyles, createDataSegments } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
+import LineChartBumpCircle from './components/LineChart.BumpCircle'
 
 // Types
 import { type ChartContext } from '../../types/ChartContext'
@@ -96,10 +97,12 @@ const LineChart = (props: LineChartProps) => {
                       {/* tooltips */}
                       <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, tableData)} onMouseOut={handleTooltipMouseOff} onClick={e => handleTooltipClick(e, data)} />
 
-                      {/* Render legend */}
-                      <Text display={config.labels ? 'block' : 'none'} x={xPos(d)} y={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))} fill={'#000'} textAnchor='middle'>
-                        {formatNumber(d[seriesKey], 'left')}
-                      </Text>
+                      {/* Render label */}
+                      {config.labels && (
+                        <Text x={xPos(d)} y={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))} fill={'#000'} textAnchor='middle'>
+                          {formatNumber(d[seriesKey], 'left')}
+                        </Text>
+                      )}
 
                       {(lineDatapointStyle === 'hidden' || lineDatapointStyle === 'always show') && (
                         <LineChartCircle
@@ -207,6 +210,7 @@ const LineChart = (props: LineChartProps) => {
                   <LinePath
                     curve={allCurves[seriesData[0].lineType]}
                     data={
+                      config.visualizationType == "Bump Chart" ? data :
                       config.xAxis.type === 'date-time' || config.xAxis.type === 'date'
                         ? data.sort((d1, d2) => {
                             let x1 = getXAxisData(d1)
@@ -293,6 +297,7 @@ const LineChart = (props: LineChartProps) => {
           </Text>
         )}
       </Group>
+      {config.visualizationType === 'Bump Chart' && <LineChartBumpCircle config={config} xScale={xScale} yScale={yScale} />}
     </ErrorBoundary>
   )
 }

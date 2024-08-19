@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, memo, useContext } from 'react'
 import { DragDropContext, Droppable } from '@hello-pangea/dnd'
+import chroma from 'chroma-js'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import Layout from '@cdc/core/components/Layout'
@@ -323,6 +324,116 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   )
 }
 
+interface CategoricalAxisProps {
+  config: ChartConfig
+  updateConfig: Function
+  display: boolean
+}
+
+const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig, display }) => {
+  const maxHeight = config?.yAxis?.maxValue
+
+  const totalEnteredHeight = config?.yAxis?.categories?.reduce((sum, obj) => sum + (parseFloat(obj.height) || 0), 0) || 0
+
+  const removeColumn = i => {
+    let categories = []
+
+    if (config.yAxis.categories) {
+      categories = [...config.yAxis.categories]
+    }
+
+    categories.splice(i, 1)
+
+    updateConfig({ ...config, yAxis: { ...config.yAxis, categories } })
+  }
+
+  const getDarkerColor = () => {
+    const timesDarkened = config.yAxis?.categories?.length
+    const darkeningFactor = 0.4
+    const baseColor = '#ddd'
+    return chroma(baseColor)
+      .darken(darkeningFactor * timesDarkened)
+      .hex()
+  }
+
+  const addColumn = () => {
+    const categories = config.yAxis.categories ? [...config.yAxis.categories] : []
+    const defaultValues = {
+      label: 'Label ' + Number(categories.length + 1),
+      height: '',
+      color: getDarkerColor()
+    }
+    categories.push(defaultValues)
+    updateConfig({ ...config, yAxis: { ...config.yAxis, categories: categories } })
+  }
+
+  const update = (fieldName, value, i) => {
+    let categories = []
+
+    if (config.yAxis.categories) {
+      categories = [...config.yAxis.categories]
+    }
+
+    categories[i][fieldName] = value
+
+    updateConfig({ ...config, yAxis: { ...config.yAxis, categories } })
+  }
+
+  if (!display) {
+    return <></>
+  }
+
+  return (
+    <>
+      {config.yAxis.type === 'categorical' &&
+        config.yAxis.categories?.map(({ label, color, height }, i) => {
+          return (
+            <div key={`preliminaryData-${i}`} className='edit-block'>
+              <p>Axis Category {i + 1}</p>
+              <button
+                type='button'
+                className='remove-column'
+                onClick={event => {
+                  event.preventDefault()
+                  removeColumn(i)
+                }}
+              >
+                Remove
+              </button>
+              <TextField
+                tooltip={
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p> Category Height will be ignored for the last category. The last category will fill the rest of the axis height.</p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                }
+                type='number'
+                value={height}
+                fieldName='height'
+                label='Category Height'
+                updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+              />
+              {Number(totalEnteredHeight) > Number(maxHeight) && config.yAxis.categories.length - 1 === i && <span style={{ color: 'red', display: 'block', fontSize: '15px' }}>Update Max value to show all categories</span>}
+
+              <div className='two-col-inputs'>
+                <TextField value={color} fieldName='color' label='Color' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                <TextField value={label} fieldName='label' label='Label' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+              </div>
+            </div>
+          )
+        })}
+
+      <button type='button' onClick={addColumn} className='btn full-width'>
+        Add Axis Category
+      </button>
+    </>
+  )
+}
+
 const EditorPanel = () => {
   const {
     config,
@@ -395,6 +506,7 @@ const EditorPanel = () => {
     visSupportsResponsiveTicks,
     visSupportsDateCategoryHeight,
     visHasDataSuppression,
+    visHasCategoricalAxis,
     visSupportsDynamicSeries
   } = useEditorPermissions()
 
@@ -906,7 +1018,7 @@ const EditorPanel = () => {
     if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
-  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting', 'Scatter Plot', 'Paired Bar', 'Deviation Bar']
+  const chartsWithOptions = ['Bump Chart', 'Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting', 'Scatter Plot', 'Paired Bar', 'Deviation Bar']
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -1099,67 +1211,69 @@ const EditorPanel = () => {
             {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && config.visualizationType !== 'Sankey' && (
               <AccordionItem>
                 <AccordionItemHeading>
-                  <AccordionItemButton>Data Series {((!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && !config.dynamicSeries) && <WarningImage width='25' className='warning-icon' />}</AccordionItemButton>
+                  <AccordionItemButton>Data Series {(!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && !config.dynamicSeries && <WarningImage width='25' className='warning-icon' />}</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   {visSupportsDynamicSeries() && <CheckBox value={config.dynamicSeries} fieldName='dynamicSeries' label='Dynamically generate series' updateField={updateField} />}
-                  {(!visSupportsDynamicSeries() || !config.dynamicSeries) && <>
-                    {((!config.series || config.series.length === 0) && !config.dynamicSeries) && config.visualizationType !== 'Paired Bar' && <p className='warning'>At least one series is required</p>}
-                    {(!config.series || config.series.length === 0 || config.series.length < 2) && config.visualizationType === 'Paired Bar' && <p className='warning'>Select two data series for paired bar chart (e.g., Male and Female).</p>}
+                  {(!visSupportsDynamicSeries() || !config.dynamicSeries) && (
                     <>
-                      <Select
-                        fieldName='visualizationType'
-                        label='Add Data Series'
-                        initial='Select'
-                        onChange={e => {
-                          if (e.target.value !== '' && e.target.value !== 'Select') {
-                            addNewSeries(e.target.value)
-                          }
-                          e.target.value = ''
-                        }}
-                        options={getColumns()}
-                      />
-                      {config.series && config.series.length !== 0 && (
-                        <Panels.Series.Wrapper getColumns={getColumns}>
-                          <fieldset>
-                            <legend className='edit-label float-left'>Displaying</legend>
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          </fieldset>
-
-                          <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
-                            <Droppable droppableId='filter_order'>
-                              {/* prettier-ignore */}
-                              {provided => {
-                                return (
-                                  <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
-                                    <Panels.Series.List series={config.series} getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} />
-                                    {provided.placeholder}
-                                  </ul>
-                                )
-                              }}
-                            </Droppable>
-                          </DragDropContext>
-                        </Panels.Series.Wrapper>
-                      )}
-                    </>
-                    {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
+                      {(!config.series || config.series.length === 0) && !config.dynamicSeries && config.visualizationType !== 'Paired Bar' && <p className='warning'>At least one series is required</p>}
+                      {(!config.series || config.series.length === 0 || config.series.length < 2) && config.visualizationType === 'Paired Bar' && <p className='warning'>Select two data series for paired bar chart (e.g., Male and Female).</p>}
                       <>
-                        <span className='divider-heading'>Confidence Keys</span>
-                        <Select value={config.confidenceKeys.upper || ''} section='confidenceKeys' fieldName='upper' label='Upper' updateField={updateField} initial='Select' options={getColumns()} />
-                        <Select value={config.confidenceKeys.lower || ''} section='confidenceKeys' fieldName='lower' label='Lower' updateField={updateField} initial='Select' options={getColumns()} />
+                        <Select
+                          fieldName='visualizationType'
+                          label='Add Data Series'
+                          initial='Select'
+                          onChange={e => {
+                            if (e.target.value !== '' && e.target.value !== 'Select') {
+                              addNewSeries(e.target.value)
+                            }
+                            e.target.value = ''
+                          }}
+                          options={getColumns()}
+                        />
+                        {config.series && config.series.length !== 0 && (
+                          <Panels.Series.Wrapper getColumns={getColumns}>
+                            <fieldset>
+                              <legend className='edit-label float-left'>Displaying</legend>
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            </fieldset>
+
+                            <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
+                              <Droppable droppableId='filter_order'>
+                                {/* prettier-ignore */}
+                                {provided => {
+                                  return (
+                                    <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
+                                      <Panels.Series.List series={config.series} getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} />
+                                      {provided.placeholder}
+                                    </ul>
+                                  )
+                                }}
+                              </Droppable>
+                            </DragDropContext>
+                          </Panels.Series.Wrapper>
+                        )}
                       </>
-                    )}
-                    {visSupportsRankByValue() && config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
-                    {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
-                    {visSupportsPreliminaryData() && <PreliminaryData config={config} updateConfig={updateConfig} data={data} />}
-                  </> }
+                      {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
+                        <>
+                          <span className='divider-heading'>Confidence Keys</span>
+                          <Select value={config.confidenceKeys.upper || ''} section='confidenceKeys' fieldName='upper' label='Upper' updateField={updateField} initial='Select' options={getColumns()} />
+                          <Select value={config.confidenceKeys.lower || ''} section='confidenceKeys' fieldName='lower' label='Lower' updateField={updateField} initial='Select' options={getColumns()} />
+                        </>
+                      )}
+                      {visSupportsRankByValue() && config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
+                      {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
+                      {visSupportsPreliminaryData() && <PreliminaryData config={config} updateConfig={updateConfig} data={data} />}
+                    </>
+                  )}
                 </AccordionItemPanel>
               </AccordionItem>
             )}
@@ -1198,11 +1312,42 @@ const EditorPanel = () => {
                   )}
                   {config.visualizationType !== 'Pie' && (
                     <>
-                      <TextField value={config.yAxis.label} section='yAxis' fieldName='label' label='Label ' updateField={updateField} />
+                      <label>
+                        <span className='edit-label'>
+                          Axis Type
+                          <Tooltip style={{ textTransform: 'none', display: 'inline-block' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>Select 'Numeric (Linear Scale)' for uniform scaling, 'Numeric (Logarithmic Scale)' for exponential data, or 'Categorical' for discrete categories.</Tooltip.Content>
+                          </Tooltip>
+                        </span>
+                        <select
+                          value={config.yAxis.type}
+                          onChange={e =>
+                            updateConfig({
+                              ...config,
+                              yAxis: {
+                                ...config.yAxis,
+                                type: e.target.value
+                              }
+                            })
+                          }
+                        >
+                          <option value='linear'>Numeric (Linear Scale)</option>
+                          {config.visualizationSubType !== 'stacked' && <option value='logarithmic'>Numeric (Logarithmic Scale)</option>}
+                          {config.orientation !== 'horizontal' && <option value='categorical'>Categorical</option>}
+                        </select>
+                      </label>
+                      <CategoricalAxis config={config} updateConfig={updateConfig} data={data} display={visHasCategoricalAxis()} />
+
+                      <TextField display={!visHasCategoricalAxis()} value={config.yAxis.label} section='yAxis' fieldName='label' label='Label ' updateField={updateField} />
                       {config.runtime.seriesKeys && config.runtime.seriesKeys.length === 1 && !['Box Plot', 'Deviation Bar', 'Forest Plot'].includes(config.visualizationType) && (
                         <CheckBox value={config.isLegendValue} fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />
                       )}
+
                       <TextField
+                        display={!visHasCategoricalAxis()}
                         value={config.yAxis.numTicks}
                         placeholder='Auto'
                         type='number'
@@ -1241,10 +1386,12 @@ const EditorPanel = () => {
                           </Tooltip>
                         }
                       />
-                      <TextField value={config.yAxis.labelOffset} section='yAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />
-                      {config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
-                      {(config.orientation === 'vertical' || !config.isResponsiveTicks) && <TextField value={config.yAxis.tickRotation || 0} type='number' min={0} section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
-                      {config.isResponsiveTicks && config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && (
+                      <TextField display={!visHasCategoricalAxis()} value={config.yAxis.labelOffset} section='yAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />
+                      {config.orientation === 'horizontal' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
+                      {(config.orientation === 'vertical' || !config.isResponsiveTicks) && (
+                        <TextField display={!visHasCategoricalAxis()} value={config.yAxis.tickRotation || 0} type='number' min={0} section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />
+                      )}
+                      {config.isResponsiveTicks && config.orientation === 'horizontal' && (
                         <TextField
                           value={config.xAxis.maxTickRotation}
                           type='number'
@@ -1272,7 +1419,6 @@ const EditorPanel = () => {
                       {visSupportsValueAxisGridLines() && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Show Gridlines' updateField={updateField} />}
                       <CheckBox value={config.yAxis.enablePadding} section='yAxis' fieldName='enablePadding' label='Add Padding to Value Axis Scale' updateField={updateField} />
                       {config.yAxis.enablePadding && <TextField type='number' section='yAxis' fieldName='scalePadding' label='Padding Percentage' className='number-narrow' updateField={updateField} value={config.yAxis.scalePadding} />}
-                      {config.visualizationSubType === 'regular' && config.visualizationType !== 'Forest Plot' && <CheckBox value={config.useLogScale} fieldName='useLogScale' label='use logarithmic scale' updateField={updateField} />}
                     </>
                   )}
                   <span className='divider-heading'>Number Formatting</span>
@@ -1294,6 +1440,7 @@ const EditorPanel = () => {
                     }
                   />
                   <CheckBox
+                    display={!visHasCategoricalAxis()}
                     value={config.dataFormat.abbreviated}
                     section='dataFormat'
                     fieldName='abbreviated'
@@ -1370,9 +1517,9 @@ const EditorPanel = () => {
                   ) : (
                     config.visualizationType !== 'Pie' && (
                       <>
-                        <CheckBox value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />
-                        <CheckBox value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Tick Labels' updateField={updateField} />
-                        <CheckBox value={config.yAxis.hideTicks} section='yAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
+                        <CheckBox display={!visHasCategoricalAxis()} value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />
+                        <CheckBox display={!visHasCategoricalAxis()} value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Tick Labels' updateField={updateField} />
+                        <CheckBox display={!visHasCategoricalAxis()} value={config.yAxis.hideTicks} section='yAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
 
                         <TextField value={config.yAxis.max} section='yAxis' fieldName='max' type='number' label='left axis max value' placeholder='Auto' updateField={updateField} />
                         <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
@@ -1738,8 +1885,8 @@ const EditorPanel = () => {
                                 })
                               }
                             >
-                              <option value='categorical'>Categorical (Linear Scale)</option>
-                              <option value='date'>Date (Linear Scale)</option>
+                              {config.visualizationType !== 'Bump Chart' && <option value='categorical'>Categorical (Linear Scale)</option>}
+                              {config.visualizationType !== 'Bump Chart' && <option value='date'>Date (Linear Scale)</option>}
                               <option value='date-time'>Date (Date Time Scale)</option>
                               {config.visualizationType === 'Scatter Plot' && <option value={'continuous'}>Continuous</option>}
                             </select>
@@ -1980,7 +2127,7 @@ const EditorPanel = () => {
                         }
                         updateField={updateField}
                       />
-                      {false && visHasBrushChart && (
+                      {visHasBrushChart() && (
                         <CheckBox
                           value={config.brush?.active}
                           section='brush'

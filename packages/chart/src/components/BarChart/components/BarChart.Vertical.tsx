@@ -80,7 +80,7 @@ export const BarChartVertical = () => {
             return barGroups.map((barGroup, index) => (
               <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={barGroup.x0}>
                 {barGroup.bars.map((bar, index) => {
-                  const scaleVal = config.useLogScale ? 0.1 : 0
+                  const scaleVal = config.yAxis.type === 'logarithmic' ? 0.1 : 0
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   const transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
@@ -113,7 +113,6 @@ export const BarChartVertical = () => {
                   let labelColor = '#000000'
                   labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor) // Set if background is transparent'
                   let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key)
-                  barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor) // Color code by category
                   const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                   const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
                   const isHighlightedBar = highlightedBarValues?.includes(xAxisValue)
@@ -156,13 +155,16 @@ export const BarChartVertical = () => {
                         : colorScale(config.runtime.seriesLabels[bar.key])
 
                       if (isRegularLollipopColor) _barColor = barColor
-                      if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
+
                       if (isHighlightedBar) _barColor = 'transparent'
+                      if (config.legend.colorCode) _barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
+                      if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
                       return _barColor
                     }
 
                     // if this is a two tone lollipop slightly lighten the bar.
                     if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
+                    if (config.legend.colorCode) _barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
 
                     // if we're highlighting a bar make it invisible since it gets a border
                     if (isHighlightedBar) _barColor = 'transparent'
@@ -263,7 +265,7 @@ export const BarChartVertical = () => {
                             cx={barX + lollipopShapeSize / 3.5}
                             cy={bar.y}
                             r={lollipopShapeSize / 2}
-                            fill={barColor}
+                            fill={getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key]))}
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
@@ -277,7 +279,7 @@ export const BarChartVertical = () => {
                             y={barY}
                             width={lollipopShapeSize}
                             height={lollipopShapeSize}
-                            fill={barColor}
+                            fill={getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key]))}
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}

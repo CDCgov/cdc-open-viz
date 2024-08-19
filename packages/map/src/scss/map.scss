@@ -258,6 +258,10 @@ $medium: 768px;
   stroke: none !important;
 }
 
+.countyMapGroup--no-transition {
+  transition: none !important;
+}
+
 // .state {
 // 	display: none;
 // }
