@@ -6,13 +6,13 @@ import useLegendClasses from '../../hooks/useLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import { handleLineType } from '../../helpers/handleLineType'
 
-import { getMarginTop } from './helpers/index'
+import { getMarginTop, getGradientConfig } from './helpers/index'
 import { Line } from '@visx/shape'
 import { Label } from '../../types/Label'
 import { ChartConfig } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
 import { forwardRef } from 'react'
-import LegendGradient from './Legend.Gradient'
+import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 
 export interface LegendProps {
   colorScale: ColorScale
@@ -47,7 +47,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
     <aside ref={ref} style={legendClasses} id={skipId || 'legend'} className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
       {legend.label && <h3>{parse(legend.label)}</h3>}
       {legend.description && <p>{parse(legend.description)}</p>}
-      <LegendGradient formatLabels={formatLabels} getTextWidth={getTextWidth} config={config} colorScale={colorScale} dimensions={dimensions} currentViewport={currentViewport} />
+      <LegendGradient getTextWidth={getTextWidth} config={config} {...getGradientConfig(config, formatLabels, colorScale)} dimensions={dimensions} currentViewport={currentViewport} />
 
       <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
         {labels => {

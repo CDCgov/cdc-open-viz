@@ -4,7 +4,7 @@ import parse from 'html-react-parser'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendShape from '@cdc/core/components/LegendShape'
-import LegendGradient from './Legend.gradient'
+import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import LegendItemHex from './LegendItem.Hex'
 import Button from '@cdc/core/components/elements/Button'
 

@@ -1,40 +1,34 @@
-import { ChartConfig } from '../../types/ChartConfig'
-import { ColorScale } from '../../types/ChartContext'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
+import { type ViewportSize, type MapConfig } from '@cdc/map/src/types/MapConfig'
+import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { getGradientLegendWidth } from '@cdc/core/helpers/getGradientLegendWidth'
 
+type CombinedConfig = MapConfig | ChartConfig
+
 interface GradientProps {
-  colorScale: ColorScale
-  config: ChartConfig
+  labels: string[]
+  colors: string[]
+  config: CombinedConfig
   dimensions: [string, string]
-  currentViewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
+  currentViewport: ViewportSize
   getTextWidth: (text: string, font: string) => string
-  formatLabels: (a: any) => object[]
 }
 
-const LegendGradient: React.FC<GradientProps> = ({ colorScale, config, dimensions, currentViewport, getTextWidth, formatLabels }) => {
-  const [chartWidth] = dimensions
-  const sample = [
-    {
-      datum: 'Data 2',
-      index: 0,
-      text: 'Data 2',
-      value: '#A6CEE3'
-    }
-  ]
+const LegendGradient = ({ labels, colors, config, dimensions, currentViewport, getTextWidth }: GradientProps): JSX.Element => {
+  let [width] = dimensions
 
-  const width = getGradientLegendWidth(chartWidth, currentViewport)
-  const colors = config.legend.colorCode ? formatLabels(sample).map(label => label?.value) : colorScale?.range() ?? []
+  const legendWidth = getGradientLegendWidth(width, currentViewport)
+
   const numTicks = colors?.length
-  const keys = config.legend.colorCode ? formatLabels(sample).map(label => label?.text || label?.datum) : colorScale?.domain() ?? []
-  const longestKeyName = keys.reduce((a, b) => (a.length > b.length ? a : b))
+
+  const longestLabel = labels && labels.length > 0 ? labels.reduce((a, b) => (a.length > b.length ? a : b)) : ''
   const boxHeight = 20
   let height = 50
   const margin = 1
 
   // configure tick witch and angle
-  const textWidth = getTextWidth(longestKeyName, `normal 12px sans-serif`)
+  const textWidth = getTextWidth(longestLabel, `normal 14px sans-serif`)
   const rotationAngle = Number(config.legend.tickRotation) || 0
   // Convert the angle from degrees to radians
   const angleInRadians = rotationAngle * (Math.PI / 180)
@@ -47,8 +41,8 @@ const LegendGradient: React.FC<GradientProps> = ({ colorScale, config, dimension
   })
 
   // render ticks and labels
-  const ticks = keys.map((key, index) => {
-    const segmentWidth = width / numTicks
+  const ticks = labels.map((key, index) => {
+    const segmentWidth = legendWidth / numTicks
     const xPositionX = index * segmentWidth + segmentWidth
     const textAnchor = rotationAngle ? 'end' : 'middle'
     const verticalAnchor = rotationAngle ? 'middle' : 'start'
@@ -56,35 +50,34 @@ const LegendGradient: React.FC<GradientProps> = ({ colorScale, config, dimension
     return (
       <Group top={margin}>
         <line x1={xPositionX} x2={xPositionX} y1={30} y2={boxHeight} stroke='black' />
-        <Text angle={-config.legend.tickRotation} x={xPositionX} y={boxHeight} dy={10} fontSize='12' textAnchor={textAnchor} verticalAnchor={verticalAnchor}>
+        <Text angle={-config.legend.tickRotation} x={xPositionX} y={boxHeight} dy={10} fontSize='14' textAnchor={textAnchor} verticalAnchor={verticalAnchor}>
           {key}
         </Text>
       </Group>
     )
   })
-
-  if (config.legend.position === 'right' || config.legend.position === 'left' || !config.legend.position) {
-    return <> </>
+  if ((config.type === 'map' && config.legend.position === 'side') || !config.legend.position) {
+    return
   }
-  if (config.visualizationType !== 'Bar' || !config.legend.position) {
-    return <> </>
+  if (config.type === 'chart' && (config.legend.position === 'left' || config.legend.position === 'right' || !config.legend.position)) {
+    return
   }
 
   if (config.legend.style === 'gradient') {
     return (
-      <svg style={{ overflow: 'visible', width: '100%' }} height={newHeight}>
+      <svg style={{ overflow: 'visible', width: '100%', marginTop: 10 }} height={newHeight}>
         {/* background border*/}
-        <rect x={0} y={0} width={width + margin * 2} height={boxHeight + margin * 2} fill='#d3d3d3' strokeWidth='0.5' />
+        <rect x={0} y={0} width={legendWidth + margin * 2} height={boxHeight + margin * 2} fill='#d3d3d3' strokeWidth='0.5' />
         {/* Define the gradient */}
-        <linearGradient id='gradient-smooth' x1='0%' y1='0%' x2='100%' y2='0%'>
+        <linearGradient id={`gradient-smooth-${config.uid || 0}`} x1='0%' y1='0%' x2='100%' y2='0%'>
           {stops}
         </linearGradient>
 
-        {config.legend.subStyle === 'smooth' && <rect x={1} y={1} width={width} height={boxHeight} fill='url(#gradient-smooth)' />}
+        {config.legend.subStyle === 'smooth' && <rect x={1} y={1} width={legendWidth} height={boxHeight} fill={`url(#gradient-smooth-${config.uid || 0})`} />}
 
         {config.legend.subStyle === 'linear blocks' &&
           colors.map((color, index) => {
-            const segmentWidth = width / numTicks
+            const segmentWidth = legendWidth / numTicks
             const xPosition = index * segmentWidth
             return (
               <Group>
