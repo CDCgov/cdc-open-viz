@@ -6,6 +6,9 @@ import Annotation from './components/Annotation'
 import Error from './components/EditorPanel/components/Error'
 import _ from 'lodash'
 
+// types
+import { type ViewportSize } from './types/MapConfig'
+
 // IE11
 import 'whatwg-fetch'
 import ResizeObserver from 'resize-observer-polyfill'
@@ -73,9 +76,6 @@ const regionKeys = Object.keys(supportedRegions)
 const countryKeys = Object.keys(supportedCountries)
 const countyKeys = Object.keys(supportedCounties)
 const cityKeys = Object.keys(supportedCities)
-
-// types
-import { type ViewportSize } from './types/MapConfig'
 
 const indexOfIgnoreType = (arr, item) => {
   for (let i = 0; i < arr.length; i++) {

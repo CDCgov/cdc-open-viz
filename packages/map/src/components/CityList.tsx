@@ -4,9 +4,9 @@ import { jsx } from '@emotion/react'
 import { supportedCities } from '../data/supported-geos'
 import { scaleLinear } from 'd3-scale'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
-import { getFilterControllingStatePicked } from './../components/UsaMap/helpers/map'
+import { getFilterControllingStatePicked } from './UsaMap/helpers/map'
 
-import ConfigContext from './../context'
+import ConfigContext from '../context'
 
 const CityList = ({ data, geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToRow, titleCase, setSharedFilterValue, isFilterValueSupported, tooltipId, projection }) => {
   const [citiesData, setCitiesData] = useState({})

@@ -4,14 +4,12 @@ interface LegendShapeProps {
   fill: string
   borderColor?: string
   display?: 'inline-block' | 'block' | 'inline'
-  viewport: 'sm' | 'xs' | 'xxs' | 'lg' | 'md'
-  shape?: 'circle' | 'square' | 'gradient'
+  shape?: 'circle' | 'square'
 }
 
 const LegendShape: React.FC<LegendShapeProps> = props => {
-  const { fill, borderColor, display = 'inline-block', viewport, shape = 'circle' } = props
-  const isGradient = shape === 'gradient'
-  const dimensions = isGradient ? { width: '4rem', height: '1.5em' } : { width: '1em', height: '1em' }
+  const { fill, borderColor, display = 'inline-block', shape = 'circle' } = props
+  const dimensions = { width: '1em', height: '1em' }
   const marginRight = ['circle', 'square'].includes(shape) ? '5px' : '0'
   const styles = {
     marginRight: marginRight,

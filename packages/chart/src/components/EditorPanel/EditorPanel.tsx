@@ -777,22 +777,17 @@ const EditorPanel = () => {
     return Object.keys(columns)
   }
 
-  const getLegendStyloptions = option => {
-    const styles = []
+  const getLegendStyleOptions = (option: 'style' | 'subStyle'): string[] => {
+    const options: string[] = []
     if (option === 'style') {
-      styles.push('circles', 'boxes')
-      if (config.visualizationType === 'Bar') {
-        styles.push('gradient')
-      }
-      if (config.visualizationType === 'Line') {
-        styles.push('lines')
-      }
+      options.push('circles', 'boxes')
+      if (config.visualizationType === 'Bar') options.push('gradient')
+      if (config.visualizationType === 'Line') options.push('lines')
     }
     if (option === 'subStyle') {
-      styles.push('linear blocks', 'smooth')
+      options.push('linear blocks', 'smooth')
     }
-
-    return styles
+    return options
   }
 
   const getDataValueOptions = (data: Record<string, any>[]): string[] => {
@@ -2726,10 +2721,10 @@ const EditorPanel = () => {
                     fieldName='style'
                     label='Legend Style'
                     updateField={updateField}
-                    options={getLegendStyloptions('style')}
+                    options={getLegendStyleOptions('style')}
                   />
 
-                  <Select display={!config.legend.hide && config.legend.style === 'gradient'} value={config.legend.subStyle} section='legend' fieldName='subStyle' label='Gradient Style' updateField={updateField} options={getLegendStyloptions('subStyle')} />
+                  <Select display={!config.legend.hide && config.legend.style === 'gradient'} value={config.legend.subStyle} section='legend' fieldName='subStyle' label='Gradient Style' updateField={updateField} options={getLegendStyleOptions('subStyle')} />
                   <TextField display={config.legend.style === 'gradient' && !config.legend.hide} className='number-narrow' type='number' value={config.legend.tickRotation} section='legend' fieldName='tickRotation' label='Tick Rotation (Degrees)' updateField={updateField} />
 
                   {/* <fieldset className="checkbox-group">

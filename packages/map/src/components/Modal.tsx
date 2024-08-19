@@ -1,9 +1,9 @@
 import React, { useContext } from 'react'
-import closeIcon from '../images/close.svg?inline'
+import closeIcon from '../images/close.svg'
 import LegendShape from '@cdc/core/components/LegendShape'
 import ConfigContext from '../context'
 
-const Modal = props => {
+const Modal = () => {
   const { applyTooltipsToGeo, capitalize, applyLegendToRow, viewport, type, content } = useContext(ConfigContext)
 
   const tooltip = applyTooltipsToGeo(content.geoName, content.keyedData, 'jsx')

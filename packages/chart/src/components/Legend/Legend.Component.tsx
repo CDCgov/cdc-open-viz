@@ -24,7 +24,7 @@ export interface LegendProps {
   ref: React.Ref<() => void>
   seriesHighlight: string[]
   skipId: string
-  dimensions: [string, string]
+  dimensions: [string, string] // for responsive width legend
   getTextWidth: (text: string, font: string) => string
 }
 
@@ -75,9 +75,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                   if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
                     className.push('inactive')
                   }
-                  if (config.legend.style === 'gradient') {
-                    className.push('gradient')
-                  }
+
                   if (config.legend.style === 'gradient') {
                     return <></>
                   }
