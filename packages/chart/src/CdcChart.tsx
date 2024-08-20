@@ -674,6 +674,19 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }, [configObj.data]) // eslint-disable-line
   }
 
+// This will set the bump chart's default scaling type to date-time
+useEffect(() => {
+    if(['Bump Chart'].includes(config.visualizationType)) {
+        setConfig({ 
+            ...config,
+            xAxis: {
+                ...config.xAxis,
+                type: 'date-time'
+            }
+        })
+    }
+}, [config.visualizationType])
+
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (stateData && config.xAxis && config.runtime?.seriesKeys) {
