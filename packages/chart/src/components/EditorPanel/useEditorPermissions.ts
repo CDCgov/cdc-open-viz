@@ -293,8 +293,6 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryAxisPadding = () => {
-    const disabledCharts = ['Bump Chart']
-    if (disabledCharts.includes(visualizationType)) return false
     return config.xAxis.type === 'date-time'
   }
 
