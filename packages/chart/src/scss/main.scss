@@ -113,11 +113,13 @@
     position: relative;
 
     &__inner {
-      &.bottom {
+      &.double-column,
+      &.single-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-column-gap: 1.5em;
       }
+
       &.vertical-sorted {
         display: block;
 
@@ -150,6 +152,10 @@
         word-wrap: break-word;
         white-space: pre-wrap;
         word-break: break-word;
+      }
+
+      & > :first-child {
+        margin-top: 3px;
       }
     }
 
@@ -188,6 +194,10 @@
         opacity: 0.5;
         transition: 0.2s all;
       }
+    }
+
+    &.no-border {
+      border: none;
     }
   }
 
@@ -273,6 +283,17 @@
     align-items: flex-start;
     flex-wrap: wrap;
 
+    &.left {
+      display: flex;
+      flex-direction: row-reverse;
+    }
+    &.top {
+      flex-wrap: nowrap;
+      flex-direction: column-reverse;
+      & > div.tooltip-boundary {
+        margin-top: 1.5em;
+      }
+    }
     &.bottom {
       flex-wrap: nowrap;
       flex-direction: column;
@@ -430,7 +451,6 @@
 
     .chart-container {
       flex-wrap: nowrap;
-
       .no-wrap {
         flex-wrap: nowrap;
       }
@@ -445,7 +465,8 @@
           margin-right: 1em;
           order: 0;
         }
-        &.bottom {
+        &.bottom,
+        &.top {
           width: 100%;
           margin-left: 0;
         }

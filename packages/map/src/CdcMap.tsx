@@ -6,6 +6,9 @@ import Annotation from './components/Annotation'
 import Error from './components/EditorPanel/components/Error'
 import _ from 'lodash'
 
+// types
+import { type ViewportSize } from './types/MapConfig'
+
 // IE11
 import 'whatwg-fetch'
 import ResizeObserver from 'resize-observer-polyfill'
@@ -26,6 +29,7 @@ import { publish } from '@cdc/core/helpers/events'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import Title from '@cdc/core/components/ui/Title'
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
@@ -90,7 +94,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [loading, setLoading] = useState(true)
   const [displayPanel, setDisplayPanel] = useState(true)
-  const [currentViewport, setCurrentViewport] = useState()
+  const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
   const [topoData, setTopoData] = useState<Topology | {}>({})
   const [runtimeFilters, setRuntimeFilters] = useState([])
   const [runtimeLegend, setRuntimeLegend] = useState([])
@@ -194,6 +198,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     for (let entry of entries) {
       let { width, height } = entry.contentRect
       let newViewport = getViewport(entry.contentRect.width)
+
       let editorWidth = 350
 
       setCurrentViewport(newViewport)
@@ -1615,7 +1620,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     tooltipId,
     tooltipRef,
     topoData,
-    setTopoData
+    setTopoData,
+    getTextWidth
   }
 
   if (!mapProps.data || !state.data) return <></>
@@ -1709,7 +1715,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                   )}
                 </section>
 
-                {general.showSidebar && 'navigation' !== general.type && <Legend ref={legendRef} skipId={tabId} />}
+                {general.showSidebar && 'navigation' !== general.type && <Legend dimensions={dimensions} currentViewport={currentViewport} ref={legendRef} skipId={tabId} />}
               </div>
 
               {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}

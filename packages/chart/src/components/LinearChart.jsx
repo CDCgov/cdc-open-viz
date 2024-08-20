@@ -71,7 +71,7 @@ const LinearChart = props => {
 
   // configure width
   let [width] = dimensions
-  if (config && config.legend && !config.legend.hide && config.legend?.position !== 'bottom' && ['lg', 'md'].includes(currentViewport)) {
+  if (config && config.legend && !config.legend.hide && !['bottom', 'top'].includes(config.legend?.position) && ['lg', 'md'].includes(currentViewport)) {
     width = width * 0.73
   }
   //  configure height , yMax, xMax
@@ -473,7 +473,7 @@ const LinearChart = props => {
                             </Text>
                           )}
 
-                          {orientation === 'vertical' && visualizationType === 'Bump Chart' && !config.yAxis.hideLabel && (      
+                          {orientation === 'vertical' && visualizationType === 'Bump Chart' && !config.yAxis.hideLabel && (
                             <>
                               <Text
                                 display={config.useLogScale ? showTicks : 'block'}
@@ -489,13 +489,7 @@ const LinearChart = props => {
                               </Text>
 
                               {(seriesHighlight.length === 0 || seriesHighlight.includes(config.runtime.seriesLabelsAll[tick.formattedValue - 1])) && (
-                                <rect 
-                                  x={0 - Number(config.yAxis.size)} 
-                                  y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)} 
-                                  width={Number(config.yAxis.size) + xScale(xScale.domain()[0])} 
-                                  height='2' 
-                                  fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])} 
-                                />
+                                <rect x={0 - Number(config.yAxis.size)} y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)} width={Number(config.yAxis.size) + xScale(xScale.domain()[0])} height='2' fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])} />
                               )}
                             </>
                           )}

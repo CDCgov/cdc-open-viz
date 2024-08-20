@@ -67,7 +67,10 @@ export default {
     type: 'equalnumber',
     numberOfItems: 3,
     position: 'side',
-    title: 'Legend'
+    title: '',
+    style: 'circles',
+    subStyle: 'linear blocks',
+    tickRotation: ''
   },
   filters: [],
   table: {

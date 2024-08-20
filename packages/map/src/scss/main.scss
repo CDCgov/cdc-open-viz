@@ -72,7 +72,14 @@
   .map-container {
     display: flex;
     position: relative;
-    flex-direction: column;
+
+    &.bottom {
+      flex-direction: column;
+    }
+    &.top {
+      flex-direction: column-reverse;
+    }
+
     &.modal-background {
       position: relative;
       &::before {
