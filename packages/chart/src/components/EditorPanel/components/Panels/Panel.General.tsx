@@ -63,7 +63,7 @@ const PanelGeneral: FC<PanelProps> = props => {
             options={enabledChartTypes}
           />
         )}
-        {visSupportsChartHeight() && config.orientation === 'vertical' && (
+        {visSupportsChartHeight() && config.orientation === 'vertical' && visualizationType !== 'Pie' && (
           <TextField
             type='number'
             value={config.heights.vertical}
