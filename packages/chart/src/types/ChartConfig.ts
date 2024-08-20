@@ -132,6 +132,7 @@ export type AllChartsConfig = {
   formattedData: Object[] & { urlFiltered: boolean }
   heights: {
     vertical: number
+    mobileVertical: number
   }
   highlightedBarValues: { value: any; color: string; borderWidth: number; legendLabel: string }[]
   introText: string
