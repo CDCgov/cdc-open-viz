@@ -439,7 +439,7 @@
         "singleRow": true,
         "colorCode": "",
         "reverseLabelOrder": false,
-        "description": "* To highlight a data series in the chart, click on the corresponding name in the legend. To undo the highlight, select the reset button.",
+        "description": "* To highlight a data series in the chart, select the corresponding name in the legend. To undo the highlight, select the reset button.",
         "dynamicLegend": false,
         "dynamicLegendDefaultText": "Show All",
         "dynamicLegendItemLimit": 5,
@@ -2780,7 +2780,7 @@
       "uid": "markup-include1719606699638",
       "type": "markup-include",
       "contentEditor": {
-        "inlineHTML": "<h1 style=\"font-size:18px; padding-left: 15px; padding-bottom: 10px\"><u><strong>Greatest Positive Change In Rank</strong></u></h1>\n<h2 style=\"font-size:16px; padding-left: 15px\"><strong>Vehicle:</strong></h2>\n<p style=\"font-size:16px; padding-left: 15px\">Rank Changed From #8 to #3 from 2014 to 2020</p>\n<p style=\"font-size:16px; padding-left: 15px\">Largest Rank Change of +5 Took Place Between 2014 and 2015</p>",
+        "inlineHTML": "<h3 style=\"font-size:18px; padding-left: 15px; padding-bottom: 10px\"><strong>Greatest Positive Change In Rank</strong></h3>\n<h4 style=\"font-size:16px; padding-left: 15px\"><strong>Vehicle:</strong></h4>\n<p style=\"font-size:16px; padding-left: 15px\">Rank Changed From #8 to #3 from 2014 to 2020</p>\n<p style=\"font-size:16px; padding-left: 15px\">Largest Rank Change of +5 Took Place Between 2014 and 2015</p>",
         "markupVariables": [],
         "showHeader": true,
         "srcUrl": "#example",
@@ -2808,7 +2808,7 @@
       "uid": "markup-include1719606700773",
       "type": "markup-include",
       "contentEditor": {
-        "inlineHTML": "<h1 style=\"font-size:18px; padding-left: 15px; ; padding-bottom: 10px\"><u><strong>Greatest Negative Change In Rank</strong></u></h1>\n<h2 style=\"font-size:16px; padding-left: 15px\"><strong>Bullying:</strong></h2>\n<p style=\"font-size:16px; padding-left: 15px\">Rank Changed From #4 to #10 from 2014 to 2020</p>\n<p style=\"font-size:16px; padding-left: 15px\">Largest Rank Change of -5 Took Place Between 2016 and 2017</p>",
+        "inlineHTML": "<h3 style=\"font-size:18px; padding-left: 15px; ; padding-bottom: 10px\"><strong>Greatest Negative Change In Rank</strong></h3>\n<h4 style=\"font-size:16px; padding-left: 15px\"><strong>Bullying:</strong></h4>\n<p style=\"font-size:16px; padding-left: 15px\">Rank Changed From #4 to #10 from 2014 to 2020</p>\n<p style=\"font-size:16px; padding-left: 15px\">Largest Rank Change of -5 Took Place Between 2016 and 2017</p>",
         "markupVariables": [],
         "showHeader": true,
         "srcUrl": "#example",
