@@ -62,6 +62,16 @@ export const addValuesToFilters = <T>(filters: Filter[], data: any[] | Record<st
       filteredData = handleVizParents(filter as VizFilter, data, filtersLookup)
     }
     const filterValues = generateValuesForFilter(filter.columnName, filteredData)
+    if(filterCopy.orderedValues){
+      filterValues.sort((a,b) => {
+        const indexOfA = filterCopy.orderedValues.indexOf(a)
+        const indexOfB = filterCopy.orderedValues.indexOf(b)
+        if(indexOfA === -1 && indexOfB === -1) return 0
+        if(indexOfA !== -1) return -1
+        if(indexOfB !== -1) return 1
+        return indexOfA < indexOfB
+      })
+    }
     filterCopy.values = filterValues
     if (filterValues.length > 0) {
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)
