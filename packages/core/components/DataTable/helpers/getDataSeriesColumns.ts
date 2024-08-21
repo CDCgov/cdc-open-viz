@@ -11,8 +11,8 @@ export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, r
   let tmpSeriesColumns: string[] = []
   if (config.visualizationType !== 'Pie') {
     tmpSeriesColumns = isVertical ? [config.xAxis?.dataKey] : [] //, ...config.runtime.seriesLabelsAll
-    if (config.runtime.series) {
-      config.runtime.series.forEach(element => {
+    if (config.runtime?.series) {
+      config.runtime?.series.forEach(element => {
         tmpSeriesColumns.push(element.dataKey)
       })
     } else if (runtimeData && runtimeData.length > 0) {
