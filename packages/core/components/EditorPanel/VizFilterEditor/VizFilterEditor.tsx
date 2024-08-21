@@ -235,6 +235,16 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                   </label>
 
                   <FilterOrder filterIndex={index} filter={filter} updateFilterProp={updateFilterProp} handleFilterOrder={handleFilterOrder} />
+                  <label>
+                    <span className='edit-filterOrder column-heading'>Keep Filter Style on Mobile</span>
+                    <input
+                      type='checkbox'
+                      checked={filter.keepFilterStyleOnMobile}
+                      onChange={event => {
+                        updateFilterProp('keepFilterStyleOnMobile', index, event.target.checked)
+                      }}
+                    />
+                  </label>
                 </FieldSetWrapper>
               )
             })}

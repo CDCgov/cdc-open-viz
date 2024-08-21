@@ -4,6 +4,8 @@ export type FilterBase = {
   showDropdown: boolean
   id: number
   parents: number[]
+  // Filters default to dropdowns on mobile, but can be set to tabs, pills, etc. when this is true.
+  keepFilterStyleOnMobile: boolean
 }
 
 export type GeneralFilter = FilterBase & {
