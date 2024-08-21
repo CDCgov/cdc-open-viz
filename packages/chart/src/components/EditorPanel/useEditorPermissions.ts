@@ -293,8 +293,6 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryAxisPadding = () => {
-    const disabledCharts = ['Bump Chart']
-    if (disabledCharts.includes(visualizationType)) return false
     return config.xAxis.type === 'date-time'
   }
 
@@ -319,6 +317,10 @@ export const useEditorPermissions = () => {
       return true
     }
     return false
+  }
+
+  const visSupportsDynamicSeries = () => {
+    return visualizationType === 'Line' || visualizationType === 'Bar' || visualizationType === 'Scatter Plot' || visualizationType === 'Area Chart'
   }
 
   const visHasSingleSeriesTooltip = () => {
@@ -381,6 +383,7 @@ export const useEditorPermissions = () => {
     visSupportsReactTooltip,
     visSupportsValueAxisMax,
     visSupportsValueAxisMin,
+    visSupportsDynamicSeries,
     visHasSingleSeriesTooltip,
     visHasCategoricalAxis
   }

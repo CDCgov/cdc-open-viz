@@ -337,16 +337,31 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {}
+    newConfig.runtime.series = newConfig.dynamicSeries ? [] : newConfig.series
     newConfig.runtime.seriesLabels = {}
     newConfig.runtime.seriesLabelsAll = []
     newConfig.runtime.originalXAxis = newConfig.xAxis
+
+    if(newConfig.dynamicSeries){
+      let finalData = dataOverride || newConfig.formattedData || newConfig.data
+      if(finalData && finalData.length && finalData.length > 0){
+        Object.keys(finalData[0]).forEach(seriesKey => {
+          if(seriesKey !== newConfig.xAxis.dataKey && finalData[0][seriesKey] && (!newConfig.filters || newConfig.filters.filter(filter => filter.columnName === seriesKey).length === 0) && (!newConfig.columns || Object.keys(newConfig.columns).indexOf(seriesKey) === -1)){
+            newConfig.runtime.series.push({
+              dataKey: seriesKey,
+              tooltip: true
+            })
+          }
+        })
+      }
+    }
 
     if (newConfig.visualizationType === 'Pie') {
       newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey])
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
     } else {
-      newConfig.runtime.seriesKeys = newConfig.series
-        ? newConfig.series.map(series => {
+      newConfig.runtime.seriesKeys = newConfig.runtime.series
+        ? newConfig.runtime.series.map(series => {
             newConfig.runtime.seriesLabels[series.dataKey] = series.name || series.label || series.dataKey
             newConfig.runtime.seriesLabelsAll.push(series.name || series.dataKey)
             return series.dataKey
@@ -659,6 +674,19 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }, [configObj.data]) // eslint-disable-line
   }
 
+// This will set the bump chart's default scaling type to date-time
+useEffect(() => {
+    if(['Bump Chart'].includes(config.visualizationType)) {
+        setConfig({ 
+            ...config,
+            xAxis: {
+                ...config.xAxis,
+                type: 'date-time'
+            }
+        })
+    }
+}, [config.visualizationType])
+
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (stateData && config.xAxis && config.runtime?.seriesKeys) {
@@ -949,7 +977,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         return true
       }
     } else {
-      if (undefined === config?.series || false === config?.series.length > 0) {
+      if ((undefined === config?.series || false === config?.series.length > 0) && !config?.dynamicSeries) {
         return true
       }
     }

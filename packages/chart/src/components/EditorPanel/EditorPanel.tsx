@@ -525,7 +525,8 @@ const EditorPanel = () => {
     visSupportsResponsiveTicks,
     visSupportsDateCategoryHeight,
     visHasDataSuppression,
-    visHasCategoricalAxis
+    visHasCategoricalAxis,
+    visSupportsDynamicSeries
   } = useEditorPermissions()
 
   // when the visualization type changes we
@@ -1229,64 +1230,69 @@ const EditorPanel = () => {
             {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && config.visualizationType !== 'Sankey' && (
               <AccordionItem>
                 <AccordionItemHeading>
-                  <AccordionItemButton>Data Series {(!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && <WarningImage width='25' className='warning-icon' />}</AccordionItemButton>
+                  <AccordionItemButton>Data Series {(!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && !config.dynamicSeries && <WarningImage width='25' className='warning-icon' />}</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {(!config.series || config.series.length === 0) && config.visualizationType !== 'Paired Bar' && <p className='warning'>At least one series is required</p>}
-                  {(!config.series || config.series.length === 0 || config.series.length < 2) && config.visualizationType === 'Paired Bar' && <p className='warning'>Select two data series for paired bar chart (e.g., Male and Female).</p>}
-                  <>
-                    <Select
-                      fieldName='visualizationType'
-                      label='Add Data Series'
-                      initial='Select'
-                      onChange={e => {
-                        if (e.target.value !== '' && e.target.value !== 'Select') {
-                          addNewSeries(e.target.value)
-                        }
-                        e.target.value = ''
-                      }}
-                      options={getColumns()}
-                    />
-                    {config.series && config.series.length !== 0 && (
-                      <Panels.Series.Wrapper getColumns={getColumns}>
-                        <fieldset>
-                          <legend className='edit-label float-left'>Displaying</legend>
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </fieldset>
-
-                        <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
-                          <Droppable droppableId='filter_order'>
-                            {/* prettier-ignore */}
-                            {provided => {
-                              return (
-                                <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
-                                  <Panels.Series.List series={config.series} getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} />
-                                  {provided.placeholder}
-                                </ul>
-                              )
-                            }}
-                          </Droppable>
-                        </DragDropContext>
-                      </Panels.Series.Wrapper>
-                    )}
-                  </>
-                  {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
+                  {visSupportsDynamicSeries() && <CheckBox value={config.dynamicSeries} fieldName='dynamicSeries' label='Dynamically generate series' updateField={updateField} />}
+                  {(!visSupportsDynamicSeries() || !config.dynamicSeries) && (
                     <>
-                      <span className='divider-heading'>Confidence Keys</span>
-                      <Select value={config.confidenceKeys.upper || ''} section='confidenceKeys' fieldName='upper' label='Upper' updateField={updateField} initial='Select' options={getColumns()} />
-                      <Select value={config.confidenceKeys.lower || ''} section='confidenceKeys' fieldName='lower' label='Lower' updateField={updateField} initial='Select' options={getColumns()} />
+                      {(!config.series || config.series.length === 0) && !config.dynamicSeries && config.visualizationType !== 'Paired Bar' && <p className='warning'>At least one series is required</p>}
+                      {(!config.series || config.series.length === 0 || config.series.length < 2) && config.visualizationType === 'Paired Bar' && <p className='warning'>Select two data series for paired bar chart (e.g., Male and Female).</p>}
+                      <>
+                        <Select
+                          fieldName='visualizationType'
+                          label='Add Data Series'
+                          initial='Select'
+                          onChange={e => {
+                            if (e.target.value !== '' && e.target.value !== 'Select') {
+                              addNewSeries(e.target.value)
+                            }
+                            e.target.value = ''
+                          }}
+                          options={getColumns()}
+                        />
+                        {config.series && config.series.length !== 0 && (
+                          <Panels.Series.Wrapper getColumns={getColumns}>
+                            <fieldset>
+                              <legend className='edit-label float-left'>Displaying</legend>
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            </fieldset>
+
+                            <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
+                              <Droppable droppableId='filter_order'>
+                                {/* prettier-ignore */}
+                                {provided => {
+                                  return (
+                                    <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
+                                      <Panels.Series.List series={config.series} getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} />
+                                      {provided.placeholder}
+                                    </ul>
+                                  )
+                                }}
+                              </Droppable>
+                            </DragDropContext>
+                          </Panels.Series.Wrapper>
+                        )}
+                      </>
+                      {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
+                        <>
+                          <span className='divider-heading'>Confidence Keys</span>
+                          <Select value={config.confidenceKeys.upper || ''} section='confidenceKeys' fieldName='upper' label='Upper' updateField={updateField} initial='Select' options={getColumns()} />
+                          <Select value={config.confidenceKeys.lower || ''} section='confidenceKeys' fieldName='lower' label='Lower' updateField={updateField} initial='Select' options={getColumns()} />
+                        </>
+                      )}
+                      {visSupportsRankByValue() && config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
+                      {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
+                      {visSupportsPreliminaryData() && <PreliminaryData config={config} updateConfig={updateConfig} data={data} />}
                     </>
                   )}
-                  {visSupportsRankByValue() && config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
-                  {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
-                  {visSupportsPreliminaryData() && <PreliminaryData config={config} updateConfig={updateConfig} data={data} />}
                 </AccordionItemPanel>
               </AccordionItem>
             )}
