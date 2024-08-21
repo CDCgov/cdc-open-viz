@@ -1,16 +1,17 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import './nesteddropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
+import { NestedDropdownFilter } from '../../types/VizFilter'
 
 const Options: React.FC<{
   currentOptions: (string | number)[]
   label: string
   handleSecondTierSelect: Function
+  tierOneIndex: number
   userSelectedTierTwoLabel: string
   userSearchTerm: string
-}> = ({ currentOptions, label, handleSecondTierSelect, userSelectedTierTwoLabel, userSearchTerm }) => {
+}> = ({ currentOptions = [], label, handleSecondTierSelect, tierOneIndex, userSelectedTierTwoLabel, userSearchTerm }) => {
   const [isTierOneExpanded, setIsTierOneExpanded] = useState(true)
-
   const checkMark = <>&#10004;</>
 
   useEffect(() => {
@@ -36,16 +37,17 @@ const Options: React.FC<{
   return (
     <>
       <li role='treeitem' key={label} tabIndex={0} aria-label={label} onClick={handleGroupClick} onKeyUp={handleKeyUp} className='nested-dropdown-group'>
-        <span id={label}>{label} </span>
+        <span className={'font-weight-bold'}>{label} </span>
         {
           <span className='list-arrow' aria-hidden='true'>
             {isTierOneExpanded ? <Icon display='caretFilledUp' /> : <Icon display='caretFilledDown' />}
           </span>
         }
         <ul aria-expanded={isTierOneExpanded} role='group' tabIndex={-1} aria-labelledby={label} className={isTierOneExpanded ? '' : 'hide'}>
-          {currentOptions.map(tierTwo => {
+          {currentOptions.map((tierTwo, tierTwoIndex) => {
             const regionID = label + tierTwo
-            let isSelected = regionID === userSelectedTierTwoLabel
+            const isSelected = regionID === userSelectedTierTwoLabel
+
             return (
               <li
                 key={regionID}
@@ -59,7 +61,13 @@ const Options: React.FC<{
                   handleSecondTierSelect(tierTwo)
                 }}
               >
-                {isSelected ? <span aria-hidden='true'>{checkMark}</span> : ''}
+                {isSelected ? (
+                  <span className='check-mark' aria-hidden='true'>
+                    {checkMark}
+                  </span>
+                ) : (
+                  ''
+                )}
 
                 {tierTwo}
               </li>
@@ -72,28 +80,25 @@ const Options: React.FC<{
 }
 
 interface NestedDropdownProps {
-  data: Record<string, string | number>[]
-  tiers: [string, string] // index 0  is the parent index 1 is the child
+  isEditor?: boolean
+  currentFilter: NestedDropdownFilter
   listLabel: string
   handleSelectedItems: Function
 }
 
-const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, tiers: [firstTierLabel, secondTierLabel], listLabel, handleSelectedItems }) => {
+const NestedDropdown: React.FC<NestedDropdownProps> = ({ currentFilter, listLabel, handleSelectedItems }) => {
   const optsMemo: Record<string, (string | number)[]> = {}
+  const { orderedValues: valueOrder } = currentFilter
+  const subGroupValueOrder = currentFilter.subGroupingFilter?.allValues ?? []
+  const groupFilterActive = currentFilter.active
+  const subGroupFilterActive = currentFilter.subGroupingFilter?.active ?? ''
 
-  data.forEach(value => {
-    const tierOne = value[firstTierLabel]
-    const tierTwo = value[secondTierLabel]
-    if (optsMemo[tierOne]) {
-      optsMemo[tierOne].push(tierTwo)
-    } else {
-      optsMemo[tierOne] = [tierTwo]
-    }
+  valueOrder?.forEach((value, index) => {
+    optsMemo[value] = subGroupValueOrder[index]?.orderedValues
   })
 
-  const [userSelectedTierTwoLabel, setUserSelectedTierTwoLabel] = useState(null)
   const [userSearchTerm, setUserSearchTerm] = useState('')
-  const [inputValue, setInputValue] = useState('')
+  const [inputValue, setInputValue] = useState(subGroupFilterActive !== '' ? `${groupFilterActive} - ${subGroupFilterActive}` : 'Select an Option')
   const [inputHasFocus, setInputHasFocus] = useState(false)
   const [isListOpened, setIsListOpened] = useState(false)
 
@@ -102,12 +107,11 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, tiers: [firstTier
 
   const chooseSelectedSecondTier = (tierOne: string, tierTwo: string) => {
     searchInput.current.focus()
-    const selectedItemValue = tierTwo
-    setUserSelectedTierTwoLabel(tierOne + tierTwo)
+    const selectedItemValue = `${tierOne} - ${tierTwo}`
     setUserSearchTerm('')
     setIsListOpened(false)
     setInputValue(selectedItemValue)
-    handleSelectedItems(tierOne, tierTwo)
+    handleSelectedItems([tierOne, tierTwo])
   }
 
   const handleKeyUp = e => {
@@ -199,7 +203,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, tiers: [firstTier
     return newOptions
   }, [userSearchTerm])
 
-  const filterOptionsKeys = Object.keys(filterOptions)
+  const filterOptionsKeys = valueOrder.length === 0 ? Object.keys(filterOptions) : valueOrder
 
   const handleSearchTermChange = e => {
     const newSearchTerm = e.target.value
@@ -234,7 +238,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, tiers: [firstTier
         </div>
         <ul role='tree' key={listLabel} tabIndex={-1} aria-labelledby='main-nested-dropdown' aria-expanded={isListOpened} ref={searchDropdown} className={`main-nested-dropdown-container ${isListOpened ? '' : 'hide'}`}>
           {filterOptions && filterOptionsKeys.length > 0
-            ? filterOptionsKeys.map((tierOne: string) => {
+            ? filterOptionsKeys.map((tierOne: string, tierOneIndex: number) => {
                 return (
                   <Options
                     currentOptions={filterOptions[tierOne]}
@@ -242,7 +246,8 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, tiers: [firstTier
                     handleSecondTierSelect={(tierTwo: string) => {
                       chooseSelectedSecondTier(tierOne, tierTwo)
                     }}
-                    userSelectedTierTwoLabel={userSelectedTierTwoLabel}
+                    tierOneIndex={tierOneIndex}
+                    userSelectedTierTwoLabel={groupFilterActive + subGroupFilterActive}
                     userSearchTerm={userSearchTerm}
                   />
                 )

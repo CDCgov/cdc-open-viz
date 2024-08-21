@@ -6,12 +6,14 @@ import Button from './elements/Button'
 import { getQueryParams, updateQueryString } from '../helpers/queryStringUtils'
 import MultiSelect from './MultiSelect'
 import { Visualization } from '../types/Visualization'
-import { MultiSelectFilter, VizFilter } from '../types/VizFilter'
+import { MultiSelectFilter, NestedDropdownFilter, VizFilter } from '../types/VizFilter'
 import { filterVizData } from '../helpers/filterVizData'
 import { addValuesToFilters } from '../helpers/addValuesToFilters'
 import { DimensionsType } from '../types/Dimensions'
+import NestedDropdown from './NestedDropdown'
+import _ from 'lodash'
 
-export const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar', 'multi-select']
+export const filterStyleOptions = ['dropdown', 'nested-dropdown', 'pill', 'tab', 'tab bar', 'multi-select']
 
 export const filterOrderOptions = [
   {
@@ -29,11 +31,33 @@ export const filterOrderOptions = [
 ]
 
 export const handleSorting = singleFilter => {
-  const sort = (a, b) => {
-    const asc = singleFilter.order !== 'desc'
-    return (asc ? a : b).toString().localeCompare((asc ? b : a).toString(), 'en', { numeric: true })
+  const { order } = singleFilter
+
+  const singleFilterValues = _.cloneDeep(singleFilter.values)
+
+  const sortAsc = (a, b) => {
+    return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
   }
-  singleFilter.values = singleFilter.values.sort(sort)
+
+  const sortDesc = (a, b) => {
+    return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
+  }
+
+  if (!order || order === '') {
+    singleFilter.order = 'asc'
+  }
+
+  if (order === 'desc') {
+    singleFilter.orderedValues = singleFilterValues.sort(sortDesc)
+  }
+
+  if (order === 'asc') {
+    singleFilter.orderedValues = singleFilterValues.sort(sortAsc)
+  }
+
+  if (order === 'cust') {
+    singleFilter.orderedValues = singleFilterValues
+  }
   return singleFilter
 }
 
@@ -94,7 +118,12 @@ export const useFilters = props => {
       setShowApplyButton(true)
     } else {
       const newFilter = newFilters[index]
-      newFilter.active = value
+      if (newFilter.filterStyle !== 'nested-dropdown') {
+        newFilter.active = value
+      } else {
+        newFilter.active = value[0]
+        newFilter.subGroupingFilter.active = value[1]
+      }
 
       const queryParams = getQueryParams()
       if (newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active) {
@@ -263,7 +292,7 @@ type FilterProps = {
 
 const Filters = (props: FilterProps) => {
   const { config: visualizationConfig, filteredData, dimensions } = props
-  const { filters, type, general, theme, filterBehavior } = visualizationConfig
+  const { data, filters, type, general, theme, filterBehavior } = visualizationConfig
   const [mobileFilterStyle, setMobileFilterStyle] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState<EventTarget>(null)
   const id = useId()
@@ -364,8 +393,12 @@ const Filters = (props: FilterProps) => {
       const { active, queuedActive, label, filterStyle } = singleFilter as VizFilter
 
       handleSorting(singleFilter)
+      singleFilter.orderedValues =
+        singleFilter.orderedValues === undefined || singleFilter.orderedValues.length === 0
+          ? singleFilter.values
+          : singleFilter.orderedValues
 
-      singleFilter.values?.forEach((filterOption, index) => {
+      singleFilter.orderedValues?.forEach((filterOption, index) => {
         const pillClassList = ['pill', active === filterOption ? 'pill--active' : null, theme && theme]
         const tabClassList = ['tab', active === filterOption && 'tab--active', theme && theme]
 
@@ -431,7 +464,7 @@ const Filters = (props: FilterProps) => {
             {filterStyle === 'tab' && !mobileFilterStyle && Tabs}
             {filterStyle === 'pill' && !mobileFilterStyle && Pills}
             {filterStyle === 'tab bar' && !mobileFilterStyle && <TabBar filter={singleFilter} index={outerIndex} />}
-            {(filterStyle === 'dropdown' || mobileFilterStyle) && (
+            {(filterStyle === 'dropdown' || mobileFilterStyle) && filterStyle !== 'nested-dropdown' && (
               <Dropdown
                 filter={singleFilter}
                 index={outerIndex}
@@ -447,6 +480,14 @@ const Filters = (props: FilterProps) => {
                 updateField={(_section, _subSection, fieldName, value) => changeFilterActive(fieldName, value)}
                 selected={singleFilter.active as string[]}
                 limit={(singleFilter as MultiSelectFilter).selectLimit || 5}
+              />
+            )}
+            {filterStyle === 'nested-dropdown' && (
+              <NestedDropdown
+                currentFilter={filters[outerIndex]}
+                filterIndex={outerIndex}
+                listLlabel={label}
+                handleSelectedItems={value => changeFilterActive(outerIndex, value)}
               />
             )}
           </>
