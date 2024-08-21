@@ -272,7 +272,7 @@ const Filters = (props: FilterProps) => {
 
   useEffect(() => {
     if (!dimensions) return
-    if (dimensions[0] < 768 && filters?.length > 0) {
+    if (dimensions[0] < 768 && filters?.length > 0 && !filters.some(f => f.keepFilterStyleOnMobile)) {
       setMobileFilterStyle(true)
     } else {
       setMobileFilterStyle(false)
