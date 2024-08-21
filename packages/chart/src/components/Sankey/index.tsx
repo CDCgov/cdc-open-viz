@@ -28,17 +28,23 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
 
   //Tooltip
   const [tooltipID, setTooltipID] = useState<string>('')
-
-  const handleNodeClick = (nodeId: string) => {
-    setTooltipID(nodeId)
-  }
-
-  const clearNodeClick = () => {
-    setTooltipID('')
-  }
-
   //Mobile Pop Up
   const [showPopup, setShowPopup] = useState(false)
+
+  const handleNodeClick = (nodeId: string) => {
+    // Store the previous tooltipID
+    const previousTooltipID = tooltipID
+
+    // If the previous tooltipID exists, clear it
+    if (previousTooltipID) {
+      setTooltipID('')
+    }
+
+    // Update the tooltipID with the new nodeId if it's different from the previous one
+    if (previousTooltipID !== nodeId) {
+      setTooltipID(nodeId)
+    }
+  }
 
   useEffect(() => {
     if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
@@ -207,7 +213,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
           fillOpacity={opacityValue}
           rx={sankeyConfig.rxValue}
           // todo: move enable tooltips to sankey
-          data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
+          data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
           data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
           onClick={() => handleNodeClick(node.id)}
           style={{ pointerEvents: 'visible', cursor: 'pointer' }}
@@ -238,7 +244,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               className='node-text'
               style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
               onClick={() => handleNodeClick(node.id)}
-              data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
+              data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
               data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
             >
               {(data?.storyNodeText?.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}
@@ -253,7 +259,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               textAnchor='start'
               style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
               onClick={() => handleNodeClick(node.id)}
-              data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
+              data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
               data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
             >
               {typeof node.value === 'number' ? node.value.toLocaleString() : node.value}
@@ -269,7 +275,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               verticalAnchor='end'
               style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
               onClick={() => handleNodeClick(node.id)}
-              data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
+              data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
               data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
             >
               {(data?.storyNodeText?.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextAfter}
@@ -280,7 +286,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
             <Text
               style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
               onClick={() => handleNodeClick(node.id)}
-              data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
+              data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
               data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
               x={node.x0! + textPositionHorizontal}
               y={(node.y1! + node.y0!) / 2 + textPositionVertical}
@@ -302,7 +308,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               textAnchor='start'
               style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
               onClick={() => handleNodeClick(node.id)}
-              data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
+              data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
               data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
             >
               <tspan className={classStyle}>{sankeyConfig.nodeValueStyle.textBefore + (typeof node.value === 'number' ? node.value.toLocaleString() : node.value) + sankeyConfig.nodeValueStyle.textAfter}</tspan>
@@ -337,7 +343,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
         strokeWidth={link.width! + 2}
         style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
         onClick={() => handleNodeClick(link.target.id || null)}
-        data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
+        data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
         data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
       />
     )
@@ -374,7 +380,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
           fillOpacity={opacityValue}
           rx={sankeyConfig.rxValue}
           // todo: move enable tooltips to sankey
-          data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
+          data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
           data-tooltip-id={`tooltip`}
           onClick={() => handleNodeClick(node.id)}
           style={{ pointerEvents: 'visible', cursor: 'pointer' }}
@@ -465,7 +471,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
 
         {/* ReactTooltip needs to remain even if tooltips are disabled -- it handles when a user clicks off of the node and resets
         the sankey diagram. When tooltips are disabled this will nothing */}
-        <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`} afterHide={() => clearNodeClick()} events={['click']} place={'bottom'} style={{ backgroundColor: `rgba(238, 238, 238, 1)`, color: 'black', boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)` }} />
+        <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`} afterHide={() => setTooltipID('')} events={['click']} place={'bottom'} style={{ backgroundColor: `rgba(238, 238, 238, 1)`, color: 'black', boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)` }} />
         {showPopup && (
           <div className='popup'>
             <div className='popup-content'>
