@@ -5,13 +5,12 @@ type FilterOrderProps = {
   handleFilterOrder?: Function
 }
 const FilterOrder: React.FC<FilterOrderProps> = ({ orderedValues, handleFilterOrder }) => {
-  const orderedFilterValues = orderedValues
   return (
     <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index)}>
       <Droppable droppableId='filter_order'>
         {provided => (
           <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
-            {orderedFilterValues?.map((value, index) => {
+            {orderedValues?.map((value, index) => {
               return (
                 <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
                   {(provided, snapshot) => (

@@ -1,7 +1,6 @@
-import { useState } from 'react'
 import _ from 'lodash'
-import { NestedDropdownFilter, SubGroupingType, VizFilter } from '../../../types/VizFilter'
-import { filterOrderOptions } from '../../Filters'
+import { SubGrouping, VizFilter, OrderBy } from '../../../types/VizFilter'
+import { filterOrderOptions, handleSorting } from '../../Filters'
 import FilterOrder from './components/FilterOrder'
 import { Visualization } from '../../../types/Visualization'
 
@@ -10,116 +9,104 @@ type NestedDropdownEditorProps = {
   dataColumns: string[]
   filterIndex: number
   handleNameChange: Function
-  handleSorting: Function
-  rawData: {}
+  rawData: Object[]
   updateField: Function
   updateFilterStyle: Function
-  updateFilterProp: Function
-  handleFilterCustomOrderChange: Function
+  handleGroupingCustomOrder: Function
 }
 
-const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ config, dataColumns, handleFilterCustomOrderChange, handleNameChange, handleSorting, filterIndex, rawData, updateField, updateFilterProp }) => {
-  const allFilters = config.filters
-  const filter = allFilters[filterIndex]
-  const subGrouping = filter?.subGroupingFilter
-  const orderedSubGroupValues = subGrouping?.allValues
+const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ config, dataColumns, handleGroupingCustomOrder, handleNameChange: handleGroupColumnNameChange, filterIndex, rawData, updateField }) => {
+  const filter = config.filters[filterIndex]
+  const subGrouping = filter?.subGrouping
   const listOfUsedColumnNames: string[] = []
 
-  allFilters.forEach((filter: NestedDropdownFilter, index) => {
+  config.filters.forEach((filter: VizFilter, index) => {
     if (filterIndex === index) return
     listOfUsedColumnNames.push(filter.columnName)
     if (subGrouping?.columnName) listOfUsedColumnNames.push(subGrouping.columnName)
   })
 
-  const columnNameOptions = dataColumns.filter(columnName => !listOfUsedColumnNames.includes(columnName))
-
-  const handleFitlerGroupColumnNameChange = value => {
-    updateField('filters', filterIndex, 'columnName', value)
-    handleNameChange(value)
+  const updateGroupingFilterProp = (prop, value) => {
+    updateField('filters', filterIndex, prop, value)
   }
 
-  const updateSubGroupingFilterProperty = newSubGrouping => {
-    updateField('filters', filterIndex, 'subGroupingFilter', newSubGrouping)
-  }
-
-  const arrangeSubGroupFilterOptions = filterOrder => {
-    const newSubGroupingFilter = { ...filter.subGroupingFilter, allValues: [] }
-    filterOrder.map(filterOption =>
-      [...filter.subGroupingFilter?.allValues].forEach(grouping => {
-        if (grouping.groupName === filterOption) {
-          newSubGroupingFilter.allValues.push(grouping)
-        }
-      })
-    )
-    return newSubGroupingFilter
-  }
-
-  const handleFilterOrderOptionSelection = sortBy => {
+  const handleGroupingOrderBy = (order: OrderBy) => {
     const groupSortObject = {
       values: _.cloneDeep(filter.values),
-      order: sortBy
+      order
     }
-    const newOrderedValues = handleSorting(groupSortObject).orderedValues
-    const newSubFilterOrderedOptions = filter.subGroupingFilter?.allValues.length > 0 ? arrangeSubGroupFilterOptions(newOrderedValues) : []
+    const newOrderedValues = handleSorting(groupSortObject).values
 
-    const newAllFilters = _.cloneDeep(allFilters)
-    newAllFilters[filterIndex] = { ...filter, orderedValues: newOrderedValues, order: sortBy, subGroupingFilter: newSubFilterOrderedOptions }
+    const newAllFilters = _.cloneDeep(config.filters)
+    newAllFilters[filterIndex] = { ...filter, values: newOrderedValues, order }
+    if (order === 'cust') {
+      newAllFilters[filterIndex].orderedValues = newOrderedValues
+    } else {
+      delete newAllFilters[filterIndex].orderedValues
+    }
     updateField(null, null, 'filters', newAllFilters)
   }
 
-  const handleSubGroupColumnNameChange = value => {
-    const filterGroupingOptions = filter?.orderedValues ?? filter.values
+  const updateSubGroupingFilterProperty = (newSubGrouping: SubGrouping) => {
+    updateField('filters', filterIndex, 'subGrouping', newSubGrouping)
+  }
 
-    const subFilterAllValues = []
-    filterGroupingOptions.map(filterGroupOption => {
-      const subFilterGroupingValues: string[] = _.uniq(
-        _.values(_.cloneDeep(rawData))
+  const handleSubGroupColumnNameChange = value => {
+    const filterGroups = filter.orderedValues ?? filter.values
+
+    const valuesLookup = filterGroups.reduce((acc, groupName) => {
+      const values: string[] = _.uniq(
+        rawData
           .map(d => {
-            return d[filter.columnName] === filterGroupOption ? d[value] : ''
+            return d[filter.columnName] === groupName ? d[value] : ''
           })
-          .filter(option => option !== '')
+          .filter(value => value !== '')
       ).sort()
 
-      subFilterAllValues.push({
-        groupName: filterGroupOption,
-        values: subFilterGroupingValues,
-        orderedValues: subFilterGroupingValues
-      })
-    })
-    const newSubGrouping: SubGroupingType = {
+      acc[groupName] = {
+        values // add temp values when column changes
+      }
+      return acc
+    }, {})
+    const newSubGrouping: SubGrouping = {
       ...subGrouping,
       columnName: value,
-      type: '',
-      allValues: subFilterAllValues
+      valuesLookup
     }
 
     updateSubGroupingFilterProperty(newSubGrouping)
   }
 
-  const handleSubFilterOrderOptionSelection = sortBy => {
-    const newSortedSubGrouping = { ...subGrouping, order: sortBy }
-    newSortedSubGrouping.allValues.map((group, groupIndex) => {
-      const groupSortObject = {
-        values: group.values,
-        order: sortBy
+  const handleSubGroupingOrderBy = (order: OrderBy) => {
+    const newValuesLookup = Object.keys(subGrouping.valuesLookup).reduce((acc, groupName) => {
+      const subGroup = subGrouping.valuesLookup[groupName]
+
+      const { values } = handleSorting({ values: subGroup.values, order })
+      acc[groupName] = {
+        values
       }
-
-      const newOrderedValues = handleSorting(groupSortObject).orderedValues
-      newSortedSubGrouping.allValues[groupIndex].orderedValues = newOrderedValues
-    })
-    updateField('filters', filterIndex, 'subGroupingFilter', newSortedSubGrouping)
+      if (order === 'cust') {
+        acc[groupName].orderedValues = values
+      } else {
+        delete acc[groupName].orderedValues
+      }
+      return acc
+    }, {})
+    const newSortedSubGrouping = { ...subGrouping, order, valuesLookup: newValuesLookup }
+    updateSubGroupingFilterProperty(newSortedSubGrouping)
   }
 
-  const handleSubGroupFilterCustomOrderChange = (movedItemIndex, indexWhereItemDropped, subGroupingFitlerOrder: string[], groupIndex) => {
-    const updatedGroupOrderedValues = subGroupingFitlerOrder
-    const [movedItem] = updatedGroupOrderedValues.splice(movedItemIndex, 1)
-    updatedGroupOrderedValues.splice(indexWhereItemDropped, 0, movedItem)
-    const newAllValues = orderedSubGroupValues
-    newAllValues[groupIndex].orderedValues = updatedGroupOrderedValues
-    const newSubGrouping = { ...subGrouping, order: 'cust', allValues: newAllValues }
-
-    updateSubGroupingFilterProperty(newSubGrouping)
+  const handleSubGroupingCustomOrder = (currentIndex, newIndex, subGroupingFitlerOrder: string[], groupName: string) => {
+    const updatedGroupOrderedValues = _.cloneDeep(subGroupingFitlerOrder)
+    const [movedItem] = updatedGroupOrderedValues.splice(currentIndex, 1)
+    updatedGroupOrderedValues.splice(newIndex, 0, movedItem)
+    const newSubGrouping = _.cloneDeep(subGrouping)
+    newSubGrouping.valuesLookup[groupName].values = updatedGroupOrderedValues
+    newSubGrouping.valuesLookup[groupName].orderedValues = updatedGroupOrderedValues
+    updateSubGroupingFilterProperty({ ...newSubGrouping, order: 'cust' })
   }
+
+  const columnNameOptions = dataColumns.filter(columnName => !listOfUsedColumnNames.includes(columnName))
 
   return (
     <div className='nesteddropdown-editor'>
@@ -129,7 +116,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ config, dat
           type='text'
           value={filter.label}
           onChange={e => {
-            updateFilterProp('label', filterIndex, e.target.value)
+            updateGroupingFilterProp('label', e.target.value)
           }}
         />
       </label>
@@ -139,7 +126,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ config, dat
           Filter Grouping
           <span></span>
         </div>
-        <select value={filter.columnName} onChange={e => handleFitlerGroupColumnNameChange(e.target.value)}>
+        <select value={filter.columnName} onChange={e => handleGroupColumnNameChange(e.target.value)}>
           <option value=''>- Select Option -</option>
           {columnNameOptions.map((option, index) => (
             <option value={option} key={index}>
@@ -175,21 +162,31 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ config, dat
       <label>
         <input
           type='checkbox'
-          checked={filter.useQueryParameter}
+          checked={!!filter.setByQueryParameter}
           aria-label='Create query parameters'
           onChange={e => {
-            updateFilterProp('useQueryParameter', filterIndex, e.target.checked)
+            updateGroupingFilterProp('setByQueryParameter', filter.columnName)
+            updateSubGroupingFilterProperty({ ...subGrouping, setByQueryParameter: subGrouping.columnName })
           }}
         />
         <span> Create query parameters</span>
-        {filter.useQueryParameter && (
+        {!!filter.setByQueryParameter && (
           <>
-            <span className='edit-label column-heading mt-2'>Default Value Set By Query String Parameter</span>
+            <span className='edit-label column-heading mt-2'>Grouping: Default Value Set By Query String Parameter</span>
             <input
               type='text'
               value={filter.setByQueryParameter}
               onChange={e => {
-                updateFilterProp('setByQueryParameter', filterIndex, e.target.value)
+                updateGroupingFilterProp('setByQueryParameter', e.target.value)
+              }}
+            />
+            <span className='edit-label column-heading mt-2'>SubGrouping: Default Value Set By Query String Parameter</span>
+            <input
+              type='text'
+              value={subGrouping.setByQueryParameter}
+              onChange={e => {
+                const setByQueryParameter = e.target.value
+                updateSubGroupingFilterProperty({ ...subGrouping, setByQueryParameter })
               }}
             />
           </>
@@ -199,7 +196,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ config, dat
       <label className='mt-2'>
         <div className='edit-label column-heading float-right'>{filter.columnName} </div>
         <span className={'edit-filterOrder column-heading '}>Group Order</span>
-        <select value={filter.order} onChange={e => handleFilterOrderOptionSelection(e.target.value)}>
+        <select value={filter.order} onChange={e => handleGroupingOrderBy(e.target.value as OrderBy)}>
           {filterOrderOptions.map((option, index) => {
             return (
               <option value={option.value} key={`filter-${option.label}-${index}`}>
@@ -208,14 +205,21 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ config, dat
             )
           })}
         </select>
-        {filter.order === 'cust' && <FilterOrder orderedValues={filter.orderedValues} handleFilterOrder={(sourceIndex, destinationIndex) => handleFilterCustomOrderChange(sourceIndex, destinationIndex, filterIndex, filter)} />}
+        {filter.order === 'cust' && (
+          <FilterOrder
+            orderedValues={filter.orderedValues}
+            handleFilterOrder={(sourceIndex, destinationIndex) => {
+              handleGroupingCustomOrder(sourceIndex, destinationIndex, filterIndex, filter)
+            }}
+          />
+        )}
       </label>
 
       {subGrouping?.columnName && (
         <label className='mt-2'>
           <span className={'edit-filterOrder column-heading'}>SubGrouping Order</span>
           <div className='edit-label column-heading float-right'>{subGrouping.columnName} </div>
-          <select value={subGrouping.order ? subGrouping.order : 'asc'} onChange={e => handleSubFilterOrderOptionSelection(e.target.value)}>
+          <select value={subGrouping.order ? subGrouping.order : 'asc'} onChange={e => handleSubGroupingOrderBy(e.target.value as OrderBy)}>
             {filterOrderOptions.map((option, index) => {
               return (
                 <option value={option.value} key={`filter-${index}`}>
@@ -225,12 +229,18 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ config, dat
             })}
           </select>
           {subGrouping?.order === 'cust' &&
-            filter.orderedValues.map((filterValue, orderedFilterValueindex) => {
-              const orderedValues = orderedSubGroupValues[orderedFilterValueindex].orderedValues
+            filter.values.map((groupName, i) => {
+              const orderedSubGroupValues = subGrouping.valuesLookup[groupName].orderedValues
               return (
-                <div key={`group-subgroup-values-${filterValue}-${orderedFilterValueindex}`}>
-                  <span className='font-weight-bold'>{filterValue}</span>
-                  <FilterOrder key={`subgroup-values-${filterValue}-${orderedFilterValueindex}`} orderedValues={orderedValues} handleFilterOrder={(sourceIndex, destinationIndex) => handleSubGroupFilterCustomOrderChange(sourceIndex, destinationIndex, orderedValues, orderedFilterValueindex)} />
+                <div key={`group-subgroup-values-${groupName}-${i}`}>
+                  <span className='font-weight-bold'>{groupName}</span>
+                  <FilterOrder
+                    key={`subgroup-values-${groupName}-${i}`}
+                    orderedValues={orderedSubGroupValues}
+                    handleFilterOrder={(sourceIndex, destinationIndex) => {
+                      handleSubGroupingCustomOrder(sourceIndex, destinationIndex, orderedSubGroupValues, groupName)
+                    }}
+                  />
                 </div>
               )
             })}

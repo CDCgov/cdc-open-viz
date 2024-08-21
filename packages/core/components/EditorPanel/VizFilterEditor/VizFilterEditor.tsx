@@ -4,7 +4,7 @@ import Icon from '../../ui/Icon'
 import { Visualization } from '../../../types/Visualization'
 import { UpdateFieldFunc } from '../../../types/UpdateFieldFunc'
 import _ from 'lodash'
-import { MultiSelectFilter, NestedDropdownFilter, VizFilter } from '../../../types/VizFilter'
+import { MultiSelectFilter, VizFilter } from '../../../types/VizFilter'
 import { filterStyleOptions, handleSorting, filterOrderOptions } from '../../Filters'
 import FieldSetWrapper from '../FieldSetWrapper'
 
@@ -39,7 +39,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
 
   const updateFilterStyle = (index, value) => {
     const filters = _.cloneDeep(config.filters)
-    const currentFilter = { ...filters[index], orderedValues: filters[index].values }
+    const currentFilter = filters[index]
     currentFilter.filterStyle = value
     if (value === 'multi-select') {
       currentFilter.active = Array.isArray(currentFilter.active) ? currentFilter.active : [currentFilter.active]
@@ -52,8 +52,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
 
   const handleNameChange = (filterIndex, columnName) => {
     const values = _.uniq(rawData.map(row => row[columnName]))
-    const orderedValues = values
-    const copiedFilter = { ..._.cloneDeep(config.filters[filterIndex]), columnName, values, orderedValues }
+    const copiedFilter = { ..._.cloneDeep(config.filters[filterIndex]), columnName, values }
     handleSorting(copiedFilter) // sorts dropdown values in place
     copiedFilter.active = copiedFilter.values[0]
     const newFilters = config.filters.map((filter, index) => {
@@ -72,8 +71,8 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
 
   const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
     // Create a shallow copy of the filter values array & update position of the values
-    const currentFilterValueOrder = filter.orderedValues ?? filter.values
-    const updatedValues = [...currentFilterValueOrder]
+    const updatedValues = [...filter.values]
+
     const [movedItem] = updatedValues.splice(idx1, 1)
     updatedValues.splice(idx2, 0, movedItem)
 
@@ -81,19 +80,9 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
     const filterItem = { ...filtersCopy[filterIndex] }
 
     // Overwrite filterItem.values since thats what we map through in the editor panel
-    filterItem.active = updatedValues[0]
+    filterItem.values = updatedValues
     filterItem.orderedValues = updatedValues
-    if (filter.filterStyle !== 'nested-dropdown') {
-      filterItem.values = updatedValues
-    }
-
-    if (filter.filterStyle === 'nested-dropdown') {
-      const subGroupingFilter = { ...filter.subGroupingFilter }
-      const updatedSubFilterValueOrder = subGroupingFilter.allValues
-      const [subFilterMovedItem] = updatedSubFilterValueOrder.splice(idx1, 1)
-      updatedSubFilterValueOrder.splice(idx2, 0, subFilterMovedItem)
-      filterItem.subGroupingFilter.allValues = updatedSubFilterValueOrder
-    }
+    filterItem.active = updatedValues[0]
 
     filterItem.order = 'cust'
 
@@ -132,7 +121,6 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
             {/* Whether filters should apply onChange or Apply Button */}
 
             {config.filters.map((filter, filterIndex) => {
-              const orderedFilterValues = filter.orderedValues ?? filter.values
               if (filter.type === 'url') return <></>
               return (
                 <FieldSetWrapper key={filter.columnName} fieldName={filter.columnName} fieldKey={filterIndex} fieldType='Filter' controls={openControls} deleteField={() => removeFilter(filterIndex)}>
@@ -228,28 +216,20 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                           }}
                         />
                       </label>
-                      <label>
-                        <span className='edit-label column-heading'>
-                          Filter Parents{' '}
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>A selected parent's value will be used to filter the available options of this child filter.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </span>
-                        <MultiSelect
-                          fieldName='parents'
-                          updateField={(_section, _subsection, _fieldname, value) => {
-                            updateFilterProp('parents', filterIndex, value)
-                          }}
-                          options={getParentFilterOptions(filterIndex)}
-                        />
-                      </label>
 
-                      <FilterOrder filterIndex={filterIndex} filter={filter} updateFilterProp={updateFilterProp} handleFilterOrder={handleFilterOrder} />
+                      <label>
+                        <span className='edit-filterOrder column-heading'>Filter Order</span>
+                        <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', filterIndex, e.target.value)}>
+                          {filterOrderOptions.map((option, index) => {
+                            return (
+                              <option value={option.value} key={`filter-${index}`}>
+                                {option.label}
+                              </option>
+                            )
+                          })}
+                        </select>
+                        {filter.order === 'cust' && <FilterOrder orderedValues={filter.orderedValues} handleFilterOrder={handleFilterOrder} />}
+                      </label>
                     </>
                   ) : (
                     <NestedDropdownEditor
@@ -257,14 +237,32 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                       dataColumns={dataColumns}
                       filterIndex={filterIndex}
                       rawData={rawData}
-                      handleFilterCustomOrderChange={handleFilterOrder}
+                      handleGroupingCustomOrder={handleFilterOrder}
                       handleNameChange={value => handleNameChange(filterIndex, value)}
-                      handleSorting={handleSorting}
                       updateField={updateField}
-                      updateFilterProp={updateFilterProp}
                       updateFilterStyle={updateFilterStyle}
                     />
                   )}
+                  <label>
+                    <span className='edit-label column-heading'>
+                      Filter Parents{' '}
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>A selected parent's value will be used to filter the available options of this child filter.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    </span>
+                    <MultiSelect
+                      fieldName='parents'
+                      updateField={(_section, _subsection, _fieldname, value) => {
+                        updateFilterProp('parents', filterIndex, value)
+                      }}
+                      options={getParentFilterOptions(filterIndex)}
+                    />
+                  </label>
                 </FieldSetWrapper>
               )
             })}

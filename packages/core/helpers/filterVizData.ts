@@ -1,4 +1,16 @@
-export const filterVizData = (filters, data) => {
+import { SubGrouping } from '../types/VizFilter'
+
+type Filter = {
+  columnName: string
+  type?: string
+  values: (string | number)[]
+  filterStyle?: string
+  active?: string | number | (string | number)[]
+  parents?: (string | number)[]
+  subGrouping?: SubGrouping
+}
+
+export const filterVizData = (filters: Filter[], data) => {
   if (!data) {
     console.warn('COVE: No data to filter')
     return []
@@ -22,20 +34,16 @@ export const filterVizData = (filters, data) => {
         } else if (value != filter.active) {
           add = false
         }
-        if (filter.filterStyle === 'nested-dropdown' && filter.subGroupingFilter && add === true) {
-          const subGroup = filter.subGroupingFilter
-          const subGroupValue = row[filter.subGroupingFilter.columnName]
-          if (subGroup.active === undefined) return
-          if (!subGroup.active.includes(subGroupValue)) {
-            add = false
-          } else if (subGroupValue != subGroup.active) {
+        if (filter.filterStyle === 'nested-dropdown' && filter.subGrouping && add === true) {
+          const subGroupActive = filter.subGrouping.active
+          const value = row[filter.subGrouping.columnName]
+          if (subGroupActive === undefined) return
+          if (value != subGroupActive) {
             add = false
           }
         }
-
-        if (add) filteredData.push(row)
       })
+    if (add) filteredData.push(row)
   })
-
   return filteredData
 }
