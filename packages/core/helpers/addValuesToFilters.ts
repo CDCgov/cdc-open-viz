@@ -15,7 +15,7 @@ const generateValuesForFilter = (columnName, data: any[] | Record<string, any[]>
   if (Array.isArray(data)) {
     data.forEach(row => {
       const value = row[columnName]
-      if (!values.includes(value)) {
+      if (value !== undefined &&!values.includes(value)) {
         values.push(value)
       }
     })
@@ -26,7 +26,7 @@ const generateValuesForFilter = (columnName, data: any[] | Record<string, any[]>
     Object.values(data).forEach((rows: any[]) => {
       rows.forEach(row => {
         const value = row[columnName]
-        if (!values.includes(value)) {
+        if (value !== undefined && !values.includes(value)) {
           values.push(value)
         }
       })
