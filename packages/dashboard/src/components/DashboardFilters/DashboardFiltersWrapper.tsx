@@ -138,7 +138,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
     .map(filterIndex => dashboardConfig.dashboard.sharedFilters[filterIndex])
 
   const displayNone = filters.length ? filters.every(filter => !filter.showDropdown) : false
-  if (displayNone) return <></>
+  if (displayNone && !isEditor) return <></>
   return (
     <Layout.VisualizationWrapper config={visualizationConfig} isEditor={isEditor} currentViewport={currentViewport}>
       {isEditor && (
@@ -152,19 +152,23 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         </Layout.Sidebar>
       )}
 
-      <Layout.Responsive isEditor={isEditor}>
-        <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''} cove-component__content col-12`}>
-          <Filters
-            show={visualizationConfig?.sharedFilterIndexes?.map(Number)}
-            filters={dashboardConfig.dashboard.sharedFilters || []}
-            apiFilterDropdowns={apiFilterDropdowns}
-            handleOnChange={handleOnChange}
-          />
-          {visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad && (
-            <button onClick={applyFilters}>GO!</button>
-          )}
-        </div>
-      </Layout.Responsive>
+      {!displayNone && (
+        <Layout.Responsive isEditor={isEditor}>
+          <div
+            className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''} cove-component__content col-12`}
+          >
+            <Filters
+              show={visualizationConfig?.sharedFilterIndexes?.map(Number)}
+              filters={dashboardConfig.dashboard.sharedFilters || []}
+              apiFilterDropdowns={apiFilterDropdowns}
+              handleOnChange={handleOnChange}
+            />
+            {visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad && (
+              <button onClick={applyFilters}>GO!</button>
+            )}
+          </div>
+        </Layout.Responsive>
+      )}
     </Layout.VisualizationWrapper>
   )
 }

@@ -23,7 +23,9 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
   const [columns, setColumns] = useState<string[]>([])
   const transform = new DataTransform()
 
-  const parentFilters: string[] = (config.dashboard.sharedFilters || []).filter(({ key, type }) => key !== filter.key && type !== 'datafilter').map(({ key }) => key)
+  const parentFilters: string[] = (config.dashboard.sharedFilters || [])
+    .filter(({ key, type }) => key !== filter.key && type !== 'datafilter')
+    .map(({ key }) => key)
 
   const vizRowColumnLocator = getVizRowColumnLocator(config.rows)
 
@@ -116,7 +118,11 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
     <>
       <label>
         <span className='edit-label column-heading'>Filter Type: </span>
-        <select defaultValue={filter.type || ''} onChange={e => updateFilterProp('type', e.target.value)} disabled={!!filter.type}>
+        <select
+          defaultValue={filter.type || ''}
+          onChange={e => updateFilterProp('type', e.target.value)}
+          disabled={!!filter.type}
+        >
           <option value=''>- Select Option -</option>
           <option value='urlfilter'>URL</option>
           <option value='datafilter'>Data</option>
@@ -124,12 +130,19 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
       </label>
       {filter.type === 'urlfilter' && (
         <>
-          <TextField label='Label' value={filter.key} updateField={(_section, _subSection, _key, value) => updateFilterProp('key', value)} />
+          <TextField
+            label='Label'
+            value={filter.key}
+            updateField={(_section, _subSection, _key, value) => updateFilterProp('key', value)}
+          />
           {!hasDashboardApplyBehavior(config.visualizations) && (
             <>
               <label>
                 <span className='edit-label column-heading'>URL to Filter: </span>
-                <select defaultValue={filter.datasetKey || ''} onChange={e => updateFilterProp('datasetKey', e.target.value)}>
+                <select
+                  defaultValue={filter.datasetKey || ''}
+                  onChange={e => updateFilterProp('datasetKey', e.target.value)}
+                >
                   <option value=''>- Select Option -</option>
                   {Object.keys(config.datasets).map(datasetKey => {
                     if (config.datasets[datasetKey].dataUrl) {
@@ -145,7 +158,10 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
               </label>
               <label>
                 <span className='edit-label column-heading'>Filter By: </span>
-                <select defaultValue={filter.filterBy || ''} onChange={e => updateFilterProp('filterBy', e.target.value)}>
+                <select
+                  defaultValue={filter.filterBy || ''}
+                  onChange={e => updateFilterProp('filterBy', e.target.value)}
+                >
                   <option value=''>- Select Option -</option>
                   <option key={'query-string'} value={'Query String'}>
                     Query String
@@ -185,7 +201,10 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
                         </Tooltip.Content>
                       </Tooltip>
                     </span>
-                    <select defaultValue={filter.whitespaceReplacement || 'Keep Spaces'} onChange={e => updateFilterProp('whitespaceReplacement', e.target.value)}>
+                    <select
+                      defaultValue={filter.whitespaceReplacement || 'Keep Spaces'}
+                      onChange={e => updateFilterProp('whitespaceReplacement', e.target.value)}
+                    >
                       <option key={'remove-spaces'} value={'Remove Spaces'}>
                         Remove Spaces
                       </option>
@@ -201,8 +220,18 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
               )}
             </>
           )}
-          {filter.filterBy === 'Query String' && <TextField label='Query string parameter' value={filter.queryParameter} updateField={(_section, _subSection, _key, value) => updateFilterProp('queryParameter', value)} />}
-          <TextField label='Filter API Endpoint: ' value={filter.apiFilter?.apiEndpoint} updateField={(_section, _subSection, _key, value) => updateAPIFilter('apiEndpoint', value)} />
+          {filter.filterBy === 'Query String' && (
+            <TextField
+              label='Query string parameter'
+              value={filter.queryParameter}
+              updateField={(_section, _subSection, _key, value) => updateFilterProp('queryParameter', value)}
+            />
+          )}
+          <TextField
+            label='Filter API Endpoint: '
+            value={filter.apiFilter?.apiEndpoint}
+            updateField={(_section, _subSection, _key, value) => updateAPIFilter('apiEndpoint', value)}
+          />
           <TextField
             label='Option Text Selector:'
             value={filter.apiFilter?.textSelector}
@@ -260,7 +289,10 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                 </Tooltip.Target>
                 <Tooltip.Content>
-                  <p>Select if you would like specific visualizations or rows to use this filter. Otherwise the filter will be added to all api requests.</p>
+                  <p>
+                    Select if you would like specific visualizations or rows to use this filter. Otherwise the filter
+                    will be added to all api requests.
+                  </p>
                 </Tooltip.Content>
               </Tooltip>
             }
@@ -272,9 +304,17 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
             }}
           />
 
-          <TextField label='Reset Label: ' value={filter.resetLabel || ''} updateField={(_section, _subSection, _key, value) => updateFilterProp('resetLabel', value)} />
+          <TextField
+            label='Reset Label: '
+            value={filter.resetLabel || ''}
+            updateField={(_section, _subSection, _key, value) => updateFilterProp('resetLabel', value)}
+          />
 
-          <TextField label='Default Value Set By Query String Parameter: ' value={filter.setByQueryParameter || ''} updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)} />
+          <TextField
+            label='Default Value Set By Query String Parameter: '
+            value={filter.setByQueryParameter || ''}
+            updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)}
+          />
         </>
       )}
       {filter.type === 'datafilter' && (
@@ -296,7 +336,11 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
             </select>
           </label>
 
-          <TextField label='Label' value={filter.key} updateField={(_section, _subSection, _key, value) => updateFilterProp('key', value)} />
+          <TextField
+            label='Label'
+            value={filter.key}
+            updateField={(_section, _subSection, _key, value) => updateFilterProp('key', value)}
+          />
 
           <label>
             <span className='edit-label column-heading'>Show Dropdown</span>
@@ -352,7 +396,11 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
               ))}
             </select>
           </label>
-          <TextField label='Reset Label: ' value={filter.resetLabel || ''} updateField={(_section, _subSection, _key, value) => updateFilterProp('resetLabel', value)} />
+          <TextField
+            label='Reset Label: '
+            value={filter.resetLabel || ''}
+            updateField={(_section, _subSection, _key, value) => updateFilterProp('resetLabel', value)}
+          />
 
           <label>
             <span className='edit-label column-heading'>Parent Filter: </span>
@@ -372,11 +420,15 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
             </select>
           </label>
 
-          <TextField label='Default Value Set By Query String Parameter: ' value={filter.setByQueryParameter || ''} updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)} />
+          <TextField
+            label='Default Value Set By Query String Parameter: '
+            value={filter.setByQueryParameter || ''}
+            updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)}
+          />
         </>
       )}
       <label>
-        <span className='edit-label column-heading'>Multi Select</span>
+        <span className='mr-1'>Multi Select</span>
         <input
           type='checkbox'
           checked={filter.multiSelect}
@@ -404,6 +456,17 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
           }
         />
       )}
+
+      <label>
+        <span className='mr-1'>Show Dropdown</span>
+        <input
+          type='checkbox'
+          checked={filter.showDropdown}
+          onChange={e => {
+            updateFilterProp('showDropdown', !filter.showDropdown)
+          }}
+        />
+      </label>
     </>
   )
 }
