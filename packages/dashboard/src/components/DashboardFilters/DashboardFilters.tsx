@@ -1,6 +1,7 @@
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { SharedFilter } from '../../types/SharedFilter'
 import { APIFilterDropdowns } from './DashboardFiltersWrapper'
+import { sortByOrderedValues } from '@cdc/core/helpers/sortByOrderedValues'
 
 type DashboardFilterProps = {
   show: number[]
@@ -45,7 +46,9 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({ show, filters: share
           })
         } else {
           // Data Filter
-          filter.values?.forEach((filterOption, index) => {
+          const orderedValues = filter.values || []
+          sortByOrderedValues(orderedValues, filter.orderedValues)
+          orderedValues.forEach((filterOption, index) => {
             const labeledOpt = filter.labels && filter.labels[filterOption]
             values.push(
               <option key={`${filter.key}-option-${index}`} value={filterOption}>

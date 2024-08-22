@@ -6,6 +6,7 @@ import DataTransform from '@cdc/core/helpers/DataTransform'
 import { useEffect, useMemo, useState } from 'react'
 import { SharedFilter } from '../../../../types/SharedFilter'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+import { sortByOrderedValues } from '@cdc/core/helpers/sortByOrderedValues'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import MultiSelect from '@cdc/core/components/MultiSelect'
@@ -94,6 +95,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
       values = values.concat(_.uniq(dataset.map(row => row[filter.columnName])))
     })
 
+    sortByOrderedValues(values, filter.orderedValues)
     setColumnValues(values)
   }
 
@@ -111,14 +113,15 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
     setColumns(Object.keys(columns))
   }
 
-  const handleFilterOrder = (sourceIndex, destinationIndex, filterIndex, filter) => {
-    let orderedValues = [...(filter.orderedValues || columnValues)]
+  const handleFilterOrder = (sourceIndex, destinationIndex) => {
+    let orderedValues = [...columnValues]
 
     let placeholder = orderedValues[sourceIndex]
     orderedValues[sourceIndex] = orderedValues[destinationIndex]
     orderedValues[destinationIndex] = placeholder
     
     updateFilterProp('orderedValues', orderedValues)
+    setColumnValues(orderedValues)
   }
 
   useEffect(() => {
@@ -393,7 +396,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
 
           <TextField label='Default Value Set By Query String Parameter: ' value={filter.setByQueryParameter || ''} updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)} />
 
-          {filter.columnName && columnValues && <FilterOrder filterIndex={0} filter={{...filter, values: filter.orderedValues || columnValues}} updateFilterProp={(prop, index, value) => updateFilterProp(prop, value)} handleFilterOrder={handleFilterOrder} />}
+          {filter.columnName && columnValues && <FilterOrder filterIndex={0} filter={{...filter, values: columnValues}} updateFilterProp={(prop, index, value) => updateFilterProp(prop, value)} handleFilterOrder={handleFilterOrder} />}
         </>
       )}
 
