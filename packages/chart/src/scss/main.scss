@@ -24,6 +24,18 @@
 .cdc-open-viz-module.type-chart {
   @import 'DataTable';
 
+  .legend-top {
+    .legend-wrapper .tooltip-boundary {
+      display: flex;
+      flex-wrap: wrap;
+      order: 2;
+      aside {
+        width: 100%;
+        order: 1;
+      }
+    }
+  }
+
   .legend-bottom {
     .legend-wrapper {
       display: flex;
@@ -121,11 +133,13 @@
     position: relative;
 
     &__inner {
-      &.bottom {
+      &.double-column,
+      &.single-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-column-gap: 1.5em;
       }
+
       &.vertical-sorted {
         display: block;
 
@@ -158,6 +172,10 @@
         word-wrap: break-word;
         white-space: pre-wrap;
         word-break: break-word;
+      }
+
+      & > :first-child {
+        margin-top: 3px;
       }
     }
 
@@ -196,6 +214,10 @@
         opacity: 0.5;
         transition: 0.2s all;
       }
+    }
+
+    &.no-border {
+      border: none;
     }
   }
 
@@ -282,6 +304,20 @@
     flex-wrap: wrap;
     justify-content: space-between;
 
+    &.legend-top:not(.legend-hidden) {
+      .legend-wrapper {
+        & > div {
+          order: 2;
+          width: 100%;
+        }
+        aside {
+          width: 100%;
+          order: 1;
+          height: fit-content;
+        }
+      }
+    }
+
     &.legend-left:not(.legend-hidden) {
       .legend-wrapper {
         & > div {
@@ -310,6 +346,17 @@
       }
     }
 
+    &.left {
+      display: flex;
+      flex-direction: row-reverse;
+    }
+    &.top {
+      flex-wrap: nowrap;
+      flex-direction: column-reverse;
+      & > div.tooltip-boundary {
+        margin-top: 1.5em;
+      }
+    }
     &.bottom {
       flex-wrap: nowrap;
       flex-direction: column;
@@ -474,7 +521,8 @@
           margin-right: 1em;
           order: 0;
         }
-        &.bottom {
+        &.bottom,
+        &.top {
           width: 100%;
           margin-left: 0;
         }

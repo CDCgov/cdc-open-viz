@@ -1,4 +1,4 @@
-import { useContext, forwardRef } from 'react'
+import { useContext, forwardRef, Fragment } from 'react'
 import ConfigContext from '../../ConfigContext'
 import LegendComponent from './Legend.Component'
 import { createFormatLabels } from './helpers/createFormatLabels'
@@ -7,6 +7,7 @@ import { createFormatLabels } from './helpers/createFormatLabels'
 const Legend = forwardRef((props, ref) => {
   // prettier-ignore
   const {
+    // prettier-ignore
     config,
     colorScale,
     seriesHighlight,
@@ -14,9 +15,10 @@ const Legend = forwardRef((props, ref) => {
     tableData,
     highlightReset,
     transformedData: data,
-    currentViewport
+    currentViewport,
+    dimensions,
+    getTextWidth,
   } = useContext(ConfigContext)
-
   if (!config.legend) return null
   // create fn to reverse labels while legend is Bottom.  Legend-right , legend-left works by default.
 
@@ -24,7 +26,21 @@ const Legend = forwardRef((props, ref) => {
 
   return (
     !['Box Plot'].includes(config.visualizationType) && (
-      <LegendComponent ref={ref} skipId={props.skipId || 'legend'} config={config} colorScale={colorScale} seriesHighlight={seriesHighlight} highlight={highlight} highlightReset={highlightReset} currentViewport={currentViewport} formatLabels={createLegendLabels} />
+      <Fragment>
+        <LegendComponent
+          getTextWidth={getTextWidth}
+          dimensions={dimensions}
+          ref={ref}
+          skipId={props.skipId || 'legend'}
+          config={config}
+          colorScale={colorScale}
+          seriesHighlight={seriesHighlight}
+          highlight={highlight}
+          highlightReset={highlightReset}
+          currentViewport={currentViewport}
+          formatLabels={createLegendLabels}
+        />
+      </Fragment>
     )
   )
 })

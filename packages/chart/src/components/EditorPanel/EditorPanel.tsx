@@ -477,6 +477,7 @@ const EditorPanel = () => {
     visCanAnimate,
     visHasLegend,
     visHasLegendAxisAlign,
+    visHasLegendColorCategory,
     visHasBrushChart,
     visSupportsDateCategoryAxis,
     visSupportsValueAxisMin,
@@ -506,7 +507,8 @@ const EditorPanel = () => {
     visSupportsResponsiveTicks,
     visSupportsDateCategoryHeight,
     visHasDataSuppression,
-    visHasCategoricalAxis
+    visHasCategoricalAxis,
+    visSupportsDynamicSeries
   } = useEditorPermissions()
 
   // when the visualization type changes we
@@ -776,9 +778,22 @@ const EditorPanel = () => {
     return Object.keys(columns)
   }
 
-  const getDataValueOptions = data => {
+  const getLegendStyleOptions = (option: 'style' | 'subStyle'): string[] => {
+    const options: string[] = []
+    if (option === 'style') {
+      options.push('circles', 'boxes')
+      if (config.visualizationType === 'Bar') options.push('gradient')
+      if (config.visualizationType === 'Line') options.push('lines')
+    }
+    if (option === 'subStyle') {
+      options.push('linear blocks', 'smooth')
+    }
+    return options
+  }
+
+  const getDataValueOptions = (data: Record<string, any>[]): string[] => {
     if (!data) return []
-    const set = new Set()
+    const set = new Set<string>()
     for (let i = 0; i < data.length; i++) {
       for (const [key] of Object.entries(data[i])) {
         set.add(key)
@@ -1210,64 +1225,69 @@ const EditorPanel = () => {
             {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && config.visualizationType !== 'Sankey' && (
               <AccordionItem>
                 <AccordionItemHeading>
-                  <AccordionItemButton>Data Series {(!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && <WarningImage width='25' className='warning-icon' />}</AccordionItemButton>
+                  <AccordionItemButton>Data Series {(!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && !config.dynamicSeries && <WarningImage width='25' className='warning-icon' />}</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {(!config.series || config.series.length === 0) && config.visualizationType !== 'Paired Bar' && <p className='warning'>At least one series is required</p>}
-                  {(!config.series || config.series.length === 0 || config.series.length < 2) && config.visualizationType === 'Paired Bar' && <p className='warning'>Select two data series for paired bar chart (e.g., Male and Female).</p>}
-                  <>
-                    <Select
-                      fieldName='visualizationType'
-                      label='Add Data Series'
-                      initial='Select'
-                      onChange={e => {
-                        if (e.target.value !== '' && e.target.value !== 'Select') {
-                          addNewSeries(e.target.value)
-                        }
-                        e.target.value = ''
-                      }}
-                      options={getColumns()}
-                    />
-                    {config.series && config.series.length !== 0 && (
-                      <Panels.Series.Wrapper getColumns={getColumns}>
-                        <fieldset>
-                          <legend className='edit-label float-left'>Displaying</legend>
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </fieldset>
-
-                        <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
-                          <Droppable droppableId='filter_order'>
-                            {/* prettier-ignore */}
-                            {provided => {
-                              return (
-                                <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
-                                  <Panels.Series.List series={config.series} getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} />
-                                  {provided.placeholder}
-                                </ul>
-                              )
-                            }}
-                          </Droppable>
-                        </DragDropContext>
-                      </Panels.Series.Wrapper>
-                    )}
-                  </>
-                  {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
+                  {visSupportsDynamicSeries() && <CheckBox value={config.dynamicSeries} fieldName='dynamicSeries' label='Dynamically generate series' updateField={updateField} />}
+                  {(!visSupportsDynamicSeries() || !config.dynamicSeries) && (
                     <>
-                      <span className='divider-heading'>Confidence Keys</span>
-                      <Select value={config.confidenceKeys.upper || ''} section='confidenceKeys' fieldName='upper' label='Upper' updateField={updateField} initial='Select' options={getColumns()} />
-                      <Select value={config.confidenceKeys.lower || ''} section='confidenceKeys' fieldName='lower' label='Lower' updateField={updateField} initial='Select' options={getColumns()} />
+                      {(!config.series || config.series.length === 0) && !config.dynamicSeries && config.visualizationType !== 'Paired Bar' && <p className='warning'>At least one series is required</p>}
+                      {(!config.series || config.series.length === 0 || config.series.length < 2) && config.visualizationType === 'Paired Bar' && <p className='warning'>Select two data series for paired bar chart (e.g., Male and Female).</p>}
+                      <>
+                        <Select
+                          fieldName='visualizationType'
+                          label='Add Data Series'
+                          initial='Select'
+                          onChange={e => {
+                            if (e.target.value !== '' && e.target.value !== 'Select') {
+                              addNewSeries(e.target.value)
+                            }
+                            e.target.value = ''
+                          }}
+                          options={getColumns()}
+                        />
+                        {config.series && config.series.length !== 0 && (
+                          <Panels.Series.Wrapper getColumns={getColumns}>
+                            <fieldset>
+                              <legend className='edit-label float-left'>Displaying</legend>
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            </fieldset>
+
+                            <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
+                              <Droppable droppableId='filter_order'>
+                                {/* prettier-ignore */}
+                                {provided => {
+                                  return (
+                                    <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
+                                      <Panels.Series.List series={config.series} getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} />
+                                      {provided.placeholder}
+                                    </ul>
+                                  )
+                                }}
+                              </Droppable>
+                            </DragDropContext>
+                          </Panels.Series.Wrapper>
+                        )}
+                      </>
+                      {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
+                        <>
+                          <span className='divider-heading'>Confidence Keys</span>
+                          <Select value={config.confidenceKeys.upper || ''} section='confidenceKeys' fieldName='upper' label='Upper' updateField={updateField} initial='Select' options={getColumns()} />
+                          <Select value={config.confidenceKeys.lower || ''} section='confidenceKeys' fieldName='lower' label='Lower' updateField={updateField} initial='Select' options={getColumns()} />
+                        </>
+                      )}
+                      {visSupportsRankByValue() && config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
+                      {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
+                      {visSupportsPreliminaryData() && <PreliminaryData config={config} updateConfig={updateConfig} data={data} />}
                     </>
                   )}
-                  {visSupportsRankByValue() && config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
-                  {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
-                  {visSupportsPreliminaryData() && <PreliminaryData config={config} updateConfig={updateConfig} data={data} />}
                 </AccordionItemPanel>
               </AccordionItem>
             )}
@@ -1880,7 +1900,7 @@ const EditorPanel = () => {
                               }
                             >
                               {config.visualizationType !== 'Bump Chart' && <option value='categorical'>Categorical (Linear Scale)</option>}
-                              {config.visualizationType !== 'Bump Chart' && <option value='date'>Date (Linear Scale)</option>}                           
+                              {config.visualizationType !== 'Bump Chart' && <option value='date'>Date (Linear Scale)</option>}
                               <option value='date-time'>Date (Date Time Scale)</option>
                               {config.visualizationType === 'Scatter Plot' && <option value={'continuous'}>Continuous</option>}
                             </select>
@@ -2687,7 +2707,32 @@ const EditorPanel = () => {
                   <AccordionItemButton>Legend</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <CheckBox value={config.legend.reverseLabelOrder} section='legend' fieldName='reverseLabelOrder' label='Reverse Labels' updateField={updateField} />
+                  <Select value={config.legend?.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom', 'top']} />
+                  {(config.legend.position === 'left' || config.legend.position === 'right' || !config.legend.position) && config.legend.style === 'gradient' && <span style={{ color: 'red', fontSize: '14px' }}>Position must be set to top or bottom to use gradient style.</span>}
+
+                  <Select
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>If using gradient style, limit the legend to five items for better mobile visibility, and position the legend at the top or bottom.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    display={!config.legend.hide}
+                    value={config.legend.style}
+                    section='legend'
+                    fieldName='style'
+                    label='Legend Style'
+                    updateField={updateField}
+                    options={getLegendStyleOptions('style')}
+                  />
+
+                  <Select display={!config.legend.hide && config.legend.style === 'gradient'} value={config.legend.subStyle} section='legend' fieldName='subStyle' label='Gradient Style' updateField={updateField} options={getLegendStyleOptions('subStyle')} />
+                  <TextField display={config.legend.style === 'gradient' && !config.legend.hide} className='number-narrow' type='number' value={config.legend.tickRotation} section='legend' fieldName='tickRotation' label='Tick Rotation (Degrees)' updateField={updateField} />
+
                   {/* <fieldset className="checkbox-group">
                     <CheckBox value={config.legend.dynamicLegend} section="legend" fieldName="dynamicLegend" label="Dynamic Legend" updateField={updateField}/>
                     {config.legend.dynamicLegend && (
@@ -2699,24 +2744,9 @@ const EditorPanel = () => {
                       </>
                     )}
                   </fieldset> */}
+
                   <CheckBox
-                    value={config.legend.hide ? true : false}
-                    section='legend'
-                    fieldName='hide'
-                    label='Hide Legend'
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                  <CheckBox
+                    display={!config.legend.hide && config.preliminaryData.some(pd => pd.type === 'suppression' && pd.label && pd.symbol)}
                     value={config.legend.hideSuppressedLabels}
                     section='legend'
                     fieldName='hideSuppressedLabels'
@@ -2739,15 +2769,18 @@ const EditorPanel = () => {
                       <TextField type='textarea' value={config.boxplot.legend.howToReadText} updateField={updateField} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
                     </>
                   } */}
-                  {config.visualizationType === 'Line' && <CheckBox value={config.legend.lineMode} section='legend' fieldName='lineMode' label='Show Lined Style Legend' updateField={updateField} />}
-                  {config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1 && (
-                    <Select value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
-                  )}
-                  <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={(...[section, , fieldName, value]) => updateBehavior(section, fieldName, value)} options={['highlight', 'isolate']} />
+                  <Select
+                    display={config.series?.length > 1}
+                    value={config.legend.behavior}
+                    section='legend'
+                    fieldName='behavior'
+                    label='Legend Behavior (When clicked)'
+                    updateField={(...[section, , fieldName, value]) => updateBehavior(section, fieldName, value)}
+                    options={['highlight', 'isolate']}
+                  />
+                  <Select display={visHasLegendColorCategory()} value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
                   {visHasLegendAxisAlign() && <CheckBox value={config.legend.axisAlign} fieldName='axisAlign' section='legend' label='Align to Axis on Isolate' updateField={updateField} />}
-
                   {config.legend.behavior === 'highlight' && config.tooltips.singleSeries && <CheckBox value={config.legend.highlightOnHover} section='legend' fieldName='highlightOnHover' label='HIGHLIGHT DATA SERIES ON HOVER' updateField={updateField} />}
-
                   {/* start: isolated values */}
                   {visHasSelectableLegendValues && config.legend.behavior === 'isolate' && !colorCodeByCategory && (
                     <fieldset className='primary-fieldset edit-block' key={'additional-highlight-values'}>
@@ -2815,15 +2848,28 @@ const EditorPanel = () => {
                     </fieldset>
                   )}
                   {/* end: isolated values */}
-
+                  <CheckBox display={!config.legend.hide && config.legend.style !== 'gradient'} value={config.legend.reverseLabelOrder} section='legend' fieldName='reverseLabelOrder' label='Reverse Labels' updateField={updateField} />
+                  <CheckBox display={['bottom', 'top'].includes(config.legend.position) && !config.legend.hide} value={config.legend.hasBorder} section='legend' fieldName='hasBorder' label='Display Border' updateField={updateField} />
+                  <CheckBox value={config.legend.singleRow} section='legend' fieldName='singleRow' label='Single Row Legend' updateField={updateField} />
+                  <CheckBox display={['bottom', 'top'].includes(config.legend.position) && !config.legend.hide && config.legend.style !== 'gradient'} value={config.legend.verticalSorted} section='legend' fieldName='verticalSorted' label='Vertical sorted Legend' updateField={updateField} />
+                  <CheckBox
+                    value={config.legend.hide ? true : false}
+                    section='legend'
+                    fieldName='hide'
+                    label='Hide Legend'
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                   <TextField value={config.legend.label} section='legend' fieldName='label' label='Title' updateField={updateField} />
-                  <Select value={config.legend?.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom']} />
-                  {config.legend.position === 'bottom' && (
-                    <>
-                      <CheckBox value={config.legend.singleRow} section='legend' fieldName='singleRow' label='Single Row Legend' updateField={updateField} />
-                      <CheckBox value={config.legend.verticalSorted} section='legend' fieldName='verticalSorted' label='Vertical sorted Legend' updateField={updateField} />
-                    </>
-                  )}
                   <TextField type='textarea' value={config.legend.description} updateField={updateField} section='legend' fieldName='description' label='Legend Description' />
                 </AccordionItemPanel>
               </AccordionItem>

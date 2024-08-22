@@ -16,7 +16,7 @@ type SharedChartContext = {
   handleChartAriaLabels: (config: any) => string
   colorScale?: ColorScale
   config: ChartConfig
-  currentViewport?: string
+  currentViewport?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   highlight?: Function
   highlightReset?: Function
   legendIsolateValues?: string[]
@@ -37,7 +37,7 @@ type SharedChartContext = {
 // Line Chart Specific Context
 type LineChartContext = SharedChartContext & {
   convertLineToBarGraph: boolean
-  dimensions: [screenWidth: number, screenHeight: number]
+  dimensions: [string, string]
   formatDate: Function
   formatTooltipsDate: Function
   formatNumber: Function
@@ -59,7 +59,7 @@ export type ChartContext =
   | LineChartContext
   | (SharedChartContext & {
       annotations: Annotation[]
-      dimensions: [screenWidth: number, screenHeight: number]
+      dimensions: [string, string]
       formatDate?: Function
       formatTooltipsDate: Function
       formatNumber?: Function

@@ -42,6 +42,7 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import Annotation from './components/Annotations'
 
 // Helpers
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import numberFromString from '@cdc/core/helpers/numberFromString'
@@ -66,7 +67,20 @@ import SkipTo from '@cdc/core/components/elements/SkipTo'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import LegendWrapper from './components/LegendWrapper'
 
-export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
+export default function CdcChart({
+  configUrl,
+  config: configObj,
+  isEditor = false,
+  isDebug = false,
+  isDashboard = false,
+  setConfig: setParentConfig,
+  setEditing,
+  hostname,
+  link,
+  setSharedFilter,
+  setSharedFilterValue,
+  dashboardConfig
+}) {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
@@ -74,7 +88,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [stateData, setStateData] = useState(config.data || [])
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
-  const [seriesHighlight, setSeriesHighlight] = useState<string[]>(configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : [])
+  const [seriesHighlight, setSeriesHighlight] = useState<string[]>(
+    configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : []
+  )
   const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
   const [dimensions, setDimensions] = useState<[number?, number?]>([])
   const [externalFilters, setExternalFilters] = useState<any[]>()
@@ -188,7 +204,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // If data is included through a URL, fetch that and store
     let data: any[] = response.data || []
 
-    const urlFilters = response.filters ? (response.filters.filter(filter => filter.type === 'url').length > 0 ? true : false) : false
+    const urlFilters = response.filters
+      ? response.filters.filter(filter => filter.type === 'url').length > 0
+        ? true
+        : false
+      : false
 
     if (response.dataUrl && !urlFilters) {
       try {
@@ -288,7 +308,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (newConfig.exclusions && newConfig.exclusions.active) {
       if (newConfig.xAxis.type === 'categorical' && newConfig.exclusions.keys?.length > 0) {
         newExcludedData = data.filter(e => !newConfig.exclusions.keys.includes(e[newConfig.xAxis.dataKey]))
-      } else if (isDateScale(newConfig.xAxis) && (newConfig.exclusions.dateStart || newConfig.exclusions.dateEnd) && newConfig.xAxis.dateParseFormat) {
+      } else if (
+        isDateScale(newConfig.xAxis) &&
+        (newConfig.exclusions.dateStart || newConfig.exclusions.dateEnd) &&
+        newConfig.xAxis.dateParseFormat
+      ) {
         // Filter dates
         const timestamp = e => new Date(e).getTime()
 
@@ -299,7 +323,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         let endDateValid = undefined !== typeof endDate && false === isNaN(endDate)
 
         if (startDateValid && endDateValid) {
-          newExcludedData = data.filter(e => timestamp(e[newConfig.xAxis.dataKey]) >= startDate && timestamp(e[newConfig.xAxis.dataKey]) <= endDate)
+          newExcludedData = data.filter(
+            e => timestamp(e[newConfig.xAxis.dataKey]) >= startDate && timestamp(e[newConfig.xAxis.dataKey]) <= endDate
+          )
         } else if (startDateValid) {
           newExcludedData = data.filter(e => timestamp(e[newConfig.xAxis.dataKey]) >= startDate)
         } else if (endDateValid) {
@@ -320,13 +346,20 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.filters.forEach((filter, index) => {
         let filterValues = []
 
-        filterValues = filter.orderedValues || generateValuesForFilter(filter.columnName, newExcludedData).sort(filter.order === 'desc' ? sortDesc : sortAsc)
+        filterValues =
+          filter.orderedValues ||
+          generateValuesForFilter(filter.columnName, newExcludedData).sort(filter.order === 'desc' ? sortDesc : sortAsc)
 
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
 
-        newConfig.filters[index].active = !newConfig.filters[index].active || filterValues.indexOf(newConfig.filters[index].active) === -1 ? filterValues[0] : newConfig.filters[index].active
-        newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle ? newConfig.filters[index].filterStyle : 'dropdown'
+        newConfig.filters[index].active =
+          !newConfig.filters[index].active || filterValues.indexOf(newConfig.filters[index].active) === -1
+            ? filterValues[0]
+            : newConfig.filters[index].active
+        newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle
+          ? newConfig.filters[index].filterStyle
+          : 'dropdown'
       })
       currentData = filterVizData(newConfig.filters, newExcludedData)
       setFilteredData(currentData)
@@ -338,16 +371,36 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {}
+    newConfig.runtime.series = newConfig.dynamicSeries ? [] : newConfig.series
     newConfig.runtime.seriesLabels = {}
     newConfig.runtime.seriesLabelsAll = []
     newConfig.runtime.originalXAxis = newConfig.xAxis
+
+    if (newConfig.dynamicSeries) {
+      let finalData = dataOverride || newConfig.formattedData || newConfig.data
+      if (finalData && finalData.length && finalData.length > 0) {
+        Object.keys(finalData[0]).forEach(seriesKey => {
+          if (
+            seriesKey !== newConfig.xAxis.dataKey &&
+            finalData[0][seriesKey] &&
+            (!newConfig.filters || newConfig.filters.filter(filter => filter.columnName === seriesKey).length === 0) &&
+            (!newConfig.columns || Object.keys(newConfig.columns).indexOf(seriesKey) === -1)
+          ) {
+            newConfig.runtime.series.push({
+              dataKey: seriesKey,
+              tooltip: true
+            })
+          }
+        })
+      }
+    }
 
     if (newConfig.visualizationType === 'Pie') {
       newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey])
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
     } else {
-      newConfig.runtime.seriesKeys = newConfig.series
-        ? newConfig.series.map(series => {
+      newConfig.runtime.seriesKeys = newConfig.runtime.series
+        ? newConfig.runtime.series.map(series => {
             newConfig.runtime.seriesLabels[series.dataKey] = series.name || series.label || series.dataKey
             newConfig.runtime.seriesLabelsAll.push(series.name || series.dataKey)
             return series.dataKey
@@ -356,8 +409,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
-      let allKeys = newExcludedData ? newExcludedData.map(d => d[newConfig.xAxis.dataKey]) : data.map(d => d[newConfig.xAxis.dataKey])
-      let allValues = newExcludedData ? newExcludedData.map(d => Number(d[newConfig?.series[0]?.dataKey])) : data.map(d => Number(d[newConfig?.series[0]?.dataKey]))
+      let allKeys = newExcludedData
+        ? newExcludedData.map(d => d[newConfig.xAxis.dataKey])
+        : data.map(d => d[newConfig.xAxis.dataKey])
+      let allValues = newExcludedData
+        ? newExcludedData.map(d => Number(d[newConfig?.series[0]?.dataKey]))
+        : data.map(d => Number(d[newConfig?.series[0]?.dataKey]))
 
       const uniqueArray = function (arrArg) {
         return arrArg.filter(function (elem, pos, arr) {
@@ -377,7 +434,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           if (!g) throw new Error('No groups resolved in box plots')
 
           // filter data by group
-          let filteredData = newExcludedData ? newExcludedData.filter(item => item[newConfig.xAxis.dataKey] === g) : data.filter(item => item[newConfig.xAxis.dataKey] === g)
+          let filteredData = newExcludedData
+            ? newExcludedData.filter(item => item[newConfig.xAxis.dataKey] === g)
+            : data.filter(item => item[newConfig.xAxis.dataKey] === g)
           let filteredDataValues: number[] = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
 
           // Sort the data for upcoming functions.
@@ -465,7 +524,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         if (series.type === 'Bar' || series.type === 'Combo') {
           newConfig.runtime.barSeriesKeys.push(series.dataKey)
         }
-        if (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') {
+        if (
+          series.type === 'Line' ||
+          series.type === 'dashed-sm' ||
+          series.type === 'dashed-md' ||
+          series.type === 'dashed-lg'
+        ) {
           newConfig.runtime.lineSeriesKeys.push(series.dataKey)
         }
         if (series.type === 'Combo') {
@@ -492,7 +556,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       })
     }
 
-    if ((newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)) {
+    if (
+      (newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') ||
+      ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)
+    ) {
       newConfig.runtime.xAxis = newConfig.yAxis['yAxis'] ? newConfig.yAxis['yAxis'] : newConfig.yAxis
       newConfig.runtime.yAxis = newConfig.xAxis['xAxis'] ? newConfig.xAxis['xAxis'] : newConfig.xAxis
 
@@ -500,7 +567,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.orientation = 'horizontal'
       // remove after  COVE supports categorical axis on horizonatal bars
       newConfig.yAxis.type = newConfig.yAxis.type === 'categorical' ? 'linear' : newConfig.yAxis.type
-    } else if (['Box Plot', 'Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType) && !checkLineToBarGraph()) {
+    } else if (
+      ['Box Plot', 'Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType) &&
+      !checkLineToBarGraph()
+    ) {
       newConfig.runtime.xAxis = newConfig.xAxis
       newConfig.runtime.yAxis = newConfig.yAxis
       newConfig.runtime.horizontal = false
@@ -512,10 +582,16 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
 
     newConfig.runtime.uniqueId = Date.now()
-    newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
+    newConfig.runtime.editorErrorMessage =
+      newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey
+        ? 'Data Key property in Y Axis section must be set for pie charts.'
+        : ''
 
     // Sankey Description box error message
-    newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Sankey' && !newConfig.description ? 'SUBTEXT/CITATION field is empty: A description of the Sankey Diagram data must be inputted.' : ''
+    newConfig.runtime.editorErrorMessage =
+      newConfig.visualizationType === 'Sankey' && !newConfig.description
+        ? 'SUBTEXT/CITATION field is empty: A description of the Sankey Diagram data must be inputted.'
+        : ''
 
     if (newConfig.legend.seriesHighlight?.length) {
       setSeriesHighlight(newConfig.legend?.seriesHighlight)
@@ -541,7 +617,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Sorts data series for horizontal bar charts
   const sortData = (a, b) => {
-    let sortKey = config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal' ? config.xAxis.dataKey : config.yAxis.sortKey
+    let sortKey =
+      config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal'
+        ? config.xAxis.dataKey
+        : config.yAxis.sortKey
     let aData = parseFloat(a[sortKey])
     let bData = parseFloat(b[sortKey])
 
@@ -645,7 +724,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
     }
 
-    if (externalFilters && externalFilters.length > 0 && externalFilters.length > 0 && externalFilters[0].hasOwnProperty('active')) {
+    if (
+      externalFilters &&
+      externalFilters.length > 0 &&
+      externalFilters.length > 0 &&
+      externalFilters[0].hasOwnProperty('active')
+    ) {
       let newConfigHere = { ...config, filters: externalFilters }
       setConfig(newConfigHere)
       setFilteredData(filterVizData(externalFilters, excludedData))
@@ -660,10 +744,25 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }, [configObj.data]) // eslint-disable-line
   }
 
+  // This will set the bump chart's default scaling type to date-time
+  useEffect(() => {
+    if (['Bump Chart'].includes(config.visualizationType)) {
+      setConfig({
+        ...config,
+        xAxis: {
+          ...config.xAxis,
+          type: 'date-time'
+        }
+      })
+    }
+  }, [config.visualizationType])
+
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (stateData && config.xAxis && config.runtime?.seriesKeys) {
-      const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType) ? config.twoColor.palette : config.palette
+      const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
+        ? config.twoColor.palette
+        : config.palette
       const allPalettes: Record<string, string[]> = { ...colorPalettes, ...twoColorPalette }
       let palette = config.customColors || allPalettes[configPalette]
       let numberOfKeys = config.runtime.seriesKeys.length
@@ -767,19 +866,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return timeFormat(config.tooltips.dateDisplayFormat)(date)
   }
 
-  // function calculates the width of given text and its font-size
-  function getTextWidth(text: string, font: string): number | undefined {
-    const canvas = document.createElement('canvas')
-    const context = canvas.getContext('2d')
-    if (!context) {
-      console.error('2d context not found')
-      return
-    }
-    context.font = font || getComputedStyle(document.body).font
-
-    return Math.ceil(context.measureText(text).width)
-  }
-
   // Format numeric data based on settings in config OR from passed in settings for Additional Columns
   // - use only for old horizontal data - newer formatNumber is in helper/formatNumber
   // TODO: we should combine various formatNumber functions across this project.
@@ -798,7 +884,20 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     // destructure dataFormat values
     let {
-      dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, bottomRoundTo, rightPrefix, rightSuffix, bottomPrefix, bottomSuffix, bottomAbbreviated }
+      dataFormat: {
+        commas,
+        abbreviated,
+        roundTo,
+        prefix,
+        suffix,
+        rightRoundTo,
+        bottomRoundTo,
+        rightPrefix,
+        rightSuffix,
+        bottomPrefix,
+        bottomSuffix,
+        bottomAbbreviated
+      }
     } = config
 
     // check if value contains comma and remove it. later will add comma below.
@@ -869,7 +968,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // Edge case for small numbers with decimals
     // - if roundTo undefined which means it is blank, then do not round
 
-    if ((axis === 'left' && commas && abbreviated && shouldAbbreviate) || (axis === 'bottom' && commas && abbreviated && shouldAbbreviate)) {
+    if (
+      (axis === 'left' && commas && abbreviated && shouldAbbreviate) ||
+      (axis === 'bottom' && commas && abbreviated && shouldAbbreviate)
+    ) {
       num = num // eslint-disable-line
     } else {
       num = num.toLocaleString('en-US', stringFormattingOptions)
@@ -934,7 +1036,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         return true
       }
     } else {
-      if (undefined === config?.series || false === config?.series.length > 0) {
+      if ((undefined === config?.series || false === config?.series.length > 0) && !config?.dynamicSeries) {
         return true
       }
     }
@@ -1041,7 +1143,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         <section className='waiting-container'>
           <h3>Finish Configuring</h3>
           <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-          <Button className='btn' style={{ margin: '1em auto' }} disabled={missingRequiredSections()} onClick={e => confirmDone(e)}>
+          <Button
+            className='btn'
+            style={{ margin: '1em auto' }}
+            disabled={missingRequiredSections()}
+            onClick={e => confirmDone(e)}
+          >
             I'm Done
           </Button>
         </section>
@@ -1117,7 +1224,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (legend?.hide) classes.push('legend-hidden')
     if (lineDatapointClass) classes.push(lineDatapointClass)
     if (!config.barHasBorder) classes.push('chart-bar--no-border')
-    if (config.brush?.active && dashboardConfig?.type === 'dashboard' && (!isLegendOnBottom || legend.hide)) classes.push('dashboard-brush')
+    if (config.brush?.active && dashboardConfig?.type === 'dashboard' && (!isLegendOnBottom || legend.hide))
+      classes.push('dashboard-brush')
     classes.push(...contentClasses)
     return classes
   }
@@ -1145,35 +1253,100 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           {config.newViz && <Confirm />}
           {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && <Error />}
           {!missingRequiredSections() && !config.newViz && (
-            <div className={`cdc-chart-inner-container cove-component__content type-${makeClassName(config.visualizationType)}`} aria-label={handleChartAriaLabels(config)} tabIndex={0}>
-              <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
+            <div
+              className={`cdc-chart-inner-container cove-component__content type-${makeClassName(
+                config.visualizationType
+              )}`}
+              aria-label={handleChartAriaLabels(config)}
+              tabIndex={0}
+            >
+              <Title
+                showTitle={config.showTitle}
+                isDashboard={isDashboard}
+                title={title}
+                superTitle={config.superTitle}
+                classes={['chart-title', `${config.theme}`, 'cove-component__header']}
+                style={undefined}
+              />
 
               {/* Filters */}
-              {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterVizData} dimensions={dimensions} />}
+              {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
+                <Filters
+                  config={config}
+                  setConfig={setConfig}
+                  setFilteredData={setFilteredData}
+                  filteredData={filteredData}
+                  excludedData={excludedData}
+                  filterData={filterVizData}
+                  dimensions={dimensions}
+                />
+              )}
               <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
-              {config.annotations?.length > 0 && <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage={`Skip over annotations`} key={`skip-annotations`} />}
+              {config.annotations?.length > 0 && (
+                <SkipTo
+                  skipId={handleChartTabbing(config, legendId)}
+                  skipMessage={`Skip over annotations`}
+                  key={`skip-annotations`}
+                />
+              )}
 
               {/* Visualization Wrapper */}
               <div className={getChartWrapperClasses().join(' ')}>
                 <LegendWrapper>
-                  <div className={legend.hide ? 'w-100' : legend.position === 'bottom' || legend.position === 'top' ? 'w-100' : 'w-75'}>
+                  <div
+                    className={
+                      legend.hide
+                        ? 'w-100'
+                        : legend.position === 'bottom' || legend.position === 'top'
+                        ? 'w-100'
+                        : 'w-75'
+                    }
+                  >
                     {/* Intro Text/Message */}
-                    {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
+                    {config?.introText && config.visualizationType !== 'Spark Line' && (
+                      <section className='introText'>{parse(config.introText)}</section>
+                    )}
 
                     {/* All charts except line and sparkline */}
-                    {config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Line' && config.visualizationType !== 'Pie' && <ParentSize>{parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}</ParentSize>}
+                    {config.visualizationType !== 'Spark Line' &&
+                      config.visualizationType !== 'Line' &&
+                      config.visualizationType !== 'Pie' && (
+                        <ParentSize>
+                          {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                        </ParentSize>
+                      )}
 
                     {/* Pie Chart */}
-                    {config.visualizationType === 'Pie' && <ParentSize className='justify-content-center d-flex'>{parent => <PieChart parentWidth={parent.width} parentHeight={parent.height} />}</ParentSize>}
+                    {config.visualizationType === 'Pie' && (
+                      <ParentSize className='justify-content-center d-flex'>
+                        {parent => <PieChart parentWidth={parent.width} parentHeight={parent.height} />}
+                      </ParentSize>
+                    )}
 
                     {/* Line Chart */}
                     {config.visualizationType === 'Line' &&
-                      (checkLineToBarGraph() ? <ParentSize>{parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}</ParentSize> : <ParentSize>{parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}</ParentSize>)}
+                      (checkLineToBarGraph() ? (
+                        <ParentSize>
+                          {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                        </ParentSize>
+                      ) : (
+                        <ParentSize>
+                          {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                        </ParentSize>
+                      ))}
 
                     {/* Sparkline */}
                     {config.visualizationType === 'Spark Line' && (
                       <>
-                        <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterVizData} dimensions={dimensions} />
+                        <Filters
+                          config={config}
+                          setConfig={setConfig}
+                          setFilteredData={setFilteredData}
+                          filteredData={filteredData}
+                          excludedData={excludedData}
+                          filterData={filterVizData}
+                          dimensions={dimensions}
+                        />
                         {config?.introText && (
                           <section className='introText' style={{ padding: '0px 0 35px' }}>
                             {parse(config.introText)}
@@ -1190,29 +1363,71 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                       </>
                     )}
                     {/* Sankey */}
-                    {config.visualizationType === 'Sankey' && <ParentSize aria-hidden='true'>{parent => <SankeyChart runtime={config.runtime} width={parent.width} height={parent.height} />}</ParentSize>}
+                    {config.visualizationType === 'Sankey' && (
+                      <ParentSize aria-hidden='true'>
+                        {parent => <SankeyChart runtime={config.runtime} width={parent.width} height={parent.height} />}
+                      </ParentSize>
+                    )}
                   </div>
                   {/* Legend */}
-                  {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend ref={legendRef} skipId={handleChartTabbing(config, legendId)} />}
+                  {!config.legend.hide &&
+                    config.visualizationType !== 'Spark Line' &&
+                    config.visualizationType !== 'Sankey' && (
+                      <Legend ref={legendRef} skipId={handleChartTabbing(config, legendId)} />
+                    )}
                 </LegendWrapper>
                 {/* Link */}
-                {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
+                {isDashboard && config.table && config.table.show && config.table.showDataTableLink
+                  ? tableLink
+                  : link && link}
                 {/* Description */}
 
-                {description && config.visualizationType !== 'Spark Line' && <div className={getChartSubTextClasses().join('')}>{parse(description)}</div>}
+                {description && config.visualizationType !== 'Spark Line' && (
+                  <div className={getChartSubTextClasses().join('')}>{parse(description)}</div>
+                )}
                 {false && <Annotation.List />}
 
                 {/* buttons */}
                 <MediaControls.Section classes={['download-buttons']}>
-                  {config.table.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
-                  {config.table.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
+                  {config.table.showDownloadImgButton && (
+                    <MediaControls.Button
+                      text='Download Image'
+                      title='Download Chart as Image'
+                      type='image'
+                      state={config}
+                      elementToCapture={imageId}
+                    />
+                  )}
+                  {config.table.showDownloadPdfButton && (
+                    <MediaControls.Button
+                      text='Download PDF'
+                      title='Download Chart as PDF'
+                      type='pdf'
+                      state={config}
+                      elementToCapture={imageId}
+                    />
+                  )}
                 </MediaControls.Section>
                 {/* Data Table */}
-                {((config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey') || (config.visualizationType === 'Sankey' && config.table.show)) && (
+                {((config.xAxis.dataKey &&
+                  config.table.show &&
+                  config.visualizationType !== 'Spark Line' &&
+                  config.visualizationType !== 'Sankey') ||
+                  (config.visualizationType === 'Sankey' && config.table.show)) && (
                   <DataTable
                     config={config}
-                    rawData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : config.table.customTableConfig ? filterVizData(config.filters, config.data) : config.data}
-                    runtimeData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : filteredData || excludedData}
+                    rawData={
+                      config.visualizationType === 'Sankey'
+                        ? config?.data?.[0]?.tableData
+                        : config.table.customTableConfig
+                        ? filterVizData(config.filters, config.data)
+                        : config.data
+                    }
+                    runtimeData={
+                      config.visualizationType === 'Sankey'
+                        ? config?.data?.[0]?.tableData
+                        : filteredData || excludedData
+                    }
                     expandDataTable={config.table.expanded}
                     columns={config.columns}
                     displayDataAsText={displayDataAsText}
@@ -1237,7 +1452,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     )
   }
 
-  const getXAxisData = d => (isDateScale(config.runtime.xAxis) ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
+  const getXAxisData = d =>
+    isDateScale(config.runtime.xAxis)
+      ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime()
+      : d[config.runtime.originalXAxis.dataKey]
   const getYAxisData = (d, seriesKey) => d[seriesKey]
 
   const capitalize = str => {
@@ -1301,7 +1519,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   return (
     <ConfigContext.Provider value={contextValues}>
-      <Layout.VisualizationWrapper config={config} isEditor={isEditor} currentViewport={currentViewport} ref={outerContainerRef} imageId={imageId} showEditorPanel={config?.showEditorPanel}>
+      <Layout.VisualizationWrapper
+        config={config}
+        isEditor={isEditor}
+        currentViewport={currentViewport}
+        ref={outerContainerRef}
+        imageId={imageId}
+        showEditorPanel={config?.showEditorPanel}
+      >
         {body}
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>

@@ -1,3 +1,4 @@
+import { Legend } from './../../types/Legend'
 import _ from 'lodash'
 import { AnyVisualization } from '../../types/Visualization'
 import { VizFilter } from '../../types/VizFilter'
@@ -42,11 +43,19 @@ export const addIdsToVisFilters = config => {
   }
 }
 
+const supportLineStyledLegend = newConfig => {
+  // support for Charts
+  if (newConfig.legend?.lineMode) {
+    newConfig.legend.style = 'lines'
+  }
+}
+
 const update_4_24_9 = config => {
   const ver = '4.24.9'
   const newConfig = _.cloneDeep(config)
   patchSingleStateZoom(newConfig)
   addIdsToVisFilters(newConfig)
+  supportLineStyledLegend(config)
   newConfig.version = ver
   return newConfig
 }

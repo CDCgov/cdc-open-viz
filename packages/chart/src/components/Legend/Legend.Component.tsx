@@ -1,16 +1,18 @@
 import parse from 'html-react-parser'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
-import LegendCircle from '@cdc/core/components/LegendCircle'
+import LegendShape from '@cdc/core/components/LegendShape'
 import Button from '@cdc/core/components/elements/Button'
 import useLegendClasses from '../../hooks/useLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import { handleLineType } from '../../helpers/handleLineType'
-import { getMarginTop } from './helpers/index'
+
+import { getMarginTop, getGradientConfig } from './helpers/index'
 import { Line } from '@visx/shape'
 import { Label } from '../../types/Label'
 import { ChartConfig } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
 import { forwardRef } from 'react'
+import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 
 export interface LegendProps {
   colorScale: ColorScale
@@ -22,15 +24,16 @@ export interface LegendProps {
   ref: React.Ref<() => void>
   seriesHighlight: string[]
   skipId: string
+  dimensions: [string, string] // for responsive width legend
+  getTextWidth: (text: string, font: string) => string
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
-const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHighlight, highlight, highlightReset, currentViewport, formatLabels, skipId = 'legend' }, ref) => {
+const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHighlight, highlight, highlightReset, currentViewport, formatLabels, skipId = 'legend', dimensions, getTextWidth }, ref) => {
   const { innerClasses, containerClasses } = useLegendClasses(config)
   const { runtime, legend } = config
 
-  if (!legend) return null
-  const isBottomOrSmallViewport = legend?.position === 'bottom' || (['sm', 'xs', 'xxs'].includes(currentViewport) && !legend.hide)
+  const isBottomOrSmallViewport = legend?.position === 'bottom' || legend?.position === 'top' || (['sm', 'xs', 'xxs'].includes(currentViewport) && !legend.hide)
 
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
@@ -38,13 +41,13 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
   }
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
-
   let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
-
+  if (!legend) return null
   return (
     <aside ref={ref} style={legendClasses} id={skipId || 'legend'} className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
       {legend.label && <h3>{parse(legend.label)}</h3>}
       {legend.description && <p>{parse(legend.description)}</p>}
+      <LegendGradient getTextWidth={getTextWidth} config={config} {...getGradientConfig(config, formatLabels, colorScale)} dimensions={dimensions} currentViewport={currentViewport} />
 
       <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
         {labels => {
@@ -73,6 +76,10 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                     className.push('inactive')
                   }
 
+                  if (config.legend.style === 'gradient') {
+                    return <></>
+                  }
+
                   return (
                     <LegendItem
                       className={className.join(' ')}
@@ -91,13 +98,13 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                       role='button'
                     >
                       <div>
-                        {config.visualizationType === 'Line' && config.legend.lineMode ? (
+                        {config.visualizationType === 'Line' && config.legend.style === 'lines' ? (
                           <svg width={40} height={20}>
                             <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={label.value} strokeWidth={2} strokeDasharray={handleLineType(config.series[i]?.type ? config.series[i]?.type : '')} />
                           </svg>
                         ) : (
                           <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <LegendCircle viewport={currentViewport} margin='0' fill={label.value} display={true} />
+                            <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} viewport={currentViewport} margin='0' fill={label.value} display={true} />
                           </div>
                         )}
                       </div>
@@ -118,6 +125,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                   if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
                     className += ' inactive'
                   }
+
                   return (
                     <LegendItem
                       className={className}
@@ -134,7 +142,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                         highlight(bar.legendLabel)
                       }}
                     >
-                      <LegendCircle fill='transparent' borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`} />{' '}
+                      <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} style={{ borderRadius: '0px' }} fill='transparent' borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`} />{' '}
                       <LegendLabel align='left' margin='0 0 0 4px'>
                         {bar.legendLabel ? bar.legendLabel : bar.value}
                       </LegendLabel>
@@ -168,7 +176,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                   ((config.visualizationType === 'Bar' && config.visualizationSubType === 'regular') || config.visualizationType === 'Line' || config.visualizationType === 'Combo') && (
                     <>
                       <hr></hr>
-                      <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
+                      <div className={config.legend.singleRow && isBottomOrSmallViewport ? `legend-container__inner ${config.legend.position} single-row` : ''}>
                         {config?.preliminaryData?.map(
                           (pd, index) =>
                             pd.displayLegend &&

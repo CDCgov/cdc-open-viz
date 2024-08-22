@@ -12,7 +12,11 @@ const LegendWrapper = props => {
 
   const getLegendWrappingClasses = () => {
     let classes = ['legend-wrapper', 'd-flex', 'flex-nowrap', 'w-100']
-    if (config.legend.position === 'bottom') classes = classes.filter(item => item !== 'flex-nowrap')
+    const { legend } = config
+    if (legend.position === 'bottom' || legend.position === 'top') {
+      classes = classes.filter(item => item !== 'flex-nowrap')
+      classes.push('flex-wrap')
+    }
     return classes.join(' ')
   }
 
