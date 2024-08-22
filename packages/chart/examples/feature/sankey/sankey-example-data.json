@@ -1120,7 +1120,7 @@
           "Disposition": "Patient Treated, Transported by this EMS Unit",
           "Type of Treatment": "Treated",
           "Final Outcome": "Transported to hospital",
-          "Number of Patients": "399,088"
+          "Number of Patients": "399088"
         },
         {
           "Disposition": "Standby-Public Safety, Fire, or EMS Operational Support Provided",
@@ -1313,7 +1313,7 @@
           "Disposition": "Patient Treated, Transferred Care to Another EMS Unit",
           "Type of Treatment": "Treated",
           "Final Outcome": "Transported to hospital",
-          "Number of Patients": "24,432"
+          "Number of Patients": "24432"
         },
         {
           "Disposition": "Patient Treated, Transported by Law Enforcement",
