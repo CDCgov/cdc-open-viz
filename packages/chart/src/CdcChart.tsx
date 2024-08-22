@@ -1220,7 +1220,13 @@ export default function CdcChart({
   const getChartWrapperClasses = () => {
     const isLegendOnBottom = legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
     const classes = ['chart-container', 'p-relative']
-    if (legend?.position) classes.push(`legend-${legend.position}`)
+    if (legend?.position) {
+      if (!['sm', 'xs', 'xxs'].includes(currentViewport)) {
+        classes.push(`legend-${legend.position}`)
+      } else {
+        classes.push('legend-bottom')
+      }
+    }
     if (legend?.hide) classes.push('legend-hidden')
     if (lineDatapointClass) classes.push(lineDatapointClass)
     if (!config.barHasBorder) classes.push('chart-bar--no-border')
@@ -1295,7 +1301,7 @@ export default function CdcChart({
                 <LegendWrapper>
                   <div
                     className={
-                      legend.hide
+                      legend.hide || ['xxs', 'xs', 'sm'].includes(currentViewport)
                         ? 'w-100'
                         : legend.position === 'bottom' || legend.position === 'top'
                         ? 'w-100'
