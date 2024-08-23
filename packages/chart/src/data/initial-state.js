@@ -165,6 +165,7 @@ export default {
     verticalSorted: false,
     highlightOnHover: false,
     hideSuppressedLabels: false,
+    hideSuppressionLink: false,
     seriesHighlight: [],
     style: 'circles',
     subStyle: 'linear blocks',

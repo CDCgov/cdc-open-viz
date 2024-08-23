@@ -216,8 +216,21 @@
       }
     }
 
-    &.no-border {
-      border: none;
+    &__outer {
+      &.definition-link {
+        display: flex;
+        flex-direction: row;
+        position: absolute;
+        left: 0%;
+        top: 108%;
+        & > * {
+          margin: 0;
+        }
+        & > p,
+        a {
+          margin-left: 5px;
+        }
+      }
     }
   }
 

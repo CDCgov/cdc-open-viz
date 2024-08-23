@@ -1,4 +1,5 @@
-import { type PreliminaryDataItem, DataItem, StyleProps, Style } from './LineChartProps'
+import { DataItem, StyleProps, Style } from './LineChartProps'
+import { PreliminaryDataItem } from '../../types/ChartConfig'
 import _ from 'lodash'
 export const createStyles = (props: StyleProps): Style[] => {
   const { preliminaryData, data, stroke, strokeWidth, handleLineType, lineType, seriesKey } = props
