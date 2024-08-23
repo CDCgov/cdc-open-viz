@@ -14,9 +14,9 @@
 
 // links that appear above data tables
 .download-links {
-  padding: 0px 1em;
   display: flex;
   justify-content: flex-end;
+  width: 100%;
   &.brush-active {
     margin-top: 2em;
   }

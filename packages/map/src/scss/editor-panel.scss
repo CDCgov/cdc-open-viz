@@ -710,12 +710,8 @@
   }
 
   @include breakpointClass(md) {
-    .editor-panel:not(.hidden) + .cdc-map-inner-container {
-      padding-left: $editorWidth;
-    }
     .waiting {
       background-color: #fff;
-      padding-left: $editorWidth;
     }
   }
 }
