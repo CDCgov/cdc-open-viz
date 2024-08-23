@@ -3782,6 +3782,7 @@ const EditorPanel = () => {
                     }
                   />
                   <CheckBox
+                    display={!config.legend.hide && !['left', 'right'].includes(config.legend.position)}
                     value={config.legend.singleRow}
                     section='legend'
                     fieldName='singleRow'

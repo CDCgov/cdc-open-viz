@@ -49,7 +49,10 @@ const useLegendClasses = (config: ConfigType) => {
   }
 
   // Configure border classes
-  if (config.legend.hideBorder.side && ['right', 'left'].includes(config.legend.position)) {
+  if (
+    config.legend.hideBorder.side &&
+    (['right', 'left'].includes(config.legend.position) || !config.legend.position)
+  ) {
     containerClasses.push('no-border')
   }
 
