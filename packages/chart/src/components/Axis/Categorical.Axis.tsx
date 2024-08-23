@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { BarStack } from '@visx/shape'
+import { BarStack, Line } from '@visx/shape'
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
@@ -8,7 +8,7 @@ import chroma from 'chroma-js'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { useBarChart } from '../../hooks/useBarChart'
 
-const CategoricalYAxis = ({ yMax, leftSize, max }) => {
+const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
   const { config, getTextWidth } = useContext(ConfigContext)
   const { fontSize } = useBarChart()
 
@@ -22,7 +22,7 @@ const CategoricalYAxis = ({ yMax, leftSize, max }) => {
     }
   }
 
-  const categories = config.yAxis.categories
+  const categories = config.yAxis?.categories
 
   const createDataShape = categories => {
     const categoryObj = [...categories].reduce((acc, item) => {
@@ -76,7 +76,7 @@ const CategoricalYAxis = ({ yMax, leftSize, max }) => {
 
   const colorScale = scaleOrdinal({
     domain: categories.map(d => d?.label),
-    range: categories.map(d => getValidColor(d?.color))
+    range: categories.map(d => getValidColor(d?.color?.trim()))
   })
 
   const keys = Object.keys(transformedData[0])
@@ -87,7 +87,6 @@ const CategoricalYAxis = ({ yMax, leftSize, max }) => {
           barStacks.map(barStack =>
             barStack.bars.map(bar => {
               const isLastIndex = config.yAxis.categories.length - 1 === barStack.index
-
               const textSize = fontSize[config.fontSize] / 1.3
               const textColor = chroma(bar.color).luminance() < 0.4 ? '#fff' : '#000'
               const textWidth = getTextWidth(bar.key, `normal ${textSize}px sans-serif`)
@@ -110,7 +109,6 @@ const CategoricalYAxis = ({ yMax, leftSize, max }) => {
                       height: bar.height,
                       x: bar.x,
                       y: bar.y,
-
                       tooltipHtml: tooltip,
                       tooltipId: `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
                     })}
@@ -127,6 +125,8 @@ const CategoricalYAxis = ({ yMax, leftSize, max }) => {
                     >
                       {bar.key}
                     </Text>
+                    {/* gridLines */}
+                    {config.runtime.yAxis.gridLines && <Line from={{ x: bar.x + xScale.bandwidth(), y: bar.y }} to={{ x: xMax + xScale.bandwidth(), y: bar.y }} stroke='rgba(0,0,0,0.3)' />}
                     {/* White background spacing between stackes */}
                     {!isLastIndex && <rect x={bar.x} y={bar.y} width={bar.width} height={1} fill={'#fff'}></rect>}
                     {/* Right side Axis line */}

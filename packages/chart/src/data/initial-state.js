@@ -160,12 +160,17 @@ export default {
     dynamicLegendItemLimit: 5,
     dynamicLegendItemLimitMessage: 'Dynamic Legend Item Limit Hit.',
     dynamicLegendChartMessage: 'Select Options from the Legend',
+    label: '',
     lineMode: false,
     verticalSorted: false,
     highlightOnHover: false,
     hideSuppressedLabels: false,
     hideSuppressionLink: false,
-    seriesHighlight: []
+    seriesHighlight: [],
+    style: 'circles',
+    subStyle: 'linear blocks',
+    hasBorder: false,
+    tickRotation: ''
   },
   brush: {
     height: 25,

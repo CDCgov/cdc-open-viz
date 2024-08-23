@@ -8,14 +8,13 @@ import { Table } from '@cdc/core/types/Table'
 import { BoxPlot } from '@cdc/core/types/BoxPlot'
 import { General } from '@cdc/core/types/General'
 import { type Link } from './../components/Sankey/types'
-
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
 
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 
-export type ViewportSize = 'sm' | 'xs' | 'xxs' | 'lg'
+export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 export type ChartColumns = Record<string, Column>
 
 export interface PreliminaryDataItem {
@@ -73,14 +72,21 @@ export type Legend = {
   hide: boolean
   highlightOnHover: boolean
   label: string
-  lineMode: boolean
   position: string
   reverseLabelOrder: boolean
   singleRow: boolean
   type: string
   verticalSorted: boolean
+<<<<<<< HEAD
   hideSuppressedLabels:boolean
   hideSuppressionLink:boolean
+=======
+  style:'circles'|'boxes'|'gradient'|'lines'
+  subStyle:'linear blocks'|'smooth'
+  hideSuppressedLabels:boolean
+  hasBorder:boolean
+  tickRotation:string
+>>>>>>> dev
 }
 
 type Visual = {

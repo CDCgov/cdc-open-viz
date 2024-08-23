@@ -53,7 +53,8 @@ export default function useDataVizClasses(config, viewport = null) {
     ulClasses.push(getListPosition())
     return ulClasses
   }
-  const legendOuterClasses = [`${legend?.position}`, `${getListPosition()}`, `cdcdataviz-sr-focusable`, `${viewport}`]
+  const hasBorder = config.legend?.displayBorder ? 'has-border' : 'no-border'
+  const legendOuterClasses = [`${legend?.position}`, `${getListPosition()}`, `cdcdataviz-sr-focusable`, `${viewport}`, `${hasBorder}`]
 
   const legendClasses = {
     aside: legendOuterClasses,

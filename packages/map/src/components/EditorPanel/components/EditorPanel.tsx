@@ -35,7 +35,7 @@ import { useFilters } from '@cdc/core/components/Filters'
 import HexSetting from './HexShapeSettings.jsx'
 import ConfigContext from '../../../context.ts'
 import { MapContext } from '../../../types/MapContext.js'
-import { Checkbox, TextField } from './Inputs'
+import { TextField } from './Inputs'
 
 // Todo: move to useReducer, seperate files out.
 const EditorPanel = ({ columnsRequiredChecker }) => {
@@ -54,7 +54,12 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     setState,
     state,
     tooltipId,
-    runtimeData
+    runtimeData,
+    setRuntimeData,
+    generateRuntimeData,
+    position,
+    topoData,
+
   } = useContext<MapContext>(ConfigContext)
 
   const { general, columns, legend, table, tooltips } = state
@@ -67,7 +72,12 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
 
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
 
-  const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({ config: state, setConfig: setState, filteredData: runtimeFilters, setFilteredData: setRuntimeFilters })
+  const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({
+    config: state,
+    setConfig: setState,
+    filteredData: runtimeFilters,
+    setFilteredData: setRuntimeFilters
+  })
 
   const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
@@ -269,6 +279,10 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           general: {
             ...state.general,
             allowMapZoom: value
+          },
+          mapPosition: {
+            coordinates: state.general.geoType === 'world' ? [0, 30] : [0, 0],
+            zoom: 1
           }
         })
         break
@@ -338,6 +352,42 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           legend: {
             ...state.legend,
             position: value
+          }
+        })
+        break
+      case 'legendStyle':
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            style: value
+          }
+        })
+        break
+      case 'legendSubStyle':
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            subStyle: value
+          }
+        })
+        break
+      case 'legendTickRotation':
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            tickRotation: value
+          }
+        })
+        break
+      case 'legendBorder':
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            displayBorder: value
           }
         })
         break
@@ -773,6 +823,11 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             statePicked: stateData
           }
         })
+
+        if (state) {
+          const newData = generateRuntimeData(state)
+          setRuntimeData(newData)
+        }
         break
       case 'classificationType':
         setState({
@@ -1149,22 +1204,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
       }
     }
   }, [runtimeLegend]) // eslint-disable-line
-
-  // if no state choice by default show alabama
-  // useEffect(() => {
-  //   if (!state.general.statePicked) {
-  //     setState({
-  //       ...state,
-  //       general: {
-  //         ...general,
-  //         statePicked: {
-  //           fipsCode: '01',
-  //           stateName: 'Alabama'
-  //         }
-  //       }
-  //     })
-  //   }
-  // }, []) // eslint-disable-line
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -2032,7 +2071,11 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                         <select
                           value={specialClass.value}
                           onChange={e => {
-                            editColumn('primary', 'specialClassEdit', { prop: 'value', index: i, value: e.target.value })
+                            editColumn('primary', 'specialClassEdit', {
+                              prop: 'value',
+                              index: i,
+                              value: e.target.value
+                            })
                           }}
                         >
                           <option value=''>- Select Value -</option>
@@ -2045,7 +2088,11 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                           type='text'
                           value={specialClass.label}
                           onChange={e => {
-                            editColumn('primary', 'specialClassEdit', { prop: 'label', index: i, value: e.target.value })
+                            editColumn('primary', 'specialClassEdit', {
+                              prop: 'label',
+                              index: i,
+                              value: e.target.value
+                            })
                           }}
                         />
                       </label>
@@ -2274,19 +2321,89 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   </label>
                 )}
                 {'navigation' !== state.general.type && (
+                  <>
+                    <label>
+                      <span className='edit-label'>Legend Position</span>
+                      <select
+                        value={legend.position || false}
+                        onChange={event => {
+                          handleEditorChanges('sidebarPosition', event.target.value)
+                        }}
+                      >
+                        <option value='side'>Side</option>
+                        <option value='bottom'>Bottom</option>
+                        <option value='top'>Top</option>
+                      </select>
+                    </label>
+                    {(state.legend.position === 'side' || !state.legend.position) && state.legend.style === 'gradient' && <span style={{ color: 'red', fontSize: '14px' }}>Position must be set to top or bottom to use gradient style.</span>}
+                  </>
+                )}
+                {'navigation' !== state.general.type && (
                   <label>
-                    <span className='edit-label'>Legend Position</span>
+                    <span className='edit-label column-heading'>
+                      Legend Style
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>If using gradient style, limit the legend to five items for better mobile visibility, and position the legend at the top or bottom.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    </span>
+
                     <select
-                      value={legend.position || false}
+                      value={legend.style || ''}
                       onChange={event => {
-                        handleEditorChanges('sidebarPosition', event.target.value)
+                        handleEditorChanges('legendStyle', event.target.value)
                       }}
                     >
-                      <option value='side'>Side</option>
-                      <option value='bottom'>Bottom</option>
+                      <option value='circles'>circles</option>
+                      <option value='boxes'>boxes</option>
+                      <option value='gradient'>gradient</option>
                     </select>
                   </label>
                 )}
+                {'navigation' !== state.general.type && state.legend.style === 'gradient' && (
+                  <label>
+                    <span className='edit-label'>Gradient Style</span>
+                    <select
+                      value={legend.subStyle || ''}
+                      onChange={event => {
+                        handleEditorChanges('legendSubStyle', event.target.value)
+                      }}
+                    >
+                      <option value='linear blocks'>linear blocks</option>
+                      <option value='smooth'>smooth</option>
+                    </select>
+                  </label>
+                )}
+                {'navigation' !== state.general.type && state.legend.style === 'gradient' && (
+                  <label>
+                    <span className='edit-label'>Tick Rotation (Degrees)</span>
+                    <input
+                      type='number'
+                      className='number-narrow'
+                      value={legend.tickRotation || ''}
+                      onChange={event => {
+                        handleEditorChanges('legendTickRotation', event.target.value)
+                      }}
+                    ></input>
+                  </label>
+                )}
+                {state.legend.position !== 'side' && (
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={legend.displayBorder}
+                      onChange={event => {
+                        handleEditorChanges('legendBorder', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label'>Display Border</span>
+                  </label>
+                )}
+
                 {'side' === legend.position && (
                   <label className='checkbox'>
                     <input
@@ -2311,16 +2428,19 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     <span className='edit-label'>Single Row Legend</span>
                   </label>
                 )}
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={legend.verticalSorted}
-                    onChange={event => {
-                      handleEditorChanges('verticalSortedLegend', event.target.checked)
-                    }}
-                  />
-                  <span className='edit-label'>Vertical sorted legend</span>
-                </label>
+                {state.legend.style !== 'gradient' && (
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={legend.verticalSorted}
+                      onChange={event => {
+                        handleEditorChanges('verticalSortedLegend', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label'>Vertical sorted legend</span>
+                  </label>
+                )}
+
                 {/* always show */}
                 {
                   <label className='checkbox'>

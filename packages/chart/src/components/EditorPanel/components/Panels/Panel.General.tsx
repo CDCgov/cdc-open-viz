@@ -52,7 +52,7 @@ const PanelGeneral: FC<PanelProps> = props => {
                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                 </Tooltip.Target>
                 <Tooltip.Content>
-                  <p>For some visualization types, such as the sankey diagram, it may be necessary to adjust to chart height for optimal display.</p>
+                  <p>For some visualization types, such as the Sankey diagram, it may be necessary to adjust the chart height for optimal display.</p>
                 </Tooltip.Content>
               </Tooltip>
             }
