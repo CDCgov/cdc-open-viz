@@ -1,44 +1,65 @@
-export default function useLegendClasses(config) {
-  let containerClasses = ['legend-container']
-  let innerClasses = ['legend-container__inner']
+type ConfigType = {
+  legend: {
+    position: 'left' | 'bottom' | 'top' | 'right'
+    singleRow?: boolean
+    reverseLabelOrder?: boolean
+    verticalSorted?: boolean
+    hideBorder: {
+      side?: boolean
+      topBottom?: boolean
+    }
+  }
+}
 
-  // Legend Positioning
-  if (config.legend.position === 'left') {
-    containerClasses.push('left')
+const useLegendClasses = (config: ConfigType) => {
+  const containerClasses = ['legend-container']
+  const innerClasses = ['legend-container__inner']
+
+  // Handle legend positioning
+  switch (config.legend.position) {
+    case 'left':
+      containerClasses.push('left')
+      break
+    case 'right':
+      containerClasses.push('right')
+      break
+    case 'bottom':
+      containerClasses.push('bottom')
+      innerClasses.push('double-column', 'bottom')
+      break
+    case 'top':
+      containerClasses.push('top')
+      innerClasses.push('double-column', 'top')
+      break
   }
 
-  if (config.legend.position === 'bottom') {
-    containerClasses.push('bottom')
-    innerClasses.push('double-column')
-    if (!config.legend.hasBorder) containerClasses.push('no-border')
-    innerClasses.push('bottom')
-  }
-  if (config.legend.position === 'top') {
-    containerClasses.push('top')
-    innerClasses.push('double-column')
-    if (!config.legend.hasBorder) containerClasses.push('no-border')
-    innerClasses.push('top')
-  }
-
+  // Handle single row configuration for 'bottom' and 'top' positions
   if (['bottom', 'top'].includes(config.legend.position) && config.legend.singleRow) {
     innerClasses.push('single-row')
   }
 
-  // Legend > Item Ordering
+  // Reverse label order
   if (config.legend.reverseLabelOrder) {
-    innerClasses.push('d-flex')
-    innerClasses.push('flex-column-reverse')
+    innerClasses.push('d-flex', 'flex-column-reverse')
   }
+
+  // Vertical sorting for 'bottom' and 'top' positions
   if (['bottom', 'top'].includes(config.legend.position) && config.legend.verticalSorted) {
     innerClasses.push('vertical-sorted')
   }
-  if (config.legend.style === 'gradient' && config.legend.position !== 'left' && config.legend.position !== 'right') {
-    innerClasses.push('gradient')
-    containerClasses.push('gradient')
-    innerClasses = innerClasses.filter(className => className !== 'double-column')
+
+  // Configure border classes
+  if (config.legend.hideBorder.side && ['right', 'left'].includes(config.legend.position)) {
+    containerClasses.push('no-border')
   }
+
+  if (config.legend.hideBorder.topBottom && ['top', 'bottom'].includes(config.legend.position)) {
+    containerClasses.push('no-border')
+  }
+
   return {
     containerClasses,
     innerClasses
   }
 }
+export default useLegendClasses

@@ -53,7 +53,7 @@ export type Legend = {
   hide: boolean
   highlightOnHover: boolean
   label: string
-  position: string
+  position: 'left' | 'bottom' | 'top' | 'right'
   reverseLabelOrder: boolean
   singleRow: boolean
   type: string
@@ -61,8 +61,11 @@ export type Legend = {
   style:'circles'|'boxes'|'gradient'|'lines'
   subStyle:'linear blocks'|'smooth'
   hideSuppressedLabels:boolean
-  hasBorder:boolean
   tickRotation:string
+  hideBorder:{
+    side:boolean
+    topBottom:boolean
+  }
 }
 
 type Visual = {
