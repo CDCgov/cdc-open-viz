@@ -24,6 +24,28 @@
 .cdc-open-viz-module.type-chart {
   @import 'DataTable';
 
+  .legend-top {
+    .legend-wrapper .tooltip-boundary {
+      display: flex;
+      flex-wrap: wrap;
+      order: 2;
+      aside {
+        width: 100%;
+        order: 1;
+      }
+    }
+  }
+
+  .legend-bottom {
+    .legend-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      aside {
+        width: 100%;
+      }
+    }
+  }
+
   &.isEditor .cdc-chart-inner-container {
     background: white;
   }
@@ -90,7 +112,6 @@
   .subtext,
   .subtext--responsive-ticks,
   .section-subtext {
-    padding: 0 1rem;
     &--brush-active {
       margin-top: 2.5em;
     }
@@ -109,7 +130,6 @@
     vertical-align: top;
     text-align: left;
     border: 1px solid $lightGray;
-    order: 1;
     position: relative;
 
     &__inner {
@@ -295,6 +315,49 @@
     display: flex;
     align-items: flex-start;
     flex-wrap: wrap;
+    justify-content: space-between;
+
+    &.legend-top:not(.legend-hidden) {
+      .legend-wrapper {
+        & > div {
+          order: 2;
+          width: 100%;
+        }
+        aside {
+          width: 100%;
+          order: 1;
+          height: fit-content;
+        }
+      }
+    }
+
+    &.legend-left:not(.legend-hidden) {
+      .legend-wrapper {
+        & > div {
+          order: 2;
+          width: 75%;
+        }
+        aside {
+          width: 25%;
+          order: 1;
+          height: fit-content;
+        }
+      }
+    }
+
+    &.legend-right:not(.legend-hidden) {
+      .legend-wrapper {
+        & > div {
+          order: 1;
+          width: 75%;
+        }
+        aside {
+          width: 25%;
+          height: fit-content;
+          order: 2;
+        }
+      }
+    }
 
     &.left {
       display: flex;
@@ -456,14 +519,7 @@
   }
 
   @include breakpointClass(md) {
-    .filters-section,
-    .chart-container:not(.sparkline) {
-      margin-left: 1em;
-      margin-right: 1em;
-    }
-
     .chart-container {
-      flex-wrap: nowrap;
       .no-wrap {
         flex-wrap: nowrap;
       }
@@ -471,7 +527,7 @@
       .legend-container {
         width: 25%;
         margin-left: 1em;
-        order: 2;
+        height: fit-content;
 
         &.left {
           margin-left: 0;
@@ -743,7 +799,6 @@
   .subtext,
   .subtext--responsive-ticks {
     margin-top: 0px;
-    padding: 0 1rem;
   }
 
   .isEditor {
