@@ -17,8 +17,10 @@
     background-color: #fff;
     z-index: 6;
     border-top: $lightGray 1px solid;
+
     @include breakpointClass(md) {
-      &.bottom {
+      &.bottom,
+      &.top {
         border: $lightGray 1px solid;
       }
       &.side {
@@ -46,6 +48,9 @@
           flex-direction: row;
           flex-wrap: wrap;
         }
+      }
+      &.no-border {
+        border: none;
       }
 
       &.bottom {
@@ -175,7 +180,8 @@
       }
     }
 
-    &.bottom.single-row {
+    &.bottom.single-row,
+    &.top.single-row {
       width: 100%;
       .legend-container ul {
         flex-direction: row;
