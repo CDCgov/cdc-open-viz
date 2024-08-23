@@ -99,7 +99,9 @@ const PanelGeneral: FC<PanelProps> = props => {
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p>Selecting this option will not hide the display of "zero value", "suppressed data", or "missing data" indicators on the chart (if applicable).</p>
+                    <p>
+                      Selecting this option will <i> not </i> hide the display of "zero value", "suppressed data", or "missing data" indicators on the chart (if applicable).
+                    </p>
                   </Tooltip.Content>
                 </Tooltip>
               }
@@ -126,13 +128,17 @@ const PanelGeneral: FC<PanelProps> = props => {
               updateField={updateField}
             />
             <CheckBox
+              display={config.visualizationType !== 'Line'}
               tooltip={
                 <Tooltip style={{ textTransform: 'none' }}>
                   <Tooltip.Target>
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p> Selecting this option will display a thin line slightly above the Date/Category Axis to indicate "zero value" where zero values are indicated in the Data Series.</p>
+                    <p>
+                      {' '}
+                      Selecting this option will display a <i> thin line</i> slightly above the Date/Category Axis to indicate "zero value" where zero values are indicated in the Data Series.
+                    </p>
                   </Tooltip.Content>
                 </Tooltip>
               }
@@ -150,7 +156,9 @@ const PanelGeneral: FC<PanelProps> = props => {
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p>Selecting this option will display the 'suppressed data symbol' on the Date/Category Axis, in the tooltip hover, and in the data table where suppressed data values are indicated in the Data Series</p>
+                    <p>
+                      Selecting this option will show the <i>suppression indicator </i> on the Date/Category axis, within tooltips, and in the data table where suppressed data values appear in the Data Series.
+                    </p>
                   </Tooltip.Content>
                 </Tooltip>
               }
