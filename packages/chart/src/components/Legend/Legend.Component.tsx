@@ -53,12 +53,16 @@ const Legend: React.FC<LegendProps> = forwardRef(
       legend?.position === 'top' ||
       (['sm', 'xs', 'xxs'].includes(currentViewport) && !legend.hide)
 
-    const legendClasses = {
-      marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
-      marginTop:
-        isBottomOrSmallViewport && config.orientation === 'horizontal'
-          ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px`
-          : getMarginTop(isBottomOrSmallViewport, config.brush.active)
+    const getLegendStyles = () => {
+      return {
+        marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
+        marginTop:
+          isBottomOrSmallViewport && config.orientation === 'horizontal'
+            ? `${
+                config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size
+              }px`
+            : getMarginTop(isBottomOrSmallViewport, config.brush.active)
+      }
     }
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
@@ -67,7 +71,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
     return (
       <aside
         ref={ref}
-        style={legendClasses}
+        style={getLegendStyles()}
         id={skipId || 'legend'}
         className={containerClasses.join(' ')}
         role='region'
