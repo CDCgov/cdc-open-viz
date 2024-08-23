@@ -2,6 +2,9 @@
 import { forwardRef, useContext } from 'react'
 import parse from 'html-react-parser'
 
+//types
+import { DimensionsType } from '@cdc/core/types/Dimensions'
+
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendShape from '@cdc/core/components/LegendShape'
 import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
@@ -19,12 +22,11 @@ import './index.scss'
 type LegendProps = {
   skipId: string
   currentViewport: ViewportSize
-  dimensions: any
+  dimensions: DimensionsType
 }
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const { skipId, currentViewport, dimensions } = props
-  let [mapWidth] = dimensions
 
   const {
     // prettier-ignore
@@ -57,7 +59,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
     setRuntimeLegend(newLegend)
 
-    setAccessibleStatus(`Disabled legend item ${legendLabel ?? ''}. Please reference the data table to see updated values.`)
+    setAccessibleStatus(
+      `Disabled legend item ${legendLabel ?? ''}. Please reference the data table to see updated values.`
+    )
   }
 
   const getFormattedLegendItems = () => {
@@ -123,7 +127,11 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           }}
           tabIndex={0}
         >
-          <LegendShape shape={state.legend.style === 'boxes' ? 'square' : 'circle'} viewport={viewport} fill={item.color} />
+          <LegendShape
+            shape={state.legend.style === 'boxes' ? 'square' : 'circle'}
+            viewport={viewport}
+            fill={item.color}
+          />
           <span>{item.label}</span>
         </li>
       )
@@ -144,13 +152,48 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
         legendItems.push(
           <>
-            <li className={`legend-container__li legend-container__li--geo-pattern`} aria-label='You are on a pattern button. We dont support toggling patterns on this legend at the moment, but provide the area as being focusable for congruity.' tabIndex={0}>
+            <li
+              className={`legend-container__li legend-container__li--geo-pattern`}
+              aria-label='You are on a pattern button. We dont support toggling patterns on this legend at the moment, but provide the area as being focusable for congruity.'
+              tabIndex={0}
+            >
               <span className='legend-item' style={{ border: 'unset' }}>
                 <svg width={legendSize} height={legendSize}>
-                  {pattern === 'waves' && <PatternWaves id={`${dataKey}--${patternDataIndex}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
-                  {pattern === 'circles' && <PatternCircles id={`${dataKey}--${patternDataIndex}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
-                  {pattern === 'lines' && <PatternLines id={`${dataKey}--${patternDataIndex}`} height={sizes[size] ?? 6} width={sizes[size] ?? 10} stroke={defaultPatternColor} strokeWidth={2} orientation={['diagonalRightToLeft']} />}
-                  <circle id={dataKey} fill={`url(#${dataKey}--${patternDataIndex})`} r={legendSize / 2} cx={legendSize / 2} cy={legendSize / 2} stroke='#0000004d' strokeWidth={1} />
+                  {pattern === 'waves' && (
+                    <PatternWaves
+                      id={`${dataKey}--${patternDataIndex}`}
+                      height={sizes[size] ?? 10}
+                      width={sizes[size] ?? 10}
+                      fill={defaultPatternColor}
+                    />
+                  )}
+                  {pattern === 'circles' && (
+                    <PatternCircles
+                      id={`${dataKey}--${patternDataIndex}`}
+                      height={sizes[size] ?? 10}
+                      width={sizes[size] ?? 10}
+                      fill={defaultPatternColor}
+                    />
+                  )}
+                  {pattern === 'lines' && (
+                    <PatternLines
+                      id={`${dataKey}--${patternDataIndex}`}
+                      height={sizes[size] ?? 6}
+                      width={sizes[size] ?? 10}
+                      stroke={defaultPatternColor}
+                      strokeWidth={2}
+                      orientation={['diagonalRightToLeft']}
+                    />
+                  )}
+                  <circle
+                    id={dataKey}
+                    fill={`url(#${dataKey}--${patternDataIndex})`}
+                    r={legendSize / 2}
+                    cx={legendSize / 2}
+                    cy={legendSize / 2}
+                    stroke='#0000004d'
+                    strokeWidth={1}
+                  />
                 </svg>
               </span>
               <p style={{ lineHeight: '22.4px' }}>{patternData.label || patternData.dataValue || ''}</p>
@@ -176,7 +219,15 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     }
   }
 
-  const pin = <path className='marker' d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z' strokeWidth={2} stroke={'black'} transform={`scale(0.5)`} />
+  const pin = (
+    <path
+      className='marker'
+      d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
+      strokeWidth={2}
+      stroke={'black'}
+      transform={`scale(0.5)`}
+    />
+  )
 
   const cityStyleShapes = {
     pin: pin,
@@ -190,10 +241,19 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   return (
     <ErrorBoundary component='Sidebar'>
       <div className='legends'>
-        <aside id={skipId || 'legend'} className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex={0} ref={ref}>
+        <aside
+          id={skipId || 'legend'}
+          className={legendClasses.aside.join(' ') || ''}
+          role='region'
+          aria-label='Legend'
+          tabIndex={0}
+          ref={ref}
+        >
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
             {legend.title && <h3 className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</h3>}
-            {legend.dynamicDescription === false && legend.description && <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>}
+            {legend.dynamicDescription === false && legend.description && (
+              <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>
+            )}
             {legend.dynamicDescription === true &&
               runtimeFilters.map((filter, idx) => {
                 const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
@@ -211,7 +271,14 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 return true
               })}
 
-            <LegendGradient labels={getFormattedLegendItems().map(item => item?.label) ?? []} colors={getFormattedLegendItems().map(item => item?.color) ?? []} dimensions={dimensions} currentViewport={currentViewport} config={state} getTextWidth={getTextWidth} />
+            <LegendGradient
+              labels={getFormattedLegendItems().map(item => item?.label) ?? []}
+              colors={getFormattedLegendItems().map(item => item?.color) ?? []}
+              dimensions={dimensions}
+              currentViewport={currentViewport}
+              config={state}
+              getTextWidth={getTextWidth}
+            />
             <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
               {state.legend.style === 'gradient' ? '' : legendList()}
             </ul>
@@ -222,7 +289,10 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                   {state.visual.cityStyleLabel && (
                     <div>
                       <svg>
-                        <Group top={state.visual.cityStyle === 'pin' ? 19 : state.visual.cityStyle === 'triangle' ? 13 : 11} left={10}>
+                        <Group
+                          top={state.visual.cityStyle === 'pin' ? 19 : state.visual.cityStyle === 'triangle' ? 13 : 11}
+                          left={10}
+                        >
                           {cityStyleShapes[state.visual.cityStyle.toLowerCase()]}
                         </Group>
                       </svg>
@@ -249,7 +319,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             {runtimeLegend.disabledAmt > 0 && <Button onClick={handleReset}>Reset</Button>}
           </section>
         </aside>
-        {state.hexMap.shapeGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && <LegendItemHex state={state} runtimeLegend={runtimeLegend} viewport={viewport} />}
+        {state.hexMap.shapeGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && (
+          <LegendItemHex state={state} runtimeLegend={runtimeLegend} viewport={viewport} />
+        )}
       </div>
     </ErrorBoundary>
   )
