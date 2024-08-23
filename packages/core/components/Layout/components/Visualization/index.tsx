@@ -17,10 +17,15 @@ type VisualizationWrapper = {
 }
 
 const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) => {
-  const { config = {}, isEditor = false, currentViewport = 'lg', imageId = '', showEditorPanel = true } = props
+  const { config = {}, isEditor = false, currentViewport = 'lg', imageId = '', showEditorPanel = true, className } = props
 
   const getWrappingClasses = () => {
     let classes = ['cdc-open-viz-module', `${currentViewport}`, `font-${config?.fontSize}`, `${config?.theme}`]
+
+    if (className) {
+      classes.push(className)
+    }
+
     isEditor && classes.push('spacing-wrapper')
     isEditor && classes.push('isEditor')
 

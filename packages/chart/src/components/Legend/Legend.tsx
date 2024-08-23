@@ -25,7 +25,7 @@ const Legend = forwardRef((props, ref) => {
   const createLegendLabels = createFormatLabels(config, tableData, data, colorScale)
 
   return (
-    !['Box Plot', 'Pie'].includes(config.visualizationType) && (
+    !['Box Plot'].includes(config.visualizationType) && (
       <Fragment>
         <LegendComponent
           getTextWidth={getTextWidth}
