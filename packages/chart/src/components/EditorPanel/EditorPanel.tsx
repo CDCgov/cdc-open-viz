@@ -2,13 +2,7 @@ import { useState, useEffect, useCallback, memo, useContext } from 'react'
 import { DragDropContext, Droppable } from '@hello-pangea/dnd'
 import chroma from 'chroma-js'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
-import {
-  Accordion,
-  AccordionItem,
-  AccordionItemHeading,
-  AccordionItemPanel,
-  AccordionItemButton
-} from 'react-accessible-accordion'
+import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import Layout from '@cdc/core/components/Layout'
 
 // @cdc/core
@@ -143,297 +137,214 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   return (
     <>
       {config.preliminaryData &&
-        config.preliminaryData?.map(
-          (
-            {
-              circleSize,
-              column,
-              displayLegend,
-              displayTable,
-              displayTooltip,
-              label,
-              seriesKey,
-              style,
-              symbol,
-              type,
-              value,
-              hideBarSymbol,
-              hideLineStyle
-            },
-            i
-          ) => {
-            return (
-              <div key={`preliminaryData-${i}`} className='edit-block'>
-                <p> {type === 'suppression' ? 'Suppressed' : 'Effect'} Data</p>
-                <button
-                  type='button'
-                  className='remove-column'
-                  onClick={event => {
-                    event.preventDefault()
-                    removeColumn(i)
-                  }}
-                >
-                  Remove
-                </button>
+        config.preliminaryData?.map(({ circleSize, column, displayLegend, displayTable, displayTooltip, label, seriesKey, style, symbol, type, value, hideBarSymbol, hideLineStyle }, i) => {
+          return (
+            <div key={`preliminaryData-${i}`} className='edit-block'>
+              <p> {type === 'suppression' ? 'Suppressed' : 'Effect'} Data</p>
+              <button
+                type='button'
+                className='remove-column'
+                onClick={event => {
+                  event.preventDefault()
+                  removeColumn(i)
+                }}
+              >
+                Remove
+              </button>
 
-                <Select
-                  value={type}
-                  initial={config.visualizationType == 'Bar' ? '' : 'Select'}
-                  fieldName='type'
-                  label='Type'
-                  updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                  options={getTypeOptions()}
-                />
-                {type === 'suppression' ? (
-                  <>
-                    <Select
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>
-                              {' '}
-                              If no “Data Series" is selected, the symbol will be applied to "all" suppressed values
-                              indicated in the dataset. If you select a particular data series, there's no need to fill
-                              in “suppression line style” and “suppression symbol” below.
-                            </p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                      value={column}
-                      initial='Select'
-                      fieldName='column'
-                      label='Add Data Series'
-                      updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                      options={config.runtime?.seriesKeys}
-                    />
-                    <TextField
-                      value={value}
-                      fieldName='value'
-                      label='Suppressed Data  Value'
-                      updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                    />
-                    {(hasComboLineSeries || config.visualizationType === 'Line') && (
-                      <>
-                        <Select
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>
-                                  The recommended approach for presenting data is to include a footnote indicating any
-                                  data suppression.
-                                </p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                          value={style}
-                          initial='Select'
-                          fieldName='style'
-                          label={'suppression line style'}
-                          updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                          options={getStyleOptions(type)}
-                        />
-                        <CheckBox
-                          value={hideLineStyle}
-                          fieldName='hideLineStyle'
-                          label='Hide Suppressed line Style'
-                          updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                        />
-                      </>
-                    )}
-
-                    {(hasComboBarSeries || config.visualizationType === 'Bar') && (
-                      <>
-                        <Select
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>
-                                  The suggested method for presenting suppressed data is to use "double asterisks". If
-                                  "double asterisks" are already used elsewhere (e.g., footnotes), please select an
-                                  alternative symbol from the menu to denote data suppression.
-                                </p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                          value={symbol}
-                          initial='Select'
-                          fieldName='symbol'
-                          label={config.visualizationType === 'Combo' ? 'suppression bar symbol' : 'suppression symbol'}
-                          updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                          options={getSymbolOptions()}
-                        />
-                        <CheckBox
-                          value={hideBarSymbol}
-                          fieldName='hideBarSymbol'
-                          label='Hide Suppressed Bar Symbol  '
-                          updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                        />
-                      </>
-                    )}
-
-                    <TextField
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>This label will display in the tooltip and legend.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                      value={label ? label : 'Suppressed'}
-                      fieldName='label'
-                      label='Suppressed Data Label'
-                      placeholder=''
-                      updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                    />
-                    <CheckBox
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>
-                              Enabling this tooltip will provide a clearer indication of 'suppressed' or 'zero data'
-                              values, whichever is applicable. Deselecting 'Display In Tooltip' indicates that you do
-                              not want to display 'suppressed' or 'zero data' values in tooltips when hovering over
-                              them.
-                            </p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                      value={displayTooltip}
-                      fieldName='displayTooltip'
-                      label='Display in tooltips'
-                      updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                    />
-                    <CheckBox
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>
-                              Deselecting "Display in Legend" indicates that you do not want to display suppressed data
-                              in the legend.
-                            </p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                      value={displayLegend}
-                      fieldName='displayLegend'
-                      label='Display in legend'
-                      updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                    />
-                    <CheckBox
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>
-                              Deselecting "Display In Data Table" indicates that you do not want to display suppressed
-                              data in the data table.
-                            </p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                      value={displayTable}
-                      fieldName='displayTable'
-                      label='Display in table'
-                      updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <Select
-                      value={seriesKey}
-                      initial='Select'
-                      fieldName='seriesKey'
-                      label='ASSOCIATE TO SERIES'
-                      updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                      options={config.runtime.lineSeriesKeys ?? config.runtime?.seriesKeys}
-                    />
-                    <Select
-                      value={column}
-                      initial='Select'
-                      fieldName='column'
-                      label='COLUMN WITH CONFIGURATION VALUE'
-                      updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                      options={getColumnOptions()}
-                    />
-                    <TextField
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>
-                              If 'Filled Circles' is selected as the style, this field is optional, and the style
-                              'Filled Circles' will apply to all points within the associated series data.
-                            </p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                      value={value}
-                      fieldName='value'
-                      label='VALUE TO TRIGGER'
-                      updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                    />
-                    <Select
-                      value={style}
-                      initial='Select'
-                      fieldName='style'
-                      label='Style'
-                      updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                      options={getStyleOptions(type)}
-                    />
-                    {style.includes('Circles') && (
-                      <TextField
-                        className='number-narrow'
-                        type='number'
-                        value={circleSize}
-                        fieldName='circleSize'
-                        label='circle size'
+              <Select
+                value={type}
+                initial={config.visualizationType == 'Bar' ? '' : 'Select'}
+                fieldName='type'
+                label='Type'
+                updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                options={getTypeOptions()}
+              />
+              {type === 'suppression' ? (
+                <>
+                  <Select
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>
+                            {' '}
+                            If no “Data Series" is selected, the symbol will be applied to "all" suppressed values indicated in the dataset. If you select a particular data series, there's no need to fill in “suppression
+                            line style” and “suppression symbol” below.
+                          </p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    value={column}
+                    initial='Select'
+                    fieldName='column'
+                    label='Add Data Series'
+                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                    options={config.runtime?.seriesKeys}
+                  />
+                  <TextField value={value} fieldName='value' label='Suppressed Data  Value' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                  {(hasComboLineSeries || config.visualizationType === 'Line') && (
+                    <>
+                      <Select
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>The recommended approach for presenting data is to include a footnote indicating any data suppression.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        value={style}
+                        initial='Select'
+                        fieldName='style'
+                        label={'suppression line style'}
                         updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                        options={getStyleOptions(type)}
                       />
-                    )}
-                    {style !== 'Filled Circles' && (
-                      <TextField
-                        value={label}
-                        fieldName='label'
-                        label='Label'
-                        placeholder=''
+                      <CheckBox value={hideLineStyle} fieldName='hideLineStyle' label='Hide Suppressed line Style' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                    </>
+                  )}
+
+                  {(hasComboBarSeries || config.visualizationType === 'Bar') && (
+                    <>
+                      <Select
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                The suggested method for presenting suppressed data is to use "double asterisks". If "double asterisks" are already used elsewhere (e.g., footnotes), please select an alternative symbol
+                                from the menu to denote data suppression.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        value={symbol}
+                        initial='Select'
+                        fieldName='symbol'
+                        label={config.visualizationType === 'Combo' ? 'suppression bar symbol' : 'suppression symbol'}
                         updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                        options={getSymbolOptions()}
                       />
-                    )}
-                  </>
-                )}
-              </div>
-            )
-          }
-        )}
+                      <CheckBox value={hideBarSymbol} fieldName='hideBarSymbol' label='Hide Suppressed Bar Symbol  ' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                    </>
+                  )}
+
+                  <TextField
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>This label will display in the tooltip and legend.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    value={label ? label : 'Suppressed'}
+                    fieldName='label'
+                    label='Suppressed Data Label'
+                    placeholder=''
+                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                  />
+                  <CheckBox
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>
+                            Enabling this tooltip will provide a clearer indication of 'suppressed' or 'zero data' values, whichever is applicable. Deselecting 'Display In Tooltip' indicates that you do not want to
+                            display 'suppressed' or 'zero data' values in tooltips when hovering over them.
+                          </p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    value={displayTooltip}
+                    fieldName='displayTooltip'
+                    label='Display in tooltips'
+                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                  />
+                  <CheckBox
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Deselecting "Display in Legend" indicates that you do not want to display suppressed data in the legend.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    value={displayLegend}
+                    fieldName='displayLegend'
+                    label='Display in legend'
+                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                  />
+                  <CheckBox
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Deselecting "Display In Data Table" indicates that you do not want to display suppressed data in the data table.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    value={displayTable}
+                    fieldName='displayTable'
+                    label='Display in table'
+                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                  />
+                </>
+              ) : (
+                <>
+                  <Select
+                    value={seriesKey}
+                    initial='Select'
+                    fieldName='seriesKey'
+                    label='ASSOCIATE TO SERIES'
+                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                    options={config.runtime.lineSeriesKeys ?? config.runtime?.seriesKeys}
+                  />
+                  <Select value={column} initial='Select' fieldName='column' label='COLUMN WITH CONFIGURATION VALUE' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getColumnOptions()} />
+                  <TextField
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>If 'Filled Circles' is selected as the style, this field is optional, and the style 'Filled Circles' will apply to all points within the associated series data.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    value={value}
+                    fieldName='value'
+                    label='VALUE TO TRIGGER'
+                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                  />
+                  <Select value={style} initial='Select' fieldName='style' label='Style' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getStyleOptions(type)} />
+                  {style.includes('Circles') && (
+                    <TextField className='number-narrow' type='number' value={circleSize} fieldName='circleSize' label='circle size' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                  )}
+                  {style !== 'Filled Circles' && <TextField value={label} fieldName='label' label='Label' placeholder='' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />}
+                </>
+              )}
+            </div>
+          )
+        })}
 
       <button type='button' onClick={addColumn} className='btn full-width'>
-        {config.visualizationType === 'Line'
-          ? 'Add Special Line'
-          : config.visualizationType === 'Bar'
-          ? ' Add Special Bar'
-          : 'Add Special Bar/Line'}
+        {config.visualizationType === 'Line' ? 'Add Special Line' : config.visualizationType === 'Bar' ? ' Add Special Bar' : 'Add Special Bar/Line'}
       </button>
     </>
   )
@@ -448,8 +359,7 @@ interface CategoricalAxisProps {
 const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig, display }) => {
   const maxHeight = config?.yAxis?.maxValue
 
-  const totalEnteredHeight =
-    config?.yAxis?.categories?.reduce((sum, obj) => sum + (parseFloat(obj.height) || 0), 0) || 0
+  const totalEnteredHeight = config?.yAxis?.categories?.reduce((sum, obj) => sum + (parseFloat(obj.height) || 0), 0) || 0
 
   const removeColumn = i => {
     let categories = []
@@ -523,11 +433,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
                       <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                     </Tooltip.Target>
                     <Tooltip.Content>
-                      <p>
-                        {' '}
-                        Category Height will be ignored for the last category. The last category will fill the rest of
-                        the axis height.
-                      </p>
+                      <p> Category Height will be ignored for the last category. The last category will fill the rest of the axis height.</p>
                     </Tooltip.Content>
                   </Tooltip>
                 }
@@ -538,24 +444,12 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
                 updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
               />
               {Number(totalEnteredHeight) > Number(maxHeight) && config.yAxis.categories.length - 1 === i && (
-                <span style={{ color: 'red', display: 'block', fontSize: '15px' }}>
-                  Update Max value to show all categories
-                </span>
+                <span style={{ color: 'red', display: 'block', fontSize: '15px' }}>Update Max value to show all categories</span>
               )}
 
               <div className='two-col-inputs'>
-                <TextField
-                  value={color}
-                  fieldName='color'
-                  label='Color'
-                  updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                />
-                <TextField
-                  value={label}
-                  fieldName='label'
-                  label='Label'
-                  updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                />
+                <TextField value={color} fieldName='color' label='Color' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                <TextField value={label} fieldName='label' label='Label' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
               </div>
             </div>
           )
@@ -655,8 +549,7 @@ const EditorPanel = () => {
       newSeries = config.series.map(series => {
         return {
           ...series,
-          type:
-            config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar',
+          type: config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar',
           axis: 'Left'
         }
       })
@@ -732,14 +625,7 @@ const EditorPanel = () => {
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
-    if (isDebug)
-      console.log(
-        '#COVE: CHART: EditorPanel: section, subsection, fieldName, newValue',
-        section,
-        subsection,
-        fieldName,
-        newValue
-      ) // eslint-disable-line
+    if (isDebug) console.log('#COVE: CHART: EditorPanel: section, subsection, fieldName, newValue', section, subsection, fieldName, newValue) // eslint-disable-line
 
     if (section === 'boxplot' && subsection === 'legend') {
       updateConfig({
@@ -920,11 +806,7 @@ const EditorPanel = () => {
       Object.keys(columns).forEach(key => {
         if (
           (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
-          (config.confidenceKeys &&
-            Object.keys(config.confidenceKeys).includes(key) &&
-            ((lower && upper) || lower || upper) &&
-            key !== lower &&
-            key !== upper)
+          (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key) && ((lower && upper) || lower || upper) && key !== lower && key !== upper)
         ) {
           delete columns[key]
         }
@@ -940,7 +822,7 @@ const EditorPanel = () => {
     switch (option) {
       case 'style':
         options.push('circles', 'boxes')
-        if (config.visualizationType === 'Bar' && !['right', 'left'].includes(config.legend.position)) {
+        if (config.visualizationType === 'Bar' && (!['right', 'left'].includes(config.legend.position) || !config.legend.position)) {
           options.push('gradient')
         }
         if (config.visualizationType === 'Line') {
@@ -1143,9 +1025,7 @@ const EditorPanel = () => {
       case config.visualizationType === 'Combo' && isAllLine && enteredValue > minVal:
         message = 'Value should not exceed ' + minValue
         break
-      case (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) &&
-        minVal > 0 &&
-        enteredValue > 0:
+      case (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && minVal > 0 && enteredValue > 0:
         message = config.useLogScale ? 'Value must be equal to 0' : 'Value must be less than or equal to 0'
         break
       case config.visualizationType === 'Deviation Bar' && enteredValue >= Math.min(minVal, config.xAxis.target):
@@ -1197,17 +1077,7 @@ const EditorPanel = () => {
     if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
-  const chartsWithOptions = [
-    'Bump Chart',
-    'Area Chart',
-    'Combo',
-    'Line',
-    'Bar',
-    'Forecasting',
-    'Scatter Plot',
-    'Paired Bar',
-    'Deviation Bar'
-  ]
+  const chartsWithOptions = ['Bump Chart', 'Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting', 'Scatter Plot', 'Paired Bar', 'Deviation Bar']
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -1335,10 +1205,7 @@ const EditorPanel = () => {
     })
   }
 
-  const colorCodeByCategory =
-    config.visualizationType === 'Bar' &&
-    config.visualizationSubType === 'regular' &&
-    config.runtime.seriesKeys.length === 1
+  const colorCodeByCategory = config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1
   const getLegendColumns = () => {
     const colorCodeData = data.map(d => d[config.legend.colorCode])
     return colorCodeByCategory ? colorCodeData : getColumns(false).filter(d => d !== config.xAxis.dataKey)
@@ -1395,161 +1262,97 @@ const EditorPanel = () => {
   return (
     <EditorPanelContext.Provider value={editorContextValues}>
       <ErrorBoundary component='EditorPanel'>
-        <Layout.Sidebar
-          displayPanel={displayPanel}
-          isDashboard={isDashboard}
-          title={'Configure Chart'}
-          onBackClick={onBackClick}
-        >
+        <Layout.Sidebar displayPanel={displayPanel} isDashboard={isDashboard} title={'Configure Chart'} onBackClick={onBackClick}>
           <Accordion allowZeroExpanded={true}>
             <Panels.General name='General' />
             <Panels.ForestPlot name='Forest Plot Settings' />
             <Panels.Sankey name='Sankey' />
-            {config.visualizationType !== 'Pie' &&
-              config.visualizationType !== 'Forest Plot' &&
-              config.visualizationType !== 'Sankey' && (
-                <AccordionItem>
-                  <AccordionItemHeading>
-                    <AccordionItemButton>
-                      Data Series{' '}
-                      {(!config.series ||
-                        config.series.length === 0 ||
-                        (config.visualizationType === 'Paired Bar' && config.series.length < 2)) &&
-                        !config.dynamicSeries && <WarningImage width='25' className='warning-icon' />}
-                    </AccordionItemButton>
-                  </AccordionItemHeading>
-                  <AccordionItemPanel>
-                    {visSupportsDynamicSeries() && (
-                      <CheckBox
-                        value={config.dynamicSeries}
-                        fieldName='dynamicSeries'
-                        label='Dynamically generate series'
-                        updateField={updateField}
-                      />
+            {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && config.visualizationType !== 'Sankey' && (
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>
+                    Data Series{' '}
+                    {(!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && !config.dynamicSeries && (
+                      <WarningImage width='25' className='warning-icon' />
                     )}
-                    {(!visSupportsDynamicSeries() || !config.dynamicSeries) && (
+                  </AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  {visSupportsDynamicSeries() && <CheckBox value={config.dynamicSeries} fieldName='dynamicSeries' label='Dynamically generate series' updateField={updateField} />}
+                  {(!visSupportsDynamicSeries() || !config.dynamicSeries) && (
+                    <>
+                      {(!config.series || config.series.length === 0) && !config.dynamicSeries && config.visualizationType !== 'Paired Bar' && <p className='warning'>At least one series is required</p>}
+                      {(!config.series || config.series.length === 0 || config.series.length < 2) && config.visualizationType === 'Paired Bar' && (
+                        <p className='warning'>Select two data series for paired bar chart (e.g., Male and Female).</p>
+                      )}
                       <>
-                        {(!config.series || config.series.length === 0) &&
-                          !config.dynamicSeries &&
-                          config.visualizationType !== 'Paired Bar' && (
-                            <p className='warning'>At least one series is required</p>
-                          )}
-                        {(!config.series || config.series.length === 0 || config.series.length < 2) &&
-                          config.visualizationType === 'Paired Bar' && (
-                            <p className='warning'>
-                              Select two data series for paired bar chart (e.g., Male and Female).
-                            </p>
-                          )}
-                        <>
-                          <Select
-                            fieldName='visualizationType'
-                            label='Add Data Series'
-                            initial='Select'
-                            onChange={e => {
-                              if (e.target.value !== '' && e.target.value !== 'Select') {
-                                addNewSeries(e.target.value)
-                              }
-                              e.target.value = ''
-                            }}
-                            options={getColumns()}
-                          />
-                          {config.series && config.series.length !== 0 && (
-                            <Panels.Series.Wrapper getColumns={getColumns}>
-                              <fieldset>
-                                <legend className='edit-label float-left'>Displaying</legend>
-                                <Tooltip style={{ textTransform: 'none' }}>
-                                  <Tooltip.Target>
-                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                  </Tooltip.Target>
-                                  <Tooltip.Content>
-                                    <p>
-                                      A data series is a set of related data points plotted in a chart and typically
-                                      represented in the chart legend.
-                                    </p>
-                                  </Tooltip.Content>
-                                </Tooltip>
-                              </fieldset>
+                        <Select
+                          fieldName='visualizationType'
+                          label='Add Data Series'
+                          initial='Select'
+                          onChange={e => {
+                            if (e.target.value !== '' && e.target.value !== 'Select') {
+                              addNewSeries(e.target.value)
+                            }
+                            e.target.value = ''
+                          }}
+                          options={getColumns()}
+                        />
+                        {config.series && config.series.length !== 0 && (
+                          <Panels.Series.Wrapper getColumns={getColumns}>
+                            <fieldset>
+                              <legend className='edit-label float-left'>Displaying</legend>
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            </fieldset>
 
-                              <DragDropContext
-                                onDragEnd={({ source, destination }) =>
-                                  handleSeriesChange(source.index, destination.index)
-                                }
-                              >
-                                <Droppable droppableId='filter_order'>
-                                  {/* prettier-ignore */}
-                                  {provided => {
-                                    return (
-                                      <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
-                                        <Panels.Series.List
-                                          series={config.series}
-                                          getItemStyle={getItemStyle}
-                                          sortableItemStyles={sortableItemStyles}
-                                          chartsWithOptions={chartsWithOptions}
-                                        />
-                                        {provided.placeholder}
-                                      </ul>
-                                    )
-                                  }}
-                                </Droppable>
-                              </DragDropContext>
-                            </Panels.Series.Wrapper>
-                          )}
-                        </>
-                        {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
-                          <>
-                            <span className='divider-heading'>Confidence Keys</span>
-                            <Select
-                              value={config.confidenceKeys.upper || ''}
-                              section='confidenceKeys'
-                              fieldName='upper'
-                              label='Upper'
-                              updateField={updateField}
-                              initial='Select'
-                              options={getColumns()}
-                            />
-                            <Select
-                              value={config.confidenceKeys.lower || ''}
-                              section='confidenceKeys'
-                              fieldName='lower'
-                              label='Lower'
-                              updateField={updateField}
-                              initial='Select'
-                              options={getColumns()}
-                            />
-                          </>
-                        )}
-                        {visSupportsRankByValue() && config.series && config.series.length === 1 && (
-                          <Select
-                            fieldName='visualizationType'
-                            label='Rank by Value'
-                            initial='Select'
-                            onChange={e => sortSeries(e.target.value)}
-                            options={['asc', 'desc']}
-                          />
-                        )}
-                        {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
-                        {visSupportsPreliminaryData() && (
-                          <PreliminaryData config={config} updateConfig={updateConfig} data={data} />
+                            <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
+                              <Droppable droppableId='filter_order'>
+                                {/* prettier-ignore */}
+                                {provided => {
+                                  return (
+                                    <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
+                                      <Panels.Series.List series={config.series} getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} />
+                                      {provided.placeholder}
+                                    </ul>
+                                  )
+                                }}
+                              </Droppable>
+                            </DragDropContext>
+                          </Panels.Series.Wrapper>
                         )}
                       </>
-                    )}
-                  </AccordionItemPanel>
-                </AccordionItem>
-              )}
+                      {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
+                        <>
+                          <span className='divider-heading'>Confidence Keys</span>
+                          <Select value={config.confidenceKeys.upper || ''} section='confidenceKeys' fieldName='upper' label='Upper' updateField={updateField} initial='Select' options={getColumns()} />
+                          <Select value={config.confidenceKeys.lower || ''} section='confidenceKeys' fieldName='lower' label='Lower' updateField={updateField} initial='Select' options={getColumns()} />
+                        </>
+                      )}
+                      {visSupportsRankByValue() && config.series && config.series.length === 1 && (
+                        <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />
+                      )}
+                      {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
+                      {visSupportsPreliminaryData() && <PreliminaryData config={config} updateConfig={updateConfig} data={data} />}
+                    </>
+                  )}
+                </AccordionItemPanel>
+              </AccordionItem>
+            )}
             <Panels.BoxPlot name='Measures' />
             {/* Left Value Axis */}
             {visSupportsLeftValueAxis() && (
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    {config.visualizationType === 'Pie'
-                      ? 'Data Format'
-                      : config.orientation === 'vertical'
-                      ? 'Left Value Axis'
-                      : 'Value Axis'}
-                    {config.visualizationType === 'Pie' && !config.yAxis.dataKey && (
-                      <WarningImage width='25' className='warning-icon' />
-                    )}
+                    {config.visualizationType === 'Pie' ? 'Data Format' : config.orientation === 'vertical' ? 'Left Value Axis' : 'Value Axis'}
+                    {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width='25' className='warning-icon' />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
@@ -1584,10 +1387,7 @@ const EditorPanel = () => {
                             <Tooltip.Target>
                               <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
-                            <Tooltip.Content>
-                              Select 'Numeric (Linear Scale)' for uniform scaling, 'Numeric (Logarithmic Scale)' for
-                              exponential data, or 'Categorical' for discrete categories.
-                            </Tooltip.Content>
+                            <Tooltip.Content>Select 'Numeric (Linear Scale)' for uniform scaling, 'Numeric (Logarithmic Scale)' for exponential data, or 'Categorical' for discrete categories.</Tooltip.Content>
                           </Tooltip>
                         </span>
                         <select
@@ -1603,37 +1403,16 @@ const EditorPanel = () => {
                           }
                         >
                           <option value='linear'>Numeric (Linear Scale)</option>
-                          {config.visualizationSubType !== 'stacked' && (
-                            <option value='logarithmic'>Numeric (Logarithmic Scale)</option>
-                          )}
+                          {config.visualizationSubType !== 'stacked' && <option value='logarithmic'>Numeric (Logarithmic Scale)</option>}
                           {config.orientation !== 'horizontal' && <option value='categorical'>Categorical</option>}
                         </select>
                       </label>
-                      <CategoricalAxis
-                        config={config}
-                        updateConfig={updateConfig}
-                        data={data}
-                        display={visHasCategoricalAxis()}
-                      />
+                      <CategoricalAxis config={config} updateConfig={updateConfig} data={data} display={visHasCategoricalAxis()} />
 
-                      <TextField
-                        display={!visHasCategoricalAxis()}
-                        value={config.yAxis.label}
-                        section='yAxis'
-                        fieldName='label'
-                        label='Label '
-                        updateField={updateField}
-                      />
-                      {config.runtime.seriesKeys &&
-                        config.runtime.seriesKeys.length === 1 &&
-                        !['Box Plot', 'Deviation Bar', 'Forest Plot'].includes(config.visualizationType) && (
-                          <CheckBox
-                            value={config.isLegendValue}
-                            fieldName='isLegendValue'
-                            label='Use Legend Value in Hover'
-                            updateField={updateField}
-                          />
-                        )}
+                      <TextField display={!visHasCategoricalAxis()} value={config.yAxis.label} section='yAxis' fieldName='label' label='Label ' updateField={updateField} />
+                      {config.runtime.seriesKeys && config.runtime.seriesKeys.length === 1 && !['Box Plot', 'Deviation Bar', 'Forest Plot'].includes(config.visualizationType) && (
+                        <CheckBox value={config.isLegendValue} fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />
+                      )}
 
                       <TextField
                         display={!visHasCategoricalAxis()}
@@ -1647,16 +1426,10 @@ const EditorPanel = () => {
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
+                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
-                              <p>
-                                Apporoximate number of ticks. Other factors such as space available and data may change
-                                the exact number of ticks used.
-                              </p>
+                              <p>Apporoximate number of ticks. Other factors such as space available and data may change the exact number of ticks used.</p>
                             </Tooltip.Content>
                           </Tooltip>
                         }
@@ -1673,10 +1446,7 @@ const EditorPanel = () => {
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
+                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>{`Increase the size if elements in the ${config.orientation} axis are being crowded or hidden behind other elements.  Decrease if less space is required for the value axis.`}</p>
@@ -1694,14 +1464,7 @@ const EditorPanel = () => {
                         className='number-narrow'
                         updateField={updateField}
                       />
-                      {config.orientation === 'horizontal' && (
-                        <CheckBox
-                          value={config.isResponsiveTicks}
-                          fieldName='isResponsiveTicks'
-                          label='Use Responsive Ticks'
-                          updateField={updateField}
-                        />
-                      )}
+                      {config.orientation === 'horizontal' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
                       {(config.orientation === 'vertical' || !config.isResponsiveTicks) && (
                         <TextField
                           display={!visHasCategoricalAxis()}
@@ -1728,10 +1491,7 @@ const EditorPanel = () => {
                           tooltip={
                             <Tooltip style={{ textTransform: 'none' }}>
                               <Tooltip.Target>
-                                <Icon
-                                  display='question'
-                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                />
+                                <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                               </Tooltip.Target>
                               <Tooltip.Content>
                                 <p>Degrees ticks will be rotated if values overlap, especially in smaller viewports.</p>
@@ -1743,32 +1503,10 @@ const EditorPanel = () => {
 
                       {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                       {/* <TextField value={config.yAxis.axisPadding} type='number' max={10} min={0} section='yAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
-                      {visSupportsValueAxisGridLines() && (
-                        <CheckBox
-                          value={config.yAxis.gridLines}
-                          section='yAxis'
-                          fieldName='gridLines'
-                          label='Show Gridlines'
-                          updateField={updateField}
-                        />
-                      )}
-                      <CheckBox
-                        value={config.yAxis.enablePadding}
-                        section='yAxis'
-                        fieldName='enablePadding'
-                        label='Add Padding to Value Axis Scale'
-                        updateField={updateField}
-                      />
+                      {visSupportsValueAxisGridLines() && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Show Gridlines' updateField={updateField} />}
+                      <CheckBox value={config.yAxis.enablePadding} section='yAxis' fieldName='enablePadding' label='Add Padding to Value Axis Scale' updateField={updateField} />
                       {config.yAxis.enablePadding && (
-                        <TextField
-                          type='number'
-                          section='yAxis'
-                          fieldName='scalePadding'
-                          label='Padding Percentage'
-                          className='number-narrow'
-                          updateField={updateField}
-                          value={config.yAxis.scalePadding}
-                        />
+                        <TextField type='number' section='yAxis' fieldName='scalePadding' label='Padding Percentage' className='number-narrow' updateField={updateField} value={config.yAxis.scalePadding} />
                       )}
                     </>
                   )}
@@ -1782,10 +1520,7 @@ const EditorPanel = () => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>{`Selecting this option will add commas to the left value axis, tooltip hover, and data table.`}</p>
@@ -1803,10 +1538,7 @@ const EditorPanel = () => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>{`This option abbreviates very large or very small numbers on the value axis`}</p>
@@ -1837,12 +1569,8 @@ const EditorPanel = () => {
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            {config.visualizationType === 'Pie' && (
-                              <p>Enter a data prefix to display in the data table and chart tooltips, if applicable.</p>
-                            )}
-                            {config.visualizationType !== 'Pie' && (
-                              <p>Enter a data prefix (such as "$"), if applicable.</p>
-                            )}
+                            {config.visualizationType === 'Pie' && <p>Enter a data prefix to display in the data table and chart tooltips, if applicable.</p>}
+                            {config.visualizationType !== 'Pie' && <p>Enter a data prefix (such as "$"), if applicable.</p>}
                           </Tooltip.Content>
                         </Tooltip>
                       }
@@ -1859,12 +1587,8 @@ const EditorPanel = () => {
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            {config.visualizationType === 'Pie' && (
-                              <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>
-                            )}
-                            {config.visualizationType !== 'Pie' && (
-                              <p>Enter a data suffix (such as "%"), if applicable.</p>
-                            )}
+                            {config.visualizationType === 'Pie' && <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>}
+                            {config.visualizationType !== 'Pie' && <p>Enter a data suffix (such as "%"), if applicable.</p>}
                           </Tooltip.Content>
                         </Tooltip>
                       }
@@ -1873,133 +1597,31 @@ const EditorPanel = () => {
 
                   {config.orientation === 'horizontal' ? ( // horizontal - x is vertical y is horizontal
                     <>
-                      {visSupportsValueAxisLine() && (
-                        <CheckBox
-                          value={config.xAxis.hideAxis}
-                          section='xAxis'
-                          fieldName='hideAxis'
-                          label='Hide Axis'
-                          updateField={updateField}
-                        />
-                      )}
-                      {visSupportsValueAxisLabels() && (
-                        <CheckBox
-                          value={config.xAxis.hideLabel}
-                          section='xAxis'
-                          fieldName='hideLabel'
-                          label='Hide Tick Labels'
-                          updateField={updateField}
-                        />
-                      )}
-                      {visSupportsValueAxisTicks() && (
-                        <CheckBox
-                          value={config.xAxis.hideTicks}
-                          section='xAxis'
-                          fieldName='hideTicks'
-                          label='Hide Ticks'
-                          updateField={updateField}
-                        />
-                      )}
-                      {visSupportsValueAxisMax() && (
-                        <TextField
-                          value={config.xAxis.max}
-                          section='xAxis'
-                          fieldName='max'
-                          label='max value'
-                          type='number'
-                          placeholder='Auto'
-                          updateField={updateField}
-                        />
-                      )}
+                      {visSupportsValueAxisLine() && <CheckBox value={config.xAxis.hideAxis} section='xAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
+                      {visSupportsValueAxisLabels() && <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Tick Labels' updateField={updateField} />}
+                      {visSupportsValueAxisTicks() && <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />}
+                      {visSupportsValueAxisMax() && <TextField value={config.xAxis.max} section='xAxis' fieldName='max' label='max value' type='number' placeholder='Auto' updateField={updateField} />}
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
-                      {visSupportsValueAxisMin() && (
-                        <TextField
-                          value={config.xAxis.min}
-                          section='xAxis'
-                          fieldName='min'
-                          type='number'
-                          label='min value'
-                          placeholder='Auto'
-                          updateField={updateField}
-                        />
-                      )}
+                      {visSupportsValueAxisMin() && <TextField value={config.xAxis.min} section='xAxis' fieldName='min' type='number' label='min value' placeholder='Auto' updateField={updateField} />}
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                       {config.visualizationType === 'Deviation Bar' && (
                         <>
-                          <TextField
-                            value={config.xAxis.target}
-                            section='xAxis'
-                            fieldName='target'
-                            type='number'
-                            label='Deviation point'
-                            placeholder='Auto'
-                            updateField={updateField}
-                          />
-                          <TextField
-                            value={config.xAxis.targetLabel || 'Target'}
-                            section='xAxis'
-                            fieldName='targetLabel'
-                            type='text'
-                            label='Deviation point Label'
-                            updateField={updateField}
-                          />
-                          <CheckBox
-                            value={config.xAxis.showTargetLabel}
-                            section='xAxis'
-                            fieldName='showTargetLabel'
-                            label='Show Deviation point label'
-                            updateField={updateField}
-                          />
+                          <TextField value={config.xAxis.target} section='xAxis' fieldName='target' type='number' label='Deviation point' placeholder='Auto' updateField={updateField} />
+                          <TextField value={config.xAxis.targetLabel || 'Target'} section='xAxis' fieldName='targetLabel' type='text' label='Deviation point Label' updateField={updateField} />
+                          <CheckBox value={config.xAxis.showTargetLabel} section='xAxis' fieldName='showTargetLabel' label='Show Deviation point label' updateField={updateField} />
                         </>
                       )}
                     </>
                   ) : (
                     config.visualizationType !== 'Pie' && (
                       <>
-                        <CheckBox
-                          display={!visHasCategoricalAxis()}
-                          value={config.yAxis.hideAxis}
-                          section='yAxis'
-                          fieldName='hideAxis'
-                          label='Hide Axis'
-                          updateField={updateField}
-                        />
-                        <CheckBox
-                          display={!visHasCategoricalAxis()}
-                          value={config.yAxis.hideLabel}
-                          section='yAxis'
-                          fieldName='hideLabel'
-                          label='Hide Tick Labels'
-                          updateField={updateField}
-                        />
-                        <CheckBox
-                          display={!visHasCategoricalAxis()}
-                          value={config.yAxis.hideTicks}
-                          section='yAxis'
-                          fieldName='hideTicks'
-                          label='Hide Ticks'
-                          updateField={updateField}
-                        />
+                        <CheckBox display={!visHasCategoricalAxis()} value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />
+                        <CheckBox display={!visHasCategoricalAxis()} value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Tick Labels' updateField={updateField} />
+                        <CheckBox display={!visHasCategoricalAxis()} value={config.yAxis.hideTicks} section='yAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
 
-                        <TextField
-                          value={config.yAxis.max}
-                          section='yAxis'
-                          fieldName='max'
-                          type='number'
-                          label='left axis max value'
-                          placeholder='Auto'
-                          updateField={updateField}
-                        />
+                        <TextField value={config.yAxis.max} section='yAxis' fieldName='max' type='number' label='left axis max value' placeholder='Auto' updateField={updateField} />
                         <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
-                        <TextField
-                          value={config.yAxis.min}
-                          section='yAxis'
-                          fieldName='min'
-                          type='number'
-                          label='left axis min value'
-                          placeholder='Auto'
-                          updateField={updateField}
-                        />
+                        <TextField value={config.yAxis.min} section='yAxis' fieldName='min' type='number' label='left axis min value' placeholder='Auto' updateField={updateField} />
                         <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                       </>
                     )
@@ -2268,50 +1890,13 @@ const EditorPanel = () => {
                   <AccordionItemButton>Right Value Axis</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <TextField
-                    value={config.yAxis.rightLabel}
-                    section='yAxis'
-                    fieldName='rightLabel'
-                    label='Label'
-                    updateField={updateField}
-                  />
-                  <TextField
-                    value={config.yAxis.rightNumTicks}
-                    placeholder='Auto'
-                    type='number'
-                    section='yAxis'
-                    fieldName='rightNumTicks'
-                    label='Number of ticks'
-                    className='number-narrow'
-                    updateField={updateField}
-                  />
-                  <TextField
-                    value={config.yAxis.rightAxisSize}
-                    type='number'
-                    section='yAxis'
-                    fieldName='rightAxisSize'
-                    label='Size (Width)'
-                    className='number-narrow'
-                    updateField={updateField}
-                  />
-                  <TextField
-                    value={config.yAxis.rightLabelOffsetSize}
-                    type='number'
-                    section='yAxis'
-                    fieldName='rightLabelOffsetSize'
-                    label='Label Offset'
-                    className='number-narrow'
-                    updateField={updateField}
-                  />
+                  <TextField value={config.yAxis.rightLabel} section='yAxis' fieldName='rightLabel' label='Label' updateField={updateField} />
+                  <TextField value={config.yAxis.rightNumTicks} placeholder='Auto' type='number' section='yAxis' fieldName='rightNumTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
+                  <TextField value={config.yAxis.rightAxisSize} type='number' section='yAxis' fieldName='rightAxisSize' label='Size (Width)' className='number-narrow' updateField={updateField} />
+                  <TextField value={config.yAxis.rightLabelOffsetSize} type='number' section='yAxis' fieldName='rightLabelOffsetSize' label='Label Offset' className='number-narrow' updateField={updateField} />
 
                   <span className='divider-heading'>Number Formatting</span>
-                  <CheckBox
-                    value={config.dataFormat.rightCommas}
-                    section='dataFormat'
-                    fieldName='rightCommas'
-                    label='Add commas'
-                    updateField={updateField}
-                  />
+                  <CheckBox value={config.dataFormat.rightCommas} section='dataFormat' fieldName='rightCommas' label='Add commas' updateField={updateField} />
                   <TextField
                     value={config.dataFormat.rightRoundTo}
                     type='number'
@@ -2335,12 +1920,8 @@ const EditorPanel = () => {
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            {config.visualizationType === 'Pie' && (
-                              <p>Enter a data prefix to display in the data table and chart tooltips, if applicable.</p>
-                            )}
-                            {config.visualizationType !== 'Pie' && (
-                              <p>Enter a data prefix (such as "$"), if applicable.</p>
-                            )}
+                            {config.visualizationType === 'Pie' && <p>Enter a data prefix to display in the data table and chart tooltips, if applicable.</p>}
+                            {config.visualizationType !== 'Pie' && <p>Enter a data prefix (such as "$"), if applicable.</p>}
                           </Tooltip.Content>
                         </Tooltip>
                       }
@@ -2357,59 +1938,21 @@ const EditorPanel = () => {
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            {config.visualizationType === 'Pie' && (
-                              <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>
-                            )}
-                            {config.visualizationType !== 'Pie' && (
-                              <p>Enter a data suffix (such as "%"), if applicable.</p>
-                            )}
+                            {config.visualizationType === 'Pie' && <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>}
+                            {config.visualizationType !== 'Pie' && <p>Enter a data suffix (such as "%"), if applicable.</p>}
                           </Tooltip.Content>
                         </Tooltip>
                       }
                     />
                   </div>
 
-                  <CheckBox
-                    value={config.yAxis.rightHideAxis}
-                    section='yAxis'
-                    fieldName='rightHideAxis'
-                    label='Hide Axis'
-                    updateField={updateField}
-                  />
-                  <CheckBox
-                    value={config.yAxis.rightHideLabel}
-                    section='yAxis'
-                    fieldName='rightHideLabel'
-                    label='Hide Tick Labels'
-                    updateField={updateField}
-                  />
-                  <CheckBox
-                    value={config.yAxis.rightHideTicks}
-                    section='yAxis'
-                    fieldName='rightHideTicks'
-                    label='Hide Ticks'
-                    updateField={updateField}
-                  />
+                  <CheckBox value={config.yAxis.rightHideAxis} section='yAxis' fieldName='rightHideAxis' label='Hide Axis' updateField={updateField} />
+                  <CheckBox value={config.yAxis.rightHideLabel} section='yAxis' fieldName='rightHideLabel' label='Hide Tick Labels' updateField={updateField} />
+                  <CheckBox value={config.yAxis.rightHideTicks} section='yAxis' fieldName='rightHideTicks' label='Hide Ticks' updateField={updateField} />
 
-                  <TextField
-                    value={config.yAxis.max}
-                    section='yAxis'
-                    fieldName='rightMax'
-                    type='number'
-                    label='right axis max value'
-                    placeholder='Auto'
-                    updateField={updateField}
-                  />
+                  <TextField value={config.yAxis.max} section='yAxis' fieldName='rightMax' type='number' label='right axis max value' placeholder='Auto' updateField={updateField} />
                   <span style={{ color: 'red', display: 'block' }}>{warningMsg.rightMaxMessage}</span>
-                  <TextField
-                    value={config.yAxis.min}
-                    section='yAxis'
-                    fieldName='rightMin'
-                    type='number'
-                    label='right axis min value'
-                    placeholder='Auto'
-                    updateField={updateField}
-                  />
+                  <TextField value={config.yAxis.min} section='yAxis' fieldName='rightMin' type='number' label='right axis min value' placeholder='Auto' updateField={updateField} />
                   <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                 </AccordionItemPanel>
               </AccordionItem>
@@ -2434,10 +1977,7 @@ const EditorPanel = () => {
                                 <Tooltip.Target>
                                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                 </Tooltip.Target>
-                                <Tooltip.Content>
-                                  Linear scales are employed for quantitative data, while time scales are used for
-                                  time-series data.
-                                </Tooltip.Content>
+                                <Tooltip.Content>Linear scales are employed for quantitative data, while time scales are used for time-series data.</Tooltip.Content>
                               </Tooltip>
                             </span>
                             <select
@@ -2452,26 +1992,14 @@ const EditorPanel = () => {
                                 })
                               }
                             >
-                              {config.visualizationType !== 'Bump Chart' && (
-                                <option value='categorical'>Categorical (Linear Scale)</option>
-                              )}
-                              {config.visualizationType !== 'Bump Chart' && (
-                                <option value='date'>Date (Linear Scale)</option>
-                              )}
+                              {config.visualizationType !== 'Bump Chart' && <option value='categorical'>Categorical (Linear Scale)</option>}
+                              {config.visualizationType !== 'Bump Chart' && <option value='date'>Date (Linear Scale)</option>}
                               <option value='date-time'>Date (Date Time Scale)</option>
-                              {config.visualizationType === 'Scatter Plot' && (
-                                <option value={'continuous'}>Continuous</option>
-                              )}
+                              {config.visualizationType === 'Scatter Plot' && <option value={'continuous'}>Continuous</option>}
                             </select>
                           </label>
 
-                          <CheckBox
-                            value={config.xAxis.manual}
-                            section='xAxis'
-                            fieldName='manual'
-                            label='Manual Ticks'
-                            updateField={updateField}
-                          />
+                          <CheckBox value={config.xAxis.manual} section='xAxis' fieldName='manual' label='Manual Ticks' updateField={updateField} />
 
                           {visSupportsDateCategoryAxisPadding() && (
                             <TextField
@@ -2489,10 +2017,7 @@ const EditorPanel = () => {
                                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                   </Tooltip.Target>
                                   <Tooltip.Content>
-                                    <p>
-                                      For use with date scale. Extends the earliest and latest dates represented on the
-                                      scale by the percentage specified.
-                                    </p>
+                                    <p>For use with date scale. Extends the earliest and latest dates represented on the scale by the percentage specified.</p>
                                   </Tooltip.Content>
                                 </Tooltip>
                               }
@@ -2539,10 +2064,7 @@ const EditorPanel = () => {
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            <p>
-                              Select the source row or column that contains the segment labels. Depending on the data
-                              structure, it may be listed as "Key."
-                            </p>
+                            <p>Select the source row or column that contains the segment labels. Depending on the data structure, it may be listed as "Key."</p>
                           </Tooltip.Content>
                         </Tooltip>
                       }
@@ -2551,13 +2073,7 @@ const EditorPanel = () => {
 
                   {config.visualizationType !== 'Pie' && (
                     <>
-                      <TextField
-                        value={config.xAxis.label}
-                        section='xAxis'
-                        fieldName='label'
-                        label='Label'
-                        updateField={updateField}
-                      />
+                      <TextField value={config.xAxis.label} section='xAxis' fieldName='label' label='Label' updateField={updateField} />
 
                       {config.xAxis.type === 'continuous' && (
                         <>
@@ -2570,10 +2086,7 @@ const EditorPanel = () => {
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
-                                  <Icon
-                                    display='question'
-                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                  />
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
                                   <p>Enter a data prefix (such as "$"), if applicable.</p>
@@ -2591,10 +2104,7 @@ const EditorPanel = () => {
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
-                                  <Icon
-                                    display='question'
-                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                  />
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
                                   <p>Enter a data suffix (such as "%"), if applicable.</p>
@@ -2612,10 +2122,7 @@ const EditorPanel = () => {
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
-                                  <Icon
-                                    display='question'
-                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                  />
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
                                   <p>{`This option abbreviates very large or very small numbers on the value axis`}</p>
@@ -2630,11 +2137,7 @@ const EditorPanel = () => {
                         <>
                           <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
                             Format how charts should parse and display your dates using{' '}
-                            <a
-                              href='https://github.com/d3/d3-time-format#locale_format'
-                              target='_blank'
-                              rel='noreferrer'
-                            >
+                            <a href='https://github.com/d3/d3-time-format#locale_format' target='_blank' rel='noreferrer'>
                               these guidelines
                             </a>
                             .
@@ -2643,16 +2146,10 @@ const EditorPanel = () => {
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
-                                  <Icon
-                                    display='question'
-                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                  />
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>
-                                    This field specifies the pattern used to read and interpret dates in your dataset,
-                                    ensuring the dates are correctly understood and processed.{' '}
-                                  </p>
+                                  <p>This field specifies the pattern used to read and interpret dates in your dataset, ensuring the dates are correctly understood and processed. </p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
@@ -2667,16 +2164,10 @@ const EditorPanel = () => {
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
-                                  <Icon
-                                    display='question'
-                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                  />
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>
-                                    {' '}
-                                    Adjusts the date display format on the axis for clear, visual date representation.
-                                  </p>
+                                  <p> Adjusts the date display format on the axis for clear, visual date representation.</p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
@@ -2691,16 +2182,10 @@ const EditorPanel = () => {
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
-                                  <Icon
-                                    display='question'
-                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                  />
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>
-                                    Specify a custom format for displaying dates in data table. If left empty, dates
-                                    will adopt the Axis Date Display format.{' '}
-                                  </p>
+                                  <p>Specify a custom format for displaying dates in data table. If left empty, dates will adopt the Axis Date Display format. </p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
@@ -2715,16 +2200,10 @@ const EditorPanel = () => {
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
-                                  <Icon
-                                    display='question'
-                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                  />
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>
-                                    Specify a custom format for displaying dates on hovers. If left empty, dates will
-                                    adopt the Axis Date Display format.{' '}
-                                  </p>
+                                  <p>Specify a custom format for displaying dates on hovers. If left empty, dates will adopt the Axis Date Display format. </p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
@@ -2742,24 +2221,14 @@ const EditorPanel = () => {
                         value={config.exclusions.active}
                         section='exclusions'
                         fieldName='active'
-                        label={
-                          config.xAxis.type === 'date'
-                            ? 'Limit by start and/or end dates'
-                            : 'Exclude one or more values'
-                        }
+                        label={config.xAxis.type === 'date' ? 'Limit by start and/or end dates' : 'Exclude one or more values'}
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
+                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
-                              <p>
-                                When this option is checked, you can select source-file values for exclusion from the
-                                date/category axis.{' '}
-                              </p>
+                              <p>When this option is checked, you can select source-file values for exclusion from the date/category axis. </p>
                             </Tooltip.Content>
                           </Tooltip>
                         }
@@ -2775,16 +2244,10 @@ const EditorPanel = () => {
                           tooltip={
                             <Tooltip style={{ textTransform: 'none' }}>
                               <Tooltip.Target>
-                                <Icon
-                                  display='question'
-                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                />
+                                <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                               </Tooltip.Target>
                               <Tooltip.Content>
-                                <p>
-                                  Use the brush slider to narrow down your data view to specific values along the axis.
-                                  This tool is useful for examining detailed data segments within the larger dataset.{' '}
-                                </p>
+                                <p>Use the brush slider to narrow down your data view to specific values along the axis. This tool is useful for examining detailed data segments within the larger dataset. </p>
                               </Tooltip.Content>
                             </Tooltip>
                           }
@@ -2821,162 +2284,112 @@ const EditorPanel = () => {
 
                           {config.xAxis.type === 'date' && (
                             <>
-                              <TextField
-                                type='date'
-                                section='exclusions'
-                                fieldName='dateStart'
-                                label='Start Date'
-                                updateField={updateField}
-                                value={config.exclusions.dateStart || ''}
-                              />
-                              <TextField
-                                type='date'
-                                section='exclusions'
-                                fieldName='dateEnd'
-                                label='End Date'
-                                updateField={updateField}
-                                value={config.exclusions.dateEnd || ''}
-                              />
+                              <TextField type='date' section='exclusions' fieldName='dateStart' label='Start Date' updateField={updateField} value={config.exclusions.dateStart || ''} />
+                              <TextField type='date' section='exclusions' fieldName='dateEnd' label='End Date' updateField={updateField} value={config.exclusions.dateEnd || ''} />
                             </>
                           )}
                         </>
                       )}
 
-                      {visSupportsDateCategoryNumTicks() &&
-                        config.xAxis.type !== 'date-time' &&
-                        config.xAxis.manual && (
-                          <>
-                            <TextField
-                              value={config.xAxis.manualStep}
-                              placeholder='Auto'
-                              type='number'
-                              min={1}
-                              section='xAxis'
-                              fieldName='manualStep'
-                              label='Step count'
-                              className='number-narrow'
-                              updateField={updateField}
-                              tooltip={
-                                <Tooltip style={{ textTransform: 'none' }}>
-                                  <Tooltip.Target>
-                                    <Icon
-                                      display='question'
-                                      style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                    />
-                                  </Tooltip.Target>
-                                  <Tooltip.Content>
-                                    <p>
-                                      Number of data points which are assigned a tick, starting from the right most data
-                                      point. Value of 1 will show a tick at every data point, value of 2 will show a
-                                      tick for every other, etc.
-                                    </p>
-                                  </Tooltip.Content>
-                                </Tooltip>
-                              }
-                            />
-                            <div className='viewport-overrides'>
-                              <label>
-                                <button
-                                  onClick={() => setDisplayViewportOverrides(!displayViewportOverrides)}
-                                  className='edit-label'
-                                >
-                                  Step Count: viewport overrides{' '}
-                                  <span style={{ transform: `rotate(${displayViewportOverrides ? '90deg' : '0deg'})` }}>
-                                    &gt;
-                                  </span>
-                                </button>
-                              </label>
-                              {displayViewportOverrides && (
-                                <div className='edit-block'>
-                                  {Object.keys(viewports).map(viewport => (
-                                    <TextField
-                                      key={`viewport-step-count-input-${viewport}`}
-                                      value={
-                                        config.xAxis.viewportStepCount
-                                          ? config.xAxis.viewportStepCount[viewport]
-                                          : undefined
-                                      }
-                                      placeholder='Auto'
-                                      type='number'
-                                      label={viewport}
-                                      className='number-narrow'
-                                      updateField={(section, fieldName, label, val) =>
-                                        updateViewportOverrides('viewportStepCount', viewport, val)
-                                      }
-                                    />
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </>
-                        )}
-                      {visSupportsDateCategoryNumTicks() &&
-                        (config.xAxis.type === 'date-time' || !config.xAxis.manual) && (
-                          <>
-                            <TextField
-                              value={config.xAxis.numTicks}
-                              placeholder='Auto'
-                              type='number'
-                              min={1}
-                              section='xAxis'
-                              fieldName='numTicks'
-                              label='Number of ticks'
-                              className='number-narrow'
-                              updateField={updateField}
-                              tooltip={
-                                <Tooltip style={{ textTransform: 'none' }}>
-                                  <Tooltip.Target>
-                                    <Icon
-                                      display='question'
-                                      style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                    />
-                                  </Tooltip.Target>
-                                  <Tooltip.Content>
-                                    <p>
-                                      Apporoximate number of ticks. Other factors such as space available and data may
-                                      change the exact number of ticks used. To enforce an exact number of ticks, check
-                                      "Manual Ticks" above.
-                                    </p>
-                                  </Tooltip.Content>
-                                </Tooltip>
-                              }
-                            />
-                            <div className='viewport-overrides'>
-                              <label>
-                                <button
-                                  onClick={() => setDisplayViewportOverrides(!displayViewportOverrides)}
-                                  className='edit-label'
-                                >
-                                  Number of ticks: viewport overrides{' '}
-                                  <span style={{ transform: `rotate(${displayViewportOverrides ? '90deg' : '0deg'})` }}>
-                                    &gt;
-                                  </span>
-                                </button>
-                              </label>
-                              {displayViewportOverrides && (
-                                <div className='edit-block'>
-                                  {Object.keys(viewports).map(viewport => (
-                                    <TextField
-                                      key={`viewport-num-ticks-input-${viewport}`}
-                                      value={
-                                        config.xAxis.viewportNumTicks
-                                          ? config.xAxis.viewportNumTicks[viewport]
-                                          : undefined
-                                      }
-                                      placeholder='Auto'
-                                      type='number'
-                                      label={viewport}
-                                      className='number-narrow'
-                                      updateField={(section, fieldName, label, val) =>
-                                        updateViewportOverrides('viewportNumTicks', viewport, val)
-                                      }
-                                    />
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </>
-                        )}
+                      {visSupportsDateCategoryNumTicks() && config.xAxis.type !== 'date-time' && config.xAxis.manual && (
+                        <>
+                          <TextField
+                            value={config.xAxis.manualStep}
+                            placeholder='Auto'
+                            type='number'
+                            min={1}
+                            section='xAxis'
+                            fieldName='manualStep'
+                            label='Step count'
+                            className='number-narrow'
+                            updateField={updateField}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    Number of data points which are assigned a tick, starting from the right most data point. Value of 1 will show a tick at every data point, value of 2 will show a tick for every other,
+                                    etc.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                          <div className='viewport-overrides'>
+                            <label>
+                              <button onClick={() => setDisplayViewportOverrides(!displayViewportOverrides)} className='edit-label'>
+                                Step Count: viewport overrides <span style={{ transform: `rotate(${displayViewportOverrides ? '90deg' : '0deg'})` }}>&gt;</span>
+                              </button>
+                            </label>
+                            {displayViewportOverrides && (
+                              <div className='edit-block'>
+                                {Object.keys(viewports).map(viewport => (
+                                  <TextField
+                                    key={`viewport-step-count-input-${viewport}`}
+                                    value={config.xAxis.viewportStepCount ? config.xAxis.viewportStepCount[viewport] : undefined}
+                                    placeholder='Auto'
+                                    type='number'
+                                    label={viewport}
+                                    className='number-narrow'
+                                    updateField={(section, fieldName, label, val) => updateViewportOverrides('viewportStepCount', viewport, val)}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
+                      {visSupportsDateCategoryNumTicks() && (config.xAxis.type === 'date-time' || !config.xAxis.manual) && (
+                        <>
+                          <TextField
+                            value={config.xAxis.numTicks}
+                            placeholder='Auto'
+                            type='number'
+                            min={1}
+                            section='xAxis'
+                            fieldName='numTicks'
+                            label='Number of ticks'
+                            className='number-narrow'
+                            updateField={updateField}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    Apporoximate number of ticks. Other factors such as space available and data may change the exact number of ticks used. To enforce an exact number of ticks, check "Manual Ticks" above.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                          <div className='viewport-overrides'>
+                            <label>
+                              <button onClick={() => setDisplayViewportOverrides(!displayViewportOverrides)} className='edit-label'>
+                                Number of ticks: viewport overrides <span style={{ transform: `rotate(${displayViewportOverrides ? '90deg' : '0deg'})` }}>&gt;</span>
+                              </button>
+                            </label>
+                            {displayViewportOverrides && (
+                              <div className='edit-block'>
+                                {Object.keys(viewports).map(viewport => (
+                                  <TextField
+                                    key={`viewport-num-ticks-input-${viewport}`}
+                                    value={config.xAxis.viewportNumTicks ? config.xAxis.viewportNumTicks[viewport] : undefined}
+                                    placeholder='Auto'
+                                    type='number'
+                                    label={viewport}
+                                    className='number-narrow'
+                                    updateField={(section, fieldName, label, val) => updateViewportOverrides('viewportNumTicks', viewport, val)}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
                       {visSupportsDateCategoryHeight() && (
                         <TextField
                           value={config.xAxis.size}
@@ -2989,27 +2402,13 @@ const EditorPanel = () => {
                           updateField={updateField}
                         />
                       )}
-                      <TextField
-                        value={config.xAxis.labelOffset}
-                        section='xAxis'
-                        fieldName='labelOffset'
-                        label='Label offset'
-                        type='number'
-                        className='number-narrow'
-                        updateField={updateField}
-                      />
+                      <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />
 
                       {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                       {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
                       {(config.xAxis.type === 'continuous' || config.forestPlot.type === 'Logarithmic') && (
                         <>
-                          <CheckBox
-                            value={config.dataFormat.bottomCommas}
-                            section='dataFormat'
-                            fieldName='bottomCommas'
-                            label='Add commas'
-                            updateField={updateField}
-                          />
+                          <CheckBox value={config.dataFormat.bottomCommas} section='dataFormat' fieldName='bottomCommas' label='Add commas' updateField={updateField} />
                           <TextField
                             value={config.dataFormat.bottomRoundTo}
                             type='number'
@@ -3022,109 +2421,45 @@ const EditorPanel = () => {
                           />
                         </>
                       )}
-                      {visSupportsResponsiveTicks() &&
-                        config.orientation === 'vertical' &&
-                        config.visualizationType !== 'Paired Bar' && (
-                          <CheckBox
-                            value={config.isResponsiveTicks}
-                            fieldName='isResponsiveTicks'
-                            label='Use Responsive Ticks'
-                            updateField={updateField}
-                          />
-                        )}
-                      {(config.orientation === 'horizontal' || !config.isResponsiveTicks) &&
-                        visSupportsDateCategoryTickRotation() && (
-                          <TextField
-                            value={config.xAxis.tickRotation}
-                            type='number'
-                            min={0}
-                            section='xAxis'
-                            fieldName='tickRotation'
-                            label='Tick rotation (Degrees)'
-                            className='number-narrow'
-                            updateField={updateField}
-                          />
-                        )}
-                      {config.orientation === 'vertical' &&
-                        config.isResponsiveTicks &&
-                        config.visualizationType !== 'Paired Bar' && (
-                          <TextField
-                            value={config.xAxis.maxTickRotation}
-                            type='number'
-                            min={0}
-                            section='xAxis'
-                            fieldName='maxTickRotation'
-                            label='Max Tick Rotation'
-                            className='number-narrow'
-                            updateField={updateField}
-                            tooltip={
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon
-                                    display='question'
-                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                  />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>
-                                    Degrees ticks will be rotated if values overlap, especially in smaller viewports.
-                                  </p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            }
-                          />
-                        )}
+                      {visSupportsResponsiveTicks() && config.orientation === 'vertical' && config.visualizationType !== 'Paired Bar' && (
+                        <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />
+                      )}
+                      {(config.orientation === 'horizontal' || !config.isResponsiveTicks) && visSupportsDateCategoryTickRotation() && (
+                        <TextField value={config.xAxis.tickRotation} type='number' min={0} section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />
+                      )}
+                      {config.orientation === 'vertical' && config.isResponsiveTicks && config.visualizationType !== 'Paired Bar' && (
+                        <TextField
+                          value={config.xAxis.maxTickRotation}
+                          type='number'
+                          min={0}
+                          section='xAxis'
+                          fieldName='maxTickRotation'
+                          label='Max Tick Rotation'
+                          className='number-narrow'
+                          updateField={updateField}
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>Degrees ticks will be rotated if values overlap, especially in smaller viewports.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
+                      )}
 
                       {config.orientation === 'horizontal' ? (
                         <>
-                          {visSupportsDateCategoryAxisLine() && (
-                            <CheckBox
-                              value={config.yAxis.hideAxis}
-                              section='yAxis'
-                              fieldName='hideAxis'
-                              label='Hide Axis'
-                              updateField={updateField}
-                            />
-                          )}
-                          {visSupportsDateCategoryAxisLabel() && (
-                            <CheckBox
-                              value={config.yAxis.hideLabel}
-                              section='yAxis'
-                              fieldName='hideLabel'
-                              label='Hide Tick Labels'
-                              updateField={updateField}
-                            />
-                          )}
+                          {visSupportsDateCategoryAxisLine() && <CheckBox value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
+                          {visSupportsDateCategoryAxisLabel() && <CheckBox value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Tick Labels' updateField={updateField} />}
                         </>
                       ) : (
                         <>
-                          {visSupportsDateCategoryAxisLine() && (
-                            <CheckBox
-                              value={config.xAxis.hideAxis}
-                              section='xAxis'
-                              fieldName='hideAxis'
-                              label='Hide Axis'
-                              updateField={updateField}
-                            />
-                          )}
-                          {visSupportsDateCategoryAxisLabel() && (
-                            <CheckBox
-                              value={config.xAxis.hideLabel}
-                              section='xAxis'
-                              fieldName='hideLabel'
-                              label='Hide Tick Labels'
-                              updateField={updateField}
-                            />
-                          )}
-                          {visSupportsDateCategoryAxisTicks() && (
-                            <CheckBox
-                              value={config.xAxis.hideTicks}
-                              section='xAxis'
-                              fieldName='hideTicks'
-                              label='Hide Ticks'
-                              updateField={updateField}
-                            />
-                          )}
+                          {visSupportsDateCategoryAxisLine() && <CheckBox value={config.xAxis.hideAxis} section='xAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
+                          {visSupportsDateCategoryAxisLabel() && <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Tick Labels' updateField={updateField} />}
+                          {visSupportsDateCategoryAxisTicks() && <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />}
                         </>
                       )}
 
@@ -3142,28 +2477,14 @@ const EditorPanel = () => {
                                   <p>Highlighted Bar {i + 1}</p>
                                   <label>
                                     <span className='edit-label column-heading'>Value</span>
-                                    <select
-                                      value={config.highlightedBarValues[i].value}
-                                      onChange={e => handleUpdateHighlightedBar(e, i)}
-                                    >
+                                    <select value={config.highlightedBarValues[i].value} onChange={e => handleUpdateHighlightedBar(e, i)}>
                                       <option value=''>- Select Value -</option>
-                                      {highlightedSeriesValues &&
-                                        [...new Set(highlightedSeriesValues)]
-                                          .sort()
-                                          .map(option => (
-                                            <option key={`special-class-value-option-${i}-${option}`}>{option}</option>
-                                          ))}
+                                      {highlightedSeriesValues && [...new Set(highlightedSeriesValues)].sort().map(option => <option key={`special-class-value-option-${i}-${option}`}>{option}</option>)}
                                     </select>
                                   </label>
                                   <label>
                                     <span className='edit-label column-heading'>Color</span>
-                                    <input
-                                      type='text'
-                                      value={
-                                        config.highlightedBarValues[i].color ? config.highlightedBarValues[i].color : ''
-                                      }
-                                      onChange={e => handleUpdateHighlightedBarColor(e, i)}
-                                    />
+                                    <input type='text' value={config.highlightedBarValues[i].color ? config.highlightedBarValues[i].color : ''} onChange={e => handleUpdateHighlightedBarColor(e, i)} />
                                   </label>
                                   <label>
                                     <span className='edit-label column-heading'>Border Width</span>
@@ -3171,25 +2492,13 @@ const EditorPanel = () => {
                                       max='5'
                                       min='0'
                                       type='number'
-                                      value={
-                                        config.highlightedBarValues[i].borderWidth
-                                          ? config.highlightedBarValues[i].borderWidth
-                                          : ''
-                                      }
+                                      value={config.highlightedBarValues[i].borderWidth ? config.highlightedBarValues[i].borderWidth : ''}
                                       onChange={e => handleUpdateHighlightedBorderWidth(e, i)}
                                     />
                                   </label>
                                   <label>
                                     <span className='edit-label column-heading'>Legend Label</span>
-                                    <input
-                                      type='text'
-                                      value={
-                                        config.highlightedBarValues[i].legendLabel
-                                          ? config.highlightedBarValues[i].legendLabel
-                                          : ''
-                                      }
-                                      onChange={e => handleHighlightedBarLegendLabel(e, i)}
-                                    />
+                                    <input type='text' value={config.highlightedBarValues[i].legendLabel ? config.highlightedBarValues[i].legendLabel : ''} onChange={e => handleHighlightedBarLegendLabel(e, i)} />
                                   </label>
                                 </div>
                               </fieldset>
@@ -3213,15 +2522,10 @@ const EditorPanel = () => {
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
+                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
-                              <p>
-                                When this option is checked, you can select values for exclusion from the pie segments.
-                              </p>
+                              <p>When this option is checked, you can select values for exclusion from the pie segments.</p>
                             </Tooltip.Content>
                           </Tooltip>
                         }
@@ -3386,10 +2690,7 @@ const EditorPanel = () => {
                       <span className='edit-label column-heading'>Anchors</span>
                       <Accordion allowZeroExpanded>
                         {config.yAxis?.anchors?.map((anchor, index) => (
-                          <AccordionItem
-                            className='series-item series-item--chart'
-                            key={`accordion-yaxis-anchors-${index}`}
-                          >
+                          <AccordionItem className='series-item series-item--chart' key={`accordion-yaxis-anchors-${index}`}>
                             <AccordionItemHeading className='series-item__title'>
                               <>
                                 <AccordionItemButton className={'accordion__button accordion__button'}>
@@ -3532,37 +2833,19 @@ const EditorPanel = () => {
                   <AccordionItemButton>Legend</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select
-                    value={config.legend?.position}
-                    section='legend'
-                    fieldName='position'
-                    label='Position'
-                    updateField={updateField}
-                    options={['right', 'left', 'bottom', 'top']}
-                  />
-                  {(config.legend.position === 'left' ||
-                    config.legend.position === 'right' ||
-                    !config.legend.position) &&
-                    config.legend.style === 'gradient' && (
-                      <span style={{ color: 'red', fontSize: '14px' }}>
-                        Position must be set to top or bottom to use gradient style.
-                      </span>
-                    )}
+                  <Select value={config.legend?.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom', 'top']} />
+                  {(config.legend.position === 'left' || config.legend.position === 'right' || !config.legend.position) && config.legend.style === 'gradient' && (
+                    <span style={{ color: 'red', fontSize: '14px' }}>Position must be set to top or bottom to use gradient style.</span>
+                  )}
 
                   <Select
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>
-                            If using gradient style, limit the legend to five items for better mobile visibility, and
-                            position the legend at the top or bottom.
-                          </p>
+                          <p>If using gradient style, limit the legend to five items for better mobile visibility, and position the legend at the top or bottom.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
@@ -3608,10 +2891,7 @@ const EditorPanel = () => {
                   </fieldset> */}
 
                   <CheckBox
-                    display={
-                      !config.legend.hide &&
-                      config.preliminaryData.some(pd => pd.type === 'suppression' && pd.label && pd.symbol)
-                    }
+                    display={!config.legend.hide && config.preliminaryData.some(pd => pd.type === 'suppression' && pd.label && pd.symbol)}
                     value={config.legend.hideSuppressedLabels}
                     section='legend'
                     fieldName='hideSuppressedLabels'
@@ -3620,16 +2900,10 @@ const EditorPanel = () => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>
-                            Hiding suppressed labels will not override the 'Special Class' assigned to line chart
-                            indicating "suppressed" data in the Data Series Panel.
-                          </p>
+                          <p>Hiding suppressed labels will not override the 'Special Class' assigned to line chart indicating "suppressed" data in the Data Series Panel.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
@@ -3659,23 +2933,9 @@ const EditorPanel = () => {
                     updateField={updateField}
                     options={getDataValueOptions(data)}
                   />
-                  {visHasLegendAxisAlign() && (
-                    <CheckBox
-                      value={config.legend.axisAlign}
-                      fieldName='axisAlign'
-                      section='legend'
-                      label='Align to Axis on Isolate'
-                      updateField={updateField}
-                    />
-                  )}
+                  {visHasLegendAxisAlign() && <CheckBox value={config.legend.axisAlign} fieldName='axisAlign' section='legend' label='Align to Axis on Isolate' updateField={updateField} />}
                   {config.legend.behavior === 'highlight' && config.tooltips.singleSeries && (
-                    <CheckBox
-                      value={config.legend.highlightOnHover}
-                      section='legend'
-                      fieldName='highlightOnHover'
-                      label='HIGHLIGHT DATA SERIES ON HOVER'
-                      updateField={updateField}
-                    />
+                    <CheckBox value={config.legend.highlightOnHover} section='legend' fieldName='highlightOnHover' label='HIGHLIGHT DATA SERIES ON HOVER' updateField={updateField} />
                   )}
                   {/* start: isolated values */}
                   {visHasSelectableLegendValues && config.legend.behavior === 'isolate' && !colorCodeByCategory && (
@@ -3688,10 +2948,7 @@ const EditorPanel = () => {
                               <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
-                              <p>
-                                You can choose data series that are shown on load. Others will be added when the user
-                                clicks on them in the legend.
-                              </p>
+                              <p>You can choose data series that are shown on load. Others will be added when the user clicks on them in the legend.</p>
                             </Tooltip.Content>
                           </Tooltip>
                         </span>
@@ -3757,11 +3014,7 @@ const EditorPanel = () => {
                   />
                   <CheckBox
                     display={!config.legend.hide}
-                    value={
-                      ['left', 'right'].includes(config.legend.position)
-                        ? config.legend.hideBorder.side
-                        : config.legend.hideBorder.topBottom
-                    }
+                    value={['left', 'right'].includes(config.legend.position) ? config.legend.hideBorder.side : config.legend.hideBorder.topBottom}
                     section='legend'
                     subsection='hideBorder'
                     fieldName={['left', 'right'].includes(config.legend.position) ? 'side' : 'topBottom'}
@@ -3770,10 +3023,7 @@ const EditorPanel = () => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Default option for top and bottom legends is ‘No Box.’.</p>
@@ -3782,11 +3032,7 @@ const EditorPanel = () => {
                     }
                   />
                   <CheckBox
-                    display={
-                      !config.legend.hide &&
-                      !['left', 'right'].includes(config.legend.position) &&
-                      config.legend.style !== 'gradient'
-                    }
+                    display={!config.legend.hide && !['left', 'right'].includes(config.legend.position) && config.legend.style !== 'gradient'}
                     value={config.legend.singleRow}
                     section='legend'
                     fieldName='singleRow'
@@ -3794,11 +3040,7 @@ const EditorPanel = () => {
                     updateField={updateField}
                   />
                   <CheckBox
-                    display={
-                      ['bottom', 'top'].includes(config.legend.position) &&
-                      !config.legend.hide &&
-                      config.legend.style !== 'gradient'
-                    }
+                    display={['bottom', 'top'].includes(config.legend.position) && !config.legend.hide && config.legend.style !== 'gradient'}
                     value={config.legend.verticalSorted}
                     section='legend'
                     fieldName='verticalSorted'
@@ -3814,10 +3056,7 @@ const EditorPanel = () => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
@@ -3825,21 +3064,8 @@ const EditorPanel = () => {
                       </Tooltip>
                     }
                   />
-                  <TextField
-                    value={config.legend.label}
-                    section='legend'
-                    fieldName='label'
-                    label='Title'
-                    updateField={updateField}
-                  />
-                  <TextField
-                    type='textarea'
-                    value={config.legend.description}
-                    updateField={updateField}
-                    section='legend'
-                    fieldName='description'
-                    label='Legend Description'
-                  />
+                  <TextField value={config.legend.label} section='legend' fieldName='label' label='Title' updateField={updateField} />
+                  <TextField type='textarea' value={config.legend.description} updateField={updateField} section='legend' fieldName='description' label='Legend Description' />
                 </AccordionItemPanel>
               </AccordionItem>
             )}
@@ -3861,22 +3087,14 @@ const EditorPanel = () => {
                   <AccordionItemButton>Data Table</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <DataTableEditor
-                    config={config}
-                    columns={Object.keys(data[0] || {})}
-                    updateField={updateField}
-                    isDashboard={isDashboard}
-                    isLoadedFromUrl={isLoadedFromUrl}
-                  />{' '}
+                  <DataTableEditor config={config} columns={Object.keys(data[0] || {})} updateField={updateField} isDashboard={isDashboard} isLoadedFromUrl={isLoadedFromUrl} />{' '}
                 </AccordionItemPanel>
               </AccordionItem>
             )}
             <Panels.Annotate name='Text Annotations' />
             {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
           </Accordion>
-          {config.type !== 'Spark Line' && (
-            <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
-          )}
+          {config.type !== 'Spark Line' && <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />}
         </Layout.Sidebar>
       </ErrorBoundary>
     </EditorPanelContext.Provider>

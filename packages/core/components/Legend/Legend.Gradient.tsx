@@ -3,6 +3,7 @@ import { Text } from '@visx/text'
 import { type ViewportSize, type MapConfig } from '@cdc/map/src/types/MapConfig'
 import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { getGradientLegendWidth } from '@cdc/core/helpers/getGradientLegendWidth'
+import { scaleLinear } from '@visx/scale'
 
 type CombinedConfig = MapConfig | ChartConfig
 
@@ -17,7 +18,9 @@ interface GradientProps {
 
 const LegendGradient = ({ labels, colors, config, dimensions, currentViewport, getTextWidth }: GradientProps): JSX.Element => {
   let [width] = dimensions
-
+  // let labels = ['0 - 20', '20 - 40', '44 - 50', ' 55-90', '99-100']
+  const ranges = labels.map(label => label.split('-').map(Number))
+  console.log(ranges, 'ranges')
   const legendWidth = getGradientLegendWidth(width, currentViewport)
 
   const numTicks = colors?.length
@@ -27,6 +30,12 @@ const LegendGradient = ({ labels, colors, config, dimensions, currentViewport, g
   let height = 50
   const margin = 1
 
+  const flatRanges = ranges.flat()
+  console.log(flatRanges, 'ranges')
+  const scale = scaleLinear({
+    range: [0, legendWidth],
+    domain: [Math.min(...flatRanges), Math.max(...flatRanges)]
+  })
   // configure tick witch and angle
   const textWidth = getTextWidth(longestLabel, `normal 14px sans-serif`)
   const rotationAngle = Number(config.legend.tickRotation) || 0
@@ -36,22 +45,28 @@ const LegendGradient = ({ labels, colors, config, dimensions, currentViewport, g
 
   // configre gradient colors
   const stops = colors.map((color, index) => {
-    const offset = (index / (colors.length - 1)) * 100
-    return <stop key={index} offset={`${offset}%`} style={{ stopColor: color, stopOpacity: 1 }} />
+    const [start, end] = ranges[index]
+    // const offset = (index / (colors.length - 1)) * 100
+    const offsetStart = scale(start)
+    const offsetEnd = scale(end)
+    return <stop key={index} offset={`${offsetStart}%`} style={{ stopColor: color, stopOpacity: 1 }} />
   })
 
   // render ticks and labels
-  const ticks = labels.map((key, index) => {
-    const segmentWidth = legendWidth / numTicks
-    const xPositionX = index * segmentWidth + segmentWidth
+  const ticks = ranges.map((range, index) => {
+    const [start, end] = range
+    //  const xPositionX = index * segmentWidth + segmentWidth
+    const positionStart = scale(start)
+    const positionEnd = scale(end)
+    const xPosition = (positionStart + positionEnd) / 2
     const textAnchor = rotationAngle ? 'end' : 'middle'
     const verticalAnchor = rotationAngle ? 'middle' : 'start'
 
     return (
-      <Group top={margin}>
-        <line x1={xPositionX} x2={xPositionX} y1={30} y2={boxHeight} stroke='black' />
-        <Text angle={-config.legend.tickRotation} x={xPositionX} y={boxHeight} dy={10} fontSize='14' textAnchor={textAnchor} verticalAnchor={verticalAnchor}>
-          {key}
+      <Group left={0} top={margin}>
+        <line x1={xPosition} x2={xPosition} y1={30} y2={boxHeight} stroke='black' />
+        <Text angle={-config.legend.tickRotation} x={xPosition} y={boxHeight} dy={10} fontSize='14' textAnchor={textAnchor} verticalAnchor={verticalAnchor}>
+          {`${start}-${end}`}
         </Text>
       </Group>
     )
