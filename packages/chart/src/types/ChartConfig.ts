@@ -77,16 +77,12 @@ export type Legend = {
   singleRow: boolean
   type: string
   verticalSorted: boolean
-<<<<<<< HEAD
-  hideSuppressedLabels:boolean
   hideSuppressionLink:boolean
-=======
   style:'circles'|'boxes'|'gradient'|'lines'
   subStyle:'linear blocks'|'smooth'
   hideSuppressedLabels:boolean
   hasBorder:boolean
   tickRotation:string
->>>>>>> dev
 }
 
 type Visual = {
