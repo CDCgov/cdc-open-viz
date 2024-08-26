@@ -95,7 +95,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
       values = values.concat(_.uniq(dataset.map(row => row[filter.columnName])))
     })
 
-    sortByOrderedValues(values, filter.orderedValues)
+    sortByOrderedValues(values, filter)
     setColumnValues(values)
   }
 

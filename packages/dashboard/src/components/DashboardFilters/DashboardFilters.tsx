@@ -47,7 +47,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({ show, filters: share
         } else {
           // Data Filter
           const orderedValues = filter.values || []
-          sortByOrderedValues(orderedValues, filter.orderedValues)
+          sortByOrderedValues(orderedValues, filter)
           orderedValues.forEach((filterOption, index) => {
             const labeledOpt = filter.labels && filter.labels[filterOption]
             values.push(
