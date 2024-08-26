@@ -441,7 +441,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                       const showTicks = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
                       const tickLength = showTicks === 'block' ? 7 : 0
                       const to = { x: tick.to.x - tickLength, y: tick.to.y }
-                      const hideFirstGridLine = tick.index === 0 && tick.value === 0
+                      const hideFirstGridLine = tick.index === 0 && tick.value === 0 && config.xAxis.hideAxis
 
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
