@@ -10,14 +10,14 @@ export const getApplicableFilters = (dashboard: Dashboard, key: string | number)
   return c?.length > 0 ? c : false
 }
 
-export const getFilteredData = (state: DashboardState, initialFilteredData = {}, dataOverride?: Object) => {
-  const newFilteredData = initialFilteredData
+export const getFilteredData = (state: DashboardState, initialFilteredData?: Record<string, any>, dataOverride?: Object) => {
+  const newFilteredData = initialFilteredData || {}
   const { config } = state
   getVizKeys(config).forEach(key => {
     const applicableFilters = getApplicableFilters(config.dashboard, key)
     if (applicableFilters) {
       const { dataKey, data, dataDescription } = config.visualizations[key]
-      const _data = state.data[dataKey] || data
+      const _data = (dataOverride || state.data)[dataKey] || data
       const formattedData = dataOverride?.[dataKey] || (dataDescription ? getFormattedData(_data, dataDescription) : _data)
 
       newFilteredData[key] = filterData(applicableFilters, formattedData)
@@ -27,7 +27,7 @@ export const getFilteredData = (state: DashboardState, initialFilteredData = {},
     if (row.dataKey) {
       const applicableFilters = getApplicableFilters(config.dashboard, index)
       const { dataKey, data, dataDescription } = row
-      const _data = state.data[dataKey] || data
+      const _data = (dataOverride || state.data)[dataKey] || data
       if (applicableFilters) {
         const formattedData = dataOverride?.[dataKey] ?? dataDescription ? getFormattedData(_data, dataDescription) : _data
 

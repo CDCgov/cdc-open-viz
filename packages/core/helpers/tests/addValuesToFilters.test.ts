@@ -13,13 +13,13 @@ describe('addValuesToFilters', () => {
   ]
   const filters: VizFilter[] = [parentFilter, childFilter, parentFilter2]
   it('adds filter values based on parent active values', () => {
-    const newFilters = addValuesToFilters<VizFilter>(filters, data)
+    const newFilters = addValuesToFilters(filters, data)
     expect(newFilters[0].values).toEqual(['apple', 'pear'])
     expect(newFilters[2].values).toEqual([3, 1, 4])
     expect(newFilters[1].values).toEqual(['b'])
 
     filters[0].active = 'pear'
-    const newFilters2 = addValuesToFilters<VizFilter>(filters, data)
+    const newFilters2 = addValuesToFilters(filters, data)
     expect(newFilters2[0].values).toEqual(['apple', 'pear'])
     expect(newFilters2[2].values).toEqual([3, 1, 4])
     expect(newFilters2[1].values).toEqual([])

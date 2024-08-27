@@ -3,43 +3,82 @@
     "theme": "theme-blue",
     "sharedFilters": [
       {
-        "key": "Category",
-        "type": "datafilter",
-        "columnName": "Sample Categories",
+        "key": "Year",
         "showDropdown": true,
-        "usedBy": ["0"],
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "http://test.gov/methodology?$select=distinct year",
+          "valueSelector": "year"
+        },
+        "usedBy": ["none"],
         "tier": 1
+      },
+      {
+        "key": "Methodology",
+        "showDropdown": false,
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "http://test.gov/methodology?$select=distinct methodology",
+          "valueSelector": "methodology"
+        },
+        "usedBy": ["chart1723488349579"],
+        "parents": ["Year"],
+        "tier": 2
       }
     ]
   },
   "rows": [
     {
-      "toggle": true,
       "columns": [
         {
           "width": 12,
-          "widget": "chart1711646813542"
+          "widget": "dashboardFilters1723488344936"
         },
+        {},
+        {}
+      ]
+    },
+    {
+      "columns": [
         {
           "width": 12,
-          "widget": "table1711646820983"
+          "widget": "dashboardFilters1723488344937"
         },
+        {},
+        {}
+      ]
+    },
+    {
+      "columns": [
         {
-          "width": 12
+          "width": 12,
+          "widget": "chart1723488349579"
         }
-      ],
-      "dataDescription": {
-        "horizontal": false,
-        "series": false
-      },
-
-      "dataKey": "valid-world-data.json",
-
-      "multiVizColumn": "Country"
+      ]
     }
   ],
   "visualizations": {
-    "chart1711646813542": {
+    "dashboardFilters1723488344936": {
+      "filters": [],
+      "filterBehavior": "Apply Button",
+      "openModal": true,
+      "uid": "dashboardFilters1723488344936",
+      "type": "dashboardFilters",
+      "sharedFilterIndexes": [0],
+      "visualizationType": "dashboardFilters"
+    },
+    "dashboardFilters1723488344937": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "openModal": true,
+      "autoLoad": true,
+      "uid": "dashboardFilters1723488344937",
+      "type": "dashboardFilters",
+      "sharedFilterIndexes": [1],
+      "visualizationType": "dashboardFilters"
+    },
+    "chart1723488349579": {
+      "annotations": [],
       "type": "chart",
       "debugSvg": false,
       "chartMessage": {
@@ -63,13 +102,16 @@
       "tipRounding": "top",
       "isResponsiveTicks": false,
       "general": {
-        "showDownloadButton": false
+        "annotationDropdownText": "Annotations",
+        "showDownloadButton": false,
+        "showMissingDataLabel": true,
+        "showSuppressedSymbol": true,
+        "showZeroValueDataLabel": true
       },
       "padding": {
         "left": 5,
         "right": 5
       },
-      "suppressedData": [],
       "preliminaryData": [],
       "yAxis": {
         "hideAxis": false,
@@ -95,7 +137,9 @@
         "axisPadding": 0,
         "scalePadding": 10,
         "tickRotation": 0,
-        "anchors": []
+        "anchors": [],
+        "shoMissingDataLabel": true,
+        "showMissingDataLine": true
       },
       "boxplot": {
         "plots": [],
@@ -156,24 +200,26 @@
         "tickColor": "#333",
         "numTicks": "",
         "labelOffset": 65,
-        "axisPadding": 0,
+        "axisPadding": 200,
         "target": 0,
         "maxTickRotation": 0,
-        "dataKey": "Sample Categories",
-        "tickWidthMax": 89
+        "dataKey": "state",
+        "tickWidthMax": 96
       },
       "table": {
         "label": "Data Table",
-        "expanded": false,
+        "expanded": true,
         "limitHeight": false,
         "height": "",
         "caption": "",
         "showDownloadUrl": false,
-        "showDataTableLink": false,
+        "showDataTableLink": true,
         "indexLabel": "",
-        "download": false,
+        "download": true,
         "showVertical": true,
         "dateDisplayFormat": "",
+        "showMissingDataLabel": true,
+        "showSuppressedSymbol": true,
         "show": false
       },
       "orientation": "vertical",
@@ -182,6 +228,7 @@
       "legend": {
         "hide": false,
         "behavior": "isolate",
+        "axisAlign": true,
         "singleRow": true,
         "colorCode": "",
         "reverseLabelOrder": false,
@@ -194,6 +241,7 @@
         "lineMode": false,
         "verticalSorted": false,
         "highlightOnHover": false,
+        "hideSuppressedLabels": false,
         "seriesHighlight": []
       },
       "brush": {
@@ -233,7 +281,7 @@
       "highlightedBarValues": [],
       "series": [
         {
-          "dataKey": "Data",
+          "dataKey": "value",
           "type": "Bar",
           "axis": "Left",
           "tooltip": true
@@ -333,45 +381,32 @@
         },
         "data": []
       },
+      "filters": [],
       "openModal": true,
-      "uid": "chart1711646813542",
+      "uid": "chart1723488349579",
       "visualizationType": "Bar",
-      "editing": false,
-      "dataKey": "valid-world-data.json",
       "dataDescription": {
         "horizontal": false,
         "series": false
       },
-      "version": "4.23",
+      "dataKey": "hidden-methodology",
+      "version": "4.24.9",
       "dynamicMarginTop": 0
-    },
-    "table1711646820983": {
-      "newViz": false,
-      "openModal": true,
-      "uid": "table1711646820983",
-      "type": "table",
-      "formattedData": {},
-      "table": {
-        "label": "Data Table",
-        "show": true,
-        "showDownloadUrl": false,
-        "showVertical": true,
-        "expanded": true
-      },
-      "columns": {},
-      "dataFormat": {},
-      "visualizationType": "table",
-      "editing": false
     }
   },
   "table": {
     "label": "Data Table",
-    "show": false,
+    "show": true,
     "showDownloadUrl": false,
     "showVertical": true
   },
-  "datasets": {},
+  "datasets": {
+    "hidden-methodology": {
+      "dataUrl": "http://test.gov/methodology"
+    }
+  },
   "type": "dashboard",
   "runtime": {},
-  "version": "4.23"
+  "version": "4.24.9",
+  "uuid": 1723488346870
 }
