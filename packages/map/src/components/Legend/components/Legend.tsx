@@ -92,7 +92,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         label: legendLabel,
         disabled: entry.disabled,
         special: entry.hasOwnProperty('special'),
-        // value: { min: entry.min, max: entry.max },
         value: [entry.min, entry.max]
       }
     })
