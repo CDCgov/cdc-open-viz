@@ -29,6 +29,7 @@ const PanelGeneral: FC<PanelProps> = props => {
     visHasaAdditionalLabelsOnBars,
     visHasLabelOnData,
     visSupportsChartHeight,
+    visSupportsMobileChartHeight,
     visSupportsSuperTitle,
     visSupportsFootnotes
   } = useEditorPermissions()
@@ -86,7 +87,7 @@ const PanelGeneral: FC<PanelProps> = props => {
             }
           />
         )}
-        {visSupportsChartHeight() && config.orientation === 'vertical' && visualizationType !== 'Pie' && (
+        {visSupportsMobileChartHeight() && config.orientation === 'vertical' && (
           <TextField
             type='number'
             value={config.heights.mobileVertical}
