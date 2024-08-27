@@ -9,7 +9,12 @@ type DashboardFilterProps = {
   handleOnChange: Function
 }
 
-const DashboardFilters: React.FC<DashboardFilterProps> = ({ show, filters: sharedFilters, apiFilterDropdowns, handleOnChange }) => {
+const DashboardFilters: React.FC<DashboardFilterProps> = ({
+  show,
+  filters: sharedFilters,
+  apiFilterDropdowns,
+  handleOnChange
+}) => {
   const nullVal = (filter: SharedFilter) => {
     const val = filter.queuedActive || filter.active
     return val === null || val === undefined || val === ''
@@ -22,7 +27,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({ show, filters: share
   return (
     <>
       {sharedFilters.map((filter, filterIndex) => {
-        if (!filter.showDropdown || (show && !show.includes(filterIndex))) return <></>
+        if (filter.showDropdown === false || (show && !show.includes(filterIndex))) return <></>
         const values: JSX.Element[] = []
         const multiValues = []
         if (filter.resetLabel) {
@@ -57,7 +62,15 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({ show, filters: share
         }
 
         return filter.multiSelect ? (
-          <MultiSelect key={`${filter.key}-filtersection-${filterIndex}`} label={filter.key} options={multiValues} fieldName={filterIndex} updateField={updateField} selected={filter.active as string[]} limit={filter.selectLimit || 5} />
+          <MultiSelect
+            key={`${filter.key}-filtersection-${filterIndex}`}
+            label={filter.key}
+            options={multiValues}
+            fieldName={filterIndex}
+            updateField={updateField}
+            selected={filter.active as string[]}
+            limit={filter.selectLimit || 5}
+          />
         ) : (
           <div className='cove-dashboard-filters' key={`${filter.key}-filtersection-${filterIndex}`}>
             <section className='dashboard-filters-section'>
