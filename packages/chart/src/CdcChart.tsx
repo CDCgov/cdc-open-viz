@@ -1221,10 +1221,10 @@ export default function CdcChart({
     const isLegendOnBottom = legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
     const classes = ['chart-container', 'p-relative']
     if (legend?.position) {
-      if (!['sm', 'xs', 'xxs'].includes(currentViewport)) {
-        classes.push(`legend-${legend.position}`)
-      } else {
+      if (['sm', 'xs', 'xxs'].includes(currentViewport) && legend?.position !== 'top') {
         classes.push('legend-bottom')
+      } else {
+        classes.push(`legend-${legend.position}`)
       }
     }
     if (legend?.hide) classes.push('legend-hidden')
