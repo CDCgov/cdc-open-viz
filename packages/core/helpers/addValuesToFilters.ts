@@ -54,6 +54,10 @@ const handleVizParents = (filter: VizFilter, data: any[], filtersLookup: Record<
   return filteredData
 }
 
+const includes = (arr: any[], val: any): boolean => {
+  return arr.map(val => String(val)).includes(String(val))
+}
+
 export const addValuesToFilters = (filters: VizFilter[], data: any[]): Array<VizFilter> => {
   const filtersLookup = _.keyBy(filters, 'id')
   return filters?.map(filter => {
@@ -71,11 +75,11 @@ export const addValuesToFilters = (filters: VizFilter[], data: any[]): Array<Viz
       } else if (filterCopy.filterStyle === 'multi-select') {
         const defaultValues = filterCopy.values
         const active = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
-        filterCopy.active = active.filter(val => defaultValues.includes(val))
+        filterCopy.active = active.filter(val => includes(defaultValues, val))
       } else {
         const defaultValue = filterCopy.values[0]
         const active = Array.isArray(filterCopy.active) ? filterCopy.active[0] : filterCopy.active
-        filterCopy.active = filterCopy.values.includes(active) ? active : defaultValue
+        filterCopy.active = includes(filterCopy.values, active) ? active : defaultValue
       }
     }
     return filterCopy
