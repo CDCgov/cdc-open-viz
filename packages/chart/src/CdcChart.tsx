@@ -7,6 +7,9 @@ import * as d3 from 'd3-array'
 import Layout from '@cdc/core/components/Layout'
 import Button from '@cdc/core/components/elements/Button'
 
+//types
+import { DimensionsType } from '@cdc/core/types/Dimensions'
+
 // External Libraries
 import { scaleOrdinal } from '@visx/scale'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
@@ -92,7 +95,7 @@ export default function CdcChart({
     configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : []
   )
   const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
-  const [dimensions, setDimensions] = useState<[number?, number?]>([])
+  const [dimensions, setDimensions] = useState<DimensionsType>([0, 0])
   const [externalFilters, setExternalFilters] = useState<any[]>()
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
