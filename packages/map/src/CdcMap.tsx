@@ -6,6 +6,9 @@ import Annotation from './components/Annotation'
 import Error from './components/EditorPanel/components/Error'
 import _ from 'lodash'
 
+// types
+import { type ViewportSize } from './types/MapConfig'
+
 // IE11
 import 'whatwg-fetch'
 import ResizeObserver from 'resize-observer-polyfill'
@@ -26,6 +29,7 @@ import { publish } from '@cdc/core/helpers/events'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import Title from '@cdc/core/components/ui/Title'
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
@@ -84,14 +88,18 @@ const indexOfIgnoreType = (arr, item) => {
 
 const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, link }) => {
   const transform = new DataTransform()
+  const [translate, setTranslate] = useState([0, 0])
+  const [scale, setScale] = useState(1)
   const [state, setState] = useState({ ...initialState })
   const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [loading, setLoading] = useState(true)
   const [displayPanel, setDisplayPanel] = useState(true)
-  const [currentViewport, setCurrentViewport] = useState()
+  const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
+  const [topoData, setTopoData] = useState<Topology | {}>({})
   const [runtimeFilters, setRuntimeFilters] = useState([])
   const [runtimeLegend, setRuntimeLegend] = useState([])
   const [runtimeData, setRuntimeData] = useState({ init: true })
+  const [stateToShow, setStateToShow] = useState(null)
   const [modal, setModal] = useState(null)
   const [accessibleStatus, setAccessibleStatus] = useState('')
   const [filteredCountryCode, setFilteredCountryCode] = useState()
@@ -101,6 +109,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
   const [dimensions, setDimensions] = useState()
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
+  const [projection, setProjection] = useState(null)
 
   const legendRef = useRef(null)
   const tooltipRef = useRef(null)
@@ -189,6 +198,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     for (let entry of entries) {
       let { width, height } = entry.contentRect
       let newViewport = getViewport(entry.contentRect.width)
+
       let editorWidth = 350
 
       setCurrentViewport(newViewport)
@@ -883,11 +893,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
         if (undefined === row.uid) return false // No UID for this row, we can't use for mapping
 
-        // When on a single state map filter runtime data by state
-        if (!(String(row[obj.columns.geo.name]).substring(0, 2) === obj.general?.statePicked?.fipsCode) && obj.general.geoType !== 'single-state' && obj.general.type !== 'us-geocode' && obj.general.geoType !== 'world') {
-          return false
-        }
-
         if (row[obj.columns.primary.name]) {
           row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name], state)
         }
@@ -1092,7 +1097,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const formatLegendLocation = key => {
     let value = key
     let formattedName = ''
-    let stateName = stateFipsToTwoDigit[key?.substring(0, 2)]
+    let stateName = stateFipsToTwoDigit[key?.substring(0, 2)] ? stateFipsToTwoDigit[key?.substring(0, 2)] : key ? runtimeData?.[key]?.[state.columns.geo.name] : ''
 
     if (stateName) {
       formattedName += stateName
@@ -1438,13 +1443,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }, [state, container]) // eslint-disable-line
 
   useEffect(() => {
-    if (state.data) {
-      let newData = generateRuntimeData(state)
-      setRuntimeData(newData)
-    }
-  }, [state.general.statePicked]) // eslint-disable-line
-
-  useEffect(() => {
     // When geotype changes - add UID
     if (state.data && state.columns.geo.name) {
       addUIDs(state, state.columns.geo.name)
@@ -1563,6 +1561,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // Props passed to all map types
   const mapProps = {
+    projection,
+    setProjection,
+    stateToShow,
+    setStateToShow,
+    setScale,
+    setTranslate,
+    scale,
+    translate,
     isDraggingAnnotation,
     handleDragStateChange,
     applyLegendToRow,
@@ -1612,7 +1618,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     type: general.type,
     viewport: currentViewport,
     tooltipId,
-    tooltipRef
+    tooltipRef,
+    topoData,
+    setTopoData,
+    getTextWidth
   }
 
   if (!mapProps.data || !state.data) return <></>
@@ -1706,7 +1715,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                   )}
                 </section>
 
-                {general.showSidebar && 'navigation' !== general.type && <Legend ref={legendRef} skipId={tabId} />}
+                {general.showSidebar && 'navigation' !== general.type && <Legend dimensions={dimensions} currentViewport={currentViewport} ref={legendRef} skipId={tabId} />}
               </div>
 
               {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
@@ -1766,7 +1775,17 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           {!isDraggingAnnotation && !window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
             <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
           )}
-          <div ref={tooltipRef} id={`tooltip__${tooltipId}-canvas`} className='tooltip d-none' style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})`, position: 'absolute', whiteSpace: 'nowrap' }}></div>
+          <div
+            ref={tooltipRef}
+            id={`tooltip__${tooltipId}-canvas`}
+            className='tooltip'
+            style={{
+              background: `rgba(255,255,255,${state.tooltips.opacity / 100})`,
+              position: 'absolute',
+              whiteSpace: 'nowrap',
+              display: 'none' // can't use d-none here
+            }}
+          ></div>
         </Layout.Responsive>
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>

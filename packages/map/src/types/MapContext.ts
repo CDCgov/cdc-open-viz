@@ -1,11 +1,11 @@
-import { type MapConfig } from './MapConfig'
+import { type MapConfig, type ViewportSize } from './MapConfig'
 
 export type MapContext = {
   applyLegendToRow
   applyTooltipsToGeo
   closeModal
   columnsInData
-  currentViewport
+  currentViewport: ViewportSize
   data
   displayDataAsText
   displayGeoName
@@ -22,6 +22,7 @@ export type MapContext = {
   isDashboard
   isDebug
   isEditor
+  isFilterValueSupported: boolean
   loadConfig
   navigationHandler
   position
@@ -44,4 +45,15 @@ export type MapContext = {
   supportedTerritories
   titleCase
   viewport
+  setStateToShow: (string) => void
+  stateToShow: string
+  scale: number
+  translate: [number, number]
+  topoData
+  setScale: (number) => void
+  setTranslate: ([x, y]: [number, number]) => void
+  runtimeData: Object[]
+  tooltipId: string
+  setTopoData: Function
+  getTextWidth: (text: string, font: string) => string | undefined
 }

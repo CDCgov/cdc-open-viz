@@ -136,6 +136,9 @@ export const useEditorPermissions = () => {
   const visHasLegendAxisAlign = () => {
     return visualizationType === 'Bar' && visualizationSubType === 'stacked' && config.legend.behavior === 'isolate'
   }
+  const visHasLegendColorCategory = () => {
+    return visualizationType === 'Bar' && visualizationSubType === 'regular' && config.series?.length === 1
+  }
 
   const visSupportsTooltipOpacity = () => {
     const disabledCharts = ['Spark Line', 'Sankey']
@@ -293,8 +296,6 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryAxisPadding = () => {
-    const disabledCharts = ['Bump Chart']
-    if (disabledCharts.includes(visualizationType)) return false
     return config.xAxis.type === 'date-time'
   }
 
@@ -319,6 +320,10 @@ export const useEditorPermissions = () => {
       return true
     }
     return false
+  }
+
+  const visSupportsDynamicSeries = () => {
+    return visualizationType === 'Line' || visualizationType === 'Bar' || visualizationType === 'Scatter Plot' || visualizationType === 'Area Chart'
   }
 
   const visHasSingleSeriesTooltip = () => {
@@ -346,6 +351,7 @@ export const useEditorPermissions = () => {
     visHasDataSuppression,
     visHasLegend,
     visHasLegendAxisAlign,
+    visHasLegendColorCategory,
     visHasBrushChart,
     visHasNumbersOnBars,
     visHasaAdditionalLabelsOnBars,
@@ -381,6 +387,7 @@ export const useEditorPermissions = () => {
     visSupportsReactTooltip,
     visSupportsValueAxisMax,
     visSupportsValueAxisMin,
+    visSupportsDynamicSeries,
     visHasSingleSeriesTooltip,
     visHasCategoricalAxis
   }

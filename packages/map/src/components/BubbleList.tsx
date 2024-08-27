@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react'
 import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
-import ConfigContext from './../../src/context'
+import ConfigContext from '../context'
 
 export const BubbleList = ({ data: dataImport, state, projection, applyLegendToRow, applyTooltipsToGeo, handleCircleClick, runtimeData, displayGeoName }) => {
   const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))

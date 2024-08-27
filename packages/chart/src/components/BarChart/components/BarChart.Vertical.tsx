@@ -78,7 +78,12 @@ export const BarChartVertical = () => {
         >
           {barGroups => {
             return barGroups.map((barGroup, index) => (
-              <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={barGroup.x0}>
+              <Group
+                className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`}
+                key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
+                id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
+                left={barGroup.x0}
+              >
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.yAxis.type === 'logarithmic' ? 0.1 : 0
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
@@ -94,7 +99,8 @@ export const BarChartVertical = () => {
                   setBarWidth(barWidth)
                   setTotalBarsInGroup(barGroup.bars.length)
                   const yAxisValue = formatNumber(/[a-zA-Z]/.test(String(bar.value)) ? '' : bar.value, 'left')
-                  const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
+                  const xAxisValue =
+                    config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
@@ -218,6 +224,7 @@ export const BarChartVertical = () => {
                           const yPadding = hasAsterisk ? -5 : -8
                           const verticalAnchor = hasAsterisk ? 'middle' : 'end'
                           const iconSize = pd.symbol === 'Asterisk' ? barWidth * 1.2 : pd.symbol === 'Double Asterisk' ? barWidth : barWidth / 1.5
+                          const fillColor = pd.displayGray ? '#8b8b8a' : '#000'
 
                           return (
                             <Text // prettier-ignore
@@ -228,7 +235,7 @@ export const BarChartVertical = () => {
                               x={barX + barWidth / 2}
                               y={barY}
                               verticalAnchor={verticalAnchor}
-                              fill={labelColor}
+                              fill={fillColor}
                               textAnchor='middle'
                               fontSize={`${iconSize}px`}
                             >

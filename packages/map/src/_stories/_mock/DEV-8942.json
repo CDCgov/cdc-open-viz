@@ -1,0 +1,270 @@
+{
+  "annotations": [],
+  "general": {
+    "title": "Default County Map",
+    "subtext": "",
+    "territoriesLabel": "Territories",
+    "type": "map",
+    "geoType": "single-state",
+    "headerColor": "theme-blue",
+    "showSidebar": true,
+    "showTitle": true,
+    "geoBorderColor": "darkGray",
+    "showDownloadButton": true,
+    "expandDataTable": false,
+    "statePicked": {
+      "fipsCode": "06",
+      "stateName": "California"
+    },
+    "annotationDropdownText": "Annotations",
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": false,
+    "territoriesAlwaysShow": false,
+    "language": "en",
+    "geoLabelOverride": "Location",
+    "hasRegions": false,
+    "fullBorder": false,
+    "convertFipsCodes": true,
+    "palette": {
+      "isReversed": false
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false
+  },
+  "type": "map",
+  "color": "pinkpurple",
+  "columns": {
+    "geo": {
+      "name": "FIPS Codes",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "name": "Insured Rate",
+      "label": "Data Label",
+      "prefix": "",
+      "suffix": "%",
+      "dataTable": true,
+      "tooltip": true,
+      "roundToPlace": 0
+    },
+    "navigate": {
+      "name": "link",
+      "tooltip": false,
+      "dataTable": false
+    },
+    "latitude": {
+      "name": "Latitude"
+    },
+    "longitude": {
+      "name": "Longitude"
+    },
+    "additionalColumn1": {
+      "label": "New Column",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "State"
+    },
+    "additionalColumn2": {
+      "label": "New Column",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Latitude"
+    },
+    "additionalColumn3": {
+      "label": "New Column",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Longitude"
+    }
+  },
+  "legend": {
+    "numberOfItems": 3,
+    "position": "side",
+    "title": "Legend Title",
+    "description": "Legend Text",
+    "type": "equalnumber",
+    "specialClasses": [
+      {
+        "key": "Insured Rate",
+        "value": "N/A",
+        "label": "N/A"
+      }
+    ],
+    "descriptions": {},
+    "unified": false,
+    "singleColumn": false,
+    "singleRow": false,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false,
+    "dynamicDescription": false
+  },
+  "filters": [
+    {
+      "order": "asc",
+      "label": "",
+      "columnName": "State",
+      "values": [
+        "California",
+        "Florida"
+      ],
+      "active": "California",
+      "filterStyle": "dropdown"
+    }
+  ],
+  "table": {
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": true,
+    "indexLabel": ""
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": true,
+    "opacity": 90
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle",
+    "cityStyleLabel": "",
+    "showBubbleZeros": false,
+    "additionalCityStyles": [],
+    "geoCodeCircleSize": "7"
+  },
+  "mapPosition": {
+    "coordinates": [
+      0,
+      0
+    ],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow Up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
+  "data": [
+    {
+      "Insured Rate": 8,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "06071",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "",
+      "Longitude": "",
+      "State": "California"
+    },
+    {
+      "Insured Rate": 25,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "55005",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "",
+      "Longitude": "",
+      "State": "California"
+    },
+    {
+      "Insured Rate": 25,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "12103",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "",
+      "Longitude": "",
+      "State": "Florida"
+    },
+    {
+      "Insured Rate": 25,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "32005",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "",
+      "State": "California",
+      "Longitude": ""
+    },
+    {
+      "Insured Rate": 18,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "06075",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "",
+      "Longitude": "",
+      "State": "California"
+    },
+    {
+      "Insured Rate": 3,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "06027",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "",
+      "Longitude": "",
+      "State": "California"
+    },
+    {
+      "Insured Rate": 25,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "06029",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "",
+      "Longitude": "",
+      "State": "California"
+    },
+    {
+      "Insured Rate": 60,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "Yosemite is great!",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "37.865101",
+      "Longitude": "-119.538330",
+      "State": "California"
+    }
+  ],
+  "version": "4.24.9"
+}

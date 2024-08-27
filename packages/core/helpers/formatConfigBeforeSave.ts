@@ -42,7 +42,7 @@ const cleanDashboardData = (config: DashboardConfig) => {
   }
   if (config.visualizations) {
     Object.keys(config.visualizations).forEach(vizKey => {
-      config.visualizations[vizKey] = _.omit(config.visualizations[vizKey], ['runtime', 'formattedData', 'data'])
+      config.visualizations[vizKey] = _.omit(config.visualizations[vizKey], ['runtime', 'formattedData', 'data', 'editing', 'originalFormattedData'])
     })
   }
   if (config.rows) {
@@ -66,7 +66,7 @@ const cleanSharedFilters = (config: DashboardConfig) => {
 }
 
 export const formatConfigBeforeSave = configToStrip => {
-  let strippedConfig = _.cloneDeep(configToStrip)
+  const strippedConfig = _.cloneDeep(configToStrip)
   if (strippedConfig.type === 'dashboard') {
     if (strippedConfig.multiDashboards) {
       strippedConfig.multiDashboards.forEach((multiDashboard, i) => {
@@ -74,6 +74,11 @@ export const formatConfigBeforeSave = configToStrip => {
         cleanSharedFilters(strippedConfig.multiDashboards[i])
         cleanDashboardFootnotes(strippedConfig.multiDashboards[i])
       })
+      delete strippedConfig.dashboard
+      delete strippedConfig.rows
+      delete strippedConfig.visualizations
+      delete strippedConfig.label
+      delete strippedConfig.activeDashboard
     }
     cleanDashboardData(strippedConfig)
     cleanSharedFilters(strippedConfig)

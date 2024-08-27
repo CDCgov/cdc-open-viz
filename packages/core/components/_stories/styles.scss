@@ -8,3 +8,15 @@
   position: fixed;
   left: -10000px;
 }
+
+.debug .editor-panel {
+  border: 2px dashed red !important;
+  background-color: rgba(255, 0, 0, 0.1);
+  padding: 5px;
+}
+
+.debug div[class*='type-'] {
+  border: 2px dashed green !important;
+  background-color: rgba(55, 255, 0, 0.1);
+  padding: 5px;
+}

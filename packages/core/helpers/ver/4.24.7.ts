@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
 import { MultiDashboardConfig } from '@cdc/dashboard/src/types/MultiDashboard'
 import { AnyVisualization } from '../../types/Visualization'
+import versionNeedsUpdate from './versionNeedsUpdate'
 
 export const dashboardFiltersMigrate = config => {
   if (!config.dashboard) return config
@@ -36,12 +37,18 @@ export const dashboardFiltersMigrate = config => {
     // 'filter-dropdowns' was renamed to 'dashboardFilters' for clarity
     if (viz.type === 'filter-dropdowns') {
       viz.type = 'dashboardFilters'
+      viz.visualizationType = 'dashboardFilters'
       if (!viz.sharedFilterIndexes) {
         viz.sharedFilterIndexes = config.dashboard.sharedFilters.map((_sf, i) => i)
         viz.filterBehavior = config.filterBehavior || 'Filter Change'
       }
     }
-    if (viz.visualizationType === 'filter-dropdowns') viz.visualizationType = 'dashboardFilters'
+
+    // Premature convertion to 4.24.7 made us add this fix
+    if (viz.type === 'dashboardFilters' && !viz.sharedFilterIndexes) {
+      viz.sharedFilterIndexes = config.dashboard.sharedFilters.map((_sf, i) => i)
+      viz.filterBehavior = config.filterBehavior || 'Filter Change'
+    }
     newVisualizations[vizKey] = viz
   })
 
@@ -63,6 +70,16 @@ export const dashboardFiltersMigrate = config => {
       ]
     }
     config.rows = [newRow, ...config.rows]
+    config.dashboard.sharedFilters = config.dashboard.sharedFilters.map(sf => {
+      if (sf.usedBy) {
+        // Fixes usedBy Rows
+        sf.usedBy = sf.usedBy.map(key => {
+          if (!(parseInt(key) > -1)) return key
+          return String(parseInt(key) + 1)
+        })
+      }
+      return sf
+    })
   }
   // if there's no dashboardFilters visualization but there are sharedFilters create a visualization and update rows.
 
@@ -100,7 +117,7 @@ const update_4_24_7 = config => {
   mapUpdates(newConfig)
   dashboardFiltersMigrate(newConfig)
   updateLogarithmicConfig(newConfig)
-  newConfig.version = ver
+  newConfig.version = versionNeedsUpdate(config.version, ver) ? ver : config.version
   return newConfig
 }
 export default update_4_24_7

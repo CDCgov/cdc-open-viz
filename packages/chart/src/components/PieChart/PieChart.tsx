@@ -205,10 +205,18 @@ const PieChart = props => {
 
   const createLegendLabels = createFormatLabels(config, [], _data, _colorScale)
 
+  const getSvgClasses = () => {
+    let classes = ['animated-pie', 'group']
+    if (config.animate === false || animatedPie) {
+      classes.push('animated')
+    }
+    return classes.join(' ')
+  }
+
   return (
     <>
       <ErrorBoundary component='PieChart'>
-        <svg width={radius * 2} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
+        <svg width={radius * 2} height={height} className={getSvgClasses()} role='img' aria-label={handleChartAriaLabels(config)}>
           <Group top={centerY} left={radius}>
             {/* prettier-ignore */}
             <Pie
@@ -231,9 +239,7 @@ const PieChart = props => {
             </TooltipWithBounds>
           </>
         )}
-        {/* <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' /> */}
       </ErrorBoundary>
-      <LegendComponent config={config} colorScale={_colorScale} seriesHighlight={seriesHighlight} highlight={highlight} highlightReset={highlightReset} currentViewport={currentViewport} formatLabels={createLegendLabels} />
     </>
   )
 }
