@@ -324,9 +324,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
 
-        newConfig.filters[index].active = !newConfig.filters[index].active || filterValues.indexOf(newConfig.filters[index].active) === -1 ? filterValues[0] : newConfig.filters[index].active
-        newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle ? newConfig.filters[index].filterStyle : 'dropdown'
-
         const includes = (arr: any[], val: any): boolean => arr.map(val => String(val)).includes(String(val))
         newConfig.filters[index].active = !newConfig.filters[index].active || !includes(filterValues, newConfig.filters[index].active) ? filterValues[0] : newConfig.filters[index].active
         newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle ? newConfig.filters[index].filterStyle : 'dropdown'
