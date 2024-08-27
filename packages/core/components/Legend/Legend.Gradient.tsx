@@ -14,13 +14,20 @@ interface GradientProps {
   dimensions: [string, string]
   currentViewport: ViewportSize
   getTextWidth: (text: string, font: string) => string
+  values?: (number | string)[][]
 }
 
-const LegendGradient = ({ labels, colors, config, dimensions, currentViewport, getTextWidth }: GradientProps): JSX.Element => {
+const LegendGradient = ({
+  labels,
+  colors,
+  config,
+  dimensions,
+  currentViewport,
+  getTextWidth,
+  values
+}: GradientProps): JSX.Element => {
   let [width] = dimensions
-  // let labels = ['0 - 20', '20 - 40', '44 - 50', ' 55-90', '99-100']
-  const ranges = labels.map(label => label.split('-').map(Number))
-  console.log(ranges, 'ranges')
+
   const legendWidth = getGradientLegendWidth(width, currentViewport)
 
   const numTicks = colors?.length
@@ -30,12 +37,6 @@ const LegendGradient = ({ labels, colors, config, dimensions, currentViewport, g
   let height = 50
   const margin = 1
 
-  const flatRanges = ranges.flat()
-  console.log(flatRanges, 'ranges')
-  const scale = scaleLinear({
-    range: [0, legendWidth],
-    domain: [Math.min(...flatRanges), Math.max(...flatRanges)]
-  })
   // configure tick witch and angle
   const textWidth = getTextWidth(longestLabel, `normal 14px sans-serif`)
   const rotationAngle = Number(config.legend.tickRotation) || 0
@@ -45,36 +46,78 @@ const LegendGradient = ({ labels, colors, config, dimensions, currentViewport, g
 
   // configre gradient colors
   const stops = colors.map((color, index) => {
-    const [start, end] = ranges[index]
-    // const offset = (index / (colors.length - 1)) * 100
-    const offsetStart = scale(start)
-    const offsetEnd = scale(end)
-    return <stop key={index} offset={`${offsetStart}%`} style={{ stopColor: color, stopOpacity: 1 }} />
+    const offset = (index / (colors.length - 1)) * 100
+    return <stop key={index} offset={`${offset}%`} style={{ stopColor: color, stopOpacity: 1 }} />
   })
 
-  // render ticks and labels
-  const ticks = ranges.map((range, index) => {
-    const [start, end] = range
-    //  const xPositionX = index * segmentWidth + segmentWidth
-    const positionStart = scale(start)
-    const positionEnd = scale(end)
-    const xPosition = (positionStart + positionEnd) / 2
-    const textAnchor = rotationAngle ? 'end' : 'middle'
-    const verticalAnchor = rotationAngle ? 'middle' : 'start'
+  const createTicks = () => {
+    if (config.legend.style !== 'gradient') return null
 
-    return (
-      <Group left={0} top={margin}>
-        <line x1={xPosition} x2={xPosition} y1={30} y2={boxHeight} stroke='black' />
-        <Text angle={-config.legend.tickRotation} x={xPosition} y={boxHeight} dy={10} fontSize='14' textAnchor={textAnchor} verticalAnchor={verticalAnchor}>
-          {`${start}-${end}`}
-        </Text>
-      </Group>
-    )
-  })
+    const generateTick = (xPosition, label, key, xPadding = 0) => {
+      const textAnchor = rotationAngle ? 'end' : 'middle'
+      const verticalAnchor = rotationAngle ? 'middle' : 'start'
+      return (
+        <Group top={margin} key={key}>
+          <line x1={xPosition} x2={xPosition} y1={30} y2={boxHeight} stroke='#000' />
+          <Text
+            angle={-config.legend.tickRotation}
+            x={xPosition}
+            y={boxHeight}
+            dy={10}
+            dx={-xPadding}
+            fontSize='14'
+            textAnchor={textAnchor}
+            verticalAnchor={verticalAnchor}
+          >
+            {label}
+          </Text>
+        </Group>
+      )
+    }
+
+    if (config.type === 'map' && config.legend.subStyle === 'smooth') {
+      const uniqueValues = Array.from(new Set(values.flat().map(Number)))
+      const scale = scaleLinear({
+        domain: [Math.min(...uniqueValues), Math.max(...uniqueValues)],
+        range: [0, legendWidth]
+      })
+
+      return values.map((range, index) => {
+        const [start, end] = range.map(Number)
+        const xPosition = (scale(start) + scale(end)) / 2
+        return generateTick(xPosition, labels[index], `map-${index}`)
+      })
+    }
+
+    if (config.type === 'chart' && config.legend.subStyle === 'smooth') {
+      const segmentWidth = legendWidth / numTicks
+      return labels.map((key, index) => {
+        const xPosition = index * segmentWidth + segmentWidth / 2
+        return generateTick(xPosition, key, `chart-${index}`, 0)
+      })
+    }
+
+    if (config.legend.subStyle === 'linear blocks') {
+      return labels.map((label, index) => {
+        const segmentWidth = legendWidth / numTicks
+        const xPosition = index * segmentWidth + segmentWidth
+        const textPadding = segmentWidth / 2
+        return generateTick(xPosition, label, `map-${index}`, textPadding)
+      })
+    }
+
+    return null
+  }
+
+  const ticks = createTicks()
+
   if ((config.type === 'map' && config.legend.position === 'side') || !config.legend.position) {
     return
   }
-  if (config.type === 'chart' && (config.legend.position === 'left' || config.legend.position === 'right' || !config.legend.position)) {
+  if (
+    config.type === 'chart' &&
+    (config.legend.position === 'left' || config.legend.position === 'right' || !config.legend.position)
+  ) {
     return
   }
 
@@ -82,13 +125,22 @@ const LegendGradient = ({ labels, colors, config, dimensions, currentViewport, g
     return (
       <svg style={{ overflow: 'visible', width: '100%', marginTop: 10 }} height={newHeight}>
         {/* background border*/}
-        <rect x={0} y={0} width={legendWidth + margin * 2} height={boxHeight + margin * 2} fill='#d3d3d3' strokeWidth='0.5' />
+        <rect
+          x={0}
+          y={0}
+          width={legendWidth + margin * 2}
+          height={boxHeight + margin * 2}
+          fill='#d3d3d3'
+          strokeWidth='0.5'
+        />
         {/* Define the gradient */}
         <linearGradient id={`gradient-smooth-${config.uid || 0}`} x1='0%' y1='0%' x2='100%' y2='0%'>
           {stops}
         </linearGradient>
 
-        {config.legend.subStyle === 'smooth' && <rect x={1} y={1} width={legendWidth} height={boxHeight} fill={`url(#gradient-smooth-${config.uid || 0})`} />}
+        {config.legend.subStyle === 'smooth' && (
+          <rect x={1} y={1} width={legendWidth} height={boxHeight} fill={`url(#gradient-smooth-${config.uid || 0})`} />
+        )}
 
         {config.legend.subStyle === 'linear blocks' &&
           colors.map((color, index) => {
@@ -96,7 +148,16 @@ const LegendGradient = ({ labels, colors, config, dimensions, currentViewport, g
             const xPosition = index * segmentWidth
             return (
               <Group>
-                <rect key={index} x={xPosition} y={0} width={segmentWidth} height={boxHeight} fill={color} stroke='white' strokeWidth='0' />
+                <rect
+                  key={index}
+                  x={xPosition}
+                  y={0}
+                  width={segmentWidth}
+                  height={boxHeight}
+                  fill={color}
+                  stroke='white'
+                  strokeWidth='0'
+                />
               </Group>
             )
           })}
