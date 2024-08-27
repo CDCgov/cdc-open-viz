@@ -104,7 +104,7 @@ export const useFilters = props => {
     }
 
     if (!visualizationConfig.dynamicSeries) {
-      newFilters = addValuesToFilters<VizFilter>(newFilters, excludedData)
+      newFilters = addValuesToFilters(newFilters, excludedData)
       setConfig({
         ...visualizationConfig,
         filters: newFilters
@@ -347,7 +347,7 @@ const Filters = (props: FilterProps) => {
     let vizfilters = type === 'map' ? filteredData : filters
     if (!vizfilters) return []
     if (vizfilters.fromHash) delete vizfilters.fromHash // support for Maps config
-    return addValuesToFilters<VizFilter>(vizfilters as VizFilter[], visualizationConfig.data)
+    return addValuesToFilters(vizfilters as VizFilter[], visualizationConfig.data)
   }, [filters, filteredData])
 
   // Resolve Filter Styles
