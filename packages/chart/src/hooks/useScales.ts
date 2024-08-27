@@ -27,7 +27,7 @@ const useScales = (properties: useScaleProps) => {
 
   const { rawData, dimensions } = useContext<ChartContext>(ConfigContext)
 
-  const [screenWidth, screenHeight] = dimensions
+  const [screenWidth] = dimensions
   const seriesDomain = config.runtime.barSeriesKeys || config.runtime.seriesKeys
   const xAxisType = config.runtime.xAxis.type
   const isHorizontal = config.orientation === 'horizontal'
@@ -76,8 +76,8 @@ const useScales = (properties: useScaleProps) => {
   }
 
   if (config.xAxis.type === 'date-time') {
-    let xAxisMin = Math.min(...xAxisDataMapped)
-    let xAxisMax = Math.max(...xAxisDataMapped)
+    let xAxisMin = Math.min(...xAxisDataMapped.map(Number))
+    let xAxisMax = Math.max(...xAxisDataMapped.map(Number))
     xAxisMin -= (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
     xAxisMax += (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
     xScale = scaleTime({
@@ -132,7 +132,9 @@ const useScales = (properties: useScaleProps) => {
   // handle Box plot
   if (visualizationType === 'Box Plot') {
     const allOutliers = []
-    const hasOutliers = config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) && !config.boxplot.hideOutliers
+    const hasOutliers =
+      config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) &&
+      !config.boxplot.hideOutliers
 
     // check if outliers are lower
     if (hasOutliers) {
@@ -192,7 +194,7 @@ const useScales = (properties: useScaleProps) => {
       nice: true
     })
   }
-  
+
   if (visualizationType === 'Forest Plot') {
     const resolvedYRange = () => {
       if (config.forestPlot.regression.showDiamond || config.forestPlot.regression.description) {
@@ -218,8 +220,11 @@ const useScales = (properties: useScaleProps) => {
     if (screenWidth > 480) {
       if (config.forestPlot.type === 'Linear') {
         xScale = scaleLinear({
-          domain: [Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding],
-          range: [leftWidthOffset, dimensions[0] - rightWidthOffset]
+          domain: [
+            Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding,
+            Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding
+          ],
+          range: [leftWidthOffset, Number(screenWidth) - rightWidthOffset]
         })
         xScale.type = scaleTypes.LINEAR
       }
@@ -237,7 +242,10 @@ const useScales = (properties: useScaleProps) => {
     } else {
       if (config.forestPlot.type === 'Linear') {
         xScale = scaleLinear({
-          domain: [Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding],
+          domain: [
+            Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding,
+            Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding
+          ],
           range: [leftWidthOffsetMobile, xMax - rightWidthOffsetMobile],
           type: scaleTypes.LINEAR
         })
@@ -321,8 +329,8 @@ const composeYScale = ({ min, max, yMax, config, leftMax }) => {
   if (config.visualizationType === 'Combo') max = leftMax
 
   // If the visualization type is a bump chart then the domain and range need different values
-  const domainSet = config.visualizationType === 'Bump Chart' ?  [1, max] : [min, max]
-  const yRange = config.visualizationType === 'Bump Chart' ?  [30,yMax] : [yMax,0]
+  const domainSet = config.visualizationType === 'Bump Chart' ? [1, max] : [min, max]
+  const yRange = config.visualizationType === 'Bump Chart' ? [30, yMax] : [yMax, 0]
   // Return the configured scale function
   return scaleFunc({
     domain: domainSet,

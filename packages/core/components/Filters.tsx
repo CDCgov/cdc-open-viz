@@ -9,6 +9,7 @@ import { Visualization } from '../types/Visualization'
 import { MultiSelectFilter, VizFilter } from '../types/VizFilter'
 import { filterVizData } from '../helpers/filterVizData'
 import { addValuesToFilters } from '../helpers/addValuesToFilters'
+import { DimensionsType } from '../types/Dimensions'
 
 export const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar', 'multi-select']
 
@@ -64,7 +65,9 @@ export const useFilters = props => {
     const [movedItem] = updatedValues.splice(idx1, 1)
     updatedValues.splice(idx2, 0, movedItem)
 
-    const filtersCopy = hasStandardFilterBehavior.includes(visualizationConfig.type) ? [...visualizationConfig.filters] : [...filteredData]
+    const filtersCopy = hasStandardFilterBehavior.includes(visualizationConfig.type)
+      ? [...visualizationConfig.filters]
+      : [...filteredData]
     const filterItem = { ...filtersCopy[filterIndex] }
 
     // Overwrite filterItem.values since thats what we map through in the editor panel
@@ -114,7 +117,10 @@ export const useFilters = props => {
     }
 
     // If we're on a chart and not using the apply button
-    if (hasStandardFilterBehavior.includes(visualizationConfig.type) && visualizationConfig.filterBehavior === 'Filter Change') {
+    if (
+      hasStandardFilterBehavior.includes(visualizationConfig.type) &&
+      visualizationConfig.filterBehavior === 'Filter Change'
+    ) {
       const newFilteredData = filterVizData(newFilters, excludedData)
       setFilteredData(newFilteredData)
 
@@ -129,7 +135,8 @@ export const useFilters = props => {
             if (
               seriesKey !== visualizationConfig.xAxis.dataKey &&
               newFilteredData[0][seriesKey] &&
-              (!visualizationConfig.filters || visualizationConfig.filters?.filter(filter => filter.columnName === seriesKey).length === 0) &&
+              (!visualizationConfig.filters ||
+                visualizationConfig.filters?.filter(filter => filter.columnName === seriesKey).length === 0) &&
               (!visualizationConfig.columns || Object.keys(visualizationConfig.columns).indexOf(seriesKey) === -1)
             ) {
               runtime.series.push({
@@ -242,7 +249,7 @@ export const useFilters = props => {
 
 type FilterProps = {
   filteredData: Object[]
-  dimensions: any[]
+  dimensions: DimensionsType
   config: Visualization
   // function for updating the runtime filters
   setFilteredData: Function
@@ -272,7 +279,7 @@ const Filters = (props: FilterProps) => {
 
   useEffect(() => {
     if (!dimensions) return
-    if (dimensions[0] < 768 && filters?.length > 0) {
+    if (Number(dimensions[0]) < 768 && filters?.length > 0) {
       setMobileFilterStyle(true)
     } else {
       setMobileFilterStyle(false)
@@ -384,7 +391,9 @@ const Filters = (props: FilterProps) => {
 
         DropdownOptions.push(
           <option key={index} value={filterOption} aria-label={filterOption}>
-            {singleFilter.labels && singleFilter.labels[filterOption] ? singleFilter.labels[filterOption] : filterOption}
+            {singleFilter.labels && singleFilter.labels[filterOption]
+              ? singleFilter.labels[filterOption]
+              : filterOption}
           </option>
         )
 
@@ -408,7 +417,10 @@ const Filters = (props: FilterProps) => {
         )
       })
 
-      const classList = ['single-filters', mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`]
+      const classList = [
+        'single-filters',
+        mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`
+      ]
 
       return (
         <div className={classList.join(' ')} key={outerIndex}>
@@ -417,7 +429,15 @@ const Filters = (props: FilterProps) => {
             {filterStyle === 'tab' && !mobileFilterStyle && Tabs}
             {filterStyle === 'pill' && !mobileFilterStyle && Pills}
             {filterStyle === 'tab bar' && !mobileFilterStyle && <TabBar filter={singleFilter} index={outerIndex} />}
-            {(filterStyle === 'dropdown' || mobileFilterStyle) && <Dropdown filter={singleFilter} index={outerIndex} label={label} active={queuedActive || active} filters={DropdownOptions} />}
+            {(filterStyle === 'dropdown' || mobileFilterStyle) && (
+              <Dropdown
+                filter={singleFilter}
+                index={outerIndex}
+                label={label}
+                active={queuedActive || active}
+                filters={DropdownOptions}
+              />
+            )}
             {filterStyle === 'multi-select' && (
               <MultiSelect
                 options={singleFilter.values.map(v => ({ value: v, label: v }))}
@@ -434,11 +454,15 @@ const Filters = (props: FilterProps) => {
   }
 
   if (visualizationConfig?.filters?.length === 0) return
-  const filterSectionClassList = ['filters-section', type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme]
+  const filterSectionClassList = [
+    'filters-section',
+    type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme
+  ]
   return (
     <section className={filterSectionClassList.join(' ')}>
       <p className='filters-section__intro-text'>
-        {filters?.some(f => f.active && f.showDropdown) ? filterConstants.introText : ''} {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
+        {filters?.some(f => f.active && f.showDropdown) ? filterConstants.introText : ''}{' '}
+        {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
       </p>
       <div className='filters-section__wrapper'>
         {' '}
@@ -446,7 +470,11 @@ const Filters = (props: FilterProps) => {
           <Style />
           {filterBehavior === 'Apply Button' ? (
             <div className='filters-section__buttons'>
-              <Button onClick={() => handleApplyButton(filters)} disabled={!showApplyButton} className={[general?.headerColor ? general.headerColor : theme, 'apply'].join(' ')}>
+              <Button
+                onClick={() => handleApplyButton(filters)}
+                disabled={!showApplyButton}
+                className={[general?.headerColor ? general.headerColor : theme, 'apply'].join(' ')}
+              >
                 {filterConstants.buttonText}
               </Button>
               <a href='#!' role='button' onClick={handleReset}>
