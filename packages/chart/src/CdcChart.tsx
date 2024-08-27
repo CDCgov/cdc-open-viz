@@ -392,6 +392,8 @@ export default function CdcChart({
           ) {
             newConfig.runtime.series.push({
               dataKey: seriesKey,
+              type: newConfig.dynamicSeriesType,
+              lineType: newConfig.dynamicSeriesLineType,
               tooltip: true
             })
           }

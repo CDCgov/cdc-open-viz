@@ -141,6 +141,8 @@ export const useFilters = props => {
             ) {
               runtime.series.push({
                 dataKey: seriesKey,
+                type: visualizationConfig.dynamicSeriesType,
+                lineType: visualizationConfig.dynamicSeriesLineType,
                 tooltip: true
               })
             }
