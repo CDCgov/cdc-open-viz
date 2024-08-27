@@ -95,7 +95,7 @@ export default function CdcChart({
     configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : []
   )
   const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
-  const [dimensions, setDimensions] = useState<DimensionsType>(['', ''])
+  const [dimensions, setDimensions] = useState<DimensionsType>([0, 0])
   const [externalFilters, setExternalFilters] = useState<any[]>()
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)

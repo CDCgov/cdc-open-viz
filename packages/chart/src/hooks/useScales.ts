@@ -76,8 +76,8 @@ const useScales = (properties: useScaleProps) => {
   }
 
   if (config.xAxis.type === 'date-time') {
-    let xAxisMin = Math.min(...xAxisDataMapped)
-    let xAxisMax = Math.max(...xAxisDataMapped)
+    let xAxisMin = Math.min(...xAxisDataMapped.map(Number))
+    let xAxisMax = Math.max(...xAxisDataMapped.map(Number))
     xAxisMin -= (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
     xAxisMax += (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
     xScale = scaleTime({

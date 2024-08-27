@@ -130,7 +130,7 @@ const CdcMap = ({
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
   const [container, setContainer] = useState()
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
-  const [dimensions, setDimensions] = useState<DimensionsType>(['', ''])
+  const [dimensions, setDimensions] = useState<DimensionsType>([0, 0])
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
   const [projection, setProjection] = useState(null)
 

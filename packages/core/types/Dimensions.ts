@@ -1,1 +1,1 @@
-export type DimensionsType = [string, string]
+export type DimensionsType = [number, number]
