@@ -347,11 +347,13 @@ export default function CdcChart({
     let currentData: any[] = []
     if (newConfig.filters) {
       newConfig.filters.forEach((filter, index) => {
-        let filterValues = []
-
-        filterValues =
-          filter.orderedValues ||
-          generateValuesForFilter(filter.columnName, newExcludedData).sort(filter.order === 'desc' ? sortDesc : sortAsc)
+        const filterValues =
+          filter.filterStyle === 'nested-dropdown'
+            ? filter.values
+            : filter.orderedValues ||
+              generateValuesForFilter(filter.columnName, newExcludedData).sort(
+                filter.order === 'desc' ? sortDesc : sortAsc
+              )
 
         newConfig.filters[index].values = filterValues
         // Initial filter should be active

@@ -6,14 +6,16 @@ import Button from './elements/Button'
 import { getQueryParams, updateQueryString } from '../helpers/queryStringUtils'
 import MultiSelect from './MultiSelect'
 import { Visualization } from '../types/Visualization'
-import { MultiSelectFilter, VizFilter } from '../types/VizFilter'
+import { MultiSelectFilter, OrderBy, VizFilter } from '../types/VizFilter'
 import { filterVizData } from '../helpers/filterVizData'
 import { addValuesToFilters } from '../helpers/addValuesToFilters'
 import { DimensionsType } from '../types/Dimensions'
+import NestedDropdown from './NestedDropdown'
+import _ from 'lodash'
 
-export const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar', 'multi-select']
+export const filterStyleOptions = ['dropdown', 'nested-dropdown', 'pill', 'tab', 'tab bar', 'multi-select']
 
-export const filterOrderOptions = [
+export const filterOrderOptions: { label: string; value: OrderBy }[] = [
   {
     label: 'Ascending Alphanumeric',
     value: 'asc'
@@ -29,11 +31,18 @@ export const filterOrderOptions = [
 ]
 
 export const handleSorting = singleFilter => {
+  const singleFilterValues = _.cloneDeep(singleFilter.values)
+  if (singleFilter.order === 'cust') {
+    return singleFilter
+  }
+
   const sort = (a, b) => {
     const asc = singleFilter.order !== 'desc'
     return (asc ? a : b).toString().localeCompare((asc ? b : a).toString(), 'en', { numeric: true })
   }
-  singleFilter.values = singleFilter.values.sort(sort)
+
+  singleFilter.values = singleFilterValues.sort(sort)
+
   return singleFilter
 }
 
@@ -94,7 +103,12 @@ export const useFilters = props => {
       setShowApplyButton(true)
     } else {
       const newFilter = newFilters[index]
-      newFilter.active = value
+      if (newFilter.filterStyle !== 'nested-dropdown') {
+        newFilter.active = value
+      } else {
+        newFilter.active = value[0]
+        newFilter.subGrouping.active = value[1]
+      }
 
       const queryParams = getQueryParams()
       if (newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active) {
@@ -423,7 +437,8 @@ const Filters = (props: FilterProps) => {
         'single-filters',
         mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`
       ]
-
+      const mobileExempt = ['nested-dropdown', 'multi-select'].includes(filterStyle)
+      const showDefaultDropdown = (filterStyle === 'dropdown' || mobileFilterStyle) && !mobileExempt
       return (
         <div className={classList.join(' ')} key={outerIndex}>
           <>
@@ -431,15 +446,6 @@ const Filters = (props: FilterProps) => {
             {filterStyle === 'tab' && !mobileFilterStyle && Tabs}
             {filterStyle === 'pill' && !mobileFilterStyle && Pills}
             {filterStyle === 'tab bar' && !mobileFilterStyle && <TabBar filter={singleFilter} index={outerIndex} />}
-            {(filterStyle === 'dropdown' || mobileFilterStyle) && (
-              <Dropdown
-                filter={singleFilter}
-                index={outerIndex}
-                label={label}
-                active={queuedActive || active}
-                filters={DropdownOptions}
-              />
-            )}
             {filterStyle === 'multi-select' && (
               <MultiSelect
                 options={singleFilter.values.map(v => ({ value: v, label: v }))}
@@ -447,6 +453,22 @@ const Filters = (props: FilterProps) => {
                 updateField={(_section, _subSection, fieldName, value) => changeFilterActive(fieldName, value)}
                 selected={singleFilter.active as string[]}
                 limit={(singleFilter as MultiSelectFilter).selectLimit || 5}
+              />
+            )}
+            {filterStyle === 'nested-dropdown' && (
+              <NestedDropdown
+                currentFilter={singleFilter}
+                listLabel={label}
+                handleSelectedItems={value => changeFilterActive(outerIndex, value)}
+              />
+            )}
+            {showDefaultDropdown && (
+              <Dropdown
+                filter={singleFilter}
+                index={outerIndex}
+                label={label}
+                active={queuedActive || active}
+                filters={DropdownOptions}
               />
             )}
           </>

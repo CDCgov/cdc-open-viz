@@ -10,15 +10,43 @@ type Filter = {
   parents?: (string | number)[]
 }
 
-// Gets filter values from dataset
-const generateValuesForFilter = (columnName, data: any[]) => {
-  const values: string[] = []
+/** MapData is an object */
+type MapData = Record<string, any[]>
 
+const cleanLookup = (lookup: Record<string, { values: string[]; orderedValues?: string[] }>) => {
+  // for nested-dropdown
+  // removes values from subGrouping.valuesLookup
+  // keeps orderedValues
+  return Object.fromEntries(
+    Object.entries(lookup || {}).map(([key, { orderedValues }]) => {
+      if (!orderedValues) return [key, { values: [] }]
+      return [key, { orderedValues, values: [] }]
+    })
+  )
+}
+
+// Gets filter values from dataset
+const generateValuesForFilter = (filter: VizFilter, data: any[] | MapData) => {
+  const columnName = filter.columnName
+  const values: string[] = []
+  const subGroupingColumn = filter.subGrouping?.columnName
+  const subValues = cleanLookup(filter.subGrouping?.valuesLookup)
   if (Array.isArray(data)) {
     data.forEach(row => {
       const value = row[columnName]
+      if (value === undefined) return
       if (!values.includes(value)) {
         values.push(value)
+      }
+      if (subGroupingColumn) {
+        const dataValue = row[subGroupingColumn]
+        if (value === undefined) return
+        if (!subValues[value]) {
+          subValues[value] = { values: [] }
+        }
+        if (!subValues[value].values.includes(dataValue)) {
+          subValues[value].values.push(dataValue)
+        }
       }
     })
   } else {
@@ -35,14 +63,26 @@ const generateValuesForFilter = (columnName, data: any[]) => {
       })
     })
   }
-  return values
+  filter.values = values
+  if (subGroupingColumn) {
+    filter.subGrouping.valuesLookup = subValues
+  }
 }
 
-const handleVizParents = (filter: VizFilter, data: any[], filtersLookup: Record<string, Filter>) => {
-  let filteredData = data
+const handleVizParents = (filter: VizFilter, data: any[] | MapData, filtersLookup: Record<string, Filter>) => {
+  let filteredData = Array.isArray(data) ? data : Object.values(data).flat(1)
   filter.parents.forEach(parentKey => {
     const parent = filtersLookup[parentKey]
-    if (parent?.active) {
+    if (parent.filterStyle === 'nested-dropdown') {
+      const { subGrouping } = parent as VizFilter
+      if (subGrouping.active) {
+        filteredData = filteredData.filter(d => {
+          const matchingParentGroup = parent.active == d[parent.columnName]
+          const matchingSubGroup = subGrouping.active == d[subGrouping.columnName]
+          return matchingParentGroup && matchingSubGroup
+        })
+      }
+    } else if (parent?.active) {
       filteredData = filteredData.filter(d => {
         if (Array.isArray(parent.active)) {
           return parent.active.includes(d[parent.columnName])
@@ -58,17 +98,17 @@ const includes = (arr: any[], val: any): boolean => {
   return arr.map(val => String(val)).includes(String(val))
 }
 
-export const addValuesToFilters = (filters: VizFilter[], data: any[]): Array<VizFilter> => {
+export const addValuesToFilters = (filters: VizFilter[], data: any[] | MapData): Array<VizFilter> => {
   const filtersLookup = _.keyBy(filters, 'id')
   return filters?.map(filter => {
     const filterCopy = _.cloneDeep(filter)
     let filteredData = data
-    if (filter.parents?.length) {
+    const isMapData = !Array.isArray(data)
+    if (filter.parents?.length && !isMapData) {
       filteredData = handleVizParents(filter as VizFilter, data, filtersLookup)
     }
-    const filterValues = generateValuesForFilter(filter.columnName, filteredData)
-    filterCopy.values = filterValues
-    if (filterValues.length > 0) {
+    generateValuesForFilter(filterCopy, filteredData)
+    if (filterCopy.values.length > 0) {
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)
       if (queryStringFilterValue) {
         filterCopy.active = queryStringFilterValue
@@ -81,6 +121,15 @@ export const addValuesToFilters = (filters: VizFilter[], data: any[]): Array<Viz
         const active = Array.isArray(filterCopy.active) ? filterCopy.active[0] : filterCopy.active
         filterCopy.active = includes(filterCopy.values, active) ? active : defaultValue
       }
+    }
+    if (filterCopy.subGrouping) {
+      const queryStringFilterValue = getQueryStringFilterValue(filterCopy.subGrouping)
+      const groupActive = filterCopy.active || filterCopy.values[0]
+      const defaultValue = filterCopy.subGrouping.valuesLookup[groupActive as string].values[0]
+      // if the value doesn't exist in the subGrouping then return the default
+      const filteredLookupValues = Object.values(filterCopy.subGrouping.valuesLookup).flatMap(v => v.values)
+      const activeValue = queryStringFilterValue || filterCopy.subGrouping.active
+      filterCopy.subGrouping.active = filteredLookupValues.includes(activeValue) ? activeValue : defaultValue
     }
     return filterCopy
   })
