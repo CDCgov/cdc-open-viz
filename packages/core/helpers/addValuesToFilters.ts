@@ -10,6 +10,9 @@ type Filter = {
   parents?: (string | number)[]
 }
 
+/** MapData is an object */
+type MapData = Record<string, any[]>
+
 const cleanLookup = (lookup: Record<string, { values: string[]; orderedValues?: string[] }>) => {
   // for nested-dropdown
   // removes values from subGrouping.valuesLookup
@@ -23,7 +26,7 @@ const cleanLookup = (lookup: Record<string, { values: string[]; orderedValues?: 
 }
 
 // Gets filter values from dataset
-const generateValuesForFilter = (filter: VizFilter, data: any[] | Record<string, any[]>) => {
+const generateValuesForFilter = (filter: VizFilter, data: any[] | MapData) => {
   const columnName = filter.columnName
   const values: string[] = []
   const subGroupingColumn = filter.subGrouping?.columnName
@@ -66,8 +69,8 @@ const generateValuesForFilter = (filter: VizFilter, data: any[] | Record<string,
   }
 }
 
-const handleVizParents = (filter: VizFilter, data: any[], filtersLookup: Record<string, Filter>) => {
-  let filteredData = data
+const handleVizParents = (filter: VizFilter, data: any[] | MapData, filtersLookup: Record<string, Filter>) => {
+  let filteredData = Array.isArray(data) ? data : Object.values(data).flat(1)
   filter.parents.forEach(parentKey => {
     const parent = filtersLookup[parentKey]
     if (parent.filterStyle === 'nested-dropdown') {
@@ -95,12 +98,13 @@ const includes = (arr: any[], val: any): boolean => {
   return arr.map(val => String(val)).includes(String(val))
 }
 
-export const addValuesToFilters = (filters: VizFilter[], data: any[]): Array<VizFilter> => {
+export const addValuesToFilters = (filters: VizFilter[], data: any[] | MapData): Array<VizFilter> => {
   const filtersLookup = _.keyBy(filters, 'id')
   return filters?.map(filter => {
     const filterCopy = _.cloneDeep(filter)
     let filteredData = data
-    if (filter.parents?.length) {
+    const isMapData = !Array.isArray(data)
+    if (filter.parents?.length && !isMapData) {
       filteredData = handleVizParents(filter as VizFilter, data, filtersLookup)
     }
     generateValuesForFilter(filterCopy, filteredData)
