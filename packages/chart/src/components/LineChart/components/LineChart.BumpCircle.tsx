@@ -15,7 +15,7 @@ const LineChartBumpCircle = (props: LineChartBumpCircleProp) => {
   const { config, xScale, yScale, parseDate } = props
 
   // get xScale and yScale...
-  if (!config.?runtime?.series) return
+  if (!config?.runtime?.series) return
 
   const handleX = xValue => {
     if (config.xAxis.type === 'date') {
