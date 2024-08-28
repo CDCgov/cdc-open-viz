@@ -1,11 +1,6 @@
 .nested-dropdown {
-  li {
+  .nested-dropdown-group {
     list-style: none;
-    cursor: pointer;
-
-    &:focus {
-      border: 2px solid var(--orange);
-    }
   }
 
   .search-input {
@@ -25,11 +20,24 @@
     cursor: pointer;
   }
 
-  .selectable-item:hover {
-    background-color: var(--lightGray);
+  .selectable-item {
+    list-style: none;
+    padding-left: 20px;
+    position: relative;
+    font-weight: normal;
+    white-space: nowrap;
+
+    & .check-mark {
+      position: absolute;
+      left: 0px;
+    }
+
+    &:hover {
+      background-color: var(--lightGray);
+    }
   }
 
-  & > div {
+  .nested-dropdown-input-container {
     position: relative;
     & > span.list-arrow {
       position: absolute;
@@ -42,26 +50,12 @@
     }
   }
 
-  & > ul {
+  & .main-nested-dropdown-container {
     max-height: 375px;
     overflow-y: scroll;
     position: absolute;
     z-index: 3;
-    width: 375px;
-
-    & > li {
-      font-weight: bold;
-
-      & > ul > li {
-        position: relative;
-        font-weight: normal;
-        white-space: nowrap;
-        & > span {
-          position: absolute;
-          left: -20px;
-        }
-      }
-    }
+    width: 325px;
   }
 
   .hide {
