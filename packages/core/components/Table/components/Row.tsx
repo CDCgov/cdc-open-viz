@@ -32,7 +32,7 @@ const Row: FC<RowProps> = props => {
 
         return (
           <Cell
-            ariaLabel={style.color ? 'suppressed data' : ''}
+            ariaLabel={style?.color ? 'suppressed data' : ''}
             key={rowKey + '__' + i}
             style={{ whiteSpace, minWidth, fontSize: cellFontSize, ...style }}
             isBold={isTotal}
