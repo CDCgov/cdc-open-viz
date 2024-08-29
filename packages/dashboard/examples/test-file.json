@@ -1,0 +1,147 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": [
+      {
+        "key": "Topic",
+        "showDropdown": true,
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_cessation&$select=distinct%20Topic",
+          "valueSelector": "Topic",
+          "textSelector": ""
+        }
+      },
+      {
+        "key": "Quarter",
+        "showDropdown": true,
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_cessation&$select=distinct%20Quarter",
+          "valueSelector": "Quarter",
+          "textSelector": ""
+        },
+        "parents": [
+          "Topic"
+        ]
+      },
+      {
+        "key": "YearQuarter",
+        "showDropdown": true,
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_cessation&$select=distinct YearQuarter,Year",
+          "valueSelector": "Year",
+          "textSelector": "YearQuarter"
+        },
+        "parents": [
+          "Topic",
+          "Quarter"
+        ],
+        "multiSelect": true
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboardFilters1723058075362"
+        },
+        {},
+        {}
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboardFilters1723058794676"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "table1724779017139"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "dashboardFilters1723058075362": {
+      "filters": [],
+      "filterBehavior": "Apply Button",
+      "newViz": true,
+      "openModal": true,
+      "uid": "dashboardFilters1723058075362",
+      "type": "dashboardFilters",
+      "sharedFilterIndexes": [
+        0,
+        1
+      ],
+      "visualizationType": "dashboardFilters",
+      "editing": false
+    },
+    "dashboardFilters1723058794676": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "newViz": true,
+      "openModal": true,
+      "uid": "dashboardFilters1723058794676",
+      "type": "dashboardFilters",
+      "sharedFilterIndexes": [
+        2
+      ],
+      "visualizationType": "dashboardFilters",
+      "editing": false,
+      "autoLoad": true
+    },
+    "table1724779017139": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "newViz": false,
+      "openModal": true,
+      "uid": "table1724779017139",
+      "type": "table",
+      "table": {
+        "label": "Data Table",
+        "show": true,
+        "showDownloadUrl": false,
+        "showVertical": true,
+        "expanded": true,
+        "collapsible": true
+      },
+      "columns": {},
+      "dataFormat": {},
+      "visualizationType": "table",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_cessation"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showVertical": true
+  },
+  "datasets": {
+    "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_cessation": {
+      "dataFileSize": 19076,
+      "dataFileName": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_cessation",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": true,
+      "dataUrl": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_cessation"
+    }
+  },
+  "type": "dashboard",
+  "version": "4.24.9",
+  "uuid": 1724778985218,
+  "runtime": {}
+}
