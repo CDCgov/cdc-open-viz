@@ -11,12 +11,14 @@ import Layout from '@cdc/core/components/Layout'
 import DashboardFiltersEditor from './DashboardFiltersEditor'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import { hasDashboardApplyBehavior } from '../../helpers/hasDashboardApplyBehavior'
+import * as apiFilterHelpers from '../../helpers/apiFilterHelpers'
 
 export type DropdownOptions = Record<'value' | 'text', string>[]
 
+/** the cached dropdown options for each filter */
 export type APIFilterDropdowns = {
   // null means still loading
-  [filtername: string]: null | DropdownOptions
+  [dropdownsKey: string]: null | DropdownOptions
 }
 
 type DashboardFiltersProps = {
@@ -27,9 +29,15 @@ type DashboardFiltersProps = {
   currentViewport?: ViewPort
 }
 
-const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({ apiFilterDropdowns, visualizationConfig, setConfig: updateConfig, currentViewport, isEditor = false }) => {
+const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
+  apiFilterDropdowns,
+  visualizationConfig,
+  setConfig: updateConfig,
+  currentViewport,
+  isEditor = false
+}) => {
   const state = useContext(DashboardContext)
-  const { config: dashboardConfig, reloadURLData, loadAPIFilters } = state
+  const { config: dashboardConfig, reloadURLData, loadAPIFilters, setAPIFilterDropdowns } = state
   const dispatch = useContext(DashboardDispatchContext)
 
   const applyFilters = () => {
@@ -54,8 +62,13 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({ apiFilterDro
             dashboardConfig.sharedFilters[index].active = sharedFilter.queuedActive
             delete dashboardConfig.sharedFilters[index].queuedActive
 
-            if (sharedFilter.setByQueryParameter && queryParams[sharedFilter.setByQueryParameter] !== sharedFilter.active) {
-              queryParams[sharedFilter.setByQueryParameter] = Array.isArray(sharedFilter.active) ? sharedFilter.active.join(',') : sharedFilter.active
+            if (
+              sharedFilter.setByQueryParameter &&
+              queryParams[sharedFilter.setByQueryParameter] !== sharedFilter.active
+            ) {
+              queryParams[sharedFilter.setByQueryParameter] = Array.isArray(sharedFilter.active)
+                ? sharedFilter.active.join(',')
+                : sharedFilter.active
               needsQueryUpdate = true
             }
           }
@@ -68,7 +81,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({ apiFilterDro
 
       dispatch({ type: 'SET_SHARED_FILTERS', payload: dashboardConfig.sharedFilters })
       dispatch({ type: 'SET_FILTERED_DATA', payload: getFilteredData(_.cloneDeep(state)) })
-      loadAPIFilters(dashboardConfig.sharedFilters)
+      loadAPIFilters(dashboardConfig.sharedFilters, apiFilterDropdowns)
         .then(newFilters => {
           reloadURLData(newFilters)
         })
@@ -82,15 +95,27 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({ apiFilterDro
 
   const handleOnChange = (index: number, value: string | string[]) => {
     const newConfig = _.cloneDeep(dashboardConfig)
-    let newSharedFilters = changeFilterActive(index, value, newConfig.dashboard.sharedFilters, visualizationConfig)
+    let [newSharedFilters, changedFilterIndexes] = changeFilterActive(
+      index,
+      value,
+      newConfig.dashboard.sharedFilters,
+      visualizationConfig
+    )
 
     if (hasDashboardApplyBehavior(dashboardConfig.visualizations)) {
       const isAutoSelectFilter = visualizationConfig.autoLoad
       const missingFilterSelections = newConfig.dashboard.sharedFilters.some(f => !f.active)
+      const apiEndpoints = newSharedFilters.filter(f => f.apiFilter).map(f => f.apiFilter.apiEndpoint)
+      const loadingFilterMemo = apiFilterHelpers.getLoadingFilterMemo(
+        apiEndpoints,
+        apiFilterDropdowns,
+        changedFilterIndexes
+      )
       if (isAutoSelectFilter && !missingFilterSelections) {
         // a dropdown has been selected that doesn't
         // require the Go Button
-        loadAPIFilters(newSharedFilters).then(filters => {
+        setAPIFilterDropdowns(loadingFilterMemo)
+        loadAPIFilters(newSharedFilters, loadingFilterMemo).then(filters => {
           reloadURLData(filters)
         })
       } else {
@@ -98,7 +123,8 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({ apiFilterDro
         // setData to empty object because we no longer have a data state.
         dispatch({ type: 'SET_DATA', payload: {} })
         dispatch({ type: 'SET_FILTERED_DATA', payload: {} })
-        loadAPIFilters(newSharedFilters)
+        setAPIFilterDropdowns(loadingFilterMemo)
+        loadAPIFilters(newSharedFilters, loadingFilterMemo)
       }
     } else {
       if (newSharedFilters[index].apiFilter) {
@@ -121,20 +147,43 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({ apiFilterDro
     })
   }
 
+  // if all of the filters are hidden filters don't display the VisualizationWrapper
+  const filters = visualizationConfig?.sharedFilterIndexes
+    ?.map(Number)
+    .map(filterIndex => dashboardConfig.dashboard.sharedFilters[filterIndex])
+
+  const displayNone = filters.length ? filters.every(filter => filter.showDropdown === false) : false
+  if (displayNone && !isEditor) return <></>
   return (
     <Layout.VisualizationWrapper config={visualizationConfig} isEditor={isEditor} currentViewport={currentViewport}>
       {isEditor && (
-        <Layout.Sidebar displayPanel={displayPanel} isDashboard={true} title={'Configure Dashboard Filters'} onBackClick={onBackClick}>
+        <Layout.Sidebar
+          displayPanel={displayPanel}
+          isDashboard={true}
+          title={'Configure Dashboard Filters'}
+          onBackClick={onBackClick}
+        >
           <DashboardFiltersEditor updateConfig={updateConfig} vizConfig={visualizationConfig} />
         </Layout.Sidebar>
       )}
 
-      <Layout.Responsive isEditor={isEditor}>
-        <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''} cove-component__content col-12`}>
-          <Filters show={visualizationConfig?.sharedFilterIndexes?.map(Number)} filters={dashboardConfig.dashboard.sharedFilters || []} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} />
-          {visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad && <button onClick={applyFilters}>GO!</button>}
-        </div>
-      </Layout.Responsive>
+      {!displayNone && (
+        <Layout.Responsive isEditor={isEditor}>
+          <div
+            className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''} cove-component__content col-12`}
+          >
+            <Filters
+              show={visualizationConfig?.sharedFilterIndexes?.map(Number)}
+              filters={dashboardConfig.dashboard.sharedFilters || []}
+              apiFilterDropdowns={apiFilterDropdowns}
+              handleOnChange={handleOnChange}
+            />
+            {visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad && (
+              <button onClick={applyFilters}>GO!</button>
+            )}
+          </div>
+        </Layout.Responsive>
+      )}
     </Layout.VisualizationWrapper>
   )
 }
