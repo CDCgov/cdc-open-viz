@@ -5,18 +5,19 @@ import type { SharedFilter } from '../../types/SharedFilter'
 
 describe('getLoadingFilterMemo', () => {
   it('should return correct APIFilterDropdowns for valid inputs', () => {
-    const sharedAPIFilters: SharedFilter[] = [{ apiFilter: { apiEndpoint: 'endpoint1' } }, { apiFilter: { apiEndpoint: 'endpoint2' } }]
+    const sharedAPIFilters = ['endpoint1', 'endpoint2']
     const apiFilterDropdowns: APIFilterDropdowns = {
       endpoint1: { text: 'text1', value: 'value1' }
     }
     const expectedOutput: APIFilterDropdowns = {
+      endpoint1: { text: 'text1', value: 'value1' },
       endpoint2: null
     }
     expect(getLoadingFilterMemo(sharedAPIFilters, apiFilterDropdowns)).toEqual(expectedOutput)
   })
 
   it('should return an empty object for empty sharedAPIFilters', () => {
-    const sharedAPIFilters: SharedFilter[] = []
+    const sharedAPIFilters: string[] = []
     const apiFilterDropdowns: APIFilterDropdowns = {
       endpoint1: { text: 'text1', value: 'value1' }
     }
@@ -25,7 +26,7 @@ describe('getLoadingFilterMemo', () => {
   })
 
   it('should return APIFilterDropdowns with null values for empty apiFilterDropdowns', () => {
-    const sharedAPIFilters: SharedFilter[] = [{ apiFilter: { apiEndpoint: 'endpoint1' } }, { apiFilter: { apiEndpoint: 'endpoint2' } }]
+    const sharedAPIFilters = ['endpoint1', 'endpoint2']
     const apiFilterDropdowns: APIFilterDropdowns = {}
     const expectedOutput: APIFilterDropdowns = {
       endpoint1: null,
@@ -34,13 +35,13 @@ describe('getLoadingFilterMemo', () => {
     expect(getLoadingFilterMemo(sharedAPIFilters, apiFilterDropdowns)).toEqual(expectedOutput)
   })
 
-  it('should not overwrite existing data in apiFilterDropdowns, so return empty object', () => {
-    const sharedAPIFilters: SharedFilter[] = [{ apiFilter: { apiEndpoint: 'endpoint1' } }, { apiFilter: { apiEndpoint: 'endpoint2' } }]
+  it('should not overwrite existing data in apiFilterDropdowns, so return original dropdowns', () => {
+    const sharedAPIFilters = ['endpoint1', 'endpoint2']
     const apiFilterDropdowns: APIFilterDropdowns = {
       endpoint1: { text: 'text1', value: 'value1' },
       endpoint2: { text: 'text2', value: 'value2' }
     }
-    expect(getLoadingFilterMemo(sharedAPIFilters, apiFilterDropdowns)).toEqual({})
+    expect(getLoadingFilterMemo(sharedAPIFilters, apiFilterDropdowns)).toEqual(apiFilterDropdowns)
   })
 })
 

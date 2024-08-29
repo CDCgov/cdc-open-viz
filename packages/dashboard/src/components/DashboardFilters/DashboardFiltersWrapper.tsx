@@ -11,12 +11,14 @@ import Layout from '@cdc/core/components/Layout'
 import DashboardFiltersEditor from './DashboardFiltersEditor'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import { hasDashboardApplyBehavior } from '../../helpers/hasDashboardApplyBehavior'
+import * as apiFilterHelpers from '../../helpers/apiFilterHelpers'
 
 export type DropdownOptions = Record<'value' | 'text', string>[]
 
+/** the cached dropdown options for each filter */
 export type APIFilterDropdowns = {
   // null means still loading
-  [filtername: string]: null | DropdownOptions
+  [dropdownsKey: string]: null | DropdownOptions
 }
 
 type DashboardFiltersProps = {
@@ -35,7 +37,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   isEditor = false
 }) => {
   const state = useContext(DashboardContext)
-  const { config: dashboardConfig, reloadURLData, loadAPIFilters } = state
+  const { config: dashboardConfig, reloadURLData, loadAPIFilters, setAPIFilterDropdowns } = state
   const dispatch = useContext(DashboardDispatchContext)
 
   const applyFilters = () => {
@@ -79,7 +81,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
 
       dispatch({ type: 'SET_SHARED_FILTERS', payload: dashboardConfig.sharedFilters })
       dispatch({ type: 'SET_FILTERED_DATA', payload: getFilteredData(_.cloneDeep(state)) })
-      loadAPIFilters(dashboardConfig.sharedFilters)
+      loadAPIFilters(dashboardConfig.sharedFilters, apiFilterDropdowns)
         .then(newFilters => {
           reloadURLData(newFilters)
         })
@@ -93,15 +95,27 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
 
   const handleOnChange = (index: number, value: string | string[]) => {
     const newConfig = _.cloneDeep(dashboardConfig)
-    let newSharedFilters = changeFilterActive(index, value, newConfig.dashboard.sharedFilters, visualizationConfig)
+    let [newSharedFilters, changedFilterIndexes] = changeFilterActive(
+      index,
+      value,
+      newConfig.dashboard.sharedFilters,
+      visualizationConfig
+    )
 
     if (hasDashboardApplyBehavior(dashboardConfig.visualizations)) {
       const isAutoSelectFilter = visualizationConfig.autoLoad
       const missingFilterSelections = newConfig.dashboard.sharedFilters.some(f => !f.active)
+      const apiEndpoints = newSharedFilters.filter(f => f.apiFilter).map(f => f.apiFilter.apiEndpoint)
+      const loadingFilterMemo = apiFilterHelpers.getLoadingFilterMemo(
+        apiEndpoints,
+        apiFilterDropdowns,
+        changedFilterIndexes
+      )
       if (isAutoSelectFilter && !missingFilterSelections) {
         // a dropdown has been selected that doesn't
         // require the Go Button
-        loadAPIFilters(newSharedFilters).then(filters => {
+        setAPIFilterDropdowns(loadingFilterMemo)
+        loadAPIFilters(newSharedFilters, loadingFilterMemo).then(filters => {
           reloadURLData(filters)
         })
       } else {
@@ -109,7 +123,8 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         // setData to empty object because we no longer have a data state.
         dispatch({ type: 'SET_DATA', payload: {} })
         dispatch({ type: 'SET_FILTERED_DATA', payload: {} })
-        loadAPIFilters(newSharedFilters)
+        setAPIFilterDropdowns(loadingFilterMemo)
+        loadAPIFilters(newSharedFilters, loadingFilterMemo)
       }
     } else {
       if (newSharedFilters[index].apiFilter) {
