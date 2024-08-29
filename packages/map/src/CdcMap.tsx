@@ -1287,9 +1287,9 @@ const CdcMap = ({
     }
 
     // If world-geocode map zoom to geo point
-    if ('world-geocode' === state.general.type) {
-      let lat = value[state.columns.latitude.name]
-      let long = value[state.columns.longitude.name]
+    if (['world-geocode'].includes(state.general.type)) {
+      const lat = value[state.columns.latitude.name]
+      const long = value[state.columns.longitude.name]
 
       setState({
         ...state,
