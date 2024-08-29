@@ -3699,7 +3699,7 @@ const EditorPanel = () => {
                           />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>"Selecting this option will hide the suppression definition link" from display."</p>
+                          <p>Selecting this option will hide the suppression definition link from display.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
