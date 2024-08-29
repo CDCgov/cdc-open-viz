@@ -333,7 +333,10 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
                 </Tooltip.Content>
               </Tooltip>
             }
-            options={[...usedByOptions, ...filter.usedBy].map(opt => ({ value: opt, label: usedByNameLookup[opt] }))}
+            options={[...usedByOptions, ...(filter.usedBy || [])].map(opt => ({
+              value: opt,
+              label: usedByNameLookup[opt]
+            }))}
             fieldName='usedBy'
             selected={filter.usedBy}
             updateField={(_section, _subsection, _fieldname, newItems) => {

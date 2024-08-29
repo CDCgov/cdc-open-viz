@@ -11,7 +11,12 @@ type ConfigCTX = DashboardState & {
   setParentConfig: any
   isDebug: boolean
   reloadURLData: (newFilters?: SharedFilter[]) => void
-  loadAPIFilters: (sharedFilters: SharedFilter[], dropdowns?: APIFilterDropdowns, recursiveLimit?: number) => Promise<SharedFilter[]>
+  loadAPIFilters: (
+    sharedFilters: SharedFilter[],
+    dropdowns: APIFilterDropdowns,
+    recursiveLimit?: number
+  ) => Promise<SharedFilter[]>
+  setAPIFilterDropdowns: (dropdowns: APIFilterDropdowns) => void
 }
 
 const firstTab: Tab = 'Dashboard Description'
@@ -27,6 +32,7 @@ export const initialState = {
 const initialContext: ConfigCTX = {
   outerContainerRef: () => {},
   setParentConfig: () => {},
+  setAPIFilterDropdowns: () => {},
   reloadURLData: () => {},
   loadAPIFilters: () => Promise.resolve([]),
   isDebug: false,
