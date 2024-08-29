@@ -1311,7 +1311,7 @@ export default function CdcChart({
                     className={
                       legend.hide || ['xxs', 'xs', 'sm'].includes(currentViewport)
                         ? 'w-100'
-                        : legend.position === 'bottom' || legend.position === 'top'
+                        : legend.position === 'bottom' || legend.position === 'top' || visualizationType === 'Sankey'
                         ? 'w-100'
                         : 'w-75'
                     }
