@@ -7,6 +7,9 @@ import * as d3 from 'd3-array'
 import Layout from '@cdc/core/components/Layout'
 import Button from '@cdc/core/components/elements/Button'
 
+//types
+import { DimensionsType } from '@cdc/core/types/Dimensions'
+
 // External Libraries
 import { scaleOrdinal } from '@visx/scale'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
@@ -92,7 +95,7 @@ export default function CdcChart({
     configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : []
   )
   const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
-  const [dimensions, setDimensions] = useState<[number?, number?]>([])
+  const [dimensions, setDimensions] = useState<DimensionsType>([0, 0])
   const [externalFilters, setExternalFilters] = useState<any[]>()
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
@@ -344,17 +347,20 @@ export default function CdcChart({
     let currentData: any[] = []
     if (newConfig.filters) {
       newConfig.filters.forEach((filter, index) => {
-        let filterValues = []
-
-        filterValues =
-          filter.orderedValues ||
-          generateValuesForFilter(filter.columnName, newExcludedData).sort(filter.order === 'desc' ? sortDesc : sortAsc)
+        const filterValues =
+          filter.filterStyle === 'nested-dropdown'
+            ? filter.values
+            : filter.orderedValues ||
+              generateValuesForFilter(filter.columnName, newExcludedData).sort(
+                filter.order === 'desc' ? sortDesc : sortAsc
+              )
 
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
 
+        const includes = (arr: any[], val: any): boolean => arr.map(val => String(val)).includes(String(val))
         newConfig.filters[index].active =
-          !newConfig.filters[index].active || filterValues.indexOf(newConfig.filters[index].active) === -1
+          !newConfig.filters[index].active || !includes(filterValues, newConfig.filters[index].active)
             ? filterValues[0]
             : newConfig.filters[index].active
         newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle
@@ -388,6 +394,8 @@ export default function CdcChart({
           ) {
             newConfig.runtime.series.push({
               dataKey: seriesKey,
+              type: newConfig.dynamicSeriesType,
+              lineType: newConfig.dynamicSeriesLineType,
               tooltip: true
             })
           }

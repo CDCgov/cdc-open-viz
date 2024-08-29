@@ -137,7 +137,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
     ?.map(Number)
     .map(filterIndex => dashboardConfig.dashboard.sharedFilters[filterIndex])
 
-  const displayNone = filters.length ? filters.every(filter => !filter.showDropdown) : false
+  const displayNone = filters.length ? filters.every(filter => filter.showDropdown === false) : false
   if (displayNone && !isEditor) return <></>
   return (
     <Layout.VisualizationWrapper config={visualizationConfig} isEditor={isEditor} currentViewport={currentViewport}>

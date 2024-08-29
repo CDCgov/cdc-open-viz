@@ -3,14 +3,14 @@
     "theme": "theme-blue",
     "filters": [
       {
-        "values": [
-          "Alaska",
-          "Alabama",
-          "Arkansas",
+        "orderedValues": [
           "American Samoa",
+          "Alabama",
+          "Alaska",
+          "Arkansas",
           "Arizona"
         ],
-        "active": "Alaska",
+        "active": "American Samoa",
         "columnName": "Location"
       },
       {
@@ -273,55 +273,55 @@
   },
   "data": [
     {
-      "Location": "Alaska",
+      "Location": "Foobar",
       "Year": "2019",
       "Type": "Federal",
       "Amount": "1377"
     },
     {
-      "Location": "Alaska",
+      "Location": "Foobar",
       "Year": "2019",
       "Type": "Local",
       "Amount": "1613"
     },
     {
-      "Location": "Alaska",
+      "Location": "Foobar",
       "Year": "2019",
       "Type": "State",
       "Amount": "1495"
     },
     {
-      "Location": "Alaska",
+      "Location": "Foobar",
       "Year": "2020",
       "Type": "Federal",
       "Amount": "1377"
     },
     {
-      "Location": "Alaska",
+      "Location": "Foobar",
       "Year": "2020",
       "Type": "Local",
       "Amount": "1613"
     },
     {
-      "Location": "Alaska",
+      "Location": "Foobar",
       "Year": "2020",
       "Type": "State",
       "Amount": "1495"
     },
     {
-      "Location": "Alaska",
+      "Location": "Foobar",
       "Year": "2021",
       "Type": "Federal",
       "Amount": "1436"
     },
     {
-      "Location": "Alaska",
+      "Location": "Foobar",
       "Year": "2021",
       "Type": "Local",
       "Amount": "1672"
     },
     {
-      "Location": "Alaska",
+      "Location": "Foobar",
       "Year": "2021",
       "Type": "State",
       "Amount": "1554"

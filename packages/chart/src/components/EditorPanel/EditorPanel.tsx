@@ -21,6 +21,7 @@ import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import { viewports } from '@cdc/core/helpers/getViewport'
+import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
 // chart components
 import Panels from './components/Panels'
@@ -1434,6 +1435,26 @@ const EditorPanel = () => {
                         fieldName='dynamicSeries'
                         label='Dynamically generate series'
                         updateField={updateField}
+                      />
+                    )}
+                    {config.dynamicSeries && config.visualizationType === 'Line' && (
+                      <Select
+                        fieldName='dynamicSeriesType'
+                        value={config.dynamicSeriesType}
+                        label='Series Type'
+                        initial='Select'
+                        updateField={updateField}
+                        options={['Line','dashed-sm', 'dashed-md', 'dashed-lg']}
+                      />
+                    )}
+                    {config.dynamicSeries && config.visualizationType === 'Line' && config.dynamicSeriesType === 'Line' && (
+                      <Select
+                        fieldName='dynamicSeriesLineType'
+                        value={config.dynamicSeriesLineType ? config.dynamicSeriesLineType : 'curveLinear'}
+                        label='Line Type'
+                        initial='Select'
+                        updateField={updateField}
+                        options={Object.keys(approvedCurveTypes).map(curveName => approvedCurveTypes[curveName])}
                       />
                     )}
                     {(!visSupportsDynamicSeries() || !config.dynamicSeries) && (

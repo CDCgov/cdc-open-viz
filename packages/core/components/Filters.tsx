@@ -6,13 +6,16 @@ import Button from './elements/Button'
 import { getQueryParams, updateQueryString } from '../helpers/queryStringUtils'
 import MultiSelect from './MultiSelect'
 import { Visualization } from '../types/Visualization'
-import { MultiSelectFilter, VizFilter } from '../types/VizFilter'
+import { MultiSelectFilter, OrderBy, VizFilter } from '../types/VizFilter'
 import { filterVizData } from '../helpers/filterVizData'
 import { addValuesToFilters } from '../helpers/addValuesToFilters'
+import { DimensionsType } from '../types/Dimensions'
+import NestedDropdown from './NestedDropdown'
+import _ from 'lodash'
 
-export const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar', 'multi-select']
+export const filterStyleOptions = ['dropdown', 'nested-dropdown', 'pill', 'tab', 'tab bar', 'multi-select']
 
-export const filterOrderOptions = [
+export const filterOrderOptions: { label: string; value: OrderBy }[] = [
   {
     label: 'Ascending Alphanumeric',
     value: 'asc'
@@ -28,11 +31,18 @@ export const filterOrderOptions = [
 ]
 
 export const handleSorting = singleFilter => {
+  const singleFilterValues = _.cloneDeep(singleFilter.values)
+  if (singleFilter.order === 'cust') {
+    return singleFilter
+  }
+
   const sort = (a, b) => {
     const asc = singleFilter.order !== 'desc'
     return (asc ? a : b).toString().localeCompare((asc ? b : a).toString(), 'en', { numeric: true })
   }
-  singleFilter.values = singleFilter.values.sort(sort)
+
+  singleFilter.values = singleFilterValues.sort(sort)
+
   return singleFilter
 }
 
@@ -64,7 +74,9 @@ export const useFilters = props => {
     const [movedItem] = updatedValues.splice(idx1, 1)
     updatedValues.splice(idx2, 0, movedItem)
 
-    const filtersCopy = hasStandardFilterBehavior.includes(visualizationConfig.type) ? [...visualizationConfig.filters] : [...filteredData]
+    const filtersCopy = hasStandardFilterBehavior.includes(visualizationConfig.type)
+      ? [...visualizationConfig.filters]
+      : [...filteredData]
     const filterItem = { ...filtersCopy[filterIndex] }
 
     // Overwrite filterItem.values since thats what we map through in the editor panel
@@ -91,7 +103,12 @@ export const useFilters = props => {
       setShowApplyButton(true)
     } else {
       const newFilter = newFilters[index]
-      newFilter.active = value
+      if (newFilter.filterStyle !== 'nested-dropdown') {
+        newFilter.active = value
+      } else {
+        newFilter.active = value[0]
+        newFilter.subGrouping.active = value[1]
+      }
 
       const queryParams = getQueryParams()
       if (newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active) {
@@ -114,7 +131,10 @@ export const useFilters = props => {
     }
 
     // If we're on a chart and not using the apply button
-    if (hasStandardFilterBehavior.includes(visualizationConfig.type) && visualizationConfig.filterBehavior === 'Filter Change') {
+    if (
+      hasStandardFilterBehavior.includes(visualizationConfig.type) &&
+      visualizationConfig.filterBehavior === 'Filter Change'
+    ) {
       const newFilteredData = filterVizData(newFilters, excludedData)
       setFilteredData(newFilteredData)
 
@@ -129,11 +149,14 @@ export const useFilters = props => {
             if (
               seriesKey !== visualizationConfig.xAxis.dataKey &&
               newFilteredData[0][seriesKey] &&
-              (!visualizationConfig.filters || visualizationConfig.filters?.filter(filter => filter.columnName === seriesKey).length === 0) &&
+              (!visualizationConfig.filters ||
+                visualizationConfig.filters?.filter(filter => filter.columnName === seriesKey).length === 0) &&
               (!visualizationConfig.columns || Object.keys(visualizationConfig.columns).indexOf(seriesKey) === -1)
             ) {
               runtime.series.push({
                 dataKey: seriesKey,
+                type: visualizationConfig.dynamicSeriesType,
+                lineType: visualizationConfig.dynamicSeriesLineType,
                 tooltip: true
               })
             }
@@ -242,7 +265,7 @@ export const useFilters = props => {
 
 type FilterProps = {
   filteredData: Object[]
-  dimensions: any[]
+  dimensions: DimensionsType
   config: Visualization
   // function for updating the runtime filters
   setFilteredData: Function
@@ -272,7 +295,7 @@ const Filters = (props: FilterProps) => {
 
   useEffect(() => {
     if (!dimensions) return
-    if (dimensions[0] < 768 && filters?.length > 0) {
+    if (Number(dimensions[0]) < 768 && filters?.length > 0) {
       setMobileFilterStyle(true)
     } else {
       setMobileFilterStyle(false)
@@ -384,7 +407,9 @@ const Filters = (props: FilterProps) => {
 
         DropdownOptions.push(
           <option key={index} value={filterOption} aria-label={filterOption}>
-            {singleFilter.labels && singleFilter.labels[filterOption] ? singleFilter.labels[filterOption] : filterOption}
+            {singleFilter.labels && singleFilter.labels[filterOption]
+              ? singleFilter.labels[filterOption]
+              : filterOption}
           </option>
         )
 
@@ -408,8 +433,12 @@ const Filters = (props: FilterProps) => {
         )
       })
 
-      const classList = ['single-filters', mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`]
-
+      const classList = [
+        'single-filters',
+        mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`
+      ]
+      const mobileExempt = ['nested-dropdown', 'multi-select'].includes(filterStyle)
+      const showDefaultDropdown = (filterStyle === 'dropdown' || mobileFilterStyle) && !mobileExempt
       return (
         <div className={classList.join(' ')} key={outerIndex}>
           <>
@@ -417,7 +446,6 @@ const Filters = (props: FilterProps) => {
             {filterStyle === 'tab' && !mobileFilterStyle && Tabs}
             {filterStyle === 'pill' && !mobileFilterStyle && Pills}
             {filterStyle === 'tab bar' && !mobileFilterStyle && <TabBar filter={singleFilter} index={outerIndex} />}
-            {(filterStyle === 'dropdown' || mobileFilterStyle) && <Dropdown filter={singleFilter} index={outerIndex} label={label} active={queuedActive || active} filters={DropdownOptions} />}
             {filterStyle === 'multi-select' && (
               <MultiSelect
                 options={singleFilter.values.map(v => ({ value: v, label: v }))}
@@ -427,6 +455,22 @@ const Filters = (props: FilterProps) => {
                 limit={(singleFilter as MultiSelectFilter).selectLimit || 5}
               />
             )}
+            {filterStyle === 'nested-dropdown' && (
+              <NestedDropdown
+                currentFilter={singleFilter}
+                listLabel={label}
+                handleSelectedItems={value => changeFilterActive(outerIndex, value)}
+              />
+            )}
+            {showDefaultDropdown && (
+              <Dropdown
+                filter={singleFilter}
+                index={outerIndex}
+                label={label}
+                active={queuedActive || active}
+                filters={DropdownOptions}
+              />
+            )}
           </>
         </div>
       )
@@ -434,11 +478,15 @@ const Filters = (props: FilterProps) => {
   }
 
   if (visualizationConfig?.filters?.length === 0) return
-  const filterSectionClassList = ['filters-section', type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme]
+  const filterSectionClassList = [
+    'filters-section',
+    type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme
+  ]
   return (
     <section className={filterSectionClassList.join(' ')}>
       <p className='filters-section__intro-text'>
-        {filters?.some(f => f.active && f.showDropdown) ? filterConstants.introText : ''} {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
+        {filters?.some(f => f.active && f.showDropdown) ? filterConstants.introText : ''}{' '}
+        {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
       </p>
       <div className='filters-section__wrapper'>
         {' '}
@@ -446,7 +494,11 @@ const Filters = (props: FilterProps) => {
           <Style />
           {filterBehavior === 'Apply Button' ? (
             <div className='filters-section__buttons'>
-              <Button onClick={() => handleApplyButton(filters)} disabled={!showApplyButton} className={[general?.headerColor ? general.headerColor : theme, 'apply'].join(' ')}>
+              <Button
+                onClick={() => handleApplyButton(filters)}
+                disabled={!showApplyButton}
+                className={[general?.headerColor ? general.headerColor : theme, 'apply'].join(' ')}
+              >
                 {filterConstants.buttonText}
               </Button>
               <a href='#!' role='button' onClick={handleReset}>

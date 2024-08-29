@@ -14,6 +14,7 @@ import { ColorScale } from '../../types/ChartContext'
 import { forwardRef } from 'react'
 import LegendSuppression from './Legend.Suppression'
 import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
+import { DimensionsType } from '@cdc/core/types/Dimensions'
 
 export interface LegendProps {
   colorScale: ColorScale
@@ -25,7 +26,7 @@ export interface LegendProps {
   ref: React.Ref<() => void>
   seriesHighlight: string[]
   skipId: string
-  dimensions: [string, string] // for responsive width legend
+  dimensions: DimensionsType // for responsive width legend
   getTextWidth: (text: string, font: string) => string
 }
 
