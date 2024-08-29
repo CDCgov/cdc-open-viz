@@ -1444,19 +1444,21 @@ const EditorPanel = () => {
                         label='Series Type'
                         initial='Select'
                         updateField={updateField}
-                        options={['Line','dashed-sm', 'dashed-md', 'dashed-lg']}
+                        options={['Line', 'dashed-sm', 'dashed-md', 'dashed-lg']}
                       />
                     )}
-                    {config.dynamicSeries && config.visualizationType === 'Line' && config.dynamicSeriesType === 'Line' && (
-                      <Select
-                        fieldName='dynamicSeriesLineType'
-                        value={config.dynamicSeriesLineType ? config.dynamicSeriesLineType : 'curveLinear'}
-                        label='Line Type'
-                        initial='Select'
-                        updateField={updateField}
-                        options={Object.keys(approvedCurveTypes).map(curveName => approvedCurveTypes[curveName])}
-                      />
-                    )}
+                    {config.dynamicSeries &&
+                      config.visualizationType === 'Line' &&
+                      config.dynamicSeriesType === 'Line' && (
+                        <Select
+                          fieldName='dynamicSeriesLineType'
+                          value={config.dynamicSeriesLineType ? config.dynamicSeriesLineType : 'curveLinear'}
+                          label='Line Type'
+                          initial='Select'
+                          updateField={updateField}
+                          options={Object.keys(approvedCurveTypes).map(curveName => approvedCurveTypes[curveName])}
+                        />
+                      )}
                     {(!visSupportsDynamicSeries() || !config.dynamicSeries) && (
                       <>
                         {(!config.series || config.series.length === 0) &&
@@ -3697,7 +3699,7 @@ const EditorPanel = () => {
                           />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>Selecting this option will provide the definition of suppressed data below the legend.</p>
+                          <p>Selecting this option will hide the suppression definition link from display.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }

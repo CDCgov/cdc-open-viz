@@ -10,12 +10,18 @@ interface LegendProps {
 const LegendSuppression: React.FC<LegendProps> = ({ config, isBottomOrSmallViewport }) => {
   const { preliminaryData, visualizationType, visualizationSubType, legend } = config
 
-  const hasOpenCircleEffects = () => preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style === 'Open Circles') && ['Line', 'Combo'].includes(visualizationType)
+  const hasOpenCircleEffects = () =>
+    preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style === 'Open Circles') &&
+    ['Line', 'Combo'].includes(visualizationType)
 
   const shouldShowSuppressedLabels = () =>
     !legend.hideSuppressedLabels &&
-    preliminaryData?.some(pd => pd.label && pd.displayLegend && pd.type === 'suppression' && pd.value && (pd?.style || pd.symbol)) &&
-    ((visualizationType === 'Bar' && visualizationSubType === 'regular') || visualizationType === 'Line' || visualizationType === 'Combo')
+    preliminaryData?.some(
+      pd => pd.label && pd.displayLegend && pd.type === 'suppression' && pd.value && (pd?.style || pd.symbol)
+    ) &&
+    ((visualizationType === 'Bar' && visualizationSubType === 'regular') ||
+      visualizationType === 'Line' ||
+      visualizationType === 'Combo')
 
   const renderEffectItems = () =>
     preliminaryData?.map(
@@ -38,7 +44,7 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isBottomOrSmallViewp
     const getStyle = displayGray => {
       if (displayGray) {
         return {
-          color: '#8b8b8a'
+          color: '#777772'
         }
       }
       return null
@@ -91,7 +97,8 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isBottomOrSmallViewp
     })
   }
 
-  const getLegendContainerClass = () => (legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : '')
+  const getLegendContainerClass = () =>
+    legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''
 
   return (
     <React.Fragment>
@@ -108,22 +115,24 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isBottomOrSmallViewp
           <div className={getLegendContainerClass()}>{renderSuppressedItems()}</div>
         </React.Fragment>
       )}
-      {!config.legend.hideSuppressionLink && config.visualizationSubType !== 'stacked' && preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value && (pd?.style || pd.symbol)) && (
-        <div className='legend-container__outer definition-link'>
-          <Icon alt='info-icon' display='info' />
-          <p>
-            This chart contains
-            <a // prettier-ignore
-              onClick={handleLinkClick}
-              data-tooltip-content='Data is suppressed to maintain statistical reliability. This occurs when the number of respondents or reported values does not meet the minimum reporting threshold.'
-              data-tooltip-id='my-tooltip'
-              href='no-router-link'
-            >
-              suppressed data
-            </a>
-          </p>
-        </div>
-      )}
+      {!config.legend.hideSuppressionLink &&
+        config.visualizationSubType !== 'stacked' &&
+        preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value && (pd?.style || pd.symbol)) && (
+          <div className='legend-container__outer definition-link'>
+            <Icon alt='info-icon' display='info' />
+            <p>
+              This chart contains
+              <a // prettier-ignore
+                onClick={handleLinkClick}
+                data-tooltip-content='Data is suppressed to maintain statistical reliability. This occurs when the number of respondents or reported values does not meet the minimum reporting threshold.'
+                data-tooltip-id='my-tooltip'
+                href='no-router-link'
+              >
+                suppressed data
+              </a>
+            </p>
+          </div>
+        )}
 
       <ReactTooltip // prettier-ignore
         id='my-tooltip'
