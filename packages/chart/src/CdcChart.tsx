@@ -1321,22 +1321,18 @@ export default function CdcChart({
                       <section className='introText'>{parse(config.introText)}</section>
                     )}
 
-                    {/* All charts except line and sparkline */}
-                    {config.visualizationType !== 'Spark Line' &&
-                      config.visualizationType !== 'Line' &&
-                      config.visualizationType !== 'Pie' && (
-                        <ParentSize>
-                          {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
-                        </ParentSize>
-                      )}
+                    {/* All charts with LinearChart */}
+                    {!['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
+                      <ParentSize>
+                        {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                      </ParentSize>
+                    )}
 
-                    {/* Pie Chart */}
                     {config.visualizationType === 'Pie' && (
                       <ParentSize className='justify-content-center d-flex'>
                         {parent => <PieChart parentWidth={parent.width} parentHeight={parent.height} />}
                       </ParentSize>
                     )}
-
                     {/* Line Chart */}
                     {config.visualizationType === 'Line' &&
                       (checkLineToBarGraph() ? (
@@ -1348,7 +1344,6 @@ export default function CdcChart({
                           {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
                         </ParentSize>
                       ))}
-
                     {/* Sparkline */}
                     {config.visualizationType === 'Spark Line' && (
                       <>
