@@ -49,12 +49,6 @@ export const useTooltip = props => {
     let formattedValue = seriesKey === config.xAxis.dataKey ? value : formatNumber(value, getAxisPosition(seriesKey))
     formattedValue = showMissingDataValue ? 'N/A' : formattedValue
 
-    const suppressed = config.preliminaryData?.find(pd => pd.label && pd.type === 'suppression' && pd.displayTooltip && value === pd.value && (!pd.column || seriesKey === pd.column))
-
-    if (suppressed) {
-      formattedValue = suppressed.label
-    }
-
     return formattedValue
   }
 
@@ -475,18 +469,29 @@ export const useTooltip = props => {
     const [key, value, axisPosition] = additionalData
 
     if (visualizationType === 'Forest Plot') {
-      if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value}`}</li>
+      if (key === config.xAxis.dataKey)
+        return <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value}`}</li>
       return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
     }
     const formattedDate = config.tooltips.dateDisplayFormat ? formatTooltipsDate(parseDate(value, false)) : formatDate(parseDate(value, false))
 
     // TOOLTIP HEADING
-    if (visualizationType === 'Bar' && orientation === 'horizontal' && key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formattedDate : value}`}</li>
+    if (visualizationType === 'Bar' && orientation === 'horizontal' && key === config.xAxis.dataKey)
+      return <li className='tooltip-heading'>{`${capitalize(config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formattedDate : value}`}</li>
 
     if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${isDateScale(xAxis) ? formattedDate : value}`}</li>
 
     // TOOLTIP BODY
-    return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${value}`}</li>
+    // handle suppressed tooltip items
+    const { label, displayGray } =
+      (config.visualizationSubType !== 'stacked' &&
+        config.general.showSuppressedSymbol &&
+        config.preliminaryData?.find(pd => pd.label && pd.type === 'suppression' && pd.displayTooltip && value === pd.value && (!pd.column || key === pd.column))) ||
+      {}
+    const newValue = label || value
+    const style = displayGray ? { color: '#8b8b8a' } : {}
+
+    return <li style={style} className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${newValue}`}</li>
   }
 
   return {

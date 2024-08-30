@@ -5,6 +5,7 @@ import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { getGradientLegendWidth } from '@cdc/core/helpers/getGradientLegendWidth'
 import { scaleLinear } from '@visx/scale'
 import { AxisBottom } from '@visx/axis'
+import { type DimensionsType } from '../../types/Dimensions'
 
 type CombinedConfig = MapConfig | ChartConfig
 
@@ -12,7 +13,7 @@ interface GradientProps {
   labels: string[]
   colors: string[]
   config: CombinedConfig
-  dimensions: [string, string]
+  dimensions: DimensionsType
   currentViewport: ViewportSize
   getTextWidth: (text: string, font: string) => string
   values?: (number | string)[][]

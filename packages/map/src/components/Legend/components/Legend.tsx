@@ -2,6 +2,9 @@
 import { forwardRef, useContext } from 'react'
 import parse from 'html-react-parser'
 
+//types
+import { DimensionsType } from '@cdc/core/types/Dimensions'
+
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendShape from '@cdc/core/components/LegendShape'
 import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
@@ -19,12 +22,11 @@ import './index.scss'
 type LegendProps = {
   skipId: string
   currentViewport: ViewportSize
-  dimensions: any
+  dimensions: DimensionsType
 }
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const { skipId, currentViewport, dimensions } = props
-  let [mapWidth] = dimensions
 
   const {
     // prettier-ignore

@@ -10,12 +10,31 @@ import { General } from '@cdc/core/types/General'
 import { type Link } from './../components/Sankey/types'
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
-import { type PreliminaryDataItem } from '../components/LineChart/LineChartProps'
+
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 
 export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 export type ChartColumns = Record<string, Column>
+
+export interface PreliminaryDataItem {
+  column: string
+  displayLegend: boolean
+  displayTable: boolean
+  displayTooltip: boolean
+  iconCode: string
+  label: string
+  lineCode: string
+  seriesKey: string
+  style: string
+  symbol: string
+  type: 'effect' | 'suppression'
+  value: string
+  hideBarSymbol: boolean
+  hideLineStyle: boolean
+  circleSize: number
+  displayGray: boolean
+}
 
 type DataFormat = {
   abbreviated: boolean
@@ -58,6 +77,7 @@ export type Legend = {
   singleRow: boolean
   type: string
   verticalSorted: boolean
+  hideSuppressionLink:boolean
   style:'circles'|'boxes'|'gradient'|'lines'
   subStyle:'linear blocks'|'smooth'
   hideSuppressedLabels:boolean

@@ -2,6 +2,7 @@ import { type ChartConfig } from './ChartConfig'
 import { PickD3Scale } from '@visx/scale'
 import { type SharedFilter } from '@cdc/dashboard/src/types/SharedFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
+import { DimensionsType } from '@cdc/core/types/Dimensions'
 
 export type ColorScale = PickD3Scale<'ordinal', any, any>
 
@@ -37,7 +38,7 @@ type SharedChartContext = {
 // Line Chart Specific Context
 type LineChartContext = SharedChartContext & {
   convertLineToBarGraph: boolean
-  dimensions: [string, string]
+  dimensions: DimensionsType
   formatDate: Function
   formatTooltipsDate: Function
   formatNumber: Function
@@ -59,7 +60,7 @@ export type ChartContext =
   | LineChartContext
   | (SharedChartContext & {
       annotations: Annotation[]
-      dimensions: [string, string]
+      dimensions: DimensionsType
       formatDate?: Function
       formatTooltipsDate: Function
       formatNumber?: Function
