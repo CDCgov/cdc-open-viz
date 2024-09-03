@@ -968,7 +968,12 @@ const EditorPanel = () => {
         }
         break
       case 'subStyle':
-        options.push('linear blocks', 'smooth')
+        if (config.visualizationType === 'Bar') {
+          options.push('linear blocks')
+        } else {
+          options.push('linear blocks', 'smooth')
+        }
+
         break
     }
     return options
