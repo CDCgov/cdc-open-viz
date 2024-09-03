@@ -13,6 +13,7 @@ import ZoomableGroup from '../../ZoomableGroup'
 import ZoomControls from '../../ZoomControls'
 import { MapContext } from '../../../types/MapContext'
 import useStateZoom from '../../../hooks/useStateZoom'
+import { Text } from '@visx/text'
 
 // SVG ITEMS
 const WIDTH = 880
@@ -103,7 +104,7 @@ const SingleStateMap = props => {
   }
   return (
     <ErrorBoundary component='SingleStateMap'>
-      {statePicked && state.general.allowMapZoom && (
+      {statePicked && state.general.allowMapZoom && state.general.statePicked.fipsCode && (
         <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' role='img' aria-label={handleMapAriaLabels(state)}>
           <ZoomableGroup
             center={position.coordinates}
@@ -137,7 +138,7 @@ const SingleStateMap = props => {
           </ZoomableGroup>
         </svg>
       )}
-      {statePicked && !state.general.allowMapZoom && (
+      {statePicked && !state.general.allowMapZoom && state.general.statePicked.fipsCode && (
         <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' role='img' aria-label={handleMapAriaLabels(state)}>
           <rect className='background center-container ocean' width={WIDTH} height={HEIGHT} fillOpacity={1} fill='white'></rect>
           <CustomProjection
@@ -167,7 +168,11 @@ const SingleStateMap = props => {
           {state.annotations.length > 0 && <Annotation.Draggable />}
         </svg>
       )}
-      {!state.general.statePicked && 'No State Picked'}
+      {!state.general.statePicked.fipsCode && (
+        <Text verticalAnchor='start' textAnchor='middle' x={WIDTH / 2} width={WIDTH} height={HEIGHT}>
+          {state.runtime.noStateFoundMessage}
+        </Text>
+      )}
       <ZoomControls
         // prettier-ignore
         handleZoomIn={handleZoomIn}
