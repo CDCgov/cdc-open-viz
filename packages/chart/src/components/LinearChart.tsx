@@ -78,14 +78,19 @@ const LinearChart: React.FC<LinearChartProps> = props => {
     width = width * 0.73
   }
   //  configure height , yMax, xMax
-  const { horizontal: heightHorizontal } = config.heights
+  const { horizontal: heightHorizontal, mobileVertical } = config.heights
   const isHorizontal = orientation === 'horizontal' || config.visualizationType === 'Forest Plot'
   const shouldAbbreviate = true
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   const xLabelOffset = isNaN(parseInt(runtime.xAxis.labelOffset)) ? 0 : parseInt(runtime.xAxis.labelOffset)
   const yLabelOffset = isNaN(parseInt(runtime.yAxis.labelOffset)) ? 0 : parseInt(runtime.yAxis.labelOffset)
   const xAxisSize = isNaN(parseInt(runtime.xAxis.size)) ? 0 : parseInt(runtime.xAxis.size)
-  let height = config.aspectRatio ? width * config.aspectRatio : config.visualizationType === 'Forest Plot' ? config.heights['vertical'] : config.heights[orientation]
+  const isForestPlot = visualizationType === 'Forest Plot'
+  const useVertical = orientation === 'vertical' || isForestPlot
+  const useMobileVertical = mobileVertical && ['xs', 'xxs'].includes(currentViewport)
+  const responsiveVertical = useMobileVertical ? 'mobileVertical' : 'vertical'
+  const renderedOrientation = useVertical ? responsiveVertical : 'horizontal'
+  let height = config.aspectRatio ? width * config.aspectRatio : config.heights[renderedOrientation]
   height = Number(height)
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   let yMax = height - (orientation === 'horizontal' ? 0 : xAxisSize)

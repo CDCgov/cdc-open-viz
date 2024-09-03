@@ -645,15 +645,14 @@ export default function CdcChart({
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
-      let newViewport = getViewport(width)
       let svgMarginWidth = 32
       let editorWidth = 350
 
-      setCurrentViewport(newViewport)
+      width = isEditor ? width - editorWidth : width
 
-      if (isEditor) {
-        width = width - editorWidth
-      }
+      let newViewport = getViewport(width)
+
+      setCurrentViewport(newViewport)
 
       if (entry.target.dataset.lollipop === 'true') {
         width = width - 2.5

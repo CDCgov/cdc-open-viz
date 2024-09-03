@@ -18,7 +18,16 @@ import { PanelProps } from '../PanelProps'
 const PanelGeneral: FC<PanelProps> = props => {
   const { config } = useContext(ConfigContext)
   const { updateField } = useEditorPanelContext()
-  const { enabledChartTypes, visHasNumbersOnBars, visHasaAdditionalLabelsOnBars, visHasLabelOnData, visSupportsChartHeight, visSupportsSuperTitle, visSupportsFootnotes } = useEditorPermissions()
+  const {
+    enabledChartTypes,
+    visHasNumbersOnBars,
+    visHasaAdditionalLabelsOnBars,
+    visHasLabelOnData,
+    visSupportsChartHeight,
+    visSupportsMobileChartHeight,
+    visSupportsSuperTitle,
+    visSupportsFootnotes
+  } = useEditorPermissions()
   const { visualizationType, visualizationSubType, barStyle } = config
 
   const showBarStyleOptions = () => {
@@ -39,24 +48,52 @@ const PanelGeneral: FC<PanelProps> = props => {
       <AccordionItemPanel>
         {config?.visualizationType !== 'Sankey' && <Select value={visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={enabledChartTypes} />}
         {visSupportsChartHeight() && config.orientation === 'vertical' && (
-          <TextField
-            type='number'
-            value={config.heights.vertical}
-            section='heights'
-            fieldName='vertical'
-            label='Chart Height'
-            updateField={updateField}
-            tooltip={
-              <Tooltip style={{ textTransform: 'none' }}>
-                <Tooltip.Target>
-                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                </Tooltip.Target>
-                <Tooltip.Content>
-                  <p>For some visualization types, such as the Sankey diagram, it may be necessary to adjust the chart height for optimal display.</p>
-                </Tooltip.Content>
-              </Tooltip>
-            }
-          />
+          <div className={visSupportsMobileChartHeight() ? 'two-col-inputs' : ''}>
+            <TextField
+              type='number'
+              value={config.heights.vertical}
+              section='heights'
+              fieldName='vertical'
+              label='Chart Height'
+              updateField={updateField}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>˝
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>
+                      For some visualization types, such as the Sankey diagram, it may be necessary to adjust the chart
+                      height for optimal display.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+            {visSupportsMobileChartHeight() && config.orientation === 'vertical' && (
+              <TextField
+                type='number'
+                value={config.heights.mobileVertical}
+                section='heights'
+                fieldName='mobileVertical'
+                label='Mobile Height'
+                updateField={updateField}
+                tooltip={
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p>
+                        If the chart height is not optimized for mobile, you can adjust the height for better display.
+                        Not setting a value will default to the chart height.
+                      </p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                }
+              />
+            )}
+          </div>
         )}
         {(visualizationType === 'Bar' || visualizationType === 'Combo' || visualizationType === 'Area Chart') && (
           <Select value={visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />
