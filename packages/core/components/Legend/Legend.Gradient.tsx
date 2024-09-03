@@ -27,6 +27,7 @@ const LegendGradient = ({
   let [width] = dimensions
 
   const legendWidth = getGradientLegendWidth(width, currentViewport)
+  const uniqueID = `${config.uid}-${Date.now()}`
 
   const numTicks = colors?.length
 
@@ -96,12 +97,12 @@ const LegendGradient = ({
           strokeWidth='0.5'
         />
         {/* Define the gradient */}
-        <linearGradient id={`gradient-smooth-${config.uid || 0}`} x1='0%' y1='0%' x2='100%' y2='0%'>
+        <linearGradient id={`gradient-smooth-${uniqueID}`} x1='0%' y1='0%' x2='100%' y2='0%'>
           {stops}
         </linearGradient>
 
         {config.legend.subStyle === 'smooth' && (
-          <rect x={1} y={1} width={legendWidth} height={boxHeight} fill={`url(#gradient-smooth-${config.uid || 0})`} />
+          <rect x={1} y={1} width={legendWidth} height={boxHeight} fill={`url(#gradient-smooth-${uniqueID})`} />
         )}
 
         {config.legend.subStyle === 'linear blocks' &&
