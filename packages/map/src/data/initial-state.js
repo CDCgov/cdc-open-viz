@@ -91,7 +91,8 @@ export default {
     opacity: 90
   },
   runtime: {
-    editorErrorMessage: []
+    editorErrorMessage: [],
+    noStateFoundMessage: 'No state image found'
   },
   visual: {
     minBubbleSize: 1,
