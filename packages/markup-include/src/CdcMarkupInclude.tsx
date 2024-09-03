@@ -31,8 +31,21 @@ type CdcMarkupIncludeProps = {
 
 import Title from '@cdc/core/components/ui/Title'
 
-const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: configObj, isDashboard = true, isEditor = false, setConfig: setParentConfig }) => {
-  const initialState = { config: configObj, loading: true, urlMarkup: '', markupError: null, errorMessage: null, coveLoadedHasRan: false }
+const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
+  configUrl,
+  config: configObj,
+  isDashboard = true,
+  isEditor = false,
+  setConfig: setParentConfig
+}) => {
+  const initialState = {
+    config: configObj,
+    loading: true,
+    urlMarkup: '',
+    markupError: null,
+    errorMessage: null,
+    coveLoadedHasRan: false
+  }
 
   const [state, dispatch] = useReducer(markupIncludeReducer, initialState)
 
@@ -49,12 +62,6 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
 
   // Default Functions
   const updateConfig = newConfig => {
-    Object.keys(defaults).forEach(key => {
-      if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
-        newConfig[key] = { ...defaults[key], ...newConfig[key] }
-      }
-    })
-
     newConfig.runtime = {}
     newConfig.runtime.uniqueId = Date.now()
 
@@ -63,7 +70,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
   }
 
   const loadConfig = useCallback(async () => {
-    let response = configObj || (await (await fetch(configUrl)).json())
+    let response = config || (await (await fetch(configUrl)).json())
     let responseData = response.data ?? {}
 
     if (response.dataUrl) {
@@ -73,8 +80,13 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
 
     response.data = responseData
     const processedConfig = { ...(await coveUpdateWorker(response)) }
+    const configNeedsUpdate = !(
+      _.isEqual(processedConfig.contentEditor, config.contentEditor) && _.isEqual(processedConfig.visual, config.visual)
+    )
 
-    updateConfig({ ...configObj, ...processedConfig })
+    if (configNeedsUpdate === true) {
+      updateConfig({ ...config, ...processedConfig })
+    }
     dispatch({ type: 'SET_LOADING', payload: false })
   }, [])
 
@@ -92,7 +104,8 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
       let errorList = {
         200: 'This is likely due to a CORS restriction policy from the remote origin address.',
         404: 'The requested source URL cannot be found. Please verify the link address provided.',
-        proto: 'Provided source URL must include https:// or http:// before the address (depending on the source content type).'
+        proto:
+          'Provided source URL must include https:// or http:// before the address (depending on the source content type).'
       }
 
       message += errorList[errorCode]
@@ -138,7 +151,10 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
   const filterOutConditions = (workingData, conditionList) => {
     const { columnName, isOrIsNotEqualTo, value } = conditionList[0]
 
-    const newWorkingData = isOrIsNotEqualTo === 'is' ? workingData.filter(dataObject => dataObject[columnName] === value) : workingData.filter(dataObject => dataObject[columnName] !== value)
+    const newWorkingData =
+      isOrIsNotEqualTo === 'is'
+        ? workingData.filter(dataObject => dataObject[columnName] === value)
+        : workingData.filter(dataObject => dataObject[columnName] !== value)
 
     conditionList.shift()
     return conditionList.length === 0 ? newWorkingData : filterOutConditions(newWorkingData, conditionList)
@@ -150,7 +166,10 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
     const convertedInlineMarkup = inlineMarkup.replace(variableRegexPattern, variableTag => {
       const workingVariable = markupVariables.filter(variable => variable.tag === variableTag)[0]
       if (workingVariable === undefined) return [variableTag]
-      const workingData = workingVariable && workingVariable.conditions.length === 0 ? data : filterOutConditions(data, [...workingVariable.conditions])
+      const workingData =
+        workingVariable && workingVariable.conditions.length === 0
+          ? data
+          : filterOutConditions(data, [...workingVariable.conditions])
 
       const variableValues: string[] = _.uniq(workingData?.map(dataObject => dataObject[workingVariable.columnName]))
       const variableDisplay = []
@@ -168,12 +187,13 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
 
       let finalDisplay = variableDisplay[0]
 
-      if(workingVariable.addCommas && !isNaN(parseFloat(finalDisplay))){
+      if (workingVariable.addCommas && !isNaN(parseFloat(finalDisplay))) {
         finalDisplay = parseFloat(finalDisplay)
-        finalDisplay = finalDisplay.toLocaleString('en-US', {useGrouping: true})
+        finalDisplay = finalDisplay.toLocaleString('en-US', { useGrouping: true })
       }
 
-      const displayInfoMessage = '<span class="font-weight-bold display-Info-message">One or more of the following values will appear in the place of this variable placeholder:</span>'
+      const displayInfoMessage =
+        '<span class="font-weight-bold display-Info-message">One or more of the following values will appear in the place of this variable placeholder:</span>'
 
       const newReplacementForVariable = `<span class="cove-tooltip-variable">${variableTag}<span class="cove-tooltip-value">${displayInfoMessage}<br/>${finalDisplay}</span></span><span class="cove-markup-include-variable-value">${finalDisplay}</span>`
 
@@ -258,7 +278,9 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
 
   return (
     <ErrorBoundary component='CdcMarkupInclude'>
-      <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard }}>
+      <ConfigContext.Provider
+        value={{ config: config, updateConfig, loading, data: data, setParentConfig, isDashboard }}
+      >
         {!config?.newViz && config?.runtime && config?.runtime.editorErrorMessage && <Error />}
         <Layout.VisualizationWrapper config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
           {content}
