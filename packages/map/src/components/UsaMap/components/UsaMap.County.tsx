@@ -10,7 +10,6 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
-import Annotation from '../../Annotation'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -239,11 +238,11 @@ const CountyMap = props => {
         }
       }
 
-      let focusIndex = -1;
-      for(let i = 0; i < topoData.mapData.length; i++){
-        if(topoData.mapData[i].id === clickedState.id){
-          focusIndex = i;
-          break;
+      let focusIndex = -1
+      for (let i = 0; i < topoData.mapData.length; i++) {
+        if (topoData.mapData[i].id === clickedState.id) {
+          focusIndex = i
+          break
         }
       }
 
@@ -337,13 +336,13 @@ const CountyMap = props => {
 
           tooltipRef.current.style.display = 'block'
           tooltipRef.current.style.top = tooltipY + 'px'
-        if(tooltipX > containerBounds.width / 2) {
-          tooltipRef.current.style.transform = 'translate(-100%, -50%)'
-          tooltipRef.current.style.left = (tooltipX - 5) + 'px'
-        } else {
-          tooltipRef.current.style.transform = 'translate(0, -50%)'
-          tooltipRef.current.style.left = (tooltipX + 5) + 'px'
-        }
+          if (tooltipX > containerBounds.width / 2) {
+            tooltipRef.current.style.transform = 'translate(-100%, -50%)'
+            tooltipRef.current.style.left = tooltipX - 5 + 'px'
+          } else {
+            tooltipRef.current.style.transform = 'translate(0, -50%)'
+            tooltipRef.current.style.left = tooltipX + 5 + 'px'
+          }
           tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(county.id), data[county.id])
           tooltipRef.current.setAttribute('data-index', countyIndex)
         } else {
@@ -387,12 +386,12 @@ const CountyMap = props => {
       if (hoveredGeo) {
         tooltipRef.current.style.display = 'block'
         tooltipRef.current.style.top = tooltipY + 'px'
-        if(tooltipX > containerBounds.width / 2) {
+        if (tooltipX > containerBounds.width / 2) {
           tooltipRef.current.style.transform = 'translate(-100%, -50%)'
-          tooltipRef.current.style.left = (tooltipX - 5) + 'px'
+          tooltipRef.current.style.left = tooltipX - 5 + 'px'
         } else {
           tooltipRef.current.style.transform = 'translate(0, -50%)'
-          tooltipRef.current.style.left = (tooltipX + 5) + 'px'
+          tooltipRef.current.style.left = tooltipX + 5 + 'px'
         }
         tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(hoveredGeo[state.columns.geo.name]), hoveredGeo)
         tooltipRef.current.setAttribute('data-index', hoveredGeoIndex)
