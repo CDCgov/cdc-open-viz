@@ -132,6 +132,10 @@
     border: 1px solid $lightGray;
     position: relative;
 
+    &.no-border {
+      border: 1px solid transparent;
+    }
+
     &__inner {
       &.double-column,
       &.single-row {

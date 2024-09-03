@@ -63,6 +63,7 @@ const LegendGradient = ({
           x={xPositionX}
           y={boxHeight}
           dy={10}
+          dx={-segmentWidth / 2}
           fontSize='14'
           textAnchor={textAnchor}
           verticalAnchor={verticalAnchor}
