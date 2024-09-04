@@ -1,5 +1,6 @@
 import { previewTheme } from './coveSbThemes'
 import * as React from 'react'
+import './coreStyles_storybook.scss'
 
 export const parameters = {
   options: {

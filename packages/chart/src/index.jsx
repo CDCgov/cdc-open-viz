@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 
 import CdcChart from './CdcChart'
+import './coreStyles_chart.scss'
 
 import 'react-tooltip/dist/react-tooltip.css'
 
