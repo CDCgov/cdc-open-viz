@@ -139,6 +139,12 @@
           display: flex;
           justify-content: center;
           align-items: center;
+          vertical-align: middle;
+
+          & svg {
+            vertical-align: baseline;
+            margin-top: -100%;
+          }
         }
       }
     }
