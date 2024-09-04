@@ -1,5 +1,5 @@
 //TODO: Move legends to core
-import { forwardRef, useContext } from 'react'
+import { forwardRef, useContext, useId } from 'react'
 import parse from 'html-react-parser'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -34,6 +34,9 @@ const Legend = forwardRef((props, ref) => {
   } = useContext(ConfigContext)
 
   const { legend } = state
+
+  // create unique id for pattern
+  const patternId = useId()
 
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
@@ -132,10 +135,10 @@ const Legend = forwardRef((props, ref) => {
             <li className={`legend-container__li legend-container__li--geo-pattern`} aria-label='You are on a pattern button. We dont support toggling patterns on this legend at the moment, but provide the area as being focusable for congruity.' tabIndex={0}>
               <span className='legend-item' style={{ border: 'unset' }}>
                 <svg width={legendSize} height={legendSize}>
-                  {pattern === 'waves' && <PatternWaves id={`${dataKey}--${patternDataIndex}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
-                  {pattern === 'circles' && <PatternCircles id={`${dataKey}--${patternDataIndex}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
-                  {pattern === 'lines' && <PatternLines id={`${dataKey}--${patternDataIndex}`} height={sizes[size] ?? 6} width={sizes[size] ?? 10} stroke={defaultPatternColor} strokeWidth={2} orientation={['diagonalRightToLeft']} />}
-                  <circle id={dataKey} fill={`url(#${dataKey}--${patternDataIndex})`} r={legendSize / 2} cx={legendSize / 2} cy={legendSize / 2} stroke='#0000004d' strokeWidth={1} />
+                  {pattern === 'waves' && <PatternWaves id={`${patternId}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
+                  {pattern === 'circles' && <PatternCircles id={`${patternId}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
+                  {pattern === 'lines' && <PatternLines id={`${patternId}`} height={sizes[size] ?? 6} width={sizes[size] ?? 10} stroke={defaultPatternColor} strokeWidth={2} orientation={['diagonalRightToLeft']} />}
+                  <circle id={dataKey} fill={`url(#${patternId})`} r={legendSize / 2} cx={legendSize / 2} cy={legendSize / 2} stroke='#0000004d' strokeWidth={1} />
                 </svg>
               </span>
               <p style={{ lineHeight: '22.4px' }}>{patternData.label || patternData.dataValue || ''}</p>
