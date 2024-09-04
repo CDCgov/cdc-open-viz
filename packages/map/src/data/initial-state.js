@@ -1,6 +1,7 @@
 export default {
   annotations: [],
   general: {
+    noStateFoundMessage: 'Map Unavailable',
     annotationDropdownText: 'Annotations',
     geoBorderColor: 'darkGray',
     headerColor: 'theme-blue',
@@ -91,8 +92,7 @@ export default {
     opacity: 90
   },
   runtime: {
-    editorErrorMessage: [],
-    noStateFoundMessage: 'No state image found'
+    editorErrorMessage: []
   },
   visual: {
     minBubbleSize: 1,
