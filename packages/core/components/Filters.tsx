@@ -31,15 +31,9 @@ export const filterOrderOptions: { label: string; value: OrderBy }[] = [
 ]
 
 export const handleSorting = singleFilter => {
-  const { order } = singleFilter
-
-  if (order === 'cust') {
-    singleFilter.values = singleFilter.orderedValues
-    return singleFilter.values
-  }
-
-  const sortAsc = (a, b) => {
-    return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
+  const singleFilterValues = _.cloneDeep(singleFilter.values)
+  if (singleFilter.order === 'cust') {
+    return singleFilter
   }
 
   const sort = (a, b) => {
