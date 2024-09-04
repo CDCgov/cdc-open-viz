@@ -169,9 +169,11 @@ const SingleStateMap = props => {
         </svg>
       )}
       {!state.general.statePicked.fipsCode && (
-        <Text verticalAnchor='start' textAnchor='middle' x={WIDTH / 2} width={WIDTH} height={HEIGHT}>
-          {state.runtime.noStateFoundMessage}
-        </Text>
+        <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' role='img' aria-label={handleMapAriaLabels(state)}>
+          <Text verticalAnchor='start' textAnchor='middle' x={WIDTH / 2} width={WIDTH} y={HEIGHT / 2}>
+            {state.general.noStateFoundMessage}
+          </Text>
+        </svg>
       )}
       <ZoomControls
         // prettier-ignore
