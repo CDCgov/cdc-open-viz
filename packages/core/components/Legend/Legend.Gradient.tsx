@@ -3,6 +3,7 @@ import { Text } from '@visx/text'
 import { type ViewportSize, type MapConfig } from '@cdc/map/src/types/MapConfig'
 import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { getGradientLegendWidth } from '@cdc/core/helpers/getGradientLegendWidth'
+import { DimensionsType } from '../../types/Dimensions'
 
 type CombinedConfig = MapConfig | ChartConfig
 
@@ -10,15 +11,23 @@ interface GradientProps {
   labels: string[]
   colors: string[]
   config: CombinedConfig
-  dimensions: [string, string]
+  dimensions: DimensionsType
   currentViewport: ViewportSize
   getTextWidth: (text: string, font: string) => string
 }
 
-const LegendGradient = ({ labels, colors, config, dimensions, currentViewport, getTextWidth }: GradientProps): JSX.Element => {
+const LegendGradient = ({
+  labels,
+  colors,
+  config,
+  dimensions,
+  currentViewport,
+  getTextWidth
+}: GradientProps): JSX.Element => {
   let [width] = dimensions
 
   const legendWidth = getGradientLegendWidth(width, currentViewport)
+  const uniqueID = `${config.uid}-${Date.now()}`
 
   const numTicks = colors?.length
 
@@ -50,7 +59,16 @@ const LegendGradient = ({ labels, colors, config, dimensions, currentViewport, g
     return (
       <Group top={margin}>
         <line x1={xPositionX} x2={xPositionX} y1={30} y2={boxHeight} stroke='black' />
-        <Text angle={-config.legend.tickRotation} x={xPositionX} y={boxHeight} dy={10} fontSize='14' textAnchor={textAnchor} verticalAnchor={verticalAnchor}>
+        <Text
+          angle={-config.legend.tickRotation}
+          x={xPositionX}
+          y={boxHeight}
+          dy={10}
+          dx={-segmentWidth / 2}
+          fontSize='14'
+          textAnchor={textAnchor}
+          verticalAnchor={verticalAnchor}
+        >
           {key}
         </Text>
       </Group>
@@ -59,7 +77,10 @@ const LegendGradient = ({ labels, colors, config, dimensions, currentViewport, g
   if ((config.type === 'map' && config.legend.position === 'side') || !config.legend.position) {
     return
   }
-  if (config.type === 'chart' && (config.legend.position === 'left' || config.legend.position === 'right' || !config.legend.position)) {
+  if (
+    config.type === 'chart' &&
+    (config.legend.position === 'left' || config.legend.position === 'right' || !config.legend.position)
+  ) {
     return
   }
 
@@ -67,13 +88,22 @@ const LegendGradient = ({ labels, colors, config, dimensions, currentViewport, g
     return (
       <svg style={{ overflow: 'visible', width: '100%', marginTop: 10 }} height={newHeight}>
         {/* background border*/}
-        <rect x={0} y={0} width={legendWidth + margin * 2} height={boxHeight + margin * 2} fill='#d3d3d3' strokeWidth='0.5' />
+        <rect
+          x={0}
+          y={0}
+          width={legendWidth + margin * 2}
+          height={boxHeight + margin * 2}
+          fill='#d3d3d3'
+          strokeWidth='0.5'
+        />
         {/* Define the gradient */}
-        <linearGradient id={`gradient-smooth-${config.uid || 0}`} x1='0%' y1='0%' x2='100%' y2='0%'>
+        <linearGradient id={`gradient-smooth-${uniqueID}`} x1='0%' y1='0%' x2='100%' y2='0%'>
           {stops}
         </linearGradient>
 
-        {config.legend.subStyle === 'smooth' && <rect x={1} y={1} width={legendWidth} height={boxHeight} fill={`url(#gradient-smooth-${config.uid || 0})`} />}
+        {config.legend.subStyle === 'smooth' && (
+          <rect x={1} y={1} width={legendWidth} height={boxHeight} fill={`url(#gradient-smooth-${uniqueID})`} />
+        )}
 
         {config.legend.subStyle === 'linear blocks' &&
           colors.map((color, index) => {
@@ -81,7 +111,16 @@ const LegendGradient = ({ labels, colors, config, dimensions, currentViewport, g
             const xPosition = index * segmentWidth
             return (
               <Group>
-                <rect key={index} x={xPosition} y={0} width={segmentWidth} height={boxHeight} fill={color} stroke='white' strokeWidth='0' />
+                <rect
+                  key={index}
+                  x={xPosition}
+                  y={0}
+                  width={segmentWidth}
+                  height={boxHeight}
+                  fill={color}
+                  stroke='white'
+                  strokeWidth='0'
+                />
               </Group>
             )
           })}

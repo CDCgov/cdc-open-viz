@@ -387,7 +387,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           ...state,
           legend: {
             ...state.legend,
-            displayBorder: value
+            hideBorder: value
           }
         })
         break
@@ -1377,7 +1377,13 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                         <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
                           {(provided, snapshot) => (
                             <li>
-                              <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                              <div
+                                className={snapshot.isDragging ? 'currently-dragging' : ''}
+                                style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)}
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                              >
                                 {value}
                               </div>
                             </li>
@@ -1452,7 +1458,13 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
         <Draggable key={value} draggableId={`item-${value}`} index={index}>
           {(provided, snapshot) => (
             <li style={{ position: 'relative' }}>
-              <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+              <div
+                className={snapshot.isDragging ? 'currently-dragging' : ''}
+                style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)}
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+              >
                 {value}
               </div>
             </li>
@@ -1787,7 +1799,9 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   </Tooltip>
                 }
               />
-              {'us' === state.general.geoType && <TextField value={general.territoriesLabel} updateField={updateField} section='general' fieldName='territoriesLabel' label='Territories Label' placeholder='Territories' />}
+              {'us' === state.general.geoType && (
+                <TextField value={general.territoriesLabel} updateField={updateField} section='general' fieldName='territoriesLabel' label='Territories Label' placeholder='Territories' />
+              )}
               {'us' === state.general.geoType && (
                 <label className='checkbox'>
                   <input
@@ -2335,7 +2349,9 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                         <option value='top'>Top</option>
                       </select>
                     </label>
-                    {(state.legend.position === 'side' || !state.legend.position) && state.legend.style === 'gradient' && <span style={{ color: 'red', fontSize: '14px' }}>Position must be set to top or bottom to use gradient style.</span>}
+                    {(state.legend.position === 'side' || !state.legend.position) && state.legend.style === 'gradient' && (
+                      <span style={{ color: 'red', fontSize: '14px' }}>Position must be set to top or bottom to use gradient style.</span>
+                    )}
                   </>
                 )}
                 {'navigation' !== state.general.type && (
@@ -2360,7 +2376,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     >
                       <option value='circles'>circles</option>
                       <option value='boxes'>boxes</option>
-                      <option value='gradient'>gradient</option>
+                      {legend.position !== 'side' && <option value='gradient'>gradient</option>}
                     </select>
                   </label>
                 )}
@@ -2391,19 +2407,26 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     ></input>
                   </label>
                 )}
-                {state.legend.position !== 'side' && (
+                {
                   <label className='checkbox'>
                     <input
                       type='checkbox'
-                      checked={legend.displayBorder}
+                      checked={legend.hideBorder}
                       onChange={event => {
                         handleEditorChanges('legendBorder', event.target.checked)
                       }}
                     />
-                    <span className='edit-label'>Display Border</span>
+                    <span className='edit-label column-heading'>Hide Legend Box</span>
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                      </Tooltip.Target>
+                      <Tooltip.Content>
+                        <p> Default option for top and bottom legends is ‘No Box.’</p>
+                      </Tooltip.Content>
+                    </Tooltip>
                   </label>
-                )}
-
+                }
                 {'side' === legend.position && (
                   <label className='checkbox'>
                     <input
@@ -2416,7 +2439,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     <span className='edit-label'>Single Column Legend</span>
                   </label>
                 )}
-                {'bottom' === legend.position && (
+                {'side' !== legend.position && legend.style !== 'gradient' && (
                   <label className='checkbox'>
                     <input
                       type='checkbox'
@@ -2757,7 +2780,9 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   />
                   <span className='edit-label'>Limit Table Height</span>
                 </label>
-                {state.table.limitHeight && <TextField value={table.height} updateField={updateField} section='table' fieldName='height' label='Data Table Height' placeholder='Height(px)' type='number' min='0' max='500' />}
+                {state.table.limitHeight && (
+                  <TextField value={table.height} updateField={updateField} section='table' fieldName='height' label='Data Table Height' placeholder='Height(px)' type='number' min='0' max='500' />
+                )}
                 <label className='checkbox'>
                   <input
                     type='checkbox'
@@ -2930,7 +2955,16 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                 <span className='edit-label'>Map Color Palette</span>
               </label>
               {/* <InputCheckbox  section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
-              <InputToggle type='3d' section='general' subsection='palette' fieldName='isReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={state.general.palette.isReversed} />
+              <InputToggle
+                type='3d'
+                section='general'
+                subsection='palette'
+                fieldName='isReversed'
+                size='small'
+                label='Use selected palette in reverse order'
+                updateField={updateField}
+                value={state.general.palette.isReversed}
+              />
               <span>Sequential</span>
               <ul className='color-palette'>
                 {sequential.map(palette => {

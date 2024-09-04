@@ -953,13 +953,28 @@ const EditorPanel = () => {
 
   const getLegendStyleOptions = (option: 'style' | 'subStyle'): string[] => {
     const options: string[] = []
-    if (option === 'style') {
-      options.push('circles', 'boxes')
-      if (config.visualizationType === 'Bar') options.push('gradient')
-      if (config.visualizationType === 'Line') options.push('lines')
-    }
-    if (option === 'subStyle') {
-      options.push('linear blocks', 'smooth')
+
+    switch (option) {
+      case 'style':
+        options.push('circles', 'boxes')
+        if (
+          config.visualizationType === 'Bar' &&
+          (!['right', 'left'].includes(config.legend.position) || !config.legend.position)
+        ) {
+          options.push('gradient')
+        }
+        if (config.visualizationType === 'Line') {
+          options.push('lines')
+        }
+        break
+      case 'subStyle':
+        if (config.visualizationType === 'Bar') {
+          options.push('linear blocks')
+        } else {
+          options.push('linear blocks', 'smooth')
+        }
+
+        break
     }
     return options
   }
@@ -3826,14 +3841,37 @@ const EditorPanel = () => {
                     updateField={updateField}
                   />
                   <CheckBox
-                    display={['bottom', 'top'].includes(config.legend.position) && !config.legend.hide}
-                    value={config.legend.hasBorder}
+                    display={!config.legend.hide}
+                    value={
+                      ['left', 'right'].includes(config.legend.position)
+                        ? config.legend.hideBorder.side
+                        : config.legend.hideBorder.topBottom
+                    }
                     section='legend'
-                    fieldName='hasBorder'
-                    label='Display Border'
+                    subsection='hideBorder'
+                    fieldName={['left', 'right'].includes(config.legend.position) ? 'side' : 'topBottom'}
+                    label='Hide Legend Box'
                     updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display='question'
+                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Default option for top and bottom legends is ‘No Box.’.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
                   />
                   <CheckBox
+                    display={
+                      !config.legend.hide &&
+                      !['left', 'right'].includes(config.legend.position) &&
+                      config.legend.style !== 'gradient'
+                    }
                     value={config.legend.singleRow}
                     section='legend'
                     fieldName='singleRow'

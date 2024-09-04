@@ -72,6 +72,7 @@
   .map-container {
     display: flex;
     position: relative;
+    flex-direction: column;
 
     &.bottom {
       flex-direction: column;

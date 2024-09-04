@@ -127,7 +127,8 @@ export type MapConfig = Visualization & {
     style: 'circles' | 'boxes' | 'gradient'
     subStyle: 'linear blocks' | 'smooth'
     tickRotation: string
-    displayBorder: false
+    hideBorder: false
+    singleColumnLegend: false
   }
   table: {
     label: string

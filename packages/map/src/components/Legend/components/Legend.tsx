@@ -63,13 +63,11 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       `Disabled legend item ${legendLabel ?? ''}. Please reference the data table to see updated values.`
     )
   }
-
   const getFormattedLegendItems = () => {
     return runtimeLegend.map((entry, idx) => {
       const entryMax = displayDataAsText(entry.max, 'primary')
 
       const entryMin = displayDataAsText(entry.min, 'primary')
-
       let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
 
       // If interval, add some formatting
@@ -95,7 +93,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         color: entry.color,
         label: legendLabel,
         disabled: entry.disabled,
-        special: entry.hasOwnProperty('special')
+        special: entry.hasOwnProperty('special'),
+        value: [entry.min, entry.max]
       }
     })
   }
@@ -274,6 +273,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             <LegendGradient
               labels={getFormattedLegendItems().map(item => item?.label) ?? []}
               colors={getFormattedLegendItems().map(item => item?.color) ?? []}
+              values={getFormattedLegendItems().map(item => item?.value) ?? []}
               dimensions={dimensions}
               currentViewport={currentViewport}
               config={state}
