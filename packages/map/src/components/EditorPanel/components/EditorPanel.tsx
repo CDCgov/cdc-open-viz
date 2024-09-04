@@ -1425,7 +1425,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
 
   if (runtimeFilters.length > 0) {
     runtimeFilters.forEach((filter, index) => {
-      runtimeFilters[index].values.forEach((value, valueNum) => {
+      runtimeFilters[index]?.values?.forEach((value, valueNum) => {
         filterValueOptionList.push([index, valueNum])
       })
     })

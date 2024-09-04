@@ -150,6 +150,8 @@ export type MapConfig = Visualization & {
   }
   runtime: {
     editorErrorMessage: string[]
+    // when a single state map doesn't include a fips code show a message...
+    noStateFoundMessage: string
   }
   mapPosition: { coordinates: Coordinate; zoom: number }
   map: {

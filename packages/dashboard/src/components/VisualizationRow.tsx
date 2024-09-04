@@ -94,11 +94,11 @@ const VisualizationRow: React.FC<VizRowProps> = ({ allExpanded, filteredDataOver
     return false
   }
   return (
-    <div className={`row mb-5 ${row.equalHeight ? 'equal-height' : ''} ${row.toggle ? 'toggle' : ''}`} key={`row__${index}`}>
+    <div className={`dashboard-row mb-5 ${row.equalHeight ? 'equal-height' : ''} ${row.toggle ? 'toggle' : ''}`} key={`row__${index}`}>
       {row.toggle && <Toggle row={row} visualizations={config.visualizations} active={show.indexOf(true)} setToggled={setToggled} />}
       {row.columns.map((col, colIndex) => {
         if (col.width) {
-          if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`col-md-${col.width}`}></div>
+          if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`dashboard-col dashboard-col-${col.width}`}></div>
 
           const visualizationConfig = getVizConfig(col.widget, index, config, rawData, dashboardFilteredData)
           if (filteredDataOverride) {
@@ -122,7 +122,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({ allExpanded, filteredDataOver
           const body = <></>
 
           return (
-            <div key={`vis__${index}__${colIndex}`} className={`col-${col.width} ${!shouldShow ? 'd-none' : ''}`}>
+            <div key={`vis__${index}__${colIndex}`} className={`dashboard-col dashboard-col-${col.width} ${!shouldShow ? 'd-none' : ''}`}>
               <VisualizationWrapper allExpanded={allExpanded} currentViewport={currentViewport} groupName={groupName} row={row}>
                 {visualizationConfig.type === 'chart' && (
                   <CdcChart

@@ -276,6 +276,12 @@ export const useEditorPermissions = () => {
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
+  const visSupportsMobileChartHeight = () => {
+    // TODO: this is a soft release. Support should eventually match visSupportsChartHeight
+    const enabledCharts = ['Bar', 'Line', 'Combo', 'Area Chart']
+    if (enabledCharts.includes(visualizationType)) return true
+    return false
+  }
 
   const visSupportsLeftValueAxis = () => {
     const disabledCharts = ['Spark Line', 'Sankey']
@@ -358,6 +364,7 @@ export const useEditorPermissions = () => {
     visSupportsBarSpace,
     visSupportsBarThickness,
     visSupportsChartHeight,
+    visSupportsMobileChartHeight,
     visSupportsDateCategoryAxis,
     visSupportsDateCategoryAxisLabel,
     visSupportsDateCategoryAxisLine,

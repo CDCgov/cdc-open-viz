@@ -34,8 +34,7 @@ const generateValuesForFilter = (filter: VizFilter, data: any[] | MapData) => {
   if (Array.isArray(data)) {
     data.forEach(row => {
       const value = row[columnName]
-      if (value === undefined) return
-      if (!values.includes(value)) {
+      if (value !== undefined && !values.includes(value)) {
         values.push(value)
       }
       if (subGroupingColumn) {
@@ -57,7 +56,7 @@ const generateValuesForFilter = (filter: VizFilter, data: any[] | MapData) => {
     Object.values(data).forEach((rows: any[]) => {
       rows.forEach(row => {
         const value = row[columnName]
-        if (!values.includes(value)) {
+        if (value !== undefined && !values.includes(value)) {
           values.push(value)
         }
       })
