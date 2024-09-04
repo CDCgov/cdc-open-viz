@@ -15,7 +15,7 @@ const LineChartBumpCircle = (props: LineChartBumpCircleProp) => {
   const { config, xScale, yScale, parseDate } = props
 
   // get xScale and yScale...
-  if (!config.series) return
+  if (!config?.runtime?.series) return
 
   const handleX = xValue => {
     if (config.xAxis.type === 'date') {
@@ -48,7 +48,7 @@ const LineChartBumpCircle = (props: LineChartBumpCircleProp) => {
 
   const getTooltip = dataRow => `<ul> ${getListItems(dataRow)} </ul>`
 
-  const circles = config.series.map((series) => {
+  const circles = config.runtime?.series.map((series) => {
     return config.data.map((d, dataIndex) => {
       let series_dataKey = d[series.dataKey]
       let axis_dataKey = d[config.xAxis.dataKey]
