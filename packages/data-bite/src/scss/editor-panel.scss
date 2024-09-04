@@ -7,11 +7,6 @@
 }
 
 .editor-panel {
-  //TODO: Remove after COVE refactor
-  &.cove {
-    @import '@cdc/core/styles/v2/layout/tooltip.scss';
-  }
-
   .text-center {
     text-align: center;
   }
