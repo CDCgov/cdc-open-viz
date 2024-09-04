@@ -70,7 +70,9 @@ export default {
     title: '',
     style: 'circles',
     subStyle: 'linear blocks',
-    tickRotation: ''
+    tickRotation: '',
+    singleColumnLegend: false,
+    hideBorder: false
   },
   filters: [],
   table: {

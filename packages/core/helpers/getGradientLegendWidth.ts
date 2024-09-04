@@ -1,4 +1,4 @@
-export const getGradientLegendWidth = (containerWidth: string, currentViewport: string) => {
+export const getGradientLegendWidth = (containerWidth: number, currentViewport: string) => {
   let newWidth = Number(containerWidth)
   switch (currentViewport) {
     case 'lg':
