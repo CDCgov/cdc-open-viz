@@ -446,13 +446,13 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                       const showTicks = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
                       const tickLength = showTicks === 'block' ? 7 : 0
                       const to = { x: tick.to.x - tickLength, y: tick.to.y }
-                      const displayFirstGridLine = tick.index !== 0 || config.xAxis.hideAxis
+                      const hideFirstGridLine = tick.index === 0 && tick.value === 0 && config.xAxis.hideAxis
 
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                           {!runtime.yAxis.hideTicks && <Line key={`${tick.value}--hide-hideTicks`} from={tick.from} to={isLogarithmicAxis ? to : tick.to} stroke={config.yAxis.tickColor} display={orientation === 'horizontal' ? 'none' : 'block'} />}
 
-                          {runtime.yAxis.gridLines && displayFirstGridLine ? <Line key={`${tick.value}--hide-hideGridLines`} display={(isLogarithmicAxis && showTicks).toString()} from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
+                          {runtime.yAxis.gridLines && !hideFirstGridLine ? <Line key={`${tick.value}--hide-hideGridLines`} display={(isLogarithmicAxis && showTicks).toString()} from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
 
                           {orientation === 'horizontal' && visualizationSubType !== 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
                             <Text
