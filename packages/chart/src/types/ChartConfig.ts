@@ -72,21 +72,20 @@ export type Legend = {
   hide: boolean
   highlightOnHover: boolean
   label: string
-  position: string
+  position: 'left' | 'bottom' | 'top' | 'right'
   reverseLabelOrder: boolean
   singleRow: boolean
   type: string
   verticalSorted: boolean
-<<<<<<< HEAD
-  hideSuppressedLabels:boolean
   hideSuppressionLink:boolean
-=======
   style:'circles'|'boxes'|'gradient'|'lines'
   subStyle:'linear blocks'|'smooth'
   hideSuppressedLabels:boolean
-  hasBorder:boolean
   tickRotation:string
->>>>>>> dev
+  hideBorder:{
+    side:boolean
+    topBottom:boolean
+  }
 }
 
 type Visual = {
@@ -136,6 +135,7 @@ export type AllChartsConfig = {
   formattedData: Object[] & { urlFiltered: boolean }
   heights: {
     vertical: number
+    mobileVertical: number
   }
   highlightedBarValues: { value: any; color: string; borderWidth: number; legendLabel: string }[]
   introText: string

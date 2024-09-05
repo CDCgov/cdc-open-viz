@@ -7,6 +7,9 @@ import * as d3 from 'd3-array'
 import Layout from '@cdc/core/components/Layout'
 import Button from '@cdc/core/components/elements/Button'
 
+//types
+import { DimensionsType } from '@cdc/core/types/Dimensions'
+
 // External Libraries
 import { scaleOrdinal } from '@visx/scale'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
@@ -92,7 +95,7 @@ export default function CdcChart({
     configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : []
   )
   const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
-  const [dimensions, setDimensions] = useState<[number?, number?]>([])
+  const [dimensions, setDimensions] = useState<DimensionsType>([0, 0])
   const [externalFilters, setExternalFilters] = useState<any[]>()
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
@@ -344,17 +347,20 @@ export default function CdcChart({
     let currentData: any[] = []
     if (newConfig.filters) {
       newConfig.filters.forEach((filter, index) => {
-        let filterValues = []
-
-        filterValues =
-          filter.orderedValues ||
-          generateValuesForFilter(filter.columnName, newExcludedData).sort(filter.order === 'desc' ? sortDesc : sortAsc)
+        const filterValues =
+          filter.filterStyle === 'nested-dropdown'
+            ? filter.values
+            : filter.orderedValues ||
+              generateValuesForFilter(filter.columnName, newExcludedData).sort(
+                filter.order === 'desc' ? sortDesc : sortAsc
+              )
 
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
 
+        const includes = (arr: any[], val: any): boolean => arr.map(val => String(val)).includes(String(val))
         newConfig.filters[index].active =
-          !newConfig.filters[index].active || filterValues.indexOf(newConfig.filters[index].active) === -1
+          !newConfig.filters[index].active || !includes(filterValues, newConfig.filters[index].active)
             ? filterValues[0]
             : newConfig.filters[index].active
         newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle
@@ -388,6 +394,8 @@ export default function CdcChart({
           ) {
             newConfig.runtime.series.push({
               dataKey: seriesKey,
+              type: newConfig.dynamicSeriesType,
+              lineType: newConfig.dynamicSeriesLineType,
               tooltip: true
             })
           }
@@ -637,15 +645,14 @@ export default function CdcChart({
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
-      let newViewport = getViewport(width)
       let svgMarginWidth = 32
       let editorWidth = 350
 
-      setCurrentViewport(newViewport)
+      width = isEditor ? width - editorWidth : width
 
-      if (isEditor) {
-        width = width - editorWidth
-      }
+      let newViewport = getViewport(width)
+
+      setCurrentViewport(newViewport)
 
       if (entry.target.dataset.lollipop === 'true') {
         width = width - 2.5
@@ -1221,10 +1228,10 @@ export default function CdcChart({
     const isLegendOnBottom = legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
     const classes = ['chart-container', 'p-relative']
     if (legend?.position) {
-      if (!['sm', 'xs', 'xxs'].includes(currentViewport)) {
-        classes.push(`legend-${legend.position}`)
-      } else {
+      if (['sm', 'xs', 'xxs'].includes(currentViewport) && legend?.position !== 'top') {
         classes.push('legend-bottom')
+      } else {
+        classes.push(`legend-${legend.position}`)
       }
     }
     if (legend?.hide) classes.push('legend-hidden')
@@ -1303,7 +1310,7 @@ export default function CdcChart({
                     className={
                       legend.hide || ['xxs', 'xs', 'sm'].includes(currentViewport)
                         ? 'w-100'
-                        : legend.position === 'bottom' || legend.position === 'top'
+                        : legend.position === 'bottom' || legend.position === 'top' || visualizationType === 'Sankey'
                         ? 'w-100'
                         : 'w-75'
                     }
@@ -1313,22 +1320,18 @@ export default function CdcChart({
                       <section className='introText'>{parse(config.introText)}</section>
                     )}
 
-                    {/* All charts except line and sparkline */}
-                    {config.visualizationType !== 'Spark Line' &&
-                      config.visualizationType !== 'Line' &&
-                      config.visualizationType !== 'Pie' && (
-                        <ParentSize>
-                          {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
-                        </ParentSize>
-                      )}
+                    {/* All charts with LinearChart */}
+                    {!['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
+                      <ParentSize>
+                        {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                      </ParentSize>
+                    )}
 
-                    {/* Pie Chart */}
                     {config.visualizationType === 'Pie' && (
                       <ParentSize className='justify-content-center d-flex'>
                         {parent => <PieChart parentWidth={parent.width} parentHeight={parent.height} />}
                       </ParentSize>
                     )}
-
                     {/* Line Chart */}
                     {config.visualizationType === 'Line' &&
                       (checkLineToBarGraph() ? (
@@ -1340,7 +1343,6 @@ export default function CdcChart({
                           {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
                         </ParentSize>
                       ))}
-
                     {/* Sparkline */}
                     {config.visualizationType === 'Spark Line' && (
                       <>

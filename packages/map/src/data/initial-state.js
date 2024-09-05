@@ -1,6 +1,7 @@
 export default {
   annotations: [],
   general: {
+    noStateFoundMessage: 'Map Unavailable',
     annotationDropdownText: 'Annotations',
     geoBorderColor: 'darkGray',
     headerColor: 'theme-blue',
@@ -70,7 +71,9 @@ export default {
     title: '',
     style: 'circles',
     subStyle: 'linear blocks',
-    tickRotation: ''
+    tickRotation: '',
+    singleColumnLegend: false,
+    hideBorder: false
   },
   filters: [],
   table: {

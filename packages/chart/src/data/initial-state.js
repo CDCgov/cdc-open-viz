@@ -169,8 +169,11 @@ export default {
     seriesHighlight: [],
     style: 'circles',
     subStyle: 'linear blocks',
-    hasBorder: false,
-    tickRotation: ''
+    tickRotation: '',
+    hideBorder: {
+      side: false,
+      topBottom: true
+    }
   },
   brush: {
     height: 25,

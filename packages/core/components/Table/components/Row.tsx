@@ -24,10 +24,19 @@ const Row: FC<RowProps> = props => {
   return (
     <tr>
       {childRow.map((child, i) => {
-        const style = (preliminaryData?.some(pd => pd.type === 'suppression' && child === pd.iconCode && pd.displayGray && pd.displayTable) && { color: '#8b8b8a' }) || {}
+        const style =
+          (preliminaryData?.some(
+            pd => pd.type === 'suppression' && child === pd.iconCode && pd.displayGray && pd.displayTable
+          ) && { color: '#777772' }) ||
+          {}
 
         return (
-          <Cell key={rowKey + '__' + i} style={{ whiteSpace, minWidth, fontSize: cellFontSize, ...style }} isBold={isTotal}>
+          <Cell
+            ariaLabel={style?.color ? 'suppressed data' : ''}
+            key={rowKey + '__' + i}
+            style={{ whiteSpace, minWidth, fontSize: cellFontSize, ...style }}
+            isBold={isTotal}
+          >
             {child}
           </Cell>
         )

@@ -17,8 +17,10 @@
     background-color: #fff;
     z-index: 6;
     border-top: $lightGray 1px solid;
+
     @include breakpointClass(md) {
-      &.bottom {
+      &.bottom,
+      &.top {
         border: $lightGray 1px solid;
       }
       &.side {
@@ -47,28 +49,15 @@
           flex-wrap: wrap;
         }
       }
+      &.no-border {
+        border: none;
+      }
 
       &.bottom {
         ul.legend-container__ul.vertical-sorted {
           display: block;
           column-count: 2;
           column-fill: balance;
-        }
-
-        ul.legend-container__ul {
-          display: flex;
-          flex-direction: row;
-          flex-wrap: wrap;
-
-          li {
-            width: 50%;
-          }
-        }
-
-        ul.single-row {
-          display: block;
-          column-count: initial;
-          column-fill: auto;
         }
       }
     }
@@ -103,7 +92,7 @@
       p {
         line-height: 1.4em;
       }
-      .legend-container__ul {
+      .legend-container__ul:not(.single-row) {
         list-style: none;
         padding-top: 1em;
         button {
@@ -137,6 +126,24 @@
           &.legend-container__li--disabled {
             opacity: 0.4;
           }
+        }
+      }
+      .legend-container__ul.single-row {
+        width: 100%;
+        list-style: none;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+
+        & > li {
+          margin-right: 1em;
+          margin-bottom: 1em;
+          white-space: nowrap;
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
       }
     }
@@ -175,30 +182,8 @@
       }
     }
 
-    &.bottom.single-row {
-      width: 100%;
-      .legend-container ul {
-        flex-direction: row;
-        align-items: baseline;
-        justify-content: flex-start;
-        flex-wrap: wrap;
-        li {
-          justify-items: center;
-          line-break: loose;
-          align-items: center;
-          width: auto;
-          padding-right: 1em;
-          padding-bottom: 1em;
-          display: inline-block;
-          & > span {
-            margin: 0 !important;
-          }
-        }
-      }
-    }
-
     @include breakpointClass(sm) {
-      .legend-container ul {
+      .legend-container ul:not(.single-row) {
         align-items: flex-start;
         justify-content: space-between;
         li {

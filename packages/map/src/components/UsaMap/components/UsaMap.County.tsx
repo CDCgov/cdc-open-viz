@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useContext } from 'react'
+import * as d3 from 'd3-geo'
 
 import { geoCentroid, geoPath, geoContains } from 'd3-geo'
 import { feature } from 'topojson-client'
@@ -10,7 +11,6 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
-import Annotation from '../../Annotation'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -131,8 +131,11 @@ const CountyMap = props => {
       runtimeFilters,
       tooltipId,
       tooltipRef,
-      container
+      container,
+      setState
   } = useContext(ConfigContext)
+
+  console.log('position updated', state.mapPosition.zoom)
 
   // CREATE STATE LINES
   const projection = geoAlbersUsaTerritories()
@@ -204,6 +207,10 @@ const CountyMap = props => {
   const lineWidth = 0.3
 
   const onReset = () => {
+    setState({
+      ...state,
+      mapPosition: { coordinates: [0, 30], zoom: 1 }
+    })
     setFocus({})
   }
 
@@ -225,10 +232,19 @@ const CountyMap = props => {
 
     // If the user clicked outside of all states, no behavior
     if (clickedState) {
+      setState({
+        ...state,
+        mapPosition: { coordinates: [0, 30], zoom: 3 }
+      })
+
       // If a county within the state was also clicked and has data, call parent click handler
       if (topoData.countyIndecies[clickedState.id]) {
         let county
-        for (let i = topoData.countyIndecies[clickedState.id][0]; i <= topoData.countyIndecies[clickedState.id][1]; i++) {
+        for (
+          let i = topoData.countyIndecies[clickedState.id][0];
+          i <= topoData.countyIndecies[clickedState.id][1];
+          i++
+        ) {
           if (geoContains(topoData.mapData[i], pointCoordinates)) {
             county = topoData.mapData[i]
             break
@@ -239,23 +255,26 @@ const CountyMap = props => {
         }
       }
 
-      let focusIndex = -1;
-      for(let i = 0; i < topoData.mapData.length; i++){
-        if(topoData.mapData[i].id === clickedState.id){
-          focusIndex = i;
-          break;
+      let focusIndex = -1
+      for (let i = 0; i < topoData.mapData.length; i++) {
+        if (topoData.mapData[i].id === clickedState.id) {
+          focusIndex = i
+          break
         }
       }
 
       // Redraw with focus on state
-      setFocus({ id: clickedState.id, index: focusIndex, center: geoCentroid(clickedState) })
+      setFocus({ id: clickedState.id, index: focusIndex, center: geoCentroid(clickedState), feature: clickedState })
     }
 
     if (state.general.type === 'us-geocode') {
       const geoRadius = (state.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
       let clickedGeo
       for (let i = 0; i < runtimeKeys.length; i++) {
-        const pixelCoords = topoData.projection([data[runtimeKeys[i]][state.columns.longitude.name], data[runtimeKeys[i]][state.columns.latitude.name]])
+        const pixelCoords = topoData.projection([
+          data[runtimeKeys[i]][state.columns.longitude.name],
+          data[runtimeKeys[i]][state.columns.latitude.name]
+        ])
         if (pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
           clickedGeo = data[runtimeKeys[i]]
           break
@@ -269,7 +288,12 @@ const CountyMap = props => {
   }
 
   const canvasHover = e => {
-    if (!tooltipRef.current || state.tooltips.appearanceType !== 'hover' || window.matchMedia('(any-hover: none)').matches) return
+    if (
+      !tooltipRef.current ||
+      state.tooltips.appearanceType !== 'hover' ||
+      window.matchMedia('(any-hover: none)').matches
+    )
+      return
 
     const canvas = e.target
     const canvasBounds = canvas.getBoundingClientRect()
@@ -337,13 +361,13 @@ const CountyMap = props => {
 
           tooltipRef.current.style.display = 'block'
           tooltipRef.current.style.top = tooltipY + 'px'
-        if(tooltipX > containerBounds.width / 2) {
-          tooltipRef.current.style.transform = 'translate(-100%, -50%)'
-          tooltipRef.current.style.left = (tooltipX - 5) + 'px'
-        } else {
-          tooltipRef.current.style.transform = 'translate(0, -50%)'
-          tooltipRef.current.style.left = (tooltipX + 5) + 'px'
-        }
+          if (tooltipX > containerBounds.width / 2) {
+            tooltipRef.current.style.transform = 'translate(-100%, -50%)'
+            tooltipRef.current.style.left = tooltipX - 5 + 'px'
+          } else {
+            tooltipRef.current.style.transform = 'translate(0, -50%)'
+            tooltipRef.current.style.left = tooltipX + 5 + 'px'
+          }
           tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(county.id), data[county.id])
           tooltipRef.current.setAttribute('data-index', countyIndex)
         } else {
@@ -354,7 +378,10 @@ const CountyMap = props => {
     } else {
       // Handle geo map hover
       if (!isNaN(currentTooltipIndex)) {
-        const pixelCoords = topoData.projection([data[runtimeKeys[currentTooltipIndex]][state.columns.longitude.name], data[runtimeKeys[currentTooltipIndex]][state.columns.latitude.name]])
+        const pixelCoords = topoData.projection([
+          data[runtimeKeys[currentTooltipIndex]][state.columns.longitude.name],
+          data[runtimeKeys[currentTooltipIndex]][state.columns.latitude.name]
+        ])
         if (pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
           // Who knew pythagorean theorum was useful
           return // The user is still hovering over the previous geo point, don't redraw tooltip
@@ -367,8 +394,16 @@ const CountyMap = props => {
       let hoveredGeo
       let hoveredGeoIndex
       for (let i = 0; i < runtimeKeys.length; i++) {
-        const pixelCoords = topoData.projection([data[runtimeKeys[i]][state.columns.longitude.name], data[runtimeKeys[i]][state.columns.latitude.name]])
-        if (state.visual.cityStyle === 'circle' && pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius && applyLegendToRow(data[runtimeKeys[i]])) {
+        const pixelCoords = topoData.projection([
+          data[runtimeKeys[i]][state.columns.longitude.name],
+          data[runtimeKeys[i]][state.columns.latitude.name]
+        ])
+        if (
+          state.visual.cityStyle === 'circle' &&
+          pixelCoords &&
+          Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius &&
+          applyLegendToRow(data[runtimeKeys[i]])
+        ) {
           hoveredGeo = data[runtimeKeys[i]]
           hoveredGeoIndex = i
           break
@@ -387,14 +422,17 @@ const CountyMap = props => {
       if (hoveredGeo) {
         tooltipRef.current.style.display = 'block'
         tooltipRef.current.style.top = tooltipY + 'px'
-        if(tooltipX > containerBounds.width / 2) {
+        if (tooltipX > containerBounds.width / 2) {
           tooltipRef.current.style.transform = 'translate(-100%, -50%)'
-          tooltipRef.current.style.left = (tooltipX - 5) + 'px'
+          tooltipRef.current.style.left = tooltipX - 5 + 'px'
         } else {
           tooltipRef.current.style.transform = 'translate(0, -50%)'
-          tooltipRef.current.style.left = (tooltipX + 5) + 'px'
+          tooltipRef.current.style.left = tooltipX + 5 + 'px'
         }
-        tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(hoveredGeo[state.columns.geo.name]), hoveredGeo)
+        tooltipRef.current.innerHTML = applyTooltipsToGeo(
+          displayGeoName(hoveredGeo[state.columns.geo.name]),
+          hoveredGeo
+        )
         tooltipRef.current.setAttribute('data-index', hoveredGeoIndex)
       } else {
         tooltipRef.current.style.display = 'none'
@@ -431,10 +469,15 @@ const CountyMap = props => {
       }
 
       // Centers the projection on the paramter passed
-      if (focus.center) {
-        topoData.projection.scale(canvas.width * (focus.id === '72' ? 10 : 2.5))
-        let offset = topoData.projection(focus.center)
-        topoData.projection.translate([-offset[0] + canvas.width, -offset[1] + canvas.height])
+      // Centers the projection on the parameter passed
+      if (focus.feature) {
+        const PADDING = 10
+        // Fit the feature within the canvas dimensions with padding
+        const fitExtent = [
+          [PADDING, PADDING],
+          [canvas.width - 0, canvas.height - PADDING]
+        ]
+        topoData.projection.fitExtent(fitExtent, focus.feature)
       }
 
       // Erases previous renderings before redrawing map
@@ -508,10 +551,13 @@ const CountyMap = props => {
       }
 
       const drawCircle = (circle, context) => {
+        const percentOfOriginalSize = 0.75
+        const adjustedGeoRadius =
+          state.mapPosition.zoom > 1 ? Number(circle.geoRadius) * percentOfOriginalSize : circle.geoRadius
         context.lineWidth = lineWidth
         context.fillStyle = circle.color
         context.beginPath()
-        context.arc(circle.x, circle.y, circle.geoRadius, 0, 2 * Math.PI)
+        context.arc(circle.x, circle.y, adjustedGeoRadius, 0, 2 * Math.PI)
         context.fill()
         context.stroke()
       }
@@ -521,12 +567,20 @@ const CountyMap = props => {
         const geoRadius = (state.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
 
         runtimeKeys.forEach(key => {
-          const pixelCoords = topoData.projection([data[key][state.columns.longitude.name], data[key][state.columns.latitude.name]])
+          const pixelCoords = topoData.projection([
+            data[key][state.columns.longitude.name],
+            data[key][state.columns.latitude.name]
+          ])
 
           if (pixelCoords) {
             const legendValues = data[key] !== undefined ? applyLegendToRow(data[key]) : false
             if (legendValues && state.visual.cityStyle === 'circle') {
-              const circle = { x: pixelCoords[0], y: pixelCoords[1], color: legendValues[0], geoRadius }
+              const circle = {
+                x: pixelCoords[0],
+                y: pixelCoords[1],
+                color: legendValues[0],
+                geoRadius: geoRadius
+              }
               drawCircle(circle, context)
             }
             if (legendValues && state.visual.cityStyle === 'pin') {

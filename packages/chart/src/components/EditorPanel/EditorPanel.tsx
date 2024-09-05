@@ -21,6 +21,7 @@ import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import { viewports } from '@cdc/core/helpers/getViewport'
+import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
 // chart components
 import Panels from './components/Panels'
@@ -952,13 +953,28 @@ const EditorPanel = () => {
 
   const getLegendStyleOptions = (option: 'style' | 'subStyle'): string[] => {
     const options: string[] = []
-    if (option === 'style') {
-      options.push('circles', 'boxes')
-      if (config.visualizationType === 'Bar') options.push('gradient')
-      if (config.visualizationType === 'Line') options.push('lines')
-    }
-    if (option === 'subStyle') {
-      options.push('linear blocks', 'smooth')
+
+    switch (option) {
+      case 'style':
+        options.push('circles', 'boxes')
+        if (
+          config.visualizationType === 'Bar' &&
+          (!['right', 'left'].includes(config.legend.position) || !config.legend.position)
+        ) {
+          options.push('gradient')
+        }
+        if (config.visualizationType === 'Line') {
+          options.push('lines')
+        }
+        break
+      case 'subStyle':
+        if (config.visualizationType === 'Bar') {
+          options.push('linear blocks')
+        } else {
+          options.push('linear blocks', 'smooth')
+        }
+
+        break
     }
     return options
   }
@@ -1436,6 +1452,28 @@ const EditorPanel = () => {
                         updateField={updateField}
                       />
                     )}
+                    {config.dynamicSeries && config.visualizationType === 'Line' && (
+                      <Select
+                        fieldName='dynamicSeriesType'
+                        value={config.dynamicSeriesType}
+                        label='Series Type'
+                        initial='Select'
+                        updateField={updateField}
+                        options={['Line', 'dashed-sm', 'dashed-md', 'dashed-lg']}
+                      />
+                    )}
+                    {config.dynamicSeries &&
+                      config.visualizationType === 'Line' &&
+                      config.dynamicSeriesType === 'Line' && (
+                        <Select
+                          fieldName='dynamicSeriesLineType'
+                          value={config.dynamicSeriesLineType ? config.dynamicSeriesLineType : 'curveLinear'}
+                          label='Line Type'
+                          initial='Select'
+                          updateField={updateField}
+                          options={Object.keys(approvedCurveTypes).map(curveName => approvedCurveTypes[curveName])}
+                        />
+                      )}
                     {(!visSupportsDynamicSeries() || !config.dynamicSeries) && (
                       <>
                         {(!config.series || config.series.length === 0) &&
@@ -3676,7 +3714,7 @@ const EditorPanel = () => {
                           />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>Selecting this option will provide the definition of suppressed data below the legend.</p>
+                          <p>Selecting this option will hide the suppression definition link from display.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
@@ -3803,14 +3841,37 @@ const EditorPanel = () => {
                     updateField={updateField}
                   />
                   <CheckBox
-                    display={['bottom', 'top'].includes(config.legend.position) && !config.legend.hide}
-                    value={config.legend.hasBorder}
+                    display={!config.legend.hide}
+                    value={
+                      ['left', 'right'].includes(config.legend.position)
+                        ? config.legend.hideBorder.side
+                        : config.legend.hideBorder.topBottom
+                    }
                     section='legend'
-                    fieldName='hasBorder'
-                    label='Display Border'
+                    subsection='hideBorder'
+                    fieldName={['left', 'right'].includes(config.legend.position) ? 'side' : 'topBottom'}
+                    label='Hide Legend Box'
                     updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display='question'
+                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Default option for top and bottom legends is ‘No Box.’.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
                   />
                   <CheckBox
+                    display={
+                      !config.legend.hide &&
+                      !['left', 'right'].includes(config.legend.position) &&
+                      config.legend.style !== 'gradient'
+                    }
                     value={config.legend.singleRow}
                     section='legend'
                     fieldName='singleRow'
