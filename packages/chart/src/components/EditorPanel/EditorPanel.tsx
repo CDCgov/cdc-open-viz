@@ -301,6 +301,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                       updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                     />
                     <CheckBox
+                      display={config.visualizationSubType === 'regular'}
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
@@ -320,6 +321,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                       updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                     />
                     <CheckBox
+                      display={config.visualizationSubType === 'regular'}
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
@@ -339,6 +341,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                       updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                     />
                     <CheckBox
+                      display={config.visualizationSubType === 'regular'}
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
@@ -358,6 +361,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                       updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                     />
                     <CheckBox
+                      display={config.visualizationSubType === 'regular'}
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
