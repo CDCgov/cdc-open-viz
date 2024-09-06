@@ -24,7 +24,19 @@ export const useEditorPermissions = () => {
     'Sankey'
 ]
 
-  const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
+  const headerColors = [
+    'theme-blue',
+    'theme-purple',
+    'theme-brown',
+    'theme-teal',
+    'theme-pink',
+    'theme-orange',
+    'theme-slate',
+    'theme-indigo',
+    'theme-cyan',
+    'theme-green',
+    'theme-amber'
+  ]
 
   const visSupportsDateCategoryAxis = () => {
     const disabledCharts = ['Forest Plot', 'Sankey']
@@ -45,13 +57,30 @@ export const useEditorPermissions = () => {
   }
 
   const visHasLabelOnData = () => {
-    const disabledCharts = ['Area Chart', 'Box Plot', 'Pie', 'Scatter Plot', 'Forest Plot', 'Spark Line', 'Sankey', 'Bump Chart']
+    const disabledCharts = [
+      'Area Chart',
+      'Box Plot',
+      'Pie',
+      'Scatter Plot',
+      'Forest Plot',
+      'Spark Line',
+      'Sankey',
+      'Bump Chart'
+    ]
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visCanAnimate = () => {
-    const disabledCharts = ['Area Chart', 'Scatter Plot', 'Box Plot', 'Forest Plot', 'Spark Line', 'Sankey', 'Bump Chart']
+    const disabledCharts = [
+      'Area Chart',
+      'Scatter Plot',
+      'Box Plot',
+      'Forest Plot',
+      'Spark Line',
+      'Sankey',
+      'Bump Chart'
+    ]
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -73,7 +102,14 @@ export const useEditorPermissions = () => {
 
   const visHasNumbersOnBars = () => {
     if (visualizationType === 'Forest Plot') return false
-    if (config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis' || config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar')) return true
+    if (
+      config.orientation === 'horizontal' &&
+      (config.yAxis.labelPlacement === 'Below Bar' ||
+        config.yAxis.labelPlacement === 'On Date/Category Axis' ||
+        config.visualizationType === 'Paired Bar' ||
+        config.visualizationType === 'Deviation Bar')
+    )
+      return true
     return false
   }
 
@@ -112,7 +148,9 @@ export const useEditorPermissions = () => {
   const visHasBarBorders = () => {
     const disabledCharts = ['Box Plot', 'Scatter Plot', 'Pie', 'Line']
     if (disabledCharts.includes(visualizationType)) return false
-    return series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar' || series.type === 'Deviation Bar')
+    return series?.some(
+      series => series.type === 'Bar' || series.type === 'Paired Bar' || series.type === 'Deviation Bar'
+    )
   }
 
   const visHasDataCutoff = () => {
@@ -307,29 +345,29 @@ export const useEditorPermissions = () => {
 
   const visSupportsReactTooltip = () => {
     if (config.yAxis.type === 'categorical') return true
-    if (['Deviation Bar', 'Box Plot', 'Scatter Plot', 'Paired Bar'].includes(visualizationType) || (visualizationType === 'Bar' && config.tooltips.singleSeries)) {
+    if (
+      ['Deviation Bar', 'Box Plot', 'Scatter Plot', 'Paired Bar'].includes(visualizationType) ||
+      (visualizationType === 'Bar' && config.tooltips.singleSeries)
+    ) {
       return true
     }
   }
 
   const visSupportsPreliminaryData = () => {
-    // check if Line added in Combo
-    const lineExist = config?.series.some(item => ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg'].includes(item?.type))
-    if (visualizationType === 'Line') {
-      return true
-    }
-    if (visualizationType === 'Bar' && visualizationSubType === 'regular') {
+    if (['Line', 'Bar', 'Combo'].includes(visualizationType)) {
       return true
     }
 
-    if (visualizationType === 'Combo') {
-      return true
-    }
     return false
   }
 
   const visSupportsDynamicSeries = () => {
-    return visualizationType === 'Line' || visualizationType === 'Bar' || visualizationType === 'Scatter Plot' || visualizationType === 'Area Chart'
+    return (
+      visualizationType === 'Line' ||
+      visualizationType === 'Bar' ||
+      visualizationType === 'Scatter Plot' ||
+      visualizationType === 'Area Chart'
+    )
   }
 
   const visHasSingleSeriesTooltip = () => {
@@ -343,7 +381,15 @@ export const useEditorPermissions = () => {
   }
 
   const visHasCategoricalAxis = () => {
-    if ((visualizationType === 'Line' || visualizationType === 'Bar' || visualizationType === 'Combo' || visualizationType === 'Area Chart') && config.yAxis.type === 'categorical' && orientation === 'vertical') return true
+    if (
+      (visualizationType === 'Line' ||
+        visualizationType === 'Bar' ||
+        visualizationType === 'Combo' ||
+        visualizationType === 'Area Chart') &&
+      config.yAxis.type === 'categorical' &&
+      orientation === 'vertical'
+    )
+      return true
   }
 
   return {
