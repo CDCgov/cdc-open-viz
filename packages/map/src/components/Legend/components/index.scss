@@ -37,8 +37,12 @@
         right: 1em;
 
         ul.vertical-sorted {
+          display: block;
           column-count: 2;
           column-fill: balance;
+          & > li {
+            white-space: nowrap;
+          }
         }
 
         ul:not(.vertical-sorted) {
@@ -53,7 +57,8 @@
         border: none;
       }
 
-      &.bottom {
+      &.bottom,
+      &.top {
         ul.legend-container__ul.vertical-sorted {
           display: block;
           column-count: 2;
@@ -95,6 +100,9 @@
       .legend-container__ul:not(.single-row) {
         list-style: none;
         padding-top: 1em;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+
         button {
           font-size: unset;
           background: transparent;
@@ -121,6 +129,7 @@
           transition: 0.1s opacity;
           display: flex;
           cursor: pointer;
+          white-space: nowrap;
           flex-grow: 1;
 
           &.legend-container__li--disabled {
@@ -144,6 +153,11 @@
           display: flex;
           justify-content: center;
           align-items: center;
+          vertical-align: middle;
+
+          & svg {
+            vertical-align: baseline;
+          }
         }
       }
     }
@@ -157,6 +171,7 @@
 
       .legend-container__li {
         width: 100%;
+        white-space: nowrap;
       }
     }
 
