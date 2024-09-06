@@ -1,21 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useId } from 'react'
 
 // CDC
 import Button from './elements/Button'
 import { getQueryParams, updateQueryString } from '../helpers/queryStringUtils'
-
-// Third Party
-import PropTypes from 'prop-types'
 import MultiSelect from './MultiSelect'
 import { Visualization } from '../types/Visualization'
-import { MultiSelectFilter, VizFilter } from '../types/VizFilter'
+import { MultiSelectFilter, OrderBy, VizFilter } from '../types/VizFilter'
 import { filterVizData } from '../helpers/filterVizData'
 import { addValuesToFilters } from '../helpers/addValuesToFilters'
+import { DimensionsType } from '../types/Dimensions'
+import NestedDropdown from './NestedDropdown'
+import _ from 'lodash'
 
-export const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar', 'multi-select']
+export const filterStyleOptions = ['dropdown', 'nested-dropdown', 'pill', 'tab', 'tab bar', 'multi-select']
 
-export const filterOrderOptions = [
+export const filterOrderOptions: { label: string; value: OrderBy }[] = [
   {
     label: 'Ascending Alphanumeric',
     value: 'asc'
@@ -31,32 +31,18 @@ export const filterOrderOptions = [
 ]
 
 export const handleSorting = singleFilter => {
-  const { order } = singleFilter
-
-  if (order === 'cust') {
-    singleFilter.values = singleFilter.orderedValues
-    return singleFilter.values
+  const singleFilterValues = _.cloneDeep(singleFilter.values)
+  if (singleFilter.order === 'cust') {
+    return singleFilter
   }
 
-  const sortAsc = (a, b) => {
-    return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
+  const sort = (a, b) => {
+    const asc = singleFilter.order !== 'desc'
+    return (asc ? a : b).toString().localeCompare((asc ? b : a).toString(), 'en', { numeric: true })
   }
 
-  const sortDesc = (a, b) => {
-    return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
-  }
+  singleFilter.values = singleFilterValues.sort(sort)
 
-  if (!order || order === '') {
-    singleFilter.order = 'asc'
-  }
-
-  if (order === 'desc') {
-    singleFilter.values = singleFilter.values.sort(sortDesc)
-  }
-
-  if (order === 'asc') {
-    singleFilter.values = singleFilter.values.sort(sortAsc)
-  }
   return singleFilter
 }
 
@@ -88,7 +74,9 @@ export const useFilters = props => {
     const [movedItem] = updatedValues.splice(idx1, 1)
     updatedValues.splice(idx2, 0, movedItem)
 
-    const filtersCopy = hasStandardFilterBehavior.includes(visualizationConfig.type) ? [...visualizationConfig.filters] : [...filteredData]
+    const filtersCopy = hasStandardFilterBehavior.includes(visualizationConfig.type)
+      ? [...visualizationConfig.filters]
+      : [...filteredData]
     const filterItem = { ...filtersCopy[filterIndex] }
 
     // Overwrite filterItem.values since thats what we map through in the editor panel
@@ -107,17 +95,20 @@ export const useFilters = props => {
     setConfig({ ...visualizationConfig, filters: filtersCopy })
   }
 
-  const announceChange = text => {}
-
   const changeFilterActive = (index, value) => {
-    const newFilters = visualizationConfig.type === 'map' ? [...filteredData] : [...visualizationConfig.filters]
+    let newFilters = visualizationConfig.type === 'map' ? [...filteredData] : [...visualizationConfig.filters]
 
     if (visualizationConfig.filterBehavior === 'Apply Button') {
       newFilters[index].queuedActive = value
       setShowApplyButton(true)
     } else {
       const newFilter = newFilters[index]
-      newFilter.active = value
+      if (newFilter.filterStyle !== 'nested-dropdown') {
+        newFilter.active = value
+      } else {
+        newFilter.active = value[0]
+        newFilter.subGrouping.active = value[1]
+      }
 
       const queryParams = getQueryParams()
       if (newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active) {
@@ -125,10 +116,14 @@ export const useFilters = props => {
         updateQueryString(queryParams)
       }
     }
-    setConfig({
-      ...visualizationConfig,
-      filters: newFilters
-    })
+
+    if (!visualizationConfig.dynamicSeries) {
+      newFilters = addValuesToFilters(newFilters, excludedData)
+      setConfig({
+        ...visualizationConfig,
+        filters: newFilters
+      })
+    }
 
     // Used for setting active filter, fromHash breaks the filteredData functionality.
     if (visualizationConfig.type === 'map' && visualizationConfig.filterBehavior === 'Filter Change') {
@@ -136,8 +131,52 @@ export const useFilters = props => {
     }
 
     // If we're on a chart and not using the apply button
-    if (hasStandardFilterBehavior.includes(visualizationConfig.type) && visualizationConfig.filterBehavior === 'Filter Change') {
-      setFilteredData(filterVizData(newFilters, excludedData))
+    if (
+      hasStandardFilterBehavior.includes(visualizationConfig.type) &&
+      visualizationConfig.filterBehavior === 'Filter Change'
+    ) {
+      const newFilteredData = filterVizData(newFilters, excludedData)
+      setFilteredData(newFilteredData)
+
+      if (visualizationConfig.dynamicSeries) {
+        const runtime = visualizationConfig.runtime || {}
+        runtime.series = []
+        runtime.seriesLabels = {}
+        runtime.seriesLabelsAll = []
+
+        if (newFilteredData && newFilteredData.length && newFilteredData.length > 0) {
+          Object.keys(newFilteredData[0]).forEach(seriesKey => {
+            if (
+              seriesKey !== visualizationConfig.xAxis.dataKey &&
+              newFilteredData[0][seriesKey] &&
+              (!visualizationConfig.filters ||
+                visualizationConfig.filters?.filter(filter => filter.columnName === seriesKey).length === 0) &&
+              (!visualizationConfig.columns || Object.keys(visualizationConfig.columns).indexOf(seriesKey) === -1)
+            ) {
+              runtime.series.push({
+                dataKey: seriesKey,
+                type: visualizationConfig.dynamicSeriesType,
+                lineType: visualizationConfig.dynamicSeriesLineType,
+                tooltip: true
+              })
+            }
+          })
+        }
+
+        runtime.seriesKeys = runtime.series
+          ? runtime.series.map(series => {
+              runtime.seriesLabels[series.dataKey] = series.name || series.label || series.dataKey
+              runtime.seriesLabelsAll.push(series.name || series.dataKey)
+              return series.dataKey
+            })
+          : []
+
+        setConfig({
+          ...visualizationConfig,
+          filters: newFilters,
+          runtime
+        })
+      }
     }
   }
 
@@ -214,7 +253,6 @@ export const useFilters = props => {
   return {
     handleApplyButton,
     changeFilterActive,
-    announceChange,
     showApplyButton,
     handleReset,
     filterConstants,
@@ -226,9 +264,15 @@ export const useFilters = props => {
 }
 
 type FilterProps = {
-  filteredData
-  dimensions
+  filteredData: Object[]
+  dimensions: DimensionsType
   config: Visualization
+  // function for updating the runtime filters
+  setFilteredData: Function
+  // updating function for setting fitlerBehavior
+  setConfig: Function
+  // exclusions
+  exclusions: any[]
 }
 
 const Filters = (props: FilterProps) => {
@@ -243,7 +287,6 @@ const Filters = (props: FilterProps) => {
   const {
     handleApplyButton,
     changeFilterActive,
-    announceChange,
     showApplyButton,
     handleReset,
     filterConstants,
@@ -252,7 +295,7 @@ const Filters = (props: FilterProps) => {
 
   useEffect(() => {
     if (!dimensions) return
-    if (dimensions[0] < 768 && filters?.length > 0) {
+    if (Number(dimensions[0]) < 768 && filters?.length > 0) {
       setMobileFilterStyle(true)
     } else {
       setMobileFilterStyle(false)
@@ -266,40 +309,7 @@ const Filters = (props: FilterProps) => {
     }
   }, [changeFilterActive, selectedFilter])
 
-  const Filters = props => props.children
-
-  const filterSectionClassList = ['filters-section', type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme]
-  // Exterior Section Wrapper
-  Filters.Section = ({ children }) => {
-    return (
-      visualizationConfig?.filters && (
-        <section className={filterSectionClassList.join(' ')}>
-          <p className='filters-section__intro-text'>
-            {filters?.some(f => f.active) ? filterConstants.introText : ''} {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
-          </p>
-          <div className='filters-section__wrapper'>{children}</div>
-        </section>
-      )
-    )
-  }
-
-  // Apply/Reset Buttons
-  Filters.ApplyBehavior = () => {
-    if (filterBehavior !== 'Apply Button') return
-    const applyButtonClasses = [general?.headerColor ? general.headerColor : theme, 'apply']
-    return (
-      <div className='filters-section__buttons'>
-        <Button onClick={() => handleApplyButton(filters)} disabled={!showApplyButton} className={applyButtonClasses.join(' ')}>
-          {filterConstants.buttonText}
-        </Button>
-        <a href='#!' role='button' onClick={handleReset}>
-          {filterConstants.resetText}
-        </a>
-      </div>
-    )
-  }
-
-  Filters.TabBar = props => {
+  const TabBar = props => {
     const { filter: singleFilter, index: outerIndex } = props
     return (
       <section className='single-filters__tab-bar'>
@@ -329,11 +339,7 @@ const Filters = (props: FilterProps) => {
     )
   }
 
-  Filters.Pills = props => props.pills
-
-  Filters.Tabs = props => props.tabs
-
-  Filters.Dropdown = props => {
+  const Dropdown = props => {
     const { index: outerIndex, label, active, filters } = props
     return (
       <select
@@ -345,7 +351,6 @@ const Filters = (props: FilterProps) => {
         value={active}
         onChange={e => {
           changeFilterActive(outerIndex, e.target.value)
-          announceChange(`Filter ${label} value has been changed to ${e.target.value}, please reference the data table to see updated values.`)
         }}
       >
         {filters}
@@ -353,130 +358,160 @@ const Filters = (props: FilterProps) => {
     )
   }
 
+  const vizFiltersWithValues = useMemo(() => {
+    // Here charts is using config.filters where maps is using a runtime value
+    let vizfilters = type === 'map' ? filteredData : filters
+    if (!vizfilters) return []
+    if (vizfilters.fromHash) delete vizfilters.fromHash // support for Maps config
+    return addValuesToFilters(vizfilters as VizFilter[], visualizationConfig.data)
+  }, [filters, filteredData])
+
   // Resolve Filter Styles
-  Filters.Style = () => {
-    if (filters || filteredData) {
-      // Here charts is using config.filters where maps is using a runtime value
-      let filtersToLoop = type === 'map' ? filteredData : filters
+  const Style = () => {
+    return vizFiltersWithValues.map((singleFilter: VizFilter, outerIndex) => {
+      if (singleFilter.showDropdown === false) return
 
-      // Remove fromHash if it exists on filters to loop so we can loop nicely
-      delete filtersToLoop.fromHash
+      const DropdownOptions = []
+      const Pills = []
+      const Tabs = []
 
-      return addValuesToFilters<VizFilter>(filtersToLoop, visualizationConfig.data).map((singleFilter: VizFilter, outerIndex) => {
-        if (singleFilter.showDropdown === false) return
+      const { active, queuedActive, label, filterStyle } = singleFilter as VizFilter
 
-        const values = []
-        const pillValues = []
-        const tabValues = []
-        const tabBarValues = []
+      handleSorting(singleFilter)
 
-        const { active, queuedActive, label, filterStyle } = singleFilter as VizFilter
+      singleFilter.values?.forEach((filterOption, index) => {
+        const pillClassList = ['pill', active === filterOption ? 'pill--active' : null, theme && theme]
+        const tabClassList = ['tab', active === filterOption && 'tab--active', theme && theme]
 
-        handleSorting(singleFilter)
-
-        singleFilter.values?.forEach((filterOption, index) => {
-          const pillClassList = ['pill', active === filterOption ? 'pill--active' : null, theme && theme]
-          const tabClassList = ['tab', active === filterOption && 'tab--active', theme && theme]
-
-          pillValues.push(
-            <div className='pill__wrapper' key={`pill-${index}`}>
-              <button
-                id={`${filterOption}-${outerIndex}-${index}-${id}`}
-                className={pillClassList.join(' ')}
-                onKeyDown={e => {
-                  if (e.keyCode === 13) {
-                    changeFilterActive(outerIndex, filterOption)
-                    setSelectedFilter(e.target)
-                  }
-                }}
-                onClick={e => {
-                  changeFilterActive(outerIndex, filterOption)
-                  setSelectedFilter(e.target)
-                }}
-                name={label}
-              >
-                {filterOption}
-              </button>
-            </div>
-          )
-
-          values.push(
-            <option key={index} value={filterOption} aria-label={filterOption}>
-              {singleFilter.labels && singleFilter.labels[filterOption] ? singleFilter.labels[filterOption] : filterOption}
-            </option>
-          )
-
-          tabValues.push(
+        Pills.push(
+          <div className='pill__wrapper' key={`pill-${index}`}>
             <button
               id={`${filterOption}-${outerIndex}-${index}-${id}`}
-              className={tabClassList.join(' ')}
-              onClick={e => {
-                changeFilterActive(outerIndex, filterOption)
-                setSelectedFilter(e.target)
-              }}
+              className={pillClassList.join(' ')}
               onKeyDown={e => {
                 if (e.keyCode === 13) {
                   changeFilterActive(outerIndex, filterOption)
                   setSelectedFilter(e.target)
                 }
               }}
+              onClick={e => {
+                changeFilterActive(outerIndex, filterOption)
+                setSelectedFilter(e.target)
+              }}
+              name={label}
             >
               {filterOption}
             </button>
-          )
-
-          tabBarValues.push(filterOption)
-        })
-
-        const classList = ['single-filters', mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`]
-
-        return (
-          <div className={classList.join(' ')} key={outerIndex}>
-            <>
-              {label && <label htmlFor={`filter-${outerIndex}`}>{label}</label>}
-              {filterStyle === 'tab' && !mobileFilterStyle && <Filters.Tabs tabs={tabValues} />}
-              {filterStyle === 'pill' && !mobileFilterStyle && <Filters.Pills pills={pillValues} />}
-              {filterStyle === 'tab bar' && !mobileFilterStyle && <Filters.TabBar filter={singleFilter} index={outerIndex} />}
-              {(filterStyle === 'dropdown' || mobileFilterStyle) && <Filters.Dropdown filter={singleFilter} index={outerIndex} label={label} active={queuedActive || active} filters={values} />}
-              {filterStyle === 'multi-select' && (
-                <MultiSelect
-                  options={singleFilter.values.map(v => ({ value: v, label: v }))}
-                  fieldName={outerIndex}
-                  updateField={(_section, _subSection, fieldName, value) => changeFilterActive(fieldName, value)}
-                  selected={singleFilter.active as string[]}
-                  limit={(singleFilter as MultiSelectFilter).selectLimit || 5}
-                />
-              )}
-            </>
           </div>
         )
+
+        DropdownOptions.push(
+          <option key={index} value={filterOption} aria-label={filterOption}>
+            {singleFilter.labels && singleFilter.labels[filterOption]
+              ? singleFilter.labels[filterOption]
+              : filterOption}
+          </option>
+        )
+
+        Tabs.push(
+          <button
+            id={`${filterOption}-${outerIndex}-${index}-${id}`}
+            className={tabClassList.join(' ')}
+            onClick={e => {
+              changeFilterActive(outerIndex, filterOption)
+              setSelectedFilter(e.target)
+            }}
+            onKeyDown={e => {
+              if (e.keyCode === 13) {
+                changeFilterActive(outerIndex, filterOption)
+                setSelectedFilter(e.target)
+              }
+            }}
+          >
+            {filterOption}
+          </button>
+        )
       })
-    }
+
+      const classList = [
+        'single-filters',
+        mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`
+      ]
+      const mobileExempt = ['nested-dropdown', 'multi-select'].includes(filterStyle)
+      const showDefaultDropdown = (filterStyle === 'dropdown' || mobileFilterStyle) && !mobileExempt
+      return (
+        <div className={classList.join(' ')} key={outerIndex}>
+          <>
+            {label && <label htmlFor={`filter-${outerIndex}`}>{label}</label>}
+            {filterStyle === 'tab' && !mobileFilterStyle && Tabs}
+            {filterStyle === 'pill' && !mobileFilterStyle && Pills}
+            {filterStyle === 'tab bar' && !mobileFilterStyle && <TabBar filter={singleFilter} index={outerIndex} />}
+            {filterStyle === 'multi-select' && (
+              <MultiSelect
+                options={singleFilter.values.map(v => ({ value: v, label: v }))}
+                fieldName={outerIndex}
+                updateField={(_section, _subSection, fieldName, value) => changeFilterActive(fieldName, value)}
+                selected={singleFilter.active as string[]}
+                limit={(singleFilter as MultiSelectFilter).selectLimit || 5}
+              />
+            )}
+            {filterStyle === 'nested-dropdown' && (
+              <NestedDropdown
+                currentFilter={singleFilter}
+                listLabel={label}
+                handleSelectedItems={value => changeFilterActive(outerIndex, value)}
+              />
+            )}
+            {showDefaultDropdown && (
+              <Dropdown
+                filter={singleFilter}
+                index={outerIndex}
+                label={label}
+                active={queuedActive || active}
+                filters={DropdownOptions}
+              />
+            )}
+          </>
+        </div>
+      )
+    })
   }
 
   if (visualizationConfig?.filters?.length === 0) return
+  const filterSectionClassList = [
+    'filters-section',
+    type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme
+  ]
   return (
-    <Filters>
-      <Filters.Section>
-        <Filters.Style />
-        <Filters.ApplyBehavior />
-      </Filters.Section>
-    </Filters>
+    <section className={filterSectionClassList.join(' ')}>
+      <p className='filters-section__intro-text'>
+        {filters?.some(f => f.active && f.showDropdown) ? filterConstants.introText : ''}{' '}
+        {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
+      </p>
+      <div className='filters-section__wrapper'>
+        {' '}
+        <>
+          <Style />
+          {filterBehavior === 'Apply Button' ? (
+            <div className='filters-section__buttons'>
+              <Button
+                onClick={() => handleApplyButton(filters)}
+                disabled={!showApplyButton}
+                className={[general?.headerColor ? general.headerColor : theme, 'apply'].join(' ')}
+              >
+                {filterConstants.buttonText}
+              </Button>
+              <a href='#!' role='button' onClick={handleReset}>
+                {filterConstants.resetText}
+              </a>
+            </div>
+          ) : (
+            <></>
+          )}
+        </>
+      </div>
+    </section>
   )
-}
-
-Filters.propTypes = {
-  // runtimeFilters in place
-  filteredData: PropTypes.array,
-  // function for updating the runtime filters
-  setFilteredData: PropTypes.func,
-  // the full apps config
-  config: PropTypes.object,
-  // updating function for setting fitlerBehavior
-  setConfig: PropTypes.func,
-  // exclusions
-  excludedData: PropTypes.array,
-  dimensions: PropTypes.array
 }
 
 export default Filters

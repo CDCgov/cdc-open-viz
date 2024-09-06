@@ -78,7 +78,12 @@ export const BarChartVertical = () => {
         >
           {barGroups => {
             return barGroups.map((barGroup, index) => (
-              <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={barGroup.x0}>
+              <Group
+                className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`}
+                key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
+                id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
+                left={barGroup.x0}
+              >
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.yAxis.type === 'logarithmic' ? 0.1 : 0
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
@@ -94,7 +99,8 @@ export const BarChartVertical = () => {
                   setBarWidth(barWidth)
                   setTotalBarsInGroup(barGroup.bars.length)
                   const yAxisValue = formatNumber(/[a-zA-Z]/.test(String(bar.value)) ? '' : bar.value, 'left')
-                  const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
+                  const xAxisValue =
+                    config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
@@ -113,7 +119,6 @@ export const BarChartVertical = () => {
                   let labelColor = '#000000'
                   labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor) // Set if background is transparent'
                   let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key)
-                  barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor) // Color code by category
                   const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                   const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
                   const isHighlightedBar = highlightedBarValues?.includes(xAxisValue)
@@ -156,13 +161,16 @@ export const BarChartVertical = () => {
                         : colorScale(config.runtime.seriesLabels[bar.key])
 
                       if (isRegularLollipopColor) _barColor = barColor
-                      if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
+
                       if (isHighlightedBar) _barColor = 'transparent'
+                      if (config.legend.colorCode) _barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
+                      if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
                       return _barColor
                     }
 
                     // if this is a two tone lollipop slightly lighten the bar.
                     if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
+                    if (config.legend.colorCode) _barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
 
                     // if we're highlighting a bar make it invisible since it gets a border
                     if (isHighlightedBar) _barColor = 'transparent'
@@ -216,6 +224,7 @@ export const BarChartVertical = () => {
                           const yPadding = hasAsterisk ? -5 : -8
                           const verticalAnchor = hasAsterisk ? 'middle' : 'end'
                           const iconSize = pd.symbol === 'Asterisk' ? barWidth * 1.2 : pd.symbol === 'Double Asterisk' ? barWidth : barWidth / 1.5
+                          const fillColor = pd.displayGray ? '#8b8b8a' : '#000'
 
                           return (
                             <Text // prettier-ignore
@@ -226,7 +235,7 @@ export const BarChartVertical = () => {
                               x={barX + barWidth / 2}
                               y={barY}
                               verticalAnchor={verticalAnchor}
-                              fill={labelColor}
+                              fill={fillColor}
                               textAnchor='middle'
                               fontSize={`${iconSize}px`}
                             >
@@ -263,7 +272,7 @@ export const BarChartVertical = () => {
                             cx={barX + lollipopShapeSize / 3.5}
                             cy={bar.y}
                             r={lollipopShapeSize / 2}
-                            fill={barColor}
+                            fill={getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key]))}
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
@@ -277,7 +286,7 @@ export const BarChartVertical = () => {
                             y={barY}
                             width={lollipopShapeSize}
                             height={lollipopShapeSize}
-                            fill={barColor}
+                            fill={getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key]))}
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}

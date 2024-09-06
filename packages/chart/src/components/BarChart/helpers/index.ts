@@ -5,7 +5,7 @@ interface BarConfigProps {
   bar?: { [key: string]: any }
   isNumber?: Function
   config: { [key: string]: any }
-  getTextWidth: Function
+  getTextWidth: (a: string, b: string) => string
   barWidth: number
   isVertical: boolean
 }
@@ -20,7 +20,6 @@ export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, i
   let barLabel = ''
   let isSuppressed = false
   let showMissingDataLabel = false
-  let showZeroValueDataLabel = false
   const showSuppressedSymbol = config.general.showSuppressedSymbol
 
   config.preliminaryData.forEach(pd => {
@@ -41,23 +40,15 @@ export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, i
   // Handle undefined, null, or non-calculable bar.value
   if (!isSuppressed && !isNumber(bar.value) && config.general.showMissingDataLabel) {
     const labelWidth = getTextWidth(barLabel, `normal ${barWidth / 2}px sans-serif`)
-    const labelFits = labelWidth < barWidth && barWidth > 10
+    const labelFits = Number(labelWidth) < barWidth && barWidth > 10
     showMissingDataLabel = true
     barHeight = labelFits ? heightMini : 0
     barWidthHorizontal = heightMini
   }
-  // handle zero values
-  if (!isSuppressed && String(bar.value) === '0' && config.general.showZeroValueDataLabel) {
-    const labelWidth = getTextWidth(barLabel, `normal ${barWidth / 2}px sans-serif`)
-    const labelFits = labelWidth < barWidth && barWidth > 10
-    barHeight = config.isLollipopChart ? heightMini * 2 : !config.isLollipopChart && labelFits ? heightMini : 0
-    barWidthHorizontal = heightMini
-    showZeroValueDataLabel = true
-  }
 
   const getBarY = (defaultBarY, yScale) => {
     // calculate Y position of small bars (suppressed,N/A,Zero valued) bars
-    if (isSuppressed || showMissingDataLabel || showZeroValueDataLabel) {
+    if (isSuppressed || showMissingDataLabel) {
       if (config.isLollipopChart) {
         return yScale - heightMini * 2
       } else {
@@ -77,12 +68,10 @@ export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, i
     if (isSuppressed) label = ''
     // If the config is set to show a label for missing data, display 'N/A'
     if (showMissingDataLabel) label = 'N/A'
-    // If the config is set to specifically show zero values, set the label to '0'
-    if (showZeroValueDataLabel) label = '0'
 
     // determine label width in pixels & check if it fits to the bar width
     const labelWidth = getTextWidth(barLabel, `normal ${barWidth / 2}px sans-serif`)
-    const labelFits = labelWidth < barWidth && barWidth > 10
+    const labelFits = Number(labelWidth) < barWidth && barWidth > 10
     if (config.isLollipopChart) {
       return label
     } else {
@@ -90,7 +79,7 @@ export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, i
     }
   }
 
-  return { barWidthHorizontal, barHeight, isSuppressed, showMissingDataLabel, showZeroValueDataLabel, getBarY, getAbsentDataLabel }
+  return { barWidthHorizontal, barHeight, isSuppressed, showMissingDataLabel, getBarY, getAbsentDataLabel }
 }
 
 export const testZeroValue = value => {

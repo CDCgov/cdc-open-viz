@@ -11,7 +11,6 @@
 
 .cdc-editor .configure .cdc-open-viz-module:not(.type-dashboard) .editor-panel__toggle {
   position: absolute;
-  top: 10px;
 }
 
 .cdc-editor .configure .cdc-open-viz-module:not(.type-dashboard) .sidebar {
@@ -25,23 +24,13 @@
   }
 
   .sidebar {
-    position: fixed;
-    height: 100vh;
+    position: static;
+    height: 100%; // take up the whole container
     top: 0;
     max-width: 350px;
     width: 350px;
     background-color: var(--white);
     grid-area: panel;
-
-    .editor-toggle {
-      position: fixed !important;
-      top: 10px !important;
-    }
-
-    .editor-panel {
-      position: fixed !important;
-      top: 0 !important;
-    }
 
     &.editor-panel--hidden &.hidden {
       display: none;
@@ -858,6 +847,10 @@
     border-bottom: #565656 3px solid;
     z-index: 3;
     margin: 0;
+
+    &.collapsed {
+      display: none;
+    }
   }
 
   &.type-dashboard {
@@ -866,20 +859,26 @@
     }
   }
 
+  .editor-panel__toggle-wrapper {
+    position: absolute;
+    top: 0;
+  }
+
   .editor-panel__toggle {
     background: #f2f2f2;
     border-radius: 60px;
     color: #000;
     font-size: 1em;
     border: 0;
-    position: fixed;
+    position: absolute;
     z-index: 100;
     transition: 0.1s background;
     cursor: pointer;
     width: 25px;
     height: 25px;
-    left: 307px;
-    top: 10px;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
     box-shadow: rgba(0, 0, 0, 0.5) 0 1px 2px;
 
     &:before {

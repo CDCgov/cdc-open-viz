@@ -70,10 +70,21 @@ export const dashboardFiltersMigrate = config => {
       ]
     }
     config.rows = [newRow, ...config.rows]
+    config.dashboard.sharedFilters = config.dashboard.sharedFilters.map(sf => {
+      if (sf.usedBy) {
+        // Fixes usedBy Rows
+        sf.usedBy = sf.usedBy.map(key => {
+          if (!(parseInt(key) > -1)) return key
+          return String(parseInt(key) + 1)
+        })
+      }
+      return sf
+    })
   }
   // if there's no dashboardFilters visualization but there are sharedFilters create a visualization and update rows.
 
   config.visualizations = newVisualizations
+  delete config.filterBehavior // deprecated
 }
 
 const mapUpdates = newConfig => {

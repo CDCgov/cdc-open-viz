@@ -16,6 +16,7 @@ import useRightAxis from '../../hooks/useRightAxis'
 // Local helpers and components
 import { filterCircles, createStyles, createDataSegments } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
+import LineChartBumpCircle from './components/LineChart.BumpCircle'
 
 // Types
 import { type ChartContext } from '../../types/ChartContext'
@@ -56,8 +57,8 @@ const LineChart = (props: LineChartProps) => {
         {' '}
         {/* left - expects a number not a string */}
         {(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => {
-          let lineType = config.series.filter(item => item.dataKey === seriesKey)[0].type
-          const seriesData = config.series.filter(item => item.dataKey === seriesKey)
+          let lineType = config.runtime.series.filter(item => item.dataKey === seriesKey)[0].type
+          const seriesData = config.runtime.series.filter(item => item.dataKey === seriesKey)
           const seriesAxis = seriesData[0].axis ? seriesData[0].axis : 'left'
           let displayArea = legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
           const circleData = filterCircles(config?.preliminaryData, tableD, seriesKey)
@@ -75,33 +76,24 @@ const LineChart = (props: LineChartProps) => {
               opacity={legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
               display={legend.behavior === 'highlight' || (seriesHighlight.length === 0 && !legend.dynamicLegend) || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
             >
+              {/* tooltips */}
+              <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, tableData)} onMouseOut={handleTooltipMouseOff} onClick={e => handleTooltipClick(e, data)} />
               {data.map((d, dataIndex) => {
-                // Find the series object from the config.series array that has a dataKey matching the seriesKey variable.
-                const series = config.series.find(({ dataKey }) => dataKey === seriesKey)
-                const { axis } = series
-
-                const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
-                const labeltype = axis === 'Right' ? 'rightLabel' : 'label'
-                let label = config.runtime.yAxis[labeltype]
-
-                // if has muiltiple series dont show legend value on tooltip
-                if (!hasMultipleSeries) label = config.isLegendValue ? config.runtime.seriesLabels[seriesKey] : label
 
                 return (
                   d[seriesKey] !== undefined &&
                   d[seriesKey] !== '' &&
                   d[seriesKey] !== null &&
                   isNumber(d[seriesKey]) && (
-                    <Group key={`series-${seriesKey}-point-${dataIndex}`} className='checkwidth'>
-                      {/* tooltips */}
-                      <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, tableData)} onMouseOut={handleTooltipMouseOff} onClick={e => handleTooltipClick(e, data)} />
+                    <React.Fragment key={`series-${seriesKey}-point-${dataIndex}`}>
+                      {/* Render label */}
+                      {config.labels && (
+                        <Text x={xPos(d)} y={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))} fill={'#000'} textAnchor='middle'>
+                          {formatNumber(d[seriesKey], 'left')}
+                        </Text>
+                      )}
 
-                      {/* Render legend */}
-                      <Text display={config.labels ? 'block' : 'none'} x={xPos(d)} y={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))} fill={'#000'} textAnchor='middle'>
-                        {formatNumber(d[seriesKey], 'left')}
-                      </Text>
-
-                      {(lineDatapointStyle === 'hidden' || lineDatapointStyle === 'always show') && (
+                      {lineDatapointStyle === 'always show' && (
                         <LineChartCircle
                           mode='ALWAYS_SHOW_POINTS'
                           dataIndex={dataIndex}
@@ -142,7 +134,7 @@ const LineChart = (props: LineChartProps) => {
                         seriesAxis={seriesAxis}
                         key={`isolated-circle-${dataIndex}`}
                       />
-                    </Group>
+                    </React.Fragment>
                   )
                 )
               })}
@@ -207,7 +199,9 @@ const LineChart = (props: LineChartProps) => {
                   <LinePath
                     curve={allCurves[seriesData[0].lineType]}
                     data={
-                      config.xAxis.type === 'date-time' || config.xAxis.type === 'date'
+                      config.visualizationType == 'Bump Chart'
+                        ? data
+                        : config.xAxis.type === 'date-time' || config.xAxis.type === 'date'
                         ? data.sort((d1, d2) => {
                             let x1 = getXAxisData(d1)
                             let x2 = getXAxisData(d2)
@@ -293,6 +287,7 @@ const LineChart = (props: LineChartProps) => {
           </Text>
         )}
       </Group>
+      {config.visualizationType === 'Bump Chart' && <LineChartBumpCircle config={config} xScale={xScale} yScale={yScale} />}
     </ErrorBoundary>
   )
 }

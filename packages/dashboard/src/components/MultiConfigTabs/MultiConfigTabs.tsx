@@ -23,7 +23,8 @@ const Tab = ({ name, handleClick, tabs, index, active }) => {
   const { overlay } = useGlobalContext()
   const inputRef = createRef<HTMLInputElement>()
 
-  const onBlur = () => {
+  const saveName = e => {
+    e.stopPropagation()
     const newVal = inputRef.current.value
     const sameName = newVal === name
     const blankName = !newVal
@@ -64,15 +65,26 @@ const Tab = ({ name, handleClick, tabs, index, active }) => {
   const canMoveRight = index <= tabs.length - 2
 
   return (
-    <li className='nav-item'>
+    <li className='nav-item d-flex mt-0'>
+      {canMoveLeft && editing && <button onClick={() => handleReorder(index, -1)}>{'<'}</button>}
       <div className={`edit nav-link${active ? ' active' : ''}`} aria-current={active ? 'page' : null} onClick={onClick}>
-        {canMoveLeft && <button onClick={() => handleReorder(index, -1)}>{'<'}</button>}
-        {editing ? <input type='text' defaultValue={name} onBlur={onBlur} ref={inputRef} /> : <>{name}</>}
-        {canMoveRight && <button onClick={() => handleReorder(index, 1)}>{'>'}</button>}
-        <button className='remove' onClick={handleRemove}>
-          X
-        </button>
+        {editing ? (
+          <div className='d-flex'>
+            <input type='text' defaultValue={name} onBlur={saveName} ref={inputRef} />
+            <button className='btn btn-link save' onClick={saveName}>
+              save
+            </button>
+          </div>
+        ) : (
+          <>
+            {name}
+            <button className='remove' onClick={handleRemove}>
+              X
+            </button>
+          </>
+        )}
       </div>
+      {canMoveRight && editing && <button onClick={() => handleReorder(index, 1)}>{'>'}</button>}
     </li>
   )
 }

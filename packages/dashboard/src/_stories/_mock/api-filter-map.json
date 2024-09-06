@@ -16,7 +16,7 @@
       },
       {
         "key": "Indicator",
-        "usedBy": ["chart1"],
+        "usedBy": ["map1"],
         "type": "urlfilter",
         "apiFilter": {
           "apiEndpoint": "http://test.gov/api/poc/indicators",

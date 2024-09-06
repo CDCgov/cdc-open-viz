@@ -4,14 +4,6 @@ $mediumGray: #e6e6e6;
 
 @import 'editor-grid-view.scss';
 
-.cdc-open-viz-module.isEditor {
-  background: $mediumGray !important;
-}
-
-// .cdc-open-viz-module .form-container {
-//   height: 100%;
-// }
-
 .cove-editor {
   display: grid;
   grid-template-areas: 'panel content';

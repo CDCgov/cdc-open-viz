@@ -11,6 +11,7 @@ export const useEditorPermissions = () => {
     'Area Chart',
     'Bar',
     'Box Plot',
+    'Bump Chart',
     'Combo',
     'Deviation Bar',
     'Forecasting',
@@ -44,13 +45,13 @@ export const useEditorPermissions = () => {
   }
 
   const visHasLabelOnData = () => {
-    const disabledCharts = ['Area Chart', 'Box Plot', 'Pie', 'Scatter Plot', 'Forest Plot', 'Spark Line', 'Sankey']
+    const disabledCharts = ['Area Chart', 'Box Plot', 'Pie', 'Scatter Plot', 'Forest Plot', 'Spark Line', 'Sankey', 'Bump Chart']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visCanAnimate = () => {
-    const disabledCharts = ['Area Chart', 'Scatter Plot', 'Box Plot', 'Forest Plot', 'Spark Line', 'Sankey']
+    const disabledCharts = ['Area Chart', 'Scatter Plot', 'Box Plot', 'Forest Plot', 'Spark Line', 'Sankey', 'Bump Chart']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -104,6 +105,7 @@ export const useEditorPermissions = () => {
     }
   }
   const visHasBrushChart = () => {
+    if (config.xAxis.type === 'categorical') return false
     return ['Line', 'Bar', 'Area Chart', 'Combo'].includes(visualizationType) && orientation === 'vertical'
   }
 
@@ -133,6 +135,9 @@ export const useEditorPermissions = () => {
   const visHasSelectableLegendValues = !['Box Plot', 'Forest Plot', 'Spark Line'].includes(visualizationType)
   const visHasLegendAxisAlign = () => {
     return visualizationType === 'Bar' && visualizationSubType === 'stacked' && config.legend.behavior === 'isolate'
+  }
+  const visHasLegendColorCategory = () => {
+    return visualizationType === 'Bar' && visualizationSubType === 'regular' && config.series?.length === 1
   }
 
   const visSupportsTooltipOpacity = () => {
@@ -166,7 +171,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryAxisLabel = () => {
-    const disabledCharts = ['Forest Plot', 'Spark Line']
+    const disabledCharts = ['Forest Plot', 'Spark Line', 'Bump Chart']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -248,7 +253,7 @@ export const useEditorPermissions = () => {
 
   // implement later
   const visSupportsValueAxisLabels = () => {
-    const disabledCharts = ['Forest Plot']
+    const disabledCharts = ['Forest Plot', 'Bump Chart']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -271,6 +276,12 @@ export const useEditorPermissions = () => {
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
+  const visSupportsMobileChartHeight = () => {
+    // TODO: this is a soft release. Support should eventually match visSupportsChartHeight
+    const enabledCharts = ['Bar', 'Line', 'Combo', 'Area Chart']
+    if (enabledCharts.includes(visualizationType)) return true
+    return false
+  }
 
   const visSupportsLeftValueAxis = () => {
     const disabledCharts = ['Spark Line', 'Sankey']
@@ -285,7 +296,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryHeight = () => {
-    const disabledCharts = ['Spark Line', 'Sankey']
+    const disabledCharts = ['Spark Line', 'Sankey', 'Bump Chart']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -317,6 +328,10 @@ export const useEditorPermissions = () => {
     return false
   }
 
+  const visSupportsDynamicSeries = () => {
+    return visualizationType === 'Line' || visualizationType === 'Bar' || visualizationType === 'Scatter Plot' || visualizationType === 'Area Chart'
+  }
+
   const visHasSingleSeriesTooltip = () => {
     if (visualizationType === 'Bar' || visualizationType === 'Line') {
       return true
@@ -342,12 +357,14 @@ export const useEditorPermissions = () => {
     visHasDataSuppression,
     visHasLegend,
     visHasLegendAxisAlign,
+    visHasLegendColorCategory,
     visHasBrushChart,
     visHasNumbersOnBars,
     visHasaAdditionalLabelsOnBars,
     visSupportsBarSpace,
     visSupportsBarThickness,
     visSupportsChartHeight,
+    visSupportsMobileChartHeight,
     visSupportsDateCategoryAxis,
     visSupportsDateCategoryAxisLabel,
     visSupportsDateCategoryAxisLine,
@@ -377,6 +394,7 @@ export const useEditorPermissions = () => {
     visSupportsReactTooltip,
     visSupportsValueAxisMax,
     visSupportsValueAxisMin,
+    visSupportsDynamicSeries,
     visHasSingleSeriesTooltip,
     visHasCategoricalAxis
   }
