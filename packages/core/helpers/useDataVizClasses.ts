@@ -43,7 +43,7 @@ export default function useDataVizClasses(config, viewport = null) {
   // Using short circuiting to check between charts & maps for now.
   const getListPosition = () => {
     if (legend?.position === 'side' && legend?.singleColumn) return 'legend-container__ul--single-column'
-    if (legend?.position === 'bottom' && legend?.singleRow) return 'single-row'
+    if (legend?.position !== 'side' && legend?.singleRow) return 'single-row'
     if (legend?.verticalSorted && !legend?.singleRow) return 'vertical-sorted'
     return ''
   }
@@ -53,7 +53,8 @@ export default function useDataVizClasses(config, viewport = null) {
     ulClasses.push(getListPosition())
     return ulClasses
   }
-  const legendOuterClasses = [`${legend?.position}`, `${getListPosition()}`, `cdcdataviz-sr-focusable`, `${viewport}`]
+  const hasBorder = config.legend?.hideBorder ? 'no-border' : ''
+  const legendOuterClasses = [`${legend?.position}`, `${getListPosition()}`, `cdcdataviz-sr-focusable`, `${viewport}`, `${hasBorder}`]
 
   const legendClasses = {
     aside: legendOuterClasses,

@@ -1,0 +1,412 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": [
+      {
+        "key": "Year",
+        "showDropdown": true,
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "http://test.gov/methodology?$select=distinct year",
+          "valueSelector": "year"
+        },
+        "usedBy": ["none"],
+        "tier": 1
+      },
+      {
+        "key": "Methodology",
+        "showDropdown": false,
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "http://test.gov/methodology?$select=distinct methodology",
+          "valueSelector": "methodology"
+        },
+        "usedBy": ["chart1723488349579"],
+        "parents": ["Year"],
+        "tier": 2
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboardFilters1723488344936"
+        },
+        {},
+        {}
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboardFilters1723488344937"
+        },
+        {},
+        {}
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart1723488349579"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "dashboardFilters1723488344936": {
+      "filters": [],
+      "filterBehavior": "Apply Button",
+      "openModal": true,
+      "uid": "dashboardFilters1723488344936",
+      "type": "dashboardFilters",
+      "sharedFilterIndexes": [0],
+      "visualizationType": "dashboardFilters"
+    },
+    "dashboardFilters1723488344937": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "openModal": true,
+      "autoLoad": true,
+      "uid": "dashboardFilters1723488344937",
+      "type": "dashboardFilters",
+      "sharedFilterIndexes": [1],
+      "visualizationType": "dashboardFilters"
+    },
+    "chart1723488349579": {
+      "annotations": [],
+      "type": "chart",
+      "debugSvg": false,
+      "chartMessage": {
+        "noData": "No Data Available"
+      },
+      "title": "",
+      "showTitle": true,
+      "showDownloadMediaButton": false,
+      "theme": "theme-blue",
+      "animate": false,
+      "fontSize": "medium",
+      "lineDatapointStyle": "hover",
+      "lineDatapointColor": "Same as Line",
+      "barHasBorder": "false",
+      "isLollipopChart": false,
+      "lollipopShape": "circle",
+      "lollipopColorStyle": "two-tone",
+      "visualizationSubType": "regular",
+      "barStyle": "",
+      "roundingStyle": "standard",
+      "tipRounding": "top",
+      "isResponsiveTicks": false,
+      "general": {
+        "annotationDropdownText": "Annotations",
+        "showDownloadButton": false,
+        "showMissingDataLabel": true,
+        "showSuppressedSymbol": true,
+        "showZeroValueDataLabel": true
+      },
+      "padding": {
+        "left": 5,
+        "right": 5
+      },
+      "preliminaryData": [],
+      "yAxis": {
+        "hideAxis": false,
+        "displayNumbersOnBar": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 50,
+        "gridLines": false,
+        "enablePadding": false,
+        "min": "",
+        "max": "",
+        "labelColor": "#333",
+        "tickLabelColor": "#333",
+        "tickColor": "#333",
+        "rightHideAxis": true,
+        "rightAxisSize": 0,
+        "rightLabel": "",
+        "rightLabelOffsetSize": 0,
+        "rightAxisLabelColor": "#333",
+        "rightAxisTickLabelColor": "#333",
+        "rightAxisTickColor": "#333",
+        "numTicks": "",
+        "axisPadding": 0,
+        "scalePadding": 10,
+        "tickRotation": 0,
+        "anchors": [],
+        "shoMissingDataLabel": true,
+        "showMissingDataLine": true
+      },
+      "boxplot": {
+        "plots": [],
+        "borders": "true",
+        "firstQuartilePercentage": 25,
+        "thirdQuartilePercentage": 75,
+        "boxWidthPercentage": 40,
+        "plotOutlierValues": false,
+        "plotNonOutlierValues": true,
+        "legend": {
+          "showHowToReadText": false,
+          "howToReadText": ""
+        },
+        "labels": {
+          "q1": "Lower Quartile",
+          "q2": "q2",
+          "q3": "Upper Quartile",
+          "q4": "q4",
+          "minimum": "Minimum",
+          "maximum": "Maximum",
+          "mean": "Mean",
+          "median": "Median",
+          "sd": "Standard Deviation",
+          "iqr": "Interquartile Range",
+          "total": "Total",
+          "outliers": "Outliers",
+          "values": "Values",
+          "lowerBounds": "Lower Bounds",
+          "upperBounds": "Upper Bounds"
+        }
+      },
+      "topAxis": {
+        "hasLine": false
+      },
+      "isLegendValue": false,
+      "barThickness": 0.35,
+      "barHeight": 25,
+      "barSpace": 15,
+      "heights": {
+        "vertical": 300,
+        "horizontal": 750
+      },
+      "xAxis": {
+        "sortDates": false,
+        "anchors": [],
+        "type": "categorical",
+        "showTargetLabel": true,
+        "targetLabel": "Target",
+        "hideAxis": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 75,
+        "tickRotation": 0,
+        "min": "",
+        "max": "",
+        "labelColor": "#333",
+        "tickLabelColor": "#333",
+        "tickColor": "#333",
+        "numTicks": "",
+        "labelOffset": 65,
+        "axisPadding": 200,
+        "target": 0,
+        "maxTickRotation": 0,
+        "dataKey": "state",
+        "tickWidthMax": 96
+      },
+      "table": {
+        "label": "Data Table",
+        "expanded": true,
+        "limitHeight": false,
+        "height": "",
+        "caption": "",
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "indexLabel": "",
+        "download": true,
+        "showVertical": true,
+        "dateDisplayFormat": "",
+        "showMissingDataLabel": true,
+        "showSuppressedSymbol": true,
+        "show": false
+      },
+      "orientation": "vertical",
+      "color": "pinkpurple",
+      "columns": {},
+      "legend": {
+        "hide": false,
+        "behavior": "isolate",
+        "axisAlign": true,
+        "singleRow": true,
+        "colorCode": "",
+        "reverseLabelOrder": false,
+        "description": "",
+        "dynamicLegend": false,
+        "dynamicLegendDefaultText": "Show All",
+        "dynamicLegendItemLimit": 5,
+        "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+        "dynamicLegendChartMessage": "Select Options from the Legend",
+        "lineMode": false,
+        "verticalSorted": false,
+        "highlightOnHover": false,
+        "hideSuppressedLabels": false,
+        "seriesHighlight": []
+      },
+      "brush": {
+        "height": 25,
+        "active": false
+      },
+      "exclusions": {
+        "active": false,
+        "keys": []
+      },
+      "palette": "qualitative-bold",
+      "isPaletteReversed": false,
+      "twoColor": {
+        "palette": "monochrome-1",
+        "isPaletteReversed": false
+      },
+      "labels": false,
+      "dataFormat": {
+        "commas": false,
+        "prefix": "",
+        "suffix": "",
+        "abbreviated": false,
+        "bottomSuffix": "",
+        "bottomPrefix": "",
+        "bottomAbbreviated": false
+      },
+      "confidenceKeys": {},
+      "visual": {
+        "border": true,
+        "accent": true,
+        "background": true,
+        "verticalHoverLine": false,
+        "horizontalHoverLine": false
+      },
+      "useLogScale": false,
+      "filterBehavior": "Filter Change",
+      "highlightedBarValues": [],
+      "series": [
+        {
+          "dataKey": "value",
+          "type": "Bar",
+          "axis": "Left",
+          "tooltip": true
+        }
+      ],
+      "tooltips": {
+        "opacity": 90,
+        "singleSeries": false,
+        "dateDisplayFormat": ""
+      },
+      "forestPlot": {
+        "startAt": 0,
+        "colors": {
+          "line": "",
+          "shape": ""
+        },
+        "lineOfNoEffect": {
+          "show": true
+        },
+        "type": "",
+        "pooledResult": {
+          "diamondHeight": 5,
+          "column": ""
+        },
+        "estimateField": "",
+        "estimateRadius": "",
+        "shape": "square",
+        "rowHeight": 20,
+        "description": {
+          "show": true,
+          "text": "description",
+          "location": 0
+        },
+        "result": {
+          "show": true,
+          "text": "result",
+          "location": 100
+        },
+        "radius": {
+          "min": 2,
+          "max": 10,
+          "scalingColumn": ""
+        },
+        "regression": {
+          "lower": 0,
+          "upper": 0,
+          "estimateField": 0
+        },
+        "leftWidthOffset": 0,
+        "rightWidthOffset": 0,
+        "showZeroLine": false,
+        "leftLabel": "",
+        "rightLabel": ""
+      },
+      "area": {
+        "isStacked": false
+      },
+      "sankey": {
+        "title": {
+          "defaultColor": "black"
+        },
+        "iterations": 1,
+        "rxValue": 0.9,
+        "overallSize": {
+          "width": 900,
+          "height": 700
+        },
+        "margin": {
+          "margin_y": 25,
+          "margin_x": 0
+        },
+        "nodeSize": {
+          "nodeWidth": 26,
+          "nodeHeight": 40
+        },
+        "nodePadding": 55,
+        "nodeFontColor": "black",
+        "nodeColor": {
+          "default": "#ff8500",
+          "inactive": "#808080"
+        },
+        "linkColor": {
+          "default": "#ffc900",
+          "inactive": "#D3D3D3"
+        },
+        "opacity": {
+          "nodeOpacityDefault": 1,
+          "nodeOpacityInactive": 0.1,
+          "LinkOpacityDefault": 1,
+          "LinkOpacityInactive": 0.1
+        },
+        "storyNodeFontColor": "#006778",
+        "storyNodeText": [],
+        "nodeValueStyle": {
+          "textBefore": "(",
+          "textAfter": ")"
+        },
+        "data": []
+      },
+      "filters": [],
+      "openModal": true,
+      "uid": "chart1723488349579",
+      "visualizationType": "Bar",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "dataKey": "hidden-methodology",
+      "version": "4.24.9",
+      "dynamicMarginTop": 0
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showVertical": true
+  },
+  "datasets": {
+    "hidden-methodology": {
+      "dataUrl": "http://test.gov/methodology"
+    }
+  },
+  "type": "dashboard",
+  "runtime": {},
+  "version": "4.24.9",
+  "uuid": 1723488346870
+}

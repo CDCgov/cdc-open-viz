@@ -5,6 +5,21 @@
 @import 'filters';
 @import '@cdc/core/styles/v2/components/ui/tooltip';
 
+.type-map--has-error {
+  overflow: hidden !important;
+  height: 100vh;
+
+  .waiting {
+    display: flex;
+    align-content: center;
+    flex-wrap: wrap;
+    display: flex;
+    align-content: center;
+    flex-wrap: wrap;
+    height: 100vh;
+  }
+}
+
 .cdc-map-outer-container {
   position: relative;
   display: flex; // Needed for the main content
@@ -58,6 +73,14 @@
     display: flex;
     position: relative;
     flex-direction: column;
+
+    &.bottom {
+      flex-direction: column;
+    }
+    &.top {
+      flex-direction: column-reverse;
+    }
+
     &.modal-background {
       position: relative;
       &::before {

@@ -3,7 +3,7 @@ import { useContext } from 'react'
 import ConfigContext from '../ConfigContext'
 import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
-
+import * as d3 from 'd3'
 const scaleTypes = {
   TIME: 'time',
   LOG: 'log',
@@ -27,7 +27,7 @@ const useScales = (properties: useScaleProps) => {
 
   const { rawData, dimensions } = useContext<ChartContext>(ConfigContext)
 
-  const [screenWidth, screenHeight] = dimensions
+  const [screenWidth] = dimensions
   const seriesDomain = config.runtime.barSeriesKeys || config.runtime.seriesKeys
   const xAxisType = config.runtime.xAxis.type
   const isHorizontal = config.orientation === 'horizontal'
@@ -60,7 +60,10 @@ const useScales = (properties: useScaleProps) => {
 
   // handle  Vertical bars
   if (!isHorizontal) {
-    xScaleBrush = composeScalePoint(xAxisDataKeysMapped, [0, xMax], 0.5)
+    xScaleBrush = scaleTime({
+      domain: d3.extent(data, d => new Date(d[config.runtime.originalXAxis.dataKey])),
+      range: [0, xMax]
+    })
     xScale = composeScaleBand(xAxisDataMapped, [0, xMax], 1 - config.barThickness)
     yScale = composeYScale(properties)
     seriesScale = composeScaleBand(seriesDomain, [0, xScale.bandwidth()], 0)
@@ -73,8 +76,8 @@ const useScales = (properties: useScaleProps) => {
   }
 
   if (config.xAxis.type === 'date-time') {
-    let xAxisMin = Math.min(...xAxisDataMapped)
-    let xAxisMax = Math.max(...xAxisDataMapped)
+    let xAxisMin = Math.min(...xAxisDataMapped.map(Number))
+    let xAxisMax = Math.max(...xAxisDataMapped.map(Number))
     xAxisMin -= (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
     xAxisMax += (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
     xScale = scaleTime({
@@ -129,7 +132,9 @@ const useScales = (properties: useScaleProps) => {
   // handle Box plot
   if (visualizationType === 'Box Plot') {
     const allOutliers = []
-    const hasOutliers = config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) && !config.boxplot.hideOutliers
+    const hasOutliers =
+      config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) &&
+      !config.boxplot.hideOutliers
 
     // check if outliers are lower
     if (hasOutliers) {
@@ -215,8 +220,11 @@ const useScales = (properties: useScaleProps) => {
     if (screenWidth > 480) {
       if (config.forestPlot.type === 'Linear') {
         xScale = scaleLinear({
-          domain: [Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding],
-          range: [leftWidthOffset, dimensions[0] - rightWidthOffset]
+          domain: [
+            Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding,
+            Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding
+          ],
+          range: [leftWidthOffset, Number(screenWidth) - rightWidthOffset]
         })
         xScale.type = scaleTypes.LINEAR
       }
@@ -234,7 +242,10 @@ const useScales = (properties: useScaleProps) => {
     } else {
       if (config.forestPlot.type === 'Linear') {
         xScale = scaleLinear({
-          domain: [Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding],
+          domain: [
+            Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding,
+            Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding
+          ],
           range: [leftWidthOffsetMobile, xMax - rightWidthOffsetMobile],
           type: scaleTypes.LINEAR
         })
@@ -316,10 +327,14 @@ const composeYScale = ({ min, max, yMax, config, leftMax }) => {
   const scaleFunc = isLogarithmicAxis ? scaleLog : scaleLinear
 
   if (config.visualizationType === 'Combo') max = leftMax
+
+  // If the visualization type is a bump chart then the domain and range need different values
+  const domainSet = config.visualizationType === 'Bump Chart' ? [1, max] : [min, max]
+  const yRange = config.visualizationType === 'Bump Chart' ? [30, yMax] : [yMax, 0]
   // Return the configured scale function
   return scaleFunc({
-    domain: [min, max],
-    range: [yMax, 0],
+    domain: domainSet,
+    range: yRange,
     nice: isLogarithmicAxis,
     zero: isLogarithmicAxis
   })

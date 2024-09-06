@@ -2,8 +2,12 @@
 import { forwardRef, useContext, useId } from 'react'
 import parse from 'html-react-parser'
 
+//types
+import { DimensionsType } from '@cdc/core/types/Dimensions'
+
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import LegendCircle from '@cdc/core/components/LegendCircle'
+import LegendShape from '@cdc/core/components/LegendShape'
+import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import LegendItemHex from './LegendItem.Hex'
 import Button from '@cdc/core/components/elements/Button'
 
@@ -11,18 +15,21 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import ConfigContext from '../../../context'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
+import { type ViewportSize } from '../../../types/MapConfig'
 import { Group } from '@visx/group'
 import './index.scss'
 
 type LegendProps = {
   skipId: string
+  currentViewport: ViewportSize
+  dimensions: DimensionsType
 }
 
-const Legend = forwardRef((props, ref) => {
-  const { skipId } = props
+const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
+  const { skipId, currentViewport, dimensions } = props
 
-  // prettier-ignore
   const {
+    // prettier-ignore
     displayDataAsText,
     resetLegendToggles,
     runtimeFilters,
@@ -31,6 +38,7 @@ const Legend = forwardRef((props, ref) => {
     setRuntimeLegend,
     state,
     viewport,
+    getTextWidth
   } = useContext(ConfigContext)
 
   const { legend } = state
@@ -54,25 +62,21 @@ const Legend = forwardRef((props, ref) => {
 
     setRuntimeLegend(newLegend)
 
-    setAccessibleStatus(`Disabled legend item ${legendLabel ?? ''}. Please reference the data table to see updated values.`)
+    setAccessibleStatus(
+      `Disabled legend item ${legendLabel ?? ''}. Please reference the data table to see updated values.`
+    )
   }
-
-  const legendList = () => {
-    let legendItems
-
-    legendItems = runtimeLegend.map((entry, idx) => {
+  const getFormattedLegendItems = () => {
+    return runtimeLegend.map((entry, idx) => {
       const entryMax = displayDataAsText(entry.max, 'primary')
 
       const entryMin = displayDataAsText(entry.min, 'primary')
-
       let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
 
       // If interval, add some formatting
       if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
         formattedText = `${entryMin} - < ${entryMax}`
       }
-
-      const { disabled } = entry
 
       if (legend.type === 'category') {
         formattedText = displayDataAsText(entry.value, 'primary')
@@ -88,31 +92,49 @@ const Legend = forwardRef((props, ref) => {
         legendLabel = entry.label || entry.value
       }
 
+      return {
+        color: entry.color,
+        label: legendLabel,
+        disabled: entry.disabled,
+        special: entry.hasOwnProperty('special'),
+        value: [entry.min, entry.max]
+      }
+    })
+  }
+
+  const legendList = () => {
+    const formattedItems = getFormattedLegendItems()
+    let legendItems
+
+    legendItems = formattedItems.map((item, idx) => {
       const handleListItemClass = () => {
         let classes = ['legend-container__li']
-        if (disabled) classes.push('legend-container__li--disabled')
-        if (entry.hasOwnProperty('special')) classes.push('legend-container__li--special-class')
-        return classes
+        if (item.disabled) classes.push('legend-container__li--disabled')
+        if (item.special) classes.push('legend-container__li--special-class')
+        return classes.join(' ')
       }
 
       return (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
         <li
-          className={handleListItemClass().join(' ')}
+          className={handleListItemClass()}
           key={idx}
-          title={`Legend item ${legendLabel} - Click to disable`}
-          onClick={() => {
-            toggleLegendActive(idx, legendLabel)
-          }}
+          title={`Legend item ${item.label} - Click to disable`}
+          onClick={() => toggleLegendActive(idx, item.label)}
           onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault()
-              toggleLegendActive(idx, legendLabel)
+              toggleLegendActive(idx, item.label)
             }
           }}
           tabIndex={0}
         >
-          <LegendCircle viewport={viewport} fill={entry.color} /> <span>{legendLabel}</span>
+          <LegendShape
+            shape={state.legend.style === 'boxes' ? 'square' : 'circle'}
+            viewport={viewport}
+            fill={item.color}
+          />
+          <span>{item.label}</span>
         </li>
       )
     })
@@ -132,13 +154,48 @@ const Legend = forwardRef((props, ref) => {
 
         legendItems.push(
           <>
-            <li className={`legend-container__li legend-container__li--geo-pattern`} aria-label='You are on a pattern button. We dont support toggling patterns on this legend at the moment, but provide the area as being focusable for congruity.' tabIndex={0}>
+            <li
+              className={`legend-container__li legend-container__li--geo-pattern`}
+              aria-label='You are on a pattern button. We dont support toggling patterns on this legend at the moment, but provide the area as being focusable for congruity.'
+              tabIndex={0}
+            >
               <span className='legend-item' style={{ border: 'unset' }}>
                 <svg width={legendSize} height={legendSize}>
-                  {pattern === 'waves' && <PatternWaves id={`${patternId}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
-                  {pattern === 'circles' && <PatternCircles id={`${patternId}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
-                  {pattern === 'lines' && <PatternLines id={`${patternId}`} height={sizes[size] ?? 6} width={sizes[size] ?? 10} stroke={defaultPatternColor} strokeWidth={2} orientation={['diagonalRightToLeft']} />}
-                  <circle id={dataKey} fill={`url(#${patternId})`} r={legendSize / 2} cx={legendSize / 2} cy={legendSize / 2} stroke='#0000004d' strokeWidth={1} />
+                  {pattern === 'waves' && (
+                    <PatternWaves
+                      id={`${patternId}`}
+                      height={sizes[size] ?? 10}
+                      width={sizes[size] ?? 10}
+                      fill={defaultPatternColor}
+                    />
+                  )}
+                  {pattern === 'circles' && (
+                    <PatternCircles
+                      id={`${patternId}`}
+                      height={sizes[size] ?? 10}
+                      width={sizes[size] ?? 10}
+                      fill={defaultPatternColor}
+                    />
+                  )}
+                  {pattern === 'lines' && (
+                    <PatternLines
+                      id={`${patternId}`}
+                      height={sizes[size] ?? 6}
+                      width={sizes[size] ?? 10}
+                      stroke={defaultPatternColor}
+                      strokeWidth={2}
+                      orientation={['diagonalRightToLeft']}
+                    />
+                  )}
+                  <circle
+                    id={dataKey}
+                    fill={`url(#${patternId})`}
+                    r={legendSize / 2}
+                    cx={legendSize / 2}
+                    cy={legendSize / 2}
+                    stroke='#0000004d'
+                    strokeWidth={1}
+                  />
                 </svg>
               </span>
               <p style={{ lineHeight: '22.4px' }}>{patternData.label || patternData.dataValue || ''}</p>
@@ -150,7 +207,6 @@ const Legend = forwardRef((props, ref) => {
 
     return legendItems
   }
-
   const { legendClasses } = useDataVizClasses(state, viewport)
 
   const handleReset = e => {
@@ -165,7 +221,15 @@ const Legend = forwardRef((props, ref) => {
     }
   }
 
-  const pin = <path className='marker' d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z' strokeWidth={2} stroke={'black'} transform={`scale(0.5)`} />
+  const pin = (
+    <path
+      className='marker'
+      d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
+      strokeWidth={2}
+      stroke={'black'}
+      transform={`scale(0.5)`}
+    />
+  )
 
   const cityStyleShapes = {
     pin: pin,
@@ -179,10 +243,19 @@ const Legend = forwardRef((props, ref) => {
   return (
     <ErrorBoundary component='Sidebar'>
       <div className='legends'>
-        <aside id={skipId || 'legend'} className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex={0} ref={ref}>
+        <aside
+          id={skipId || 'legend'}
+          className={legendClasses.aside.join(' ') || ''}
+          role='region'
+          aria-label='Legend'
+          tabIndex={0}
+          ref={ref}
+        >
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
             {legend.title && <h3 className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</h3>}
-            {legend.dynamicDescription === false && legend.description && <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>}
+            {legend.dynamicDescription === false && legend.description && (
+              <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>
+            )}
             {legend.dynamicDescription === true &&
               runtimeFilters.map((filter, idx) => {
                 const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
@@ -199,8 +272,18 @@ const Legend = forwardRef((props, ref) => {
                 }
                 return true
               })}
+
+            <LegendGradient
+              labels={getFormattedLegendItems().map(item => item?.label) ?? []}
+              colors={getFormattedLegendItems().map(item => item?.color) ?? []}
+              values={getFormattedLegendItems().map(item => item?.value) ?? []}
+              dimensions={dimensions}
+              currentViewport={currentViewport}
+              config={state}
+              getTextWidth={getTextWidth}
+            />
             <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
-              {legendList()}
+              {state.legend.style === 'gradient' ? '' : legendList()}
             </ul>
             {(state.visual.additionalCityStyles.some(c => c.label) || state.visual.cityStyleLabel) && (
               <>
@@ -209,7 +292,10 @@ const Legend = forwardRef((props, ref) => {
                   {state.visual.cityStyleLabel && (
                     <div>
                       <svg>
-                        <Group top={state.visual.cityStyle === 'pin' ? 19 : state.visual.cityStyle === 'triangle' ? 13 : 11} left={10}>
+                        <Group
+                          top={state.visual.cityStyle === 'pin' ? 19 : state.visual.cityStyle === 'triangle' ? 13 : 11}
+                          left={10}
+                        >
                           {cityStyleShapes[state.visual.cityStyle.toLowerCase()]}
                         </Group>
                       </svg>
@@ -236,7 +322,9 @@ const Legend = forwardRef((props, ref) => {
             {runtimeLegend.disabledAmt > 0 && <Button onClick={handleReset}>Reset</Button>}
           </section>
         </aside>
-        {state.hexMap.shapeGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && <LegendItemHex state={state} runtimeLegend={runtimeLegend} viewport={viewport} />}
+        {state.hexMap.shapeGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && (
+          <LegendItemHex state={state} runtimeLegend={runtimeLegend} viewport={viewport} />
+        )}
       </div>
     </ErrorBoundary>
   )

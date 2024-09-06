@@ -1,7 +1,7 @@
 import { gatherQueryParams } from '@cdc/core/helpers/gatherQueryParams'
 import { SharedFilter } from '../types/SharedFilter'
 import { capitalizeSplitAndJoin } from '@cdc/core/helpers/cove/string'
-import { Visualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization, Visualization } from '@cdc/core/types/Visualization'
 import _ from 'lodash'
 
 export const isUpdateNeeded = (filters: SharedFilter[], currentQueryParams: Record<string, string>, newQueryParams: Record<string, string>): boolean => {
@@ -20,8 +20,12 @@ export const isUpdateNeeded = (filters: SharedFilter[], currentQueryParams: Reco
   return needsUpdate
 }
 
-export const getDataURL = (updatedQSParams: Record<string, string>, dataUrl: URL, newFileName: string) => {
-  const _params = Object.keys(updatedQSParams).map(key => ({ key, value: updatedQSParams[key] }))
+export const getDataURL = (updatedQSParams: Record<string, string | string[]>, dataUrl: URL, newFileName: string) => {
+  const _params = Object.keys(updatedQSParams).flatMap(key => {
+    const value = updatedQSParams[key]
+    if (Array.isArray(value)) return value.map(v => ({ key, value: v }))
+    return { key, value }
+  })
   const baseURL = dataUrl.origin + dataUrl.pathname
   let dataUrlFinal = `${baseURL}${gatherQueryParams(baseURL, _params)}`
 
@@ -65,4 +69,10 @@ export const getVisualizationsWithFormattedData = (visualizations: Record<string
     }
     return acc
   }, _.cloneDeep(visualizations))
+}
+
+export const filterUsedByDataUrl = (filter: SharedFilter, datasetKey: string, visualizations: Record<string, AnyVisualization>) => {
+  if (!filter.usedBy || !filter.usedBy.length) return true
+  const vizUsingFilters = filter.usedBy?.map(vizKey => visualizations[vizKey])
+  return vizUsingFilters?.some(viz => viz?.dataKey === datasetKey)
 }

@@ -19,6 +19,9 @@ import _ from 'lodash'
 import { footnotesSymbols } from '@cdc/core/helpers/footnoteSymbols'
 import FootnotesConfig from '@cdc/core/types/Footnotes'
 import { ConfigRow } from '../types/ConfigRow'
+import BumpChartConfig from './_mock/bump-chart.json'
+import MethodologyConfig from './_mock/methodology.json'
+import methodologyAPI from './_mock/methodologyAPI'
 
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Pages/Dashboard',
@@ -44,6 +47,13 @@ export const Example_2: Story = {
 export const Example_3: Story = {
   args: {
     config: ExampleConfig_3,
+    isEditor: false
+  }
+}
+
+export const Bump_Chart_Dashboard: Story = {
+  args: {
+    config: BumpChartConfig,
     isEditor: false
   }
 }
@@ -109,13 +119,6 @@ const multiVizData = {
   'footnote-data.json': { data: footnoteData }
 }
 
-export const MultiVisualization: Story = {
-  args: {
-    config: { ...MultiVizConfig, datasets: multiVizData },
-    isEditor: false
-  }
-}
-
 export const MultiDashboard: Story = {
   args: {
     config: MultiDashboardConfig,
@@ -138,6 +141,7 @@ const sleep = ms => {
 }
 
 const fetchMock = {
+  debug: true,
   mocks: [
     {
       matcher: {
@@ -216,11 +220,55 @@ const fetchMock = {
           }
         ]
       }
-    }
+    },
+    {
+      matcher: {
+        name: 'methodologyYear',
+        url: 'path:/methodology',
+        query: {
+          $select: 'distinct year'
+        }
+      },
+      response: {
+        status: 200,
+        body: methodologyAPI('distinct year')
+      }
+    },
+    ...['a', 'b'].map(methodology => {
+      return {
+        matcher: {
+          name: 'methodology' + methodology,
+          url: 'path:/methodology',
+          query: {
+            methodology: `"${methodology}"`
+          }
+        },
+        response: {
+          status: 200,
+          body: methodologyAPI('*', ['methodology', methodology])
+        }
+      }
+    }),
+    ...[1999, 2000, 2012, 2013].map(year => {
+      return {
+        matcher: {
+          name: 'methodology' + year,
+          url: 'path:/methodology',
+          query: {
+            $select: 'distinct methodology',
+            year
+          }
+        },
+        response: {
+          status: 200,
+          body: methodologyAPI('distinct methodology', ['year', year])
+        }
+      }
+    })
   ]
 }
 
-export const APIFiltersMap: Story = {
+export const RegressionAPIFiltersMap: Story = {
   args: {
     config: APIFiltersMapData as unknown as Config,
     isEditor: false
@@ -249,7 +297,7 @@ export const APIFiltersMap: Story = {
   }
 }
 
-export const APIFiltersChart: Story = {
+export const RegressionAPIFiltersChart: Story = {
   args: {
     config: APIFiltersChartData as unknown as Config,
     isEditor: false
@@ -274,6 +322,64 @@ export const APIFiltersChart: Story = {
     await sleep(1000)
     const yearFilter = canvas.getByLabelText('Year', { selector: 'select' })
     await user.selectOptions(yearFilter, ['Some Year 1'])
+  }
+}
+
+export const RegressionHiddenFilter: Story = {
+  args: {
+    config: MethodologyConfig,
+    isEditor: false
+  },
+  parameters: {
+    fetchMock
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+    // play is running before full rendering is complete so sleep function
+    // is needed to delay the execution.
+    // possible related bug: https://github.com/storybookjs/storybook/issues/18258
+    await sleep(1000)
+    const yearFilter = canvas.getByLabelText('Year', { selector: 'select' })
+    await user.selectOptions(yearFilter, ['1999'])
+    await user.click(canvas.getByText('GO!'))
+    await sleep(500)
+    canvas.getAllByText('alabama')
+    canvas.getAllByText('alaska')
+    canvas.getAllByText('arizona')
+    await user.selectOptions(yearFilter, ['2012'])
+    await user.click(canvas.getByText('GO!'))
+    await sleep(500)
+    canvas.getAllByText('new york')
+    canvas.getAllByText('new jersey')
+    canvas.getAllByText('new mexico')
+  }
+}
+
+export const RegressionMultiVisualization: Story = {
+  args: {
+    config: { ...MultiVizConfig, datasets: multiVizData },
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+    // play is running before full rendering is complete so sleep function
+    // is needed to delay the execution.
+    // possible related bug: https://github.com/storybookjs/storybook/issues/18258
+    await sleep(1000)
+    const categoryFilter = canvas.getByLabelText('Category', { selector: 'select' })
+    canvas.getAllByText('Paraguay')
+    canvas.getAllByText('Poland')
+    canvas.getAllByText('Iraq')
+    await user.selectOptions(categoryFilter, ['category-3'])
+    canvas.getAllByText('Paraguay')
+    canvas.getAllByText('Ethiopia')
+    canvas.getAllByText('Iraq')
+    await user.selectOptions(categoryFilter, ['category-1'])
+    canvas.getAllByText('Poland')
+    canvas.getAllByText('Ethiopia')
+    canvas.getAllByText('Curacao')
   }
 }
 
