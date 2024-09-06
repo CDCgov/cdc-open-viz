@@ -35,7 +35,12 @@ function filter(data = [], filters: SharedFilter[], condition) {
         isNotTheSelectedValue = selectedValue && currentValue != selectedValue
       }
 
-      if ((filter.filterStyle === 'nested-dropdown' && filter.subGrouping && filter.active === currentValue, isNotTheSelectedValue === false)) {
+      if (
+        filter.filterStyle === 'nested-dropdown' &&
+        filter.subGrouping &&
+        filter.active === currentValue &&
+        isNotTheSelectedValue === false
+      ) {
         const subGroupActive = filter.subGrouping.active
         const value = row[filter.subGrouping.columnName]
         if (subGroupActive === undefined || value !== subGroupActive) {
