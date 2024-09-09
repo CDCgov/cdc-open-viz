@@ -74,7 +74,7 @@ const SingleStateMap = props => {
     )
   }
 
-  const checkForNoData = data => {
+  const checkForNoData = () => {
     // If no statePicked, return true
     if (!state.general.statePicked.fipsCode) return true
     // if statePicked for District of Columbia, Guam, Puerto Rico, Virgin Islands, American Samoa, Northern Mariana Islands
@@ -173,6 +173,13 @@ const SingleStateMap = props => {
                 }
               ]}
               projection={geoAlbersUsaTerritories}
+              fitExtent={[
+                [
+                  [PADDING, PADDING],
+                  [WIDTH - PADDING, HEIGHT - PADDING]
+                ],
+                stateToShow
+              ]}
             >
               {({ features, projection }) => {
                 return (
@@ -245,7 +252,7 @@ const SingleStateMap = props => {
         </svg>
       )}
 
-      {checkForNoData(data) && (
+      {checkForNoData() && (
         <svg
           viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
           preserveAspectRatio='xMinYMin'
@@ -253,7 +260,7 @@ const SingleStateMap = props => {
           role='img'
           aria-label={handleMapAriaLabels(state)}
         >
-          <Text verticalAnchor='start' textAnchor='middle' x={WIDTH / 2} width={WIDTH} y={HEIGHT / 2}>
+          <Text verticalAnchor='start' textAnchor='middle' x={WIDTH / 2} width={WIDTH} y={HEIGHT / 2} fontSize={18}>
             {state.general.noStateFoundMessage}
           </Text>
         </svg>
