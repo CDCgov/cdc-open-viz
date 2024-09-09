@@ -21,8 +21,28 @@ const HEIGHT = 500
 const PADDING = 25
 
 const SingleStateMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported, runtimeFilters, tooltipId, position, setPosition, stateToShow, topoData, setTopoData, scale, translate, setStateToShow } =
-    useContext<MapContext>(ConfigContext)
+  const {
+    state,
+    applyTooltipsToGeo,
+    data,
+    geoClickHandler,
+    applyLegendToRow,
+    displayGeoName,
+    handleMapAriaLabels,
+    titleCase,
+    setSharedFilterValue,
+    isFilterValueSupported,
+    runtimeFilters,
+    tooltipId,
+    position,
+    setPosition,
+    stateToShow,
+    topoData,
+    setTopoData,
+    scale,
+    translate,
+    setStateToShow
+  } = useContext<MapContext>(ConfigContext)
 
   const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection, statePicked } = useStateZoom(topoData)
 
@@ -52,6 +72,22 @@ const SingleStateMap = props => {
         <Loading />
       </div>
     )
+  }
+
+  const checkForNoData = data => {
+    // If no statePicked, return true
+    if (!state.general.statePicked.fipsCode) return true
+    // if statePicked for District of Columbia, Guam, Puerto Rico, Virgin Islands, American Samoa, Northern Mariana Islands
+    if (
+      state.general.statePicked.fipsCode === '11' || // District of Columbia
+      state.general.statePicked.fipsCode === '66' || // Guam
+      state.general.statePicked.fipsCode === '72' || // Puerto Rico
+      state.general.statePicked.fipsCode === '78' || // Virgin Islands
+      state.general.statePicked.fipsCode === '60' || // American Samoa
+      state.general.statePicked.fipsCode === '69' // Northern Mariana Islands
+    ) {
+      return true
+    }
   }
 
   // Constructs and displays markup for all geos on the map (except territories right now)
@@ -105,7 +141,13 @@ const SingleStateMap = props => {
   return (
     <ErrorBoundary component='SingleStateMap'>
       {statePicked && state.general.allowMapZoom && state.general.statePicked.fipsCode && (
-        <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' role='img' aria-label={handleMapAriaLabels(state)}>
+        <svg
+          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+          preserveAspectRatio='xMinYMin'
+          className='svg-container'
+          role='img'
+          aria-label={handleMapAriaLabels(state)}
+        >
           <ZoomableGroup
             center={position.coordinates}
             zoom={position.zoom}
@@ -116,7 +158,13 @@ const SingleStateMap = props => {
             width={880}
             height={500}
           >
-            <rect className='background center-container ocean' width={WIDTH} height={HEIGHT} fillOpacity={1} fill='white'></rect>
+            <rect
+              className='background center-container ocean'
+              width={WIDTH}
+              height={HEIGHT}
+              fillOpacity={1}
+              fill='white'
+            ></rect>
             <CustomProjection
               data={[
                 {
@@ -128,7 +176,15 @@ const SingleStateMap = props => {
             >
               {({ features, projection }) => {
                 return (
-                  <g id='mapGroup' className={`countyMapGroup ${state.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''}`} transform={`translate(${translate}) scale(${scale})`} data-scale='' key='countyMapGroup'>
+                  <g
+                    id='mapGroup'
+                    className={`countyMapGroup ${
+                      state.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''
+                    }`}
+                    transform={`translate(${translate}) scale(${scale})`}
+                    data-scale=''
+                    key='countyMapGroup'
+                  >
                     {constructGeoJsx(features, projection)}
                   </g>
                 )
@@ -139,8 +195,20 @@ const SingleStateMap = props => {
         </svg>
       )}
       {statePicked && !state.general.allowMapZoom && state.general.statePicked.fipsCode && (
-        <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' role='img' aria-label={handleMapAriaLabels(state)}>
-          <rect className='background center-container ocean' width={WIDTH} height={HEIGHT} fillOpacity={1} fill='white'></rect>
+        <svg
+          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+          preserveAspectRatio='xMinYMin'
+          className='svg-container'
+          role='img'
+          aria-label={handleMapAriaLabels(state)}
+        >
+          <rect
+            className='background center-container ocean'
+            width={WIDTH}
+            height={HEIGHT}
+            fillOpacity={1}
+            fill='white'
+          ></rect>
           <CustomProjection
             data={[
               {
@@ -159,7 +227,15 @@ const SingleStateMap = props => {
           >
             {({ features, projection }) => {
               return (
-                <g id='mapGroup' className={`countyMapGroup ${state.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''}`} transform={`translate(${translate}) scale(${scale})`} data-scale='' key='countyMapGroup'>
+                <g
+                  id='mapGroup'
+                  className={`countyMapGroup ${
+                    state.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''
+                  }`}
+                  transform={`translate(${translate}) scale(${scale})`}
+                  data-scale=''
+                  key='countyMapGroup'
+                >
                   {constructGeoJsx(features, projection)}
                 </g>
               )
@@ -168,8 +244,15 @@ const SingleStateMap = props => {
           {state.annotations.length > 0 && <Annotation.Draggable />}
         </svg>
       )}
-      {!state.general.statePicked.fipsCode && (
-        <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' role='img' aria-label={handleMapAriaLabels(state)}>
+
+      {checkForNoData(data) && (
+        <svg
+          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+          preserveAspectRatio='xMinYMin'
+          className='svg-container'
+          role='img'
+          aria-label={handleMapAriaLabels(state)}
+        >
           <Text verticalAnchor='start' textAnchor='middle' x={WIDTH / 2} width={WIDTH} y={HEIGHT / 2}>
             {state.general.noStateFoundMessage}
           </Text>
