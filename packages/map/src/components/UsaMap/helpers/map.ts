@@ -80,13 +80,27 @@ export const isTopoReady = (topoData, state, runtimeFilters) => {
   return topoData.year && (!currentYear || currentYear === topoData.year)
 }
 
+export const hasMoreThanFromHash = (data: { [key: string]: any }): boolean => {
+  // Get all keys of the data object
+  const keys = Object.keys(data)
+
+  // Filter out the 'fromHash' key
+  const otherKeys = keys.filter(key => key !== 'fromHash')
+
+  // Check if there are any other keys left
+  return otherKeys.length > 0
+}
+
 export const getFilterControllingStatePicked = (state, runtimeData) => {
   if (!state.general.filterControlsStatePicked || !runtimeData) {
     const statePicked = state?.general?.statePicked?.stateName
     return statePicked
   } else {
-    let statePickedFromFilter = Object.values(runtimeData)?.map(s => s[state.general.filterControlsStatePicked])?.[0]
-    const statePicked = statePickedFromFilter || state.general.statePicked.stateName || 'Alabama'
-    return statePicked
+    if (hasMoreThanFromHash(runtimeData)) {
+      let statePickedFromFilter = Object.values(runtimeData)?.map(s => s[state.general.filterControlsStatePicked])?.[0]
+      const statePicked = statePickedFromFilter || state.general.statePicked.stateName || 'Alabama'
+      return statePicked
+    }
+    return null
   }
 }

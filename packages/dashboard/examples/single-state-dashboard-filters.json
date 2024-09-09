@@ -337,6 +337,16 @@
           "State": "Florida"
         },
         {
+          "Insured Rate": "0",
+          "Coverage Status": "Insured",
+          "FIPS Codes": "12103",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "Arizona "
+        },
+        {
           "Insured Rate": 25,
           "Coverage Status": "Insured",
           "FIPS Codes": "32005",
