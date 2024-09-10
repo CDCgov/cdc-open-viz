@@ -138,6 +138,7 @@ const CdcMap = ({
   const tooltipRef = useRef(null)
   const legendId = useId()
   const tooltipId = useId()
+  const mapId = useId()
 
   const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
   let legendMemo = useRef(new Map())
@@ -1721,7 +1722,8 @@ const CdcMap = ({
     tooltipRef,
     topoData,
     setTopoData,
-    getTextWidth
+    getTextWidth,
+    mapId
   }
 
   if (!mapProps.data || !state.data) return <></>
