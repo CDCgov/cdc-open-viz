@@ -13,7 +13,8 @@ const breakpoints = [
   '1280' // xl
 ]
 
-const os = navigator.userAgent.indexOf('Win') !== -1 ? 'Win' : navigator.userAgent.indexOf('Mac') !== -1 ? 'MacOS' : null
+const os =
+  navigator.userAgent.indexOf('Win') !== -1 ? 'Win' : navigator.userAgent.indexOf('Mac') !== -1 ? 'MacOS' : null
 
 const Responsive = ({ children, isEditor }) => {
   const [displayPanel, setDisplayPanel] = useState(false)
@@ -35,6 +36,7 @@ const Responsive = ({ children, isEditor }) => {
   )
 
   const onKeypress = key => {
+    if (!isEditor) return key
     if (key.code === 'KeyL' && key.ctrlKey) setDisplayPanel(display => !display)
     const viewportCommandKey = os === 'MacOS' ? key.metaKey : key.altKey
     if (viewportCommandKey) {
@@ -113,7 +115,10 @@ const Responsive = ({ children, isEditor }) => {
 
   return (
     <div className='cove-editor__content' data-grid={displayGrid || null}>
-      <div className='cove-editor__content-wrap--x' style={viewportPreview ? { maxWidth: viewportPreview + 'px', minWidth: 'unset' } : null}>
+      <div
+        className='cove-editor__content-wrap--x'
+        style={viewportPreview ? { maxWidth: viewportPreview + 'px', minWidth: 'unset' } : null}
+      >
         <div className='cove-editor__content-wrap--y'>
           <div className='cove-editor-utils__breakpoints--px'>
             {displayGrid && displayPanel && (
@@ -143,7 +148,8 @@ const Responsive = ({ children, isEditor }) => {
           <p className={displayGrid ? 'hotkey--active' : null}>G</p>
           <p className={rotateAnimation ? 'hotkey--active' : null}>R</p>
           <p className={viewportPreview ? 'hotkey--active' : null}>
-            {os === 'MacOS' ? <Icon style={{ marginRight: '0.25rem' }} display='command' size={12} /> : 'Alt'} + {viewportPreview ? breakpoints.indexOf(viewportPreview) + 1 : `[1 - ${breakpoints.length}]`}
+            {os === 'MacOS' ? <Icon style={{ marginRight: '0.25rem' }} display='command' size={12} /> : 'Alt'} +{' '}
+            {viewportPreview ? breakpoints.indexOf(viewportPreview) + 1 : `[1 - ${breakpoints.length}]`}
           </p>
         </div>
       </div>
@@ -161,7 +167,11 @@ const Responsive = ({ children, isEditor }) => {
             </div>
           </button>
           {breakpoints.map((breakpoint, index) => (
-            <button className={`cove-editor-utils__breakpoints-item${viewportPreview === breakpoint ? ' active' : ''}`} onClick={() => viewportPreviewController(breakpoint)} key={index}>
+            <button
+              className={`cove-editor-utils__breakpoints-item${viewportPreview === breakpoint ? ' active' : ''}`}
+              onClick={() => viewportPreviewController(breakpoint)}
+              key={index}
+            >
               {breakpoint}px
             </button>
           ))}

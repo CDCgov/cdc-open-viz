@@ -260,7 +260,15 @@ const SingleStateMap = props => {
           role='img'
           aria-label={handleMapAriaLabels(state)}
         >
-          <Text verticalAnchor='start' textAnchor='middle' x={WIDTH / 2} width={WIDTH} y={HEIGHT / 2} fontSize={18}>
+          <Text
+            verticalAnchor='start'
+            textAnchor='middle'
+            x={WIDTH / 2}
+            width={WIDTH}
+            y={HEIGHT / 2}
+            fontSize={18}
+            style={{ fontSize: '28px', height: '18px' }}
+          >
             {state.general.noStateFoundMessage}
           </Text>
         </svg>
