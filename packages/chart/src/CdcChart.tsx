@@ -744,7 +744,7 @@ export default function CdcChart({
   }, [externalFilters]) // eslint-disable-line
 
   // Load data when configObj data changes
-  if (configObj) {
+  if (configObj && isDashboard) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       loadConfig()

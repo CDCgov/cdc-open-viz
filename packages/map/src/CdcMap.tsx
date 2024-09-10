@@ -1625,7 +1625,7 @@ const CdcMap = ({
     reloadURLData()
   }, [JSON.stringify(state.filters)])
 
-  if (config) {
+  if (config && isDashboard) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       loadConfig(config)
