@@ -89,7 +89,7 @@ export default function CdcChart({
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
-  const [stateData, _setStateData] = useState(configObj.data || [])
+  const [stateData, _setStateData] = useState(config.data || [])
   const setStateData = data => {
     _setStateData(data)
   }

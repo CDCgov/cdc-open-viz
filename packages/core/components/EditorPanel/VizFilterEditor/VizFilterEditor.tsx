@@ -52,8 +52,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
 
   const handleNameChange = (filterIndex, columnName) => {
     const values = _.uniq(rawData.map(row => row[columnName]))
-    const orderedValues = values
-    const copiedFilter = { ..._.cloneDeep(config.filters[filterIndex]), columnName, values, orderedValues }
+    const copiedFilter = { ..._.cloneDeep(config.filters[filterIndex]), columnName, values }
     handleSorting(copiedFilter) // sorts dropdown values in place
     copiedFilter.active = copiedFilter.values[0]
     const newFilters = config.filters.map((filter, index) => {
@@ -81,7 +80,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
     const filterItem = { ...filtersCopy[filterIndex] }
 
     // Overwrite filterItem.values since thats what we map through in the editor panel
-    filterItem.active = updatedValues[0]
+    filterItem.values = updatedValues
     filterItem.orderedValues = updatedValues
     filterItem.active = updatedValues[0]
 

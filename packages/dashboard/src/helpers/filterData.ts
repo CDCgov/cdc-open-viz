@@ -42,10 +42,8 @@ function filter(data = [], filters: SharedFilter[], condition) {
         isNotTheSelectedValue === false
       ) {
         const subGroupActive = filter.subGrouping.active
-        const value = row[filter.subGrouping.columnName]
-        if (subGroupActive === undefined || value !== subGroupActive) {
-          isNotTheSelectedValue = true
-        }
+        const selectedSubGroupValue = row[filter.subGrouping.columnName]
+        isNotTheSelectedValue = subGroupActive && selectedSubGroupValue !== subGroupActive
       }
 
       const isFirstOccurrenceOfTier = filter.tier === condition

@@ -378,11 +378,6 @@ const Filters = (props: FilterProps) => {
       const { active, queuedActive, label, filterStyle } = singleFilter as VizFilter
 
       handleSorting(singleFilter)
-      singleFilter.orderedValues =
-        singleFilter.orderedValues === undefined || singleFilter.orderedValues.length === 0
-          ? singleFilter.values
-          : singleFilter.orderedValues
-
       singleFilter.values.forEach((filterOption, index) => {
         const pillClassList = ['pill', active === filterOption ? 'pill--active' : null, theme && theme]
         const tabClassList = ['tab', active === filterOption && 'tab--active', theme && theme]
