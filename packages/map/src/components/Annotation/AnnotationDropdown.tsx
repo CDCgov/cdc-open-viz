@@ -32,6 +32,7 @@ const AnnotationDropdown = () => {
 
     if (config.general.showAnnotationDropdown) {
       classes.push('d-lg-block')
+      classes.splice(classes.indexOf('d-lg-none'), 1)
     }
     return classes.join(' ')
   }
