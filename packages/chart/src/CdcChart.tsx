@@ -108,11 +108,13 @@ export default function CdcChart({
     isBrushing: false
   })
 
+  let [width] = dimensions
   const useVertical = config.orientation === 'vertical'
   const useMobileVertical = config.heights?.mobileVertical && ['xs', 'xxs'].includes(currentViewport)
   const responsiveVertical = useMobileVertical ? 'mobileVertical' : 'vertical'
   const renderedOrientation = useVertical ? responsiveVertical : 'horizontal'
   let height = config.aspectRatio ? width * config.aspectRatio : config?.heights?.[renderedOrientation]
+  if (config.visualizationType === 'Pie') height = config?.heights?.[renderedOrientation]
   height = height + Number(config?.xAxis?.size)
 
   type Config = typeof config
@@ -1338,7 +1340,7 @@ export default function CdcChart({
                     )}
 
                     {config.visualizationType === 'Pie' && (
-                      <ParentSize className='justify-content-center d-flex'>
+                      <ParentSize className='justify-content-center d-flex' style={{ height, width: `100%` }}>
                         {parent => <PieChart parentWidth={parent.width} parentHeight={parent.height} />}
                       </ParentSize>
                     )}
