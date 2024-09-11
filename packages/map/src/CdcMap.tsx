@@ -1839,87 +1839,87 @@ const CdcMap = ({
                     </>
                   )}
                 </section>
+              </div>
 
-                {general.showSidebar && 'navigation' !== general.type && (
-                  <Legend dimensions={dimensions} currentViewport={currentViewport} ref={legendRef} skipId={tabId} />
+              {general.showSidebar && 'navigation' !== general.type && (
+                <Legend dimensions={dimensions} currentViewport={currentViewport} ref={legendRef} skipId={tabId} />
+              )}
+
+              {'navigation' === general.type && (
+                <NavigationMenu
+                  mapTabbingID={tabId}
+                  displayGeoName={displayGeoName}
+                  data={runtimeData}
+                  options={general}
+                  columns={state.columns}
+                  navigationHandler={val => navigationHandler(val)}
+                />
+              )}
+
+              {/* Link */}
+              {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
+
+              {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+
+              <MediaControls.Section classes={['download-buttons']}>
+                {state.general.showDownloadImgButton && (
+                  <MediaControls.Button
+                    text='Download Image'
+                    title='Download Chart as Image'
+                    type='image'
+                    state={state}
+                    elementToCapture={imageId}
+                  />
                 )}
+                {state.general.showDownloadPdfButton && (
+                  <MediaControls.Button
+                    text='Download PDF'
+                    title='Download Chart as PDF'
+                    type='pdf'
+                    state={state}
+                    elementToCapture={imageId}
+                  />
+                )}
+              </MediaControls.Section>
 
-                {'navigation' === general.type && (
-                  <NavigationMenu
-                    mapTabbingID={tabId}
-                    displayGeoName={displayGeoName}
-                    data={runtimeData}
-                    options={general}
+              {state.runtime.editorErrorMessage.length === 0 &&
+                true === table.forceDisplay &&
+                general.type !== 'navigation' &&
+                false === loading && (
+                  <DataTable
+                    config={state}
+                    rawData={state.data}
+                    navigationHandler={navigationHandler}
+                    expandDataTable={table.expanded}
+                    headerColor={general.headerColor}
                     columns={state.columns}
-                    navigationHandler={val => navigationHandler(val)}
+                    showDownloadButton={general.showDownloadButton}
+                    showFullGeoNameInCSV={table.showFullGeoNameInCSV}
+                    runtimeLegend={runtimeLegend}
+                    runtimeData={runtimeData}
+                    displayDataAsText={displayDataAsText}
+                    displayGeoName={displayGeoName}
+                    applyLegendToRow={applyLegendToRow}
+                    tableTitle={table.label}
+                    indexTitle={table.indexLabel}
+                    vizTitle={general.title}
+                    viewport={currentViewport}
+                    formatLegendLocation={formatLegendLocation}
+                    setFilteredCountryCode={setFilteredCountryCode}
+                    tabbingId={tabId}
+                    showDownloadImgButton={state.general.showDownloadImgButton}
+                    showDownloadPdfButton={state.general.showDownloadPdfButton}
+                    innerContainerRef={innerContainerRef}
+                    outerContainerRef={outerContainerRef}
+                    imageRef={imageId}
+                    isDebug={isDebug}
+                    wrapColumns={table.wrapColumns}
                   />
                 )}
 
-                {/* Link */}
-                {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
+              {state.annotations.length > 0 && <Annotation.Dropdown />}
 
-                {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
-
-                <MediaControls.Section classes={['download-buttons']}>
-                  {state.general.showDownloadImgButton && (
-                    <MediaControls.Button
-                      text='Download Image'
-                      title='Download Chart as Image'
-                      type='image'
-                      state={state}
-                      elementToCapture={imageId}
-                    />
-                  )}
-                  {state.general.showDownloadPdfButton && (
-                    <MediaControls.Button
-                      text='Download PDF'
-                      title='Download Chart as PDF'
-                      type='pdf'
-                      state={state}
-                      elementToCapture={imageId}
-                    />
-                  )}
-                </MediaControls.Section>
-
-                {state.runtime.editorErrorMessage.length === 0 &&
-                  true === table.forceDisplay &&
-                  general.type !== 'navigation' &&
-                  false === loading && (
-                    <DataTable
-                      config={state}
-                      rawData={state.data}
-                      navigationHandler={navigationHandler}
-                      expandDataTable={table.expanded}
-                      headerColor={general.headerColor}
-                      columns={state.columns}
-                      showDownloadButton={general.showDownloadButton}
-                      showFullGeoNameInCSV={table.showFullGeoNameInCSV}
-                      runtimeLegend={runtimeLegend}
-                      runtimeData={runtimeData}
-                      displayDataAsText={displayDataAsText}
-                      displayGeoName={displayGeoName}
-                      applyLegendToRow={applyLegendToRow}
-                      tableTitle={table.label}
-                      indexTitle={table.indexLabel}
-                      vizTitle={general.title}
-                      viewport={currentViewport}
-                      formatLegendLocation={formatLegendLocation}
-                      setFilteredCountryCode={setFilteredCountryCode}
-                      tabbingId={tabId}
-                      showDownloadImgButton={state.general.showDownloadImgButton}
-                      showDownloadPdfButton={state.general.showDownloadPdfButton}
-                      innerContainerRef={innerContainerRef}
-                      outerContainerRef={outerContainerRef}
-                      imageRef={imageId}
-                      isDebug={isDebug}
-                      wrapColumns={table.wrapColumns}
-                    />
-                  )}
-
-                {state.annotations.length > 0 && <Annotation.Dropdown />}
-
-                {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
-              </div>
+              {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
             </section>
           )}
 
