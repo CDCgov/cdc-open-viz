@@ -113,7 +113,7 @@ table.data-table {
 
   tr {
     &.row-group {
-      background-color: var(--quaternary) !important;
+      background-color: var(--tertiary) !important;
       font-weight: bold;
     }
     border-bottom: solid 1px #e5e5e5;
