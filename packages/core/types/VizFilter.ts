@@ -2,6 +2,7 @@ export type OrderBy = 'asc' | 'desc' | 'cust'
 
 export type FilterBase = {
   columnName: string
+  orderedValues?: string[]
   values: string[]
   showDropdown: boolean
   id: number

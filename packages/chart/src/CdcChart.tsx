@@ -69,6 +69,7 @@ import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import LegendWrapper from './components/LegendWrapper'
+import _ from 'lodash'
 
 export default function CdcChart({
   configUrl,
@@ -88,7 +89,7 @@ export default function CdcChart({
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
-  const [stateData, setStateData] = useState(config.data || [])
+  const [stateData, _setStateData] = useState(configObj.data || [])
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
   const [seriesHighlight, setSeriesHighlight] = useState<string[]>(
@@ -296,7 +297,8 @@ export default function CdcChart({
     updateConfig(processedConfig, data)
   }
 
-  const updateConfig = (newConfig, dataOverride?: any[]) => {
+  const updateConfig = (_config, dataOverride?: any[]) => {
+    const newConfig = _.cloneDeep(_config)
     let data = dataOverride || stateData
 
     // Deeper copy
@@ -1507,7 +1509,7 @@ export default function CdcChart({
     missingRequiredSections,
     outerContainerRef,
     parseDate,
-    rawData: stateData ?? {},
+    rawData: _.cloneDeep(stateData) ?? {},
     seriesHighlight,
     setBrushConfig,
     setConfig,
@@ -1521,7 +1523,7 @@ export default function CdcChart({
     tableData: filteredData || excludedData, // do not clean table data
     transformedData: clean(filteredData || excludedData), // do this right before passing to components
     twoColorPalette,
-    unfilteredData: stateData,
+    unfilteredData: _.cloneDeep(stateData),
     updateConfig
   }
 

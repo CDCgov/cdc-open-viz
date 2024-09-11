@@ -14,6 +14,7 @@ import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/compon
 import { DashboardConfig } from '../../../../types/DashboardConfig'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { hasDashboardApplyBehavior } from '../../../../helpers/hasDashboardApplyBehavior'
+import NestedDropDownDashboard from './NestedDropDownDashboard'
 
 type FilterEditorProps = {
   config: DashboardConfig
@@ -25,6 +26,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
   const [columns, setColumns] = useState<string[]>([])
   const [columnValues, setColumnValues] = useState<string[]>([])
   const transform = new DataTransform()
+  const filterStyles = ['dropdown', 'multiselect', 'nested-dropdown']
 
   const parentFilters: string[] = (config.dashboard.sharedFilters || [])
     .filter(({ key, type }) => key !== filter.key && type !== 'datafilter')
@@ -59,7 +61,6 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
     const rowsNotSelected = rowOptions.filter(row => !filter.usedBy || filter.usedBy.indexOf(row.toString()) === -1)
     return [nameLookup, [...vizOptions, ...rowsNotSelected]]
   }, [config.visualizations, filter.usedBy, filter.setBy, vizRowColumnLocator])
-
 
   const iterateDatasets = async (callback: Function) => {
     const dataKeys = Object.keys(config.datasets)
@@ -116,7 +117,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
     let placeholder = orderedValues[sourceIndex]
     orderedValues[sourceIndex] = orderedValues[destinationIndex]
     orderedValues[destinationIndex] = placeholder
-    
+
     updateFilterProp('orderedValues', orderedValues)
     setColumnValues(orderedValues)
   }
@@ -360,39 +361,84 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
       {filter.type === 'datafilter' && (
         <>
           <label>
-            <span className='edit-label column-heading'>Filter: </span>
+            <span className='edit-label column-heading'>Filter Style: </span>
             <select
-              value={filter.columnName}
+              value={filter.filterStyle}
               onChange={e => {
-                updateFilterProp('columnName', e.target.value)
+                updateFilterProp('filterStyle', e.target.value)
               }}
             >
               <option value=''>- Select Option -</option>
-              {columns.map(dataKey => (
-                <option value={dataKey} key={`filter-column-select-item-${dataKey}`}>
+              {filterStyles.map(dataKey => (
+                <option value={dataKey} key={`filter-style-select-item-${dataKey}`}>
                   {dataKey}
                 </option>
               ))}
             </select>
           </label>
-
-          <TextField
-            label='Label'
-            value={filter.key}
-            updateField={(_section, _subSection, _key, value) => updateFilterProp('key', value)}
-          />
-
-          <label>
-            <span className='edit-label column-heading'>Show Dropdown</span>
-            <input
-              type='checkbox'
-              defaultChecked={filter.showDropdown === true}
-              onChange={e => {
-                updateFilterProp('showDropdown', !filter.showDropdown)
-              }}
+          {filter.filterStyle === 'multi-select' && (
+            <TextField
+              label='Select Limit'
+              value={filter.selectLimit}
+              updateField={(_section, _subSection, _field, value) => updateFilterProp('selectLimit', value)}
+              type='number'
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>The maximum number of items that can be selected.</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
             />
-          </label>
+          )}
+          {filter.filterStyle !== 'nested-dropdown' ? (
+            <>
+              <label>
+                <span className='edit-label column-heading'>Filter: </span>
+                <select
+                  value={filter.columnName}
+                  onChange={e => {
+                    updateFilterProp('columnName', e.target.value)
+                  }}
+                >
+                  <option value=''>- Select Option -</option>
+                  {columns.map(dataKey => (
+                    <option value={dataKey} key={`filter-column-select-item-${dataKey}`}>
+                      {dataKey}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
+              <TextField
+                label='Label'
+                value={filter.key}
+                updateField={(_section, _subSection, _key, value) => updateFilterProp('key', value)}
+              />
+
+              <label>
+                <span className='edit-label column-heading'>Show Dropdown</span>
+                <input
+                  type='checkbox'
+                  defaultChecked={filter.showDropdown === true}
+                  onChange={e => {
+                    updateFilterProp('showDropdown', !filter.showDropdown)
+                  }}
+                />
+              </label>
+            </>
+          ) : (
+            <NestedDropDownDashboard
+              filter={filter}
+              updateFilterProp={(name, value) => {
+                updateFilterProp(name, value)
+              }}
+              config={config}
+            />
+          )}
           <label>
             <span className='edit-label column-heading'>Set By: </span>
             <select value={filter.setBy} onChange={e => updateFilterProp('setBy', e.target.value)}>
@@ -466,7 +512,13 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
             updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)}
           />
 
-          {filter.columnName && columnValues && <FilterOrder filterIndex={0} filter={{...filter, values: columnValues}} updateFilterProp={(prop, index, value) => updateFilterProp(prop, value)} handleFilterOrder={handleFilterOrder} />}
+          {filter.columnName && columnValues && (
+            <FilterOrder
+              filter={{ ...filter, values: columnValues }}
+              updateFilterProp={(prop, index, value) => updateFilterProp(prop, value)}
+              handleFilterOrder={handleFilterOrder}
+            />
+          )}
         </>
       )}
 

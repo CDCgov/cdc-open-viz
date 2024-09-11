@@ -1,9 +1,10 @@
-import { FilterBase } from '@cdc/core/types/VizFilter'
+import { FilterBase, SubGrouping } from '@cdc/core/types/VizFilter'
 import { APIFilter } from './APIFilter'
 export type SharedFilter = FilterBase & {
   type?: 'urlfilter' | 'datafilter' | ''
   fileName?: string
   filterBy?: 'Query String' | 'File Name'
+  filterStyle: 'dropdown' | 'nested-dropdown' | 'multi-select'
   queryParameter?: string
   setByQueryParameter?: string
   active?: string | string[]
@@ -18,6 +19,7 @@ export type SharedFilter = FilterBase & {
   key: string
   apiFilter?: APIFilter
   datasetKey?: string
+  subGrouping: SubGrouping
   tier?: number
   /**
    * How to format the end file name when filter.filterBy is set to "File Name"

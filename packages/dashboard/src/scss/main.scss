@@ -262,6 +262,10 @@
     width: 100%;
   }
 
+  .cove-dashboard-filters-container {
+    z-index: 5;
+  }
+
   .cove-dashboard-filters {
     display: inline-flex;
     margin: 1em;

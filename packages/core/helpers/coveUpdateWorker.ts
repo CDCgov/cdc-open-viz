@@ -7,6 +7,7 @@ import update_4_24_7 from './ver/4.24.7'
 import update_4_24_9 from './ver/4.24.9'
 import versionNeedsUpdate from './ver/versionNeedsUpdate'
 import { UpdateFunction } from 'json-edit-react'
+import update_4_24_10 from './ver/4.24.10'
 
 export const coveUpdateWorker = config => {
   let genConfig = config
@@ -16,7 +17,8 @@ export const coveUpdateWorker = config => {
     ['4.24.4', update_4_24_4],
     ['4.24.5', update_4_24_5],
     ['4.24.7', update_4_24_7, true],
-    ['4.24.9', update_4_24_9]
+    ['4.24.9', update_4_24_9],
+    ['4.24.10', update_4_24_10]
   ]
 
   versions.forEach(([version, updateFunction, alwaysRun]: [string, UpdateFunction, boolean?]) => {

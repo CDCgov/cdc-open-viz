@@ -1,4 +1,10 @@
-import { Accordion, AccordionItem, AccordionItemButton, AccordionItemHeading, AccordionItemPanel } from 'react-accessible-accordion'
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemButton,
+  AccordionItemHeading,
+  AccordionItemPanel
+} from 'react-accessible-accordion'
 import { useContext, useMemo, useState } from 'react'
 import { CheckBox, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
@@ -29,11 +35,15 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
   const dispatch = useContext(DashboardDispatchContext)
 
   const existingOptions = useMemo(() => {
-    const sharedFilterIndexes = (config.visualizations[vizConfig.uid] as DashboardFilters).sharedFilterIndexes.map(Number)
+    const sharedFilterIndexes = (config.visualizations[vizConfig.uid] as DashboardFilters).sharedFilterIndexes.map(
+      Number
+    )
     return config.dashboard.sharedFilters
       .map<[number, string]>(({ key }, i) => [i, key])
       .filter(([filterIndex]) => !sharedFilterIndexes.includes(filterIndex)) // filter out already added filters
-      .map(([filterIndex, filterName]) => <option key={filterIndex} value={filterIndex}>{`${filterIndex} - ${filterName}`}</option>)
+      .map(([filterIndex, filterName]) => (
+        <option key={filterIndex} value={filterIndex}>{`${filterIndex} - ${filterName}`}</option>
+      ))
   }, [config.visualizations, vizConfig.uid])
 
   const openControls = useState({})
@@ -46,6 +56,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
     const apiFilterChanged = value.apiEndpoint !== oldEndpoint || value.valueSelector !== oldAPIValueSelector
     newSharedFilters[index][prop] = value
     if (prop === 'columnName') {
+      if (newSharedFilters[index].subGrouping) delete newSharedFilters[index].subGrouping
       // changing a data column and want to load the data into the preview options
       const sharedFiltersWithValues = addValuesToDashboardFilters(newSharedFilters, data)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFiltersWithValues })
@@ -110,7 +121,10 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                 </Tooltip.Target>
                 <Tooltip.Content>
-                  <p>The Apply Button option changes the visualization when the user clicks "apply". The Filter Change option immediately changes the visualization when the selection is changed.</p>
+                  <p>
+                    The Apply Button option changes the visualization when the user clicks "apply". The Filter Change
+                    option immediately changes the visualization when the selection is changed.
+                  </p>
                 </Tooltip.Content>
               </Tooltip>
             }
@@ -128,7 +142,10 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p>Check if you would like for all URL filters to automatically select a value when a parent filter is changed.</p>
+                    <p>
+                      Check if you would like for all URL filters to automatically select a value when a parent filter
+                      is changed.
+                    </p>
                   </Tooltip.Content>
                 </Tooltip>
               }
@@ -156,7 +173,10 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                     <DeleteFilterModal
                       removeFilterCompletely={removeFilter}
                       removeFilterFromViz={index => {
-                        updateConfig({ ...vizConfig, sharedFilterIndexes: vizConfig.sharedFilterIndexes.filter(i => i !== index) })
+                        updateConfig({
+                          ...vizConfig,
+                          sharedFilterIndexes: vizConfig.sharedFilterIndexes.filter(i => i !== index)
+                        })
                       }}
                       filterIndex={index}
                     />
@@ -185,14 +205,20 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p>This feature is indentended to support legacy functionality. Be advised that any change to the filter in this editor will reflect on the whole dashboard. </p>
+                    <p>
+                      This feature is indentended to support legacy functionality. Be advised that any change to the
+                      filter in this editor will reflect on the whole dashboard.{' '}
+                    </p>
                   </Tooltip.Content>
                 </Tooltip>
               </span>
               <select
                 value={''}
                 onChange={e => {
-                  updateConfig({ ...vizConfig, sharedFilterIndexes: [...vizConfig.sharedFilterIndexes, e.target.value] })
+                  updateConfig({
+                    ...vizConfig,
+                    sharedFilterIndexes: [...vizConfig.sharedFilterIndexes, e.target.value]
+                  })
                   setCanAddExisting(false)
                 }}
               >
