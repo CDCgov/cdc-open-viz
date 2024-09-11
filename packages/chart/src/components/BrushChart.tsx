@@ -12,7 +12,7 @@ interface BrushChartProps {
 }
 
 const BrushChart = ({ xMax, yMax, xScaleBrush: x }: BrushChartProps) => {
-  const { tableData, config, setBrushConfig, getTextWidth } = useContext(ConfigContext)
+  const { tableData, config, setBrushConfig, getTextWidth, dashboardConfig, formatDate } = useContext(ConfigContext)
   const [brushState, setBrushState] = useState({ isBrushing: false, selection: [] })
   const [tooltip, showTooltip] = useState(false)
   const svgRef = useRef()
@@ -60,10 +60,88 @@ const BrushChart = ({ xMax, yMax, xScaleBrush: x }: BrushChartProps) => {
       .attr('transform', selection === null ? null : (_, i) => `translate(${selection[i]},${'10'})`)
   }
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   const svg = d3.select(svgRef.current).attr('overflow', 'visible')
+
+  //   // append background rect
+  //   svg
+  //     .append('rect') // prettier-ignore
+  //     .attr('fill', '#949494')
+  //     .attr('stroke', '#c5c5c5')
+  //     .attr('stroke-width', 2)
+  //     .attr('ry', borderRadius)
+  //     .attr('rx', borderRadius)
+  //     .attr('height', brushheight)
+  //     .attr('width', xMax)
+
+  //   const brushHanlder = event => {
+  //     if (!event) {
+  //       return
+  //     }
+  //     const selection = event?.selection
+
+  //     if (selection && selection.length > 0) {
+  //       // invert pixel values into data values
+  //       const [x0, x1] = selection.map(value => invertValue(x, value))
+  //       // filter out data based on inverted data values
+  //       const newFilteredData = tableData.filter(d => {
+  //         return (
+  //           new Date(d[config.runtime.originalXAxis.dataKey]) >= x0 &&
+  //           new Date(d[config.runtime.originalXAxis.dataKey]) <= x1
+  //         )
+  //       })
+
+  //       const firstDate = (newFilteredData.length && newFilteredData[0][config?.runtime?.originalXAxis?.dataKey]) ?? ''
+  //       const lastDate =
+  //         (newFilteredData.length &&
+  //           newFilteredData[newFilteredData.length - 1][config?.runtime?.originalXAxis?.dataKey]) ??
+  //         ''
+  //       // add custom blue colored handlers to each corners of brush
+  //       svg.selectAll('.handle--custom').remove()
+  //       // append handler
+  //       svg.call(brushHandle, selection, firstDate, lastDate)
+  //       // update the brush state to add filtered data based on selection
+  //       setBrushConfig({
+  //         active: true,
+  //         isBrushing: true,
+  //         data: newFilteredData
+  //       })
+  //       setBrushState({
+  //         isBrushing: true,
+  //         selection
+  //       })
+  //     }
+  //   }
+  //   // create brush with "start ,brush, end'" states
+  //   const brush = d3
+  //     .brushX()
+  //     .extent([
+  //       [0, 0],
+  //       [xMax, brushheight]
+  //     ])
+  //     .on('start brush end', brushHanlder)
+
+  //   const defaultSelection = [0, xMax]
+
+  //   const brushGroup = svg.append('g').call(brush).call(brush.move, defaultSelection)
+  //   brushGroup.select('.overlay').style('pointer-events', 'none')
+  //   // svg.call(brushHandle, selection, firstDate, lastDate)
+
+  //   brushGroup
+  //     .selectAll('.selection')
+  //     .attr('fill', '#474747')
+  //     .attr('fill-opacity', 1)
+  //     .attr('rx', borderRadius)
+  //     .attr('ry', borderRadius)
+
+  //   return () => {
+  //     svg.selectAll('*').remove() // Cleanup on component unmount
+  //   }
+  // }, [config, dashboardConfig])
+
+  const initializeBrush = () => {
     const svg = d3.select(svgRef.current).attr('overflow', 'visible')
 
-    // append background rect
     svg
       .append('rect') // prettier-ignore
       .attr('fill', '#949494')
@@ -74,62 +152,96 @@ const BrushChart = ({ xMax, yMax, xScaleBrush: x }: BrushChartProps) => {
       .attr('height', brushheight)
       .attr('width', xMax)
 
-    const brushHanlder = event => {
-      if (!event) {
-        return
-      }
+    const brushHandler = event => {
       const selection = event?.selection
+      if (!selection) return
 
-      if (selection && selection.length > 0) {
-        // invert pixel values into data values
-        const [x0, x1] = selection.map(value => invertValue(x, value))
-        // filter out data based on inverted data values
-        const newFilteredData = tableData.filter(d => new Date(d[config.runtime.originalXAxis.dataKey]) >= x0 && new Date(d[config.runtime.originalXAxis.dataKey]) <= x1)
+      const [x0, x1] = selection.map(value => invertValue(x, value))
 
-        const firstDate = (newFilteredData.length && newFilteredData[0][config?.runtime?.originalXAxis?.dataKey]) ?? ''
-        const lastDate = (newFilteredData.length && newFilteredData[newFilteredData.length - 1][config?.runtime?.originalXAxis?.dataKey]) ?? ''
-        // add custom blue colored handlers to each corners of brush
-        svg.selectAll('.handle--custom').remove()
-        // append handler
-        svg.call(brushHandle, selection, firstDate, lastDate)
-        // update the brush state to add filtered data based on selection
-        setBrushConfig({
-          active: true,
-          isBrushing: true,
-          data: newFilteredData
-        })
-        setBrushState({
-          isBrushing: true,
-          selection
-        })
+      console.log(formatDate(x0), 'formatDate')
+
+      // filter and update brush state directly
+
+      const newFilteredData = tableData.filter(d => {
+        const dateValue = d[config.runtime.originalXAxis.dataKey]
+        // Check if the date value exists and is valid
+        if (!dateValue) {
+          console.warn(`Missing date value for data entry:`, d)
+          return false
+        }
+
+        const parsedDate = new Date(dateValue)
+
+        // Check if parsedDate is a valid date
+        if (isNaN(parsedDate.getTime())) {
+          console.warn(`Invalid date found for data entry:`, dateValue, d)
+          return false
+        }
+
+        // Check if the date falls within the selection range
+        if (parsedDate >= x0 && parsedDate <= x1) {
+          return true
+        } else {
+          //   console.log(`Filtered out:`, parsedDate, x0, x1)
+          return false
+        }
+      })
+
+      if (newFilteredData.length === 0) {
+        console.warn('Warning: newFilteredData is an empty array. Check data or date range selection.')
+        // Optionally provide a fallback or default data set here
       }
+      setBrushConfig({
+        active: true,
+        isBrushing: true,
+        data: newFilteredData
+      })
+      setBrushState({
+        isBrushing: true,
+        selection
+      })
     }
-    // create brush with "start ,brush, end'" states
+
     const brush = d3
       .brushX()
       .extent([
         [0, 0],
-        [xMax, brushheight]
-      ])
-      .on('start brush end', brushHanlder)
+        [xMax, 25]
+      ]) // brush extent
+      .on('start brush end', brushHandler)
 
     const defaultSelection = [0, xMax]
-
-    const brushGroup = svg.append('g').call(brush).call(brush.move, defaultSelection)
+    let brushGroup = svg.append('g').call(brush).call(brush.move, defaultSelection)
     brushGroup.select('.overlay').style('pointer-events', 'none')
-    // svg.call(brushHandle, selection, firstDate, lastDate)
 
-    brushGroup.selectAll('.selection').attr('fill', '#474747').attr('fill-opacity', 1).attr('rx', borderRadius).attr('ry', borderRadius)
+    brushGroup
+      .selectAll('.selection')
+      .attr('fill', '#474747')
+      .attr('fill-opacity', 1)
+      .attr('rx', borderRadius)
+      .attr('ry', borderRadius)
+  }
 
-    return () => {
-      svg.selectAll('*').remove() // Cleanup on component unmount
-    }
-  }, [config, config.brush.active])
-  console.log(config.brush.active, 'ace')
+  // Initialize brush when component is first rendered
+  if (!brushState.isBrushing) {
+    initializeBrush()
+  }
 
   return (
-    <Group onMouseLeave={handleMouseLeave} onMouseOver={handleMouseOver} className='brush-container' left={Number(config.runtime.yAxis.size)} top={calculateGroupTop()}>
-      <Text pointerEvents='visiblePainted' display={tooltip ? 'block' : 'none'} fontSize={16} x={(Number(xMax) - Number(textWidth)) / 2} y={-10}>
+    <Group
+      onMouseLeave={handleMouseLeave}
+      onMouseOver={handleMouseOver}
+      className='brush-container'
+      left={Number(config.runtime.yAxis.size)}
+      top={calculateGroupTop()}
+    >
+      <Text
+        pointerEvents='visiblePainted'
+        display={tooltip ? 'block' : 'none'}
+        fontSize={16}
+        x={(Number(xMax) - Number(textWidth)) / 2}
+        y={-10}
+      >
         Drag edges to focus on a specific segment
       </Text>
       <svg width={'100%'} height={brushheight * 3} ref={svgRef}></svg>
