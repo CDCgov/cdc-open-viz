@@ -53,7 +53,21 @@ export type DataTableProps = {
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = (props: DataTableProps) => {
-  const { config, dataConfig, tableTitle, vizTitle, rawData, runtimeData: parentRuntimeData, headerColor, expandDataTable, columns, viewport, formatLegendLocation, tabbingId, wrapColumns } = props
+  const {
+    config,
+    dataConfig,
+    tableTitle,
+    vizTitle,
+    rawData,
+    runtimeData: parentRuntimeData,
+    headerColor,
+    expandDataTable,
+    columns,
+    viewport,
+    formatLegendLocation,
+    tabbingId,
+    wrapColumns
+  } = props
   const runtimeData = useMemo(() => {
     const data = removeNullColumns(parentRuntimeData)
     if (config.table.pivot) {
@@ -67,7 +81,11 @@ const DataTable = (props: DataTableProps) => {
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
-  const [sortBy, setSortBy] = useState<any>({ column: config.type === 'map' ? 'geo' : 'date', asc: false, colIndex: null })
+  const [sortBy, setSortBy] = useState<any>({
+    column: config.type === 'map' ? 'geo' : 'date',
+    asc: false,
+    colIndex: null
+  })
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
@@ -86,7 +104,8 @@ const DataTable = (props: DataTableProps) => {
   // Change accessibility label depending on expanded status
   useEffect(() => {
     const expandedLabel = 'Accessible data table.'
-    const collapsedLabel = 'Accessible data table. This table is currently collapsed visually but can still be read using a screen reader.'
+    const collapsedLabel =
+      'Accessible data table. This table is currently collapsed visually but can still be read using a screen reader.'
 
     if (expanded === true && accessibilityLabel !== expandedLabel) {
       setAccessibilityLabel(expandedLabel)
@@ -141,7 +160,9 @@ const DataTable = (props: DataTableProps) => {
 
   const caption = useMemo(() => {
     if (config.type === 'map') {
-      return config.table.caption ? config.table.caption : `Data table showing data for the ${mapLookup[config.general.geoType]} figure.`
+      return config.table.caption
+        ? config.table.caption
+        : `Data table showing data for the ${mapLookup[config.general.geoType]} figure.`
     } else {
       return config.table.caption ? config.table.caption : `Data table showing data for the ${config.type} figure.`
     }
@@ -199,45 +220,90 @@ const DataTable = (props: DataTableProps) => {
       <ErrorBoundary component='DataTable'>
         <MediaControls.Section classes={getMediaControlsClasses()}>
           <MediaControls.Link config={config} dashboardDataConfig={dataConfig} />
-          {(config.table.download || config.general?.showDownloadButton) && <DownloadButton rawData={getDownloadData()} fileName={`${vizTitle || 'data-table'}.csv`} headerColor={headerColor} />}
+          {(config.table.download || config.general?.showDownloadButton) && (
+            <DownloadButton
+              rawData={getDownloadData()}
+              fileName={`${vizTitle || 'data-table'}.csv`}
+              headerColor={headerColor}
+            />
+          )}
         </MediaControls.Section>
-        <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
+        <section
+          id={tabbingId.replace('#', '')}
+          className={`data-table-container ${viewport} w-100`}
+          aria-label={accessibilityLabel}
+        >
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
-          {config.table.collapsible !== false && <ExpandCollapse expanded={expanded} setExpanded={setExpanded} fontSize={config.fontSize} tableTitle={tableTitle} viewport={viewport} />}
+          {config.table.collapsible !== false && (
+            <ExpandCollapse
+              expanded={expanded}
+              setExpanded={setExpanded}
+              fontSize={config.fontSize}
+              tableTitle={tableTitle}
+              viewport={viewport}
+            />
+          )}
           <div className='table-container' style={limitHeight}>
             <Table
               preliminaryData={config.preliminaryData}
               viewport={viewport}
               wrapColumns={wrapColumns}
-              childrenMatrix={config.type === 'map' ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData, viewport }) : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })}
+              childrenMatrix={
+                config.type === 'map'
+                  ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData, viewport })
+                  : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
+              }
               tableName={config.type}
               caption={caption}
               stickyHeader
               hasRowType={hasRowType}
-              headContent={config.type === 'map' ? <MapHeader columns={columns} {...props} sortBy={sortBy} setSortBy={setSortBy} /> : <ChartHeader data={runtimeData} {...props} hasRowType={hasRowType} isVertical={isVertical} sortBy={sortBy} setSortBy={setSortBy} />}
-              tableOptions={{ className: `${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${isVertical ? '' : ' horizontal'}`, 'aria-live': 'assertive', 'aria-rowcount': config?.data?.length ? config.data.length : -1, hidden: !expanded }}
+              headContent={
+                config.type === 'map' ? (
+                  <MapHeader columns={columns} {...props} sortBy={sortBy} setSortBy={setSortBy} />
+                ) : (
+                  <ChartHeader
+                    data={runtimeData}
+                    {...props}
+                    hasRowType={hasRowType}
+                    isVertical={isVertical}
+                    sortBy={sortBy}
+                    setSortBy={setSortBy}
+                  />
+                )
+              }
+              tableOptions={{
+                className: `${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${
+                  isVertical ? '' : ' horizontal'
+                }`,
+                'aria-live': 'assertive',
+                'aria-rowcount': config?.data?.length ? config.data.length : -1,
+                hidden: !expanded
+              }}
               fontSize={config.fontSize}
             />
 
             {/* REGION Data Table */}
-            {noRelativeRegions && config.regions && config.regions.length > 0 && config.visualizationType !== 'Box Plot' && (
-              <Table
-                viewport={viewport}
-                wrapColumns={wrapColumns}
-                childrenMatrix={regionCellMatrix({ config })}
-                tableName={config.visualizationType}
-                caption='Table of the highlighted regions in the visualization'
-                headContent={
-                  <tr>
-                    <th>Region Name</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                  </tr>
-                }
-                tableOptions={{ className: 'region-table data-table' }}
-                fontSize={config.fontSize}
-              />
-            )}
+            {noRelativeRegions &&
+              config.regions &&
+              config.regions.length > 0 &&
+              config.visualizationType !== 'Box Plot' && (
+                <Table
+                  viewport={viewport}
+                  wrapColumns={wrapColumns}
+                  childrenMatrix={regionCellMatrix({ config })}
+                  tableName={config.visualizationType}
+                  caption='Table of the highlighted regions in the visualization'
+                  headContent={
+                    <tr>
+                      <th>Region Name</th>
+                      <th>Start Date</th>
+                      <th>End Date</th>
+                    </tr>
+                  }
+                  tableOptions={{ className: 'region-table data-table' }}
+                  fontSize={config.fontSize}
+                />
+              )}
           </div>
         </section>
         <div id={skipId} className='cdcdataviz-sr-only'>
@@ -249,7 +315,11 @@ const DataTable = (props: DataTableProps) => {
     // Render Data Table for Box Plots
     return (
       <ErrorBoundary component='DataTable'>
-        <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
+        <section
+          id={tabbingId.replace('#', '')}
+          className={`data-table-container ${viewport} w-100`}
+          aria-label={accessibilityLabel}
+        >
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
           <div className='table-container' style={limitHeight}>
@@ -261,7 +331,12 @@ const DataTable = (props: DataTableProps) => {
               caption={caption}
               stickyHeader
               headContent={<BoxplotHeader categories={config.boxplot.categories} />}
-              tableOptions={{ className: `${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}`, 'aria-live': 'assertive', 'aria-rowcount': 11, hidden: !expanded }}
+              tableOptions={{
+                className: `${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}`,
+                'aria-live': 'assertive',
+                'aria-rowcount': 11,
+                hidden: !expanded
+              }}
               fontSize={config.fontSize}
             />
           </div>
