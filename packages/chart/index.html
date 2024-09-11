@@ -16,6 +16,21 @@
       /* .react-container + .react-container {
         margin-top: 3rem;
       } */
+      .dashboard-row {
+        display: flex;
+        flex-direction: column;
+        &.toggle {
+          display: block;
+        }
+      }
+      .dashboard-col-6 {
+      }
+      .dashboard-col {
+        margin: 0;
+      }
+      .dashboard-col-6 {
+        width: 50%;
+      }
     </style>
     <link
       rel="stylesheet prefetch"
@@ -30,7 +45,7 @@
       <main class="col-lg-9 order-lg-2" role="main" aria-label="Main Content Area">
         <div class="row">
           <div class="col-md-12"> -->
-    <div class="react-container" data-config="/examples/feature/sankey/sankey-example-data.json"></div>
+    <!-- <div class="react-container" data-config="/examples/feature/sankey/sankey-example-data.json"></div> -->
     <!-- </div>
         </div>
       </main>
@@ -49,7 +64,12 @@
   -->
 
     <!-- GENERIC CHART TYPES -->
-    <div class="react-container" data-config="/examples/cases-year.json"></div>
+    <div class="dashboard-row">
+      <div class="dashboard-col dashboard-col-6">
+        <div class="react-container" data-config="/examples/cases-year.json"></div>
+      </div>
+    </div>
+
     <!-- <div class="react-container" data-config="/examples/test.json"></div> -->
     <!-- <div class="react-container" data-config="/examples/feature/line/line-chart.json"></div> -->
     <!-- <div class="react-container" data-config="/examples/dev-8332.json"></div> -->
