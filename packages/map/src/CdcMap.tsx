@@ -1839,11 +1839,11 @@ const CdcMap = ({
                     </>
                   )}
                 </section>
-              </div>
 
-              {general.showSidebar && 'navigation' !== general.type && (
-                <Legend dimensions={dimensions} currentViewport={currentViewport} ref={legendRef} skipId={tabId} />
-              )}
+                {general.showSidebar && 'navigation' !== general.type && (
+                  <Legend dimensions={dimensions} currentViewport={currentViewport} ref={legendRef} skipId={tabId} />
+                )}
+              </div>
 
               {'navigation' === general.type && (
                 <NavigationMenu
