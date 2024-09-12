@@ -79,6 +79,7 @@ const BrushChart = ({ xMax, yMax, xScaleBrush: x }: BrushChartProps) => {
     const brushHandler = event => {
       const selection = event?.selection
       //if (!selection) return
+      let isUserBrushing = event.type === 'brush' && selection && selection.length > 0
 
       const [x0, x1] = selection.map(value => xScale.invert(value))
 
@@ -103,9 +104,19 @@ const BrushChart = ({ xMax, yMax, xScaleBrush: x }: BrushChartProps) => {
         }
       })
 
+      const firstDate = (newFilteredData.length && newFilteredData[0][config?.runtime?.originalXAxis?.dataKey]) ?? ''
+      const lastDate =
+        (newFilteredData.length &&
+          newFilteredData[newFilteredData.length - 1][config?.runtime?.originalXAxis?.dataKey]) ??
+        ''
+      // add custom blue colored handlers to each corners of brush
+      svg.selectAll('.handle--custom').remove()
+      // append handler
+      svg.call(brushHandle, selection, firstDate, lastDate)
+
       setBrushConfig({
-        active: true,
-        isBrushing: true,
+        active: config.brush.active,
+        isBrushing: isUserBrushing,
         data: newFilteredData
       })
       setBrushState({
