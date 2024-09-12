@@ -11,6 +11,7 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/components/FilterOrder'
+import { filterOrderOptions } from '@cdc/core/components/Filters'
 import { DashboardConfig } from '../../../../types/DashboardConfig'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { hasDashboardApplyBehavior } from '../../../../helpers/hasDashboardApplyBehavior'
@@ -114,9 +115,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
   const handleFilterOrder = (sourceIndex, destinationIndex) => {
     let orderedValues = [...columnValues]
 
-    let placeholder = orderedValues[sourceIndex]
-    orderedValues[sourceIndex] = orderedValues[destinationIndex]
-    orderedValues[destinationIndex] = placeholder
+    const [movedItem] = orderedValues.splice(sourceIndex, 1)
+    orderedValues.splice(destinationIndex, 0, movedItem)
 
     updateFilterProp('orderedValues', orderedValues)
     setColumnValues(orderedValues)
@@ -512,10 +512,22 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
             updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)}
           />
 
-          {filter.columnName && columnValues && (
+          <label>
+            <span className='edit-filterOrder column-heading'>Filter Order</span>
+            <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', e.target.value)}>
+              {filterOrderOptions.map((option, index) => {
+                return (
+                  <option value={option.value} key={`filter-${index}`}>
+                    {option.label}
+                  </option>
+                )
+              })}
+            </select>
+          </label>
+
+          {filter.order === 'cust' && filter.columnName && columnValues && (
             <FilterOrder
-              filter={{ ...filter, values: columnValues }}
-              updateFilterProp={(prop, index, value) => updateFilterProp(prop, value)}
+              orderedValues={columnValues}
               handleFilterOrder={handleFilterOrder}
             />
           )}

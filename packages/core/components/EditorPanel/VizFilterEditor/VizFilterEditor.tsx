@@ -69,9 +69,11 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
     updateField(null, null, 'filters', filters)
   }
 
-  const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
+  const handleFilterOrder = (idx1, idx2, filterIndex) => {
+    const filter = config.filters[filterIndex]
+
     // Create a shallow copy of the filter values array & update position of the values
-    const updatedValues = [...filter.values]
+    const updatedValues = [...(filter.orderedValues || filter.values)]
 
     const [movedItem] = updatedValues.splice(idx1, 1)
     updatedValues.splice(idx2, 0, movedItem)
@@ -244,7 +246,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                           })}
                         </select>
                         {filter.order === 'cust' && (
-                          <FilterOrder orderedValues={filter.orderedValues} handleFilterOrder={handleFilterOrder} />
+                          <FilterOrder orderedValues={filter.orderedValues || filter.values} filterIndex={filterIndex} handleFilterOrder={handleFilterOrder} />
                         )}
                       </label>
                     </>

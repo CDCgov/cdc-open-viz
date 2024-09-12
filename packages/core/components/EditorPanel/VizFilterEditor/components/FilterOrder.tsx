@@ -4,9 +4,9 @@ type FilterOrderProps = {
   orderedValues: string[]
   handleFilterOrder?: Function
 }
-const FilterOrder: React.FC<FilterOrderProps> = ({ orderedValues, handleFilterOrder }) => {
+const FilterOrder: React.FC<FilterOrderProps> = ({ orderedValues, handleFilterOrder, filterIndex}) => {
   return (
-    <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index)}>
+    <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, filterIndex)}>
       <Droppable droppableId='filter_order'>
         {provided => (
           <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
