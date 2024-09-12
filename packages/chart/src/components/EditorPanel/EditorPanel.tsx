@@ -3844,7 +3844,7 @@ const EditorPanel = () => {
                     label='Reverse Labels'
                     updateField={updateField}
                   />
-                  {/* <CheckBox
+                  <CheckBox
                     display={!config.legend.hide}
                     value={
                       ['left', 'right'].includes(config.legend.position)
@@ -3869,7 +3869,7 @@ const EditorPanel = () => {
                         </Tooltip.Content>
                       </Tooltip>
                     }
-                  /> */}
+                  />
                   <CheckBox
                     display={
                       !config.legend.hide &&
