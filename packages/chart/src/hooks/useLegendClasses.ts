@@ -56,9 +56,9 @@ const useLegendClasses = (config: ConfigType) => {
     containerClasses.push('no-border')
   }
 
-  // if (config.legend.hideBorder.topBottom && ['top', 'bottom'].includes(config.legend.position)) {
-  //   containerClasses.push('no-border')
-  // }
+  if (config.legend.hideBorder.topBottom && ['top', 'bottom'].includes(config.legend.position)) {
+    containerClasses.push('no-border')
+  }
 
   return {
     containerClasses,
