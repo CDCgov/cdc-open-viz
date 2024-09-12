@@ -202,8 +202,8 @@ const PieChart = props => {
     )
   }
 
-  let [chartWidth] = dimensions
-  let width = 0
+  let chartWidth = props.parentWidth
+  let width = props.parentWidth
 
   if (config && config.legend && !config.legend.hide && currentViewport === 'lg') {
     width = Number(chartWidth) * 0.73
@@ -213,7 +213,7 @@ const PieChart = props => {
 
   const radius = Math.min(width, height) / 2
   const centerY = height / 2
-  const centerX = width / 2
+  const centerX = props.parentWidth / 2
   const donutThickness = config.pieType === 'Donut' ? 75 : radius
 
   useEffect(() => {
