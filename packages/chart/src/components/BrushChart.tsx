@@ -7,18 +7,19 @@ import { Text } from '@visx/text'
 interface BrushChartProps {
   xMax: number
   yMax: number
-  xScaleBrush: Function
 }
 
-const BrushChart = ({ xMax, yMax, xScaleBrush: x }: BrushChartProps) => {
+const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
   const { tableData, config, setBrushConfig, getTextWidth, dashboardConfig, formatDate } = useContext(ConfigContext)
   const [brushState, setBrushState] = useState({ isBrushing: false, selection: [] })
+  const [brushKey, setBrushKey] = useState(0)
+  const sharedFilters = dashboardConfig?.dashboard?.sharedFilters ?? []
+  const isDashboardFilters = sharedFilters?.length > 0
   const [tooltip, showTooltip] = useState(false)
   const svgRef = useRef()
   const brushheight = 25
   const borderRadius = 15
   const xDomain = d3.extent(tableData, d => new Date(d[config.runtime.originalXAxis.dataKey]))
-  console.log(xDomain, 'xDomain')
 
   const xScale = d3.scaleTime().domain(xDomain).range([0, xMax])
 
@@ -145,7 +146,36 @@ const BrushChart = ({ xMax, yMax, xScaleBrush: x }: BrushChartProps) => {
       .attr('ry', borderRadius)
   }
 
+  useEffect(() => {
+    const isFiltersActive = config.filters?.some(filter => filter.active)
+    const isExclusionsActive = config.exclusions?.active
+
+    if ((isFiltersActive || isExclusionsActive || isDashboardFilters) && config.brush?.active) {
+      setBrushKey(prevKey => prevKey + 1)
+      setBrushConfig(prev => {
+        return {
+          ...prev,
+          data: tableData
+        }
+      })
+    }
+    return () =>
+      setBrushConfig(prev => {
+        return {
+          ...prev,
+          data: []
+        }
+      })
+  }, [config.filters, config.exclusions, config.brush?.active, isDashboardFilters])
   // Initialize brush when component is first rendered
+
+  // reset brush on keychange
+  useEffect(() => {
+    if (brushKey) {
+      initializeBrush()
+    }
+  }, [brushKey])
+
   if (!brushState.isBrushing) {
     initializeBrush()
   }
