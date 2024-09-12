@@ -1291,6 +1291,14 @@ export default function CdcChart({
                 classes={['chart-title', `${config.theme}`, 'cove-component__header']}
                 style={undefined}
               />
+              {/* Intro Text/Message */}
+              {config?.introText && config.visualizationType !== 'Spark Line' && (
+                <section
+                  className={`introText legend_${config.legend.hide ? 'hidden' : 'visible'}_${config.legend.position} `}
+                >
+                  {parse(config.introText)}
+                </section>
+              )}
 
               {/* Filters */}
               {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
@@ -1325,11 +1333,6 @@ export default function CdcChart({
                         : 'w-75'
                     }
                   >
-                    {/* Intro Text/Message */}
-                    {config?.introText && config.visualizationType !== 'Spark Line' && (
-                      <section className='introText'>{parse(config.introText)}</section>
-                    )}
-
                     {/* All charts with LinearChart */}
                     {!['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
                       <div style={{ height, width: `100%` }}>
