@@ -173,11 +173,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
         finalDisplay = finalDisplay.toLocaleString('en-US', {useGrouping: true})
       }
 
-      const displayInfoMessage = '<span class="font-weight-bold display-Info-message">One or more of the following values will appear in the place of this variable placeholder:</span>'
-
-      const newReplacementForVariable = `<span class="cove-tooltip-variable">${variableTag}<span class="cove-tooltip-value">${displayInfoMessage}<br/>${finalDisplay}</span></span><span class="cove-markup-include-variable-value">${finalDisplay}</span>`
-
-      return newReplacementForVariable
+      return finalDisplay
     })
     return convertedInlineMarkup
   }
