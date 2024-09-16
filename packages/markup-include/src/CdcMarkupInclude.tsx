@@ -72,7 +72,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
     }
 
     response.data = responseData
-    const processedConfig = { ...(await coveUpdateWorker(response)) }
+    const processedConfig = { ...coveUpdateWorker(response) }
 
     updateConfig({ ...configObj, ...processedConfig })
     dispatch({ type: 'SET_LOADING', payload: false })
