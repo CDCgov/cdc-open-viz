@@ -1736,7 +1736,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       type='radio'
                       name='equalnumber'
                       value='equalnumber'
-                      checked={state.legend.type === 'equalnumber'}
+                      checked={state.legend.type === 'equalnumber' || state.legend.type === 'equalinterval'}
                       onChange={e => handleEditorChanges('classificationType', e.target.value)}
                     />
                     Numeric/Quantitative
