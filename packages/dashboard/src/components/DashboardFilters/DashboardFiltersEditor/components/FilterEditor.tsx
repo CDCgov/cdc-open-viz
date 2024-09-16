@@ -6,11 +6,9 @@ import DataTransform from '@cdc/core/helpers/DataTransform'
 import { useEffect, useMemo, useState } from 'react'
 import { SharedFilter } from '../../../../types/SharedFilter'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import { sortByOrderedValues } from '@cdc/core/helpers/sortByOrderedValues'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import MultiSelect from '@cdc/core/components/MultiSelect'
-import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/components/FilterOrder'
 import { DashboardConfig } from '../../../../types/DashboardConfig'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { hasDashboardApplyBehavior } from '../../../../helpers/hasDashboardApplyBehavior'
@@ -23,7 +21,6 @@ type FilterEditorProps = {
 
 const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilterProp }) => {
   const [columns, setColumns] = useState<string[]>([])
-  const [columnValues, setColumnValues] = useState<string[]>([])
   const transform = new DataTransform()
 
   const parentFilters: string[] = (config.dashboard.sharedFilters || [])
@@ -60,8 +57,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
     return [nameLookup, [...vizOptions, ...rowsNotSelected]]
   }, [config.visualizations, filter.usedBy, filter.setBy, vizRowColumnLocator])
 
-
-  const iterateDatasets = async (callback: Function) => {
+  const loadColumnData = async () => {
+    const columns = {}
     const dataKeys = Object.keys(config.datasets)
 
     for (let i = 0; i < dataKeys.length; i++) {
@@ -80,54 +77,20 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
       }
 
       if (_dataSet.data) {
-        callback(_dataSet.data)
+        _dataSet.data.forEach(row => {
+          Object.keys(row).forEach(columnName => {
+            columns[columnName] = true
+          })
+        })
       }
     }
-  }
-
-  const loadValuesforColumn = async () => {
-    let values = []
-
-    await iterateDatasets(dataset => {
-      values = values.concat(_.uniq(dataset.map(row => row[filter.columnName])))
-    })
-
-    sortByOrderedValues(values, filter)
-    setColumnValues(values)
-  }
-
-  const loadColumnData = async () => {
-    const columns = {}
-
-    await iterateDatasets(dataset => {
-      dataset.forEach(row => {
-        Object.keys(row).forEach(columnName => {
-          columns[columnName] = true
-        })
-      })
-    })
 
     setColumns(Object.keys(columns))
-  }
-
-  const handleFilterOrder = (sourceIndex, destinationIndex) => {
-    let orderedValues = [...columnValues]
-
-    let placeholder = orderedValues[sourceIndex]
-    orderedValues[sourceIndex] = orderedValues[destinationIndex]
-    orderedValues[destinationIndex] = placeholder
-    
-    updateFilterProp('orderedValues', orderedValues)
-    setColumnValues(orderedValues)
   }
 
   useEffect(() => {
     loadColumnData()
   }, [config.datasets])
-
-  useEffect(() => {
-    loadValuesforColumn()
-  }, [filter.columnName])
 
   const addFilterUsedBy = (filter, value) => {
     if (value === '') return
@@ -465,11 +428,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
             value={filter.setByQueryParameter || ''}
             updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)}
           />
-
-          {filter.columnName && columnValues && <FilterOrder filterIndex={0} filter={{...filter, values: columnValues}} updateFilterProp={(prop, index, value) => updateFilterProp(prop, value)} handleFilterOrder={handleFilterOrder} />}
         </>
       )}
-
       <label>
         <span className='mr-1'>Multi Select</span>
         <input
