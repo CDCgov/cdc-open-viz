@@ -301,7 +301,7 @@ export default function CdcChart({
       newConfig.data = data
     }
 
-    const processedConfig = { ...(await coveUpdateWorker(newConfig)) }
+    const processedConfig = { ...coveUpdateWorker(newConfig) }
 
     updateConfig(processedConfig, data)
   }

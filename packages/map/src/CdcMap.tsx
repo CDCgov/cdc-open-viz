@@ -1491,7 +1491,7 @@ const CdcMap = ({
     validateFipsCodeLength(newState)
 
     // add ability to rename state properties over time.
-    const processedConfig = { ...(await coveUpdateWorker(newState)) }
+    const processedConfig = { ...coveUpdateWorker(newState) }
 
     setState(processedConfig)
     setLoading(false)
