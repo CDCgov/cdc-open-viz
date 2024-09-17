@@ -138,6 +138,7 @@ const CdcMap = ({
   const tooltipRef = useRef(null)
   const legendId = useId()
   const tooltipId = useId()
+  const mapId = useId()
 
   const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
   let legendMemo = useRef(new Map())
@@ -1721,7 +1722,8 @@ const CdcMap = ({
     tooltipRef,
     topoData,
     setTopoData,
-    getTextWidth
+    getTextWidth,
+    mapId
   }
 
   if (!mapProps.data || !state.data) return <></>
@@ -1798,9 +1800,6 @@ const CdcMap = ({
                 <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
               )}
 
-              {general.introText && <section className='introText'>{parse(general.introText)}</section>}
-
-              {/* prettier-ignore */}
               {state?.filters?.length > 0 && (
                 <Filters
                   config={state}
@@ -1822,14 +1821,12 @@ const CdcMap = ({
                     closeModal(e)
                   }
                 }}
+                style={{ padding: '15px 25px', margin: '0px' }}
               >
+                {general.introText && <section className='introText'>{parse(general.introText)}</section>}
+
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-                <section
-                  className='outline-none geography-container'
-                  ref={mapSvg}
-                  tabIndex='0'
-                  style={{ width: '100%' }}
-                >
+                <section className='outline-none geography-container w-100' ref={mapSvg} tabIndex='0'>
                   {currentViewport && (
                     <>
                       {modal && <Modal />}
@@ -1842,11 +1839,11 @@ const CdcMap = ({
                     </>
                   )}
                 </section>
-
-                {general.showSidebar && 'navigation' !== general.type && (
-                  <Legend dimensions={dimensions} currentViewport={currentViewport} ref={legendRef} skipId={tabId} />
-                )}
               </div>
+
+              {general.showSidebar && 'navigation' !== general.type && (
+                <Legend dimensions={dimensions} currentViewport={currentViewport} ref={legendRef} skipId={tabId} />
+              )}
 
               {'navigation' === general.type && (
                 <NavigationMenu

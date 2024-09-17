@@ -9,5 +9,6 @@ export type General = {
   showMissingDataLabel: boolean
   showSuppressedSymbol: boolean
   showAnnotationDropdown?: boolean
+  hideNullValue: boolean
   title: string
 }

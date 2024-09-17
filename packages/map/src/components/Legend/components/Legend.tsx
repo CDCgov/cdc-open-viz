@@ -1,5 +1,5 @@
 //TODO: Move legends to core
-import { forwardRef, useContext } from 'react'
+import { forwardRef, useContext, useId } from 'react'
 import parse from 'html-react-parser'
 
 //types
@@ -38,7 +38,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     setRuntimeLegend,
     state,
     viewport,
-    getTextWidth
+    getTextWidth,
+    mapId
   } = useContext(ConfigContext)
 
   const { legend } = state
@@ -160,7 +161,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 <svg width={legendSize} height={legendSize}>
                   {pattern === 'waves' && (
                     <PatternWaves
-                      id={`${dataKey}--${patternDataIndex}`}
+                      id={`${mapId}--${dataKey}--${patternDataIndex}`}
                       height={sizes[size] ?? 10}
                       width={sizes[size] ?? 10}
                       fill={defaultPatternColor}
@@ -168,7 +169,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                   )}
                   {pattern === 'circles' && (
                     <PatternCircles
-                      id={`${dataKey}--${patternDataIndex}`}
+                      id={`${mapId}--${dataKey}--${patternDataIndex}`}
                       height={sizes[size] ?? 10}
                       width={sizes[size] ?? 10}
                       fill={defaultPatternColor}
@@ -176,7 +177,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                   )}
                   {pattern === 'lines' && (
                     <PatternLines
-                      id={`${dataKey}--${patternDataIndex}`}
+                      id={`${mapId}--${dataKey}--${patternDataIndex}`}
                       height={sizes[size] ?? 6}
                       width={sizes[size] ?? 10}
                       stroke={defaultPatternColor}
@@ -186,7 +187,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                   )}
                   <circle
                     id={dataKey}
-                    fill={`url(#${dataKey}--${patternDataIndex})`}
+                    fill={`url(#${mapId}--${dataKey}--${patternDataIndex})`}
                     r={legendSize / 2}
                     cx={legendSize / 2}
                     cy={legendSize / 2}

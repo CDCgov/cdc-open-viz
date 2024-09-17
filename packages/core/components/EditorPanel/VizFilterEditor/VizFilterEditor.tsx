@@ -39,7 +39,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
 
   const updateFilterStyle = (index, value) => {
     const filters = _.cloneDeep(config.filters)
-    const currentFilter = filters[index]
+    const currentFilter = { ...filters[index], orderedValues: filters[index].values }
     currentFilter.filterStyle = value
     if (value === 'multi-select') {
       currentFilter.active = Array.isArray(currentFilter.active) ? currentFilter.active : [currentFilter.active]
@@ -92,7 +92,9 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
   }
 
   const getParentFilterOptions = (index: number): { label: string; value: number }[] => {
-    return config.filters.filter((f, i) => i !== index).map(({ label, columnName, id }) => ({ label: label || columnName, value: id }))
+    return config.filters
+      .filter((f, i) => i !== index)
+      .map(({ label, columnName, id }) => ({ label: label || columnName, value: id }))
   }
 
   return (
@@ -111,7 +113,10 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                 </Tooltip.Target>
                 <Tooltip.Content>
-                  <p>The Apply Button option changes the visualization when the user clicks "apply". The Filter Change option immediately changes the visualization when the selection is changed.</p>
+                  <p>
+                    The Apply Button option changes the visualization when the user clicks "apply". The Filter Change
+                    option immediately changes the visualization when the selection is changed.
+                  </p>
                 </Tooltip.Content>
               </Tooltip>
             }
@@ -123,7 +128,14 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
             {config.filters.map((filter, filterIndex) => {
               if (filter.type === 'url') return <></>
               return (
-                <FieldSetWrapper key={filter.columnName} fieldName={filter.columnName} fieldKey={filterIndex} fieldType='Filter' controls={openControls} deleteField={() => removeFilter(filterIndex)}>
+                <FieldSetWrapper
+                  key={filter.columnName}
+                  fieldName={filter.columnName}
+                  fieldKey={filterIndex}
+                  fieldType='Filter'
+                  controls={openControls}
+                  deleteField={() => removeFilter(filterIndex)}
+                >
                   <label>
                     <span className='edit-label column-heading'>Filter Style</span>
 
@@ -219,7 +231,10 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
 
                       <label>
                         <span className='edit-filterOrder column-heading'>Filter Order</span>
-                        <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', filterIndex, e.target.value)}>
+                        <select
+                          value={filter.order ? filter.order : 'asc'}
+                          onChange={e => updateFilterProp('order', filterIndex, e.target.value)}
+                        >
                           {filterOrderOptions.map((option, index) => {
                             return (
                               <option value={option.value} key={`filter-${index}`}>
@@ -228,7 +243,9 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                             )
                           })}
                         </select>
-                        {filter.order === 'cust' && <FilterOrder orderedValues={filter.orderedValues} handleFilterOrder={handleFilterOrder} />}
+                        {filter.order === 'cust' && (
+                          <FilterOrder orderedValues={filter.orderedValues} handleFilterOrder={handleFilterOrder} />
+                        )}
                       </label>
                     </>
                   ) : (
@@ -251,7 +268,9 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>A selected parent's value will be used to filter the available options of this child filter.</p>
+                          <p>
+                            A selected parent's value will be used to filter the available options of this child filter.
+                          </p>
                         </Tooltip.Content>
                       </Tooltip>
                     </span>

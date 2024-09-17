@@ -69,6 +69,7 @@ import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import LegendWrapper from './components/LegendWrapper'
+import _ from 'lodash'
 
 export default function CdcChart({
   configUrl,
@@ -88,7 +89,7 @@ export default function CdcChart({
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
-  const [stateData, setStateData] = useState(config.data || [])
+  const [stateData, setStateData] = useState(configObj.data || [])
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
   const [seriesHighlight, setSeriesHighlight] = useState<string[]>(
@@ -107,6 +108,14 @@ export default function CdcChart({
     isActive: false,
     isBrushing: false
   })
+
+  const useVertical = config.orientation === 'vertical'
+  const useMobileVertical = config.heights?.mobileVertical && ['xs', 'xxs'].includes(currentViewport)
+  const responsiveVertical = useMobileVertical ? 'mobileVertical' : 'vertical'
+  const renderedOrientation = useVertical ? responsiveVertical : 'horizontal'
+  let height = config.aspectRatio ? width * config.aspectRatio : config?.heights?.[renderedOrientation]
+  height = height + Number(config?.xAxis?.size)
+
   type Config = typeof config
   let legendMemo = useRef(new Map()) // map collection
   let innerContainerRef = useRef()
@@ -296,7 +305,8 @@ export default function CdcChart({
     updateConfig(processedConfig, data)
   }
 
-  const updateConfig = (newConfig, dataOverride?: any[]) => {
+  const updateConfig = (_config, dataOverride?: any[]) => {
+    const newConfig = _.cloneDeep(_config)
     let data = dataOverride || stateData
 
     // Deeper copy
@@ -1322,9 +1332,11 @@ export default function CdcChart({
 
                     {/* All charts with LinearChart */}
                     {!['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
-                      <ParentSize>
-                        {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
-                      </ParentSize>
+                      <div style={{ height, width: `100%` }}>
+                        <ParentSize>
+                          {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                        </ParentSize>
+                      </div>
                     )}
 
                     {config.visualizationType === 'Pie' && (
@@ -1335,13 +1347,17 @@ export default function CdcChart({
                     {/* Line Chart */}
                     {config.visualizationType === 'Line' &&
                       (checkLineToBarGraph() ? (
-                        <ParentSize>
-                          {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
-                        </ParentSize>
+                        <div style={{ height: config?.heights?.vertical, width: `100%` }}>
+                          <ParentSize>
+                            {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                          </ParentSize>
+                        </div>
                       ) : (
-                        <ParentSize>
-                          {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
-                        </ParentSize>
+                        <div style={{ height, width: `100%` }}>
+                          <ParentSize>
+                            {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                          </ParentSize>
+                        </div>
                       ))}
                     {/* Sparkline */}
                     {config.visualizationType === 'Spark Line' && (
@@ -1507,7 +1523,7 @@ export default function CdcChart({
     missingRequiredSections,
     outerContainerRef,
     parseDate,
-    rawData: stateData ?? {},
+    rawData: _.cloneDeep(stateData) ?? {},
     seriesHighlight,
     setBrushConfig,
     setConfig,
@@ -1521,7 +1537,7 @@ export default function CdcChart({
     tableData: filteredData || excludedData, // do not clean table data
     transformedData: clean(filteredData || excludedData), // do this right before passing to components
     twoColorPalette,
-    unfilteredData: stateData,
+    unfilteredData: _.cloneDeep(stateData),
     updateConfig
   }
 
