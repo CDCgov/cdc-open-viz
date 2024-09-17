@@ -81,6 +81,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           />
         ) : filter.filterStyle === 'nested-dropdown' ? (
           <NestedDropdown
+            key={`${filter.key}-filtersection-${filterIndex}`}
             currentFilter={filter}
             filterIndex={filterIndex}
             listLabel={filter.key}
