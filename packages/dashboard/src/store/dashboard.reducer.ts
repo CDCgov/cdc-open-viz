@@ -88,6 +88,13 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     case 'SET_SHARED_FILTERS': {
       const newSharedFilters = action.payload
       const newDashboardConfig = { ...state.config.dashboard, sharedFilters: newSharedFilters }
+      if (state.config.multiDashboards) {
+        const saveSlot = state.config.activeDashboard
+        const newMultiDashboards = _.cloneDeep(state.config.multiDashboards)
+        newMultiDashboards[saveSlot].dashboard = newDashboardConfig
+        const newState = applyMultiDashboards(state, newMultiDashboards)
+        return { ...newState, config: { ...newState.config, dashboard: newDashboardConfig } }
+      }
       return { ...state, config: { ...state.config, dashboard: newDashboardConfig } }
     }
     case 'SET_TAB_SELECTED': {
