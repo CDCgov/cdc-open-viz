@@ -73,7 +73,7 @@ export const getToFetch = (
 export const setAutoLoadDefaultValue = (
   sharedFilterIndex: number,
   dropdownOptions: DropdownOptions,
-  sharedFilters,
+  sharedFilters: SharedFilter[],
   autoLoadFilterIndexes: number[]
 ): SharedFilter => {
   const sharedFiltersCopy = _.cloneDeep(sharedFilters)
@@ -83,13 +83,14 @@ export const setAutoLoadDefaultValue = (
     const filterParents = sharedFiltersCopy.filter(f => sharedFilter.parents?.includes(f.key))
     const notAllParentFiltersSelected = filterParents.some(p => !(p.active || p.queuedActive))
     if (filterParents && notAllParentFiltersSelected) return sharedFilter
-    const defaultValue = sharedFilter.multiSelect ? [dropdownOptions[0]?.value] : dropdownOptions[0]?.value
+    const defaultValue =
+      sharedFilter.filterStyle === 'multi-select' ? [dropdownOptions[0]?.value] : dropdownOptions[0]?.value
     if (!sharedFilter.active) {
       const queryParams = getQueryParams()
       const defaultQueryParamValue = queryParams[sharedFilter?.queryParameter]
       sharedFilter.active = defaultQueryParamValue || defaultValue
-    } else if (sharedFilter.multiSelect) {
-      const currentOption = sharedFilter.active.filter(activeVal =>
+    } else if (sharedFilter.filterStyle === 'multi-select') {
+      const currentOption = (sharedFilter.active as string[]).filter(activeVal =>
         dropdownOptions.find(option => option.value === activeVal)
       )
       sharedFilter.active = currentOption.length ? currentOption : defaultValue

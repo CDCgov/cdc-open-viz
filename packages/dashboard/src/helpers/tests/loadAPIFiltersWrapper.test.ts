@@ -51,7 +51,7 @@ const sharedFilters = [
       textSelector: 'YearQuarter'
     },
     parents: ['Sex', 'Quarter'],
-    multiSelect: true
+    filterStyle: 'multi-select'
   }
 ] as SharedFilter[]
 
@@ -172,5 +172,49 @@ describe('loadAPIFiltersFactory', () => {
     expect(setAPIFilterDropdowns).toHaveBeenCalledWith(expectedDropdowns)
     expect(fetch).toHaveBeenCalledTimes(2)
     expect(newSharedFilters[2].active).toEqual([2020])
+  })
+  it('returns new active values for multiselect', async () => {
+    const _sharedFilters = _.cloneDeep(sharedFilters)
+    _sharedFilters[1].active = 'Q1'
+    _sharedFilters[2].active = ['2020', '2021']
+    const apiDropdownsLoaded = {
+      'cdc.gov/filters/Quarter': [
+        {
+          text: 'Q1',
+          value: 'Q1'
+        },
+        {
+          text: 'Q2',
+          value: 'Q2'
+        },
+        {
+          text: 'Q3',
+          value: 'Q3'
+        },
+        {
+          text: 'Q4',
+          value: 'Q4'
+        }
+      ],
+      'cdc.gov/filters/Sex': [
+        {
+          text: 'male',
+          value: 'M'
+        },
+        {
+          text: 'female',
+          value: 'F'
+        }
+      ],
+      'cdc.gov/filters/YearQuarter': [
+        { value: '2020', text: '2020Q1' },
+        { value: '2021', text: '2021Q1' }
+      ]
+    }
+    const newSharedFilters = await loadAPIFilters(_sharedFilters, apiDropdownsLoaded)
+    expect(dispatch).toHaveBeenCalledTimes(1)
+    expect(setAPIFilterDropdowns).toHaveBeenCalledTimes(1)
+
+    expect(newSharedFilters[2].active).toEqual(['2020', '2021'])
   })
 })
