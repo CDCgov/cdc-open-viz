@@ -479,8 +479,8 @@ const Filters = (props: FilterProps) => {
 
   if (visualizationConfig?.filters?.length === 0) return
   const filterSectionClassList = [
-    `filters-section legend_${visualizationConfig.legend.hide ? 'hidden' : 'visible'}_${
-      visualizationConfig.legend.position
+    `filters-section legend_${visualizationConfig?.legend?.hide ? 'hidden' : 'visible'}_${
+      visualizationConfig?.legend?.position || ''
     }`,
     type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme
   ]
