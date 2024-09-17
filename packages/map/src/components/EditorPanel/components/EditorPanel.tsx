@@ -3370,14 +3370,10 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     >
                       <option value='circle'>Circle</option>
                       <option value='pin'>Pin</option>
-                      {'us-geocode' !== state.general.type && (
-                        <>
-                          <option value='square'>Square</option>
-                          <option value='triangle'>Triangle</option>
-                          <option value='diamond'>Diamond</option>
-                          <option value='star'>Star</option>
-                        </>
-                      )}
+                      <option value='square'>Square</option>
+                      <option value='triangle'>Triangle</option>
+                      <option value='diamond'>Diamond</option>
+                      <option value='star'>Star</option>
                     </select>
                   </label>
                   <TextField
@@ -3461,11 +3457,10 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       </div>
                     )
                   })}
-                {'us-geocode' !== state.general.type && (
-                  <button type='button' onClick={() => editCityStyles('add', 0, '', '')} className='btn full-width'>
-                    Add city style
-                  </button>
-                )}
+
+                <button type='button' onClick={() => editCityStyles('add', 0, '', '')} className='btn full-width'>
+                  Add city style
+                </button>
               </>
               <label htmlFor='opacity'>
                 <TextField
