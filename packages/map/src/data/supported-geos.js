@@ -190,6 +190,7 @@ export const supportedStatesFipsCodes = {
   '08': 'Colorado',
   '09': 'Connecticut',
   10: 'Delaware',
+  11: 'District of Columbia',
   12: 'Florida',
   13: 'Georgia',
   15: 'Hawaii',
@@ -234,9 +235,9 @@ export const supportedStatesFipsCodes = {
   56: 'Wyoming',
   60: 'American Samoa',
   66: 'Guam',
-  69: 'Northern Mariana Islands',
+  69: 'Commonwealth of the Northern Mariana Islands',
   72: 'Puerto Rico',
-  78: 'Virgin Islands'
+  78: 'United States Virgin Islands'
 }
 
 export const supportedCountries = {
@@ -289,7 +290,12 @@ export const supportedCountries = {
   COL: ['Colombia'],
   COM: ['Comoros'],
   COG: ['Congo', 'Congo, Republic of the', 'Republic of the Congo'],
-  COD: ['Democratic Republic of the Congo', 'Congo, Democratic Republic of the', 'Congo, the Democratic Republic of the', 'Dem. Rep. Congo'],
+  COD: [
+    'Democratic Republic of the Congo',
+    'Congo, Democratic Republic of the',
+    'Congo, the Democratic Republic of the',
+    'Dem. Rep. Congo'
+  ],
   COK: ['Cook Islands', 'Cook Is.', 'Cook Islands (New Zealand)'],
   CRI: ['Costa Rica'],
   CIV: ["Côte d'Ivoire"],
@@ -382,7 +388,12 @@ export const supportedCountries = {
   MUS: ['Mauritius'],
   MYT: ['Mayotte', 'Mayotte (France)'],
   MEX: ['Mexico'],
-  FSM: ['Micronesia', 'Federated States of Micronesia', 'Micronesia (Federated States of)', 'Micronesia, Federated States of'],
+  FSM: [
+    'Micronesia',
+    'Federated States of Micronesia',
+    'Micronesia (Federated States of)',
+    'Micronesia, Federated States of'
+  ],
   MDA: ['Moldova', 'Moldova, Republic of'],
   MCO: ['Monaco'],
   MNG: ['Mongolia'],
