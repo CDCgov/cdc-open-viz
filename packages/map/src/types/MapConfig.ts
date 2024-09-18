@@ -149,7 +149,7 @@ export type MapConfig = Visualization & {
     opacity: number
   }
   runtime: {
-    editorErrorMessage: string[],
+    editorErrorMessage: string[]
     // when a single state map doesn't include a fips code show a message...
     noStateFoundMessage: string
   }
