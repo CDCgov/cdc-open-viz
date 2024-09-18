@@ -1,6 +1,7 @@
 export default {
   annotations: [],
   general: {
+    noStateFoundMessage: 'Map Unavailable',
     annotationDropdownText: 'Annotations',
     geoBorderColor: 'darkGray',
     headerColor: 'theme-blue',
