@@ -32,7 +32,8 @@ export const filterOrderOptions: { label: string; value: OrderBy }[] = [
 
 export const handleSorting = singleFilter => {
   const singleFilterValues = _.cloneDeep(singleFilter.values)
-  if (singleFilter.order === 'cust') {
+  if (singleFilter.order === 'cust' && singleFilter.filterStyle !== 'nested-dropdown') {
+    singleFilter.values = singleFilter.orderedValues?.length ? singleFilter.orderedValues : singleFilterValues
     return singleFilter
   }
 
