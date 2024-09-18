@@ -368,7 +368,7 @@ export default function CdcChart({
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
 
-        const includes = (arr: any[], val: any): boolean => arr.map(val => String(val)).includes(String(val))
+        const includes = (arr: any[], val: any): boolean => (arr || []).map(val => String(val)).includes(String(val))
         newConfig.filters[index].active =
           !newConfig.filters[index].active || !includes(filterValues, newConfig.filters[index].active)
             ? filterValues[0]
