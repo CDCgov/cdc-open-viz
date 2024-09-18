@@ -135,8 +135,6 @@ const CountyMap = props => {
       setState
   } = useContext(ConfigContext)
 
-  console.log('position updated', state.mapPosition.zoom)
-
   // CREATE STATE LINES
   const projection = geoAlbersUsaTerritories()
 
@@ -305,7 +303,7 @@ const CountyMap = props => {
     let pointCoordinates = topoData.projection.invert([x, y])
 
     const currentTooltipIndex = parseInt(tooltipRef.current.getAttribute('data-index'))
-    const geoRadius = (state.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
+    const geoRadius = (state.visual.geoCodeCircleSize || 5) * 1
 
     const context = canvas.getContext('2d')
     const path = geoPath(topoData.projection, context)
@@ -551,9 +549,7 @@ const CountyMap = props => {
       }
 
       const drawCircle = (circle, context) => {
-        const percentOfOriginalSize = 0.75
-        const adjustedGeoRadius =
-          state.mapPosition.zoom > 1 ? Number(circle.geoRadius) * percentOfOriginalSize : circle.geoRadius
+        const adjustedGeoRadius = Number(circle.geoRadius)
         context.lineWidth = lineWidth
         context.fillStyle = circle.color
         context.beginPath()
@@ -564,7 +560,7 @@ const CountyMap = props => {
 
       if (state.general.type === 'us-geocode') {
         context.strokeStyle = 'black'
-        const geoRadius = (state.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
+        const geoRadius = state.visual.geoCodeCircleSize || 5
 
         runtimeKeys.forEach(key => {
           const pixelCoords = topoData.projection([
