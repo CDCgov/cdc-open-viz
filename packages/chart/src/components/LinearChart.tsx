@@ -584,18 +584,6 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                               </Text>
                             )}
 
-                          {runtime.yAxis.gridLines && displayFirstGridLine ? (
-                            <Line
-                              key={`${tick.value}--hide-hideGridLines`}
-                              display={(isLogarithmicAxis && showTicks).toString()}
-                              from={{ x: tick.from.x + xMax, y: tick.from.y }}
-                              to={tick.from}
-                              stroke='rgba(0,0,0,0.3)'
-                            />
-                          ) : (
-                            ''
-                          )}
-
                           {orientation === 'horizontal' &&
                             visualizationSubType !== 'stacked' &&
                             config.yAxis.labelPlacement === 'On Date/Category Axis' &&
