@@ -152,27 +152,12 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       if (!from) return null
       if (!to) return null
 
-      const TopRegionBorderShape = () => {
-        return (
-          <path
-            stroke='#333'
-            d={`M${from} -5
-                L${from} 5
-                M${from} 0
-                L${to} 0
-                M${to} -5
-                L${to} 5`}
-          />
-        )
-      }
-
       const HighlightedArea = () => {
         return <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
       }
 
       return (
         <Group height={100} fill='red' className='regions regions-group--line zzz' key={region.label} onMouseMove={handleTooltipMouseOver} onMouseLeave={handleTooltipMouseOff} handleTooltipClick={handleTooltipClick} tooltipData={JSON.stringify(tooltipData)} showTooltip={showTooltip}>
-          <TopRegionBorderShape />
           <HighlightedArea />
           <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
             {region.label}
