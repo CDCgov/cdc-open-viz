@@ -10,7 +10,7 @@ export type MapVisualSettings = {
   /** extraBubbleBorder - Bubble Maps > adds a white circle around the bubble to show contrast on other bubbles */
   extraBubbleBorder: boolean
   /** cityStyle - visual indicator of cities on state maps */
-  cityStyle: 'circle' | 'pin'
+  cityStyle: 'circle' | 'pin' | 'star' | 'diamond' | 'triangle' | 'square'
   /** cityStyle - optional visual indicator of label on the Legend */
   cityStyleLabel: string
   /** geoCodeCircleSize - controls the size of the city style option (circle or pin) */
@@ -40,7 +40,10 @@ export type GeoColumnProperties = Pick<EditorColumnProperties, 'name' | 'label' 
 export type LatitudeColumnProperties = Pick<EditorColumnProperties, 'name'>
 export type LongitudeColumnProperties = Pick<EditorColumnProperties, 'name'>
 export type NavigateColumnProperties = Pick<EditorColumnProperties, 'name'>
-export type PrimaryColumnProperties = Pick<EditorColumnProperties, 'dataTable' | 'label' | 'name' | 'prefix' | 'suffix' | 'tooltip'>
+export type PrimaryColumnProperties = Pick<
+  EditorColumnProperties,
+  'dataTable' | 'label' | 'name' | 'prefix' | 'suffix' | 'tooltip'
+>
 export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 export type LegendShapeItem = {
   column: string
