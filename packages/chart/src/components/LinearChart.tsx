@@ -559,7 +559,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                               display={(isLogarithmicAxis && showTicks).toString()}
                               from={{ x: tick.from.x + xMax, y: tick.from.y }}
                               to={tick.from}
-                              stroke='rgba(0,0,0,0.3)'
+                              stroke='#d6d6d6'
                             />
                           ) : (
                             ''
@@ -787,7 +787,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                             <Line
                               from={{ x: tick.from.x + xMax, y: tick.from.y }}
                               to={tick.from}
-                              stroke='rgba(0,0,0,0.3)'
+                              stroke='#d6d6d6'
                             />
                           ) : (
                             ''

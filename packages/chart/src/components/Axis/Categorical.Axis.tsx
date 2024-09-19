@@ -126,7 +126,7 @@ const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
                       {bar.key}
                     </Text>
                     {/* gridLines */}
-                    {config.runtime.yAxis.gridLines && <Line from={{ x: bar.x + xScale.bandwidth(), y: bar.y }} to={{ x: xMax + xScale.bandwidth(), y: bar.y }} stroke='rgba(0,0,0,0.3)' />}
+                    {config.runtime.yAxis.gridLines && <Line from={{ x: bar.x + xScale.bandwidth(), y: bar.y }} to={{ x: xMax + xScale.bandwidth(), y: bar.y }} stroke='#d6d6d6' />}
                     {/* White background spacing between stackes */}
                     {!isLastIndex && <rect x={bar.x} y={bar.y} width={bar.width} height={1} fill={'#fff'}></rect>}
                     {/* Right side Axis line */}
