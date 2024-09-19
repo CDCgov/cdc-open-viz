@@ -82,7 +82,14 @@ const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
   const keys = Object.keys(transformedData[0])
   return (
     <Group left={leftSize - xScale.bandwidth()} top={0}>
-      <BarStack data={transformedData} keys={keys} x={() => xScale(xScaleValue)} xScale={xScale} yScale={yScale} color={colorScale}>
+      <BarStack
+        data={transformedData}
+        keys={keys}
+        x={() => xScale(xScaleValue)}
+        xScale={xScale}
+        yScale={yScale}
+        color={colorScale}
+      >
         {barStacks =>
           barStacks.map(barStack =>
             barStack.bars.map(bar => {
@@ -96,7 +103,11 @@ const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
                     </li></ul>`
               return (
                 <Group key={`${barStack.index}--${bar.index}--${orientation}`}>
-                  <Group key={`bar-stack-${barStack.index}-${bar.index}`} id={`barStack${barStack.index}-${bar.index}`} className='stack vertical'>
+                  <Group
+                    key={`bar-stack-${barStack.index}-${bar.index}`}
+                    id={`barStack${barStack.index}-${bar.index}`}
+                    className='stack vertical'
+                  >
                     {createBarElement({
                       type: 'axisBar',
                       config: config,
@@ -126,7 +137,13 @@ const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
                       {bar.key}
                     </Text>
                     {/* gridLines */}
-                    {config.runtime.yAxis.gridLines && <Line from={{ x: bar.x + xScale.bandwidth(), y: bar.y }} to={{ x: xMax + xScale.bandwidth(), y: bar.y }} stroke='#d6d6d6' />}
+                    {config.runtime.yAxis.gridLines && (
+                      <Line
+                        from={{ x: bar.x + xScale.bandwidth(), y: bar.y }}
+                        to={{ x: xMax + xScale.bandwidth(), y: bar.y }}
+                        stroke='#d6d6d6'
+                      />
+                    )}
                     {/* White background spacing between stackes */}
                     {!isLastIndex && <rect x={bar.x} y={bar.y} width={bar.width} height={1} fill={'#fff'}></rect>}
                     {/* Right side Axis line */}
