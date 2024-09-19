@@ -87,7 +87,7 @@ export const setAutoLoadDefaultValue = (
       sharedFilter.filterStyle === 'multi-select' ? [dropdownOptions[0]?.value] : dropdownOptions[0]?.value
     if (!sharedFilter.active) {
       const queryParams = getQueryParams()
-      const defaultQueryParamValue = queryParams[sharedFilter?.queryParameter]
+      const defaultQueryParamValue = queryParams[sharedFilter?.setByQueryParameter]
       sharedFilter.active = defaultQueryParamValue || defaultValue
     } else if (sharedFilter.filterStyle === 'multi-select') {
       const currentOption = (sharedFilter.active as string[]).filter(activeVal =>
