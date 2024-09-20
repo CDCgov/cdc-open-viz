@@ -13,7 +13,7 @@ const LegendWrapper: React.FC<LegendWrapperProps> = props => {
   const getLegendWrappingClasses = () => {
     let classes = ['legend-wrapper', 'd-flex', 'flex-nowrap', 'w-100']
     const { legend } = config
-    if (legend.position === 'bottom' || legend.position === 'top' || ['xxs', 'xs', 'sm'].includes(currentViewport)) {
+    if (legend.position === 'bottom' || legend.position === 'top' || ['xxs', 'xs'].includes(currentViewport)) {
       classes = classes.filter(item => item !== 'flex-nowrap')
       classes.push('flex-wrap')
     }

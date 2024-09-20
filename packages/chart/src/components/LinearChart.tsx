@@ -79,7 +79,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
     config.legend &&
     !config.legend.hide &&
     !['bottom', 'top'].includes(config.legend?.position) &&
-    ['lg', 'md'].includes(currentViewport)
+    ['lg', 'md', 'sm'].includes(currentViewport)
   ) {
     width = width * 0.73
   }
