@@ -91,10 +91,16 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           tooltip={
             <Tooltip style={{ textTransform: 'none' }}>
               <Tooltip.Target>
-                <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                <Icon
+                  display='question'
+                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                />
               </Tooltip.Target>
               <Tooltip.Content>
-                <p>Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement.</p>
+                <p>
+                  Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a
+                  508 requirement.
+                </p>
               </Tooltip.Content>
             </Tooltip>
           }
@@ -112,7 +118,10 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           tooltip={
             <Tooltip style={{ textTransform: 'none' }}>
               <Tooltip.Target>
-                <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                <Icon
+                  display='question'
+                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                />
               </Tooltip.Target>
               <Tooltip.Content>
                 <p>This will draw the data table with vertical data instead of horizontal.</p>
@@ -135,7 +144,10 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
                 <Icon display='question' style={{ marginLeft: '0.5rem' }} />
               </Tooltip.Target>
               <Tooltip.Content>
-                <p>To comply with 508 standards, if the first column in the data table has no header, enter a brief one here.</p>
+                <p>
+                  To comply with 508 standards, if the first column in the data table has no header, enter a brief one
+                  here.
+                </p>
               </Tooltip.Content>
             </Tooltip>
           }
@@ -160,17 +172,87 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           </Tooltip>
         }
       />
-      <CheckBox value={config.table.limitHeight} section='table' fieldName='limitHeight' label=' Limit Table Height' updateField={updateField} />
-      {config.table.limitHeight && <TextField value={config.table.height} section='table' fieldName='height' label='Data Table Height' type='number' min={0} max={500} placeholder='Height(px)' updateField={updateField} />}
-      {config?.visualizationType !== 'Sankey' && <MultiSelect key={excludedColumns.join('') + 'excluded'} options={dataColumns.map(c => ({ label: c, value: c }))} selected={excludedColumns} fieldName='dataTable' label='Exclude Columns' section='columns' updateField={excludeColumns} />}
-      <CheckBox value={config.table.collapsible} fieldName='collapsible' label=' Collapsible' section='table' updateField={updateField} />
-      {config.table.collapsible !== false && <CheckBox value={config.table.expanded} fieldName='expanded' label=' Expanded by Default' section='table' updateField={updateField} />}
-      {isDashboard && config.type !== 'table' && <CheckBox value={config.table.showDataTableLink} fieldName='showDataTableLink' label='Show Data Table Name & Link' section='table' updateField={updateField} />}
-      {isLoadedFromUrl && <CheckBox value={config.table.showDownloadUrl} fieldName='showDownloadUrl' label='Show URL to Automatically Updated Data' section='table' updateField={updateField} />}
-      {config.type !== 'table' && <CheckBox value={config.table.showDownloadImgButton} fieldName='showDownloadImgButton' label='Display Image Button' section='table' updateField={updateField} />}
+      <CheckBox
+        value={config.table.limitHeight}
+        section='table'
+        fieldName='limitHeight'
+        label=' Limit Table Height'
+        updateField={updateField}
+      />
+      {config.table.limitHeight && (
+        <TextField
+          value={config.table.height}
+          section='table'
+          fieldName='height'
+          label='Data Table Height'
+          type='number'
+          min={0}
+          max={500}
+          placeholder='Height(px)'
+          updateField={updateField}
+        />
+      )}
+      {config?.visualizationType !== 'Sankey' && (
+        <MultiSelect
+          key={excludedColumns.join('') + 'excluded'}
+          options={dataColumns.map(c => ({ label: c, value: c }))}
+          selected={excludedColumns}
+          fieldName='dataTable'
+          label='Exclude Columns'
+          section='columns'
+          updateField={excludeColumns}
+        />
+      )}
+      <CheckBox
+        value={config.table.collapsible}
+        fieldName='collapsible'
+        label=' Collapsible'
+        section='table'
+        updateField={updateField}
+      />
+      {config.table.collapsible !== false && (
+        <CheckBox
+          value={config.table.expanded}
+          fieldName='expanded'
+          label=' Expanded by Default'
+          section='table'
+          updateField={updateField}
+        />
+      )}
+      {isDashboard && config.type !== 'table' && (
+        <CheckBox
+          value={config.table.showDataTableLink}
+          fieldName='showDataTableLink'
+          label='Show Data Table Name & Link'
+          section='table'
+          updateField={updateField}
+        />
+      )}
+      {isLoadedFromUrl && (
+        <CheckBox
+          value={config.table.showDownloadUrl}
+          fieldName='showDownloadUrl'
+          label='Show URL to Automatically Updated Data'
+          section='table'
+          updateField={updateField}
+        />
+      )}
+      {config.type !== 'table' && (
+        <CheckBox
+          value={config.table.showDownloadImgButton}
+          fieldName='showDownloadImgButton'
+          label='Display Image Button'
+          section='table'
+          updateField={updateField}
+        />
+      )}
       <label>
         <span className='edit-label column-heading'>Table Cell Min Width</span>
-        <input type='number' value={config.table.cellMinWidth ? config.table.cellMinWidth : 0} onChange={e => updateField('table', null, 'cellMinWidth', e.target.value)} />
+        <input
+          type='number'
+          value={config.table.cellMinWidth ? config.table.cellMinWidth : 0}
+          onChange={e => updateField('table', null, 'cellMinWidth', e.target.value)}
+        />
       </label>
       {config?.visualizationType !== 'Sankey' && (
         <label>
@@ -181,7 +263,10 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
                 <Icon display='question' style={{ marginLeft: '0.5rem' }} />
               </Tooltip.Target>
               <Tooltip.Content>
-                <p>Choose a column to use for grouping data rows. The selected column will not be shown in the data table. You will only be able to choose a column which does not have a column configuration.</p>
+                <p>
+                  Choose a column to use for grouping data rows. The selected column will not be shown in the data
+                  table. You will only be able to choose a column which does not have a column configuration.
+                </p>
               </Tooltip.Content>
             </Tooltip>
           </span>
@@ -192,7 +277,12 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
               changeGroupBy(event.target.value)
             }}
           >
-            {[PLACEHOLDER, ...groupPivotColumns.filter(col => col !== config.table.pivot?.columnName && col !== config.table.pivot?.valueColumn)].map(option => (
+            {[
+              PLACEHOLDER,
+              ...groupPivotColumns.filter(
+                col => col !== config.table.pivot?.columnName && col !== config.table.pivot?.valueColumn
+              )
+            ].map(option => (
               <option key={option}>{option}</option>
             ))}
           </select>
@@ -211,7 +301,9 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           </Tooltip>
         }
         value={config.table.pivot?.columnName}
-        options={groupPivotColumns.filter(col => col !== config.table.groupBy && col !== config.table.pivot?.valueColumn)}
+        options={groupPivotColumns.filter(
+          col => col !== config.table.groupBy && col !== config.table.pivot?.valueColumn
+        )}
         initial='-Select-'
         section='table'
         subsection='pivot'
@@ -234,7 +326,9 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           value={config.table.pivot?.valueColumn}
           initial='-Select-'
           section='table'
-          options={groupPivotColumns.filter(col => col !== config.table.pivot?.columnName && col !== config.table.groupBy)}
+          options={groupPivotColumns.filter(
+            col => col !== config.table.pivot?.columnName && col !== config.table.groupBy
+          )}
           subsection='pivot'
           fieldName='valueColumn'
           updateField={updateField}
