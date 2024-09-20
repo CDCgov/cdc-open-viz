@@ -246,6 +246,15 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           updateField={updateField}
         />
       )}
+      {config.type !== 'table' && (
+        <CheckBox
+          value={config.table.showDownloadLinkBelow}
+          fieldName='showDownloadLinkBelow'
+          label='Show Download Link Below Table'
+          section='table'
+          updateField={updateField}
+        />
+      )}
       <label>
         <span className='edit-label column-heading'>Table Cell Min Width</span>
         <input
