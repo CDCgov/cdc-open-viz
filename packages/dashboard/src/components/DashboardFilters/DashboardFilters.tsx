@@ -27,7 +27,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
   }
 
   return (
-    <>
+    <form className='d-flex'>
       {sharedFilters.map((filter, filterIndex) => {
         if (
           (filter.type !== 'urlfilter' && !filter.showDropdown && filter.filterStyle !== 'nested-dropdown') ||
@@ -36,13 +36,6 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           return <></>
         const values: JSX.Element[] = []
         const multiValues = []
-        if (filter.resetLabel) {
-          values.push(
-            <option key={`${filter.resetLabel}-option`} value={filter.resetLabel}>
-              {filter.resetLabel}
-            </option>
-          )
-        }
         const _key = filter.apiFilter?.apiEndpoint
         if (_key && apiFilterDropdowns[_key]) {
           // URL Filter
@@ -88,30 +81,31 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
             handleSelectedItems={value => updateField(null, null, filterIndex, value)}
           />
         ) : (
-          <div className='cove-dashboard-filters' key={`${filter.key}-filtersection-${filterIndex}`}>
-            <section className='dashboard-filters-section'>
-              <label htmlFor={`filter-${filterIndex}`}>{filter.key}</label>
-              <select
-                id={`filter-${filterIndex}`}
-                className='filter-select'
-                data-index='0'
-                value={filter.queuedActive || filter.active}
-                onChange={val => {
-                  handleOnChange(filterIndex, val.target.value)
-                }}
-              >
-                {nullVal(filter) && !filter.resetLabel && (
-                  <option value='' key='select'>
-                    {'-Select-'}
-                  </option>
-                )}
-                {values}
-              </select>
-            </section>
+          <div className='form-group mr-4' key={`${filter.key}-filtersection-${filterIndex}`}>
+            <label className='text-capitalize font-weight-bold' htmlFor={`filter-${filterIndex}`}>
+              {filter.key}
+            </label>
+            <select
+              id={`filter-${filterIndex}`}
+              className='form-control'
+              data-index='0'
+              value={filter.queuedActive || filter.active}
+              onChange={val => {
+                handleOnChange(filterIndex, val.target.value)
+              }}
+              disabled={values.length === 1 && !nullVal(filter)}
+            >
+              {nullVal(filter) && (
+                <option key={`select`} value=''>
+                  {filter.resetLabel || '-Select-'}
+                </option>
+              )}
+              {values}
+            </select>
           </div>
         )
       })}
-    </>
+    </form>
   )
 }
 

@@ -50,7 +50,7 @@ const Options: React.FC<{
         <span className={'font-weight-bold'}>{label} </span>
         {
           <span className='list-arrow' aria-hidden='true'>
-            {isTierOneExpanded ? <Icon display='caretFilledUp' /> : <Icon display='caretFilledDown' />}
+            {isTierOneExpanded ? <Icon display='caretUp' alt='expanded' /> : <Icon display='caretDown' alt='closed' />}
           </span>
         }
         <ul
@@ -245,7 +245,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ currentFilter, listLabe
             onBlur={() => setInputHasFocus(false)}
           />
           <span className='list-arrow' aria-hidden={true}>
-            {isListOpened ? <Icon display='caretFilledUp' /> : <Icon display='caretFilledDown' />}
+            {isListOpened ? <Icon display='caretUp' alt='expanded' /> : <Icon display='caretDown' alt='closed' />}
           </span>
         </div>
         <ul

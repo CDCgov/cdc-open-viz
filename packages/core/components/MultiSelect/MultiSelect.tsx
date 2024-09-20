@@ -22,7 +22,17 @@ interface MultiSelectProps {
   tooltip?: React.ReactNode
 }
 
-const MultiSelect: React.FC<MultiSelectProps> = ({ section = null, subsection = null, fieldName, label, options, updateField, selected = [], limit, tooltip }) => {
+const MultiSelect: React.FC<MultiSelectProps> = ({
+  section = null,
+  subsection = null,
+  fieldName,
+  label,
+  options,
+  updateField,
+  selected = [],
+  limit,
+  tooltip
+}) => {
   const preselectedItems = options.filter(opt => selected.includes(opt.value)).slice(0, limit)
   const [selectedItems, setSelectedItems] = useState<Option[]>(preselectedItems)
   const [expanded, setExpanded] = useState(false)

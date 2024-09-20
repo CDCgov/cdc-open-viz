@@ -127,7 +127,11 @@ export const MultiDashboard: Story = {
 }
 
 const FNrows: ConfigRow[] = [{ ...MultiVizConfig.rows[0], footnotesId: 'footnote123' }]
-const footnoteConfig: Partial<FootnotesConfig> = { dataKey: 'footnote-data.json', dynamicFootnotes: { symbolColumn: 'symbol', textColumn: 'text' }, staticFootnotes: [{ symbol: '**', text: 'This is a static Footnote' }] }
+const footnoteConfig: Partial<FootnotesConfig> = {
+  dataKey: 'footnote-data.json',
+  dynamicFootnotes: { symbolColumn: 'symbol', textColumn: 'text' },
+  staticFootnotes: [{ symbol: '**', text: 'This is a static Footnote' }]
+}
 const FNViz = { ...MultiVizConfig.visualizations, footnote123: footnoteConfig }
 export const Footnotes: Story = {
   args: {
