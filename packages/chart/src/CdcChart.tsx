@@ -1235,10 +1235,10 @@ export default function CdcChart({
   }
 
   const getChartWrapperClasses = () => {
-    const isLegendOnBottom = legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+    const isLegendOnBottom = legend?.position === 'bottom' || ['xs', 'xxs'].includes(currentViewport)
     const classes = ['chart-container', 'p-relative']
     if (legend?.position) {
-      if (['sm', 'xs', 'xxs'].includes(currentViewport) && legend?.position !== 'top') {
+      if (['xs', 'xxs'].includes(currentViewport) && legend?.position !== 'top') {
         classes.push('legend-bottom')
       } else {
         classes.push(`legend-${legend.position}`)
@@ -1255,7 +1255,7 @@ export default function CdcChart({
 
   const getChartSubTextClasses = () => {
     const classes = ['subtext ']
-    const isLegendOnBottom = legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+    const isLegendOnBottom = legend?.position === 'bottom' || ['xs', 'xxs'].includes(currentViewport)
 
     if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
     if (config.brush?.active && !isLegendOnBottom) classes.push('subtext--brush-active ')
@@ -1318,7 +1318,7 @@ export default function CdcChart({
                 <LegendWrapper>
                   <div
                     className={
-                      legend.hide || ['xxs', 'xs', 'sm'].includes(currentViewport)
+                      legend.hide || ['xxs', 'xs'].includes(currentViewport)
                         ? 'w-100'
                         : legend.position === 'bottom' || legend.position === 'top' || visualizationType === 'Sankey'
                         ? 'w-100'
@@ -1511,7 +1511,7 @@ export default function CdcChart({
     highlightReset,
     imageId,
     isDashboard,
-    isLegendBottom: legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport),
+    isLegendBottom: legend?.position === 'bottom' || ['xs', 'xxs'].includes(currentViewport),
     isDebug,
     isDraggingAnnotation,
     handleDragStateChange,
