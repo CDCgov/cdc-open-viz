@@ -125,7 +125,8 @@ export default {
     labelOffset: 65,
     axisPadding: 200,
     target: 0,
-    maxTickRotation: 0
+    maxTickRotation: 0,
+    padding: 0
   },
   table: {
     label: 'Data Table',

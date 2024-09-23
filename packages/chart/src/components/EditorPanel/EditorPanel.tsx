@@ -742,7 +742,7 @@ const EditorPanel = () => {
       updatedConfig.orientation = 'vertical'
     }
     if (isDateScale(updatedConfig.xAxis) && !updatedConfig.xAxis.padding) {
-      updatedConfig.xAxis.padding = 6
+      updatedConfig.xAxis.padding = 0
     }
     // DEV-8008 - Remove Bar styling when Line is converted to Bar
     if (updatedConfig.visualizationType === 'Line') {
