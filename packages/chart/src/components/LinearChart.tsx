@@ -559,7 +559,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                               display={(isLogarithmicAxis && showTicks).toString()}
                               from={{ x: tick.from.x + xMax, y: tick.from.y }}
                               to={tick.from}
-                              stroke='rgba(0,0,0,0.3)'
+                              stroke='#d6d6d6'
                             />
                           ) : (
                             ''
@@ -784,11 +784,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                           )}
 
                           {runtime.yAxis.rightGridLines ? (
-                            <Line
-                              from={{ x: tick.from.x + xMax, y: tick.from.y }}
-                              to={tick.from}
-                              stroke='rgba(0,0,0,0.3)'
-                            />
+                            <Line from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='#d6d6d6' />
                           ) : (
                             ''
                           )}
@@ -1276,7 +1272,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
           {config.filters && config.filters.values.length === 0 && data.length === 0 && (
             <Text
               x={Number(config.yAxis.size) + Number(xMax / 2)}
-              y={height / 2 - config.xAxis.padding / 2}
+              y={height / 2 - (config.xAxis.padding || 0) / 2}
               textAnchor='middle'
             >
               {config.chartMessage.noData}
