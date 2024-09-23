@@ -1462,6 +1462,11 @@ const CdcMap = ({
       if (newData) {
         newState.data = newData
       }
+    } else if(newState.formattedData) {
+      newState.data = newState.formattedData
+    } else if(newState.dataDescription) {
+      newState.data = transform.autoStandardize(newState.data)
+      newState.data = transform.developerStandardize(newState.data, newState.dataDescription)
     }
 
     // This code goes through and adds the defaults for every property declaring in the initial state at the top.
