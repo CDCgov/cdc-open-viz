@@ -28,6 +28,8 @@ type DeprecatedVisualizationType = {
   legend: Legend
   multiDashboards?: any[]
   newViz: boolean
+  isResponsiveTicks: boolean
+  barThickness: string
   openModal: boolean
   orientation: 'vertical' | 'horizontal'
   originalFormattedData: any
@@ -36,7 +38,17 @@ type DeprecatedVisualizationType = {
   table: Table
   theme: string
   title: string
-  type: 'dashboard' | 'chart' | 'footnotes' | 'map' | 'data-bite' | 'waffle-chart' | 'markup-include' | 'filtered-text' | 'table' | 'navigation'
+  type:
+    | 'dashboard'
+    | 'chart'
+    | 'footnotes'
+    | 'map'
+    | 'data-bite'
+    | 'waffle-chart'
+    | 'markup-include'
+    | 'filtered-text'
+    | 'table'
+    | 'navigation'
   usesSharedFilter: any
   visualizationSubType: string
   visualizationType: string
