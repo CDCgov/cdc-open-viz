@@ -31,8 +31,21 @@ type CdcMarkupIncludeProps = {
 
 import Title from '@cdc/core/components/ui/Title'
 
-const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: configObj, isDashboard = true, isEditor = false, setConfig: setParentConfig }) => {
-  const initialState = { config: configObj, loading: true, urlMarkup: '', markupError: null, errorMessage: null, coveLoadedHasRan: false }
+const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
+  configUrl,
+  config: configObj,
+  isDashboard = true,
+  isEditor = false,
+  setConfig: setParentConfig
+}) => {
+  const initialState = {
+    config: configObj,
+    loading: true,
+    urlMarkup: '',
+    markupError: null,
+    errorMessage: null,
+    coveLoadedHasRan: false
+  }
 
   const [state, dispatch] = useReducer(markupIncludeReducer, initialState)
 
@@ -92,7 +105,8 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
       let errorList = {
         200: 'This is likely due to a CORS restriction policy from the remote origin address.',
         404: 'The requested source URL cannot be found. Please verify the link address provided.',
-        proto: 'Provided source URL must include https:// or http:// before the address (depending on the source content type).'
+        proto:
+          'Provided source URL must include https:// or http:// before the address (depending on the source content type).'
       }
 
       message += errorList[errorCode]
@@ -138,7 +152,10 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
   const filterOutConditions = (workingData, conditionList) => {
     const { columnName, isOrIsNotEqualTo, value } = conditionList[0]
 
-    const newWorkingData = isOrIsNotEqualTo === 'is' ? workingData.filter(dataObject => dataObject[columnName] === value) : workingData.filter(dataObject => dataObject[columnName] !== value)
+    const newWorkingData =
+      isOrIsNotEqualTo === 'is'
+        ? workingData.filter(dataObject => dataObject[columnName] === value)
+        : workingData.filter(dataObject => dataObject[columnName] !== value)
 
     conditionList.shift()
     return conditionList.length === 0 ? newWorkingData : filterOutConditions(newWorkingData, conditionList)
@@ -150,7 +167,10 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
     const convertedInlineMarkup = inlineMarkup.replace(variableRegexPattern, variableTag => {
       const workingVariable = markupVariables.filter(variable => variable.tag === variableTag)[0]
       if (workingVariable === undefined) return [variableTag]
-      const workingData = workingVariable && workingVariable.conditions.length === 0 ? data : filterOutConditions(data, [...workingVariable.conditions])
+      const workingData =
+        workingVariable && workingVariable.conditions.length === 0
+          ? data
+          : filterOutConditions(data, [...workingVariable.conditions])
 
       const variableValues: string[] = _.uniq(workingData?.map(dataObject => dataObject[workingVariable.columnName]))
       const variableDisplay = []
@@ -168,9 +188,9 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
 
       let finalDisplay = variableDisplay[0]
 
-      if(workingVariable.addCommas && !isNaN(parseFloat(finalDisplay))){
+      if (workingVariable.addCommas && !isNaN(parseFloat(finalDisplay))) {
         finalDisplay = parseFloat(finalDisplay)
-        finalDisplay = finalDisplay.toLocaleString('en-US', {useGrouping: true})
+        finalDisplay = finalDisplay.toLocaleString('en-US', { useGrouping: true })
       }
 
       return finalDisplay
@@ -205,11 +225,6 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
       dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
     }
   }, [config, container])
-
-  //Reload config if config object provided/updated
-  useEffect(() => {
-    loadConfig().catch(err => console.log(err))
-  }, [configObj?.data])
 
   //Reload any functions when config is updated
   useEffect(() => {
