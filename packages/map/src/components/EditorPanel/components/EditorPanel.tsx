@@ -541,6 +541,15 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           }
         })
         break
+      case 'toggleDownloadLinkBelow':
+        setState({
+          ...state,
+          table: {
+            ...state.table,
+            showDownloadLinkBelow: !state.table.showDownloadLinkBelow
+          }
+        })
+        break
       case 'toggleDownloadPdfButton':
         setState({
           ...state,
@@ -3083,6 +3092,16 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     }}
                   />
                   <span className='edit-label'>Enable Image Download</span>
+                </label>
+                <label className='checkbox'>
+                  <input
+                    type='checkbox'
+                    checked={state.table.showDownloadLinkBelow}
+                    onChange={event => {
+                      handleEditorChanges('toggleDownloadLinkBelow', event.target.checked)
+                    }}
+                  />
+                  <span className='edit-label'>Show Download Link Below Table</span>
                 </label>
                 {/* <label className='checkbox'>
                       <input

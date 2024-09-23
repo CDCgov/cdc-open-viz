@@ -135,6 +135,7 @@ export default {
     caption: '',
     showDownloadUrl: false,
     showDataTableLink: true,
+    showDownloadLinkBelow: true,
     indexLabel: '',
     download: false,
     showVertical: true,

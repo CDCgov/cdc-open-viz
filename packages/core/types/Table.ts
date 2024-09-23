@@ -23,6 +23,7 @@ export type Table = {
   show?: boolean
   showDataTableLink?: boolean
   showDownloadImgButton?: boolean
+  showDownloadLinkBelow?: boolean
   showDownloadPdfButton?: boolean
   showDownloadUrl?: boolean
   showVertical?: boolean
