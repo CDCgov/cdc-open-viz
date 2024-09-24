@@ -398,7 +398,6 @@ export default function CdcChart({
         Object.keys(finalData[0]).forEach(seriesKey => {
           if (
             seriesKey !== newConfig.xAxis.dataKey &&
-            finalData[0][seriesKey] &&
             (!newConfig.filters || newConfig.filters.filter(filter => filter.columnName === seriesKey).length === 0) &&
             (!newConfig.columns || Object.keys(newConfig.columns).indexOf(seriesKey) === -1)
           ) {
