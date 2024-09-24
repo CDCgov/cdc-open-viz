@@ -117,8 +117,8 @@ const LinearChart: React.FC<LinearChartProps> = props => {
   const { hasTopAxis } = useTopAxis(config)
   const [animatedChart, setAnimatedChart] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
+  const [suffixWidth, setSuffixWidth] = useState(0)
   const annotationRefs = useRef(null)
-
   // refs
   const triggerRef = useRef()
   const axisBottomRef = useRef(null)
@@ -168,7 +168,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
     setChartPosition(svgRef?.current?.getBoundingClientRect())
   }, [svgRef, config.legend])
 
-  const handleLeftTickFormatting = (tick, index) => {
+  const handleLeftTickFormatting = (tick, index, ticks) => {
     if (isLogarithmicAxis && tick === 0.1) {
       //when logarithmic scale applied change value of first tick
       tick = 0
@@ -178,8 +178,11 @@ const LinearChart: React.FC<LinearChartProps> = props => {
     if (config.visualizationType === 'Forest Plot') return config.data[index][config.xAxis.dataKey]
     if (isDateScale(runtime.yAxis)) return formatDate(parseDate(tick))
     if (orientation === 'vertical' && max - min < 3)
-      return formatNumber(tick, 'left', shouldAbbreviate, false, false, '1')
-    if (orientation === 'vertical') return formatNumber(tick, 'left', shouldAbbreviate)
+      return formatNumber(tick, 'left', shouldAbbreviate, false, false, '1', { index, length: ticks.length })
+    if (orientation === 'vertical') {
+      // TODO suggestion: pass all options as object key/values to allow for more flexibility
+      return formatNumber(tick, 'left', shouldAbbreviate, false, false, undefined, { index, length: ticks.length })
+    }
     return tick
   }
 
@@ -301,6 +304,14 @@ const LinearChart: React.FC<LinearChartProps> = props => {
       }, 500)
     }
   }, [dataRef?.isIntersecting, config.animate])
+
+  useEffect(() => {
+    const textElement = document.querySelector(`#suffix`)
+    if (textElement) {
+      const textWidth = textElement.getBBox().width
+      setSuffixWidth(textWidth)
+    }
+  }, [])
 
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
@@ -527,7 +538,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
               left={Number(runtime.yAxis.size) - config.yAxis.axisPadding}
               label={runtime.yAxis.label || runtime.yAxis.label}
               stroke='#333'
-              tickFormat={(tick, i) => handleLeftTickFormatting(tick, i)}
+              tickFormat={handleLeftTickFormatting}
               numTicks={handleNumTicks()}
             >
               {props => {
@@ -546,6 +557,9 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                       const tickLength = showTicks === 'block' ? 7 : 0
                       const to = { x: tick.to.x - tickLength, y: tick.to.y }
                       const hideFirstGridLine = tick.index === 0 && tick.value === 0 && config.xAxis.hideAxis
+                      const lastTick = props.ticks.length - 1 === i
+                      const { suffix, simplifiedPrefixSuffix } = config.dataFormat
+                      const suffixOneChar = suffix.length === 1
 
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
@@ -589,6 +603,18 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                                 {tick.formattedValue}
                               </Text>
                             )}
+
+                          {runtime.yAxis.gridLines && !hideFirstGridLine ? (
+                            <Line
+                              key={`${tick.value}--hide-hideGridLines`}
+                              display={(isLogarithmicAxis && showTicks).toString()}
+                              from={{ x: tick.from.x + xMax, y: tick.from.y }}
+                              to={tick.from}
+                              stroke='rgba(0,0,0,0.3)'
+                            />
+                          ) : (
+                            ''
+                          )}
 
                           {orientation === 'horizontal' &&
                             visualizationSubType === 'stacked' &&
@@ -669,18 +695,44 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                             visualizationType !== 'Paired Bar' &&
                             visualizationType !== 'Bump Chart' &&
                             !config.yAxis.hideLabel && (
-                              <Text
-                                display={isLogarithmicAxis ? showTicks : 'block'}
-                                dx={isLogarithmicAxis ? -6 : 0}
-                                x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
-                                y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
-                                angle={-Number(config.yAxis.tickRotation) || 0}
-                                verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}
-                                textAnchor={config.runtime.horizontal ? 'start' : 'end'}
-                                fill={config.yAxis.tickLabelColor}
-                              >
-                                {tick.formattedValue}
-                              </Text>
+                              <>
+                                {/* SIMPLIFIED SUFFIX: Dom suffix for simplified suffix behavior */}
+                                {/* top suffix is shown alone and is allowed to 'overflow' to the right */}
+                                {/* SPECIAL CASE: a one character simplified suffix does not overflow */}
+                                {simplifiedPrefixSuffix && lastTick && (
+                                  <Text
+                                    id='suffix'
+                                    display={isLogarithmicAxis ? showTicks : 'block'}
+                                    dx={isLogarithmicAxis ? -6 : 0}
+                                    x={tick.to.x}
+                                    y={tick.to.y}
+                                    angle={-Number(config.yAxis.tickRotation) || 0}
+                                    verticalAnchor={'middle'}
+                                    textAnchor={suffixOneChar ? 'end' : 'start'}
+                                    fill={config.yAxis.tickLabelColor}
+                                    stroke={'#fff'}
+                                    strokeWidth={6}
+                                    paintOrder={'stroke'} // keeps stroke under fill
+                                    style={{ whiteSpace: 'pre-wrap' }} // prevents leading spaces from being trimmed
+                                  >
+                                    {suffix}
+                                  </Text>
+                                )}
+
+                                {/* VALUE */}
+                                <Text
+                                  display={isLogarithmicAxis ? showTicks : 'block'}
+                                  dx={isLogarithmicAxis ? -6 : 0}
+                                  x={suffixOneChar ? tick.to.x - suffixWidth : tick.to.x}
+                                  y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                                  angle={-Number(config.yAxis.tickRotation) || 0}
+                                  verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}
+                                  textAnchor={config.runtime.horizontal ? 'start' : 'end'}
+                                  fill={config.yAxis.tickLabelColor}
+                                >
+                                  {tick.formattedValue}
+                                </Text>
+                              </>
                             )}
                         </Group>
                       )

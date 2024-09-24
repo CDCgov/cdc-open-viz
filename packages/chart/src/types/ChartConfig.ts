@@ -51,6 +51,7 @@ type DataFormat = {
   rightSuffix: string
   roundTo: number
   suffix: string
+  simplifiedPrefixSuffix?: boolean
 }
 
 type Exclusions = {
