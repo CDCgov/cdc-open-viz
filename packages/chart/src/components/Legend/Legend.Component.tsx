@@ -56,7 +56,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
       (['sm', 'xs', 'xxs'].includes(currentViewport) && !legend.hide)
 
     const legendClasses = {
-      marginBottom: (isBottomOrSmallViewport && (legend.hideSuppressionLink ? '15px' : '45px')) || '0px',
+      marginBottom: (isBottomOrSmallViewport && (legend.hideSuppressionLink ? '15px' : '15px')) || '0px',
 
       marginTop:
         isBottomOrSmallViewport && config.orientation === 'horizontal'

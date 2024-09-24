@@ -469,7 +469,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                 <Group>
                   <Text
                     x={xMax / 2}
-                    y={axisMaxHeight + 20 + xLabelOffset}
+                    y={axisMaxHeight + (['xxs', 'xs', 'sm'].includes(currentViewport) ? 10 : 20) + xLabelOffset}
                     stroke='#333'
                     textAnchor={'middle'}
                     verticalAnchor='start'
@@ -480,7 +480,10 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                 {svgRef.current
                   ? svgRef.current.setAttribute(
                       'height',
-                      Number(height) + Number(axisMaxHeight) + (runtime.xAxis.label ? 50 : 0) + 'px'
+                      Number(height) +
+                        Number(axisMaxHeight) +
+                        (runtime.xAxis.label ? (['xxs', 'xs', 'sm'].includes(currentViewport) ? 10 : 20) : 0) +
+                        'px'
                     )
                   : ''}
               </>
@@ -980,7 +983,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                     {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
                     <Text
                       x={axisCenter}
-                      y={axisMaxHeight + 20 + xLabelOffset}
+                      y={axisMaxHeight + (['xxs', 'xs', 'sm'].includes(currentViewport) ? 10 : 20) + xLabelOffset}
                       textAnchor='middle'
                       verticalAnchor='start'
                       fontWeight='bold'
@@ -994,7 +997,10 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                 if (svgRef.current)
                   svgRef.current.setAttribute(
                     'height',
-                    Number(height) + Number(axisMaxHeight) + (runtime.xAxis.label ? 50 : 0) + 'px'
+                    Number(height) +
+                      Number(axisMaxHeight) +
+                      (runtime.xAxis.label ? (['xxs', 'xs', 'sm'].includes(currentViewport) ? 10 : 20) : 0) +
+                      'px'
                   )
 
                 return axisContents
