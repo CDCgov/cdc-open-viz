@@ -445,7 +445,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                 />
               </>
             )
-            break
           default:
             body = <></>
             break

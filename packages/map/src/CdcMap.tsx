@@ -1923,6 +1923,8 @@ const CdcMap = ({
 
               {state.annotations.length > 0 && <Annotation.Dropdown />}
 
+              {state.annotations.length > 0 && <Annotation.Dropdown />}
+
               {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
             </section>
           )}
