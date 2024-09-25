@@ -57,7 +57,7 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
     }
 
     let newConfig = { ...config, ...response }
-    const processedConfig = { ...(await coveUpdateWorker(newConfig)) }
+    const processedConfig = { ...coveUpdateWorker(newConfig) }
 
     updateConfig(processedConfig)
     setLoading(false)

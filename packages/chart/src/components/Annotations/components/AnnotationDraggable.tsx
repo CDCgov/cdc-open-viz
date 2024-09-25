@@ -90,9 +90,17 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
                   props.x
                 )
 
-                updatedAnnotations[index] = { ...updatedAnnotations[index], x: xScaleAnnotation.invert(xScale(nearestDatum.x)), y: yScale(nearestDatum.y) }
+                updatedAnnotations[index] = {
+                  ...updatedAnnotations[index],
+                  x: xScaleAnnotation.invert(xScale(nearestDatum.x)),
+                  y: yScale(nearestDatum.y)
+                }
               } else {
-                updatedAnnotations[index] = { ...updatedAnnotations[index], x: xScaleAnnotation.invert(props.x), y: props.y }
+                updatedAnnotations[index] = {
+                  ...updatedAnnotations[index],
+                  x: xScaleAnnotation.invert(props.x),
+                  y: props.y
+                }
               }
             }
 
@@ -102,7 +110,12 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
             })
           }}
         >
-          <HtmlLabel className='annotation__desktop-label' showAnchorLine={false} horizontalAnchor={handleConnectionHorizontalType(annotation, xScale, config)} verticalAnchor={handleConnectionVerticalType(annotation, xScale, config)}>
+          <HtmlLabel
+            className='annotation__desktop-label'
+            showAnchorLine={false}
+            horizontalAnchor={handleConnectionHorizontalType(annotation, xScale, config)}
+            verticalAnchor={handleConnectionVerticalType(annotation, xScale, config)}
+          >
             <div
               style={{
                 borderRadius: 5, // Optional: set border radius
@@ -113,7 +126,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
                 justifyContent: 'start',
                 flexDirection: 'row'
               }}
-              role='presentation'
+              // role='presentation'
               tabIndex={0}
               aria-label={`Annotation text that reads: ${annotation.text}`}
             >
@@ -127,22 +140,62 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
               <div style={{ fontSize: fontSizes[config.fontSize] }} dangerouslySetInnerHTML={sanitizedData()} />
             </div>
           </HtmlLabel>
-          {annotation.connectionType === 'line' && <Connector type='line' pathProps={{ markerStart: `url(#marker-start--${index})` }} />}
-          {annotation.connectionType === 'elbow' && <Connector type='elbow' pathProps={{ markerStart: `url(#marker-start--${index})` }} />}
+          {annotation.connectionType === 'line' && (
+            <Connector type='line' pathProps={{ markerStart: `url(#marker-start--${index})` }} />
+          )}
+          {annotation.connectionType === 'elbow' && (
+            <Connector type='elbow' pathProps={{ markerStart: `url(#marker-start--${index})` }} />
+          )}
           {annotation.connectionType === 'curve' && (
             <LinePath
               d={`M ${annotationX},${annotation.y}
-                      Q ${annotationX + annotation.dx / 2}, ${annotation.y + annotation.dy / 2 + Number(annotation?.bezier) || 0} ${annotationX + annotation.dx},${annotation.y + annotation.dy}`}
+                      Q ${annotationX + annotation.dx / 2}, ${
+                annotation.y + annotation.dy / 2 + Number(annotation?.bezier) || 0
+              } ${annotationX + annotation.dx},${annotation.y + annotation.dy}`}
               stroke='black'
               strokeWidth='2'
               fill='none'
               marker-start={`url(#marker-start--${index})`}
             />
           )}
-          {annotation.marker === 'circle' && <CircleSubject id={`marker-start--${index}`} className='circle-subject' stroke={colorScale(annotation.seriesKey)} radius={8} />}
-          {annotation.marker === 'arrow' && <MarkerArrow fill='black' id={`marker-start--${index}`} x={annotationX} y={annotation.y} stroke='#333' markerWidth={10} size={10} strokeWidth={1} orient='auto-start-reverse' markerUnits='userSpaceOnUse' />}
-          <circle fill='white' cx={annotationX + annotation.dx} cy={annotation.y + annotation.dy} r={16} className='annotation__mobile-label annotation__mobile-label-circle' stroke={colorScale(annotation.seriesKey)} />
-          <text height={16} x={annotationX + annotation.dx} y={annotation.y + annotation.dy} className='annotation__mobile-label' alignmentBaseline='middle' textAnchor='middle'>
+          {annotation.marker === 'circle' && (
+            <CircleSubject
+              id={`marker-start--${index}`}
+              className='circle-subject'
+              stroke={colorScale(annotation.seriesKey)}
+              radius={8}
+            />
+          )}
+          {annotation.marker === 'arrow' && (
+            <MarkerArrow
+              fill='black'
+              id={`marker-start--${index}`}
+              x={annotationX}
+              y={annotation.y}
+              stroke='#333'
+              markerWidth={10}
+              size={10}
+              strokeWidth={1}
+              orient='auto-start-reverse'
+              markerUnits='userSpaceOnUse'
+            />
+          )}
+          <circle
+            fill='white'
+            cx={annotationX + annotation.dx}
+            cy={annotation.y + annotation.dy}
+            r={16}
+            className='annotation__mobile-label annotation__mobile-label-circle'
+            stroke={colorScale(annotation.seriesKey)}
+          />
+          <text
+            height={16}
+            x={annotationX + annotation.dx}
+            y={annotation.y + annotation.dy}
+            className='annotation__mobile-label'
+            alignmentBaseline='middle'
+            textAnchor='middle'
+          >
             {index + 1}
           </text>
         </AnnotationComponent>

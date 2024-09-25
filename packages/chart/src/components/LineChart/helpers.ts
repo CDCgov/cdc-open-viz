@@ -1,10 +1,20 @@
-import { type PreliminaryDataItem, DataItem, StyleProps, Style } from './LineChartProps'
+import { DataItem, StyleProps, Style } from './LineChartProps'
+import { PreliminaryDataItem } from '../../types/ChartConfig'
 import _ from 'lodash'
 export const createStyles = (props: StyleProps): Style[] => {
   const { preliminaryData, data, stroke, strokeWidth, handleLineType, lineType, seriesKey } = props
 
-  const validPreliminaryData: PreliminaryDataItem[] = preliminaryData.filter(pd => pd.seriesKey && pd.column && pd.value && pd.type && pd.style && pd.type === 'effect')
-  const getMatchingPd = (point: DataItem): PreliminaryDataItem => validPreliminaryData.find(pd => pd.seriesKey === seriesKey && point[pd.column] === pd.value && pd.type === 'effect' && pd.style !== 'Open Circles')
+  const validPreliminaryData: PreliminaryDataItem[] = preliminaryData.filter(
+    pd => pd.seriesKey && pd.column && pd.value && pd.type && pd.style && pd.type === 'effect'
+  )
+  const getMatchingPd = (point: DataItem): PreliminaryDataItem =>
+    validPreliminaryData.find(
+      pd =>
+        pd.seriesKey === seriesKey &&
+        point[pd.column] === pd.value &&
+        pd.type === 'effect' &&
+        pd.style !== 'Open Circles'
+    )
 
   let styles: Style[] = []
   const createStyle = (lineStyle): Style => ({
@@ -15,7 +25,9 @@ export const createStyles = (props: StyleProps): Style[] => {
 
   data.forEach((d, index) => {
     let matchingPd: PreliminaryDataItem = getMatchingPd(d)
-    let style: Style = matchingPd ? createStyle(handleLineType(matchingPd.style)) : createStyle(handleLineType(lineType))
+    let style: Style = matchingPd
+      ? createStyle(handleLineType(matchingPd.style))
+      : createStyle(handleLineType(lineType))
 
     styles.push(style)
 
@@ -27,14 +39,31 @@ export const createStyles = (props: StyleProps): Style[] => {
   return styles as Style[]
 }
 
-export const filterCircles = (preliminaryData: PreliminaryDataItem[], data: DataItem[], seriesKey: string): DataItem[] => {
+export const filterCircles = (
+  preliminaryData: PreliminaryDataItem[],
+  data: DataItem[],
+  seriesKey: string
+): DataItem[] => {
   // Filter and map preliminaryData to get circlesFiltered
-  const circlesFiltered = preliminaryData?.filter(item => item.style.includes('Circles') && item.type === 'effect').map(item => ({ column: item.column, value: item.value, seriesKey: item.seriesKey, circleSize: item.circleSize, style: item.style }))
+  const circlesFiltered = preliminaryData
+    ?.filter(item => item.style.includes('Circles') && item.type === 'effect')
+    .map(item => ({
+      column: item.column,
+      value: item.value,
+      seriesKey: item.seriesKey,
+      circleSize: item.circleSize,
+      style: item.style
+    }))
   const filteredData = []
   // Process data to find matching items
   data.forEach(item => {
     circlesFiltered.forEach(fc => {
-      if (item[fc.column] === fc.value && fc.seriesKey === seriesKey && item[seriesKey] && fc.style === 'Open Circles') {
+      if (
+        item[fc.column] === fc.value &&
+        fc.seriesKey === seriesKey &&
+        item[seriesKey] &&
+        fc.style === 'Open Circles'
+      ) {
         const result = {
           data: item,
           size: fc.circleSize,
@@ -42,7 +71,12 @@ export const filterCircles = (preliminaryData: PreliminaryDataItem[], data: Data
         }
         filteredData.push(result)
       }
-      if ((!fc.value || item[fc.column] === fc.value) && fc.seriesKey === seriesKey && item[seriesKey] && fc.style === 'Filled Circles') {
+      if (
+        (!fc.value || item[fc.column] === fc.value) &&
+        fc.seriesKey === seriesKey &&
+        item[seriesKey] &&
+        fc.style === 'Filled Circles'
+      ) {
         const result = {
           data: item,
           size: fc.circleSize,
@@ -71,7 +105,9 @@ const handleFirstIndex = (data, seriesKey, preliminaryData) => {
   // Function to check if a data item matches the suppression criteria
   const isSuppressed = pd => {
     if (pd.type === 'effect' || pd.hideLineStyle) return
-    return pd.type == 'suppression' && pd.value === firstIndexDataItem[seriesKey] && (!pd.column || pd.column === seriesKey)
+    return (
+      pd.type == 'suppression' && pd.value === firstIndexDataItem[seriesKey] && (!pd.column || pd.column === seriesKey)
+    )
   }
 
   // Find applicable suppression data for the first item
@@ -107,7 +143,13 @@ const handleLastIndex = (data, seriesKey, preliminaryData) => {
   let lastAddedIndex = -1 // Tracks the last index added to the result
   preliminaryData?.forEach(pd => {
     if (pd.type === 'effect') return
-    if (data[data.length - 1][seriesKey] === pd.value && pd.style && (!pd.column || pd.column === seriesKey) && pd.type == 'suppression' && !pd.hideLineStyle) {
+    if (
+      data[data.length - 1][seriesKey] === pd.value &&
+      pd.style &&
+      (!pd.column || pd.column === seriesKey) &&
+      pd.type == 'suppression' &&
+      !pd.hideLineStyle
+    ) {
       const lastIndex = data.length - 1
       const modifiedItem = { ...data[lastIndex], [seriesKey]: 0 }
       result.data.push(modifiedItem)
@@ -157,7 +199,9 @@ function handleMiddleIndices(data, seriesKey, dataKey, preliminaryData) {
       }
 
       // Find and add the next calculable object
-      const nextIndex = data.slice(i + 1).findIndex(item => item[seriesKey] !== targetValue && isCalculable(item[seriesKey]))
+      const nextIndex = data
+        .slice(i + 1)
+        .findIndex(item => item[seriesKey] !== targetValue && isCalculable(item[seriesKey]))
       if (nextIndex !== -1) {
         result.data.push(data[i + 1 + nextIndex])
       }

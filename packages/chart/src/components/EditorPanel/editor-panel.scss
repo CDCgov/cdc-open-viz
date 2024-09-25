@@ -7,9 +7,22 @@
 }
 
 .cdc-open-viz-module.type-chart {
-  @include breakpointClass(md) {
-    .editor-panel:not(.hidden) + .cdc-chart-inner-container {
-      padding-left: 350px;
+  .viewport-overrides {
+    button {
+      width: 100%;
+      padding: 1em;
+      margin-top: 1em;
+      text-align: left;
+
+      span {
+        display: inline-block;
+        float: right;
+      }
+    }
+
+    .edit-block {
+      margin-top: 0;
+      padding: 1em;
     }
   }
 

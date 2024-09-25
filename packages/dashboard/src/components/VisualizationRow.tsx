@@ -27,10 +27,21 @@ type VisualizationWrapperProps = {
   row: ConfigRow
 }
 
-const VisualizationWrapper: React.FC<VisualizationWrapperProps> = ({ allExpanded, currentViewport, groupName, row, children }) => {
+const VisualizationWrapper: React.FC<VisualizationWrapperProps> = ({
+  allExpanded,
+  currentViewport,
+  groupName,
+  row,
+  children
+}) => {
   return row.expandCollapseAllButtons ? (
     <div className='collapsable-multiviz-container'>
-      <CollapsibleVisualizationRow allExpanded={allExpanded} fontSize={'26px'} groupName={groupName} currentViewport={currentViewport}>
+      <CollapsibleVisualizationRow
+        allExpanded={allExpanded}
+        fontSize={'26px'}
+        groupName={groupName}
+        currentViewport={currentViewport}
+      >
         {children}
       </CollapsibleVisualizationRow>
     </div>
@@ -54,7 +65,17 @@ type VizRowProps = {
   currentViewport: ViewPort
 }
 
-const VisualizationRow: React.FC<VizRowProps> = ({ allExpanded, filteredDataOverride, groupName, row, rowIndex: index, setSharedFilter, updateChildConfig, applyFilters, apiFilterDropdowns, handleOnChange, currentViewport }) => {
+const VisualizationRow: React.FC<VizRowProps> = ({
+  allExpanded,
+  filteredDataOverride,
+  groupName,
+  row,
+  rowIndex: index,
+  setSharedFilter,
+  updateChildConfig,
+  apiFilterDropdowns,
+  currentViewport
+}) => {
   const { config, filteredData: dashboardFilteredData, data: rawData } = useContext(DashboardContext)
   const [show, setShow] = React.useState(row.columns.map((col, i) => i === 0))
   const setToggled = (colIndex: number) => {
@@ -81,7 +102,9 @@ const VisualizationRow: React.FC<VizRowProps> = ({ allExpanded, filteredDataOver
   }, [config, row, rawData, dashboardFilteredData])
 
   const applyButtonNotClicked = (vizConfig: DashboardFilters): boolean => {
-    const dashboardFilters = Object.values(config.visualizations).filter(v => v.type === 'dashboardFilters') as DashboardFilters[]
+    const dashboardFilters = Object.values(config.visualizations).filter(
+      v => v.type === 'dashboardFilters'
+    ) as DashboardFilters[]
     const applyFilters = dashboardFilters.filter(v => !v.autoLoad).flatMap(v => v.sharedFilterIndexes)
     if (hasDashboardApplyBehavior(config.visualizations) && vizConfig.autoLoad) {
       return applyFilters.some(index => {
@@ -94,11 +117,16 @@ const VisualizationRow: React.FC<VizRowProps> = ({ allExpanded, filteredDataOver
     return false
   }
   return (
-    <div className={`row mb-5 ${row.equalHeight ? 'equal-height' : ''} ${row.toggle ? 'toggle' : ''}`} key={`row__${index}`}>
-      {row.toggle && <Toggle row={row} visualizations={config.visualizations} active={show.indexOf(true)} setToggled={setToggled} />}
+    <div
+      className={`row mb-5 ${row.equalHeight ? 'equal-height' : ''} ${row.toggle ? 'toggle' : ''}`}
+      key={`row__${index}`}
+    >
+      {row.toggle && (
+        <Toggle row={row} visualizations={config.visualizations} active={show.indexOf(true)} setToggled={setToggled} />
+      )}
       {row.columns.map((col, colIndex) => {
         if (col.width) {
-          if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`col-md-${col.width}`}></div>
+          if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`col col-${col.width}`}></div>
 
           const visualizationConfig = getVizConfig(col.widget, index, config, rawData, dashboardFilteredData)
           if (filteredDataOverride) {
@@ -108,22 +136,37 @@ const VisualizationRow: React.FC<VizRowProps> = ({ allExpanded, filteredDataOver
             }
           }
 
-          const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
-          const setSharedFilterValue = setsSharedFilter ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget)[0].active : undefined
+          const setsSharedFilter =
+            config.dashboard.sharedFilters &&
+            config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
+          const setSharedFilterValue = setsSharedFilter
+            ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget)[0].active
+            : undefined
           const tableLink = (
             <a href={`#data-table-${visualizationConfig.dataKey}`} className='margin-left-href'>
               {visualizationConfig.dataKey} (Go to Table)
             </a>
           )
-          const hideFilter = inNoDataState && visualizationConfig.type === 'dashboardFilters' && applyButtonNotClicked(visualizationConfig)
+          const hideFilter =
+            inNoDataState &&
+            visualizationConfig.type === 'dashboardFilters' &&
+            applyButtonNotClicked(visualizationConfig)
 
           const shouldShow = row.toggle === undefined || (row.toggle && show[colIndex])
 
           const body = <></>
 
           return (
-            <div key={`vis__${index}__${colIndex}`} className={`col-${col.width} ${!shouldShow ? 'd-none' : ''}`}>
-              <VisualizationWrapper allExpanded={allExpanded} currentViewport={currentViewport} groupName={groupName} row={row}>
+            <div
+              key={`vis__${index}__${colIndex}`}
+              className={`p-1 col-12 col-md-${col.width} ${!shouldShow ? 'd-none' : ''}`}
+            >
+              <VisualizationWrapper
+                allExpanded={allExpanded}
+                currentViewport={currentViewport}
+                groupName={groupName}
+                row={row}
+              >
                 {visualizationConfig.type === 'chart' && (
                   <CdcChart
                     key={col.widget}
@@ -135,7 +178,15 @@ const VisualizationRow: React.FC<VizRowProps> = ({ allExpanded, filteredDataOver
                     }}
                     setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
                     isDashboard={true}
-                    link={config.table && config.table.show && config.datasets && visualizationConfig.table && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
+                    link={
+                      config.table &&
+                      config.table.show &&
+                      config.datasets &&
+                      visualizationConfig.table &&
+                      visualizationConfig.table.showDataTableLink
+                        ? tableLink
+                        : undefined
+                    }
                     configUrl={undefined}
                     setEditing={undefined}
                     hostname={undefined}
@@ -154,7 +205,15 @@ const VisualizationRow: React.FC<VizRowProps> = ({ allExpanded, filteredDataOver
                     setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
                     setSharedFilterValue={setSharedFilterValue}
                     isDashboard={true}
-                    link={config.table && config.table.show && config.datasets && visualizationConfig.table && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
+                    link={
+                      config.table &&
+                      config.table.show &&
+                      config.datasets &&
+                      visualizationConfig.table &&
+                      visualizationConfig.table.showDataTableLink
+                        ? tableLink
+                        : undefined
+                    }
                   />
                 )}
                 {visualizationConfig.type === 'data-bite' && (
@@ -177,7 +236,15 @@ const VisualizationRow: React.FC<VizRowProps> = ({ allExpanded, filteredDataOver
                       updateChildConfig(col.widget, newConfig)
                     }}
                     isDashboard={true}
-                    configUrl={config.table && config.table.show && config.datasets && visualizationConfig.table && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
+                    configUrl={
+                      config.table &&
+                      config.table.show &&
+                      config.datasets &&
+                      visualizationConfig.table &&
+                      visualizationConfig.table.showDataTableLink
+                        ? tableLink
+                        : undefined
+                    }
                   />
                 )}
                 {visualizationConfig.type === 'markup-include' && (
@@ -226,14 +293,28 @@ const VisualizationRow: React.FC<VizRowProps> = ({ allExpanded, filteredDataOver
                     viewport={currentViewport}
                   />
                 )}
-                {visualizationConfig.type === 'footnotes' && <FootnotesStandAlone key={col.widget} visualizationKey={col.widget} config={visualizationConfig} viewport={currentViewport} />}
+                {visualizationConfig.type === 'footnotes' && (
+                  <FootnotesStandAlone
+                    key={col.widget}
+                    visualizationKey={col.widget}
+                    config={visualizationConfig}
+                    viewport={currentViewport}
+                  />
+                )}
               </VisualizationWrapper>
             </div>
           )
         }
         return <React.Fragment key={`vis__${index}__${colIndex}`}></React.Fragment>
       })}
-      {row.footnotesId ? <FootnotesStandAlone isEditor={false} visualizationKey={row.footnotesId} config={footnotesConfig} viewport={currentViewport} /> : null}
+      {row.footnotesId ? (
+        <FootnotesStandAlone
+          isEditor={false}
+          visualizationKey={row.footnotesId}
+          config={footnotesConfig}
+          viewport={currentViewport}
+        />
+      ) : null}
     </div>
   )
 }

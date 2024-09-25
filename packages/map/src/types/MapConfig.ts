@@ -33,6 +33,7 @@ type PatternSelection = {
   label: string
   // size of pattern
   size: 'small' | 'medium' | 'large'
+  contrastCheck: boolean
 }
 
 export type GeoColumnProperties = Pick<EditorColumnProperties, 'name' | 'label' | 'tooltip' | 'dataTable'>
@@ -40,7 +41,7 @@ export type LatitudeColumnProperties = Pick<EditorColumnProperties, 'name'>
 export type LongitudeColumnProperties = Pick<EditorColumnProperties, 'name'>
 export type NavigateColumnProperties = Pick<EditorColumnProperties, 'name'>
 export type PrimaryColumnProperties = Pick<EditorColumnProperties, 'dataTable' | 'label' | 'name' | 'prefix' | 'suffix' | 'tooltip'>
-
+export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 export type LegendShapeItem = {
   column: string
   key: string
@@ -123,6 +124,11 @@ export type MapConfig = Visualization & {
     numberOfItems: number
     position: string
     title: string
+    style: 'circles' | 'boxes' | 'gradient'
+    subStyle: 'linear blocks' | 'smooth'
+    tickRotation: string
+    hideBorder: false
+    singleColumnLegend: false
   }
   table: {
     label: string
@@ -144,6 +150,8 @@ export type MapConfig = Visualization & {
   }
   runtime: {
     editorErrorMessage: string[]
+    // when a single state map doesn't include a fips code show a message...
+    noStateFoundMessage: string
   }
   mapPosition: { coordinates: Coordinate; zoom: number }
   map: {

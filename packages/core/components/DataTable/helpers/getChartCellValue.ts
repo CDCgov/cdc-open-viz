@@ -63,7 +63,7 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
     const barSeriesExist = config.runtime?.barSeriesKeys?.includes(column)
     const lineSeriesExist = config.runtime?.lineSeriesKeys?.includes(column)
     const showSymbol = config.general.showSuppressedSymbol
-    if (isValueMatch && isColumnMatch && pd.displayTable && pd.type === 'suppression') {
+    if (isValueMatch && isColumnMatch && pd.displayTable && pd.type === 'suppression' && config.visualizationSubType !== 'stacked') {
       switch (config.visualizationType) {
         case 'Combo':
           cellValue = barSeriesExist && showSymbol ? pd.iconCode : lineSeriesExist && showSymbol ? pd.lineCode : ''

@@ -6,7 +6,7 @@ import './multiselect.styles.css'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 
 interface Option {
-  value: string
+  value: string | number
   label: string
 }
 
@@ -17,11 +17,12 @@ interface MultiSelectProps {
   options: Option[]
   updateField: UpdateFieldFunc<string[]>
   label?: string
-  selected?: string[]
+  selected?: (string | number)[]
   limit?: number
+  tooltip?: React.ReactNode
 }
 
-const MultiSelect: React.FC<MultiSelectProps> = ({ section = null, subsection = null, fieldName, label, options, updateField, selected = [], limit }) => {
+const MultiSelect: React.FC<MultiSelectProps> = ({ section = null, subsection = null, fieldName, label, options, updateField, selected = [], limit, tooltip }) => {
   const preselectedItems = options.filter(opt => selected.includes(opt.value)).slice(0, limit)
   const [selectedItems, setSelectedItems] = useState<Option[]>(preselectedItems)
   const [expanded, setExpanded] = useState(false)
@@ -72,6 +73,8 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ section = null, subsection = 
           {label}
         </span>
       )}
+
+      {tooltip && tooltip}
 
       <div className='wrapper'>
         <div className='selected'>

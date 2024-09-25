@@ -27,11 +27,33 @@ type LineChartCircleProps = {
 }
 
 const LineChartCircle = (props: LineChartCircleProps) => {
-  const { config, d, tableData, displayArea, seriesKey, tooltipData, xScale, yScale, colorScale, parseDate, yScaleRight, data, circleData, dataIndex, mode } = props
+  const {
+    config,
+    d,
+    tableData,
+    displayArea,
+    seriesKey,
+    tooltipData,
+    xScale,
+    yScale,
+    colorScale,
+    parseDate,
+    yScaleRight,
+    data,
+    circleData,
+    dataIndex,
+    mode
+  } = props
   const { lineDatapointStyle } = config
-  const filtered = config?.series.filter(s => s.dataKey === seriesKey)?.[0]
+  const filtered = config?.runtime?.series.filter(s => s.dataKey === seriesKey)?.[0]
   // If we're not showing the circle, simply return
-  const getColor = (displayArea: boolean, colorScale: Function, config: ChartConfig, hoveredKey: string, seriesKey: string) => {
+  const getColor = (
+    displayArea: boolean,
+    colorScale: Function,
+    config: ChartConfig,
+    hoveredKey: string,
+    seriesKey: string
+  ) => {
     const seriesLabels = config.runtime.seriesLabels || []
     let color
 
@@ -47,14 +69,19 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     return color
   }
   const getXPos = hoveredXValue => {
-    return (config.xAxis.type === 'categorical' ? xScale(hoveredXValue) : xScale(parseDate(hoveredXValue))) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+    return (
+      (config.xAxis.type === 'categorical' ? xScale(hoveredXValue) : xScale(parseDate(hoveredXValue))) +
+      (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+    )
   }
   if (mode === 'ALWAYS_SHOW_POINTS') {
     if (lineDatapointStyle === 'hidden') return <></>
     const getIndex = seriesKey => config.runtime.seriesLabelsAll.indexOf(seriesKey)
 
     if (lineDatapointStyle === 'always show') {
-      const isMatch = circleData?.some(cd => cd[config.xAxis.dataKey] === d[config.xAxis.dataKey] && cd[seriesKey] === d[seriesKey])
+      const isMatch = circleData?.some(
+        cd => cd[config.xAxis.dataKey] === d[config.xAxis.dataKey] && cd[seriesKey] === d[seriesKey]
+      )
       if (isMatch) {
         return <></>
       }
@@ -98,7 +125,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
         if (isNaN(hoveredSeriesValue)) return <></>
         const isMatch = circleData?.some(cd => cd[config.xAxis.dataKey] === hoveredXValue)
 
-        if (isMatch) {
+        if (isMatch || !hoveredSeriesValue) {
           return <></>
         }
 
@@ -135,7 +162,12 @@ const LineChartCircle = (props: LineChartCircleProps) => {
       }
       // Handle points in the middle
       if (currentIndex > 0 && currentIndex < data.length - 1) {
-        if (currentPoint && currentPoint[seriesKey] && (!previousPoint || !previousPoint[seriesKey]) && (!nextPoint || !nextPoint[seriesKey])) {
+        if (
+          currentPoint &&
+          currentPoint[seriesKey] &&
+          (!previousPoint || !previousPoint[seriesKey]) &&
+          (!nextPoint || !nextPoint[seriesKey])
+        ) {
           res = true
         }
       }
@@ -146,7 +178,14 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     if (mode) {
       if (drawIsolatedPoints(dataIndex, seriesKey)) {
         return (
-          <circle cx={getXPos(d[config.xAxis?.dataKey])} cy={filtered.axis === 'Right' ? yScaleRight(d[filtered.dataKey]) : yScale(d[filtered?.dataKey])} r={5.3} strokeWidth={2} stroke={colorScale(config.runtime.seriesLabels[seriesKey])} fill={colorScale(config.runtime?.seriesLabels[seriesKey])} />
+          <circle
+            cx={getXPos(d[config.xAxis?.dataKey])}
+            cy={filtered?.axis === 'Right' ? yScaleRight(d[filtered?.dataKey]) : yScale(d[filtered?.dataKey])}
+            r={5.3}
+            strokeWidth={2}
+            stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
+            fill={colorScale(config.runtime?.seriesLabels[seriesKey])}
+          />
         )
       }
     }

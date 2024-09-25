@@ -1,11 +1,11 @@
 {
   "name": "@cdc/core",
-  "version": "4.24.7",
+  "version": "4.24.5",
   "description": "Core components, styles, hooks, and helpers, for the CDC Open Visualization project",
   "moduleName": "CdcCore",
   "main": "dist/cdccore",
   "scripts": {
-    "test": "vitest run --reporter verbose",
+    "test": "vitest run --environment jsdom --reporter verbose",
     "test-watch": "vitest watch --reporter verbose",
     "test-watch:ui": "vitest --ui"
   },

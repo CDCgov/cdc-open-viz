@@ -1,7 +1,12 @@
 import { useContext, FC } from 'react'
 
 // external libraries
-import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
+import {
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemPanel,
+  AccordionItemButton
+} from 'react-accessible-accordion'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
 // core
@@ -18,11 +23,24 @@ import { PanelProps } from '../PanelProps'
 const PanelGeneral: FC<PanelProps> = props => {
   const { config } = useContext(ConfigContext)
   const { updateField } = useEditorPanelContext()
-  const { enabledChartTypes, visHasNumbersOnBars, visHasaAdditionalLabelsOnBars, visHasLabelOnData, visSupportsChartHeight, visSupportsSuperTitle, visSupportsFootnotes } = useEditorPermissions()
+  const {
+    enabledChartTypes,
+    visHasNumbersOnBars,
+    visHasaAdditionalLabelsOnBars,
+    visHasLabelOnData,
+    visSupportsChartHeight,
+    visSupportsMobileChartHeight,
+    visSupportsSuperTitle,
+    visSupportsFootnotes
+  } = useEditorPermissions()
   const { visualizationType, visualizationSubType, barStyle } = config
 
   const showBarStyleOptions = () => {
-    if ((visualizationType === 'Bar' || visualizationType === 'Deviation Bar') && visualizationSubType !== 'stacked' && (config.orientation === 'horizontal' || config.orientation === 'vertical')) {
+    if (
+      (visualizationType === 'Bar' || visualizationType === 'Deviation Bar') &&
+      visualizationSubType !== 'stacked' &&
+      (config.orientation === 'horizontal' || config.orientation === 'vertical')
+    ) {
       return ['flat', 'rounded', 'lollipop']
     } else {
       return ['flat', 'rounded']
@@ -37,30 +55,91 @@ const PanelGeneral: FC<PanelProps> = props => {
         <AccordionItemButton>General</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        {config?.visualizationType !== 'Sankey' && <Select value={visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={enabledChartTypes} />}
-        {visSupportsChartHeight() && config.orientation === 'vertical' && (
-          <TextField
-            type='number'
-            value={config.heights.vertical}
-            section='heights'
-            fieldName='vertical'
-            label='Chart Height'
+        {config?.visualizationType !== 'Sankey' && (
+          <Select
+            value={visualizationType}
+            fieldName='visualizationType'
+            label='Chart Type'
             updateField={updateField}
-            tooltip={
-              <Tooltip style={{ textTransform: 'none' }}>
-                <Tooltip.Target>
-                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                </Tooltip.Target>
-                <Tooltip.Content>
-                  <p>For some visualization types, such as the sankey diagram, it may be necessary to adjust to chart height for optimal display.</p>
-                </Tooltip.Content>
-              </Tooltip>
-            }
+            options={enabledChartTypes}
           />
         )}
-        {(visualizationType === 'Bar' || visualizationType === 'Combo' || visualizationType === 'Area Chart') && <Select value={visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />}
-        {visualizationType === 'Area Chart' && visualizationSubType === 'stacked' && <Select value={config.stackedAreaChartLineType || 'Linear'} fieldName='stackedAreaChartLineType' label='Stacked Area Chart Line Type' updateField={updateField} options={Object.keys(approvedCurveTypes)} />}
-        {visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
+        {visSupportsChartHeight() && config.orientation === 'vertical' && (
+          <div className={visSupportsMobileChartHeight() ? 'two-col-inputs' : ''}>
+            <TextField
+              type='number'
+              value={config.heights.vertical}
+              section='heights'
+              fieldName='vertical'
+              label='Chart Height'
+              updateField={updateField}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    ˝
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>
+                      For some visualization types, such as the Sankey diagram, it may be necessary to adjust the chart
+                      height for optimal display.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+            {visSupportsMobileChartHeight() && config.orientation === 'vertical' && (
+              <TextField
+                type='number'
+                value={config.heights.mobileVertical}
+                section='heights'
+                fieldName='mobileVertical'
+                label='Mobile Height'
+                updateField={updateField}
+                tooltip={
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p>
+                        If the chart height is not optimized for mobile, you can adjust the height for better display.
+                        Not setting a value will default to the chart height.
+                      </p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                }
+              />
+            )}
+          </div>
+        )}
+        {(visualizationType === 'Bar' || visualizationType === 'Combo' || visualizationType === 'Area Chart') && (
+          <Select
+            value={visualizationSubType || 'Regular'}
+            fieldName='visualizationSubType'
+            label='Chart Subtype'
+            updateField={updateField}
+            options={['regular', 'stacked']}
+          />
+        )}
+        {visualizationType === 'Area Chart' && visualizationSubType === 'stacked' && (
+          <Select
+            value={config.stackedAreaChartLineType || 'Linear'}
+            fieldName='stackedAreaChartLineType'
+            label='Stacked Area Chart Line Type'
+            updateField={updateField}
+            options={Object.keys(approvedCurveTypes)}
+          />
+        )}
+        {visualizationType === 'Bar' && (
+          <Select
+            value={config.orientation || 'vertical'}
+            fieldName='orientation'
+            label='Orientation'
+            updateField={updateField}
+            options={['vertical', 'horizontal']}
+          />
+        )}
         {visualizationType === 'Deviation Bar' && <Select label='Orientation' options={['horizontal']} />}
         {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') && (
           <Select
@@ -81,11 +160,42 @@ const PanelGeneral: FC<PanelProps> = props => {
             }
           />
         )}
-        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') && barStyle === 'rounded' && <Select value={config.tipRounding || 'top'} fieldName='tipRounding' label='tip rounding' updateField={updateField} options={['top', 'full']} />}
-        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') && barStyle === 'rounded' && <Select value={config.roundingStyle || 'standard'} fieldName='roundingStyle' label='rounding style' updateField={updateField} options={['standard', 'shallow', 'finger']} />}
-        {visualizationType === 'Bar' && config.orientation === 'horizontal' && <Select value={config.yAxis.labelPlacement || 'Below Bar'} section='yAxis' fieldName='labelPlacement' label='Label Placement' updateField={updateField} options={['Below Bar', 'On Date/Category Axis']} />}
+        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') && barStyle === 'rounded' && (
+          <Select
+            value={config.tipRounding || 'top'}
+            fieldName='tipRounding'
+            label='tip rounding'
+            updateField={updateField}
+            options={['top', 'full']}
+          />
+        )}
+        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') && barStyle === 'rounded' && (
+          <Select
+            value={config.roundingStyle || 'standard'}
+            fieldName='roundingStyle'
+            label='rounding style'
+            updateField={updateField}
+            options={['standard', 'shallow', 'finger']}
+          />
+        )}
+        {visualizationType === 'Bar' && config.orientation === 'horizontal' && (
+          <Select
+            value={config.yAxis.labelPlacement || 'Below Bar'}
+            section='yAxis'
+            fieldName='labelPlacement'
+            label='Label Placement'
+            updateField={updateField}
+            options={['Below Bar', 'On Date/Category Axis']}
+          />
+        )}
         {visHasNumbersOnBars() ? (
-          <CheckBox value={config.yAxis.displayNumbersOnBar} section='yAxis' fieldName='displayNumbersOnBar' label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField} />
+          <CheckBox
+            value={config.yAxis.displayNumbersOnBar}
+            section='yAxis'
+            fieldName='displayNumbersOnBar'
+            label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'}
+            updateField={updateField}
+          />
         ) : (
           visHasLabelOnData() && (
             <CheckBox
@@ -99,7 +209,10 @@ const PanelGeneral: FC<PanelProps> = props => {
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p>Selecting this option will not hide the display of "zero value", "suppressed data", or "missing data" indicators on the chart (if applicable).</p>
+                    <p>
+                      Selecting this option will <i> not </i> hide the display of "zero value", "suppressed data", or
+                      "missing data" indicators on the chart (if applicable).
+                    </p>
                   </Tooltip.Content>
                 </Tooltip>
               }
@@ -115,7 +228,19 @@ const PanelGeneral: FC<PanelProps> = props => {
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p>Selecting this option will display 'N/A' on the Date/Category Axis, in the tooltip hover, and in the data table to indicate missing or undefined data values.</p>
+                    {config.visualizationSubType === 'stacked' && (
+                      <p>
+                        We do not recommend using stacked vertical/horizontal bar charts for missing data. If you choose
+                        to proceed, selecting this option will display 'N/A' in the tooltip hover and data table (e.g.
+                        nothing will display in chart).
+                      </p>
+                    )}
+                    {config.visualizationSubType !== 'stacked' && (
+                      <p>
+                        Selecting this option will display 'N/A' on the Date/Category Axis, in the tooltip hover, and in
+                        the data table to indicate missing or undefined data values.
+                      </p>
+                    )}
                   </Tooltip.Content>
                 </Tooltip>
               }
@@ -126,20 +251,27 @@ const PanelGeneral: FC<PanelProps> = props => {
               updateField={updateField}
             />
             <CheckBox
+              display={
+                config.visualizationSubType === 'stacked' &&
+                (config.visualizationType === 'Bar' || config.visualizationType === 'Combo')
+              }
               tooltip={
                 <Tooltip style={{ textTransform: 'none' }}>
                   <Tooltip.Target>
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p> Selecting this option will display a thin line slightly above the Date/Category Axis to indicate "zero value" where zero values are indicated in the Data Series.</p>
+                    <p>
+                      Selecting 'Remove Null Values' will hide the 'N/A' (no data indicator) when you hover over the
+                      chart.
+                    </p>
                   </Tooltip.Content>
                 </Tooltip>
               }
-              value={config.general.showZeroValueDataLabel}
+              value={config.general.hideNullValue}
               section='general'
-              fieldName='showZeroValueDataLabel'
-              label='Display "Zero Value Data" Label'
+              fieldName='hideNullValue'
+              label={`Remove "Null" Values From Hover`}
               updateField={updateField}
             />
 
@@ -150,7 +282,20 @@ const PanelGeneral: FC<PanelProps> = props => {
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p>Selecting this option will display the 'suppressed data symbol' on the Date/Category Axis, in the tooltip hover, and in the data table where suppressed data values are indicated in the Data Series</p>
+                    {config.visualizationSubType !== 'stacked' && (
+                      <p>
+                        Selecting this option will show the <i>suppression indicator </i> on the Date/Category axis,
+                        within tooltips, and in the data table where suppressed data values appear in the Data Series.
+                      </p>
+                    )}
+
+                    {config.visualizationSubType === 'stacked' && (
+                      <p>
+                        We do not recommend using stacked vertical/horizontal bar charts for suppressed data. If you
+                        choose to proceed, selecting this option will display the 'suppressed data symbol' in the
+                        tooltip hover and data table (e.g., nothing will display in the chart).
+                      </p>
+                    )}
                   </Tooltip.Content>
                 </Tooltip>
               }
@@ -163,7 +308,9 @@ const PanelGeneral: FC<PanelProps> = props => {
           </>
         )}
 
-        {visualizationType === 'Pie' && <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />}
+        {visualizationType === 'Pie' && (
+          <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />
+        )}
         {visualizationType === 'Line' && (
           <CheckBox
             value={config.allowLineToBarGraph}
@@ -255,7 +402,10 @@ const PanelGeneral: FC<PanelProps> = props => {
                 <Icon display='question' style={{ marginLeft: '0.5rem' }} />
               </Tooltip.Target>
               <Tooltip.Content>
-                <p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
+                <p>
+                  Enter supporting text to display below the data visualization, if applicable. The following HTML tags
+                  are supported: strong, em, sup, and sub.
+                </p>
               </Tooltip.Content>
             </Tooltip>
           }
@@ -274,7 +424,10 @@ const PanelGeneral: FC<PanelProps> = props => {
                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                 </Tooltip.Target>
                 <Tooltip.Content>
-                  <p>Consider adding footnotes when displaying 'suppressed,' 'no data,' and 'zero values' to ensure accurate interpretation of the data.</p>
+                  <p>
+                    Consider adding footnotes when displaying 'suppressed,' 'no data,' and 'zero values' to ensure
+                    accurate interpretation of the data.
+                  </p>
                 </Tooltip.Content>
               </Tooltip>
             }

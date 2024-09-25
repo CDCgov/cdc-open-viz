@@ -33,7 +33,17 @@ type TooltipData = {
 }
 
 const PieChart = props => {
-  const { transformedData: data, config, colorScale, currentViewport, dimensions, highlight, highlightReset, seriesHighlight, isDraggingAnnotation } = useContext(ConfigContext)
+  const {
+    transformedData: data,
+    config,
+    colorScale,
+    currentViewport,
+    dimensions,
+    highlight,
+    highlightReset,
+    seriesHighlight,
+    isDraggingAnnotation
+  } = useContext(ConfigContext)
   const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip<TooltipData>()
   const { handleTooltipMouseOver, handleTooltipMouseOff, TooltipListItem } = useCoveTooltip({
     xScale: false,
@@ -135,7 +145,18 @@ const PieChart = props => {
       <>
         {transitions.map(({ item: arc, props, key }, animatedPieIndex) => {
           return (
-            <Group className={arc.data[config.xAxis.dataKey]} key={`${key}-${animatedPieIndex}`} style={{ opacity: config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) === -1 ? 0.5 : 1 }}>
+            <Group
+              className={arc.data[config.xAxis.dataKey]}
+              key={`${key}-${animatedPieIndex}`}
+              style={{
+                opacity:
+                  config.legend.behavior === 'highlight' &&
+                  seriesHighlight.length > 0 &&
+                  seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) === -1
+                    ? 0.5
+                    : 1
+              }}
+            >
               <animated.path
                 d={interpolate([props.startAngle, props.endAngle], (startAngle, endAngle) =>
                   path({
@@ -163,7 +184,14 @@ const PieChart = props => {
           return (
             <animated.g key={`${key}${i}`}>
               {hasSpaceForLabel && (
-                <Text style={{ fill: textColor }} x={centroidX} y={centroidY} dy='.33em' textAnchor='middle' pointerEvents='none'>
+                <Text
+                  style={{ fill: textColor }}
+                  x={centroidX}
+                  y={centroidY}
+                  dy='.33em'
+                  textAnchor='middle'
+                  pointerEvents='none'
+                >
                   {Math.round((((arc.endAngle - arc.startAngle) * 180) / Math.PI / 360) * 100) + '%'}
                 </Text>
               )}
@@ -174,17 +202,18 @@ const PieChart = props => {
     )
   }
 
-  let [width] = dimensions
+  let chartWidth = props.parentWidth
+  let width = props.parentWidth
 
   if (config && config.legend && !config.legend.hide && currentViewport === 'lg') {
-    width = width * 0.73
+    width = Number(chartWidth) * 0.73
   }
 
   const height = config.heights.vertical
 
   const radius = Math.min(width, height) / 2
   const centerY = height / 2
-  const centerX = width / 2
+  const centerX = props.parentWidth / 2
   const donutThickness = config.pieType === 'Donut' ? 75 : radius
 
   useEffect(() => {
@@ -205,10 +234,24 @@ const PieChart = props => {
 
   const createLegendLabels = createFormatLabels(config, [], _data, _colorScale)
 
+  const getSvgClasses = () => {
+    let classes = ['animated-pie', 'group']
+    if (config.animate === false || animatedPie) {
+      classes.push('animated')
+    }
+    return classes.join(' ')
+  }
+
   return (
     <>
       <ErrorBoundary component='PieChart'>
-        <svg width={radius * 2} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
+        <svg
+          width={radius * 2}
+          height={height}
+          className={getSvgClasses()}
+          role='img'
+          aria-label={handleChartAriaLabels(config)}
+        >
           <Group top={centerY} left={radius}>
             {/* prettier-ignore */}
             <Pie
@@ -223,17 +266,31 @@ const PieChart = props => {
           </Group>
         </svg>
         <div ref={triggerRef} />
-        {!isDraggingAnnotation && tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
-          <>
-            <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100}) !important`}</style>
-            <TooltipWithBounds key={Math.random()} className={'tooltip cdc-open-viz-module'} left={tooltipLeft} top={tooltipTop}>
-              <ul>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
-            </TooltipWithBounds>
-          </>
-        )}
-        {/* <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' /> */}
+        {!isDraggingAnnotation &&
+          tooltipData &&
+          Object.entries(tooltipData.data).length > 0 &&
+          tooltipOpen &&
+          showTooltip &&
+          tooltipData.dataYPosition &&
+          tooltipData.dataXPosition && (
+            <>
+              <style>{`.tooltip {background-color: rgba(255,255,255, ${
+                config.tooltips.opacity / 100
+              }) !important`}</style>
+              <TooltipWithBounds
+                key={Math.random()}
+                className={'tooltip cdc-open-viz-module'}
+                left={tooltipLeft}
+                top={tooltipTop}
+              >
+                <ul>
+                  {typeof tooltipData === 'object' &&
+                    Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}
+                </ul>
+              </TooltipWithBounds>
+            </>
+          )}
       </ErrorBoundary>
-      <LegendComponent config={config} colorScale={_colorScale} seriesHighlight={seriesHighlight} highlight={highlight} highlightReset={highlightReset} currentViewport={currentViewport} formatLabels={createLegendLabels} />
     </>
   )
 }

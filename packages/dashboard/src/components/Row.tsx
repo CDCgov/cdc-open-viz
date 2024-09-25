@@ -193,7 +193,7 @@ const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
             overlay?.actions.openOverlay(<DataDesignerModal rowIndex={rowIdx} />)
           }}
         >
-          {iconHash['gear']}
+          {iconHash['gearMulti']}
         </button>
         <div className='column-container'>
           {row.columns
