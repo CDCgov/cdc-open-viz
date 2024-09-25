@@ -57,14 +57,18 @@ describe('getDataURL', () => {
     const updatedQSParams = { param1: 'value1', param2: 'value2' }
     const dataUrl = new URL('https://example.com/path/to/file.csv')
     const newFileName = ''
-    expect(getDataURL(updatedQSParams, dataUrl, newFileName)).toBe('https://example.com/path/to/file.csv?param1="value1"&param2="value2"')
+    expect(getDataURL(updatedQSParams, dataUrl, newFileName)).toBe(
+      'https://example.com/path/to/file.csv?param1="value1"&param2="value2"'
+    )
   })
 
   it('should append query parameters correctly when they are arrays and there is no new file name', () => {
     const updatedQSParams = { param1: ['value1', 'value2'], param2: 'value3' }
     const dataUrl = new URL('https://example.com/path/to/file.csv')
     const newFileName = ''
-    expect(getDataURL(updatedQSParams, dataUrl, newFileName)).toBe('https://example.com/path/to/file.csv?param1="value1"&param1="value2"&param2="value3"')
+    expect(getDataURL(updatedQSParams, dataUrl, newFileName)).toBe(
+      'https://example.com/path/to/file.csv?param1="value1"&param1="value2"&param2="value3"'
+    )
   })
 
   it('should change the file name correctly when there are no query parameters but there is a new file name', () => {
@@ -78,14 +82,47 @@ describe('getDataURL', () => {
     const updatedQSParams = { param1: 'value1', param2: 'value2' }
     const dataUrl = new URL('https://example.com/path/to/file.csv')
     const newFileName = 'newfile'
-    expect(getDataURL(updatedQSParams, dataUrl, newFileName)).toBe('https://example.com/path/to/newfile.csv?param1="value1"&param2="value2"')
+    expect(getDataURL(updatedQSParams, dataUrl, newFileName)).toBe(
+      'https://example.com/path/to/newfile.csv?param1="value1"&param2="value2"'
+    )
   })
 
   it('should change the file name and append query parameters correctly when they are arrays and there is a new file name', () => {
     const updatedQSParams = { param1: ['value1', 'value2'], param2: 'value3' }
     const dataUrl = new URL('https://example.com/path/to/file.csv')
     const newFileName = 'newfile'
-    expect(getDataURL(updatedQSParams, dataUrl, newFileName)).toBe('https://example.com/path/to/newfile.csv?param1="value1"&param1="value2"&param2="value3"')
+    expect(getDataURL(updatedQSParams, dataUrl, newFileName)).toBe(
+      'https://example.com/path/to/newfile.csv?param1="value1"&param1="value2"&param2="value3"'
+    )
+  })
+
+  it('should filter out empty query parameters', () => {
+    const currentQSParams = {
+      $datakey: 'topic',
+      $limit: '5000',
+      'TEST TEST': '"undefined"',
+      AgeGroupSelector: '"undefined"',
+      Category: '"undefined"',
+      Indicator: '"undefined"',
+      Location: '"undefined"',
+      Year: '"undefined"'
+    }
+    const updatedQSParams = {
+      AgeGroupSelector: undefined,
+      Category: undefined,
+      Indicator: undefined,
+      Location: undefined,
+      Year: undefined
+    }
+    const runtimeURL = `http://example.com/public?$datakey=topic&$limit=5000&Location="undefined"&Category="undefined"&Indicator="undefined"&Year="undefined"&AgeGroupSelector="undefined"`
+    const dataUrl = new URL(runtimeURL, 'http://example.com')
+    const newFileName = ''
+    const dataUrlFinal = getDataURL({ ...currentQSParams, ...updatedQSParams }, dataUrl, newFileName)
+    expect(dataUrlFinal).toBe('http://example.com/public?$datakey=topic&$limit=5000')
+    updatedQSParams.Category = 'something'
+    expect(getDataURL({ ...currentQSParams, ...updatedQSParams }, dataUrl, newFileName)).toBe(
+      'http://example.com/public?$datakey=topic&$limit=5000&Category="something"'
+    )
   })
 })
 
