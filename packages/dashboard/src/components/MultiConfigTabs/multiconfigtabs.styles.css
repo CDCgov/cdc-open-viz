@@ -10,19 +10,12 @@
     &:hover {
       :is(button) {
         display: inline-block;
-        color: var(--gray);
-        &:hover {
-          color: var(--black);
-          font-weight: bold;
-        }
       }
     }
-  }
-  .remove {
-    color: var(--gray);
-    &:hover {
-      color: var(--black);
-      font-weight: bold;
+    .btn-danger {
+      text-decoration: none;
+      padding: 0px 5px;
+      font-size: inherit;
     }
   }
   .add {

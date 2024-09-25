@@ -21,7 +21,7 @@ const FieldSet: React.FC<FieldSetProps> = ({ fieldName, fieldKey, fieldType, con
   if (!show)
     return (
       <div className='mb-1'>
-        <button onClick={() => setShow(fieldKey, true)}>
+        <button className='btn btn-light' onClick={() => setShow(fieldKey, true)}>
           <Icon display='caretDown' />
         </button>
         <span> {fieldName ? `${fieldName}` : 'New ' + fieldType}</span>
@@ -30,7 +30,7 @@ const FieldSet: React.FC<FieldSetProps> = ({ fieldName, fieldKey, fieldType, con
   return (
     <fieldset className='edit-block mb-1' key={fieldKey}>
       <div className='d-flex justify-content-between'>
-        <button onClick={() => setShow(fieldKey, false)}>
+        <button className='btn btn-light' onClick={() => setShow(fieldKey, false)}>
           <Icon display='caretUp' />
         </button>
         <button

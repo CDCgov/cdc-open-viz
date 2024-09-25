@@ -3,19 +3,24 @@ import { SharedFilter } from '../../types/SharedFilter'
 import { APIFilterDropdowns } from './DashboardFiltersWrapper'
 import { sortByOrderedValues } from '@cdc/core/helpers/sortByOrderedValues'
 import NestedDropdown from '@cdc/core/components/NestedDropdown'
+import { MouseEventHandler } from 'react'
 
 type DashboardFilterProps = {
   show: number[]
   filters: SharedFilter[]
   apiFilterDropdowns: APIFilterDropdowns
   handleOnChange: Function
+  showSubmit: boolean
+  applyFilters: MouseEventHandler<HTMLButtonElement>
 }
 
 const DashboardFilters: React.FC<DashboardFilterProps> = ({
   show,
   filters: sharedFilters,
   apiFilterDropdowns,
-  handleOnChange
+  handleOnChange,
+  showSubmit,
+  applyFilters
 }) => {
   const nullVal = (filter: SharedFilter) => {
     const val = filter.queuedActive || filter.active
@@ -27,10 +32,10 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
   }
 
   return (
-    <form className='d-flex'>
+    <form className='d-flex flex-wrap'>
       {sharedFilters.map((filter, filterIndex) => {
         if (
-          (filter.type !== 'urlfilter' && !filter.showDropdown && filter.filterStyle !== 'nested-dropdown') ||
+          (filter.type !== 'urlfilter' && filter.showDropdown === false && filter.filterStyle !== 'nested-dropdown') ||
           (show && !show.includes(filterIndex))
         )
           return <></>
@@ -81,7 +86,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
             handleSelectedItems={value => updateField(null, null, filterIndex, value)}
           />
         ) : (
-          <div className='form-group mr-4' key={`${filter.key}-filtersection-${filterIndex}`}>
+          <div className='form-group mr-3' key={`${filter.key}-filtersection-${filterIndex}`}>
             <label className='text-capitalize font-weight-bold' htmlFor={`filter-${filterIndex}`}>
               {filter.key}
             </label>
@@ -105,6 +110,11 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           </div>
         )
       })}
+      {showSubmit && (
+        <button className='btn btn-primary' onClick={applyFilters}>
+          GO!
+        </button>
+      )}
     </form>
   )
 }

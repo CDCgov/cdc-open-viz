@@ -29,18 +29,21 @@ export type CheckboxProps = {
   className?: string
 } & Input
 
-export type SelectProps = {
-  value?: string
-  options?: string[]
-  required?: boolean
-  initial?: string
-
-  // all other props
-  [x: string]: any
-} & Input
-
 const TextField = memo((props: TextFieldProps) => {
-  const { display = true, label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'text', i = null, min = null, ...attributes } = props
+  const {
+    display = true,
+    label,
+    tooltip,
+    section = null,
+    subsection = null,
+    fieldName,
+    updateField,
+    value: stateValue,
+    type = 'text',
+    i = null,
+    min = null,
+    ...attributes
+  } = props
   const [value, setValue] = useState(stateValue)
   const [debouncedValue] = useDebounce(value, 500)
 
@@ -93,7 +96,17 @@ const TextField = memo((props: TextFieldProps) => {
 })
 
 const CheckBox = memo((props: CheckboxProps) => {
-  const { display = true, label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes } = props
+  const {
+    display = true,
+    label,
+    value,
+    fieldName,
+    section = null,
+    subsection = null,
+    tooltip,
+    updateField,
+    ...attributes
+  } = props
   if (!display) {
     return <></>
   }
@@ -116,13 +129,46 @@ const CheckBox = memo((props: CheckboxProps) => {
   )
 })
 
+export type SelectProps = {
+  value?: string
+  options?: string[] | { label: string; value: string }[]
+  required?: boolean
+  initial?: string
+
+  // all other props
+  [x: string]: any
+} & Input
+
 const Select = memo((props: SelectProps) => {
-  const { display = true, label, value, options, fieldName, section = null, subsection = null, required = false, tooltip, updateField, initial: initialValue, ...attributes } = props
-  let optionsJsx = options.map((optionName, index) => (
-    <option value={optionName} key={index}>
-      {optionName}
-    </option>
-  ))
+  const {
+    display = true,
+    label,
+    value,
+    options,
+    fieldName,
+    section = null,
+    subsection = null,
+    required = false,
+    tooltip,
+    updateField,
+    initial: initialValue,
+    ...attributes
+  } = props
+  const optionsJsx = options.map((option, index) => {
+    if (typeof option === 'string') {
+      return (
+        <option value={option} key={index}>
+          {option}
+        </option>
+      )
+    } else {
+      return (
+        <option value={option.value} key={index}>
+          {option.label}
+        </option>
+      )
+    }
+  })
 
   if (initialValue) {
     optionsJsx.unshift(
@@ -142,7 +188,7 @@ const Select = memo((props: SelectProps) => {
         {tooltip}
       </span>
       <select
-        className={required && !value ? 'warning' : ''}
+        className={`form-control ${required && !value ? 'warning' : ''}`}
         name={fieldName}
         value={value}
         onChange={event => {

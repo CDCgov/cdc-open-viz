@@ -93,7 +93,6 @@
 
   .link.link-upload {
     display: block;
-    color: #005eaa;
     background: unset;
     padding-left: unset;
     margin-top: 0.3rem;
@@ -101,6 +100,7 @@
     text-decoration: underline;
     cursor: pointer;
     font-size: 12px;
+    border: none;
   }
 
     .link.link-replace {
