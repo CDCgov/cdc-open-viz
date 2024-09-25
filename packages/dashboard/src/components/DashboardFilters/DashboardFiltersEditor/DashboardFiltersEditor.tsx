@@ -10,9 +10,9 @@ import { DashboardContext, DashboardDispatchContext } from '../../../DashboardCo
 import _ from 'lodash'
 import { DashboardFilters } from '../../../types/DashboardFilters'
 import { SharedFilter } from '../../../types/SharedFilter'
-import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import DeleteFilterModal from './components/DeleteFilterModal'
+import { addValuesToDashboardFilters } from '../../../helpers/addValuesToDashboardFilters'
 
 type DashboardFitlersEditorProps = {
   vizConfig: DashboardFilters
@@ -47,7 +47,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
     newSharedFilters[index][prop] = value
     if (prop === 'columnName') {
       // changing a data column and want to load the data into the preview options
-      const sharedFiltersWithValues = addValuesToFilters<SharedFilter>(newSharedFilters, data)
+      const sharedFiltersWithValues = addValuesToDashboardFilters(newSharedFilters, data)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFiltersWithValues })
     } else if (prop === 'apiFilter' && value.apiEndpoint && value.valueSelector && apiFilterChanged) {
       // changing a api filter and want to load the api data into the preview.

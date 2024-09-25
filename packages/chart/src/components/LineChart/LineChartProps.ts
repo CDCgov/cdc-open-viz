@@ -1,5 +1,6 @@
 // todo: review tooltipData type
 // todo: review svgRef type
+import { type PreliminaryDataItem } from '../../types/ChartConfig'
 export type LineChartProps = {
   xScale: Function
   yScale: Function
@@ -14,24 +15,6 @@ export type LineChartProps = {
   svgRef: any
   handleTooltipClick: Function
   tooltipData: any
-}
-
-export interface PreliminaryDataItem {
-  column: string
-  displayLegend: boolean
-  displayTable: boolean
-  displayTooltip: boolean
-  iconCode: string
-  label: string
-  lineCode: string
-  seriesKey: string
-  style: string
-  symbol: string
-  type: 'effect' | 'suppression'
-  value: string
-  hideBarSymbol: boolean
-  hideLineStyle: boolean
-  circleSize: number
 }
 
 export interface DataItem {

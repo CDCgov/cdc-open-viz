@@ -28,7 +28,7 @@ export default {
     showDownloadButton: false,
     showMissingDataLabel: true,
     showSuppressedSymbol: true,
-    showZeroValueDataLabel: true
+    hideNullValue: true
   },
   padding: {
     left: 5,
@@ -61,7 +61,8 @@ export default {
     tickRotation: 0,
     anchors: [],
     shoMissingDataLabel: true,
-    showMissingDataLine: true
+    showMissingDataLine: true,
+    categories: []
   },
   boxplot: {
     plots: [],
@@ -159,11 +160,20 @@ export default {
     dynamicLegendItemLimit: 5,
     dynamicLegendItemLimitMessage: 'Dynamic Legend Item Limit Hit.',
     dynamicLegendChartMessage: 'Select Options from the Legend',
+    label: '',
     lineMode: false,
     verticalSorted: false,
     highlightOnHover: false,
     hideSuppressedLabels: false,
-    seriesHighlight: []
+    hideSuppressionLink: false,
+    seriesHighlight: [],
+    style: 'circles',
+    subStyle: 'linear blocks',
+    tickRotation: '',
+    hideBorder: {
+      side: false,
+      topBottom: true
+    }
   },
   brush: {
     height: 25,

@@ -258,6 +258,10 @@ $medium: 768px;
   stroke: none !important;
 }
 
+.countyMapGroup--no-transition {
+  transition: none !important;
+}
+
 // .state {
 // 	display: none;
 // }
@@ -373,4 +377,8 @@ canvas {
   background-color: white;
   pointer-events: none;
   display: none;
+}
+
+.data-table-container {
+  margin: 5px 0px !important;
 }

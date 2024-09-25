@@ -51,7 +51,7 @@ export const BarChartHorizontal = () => {
             return updateBars(barGroups).map((barGroup, index) => (
               <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} top={barGroup.y}>
                 {barGroup.bars.map((bar, index) => {
-                  const scaleVal = config.useLogScale ? 0.1 : 0
+                  const scaleVal = config.yAxis.type === 'logarithmic' ? 0.1 : 0
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
@@ -75,7 +75,7 @@ export const BarChartHorizontal = () => {
                   const barDefaultLabel = !config.yAxis.displayNumbersOnBar ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
-                  const textWidth = (getTextWidth as any)(barDefaultLabel, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                  const textWidth = getTextWidth(barDefaultLabel, `normal ${fontSize[config.fontSize]}px sans-serif`)
                   const textFits = Number(textWidth) < defaultBarWidth - 5
 
                   // control text position
@@ -177,6 +177,7 @@ export const BarChartHorizontal = () => {
                           const hasAsterisk = String(pd.symbol).includes('Asterisk')
                           const verticalAnchor = hasAsterisk ? 'middle' : 'end'
                           const iconSize = pd.symbol === 'Asterisk' ? barHeight * 1.2 : pd.symbol === 'Double Asterisk' ? barHeight : barHeight / 1.5
+                          const fillColor = pd.displayGray ? '#8b8b8a' : '#000'
                           return (
                             <Text // prettier-ignore
                               key={index}
@@ -185,7 +186,7 @@ export const BarChartHorizontal = () => {
                               opacity={transparentBar ? 0.5 : 1}
                               x={barX}
                               y={config.barHeight / 2 + config.barHeight * bar.index}
-                              fill={'#000'}
+                              fill={fillColor}
                               dy={config.barHeight / 5}
                               dx={10}
                               textAnchor='start'

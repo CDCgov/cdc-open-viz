@@ -23,7 +23,7 @@ import Territory from './Territory'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { MapContext } from '../../../types/MapContext'
-import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { checkColorContrast, getContrastColor, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -66,7 +66,9 @@ const UsaMap = () => {
       supportedTerritories,
       titleCase,
       tooltipId,
-      handleDragStateChange
+      handleDragStateChange,
+      setState,
+      mapId
     } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
@@ -154,15 +156,28 @@ const UsaMap = () => {
       let needsPointer = false
 
       // If we need to add a pointer cursor
-      if ((state.columns.navigate && territoryData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+      if (
+        (state.columns.navigate && territoryData[state.columns.navigate.name]) ||
+        state.tooltips.appearanceType === 'click'
+      ) {
         needsPointer = true
       }
 
       styles = {
         color: textColor,
         fill: legendColors[0],
-        opacity: setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== territoryData[state.columns.geo.name] ? 0.5 : 1,
-        stroke: setSharedFilterValue && isFilterValueSupported && setSharedFilterValue === territoryData[state.columns.geo.name] ? 'rgba(0, 0, 0, 1)' : geoStrokeColor,
+        opacity:
+          setSharedFilterValue &&
+          isFilterValueSupported &&
+          setSharedFilterValue !== territoryData[state.columns.geo.name]
+            ? 0.5
+            : 1,
+        stroke:
+          setSharedFilterValue &&
+          isFilterValueSupported &&
+          setSharedFilterValue === territoryData[state.columns.geo.name]
+            ? 'rgba(0, 0, 0, 1)'
+            : geoStrokeColor,
         cursor: needsPointer ? 'pointer' : 'default',
         '&:hover': {
           fill: legendColors[1]
@@ -253,8 +268,14 @@ const UsaMap = () => {
 
         styles = {
           fill: state.general.type !== 'bubble' ? legendColors[0] : '#E6E6E6',
-          opacity: setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[state.columns.geo.name] ? 0.5 : 1,
-          stroke: setSharedFilterValue && isFilterValueSupported && setSharedFilterValue === geoData[state.columns.geo.name] ? 'rgba(0, 0, 0, 1)' : geoStrokeColor,
+          opacity:
+            setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[state.columns.geo.name]
+              ? 0.5
+              : 1,
+          stroke:
+            setSharedFilterValue && isFilterValueSupported && setSharedFilterValue === geoData[state.columns.geo.name]
+              ? 'rgba(0, 0, 0, 1)'
+              : geoStrokeColor,
           cursor: 'default',
           '&:hover': {
             fill: state.general.type !== 'bubble' ? legendColors[1] : '#e6e6e6'
@@ -265,7 +286,10 @@ const UsaMap = () => {
         }
 
         // When to add pointer cursor
-        if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+        if (
+          (state.columns.navigate && geoData[state.columns.navigate.name]) ||
+          state.tooltips.appearanceType === 'click'
+        ) {
           styles.cursor = 'pointer'
         }
 
@@ -283,33 +307,81 @@ const UsaMap = () => {
                   switch (item.operator) {
                     case '=':
                       if (geoData[item.key] === item.value || Number(geoData[item.key]) === Number(item.value)) {
-                        return <HexIcon textColor={textColor} item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                        return (
+                          <HexIcon
+                            textColor={textColor}
+                            item={item}
+                            index={itemIndex}
+                            centroid={centroid}
+                            iconSize={iconSize}
+                          />
+                        )
                       }
                       break
                     case '≠':
                       if (geoData[item.key] !== item.value && Number(geoData[item.key]) !== Number(item.value)) {
-                        return <HexIcon textColor={textColor} item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                        return (
+                          <HexIcon
+                            textColor={textColor}
+                            item={item}
+                            index={itemIndex}
+                            centroid={centroid}
+                            iconSize={iconSize}
+                          />
+                        )
                       }
                       break
                     case '<':
                       if (Number(geoData[item.key]) < Number(item.value)) {
-                        return <HexIcon textColor={textColor} item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                        return (
+                          <HexIcon
+                            textColor={textColor}
+                            item={item}
+                            index={itemIndex}
+                            centroid={centroid}
+                            iconSize={iconSize}
+                          />
+                        )
                       }
                       break
                     case '>':
                       if (Number(geoData[item.key]) > Number(item.value)) {
-                        return <HexIcon textColor={textColor} item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                        return (
+                          <HexIcon
+                            textColor={textColor}
+                            item={item}
+                            index={itemIndex}
+                            centroid={centroid}
+                            iconSize={iconSize}
+                          />
+                        )
                       }
                       break
                     case '<=':
                       if (Number(geoData[item.key]) <= Number(item.value)) {
-                        return <HexIcon textColor={textColor} item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                        return (
+                          <HexIcon
+                            textColor={textColor}
+                            item={item}
+                            index={itemIndex}
+                            centroid={centroid}
+                            iconSize={iconSize}
+                          />
+                        )
                       }
                       break
                     case '>=':
                       if (item.operator === '>=') {
                         if (Number(geoData[item.key]) >= Number(item.value)) {
-                          return <HexIcon textColor={textColor} item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                          return (
+                            <HexIcon
+                              textColor={textColor}
+                              item={item}
+                              index={itemIndex}
+                              centroid={centroid}
+                              iconSize={iconSize}
+                            />
+                          )
                         }
                       }
                       break
@@ -324,7 +396,15 @@ const UsaMap = () => {
 
         return (
           <g data-name={geoName} key={key} tabIndex={-1}>
-            <g className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id={`tooltip__${tooltipId}`} data-tooltip-html={tooltip} tabIndex={-1}>
+            <g
+              className='geo-group'
+              style={styles}
+              onClick={() => geoClickHandler(geoDisplayName, geoData)}
+              id={geoName}
+              data-tooltip-id={`tooltip__${tooltipId}`}
+              data-tooltip-html={tooltip}
+              tabIndex={-1}
+            >
               {/* state path */}
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
 
@@ -335,15 +415,45 @@ const UsaMap = () => {
                 const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
                 const patternColor = patternData.color || getContrastColor('#000', currentFill)
 
+                if (!hasMatchingValues) return
+                checkColorContrast(currentFill, patternColor)
+
                 return (
-                  hasMatchingValues && (
-                    <>
-                      {pattern === 'waves' && <PatternWaves id={`${dataKey}--${geoIndex}`} height={patternSizes[size] ?? 10} width={patternSizes[size] ?? 10} fill={patternColor} />}
-                      {pattern === 'circles' && <PatternCircles id={`${dataKey}--${geoIndex}`} height={patternSizes[size] ?? 10} width={patternSizes[size] ?? 10} fill={patternColor} />}
-                      {pattern === 'lines' && <PatternLines id={`${dataKey}--${geoIndex}`} height={patternSizes[size] ?? 6} width={patternSizes[size] ?? 6} stroke={patternColor} strokeWidth={1} orientation={['diagonalRightToLeft']} />}
-                      <path className={`pattern-geoKey--${dataKey}`} tabIndex={-1} stroke='transparent' d={path} fill={`url(#${dataKey}--${geoIndex})`} />
-                    </>
-                  )
+                  <>
+                    {pattern === 'waves' && (
+                      <PatternWaves
+                        id={`${mapId}--${dataKey}--${geoIndex}`}
+                        height={patternSizes[size] ?? 10}
+                        width={patternSizes[size] ?? 10}
+                        fill={patternColor}
+                      />
+                    )}
+                    {pattern === 'circles' && (
+                      <PatternCircles
+                        id={`${mapId}--${dataKey}--${geoIndex}`}
+                        height={patternSizes[size] ?? 10}
+                        width={patternSizes[size] ?? 10}
+                        fill={patternColor}
+                      />
+                    )}
+                    {pattern === 'lines' && (
+                      <PatternLines
+                        id={`${mapId}--${dataKey}--${geoIndex}`}
+                        height={patternSizes[size] ?? 6}
+                        width={patternSizes[size] ?? 6}
+                        stroke={patternColor}
+                        strokeWidth={1}
+                        orientation={['diagonalRightToLeft']}
+                      />
+                    )}
+                    <path
+                      className={`pattern-geoKey--${dataKey}`}
+                      tabIndex={-1}
+                      stroke='transparent'
+                      d={path}
+                      fill={`url(#${mapId}--${dataKey}--${geoIndex})`}
+                    />
+                  </>
                 )
               })}
               {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
@@ -386,7 +496,18 @@ const UsaMap = () => {
 
     // Bubbles
     if (state.general.type === 'bubble') {
-      geosJsx.push(<BubbleList key='bubbles' data={state.data} runtimeData={data} state={state} projection={projection} applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} displayGeoName={displayGeoName} />)
+      geosJsx.push(
+        <BubbleList
+          key='bubbles'
+          data={state.data}
+          runtimeData={data}
+          state={state}
+          projection={projection}
+          applyLegendToRow={applyLegendToRow}
+          applyTooltipsToGeo={applyTooltipsToGeo}
+          displayGeoName={displayGeoName}
+        />
+      )
     }
 
     // })
@@ -435,8 +556,22 @@ const UsaMap = () => {
 
     return (
       <g tabIndex={-1}>
-        <line x1={centroid[0]} y1={centroid[1]} x2={centroid[0] + dx} y2={centroid[1] + dy} stroke='rgba(0,0,0,.5)' strokeWidth={1} />
-        <text x={4} strokeWidth='0' fontSize={13} style={{ fill: '#202020' }} alignmentBaseline='middle' transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}>
+        <line
+          x1={centroid[0]}
+          y1={centroid[1]}
+          x2={centroid[0] + dx}
+          y2={centroid[1] + dy}
+          stroke='rgba(0,0,0,.5)'
+          strokeWidth={1}
+        />
+        <text
+          x={4}
+          strokeWidth='0'
+          fontSize={13}
+          style={{ fill: '#202020' }}
+          alignmentBaseline='middle'
+          transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
+        >
           {abbr.substring(3)}
         </text>
       </g>

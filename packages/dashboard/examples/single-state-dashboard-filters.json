@@ -1,0 +1,421 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": [
+      {
+        "key": "New Dashboard Filter 1",
+        "showDropdown": true,
+        "values": [
+          "Florida",
+          "California",
+          "Guam"
+        ],
+        "type": "datafilter",
+        "columnName": "State",
+        "tier": 1,
+        "usedBy": [
+          "map1721943918271"
+        ]
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboardFilters1721943964161"
+        }
+      ],
+      "uuid": 1721943975299
+    },
+    {
+      "uuid": 1721943975299,
+      "columns": [
+        {
+          "width": 12,
+          "widget": "map1721943918271"
+        },
+        {},
+        {}
+      ]
+    }
+  ],
+  "visualizations": {
+    "map1721943918271": {
+      "annotations": [],
+      "general": {
+        "geoType": "single-state",
+        "annotationDropdownText": "Annotations",
+        "geoBorderColor": "darkGray",
+        "headerColor": "theme-blue",
+        "title": "",
+        "showTitle": true,
+        "showSidebar": true,
+        "showDownloadButton": true,
+        "showDownloadMediaButton": false,
+        "displayAsHex": false,
+        "displayStateLabels": false,
+        "territoriesLabel": "Territories",
+        "territoriesAlwaysShow": false,
+        "language": "en",
+        "geoLabelOverride": "",
+        "hasRegions": false,
+        "fullBorder": false,
+        "type": "data",
+        "convertFipsCodes": true,
+        "palette": {
+          "isReversed": false
+        },
+        "allowMapZoom": true,
+        "hideGeoColumnInTooltip": false,
+        "hidePrimaryColumnInTooltip": false,
+        "expandDataTable": false,
+        "filterControlsStatePicked": "State",
+        "statePicked": {
+          "fipsCode": "01",
+          "stateName": "Alabama"
+        }
+      },
+      "type": "map",
+      "color": "pinkpurple",
+      "columns": {
+        "geo": {
+          "name": "FIPS Codes",
+          "label": "Location",
+          "tooltip": false,
+          "dataTable": true
+        },
+        "primary": {
+          "dataTable": true,
+          "tooltip": true,
+          "prefix": "",
+          "suffix": "",
+          "name": "Insured Rate",
+          "label": "",
+          "roundToPlace": 0
+        },
+        "navigate": {
+          "name": ""
+        },
+        "latitude": {
+          "name": "Latitude"
+        },
+        "longitude": {
+          "name": "Longitude"
+        }
+      },
+      "legend": {
+        "descriptions": {},
+        "specialClasses": [],
+        "unified": false,
+        "singleColumn": false,
+        "singleRow": false,
+        "verticalSorted": false,
+        "showSpecialClassesLast": false,
+        "dynamicDescription": false,
+        "type": "equalnumber",
+        "numberOfItems": 3,
+        "position": "side",
+        "title": "Legend"
+      },
+      "filters": [],
+      "table": {
+        "wrapColumns": false,
+        "label": "Data Table",
+        "expanded": false,
+        "limitHeight": false,
+        "height": "",
+        "caption": "",
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "showFullGeoNameInCSV": false,
+        "forceDisplay": true,
+        "download": true,
+        "indexLabel": ""
+      },
+      "tooltips": {
+        "appearanceType": "hover",
+        "linkLabel": "Learn More",
+        "capitalizeLabels": true,
+        "opacity": 90
+      },
+      "visual": {
+        "minBubbleSize": 1,
+        "maxBubbleSize": 20,
+        "extraBubbleBorder": false,
+        "cityStyle": "circle",
+        "cityStyleLabel": "",
+        "showBubbleZeros": false,
+        "additionalCityStyles": [],
+        "geoCodeCircleSize": "2"
+      },
+      "mapPosition": {
+        "coordinates": [
+          0,
+          30
+        ],
+        "zoom": 1
+      },
+      "map": {
+        "layers": [],
+        "patterns": []
+      },
+      "hexMap": {
+        "type": "",
+        "shapeGroups": [
+          {
+            "legendTitle": "",
+            "legendDescription": "",
+            "items": [
+              {
+                "key": "",
+                "shape": "Arrow Up",
+                "column": "",
+                "operator": "=",
+                "value": ""
+              }
+            ]
+          }
+        ]
+      },
+      "filterBehavior": "Filter Change",
+      "openModal": true,
+      "uid": "map1721943918271",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "dataKey": "test-single-county-file.json",
+      "editing": false,
+      "originalFormattedData": [
+        {
+          "Insured Rate": 8,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "12057",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "Florida"
+        },
+        {
+          "Insured Rate": 25,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "55005",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "California"
+        },
+        {
+          "Insured Rate": 25,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "12103",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "Florida"
+        },
+        {
+          "Insured Rate": 25,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "12103",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "Guam"
+        },
+        {
+          "Insured Rate": 25,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "32005",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "California"
+        },
+        {
+          "Insured Rate": 18,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "06075",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "California"
+        },
+        {
+          "Insured Rate": 3,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "06027",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "California"
+        },
+        {
+          "Insured Rate": 25,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "06029",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "California"
+        },
+        {
+          "Insured Rate": 60,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "Yosemite",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "37.865101",
+          "Longitude": "-119.538330",
+          "State": "California"
+        }
+      ],
+      "version": "4.24.9"
+    },
+    "dashboardFilters1721943964161": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "newViz": true,
+      "openModal": true,
+      "uid": "dashboardFilters1721943964161",
+      "type": "dashboardFilters",
+      "sharedFilterIndexes": [
+        0
+      ],
+      "visualizationType": "dashboardFilters",
+      "editing": false
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showVertical": true
+  },
+  "newViz": true,
+  "datasets": {
+    "test-single-county-file.json": {
+      "data": [
+        {
+          "Insured Rate": 8,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "12057",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "Florida"
+        },
+        {
+          "Insured Rate": 25,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "55005",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "California"
+        },
+        {
+          "Insured Rate": 25,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "12103",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "Florida"
+        },
+        {
+          "Insured Rate": "0",
+          "Coverage Status": "Insured",
+          "FIPS Codes": "12103",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "Arizona "
+        },
+        {
+          "Insured Rate": 25,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "32005",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "California"
+        },
+        {
+          "Insured Rate": 18,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "06075",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "California"
+        },
+        {
+          "Insured Rate": 3,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "06027",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "California"
+        },
+        {
+          "Insured Rate": 25,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "06029",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "",
+          "Longitude": "",
+          "State": "California"
+        },
+        {
+          "Insured Rate": 60,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "Yosemite",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "37.865101",
+          "Longitude": "-119.538330",
+          "State": "California"
+        },
+        {
+          "Insured Rate": 60,
+          "Coverage Status": "Insured",
+          "FIPS Codes": "Yosemite",
+          "Year (Good filter option)": "2010",
+          "link": "",
+          "Latitude": "37.865101",
+          "Longitude": "-119.538330",
+          "State": "Test Location"
+        }
+      ],
+      "dataFileSize": 1764,
+      "dataFileName": "test-single-county-file.json",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "JSON",
+      "preview": true
+    }
+  },
+  "type": "dashboard",
+  "runtime": {},
+  "version": "4.24.9",
+  "uuid": 1721943961122
+}

@@ -3,7 +3,7 @@
     "theme": "theme-blue",
     "sharedFilters": [
       {
-        "key": "Dashboard Filter 1",
+        "key": "Category",
         "type": "datafilter",
         "columnName": "Sample Categories",
         "showDropdown": true,

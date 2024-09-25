@@ -8,15 +8,33 @@ import { Table } from '@cdc/core/types/Table'
 import { BoxPlot } from '@cdc/core/types/BoxPlot'
 import { General } from '@cdc/core/types/General'
 import { type Link } from './../components/Sankey/types'
-import { Legend } from '@cdc/core/types/Legend'
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
-import { type PreliminaryDataItem } from '../components/LineChart/LineChartProps'
+
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 
-export type ViewportSize = 'sm' | 'xs' | 'xxs' | 'lg'
+export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 export type ChartColumns = Record<string, Column>
+
+export interface PreliminaryDataItem {
+  column: string
+  displayLegend: boolean
+  displayTable: boolean
+  displayTooltip: boolean
+  iconCode: string
+  label: string
+  lineCode: string
+  seriesKey: string
+  style: string
+  symbol: string
+  type: 'effect' | 'suppression'
+  value: string
+  hideBarSymbol: boolean
+  hideLineStyle: boolean
+  circleSize: number
+  displayGray: boolean
+}
 
 type DataFormat = {
   abbreviated: boolean
@@ -54,12 +72,20 @@ export type Legend = {
   hide: boolean
   highlightOnHover: boolean
   label: string
-  lineMode: boolean
-  position: string
+  position: 'left' | 'bottom' | 'top' | 'right'
   reverseLabelOrder: boolean
   singleRow: boolean
   type: string
   verticalSorted: boolean
+  hideSuppressionLink:boolean
+  style:'circles'|'boxes'|'gradient'|'lines'
+  subStyle:'linear blocks'|'smooth'
+  hideSuppressedLabels:boolean
+  tickRotation:string
+  hideBorder:{
+    side:boolean
+    topBottom:boolean
+  }
 }
 
 type Visual = {
@@ -79,7 +105,7 @@ export type AllChartsConfig = {
   barHasBorder: 'true' | 'false'
   barHeight: number
   barSpace: number
-  barStyle: string
+  barStyle: 'lollipop'|'rounded'|'flat'
   barThickness: number
   boxplot: BoxPlot
   brush: {
@@ -109,6 +135,7 @@ export type AllChartsConfig = {
   formattedData: Object[] & { urlFiltered: boolean }
   heights: {
     vertical: number
+    mobileVertical: number
   }
   highlightedBarValues: { value: any; color: string; borderWidth: number; legendLabel: string }[]
   introText: string
@@ -152,10 +179,9 @@ export type AllChartsConfig = {
   topAxis: { hasLine: boolean }
   twoColor: { palette: string }
   type: 'chart' | 'dashboard'
-  useLogScale: boolean
   uid: string | number
   visual: Visual
-  visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting' | 'Sankey'
+  visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting' | 'Sankey' | 'Bump Chart'
   visualizationSubType: string
   xAxis: Axis
   yAxis: Axis

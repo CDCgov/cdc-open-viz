@@ -51,12 +51,12 @@ This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that i
 
 ### Branching Information
 
-Notice - all pull requests you should branch from and target test.
+Notice - all pull requests you should branch from and target dev.
 
-| Branch Name | Description                              |
-| ----------- | ---------------------------------------- |
-| main        | Default branch we create releases on     |
-| test        | Development branch we use to test on     |
+| Branch Name | Description                                     |
+| ----------- | ----------------------------------------------- |
+| main        | Default branch we create releases on            |
+| test        | Development branch we use to test on            |
 | dev         | Development branch we use to branch features on |
 
 After pulling the code to your local, the `main` branch will be checked out by default. Switch to test using `git checkout test` and then create a feature branch to work on using gitflow, or manually using:

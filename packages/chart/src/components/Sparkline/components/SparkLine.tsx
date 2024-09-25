@@ -107,10 +107,10 @@ const SparkLine: React.FC<SparkLineProps> = props => {
                   opacity={config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
                   display={config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
                 >
-                  {data.map((d, dataIndex) => {
+                  {config.labels && data.map((d, dataIndex) => {
                     return (
                       <Group key={`series-${seriesKey}-point-${dataIndex}`}>
-                        <Text display={config.labels ? 'block' : 'none'} x={xScale(getXAxisData(d))} y={yScale(getYAxisData(d, seriesKey))} fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'} textAnchor='middle'>
+                        <Text x={xScale(getXAxisData(d))} y={yScale(getYAxisData(d, seriesKey))} fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'} textAnchor='middle'>
                           {formatNumber(d[seriesKey])}
                         </Text>
                       </Group>

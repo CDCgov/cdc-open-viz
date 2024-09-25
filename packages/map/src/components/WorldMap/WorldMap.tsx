@@ -10,6 +10,7 @@ import Geo from '../Geo'
 import CityList from '../CityList'
 import BubbleList from '../BubbleList'
 import ConfigContext from '../../context'
+import ZoomControls from '../ZoomControls'
 
 const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 
@@ -34,7 +35,9 @@ const WorldMap = () => {
     state,
     supportedCountries,
     titleCase,
-    tooltipId
+    tooltipId,
+    setScale,
+    setTranslate
   } = useContext(ConfigContext)
 
   // TODO Refactor - state should be set together here to avoid rerenders
@@ -57,35 +60,6 @@ const WorldMap = () => {
   const handleZoomOut = (position, setPosition) => {
     if (position.zoom <= 1) return
     setPosition(pos => ({ ...pos, zoom: pos.zoom / 1.5 }))
-  }
-
-  const ZoomControls = ({ position, setPosition, state, setState, setRuntimeData, generateRuntimeData }) => {
-    if (!state.general.allowMapZoom) return
-    return (
-      <div className='zoom-controls' data-html2canvas-ignore>
-        <button onClick={() => handleZoomIn(position, setPosition)} aria-label='Zoom In'>
-          <svg viewBox='0 0 24 24' stroke='currentColor' strokeWidth='3'>
-            <line x1='12' y1='5' x2='12' y2='19' />
-            <line x1='5' y1='12' x2='19' y2='12' />
-          </svg>
-        </button>
-        <button onClick={() => handleZoomOut(position, setPosition)} aria-label='Zoom Out'>
-          <svg viewBox='0 0 24 24' stroke='currentColor' strokeWidth='3'>
-            <line x1='5' y1='12' x2='19' y2='12' />
-          </svg>
-        </button>
-        {state.general.type === 'bubble' && (
-          <button onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)} className='reset' aria-label='Reset Zoom and Map Filters'>
-            Reset Filters
-          </button>
-        )}
-        {state.general.type === 'world-geocode' && (
-          <button onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)} className='reset' aria-label='Reset Zoom'>
-            Reset Zoom
-          </button>
-        )}
-      </div>
-    )
   }
 
   // TODO Refactor - state should be set together here to avoid rerenders
@@ -173,7 +147,7 @@ const WorldMap = () => {
       }
 
       // Default return state, just geo with no additional information
-      return <Geo additionalData={additionalData} geoData={geoData} state={state} key={i + '-geo'} stroke={geoStrokeColor} strokeWidth={strokeWidth} style={styles} path={path} />
+      return <Geo additionaldata={JSON.stringify(additionalData)} geodata={JSON.stringify(geoData)} state={state} key={i + '-geo'} stroke={geoStrokeColor} strokeWidth={strokeWidth} style={styles} path={path} />
     })
 
     // Cities
@@ -217,7 +191,18 @@ const WorldMap = () => {
         </svg>
       )}
       {(state.general.type === 'data' || (state.general.type === 'world-geocode' && hasZoom) || (state.general.type === 'bubble' && hasZoom)) && (
-        <ZoomControls position={position} setPosition={setPosition} setRuntimeData={setRuntimeData} state={state} setState={setState} generateRuntimeData={generateRuntimeData} />
+        <ZoomControls
+          // prettier-ignore
+          generateRuntimeData={generateRuntimeData}
+          handleZoomIn={handleZoomIn}
+          handleZoomOut={handleZoomOut}
+          position={position}
+          setPosition={setPosition}
+          setRuntimeData={setRuntimeData}
+          setState={setState}
+          state={state}
+          handleReset={handleReset}
+        />
       )}
     </ErrorBoundary>
   )

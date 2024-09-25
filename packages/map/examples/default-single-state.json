@@ -1,109 +1,280 @@
 {
-	"type": "map",
-	"general": {
-		"title": "Default County Map",
-		"subtext": "",
-		"territoriesLabel": "Territories",
-		"type": "map",
-		"geoType": "single-state",
-		"headerColor": "theme-blue",
-		"showSidebar": true,
-		"showTitle": true,
-		"geoBorderColor": "darkGray",
-		"showDownloadButton": true,
-		"expandDataTable": false,
-		"statePicked": {
-			"stateName": "California",
-			"fipsCode": "06"
-		}
-	},
-	"color": "pinkpurple",
-	"columns": {
-		"geo": {
-			"name": "FIPS Codes",
-			"label": "Location",
-			"tooltip": false,
-			"dataTable": true
-		},
-		"primary": {
-			"name": "Insured Rate",
-			"label": "Data Label",
-			"prefix": "",
-			"suffix": "%",
-			"dataTable": true,
-			"tooltip": true
-		},
-		"navigate": {
-			"name": "link",
-			"tooltip": false,
-			"dataTable": false
-		}
-	},
-	"legend": {
-		"numberOfItems": 3,
-		"position": "side",
-		"title": "Legend Title",
-		"description": "Legend Text",
-		"type": "equalnumber",
-		"specialClasses": ["N/A"]
-	},
-	"filters": [],
-	"data": [
-		{
-			"Insured Rate": "8",
-			"Coverage Status": "Insured",
-			"FIPS Codes": "06071",
-			"Year (Good filter option)": "2010",
-			"link": ""
-		},
-		{
-			"Insured Rate": "25",
-			"Coverage Status": "Insured",
-			"FIPS Codes": "55005",
-			"Year (Good filter option)": "2010",
-			"link": ""
-		},
-		{
-			"Insured Rate": "25",
-			"Coverage Status": "Insured",
-			"FIPS Codes": "12103",
-			"Year (Good filter option)": "2010",
-			"link": ""
-		},
-		{
-			"Insured Rate": "25",
-			"Coverage Status": "Insured",
-			"FIPS Codes": "32005",
-			"Year (Good filter option)": "2010",
-			"link": ""
-		},
-		{
-			"Insured Rate": "18",
-			"Coverage Status": "Insured",
-			"FIPS Codes": "06075",
-			"Year (Good filter option)": "2010",
-			"link": ""
-		},
-		{
-			"Insured Rate": "3",
-			"Coverage Status": "Insured",
-			"FIPS Codes": "06027",
-			"Year (Good filter option)": "2010",
-			"link": ""
-		},
-		{
-			"Insured Rate": "25",
-			"Coverage Status": "Insured",
-			"FIPS Codes": "06029",
-			"Year (Good filter option)": "2010",
-			"link": ""
-		},
-		{
-			"Insured Rate": "60",
-			"Coverage Status": "Insured",
-			"FIPS Codes": "06065",
-			"Year (Good filter option)": "2010",
-			"link": ""
-		}
-	]
+  "annotations": [],
+  "general": {
+    "title": "Default County Map",
+    "subtext": "",
+    "territoriesLabel": "Territories",
+    "type": "map",
+    "geoType": "single-state",
+    "headerColor": "theme-blue",
+    "showSidebar": true,
+    "showTitle": true,
+    "geoBorderColor": "darkGray",
+    "showDownloadButton": true,
+    "expandDataTable": false,
+    "statePicked": {
+      "stateName": "California",
+      "fipsCode": "06"
+    },
+    "annotationDropdownText": "Annotations",
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": false,
+    "territoriesAlwaysShow": false,
+    "language": "en",
+    "geoLabelOverride": "Location",
+    "hasRegions": false,
+    "fullBorder": false,
+    "convertFipsCodes": true,
+    "palette": {
+      "isReversed": false
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false
+  },
+  "type": "map",
+  "color": "pinkpurple",
+  "columns": {
+    "geo": {
+      "name": "FIPS Codes",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "name": "Insured Rate",
+      "label": "Data Label",
+      "prefix": "",
+      "suffix": "%",
+      "dataTable": true,
+      "tooltip": true,
+      "roundToPlace": 0
+    },
+    "navigate": {
+      "name": "link",
+      "tooltip": false,
+      "dataTable": false
+    },
+    "latitude": {
+      "name": "Latitude"
+    },
+    "longitude": {
+      "name": "Longitude"
+    }
+  },
+  "legend": {
+    "numberOfItems": 3,
+    "position": "side",
+    "title": "Legend Title",
+    "description": "Legend Text",
+    "type": "equalnumber",
+    "specialClasses": [
+      {
+        "key": "Insured Rate",
+        "value": "N/A",
+        "label": "N/A"
+      }
+    ],
+    "descriptions": {},
+    "unified": false,
+    "singleColumn": false,
+    "singleRow": false,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false,
+    "dynamicDescription": false
+  },
+  "filters": [],
+  "table": {
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": true,
+    "indexLabel": ""
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": true,
+    "opacity": 90
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle",
+    "cityStyleLabel": "",
+    "showBubbleZeros": false,
+    "additionalCityStyles": [],
+    "geoCodeCircleSize": "2"
+  },
+  "mapPosition": {
+    "coordinates": [
+      0,
+      30
+    ],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow Up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
+  "data": [
+    {
+      "Insured Rate": 8,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "SLT",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "38.9399",
+      "Longitude": "-119.9772"
+    },
+    {
+      "Insured Rate": 8,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "06071",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "",
+      "Longitude": ""
+    },
+    {
+      "Insured Rate": 25,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "55005",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "",
+      "Longitude": ""
+    },
+    {
+      "Insured Rate": 25,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "12103",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "",
+      "Longitude": ""
+    },
+    {
+      "Insured Rate": 25,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "32005",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "",
+      "Longitude": ""
+    },
+    {
+      "Insured Rate": 18,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "06075",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "",
+      "Longitude": ""
+    },
+    {
+      "Insured Rate": 3,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "06027",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "",
+      "Longitude": ""
+    },
+    {
+      "Insured Rate": 25,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "06029",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "",
+      "Longitude": ""
+    },
+    {
+      "Insured Rate": 60,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "Yosemite is great!",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "37.865101",
+      "Longitude": "-119.538330"
+    },
+    {
+      "Insured Rate": 60,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "LA",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "34.0549",
+      "Longitude": "-118.2426"
+    },
+    {
+      "Insured Rate": 60,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "BH",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "34.0736",
+      "Longitude": "-118.4004"
+    },
+    {
+      "Insured Rate": 60,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "Santa Monica",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "34.0195",
+      "Longitude": "-118.4912"
+    },
+    {
+      "Insured Rate": 60,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "LA",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "34.0549",
+      "Longitude": "-118.2426"
+    },
+    {
+      "Insured Rate": 60,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "LA",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Latitude": "34.0549",
+      "Longitude": "-118.2426"
+    }
+  ],
+  "version": "4.24.7"
 }

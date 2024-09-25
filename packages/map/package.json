@@ -1,6 +1,6 @@
 {
   "name": "@cdc/map",
-  "version": "4.24.7",
+  "version": "4.24.5",
   "description": "React component for visualizing tabular data on a map of the United States or the world.",
   "moduleName": "CdcMap",
   "main": "dist/cdcmap",
@@ -25,7 +25,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@cdc/core": "^4.24.7",
+    "@cdc/core": "^4.24.5",
     "@emotion/core": "^10.0.28",
     "@emotion/react": "^11.1.5",
     "@hello-pangea/dnd": "^16.2.0",

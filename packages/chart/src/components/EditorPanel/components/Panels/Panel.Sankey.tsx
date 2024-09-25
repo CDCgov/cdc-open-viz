@@ -3,7 +3,12 @@ import ConfigContext from '../../../../ConfigContext'
 import { CheckBox, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import Button from '@cdc/core/components/elements/Button'
 
-import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
+import {
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemPanel,
+  AccordionItemButton
+} from 'react-accessible-accordion'
 import EditorPanelContext, { type EditorPanelContext as EPContext } from '../../EditorPanelContext'
 
 const SankeySettings = () => {
@@ -64,21 +69,45 @@ const SankeySettings = () => {
         <AccordionItemButton>Sankey Settings</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        <p>Node stories can provide additional details to support public health messaging. COVE can display a maximum of 3 node stories.</p>
+        <p>
+          Node stories can provide additional details to support public health messaging. COVE can display a maximum of
+          3 node stories.
+        </p>
         {data?.storyNodeText &&
           data?.storyNodeText.map(({ StoryNode, segmentTextBefore, segmentTextAfter }, i) => (
-            <div key={i} style={{ border: '1px solid black', margin: '15px auto', padding: '15px', borderRadius: '10px' }}>
+            <div
+              key={i}
+              style={{ border: '1px solid black', margin: '15px auto', padding: '15px', borderRadius: '10px' }}
+            >
               <label>
                 Story Node Text
-                <input type='text' value={StoryNode} fieldName='StoryNode' label='StoryNode' onChange={e => updateStoryNode('StoryNode', e.target.value, i)} />
+                <input
+                  type='text'
+                  value={StoryNode}
+                  fieldName='StoryNode'
+                  label='StoryNode'
+                  onChange={e => updateStoryNode('StoryNode', e.target.value, i)}
+                />
               </label>
               <label>
                 Story Text Before
-                <input type='text' value={segmentTextBefore} fieldName='segmentTextBefore' label='Segment Text Before' onChange={e => updateStoryNode('segmentTextBefore', e.target.value, i)} />
+                <input
+                  type='text'
+                  value={segmentTextBefore}
+                  fieldName='segmentTextBefore'
+                  label='Segment Text Before'
+                  onChange={e => updateStoryNode('segmentTextBefore', e.target.value, i)}
+                />
               </label>
               <label>
                 Story Text After
-                <input type='text' value={segmentTextAfter} fieldName='segmentTextAfter' label='Segment Text After' onChange={e => updateStoryNode('segmentTextAfter', e.target.value, i)} />
+                <input
+                  type='text'
+                  value={segmentTextAfter}
+                  fieldName='segmentTextAfter'
+                  label='Segment Text After'
+                  onChange={e => updateStoryNode('segmentTextAfter', e.target.value, i)}
+                />
               </label>
               <Button onClick={e => removeStoryNode(i)} className='btn' style={{ background: 'tomato' }}>
                 Remove Story Node
@@ -97,7 +126,14 @@ const SankeySettings = () => {
             Add StoryNode
           </button>
         )}
-        {config.enableTooltips && config.data?.tooltips?.length > 0 && <CheckBox value={config.enableTooltips} fieldName='enableTooltips' label='Enable Tooltips' updateField={updateField} />}
+        {config.data?.[0]?.tooltips?.length > 0 && (
+          <CheckBox
+            value={config.enableTooltips}
+            fieldName='enableTooltips'
+            label='Enable Tooltips'
+            updateField={updateField}
+          />
+        )}
       </AccordionItemPanel>
     </AccordionItem>
   )

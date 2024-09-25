@@ -72,7 +72,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
     }
 
     response.data = responseData
-    const processedConfig = { ...(await coveUpdateWorker(response)) }
+    const processedConfig = { ...coveUpdateWorker(response) }
 
     updateConfig({ ...configObj, ...processedConfig })
     dispatch({ type: 'SET_LOADING', payload: false })
@@ -166,9 +166,16 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
       }
       variableDisplay.push(variableValues.join(', '))
 
+      let finalDisplay = variableDisplay[0]
+
+      if(workingVariable.addCommas && !isNaN(parseFloat(finalDisplay))){
+        finalDisplay = parseFloat(finalDisplay)
+        finalDisplay = finalDisplay.toLocaleString('en-US', {useGrouping: true})
+      }
+
       const displayInfoMessage = '<span class="font-weight-bold display-Info-message">One or more of the following values will appear in the place of this variable placeholder:</span>'
 
-      const newReplacementForVariable = `<span class="cove-tooltip-variable">${variableTag}<span class="cove-tooltip-value">${displayInfoMessage}<br/>${variableDisplay[0]}</span></span><span class="cove-markup-include-variable-value">${variableDisplay[0].trim()}</span>`
+      const newReplacementForVariable = `<span class="cove-tooltip-variable">${variableTag}<span class="cove-tooltip-value">${displayInfoMessage}<br/>${finalDisplay}</span></span><span class="cove-markup-include-variable-value">${finalDisplay}</span>`
 
       return newReplacementForVariable
     })

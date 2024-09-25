@@ -3,7 +3,7 @@ import { useContext } from 'react'
 import ConfigContext from '../ConfigContext'
 import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
-
+import * as d3 from 'd3'
 const scaleTypes = {
   TIME: 'time',
   LOG: 'log',
@@ -27,12 +27,10 @@ const useScales = (properties: useScaleProps) => {
 
   const { rawData, dimensions } = useContext<ChartContext>(ConfigContext)
 
-  const [screenWidth, screenHeight] = dimensions
+  const [screenWidth] = dimensions
   const seriesDomain = config.runtime.barSeriesKeys || config.runtime.seriesKeys
   const xAxisType = config.runtime.xAxis.type
   const isHorizontal = config.orientation === 'horizontal'
-  const getXAxisDataKeys = d => d[config.runtime.originalXAxis.dataKey]
-  const xAxisDataKeysMapped = data.map(d => getXAxisDataKeys(d))
 
   const { visualizationType } = config
 
@@ -43,7 +41,6 @@ const useScales = (properties: useScaleProps) => {
   let g1xScale = null
   let seriesScale = null
   let xScaleNoPadding = null
-  let xScaleBrush = null
   let xScaleAnnotation = scaleLinear({
     domain: [0, 100],
     range: [0, xMax]
@@ -52,7 +49,7 @@ const useScales = (properties: useScaleProps) => {
   // handle  Horizontal bars
   if (isHorizontal) {
     xScale = composeXScale({ min: min * 1.03, ...properties })
-    xScale.type = config.useLogScale ? scaleTypes.LOG : scaleTypes.LINEAR
+    xScale.type = config.yAxis.type === 'logarithmic' ? scaleTypes.LOG : scaleTypes.LINEAR
     yScale = getYScaleFunction(xAxisType, xAxisDataMapped)
     yScale.rangeRound([0, yMax])
     seriesScale = composeScalePoint(seriesDomain, [0, yMax])
@@ -60,7 +57,6 @@ const useScales = (properties: useScaleProps) => {
 
   // handle  Vertical bars
   if (!isHorizontal) {
-    xScaleBrush = composeScalePoint(xAxisDataKeysMapped, [0, xMax], 0.5)
     xScale = composeScaleBand(xAxisDataMapped, [0, xMax], 1 - config.barThickness)
     yScale = composeYScale(properties)
     seriesScale = composeScaleBand(seriesDomain, [0, xScale.bandwidth()], 0)
@@ -73,8 +69,8 @@ const useScales = (properties: useScaleProps) => {
   }
 
   if (config.xAxis.type === 'date-time') {
-    let xAxisMin = Math.min(...xAxisDataMapped)
-    let xAxisMax = Math.max(...xAxisDataMapped)
+    let xAxisMin = Math.min(...xAxisDataMapped.map(Number))
+    let xAxisMax = Math.max(...xAxisDataMapped.map(Number))
     xAxisMin -= (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
     xAxisMax += (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
     xScale = scaleTime({
@@ -129,7 +125,9 @@ const useScales = (properties: useScaleProps) => {
   // handle Box plot
   if (visualizationType === 'Box Plot') {
     const allOutliers = []
-    const hasOutliers = config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) && !config.boxplot.hideOutliers
+    const hasOutliers =
+      config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) &&
+      !config.boxplot.hideOutliers
 
     // check if outliers are lower
     if (hasOutliers) {
@@ -215,8 +213,11 @@ const useScales = (properties: useScaleProps) => {
     if (screenWidth > 480) {
       if (config.forestPlot.type === 'Linear') {
         xScale = scaleLinear({
-          domain: [Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding],
-          range: [leftWidthOffset, dimensions[0] - rightWidthOffset]
+          domain: [
+            Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding,
+            Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding
+          ],
+          range: [leftWidthOffset, Number(screenWidth) - rightWidthOffset]
         })
         xScale.type = scaleTypes.LINEAR
       }
@@ -234,7 +235,10 @@ const useScales = (properties: useScaleProps) => {
     } else {
       if (config.forestPlot.type === 'Linear') {
         xScale = scaleLinear({
-          domain: [Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding],
+          domain: [
+            Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding,
+            Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding
+          ],
           range: [leftWidthOffsetMobile, xMax - rightWidthOffsetMobile],
           type: scaleTypes.LINEAR
         })
@@ -255,7 +259,7 @@ const useScales = (properties: useScaleProps) => {
       }
     }
   }
-  return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush, xScaleAnnotation }
+  return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleAnnotation }
 }
 
 export default useScales
@@ -295,31 +299,37 @@ export const getTickValues = (xAxisDataMapped, xScale, num) => {
 /// helper functions
 const composeXScale = ({ min, max, xMax, config }) => {
   // Adjust min value if using logarithmic scale
-  min = config.useLogScale && min >= 0 && min < 1 ? min + 0.1 : min
+  const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
+  min = isLogarithmicAxis && min >= 0 && min < 1 ? min + 0.1 : min
   // Select the appropriate scale function
-  const scaleFunc = config.useLogScale ? scaleLog : scaleLinear
+  const scaleFunc = isLogarithmicAxis ? scaleLog : scaleLinear
   // Return the configured scale function
   return scaleFunc({
     domain: [min, max],
     range: [0, xMax],
-    nice: config.useLogScale,
-    zero: config.useLogScale
+    nice: isLogarithmicAxis,
+    zero: isLogarithmicAxis
   })
 }
 
 const composeYScale = ({ min, max, yMax, config, leftMax }) => {
   // Adjust min value if using logarithmic scale
-  min = config.useLogScale && min >= 0 && min < 1 ? min + 0.1 : min
+  const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
+  min = isLogarithmicAxis && min >= 0 && min < 1 ? min + 0.1 : min
   // Select the appropriate scale function
-  const scaleFunc = config.useLogScale ? scaleLog : scaleLinear
+  const scaleFunc = isLogarithmicAxis ? scaleLog : scaleLinear
 
   if (config.visualizationType === 'Combo') max = leftMax
+
+  // If the visualization type is a bump chart then the domain and range need different values
+  const domainSet = config.visualizationType === 'Bump Chart' ? [1, max] : [min, max]
+  const yRange = config.visualizationType === 'Bump Chart' ? [30, yMax] : [yMax, 0]
   // Return the configured scale function
   return scaleFunc({
-    domain: [min, max],
-    range: [yMax, 0],
-    nice: config.useLogScale,
-    zero: config.useLogScale
+    domain: domainSet,
+    range: yRange,
+    nice: isLogarithmicAxis,
+    zero: isLogarithmicAxis
   })
 }
 

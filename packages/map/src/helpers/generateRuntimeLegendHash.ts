@@ -15,9 +15,9 @@ export const generateRuntimeLegendHash = (state, runtimeFilters) => {
     specialClasses: state.legend.specialClasses,
     geoType: state.general.geoType,
     data: state.data,
-    ...runtimeFilters,
     filters: {
       ...state.filters
-    }
+    },
+    ...runtimeFilters
   })
 }
