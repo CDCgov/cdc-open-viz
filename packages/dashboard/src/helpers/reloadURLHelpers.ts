@@ -4,7 +4,11 @@ import { capitalizeSplitAndJoin } from '@cdc/core/helpers/cove/string'
 import { AnyVisualization, Visualization } from '@cdc/core/types/Visualization'
 import _ from 'lodash'
 
-export const isUpdateNeeded = (filters: SharedFilter[], currentQueryParams: Record<string, string>, newQueryParams: Record<string, string>): boolean => {
+export const isUpdateNeeded = (
+  filters: SharedFilter[],
+  currentQueryParams: Record<string, string>,
+  newQueryParams: Record<string, string>
+): boolean => {
   let needsUpdate = false
   filters.find(filter => {
     if (filter.type === 'urlfilter' && !Array.isArray(filter.active) && filter.filterBy === 'File Name') {
@@ -23,6 +27,8 @@ export const isUpdateNeeded = (filters: SharedFilter[], currentQueryParams: Reco
 export const getDataURL = (updatedQSParams: Record<string, string | string[]>, dataUrl: URL, newFileName: string) => {
   const _params = Object.keys(updatedQSParams).flatMap(key => {
     const value = updatedQSParams[key]
+    if (value === undefined) return []
+    if (typeof value === 'string' && (value as String).match(/undefined/)) return []
     if (Array.isArray(value)) return value.map(v => ({ key, value: v }))
     return { key, value }
   })
@@ -32,7 +38,10 @@ export const getDataURL = (updatedQSParams: Record<string, string | string[]>, d
   if (newFileName !== '') {
     const fileExtension = dataUrl.pathname.split('.').pop()
     const pathWithoutFilename = dataUrl.pathname.substring(0, dataUrl.pathname.lastIndexOf('/'))
-    dataUrlFinal = `${dataUrl.origin}${pathWithoutFilename}/${newFileName}.${fileExtension}${gatherQueryParams(baseURL, _params)}`
+    dataUrlFinal = `${dataUrl.origin}${pathWithoutFilename}/${newFileName}.${fileExtension}${gatherQueryParams(
+      baseURL,
+      _params
+    )}`
   }
   return dataUrlFinal
 }
@@ -47,7 +56,11 @@ export const getNewFileName = (newFileName: string, filter: SharedFilter, datase
   if (filter.datasetKey === datasetKey) {
     if (filter.fileName) {
       // if a file name is found, ie, state_${query}, use that, ie. state_activeFilter.json
-      fileName = capitalizeSplitAndJoin.call(String(filter.fileName), ' ', replacements[filter.whitespaceReplacement ?? 'Keep Spaces'])
+      fileName = capitalizeSplitAndJoin.call(
+        String(filter.fileName),
+        ' ',
+        replacements[filter.whitespaceReplacement ?? 'Keep Spaces']
+      )
     } else {
       // if no file name is entered use the default active filter. ie. /activeFilter.json
       fileName = filter.active as string
@@ -55,7 +68,14 @@ export const getNewFileName = (newFileName: string, filter: SharedFilter, datase
   }
 
   if (fileName?.includes('${query}')) {
-    fileName = fileName.replace('${query}', capitalizeSplitAndJoin.call(String(filter.active), ' ', replacements[filter.whitespaceReplacement ?? 'Keep Spaces']))
+    fileName = fileName.replace(
+      '${query}',
+      capitalizeSplitAndJoin.call(
+        String(filter.active),
+        ' ',
+        replacements[filter.whitespaceReplacement ?? 'Keep Spaces']
+      )
+    )
   }
 
   return fileName
@@ -71,7 +91,11 @@ export const getVisualizationsWithFormattedData = (visualizations: Record<string
   }, _.cloneDeep(visualizations))
 }
 
-export const filterUsedByDataUrl = (filter: SharedFilter, datasetKey: string, visualizations: Record<string, AnyVisualization>) => {
+export const filterUsedByDataUrl = (
+  filter: SharedFilter,
+  datasetKey: string,
+  visualizations: Record<string, AnyVisualization>
+) => {
   if (!filter.usedBy || !filter.usedBy.length) return true
   const vizUsingFilters = filter.usedBy?.map(vizKey => visualizations[vizKey])
   return vizUsingFilters?.some(viz => viz?.dataKey === datasetKey)
