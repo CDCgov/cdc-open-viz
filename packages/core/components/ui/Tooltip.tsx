@@ -50,7 +50,6 @@ const Tooltip: React.FC<ToolTipProps> & { Target; Content } = ({
       </a>
       <ReactTooltip
         id={uid}
-        isOpen={true}
         // ! do not remove the deprecated property, it will break tooltips in the editor.
         anchorId={uid}
         className={
