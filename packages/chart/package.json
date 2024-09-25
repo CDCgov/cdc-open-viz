@@ -61,7 +61,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "gitHead": "ff5b1ca0c84bb0629bc69e5a26a4a81254dbf69f",
+  "gitHead": "c4b0402afe6ed209a85b7078711549b9fd7dae7d",
   "devDependencies": {
     "@types/d3-sankey": "^0.12.4",
     "resize-observer-polyfill": "^1.5.1"
