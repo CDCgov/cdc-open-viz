@@ -12,10 +12,18 @@ type NestedDropdownEditorProps = {
   rawData: Object[]
   updateField: Function
   updateFilterStyle: Function
-  handleGroupingCustomOrder: Function
+  handleGroupingCustomOrder: (index1: number, index2: number) => void
 }
 
-const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ config, dataColumns, handleGroupingCustomOrder, handleNameChange: handleGroupColumnNameChange, filterIndex, rawData, updateField }) => {
+const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
+  config,
+  dataColumns,
+  handleGroupingCustomOrder,
+  handleNameChange: handleGroupColumnNameChange,
+  filterIndex,
+  rawData,
+  updateField
+}) => {
   const filter = config.filters[filterIndex]
   const subGrouping = filter?.subGrouping
   const listOfUsedColumnNames: string[] = []
@@ -52,7 +60,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ config, dat
   }
 
   const handleSubGroupColumnNameChange = value => {
-    const filterGroups = filter.orderedValues ?? filter.values
+    const filterGroups = filter.orderedValues?.length ? filter.orderedValues : filter.values
 
     const valuesLookup = filterGroups.reduce((acc, groupName) => {
       const values: string[] = _.uniq(
@@ -96,7 +104,12 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ config, dat
     updateSubGroupingFilterProperty(newSortedSubGrouping)
   }
 
-  const handleSubGroupingCustomOrder = (currentIndex, newIndex, subGroupingFitlerOrder: string[], groupName: string) => {
+  const handleSubGroupingCustomOrder = (
+    currentIndex,
+    newIndex,
+    subGroupingFitlerOrder: string[],
+    groupName: string
+  ) => {
     const updatedGroupOrderedValues = _.cloneDeep(subGroupingFitlerOrder)
     const [movedItem] = updatedGroupOrderedValues.splice(currentIndex, 1)
     updatedGroupOrderedValues.splice(newIndex, 0, movedItem)
@@ -172,7 +185,9 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ config, dat
         <span> Create query parameters</span>
         {!!filter.setByQueryParameter && (
           <>
-            <span className='edit-label column-heading mt-2'>Grouping: Default Value Set By Query String Parameter</span>
+            <span className='edit-label column-heading mt-2'>
+              Grouping: Default Value Set By Query String Parameter
+            </span>
             <input
               type='text'
               value={filter.setByQueryParameter}
@@ -180,7 +195,9 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ config, dat
                 updateGroupingFilterProp('setByQueryParameter', e.target.value)
               }}
             />
-            <span className='edit-label column-heading mt-2'>SubGrouping: Default Value Set By Query String Parameter</span>
+            <span className='edit-label column-heading mt-2'>
+              SubGrouping: Default Value Set By Query String Parameter
+            </span>
             <input
               type='text'
               value={subGrouping.setByQueryParameter}
@@ -206,12 +223,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ config, dat
           })}
         </select>
         {filter.order === 'cust' && (
-          <FilterOrder
-            orderedValues={filter.orderedValues}
-            handleFilterOrder={(sourceIndex, destinationIndex) => {
-              handleGroupingCustomOrder(sourceIndex, destinationIndex, filterIndex, filter)
-            }}
-          />
+          <FilterOrder orderedValues={filter.orderedValues} handleFilterOrder={handleGroupingCustomOrder} />
         )}
       </label>
 
@@ -219,7 +231,10 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({ config, dat
         <label className='mt-2'>
           <span className={'edit-filterOrder column-heading'}>SubGrouping Order</span>
           <div className='edit-label column-heading float-right'>{subGrouping.columnName} </div>
-          <select value={subGrouping.order ? subGrouping.order : 'asc'} onChange={e => handleSubGroupingOrderBy(e.target.value as OrderBy)}>
+          <select
+            value={subGrouping.order ? subGrouping.order : 'asc'}
+            onChange={e => handleSubGroupingOrderBy(e.target.value as OrderBy)}
+          >
             {filterOrderOptions.map((option, index) => {
               return (
                 <option value={option.value} key={`filter-${index}`}>

@@ -4,7 +4,7 @@ import Icon from '../../ui/Icon'
 import { Visualization } from '../../../types/Visualization'
 import { UpdateFieldFunc } from '../../../types/UpdateFieldFunc'
 import _ from 'lodash'
-import { MultiSelectFilter, VizFilter } from '../../../types/VizFilter'
+import { MultiSelectFilter, VizFilter, VizFilterStyle } from '../../../types/VizFilter'
 import { filterStyleOptions, handleSorting, filterOrderOptions } from '../../Filters'
 import FieldSetWrapper from '../FieldSetWrapper'
 
@@ -37,14 +37,17 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
     updateField('filters', filterIndex, prop, value)
   }
 
-  const updateFilterStyle = (index, value) => {
+  const updateFilterStyle = (index, style: VizFilterStyle) => {
     const filters = _.cloneDeep(config.filters)
     const currentFilter = { ...filters[index], orderedValues: filters[index].values }
-    currentFilter.filterStyle = value
-    if (value === 'multi-select') {
+    currentFilter.filterStyle = style
+    if (style === 'multi-select') {
       currentFilter.active = Array.isArray(currentFilter.active) ? currentFilter.active : [currentFilter.active]
     } else if (Array.isArray(currentFilter.active)) {
       currentFilter.active = currentFilter.active[0]
+    }
+    if (style === 'nested-dropdown') {
+      currentFilter.showDropdown = true
     }
     filters[index] = currentFilter
     updateField(null, null, 'filters', filters)
@@ -69,9 +72,10 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
     updateField(null, null, 'filters', filters)
   }
 
-  const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
+  const handleFilterOrder = (idx1, idx2, filterIndex) => {
+    const filter = config.filters[filterIndex]
     // Create a shallow copy of the filter values array & update position of the values
-    const updatedValues = [...filter.values]
+    const updatedValues = [...(filter.orderedValues || filter.values)]
 
     const [movedItem] = updatedValues.splice(idx1, 1)
     updatedValues.splice(idx2, 0, movedItem)
@@ -244,7 +248,10 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                           })}
                         </select>
                         {filter.order === 'cust' && (
-                          <FilterOrder orderedValues={filter.orderedValues} handleFilterOrder={handleFilterOrder} />
+                          <FilterOrder
+                            orderedValues={filter.orderedValues || filter.values}
+                            handleFilterOrder={(index1, index2) => handleFilterOrder(index1, index2, filterIndex)}
+                          />
                         )}
                       </label>
                     </>
@@ -254,7 +261,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                       dataColumns={dataColumns}
                       filterIndex={filterIndex}
                       rawData={rawData}
-                      handleGroupingCustomOrder={handleFilterOrder}
+                      handleGroupingCustomOrder={(index1, index2) => handleFilterOrder(index1, index2, filterIndex)}
                       handleNameChange={value => handleNameChange(filterIndex, value)}
                       updateField={updateField}
                       updateFilterStyle={updateFilterStyle}

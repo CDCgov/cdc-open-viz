@@ -11,16 +11,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
-import {
-  drawCircle,
-  drawDiamond,
-  drawSquare,
-  drawTriangle,
-  drawPin,
-  drawStar,
-  drawShape,
-  createShapeProperties
-} from '../helpers/shapes'
+import Annotation from '../../Annotation'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -312,7 +303,7 @@ const CountyMap = props => {
     let pointCoordinates = topoData.projection.invert([x, y])
 
     const currentTooltipIndex = parseInt(tooltipRef.current.getAttribute('data-index'))
-    const geoRadius = (state.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
+    const geoRadius = (state.visual.geoCodeCircleSize || 5) * 1
 
     const context = canvas.getContext('2d')
     const path = geoPath(topoData.projection, context)
@@ -539,34 +530,38 @@ const CountyMap = props => {
         })
       }
 
+      const drawPin = (pin, ctx) => {
+        ctx.save()
+        ctx.translate(pin.x, pin.y)
+        ctx.beginPath()
+        ctx.moveTo(0, 0)
+        ctx.bezierCurveTo(2, -10, -20, -25, 0, -30)
+        ctx.bezierCurveTo(20, -25, -2, -10, 0, 0)
+        ctx.fillStyle = pin.color
+        ctx.fill()
+        ctx.strokeStyle = 'black'
+        ctx.lineWidth = 1.5
+        ctx.stroke()
+        ctx.beginPath()
+        ctx.arc(0, -21, 3, 0, Math.PI * 2)
+        ctx.closePath()
+        ctx.fill()
+        ctx.restore()
+      }
+
+      const drawCircle = (circle, context) => {
+        const adjustedGeoRadius = Number(circle.geoRadius)
+        context.lineWidth = lineWidth
+        context.fillStyle = circle.color
+        context.beginPath()
+        context.arc(circle.x, circle.y, adjustedGeoRadius, 0, 2 * Math.PI)
+        context.fill()
+        context.stroke()
+      }
+
       if (state.general.type === 'us-geocode') {
         context.strokeStyle = 'black'
-        const geoRadius = (state.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
-        const { additionalCityStyles } = state.visual || []
-        const cityStyles = Object.values(data)
-          .filter(d => additionalCityStyles.some(style => String(d[style.column]) === String(style.value)))
-          .map(d => {
-            const conditionsMatched = additionalCityStyles.find(
-              style => String(d[style.column]) === String(style.value)
-            )
-            return { ...conditionsMatched, ...d }
-          })
-
-        let cityPixelCoords = []
-        cityStyles.forEach(city => {
-          cityPixelCoords = topoData.projection([city[state.columns.longitude.name], city[state.columns.latitude.name]])
-
-          if (cityPixelCoords) {
-            const legendValues = applyLegendToRow(data[city?.value])
-            if (legendValues) {
-              const shapeType = city?.shape?.toLowerCase()
-              const shapeProperties = createShapeProperties(shapeType, cityPixelCoords, legendValues, state, geoRadius)
-              if (shapeProperties) {
-                drawShape(shapeProperties, context, state, lineWidth)
-              }
-            }
-          }
-        })
+        const geoRadius = state.visual.geoCodeCircleSize || 5
 
         runtimeKeys.forEach(key => {
           const citiesList = new Set(cityStyles.map(item => item.value))
