@@ -11,7 +11,7 @@ import { Line } from '@visx/shape'
 import { Label } from '../../types/Label'
 import { ChartConfig } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
-import { forwardRef } from 'react'
+import { forwardRef, useState } from 'react'
 import LegendSuppression from './Legend.Suppression'
 import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
@@ -50,6 +50,8 @@ const Legend: React.FC<LegendProps> = forwardRef(
     const { innerClasses, containerClasses } = useLegendClasses(config)
     const { runtime, legend } = config
 
+    const [hasSuppression, setHasSuppression] = useState(false)
+
     const isBottomOrSmallViewport =
       legend?.position === 'bottom' ||
       legend?.position === 'top' ||
@@ -67,7 +69,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
     const { HighLightedBarUtils } = useHighlightedBars(config)
     let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
     if (!legend) return null
-    return (
+    let legendElement = (
       <aside
         ref={ref}
         style={legendClasses}
@@ -206,7 +208,11 @@ const Legend: React.FC<LegendProps> = forwardRef(
                   })}
                 </div>
 
-                <LegendSuppression config={config} isBottomOrSmallViewport={isBottomOrSmallViewport} />
+                <LegendSuppression
+                  config={config}
+                  isBottomOrSmallViewport={isBottomOrSmallViewport}
+                  setHasSuppression={setHasSuppression}
+                />
               </>
             )
           }}
@@ -218,6 +224,11 @@ const Legend: React.FC<LegendProps> = forwardRef(
         )}
       </aside>
     )
+    // If the legend contains the absolutely-positioned suppression info box it needs a 30px tall div to push remaining content down
+    if (hasSuppression) {
+      legendElement = [legendElement, <div className='legend-suppression-spacer'></div>]
+    }
+    return legendElement
   }
 )
 
