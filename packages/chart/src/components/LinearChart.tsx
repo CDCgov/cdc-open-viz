@@ -311,7 +311,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
       const textWidth = textElement.getBBox().width
       setSuffixWidth(textWidth)
     }
-  }, [])
+  }, [config.dataFormat.suffix, config.dataFormat.onlyShowTopPrefixSuffix])
 
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
@@ -558,12 +558,15 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                       const to = { x: tick.to.x - tickLength, y: tick.to.y }
                       const hideFirstGridLine = tick.index === 0 && tick.value === 0 && config.xAxis.hideAxis
                       const lastTick = props.ticks.length - 1 === i
-                      const { suffix, simplifiedPrefixSuffix } = config.dataFormat
+                      const { suffix, onlyShowTopPrefixSuffix } = config.dataFormat
                       const suffixOneChar = suffix.length === 1
+                      const hideTopTick = lastTick && onlyShowTopPrefixSuffix && suffix && !suffixOneChar
+                      const labelPadding = 2
+                      const labelX = tick.to.x - labelPadding
 
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                          {!runtime.yAxis.hideTicks && (
+                          {!runtime.yAxis.hideTicks && !hideTopTick && (
                             <Line
                               key={`${tick.value}--hide-hideTicks`}
                               from={tick.from}
@@ -696,15 +699,15 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                             visualizationType !== 'Bump Chart' &&
                             !config.yAxis.hideLabel && (
                               <>
-                                {/* SIMPLIFIED SUFFIX: Dom suffix for simplified suffix behavior */}
+                                {/* TOP ONLY SUFFIX: Dom suffix for 'show only top suffix' behavior */}
                                 {/* top suffix is shown alone and is allowed to 'overflow' to the right */}
-                                {/* SPECIAL CASE: a one character simplified suffix does not overflow */}
-                                {simplifiedPrefixSuffix && lastTick && (
+                                {/* SPECIAL CASE: a one character top-only suffix does not overflow */}
+                                {onlyShowTopPrefixSuffix && lastTick && (
                                   <Text
                                     id='suffix'
                                     display={isLogarithmicAxis ? showTicks : 'block'}
                                     dx={isLogarithmicAxis ? -6 : 0}
-                                    x={tick.to.x}
+                                    x={labelX}
                                     y={tick.to.y}
                                     angle={-Number(config.yAxis.tickRotation) || 0}
                                     verticalAnchor={'middle'}
@@ -713,6 +716,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                                     stroke={'#fff'}
                                     strokeWidth={6}
                                     paintOrder={'stroke'} // keeps stroke under fill
+                                    strokeLinejoin='round'
                                     style={{ whiteSpace: 'pre-wrap' }} // prevents leading spaces from being trimmed
                                   >
                                     {suffix}
@@ -723,7 +727,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                                 <Text
                                   display={isLogarithmicAxis ? showTicks : 'block'}
                                   dx={isLogarithmicAxis ? -6 : 0}
-                                  x={suffixOneChar ? tick.to.x - suffixWidth : tick.to.x}
+                                  x={suffixOneChar ? labelX - suffixWidth : labelX}
                                   y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                                   angle={-Number(config.yAxis.tickRotation) || 0}
                                   verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}

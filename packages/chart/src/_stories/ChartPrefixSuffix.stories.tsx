@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import barConfig from './_mock/line_chart_two_points_new_chart.json'
 import annotationConfig from './_mock/annotation_category_mock.json'
 import areaPrefix from './_mock/annotation_category_mock.json'
 
@@ -12,28 +13,38 @@ const meta: Meta<typeof Chart> = {
 
 type Story = StoryObj<typeof Chart>
 
-export const Simplified_Suffix: Story = {
+export const Top_Suffix: Story = {
   args: {
-    config: editConfigKeys(annotationConfig, [
-      { path: ['dataFormat', 'simplifiedPrefixSuffix'], value: true },
+    config: editConfigKeys(barConfig, [
+      { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
       { path: ['dataFormat', 'suffix'], value: ' Somethings per Something' }
     ])
   }
 }
-export const SuffixSimplifiedWithOptions: Story = {
+
+export const Top_Suffix_Worst_Case: Story = {
   args: {
     config: editConfigKeys(annotationConfig, [
-      { path: ['dataFormat', 'simplifiedPrefixSuffix'], value: true },
+      { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
+      { path: ['dataFormat', 'suffix'], value: ' Somethings per Something' }
+    ])
+  }
+}
+
+export const Top_Suffix_With_Options: Story = {
+  args: {
+    config: editConfigKeys(annotationConfig, [
+      { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
       { path: ['yAxis', 'tickRotation'], value: 45 },
       { path: ['yAxis', 'tickLabelColor'], value: 'red' }
     ])
   }
 }
 
-export const SimplifiedSuffixOneChar: Story = {
+export const Top_Suffix_One_Char: Story = {
   args: {
     config: editConfigKeys(annotationConfig, [
-      { path: ['dataFormat', 'simplifiedPrefixSuffix'], value: true },
+      { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
       { path: ['dataFormat', 'suffix'], value: '%' }
     ])
   }
@@ -44,10 +55,10 @@ export const Suffix: Story = {
     config: annotationConfig
   }
 }
-export const SimplifiedPrefix: Story = {
+export const Top_Prefix: Story = {
   args: {
     config: editConfigKeys(annotationConfig, [
-      { path: ['dataFormat', 'simplifiedPrefixSuffix'], value: true },
+      { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
       { path: ['dataFormat', 'prefix'], value: '$' },
       { path: ['dataFormat', 'suffix'], value: '' }
     ])
@@ -62,10 +73,10 @@ export const Prefix: Story = {
   }
 }
 
-export const SimplifiedPrefixAndSuffix: Story = {
+export const Top_Prefix_And_Suffix: Story = {
   args: {
     config: editConfigKeys(annotationConfig, [
-      { path: ['dataFormat', 'simplifiedPrefixSuffix'], value: true },
+      { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
       { path: ['dataFormat', 'prefix'], value: '$' }
     ])
   }

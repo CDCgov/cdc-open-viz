@@ -925,7 +925,7 @@ export default function CdcChart({
         bottomPrefix,
         bottomSuffix,
         bottomAbbreviated,
-        simplifiedPrefixSuffix
+        onlyShowTopPrefixSuffix
       }
     } = config
 
@@ -1018,8 +1018,8 @@ export default function CdcChart({
     if (addColPrefix && axis === 'left') {
       result = addColPrefix + result
     } else {
-      // if simplifiedPrefixSuffix only show top prefix
-      const suppressAllButLast = simplifiedPrefixSuffix && length - 1 !== index
+      // if onlyShowTopPrefixSuffix only show top prefix
+      const suppressAllButLast = onlyShowTopPrefixSuffix && length - 1 !== index
       if (prefix && axis === 'left' && !suppressAllButLast) {
         result += prefix
       }
@@ -1039,7 +1039,7 @@ export default function CdcChart({
     if (addColSuffix && axis === 'left') {
       result += addColSuffix
     } else {
-      if (suffix && axis === 'left' && !simplifiedPrefixSuffix) {
+      if (suffix && axis === 'left' && !onlyShowTopPrefixSuffix) {
         result += suffix
       }
     }
