@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import barConfig from './_mock/line_chart_two_points_new_chart.json'
 import annotationConfig from './_mock/annotation_category_mock.json'
 import areaPrefix from './_mock/annotation_category_mock.json'
+import horizontalBarConfig from './_mock/horizontal_bar.json'
 
 import Chart from '../CdcChart'
 import { editConfigKeys } from '../helpers/configHelpers'
@@ -79,6 +80,14 @@ export const Top_Prefix_And_Suffix: Story = {
     config: editConfigKeys(annotationConfig, [
       { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
       { path: ['dataFormat', 'prefix'], value: '$' }
+    ])
+  }
+}
+export const Horizontal_Bar: Story = {
+  args: {
+    config: editConfigKeys(horizontalBarConfig, [
+      { path: ['dataFormat', 'suffix'], value: ' suf' },
+      { path: ['dataFormat', 'prefix'], value: 'pre' }
     ])
   }
 }
