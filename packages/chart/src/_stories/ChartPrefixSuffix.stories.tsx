@@ -17,7 +17,8 @@ export const Top_Suffix: Story = {
   args: {
     config: editConfigKeys(barConfig, [
       { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
-      { path: ['dataFormat', 'suffix'], value: ' Somethings per Something' }
+      { path: ['dataFormat', 'suffix'], value: ' Somethings per Something' },
+      { path: ['yAxis', 'gridLines'], value: true }
     ])
   }
 }
