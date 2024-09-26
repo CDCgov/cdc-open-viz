@@ -109,15 +109,6 @@ export default function CdcChart({
     isBrushing: false
   })
 
-  let [width] = dimensions
-  const useVertical = config.orientation === 'vertical'
-  const useMobileVertical = config.heights?.mobileVertical && ['xs', 'xxs'].includes(currentViewport)
-  const responsiveVertical = useMobileVertical ? 'mobileVertical' : 'vertical'
-  const renderedOrientation = useVertical ? responsiveVertical : 'horizontal'
-  let height = config.aspectRatio ? width * config.aspectRatio : config?.heights?.[renderedOrientation]
-  if (config.visualizationType === 'Pie') height = config?.heights?.[renderedOrientation]
-  height = height + Number(config?.xAxis?.size) + 45
-
   type Config = typeof config
   let legendMemo = useRef(new Map()) // map collection
   let innerContainerRef = useRef()
@@ -1337,32 +1328,26 @@ export default function CdcChart({
                   >
                     {/* All charts with LinearChart */}
                     {!['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
-                      <div style={{ height, width: `100%` }}>
-                        <ParentSize>
-                          {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
-                        </ParentSize>
-                      </div>
+                      <ParentSize>
+                        {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                      </ParentSize>
                     )}
 
                     {config.visualizationType === 'Pie' && (
-                      <ParentSize className='justify-content-center d-flex' style={{ height, width: `100%` }}>
+                      <ParentSize className='justify-content-center d-flex'>
                         {parent => <PieChart parentWidth={parent.width} parentHeight={parent.height} />}
                       </ParentSize>
                     )}
                     {/* Line Chart */}
                     {config.visualizationType === 'Line' &&
                       (checkLineToBarGraph() ? (
-                        <div style={{ height: config?.heights?.vertical, width: `100%` }}>
-                          <ParentSize>
-                            {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
-                          </ParentSize>
-                        </div>
+                        <ParentSize>
+                          {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                        </ParentSize>
                       ) : (
-                        <div style={{ height, width: `100%` }}>
-                          <ParentSize>
-                            {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
-                          </ParentSize>
-                        </div>
+                        <ParentSize>
+                          {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                        </ParentSize>
                       ))}
                     {/* Sparkline */}
                     {config.visualizationType === 'Spark Line' && (
