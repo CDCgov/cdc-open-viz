@@ -9,6 +9,7 @@ import Button from '@cdc/core/components/elements/Button'
 
 //types
 import { DimensionsType } from '@cdc/core/types/Dimensions'
+import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 
 // External Libraries
 import { scaleOrdinal } from '@visx/scale'
@@ -71,6 +72,20 @@ import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import LegendWrapper from './components/LegendWrapper'
 import _ from 'lodash'
 
+interface CdcChartProps {
+  configUrl: string
+  config?: ChartConfig
+  isEditor?: boolean
+  isDebug?: boolean
+  isDashboard?: boolean
+  setConfig: (config: ChartConfig) => void
+  setEditing?: (editing: boolean) => void
+  hostname?: string
+  link?: string
+  setSharedFilter?: (filter: any) => void
+  setSharedFilterValue?: (value: any) => void
+  dashboardConfig?: DashboardConfig
+}
 export default function CdcChart({
   configUrl,
   config: configObj,
@@ -84,12 +99,12 @@ export default function CdcChart({
   setSharedFilter,
   setSharedFilterValue,
   dashboardConfig
-}) {
+}: CdcChartProps) {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
-  const [stateData, setStateData] = useState(configObj?.data || [])
+  const [stateData, setStateData] = useState(configObj ? configObj.data : [])
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
   const [seriesHighlight, setSeriesHighlight] = useState<string[]>(
