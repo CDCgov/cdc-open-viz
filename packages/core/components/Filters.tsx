@@ -484,10 +484,11 @@ const Filters = (props: FilterProps) => {
     }`,
     type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme
   ]
+
   return (
     <section className={filterSectionClassList.join(' ')}>
       <p className='filters-section__intro-text'>
-        {filters?.some(f => f.active && f.showDropdown) ? filterConstants.introText : ''}{' '}
+        {filters?.some(filter => filter.active && filter.columnName) ? filterConstants.introText : ''}{' '}
         {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
       </p>
       <div className='filters-section__wrapper'>

@@ -132,6 +132,10 @@
     border: 1px solid $lightGray;
     position: relative;
 
+    &.top {
+      padding: 0;
+    }
+
     &.no-border {
       border: 1px solid transparent;
     }
@@ -453,46 +457,6 @@
       .visx-group:not(.visx-axis) rect {
         stroke: none;
       }
-    }
-  }
-
-  .filters-section {
-    margin-left: 1rem;
-    margin-right: 1rem;
-
-    &__title {
-      margin: 15px 0;
-    }
-
-    &__wrapper {
-      hr {
-        margin-bottom: 20px;
-      }
-
-      label {
-        display: inherit;
-        margin-bottom: 5px;
-        font-weight: 600;
-        font-size: 16px;
-      }
-    }
-
-    @include breakpoint(md) {
-      display: flex;
-      gap: 30px;
-    }
-
-    label:not(:empty) {
-      margin-right: 0.4em;
-    }
-
-    select {
-      font-size: 1em;
-      padding-right: 5px;
-    }
-
-    .single-filter {
-      margin-bottom: 0.5em;
     }
   }
 
