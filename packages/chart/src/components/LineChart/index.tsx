@@ -60,12 +60,26 @@ const LineChart = (props: LineChartProps) => {
           let lineType = config.runtime.series.filter(item => item.dataKey === seriesKey)[0].type
           const seriesData = config.runtime.series.filter(item => item.dataKey === seriesKey)
           const seriesAxis = seriesData[0].axis ? seriesData[0].axis : 'left'
-          let displayArea = legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
+          let displayArea =
+            legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
           const circleData = filterCircles(config?.preliminaryData, tableD, seriesKey)
           // styles for preliminary Data  items
-          let styles = createStyles({ preliminaryData: config.preliminaryData, data: tableD, stroke: colorScale(config.runtime.seriesLabels[seriesKey]), strokeWidth: seriesData[0].weight || 2, handleLineType, lineType, seriesKey })
-          const suppressedSegments = createDataSegments(tableData, seriesKey, config.preliminaryData, config.xAxis.dataKey)
-
+          let styles = createStyles({
+            preliminaryData: config.preliminaryData,
+            data: tableD,
+            stroke: colorScale(config.runtime.seriesLabels[seriesKey]),
+            strokeWidth: seriesData[0].weight || 2,
+            handleLineType,
+            lineType,
+            seriesKey
+          })
+          const suppressedSegments = createDataSegments(
+            tableData,
+            seriesKey,
+            config.preliminaryData,
+            config.xAxis.dataKey
+          )
+          const splittedData = config?.preliminaryData?.filter(pd => pd.style && !pd.style.includes('Circles'))
           let xPos = d => {
             return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
           }
@@ -73,13 +87,33 @@ const LineChart = (props: LineChartProps) => {
           return (
             <Group
               key={`series-${seriesKey}`}
-              opacity={legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
-              display={legend.behavior === 'highlight' || (seriesHighlight.length === 0 && !legend.dynamicLegend) || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
+              opacity={
+                legend.behavior === 'highlight' &&
+                seriesHighlight.length > 0 &&
+                seriesHighlight.indexOf(seriesKey) === -1
+                  ? 0.5
+                  : 1
+              }
+              display={
+                legend.behavior === 'highlight' ||
+                (seriesHighlight.length === 0 && !legend.dynamicLegend) ||
+                seriesHighlight.indexOf(seriesKey) !== -1
+                  ? 'block'
+                  : 'none'
+              }
             >
               {/* tooltips */}
-              <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, tableData)} onMouseOut={handleTooltipMouseOff} onClick={e => handleTooltipClick(e, data)} />
+              <Bar
+                key={'bars'}
+                width={Number(xMax)}
+                height={Number(yMax)}
+                fill={DEBUG ? 'red' : 'transparent'}
+                fillOpacity={0.05}
+                onMouseMove={e => handleTooltipMouseOver(e, tableData)}
+                onMouseOut={handleTooltipMouseOff}
+                onClick={e => handleTooltipClick(e, data)}
+              />
               {data.map((d, dataIndex) => {
-
                 return (
                   d[seriesKey] !== undefined &&
                   d[seriesKey] !== '' &&
@@ -88,7 +122,16 @@ const LineChart = (props: LineChartProps) => {
                     <React.Fragment key={`series-${seriesKey}-point-${dataIndex}`}>
                       {/* Render label */}
                       {config.labels && (
-                        <Text x={xPos(d)} y={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))} fill={'#000'} textAnchor='middle'>
+                        <Text
+                          x={xPos(d)}
+                          y={
+                            seriesAxis === 'Right'
+                              ? yScaleRight(getYAxisData(d, seriesKey))
+                              : yScale(getYAxisData(d, seriesKey))
+                          }
+                          fill={'#000'}
+                          textAnchor='middle'
+                        >
                           {formatNumber(d[seriesKey], 'left')}
                         </Text>
                       )}
@@ -160,14 +203,18 @@ const LineChart = (props: LineChartProps) => {
                 )}
               </>
               {/* SPLIT LINE */}
-              {config?.preliminaryData?.some(pd => pd.value && pd.type) ? (
+              {splittedData.length > 0 ? (
                 <>
                   <SplitLinePath
                     curve={allCurves[seriesData[0].lineType]}
                     segments={data.map(d => [d])}
                     segmentation='x'
                     x={d => xPos(d)}
-                    y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
+                    y={d =>
+                      seriesAxis === 'Right'
+                        ? yScaleRight(getYAxisData(d, seriesKey))
+                        : yScale(Number(getYAxisData(d, seriesKey)))
+                    }
                     styles={styles}
                     defined={(item, i) => {
                       return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
@@ -180,7 +227,11 @@ const LineChart = (props: LineChartProps) => {
                         key={index}
                         data={segment.data}
                         x={d => xPos(d)}
-                        y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
+                        y={d =>
+                          seriesAxis === 'Right'
+                            ? yScaleRight(getYAxisData(d, seriesKey))
+                            : yScale(Number(getYAxisData(d, seriesKey)))
+                        }
                         stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
                         strokeWidth={seriesData[0].weight || 2}
                         strokeOpacity={1}
@@ -212,7 +263,11 @@ const LineChart = (props: LineChartProps) => {
                         : data
                     }
                     x={d => xPos(d)}
-                    y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
+                    y={d =>
+                      seriesAxis === 'Right'
+                        ? yScaleRight(getYAxisData(d, seriesKey))
+                        : yScale(Number(getYAxisData(d, seriesKey)))
+                    }
                     stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
                     strokeWidth={seriesData[0].weight || 2}
                     strokeOpacity={1}
@@ -231,11 +286,21 @@ const LineChart = (props: LineChartProps) => {
                   <circle
                     key={i}
                     cx={xPos(item.data)}
-                    cy={seriesAxis === 'Right' ? yScaleRight(getYAxisData(item.data, seriesKey)) : yScale(Number(getYAxisData(item.data, seriesKey)))}
+                    cy={
+                      seriesAxis === 'Right'
+                        ? yScaleRight(getYAxisData(item.data, seriesKey))
+                        : yScale(Number(getYAxisData(item.data, seriesKey)))
+                    }
                     r={item.size}
                     strokeWidth={seriesData[0].weight || 2}
                     stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'}
-                    fill={item.isFilled ? (colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000') : '#fff'}
+                    fill={
+                      item.isFilled
+                        ? colorScale
+                          ? colorScale(config.runtime.seriesLabels[seriesKey])
+                          : '#000'
+                        : '#fff'
+                    }
                   />
                 )
               })}
@@ -247,7 +312,11 @@ const LineChart = (props: LineChartProps) => {
                   curve={allCurves[seriesData[0].lineType]}
                   data={data}
                   x={d => xPos(d)}
-                  y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
+                  y={d =>
+                    seriesAxis === 'Right'
+                      ? yScaleRight(getYAxisData(d, seriesKey))
+                      : yScale(Number(getYAxisData(d, seriesKey)))
+                  }
                   stroke='#fff'
                   strokeWidth={3}
                   strokeOpacity={1}
@@ -272,7 +341,16 @@ const LineChart = (props: LineChartProps) => {
                     return <></>
                   }
                   return (
-                    <text x={xPos(lastDatum) + 5} y={yScale(getYAxisData(lastDatum, seriesKey))} alignmentBaseline='middle' fill={config.colorMatchLineSeriesLabels && colorScale ? colorScale(config.runtime.seriesLabels[seriesKey] || seriesKey) : 'black'}>
+                    <text
+                      x={xPos(lastDatum) + 5}
+                      y={yScale(getYAxisData(lastDatum, seriesKey))}
+                      alignmentBaseline='middle'
+                      fill={
+                        config.colorMatchLineSeriesLabels && colorScale
+                          ? colorScale(config.runtime.seriesLabels[seriesKey] || seriesKey)
+                          : 'black'
+                      }
+                    >
                       {config.runtime.seriesLabels[seriesKey] || seriesKey}
                     </text>
                   )
@@ -287,7 +365,9 @@ const LineChart = (props: LineChartProps) => {
           </Text>
         )}
       </Group>
-      {config.visualizationType === 'Bump Chart' && <LineChartBumpCircle config={config} xScale={xScale} yScale={yScale} />}
+      {config.visualizationType === 'Bump Chart' && (
+        <LineChartBumpCircle config={config} xScale={xScale} yScale={yScale} />
+      )}
     </ErrorBoundary>
   )
 }

@@ -1,4 +1,5 @@
 {
+  "annotations": [],
   "general": {
     "statePicked": {
       "fipsCode": "32",
@@ -27,7 +28,10 @@
     "hideGeoColumnInTooltip": false,
     "hidePrimaryColumnInTooltip": false,
     "territoriesAlwaysShow": false,
-    "geoLabelOverride": ""
+    "geoLabelOverride": "",
+    "noStateFoundMessage": "Map Unavailable",
+    "annotationDropdownText": "Annotations",
+    "convertFipsCodes": true
   },
   "type": "map",
   "color": "pinkpurple",
@@ -44,7 +48,8 @@
       "prefix": "",
       "suffix": "",
       "name": "Value",
-      "label": ""
+      "label": "",
+      "roundToPlace": 0
     },
     "navigate": {
       "name": "Condition"
@@ -67,7 +72,13 @@
     "position": "side",
     "title": "Legend",
     "singleRow": false,
-    "showSpecialClassesLast": false
+    "showSpecialClassesLast": false,
+    "verticalSorted": false,
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "singleColumnLegend": false,
+    "hideBorder": false
   },
   "filters": [],
   "table": {
@@ -80,8 +91,9 @@
     "showDataTableLink": true,
     "showFullGeoNameInCSV": false,
     "forceDisplay": true,
-    "download": false,
-    "indexLabel": ""
+    "download": true,
+    "indexLabel": "",
+    "wrapColumns": false
   },
   "tooltips": {
     "appearanceType": "hover",
@@ -96,9 +108,11 @@
     "minBubbleSize": 1,
     "maxBubbleSize": 20,
     "extraBubbleBorder": false,
-    "cityStyle": "pin",
-    "geoCodeCircleSize": 2,
-    "showBubbleZeros": false
+    "cityStyle": "circle",
+    "geoCodeCircleSize": "3",
+    "showBubbleZeros": false,
+    "cityStyleLabel": "",
+    "additionalCityStyles": []
   },
   "mapPosition": {
     "coordinates": [
@@ -108,7 +122,26 @@
     "zoom": 1
   },
   "map": {
-    "layers": []
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow Up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
   },
   "filterBehavior": "Filter Change",
   "dataTable": {
@@ -767,5 +800,6 @@
   "hasRegions": false,
   "expandDataTable": true,
   "fullBorder": false,
-  "validated": 4.23
+  "validated": 4.23,
+  "version": "4.24.9"
 }

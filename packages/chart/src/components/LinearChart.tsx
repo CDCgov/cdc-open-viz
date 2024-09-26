@@ -152,9 +152,15 @@ const LinearChart: React.FC<LinearChartProps> = props => {
   }
   const { min, max, leftMax, rightMax } = useMinMax(properties)
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
-  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush, xScaleAnnotation } = useScales(
-    { ...properties, min, max, leftMax, rightMax, dimensions, xMax: props.parentWidth - Number(config.yAxis.size) }
-  )
+  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleAnnotation } = useScales({
+    ...properties,
+    min,
+    max,
+    leftMax,
+    rightMax,
+    dimensions,
+    xMax: props.parentWidth - Number(config.yAxis.size)
+  })
 
   // sets the portal x/y for where tooltips should appear on the page.
   const [chartPosition, setChartPosition] = useState(null)
@@ -567,25 +573,6 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                           ) : (
                             ''
                           )}
-
-                          {orientation === 'horizontal' &&
-                            visualizationSubType !== 'stacked' &&
-                            config.yAxis.labelPlacement === 'On Date/Category Axis' &&
-                            !config.yAxis.hideLabel && (
-                              <Text
-                                transform={`translate(${tick.to.x - 5}, ${
-                                  config.isLollipopChart
-                                    ? tick.to.y - minY
-                                    : tick.to.y -
-                                      minY +
-                                      (Number(config.barHeight * config.runtime.series.length) - barMinHeight) / 2
-                                }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation || 0 : 0})`}
-                                verticalAnchor={'start'}
-                                textAnchor={'end'}
-                              >
-                                {tick.formattedValue}
-                              </Text>
-                            )}
 
                           {orientation === 'horizontal' &&
                             visualizationSubType !== 'stacked' &&

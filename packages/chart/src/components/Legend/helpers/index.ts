@@ -1,7 +1,6 @@
-export const getMarginTop = (isBottomOrSmallViewport, isBrushActive) => {
+export const getMarginTop = (isBottomOrSmallViewport, isBrushActive, legend) => {
   if (!isBottomOrSmallViewport) return '0px'
-  if (isBrushActive) return '35px'
-  return '15px'
+  if (isBrushActive && legend.position === 'bottom') return '35px'
 }
 
 export const getGradientConfig = (config, formatLabels, colorScale) => {
@@ -9,7 +8,23 @@ export const getGradientConfig = (config, formatLabels, colorScale) => {
 
   const formatted = formatLabels(defaultValue)
   const colors = config.legend.colorCode ? formatted.map(label => label?.value) : colorScale?.range() ?? []
-  const labels = config.legend.colorCode ? formatted.map(label => label?.text || label?.datum) : colorScale?.domain() ?? []
+  const labels = config.legend.colorCode
+    ? formatted.map(label => label?.text || label?.datum)
+    : colorScale?.domain() ?? []
 
   return { colors, labels }
+}
+
+export const getMarginBottom = (isBottomOrSmallViewport, config) => {
+  const isLegendTop = config.legend?.position === 'top' && !config.legend.hide
+
+  let marginBottom = '0px'
+  if (isLegendTop) {
+    marginBottom = config.legend.hideBorder.topBottom ? '15px' : '25px'
+  }
+  if (isBottomOrSmallViewport) {
+    marginBottom = '15px'
+  }
+
+  return marginBottom
 }

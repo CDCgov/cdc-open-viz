@@ -328,7 +328,7 @@ const DataTable = (props: DataTableProps) => {
       <ErrorBoundary component='DataTable'>
         <section
           id={tabbingId.replace('#', '')}
-          className={`data-table-container ${viewport}`}
+          className={`data-table-container ${viewport} w-100`}
           aria-label={accessibilityLabel}
         >
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
