@@ -2009,6 +2009,14 @@ const EditorPanel = () => {
                       <>
                         <CheckBox
                           display={!visHasCategoricalAxis()}
+                          value={config.dataFormat.onlyShowTopPrefixSuffix}
+                          section='dataFormat'
+                          fieldName='onlyShowTopPrefixSuffix'
+                          label='Only Show Top Prefix/Suffix'
+                          updateField={updateField}
+                        />
+                        <CheckBox
+                          display={!visHasCategoricalAxis()}
                           value={config.yAxis.hideAxis}
                           section='yAxis'
                           fieldName='hideAxis'
