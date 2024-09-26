@@ -1493,8 +1493,10 @@ const CdcMap = ({
     // add ability to rename state properties over time.
     const processedConfig = { ...coveUpdateWorker(newState) }
 
-    setState(processedConfig)
-    setLoading(false)
+    setTimeout(() => {
+      setState(processedConfig)
+      setLoading(false)
+    }, 10)
   }
 
   const init = async () => {
