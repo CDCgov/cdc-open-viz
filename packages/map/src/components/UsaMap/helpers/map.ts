@@ -1,4 +1,5 @@
-import { feature, mesh } from 'topojson-client'
+import { feature } from 'topojson-client'
+import usExtendedGeography from './../data/us-extended-geography.json'
 
 export const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -12,12 +13,16 @@ export const getTopoData = year => {
       } else {
         response = await response.json()
       }
-      let topoData = {}
 
-      topoData.year = year || 'default'
-      topoData.fulljson = response
-      topoData.counties = feature(response, response.objects.counties).features
-      topoData.states = feature(response, response.objects.states).features
+      const counties = [response, usExtendedGeography].flatMap(topo => feature(topo, topo.objects.counties).features)
+      const states = [response, usExtendedGeography].flatMap(topo => feature(topo, topo.objects.states).features)
+
+      const topoData = {
+        year: year || 'default',
+        fulljson: response,
+        counties,
+        states
+      }
 
       resolve(topoData)
     }

@@ -152,9 +152,15 @@ const LinearChart: React.FC<LinearChartProps> = props => {
   }
   const { min, max, leftMax, rightMax } = useMinMax(properties)
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
-  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush, xScaleAnnotation } = useScales(
-    { ...properties, min, max, leftMax, rightMax, dimensions, xMax: props.parentWidth - Number(config.yAxis.size) }
-  )
+  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleAnnotation } = useScales({
+    ...properties,
+    min,
+    max,
+    leftMax,
+    rightMax,
+    dimensions,
+    xMax: props.parentWidth - Number(config.yAxis.size)
+  })
 
   // sets the portal x/y for where tooltips should appear on the page.
   const [chartPosition, setChartPosition] = useState(null)
@@ -559,30 +565,11 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                               display={(isLogarithmicAxis && showTicks).toString()}
                               from={{ x: tick.from.x + xMax, y: tick.from.y }}
                               to={tick.from}
-                              stroke='rgba(0,0,0,0.3)'
+                              stroke='#d6d6d6'
                             />
                           ) : (
                             ''
                           )}
-
-                          {orientation === 'horizontal' &&
-                            visualizationSubType !== 'stacked' &&
-                            config.yAxis.labelPlacement === 'On Date/Category Axis' &&
-                            !config.yAxis.hideLabel && (
-                              <Text
-                                transform={`translate(${tick.to.x - 5}, ${
-                                  config.isLollipopChart
-                                    ? tick.to.y - minY
-                                    : tick.to.y -
-                                      minY +
-                                      (Number(config.barHeight * config.runtime.series.length) - barMinHeight) / 2
-                                }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation || 0 : 0})`}
-                                verticalAnchor={'start'}
-                                textAnchor={'end'}
-                              >
-                                {tick.formattedValue}
-                              </Text>
-                            )}
 
                           {orientation === 'horizontal' &&
                             visualizationSubType !== 'stacked' &&
@@ -784,11 +771,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                           )}
 
                           {runtime.yAxis.rightGridLines ? (
-                            <Line
-                              from={{ x: tick.from.x + xMax, y: tick.from.y }}
-                              to={tick.from}
-                              stroke='rgba(0,0,0,0.3)'
-                            />
+                            <Line from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='#d6d6d6' />
                           ) : (
                             ''
                           )}
@@ -1276,7 +1259,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
           {config.filters && config.filters.values.length === 0 && data.length === 0 && (
             <Text
               x={Number(config.yAxis.size) + Number(xMax / 2)}
-              y={height / 2 - config.xAxis.padding / 2}
+              y={height / 2 - (config.xAxis.padding || 0) / 2}
               textAnchor='middle'
             >
               {config.chartMessage.noData}

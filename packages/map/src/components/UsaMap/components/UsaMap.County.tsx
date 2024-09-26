@@ -11,6 +11,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
+import Annotation from '../../Annotation'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -134,8 +135,6 @@ const CountyMap = props => {
       container,
       setState
   } = useContext(ConfigContext)
-
-  console.log('position updated', state.mapPosition.zoom)
 
   // CREATE STATE LINES
   const projection = geoAlbersUsaTerritories()
@@ -266,7 +265,6 @@ const CountyMap = props => {
       // Redraw with focus on state
       setFocus({ id: clickedState.id, index: focusIndex, center: geoCentroid(clickedState), feature: clickedState })
     }
-
     if (state.general.type === 'us-geocode') {
       const geoRadius = (state.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
       let clickedGeo
@@ -305,7 +303,7 @@ const CountyMap = props => {
     let pointCoordinates = topoData.projection.invert([x, y])
 
     const currentTooltipIndex = parseInt(tooltipRef.current.getAttribute('data-index'))
-    const geoRadius = (state.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
+    const geoRadius = (state.visual.geoCodeCircleSize || 5) * 1
 
     const context = canvas.getContext('2d')
     const path = geoPath(topoData.projection, context)
@@ -398,8 +396,9 @@ const CountyMap = props => {
           data[runtimeKeys[i]][state.columns.longitude.name],
           data[runtimeKeys[i]][state.columns.latitude.name]
         ])
+        let includedShapes = ['circle', 'diamond', 'star', 'triangle', 'square'].includes(state.visual.cityStyle)
         if (
-          state.visual.cityStyle === 'circle' &&
+          includedShapes &&
           pixelCoords &&
           Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius &&
           applyLegendToRow(data[runtimeKeys[i]])
@@ -551,9 +550,7 @@ const CountyMap = props => {
       }
 
       const drawCircle = (circle, context) => {
-        const percentOfOriginalSize = 0.75
-        const adjustedGeoRadius =
-          state.mapPosition.zoom > 1 ? Number(circle.geoRadius) * percentOfOriginalSize : circle.geoRadius
+        const adjustedGeoRadius = Number(circle.geoRadius)
         context.lineWidth = lineWidth
         context.fillStyle = circle.color
         context.beginPath()
@@ -564,28 +561,23 @@ const CountyMap = props => {
 
       if (state.general.type === 'us-geocode') {
         context.strokeStyle = 'black'
-        const geoRadius = (state.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
+        const geoRadius = state.visual.geoCodeCircleSize || 5
 
         runtimeKeys.forEach(key => {
+          const citiesList = new Set(cityStyles.map(item => item.value))
+
           const pixelCoords = topoData.projection([
             data[key][state.columns.longitude.name],
             data[key][state.columns.latitude.name]
           ])
-
-          if (pixelCoords) {
+          if (pixelCoords && !citiesList.has(key)) {
             const legendValues = data[key] !== undefined ? applyLegendToRow(data[key]) : false
-            if (legendValues && state.visual.cityStyle === 'circle') {
-              const circle = {
-                x: pixelCoords[0],
-                y: pixelCoords[1],
-                color: legendValues[0],
-                geoRadius: geoRadius
+            if (legendValues) {
+              const shapeType = state.visual.cityStyle.toLowerCase()
+              const shapeProperties = createShapeProperties(shapeType, pixelCoords, legendValues, state, geoRadius)
+              if (shapeProperties) {
+                drawShape(shapeProperties, context, state, lineWidth)
               }
-              drawCircle(circle, context)
-            }
-            if (legendValues && state.visual.cityStyle === 'pin') {
-              const pin = { x: pixelCoords[0], y: pixelCoords[1], color: legendValues[0] }
-              drawPin(pin, context)
             }
           }
         })
@@ -606,6 +598,7 @@ const CountyMap = props => {
         onClick={canvasClick}
         className='county-map-canvas'
       ></canvas>
+
       <button className={`btn btn--reset`} onClick={onReset} ref={resetButton} tabIndex='0'>
         Reset Zoom
       </button>
