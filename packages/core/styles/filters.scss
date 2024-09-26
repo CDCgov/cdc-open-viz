@@ -28,6 +28,10 @@ section.filters-section {
   border-radius: 10px;
   margin-bottom: 10px;
   display: block !important;
+
+  &.legend_visible_top {
+    margin-bottom: 0px;
+  }
 }
 
 div.single-filters {

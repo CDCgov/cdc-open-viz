@@ -77,17 +77,6 @@ const SingleStateMap = props => {
   const checkForNoData = () => {
     // If no statePicked, return true
     if (!state.general.statePicked.fipsCode) return true
-    // if statePicked for District of Columbia, Guam, Puerto Rico, Virgin Islands, American Samoa, Northern Mariana Islands
-    if (
-      state.general.statePicked.fipsCode === '11' || // District of Columbia
-      state.general.statePicked.fipsCode === '66' || // Guam
-      state.general.statePicked.fipsCode === '72' || // Puerto Rico
-      state.general.statePicked.fipsCode === '78' || // Virgin Islands
-      state.general.statePicked.fipsCode === '60' || // American Samoa
-      state.general.statePicked.fipsCode === '69' // Northern Mariana Islands
-    ) {
-      return true
-    }
   }
 
   // Constructs and displays markup for all geos on the map (except territories right now)

@@ -2,16 +2,25 @@ export type OrderBy = 'asc' | 'desc' | 'cust'
 
 export type FilterBase = {
   columnName: string
+  orderedValues?: string[]
   values: string[]
   showDropdown: boolean
   id: number
   parents: number[]
 }
 
+export type VizFilterStyle =
+  | 'tab'
+  | 'pill'
+  | 'tab bar'
+  | 'dropdown'
+  | 'dropdown bar'
+  | 'multi-select'
+  | 'nested-dropdown'
 export type GeneralFilter = FilterBase & {
   active: string
   queuedActive: string
-  filterStyle: 'tab' | 'pill' | 'tab bar' | 'dropdown' | 'dropdown bar' | 'multi-select' | 'nested-dropdown'
+  filterStyle: VizFilterStyle
   label: string
   order: OrderBy
   orderedValues?: string[] // should only exist if the order is 'cust'

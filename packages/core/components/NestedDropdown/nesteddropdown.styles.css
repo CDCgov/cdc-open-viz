@@ -1,3 +1,7 @@
+:has(> .nested-dropdown-container) {
+  z-index: 5;
+}
+
 .nested-dropdown {
   .nested-dropdown-group {
     list-style: none;

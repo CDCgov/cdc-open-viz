@@ -6,14 +6,13 @@ import DataTransform from '@cdc/core/helpers/DataTransform'
 import { useEffect, useMemo, useState } from 'react'
 import { SharedFilter } from '../../../../types/SharedFilter'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import { sortByOrderedValues } from '@cdc/core/helpers/sortByOrderedValues'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import MultiSelect from '@cdc/core/components/MultiSelect'
-import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/components/FilterOrder'
 import { DashboardConfig } from '../../../../types/DashboardConfig'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { hasDashboardApplyBehavior } from '../../../../helpers/hasDashboardApplyBehavior'
+import NestedDropDownDashboard from './NestedDropDownDashboard'
 
 type FilterEditorProps = {
   config: DashboardConfig
@@ -23,8 +22,8 @@ type FilterEditorProps = {
 
 const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilterProp }) => {
   const [columns, setColumns] = useState<string[]>([])
-  const [columnValues, setColumnValues] = useState<string[]>([])
   const transform = new DataTransform()
+  const filterStyles = ['dropdown', 'multiselect', 'nested-dropdown']
 
   const parentFilters: string[] = (config.dashboard.sharedFilters || [])
     .filter(({ key, type }) => key !== filter.key && type !== 'datafilter')
@@ -60,8 +59,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
     return [nameLookup, [...vizOptions, ...rowsNotSelected]]
   }, [config.visualizations, filter.usedBy, filter.setBy, vizRowColumnLocator])
 
-
-  const iterateDatasets = async (callback: Function) => {
+  const loadColumnData = async () => {
+    const columns = {}
     const dataKeys = Object.keys(config.datasets)
 
     for (let i = 0; i < dataKeys.length; i++) {
@@ -80,54 +79,20 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
       }
 
       if (_dataSet.data) {
-        callback(_dataSet.data)
+        _dataSet.data.forEach(row => {
+          Object.keys(row).forEach(columnName => {
+            columns[columnName] = true
+          })
+        })
       }
     }
-  }
-
-  const loadValuesforColumn = async () => {
-    let values = []
-
-    await iterateDatasets(dataset => {
-      values = values.concat(_.uniq(dataset.map(row => row[filter.columnName])))
-    })
-
-    sortByOrderedValues(values, filter)
-    setColumnValues(values)
-  }
-
-  const loadColumnData = async () => {
-    const columns = {}
-
-    await iterateDatasets(dataset => {
-      dataset.forEach(row => {
-        Object.keys(row).forEach(columnName => {
-          columns[columnName] = true
-        })
-      })
-    })
 
     setColumns(Object.keys(columns))
-  }
-
-  const handleFilterOrder = (sourceIndex, destinationIndex) => {
-    let orderedValues = [...columnValues]
-
-    let placeholder = orderedValues[sourceIndex]
-    orderedValues[sourceIndex] = orderedValues[destinationIndex]
-    orderedValues[destinationIndex] = placeholder
-    
-    updateFilterProp('orderedValues', orderedValues)
-    setColumnValues(orderedValues)
   }
 
   useEffect(() => {
     loadColumnData()
   }, [config.datasets])
-
-  useEffect(() => {
-    loadValuesforColumn()
-  }, [filter.columnName])
 
   const addFilterUsedBy = (filter, value) => {
     if (value === '') return
@@ -360,39 +325,84 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
       {filter.type === 'datafilter' && (
         <>
           <label>
-            <span className='edit-label column-heading'>Filter: </span>
+            <span className='edit-label column-heading'>Filter Style: </span>
             <select
-              value={filter.columnName}
+              value={filter.filterStyle}
               onChange={e => {
-                updateFilterProp('columnName', e.target.value)
+                updateFilterProp('filterStyle', e.target.value)
               }}
             >
               <option value=''>- Select Option -</option>
-              {columns.map(dataKey => (
-                <option value={dataKey} key={`filter-column-select-item-${dataKey}`}>
+              {filterStyles.map(dataKey => (
+                <option value={dataKey} key={`filter-style-select-item-${dataKey}`}>
                   {dataKey}
                 </option>
               ))}
             </select>
           </label>
-
-          <TextField
-            label='Label'
-            value={filter.key}
-            updateField={(_section, _subSection, _key, value) => updateFilterProp('key', value)}
-          />
-
-          <label>
-            <span className='edit-label column-heading'>Show Dropdown</span>
-            <input
-              type='checkbox'
-              defaultChecked={filter.showDropdown === true}
-              onChange={e => {
-                updateFilterProp('showDropdown', !filter.showDropdown)
-              }}
+          {filter.filterStyle === 'multi-select' && (
+            <TextField
+              label='Select Limit'
+              value={filter.selectLimit}
+              updateField={(_section, _subSection, _field, value) => updateFilterProp('selectLimit', value)}
+              type='number'
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>The maximum number of items that can be selected.</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
             />
-          </label>
+          )}
+          {filter.filterStyle !== 'nested-dropdown' ? (
+            <>
+              <label>
+                <span className='edit-label column-heading'>Filter: </span>
+                <select
+                  value={filter.columnName}
+                  onChange={e => {
+                    updateFilterProp('columnName', e.target.value)
+                  }}
+                >
+                  <option value=''>- Select Option -</option>
+                  {columns.map(dataKey => (
+                    <option value={dataKey} key={`filter-column-select-item-${dataKey}`}>
+                      {dataKey}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
+              <TextField
+                label='Label'
+                value={filter.key}
+                updateField={(_section, _subSection, _key, value) => updateFilterProp('key', value)}
+              />
+
+              <label>
+                <span className='edit-label column-heading'>Show Dropdown</span>
+                <input
+                  type='checkbox'
+                  defaultChecked={filter.showDropdown === true}
+                  onChange={e => {
+                    updateFilterProp('showDropdown', !filter.showDropdown)
+                  }}
+                />
+              </label>
+            </>
+          ) : (
+            <NestedDropDownDashboard
+              filter={filter}
+              updateFilterProp={(name, value) => {
+                updateFilterProp(name, value)
+              }}
+              config={config}
+            />
+          )}
           <label>
             <span className='edit-label column-heading'>Set By: </span>
             <select value={filter.setBy} onChange={e => updateFilterProp('setBy', e.target.value)}>
@@ -465,11 +475,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
             value={filter.setByQueryParameter || ''}
             updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)}
           />
-
-          {filter.columnName && columnValues && <FilterOrder filterIndex={0} filter={{...filter, values: columnValues}} updateFilterProp={(prop, index, value) => updateFilterProp(prop, value)} handleFilterOrder={handleFilterOrder} />}
         </>
       )}
-
       <label>
         <span className='mr-1'>Multi Select</span>
         <input

@@ -541,6 +541,15 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           }
         })
         break
+      case 'toggleDownloadLinkBelow':
+        setState({
+          ...state,
+          table: {
+            ...state.table,
+            showDownloadLinkBelow: !state.table.showDownloadLinkBelow
+          }
+        })
+        break
       case 'toggleDownloadPdfButton':
         setState({
           ...state,
@@ -1736,7 +1745,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       type='radio'
                       name='equalnumber'
                       value='equalnumber'
-                      checked={state.legend.type === 'equalnumber'}
+                      checked={state.legend.type === 'equalnumber' || state.legend.type === 'equalinterval'}
                       onChange={e => handleEditorChanges('classificationType', e.target.value)}
                     />
                     Numeric/Quantitative
@@ -3084,6 +3093,16 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   />
                   <span className='edit-label'>Enable Image Download</span>
                 </label>
+                <label className='checkbox'>
+                  <input
+                    type='checkbox'
+                    checked={state.table.showDownloadLinkBelow}
+                    onChange={event => {
+                      handleEditorChanges('toggleDownloadLinkBelow', event.target.checked)
+                    }}
+                  />
+                  <span className='edit-label'>Show Download Link Below Table</span>
+                </label>
                 {/* <label className='checkbox'>
                       <input
                         type='checkbox'
@@ -3370,14 +3389,10 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     >
                       <option value='circle'>Circle</option>
                       <option value='pin'>Pin</option>
-                      {'us-geocode' !== state.general.type && (
-                        <>
-                          <option value='square'>Square</option>
-                          <option value='triangle'>Triangle</option>
-                          <option value='diamond'>Diamond</option>
-                          <option value='star'>Star</option>
-                        </>
-                      )}
+                      <option value='square'>Square</option>
+                      <option value='triangle'>Triangle</option>
+                      <option value='diamond'>Diamond</option>
+                      <option value='star'>Star</option>
                     </select>
                   </label>
                   <TextField
@@ -3461,11 +3476,10 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       </div>
                     )
                   })}
-                {'us-geocode' !== state.general.type && (
-                  <button type='button' onClick={() => editCityStyles('add', 0, '', '')} className='btn full-width'>
-                    Add city style
-                  </button>
-                )}
+
+                <button type='button' onClick={() => editCityStyles('add', 0, '', '')} className='btn full-width'>
+                  Add city style
+                </button>
               </>
               <label htmlFor='opacity'>
                 <TextField

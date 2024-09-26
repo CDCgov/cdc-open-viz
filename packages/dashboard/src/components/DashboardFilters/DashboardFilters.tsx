@@ -1,7 +1,6 @@
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { SharedFilter } from '../../types/SharedFilter'
 import { APIFilterDropdowns } from './DashboardFiltersWrapper'
-import { sortByOrderedValues } from '@cdc/core/helpers/sortByOrderedValues'
 
 type DashboardFilterProps = {
   show: number[]
@@ -28,7 +27,11 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
   return (
     <>
       {sharedFilters.map((filter, filterIndex) => {
-        if (filter.showDropdown === false || (show && !show.includes(filterIndex))) return <></>
+        if (
+          (filter.type !== 'urlfilter' && !filter.showDropdown && filter.filterStyle !== 'nested-dropdown') ||
+          (show && !show.includes(filterIndex))
+        )
+          return <></>
         const values: JSX.Element[] = []
         const multiValues = []
         if (filter.resetLabel) {
@@ -51,9 +54,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           })
         } else {
           // Data Filter
-          const orderedValues = filter.values || []
-          sortByOrderedValues(orderedValues, filter)
-          orderedValues.forEach((filterOption, index) => {
+          filter.values?.forEach((filterOption, index) => {
             const labeledOpt = filter.labels && filter.labels[filterOption]
             values.push(
               <option key={`${filter.key}-option-${index}`} value={filterOption}>
@@ -64,7 +65,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           })
         }
 
-        return filter.multiSelect ? (
+        return filter.filterStyle === 'multi-select' ? (
           <MultiSelect
             key={`${filter.key}-filtersection-${filterIndex}`}
             label={filter.key}
@@ -73,6 +74,14 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
             updateField={updateField}
             selected={filter.active as string[]}
             limit={filter.selectLimit || 5}
+          />
+        ) : filter.filterStyle === 'nested-dropdown' ? (
+          <NestedDropdown
+            key={`${filter.key}-filtersection-${filterIndex}`}
+            currentFilter={filter}
+            filterIndex={filterIndex}
+            listLabel={filter.key}
+            handleSelectedItems={value => updateField(null, null, filterIndex, value)}
           />
         ) : (
           <div className='cove-dashboard-filters' key={`${filter.key}-filtersection-${filterIndex}`}>

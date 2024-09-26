@@ -1,7 +1,4 @@
-import { Legend } from './../../types/Legend'
 import _ from 'lodash'
-import { AnyVisualization } from '../../types/Visualization'
-import { VizFilter } from '../../types/VizFilter'
 import { AnyVisualization } from '../../types/Visualization'
 import { VizFilter } from '../../types/VizFilter'
 import versionNeedsUpdate from './versionNeedsUpdate'

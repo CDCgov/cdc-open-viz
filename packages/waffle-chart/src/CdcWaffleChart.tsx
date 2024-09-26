@@ -382,7 +382,7 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
 
     response.data = responseData
 
-    const processedConfig = { ...(await coveUpdateWorker(response)) }
+    const processedConfig = { ...coveUpdateWorker(response) }
     updateConfig({ ...defaults, ...processedConfig })
     dispatch({ type: 'SET_LOADING', payload: false })
   }, [])
@@ -417,21 +417,12 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
     }
   }, [config, container])
 
-  //Reload config if config object provided/updated
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    // eslint-disable-next-line no-console
-    loadConfig().catch(err => console.log(err))
-  }, [])
-
-  //Reload config if parent passes different config
-  if (configObj) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-      if (!configObj.dataUrl) {
-        updateConfig({ ...defaults, ...configObj })
-      }
-    }, [configObj.data])
-  }
+    if (!configObj.dataUrl) {
+      updateConfig({ ...defaults, ...configObj })
+    }
+  }, [configObj?.data])
 
   let content = <Loading />
 

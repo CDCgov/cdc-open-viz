@@ -101,7 +101,10 @@
         list-style: none;
         padding-top: 1em;
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
+        @include breakpoint(md) {
+          grid-template-columns: 1fr 1fr;
+        }
 
         button {
           font-size: unset;
@@ -129,8 +132,11 @@
           transition: 0.1s opacity;
           display: flex;
           cursor: pointer;
-          white-space: nowrap;
+          white-space: wrap;
           flex-grow: 1;
+          @include breakpoint(md) {
+            white-space: nowrap;
+          }
 
           &.legend-container__li--disabled {
             opacity: 0.4;
@@ -149,11 +155,14 @@
         & > li {
           margin-right: 1em;
           margin-bottom: 1em;
-          white-space: nowrap;
+          white-space: wrap;
           display: flex;
           justify-content: center;
           align-items: center;
           vertical-align: middle;
+          @include breakpoint(md) {
+            white-space: nowrap;
+          }
 
           & svg {
             vertical-align: baseline;

@@ -22,7 +22,10 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
 
     if (filter) {
       Object.keys(columns).forEach(key => {
-        if ((config.series && config.series.filter(series => series.dataKey === key).length > 0) || (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key))) {
+        if (
+          (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
+          (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key))
+        ) {
           delete columns[key]
         }
       })
@@ -45,7 +48,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   }
 
   const handleAddAnnotation = () => {
-    const svgContainer = document.querySelector('.chart-container > div > svg')?.getBoundingClientRect()
+    const svgContainer = document.querySelector('.chart-container svg')?.getBoundingClientRect()
     const newSvgDims = [svgContainer.width, svgContainer.height]
 
     const newAnnotation = {
@@ -77,7 +80,12 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
       seriesKey: '',
       x: 50,
       y: Number(newSvgDims?.[1] / 2),
-      xKey: config.xAxis.type === 'date' ? new Date(config?.data?.[0]?.[config.xAxis.dataKey]).getTime() : config.xAxis.type === 'categorical' ? '1/15/2016' : '',
+      xKey:
+        config.xAxis.type === 'date'
+          ? new Date(config?.data?.[0]?.[config.xAxis.dataKey]).getTime()
+          : config.xAxis.type === 'categorical'
+          ? '1/15/2016'
+          : '',
       yKey: '',
       dx: 20,
       dy: -20,
@@ -144,11 +152,17 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         {config?.annotations &&
           config?.annotations.map((annotation, index) => (
             <Accordion key={index}>
-              <Accordion.Section title={annotation.text ? annotation.text.substring(0, 15) + '...' : `Annotation ${index + 1}`}>
+              <Accordion.Section
+                title={annotation.text ? annotation.text.substring(0, 15) + '...' : `Annotation ${index + 1}`}
+              >
                 <div className='annotation-group'>
                   <label>
                     Annotation Text:
-                    <textarea rows={5} value={annotation.text} onChange={e => handleAnnotationUpdate(e.target.value, 'text', index)} />
+                    <textarea
+                      rows={5}
+                      value={annotation.text}
+                      onChange={e => handleAnnotationUpdate(e.target.value, 'text', index)}
+                    />
                   </label>
                   <label>
                     Opacity

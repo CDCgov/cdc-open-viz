@@ -110,7 +110,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
     response.data = responseData
 
-    const processedConfig = { ...(await coveUpdateWorker(response)) }
+    const processedConfig = { ...coveUpdateWorker(response) }
 
     updateConfig({ ...defaults, ...processedConfig })
     dispatch({ type: 'SET_LOADING', payload: false })

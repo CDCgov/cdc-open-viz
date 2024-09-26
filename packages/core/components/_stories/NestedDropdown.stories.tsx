@@ -1,58 +1,34 @@
 import { Meta, StoryObj } from '@storybook/react'
-
 import NestedDropdown from '../NestedDropdown'
+import nestedDropdownStory from './_mocks/nested-dropdown.json'
+import { useState } from 'react'
 
 const meta: Meta<typeof NestedDropdown> = {
   title: 'Components/Molecules/NestedDropdown',
   component: NestedDropdown
 }
 
+const Template = args => {
+  const [currentStoryFilter, setCurrentStoryFilter] = useState({
+    ...nestedDropdownStory
+  })
+  return (
+    <NestedDropdown
+      listLabel='Age'
+      handleSelectedItems={([group, subGroup]) => {
+        setCurrentStoryFilter({
+          ...currentStoryFilter,
+          active: group,
+          subGrouping: { ...currentStoryFilter.subGrouping, active: subGroup }
+        })
+      }}
+      currentFilter={currentStoryFilter}
+    />
+  )
+}
+
 type Story = StoryObj<typeof NestedDropdown>
 
-export const Primary: Story = {
-  args: {
-    data: [
-      {
-        country: 'USA',
-        region: 'Region1'
-      },
-      {
-        country: 'USA',
-        region: 'Florida'
-      },
-      {
-        country: 'USA',
-        region: 'Iowa'
-      },
-      {
-        country: 'Country2',
-        region: 'Region1'
-      },
-      {
-        country: 'Country2',
-        region: 'Region2'
-      },
-      {
-        country: 'Country2',
-        region: 'Region3'
-      },
-      {
-        country: 'Italy',
-        region: 'Region1'
-      },
-      {
-        country: 'Italy',
-        region: 'Naples'
-      },
-      {
-        country: 'Italy',
-        region: 'Region3'
-      }
-    ],
-    tiers: ['country', 'region'],
-    listLabel: 'Countries of the World',
-    handleSelectedItems: console.log
-  }
-}
+export const Primary: Story = Template.bind({})
 
 export default meta
