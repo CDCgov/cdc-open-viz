@@ -1,7 +1,6 @@
 import { setAutoLoadDefaultValue, getToFetch, getFilterValues, getLoadingFilterMemo } from '../apiFilterHelpers'
 import _ from 'lodash'
 import type { APIFilterDropdowns } from '../../components/DashboardFilters'
-import type { SharedFilter } from '../../types/SharedFilter'
 
 describe('getLoadingFilterMemo', () => {
   it('should return correct APIFilterDropdowns for valid inputs', () => {
