@@ -199,7 +199,9 @@ export const useTooltip = props => {
             ?.flatMap(seriesKey => {
               const value = resolvedScaleValues[0]?.[seriesKey]
               const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
-              return [[seriesKey, formattedValue, getAxisPosition(seriesKey)]]
+              return config.general.hideNullValue && !value
+                ? []
+                : [[seriesKey, formattedValue, getAxisPosition(seriesKey)]]
             })
         )
       }
