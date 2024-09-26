@@ -110,12 +110,14 @@ export default function CdcChart({
     isBrushing: false
   })
 
+  let [width] = dimensions
   const useVertical = config.orientation === 'vertical'
   const useMobileVertical = config.heights?.mobileVertical && isMobileHeightViewport(currentViewport)
   const responsiveVertical = useMobileVertical ? 'mobileVertical' : 'vertical'
   const renderedOrientation = useVertical ? responsiveVertical : 'horizontal'
   let height = config.aspectRatio ? width * config.aspectRatio : config?.heights?.[renderedOrientation]
-  height = height + Number(config?.xAxis?.size)
+  if (config.visualizationType === 'Pie') height = config?.heights?.[renderedOrientation]
+  height = height + Number(config?.xAxis?.size) + 45
 
   type Config = typeof config
   let legendMemo = useRef(new Map()) // map collection
@@ -301,7 +303,7 @@ export default function CdcChart({
       newConfig.data = data
     }
 
-    const processedConfig = { ...(await coveUpdateWorker(newConfig)) }
+    const processedConfig = { ...coveUpdateWorker(newConfig) }
 
     updateConfig(processedConfig, data)
   }
@@ -369,7 +371,7 @@ export default function CdcChart({
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
 
-        const includes = (arr: any[], val: any): boolean => arr.map(val => String(val)).includes(String(val))
+        const includes = (arr: any[], val: any): boolean => (arr || []).map(val => String(val)).includes(String(val))
         newConfig.filters[index].active =
           !newConfig.filters[index].active || !includes(filterValues, newConfig.filters[index].active)
             ? filterValues[0]
@@ -1292,6 +1294,14 @@ export default function CdcChart({
                 classes={['chart-title', `${config.theme}`, 'cove-component__header']}
                 style={undefined}
               />
+              {/* Intro Text/Message */}
+              {config?.introText && config.visualizationType !== 'Spark Line' && (
+                <section
+                  className={`introText legend_${config.legend.hide ? 'hidden' : 'visible'}_${config.legend.position} `}
+                >
+                  {parse(config.introText)}
+                </section>
+              )}
 
               {/* Filters */}
               {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
@@ -1326,11 +1336,6 @@ export default function CdcChart({
                         : 'w-75'
                     }
                   >
-                    {/* Intro Text/Message */}
-                    {config?.introText && config.visualizationType !== 'Spark Line' && (
-                      <section className='introText'>{parse(config.introText)}</section>
-                    )}
-
                     {/* All charts with LinearChart */}
                     {!['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
                       <div style={{ height, width: `100%` }}>
@@ -1341,7 +1346,7 @@ export default function CdcChart({
                     )}
 
                     {config.visualizationType === 'Pie' && (
-                      <ParentSize className='justify-content-center d-flex'>
+                      <ParentSize className='justify-content-center d-flex' style={{ height, width: `100%` }}>
                         {parent => <PieChart parentWidth={parent.width} parentHeight={parent.height} />}
                       </ParentSize>
                     )}

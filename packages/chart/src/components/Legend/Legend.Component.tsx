@@ -6,7 +6,7 @@ import useLegendClasses from '../../hooks/useLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import { handleLineType } from '../../helpers/handleLineType'
 
-import { getMarginTop, getGradientConfig } from './helpers/index'
+import { getMarginTop, getGradientConfig, getMarginBottom } from './helpers/index'
 import { Line } from '@visx/shape'
 import { Label } from '../../types/Label'
 import { ChartConfig } from '../../types/ChartConfig'
@@ -52,17 +52,15 @@ const Legend: React.FC<LegendProps> = forwardRef(
     const { runtime, legend } = config
 
     const isBottomOrSmallViewport =
-      legend?.position === 'bottom' ||
-      legend?.position === 'top' ||
-      (isLegendWrapViewport(currentViewport) && !legend.hide)
+      legend?.position === 'bottom' || (isLegendWrapViewport(currentViewport) && !legend.hide)
 
     const legendClasses = {
-      marginBottom: (isBottomOrSmallViewport && (legend.hideSuppressionLink ? '15px' : '45px')) || '0px',
+      marginBottom: getMarginBottom(isBottomOrSmallViewport, config),
 
       marginTop:
         isBottomOrSmallViewport && config.orientation === 'horizontal'
           ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px`
-          : getMarginTop(isBottomOrSmallViewport, config.brush.active)
+          : getMarginTop(isBottomOrSmallViewport, config.brush.active, legend)
     }
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
