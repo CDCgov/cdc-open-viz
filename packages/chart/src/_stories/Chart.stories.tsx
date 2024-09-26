@@ -5,6 +5,7 @@ import Chart from '../CdcChart'
 import lineChartTwoPointsRegressionTest from './_mock/line_chart_two_points_regression_test.json'
 import lineChartTwoPointsNewChart from './_mock/line_chart_two_points_new_chart.json'
 import lollipop from './_mock/lollipop.json'
+import forestPlot from '../../examples/feature/forest-plot/forest-plot.json'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',
@@ -37,6 +38,12 @@ export const Suppression: Story = {
   args: {
     config: SuppressedConfig,
     isEditor: false
+  }
+}
+
+export const Forest_Plot: Story = {
+  args: {
+    config: forestPlot
   }
 }
 
