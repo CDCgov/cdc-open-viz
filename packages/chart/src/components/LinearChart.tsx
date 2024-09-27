@@ -308,7 +308,8 @@ const LinearChart: React.FC<LinearChartProps> = props => {
 
   useEffect(() => {
     const textElement = document.querySelector(`#suffix`)
-    if (!textElement) return
+    if (!textElement && !suffixWidth) return
+    if (!textElement) return setSuffixWidth(0)
     const textWidth = textElement.getBBox().width
     setSuffixWidth(textWidth)
   }, [config.dataFormat.suffix, config.dataFormat.onlyShowTopPrefixSuffix])
