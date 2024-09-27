@@ -37,6 +37,7 @@ import useTopAxis from '../hooks/useTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
+import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 
 type LinearChartProps = {
   parentWidth: number
@@ -1087,7 +1088,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                                 {/* SPECIAL ONE CHAR CASE: a one character top-only suffix does not overflow */}
                                 {/* IF VALUES ON LINE: suffix is combined with value to avoid having to calculate varying (now left-aligned) value widths */}
                                 {onlyShowTopPrefixSuffix && lastTick && !labelsOnGridlines && (
-                                  <Text
+                                  <BlurStrokeText
                                     id='suffix'
                                     display={isLogarithmicAxis ? showTicks : 'block'}
                                     dx={isLogarithmicAxis ? -6 : 0}
@@ -1098,17 +1099,16 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                                     textAnchor={suffixOneChar ? 'end' : 'start'}
                                     fill={config.yAxis.tickLabelColor}
                                     stroke={'#fff'}
-                                    strokeWidth={6}
                                     paintOrder={'stroke'} // keeps stroke under fill
                                     strokeLinejoin='round'
                                     style={{ whiteSpace: 'pre-wrap' }} // prevents leading spaces from being trimmed
                                   >
                                     {suffix}
-                                  </Text>
+                                  </BlurStrokeText>
                                 )}
 
                                 {/* VALUE */}
-                                <Text
+                                <BlurStrokeText
                                   display={isLogarithmicAxis ? showTicks : 'block'}
                                   dx={isLogarithmicAxis ? -6 : 0}
                                   x={suffixOneChar ? labelX - suffixWidth : labelX}
@@ -1117,14 +1117,14 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                                   verticalAnchor={config.runtime.horizontal ? 'start' : labelVerticalAnchor}
                                   textAnchor={config.runtime.horizontal || labelsOnGridlines ? 'start' : 'end'}
                                   fill={config.yAxis.tickLabelColor}
-                                  stroke={labelsOnGridlines ? '#fff' : 'none'}
+                                  stroke={'#fff'}
+                                  disableStroke={!labelsOnGridlines}
                                   strokeLinejoin='round'
-                                  strokeWidth={6}
                                   paintOrder={'stroke'} // keeps stroke under fill
                                   style={{ whiteSpace: 'pre-wrap' }} // prevents leading spaces from being trimmed
                                 >
                                   {`${tick.formattedValue}${combineDomSuffixWithValue ? suffix : ''}`}
-                                </Text>
+                                </BlurStrokeText>
                               </>
                             )}
                         </Group>
