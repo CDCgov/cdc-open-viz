@@ -487,7 +487,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                 <Group>
                   <Text
                     x={xMax / 2}
-                    y={axisMaxHeight + (isLegendWrapViewport(currentViewport) ? 10 : 20) + xLabelOffset}
+                    y={axisMaxHeight + xLabelOffset}
                     stroke='#333'
                     textAnchor={'middle'}
                     verticalAnchor='start'
@@ -498,10 +498,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                 {svgRef.current
                   ? svgRef.current.setAttribute(
                       'height',
-                      Number(height) +
-                        Number(axisMaxHeight) +
-                        (runtime.xAxis.label ? (isLegendWrapViewport(currentViewport) ? 10 : 20) : 0) +
-                        'px'
+                      height + axisMaxHeight + xLabelOffset + (config.xAxis.label ? 15 : 0) + 'px'
                     )
                   : ''}
               </>
@@ -1373,7 +1370,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                     {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
                     <Text
                       x={axisCenter}
-                      y={axisMaxHeight + (isLegendWrapViewport(currentViewport) ? 10 : 20) + xLabelOffset}
+                      y={axisMaxHeight + xLabelOffset}
                       textAnchor='middle'
                       verticalAnchor='start'
                       fontWeight='bold'
@@ -1384,14 +1381,12 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                   </Group>
                 )
 
-                if (svgRef.current)
+                if (svgRef.current) {
                   svgRef.current.setAttribute(
                     'height',
-                    Number(height) +
-                      Number(axisMaxHeight) +
-                      (runtime.xAxis.label ? (isLegendWrapViewport(currentViewport) ? 10 : 20) : 0) +
-                      'px'
+                    height + axisMaxHeight + xLabelOffset + (config.xAxis.label ? 15 : 0) + 'px'
                   )
+                }
 
                 return axisContents
               }}
