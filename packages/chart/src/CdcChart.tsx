@@ -56,6 +56,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
+import { isLegendWrapViewport, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 
 import './scss/main.scss'
 // load both then config below determines which to use
@@ -1240,10 +1241,10 @@ export default function CdcChart({
   }
 
   const getChartWrapperClasses = () => {
-    const isLegendOnBottom = legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+    const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
     const classes = ['chart-container', 'p-relative']
     if (legend?.position) {
-      if (['sm', 'xs', 'xxs'].includes(currentViewport) && legend?.position !== 'top') {
+      if (isLegendWrapViewport(currentViewport) && legend?.position !== 'top') {
         classes.push('legend-bottom')
       } else {
         classes.push(`legend-${legend.position}`)
@@ -1260,7 +1261,7 @@ export default function CdcChart({
 
   const getChartSubTextClasses = () => {
     const classes = ['subtext ']
-    const isLegendOnBottom = legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+    const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
 
     if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
     if (config.brush?.active && !isLegendOnBottom) classes.push('subtext--brush-active ')
@@ -1331,7 +1332,7 @@ export default function CdcChart({
                 <LegendWrapper>
                   <div
                     className={
-                      legend.hide || ['xxs', 'xs', 'sm'].includes(currentViewport)
+                      legend.hide || isLegendWrapViewport(currentViewport)
                         ? 'w-100'
                         : legend.position === 'bottom' || legend.position === 'top' || visualizationType === 'Sankey'
                         ? 'w-100'
@@ -1513,7 +1514,7 @@ export default function CdcChart({
     highlightReset,
     imageId,
     isDashboard,
-    isLegendBottom: legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport),
+    isLegendBottom: legend?.position === 'bottom' || isLegendWrapViewport(currentViewport),
     isDebug,
     isDraggingAnnotation,
     handleDragStateChange,

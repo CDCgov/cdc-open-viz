@@ -15,6 +15,7 @@ import { forwardRef, useState } from 'react'
 import LegendSuppression from './Legend.Suppression'
 import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
+import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 
 export interface LegendProps {
   colorScale: ColorScale
@@ -53,7 +54,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
     const [hasSuppression, setHasSuppression] = useState(false)
 
     const isBottomOrSmallViewport =
-      legend?.position === 'bottom' || (['sm', 'xs', 'xxs'].includes(currentViewport) && !legend.hide)
+      legend?.position === 'bottom' || (isLegendWrapViewport(currentViewport) && !legend.hide)
 
     const legendClasses = {
       marginBottom: getMarginBottom(isBottomOrSmallViewport, config),

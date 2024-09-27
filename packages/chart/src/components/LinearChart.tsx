@@ -27,6 +27,7 @@ import CategoricalYAxis from './Axis/Categorical.Axis'
 
 // Helpers
 import { isConvertLineToBarGraph } from '../helpers/isConvertLineToBarGraph'
+import { isLegendWrapViewport, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 
 // Hooks
 import useMinMax from '../hooks/useMinMax'
@@ -79,7 +80,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
     config.legend &&
     !config.legend.hide &&
     !['bottom', 'top'].includes(config.legend?.position) &&
-    ['lg', 'md'].includes(currentViewport)
+    !isLegendWrapViewport(currentViewport)
   ) {
     width = width * 0.73
   }
@@ -93,7 +94,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
   const xAxisSize = isNaN(parseInt(runtime.xAxis.size)) ? 0 : parseInt(runtime.xAxis.size)
   const isForestPlot = visualizationType === 'Forest Plot'
   const useVertical = orientation === 'vertical' || isForestPlot
-  const useMobileVertical = mobileVertical && ['xs', 'xxs'].includes(currentViewport)
+  const useMobileVertical = mobileVertical && isMobileHeightViewport(currentViewport)
   const responsiveVertical = useMobileVertical ? 'mobileVertical' : 'vertical'
   const renderedOrientation = useVertical ? responsiveVertical : 'horizontal'
   let height = config.aspectRatio ? width * config.aspectRatio : config.heights[renderedOrientation]
