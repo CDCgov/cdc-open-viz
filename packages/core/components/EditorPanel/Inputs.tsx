@@ -27,7 +27,8 @@ export type CheckboxProps = {
   min?: number
   i?: number
   className?: string
-} & Input
+} & Input &
+  Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value'>
 
 export type SelectProps = {
   value?: string
@@ -40,7 +41,20 @@ export type SelectProps = {
 } & Input
 
 const TextField = memo((props: TextFieldProps) => {
-  const { display = true, label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'text', i = null, min = null, ...attributes } = props
+  const {
+    display = true,
+    label,
+    tooltip,
+    section = null,
+    subsection = null,
+    fieldName,
+    updateField,
+    value: stateValue,
+    type = 'text',
+    i = null,
+    min = null,
+    ...attributes
+  } = props
   const [value, setValue] = useState(stateValue)
   const [debouncedValue] = useDebounce(value, 500)
 
@@ -93,7 +107,17 @@ const TextField = memo((props: TextFieldProps) => {
 })
 
 const CheckBox = memo((props: CheckboxProps) => {
-  const { display = true, label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes } = props
+  const {
+    display = true,
+    label,
+    value,
+    fieldName,
+    section = null,
+    subsection = null,
+    tooltip,
+    updateField,
+    ...attributes
+  } = props
   if (!display) {
     return <></>
   }
@@ -117,7 +141,20 @@ const CheckBox = memo((props: CheckboxProps) => {
 })
 
 const Select = memo((props: SelectProps) => {
-  const { display = true, label, value, options, fieldName, section = null, subsection = null, required = false, tooltip, updateField, initial: initialValue, ...attributes } = props
+  const {
+    display = true,
+    label,
+    value,
+    options,
+    fieldName,
+    section = null,
+    subsection = null,
+    required = false,
+    tooltip,
+    updateField,
+    initial: initialValue,
+    ...attributes
+  } = props
   let optionsJsx = options.map((optionName, index) => (
     <option value={optionName} key={index}>
       {optionName}
