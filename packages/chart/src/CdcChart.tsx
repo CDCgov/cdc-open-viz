@@ -889,7 +889,16 @@ export default function CdcChart({
   // Format numeric data based on settings in config OR from passed in settings for Additional Columns
   // - use only for old horizontal data - newer formatNumber is in helper/formatNumber
   // TODO: we should combine various formatNumber functions across this project.
-  const formatNumber = (num, axis, shouldAbbreviate = false, addColPrefix, addColSuffix, addColRoundTo) => {
+  // TODO suggestion: pass all options as object key/values to allow for more flexibility
+  const formatNumber = (
+    num,
+    axis,
+    shouldAbbreviate = false,
+    addColPrefix,
+    addColSuffix,
+    addColRoundTo,
+    { index, length } = { index: null, length: null }
+  ) => {
     // if num is NaN return num
     if (isNaN(num) || !num) return num
     // Check if the input number is negative
@@ -916,7 +925,8 @@ export default function CdcChart({
         rightSuffix,
         bottomPrefix,
         bottomSuffix,
-        bottomAbbreviated
+        bottomAbbreviated,
+        onlyShowTopPrefixSuffix
       }
     } = config
 
@@ -1009,7 +1019,9 @@ export default function CdcChart({
     if (addColPrefix && axis === 'left') {
       result = addColPrefix + result
     } else {
-      if (prefix && axis === 'left') {
+      // if onlyShowTopPrefixSuffix only show top prefix
+      const suppressAllButLast = onlyShowTopPrefixSuffix && length - 1 !== index
+      if (prefix && axis === 'left' && !suppressAllButLast) {
         result += prefix
       }
     }
@@ -1028,7 +1040,7 @@ export default function CdcChart({
     if (addColSuffix && axis === 'left') {
       result += addColSuffix
     } else {
-      if (suffix && axis === 'left') {
+      if (suffix && axis === 'left' && !onlyShowTopPrefixSuffix) {
         result += suffix
       }
     }
