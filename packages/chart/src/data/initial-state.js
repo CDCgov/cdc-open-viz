@@ -115,7 +115,7 @@ export default {
     hideAxis: false,
     hideLabel: false,
     hideTicks: false,
-    size: 75,
+    size: 35,
     tickRotation: 0,
     min: '',
     max: '',

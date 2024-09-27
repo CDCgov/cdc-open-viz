@@ -101,7 +101,7 @@ export default function ChooseTab() {
             barThickness: '0.37',
             xAxis: {
               type: 'categorical',
-              size: 75,
+              size: 35,
               maxTickRotation: 45,
               labelOffset: 0
             }
