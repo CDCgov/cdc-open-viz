@@ -960,22 +960,22 @@ const LinearChart: React.FC<LinearChartProps> = props => {
 
                       // Vertical value/suffix vars
                       const { suffix, onlyShowTopPrefixSuffix } = config.dataFormat
-                      const { labelsOnGridlines, hideAxis } = config.yAxis
+                      const { labelsAboveGridlines, hideAxis } = config.yAxis
                       const lastTick = props.ticks.length - 1 === i
                       const suffixOneChar = suffix.length === 1
                       const hideTopTick = lastTick && onlyShowTopPrefixSuffix && suffix && !suffixOneChar
                       const valueOnLinePadding = hideAxis ? -8 : -12
-                      const labelXPadding = labelsOnGridlines ? valueOnLinePadding : 2
-                      const labelYPadding = labelsOnGridlines ? 4 : 0
+                      const labelXPadding = labelsAboveGridlines ? valueOnLinePadding : 2
+                      const labelYPadding = labelsAboveGridlines ? 4 : 0
                       const labelX = tick.to.x - labelXPadding
                       const labelY = tick.to.y - labelYPadding
-                      const labelVerticalAnchor = labelsOnGridlines ? 'end' : 'middle'
+                      const labelVerticalAnchor = labelsAboveGridlines ? 'end' : 'middle'
                       const combineDomSuffixWithValue =
-                        onlyShowTopPrefixSuffix && labelsOnGridlines && suffix && lastTick
+                        onlyShowTopPrefixSuffix && labelsAboveGridlines && suffix && lastTick
 
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                          {!runtime.yAxis.hideTicks && !labelsOnGridlines && !hideTopTick && (
+                          {!runtime.yAxis.hideTicks && !labelsAboveGridlines && !hideTopTick && (
                             <Line
                               key={`${tick.value}--hide-hideTicks`}
                               from={tick.from}
@@ -1088,7 +1088,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                                 {/* top suffix is shown alone and is allowed to 'overflow' to the right */}
                                 {/* SPECIAL ONE CHAR CASE: a one character top-only suffix does not overflow */}
                                 {/* IF VALUES ON LINE: suffix is combined with value to avoid having to calculate varying (now left-aligned) value widths */}
-                                {onlyShowTopPrefixSuffix && lastTick && !labelsOnGridlines && (
+                                {onlyShowTopPrefixSuffix && lastTick && !labelsAboveGridlines && (
                                   <BlurStrokeText
                                     id='suffix'
                                     display={isLogarithmicAxis ? showTicks : 'block'}
@@ -1116,10 +1116,10 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                                   y={labelY + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                                   angle={-Number(config.yAxis.tickRotation) || 0}
                                   verticalAnchor={config.runtime.horizontal ? 'start' : labelVerticalAnchor}
-                                  textAnchor={config.runtime.horizontal || labelsOnGridlines ? 'start' : 'end'}
+                                  textAnchor={config.runtime.horizontal || labelsAboveGridlines ? 'start' : 'end'}
                                   fill={config.yAxis.tickLabelColor}
                                   stroke={'#fff'}
-                                  disableStroke={!labelsOnGridlines}
+                                  disableStroke={!labelsAboveGridlines}
                                   strokeLinejoin='round'
                                   paintOrder={'stroke'} // keeps stroke under fill
                                   style={{ whiteSpace: 'pre-wrap' }} // prevents leading spaces from being trimmed

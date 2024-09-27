@@ -6,6 +6,7 @@ import lineChartTwoPointsRegressionTest from './_mock/line_chart_two_points_regr
 import lineChartTwoPointsNewChart from './_mock/line_chart_two_points_new_chart.json'
 import lollipop from './_mock/lollipop.json'
 import forestPlot from '../../examples/feature/forest-plot/forest-plot.json'
+import horizontalBarConfig from './_mock/horizontal_bar.json'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',
@@ -47,4 +48,9 @@ export const Forest_Plot: Story = {
   }
 }
 
+export const Horizontal_Bar: Story = {
+  args: {
+    config: horizontalBarConfig
+  }
+}
 export default meta

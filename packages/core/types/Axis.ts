@@ -20,7 +20,7 @@ export type Axis = {
   label?: string
   labelOffset?: number
   labelPlacement?: string
-  labelsOnGridlines?: boolean
+  labelsAboveGridlines?: boolean
   manual?: boolean
   manualStep?: number
   max?: string

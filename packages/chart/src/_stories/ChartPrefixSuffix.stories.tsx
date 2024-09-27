@@ -98,7 +98,7 @@ export const Top_Suffix_On_Line: Story = {
       { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
       { path: ['dataFormat', 'suffix'], value: ' Somethings per Something' },
       { path: ['yAxis', 'gridLines'], value: true },
-      { path: ['yAxis', 'labelsOnGridlines'], value: true },
+      { path: ['yAxis', 'labelsAboveGridlines'], value: true },
       { path: ['yAxis', 'hideAxis'], value: true }
     ])
   }
@@ -107,9 +107,10 @@ export const Top_Suffix_On_Line: Story = {
 export const Values_On_Line_All_Suffix: Story = {
   args: {
     config: editConfigKeys(annotationConfig, [
-      { path: ['yAxis', 'labelsOnGridlines'], value: true },
+      { path: ['yAxis', 'labelsAboveGridlines'], value: true },
       { path: ['dataFormat', 'suffix'], value: ' units' },
-      { path: ['yAxis', 'gridLines'], value: true }
+      { path: ['yAxis', 'gridLines'], value: true },
+      { path: ['yAxis', 'hideAxis'], value: true }
     ])
   }
 }
@@ -120,8 +121,20 @@ export const Values_on_Line_Top_Suffix_Only_Area_Worst_Case: Story = {
       { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
       { path: ['dataFormat', 'prefix'], value: 'pre' },
       { path: ['dataFormat', 'suffix'], value: ' Somethings per Something' },
-      { path: ['yAxis', 'labelsOnGridlines'], value: true },
+      { path: ['yAxis', 'labelsAboveGridlines'], value: true },
       { path: ['yAxis', 'gridLines'], value: true }
+    ])
+  }
+}
+
+export const Top_Suffix_Above_Gridlines_With_Options: Story = {
+  args: {
+    config: editConfigKeys(annotationConfig, [
+      { path: ['yAxis', 'tickRotation'], value: 45 },
+      { path: ['yAxis', 'tickLabelColor'], value: 'red' },
+      { path: ['yAxis', 'labelsAboveGridlines'], value: true },
+      { path: ['yAxis', 'gridLines'], value: true },
+      { path: ['yAxis', 'hideAxis'], value: true }
     ])
   }
 }

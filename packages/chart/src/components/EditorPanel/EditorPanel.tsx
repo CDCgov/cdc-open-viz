@@ -1805,9 +1805,9 @@ const EditorPanel = () => {
                       )}
                       {visSupportsValueAxisGridLines() && (
                         <CheckBox
-                          value={config.yAxis.labelsOnGridlines}
+                          value={config.yAxis.labelsAboveGridlines}
                           section='yAxis'
-                          fieldName='labelsOnGridlines'
+                          fieldName='labelsAboveGridlines'
                           label='Labels above gridlines'
                           updateField={updateField}
                           disabled={!config.yAxis.gridLines}
