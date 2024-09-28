@@ -38,7 +38,7 @@ import VisualizationsPanel from './components/VisualizationsPanel'
 import dashboardReducer from './store/dashboard.reducer'
 import { filterData } from './helpers/filterData'
 import { getVizKeys } from './helpers/getVizKeys'
-import Title from '@cdc/core/components/ui/Title'
+import Title from '@cdc/core/components/Layout/components/Title'
 import { type TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 
 // types

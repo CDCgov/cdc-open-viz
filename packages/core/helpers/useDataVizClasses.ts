@@ -1,4 +1,9 @@
 export default function useDataVizClasses(config, viewport = null) {
+  const makeClassName = string => {
+    if (!string || !string.toLowerCase) return
+    return string.toLowerCase().replaceAll(/ /g, '-')
+  }
+
   const { legend } = config
   let lineDatapointClass = ''
 
@@ -18,8 +23,20 @@ export default function useDataVizClasses(config, viewport = null) {
     if (title && showTitle) contentClasses.push('component--has-title')
   }
 
+  if (config.type === 'chart') {
+    contentClasses.push('cdc-chart-inner-container')
+    contentClasses.push(`type-${makeClassName(config.visualizationType)}`)
+  }
+
+  if (config.visualizationType === 'markup-include') {
+    contentClasses.push('markup-include-content-container', 'no-borders')
+  }
+
   config.showTitle && contentClasses.push('component--has-title')
-  config.title && config.visualizationType !== 'chart' && config.visualizationType !== 'Spark Line' && contentClasses.push('component--has-title')
+  config.title &&
+    config.visualizationType !== 'chart' &&
+    config.visualizationType !== 'Spark Line' &&
+    contentClasses.push('component--has-title')
   config.subtext && innerContainerClasses.push('component--has-subtext')
   config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
   config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
@@ -54,7 +71,13 @@ export default function useDataVizClasses(config, viewport = null) {
     return ulClasses
   }
   const hasBorder = config.legend?.hideBorder ? 'no-border' : ''
-  const legendOuterClasses = [`${legend?.position}`, `${getListPosition()}`, `cdcdataviz-sr-focusable`, `${viewport}`, `${hasBorder}`]
+  const legendOuterClasses = [
+    `${legend?.position}`,
+    `${getListPosition()}`,
+    `cdcdataviz-sr-focusable`,
+    `${viewport}`,
+    `${hasBorder}`
+  ]
 
   const legendClasses = {
     aside: legendOuterClasses,

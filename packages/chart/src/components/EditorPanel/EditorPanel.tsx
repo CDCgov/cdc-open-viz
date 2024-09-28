@@ -589,7 +589,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
   )
 }
 
-const EditorPanel = () => {
+const EditorPanel = ({ isEditor }) => {
   const {
     config,
     updateConfig,
@@ -841,10 +841,6 @@ const EditorPanel = () => {
 
   const [displayPanel, setDisplayPanel] = useState(true)
   const [displayViewportOverrides, setDisplayViewportOverrides] = useState(false)
-
-  if (loading) {
-    return null
-  }
 
   useEffect(() => {
     if (!config.general?.boxplot) return
@@ -1419,6 +1415,10 @@ const EditorPanel = () => {
     handleUpdateHighlightedBorderWidth,
     handleUpdateHighlightedBarColor,
     setLollipopShape
+  }
+
+  if (!isEditor || !config || loading) {
+    return null
   }
 
   return (

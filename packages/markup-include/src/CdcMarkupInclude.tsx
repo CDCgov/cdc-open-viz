@@ -29,8 +29,6 @@ type CdcMarkupIncludeProps = {
   setConfig: any
 }
 
-import Title from '@cdc/core/components/ui/Title'
-
 const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   configUrl,
   config: configObj,
@@ -245,17 +243,19 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
       <>
         {isEditor && <EditorPanel />}
         <Layout.Responsive isEditor={isEditor}>
-          <div className='markup-include-content-container cove-component__content no-borders'>
-            <div className={`markup-include-component ${contentClasses.join(' ')}`}>
-              <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
-              <div className={`${innerContainerClasses.join(' ')}`}>
-                <div className='cove-component__content-wrap'>
-                  {!markupError && <Markup allowElements={!!urlMarkup} content={markup} />}
-                  {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
+          <Layout.Content config={config} missingRequiredSections={false}>
+            <div className='markup-include-content-container cove-component__content no-borders'>
+              <div className={`markup-include-component ${contentClasses.join(' ')}`}>
+                <Layout.Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
+                <div className={`${innerContainerClasses.join(' ')}`}>
+                  <div className='cove-component__content-wrap'>
+                    {!markupError && <Markup allowElements={!!urlMarkup} content={markup} />}
+                    {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </Layout.Content>
         </Layout.Responsive>
       </>
     )
