@@ -1350,11 +1350,9 @@ export default function CdcChart({
                   >
                     {/* All charts with LinearChart */}
                     {!['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
-                      <div style={{ height, width: `100%` }}>
-                        <ParentSize>
-                          {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
-                        </ParentSize>
-                      </div>
+                      <ParentSize>
+                        {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                      </ParentSize>
                     )}
 
                     {config.visualizationType === 'Pie' && (
@@ -1365,17 +1363,13 @@ export default function CdcChart({
                     {/* Line Chart */}
                     {config.visualizationType === 'Line' &&
                       (checkLineToBarGraph() ? (
-                        <div style={{ height: config?.heights?.vertical, width: `100%` }}>
-                          <ParentSize>
-                            {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
-                          </ParentSize>
-                        </div>
+                        <ParentSize>
+                          {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                        </ParentSize>
                       ) : (
-                        <div style={{ height, width: `100%` }}>
-                          <ParentSize>
-                            {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
-                          </ParentSize>
-                        </div>
+                        <ParentSize>
+                          {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                        </ParentSize>
                       ))}
                     {/* Sparkline */}
                     {config.visualizationType === 'Spark Line' && (

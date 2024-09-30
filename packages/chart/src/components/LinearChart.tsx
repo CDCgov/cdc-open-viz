@@ -121,6 +121,8 @@ const LinearChart: React.FC<LinearChartProps> = props => {
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
   const annotationRefs = useRef(null)
+  // Used to calculate the y position of the x-axis title
+  const [tallestXLabel, setTallestXLabel] = useState(0)
   // refs
   const triggerRef = useRef()
   const axisBottomRef = useRef(null)
@@ -315,6 +317,19 @@ const LinearChart: React.FC<LinearChartProps> = props => {
     setSuffixWidth(textWidth)
   }, [config.dataFormat.suffix, config.dataFormat.onlyShowTopPrefixSuffix])
 
+  useEffect(() => {
+    const labels = document.querySelectorAll('.x-axis-label-container')
+
+    if (!labels) return
+
+    const tallestLabel = Array.from(labels).reduce((acc, label) => {
+      const labelHeight = label.getBBox().height
+      return labelHeight > acc ? labelHeight : acc
+    }, 0)
+
+    setTallestXLabel(tallestLabel)
+  }, [dimensions])
+
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
     if (visualizationType === 'Combo' && runtime.forecastingSeriesKeys > 0) return true
@@ -353,7 +368,8 @@ const LinearChart: React.FC<LinearChartProps> = props => {
   }
 
   const generatePairedBarAxis = () => {
-    let axisMaxHeight = 40
+    const X_LABEL_PADDING = 10
+    const axisMaxHeight = tallestXLabel + X_LABEL_PADDING
 
     const getTickPositions = (ticks, xScale) => {
       if (!ticks.length) return false
@@ -408,10 +424,8 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                   const isResponsiveTicks = config.isResponsiveTicks && isTicksOverlapping
                   const angle =
                     tick.index !== 0 && (isResponsiveTicks ? maxTickRotation : Number(config.yAxis.tickRotation))
-                  const axisHeight = textWidth * Math.sin(angle * (Math.PI / 180)) + 25
-                  const textAnchor = angle && tick.index !== 0 ? 'end' : 'middle'
 
-                  if (axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
+                  const textAnchor = angle && tick.index !== 0 ? 'end' : 'middle'
 
                   return (
                     <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
@@ -461,13 +475,10 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                     const isResponsiveTicks = config.isResponsiveTicks && isTicksOverlapping
                     const angle =
                       tick.index !== 0 && (isResponsiveTicks ? maxTickRotation : Number(config.yAxis.tickRotation))
-                    const axisHeight = textWidth * Math.sin(angle * (Math.PI / 180)) + 25
                     const textAnchor = angle && tick.index !== 0 ? 'end' : 'middle'
 
-                    if (axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
-
                     return (
-                      <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
+                      <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick x-axis-label-container'}>
                         {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                         {!runtime.yAxis.hideLabel && (
                           <Text // prettier-ignore
@@ -488,7 +499,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                 <Group>
                   <Text
                     x={xMax / 2}
-                    y={axisMaxHeight + 20 + xLabelOffset}
+                    y={axisMaxHeight + xLabelOffset}
                     stroke='#333'
                     textAnchor={'middle'}
                     verticalAnchor='start'
@@ -1269,6 +1280,9 @@ const LinearChart: React.FC<LinearChartProps> = props => {
               }
             >
               {props => {
+                const X_LABEL_PADDING = 10
+                const axisMaxHeight = tallestXLabel + X_LABEL_PADDING
+
                 const axisCenter =
                   config.visualizationType !== 'Forest Plot'
                     ? (props.axisToPoint.x - props.axisFromPoint.x) / 2
@@ -1302,6 +1316,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                 }
                 // calculate the end of x axis box
                 const axisBBox = axisBottomRef?.current?.getBBox().height
+
                 config.xAxis.axisBBox = axisBBox
 
                 // Check if ticks are overlapping
@@ -1315,12 +1330,9 @@ const LinearChart: React.FC<LinearChartProps> = props => {
 
                 const dynamicMarginTop =
                   areTicksTouching && config.isResponsiveTicks ? tickWidthMax + defaultTickLength + 20 : 0
-                const rotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
 
                 config.dynamicMarginTop = dynamicMarginTop
                 config.xAxis.tickWidthMax = tickWidthMax
-
-                let axisMaxHeight = 40
 
                 const axisContents = (
                   <Group className='bottom-axis' width={dimensions[0]}>
@@ -1346,12 +1358,8 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                           ? -Number(config.xAxis.maxTickRotation) || -90
                           : -Number(config.runtime.xAxis.tickRotation)
 
-                      const axisHeight = textWidth * Math.sin(tickRotation * -1 * (Math.PI / 180)) + 25
-
-                      if (axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
-
                       return (
-                        <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
+                        <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick x-axis-label-container'}>
                           {!config.xAxis.hideTicks && (
                             <Line
                               from={tick.from}
@@ -1385,7 +1393,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                     {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
                     <Text
                       x={axisCenter}
-                      y={axisMaxHeight + 20 + xLabelOffset}
+                      y={axisMaxHeight + xLabelOffset}
                       textAnchor='middle'
                       verticalAnchor='start'
                       fontWeight='bold'
@@ -1396,11 +1404,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                   </Group>
                 )
 
-                if (svgRef.current)
-                  svgRef.current.setAttribute(
-                    'height',
-                    Number(height) + Number(axisMaxHeight) + (runtime.xAxis.label ? 50 : 0) + 'px'
-                  )
+                if (svgRef.current) svgRef.current.setAttribute('height', Number(height) + Number(axisMaxHeight) + 'px')
 
                 return axisContents
               }}
