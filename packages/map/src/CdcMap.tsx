@@ -1810,6 +1810,8 @@ const CdcMap = ({
                 />
               )}
 
+              <Layout.IntroText text={general.introText} config={state} />
+
               <div
                 role='region'
                 tabIndex='0'
@@ -1822,8 +1824,6 @@ const CdcMap = ({
                 }}
                 style={{ padding: '15px 25px', margin: '0px' }}
               >
-                {general.introText && <section className='introText'>{parse(general.introText)}</section>}
-
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
                 <section className='outline-none geography-container w-100' ref={mapSvg} tabIndex='0'>
                   {currentViewport && (

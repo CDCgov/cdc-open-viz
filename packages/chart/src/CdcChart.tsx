@@ -1324,10 +1324,7 @@ export default function CdcChart({
                         : 'w-75'
                     }
                   >
-                    {/* Intro Text/Message */}
-                    {config?.introText && config.visualizationType !== 'Spark Line' && (
-                      <section className='introText'>{parse(config.introText)}</section>
-                    )}
+                    <Layout.IntroText text={config.introText} config={config} />
 
                     {/* All charts with LinearChart */}
                     {!['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
