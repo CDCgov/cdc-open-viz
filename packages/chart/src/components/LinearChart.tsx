@@ -38,6 +38,7 @@ import useTopAxis from '../hooks/useTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
+import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 
 type LinearChartProps = {
   parentWidth: number
@@ -308,10 +309,10 @@ const LinearChart: React.FC<LinearChartProps> = props => {
 
   useEffect(() => {
     const textElement = document.querySelector(`#suffix`)
-    if (textElement) {
-      const textWidth = textElement.getBBox().width
-      setSuffixWidth(textWidth)
-    }
+    if (!textElement && !suffixWidth) return
+    if (!textElement) return setSuffixWidth(0)
+    const textWidth = textElement.getBBox().width
+    setSuffixWidth(textWidth)
   }, [config.dataFormat.suffix, config.dataFormat.onlyShowTopPrefixSuffix])
 
   const chartHasTooltipGuides = () => {
@@ -957,16 +958,25 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                       const showTicks = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
                       const tickLength = showTicks === 'block' ? 7 : 0
                       const to = { x: tick.to.x - tickLength, y: tick.to.y }
-                      const lastTick = props.ticks.length - 1 === i
+
+                      // Vertical value/suffix vars
                       const { suffix, onlyShowTopPrefixSuffix } = config.dataFormat
+                      const { labelsAboveGridlines, hideAxis } = config.yAxis
+                      const lastTick = props.ticks.length - 1 === i
                       const suffixOneChar = suffix.length === 1
                       const hideTopTick = lastTick && onlyShowTopPrefixSuffix && suffix && !suffixOneChar
-                      const labelPadding = 2
-                      const labelX = tick.to.x - labelPadding
+                      const valueOnLinePadding = hideAxis ? -8 : -12
+                      const labelXPadding = labelsAboveGridlines ? valueOnLinePadding : 2
+                      const labelYPadding = labelsAboveGridlines ? 4 : 0
+                      const labelX = tick.to.x - labelXPadding
+                      const labelY = tick.to.y - labelYPadding
+                      const labelVerticalAnchor = labelsAboveGridlines ? 'end' : 'middle'
+                      const combineDomSuffixWithValue =
+                        onlyShowTopPrefixSuffix && labelsAboveGridlines && suffix && lastTick
 
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                          {!runtime.yAxis.hideTicks && !hideTopTick && (
+                          {!runtime.yAxis.hideTicks && !labelsAboveGridlines && !hideTopTick && (
                             <Line
                               key={`${tick.value}--hide-hideTicks`}
                               from={tick.from}
@@ -1077,41 +1087,46 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                               <>
                                 {/* TOP ONLY SUFFIX: Dom suffix for 'show only top suffix' behavior */}
                                 {/* top suffix is shown alone and is allowed to 'overflow' to the right */}
-                                {/* SPECIAL CASE: a one character top-only suffix does not overflow */}
-                                {onlyShowTopPrefixSuffix && lastTick && (
-                                  <Text
+                                {/* SPECIAL ONE CHAR CASE: a one character top-only suffix does not overflow */}
+                                {/* IF VALUES ON LINE: suffix is combined with value to avoid having to calculate varying (now left-aligned) value widths */}
+                                {onlyShowTopPrefixSuffix && lastTick && !labelsAboveGridlines && (
+                                  <BlurStrokeText
                                     id='suffix'
                                     display={isLogarithmicAxis ? showTicks : 'block'}
                                     dx={isLogarithmicAxis ? -6 : 0}
                                     x={labelX}
-                                    y={tick.to.y}
+                                    y={labelY}
                                     angle={-Number(config.yAxis.tickRotation) || 0}
-                                    verticalAnchor={'middle'}
+                                    verticalAnchor={labelVerticalAnchor}
                                     textAnchor={suffixOneChar ? 'end' : 'start'}
                                     fill={config.yAxis.tickLabelColor}
                                     stroke={'#fff'}
-                                    strokeWidth={6}
                                     paintOrder={'stroke'} // keeps stroke under fill
                                     strokeLinejoin='round'
                                     style={{ whiteSpace: 'pre-wrap' }} // prevents leading spaces from being trimmed
                                   >
                                     {suffix}
-                                  </Text>
+                                  </BlurStrokeText>
                                 )}
 
                                 {/* VALUE */}
-                                <Text
+                                <BlurStrokeText
                                   display={isLogarithmicAxis ? showTicks : 'block'}
                                   dx={isLogarithmicAxis ? -6 : 0}
                                   x={suffixOneChar ? labelX - suffixWidth : labelX}
-                                  y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                                  y={labelY + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                                   angle={-Number(config.yAxis.tickRotation) || 0}
-                                  verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}
-                                  textAnchor={config.runtime.horizontal ? 'start' : 'end'}
+                                  verticalAnchor={config.runtime.horizontal ? 'start' : labelVerticalAnchor}
+                                  textAnchor={config.runtime.horizontal || labelsAboveGridlines ? 'start' : 'end'}
                                   fill={config.yAxis.tickLabelColor}
+                                  stroke={'#fff'}
+                                  disableStroke={!labelsAboveGridlines}
+                                  strokeLinejoin='round'
+                                  paintOrder={'stroke'} // keeps stroke under fill
+                                  style={{ whiteSpace: 'pre-wrap' }} // prevents leading spaces from being trimmed
                                 >
-                                  {tick.formattedValue}
-                                </Text>
+                                  {`${tick.formattedValue}${combineDomSuffixWithValue ? suffix : ''}`}
+                                </BlurStrokeText>
                               </>
                             )}
                         </Group>

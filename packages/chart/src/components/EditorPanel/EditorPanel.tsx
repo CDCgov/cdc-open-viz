@@ -1803,6 +1803,17 @@ const EditorPanel = () => {
                           updateField={updateField}
                         />
                       )}
+                      {visSupportsValueAxisGridLines() && (
+                        <CheckBox
+                          value={config.yAxis.labelsAboveGridlines}
+                          section='yAxis'
+                          fieldName='labelsAboveGridlines'
+                          label='Labels above gridlines'
+                          updateField={updateField}
+                          disabled={!config.yAxis.gridLines}
+                          title={!config.yAxis.gridLines ? 'Show gridlines to enable' : ''}
+                        />
+                      )}
                       <CheckBox
                         value={config.yAxis.enablePadding}
                         section='yAxis'
