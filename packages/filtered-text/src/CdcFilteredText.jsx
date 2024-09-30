@@ -5,7 +5,6 @@ import ConfigContext from './ConfigContext'
 import defaults from './data/initial-state'
 
 // components
-import Title from '@cdc/core/components/ui/Title'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 import EditorPanel from './components/EditorPanel'
@@ -22,7 +21,13 @@ import parse from 'html-react-parser'
 // styles
 import './scss/main.scss'
 
-const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
+const CdcFilteredText = ({
+  config: configObj,
+  configUrl,
+  isDashboard = false,
+  isEditor = false,
+  setConfig: setParentConfig
+}) => {
   const transform = new DataTransform()
   // Default States
   const [config, setConfig] = useState(defaults)
@@ -121,7 +126,7 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
       <>
         <Layout.Responsive isEditor={isEditor}>
           <div className={`cove-component__content no-borders`}>
-            <Title classes={[`${config.theme}`]} title={title} style={{ fontSize }} />
+            <Layout.Title classes={[`${config.theme}`]} title={title} style={{ fontSize }} />
             <div className={`${contentClasses.join(' ')} body`}>
               {filterByTextColumn()
                 .slice(0, 1)

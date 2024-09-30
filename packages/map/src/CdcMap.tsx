@@ -29,7 +29,6 @@ import { getUniqueValues } from './helpers/getUniqueValues'
 import { publish } from '@cdc/core/helpers/events'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
-import Title from '@cdc/core/components/ui/Title'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 // Data
@@ -1789,7 +1788,7 @@ const CdcMap = ({
             <section className={sectionClassNames()} aria-label={'Map: ' + title} ref={innerContainerRef}>
               {state?.runtime?.editorErrorMessage.length > 0 && <Error state={state} />}
               {/* prettier-ignore */}
-              <Title
+              <Layout.Title
                 title={title}
                 superTitle={general.superTitle}
                 config={config}

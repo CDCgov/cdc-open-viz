@@ -61,7 +61,6 @@ import './scss/main.scss'
 // load both then config below determines which to use
 import DataTable from '@cdc/core/components/DataTable'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
-import Title from '@cdc/core/components/ui/Title'
 import { ChartConfig } from './types/ChartConfig'
 import { Label } from './types/Label'
 import { type ViewportSize } from './types/ChartConfig'
@@ -89,7 +88,7 @@ export default function CdcChart({
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
-  const [stateData, setStateData] = useState(configObj.data || [])
+  const [stateData, setStateData] = useState(configObj?.data || [])
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
   const [seriesHighlight, setSeriesHighlight] = useState<string[]>(
@@ -1283,7 +1282,7 @@ export default function CdcChart({
               aria-label={handleChartAriaLabels(config)}
               tabIndex={0}
             >
-              <Title
+              <Layout.Title
                 showTitle={config.showTitle}
                 isDashboard={isDashboard}
                 title={title}
