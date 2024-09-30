@@ -1858,7 +1858,7 @@ const CdcMap = ({
               {/* Link */}
               {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
 
-              {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+              <Layout.SubText text={subtext} config={state} />
 
               <MediaControls.Section classes={['download-buttons']}>
                 {state.general.showDownloadImgButton && (

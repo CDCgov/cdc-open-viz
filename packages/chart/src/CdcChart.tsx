@@ -1375,11 +1375,7 @@ export default function CdcChart({
                         <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles }}>
                           <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
                         </div>
-                        {description && (
-                          <div className='subtext' style={{ padding: '35px 0 15px' }}>
-                            {parse(description)}
-                          </div>
-                        )}
+                        <Layout.SubText text={description} config={config} />
                       </>
                     )}
                     {/* Sankey */}

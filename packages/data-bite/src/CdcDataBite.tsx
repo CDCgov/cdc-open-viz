@@ -587,7 +587,8 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                           {calculateDataBite()}
                         </span>
                       )}
-                      {subtext && !config.general.isCompactStyle && <p className='bite-subtext'>{parse(subtext)}</p>}
+
+                      <Layout.SubText text={subtext} config={state} />
                     </div>
                   </Fragment>
                 </div>
