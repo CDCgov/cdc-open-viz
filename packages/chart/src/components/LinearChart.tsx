@@ -519,7 +519,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                     const textAnchor = angle && tick.index !== 0 ? 'end' : 'middle'
                     if (!i) return <></> // skip first tick to avoid overlapping 0's
                     return (
-                      <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
+                      <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick x-axis-label-container'}>
                         {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                         {!runtime.yAxis.hideLabel && (
                           <Text // prettier-ignore
@@ -1392,7 +1392,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                           : -Number(config.runtime.xAxis.tickRotation)
 
                       return (
-                        <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
+                        <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick x-axis-label-container'}>
                           {!config.xAxis.hideTicks && (
                             <Line
                               from={tick.from}
