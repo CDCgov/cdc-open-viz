@@ -92,7 +92,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
   const isHorizontal = orientation === 'horizontal' || config.visualizationType === 'Forest Plot'
   const shouldAbbreviate = true
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
-  const xLabelOffset = isNaN(parseInt(runtime.xAxis.labelOffset)) ? 0 : parseInt(runtime.xAxis.labelOffset)
+  const xLabelOffset = isNaN(parseInt(config.xAxis.labelOffset)) ? 0 : parseInt(config.xAxis.labelOffset)
   const yLabelOffset = isNaN(parseInt(runtime.yAxis.labelOffset)) ? 0 : parseInt(runtime.yAxis.labelOffset)
   const xAxisSize = isNaN(parseInt(runtime.xAxis.size)) ? 0 : parseInt(runtime.xAxis.size)
   const isForestPlot = visualizationType === 'Forest Plot'
@@ -126,6 +126,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
   // Used to calculate the y position of the x-axis title
   const [tallestXLabel, setTallestXLabel] = useState(0)
   const [xAxisLabelHeight, setXAxisLabelHeight] = useState(0)
+  const [svgHeight, setSvgHeight] = useState(height)
   // refs
   const triggerRef = useRef()
   const axisBottomRef = useRef(null)
@@ -303,6 +304,13 @@ const LinearChart: React.FC<LinearChartProps> = props => {
     }
   }) /* eslint-disable-line */
 
+  useEffect(() => {
+    const axisMaxHeight = tallestXLabel + X_LABEL_PADDING
+    const calculatedHeight = height - xAxisSize + Number(axisMaxHeight) + xLabelOffset + xAxisLabelHeight
+
+    setSvgHeight(calculatedHeight)
+  }, [tallestXLabel, height, xLabelOffset])
+
   // If the chart is in view, set to animate if it has not already played
   useEffect(() => {
     if (dataRef?.isIntersecting === true && config.animate) {
@@ -330,7 +338,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
     if (xAxisLabel) {
       setXAxisLabelHeight(xAxisLabel.getBBox().height)
     }
-  }, [dimensions, config.xAxis])
+  }, [dimensions[0], config.xAxis])
 
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
@@ -498,6 +506,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                 </Group>
                 <Group>
                   <Text
+                    className='x-axis-title-label'
                     x={xMax / 2}
                     y={axisMaxHeight + xLabelOffset}
                     stroke='#333'
@@ -507,9 +516,6 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                     {runtime.xAxis.label}
                   </Text>
                 </Group>
-                {svgRef.current
-                  ? svgRef.current.setAttribute('height', height + axisMaxHeight + xLabelOffset + xAxisLabelHeight)
-                  : ''}
               </>
             )
           }}
@@ -527,7 +533,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
         <svg
           onMouseMove={onMouseMove}
           width={props.parentWidth}
-          height={props.parentHeight}
+          height={svgHeight}
           className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${
             debugSvg && 'debug'
           } ${isDraggingAnnotation && 'dragging-annotation'}`}
@@ -1329,7 +1335,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                 config.dynamicMarginTop = dynamicMarginTop
                 config.xAxis.tickWidthMax = tickWidthMax
 
-                const axisContents = (
+                return (
                   <Group className='bottom-axis' width={dimensions[0]}>
                     {props.ticks.map((tick, i, propsTicks) => {
                       // when using LogScale show major ticks values only
@@ -1399,15 +1405,6 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                     </Text>
                   </Group>
                 )
-
-                if (svgRef.current) {
-                  svgRef.current.setAttribute(
-                    'height',
-                    height - xAxisSize + axisMaxHeight + xLabelOffset + xAxisLabelHeight
-                  )
-                }
-
-                return axisContents
               }}
             </AxisBottom>
           )}
