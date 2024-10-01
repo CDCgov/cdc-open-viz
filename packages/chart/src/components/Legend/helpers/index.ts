@@ -10,9 +10,13 @@ export const getGradientConfig = (config, formatLabels, colorScale) => {
   return { colors, labels }
 }
 
-export const getMarginTop = (isBottomOrSmallViewport, isBrushActive, legend) => {
-  if (!isBottomOrSmallViewport) return '0px'
-  if (isBrushActive && legend.position === 'bottom') return '35px'
+export const getMarginTop = (isBottomOrSmallViewport, config) => {
+  if (!isBottomOrSmallViewport) {
+    return '0px'
+  }
+  if (isBottomOrSmallViewport && config.brush?.active) {
+    return '35px'
+  }
   return '20px'
 }
 export const getMarginBottom = (isBottomOrSmallViewport, config) => {
