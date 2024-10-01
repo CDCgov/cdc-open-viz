@@ -1387,7 +1387,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                     })}
                     {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
                     <Text
-                      class='x-axis-title-label'
+                      className='x-axis-title-label'
                       x={axisCenter}
                       y={axisMaxHeight + xLabelOffset}
                       textAnchor='middle'
