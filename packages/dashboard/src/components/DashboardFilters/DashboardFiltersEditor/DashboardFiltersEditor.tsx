@@ -19,6 +19,7 @@ import { SharedFilter } from '../../../types/SharedFilter'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import DeleteFilterModal from './components/DeleteFilterModal'
 import { addValuesToDashboardFilters } from '../../../helpers/addValuesToDashboardFilters'
+import { FILTER_STYLE } from '../../../types/FilterStyles'
 
 type DashboardFitlersEditorProps = {
   vizConfig: DashboardFilters
@@ -51,16 +52,51 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
 
   const updateFilterProp = (prop: string, index: number, value) => {
     const newSharedFilters = _.cloneDeep(sharedFilters)
-    const oldEndpoint = sharedFilters[index].apiFilter?.apiEndpoint
-    const oldAPIValueSelector = sharedFilters[index].apiFilter?.valueSelector
-    const apiFilterChanged = value.apiEndpoint !== oldEndpoint || value.valueSelector !== oldAPIValueSelector
+    const {
+      apiEndpoint: oldEndpoint,
+      valueSelector: oldValueSelector,
+      textSelector: oldTextSelector,
+      subgroupValueSelector: oldSubgroupValueSelector
+    } = sharedFilters[index].apiFilter || {}
+    const apiFilterChanged =
+      value.apiEndpoint !== oldEndpoint ||
+      value.valueSelector !== oldValueSelector ||
+      value.textSelector !== oldTextSelector
+    const subGroupAPIValueOrTextSelectorChanged = value.subgroupValueSelector !== oldSubgroupValueSelector
+
     newSharedFilters[index][prop] = value
     if (prop === 'columnName') {
       if (newSharedFilters[index].subGrouping) delete newSharedFilters[index].subGrouping
       // changing a data column and want to load the data into the preview options
       const sharedFiltersWithValues = addValuesToDashboardFilters(newSharedFilters, data)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFiltersWithValues })
-    } else if (prop === 'apiFilter' && value.apiEndpoint && value.valueSelector && apiFilterChanged) {
+    } else if (prop === 'filterStyle') {
+      newSharedFilters[index] = {
+        ...newSharedFilters[index],
+        active: '',
+        apiFilter: {
+          apiEndpoint: '',
+          subgroupValueSelector: '',
+          textSelector: '',
+          valueSelector: ''
+        },
+        filterStyle: value
+      }
+      dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+    } else if (
+      prop === 'apiFilter' &&
+      value.apiEndpoint &&
+      value.valueSelector &&
+      (apiFilterChanged || subGroupAPIValueOrTextSelectorChanged)
+    ) {
+      if (sharedFilters[index].filterStyle === FILTER_STYLE.nestedDropdown && value.subgroupValueSelector) {
+        newSharedFilters[index].subGrouping = {
+          active: '',
+          columnName: '',
+          setByQueryParameter: '',
+          valuesLookup: {}
+        }
+      }
       // changing a api filter and want to load the api data into the preview.
       // automatically dispatches SET_SHARED_FILTERS
       loadAPIFilters(newSharedFilters, {})

@@ -7,12 +7,14 @@ import { TextField } from '@cdc/core/components/EditorPanel/Inputs'
 type NestedDropDownEditorDashboardProps = {
   config: DashboardConfig
   filter: SharedFilter
+  isDashboard: boolean
   updateFilterProp: Function
 }
 
 const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
   filter,
   config,
+  isDashboard = false,
   updateFilterProp
 }) => {
   const subGrouping = filter?.subGrouping
@@ -84,12 +86,13 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
 
   return (
     <div className='nesteddropdown-editor'>
-      <TextField
-        label='Label'
-        value={filter.key}
-        updateField={(_section, _subSection, _key, value) => updateFilterProp('key', value)}
-      />
-
+      {!isDashboard && (
+        <TextField
+          label='Label'
+          value={filter.key}
+          updateField={(_section, _subSection, _key, value) => updateFilterProp('key', value)}
+        />
+      )}
       <label>
         <div className='edit-label column-heading mt-2'>
           Filter Grouping
