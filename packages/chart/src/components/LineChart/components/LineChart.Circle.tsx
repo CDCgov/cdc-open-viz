@@ -147,10 +147,17 @@ const LineChartCircle = (props: LineChartCircleProps) => {
 
   if (mode === 'ISOLATED_POINTS') {
     const drawIsolatedPoints = (currentIndex, seriesKey) => {
+      let isMatch = false
       const currentPoint = data[currentIndex]
       const previousPoint = currentIndex > 0 ? data[currentIndex - 1] : null
       const nextPoint = currentIndex < data.length - 1 ? data[currentIndex + 1] : null
       let res = false
+      // check if isolated points has overlap with circle effect
+      circleData.forEach(item => {
+        if (item?.data[seriesKey] === currentPoint[seriesKey]) {
+          isMatch = true
+        }
+      })
 
       // Handle the first point in the array
       if (currentIndex === 0 && nextPoint && !nextPoint[seriesKey]) {
@@ -170,6 +177,9 @@ const LineChartCircle = (props: LineChartCircleProps) => {
         ) {
           res = true
         }
+      }
+      if (isMatch) {
+        res = false
       }
 
       return res
