@@ -31,6 +31,7 @@ import dataBiteReducer from './store/db.reducer'
 
 // styles
 import './scss/main.scss'
+import LayoutTemplate from '@cdc/core/components/Layout/LayoutTemplate'
 
 type CdcDataBiteProps = {
   config: Config
@@ -540,104 +541,83 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     const showBite = undefined !== dataColumn && undefined !== dataFunction
     body = (
       <>
-        {isEditor && <EditorPanel />}
-        <Layout.Responsive isEditor={isEditor}>
-          <div className={`cove-component__content`}>
-            {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
-            {(!config.dataColumn || !config.dataFunction) && <Confirm />}
-            <Layout.Title
-              config={config}
-              title={title}
-              isDashboard={isDashboard}
-              classes={['bite-header', `${config.theme}`]}
-            />
-            <div className={`bite ${biteClasses.join(' ')}`}>
-              <div className={`bite-content-container ${contentClasses.join(' ')}`}>
-                {showBite && 'graphic' === biteStyle && isTop && (
-                  <CircleCallout
-                    theme={config.theme}
-                    text={calculateDataBite()}
-                    biteFontSize={biteFontSize}
-                    dataFormat={dataFormat}
-                  />
-                )}
-                {isTop && <DataImage />}
-                <div className={`bite-content`}>
-                  {showBite && 'title' === biteStyle && (
-                    <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
-                      {calculateDataBite()}
-                    </div>
-                  )}
-                  {showBite && 'split' === biteStyle && (
-                    <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
-                      {calculateDataBite()}
-                    </div>
-                  )}
-                  <Fragment>
-                    <div className='bite-content__text-wrap'>
-                      <p className='bite-text'>
-                        {showBite && 'body' === biteStyle && (
-                          <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
-                            {calculateDataBite()}
-                          </span>
-                        )}
-                        {parse(biteBody)}
-                      </p>
-                      {showBite && 'end' === biteStyle && (
-                        <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
-                          {calculateDataBite()}
-                        </span>
-                      )}
-
-                      <Layout.SubText text={subtext} config={state} />
-                    </div>
-                  </Fragment>
+        {(!config.dataColumn || !config.dataFunction) && <Confirm />}
+        <div className={`bite ${biteClasses.join(' ')}`}>
+          <div className={`bite-content-container ${contentClasses.join(' ')}`}>
+            {showBite && 'graphic' === biteStyle && isTop && (
+              <CircleCallout
+                theme={config.theme}
+                text={calculateDataBite()}
+                biteFontSize={biteFontSize}
+                dataFormat={dataFormat}
+              />
+            )}
+            {isTop && <DataImage />}
+            <div className={`bite-content`}>
+              {showBite && 'title' === biteStyle && (
+                <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
+                  {calculateDataBite()}
                 </div>
-                {isBottom && <DataImage />}
-                {showBite && 'graphic' === biteStyle && !isTop && (
-                  <CircleCallout
-                    theme={config.theme}
-                    text={calculateDataBite()}
-                    biteFontSize={biteFontSize}
-                    dataFormat={dataFormat}
-                  />
-                )}
-              </div>
+              )}
+              {showBite && 'split' === biteStyle && (
+                <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
+                  {calculateDataBite()}
+                </div>
+              )}
+              <Fragment>
+                <div className='bite-content__text-wrap'>
+                  <p className='bite-text'>
+                    {showBite && 'body' === biteStyle && (
+                      <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
+                        {calculateDataBite()}
+                      </span>
+                    )}
+                    {parse(biteBody)}
+                  </p>
+                  {showBite && 'end' === biteStyle && (
+                    <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
+                      {calculateDataBite()}
+                    </span>
+                  )}
+
+                  <Layout.SubText text={subtext} config={state} />
+                </div>
+              </Fragment>
             </div>
+            {isBottom && <DataImage />}
+            {showBite && 'graphic' === biteStyle && !isTop && (
+              <CircleCallout
+                theme={config.theme}
+                text={calculateDataBite()}
+                biteFontSize={biteFontSize}
+                dataFormat={dataFormat}
+              />
+            )}
           </div>
-          {link && link}
-        </Layout.Responsive>
+        </div>
+        {link && link}
       </>
     )
   }
 
   return (
     <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
-      {biteStyle !== 'gradient' && (
-        <Layout.VisualizationWrapper
-          ref={outerContainerRef}
-          config={config}
-          isEditor={isEditor}
-          showEditorPanel={config?.showEditorPanel}
-        >
-          {body}
-        </Layout.VisualizationWrapper>
-      )}
-      {'gradient' === biteStyle && (
-        <Layout.VisualizationWrapper
-          ref={outerContainerRef}
-          config={config}
-          isEditor={isEditor}
-          showEditorPanel={config?.showEditorPanel}
-        >
-          {isEditor && <EditorPanel />}
-          <Layout.Responsive isEditor={isEditor}>
-            {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
+      <LayoutTemplate
+        ref={outerContainerRef}
+        config={config}
+        isEditor={isEditor}
+        showEditorPanel={config?.showEditorPanel}
+        editorPanel={<EditorPanel />}
+        handleAriaLabels={() => 'Data Bite'}
+      >
+        {biteStyle !== 'gradient' && body}
+        {'gradient' === biteStyle && (
+          <>
             {(!config.dataColumn || !config.dataFunction) && <Confirm />}
             <GradientBite label={config.title} value={calculateDataBite()} />
-          </Layout.Responsive>
-        </Layout.VisualizationWrapper>
-      )}
+          </>
+        )}
+      </LayoutTemplate>
     </Context.Provider>
   )
 }

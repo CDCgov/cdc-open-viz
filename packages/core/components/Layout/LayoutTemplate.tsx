@@ -57,10 +57,13 @@ const LayoutTemplate: ReactFC<LayoutTemplateProps> = ({
         />
       )}
       {/* CHARTS & MAPS > ERROR */}
-      {(config.type === 'chart' && config?.runtime?.editorErrorMessage) ||
-      (config.type === 'map' && config?.runtime?.editorErrorMessage.length > 0) ? (
+      {!config.newViz &&
+      ((config.type === 'chart' && config?.runtime?.editorErrorMessage) ||
+        (config.type === 'map' && config?.runtime?.editorErrorMessage.length > 0) ||
+        (config.runtime && config.runtime.editorErrorMessage)) ? (
         <Layout.ErrorSetup config={config} />
       ) : null}
+
       {/* MAPS > REQUIRED COLUMNS */}
       {requiredColumns && config.type === 'map' && (
         <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
