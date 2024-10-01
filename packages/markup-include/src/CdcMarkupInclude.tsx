@@ -14,7 +14,7 @@ import defaults from './data/initial-state'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import useDataVizClasses from '@cdc/core/components/Layout/components/ContentWrapper/useDataVizClasses'
 import markupIncludeReducer from './store/markupInclude.reducer'
 import Layout from '@cdc/core/components/Layout'
 // styles

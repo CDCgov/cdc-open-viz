@@ -11,7 +11,7 @@ import EditorPanel from './components/EditorPanel'
 
 // helpers
 import DataTransform from '@cdc/core/helpers/DataTransform'
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import useDataVizClasses from '@cdc/core/components/Layout/components/ContentWrapper/useDataVizClasses'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import Layout from '@cdc/core/components/Layout'
 
