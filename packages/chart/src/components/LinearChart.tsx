@@ -103,7 +103,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
   let height = config.aspectRatio ? width * config.aspectRatio : config.heights[renderedOrientation]
   height = Number(height)
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
-  let yMax = height - (orientation === 'horizontal' ? 0 : xAxisSize)
+  let yMax = height
   height += orientation === 'horizontal' ? xAxisSize : 0
 
   if (config.visualizationType === 'Forest Plot') {
@@ -306,7 +306,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
 
   useEffect(() => {
     const axisMaxHeight = tallestXLabel + X_LABEL_PADDING
-    const calculatedHeight = height - xAxisSize + Number(axisMaxHeight) + xLabelOffset + xAxisLabelHeight
+    const calculatedHeight = height + Number(axisMaxHeight) + xLabelOffset + xAxisLabelHeight
 
     setSvgHeight(calculatedHeight)
   }, [tallestXLabel, height, xLabelOffset])
