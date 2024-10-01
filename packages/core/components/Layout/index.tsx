@@ -5,6 +5,8 @@ import Title from './components/Title'
 import IntroText from './components/IntroText'
 import SubText from './components/Subtext'
 import ContentWrapper from './components/ContentWrapper'
+import ConfirmSetup from './components/ConfirmSetup'
+import ErrorSetup from './components/ErrorSetup'
 
 const Layout = {
   Responsive,
@@ -13,7 +15,9 @@ const Layout = {
   Title,
   IntroText,
   SubText,
-  ContentWrapper
+  ContentWrapper,
+  ConfirmSetup,
+  ErrorSetup
 }
 
 export default Layout
