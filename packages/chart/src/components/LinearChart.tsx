@@ -323,6 +323,13 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     }
   }) /* eslint-disable-line */
 
+  useEffect(() => {
+    const axisMaxHeight = tallestXLabel + X_LABEL_PADDING
+    const calculatedHeight = height - xAxisSize + Number(axisMaxHeight) + xLabelOffset + xAxisLabelHeight
+
+    setSvgHeight(calculatedHeight)
+  }, [tallestXLabel, height, xLabelOffset])
+
   // If the chart is in view, set to animate if it has not already played
   useEffect(() => {
     if (dataRef?.isIntersecting === true && config.animate) {
