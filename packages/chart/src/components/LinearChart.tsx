@@ -330,7 +330,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
     if (xAxisLabel) {
       setXAxisLabelHeight(xAxisLabel.getBBox().height)
     }
-  }, [dimensions])
+  }, [dimensions, config.xAxis])
 
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
