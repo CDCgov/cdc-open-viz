@@ -3,7 +3,6 @@ import * as d3 from 'd3'
 import Layout from '@cdc/core/components/Layout'
 import Waiting from '@cdc/core/components/Waiting'
 import Annotation from './components/Annotation'
-import Error from './components/EditorPanel/components/Error'
 import _ from 'lodash'
 
 // types
@@ -77,6 +76,7 @@ import WorldMap from './components/WorldMap' // Future: Lazy
 import useTooltip from './hooks/useTooltip'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
+import LayoutTemplate from '@cdc/core/components/Layout/LayoutTemplate'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -1766,189 +1766,169 @@ const CdcMap = ({
 
   return (
     <ConfigContext.Provider value={mapProps}>
-      <Layout.VisualizationWrapper
+      <LayoutTemplate
         config={state}
         isEditor={isEditor}
         ref={outerContainerRef}
         imageId={imageId}
         showEditorPanel={state.showEditorPanel}
+        editorPanel={<EditorPanel columnsRequiredChecker={columnsRequiredChecker} />}
+        handleAriaLabels={handleMapAriaLabels}
+        requiredColumns={requiredColumns}
+        displayPanel={displayPanel}
       >
-        {isEditor && <EditorPanel columnsRequiredChecker={columnsRequiredChecker} />}
-        <Layout.Responsive isEditor={isEditor}>
-          {requiredColumns && (
-            <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
-          )}
-          {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
-            <Layout.ContentWrapper
-              config={state}
-              ariaLabel={'Map: ' + title}
-              missingRequiredSections={() => false}
-              newViz={state.newViz}
-              viewport={currentViewport}
-            >
-              {state?.runtime?.editorErrorMessage.length > 0 && <Error state={state} />}
-              {/* prettier-ignore */}
-              <Layout.Title
-                title={title}
-                superTitle={general.superTitle}
-                config={config}
-                classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
-              />
-              <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
-              {state?.annotations?.length > 0 && (
-                <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
-              )}
+        <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
+        {state?.annotations?.length > 0 && (
+          <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
+        )}
 
-              {state?.filters?.length > 0 && (
-                <Filters
-                  config={state}
-                  setConfig={setState}
-                  getUniqueValues={getUniqueValues}
-                  filteredData={runtimeFilters}
-                  setFilteredData={setRuntimeFilters}
-                  dimensions={dimensions}
-                />
-              )}
+        {state?.filters?.length > 0 && (
+          <Filters
+            config={state}
+            setConfig={setState}
+            getUniqueValues={getUniqueValues}
+            filteredData={runtimeFilters}
+            setFilteredData={setRuntimeFilters}
+            dimensions={dimensions}
+          />
+        )}
 
-              <Layout.IntroText text={general.introText} config={state} />
+        <Layout.IntroText text={general.introText} config={state} />
 
-              <div
-                role='region'
-                tabIndex='0'
-                className={mapContainerClasses.join(' ')}
-                onClick={e => closeModal(e)}
-                onKeyDown={e => {
-                  if (e.keyCode === 13) {
-                    closeModal(e)
-                  }
-                }}
-                style={{ padding: '15px 25px', margin: '0px' }}
-              >
-                {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-                <section className='outline-none geography-container w-100' ref={mapSvg} tabIndex='0'>
-                  {currentViewport && (
-                    <>
-                      {modal && <Modal />}
-                      {'single-state' === geoType && <UsaMap.SingleState />}
-                      {'us' === geoType && 'us-geocode' !== state.general.type && <UsaMap.State />}
-                      {'us-region' === geoType && <UsaMap.Region />}
-                      {'us-county' === geoType && <UsaMap.County />}
-                      {'world' === geoType && <WorldMap />}
-                      {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
-                    </>
-                  )}
-                </section>
-              </div>
-
-              {general.showSidebar && 'navigation' !== general.type && (
-                <Legend dimensions={dimensions} currentViewport={currentViewport} ref={legendRef} skipId={tabId} />
-              )}
-
-              {'navigation' === general.type && (
-                <NavigationMenu
-                  mapTabbingID={tabId}
-                  displayGeoName={displayGeoName}
-                  data={runtimeData}
-                  options={general}
-                  columns={state.columns}
-                  navigationHandler={val => navigationHandler(val)}
-                />
-              )}
-
-              {/* Link */}
-              {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
-
-              <Layout.SubText text={subtext} config={state} />
-
-              <MediaControls.Section classes={['download-buttons']}>
-                {state.general.showDownloadImgButton && (
-                  <MediaControls.Button
-                    text='Download Image'
-                    title='Download Chart as Image'
-                    type='image'
-                    state={state}
-                    elementToCapture={imageId}
-                  />
-                )}
-                {state.general.showDownloadPdfButton && (
-                  <MediaControls.Button
-                    text='Download PDF'
-                    title='Download Chart as PDF'
-                    type='pdf'
-                    state={state}
-                    elementToCapture={imageId}
-                  />
-                )}
-              </MediaControls.Section>
-
-              {state.runtime.editorErrorMessage.length === 0 &&
-                true === table.forceDisplay &&
-                general.type !== 'navigation' &&
-                false === loading && (
-                  <DataTable
-                    config={state}
-                    rawData={state.data}
-                    navigationHandler={navigationHandler}
-                    expandDataTable={table.expanded}
-                    headerColor={general.headerColor}
-                    columns={state.columns}
-                    showDownloadButton={general.showDownloadButton}
-                    showFullGeoNameInCSV={table.showFullGeoNameInCSV}
-                    runtimeLegend={runtimeLegend}
-                    runtimeData={runtimeData}
-                    displayDataAsText={displayDataAsText}
-                    displayGeoName={displayGeoName}
-                    applyLegendToRow={applyLegendToRow}
-                    tableTitle={table.label}
-                    indexTitle={table.indexLabel}
-                    vizTitle={general.title}
-                    viewport={currentViewport}
-                    formatLegendLocation={formatLegendLocation}
-                    setFilteredCountryCode={setFilteredCountryCode}
-                    tabbingId={tabId}
-                    showDownloadImgButton={state.general.showDownloadImgButton}
-                    showDownloadPdfButton={state.general.showDownloadPdfButton}
-                    innerContainerRef={innerContainerRef}
-                    outerContainerRef={outerContainerRef}
-                    imageRef={imageId}
-                    isDebug={isDebug}
-                    wrapColumns={table.wrapColumns}
-                  />
-                )}
-
-              {state.annotations.length > 0 && <Annotation.Dropdown />}
-
-              {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
-            </Layout.ContentWrapper>
-          )}
-
-          <div aria-live='assertive' className='cdcdataviz-sr-only'>
-            {accessibleStatus}
-          </div>
-
-          {!isDraggingAnnotation &&
-            !window.matchMedia('(any-hover: none)').matches &&
-            'hover' === tooltips.appearanceType && (
-              <ReactTooltip
-                id={`tooltip__${tooltipId}`}
-                float={true}
-                className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`}
-                style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }}
-              />
+        <div
+          role='region'
+          tabIndex='0'
+          className={mapContainerClasses.join(' ')}
+          onClick={e => closeModal(e)}
+          onKeyDown={e => {
+            if (e.keyCode === 13) {
+              closeModal(e)
+            }
+          }}
+          style={{ padding: '15px 25px', margin: '0px' }}
+        >
+          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+          <section className='outline-none geography-container w-100' ref={mapSvg} tabIndex='0'>
+            {currentViewport && (
+              <>
+                {modal && <Modal />}
+                {'single-state' === geoType && <UsaMap.SingleState />}
+                {'us' === geoType && 'us-geocode' !== state.general.type && <UsaMap.State />}
+                {'us-region' === geoType && <UsaMap.Region />}
+                {'us-county' === geoType && <UsaMap.County />}
+                {'world' === geoType && <WorldMap />}
+                {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
+              </>
             )}
-          <div
-            ref={tooltipRef}
-            id={`tooltip__${tooltipId}-canvas`}
-            className='tooltip'
-            style={{
-              background: `rgba(255,255,255,${state.tooltips.opacity / 100})`,
-              position: 'absolute',
-              whiteSpace: 'nowrap',
-              display: 'none' // can't use d-none here
-            }}
-          ></div>
-        </Layout.Responsive>
-      </Layout.VisualizationWrapper>
+          </section>
+        </div>
+
+        {general.showSidebar && 'navigation' !== general.type && (
+          <Legend dimensions={dimensions} currentViewport={currentViewport} ref={legendRef} skipId={tabId} />
+        )}
+
+        {'navigation' === general.type && (
+          <NavigationMenu
+            mapTabbingID={tabId}
+            displayGeoName={displayGeoName}
+            data={runtimeData}
+            options={general}
+            columns={state.columns}
+            navigationHandler={val => navigationHandler(val)}
+          />
+        )}
+
+        {/* Link */}
+        {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
+
+        <Layout.SubText text={subtext} config={state} />
+
+        <MediaControls.Section classes={['download-buttons']}>
+          {state.general.showDownloadImgButton && (
+            <MediaControls.Button
+              text='Download Image'
+              title='Download Chart as Image'
+              type='image'
+              state={state}
+              elementToCapture={imageId}
+            />
+          )}
+          {state.general.showDownloadPdfButton && (
+            <MediaControls.Button
+              text='Download PDF'
+              title='Download Chart as PDF'
+              type='pdf'
+              state={state}
+              elementToCapture={imageId}
+            />
+          )}
+        </MediaControls.Section>
+
+        {state.runtime.editorErrorMessage.length === 0 &&
+          true === table.forceDisplay &&
+          general.type !== 'navigation' &&
+          false === loading && (
+            <DataTable
+              config={state}
+              rawData={state.data}
+              navigationHandler={navigationHandler}
+              expandDataTable={table.expanded}
+              headerColor={general.headerColor}
+              columns={state.columns}
+              showDownloadButton={general.showDownloadButton}
+              showFullGeoNameInCSV={table.showFullGeoNameInCSV}
+              runtimeLegend={runtimeLegend}
+              runtimeData={runtimeData}
+              displayDataAsText={displayDataAsText}
+              displayGeoName={displayGeoName}
+              applyLegendToRow={applyLegendToRow}
+              tableTitle={table.label}
+              indexTitle={table.indexLabel}
+              vizTitle={general.title}
+              viewport={currentViewport}
+              formatLegendLocation={formatLegendLocation}
+              setFilteredCountryCode={setFilteredCountryCode}
+              tabbingId={tabId}
+              showDownloadImgButton={state.general.showDownloadImgButton}
+              showDownloadPdfButton={state.general.showDownloadPdfButton}
+              innerContainerRef={innerContainerRef}
+              outerContainerRef={outerContainerRef}
+              imageRef={imageId}
+              isDebug={isDebug}
+              wrapColumns={table.wrapColumns}
+            />
+          )}
+
+        {state.annotations.length > 0 && <Annotation.Dropdown />}
+
+        {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
+
+        <div aria-live='assertive' className='cdcdataviz-sr-only'>
+          {accessibleStatus}
+        </div>
+
+        {!isDraggingAnnotation &&
+          !window.matchMedia('(any-hover: none)').matches &&
+          'hover' === tooltips.appearanceType && (
+            <ReactTooltip
+              id={`tooltip__${tooltipId}`}
+              float={true}
+              className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`}
+              style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }}
+            />
+          )}
+        <div
+          ref={tooltipRef}
+          id={`tooltip__${tooltipId}-canvas`}
+          className='tooltip'
+          style={{
+            background: `rgba(255,255,255,${state.tooltips.opacity / 100})`,
+            position: 'absolute',
+            whiteSpace: 'nowrap',
+            display: 'none' // can't use d-none here
+          }}
+        ></div>
+      </LayoutTemplate>
     </ConfigContext.Provider>
   )
 }

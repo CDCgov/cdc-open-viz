@@ -1210,7 +1210,7 @@ export default function CdcChart({
     body = (
       <LayoutTemplate
         config={config}
-        editorPanel={EditorPanel} // todo: make editor panel reusable in the future.
+        editorPanel={<EditorPanel />} // todo: make editor panel reusable in the future.
         isEditor={isEditor}
         newViz={config.newViz}
         missingRequiredSections={missingRequiredSections}

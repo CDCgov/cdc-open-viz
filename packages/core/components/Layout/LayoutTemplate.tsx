@@ -1,5 +1,6 @@
 import React from 'react'
 import Layout from './index'
+import Waiting from '../Waiting'
 
 type LayoutTemplateProps = {
   config: any // todo
@@ -8,6 +9,7 @@ type LayoutTemplateProps = {
   isEditor: boolean
   isDashboard: boolean
   missingRequiredSections: any
+  children: React.ReactNode
 }
 
 const LayoutTemplate: ReactFC<LayoutTemplateProps> = ({
@@ -21,18 +23,15 @@ const LayoutTemplate: ReactFC<LayoutTemplateProps> = ({
   missingRequiredSections,
   outerContainerRef,
   updateConfig,
-  viewport
+  viewport,
+  requiredColumns,
+  displayPanel
 }) => {
-  console.log('config', config)
   if (!config) return <></>
-  const EditorPanel = editorPanel
 
   const handleRequiredSections = () => {
     if (config.type === 'chart') {
       return !missingRequiredSections() && !config?.newViz
-    }
-
-    if (config.type === 'map') {
     }
 
     return true
@@ -47,16 +46,25 @@ const LayoutTemplate: ReactFC<LayoutTemplateProps> = ({
       imageId={imageId}
       showEditorPanel={config?.showEditorPanel}
     >
-      {isEditor && <EditorPanel />}
+      {isEditor && editorPanel}
+      {/* CHARTS > CONFIRM SETUP */}
       {config && config.type === 'chart' && config.newViz && (
         <Layout.ConfirmSetup
           newViz={config.newViz}
-          missingRequiredSections={config.type === 'chart' ? missingRequiredSections : () => false}
+          missingRequiredSections={missingRequiredSections}
           updateConfig={updateConfig}
           config={config}
         />
       )}
-      {config && config.runtime && config.runtime.editorErrorMessage && <Layout.ErrorSetup config={config} />}
+      {/* CHARTS & MAPS > ERROR */}
+      {(config.type === 'chart' && config?.runtime?.editorErrorMessage) ||
+      (config.type === 'map' && config?.runtime?.editorErrorMessage.length > 0) ? (
+        <Layout.ErrorSetup config={config} />
+      ) : null}
+      {/* MAPS > REQUIRED COLUMNS */}
+      {requiredColumns && config.type === 'map' && (
+        <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
+      )}
       <Layout.Responsive isEditor={isEditor}>
         {handleRequiredSections() && (
           <Layout.ContentWrapper
@@ -69,9 +77,8 @@ const LayoutTemplate: ReactFC<LayoutTemplateProps> = ({
               showTitle={config?.showTitle ? config.showTitle : true}
               isDashboard={isDashboard}
               title={config?.type === 'map' ? config.general.title : config.title}
-              superTitle={config.superTitle}
-              classes={['chart-title', `${config.theme}`, 'cove-component__header']}
-              style={undefined}
+              superTitle={config.type === 'map' ? config.general.superTitle : config.superTitle}
+              config={config}
             />
             {children}
           </Layout.ContentWrapper>

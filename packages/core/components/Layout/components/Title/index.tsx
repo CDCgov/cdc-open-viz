@@ -2,7 +2,7 @@ import React from 'react'
 import parse from 'html-react-parser'
 import './Title.scss'
 
-type HeaderProps = {
+type TitleProps = {
   title?: string
   isDashboard?: boolean
   superTitle?: string
@@ -12,11 +12,28 @@ type HeaderProps = {
   ariaLevel?: number
 }
 
-const Title = (props: HeaderProps) => {
-  const { isDashboard, title, superTitle, classes = [], showTitle = true, ariaLevel = 2 } = props
+const Title: React.FC<TitleProps> = props => {
+  const { config, isDashboard, title, superTitle, classes = [], showTitle = true, ariaLevel = 2 } = props
+
+  const getVizTitleClasses = classes => {
+    switch (config.type) {
+      case 'map':
+        return [
+          'map-title',
+          config.general.showTitle === true ? 'visible' : 'hidden',
+          `${config.general.headerColor}`,
+          'cove-component__header',
+          ...classes
+        ]
+      case 'chart':
+        return ['chart-title', `${config.theme}`, 'cove-component__header', ...classes]
+      default:
+        return ['chart-title', `${config.theme}`, 'cove-component__header', ...classes]
+    }
+  }
 
   // standard classes every vis should have
-  const updatedClasses = ['cove-component__header', 'component__header', ...classes]
+  const updatedClasses = getVizTitleClasses(classes)
 
   return (
     title &&
