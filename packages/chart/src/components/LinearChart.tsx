@@ -325,7 +325,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
 
   useEffect(() => {
     const axisMaxHeight = tallestXLabel + X_LABEL_PADDING
-    const calculatedHeight = height - xAxisSize + Number(axisMaxHeight) + xLabelOffset + xAxisLabelHeight
+    const calculatedHeight = height + Number(axisMaxHeight) + xLabelOffset + xAxisLabelHeight
 
     setSvgHeight(calculatedHeight)
   }, [tallestXLabel, height, xLabelOffset])
