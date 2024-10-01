@@ -57,14 +57,14 @@ const Legend: React.FC<LegendProps> = forwardRef(
       legend?.position === 'bottom' || (isLegendWrapViewport(currentViewport) && !legend.hide)
 
     const legendClasses = {
-      marginBottom: getMarginBottom(isBottomOrSmallViewport, config),
+      marginBottom: getMarginBottom(config, hasSuppression),
       marginTop: getMarginTop(isBottomOrSmallViewport, config)
     }
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
     let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
     if (!legend) return null
-    let legendElement = (
+    return (
       <aside
         ref={ref}
         style={legendClasses}
@@ -219,11 +219,6 @@ const Legend: React.FC<LegendProps> = forwardRef(
         )}
       </aside>
     )
-    // If the legend contains the absolutely-positioned suppression info box it needs a 30px tall div to push remaining content down
-    if (hasSuppression) {
-      legendElement = [legendElement, <div className='legend-suppression-spacer'></div>]
-    }
-    return legendElement
   }
 )
 

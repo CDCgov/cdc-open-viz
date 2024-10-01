@@ -19,13 +19,14 @@ export const getMarginTop = (isBottomOrSmallViewport, config) => {
   }
   return '20px'
 }
-export const getMarginBottom = (isBottomOrSmallViewport, config) => {
+export const getMarginBottom = (config, hasSuppression) => {
   const isLegendTop = config.legend?.position === 'top' && !config.legend.hide
 
-  let marginBottom = '0px'
-  if (isLegendTop) {
-    marginBottom = config.legend.hideBorder.topBottom ? '15px' : '25px'
-  }
+  let marginBottom = 0
 
-  return marginBottom
+  if (isLegendTop) marginBottom = config.legend.hideBorder.topBottom ? 15 : 25
+
+  if (hasSuppression) marginBottom += 30
+
+  return `${marginBottom}px`
 }
