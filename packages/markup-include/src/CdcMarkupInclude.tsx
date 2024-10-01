@@ -17,6 +17,7 @@ import Loading from '@cdc/core/components/Loading'
 import useDataVizClasses from '@cdc/core/components/Layout/components/ContentWrapper/useDataVizClasses'
 import markupIncludeReducer from './store/markupInclude.reducer'
 import Layout from '@cdc/core/components/Layout'
+import LayoutTemplate from '@cdc/core/components/Layout/LayoutTemplate'
 // styles
 import './cdcMarkupInclude.style.css'
 import './scss/main.scss'
@@ -241,18 +242,12 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   if (loading === false) {
     content = (
       <>
-        {isEditor && <EditorPanel />}
-        <Layout.Responsive isEditor={isEditor}>
-          <Layout.ContentWrapper config={config} ariaLabel={title} newViz={false}>
-            <Layout.Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
-            <div className={`${innerContainerClasses.join(' ')}`}>
-              <div className='cove-component__content-wrap'>
-                {!markupError && <Markup allowElements={!!urlMarkup} content={markup} />}
-                {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
-              </div>
-            </div>
-          </Layout.ContentWrapper>
-        </Layout.Responsive>
+        <div className={`${innerContainerClasses.join(' ')}`}>
+          <div className='cove-component__content-wrap'>
+            {!markupError && <Markup allowElements={!!urlMarkup} content={markup} />}
+            {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
+          </div>
+        </div>
       </>
     )
   }
@@ -272,9 +267,15 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     <ErrorBoundary component='CdcMarkupInclude'>
       <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard }}>
         {!config?.newViz && config?.runtime && config?.runtime.editorErrorMessage && <Error />}
-        <Layout.VisualizationWrapper config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
+        <LayoutTemplate
+          config={config}
+          editorPanel={<EditorPanel />}
+          isEditor={isEditor}
+          showEditorPanel={config?.showEditorPanel}
+          handleAriaLabels={() => 'Markup Include'}
+        >
           {content}
-        </Layout.VisualizationWrapper>
+        </LayoutTemplate>
       </ConfigContext.Provider>
     </ErrorBoundary>
   )

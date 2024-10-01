@@ -10,13 +10,14 @@ type TitleProps = {
   style?: React.CSSProperties
   showTitle?: boolean
   ariaLevel?: number
+  config: any
 }
 
 const Title: React.FC<TitleProps> = props => {
   const { config, isDashboard, title, superTitle, classes = [], showTitle = true, ariaLevel = 2 } = props
 
   const getVizTitleClasses = classes => {
-    switch (config.type) {
+    switch (config?.type) {
       case 'map':
         return [
           'map-title',
@@ -28,7 +29,7 @@ const Title: React.FC<TitleProps> = props => {
       case 'chart':
         return ['chart-title', `${config.theme}`, 'cove-component__header', ...classes]
       default:
-        return ['chart-title', `${config.theme}`, 'cove-component__header', ...classes]
+        return [`${config?.theme}`, 'cove-component__header', ...classes]
     }
   }
 

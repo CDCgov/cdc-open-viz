@@ -65,6 +65,8 @@ const LayoutTemplate: ReactFC<LayoutTemplateProps> = ({
       {requiredColumns && config.type === 'map' && (
         <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
       )}
+
+      {/* RESPONSIVE WRAPPER FOR EDITOR PANEL */}
       <Layout.Responsive isEditor={isEditor}>
         {handleRequiredSections() && (
           <Layout.ContentWrapper
@@ -76,7 +78,14 @@ const LayoutTemplate: ReactFC<LayoutTemplateProps> = ({
             <Layout.Title
               showTitle={config?.showTitle ? config.showTitle : true}
               isDashboard={isDashboard}
-              title={config?.type === 'map' ? config.general.title : config.title}
+              // TODO: use coveUpdateWorker here
+              title={
+                config?.type === 'map'
+                  ? config.general.title
+                  : config.type === 'markup-include'
+                  ? config.contentEditor.title
+                  : config.title
+              }
               superTitle={config.type === 'map' ? config.general.superTitle : config.superTitle}
               config={config}
             />
