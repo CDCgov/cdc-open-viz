@@ -4,6 +4,7 @@ import VisualizationWrapper from './components/Visualization'
 import Title from './components/Title'
 import IntroText from './components/IntroText'
 import SubText from './components/Subtext'
+import ContentWrapper from './components/ContentWrapper'
 
 const Layout = {
   Responsive,
@@ -11,7 +12,8 @@ const Layout = {
   VisualizationWrapper,
   Title,
   IntroText,
-  SubText
+  SubText,
+  ContentWrapper
 }
 
 export default Layout

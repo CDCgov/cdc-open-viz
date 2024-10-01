@@ -1764,12 +1764,6 @@ const CdcMap = ({
     </a>
   )
 
-  const sectionClassNames = () => {
-    const classes = ['cove-component__content', 'cdc-map-inner-container', `${currentViewport}`]
-    if (config?.runtime?.editorErrorMessage.length > 0) classes.push('type-map--has-error')
-    return classes.join(' ')
-  }
-
   return (
     <ConfigContext.Provider value={mapProps}>
       <Layout.VisualizationWrapper
@@ -1785,7 +1779,13 @@ const CdcMap = ({
             <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
           )}
           {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
-            <section className={sectionClassNames()} aria-label={'Map: ' + title} ref={innerContainerRef}>
+            <Layout.ContentWrapper
+              config={state}
+              ariaLabel={'Map: ' + title}
+              missingRequiredSections={() => false}
+              newViz={state.newViz}
+              viewport={currentViewport}
+            >
               {state?.runtime?.editorErrorMessage.length > 0 && <Error state={state} />}
               {/* prettier-ignore */}
               <Layout.Title
@@ -1919,7 +1919,7 @@ const CdcMap = ({
               {state.annotations.length > 0 && <Annotation.Dropdown />}
 
               {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
-            </section>
+            </Layout.ContentWrapper>
           )}
 
           <div aria-live='assertive' className='cdcdataviz-sr-only'>

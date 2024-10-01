@@ -23,7 +23,7 @@ import defaults from './data/initial-state'
 import { publish } from '@cdc/core/helpers/events'
 import chartReducer from './store/chart.reducer'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import useDataVizClasses from '@cdc/core/components/Layout/components/ContentWrapper/useDataVizClasses'
 
 import './scss/main.scss'
 import Layout from '@cdc/core/components/Layout'
@@ -358,7 +358,12 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   }
 
   return (
-    <div className='cove-component__content'>
+    <Layout.ContentWrapper
+      config={config}
+      missingRequiredSections={() => false}
+      ariaLabel={'Waffle Chart'}
+      newViz={false}
+    >
       <Layout.Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
       <div className={contentClasses.join(' ')}>
         {!config.newViz && config.runtime && config.runtime.editorErrorMessage && (
@@ -423,7 +428,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         </div>
       </div>
       {link && link}
-    </div>
+    </Layout.ContentWrapper>
   )
 }
 
