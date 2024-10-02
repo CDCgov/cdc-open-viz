@@ -64,9 +64,8 @@ const update_4_24_10 = config => {
   setXAxisLabelOffsetToZero(newConfig)
   changePivotColumns(newConfig)
   removeMultiSelectPropFromMultiselect(newConfig)
-  const updatedConfig = setXAxisLabelOffsetToZero(newConfig)
-  updatedConfig.version = ver
-  return updatedConfig
+  newConfig.version = ver
+  return newConfig
 }
 
 export default update_4_24_10
