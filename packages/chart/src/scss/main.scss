@@ -134,6 +134,7 @@
 
     &.no-border {
       border: 1px solid transparent;
+      padding: 0;
     }
 
     &__inner {
@@ -199,11 +200,11 @@
 
     h3,
     p {
-      margin-bottom: 0.8em;
+      margin-bottom: 0.4em;
     }
 
     & div.legend-item {
-      margin-bottom: 0.5em !important;
+      margin-bottom: 0.2em !important;
 
       &:last-child {
         margin: 0 !important;
