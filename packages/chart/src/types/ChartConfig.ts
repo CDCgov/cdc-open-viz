@@ -10,7 +10,6 @@ import { General } from '@cdc/core/types/General'
 import { type Link } from './../components/Sankey/types'
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
-
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 
@@ -181,6 +180,7 @@ export type AllChartsConfig = {
   twoColor: { palette: string }
   type: 'chart' | 'dashboard'
   uid: string | number
+  version: string
   visual: Visual
   visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting' | 'Sankey' | 'Bump Chart'
   visualizationSubType: string
