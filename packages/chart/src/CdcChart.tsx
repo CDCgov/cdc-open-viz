@@ -368,17 +368,13 @@ export default function CdcChart({
                 filter.order === 'desc' ? sortDesc : sortAsc
               )
 
-        newConfig.filters[index].values = filterValues
         // Initial filter should be active
 
         const includes = (arr: any[], val: any): boolean => (arr || []).map(val => String(val)).includes(String(val))
-        newConfig.filters[index].active =
-          !newConfig.filters[index].active || !includes(filterValues, newConfig.filters[index].active)
-            ? filterValues[0]
-            : newConfig.filters[index].active
-        newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle
-          ? newConfig.filters[index].filterStyle
-          : 'dropdown'
+
+        filter.active =
+          !filter.active || !includes(filterValues, filter.active) || filter.active ? filterValues[0] : filter.active
+        filter.filterStyle = filter.filterStyle ? filter.filterStyle : 'dropdown'
       })
       currentData = filterVizData(newConfig.filters, newExcludedData)
       setFilteredData(currentData)

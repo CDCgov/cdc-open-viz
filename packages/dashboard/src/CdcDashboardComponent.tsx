@@ -20,7 +20,7 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import getViewport from '@cdc/core/helpers/getViewport'
 
 import CdcMap from '@cdc/map'
-import CdcChart from '@cdc/chart'
+import CdcChart from '../../chart/src/CdcChart'
 import CdcDataBite from '@cdc/data-bite'
 import CdcWaffleChart from '@cdc/waffle-chart'
 import CdcMarkupInclude from '@cdc/markup-include'
