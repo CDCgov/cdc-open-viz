@@ -26,7 +26,7 @@ export const getMarginBottom = (config, hasSuppression) => {
 
   if (isLegendTop) marginBottom = config.legend.hideBorder.topBottom ? 15 : 25
 
-  if (hasSuppression) marginBottom += 30
+  if (hasSuppression) marginBottom += 40
 
   return `${marginBottom}px`
 }
