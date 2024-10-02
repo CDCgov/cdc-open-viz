@@ -115,7 +115,7 @@ export default function CdcChart({
   const renderedOrientation = useVertical ? responsiveVertical : 'horizontal'
   let height = config.aspectRatio ? width * config.aspectRatio : config?.heights?.[renderedOrientation]
   if (config.visualizationType === 'Pie') height = config?.heights?.[renderedOrientation]
-  height = height + Number(config?.xAxis?.size) + 45
+  height = height + Number(config.orientation === 'horizontal' ? config.yAxis.size : config?.xAxis?.size) + 45
 
   type Config = typeof config
   let legendMemo = useRef(new Map()) // map collection
@@ -398,7 +398,6 @@ export default function CdcChart({
         Object.keys(finalData[0]).forEach(seriesKey => {
           if (
             seriesKey !== newConfig.xAxis.dataKey &&
-            finalData[0][seriesKey] &&
             (!newConfig.filters || newConfig.filters.filter(filter => filter.columnName === seriesKey).length === 0) &&
             (!newConfig.columns || Object.keys(newConfig.columns).indexOf(seriesKey) === -1)
           ) {

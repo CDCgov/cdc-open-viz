@@ -42,7 +42,13 @@ const cleanDashboardData = (config: DashboardConfig) => {
   }
   if (config.visualizations) {
     Object.keys(config.visualizations).forEach(vizKey => {
-      config.visualizations[vizKey] = _.omit(config.visualizations[vizKey], ['runtime', 'formattedData', 'data', 'editing', 'originalFormattedData'])
+      config.visualizations[vizKey] = _.omit(config.visualizations[vizKey], [
+        'runtime',
+        'formattedData',
+        'data',
+        'editing',
+        'originalFormattedData'
+      ])
     })
   }
   if (config.rows) {
@@ -65,6 +71,14 @@ const cleanSharedFilters = (config: DashboardConfig) => {
   }
 }
 
+const removeRuntimeDataURLs = (config: DashboardConfig) => {
+  if (config.datasets) {
+    Object.keys(config.datasets).forEach(datasetKey => {
+      delete config.datasets[datasetKey].runtimeDataUrl
+    })
+  }
+}
+
 export const formatConfigBeforeSave = configToStrip => {
   const strippedConfig = _.cloneDeep(configToStrip)
   if (strippedConfig.type === 'dashboard') {
@@ -83,6 +97,7 @@ export const formatConfigBeforeSave = configToStrip => {
     cleanDashboardData(strippedConfig)
     cleanSharedFilters(strippedConfig)
     cleanDashboardFootnotes(strippedConfig)
+    removeRuntimeDataURLs(strippedConfig)
   } else {
     delete strippedConfig.runtime
     delete strippedConfig.formattedData
