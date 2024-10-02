@@ -46,6 +46,7 @@ type LinearChartProps = {
 }
 
 const X_LABEL_PADDING = 10
+const X_TICK_LABEL_PADDING = 3
 
 const LinearChart: React.FC<LinearChartProps> = props => {
   // prettier-ignore
@@ -491,7 +492,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                         {!runtime.yAxis.hideLabel && (
                           <Text // prettier-ignore
                             x={tick.to.x}
-                            y={tick.to.y}
+                            y={tick.to.y + X_TICK_LABEL_PADDING}
                             angle={-angle}
                             verticalAnchor={angle ? 'middle' : 'start'}
                             textAnchor={textAnchor}
@@ -1374,7 +1375,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                               dy={config.orientation === 'horizontal' && isLogarithmicAxis ? 8 : 0}
                               display={config.orientation === 'horizontal' && isLogarithmicAxis ? showTick : 'block'}
                               x={tick.to.x}
-                              y={tick.to.y}
+                              y={tick.to.y + X_TICK_LABEL_PADDING}
                               angle={tickRotation}
                               verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
                               textAnchor={tickRotation ? 'end' : 'middle'}
