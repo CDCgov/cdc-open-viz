@@ -1,4 +1,4 @@
-import { removeMultiSelectPropFromMultiselect } from '../4.24.10'
+import { removeMultiSelectPropFromMultiselect, setXAxisLabelOffsetToZero } from '../4.24.10'
 import { expect, describe, it } from 'vitest'
 
 describe('removeMultiSelectPropFromMultiSelect() ', () => {
@@ -7,5 +7,13 @@ describe('removeMultiSelectPropFromMultiSelect() ', () => {
     removeMultiSelectPropFromMultiselect(mockConfig)
     expect(mockConfig.dashboard.sharedFilters[0].filterStyle).toBe('multi-select')
     expect(mockConfig.dashboard.sharedFilters[0].multiSelect).toBeUndefined()
+  })
+})
+
+describe('setXAxisLabelOffsetToZero(config) ', () => {
+  it('sets the x-axis label offset to 0', () => {
+    const mockConfig = { xAxis: { labelOffset: 5 } } as any
+    const newConfig = setXAxisLabelOffsetToZero(mockConfig)
+    expect(newConfig.xAxis.labelOffset).toBe(0)
   })
 })
