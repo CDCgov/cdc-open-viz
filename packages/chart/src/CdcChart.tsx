@@ -900,11 +900,20 @@ export default function CdcChart({
     }
   }
 
-  const formatDate = date => {
+  const formatDate = (date, prevTick, setPrevTick) => {
     let formattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(date)
     // Handle the case where all months work with '%b.' except for May
     if (config.runtime[section].dateDisplayFormat.includes('%b.') && formattedDate.includes('May.')) {
       formattedDate = formattedDate.replace(/May\./g, 'May')
+    }
+    // Suppress matching years
+    if (config.xAxis.suppressMatchingYears && config.runtime[section].dateDisplayFormat.includes('%Y') && prevDate) {
+      const prevFormattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(prevDate)
+      const year = formattedDate.match(/\d{4}/)
+      const prevYear = prevFormattedDate.match(/\d{4}/)
+      if (year && prevYear && year[0] === prevYear[0]) {
+        formattedDate = formattedDate.replace(year, '')
+      }
     }
     return formattedDate
   }

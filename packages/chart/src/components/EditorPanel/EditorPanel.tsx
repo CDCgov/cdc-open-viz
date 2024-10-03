@@ -2835,6 +2835,29 @@ const EditorPanel = () => {
                         }
                         updateField={updateField}
                       />
+                      <CheckBox
+                        value={config.xAxis.suppressMatchingYears}
+                        section='xAxis'
+                        fieldName='suppressMatchingYears'
+                        label='Suppress matching years'
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon
+                                display='question'
+                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                              />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                When this option is checked and the date format in the axis includes years, the year
+                                will be suppressed if it is the same as the previous year.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        updateField={updateField}
+                      />
                       {visHasBrushChart() && (
                         <CheckBox
                           value={config.brush?.active}

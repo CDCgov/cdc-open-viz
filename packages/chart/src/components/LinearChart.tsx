@@ -195,13 +195,19 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     return tick
   }
 
+  let prevDate
+
   const handleBottomTickFormatting = tick => {
     if (isLogarithmicAxis && tick === 0.1) {
       // when logarithmic scale applied change value FIRST  of  tick
       tick = 0
     }
 
-    if (isDateScale(runtime.xAxis) && config.visualizationType !== 'Forest Plot') return formatDate(tick)
+    if (isDateScale(runtime.xAxis) && config.visualizationType !== 'Forest Plot') {
+      const formattedDate = formatDate(tick, prevDate)
+      prevDate = tick
+      return formattedDate
+    }
     if (orientation === 'horizontal' && config.visualizationType !== 'Forest Plot')
       return formatNumber(tick, 'left', shouldAbbreviate)
     if (config.xAxis.type === 'continuous' && config.visualizationType !== 'Forest Plot')
