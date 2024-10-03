@@ -76,7 +76,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   const getStyleOptions = type => {
     const options = Object.keys(lineCodes)
     if (type === 'suppression') {
-      return options.slice(0, -1)
+      return options.slice(0, -2)
     } else {
       return options
     }

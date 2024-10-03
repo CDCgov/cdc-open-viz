@@ -161,7 +161,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
     leftMax,
     rightMax,
     dimensions,
-    xMax: props.parentWidth - Number(config.yAxis.size)
+    xMax: props.parentWidth - Number(config.orientation === 'horizontal' ? config.xAxis.size : config.yAxis.size)
   })
 
   // sets the portal x/y for where tooltips should appear on the page.

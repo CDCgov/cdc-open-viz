@@ -137,7 +137,8 @@ const CdcMap = ({
   const legendRef = useRef(null)
   const tooltipRef = useRef(null)
   const legendId = useId()
-  const tooltipId = useId()
+  // create random tooltipId
+  const tooltipId = `${Math.random().toString(16).slice(-4)}`
   const mapId = useId()
 
   const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
@@ -1498,8 +1499,10 @@ const CdcMap = ({
     // add ability to rename state properties over time.
     const processedConfig = { ...coveUpdateWorker(newState) }
 
-    setState(processedConfig)
-    setLoading(false)
+    setTimeout(() => {
+      setState(processedConfig)
+      setLoading(false)
+    }, 10)
   }
 
   const init = async () => {
