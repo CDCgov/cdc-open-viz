@@ -900,7 +900,7 @@ export default function CdcChart({
     }
   }
 
-  const formatDate = (date, prevTick, setPrevTick) => {
+  const formatDate = (date, prevDate) => {
     let formattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(date)
     // Handle the case where all months work with '%b.' except for May
     if (config.runtime[section].dateDisplayFormat.includes('%b.') && formattedDate.includes('May.')) {
