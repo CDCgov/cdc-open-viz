@@ -90,6 +90,8 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   const [forestXLabelY, setForestXLabelY] = useState(0)
 
   // REFS
+  const annotationRefs = useRef(null)
+  const prevTickRef = useRef(null)
   const axisBottomRef = useRef(null)
   const forestPlotRightLabelRef = useRef(null)
   const svgRef = useRef()
@@ -195,8 +197,6 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     return tick
   }
 
-  let prevDate
-
   const handleBottomTickFormatting = tick => {
     if (isLogarithmicAxis && tick === 0.1) {
       // when logarithmic scale applied change value FIRST  of  tick
@@ -204,8 +204,8 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     }
 
     if (isDateScale(runtime.xAxis) && config.visualizationType !== 'Forest Plot') {
-      const formattedDate = formatDate(tick, prevDate)
-      prevDate = tick
+      const formattedDate = formatDate(tick, prevTickRef.current)
+      prevTickRef.current = tick
       return formattedDate
     }
     if (orientation === 'horizontal' && config.visualizationType !== 'Forest Plot')
