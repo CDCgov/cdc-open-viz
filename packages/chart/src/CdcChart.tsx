@@ -901,7 +901,12 @@ export default function CdcChart({
   }
 
   const formatDate = date => {
-    return timeFormat(config.runtime[section].dateDisplayFormat)(date)
+    let formattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(date)
+    // Handle the case where all months work with '%b.' except for May
+    if (config.runtime[section].dateDisplayFormat.includes('%b.') && formattedDate.includes('May.')) {
+      formattedDate = formattedDate.replace(/May\./g, 'May')
+    }
+    return formattedDate
   }
 
   const formatTooltipsDate = date => {
