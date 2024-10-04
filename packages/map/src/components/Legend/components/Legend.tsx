@@ -11,7 +11,7 @@ import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import LegendItemHex from './LegendItem.Hex'
 import Button from '@cdc/core/components/elements/Button'
 
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import useDataVizClasses from '@cdc/core/components/Layout/components/ContentWrapper/useDataVizClasses'
 import ConfigContext from '../../../context'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'

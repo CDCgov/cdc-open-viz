@@ -153,14 +153,6 @@
     margin-bottom: 20px;
   }
 
-  .subtext,
-  .subtext--responsive-ticks,
-  .section-subtext {
-    &--brush-active {
-      margin-top: 2.5em;
-    }
-  }
-
   .type-pie {
     svg.animated-pie {
       width: auto !important;
@@ -842,11 +834,6 @@
 
   .cove-component__content .chart-container {
     padding: 1em;
-  }
-
-  .subtext,
-  .subtext--responsive-ticks {
-    margin-top: 0px;
   }
 
   .isEditor {

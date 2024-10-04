@@ -1,0 +1,25 @@
+.type-data-bite .cove-component__subtext {
+  font-size: 0.9em;
+  font-style: italic;
+  flex-basis: 100%;
+  width: 100%;
+  align-self: flex-end;
+  display: block;
+  color: rgba(0, 0, 0, 0.5);
+  text-transform: none;
+  font-weight: normal;
+  margin-top: 1em;
+  padding: 15px 0;
+  font-style: italic;
+}
+
+.cove-component__subtext--brush-active,
+.subtext--responsive-ticks--brush-active,
+.section-subtext--brush-active {
+  margin-top: 2.5em;
+}
+
+.cove-component__subtext,
+.subtext--responsive-ticks {
+  margin-top: 0px;
+}

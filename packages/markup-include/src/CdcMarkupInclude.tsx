@@ -14,9 +14,10 @@ import defaults from './data/initial-state'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import useDataVizClasses from '@cdc/core/components/Layout/components/ContentWrapper/useDataVizClasses'
 import markupIncludeReducer from './store/markupInclude.reducer'
 import Layout from '@cdc/core/components/Layout'
+import LayoutTemplate from '@cdc/core/components/Layout/LayoutTemplate'
 // styles
 import './cdcMarkupInclude.style.css'
 import './scss/main.scss'
@@ -28,8 +29,6 @@ type CdcMarkupIncludeProps = {
   isEditor: boolean
   setConfig: any
 }
-
-import Title from '@cdc/core/components/ui/Title'
 
 const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   configUrl,
@@ -243,20 +242,12 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   if (loading === false) {
     content = (
       <>
-        {isEditor && <EditorPanel />}
-        <Layout.Responsive isEditor={isEditor}>
-          <div className='markup-include-content-container cove-component__content no-borders'>
-            <div className={`markup-include-component ${contentClasses.join(' ')}`}>
-              <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
-              <div className={`${innerContainerClasses.join(' ')}`}>
-                <div className='cove-component__content-wrap'>
-                  {!markupError && <Markup allowElements={!!urlMarkup} content={markup} />}
-                  {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
-                </div>
-              </div>
-            </div>
+        <div className={`${innerContainerClasses.join(' ')}`}>
+          <div className='cove-component__content-wrap'>
+            {!markupError && <Markup allowElements={!!urlMarkup} content={markup} />}
+            {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
           </div>
-        </Layout.Responsive>
+        </div>
       </>
     )
   }
@@ -276,9 +267,15 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     <ErrorBoundary component='CdcMarkupInclude'>
       <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard }}>
         {!config?.newViz && config?.runtime && config?.runtime.editorErrorMessage && <Error />}
-        <Layout.VisualizationWrapper config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
+        <LayoutTemplate
+          config={config}
+          editorPanel={<EditorPanel />}
+          isEditor={isEditor}
+          showEditorPanel={config?.showEditorPanel}
+          handleAriaLabels={() => 'Markup Include'}
+        >
           {content}
-        </Layout.VisualizationWrapper>
+        </LayoutTemplate>
       </ConfigContext.Provider>
     </ErrorBoundary>
   )

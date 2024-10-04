@@ -1,4 +1,4 @@
-import useDataVizClasses from '../../helpers/useDataVizClasses'
+import useDataVizClasses from '../Layout/components/ContentWrapper/useDataVizClasses'
 
 const Legend = props => {
   const { config } = props

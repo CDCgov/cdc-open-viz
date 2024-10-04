@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import '../styles/editor-utils.scss'
-import '../styles/editor.scss'
+import '../../styles/editor-utils.scss'
+import '../../styles/editor.scss'
 
-import Icon from '../../ui/Icon'
+import Icon from '../../../ui/Icon'
 
 const breakpoints = [
   '360', // xxs (mobile) 0 - 360

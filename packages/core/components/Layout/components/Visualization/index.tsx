@@ -14,10 +14,18 @@ type VisualizationWrapper = {
   imageId?: string
   isEditor: boolean
   showEditorPanel?: boolean
+  className?: string
 }
 
 const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) => {
-  const { config = {}, isEditor = false, currentViewport = 'lg', imageId = '', showEditorPanel = true, className } = props
+  const {
+    config = {},
+    isEditor = false,
+    currentViewport = 'lg',
+    imageId = '',
+    showEditorPanel = true,
+    className
+  } = props
 
   const getWrappingClasses = () => {
     let classes = ['cdc-open-viz-module', `${currentViewport}`, `font-${config?.fontSize}`, `${config?.theme}`]
@@ -50,6 +58,7 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
       config?.visualizationType === 'Spark Line' && classes.push(`type-sparkline`)
       return classes
     }
+
     if (config.type === 'map') {
       classes.push(`type-map`)
       if (config?.runtime?.editorErrorMessage.length !== 0) classes.push('type-map--has-error')
@@ -67,7 +76,14 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
     }
 
     if (config.type === 'waffle-chart') {
-      classes.push('cove', 'cdc-open-viz-module', 'type-waffle-chart', currentViewport, config.theme, 'font-' + config.overallFontSize)
+      classes.push(
+        'cove',
+        'cdc-open-viz-module',
+        'type-waffle-chart',
+        currentViewport,
+        config.theme,
+        'font-' + config.overallFontSize
+      )
 
       if (isEditor) {
         classes.push('is-editor')

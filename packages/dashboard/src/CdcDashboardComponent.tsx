@@ -37,7 +37,6 @@ import VisualizationsPanel from './components/VisualizationsPanel'
 import dashboardReducer from './store/dashboard.reducer'
 import { filterData } from './helpers/filterData'
 import { getVizKeys } from './helpers/getVizKeys'
-import Title from '@cdc/core/components/ui/Title'
 import { type TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 
 // types
@@ -476,7 +475,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
         <MultiTabs isEditor={isEditor && !isPreview} />
         <Layout.Responsive isEditor={isEditor}>
           <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
-            <Title
+            <Layout.Title
               title={title}
               isDashboard={true}
               classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]}
