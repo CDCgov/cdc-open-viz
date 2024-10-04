@@ -23,8 +23,9 @@ function getMaxTierAndSetFilterTiers(filters: SharedFilter[]): number {
 }
 
 function filter(data = [], filters: SharedFilter[], condition) {
+  const filteredFilters = filters.filter(f => f.resetLabel !== f.active)
   return data.filter(row => {
-    const foundMatchingFilter = filters.find(filter => {
+    const foundMatchingFilter = filteredFilters.find(filter => {
       const currentValue = row[filter.columnName]
 
       const selectedValue = filter.queuedActive || filter.active
