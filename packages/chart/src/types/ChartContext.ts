@@ -13,26 +13,29 @@ export type TransformedData = {
 
 type SharedChartContext = {
   animatedChart?: boolean
-  // process top level chart aria label for each chart type
-  handleChartAriaLabels: (config: any) => string
+  axisBottomRef?: React.MutableRefObject<null>
+  brushConfig: { data: []; isBrushing: boolean; isActive: boolean }
+  capitalize: (value: string) => string
+  clean: Function
   colorScale?: ColorScale
   config: ChartConfig
   currentViewport?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
+  getTextWidth?: (a: string, b: string) => string
+  // process top level chart aria label for each chart type
+  handleChartAriaLabels: (config: any) => string
+  handleDragStateChange: (isDragging: any) => void
   highlight?: Function
   highlightReset?: Function
-  legendIsolateValues?: string[]
-  setLegendIsolateValues?: Function
-  getTextWidth?: (a: string, b: string) => string
-  brushConfig: { data: []; isBrushing: boolean; isActive: boolean }
-  setBrushConfig: Function
-  clean: Function
-  capitalize: (value: string) => string
   // whether or not the legend is appearing below the chart
   isLegendBottom?: boolean
   // whether or not the chart is viewed within the editor screen
   isEditor?: boolean
   // whether or not the user is dragging an annotation
   isDraggingAnnotation?: boolean
+  legendIsolateValues?: string[]
+  setBrushConfig: Function
+  setHeight?: React.Dispatch<React.SetStateAction<number>>
+  setLegendIsolateValues?: Function
 }
 
 // Line Chart Specific Context
@@ -60,6 +63,7 @@ export type ChartContext =
   | LineChartContext
   | (SharedChartContext & {
       annotations: Annotation[]
+      colorPalettes: any
       dimensions: DimensionsType
       formatDate?: Function
       formatTooltipsDate: Function
@@ -71,11 +75,10 @@ export type ChartContext =
       parseDate?: Function
       rawData?: Object[]
       seriesHighlight?: string[]
-      tableData?: Object[]
-      transformedData?: TransformedData[]
       setSharedFilter?: Function
       sharedFilterValue?: string
-      updateConfig?: Function
-      colorPalettes: any
+      tableData?: Object[]
+      transformedData?: TransformedData[]
       twoColorPalette: any
+      updateConfig?: Function
     })

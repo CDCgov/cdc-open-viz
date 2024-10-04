@@ -8,6 +8,7 @@ import lollipop from './_mock/lollipop.json'
 import forestPlot from '../../examples/feature/forest-plot/forest-plot.json'
 import pairedBar from './_mock/paired-bar.json'
 import horizontalBarConfig from './_mock/horizontal_bar.json'
+import pieConfig from './_mock/pie_with_data.json'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',
@@ -52,6 +53,12 @@ export const Forest_Plot: Story = {
 export const Horizontal_Bar: Story = {
   args: {
     config: horizontalBarConfig
+  }
+}
+
+export const Pie: Story = {
+  args: {
+    config: pieConfig
   }
 }
 

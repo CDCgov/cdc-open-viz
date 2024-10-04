@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 
 // Libraries
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -39,6 +39,7 @@ import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
+import { calcInitialHeight } from '../helpers/sizeHelpers'
 
 type LinearChartProps = {
   parentWidth: number
@@ -48,10 +49,12 @@ type LinearChartProps = {
 const X_LABEL_PADDING = 10
 const X_TICK_LABEL_PADDING = 3
 
-const LinearChart: React.FC<LinearChartProps> = props => {
+const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) => {
   // prettier-ignore
   const {
+    axisBottomRef,
     brushConfig,
+    colorScale,
     config,
     currentViewport,
     dimensions,
@@ -61,82 +64,76 @@ const LinearChart: React.FC<LinearChartProps> = props => {
     handleChartAriaLabels,
     handleLineType,
     handleDragStateChange,
+    isDraggingAnnotation,
     parseDate,
     tableData,
     transformedData: data,
     updateConfig,
-    isDraggingAnnotation,
     seriesHighlight,
-    colorScale
   } = useContext(ConfigContext)
 
+  // CONFIG
   // todo: start destructuring this file for conciseness
-  const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
+  const { heights, visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, legend, debugSvg } =
+    config
 
-  const checkLineToBarGraph = () => {
-    return isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph)
-  }
-
-  // configure width
-  let [width] = dimensions
-  if (
-    config &&
-    config.legend &&
-    !config.legend.hide &&
-    !['bottom', 'top'].includes(config.legend?.position) &&
-    !isLegendWrapViewport(currentViewport)
-  ) {
-    width = width * 0.73
-  }
-  //  configure height , yMax, xMax
-  const { horizontal: heightHorizontal, mobileVertical } = config.heights
-  const isHorizontal = orientation === 'horizontal' || config.visualizationType === 'Forest Plot'
-  const shouldAbbreviate = true
-  const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
-  const xLabelOffset = isNaN(parseInt(config.xAxis.labelOffset)) ? 0 : parseInt(config.xAxis.labelOffset)
-  const yLabelOffset = isNaN(parseInt(runtime.yAxis.labelOffset)) ? 0 : parseInt(runtime.yAxis.labelOffset)
-  const xAxisSize = isNaN(parseInt(runtime.xAxis.size)) ? 0 : parseInt(runtime.xAxis.size)
-  const isForestPlot = visualizationType === 'Forest Plot'
-  const useVertical = orientation === 'vertical' || isForestPlot
-  const useMobileVertical = mobileVertical && isMobileHeightViewport(currentViewport)
-  const responsiveVertical = useMobileVertical ? 'mobileVertical' : 'vertical'
-  const renderedOrientation = useVertical ? responsiveVertical : 'horizontal'
-  let height = config.aspectRatio ? width * config.aspectRatio : config.heights[renderedOrientation]
-  height = Number(height)
-  const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
-  let yMax = height
-  height += orientation === 'horizontal' ? xAxisSize : 0
-
-  if (config.visualizationType === 'Forest Plot') {
-    height = height + config.data.length * config.forestPlot.rowHeight
-    yMax = yMax + config.data.length * config.forestPlot.rowHeight
-    width = dimensions[0]
-  }
-  if (config.brush?.active) {
-    height = height + config.brush?.height
-  }
-
-  // hooks  % states
+  // HOOKS  % STATES
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
   const { visSupportsReactTooltip } = useEditorPermissions()
   const { hasTopAxis } = useTopAxis(config)
   const [animatedChart, setAnimatedChart] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
-  const annotationRefs = useRef(null)
   // Used to calculate the y position of the x-axis title
   const [tallestXLabel, setTallestXLabel] = useState(0)
-  const [xAxisLabelHeight, setXAxisLabelHeight] = useState(0)
-  const [svgHeight, setSvgHeight] = useState(height)
-  // refs
+  const [forestXLabelY, setForestXLabelY] = useState(0)
+
+  // REFS
   const triggerRef = useRef()
-  const axisBottomRef = useRef(null)
   const svgRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
 
-  // getters & functions
+  // VARS/MEMOS
+  const shouldAbbreviate = true
+  const isHorizontal = orientation === 'horizontal' || config.visualizationType === 'Forest Plot'
+  const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
+  const isForestPlot = visualizationType === 'Forest Plot'
+
+  const xLabelOffset = isNaN(parseInt(`${xAxis.labelOffset}`)) ? 0 : parseInt(`${xAxis.labelOffset}`)
+  const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
+
+  // zero if not forest plot
+  const forestRowsHeight = isForestPlot ? config.data.length * config.forestPlot.rowHeight : 0
+
+  // height before bottom axis
+  const initialHeight = useMemo(() => calcInitialHeight(config, currentViewport), [config, currentViewport])
+  const forestHeight = useMemo(() => initialHeight + forestRowsHeight, [initialHeight, forestRowsHeight])
+
+  // width
+  const width = useMemo(() => {
+    const initialWidth = dimensions[0]
+    const legendHidden = legend?.hide
+    const legendOnTopOrBottom = ['bottom', 'top'].includes(config.legend?.position)
+    const legendWrapped = isLegendWrapViewport(currentViewport)
+
+    const legendShowingLeftOrRight = !isForestPlot && !legendHidden && !legendOnTopOrBottom && !legendWrapped
+
+    if (!legendShowingLeftOrRight) return initialWidth
+
+    return initialWidth * 0.73
+  }, [dimensions[0], config.legend, currentViewport])
+
+  // xMax and yMax
+  const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
+  const yMax = initialHeight + forestRowsHeight
+
+  const checkLineToBarGraph = () => {
+    return isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph)
+  }
+
+  // GETTERS & FUNCTIONS
   const getXAxisData = d =>
     isDateScale(config.runtime.xAxis)
       ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime()
@@ -168,14 +165,8 @@ const LinearChart: React.FC<LinearChartProps> = props => {
     leftMax,
     rightMax,
     dimensions,
-    xMax: props.parentWidth - Number(config.yAxis.size)
+    xMax: parentWidth - Number(config.yAxis.size)
   })
-
-  // sets the portal x/y for where tooltips should appear on the page.
-  const [chartPosition, setChartPosition] = useState(null)
-  useEffect(() => {
-    setChartPosition(svgRef?.current?.getBoundingClientRect())
-  }, [svgRef, config.legend])
 
   const handleLeftTickFormatting = (tick, index, ticks) => {
     if (isLogarithmicAxis && tick === 0.1) {
@@ -295,6 +286,8 @@ const LinearChart: React.FC<LinearChartProps> = props => {
       hideTooltip
   })
 
+  // EFFECTS
+
   // Make sure the chart is visible if in the editor
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
@@ -304,13 +297,6 @@ const LinearChart: React.FC<LinearChartProps> = props => {
       setAnimatedChart(prevState => true)
     }
   }) /* eslint-disable-line */
-
-  useEffect(() => {
-    const axisMaxHeight = tallestXLabel + X_LABEL_PADDING
-    const calculatedHeight = height + Number(axisMaxHeight) + xLabelOffset + xAxisLabelHeight
-
-    setSvgHeight(calculatedHeight)
-  }, [tallestXLabel, height, xLabelOffset])
 
   // If the chart is in view, set to animate if it has not already played
   useEffect(() => {
@@ -335,11 +321,21 @@ const LinearChart: React.FC<LinearChartProps> = props => {
       const tallestLabel = Math.max(...Array.from(labels).map(label => label.getBBox().height))
       setTallestXLabel(tallestLabel)
     }
-    const xAxisLabel = document.querySelector('.x-axis-title-label')
-    if (xAxisLabel) {
-      setXAxisLabelHeight(xAxisLabel.getBBox().height)
-    }
   }, [dimensions[0], config.xAxis])
+
+  // forest plot x-axis label positioning
+  useEffect(() => {
+    if (!isForestPlot || xAxis.hideLabel) return
+
+    const rightLabel = document.querySelector('.forest-plot__right-label')
+
+    if (!rightLabel) return
+
+    const axisBottomY = yMax + Number(config.xAxis.axisPadding)
+    const labelRelativeY = rightLabel?.getBBox().y - axisBottomY
+    const xLabelY = labelRelativeY + rightLabel.getBBox().height + X_LABEL_PADDING
+    setForestXLabelY(xLabelY)
+  }, [config.data.length, forestRowsHeight])
 
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
@@ -459,6 +455,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
           }}
         </AxisBottom>
         <AxisBottom
+          innerRef={axisBottomRef}
           top={yMax}
           left={Number(runtime.yAxis.size)}
           label={runtime.xAxis.label}
@@ -485,7 +482,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                     const angle =
                       tick.index !== 0 && (isResponsiveTicks ? maxTickRotation : Number(config.yAxis.tickRotation))
                     const textAnchor = angle && tick.index !== 0 ? 'end' : 'middle'
-
+                    if (!i) return <></> // skip first tick to avoid overlapping 0's
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick x-axis-label-container'}>
                         {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
@@ -530,11 +527,11 @@ const LinearChart: React.FC<LinearChartProps> = props => {
   ) : (
     <ErrorBoundary component='LinearChart'>
       {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
-      <div style={{ width: `${props.parentWidth}px`, overflow: 'visible' }} className='tooltip-boundary'>
+      <div style={{ width: `${parentWidth}px`, overflow: 'visible' }} className='tooltip-boundary'>
         <svg
           onMouseMove={onMouseMove}
-          width={props.parentWidth}
-          height={svgHeight}
+          width={parentWidth}
+          height={parentHeight}
           className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${
             debugSvg && 'debug'
           } ${isDraggingAnnotation && 'dragging-annotation'}`}
@@ -543,9 +540,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
           ref={svgRef}
           style={{ overflow: 'visible' }}
         >
-          {!isDraggingAnnotation && (
-            <Bar width={props.parentWidth} height={props.parentHeight} fill={'transparent'}></Bar>
-          )}{' '}
+          {!isDraggingAnnotation && <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>}{' '}
           {/* GRID LINES */}
           {/* Actual AxisLeft is drawn after visualization */}
           {!['Spark Line', 'Forest Plot'].includes(visualizationType) && config.yAxis.type !== 'categorical' && (
@@ -724,7 +719,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
               yScale={yScale}
               seriesScale={seriesScale}
               width={width}
-              height={height}
+              height={forestHeight}
               getXAxisData={getXAxisData}
               getYAxisData={getYAxisData}
               animatedChart={animatedChart}
@@ -945,7 +940,8 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                           runtime.horizontal
                             ? {
                                 x: 0,
-                                y: config.visualizationType === 'Forest Plot' ? height : Number(heightHorizontal)
+                                y:
+                                  config.visualizationType === 'Forest Plot' ? parentHeight : Number(heights.horizontal)
                               }
                             : props.axisToPoint
                         }
@@ -1261,7 +1257,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
               innerRef={axisBottomRef}
               top={
                 runtime.horizontal && config.visualizationType !== 'Forest Plot'
-                  ? Number(heightHorizontal) + Number(config.xAxis.axisPadding)
+                  ? Number(heights.horizontal) + Number(config.xAxis.axisPadding)
                   : config.visualizationType === 'Forest Plot'
                   ? yMax + Number(config.xAxis.axisPadding)
                   : yMax
@@ -1396,7 +1392,7 @@ const LinearChart: React.FC<LinearChartProps> = props => {
                     <Text
                       className='x-axis-title-label'
                       x={axisCenter}
-                      y={axisMaxHeight + xLabelOffset}
+                      y={isForestPlot ? forestXLabelY : axisMaxHeight + xLabelOffset}
                       textAnchor='middle'
                       verticalAnchor='start'
                       fontWeight='bold'
