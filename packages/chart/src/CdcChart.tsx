@@ -664,7 +664,7 @@ export default function CdcChart({
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
-      let svgMarginWidth = 32
+      let svgMarginWidth = 30
       let editorWidth = 350
 
       width = isEditor ? width - editorWidth : width
@@ -1572,6 +1572,7 @@ export default function CdcChart({
     isEditor,
     isNumber,
     legend,
+    legendRef,
     lineOptions,
     loading,
     missingRequiredSections,

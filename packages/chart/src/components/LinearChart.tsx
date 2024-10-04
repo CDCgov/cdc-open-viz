@@ -65,6 +65,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     handleLineType,
     handleDragStateChange,
     isDraggingAnnotation,
+    legendRef,
     parseDate,
     tableData,
     transformedData: data,
@@ -132,6 +133,16 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     const legendShowingLeftOrRight = !isForestPlot && !legendHidden && !legendOnTopOrBottom && !legendWrapped
 
     if (!legendShowingLeftOrRight) return initialWidth
+
+    if (legendRef.current) {
+      const legendStyle = getComputedStyle(legendRef.current)
+      return (
+        initialWidth -
+        legendRef.current.getBoundingClientRect().width -
+        parseInt(legendStyle.marginLeft) -
+        parseInt(legendStyle.marginRight)
+      )
+    }
 
     return initialWidth * 0.73
   }, [dimensions[0], config.legend, currentViewport])
