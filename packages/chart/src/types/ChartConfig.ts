@@ -116,6 +116,7 @@ type Visual = {
 export type AllChartsConfig = {
   annotations: Annotation[]
   animate: boolean
+  aspectRatio?: number
   general: General
   barHasBorder: 'true' | 'false'
   barHeight: number

@@ -53,6 +53,7 @@ const DEFAULT_TICK_LENGTH = 8
 const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) => {
   // prettier-ignore
   const {
+    axisBottomRef,
     brushConfig,
     colorScale,
     config,
@@ -322,13 +323,6 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
       setAnimatedChart(prevState => true)
     }
   }) /* eslint-disable-line */
-
-  useEffect(() => {
-    const axisMaxHeight = tallestXLabel + X_LABEL_PADDING
-    const calculatedHeight = height + Number(axisMaxHeight) + xLabelOffset + xAxisLabelHeight
-
-    setSvgHeight(calculatedHeight)
-  }, [tallestXLabel, height, xLabelOffset])
 
   // If the chart is in view, set to animate if it has not already played
   useEffect(() => {

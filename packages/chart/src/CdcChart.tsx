@@ -125,6 +125,7 @@ export default function CdcChart({
     isActive: false,
     isBrushing: false
   })
+  const [height, setHeight] = useState(calcInitialHeight(config, currentViewport))
 
   const { description, visualizationType } = config
 
@@ -695,6 +696,22 @@ export default function CdcChart({
   function isEmpty(obj) {
     return Object.keys(obj).length === 0
   }
+  useEffect(() => {
+    const initialHeight = calcInitialHeight(config, currentViewport)
+    const isForestPlot = visualizationType === 'Forest Plot'
+
+    // heights to add
+    const brushHeight = brush?.active ? brush?.height : 0
+    const xAxisHeight = axisBottomRef.current?.getBBox()?.height || 0
+    const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
+    const additionalHeight = xAxisHeight + brushHeight + forestRowsHeight
+
+    const adjustedHeight = initialHeight + additionalHeight
+
+    if (adjustedHeight === height) return
+
+    setHeight(adjustedHeight)
+  }, [brush, axisBottomRef.current, config.data, currentViewport])
 
   // Load data when component first mounts
   useEffect(() => {
@@ -1508,6 +1525,7 @@ export default function CdcChart({
   }
 
   const contextValues = {
+    axisBottomRef,
     brushConfig,
     capitalize,
     clean,
