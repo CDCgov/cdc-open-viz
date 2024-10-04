@@ -1,5 +1,9 @@
 import _ from 'lodash'
 
+const strip = (paramVal: string) => {
+  return paramVal.replace(/"/g, '')
+}
+
 const isNumber = (value: string) => {
   const hasLetters = value.match(/[a-zA-Z]/)
   if (hasLetters) return false
@@ -14,7 +18,7 @@ export const gatherQueryParams = (baseEndpoint: string, params: { key: string; v
       const leadingCharacter = i === 0 && !baseEndpointHasQueryParams ? '?' : '&'
       const isStatementParam = key.match(/\$.*/)
       if (isNumber(value) || isStatementParam) return leadingCharacter + key + '=' + value
-      return leadingCharacter + key + '=' + `"${value}"`
+      return leadingCharacter + key + '=' + `"${strip(value)}"`
     })
     .join('')
 }

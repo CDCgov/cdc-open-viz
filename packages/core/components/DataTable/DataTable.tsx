@@ -20,6 +20,7 @@ import removeNullColumns from './helpers/removeNullColumns'
 import { TableConfig } from './types/TableConfig'
 import { Column } from '../../types/Column'
 import { pivotData } from '../../helpers/pivotData'
+import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 
 export type DataTableProps = {
   applyLegendToRow?: Function
@@ -211,7 +212,7 @@ const DataTable = (props: DataTableProps) => {
     const getMediaControlsClasses = belowTable => {
       const classes = ['download-links']
       if (!belowTable) {
-        const isLegendOnBottom = config?.legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(viewport)
+        const isLegendOnBottom = config?.legend?.position === 'bottom' || isLegendWrapViewport(viewport)
         if (config.brush?.active && !isLegendOnBottom) classes.push('brush-active')
         if (config.brush?.active && config.legend.hide) classes.push('brush-active')
       } else {
@@ -328,7 +329,7 @@ const DataTable = (props: DataTableProps) => {
       <ErrorBoundary component='DataTable'>
         <section
           id={tabbingId.replace('#', '')}
-          className={`data-table-container ${viewport}`}
+          className={`data-table-container ${viewport} w-100`}
           aria-label={accessibilityLabel}
         >
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />

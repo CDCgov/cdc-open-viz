@@ -125,7 +125,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
         if (isNaN(hoveredSeriesValue)) return <></>
         const isMatch = circleData?.some(cd => cd[config.xAxis.dataKey] === hoveredXValue)
 
-        if (isMatch) {
+        if (isMatch || !hoveredSeriesValue) {
           return <></>
         }
 

@@ -31,8 +31,6 @@ const useScales = (properties: useScaleProps) => {
   const seriesDomain = config.runtime.barSeriesKeys || config.runtime.seriesKeys
   const xAxisType = config.runtime.xAxis.type
   const isHorizontal = config.orientation === 'horizontal'
-  const getXAxisDataKeys = d => d[config.runtime.originalXAxis.dataKey]
-  const xAxisDataKeysMapped = data.map(d => getXAxisDataKeys(d))
 
   const { visualizationType } = config
 
@@ -43,7 +41,6 @@ const useScales = (properties: useScaleProps) => {
   let g1xScale = null
   let seriesScale = null
   let xScaleNoPadding = null
-  let xScaleBrush = null
   let xScaleAnnotation = scaleLinear({
     domain: [0, 100],
     range: [0, xMax]
@@ -60,10 +57,6 @@ const useScales = (properties: useScaleProps) => {
 
   // handle  Vertical bars
   if (!isHorizontal) {
-    xScaleBrush = scaleTime({
-      domain: d3.extent(data, d => new Date(d[config.runtime.originalXAxis.dataKey])),
-      range: [0, xMax]
-    })
     xScale = composeScaleBand(xAxisDataMapped, [0, xMax], 1 - config.barThickness)
     yScale = composeYScale(properties)
     seriesScale = composeScaleBand(seriesDomain, [0, xScale.bandwidth()], 0)
@@ -266,7 +259,7 @@ const useScales = (properties: useScaleProps) => {
       }
     }
   }
-  return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush, xScaleAnnotation }
+  return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleAnnotation }
 }
 
 export default useScales

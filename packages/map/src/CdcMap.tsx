@@ -137,7 +137,8 @@ const CdcMap = ({
   const legendRef = useRef(null)
   const tooltipRef = useRef(null)
   const legendId = useId()
-  const tooltipId = useId()
+  // create random tooltipId
+  const tooltipId = `${Math.random().toString(16).slice(-4)}`
   const mapId = useId()
 
   const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
@@ -1496,10 +1497,12 @@ const CdcMap = ({
     validateFipsCodeLength(newState)
 
     // add ability to rename state properties over time.
-    const processedConfig = { ...(await coveUpdateWorker(newState)) }
+    const processedConfig = { ...coveUpdateWorker(newState) }
 
-    setState(processedConfig)
-    setLoading(false)
+    setTimeout(() => {
+      setState(processedConfig)
+      setLoading(false)
+    }, 10)
   }
 
   const init = async () => {
@@ -1805,6 +1808,12 @@ const CdcMap = ({
                 <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
               )}
 
+              {general.introText && (
+                <section className='introText' style={{ padding: '15px', margin: '0px' }}>
+                  {parse(general.introText)}
+                </section>
+              )}
+
               {state?.filters?.length > 0 && (
                 <Filters
                   config={state}
@@ -1828,8 +1837,6 @@ const CdcMap = ({
                 }}
                 style={{ padding: '15px 25px', margin: '0px' }}
               >
-                {general.introText && <section className='introText'>{parse(general.introText)}</section>}
-
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
                 <section className='outline-none geography-container w-100' ref={mapSvg} tabIndex='0'>
                   {currentViewport && (
@@ -1844,11 +1851,11 @@ const CdcMap = ({
                     </>
                   )}
                 </section>
-              </div>
 
-              {general.showSidebar && 'navigation' !== general.type && (
-                <Legend dimensions={dimensions} currentViewport={currentViewport} ref={legendRef} skipId={tabId} />
-              )}
+                {general.showSidebar && 'navigation' !== general.type && (
+                  <Legend dimensions={dimensions} currentViewport={currentViewport} ref={legendRef} skipId={tabId} />
+                )}
+              </div>
 
               {'navigation' === general.type && (
                 <NavigationMenu
@@ -1921,6 +1928,8 @@ const CdcMap = ({
                     wrapColumns={table.wrapColumns}
                   />
                 )}
+
+              {state.annotations.length > 0 && <Annotation.Dropdown />}
 
               {state.annotations.length > 0 && <Annotation.Dropdown />}
 

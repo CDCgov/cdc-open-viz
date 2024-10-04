@@ -24,7 +24,7 @@ export const changeFilterActive = (
   vizConfig: DashboardFilters
 ): [SharedFilter[], number[]] => {
   const sharedFiltersCopy = _.cloneDeep(sharedFilters)
-  const currentFilter = sharedFilters[filterIndex]
+  const currentFilter = sharedFiltersCopy[filterIndex]
   if (vizConfig.filterBehavior !== FilterBehavior.Apply || vizConfig.autoLoad) {
     if (currentFilter?.filterStyle === 'nested-dropdown') {
       sharedFiltersCopy[filterIndex].active = value[0]
