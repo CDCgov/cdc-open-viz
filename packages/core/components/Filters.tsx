@@ -478,15 +478,21 @@ const Filters = (props: FilterProps) => {
   }
 
   if (visualizationConfig?.filters?.length === 0) return
-  const filterSectionClassList = [
-    `filters-section legend_${visualizationConfig?.legend?.hide ? 'hidden' : 'visible'}_${
-      visualizationConfig?.legend?.position || ''
-    }`,
-    type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme
-  ]
+
+  const getCLasses = () => {
+    const classList = [
+      'filters-section',
+      type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme
+    ]
+
+    if (visualizationConfig && !visualizationConfig?.legend?.hide && visualizationConfig?.legend?.position === 'top') {
+      classList.push('mb-0')
+    }
+    return classList
+  }
 
   return (
-    <section className={filterSectionClassList.join(' ')}>
+    <section className={getCLasses().join(' ')}>
       <p className='filters-section__intro-text'>
         {filters?.some(filter => filter.active && filter.columnName) ? filterConstants.introText : ''}{' '}
         {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
