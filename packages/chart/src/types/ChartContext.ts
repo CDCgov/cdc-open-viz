@@ -3,7 +3,7 @@ import { PickD3Scale } from '@visx/scale'
 import { type SharedFilter } from '@cdc/dashboard/src/types/SharedFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
-
+import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 export type ColorScale = PickD3Scale<'ordinal', any, any>
 
 export type TransformedData = {
@@ -20,6 +20,7 @@ type SharedChartContext = {
   colorScale?: ColorScale
   config: ChartConfig
   currentViewport?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
+  dashboardConfig?: DashboardConfig
   getTextWidth?: (a: string, b: string) => string
   // process top level chart aria label for each chart type
   handleChartAriaLabels: (config: any) => string

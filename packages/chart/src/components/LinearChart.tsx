@@ -165,7 +165,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     leftMax,
     rightMax,
     dimensions,
-    xMax: parentWidth - Number(config.yAxis.size)
+    xMax: parentWidth - Number(config.orientation === 'horizontal' ? config.xAxis.size : config.yAxis.size)
   })
 
   const handleLeftTickFormatting = (tick, index, ticks) => {

@@ -35,8 +35,8 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   }
 
   const handleAnnotationUpdate = (value, property, index) => {
-    const svgContainer = document.querySelector('.chart-container > div > svg')?.getBoundingClientRect()
-    const newSvgDims = [svgContainer.width, svgContainer.height]
+    const svgContainer = document.querySelector('.chart-container  > svg')?.getBoundingClientRect()
+    const newSvgDims = [svgContainer?.width, svgContainer?.height]
     const annotations = [...config?.annotations]
     annotations[index][property] = value
     annotations[index].savedDimensions = newSvgDims
@@ -48,8 +48,8 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   }
 
   const handleAddAnnotation = () => {
-    const svgContainer = document.querySelector('.chart-container svg')?.getBoundingClientRect()
-    const newSvgDims = [svgContainer.width, svgContainer.height]
+    const svgContainer = document.querySelector('.chart-container > svg')?.getBoundingClientRect()
+    const newSvgDims = [svgContainer?.width, svgContainer?.height]
 
     const newAnnotation = {
       text: 'New Annotation',
