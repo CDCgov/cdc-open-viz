@@ -46,7 +46,7 @@ type LinearChartProps = {
   parentHeight: number
 }
 
-const X_LABEL_PADDING = 10
+const X_LABEL_PADDING = 15
 const X_TICK_LABEL_PADDING = 3
 
 const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) => {
