@@ -76,7 +76,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   const getStyleOptions = type => {
     const options = Object.keys(lineCodes)
     if (type === 'suppression') {
-      return options.slice(0, -1)
+      return options.slice(0, -2)
     } else {
       return options
     }
@@ -1803,6 +1803,17 @@ const EditorPanel = () => {
                           updateField={updateField}
                         />
                       )}
+                      {visSupportsValueAxisGridLines() && (
+                        <CheckBox
+                          value={config.yAxis.labelsAboveGridlines}
+                          section='yAxis'
+                          fieldName='labelsAboveGridlines'
+                          label='Labels above gridlines'
+                          updateField={updateField}
+                          disabled={!config.yAxis.gridLines}
+                          title={!config.yAxis.gridLines ? 'Show gridlines to enable' : ''}
+                        />
+                      )}
                       <CheckBox
                         value={config.yAxis.enablePadding}
                         section='yAxis'
@@ -2007,6 +2018,14 @@ const EditorPanel = () => {
                   ) : (
                     config.visualizationType !== 'Pie' && (
                       <>
+                        <CheckBox
+                          display={!visHasCategoricalAxis()}
+                          value={config.dataFormat.onlyShowTopPrefixSuffix}
+                          section='dataFormat'
+                          fieldName='onlyShowTopPrefixSuffix'
+                          label='Only Show Top Prefix/Suffix'
+                          updateField={updateField}
+                        />
                         <CheckBox
                           display={!visHasCategoricalAxis()}
                           value={config.yAxis.hideAxis}

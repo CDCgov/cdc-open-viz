@@ -10,11 +10,6 @@ import { UpdateFunction } from 'json-edit-react'
 import update_4_24_10 from './ver/4.24.10'
 
 export const coveUpdateWorker = config => {
-  if (config.multiDashboards) {
-    config.multiDashboards.forEach((dashboard, index) => {
-      config.multiDashboards[index] = coveUpdateWorker(dashboard)
-    })
-  }
   let genConfig = config
 
   const versions = [
