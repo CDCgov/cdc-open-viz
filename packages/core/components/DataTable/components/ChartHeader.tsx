@@ -47,13 +47,19 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }
 
     if (columnHeaderText === notApplicableText) return
 
-    return <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'}  order`}</span>
+    return (
+      <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${
+        sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
+      }  order`}</span>
+    )
   }
 
   const ColumnHeadingText = ({ column, text, config }) => {
+    if (text === 'pivotColumn') return ''
     let notApplicableText = 'Not Applicable'
     if (text === '__series__' && config.table.indexLabel) return `${config.table.indexLabel} `
-    if (text === '__series__' && !config.table.indexLabel) return <ScreenReaderText as='span'>{notApplicableText}</ScreenReaderText>
+    if (text === '__series__' && !config.table.indexLabel)
+      return <ScreenReaderText as='span'>{notApplicableText}</ScreenReaderText>
     return text
   }
 
@@ -90,10 +96,16 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }
                 }
               }}
               className={handleHeaderClasses(sortBy, text)}
-              {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
+              {...(sortBy.column === column
+                ? sortBy.asc
+                  ? { 'aria-sort': 'ascending' }
+                  : { 'aria-sort': 'descending' }
+                : null)}
             >
               <ColumnHeadingText text={text} column={column} config={config} />
-              {column === sortBy.column && <span className={'sort-icon'}>{!sortBy.asc ? <UpIcon /> : <DownIcon />}</span>}
+              {column === sortBy.column && (
+                <span className={'sort-icon'}>{!sortBy.asc ? <UpIcon /> : <DownIcon />}</span>
+              )}
               <ScreenReaderSortByText sortBy={sortBy} config={config} text={text} />
             </th>
           )
@@ -124,10 +136,16 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }
                 }
               }}
               className={handleHeaderClasses(sortBy, text)}
-              {...(sortBy.column === text ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
+              {...(sortBy.column === text
+                ? sortBy.asc
+                  ? { 'aria-sort': 'ascending' }
+                  : { 'aria-sort': 'descending' }
+                : null)}
             >
               <ColumnHeadingText text={text} column={column} config={config} />
-              {index === sortBy.colIndex && <span className={'sort-icon'}>{!sortBy.asc ? <UpIcon /> : <DownIcon />}</span>}
+              {index === sortBy.colIndex && (
+                <span className={'sort-icon'}>{!sortBy.asc ? <UpIcon /> : <DownIcon />}</span>
+              )}
               <ScreenReaderSortByText text={text} config={config} sortBy={sortBy} />
             </th>
           )
