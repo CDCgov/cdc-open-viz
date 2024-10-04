@@ -57,6 +57,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
+import { isLegendWrapViewport, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 
 import './scss/main.scss'
 // load both then config below determines which to use
@@ -104,7 +105,7 @@ export default function CdcChart({
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
-  const [stateData, setStateData] = useState(configObj ? configObj.data : [])
+  const [stateData, setStateData] = useState(configObj?.data || [])
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
   const [seriesHighlight, setSeriesHighlight] = useState<string[]>(
@@ -126,12 +127,12 @@ export default function CdcChart({
 
   let [width] = dimensions
   const useVertical = config.orientation === 'vertical'
-  const useMobileVertical = config.heights?.mobileVertical && ['xs', 'xxs'].includes(currentViewport)
+  const useMobileVertical = config.heights?.mobileVertical && isMobileHeightViewport(currentViewport)
   const responsiveVertical = useMobileVertical ? 'mobileVertical' : 'vertical'
   const renderedOrientation = useVertical ? responsiveVertical : 'horizontal'
   let height = config.aspectRatio ? width * config.aspectRatio : config?.heights?.[renderedOrientation]
   if (config.visualizationType === 'Pie') height = config?.heights?.[renderedOrientation]
-  height = height + Number(config?.xAxis?.size) + 45
+  height = height + Number(config.orientation === 'horizontal' ? config.yAxis.size : config?.xAxis?.size) + 45
 
   type Config = typeof config
   let legendMemo = useRef(new Map()) // map collection
@@ -415,7 +416,6 @@ export default function CdcChart({
         Object.keys(finalData[0]).forEach(seriesKey => {
           if (
             seriesKey !== newConfig.xAxis.dataKey &&
-            finalData[0][seriesKey] &&
             (!newConfig.filters || newConfig.filters.filter(filter => filter.columnName === seriesKey).length === 0) &&
             (!newConfig.columns || Object.keys(newConfig.columns).indexOf(seriesKey) === -1)
           ) {
@@ -903,7 +903,16 @@ export default function CdcChart({
   // Format numeric data based on settings in config OR from passed in settings for Additional Columns
   // - use only for old horizontal data - newer formatNumber is in helper/formatNumber
   // TODO: we should combine various formatNumber functions across this project.
-  const formatNumber = (num, axis, shouldAbbreviate = false, addColPrefix, addColSuffix, addColRoundTo) => {
+  // TODO suggestion: pass all options as object key/values to allow for more flexibility
+  const formatNumber = (
+    num,
+    axis,
+    shouldAbbreviate = false,
+    addColPrefix,
+    addColSuffix,
+    addColRoundTo,
+    { index, length } = { index: null, length: null }
+  ) => {
     // if num is NaN return num
     if (isNaN(num) || !num) return num
     // Check if the input number is negative
@@ -930,7 +939,8 @@ export default function CdcChart({
         rightSuffix,
         bottomPrefix,
         bottomSuffix,
-        bottomAbbreviated
+        bottomAbbreviated,
+        onlyShowTopPrefixSuffix
       }
     } = config
 
@@ -1023,7 +1033,9 @@ export default function CdcChart({
     if (addColPrefix && axis === 'left') {
       result = addColPrefix + result
     } else {
-      if (prefix && axis === 'left') {
+      // if onlyShowTopPrefixSuffix only show top prefix
+      const suppressAllButLast = onlyShowTopPrefixSuffix && length - 1 !== index
+      if (prefix && axis === 'left' && !suppressAllButLast) {
         result += prefix
       }
     }
@@ -1042,7 +1054,7 @@ export default function CdcChart({
     if (addColSuffix && axis === 'left') {
       result += addColSuffix
     } else {
-      if (suffix && axis === 'left') {
+      if (suffix && axis === 'left' && !onlyShowTopPrefixSuffix) {
         result += suffix
       }
     }
@@ -1252,10 +1264,10 @@ export default function CdcChart({
   }
 
   const getChartWrapperClasses = () => {
-    const isLegendOnBottom = legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+    const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
     const classes = ['chart-container', 'p-relative']
     if (legend?.position) {
-      if (['sm', 'xs', 'xxs'].includes(currentViewport) && legend?.position !== 'top') {
+      if (isLegendWrapViewport(currentViewport) && legend?.position !== 'top') {
         classes.push('legend-bottom')
       } else {
         classes.push(`legend-${legend.position}`)
@@ -1272,7 +1284,7 @@ export default function CdcChart({
 
   const getChartSubTextClasses = () => {
     const classes = ['subtext ']
-    const isLegendOnBottom = legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+    const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
 
     if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
     if (config.brush?.active && !isLegendOnBottom) classes.push('subtext--brush-active ')
@@ -1343,7 +1355,7 @@ export default function CdcChart({
                 <LegendWrapper>
                   <div
                     className={
-                      legend.hide || ['xxs', 'xs', 'sm'].includes(currentViewport)
+                      legend.hide || isLegendWrapViewport(currentViewport)
                         ? 'w-100'
                         : legend.position === 'bottom' || legend.position === 'top' || visualizationType === 'Sankey'
                         ? 'w-100'
@@ -1531,7 +1543,7 @@ export default function CdcChart({
     highlightReset,
     imageId,
     isDashboard,
-    isLegendBottom: legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport),
+    isLegendBottom: legend?.position === 'bottom' || isLegendWrapViewport(currentViewport),
     isDebug,
     isDraggingAnnotation,
     handleDragStateChange,
