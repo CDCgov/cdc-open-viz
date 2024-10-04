@@ -1,12 +1,10 @@
 import React, { useContext } from 'react'
 
-import CdcMap from '@cdc/map' // TODO: Lazy load this
-import CdcChart from '@cdc/chart' // TODO: Lazy load this
-import CdcDataBite from '@cdc/data-bite'
-import CdcWaffleChart from '@cdc/waffle-chart'
-import CdcMarkupInclude from '@cdc/markup-include'
-
-import '../scss/configure-tab.scss'
+import CdcMap from '@cdc/map/src/CdcMap' // TODO: Lazy load this
+import CdcChart from '@cdc/chart/src/CdcChart' // TODO: Lazy load this
+import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
+import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
+import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'

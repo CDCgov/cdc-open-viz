@@ -69,6 +69,7 @@ $colors: (
     @each $key, $value in $colors {
       --#{$key}: #{$value};
     }
+    --editorWidth: 350px;
   }
 }
 

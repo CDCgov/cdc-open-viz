@@ -1,5 +1,4 @@
-@import '@cdc/core/styles/base';
-@import '@cdc/core/styles/heading-colors';
+@import '../../../scss/mixins';
 
 .cdc-map-inner-container {
   .map-container.world aside.side {
@@ -7,7 +6,7 @@
   }
   @include breakpointClass(md) {
     .map-container.world aside.side {
-      border-top: $lightGray 1px solid;
+      border-top: var(--lightGray) 1px solid;
       position: absolute;
       box-shadow: rgba(0, 0, 0, 0.2) 0 10px 18px;
     }
@@ -16,12 +15,10 @@
   aside {
     background-color: #fff;
     z-index: 6;
-    border-top: $lightGray 1px solid;
-
+    border-top: var(--lightGray) 1px solid;
     @include breakpointClass(md) {
-      &.bottom,
-      &.top {
-        border: $lightGray 1px solid;
+      &.bottom, &.top {
+        border: var(--lightGray) 1px solid;
       }
       &.side {
         z-index: 1;
@@ -32,7 +29,7 @@
         align-self: flex-start;
         z-index: 4;
         right: 1em;
-        border: $lightGray 1px solid;
+        border: var(--lightGray) 1px solid;
         top: 2em;
         right: 1em;
 

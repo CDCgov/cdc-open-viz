@@ -31,7 +31,7 @@ header + .map-container.full-border {
 // World Specific Styles
 .map-container.world {
   &.data .geography-container {
-    border-bottom: $lightGray 1px solid;
+    border-bottom: var(--lightGray) 1px solid;
   }
   .geography-container {
     cursor: move;

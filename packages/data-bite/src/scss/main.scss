@@ -1,11 +1,7 @@
-@import '@cdc/core/styles/base';
-@import '@cdc/core/styles/heading-colors';
-@import '@cdc/core/styles/v2/themes/color-definitions';
 @import 'variables';
 
 .cdc-open-viz-module.type-data-bite {
   @import 'bite';
-  // @import 'editor-panel';
   .visually-hidden {
     position: fixed;
     left: -10000px;

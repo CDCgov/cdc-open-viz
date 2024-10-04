@@ -18,7 +18,7 @@
   .geo-buttons {
     list-style: none;
     display: flex;
-    color: $mediumGray;
+    color: var(--mediumGray);
     svg {
       display: block;
       max-width: 80px;
@@ -33,7 +33,7 @@
       background: transparent;
       padding: 0.3em 0.75em;
       display: flex;
-      border: $lightGray 1px solid;
+      border: var(--lightGray) 1px solid;
       width: 40%;
       align-items: center;
       margin-right: 1em;
@@ -110,11 +110,6 @@
   }
 
   .editor-panel {
-    //TODO: Remove after COVE refactor
-    &.cove {
-      @import '@cdc/core/styles/v2/layout/tooltip.scss';
-    }
-
     .cove-input-group,
     .cove-accordion__small-inputs {
       position: relative;
@@ -191,10 +186,10 @@
     }
 
     .accordion__heading {
-      background: $lightestGray;
+      background: var(--lightestGray);
     }
     .form-container {
-      border-right: $lightGray 1px solid;
+      border-right: var(--lightGray) 1px solid;
       flex-grow: 1;
     }
     .guidance-link {
@@ -207,7 +202,7 @@
       }
       svg {
         width: 60px;
-        color: $blue;
+        color: var(--blue);
         margin-right: 1rem;
         height: 60px; // IE11
         path {

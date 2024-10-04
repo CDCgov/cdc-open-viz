@@ -1,9 +1,8 @@
-@import '@cdc/core/styles/base';
-@import '@cdc/core/styles/heading-colors';
+@import 'mixins';
+
 @import 'variables';
 @import 'editor-panel';
 @import 'filters';
-@import '@cdc/core/styles/v2/components/ui/tooltip';
 
 .type-map--has-error {
   overflow: hidden !important;
@@ -39,7 +38,7 @@
 
   @include breakpointClass(md) {
     .map-container.modal-background::before {
-      border-bottom: $lightGray 1px solid;
+      border-bottom: var(--lightGray) 1px solid;
       margin-bottom: -1px;
       bottom: 1px;
     }
@@ -194,7 +193,7 @@
     padding: 1em;
     z-index: 6;
     width: 100%;
-    border-top: $lightGray 1px solid;
+    border-top: var(--lightGray) 1px solid;
     label {
       flex-grow: 1;
       > div.select-heading {
