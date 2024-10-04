@@ -91,6 +91,10 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   // REFS
   const triggerRef = useRef()
   const svgRef = useRef()
+  const suffixRef = useRef(null)
+  const xAxisLabelRefs = useRef([])
+  const forestPlotRightLabelRef = useRef(null)
+
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
@@ -308,7 +312,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   }, [dataRef?.isIntersecting, config.animate])
 
   useEffect(() => {
-    const textElement = document.querySelector(`#suffix`)
+    const textElement = suffixRef.current
     if (!textElement && !suffixWidth) return
     if (!textElement) return setSuffixWidth(0)
     const textWidth = textElement.getBBox().width
@@ -316,23 +320,22 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   }, [config.dataFormat.suffix, config.dataFormat.onlyShowTopPrefixSuffix])
 
   useEffect(() => {
-    const labels = document.querySelectorAll('.x-axis-label-container')
-    if (labels) {
-      const tallestLabel = Math.max(...Array.from(labels).map(label => label.getBBox().height))
-      setTallestXLabel(tallestLabel)
-    }
-  }, [dimensions[0], config.xAxis])
+    if (!xAxisLabelRefs.current.length) return
+
+    const tallestLabel = Math.max(...xAxisLabelRefs.current.map(label => label.getBBox().height))
+    setTallestXLabel(tallestLabel)
+  }, [dimensions[0], config.xAxis, xAxisLabelRefs.current])
 
   // forest plot x-axis label positioning
   useEffect(() => {
     if (!isForestPlot || xAxis.hideLabel) return
 
-    const rightLabel = document.querySelector('.forest-plot__right-label')
+    const rightLabel = forestPlotRightLabelRef.current
 
     if (!rightLabel) return
 
     const axisBottomY = yMax + Number(config.xAxis.axisPadding)
-    const labelRelativeY = rightLabel?.getBBox().y - axisBottomY
+    const labelRelativeY = rightLabel.getBBox().y - axisBottomY
     const xLabelY = labelRelativeY + rightLabel.getBBox().height + X_LABEL_PADDING
     setForestXLabelY(xLabelY)
   }, [config.data.length, forestRowsHeight])
@@ -437,6 +440,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                       {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                       {!runtime.yAxis.hideLabel && (
                         <Text // prettier-ignore
+                          innerRef={el => (xAxisLabelRefs.current[i] = el)}
                           x={tick.to.x}
                           y={tick.to.y}
                           angle={-angle}
@@ -484,7 +488,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                     const textAnchor = angle && tick.index !== 0 ? 'end' : 'middle'
                     if (!i) return <></> // skip first tick to avoid overlapping 0's
                     return (
-                      <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick x-axis-label-container'}>
+                      <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                         {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                         {!runtime.yAxis.hideLabel && (
                           <Text // prettier-ignore
@@ -731,6 +735,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
               showTooltip={showTooltip}
               chartRef={svgRef}
               config={config}
+              forestPlotRightLabelRef={forestPlotRightLabelRef}
             />
           )}
           {/*Brush chart */}
@@ -1102,7 +1107,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                                 {/* IF VALUES ON LINE: suffix is combined with value to avoid having to calculate varying (now left-aligned) value widths */}
                                 {onlyShowTopPrefixSuffix && lastTick && !labelsAboveGridlines && (
                                   <BlurStrokeText
-                                    id='suffix'
+                                    innerRef={suffixRef}
                                     display={isLogarithmicAxis ? showTicks : 'block'}
                                     dx={isLogarithmicAxis ? -6 : 0}
                                     x={labelX}
@@ -1357,7 +1362,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                           : -Number(config.runtime.xAxis.tickRotation)
 
                       return (
-                        <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick x-axis-label-container'}>
+                        <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                           {!config.xAxis.hideTicks && (
                             <Line
                               from={tick.from}
@@ -1368,6 +1373,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                           )}
                           {!config.xAxis.hideLabel && (
                             <Text
+                              innerRef={el => (xAxisLabelRefs.current[i] = el)}
                               dy={config.orientation === 'horizontal' && isLogarithmicAxis ? 8 : 0}
                               display={config.orientation === 'horizontal' && isLogarithmicAxis ? showTick : 'block'}
                               x={tick.to.x}
