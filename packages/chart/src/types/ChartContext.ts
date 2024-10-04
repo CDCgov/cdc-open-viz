@@ -3,7 +3,7 @@ import { PickD3Scale } from '@visx/scale'
 import { type SharedFilter } from '@cdc/dashboard/src/types/SharedFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
-
+import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 export type ColorScale = PickD3Scale<'ordinal', any, any>
 
 export type TransformedData = {
@@ -33,6 +33,7 @@ type SharedChartContext = {
   isEditor?: boolean
   // whether or not the user is dragging an annotation
   isDraggingAnnotation?: boolean
+  dashboardConfig?: DashboardConfig
 }
 
 // Line Chart Specific Context
