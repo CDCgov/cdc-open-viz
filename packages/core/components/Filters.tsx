@@ -479,20 +479,17 @@ const Filters = (props: FilterProps) => {
 
   if (visualizationConfig?.filters?.length === 0) return
 
-  const getCLasses = () => {
-    const classList = [
-      'filters-section',
-      type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme
-    ]
+  const getClasses = () => {
+    const { visualizationType, legend } = visualizationConfig || {}
+    const baseClass = 'filters-section'
+    const conditionalClass = type === 'map' ? general.headerColor : visualizationType === 'Spark Line' ? null : theme
+    const legendClass = legend && !legend.hide && legend.position === 'top' ? 'mb-0' : null
 
-    if (visualizationConfig && !visualizationConfig?.legend?.hide && visualizationConfig?.legend?.position === 'top') {
-      classList.push('mb-0')
-    }
-    return classList
+    return [baseClass, conditionalClass, legendClass].filter(Boolean)
   }
 
   return (
-    <section className={getCLasses().join(' ')}>
+    <section className={getClasses().join(' ')}>
       <p className='filters-section__intro-text'>
         {filters?.some(filter => filter.active && filter.columnName) ? filterConstants.introText : ''}{' '}
         {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
