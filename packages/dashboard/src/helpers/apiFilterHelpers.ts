@@ -4,6 +4,7 @@ import { APIFilter } from '../types/APIFilter'
 import { SharedFilter } from '../types/SharedFilter'
 import _ from 'lodash'
 import { getQueryParams } from '@cdc/core/helpers/queryStringUtils'
+import { FILTER_STYLE } from '../types/FilterStyles'
 
 /** key for the dropdowns object */
 type DropdownsKey = string
@@ -46,6 +47,31 @@ export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): Drop
   return data.map(v => ({ text: v[textSelector || valueSelector], value: v[valueSelector] }))
 }
 
+export const getNestedDropdownValues = (data: Array<Object>, apiFilter: APIFilter) => {
+  const { textSelector, valueSelector, subgroupTextSelector, subgroupValueSelector } = apiFilter
+  const nestedDropdownValues = []
+  _.sortBy(data, [valueSelector, subgroupValueSelector]).map(value => {
+    const group =
+      textSelector === undefined || textSelector === ''
+        ? [value[valueSelector]]
+        : [value[valueSelector], value[textSelector]]
+    const subgroup =
+      subgroupTextSelector === undefined || subgroupTextSelector === ''
+        ? [value[subgroupValueSelector]]
+        : [value[subgroupValueSelector], value[subgroupTextSelector]]
+    const NDValuesCount = nestedDropdownValues.length
+    if (nestedDropdownValues[NDValuesCount - 1]?.[0][0] === group[0]) {
+      nestedDropdownValues[NDValuesCount - 1][1].push(subgroup)
+    } else {
+      nestedDropdownValues[NDValuesCount] = [group, [subgroup]]
+    }
+  })
+
+  nestedDropdownValues.map(groupings => [groupings[0], _.uniq(groupings[1])])
+
+  return nestedDropdownValues
+}
+
 /** API endpoint to fetch */
 type Endpoint = string
 type SharedFilterIndex = number
@@ -84,12 +110,12 @@ export const setAutoLoadDefaultValue = (
     const notAllParentFiltersSelected = filterParents.some(p => !(p.active || p.queuedActive))
     if (filterParents && notAllParentFiltersSelected) return sharedFilter
     const defaultValue =
-      sharedFilter.filterStyle === 'multi-select' ? [dropdownOptions[0]?.value] : dropdownOptions[0]?.value
+      sharedFilter.filterStyle === FILTER_STYLE.multiSelect ? [dropdownOptions[0]?.value] : dropdownOptions[0]?.value
     if (!sharedFilter.active) {
       const queryParams = getQueryParams()
       const defaultQueryParamValue = queryParams[sharedFilter?.setByQueryParameter]
       sharedFilter.active = defaultQueryParamValue || defaultValue
-    } else if (sharedFilter.filterStyle === 'multi-select') {
+    } else if (sharedFilter.filterStyle === FILTER_STYLE.multiSelect) {
       const currentOption = (sharedFilter.active as string[]).filter(activeVal =>
         dropdownOptions.find(option => option.value === activeVal)
       )

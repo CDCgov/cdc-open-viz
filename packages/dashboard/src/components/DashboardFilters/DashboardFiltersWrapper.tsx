@@ -127,7 +127,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         loadAPIFilters(newSharedFilters, loadingFilterMemo)
       }
     } else {
-      if (newSharedFilters[index].apiFilter) {
+      if (newSharedFilters[index].type === 'urlfilter' && newSharedFilters[index].apiFilter) {
         reloadURLData(newSharedFilters)
       } else {
         const clonedState = _.cloneDeep(state)

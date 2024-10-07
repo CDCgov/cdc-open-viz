@@ -3,9 +3,12 @@ import { handleSearchTerm, OptionsMemo } from '../nestedDropdownHelpers'
 
 describe('handleSearchTerm()', () => {
   const optsMemo: OptionsMemo = [
-    ['Fruits', ['Apple', 'Cantaloupe', 'Orange', 'Tomato']],
-    ['Vegetables', ['Spinach', 'Broccoli', 'Carrot', 'Tomato']],
-    ['Fungi', ['Portobello', 'Morel', 'Chanterelle']]
+    [['Fruits'], [['Apple'], ['Cantaloupe'], ['Orange'], ['Tomato']]],
+    [['Vegetables'], [['Spinach'], ['Broccoli'], ['Carrot'], ['Tomato']]],
+    [
+      ['Fungi', 'Mushrooms'],
+      [['Portobello', 'Mushroom 1'], ['Morel, Mushroom 2'], ['Chanterelle', 'Mushroom 3']]
+    ]
   ]
   it('Return the original OptsMemo when there is no search term', () => {
     const result = handleSearchTerm('', optsMemo)
@@ -21,32 +24,34 @@ describe('handleSearchTerm()', () => {
     const result = handleSearchTerm('', optsMemo)
     expect(result).toEqual(optsMemo)
     const result2 = handleSearchTerm('fruit', optsMemo)
-    const expectedResult2: OptionsMemo = [['Fruits', ['Apple', 'Cantaloupe', 'Orange', 'Tomato']]]
+    const expectedResult2: OptionsMemo = [[['Fruits'], [['Apple'], ['Cantaloupe'], ['Orange'], ['Tomato']]]]
     expect(result2).toEqual(expectedResult2)
     const result3 = handleSearchTerm('VEG', optsMemo)
-    const expectedResult3: OptionsMemo = [['Vegetables', ['Spinach', 'Broccoli', 'Carrot', 'Tomato']]]
+    const expectedResult3: OptionsMemo = [[['Vegetables'], [['Spinach'], ['Broccoli'], ['Carrot'], ['Tomato']]]]
     expect(result3).toEqual(expectedResult3)
-    const result4 = handleSearchTerm('f', optsMemo)
+    const result4 = handleSearchTerm('mush', optsMemo)
     const expectedResult4: OptionsMemo = [
-      ['Fruits', ['Apple', 'Cantaloupe', 'Orange', 'Tomato']],
-      ['Fungi', ['Portobello', 'Morel', 'Chanterelle']]
+      [
+        ['Fungi', 'Mushrooms'],
+        [['Portobello', 'Mushroom 1'], ['Morel, Mushroom 2'], ['Chanterelle', 'Mushroom 3']]
+      ]
     ]
     expect(result4).toEqual(expectedResult4)
   })
   it('Filter out the subvalues', () => {
     const result = handleSearchTerm('ap', optsMemo)
-    const expectedResult: OptionsMemo = [['Fruits', ['Apple']]]
+    const expectedResult: OptionsMemo = [[['Fruits'], [['Apple']]]]
     expect(result).toEqual(expectedResult)
     const result2 = handleSearchTerm('ca', optsMemo)
     const expectedResult2: OptionsMemo = [
-      ['Fruits', ['Cantaloupe']],
-      ['Vegetables', ['Carrot']]
+      [['Fruits'], [['Cantaloupe']]],
+      [['Vegetables'], [['Carrot']]]
     ]
     expect(result2).toEqual(expectedResult2)
     const result3 = handleSearchTerm('tomato', optsMemo)
     const expectedResult3: OptionsMemo = [
-      ['Fruits', ['Tomato']],
-      ['Vegetables', ['Tomato']]
+      [['Fruits'], [['Tomato']]],
+      [['Vegetables'], [['Tomato']]]
     ]
     expect(result3).toEqual(expectedResult3)
   })
