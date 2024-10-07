@@ -30,7 +30,8 @@ export const Equal_Number_Map: Story = {
 
 export const Scale_Based: Story = {
   args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Scale-Based-Categorical-Map-With-Special-Classes.json'
+    configUrl:
+      'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Scale-Based-Categorical-Map-With-Special-Classes.json'
   }
 }
 export const Qualitative: Story = {
@@ -84,11 +85,6 @@ export const HHS_Region_Map: Story = {
 export const Custom_Map_Layers: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/custom-layer-map.json'
-  }
-}
-export const Geocode: Story = {
-  args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-u-s-geo-code-dat.json'
   }
 }
 
