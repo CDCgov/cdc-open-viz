@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 // Libraries
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -27,7 +27,7 @@ import CategoricalYAxis from './Axis/Categorical.Axis'
 
 // Helpers
 import { isConvertLineToBarGraph } from '../helpers/isConvertLineToBarGraph'
-import { isLegendWrapViewport, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
+import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 
 // Hooks
 import useMinMax from '../hooks/useMinMax'
@@ -52,7 +52,6 @@ const X_TICK_LABEL_PADDING = 3
 const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) => {
   // prettier-ignore
   const {
-    axisBottomRef,
     brushConfig,
     colorScale,
     config,
@@ -70,6 +69,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     transformedData: data,
     updateConfig,
     seriesHighlight,
+    setAxisBottomHeight,
   } = useContext(ConfigContext)
 
   // CONFIG
@@ -89,11 +89,12 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   const [forestXLabelY, setForestXLabelY] = useState(0)
 
   // REFS
-  const triggerRef = useRef()
+  const axisBottomRef = useRef(null)
+  const forestPlotRightLabelRef = useRef(null)
   const svgRef = useRef()
   const suffixRef = useRef(null)
+  const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
-  const forestPlotRightLabelRef = useRef(null)
 
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
@@ -112,7 +113,10 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   const forestRowsHeight = isForestPlot ? config.data.length * config.forestPlot.rowHeight : 0
 
   // height before bottom axis
-  const initialHeight = useMemo(() => calcInitialHeight(config, currentViewport), [config, currentViewport])
+  const initialHeight = useMemo(
+    () => calcInitialHeight(config, currentViewport),
+    [config, currentViewport, parentHeight]
+  )
   const forestHeight = useMemo(() => initialHeight + forestRowsHeight, [initialHeight, forestRowsHeight])
 
   // width
@@ -312,11 +316,11 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   }, [dataRef?.isIntersecting, config.animate])
 
   useEffect(() => {
-    const textElement = suffixRef.current
-    if (!textElement && !suffixWidth) return
-    if (!textElement) return setSuffixWidth(0)
-    const textWidth = textElement.getBBox().width
-    setSuffixWidth(textWidth)
+    const suffixEl = suffixRef.current
+    if (!suffixEl && !suffixWidth) return
+    if (!suffixEl) return setSuffixWidth(0)
+    const suffixElWidth = suffixEl.getBBox().width
+    setSuffixWidth(suffixElWidth)
   }, [config.dataFormat.suffix, config.dataFormat.onlyShowTopPrefixSuffix])
 
   useEffect(() => {
@@ -324,7 +328,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
 
     const tallestLabel = Math.max(...xAxisLabelRefs.current.map(label => label.getBBox().height))
     setTallestXLabel(tallestLabel)
-  }, [dimensions[0], config.xAxis, xAxisLabelRefs.current])
+  }, [dimensions[0], config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
 
   // forest plot x-axis label positioning
   useEffect(() => {
@@ -339,6 +343,12 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     const xLabelY = labelRelativeY + rightLabel.getBBox().height + X_LABEL_PADDING
     setForestXLabelY(xLabelY)
   }, [config.data.length, forestRowsHeight])
+
+  useLayoutEffect(() => {
+    if (!axisBottomRef.current) return
+    const height = axisBottomRef.current.getBBox().height
+    setAxisBottomHeight(height)
+  }, [axisBottomRef.current, config, tallestXLabel])
 
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config

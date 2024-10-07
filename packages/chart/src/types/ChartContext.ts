@@ -13,7 +13,6 @@ export type TransformedData = {
 
 type SharedChartContext = {
   animatedChart?: boolean
-  axisBottomRef?: React.MutableRefObject<null>
   brushConfig: { data: []; isBrushing: boolean; isActive: boolean }
   capitalize: (value: string) => string
   clean: Function
@@ -34,8 +33,8 @@ type SharedChartContext = {
   // whether or not the user is dragging an annotation
   isDraggingAnnotation?: boolean
   legendIsolateValues?: string[]
+  setAxisBottomHeight?: React.Dispatch<React.SetStateAction<number>>
   setBrushConfig: Function
-  setHeight?: React.Dispatch<React.SetStateAction<number>>
   setLegendIsolateValues?: Function
 }
 

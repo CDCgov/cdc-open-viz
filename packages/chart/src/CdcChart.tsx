@@ -126,9 +126,9 @@ export default function CdcChart({
     isBrushing: false
   })
   const [height, setHeight] = useState(calcInitialHeight(config, currentViewport))
+  const [axisBottomHeight, setAxisBottomHeight] = useState(0)
 
   const legendRef = useRef(null)
-  const axisBottomRef = useRef(null)
 
   const handleDragStateChange = isDragging => {
     setIsDraggingAnnotation(isDragging)
@@ -694,22 +694,22 @@ export default function CdcChart({
   function isEmpty(obj) {
     return Object.keys(obj).length === 0
   }
+
   useEffect(() => {
     const initialHeight = calcInitialHeight(config, currentViewport)
     const isForestPlot = visualizationType === 'Forest Plot'
 
     // heights to add
     const brushHeight = brush?.active ? brush?.height : 0
-    const xAxisHeight = axisBottomRef.current?.getBBox()?.height || 0
     const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
-    const additionalHeight = xAxisHeight + brushHeight + forestRowsHeight
+    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight
 
     const adjustedHeight = initialHeight + additionalHeight
 
     if (adjustedHeight === height) return
 
     setHeight(adjustedHeight)
-  }, [brush, axisBottomRef.current, config.data, currentViewport])
+  }, [brush, axisBottomHeight, config, currentViewport])
 
   // Load data when component first mounts
   useEffect(() => {
@@ -1527,7 +1527,6 @@ export default function CdcChart({
   }
 
   const contextValues = {
-    axisBottomRef,
     brushConfig,
     capitalize,
     clean,
@@ -1566,6 +1565,7 @@ export default function CdcChart({
     parseDate,
     rawData: _.cloneDeep(stateData) ?? {},
     seriesHighlight,
+    setAxisBottomHeight,
     setBrushConfig,
     setConfig,
     setDynamicLegendItems,
