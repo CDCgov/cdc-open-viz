@@ -227,6 +227,21 @@ const PanelGeneral: FC<PanelProps> = props => {
                   <Tooltip.Target>
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
+                  <Tooltip.Content></Tooltip.Content>
+                </Tooltip>
+              }
+              value={config.general.showZeroValueData}
+              section='general'
+              fieldName='showZeroValueData'
+              label='Display "Zero Data" Label'
+              updateField={updateField}
+            />
+            <CheckBox
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
                   <Tooltip.Content>
                     {config.visualizationSubType === 'stacked' && (
                       <p>
