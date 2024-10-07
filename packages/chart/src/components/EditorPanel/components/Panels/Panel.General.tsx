@@ -227,7 +227,12 @@ const PanelGeneral: FC<PanelProps> = props => {
                   <Tooltip.Target>
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
-                  <Tooltip.Content></Tooltip.Content>
+                  <Tooltip.Content>
+                    <p>
+                      Selecting this option will display a thin line slightly above the Date/Category Axis to indicate
+                      "zero value" where zero values are indicated in the Data Series.
+                    </p>
+                  </Tooltip.Content>
                 </Tooltip>
               }
               value={config.general.showZeroValueData}
