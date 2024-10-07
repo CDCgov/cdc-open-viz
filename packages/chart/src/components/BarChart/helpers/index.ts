@@ -87,6 +87,7 @@ export const getBarConfig = ({
     if (isSuppressed) label = ''
     // If the config is set to show a label for missing data, display 'N/A'
     if (showMissingDataLabel) label = 'N/A'
+    if (showZeroValueData) label = '0'
 
     // determine label width in pixels & check if it fits to the bar width
     const labelWidth = getTextWidth(barLabel, `normal ${barWidth / 2}px sans-serif`)
@@ -97,7 +98,6 @@ export const getBarConfig = ({
       return labelFits && isVertical ? label : !isVertical ? label : ''
     }
   }
-
   return { barWidthHorizontal, barHeight, isSuppressed, showMissingDataLabel, getBarY, getAbsentDataLabel }
 }
 
