@@ -325,8 +325,8 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   }, [config.dataFormat.suffix, config.dataFormat.onlyShowTopPrefixSuffix])
 
   useEffect(() => {
+    xAxisLabelRefs.current = xAxisLabelRefs.current?.filter(label => label)
     if (!xAxisLabelRefs.current.length) return
-
     const tallestLabel = Math.max(...xAxisLabelRefs.current.map(label => label.getBBox().height))
     setBottomLabelStart(tallestLabel + X_TICK_LABEL_PADDING + DEFAULT_TICK_LENGTH)
   }, [dimensions[0], config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
