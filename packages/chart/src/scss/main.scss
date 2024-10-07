@@ -221,10 +221,6 @@
         white-space: pre-wrap;
         word-break: break-word;
       }
-
-      & > :first-child {
-        margin-top: 3px;
-      }
     }
 
     .vertical-sorted:not(.single-row) .legend-item {

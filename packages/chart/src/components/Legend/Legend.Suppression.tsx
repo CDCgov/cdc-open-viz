@@ -11,7 +11,7 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isBottomOrSmallViewp
   const { preliminaryData, visualizationType, visualizationSubType, legend } = config
 
   const hasOpenCircleEffects = () =>
-    preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style === 'Open Circles') &&
+    preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style !== 'Filled Circles') &&
     ['Line', 'Combo'].includes(visualizationType)
 
   const shouldShowSuppressedLabels = () =>
