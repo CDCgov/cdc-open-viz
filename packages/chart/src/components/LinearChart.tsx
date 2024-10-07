@@ -46,8 +46,9 @@ type LinearChartProps = {
   parentHeight: number
 }
 
-const X_LABEL_PADDING = 15
+const BOTTOM_LABEL_PADDING = 15
 const X_TICK_LABEL_PADDING = 3
+const DEFAULT_TICK_LENGTH = 8
 
 const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) => {
   // prettier-ignore
@@ -85,7 +86,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
   // Used to calculate the y position of the x-axis title
-  const [tallestXLabel, setTallestXLabel] = useState(0)
+  const [bottomLabelStart, setBottomLabelStart] = useState(0)
   const [forestXLabelY, setForestXLabelY] = useState(0)
 
   // REFS
@@ -327,7 +328,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     if (!xAxisLabelRefs.current.length) return
 
     const tallestLabel = Math.max(...xAxisLabelRefs.current.map(label => label.getBBox().height))
-    setTallestXLabel(tallestLabel)
+    setBottomLabelStart(tallestLabel + X_TICK_LABEL_PADDING + DEFAULT_TICK_LENGTH)
   }, [dimensions[0], config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
 
   // forest plot x-axis label positioning
@@ -340,7 +341,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
 
     const axisBottomY = yMax + Number(config.xAxis.axisPadding)
     const labelRelativeY = rightLabel.getBBox().y - axisBottomY
-    const xLabelY = labelRelativeY + rightLabel.getBBox().height + X_LABEL_PADDING
+    const xLabelY = labelRelativeY + rightLabel.getBBox().height + BOTTOM_LABEL_PADDING
     setForestXLabelY(xLabelY)
   }, [config.data.length, forestRowsHeight])
 
@@ -348,7 +349,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     if (!axisBottomRef.current) return
     const height = axisBottomRef.current.getBBox().height
     setAxisBottomHeight(height)
-  }, [axisBottomRef.current, config, tallestXLabel])
+  }, [axisBottomRef.current, config, bottomLabelStart])
 
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
@@ -388,7 +389,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   }
 
   const generatePairedBarAxis = () => {
-    const axisMaxHeight = tallestXLabel + X_LABEL_PADDING
+    const axisMaxHeight = bottomLabelStart + BOTTOM_LABEL_PADDING
 
     const getTickPositions = (ticks, xScale) => {
       if (!ticks.length) return false
@@ -1295,7 +1296,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
               }
             >
               {props => {
-                const axisMaxHeight = tallestXLabel + X_LABEL_PADDING
+                const axisMaxHeight = bottomLabelStart + BOTTOM_LABEL_PADDING
 
                 const axisCenter =
                   config.visualizationType !== 'Forest Plot'
@@ -1305,7 +1306,6 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                 const ismultiLabel = props.ticks.some(tick => containsMultipleWords(tick.value))
 
                 // Calculate sumOfTickWidth here, before map function
-                const defaultTickLength = 8
                 const tickWidthMax = Math.max(
                   ...props.ticks.map(tick =>
                     getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
@@ -1342,7 +1342,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                 })
 
                 const dynamicMarginTop =
-                  areTicksTouching && config.isResponsiveTicks ? tickWidthMax + defaultTickLength + 20 : 0
+                  areTicksTouching && config.isResponsiveTicks ? tickWidthMax + DEFAULT_TICK_LENGTH + 20 : 0
 
                 config.dynamicMarginTop = dynamicMarginTop
                 config.xAxis.tickWidthMax = tickWidthMax
@@ -1352,7 +1352,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                     {props.ticks.map((tick, i, propsTicks) => {
                       // when using LogScale show major ticks values only
                       const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
-                      const tickLength = showTick === 'block' ? 16 : defaultTickLength
+                      const tickLength = showTick === 'block' ? 16 : DEFAULT_TICK_LENGTH
                       const to = { x: tick.to.x, y: tickLength }
                       const textWidth = getTextWidth(
                         tick.formattedValue,

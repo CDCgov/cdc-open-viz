@@ -75,12 +75,12 @@ import LegendWrapper from './components/LegendWrapper'
 import _ from 'lodash'
 
 interface CdcChartProps {
-  configUrl: string
+  configUrl?: string
   config?: ChartConfig
   isEditor?: boolean
   isDebug?: boolean
   isDashboard?: boolean
-  setConfig: (config: ChartConfig) => void
+  setConfig?: (config: ChartConfig) => void
   setEditing?: (editing: boolean) => void
   hostname?: string
   link?: string
