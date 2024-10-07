@@ -19,14 +19,14 @@
     }
     button {
       background-color: #fff;
-      color: $baseColor;
+      color: var(--baseColor);
       border: solid 1px;
       border-color: rgb(199, 199, 199);
       padding: 1.3em $gbl-padding;
       height: 100%;
       align-items: center;
       display: flex;
-      border: $lightGray 1px solid;
+      border: var(--lightGray) 1px solid;
       margin-right: 1em;
       cursor: pointer;
       transition: 0.1s all;
