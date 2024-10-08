@@ -36,6 +36,7 @@ type SharedChartContext = {
   setAxisBottomHeight?: React.Dispatch<React.SetStateAction<number>>
   setBrushConfig: Function
   setLegendIsolateValues?: Function
+  topLabelOnGridlineHeightState?: [number, React.Dispatch<React.SetStateAction<number>>]
 }
 
 // Line Chart Specific Context

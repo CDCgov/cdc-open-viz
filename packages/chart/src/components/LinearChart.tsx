@@ -71,12 +71,16 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     updateConfig,
     seriesHighlight,
     setAxisBottomHeight,
+    topLabelOnGridlineHeightState
   } = useContext(ConfigContext)
 
   // CONFIG
   // todo: start destructuring this file for conciseness
   const { heights, visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, legend, debugSvg } =
     config
+
+  // if labels are above gridlines, we need to add height to the top of the chart and adjust the viewBox
+  const [topLabelOnGridlineHeight, setTopLabelOnGridlineHeight] = topLabelOnGridlineHeightState
 
   // HOOKS  % STATES
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
@@ -94,6 +98,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   const forestPlotRightLabelRef = useRef(null)
   const svgRef = useRef()
   const suffixRef = useRef(null)
+  const topYLabelRef = useRef(null)
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
 
@@ -351,6 +356,20 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     setAxisBottomHeight(height)
   }, [axisBottomRef.current, config, bottomLabelStart])
 
+  useLayoutEffect(() => {
+    if (!topYLabelRef.current && !yAxis.labelsAboveGridlines) return
+
+    // setting turned off
+    if (!yAxis.labelsAboveGridlines) {
+      setTopLabelOnGridlineHeight(0)
+      topYLabelRef.current = null
+      return
+    }
+
+    const height = topYLabelRef.current.getBBox().height
+    setTopLabelOnGridlineHeight(height)
+  }, [topYLabelRef.current, yAxis.labelsAboveGridlines])
+
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
     if (visualizationType === 'Combo' && runtime.forecastingSeriesKeys > 0) return true
@@ -544,6 +563,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
       {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
       <div style={{ width: `${parentWidth}px`, overflow: 'visible' }} className='tooltip-boundary'>
         <svg
+          viewBox={`0 ${-topLabelOnGridlineHeight} ${parentWidth} ${parentHeight}`}
           onMouseMove={onMouseMove}
           width={parentWidth}
           height={parentHeight}
@@ -1138,6 +1158,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
 
                                 {/* VALUE */}
                                 <BlurStrokeText
+                                  innerRef={el => lastTick && (topYLabelRef.current = el)}
                                   display={isLogarithmicAxis ? showTicks : 'block'}
                                   dx={isLogarithmicAxis ? -6 : 0}
                                   x={suffixOneChar ? labelX - suffixWidth : labelX}

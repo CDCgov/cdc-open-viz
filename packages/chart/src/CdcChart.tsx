@@ -127,6 +127,8 @@ export default function CdcChart({
   })
   const [height, setHeight] = useState(calcInitialHeight(config, currentViewport))
   const [axisBottomHeight, setAxisBottomHeight] = useState(0)
+  // if labels are above gridlines, we need to add height to the top of the chart and adjust the viewBox
+  const [topLabelOnGridlineHeight, setTopLabelOnGridlineHeight] = useState(0)
 
   const legendRef = useRef(null)
 
@@ -702,7 +704,7 @@ export default function CdcChart({
     // heights to add
     const brushHeight = brush?.active ? brush?.height : 0
     const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
-    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight
+    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight + topLabelOnGridlineHeight
 
     const adjustedHeight = initialHeight + additionalHeight
 
@@ -1576,6 +1578,7 @@ export default function CdcChart({
     setSharedFilter,
     setSharedFilterValue,
     tableData: filteredData || excludedData, // do not clean table data
+    topLabelOnGridlineHeightState: [topLabelOnGridlineHeight, setTopLabelOnGridlineHeight],
     transformedData: clean(filteredData || excludedData), // do this right before passing to components
     twoColorPalette,
     unfilteredData: _.cloneDeep(stateData),
