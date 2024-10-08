@@ -132,9 +132,9 @@ const Legend: React.FC<LegendProps> = forwardRef(
                         }}
                         role='button'
                       >
-                        <div>
+                        <div className='d-flex justify-content-center align-items-center'>
                           {config.visualizationType === 'Line' && config.legend.style === 'lines' ? (
-                            <svg width={40} height={20}>
+                            <svg width={40} height={25}>
                               <Line
                                 from={{ x: 10, y: 10 }}
                                 to={{ x: 40, y: 10 }}
@@ -144,7 +144,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                               />
                             </svg>
                           ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <div className='d-flex flex-column mt-1'>
                               <LegendShape
                                 shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
                                 viewport={currentViewport}
