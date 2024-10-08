@@ -134,6 +134,21 @@ const CdcChart = ({
   const handleDragStateChange = isDragging => {
     setIsDraggingAnnotation(isDragging)
   }
+
+  const getNumericValue = number => {
+    if (typeof number === 'string') return parseFloat(number.replace(/,/g, ''))
+    return Number(number)
+  }
+
+  const handleRankByValue = (data, passedConfig = config) => {
+    if (passedConfig.rankByValue) {
+      const series = passedConfig.series[0].dataKey
+      const sorted = data.sort((a, b) => getNumericValue(a[series]) - getNumericValue(b[series]))
+      return passedConfig.rankByValue === 'asc' ? sorted : sorted.reverse()
+    }
+    return data
+  }
+
   if (isDebug) console.log('Chart config, isEditor', config, isEditor)
 
   // Destructure items from config for more readable JSX
@@ -209,6 +224,8 @@ const CdcChart = ({
 
       Object.assign(data, { urlFiltered: true })
 
+      data = handleRankByValue(data)
+
       updateConfig({ ...config, runtimeDataUrl: dataUrlFinal, data, formattedData: data })
 
       if (data) {
@@ -271,6 +288,8 @@ const CdcChart = ({
       data = transform.developerStandardize(data, response.dataDescription)
     }
 
+    data = handleRankByValue(data, response)
+
     if (data) {
       setStateData(data)
       setExcludedData(data)
@@ -317,6 +336,8 @@ const CdcChart = ({
   const updateConfig = (_config, dataOverride?: any[]) => {
     const newConfig = _.cloneDeep(_config)
     let data = dataOverride || stateData
+
+    data = handleRankByValue(data, newConfig)
 
     // Deeper copy
     Object.keys(defaults).forEach(key => {

@@ -876,13 +876,6 @@ const EditorPanel = () => {
     updateConfig({ ...config, series: newSeries }) // left axis series keys
   }
 
-  const sortSeries = e => {
-    const series = config.series[0].dataKey
-    const sorted = data.sort((a, b) => a[series] - b[series])
-    const newData = e === 'asc' ? sorted : sorted.reverse()
-    updateConfig({ ...config }, newData)
-  }
-
   const addNewExclusion = exclusionKey => {
     let newExclusion = [...config.exclusions.keys]
     newExclusion.push(exclusionKey)
@@ -1393,7 +1386,6 @@ const EditorPanel = () => {
     handleSeriesChange,
     handleAddNewHighlightedBar,
     setCategoryAxis,
-    sortSeries,
     updateField,
     warningMsg,
     highlightedBarValues,
@@ -1557,10 +1549,11 @@ const EditorPanel = () => {
                         )}
                         {visSupportsRankByValue() && config.series && config.series.length === 1 && (
                           <Select
-                            fieldName='visualizationType'
+                            value={config.rankByValue}
+                            fieldName='rankByValue'
                             label='Rank by Value'
                             initial='Select'
-                            onChange={e => sortSeries(e.target.value)}
+                            updateField={updateField}
                             options={['asc', 'desc']}
                           />
                         )}
