@@ -878,7 +878,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
           {config.filters && config.filters.values.length === 0 && data.length === 0 && (
             <Text
               x={Number(config.yAxis.size) + Number(xMax / 2)}
-              y={height / 2 - (config.xAxis.padding || 0) / 2}
+              y={initialHeight / 2 - (config.xAxis.padding || 0) / 2}
               textAnchor='middle'
             >
               {config.chartMessage.noData}
@@ -1178,7 +1178,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
             <CategoricalYAxis
               max={max}
               maxValue={maxValue}
-              height={height}
+              height={initialHeight}
               xMax={xMax}
               yMax={yMax}
               leftSize={Number(runtime.yAxis.size) - config.yAxis.axisPadding}
