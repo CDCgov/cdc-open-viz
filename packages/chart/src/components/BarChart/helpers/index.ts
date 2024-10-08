@@ -11,7 +11,16 @@ interface BarConfigProps {
 }
 
 // Function to create bar width based on suppression status and missing data label
-export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, isNumber, getTextWidth, barWidth, isVertical }: BarConfigProps) => {
+export const getBarConfig = ({
+  bar,
+  defaultBarHeight,
+  defaultBarWidth,
+  config,
+  isNumber,
+  getTextWidth,
+  barWidth,
+  isVertical
+}: BarConfigProps) => {
   const heightMini = 3 /// height of small bars aka suppressed/NA/Zero valued
   let barHeight = defaultBarHeight
 
@@ -20,6 +29,7 @@ export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, i
   let barLabel = ''
   let isSuppressed = false
   let showMissingDataLabel = false
+  let showZeroValueData = false
   const showSuppressedSymbol = config.general.showSuppressedSymbol
 
   config.preliminaryData.forEach(pd => {
@@ -45,10 +55,19 @@ export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, i
     barHeight = labelFits ? heightMini : 0
     barWidthHorizontal = heightMini
   }
+  // Handle undefined, null, or non-calculable bar.value
+
+  if (!isSuppressed && bar.value === '0' && config.general.showZeroValueData) {
+    const labelWidth = getTextWidth('0', `normal ${barWidth / 2}px sans-serif`)
+    const labelFits = Number(labelWidth) < barWidth && barWidth > 10
+    showZeroValueData = true
+    barHeight = labelFits ? heightMini : 0
+    barWidthHorizontal = heightMini
+  }
 
   const getBarY = (defaultBarY, yScale) => {
     // calculate Y position of small bars (suppressed,N/A,Zero valued) bars
-    if (isSuppressed || showMissingDataLabel) {
+    if (isSuppressed || showMissingDataLabel || showZeroValueData) {
       if (config.isLollipopChart) {
         return yScale - heightMini * 2
       } else {
@@ -68,6 +87,7 @@ export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, i
     if (isSuppressed) label = ''
     // If the config is set to show a label for missing data, display 'N/A'
     if (showMissingDataLabel) label = 'N/A'
+    if (showZeroValueData) label = '0'
 
     // determine label width in pixels & check if it fits to the bar width
     const labelWidth = getTextWidth(barLabel, `normal ${barWidth / 2}px sans-serif`)
@@ -78,7 +98,6 @@ export const getBarConfig = ({ bar, defaultBarHeight, defaultBarWidth, config, i
       return labelFits && isVertical ? label : !isVertical ? label : ''
     }
   }
-
   return { barWidthHorizontal, barHeight, isSuppressed, showMissingDataLabel, getBarY, getAbsentDataLabel }
 }
 

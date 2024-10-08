@@ -28,6 +28,7 @@ export default {
     showDownloadButton: false,
     showMissingDataLabel: true,
     showSuppressedSymbol: true,
+    showZeroValueData: true,
     hideNullValue: true
   },
   padding: {
