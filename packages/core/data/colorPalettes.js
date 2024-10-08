@@ -60,7 +60,7 @@ const colorPalettesMap = {
     '#853209',
     '#661F00'
   ],
-  colorblindsafe: ['#e69f00', '#56b4e9', '#009e73', '#f0e442', '#0072b2', '#d55e00', '#cc79a7', '#000000']
+  colorblindsafe: ['#e69f00', '#56b4e9', '#009e73', '#f0e442', '#0072b2', '#d55e00', '#cc79a7', '#000000', '#7e5803']
 }
 
 // * ============= Palettes for Chart project ==========  * //
@@ -113,7 +113,8 @@ const colorPalettes2 = {
   'sequential-blue-2-(MPX)': ['#D5F6F9', '#99E2ED', '#5FB6D1', '#3189B0', '#116091', '#0A3E72'],
   'sequential-orange-(MPX)': ['#FFEFCF', '#FFD49C', '#F7A866', '#EB7723', '#B95117', '#862B0B'],
   'sequential-green': ['#C7E9C0', '#A1D99B', '#74C476', '#41AB5D', '#238B45', '#005A32'],
-  colorblindsafe: ['#e69f00', '#56b4e9', '#009e73', '#f0e442', '#0072b2', '#d55e00', '#cc79a7', '#000000']
+
+  colorblindsafe: ['#e69f00', '#56b4e9', '#009e73', '#f0e442', '#0072b2', '#d55e00', '#cc79a7', '#000000', '#7e5803']
 }
 // * ============= Palettes for Paired bar Chart ==========  * //
 export const colorPalettes3 = {
