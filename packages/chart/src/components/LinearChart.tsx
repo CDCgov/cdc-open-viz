@@ -100,8 +100,9 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   // REFS
   const axisBottomRef = useRef(null)
   const forestPlotRightLabelRef = useRef(null)
-  const svgRef = useRef()
+  const svgRef = useRef(null)
   const suffixRef = useRef(null)
+  const topYLabelRef = useRef(null)
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
@@ -360,16 +361,24 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     const axisBottomHeight = axisBottomRef.current.getBBox().height
 
     const isForestPlot = visualizationType === 'Forest Plot'
+    const topLabelOnGridline = topYLabelRef.current && yAxis.labelsAboveGridlines
 
     // Heights to add
     const brushHeight = brush?.active ? brush?.height : 0
     const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
-    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight
+    const topLabelOnGridlineHeight = topLabelOnGridline ? topYLabelRef.current.getBBox().height : 0
+    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight + topLabelOnGridlineHeight
 
     if (!parentRef.current) return
 
     parentRef.current.style.height = `${initialHeight + additionalHeight}px`
-  }, [axisBottomRef.current, config, bottomLabelStart, brush, currentViewport])
+
+    if (!topLabelOnGridlineHeight) return
+    //set viewbox
+    const svg = svgRef.current
+    if (!svg) return
+    svg.setAttribute('viewBox', `0 ${-topLabelOnGridlineHeight} ${parentWidth} ${parentHeight}`)
+  }, [axisBottomRef.current, config, bottomLabelStart, brush, currentViewport, topYLabelRef.current])
 
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
@@ -564,6 +573,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
       {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
       <div style={{ width: `${parentWidth}px`, overflow: 'visible' }} className='tooltip-boundary'>
         <svg
+          ref={svgRef}
           onMouseMove={onMouseMove}
           width={parentWidth}
           height={parentHeight}
@@ -572,7 +582,6 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
           } ${isDraggingAnnotation && 'dragging-annotation'}`}
           role='img'
           aria-label={handleChartAriaLabels(config)}
-          ref={svgRef}
           style={{ overflow: 'visible' }}
         >
           {!isDraggingAnnotation && <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>}{' '}
@@ -1158,6 +1167,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
 
                                 {/* VALUE */}
                                 <BlurStrokeText
+                                  innerRef={el => lastTick && (topYLabelRef.current = el)}
                                   display={isLogarithmicAxis ? showTicks : 'block'}
                                   dx={isLogarithmicAxis ? -6 : 0}
                                   x={suffixOneChar ? labelX - suffixWidth : labelX}
