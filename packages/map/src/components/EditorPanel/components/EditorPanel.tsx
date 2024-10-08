@@ -1167,7 +1167,14 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
         if (paletteName.includes('qualitative') && !paletteName.endsWith('reverse')) {
           nonSequential.push(paletteName)
         }
-        if (!paletteName.includes('qualitative') && !paletteName.endsWith('reverse')) {
+        if (paletteName.includes('colorblindsafe') && !paletteName.endsWith('reverse')) {
+          nonSequential.push(paletteName)
+        }
+        if (
+          !paletteName.includes('qualitative') &&
+          !paletteName.includes('colorblindsafe') &&
+          !paletteName.endsWith('reverse')
+        ) {
           sequential.push(paletteName)
         }
       }
@@ -1175,7 +1182,14 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
         if (paletteName.includes('qualitative') && paletteName.endsWith('reverse')) {
           nonSequential.push(paletteName)
         }
-        if (!paletteName.includes('qualitative') && paletteName.endsWith('reverse')) {
+        if (paletteName.includes('colorblindsafe') && paletteName.endsWith('reverse')) {
+          nonSequential.push(paletteName)
+        }
+        if (
+          !paletteName.includes('qualitative') &&
+          !paletteName.includes('colorblindsafe') &&
+          paletteName.endsWith('reverse')
+        ) {
           sequential.push(paletteName)
         }
       }
