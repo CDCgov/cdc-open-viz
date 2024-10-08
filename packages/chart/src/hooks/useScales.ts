@@ -263,14 +263,20 @@ const useScales = (properties: useScaleProps) => {
 
 export default useScales
 
-export const getTickValues = (xAxisDataMapped, xScale, num) => {
+export const getFirstDayOfMonth = ms => {
+  const date = new Date(ms)
+  return new Date(date.getFullYear(), date.getMonth(), 1).getTime()
+}
+
+export const getTickValues = (xAxisDataMapped, xScale, num, config) => {
   const xDomain = xScale.domain()
 
   if (xScale.type === 'time') {
     const xDomainMax = xAxisDataMapped[xAxisDataMapped.length - 1]
     const xDomainMin = xAxisDataMapped[0]
+
     const step = (xDomainMax - xDomainMin) / (num - 1)
-    const tickValues = []
+    let tickValues = []
     for (let i = xDomainMax; i >= xDomainMin; i -= step) {
       tickValues.push(i)
     }
@@ -278,6 +284,11 @@ export const getTickValues = (xAxisDataMapped, xScale, num) => {
       tickValues.push(xDomainMin)
     }
     tickValues.reverse()
+
+    // Use first days of months for date axis formatted like "Apr. 2024"
+    if (config.xAxis.dateDisplayFormat === '%b. %Y') {
+      tickValues = tickValues.map(tv => getFirstDayOfMonth(tv))
+    }
 
     return tickValues
   }

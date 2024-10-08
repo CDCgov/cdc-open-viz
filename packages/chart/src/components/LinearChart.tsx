@@ -1307,7 +1307,8 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                   ? getTickValues(
                       xAxisDataMapped,
                       xScale,
-                      config.xAxis.type === 'date-time' ? countNumOfTicks('xAxis') : getManualStep()
+                      config.xAxis.type === 'date-time' ? countNumOfTicks('xAxis') : getManualStep(),
+                      config
                     )
                   : undefined
               }
@@ -1357,6 +1358,11 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                     return
                   }
                 })
+
+                // Force wrap to two lines for date axis formatted like "Apr. 2024"
+                if (config.xAxis.dateDisplayFormat === '%b. %Y') {
+                  areTicksTouching = true
+                }
 
                 const dynamicMarginTop =
                   areTicksTouching && config.isResponsiveTicks ? tickWidthMax + DEFAULT_TICK_LENGTH + 20 : 0
