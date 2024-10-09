@@ -25,7 +25,7 @@ export const getLoadingFilterMemo = (
     return acc
   }, {})
 
-const getParentParams = (
+export const getParentParams = (
   childFilter: SharedFilter,
   sharedFilters: SharedFilter[]
 ): Record<'key' | 'value', string>[] | null => {

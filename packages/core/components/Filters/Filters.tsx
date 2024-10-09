@@ -13,10 +13,20 @@ import { DimensionsType } from '../../types/Dimensions'
 import NestedDropdown from '../NestedDropdown'
 import _ from 'lodash'
 import { getNestedOptions } from './helpers/getNestedOptions'
-import { FILTER_STYLE } from '@cdc/dashboard/src/types/FilterStyles'
-import { applyQueuedActive } from '@cdc/dashboard/src/helpers/applyQueuedActive'
+import { applyQueuedActive } from './helpers/applyQueuedActive'
 
-export const filterStyleOptions = ['dropdown', 'nested-dropdown', 'pill', 'tab', 'tab bar', 'multi-select']
+export const VIZ_FILTER_STYLE = {
+  dropdown: 'dropdown',
+  nestedDropdown: 'nested-dropdown',
+  pill: 'pill',
+  tab: 'tab',
+  tabBar: 'tab bar',
+  multiSelect: 'multi-select'
+} as const
+
+export type VizFilterStyle = (typeof VIZ_FILTER_STYLE)[keyof typeof VIZ_FILTER_STYLE]
+
+export const filterStyleOptions = Object.values(VIZ_FILTER_STYLE)
 
 export const filterOrderOptions: { label: string; value: OrderBy }[] = [
   {
