@@ -2850,8 +2850,8 @@ const EditorPanel = () => {
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>
-                                When this option is checked and the date format in the axis includes years, the year
-                                will be suppressed if it is the same as the previous year.
+                                When this option is checked and the date format for the axis includes years, each year
+                                will only be shown once in the axis.
                               </p>
                             </Tooltip.Content>
                           </Tooltip>

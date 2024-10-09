@@ -40,6 +40,7 @@ export type Axis = {
   sortKey?: string
   showTargetLabel?: boolean
   size?: number
+  suppressMatchingYears?: boolean
   target?: number
   targetLabel?: string
   tickRotation?: number

@@ -268,6 +268,20 @@ export const getFirstDayOfMonth = ms => {
   return new Date(date.getFullYear(), date.getMonth(), 1).getTime()
 }
 
+export const dateFormatHasMonthButNoDays = dateFormat => {
+  return (
+    (dateFormat.includes('%b') ||
+      dateFormat.includes('%B') ||
+      dateFormat.includes('%m') ||
+      dateFormat.includes('%-m') ||
+      dateFormat.includes('%_m')) &&
+    !dateFormat.includes('%d') &&
+    !dateFormat.includes('%-d') &&
+    !dateFormat.includes('%_d') &&
+    !dateFormat.includes('%e')
+  )
+}
+
 export const getTickValues = (xAxisDataMapped, xScale, num, config) => {
   const xDomain = xScale.domain()
 
@@ -285,8 +299,8 @@ export const getTickValues = (xAxisDataMapped, xScale, num, config) => {
     }
     tickValues.reverse()
 
-    // Use first days of months for date axis formatted like "Apr. 2024"
-    if (config.xAxis.dateDisplayFormat === '%b. %Y') {
+    // Use first days of months when showing months without days
+    if (dateFormatHasMonthButNoDays(config.xAxis.dateDisplayFormat)) {
       tickValues = tickValues.map(tv => getFirstDayOfMonth(tv))
     }
 

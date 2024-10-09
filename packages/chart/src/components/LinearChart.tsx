@@ -1359,8 +1359,8 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                   }
                 })
 
-                // Force wrap to two lines for date axis formatted like "Apr. 2024"
-                if (config.xAxis.dateDisplayFormat === '%b. %Y') {
+                // Force wrap when suppressing years so it's easier to read
+                if (config.xAxis.suppressMatchingYears) {
                   areTicksTouching = true
                 }
 
