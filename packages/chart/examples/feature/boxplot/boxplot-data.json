@@ -1,90 +1,22 @@
 [
   {
-    "Group_Category": "category one",
-    "Value": "21"
+    "category one": "Group A",
+    "value": 10,
+    "valu2": 10
   },
   {
-    "Group_Category": "category one",
-    "Value": "19"
+    "category one": "Group A",
+    "value": 200,
+    "valu2": 10
   },
   {
-    "Group_Category": "category one",
-    "Value": "23"
+    "category one": "Group A",
+    "value": 30,
+    "valu2": 10
   },
   {
-    "Group_Category": "category one",
-    "Value": "24"
-  },
-  {
-    "Group_Category": "category two",
-    "Value": "18"
-  },
-  {
-    "Group_Category": "category two",
-    "Value": "10"
-  },
-  {
-    "Group_Category": "category two",
-    "Value": "12"
-  },
-  {
-    "Group_Category": "category two",
-    "Value": "19"
-  },
-  {
-    "Group_Category": "category three",
-    "Value": "30"
-  },
-  {
-    "Group_Category": "category three",
-    "Value": "35"
-  },
-  {
-    "Group_Category": "category three",
-    "Value": "36"
-  },
-  {
-    "Group_Category": "category three",
-    "Value": "46"
-  },
-  {
-    "Group_Category": "category four",
-    "Value": "30"
-  },
-  {
-    "Group_Category": "category four",
-    "Value": "40"
-  },
-  {
-    "Group_Category": "category four",
-    "Value": "50"
-  },
-  {
-    "Group_Category": "category four",
-    "Value": "50"
-  },
-  {
-    "Group_Category": "category four",
-    "Value": "85"
-  },
-  {
-    "Group_Category": "category four",
-    "Value": "82"
-  },
-  {
-    "Group_Category": "category four",
-    "Value": "43"
-  },
-  {
-    "Group_Category": "category four",
-    "Value": "42"
-  },
-  {
-    "Group_Category": "category four",
-    "Value": "41"
-  },
-  {
-    "Group_Category": "category four",
-    "Value": "21"
+    "category one": "Group A",
+    "value": 50,
+    "valu2": 10
   }
 ]

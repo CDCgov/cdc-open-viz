@@ -4,9 +4,10 @@ import { Group } from '@visx/group'
 import ConfigContext from '../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
+import { scaleBand, scaleLinear } from '@visx/scale'
 
-const CoveBoxPlot = ({ xScale, yScale }) => {
-  const { config, setConfig } = useContext(ConfigContext)
+const CoveBoxPlot = ({ xScale, yScale, yMax, xMax, seriesScale }) => {
+  const { config, setConfig, transformedData: data } = useContext(ConfigContext)
   const { boxplot } = config
 
   useEffect(() => {
@@ -32,6 +33,10 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
       ${boxplot.labels.median}: ${d.columnMedian}
     `
   }
+  const groupScale = scaleBand({
+    range: [0, xMax],
+    domain: ['Group A']
+  })
 
   //  accessors & constants
   const max = d => Number(d.columnMax)
@@ -40,66 +45,78 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
   const thirdQuartile = d => Number(d.columnThirdQuartile)
   const firstQuartile = d => Number(d.columnFirstQuartile)
   const fillOpacity = 0.5
-  const boxWidth = xScale.bandwidth()
+  const boxWidth = groupScale.bandwidth()
   const constrainedWidth = Math.min(40, boxWidth)
   const color_0 = colorPalettesChart[config?.palette][0] ? colorPalettesChart[config?.palette][0] : '#000'
+  // const seriesScale = scaleBand({
+  //   domain: ['value', 'value2'],
+  //   range: [0, yMax]
+  // })
+  console.log(data.map(d => d['category one']))
 
+  const xScaleX = scaleBand({
+    rangeRound: [0, groupScale.bandwidth()],
+    domain: ['value', 'value2']
+  })
+
+  const offset = boxWidth - constrainedWidth
+  console.log(boxWidth, 'boxWidth')
   return (
     <ErrorBoundary component='BoxPlot'>
-      <Group className='boxplot' key={`boxplot-group`}>
+      <Group left={Number(config.yAxis.size)} className='boxplot' key={`boxplot-group`}>
         {boxplot.plots.map((d, i) => {
-          const offset = boxWidth - constrainedWidth
-          const radius = 4
           return (
-            <Group key={`boxplotplot-${i}`}>
-              {boxplot.plotNonOutlierValues &&
-                d.nonOutlierValues.map((value, index) => {
-                  return <circle cx={xScale(d.columnCategory) + Number(config.yAxis.size) + boxWidth / 2} cy={yScale(value)} r={radius} fill={'#ccc'} style={{ opacity: 1, fillOpacity: 1, stroke: 'black' }} key={`boxplot-${i}--circle-${index}`} />
-                })}
-              <BoxPlot
-                data-left={xScale(d.columnCategory) + config.yAxis.size + offset / 2 + 0.5}
-                key={`box-plot-${i}`}
-                min={min(d)}
-                max={max(d)}
-                left={Number(xScale(d.columnCategory)) + Number(config.yAxis.size) + offset / 2 + 0.5}
-                firstQuartile={firstQuartile(d)}
-                thirdQuartile={thirdQuartile(d)}
-                median={median(d)}
-                boxWidth={constrainedWidth}
-                fill={color_0}
-                fillOpacity={fillOpacity}
-                stroke='black'
-                valueScale={yScale}
-                outliers={boxplot.plotOutlierValues ? d.columnOutliers : []}
-                outlierProps={{
-                  style: {
-                    fill: `${color_0}`,
-                    opacity: 1
-                  }
-                }}
-                medianProps={{
-                  style: {
-                    stroke: 'black'
-                  }
-                }}
-                boxProps={{
-                  style: {
-                    stroke: 'black',
-                    strokeWidth: boxplot.borders === 'true' ? 1 : 0
-                  }
-                }}
-                maxProps={{
-                  style: {
-                    stroke: 'black'
-                  }
-                }}
-                container
-                containerProps={{
-                  'data-tooltip-html': handleTooltip(d),
-                  'data-tooltip-id': tooltip_id,
-                  tabIndex: -1
-                }}
-              />
+            <Group left={groupScale(d.columnCategory)}>
+              {config.series.map(item => {
+                return (
+                  <Group key={`boxplotplot-${i}`}>
+                    <BoxPlot
+                      data-left={xScale(item.dataKey)}
+                      key={`box-plot-${i}`}
+                      min={min(d)}
+                      max={max(d)}
+                      left={xScaleX(item.dataKey)}
+                      firstQuartile={firstQuartile(d)}
+                      thirdQuartile={thirdQuartile(d)}
+                      median={median(d)}
+                      boxWidth={constrainedWidth}
+                      fill={color_0}
+                      fillOpacity={fillOpacity}
+                      stroke='black'
+                      valueScale={yScale}
+                      outliers={boxplot.plotOutlierValues ? d.columnOutliers : []}
+                      outlierProps={{
+                        style: {
+                          fill: `${color_0}`,
+                          opacity: 1
+                        }
+                      }}
+                      medianProps={{
+                        style: {
+                          stroke: 'black'
+                        }
+                      }}
+                      boxProps={{
+                        style: {
+                          stroke: 'black',
+                          strokeWidth: boxplot.borders === 'true' ? 1 : 0
+                        }
+                      }}
+                      maxProps={{
+                        style: {
+                          stroke: 'black'
+                        }
+                      }}
+                      container
+                      containerProps={{
+                        'data-tooltip-html': handleTooltip(d),
+                        'data-tooltip-id': tooltip_id,
+                        tabIndex: -1
+                      }}
+                    />
+                  </Group>
+                )
+              })}
             </Group>
           )
         })}

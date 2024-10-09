@@ -147,6 +147,7 @@ const useScales = (properties: useScaleProps) => {
     if (highestFence > max) max = highestFence
 
     // Set Scales
+
     yScale = scaleLinear({
       range: [yMax, 0],
       round: true,
@@ -160,6 +161,8 @@ const useScales = (properties: useScaleProps) => {
       padding: 0.4
     })
     xScale.type = scaleTypes.BAND
+
+    seriesScale = composeScalePoint(seriesDomain, [0, yMax])
   }
 
   // handle Paired bar

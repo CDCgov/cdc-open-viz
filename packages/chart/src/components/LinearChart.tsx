@@ -601,7 +601,9 @@ const LinearChart: React.FC<LinearChartProps> = props => {
               showTooltip={showTooltip}
             />
           )}
-          {visualizationType === 'Box Plot' && <BoxPlot xScale={xScale} yScale={yScale} />}
+          {visualizationType === 'Box Plot' && (
+            <BoxPlot seriesScale={seriesScale} xMax={xMax} yMax={yMax} xScale={xScale} yScale={yScale} />
+          )}
           {((visualizationType === 'Area Chart' && config.visualizationSubType === 'regular') ||
             visualizationType === 'Combo') && (
             <AreaChart
