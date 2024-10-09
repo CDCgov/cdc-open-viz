@@ -6,7 +6,7 @@ import {
   AccordionItemPanel
 } from 'react-accessible-accordion'
 import { useContext, useMemo, useState } from 'react'
-import { CheckBox, Select } from '@cdc/core/components/EditorPanel/Inputs'
+import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import FieldSetWrapper from '@cdc/core/components/EditorPanel/FieldSetWrapper'
@@ -162,6 +162,16 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
               </Tooltip>
             }
           />
+          {vizConfig.filterBehavior === 'Apply Button' && (
+            <TextField
+              label='Apply Filter Button Text'
+              maxLength={20}
+              value={vizConfig.applyFiltersButtonText}
+              updateField={(_section, _subsection, _key, value) => {
+                updateConfig({ ...vizConfig, applyFiltersButtonText: value })
+              }}
+            />
+          )}
           {vizConfig.filterBehavior === 'Filter Change' && (
             <CheckBox
               label='Auto Load'
