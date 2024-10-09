@@ -34,6 +34,7 @@ type SharedChartContext = {
   isDraggingAnnotation?: boolean
   legendIsolateValues?: string[]
   setAxisBottomHeight?: React.Dispatch<React.SetStateAction<number>>
+  legendRef?: React.MutableRefObject<null>
   setBrushConfig: Function
   setLegendIsolateValues?: Function
 }
