@@ -14,6 +14,7 @@ import NestedDropdown from '../NestedDropdown'
 import _ from 'lodash'
 import { getNestedOptions } from './helpers/getNestedOptions'
 import { applyQueuedActive } from './helpers/applyQueuedActive'
+import { handleSorting } from './helpers/handleSorting'
 
 export const VIZ_FILTER_STYLE = {
   dropdown: 'dropdown',
@@ -42,23 +43,6 @@ export const filterOrderOptions: { label: string; value: OrderBy }[] = [
     value: 'cust'
   }
 ]
-
-export const handleSorting = singleFilter => {
-  const singleFilterValues = _.cloneDeep(singleFilter.values)
-  if (singleFilter.order === 'cust' && singleFilter.filterStyle !== 'nested-dropdown') {
-    singleFilter.values = singleFilter.orderedValues?.length ? singleFilter.orderedValues : singleFilterValues
-    return singleFilter
-  }
-
-  const sort = (a, b) => {
-    const asc = singleFilter.order !== 'desc'
-    return (asc ? a : b).toString().localeCompare((asc ? b : a).toString(), 'en', { numeric: true })
-  }
-
-  singleFilter.values = singleFilterValues.sort(sort)
-
-  return singleFilter
-}
 
 const hasStandardFilterBehavior = ['chart', 'table']
 
@@ -469,8 +453,8 @@ const Filters = (props: FilterProps) => {
             )}
             {filterStyle === 'nested-dropdown' && (
               <NestedDropdown
-                activeGroup={(singleFilter.active as string) || singleFilter.queuedActive[0]}
-                activeSubGroup={(singleFilter.subGrouping.active as string) || singleFilter.queuedActive[1]}
+                activeGroup={(singleFilter.active as string) || (singleFilter.queuedActive || [])[0]}
+                activeSubGroup={(singleFilter.subGrouping?.active as string) || (singleFilter.queuedActive || [])[1]}
                 options={getNestedOptions(singleFilter)}
                 listLabel={label}
                 handleSelectedItems={value => changeFilterActive(outerIndex, value)}
