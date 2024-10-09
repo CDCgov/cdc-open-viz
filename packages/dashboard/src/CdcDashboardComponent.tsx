@@ -135,6 +135,9 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
             if (filter.apiFilter) {
               updatedQSParams[filter.apiFilter.valueSelector] = filter.active
+              if (filter.apiFilter.subgroupValueSelector) {
+                updatedQSParams[filter.apiFilter.subgroupValueSelector] = filter.subGrouping.active
+              }
             }
           }
         })

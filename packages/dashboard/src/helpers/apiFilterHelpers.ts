@@ -4,6 +4,7 @@ import { APIFilter } from '../types/APIFilter'
 import { SharedFilter } from '../types/SharedFilter'
 import _ from 'lodash'
 import { getQueryParams } from '@cdc/core/helpers/queryStringUtils'
+import { FILTER_STYLE } from '../types/FilterStyles'
 
 /** key for the dropdowns object */
 type DropdownsKey = string
@@ -24,7 +25,7 @@ export const getLoadingFilterMemo = (
     return acc
   }, {})
 
-const getParentParams = (
+export const getParentParams = (
   childFilter: SharedFilter,
   sharedFilters: SharedFilter[]
 ): Record<'key' | 'value', string>[] | null => {
@@ -32,17 +33,39 @@ const getParentParams = (
   if (!(_parents || []).length) return null
 
   return _parents.flatMap(filter => {
-    const key = filter.queryParameter || filter.apiFilter.valueSelector || ''
-    const value = filter.queuedActive || filter.active || ''
-    if (Array.isArray(value)) {
-      return value.map(_value => ({ key, value: _value.toString() }))
+    if (filter.filterStyle === FILTER_STYLE.nestedDropdown) {
+      const key = filter.apiFilter.valueSelector || ''
+      const subKey = filter.apiFilter.subgroupValueSelector || ''
+      const val = filter.queuedActive ? filter.queuedActive[0] : (filter.active as string) || ''
+      const subVal = filter.queuedActive ? filter.queuedActive[1] : filter.subGrouping.active || ''
+      return [
+        { key, value: val },
+        { key: subKey, value: subVal }
+      ]
+    } else {
+      const key = filter.queryParameter || filter.apiFilter.valueSelector || ''
+      const value = filter.queuedActive || filter.active || ''
+      if (Array.isArray(value)) {
+        return value.map(_value => ({ key, value: _value.toString() }))
+      }
+      return [{ key, value: value.toString() }]
     }
-    return [{ key, value: value.toString() }]
   })
 }
 
 export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): DropdownOptions => {
-  const { textSelector, valueSelector } = apiFilter
+  const { textSelector, valueSelector, subgroupTextSelector, subgroupValueSelector } = apiFilter
+  if (subgroupValueSelector) {
+    const memo = {}
+    data.forEach(v => {
+      if (!memo[v[valueSelector]]) {
+        memo[v[valueSelector]] = { text: v[textSelector || valueSelector], value: v[valueSelector], subOptions: [] }
+      }
+      memo[v[valueSelector]].subOptions.push({ text: v[subgroupTextSelector], value: v[subgroupValueSelector] })
+    })
+    return Object.values(memo)
+  } else {
+  }
   return data.map(v => ({ text: v[textSelector || valueSelector], value: v[valueSelector] }))
 }
 
@@ -84,12 +107,12 @@ export const setAutoLoadDefaultValue = (
     const notAllParentFiltersSelected = filterParents.some(p => !(p.active || p.queuedActive))
     if (filterParents && notAllParentFiltersSelected) return sharedFilter
     const defaultValue =
-      sharedFilter.filterStyle === 'multi-select' ? [dropdownOptions[0]?.value] : dropdownOptions[0]?.value
+      sharedFilter.filterStyle === FILTER_STYLE.multiSelect ? [dropdownOptions[0]?.value] : dropdownOptions[0]?.value
     if (!sharedFilter.active) {
       const queryParams = getQueryParams()
       const defaultQueryParamValue = queryParams[sharedFilter?.setByQueryParameter]
       sharedFilter.active = defaultQueryParamValue || defaultValue
-    } else if (sharedFilter.filterStyle === 'multi-select') {
+    } else if (sharedFilter.filterStyle === FILTER_STYLE.multiSelect) {
       const currentOption = (sharedFilter.active as string[]).filter(activeVal =>
         dropdownOptions.find(option => option.value === activeVal)
       )

@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { SharedFilter } from '../types/SharedFilter'
+import { FILTER_STYLE } from '../types/FilterStyles'
 
 const findFilterTier = (filters: SharedFilter[], sharedFilter: SharedFilter) => {
   if (!sharedFilter.parents?.length) {
@@ -27,7 +28,10 @@ function filter(data = [], filters: SharedFilter[], condition) {
     const foundMatchingFilter = filters.find(filter => {
       const currentValue = row[filter.columnName]
 
-      const selectedValue = filter.queuedActive || filter.active
+      const selectedValue =
+        filter.queuedActive || filter.filterStyle === FILTER_STYLE.nestedDropdown
+          ? [filter.active, filter.subGrouping?.active]
+          : filter.active
       let isNotTheSelectedValue = true
       if (Array.isArray(selectedValue)) {
         isNotTheSelectedValue = !selectedValue.includes(currentValue)
