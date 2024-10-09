@@ -33,43 +33,40 @@ const getParentParams = (
   if (!(_parents || []).length) return null
 
   return _parents.flatMap(filter => {
-    const key = filter.queryParameter || filter.apiFilter.valueSelector || ''
-    const value = filter.queuedActive || filter.active || ''
-    if (Array.isArray(value)) {
-      return value.map(_value => ({ key, value: _value.toString() }))
+    if (filter.filterStyle === FILTER_STYLE.nestedDropdown) {
+      const key = filter.apiFilter.valueSelector || ''
+      const subKey = filter.apiFilter.subgroupValueSelector || ''
+      const val = filter.queuedActive ? filter.queuedActive[0] : (filter.active as string) || ''
+      const subVal = filter.queuedActive ? filter.queuedActive[1] : filter.subGrouping.active || ''
+      return [
+        { key, value: val },
+        { key: subKey, value: subVal }
+      ]
+    } else {
+      const key = filter.queryParameter || filter.apiFilter.valueSelector || ''
+      const value = filter.queuedActive || filter.active || ''
+      if (Array.isArray(value)) {
+        return value.map(_value => ({ key, value: _value.toString() }))
+      }
+      return [{ key, value: value.toString() }]
     }
-    return [{ key, value: value.toString() }]
   })
 }
 
 export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): DropdownOptions => {
-  const { textSelector, valueSelector } = apiFilter
-  return data.map(v => ({ text: v[textSelector || valueSelector], value: v[valueSelector] }))
-}
-
-export const getNestedDropdownValues = (data: Array<Object>, apiFilter: APIFilter) => {
   const { textSelector, valueSelector, subgroupTextSelector, subgroupValueSelector } = apiFilter
-  const nestedDropdownValues = []
-  _.sortBy(data, [valueSelector, subgroupValueSelector]).map(value => {
-    const group =
-      textSelector === undefined || textSelector === ''
-        ? [value[valueSelector]]
-        : [value[valueSelector], value[textSelector]]
-    const subgroup =
-      subgroupTextSelector === undefined || subgroupTextSelector === ''
-        ? [value[subgroupValueSelector]]
-        : [value[subgroupValueSelector], value[subgroupTextSelector]]
-    const NDValuesCount = nestedDropdownValues.length
-    if (nestedDropdownValues[NDValuesCount - 1]?.[0][0] === group[0]) {
-      nestedDropdownValues[NDValuesCount - 1][1].push(subgroup)
-    } else {
-      nestedDropdownValues[NDValuesCount] = [group, [subgroup]]
-    }
-  })
-
-  nestedDropdownValues.map(groupings => [groupings[0], _.uniq(groupings[1])])
-
-  return nestedDropdownValues
+  if (subgroupValueSelector) {
+    const memo = {}
+    data.forEach(v => {
+      if (!memo[v[valueSelector]]) {
+        memo[v[valueSelector]] = { text: v[textSelector || valueSelector], value: v[valueSelector], subOptions: [] }
+      }
+      memo[v[valueSelector]].subOptions.push({ text: v[subgroupTextSelector], value: v[subgroupValueSelector] })
+    })
+    return Object.values(memo)
+  } else {
+  }
+  return data.map(v => ({ text: v[textSelector || valueSelector], value: v[valueSelector] }))
 }
 
 /** API endpoint to fetch */

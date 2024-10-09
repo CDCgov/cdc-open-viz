@@ -3,6 +3,7 @@ import { FilterBehavior } from '../helpers/FilterBehavior'
 import { getQueryParams, updateQueryString } from '@cdc/core/helpers/queryStringUtils'
 import { SharedFilter } from '../types/SharedFilter'
 import { DashboardFilters } from '../types/DashboardFilters'
+import { FILTER_STYLE } from '../types/FilterStyles'
 
 const handleChildren = (sharedFilters: SharedFilter[], parentIndex: number) => {
   const parentKey = sharedFilters[parentIndex].key
@@ -26,7 +27,7 @@ export const changeFilterActive = (
   const sharedFiltersCopy = _.cloneDeep(sharedFilters)
   const currentFilter = sharedFilters[filterIndex]
   if (vizConfig.filterBehavior !== FilterBehavior.Apply || vizConfig.autoLoad) {
-    if (currentFilter?.filterStyle === 'nested-dropdown') {
+    if (currentFilter?.filterStyle === FILTER_STYLE.nestedDropdown) {
       sharedFiltersCopy[filterIndex].active = value[0]
       sharedFiltersCopy[filterIndex].subGrouping.active = value[1]
     } else {

@@ -12,6 +12,7 @@ import FilterOrder from './components/FilterOrder'
 import { useMemo, useState } from 'react'
 import MultiSelect from '../../MultiSelect'
 import NestedDropdownEditor from './NestedDropdownEditor'
+import { FILTER_STYLE } from '@cdc/dashboard/src/types/FilterStyles'
 
 type VizFilterProps = {
   config: Visualization
@@ -144,7 +145,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                     <span className='edit-label column-heading'>Filter Style</span>
 
                     <select
-                      value={filter.filterStyle}
+                      value={filter.filterStyle || FILTER_STYLE.dropdown}
                       onChange={e => {
                         updateFilterStyle(filterIndex, e.target.value)
                       }}

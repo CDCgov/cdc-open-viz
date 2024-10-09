@@ -1,14 +1,15 @@
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { SharedFilter } from '../../types/SharedFilter'
-import { APIFilterDropdowns } from './DashboardFiltersWrapper'
+import { APIFilterDropdowns, DropdownOptions } from './DashboardFiltersWrapper'
 import NestedDropdown from '../../../../core/components/NestedDropdown/NestedDropdown'
 import { FILTER_STYLE } from '../../types/FilterStyles'
+import { NestedOptions, ValueTextPair } from '@cdc/core/components/NestedDropdown/nestedDropdownHelpers'
 
 type DashboardFilterProps = {
   show: number[]
   filters: SharedFilter[]
   apiFilterDropdowns: APIFilterDropdowns
-  handleOnChange: Function
+  handleOnChange: (index: number, value: string | string[]) => void
 }
 
 const DashboardFilters: React.FC<DashboardFilterProps> = ({
@@ -23,7 +24,16 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
   }
 
   const updateField = (_section, _subsection, fieldName, value) => {
-    handleOnChange(fieldName, value)
+    handleOnChange(fieldName, value) // fieldName is the sharedFilterIndex
+  }
+
+  const getNestedDropdownOptions = (options?: DropdownOptions): NestedOptions => {
+    if (!options) return []
+    const getValueTextTuple = (value: string, text?: string): ValueTextPair => (text ? [value, text] : [value])
+    return options.map(({ value, text, subOptions }) => [
+      getValueTextTuple(value, text),
+      (subOptions || []).map(({ value, text }) => getValueTextTuple(value, text))
+    ])
   }
 
   return (
@@ -38,12 +48,6 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           return <></>
         const values: JSX.Element[] = []
 
-        type FilterValues = { value: string; label: string | number; subGroupValues? }[]
-        const filterValues: {
-          values: FilterValues
-          subGroupValues?: FilterValues
-        } = { values: [] }
-
         if (filter.resetLabel) {
           values.push(
             <option key={`${filter.resetLabel}-option`} value={filter.resetLabel}>
@@ -51,7 +55,11 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
             </option>
           )
         }
+
         const _key = filter.apiFilter?.apiEndpoint
+
+        const multiValues: { value; label }[] = []
+
         if (_key && apiFilterDropdowns[_key]) {
           // URL Filter
           if (filter.filterStyle !== FILTER_STYLE.nestedDropdown) {
@@ -61,11 +69,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                   {text}
                 </option>
               )
-              filterValues.values.push({ value, label: text })
-            })
-          } else {
-            filterValues.values = Object.keys(apiFilterDropdowns[_key]).map(key => {
-              return apiFilterDropdowns[_key][key]
+              multiValues.push({ value, label: text })
             })
           }
         } else {
@@ -77,7 +81,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                 {labeledOpt || filterOption}
               </option>
             )
-            filterValues.values.push({ value: filterOption, label: labeledOpt || filterOption })
+            multiValues.push({ value: filterOption, label: labeledOpt || filterOption })
           })
         }
 
@@ -85,7 +89,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           <MultiSelect
             key={`${filter.key}-filtersection-${filterIndex}`}
             label={filter.key}
-            options={filterValues.values}
+            options={multiValues}
             fieldName={filterIndex}
             updateField={updateField}
             selected={filter.active as string[]}
@@ -94,18 +98,9 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         ) : filter.filterStyle === FILTER_STYLE.nestedDropdown ? (
           <NestedDropdown
             key={`${filter.key}-filtersection-${filterIndex}`}
-            currentFilter={
-              urlFilterType
-                ? {
-                    ...filter,
-                    values: filterValues.values,
-                    subGrouping: {
-                      active: ''
-                    }
-                  }
-                : { ...filter }
-            }
-            isUrlFilter={urlFilterType}
+            activeGroup={filter.active as string}
+            activeSubGroup={filter.subGrouping?.active}
+            options={getNestedDropdownOptions(apiFilterDropdowns[_key])}
             listLabel={filter.key}
             handleSelectedItems={value => updateField(null, null, filterIndex, value)}
           />

@@ -42,7 +42,10 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     case 'ADD_FOOTNOTE': {
       const { id, rowIndex, config } = action.payload
       const newRows = state.config.rows.map((row, i) => (i === rowIndex ? { ...row, footnotesId: id } : row))
-      return { ...state, config: { ...state.config, rows: newRows, visualizations: { ...state.config.visualizations, [id]: config } } }
+      return {
+        ...state,
+        config: { ...state.config, rows: newRows, visualizations: { ...state.config.visualizations, [id]: config } }
+      }
     }
     case 'ADD_NEW_DASHBOARD': {
       const currentMultiDashboards = state.config.multiDashboards
@@ -147,10 +150,33 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       })
       return { ...state, config: { ...state.config, rows: newRows } }
     }
+    case 'ADD_VISUALIZATION': {
+      const { newViz, rowIdx, colIdx } = action.payload
+      const vizKey = newViz.uid
+      const newRows = _.cloneDeep(state.config.rows)
+      newRows[rowIdx].columns[colIdx].widget = vizKey
+      return {
+        ...state,
+        config: { ...state.config, visualizations: { ...state.config.visualizations, [vizKey]: newViz }, rows: newRows }
+      }
+    }
+    case 'MOVE_VISUALIZATION': {
+      const { rowIdx, colIdx, widget } = action.payload
+      const newRows = _.cloneDeep(state.config.rows)
+      newRows[widget.rowIdx].columns[widget.colIdx].widget = null
+      newRows[rowIdx].columns[colIdx].widget = widget.uid
+      return {
+        ...state,
+        config: { ...state.config, rows: newRows }
+      }
+    }
     case 'UPDATE_VISUALIZATION': {
       const { vizKey, configureData } = action.payload
       const updatedViz = { ...state.config.visualizations[vizKey], ...configureData } as AnyVisualization
-      return { ...state, config: { ...state.config, visualizations: { ...state.config.visualizations, [vizKey]: updatedViz } } }
+      return {
+        ...state,
+        config: { ...state.config, visualizations: { ...state.config.visualizations, [vizKey]: updatedViz } }
+      }
     }
     case 'UPDATE_ROW': {
       const { rowIndex, rowData } = action.payload
@@ -162,11 +188,38 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       })
       return { ...state, config: { ...state.config, rows: newRows } }
     }
+    case 'DELETE_WIDGET': {
+      const { rowIdx, colIdx, uid } = action.payload
+      const newRows = _.cloneDeep(state.config.rows)
+      newRows[rowIdx].columns[colIdx].widget = null
+      const newVisualizations = _.cloneDeep(state.config.visualizations)
+      delete newVisualizations[uid]
+      const newSharedFilters = _.cloneDeep(state.config.dashboard.sharedFilters)
+      if (newSharedFilters && newSharedFilters.length > 0) {
+        newSharedFilters.forEach(sharedFilter => {
+          if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(uid) !== -1) {
+            sharedFilter.usedBy.splice(sharedFilter.usedBy.indexOf(uid), 1)
+          }
+        })
+      }
+      return {
+        ...state,
+        config: {
+          ...state.config,
+          dashboard: { ...state.config.dashboard, sharedFilters: newSharedFilters },
+          visualizations: newVisualizations,
+          rows: newRows
+        }
+      }
+    }
     default:
       return state
   }
 }
 
-const applyMultiDashboards = (state, newMultiDashboards) => ({ ...state, config: { ...state.config, multiDashboards: newMultiDashboards } })
+const applyMultiDashboards = (state, newMultiDashboards) => ({
+  ...state,
+  config: { ...state.config, multiDashboards: newMultiDashboards }
+})
 
 export default devToolsWrapper<DashboardState, DashboardActions>(reducer)

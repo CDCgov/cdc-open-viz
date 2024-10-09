@@ -12,8 +12,12 @@ import DashboardFiltersEditor from './DashboardFiltersEditor'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import { hasDashboardApplyBehavior } from '../../helpers/hasDashboardApplyBehavior'
 import * as apiFilterHelpers from '../../helpers/apiFilterHelpers'
+import { FILTER_STYLE } from '../../types/FilterStyles'
+import { applyQueuedActive } from '../../helpers/applyQueuedActive'
 
-export type DropdownOptions = Record<'value' | 'text', string>[]
+type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
+
+export type DropdownOptions = (Record<'value' | 'text', string> & SubOptions)[]
 
 /** the cached dropdown options for each filter */
 export type APIFilterDropdowns = {
@@ -57,11 +61,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       if (hasDashboardApplyBehavior(state.config.visualizations)) {
         const queryParams = getQueryParams()
         let needsQueryUpdate = false
-        dashboardConfig.sharedFilters.forEach((sharedFilter, index) => {
+        dashboardConfig.sharedFilters.forEach(sharedFilter => {
           if (sharedFilter.queuedActive) {
-            dashboardConfig.sharedFilters[index].active = sharedFilter.queuedActive
-            delete dashboardConfig.sharedFilters[index].queuedActive
-
+            applyQueuedActive(sharedFilter)
             if (
               sharedFilter.setByQueryParameter &&
               queryParams[sharedFilter.setByQueryParameter] !== sharedFilter.active

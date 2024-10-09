@@ -1,28 +1,33 @@
 import _ from 'lodash'
 
-export type OptionsMemo = [[string | number], [string | number][]] | []
-export const handleSearchTerm = (userSearchTerm: string, optsMemo: OptionsMemo = []): OptionsMemo => {
-  if (userSearchTerm === undefined || userSearchTerm === '') return optsMemo
+export type ValueTextPair = [string | number, string | number | undefined] | [string | number] // [value, text]
+
+export type NestedOptions = Array<[ValueTextPair, ValueTextPair[]]>
+
+export const filterSearchTerm = (userSearchTerm: string, optsMemo: NestedOptions): NestedOptions => {
+  if (userSearchTerm === undefined || userSearchTerm === '') return optsMemo || ([] as NestedOptions)
   const newRegex = new RegExp(`^${userSearchTerm}`, 'i')
-  const newOptsMemoTierOneFiltered = optsMemo.filter(([tierOne, tierTwo]) => {
-    const tierOneText = tierOne[1] ? tierOne[1] : tierOne[0]
+  const newOptsMemoTierOneFiltered = optsMemo.filter(([group, subGroups]) => {
+    const [groupValue, groupText] = group
+    const _groupText = String(groupText || groupValue)
     return (
-      tierOneText.match(newRegex) ||
-      tierTwo.some(value => {
-        const tierTwoText = value[1] ? value[1] : value[0]
-        return String(tierTwoText).match(newRegex)
+      _groupText.match(newRegex) ||
+      subGroups.some(([value, text]) => {
+        const subGroupText = String(text || value)
+        return subGroupText.match(newRegex)
       })
     )
   })
 
-  const filterOptions: OptionsMemo = newOptsMemoTierOneFiltered.map(([tierOne, tierTwo]) => {
-    const tierOneText = tierOne[1] ? tierOne[1] : tierOne[0]
-    if (tierOneText.match(newRegex)) return [tierOne, tierTwo]
-    const newOptions = tierTwo.filter(option => {
-      const tierTwoText = option[1] ? option[1] : option[0]
-      return String(tierTwoText).match(newRegex)
+  const filterOptions: NestedOptions = newOptsMemoTierOneFiltered.map(([group, subGroups]) => {
+    const [groupValue, groupText] = group
+    const _groupText = String(groupText || groupValue)
+    if (_groupText.match(newRegex)) return [group, subGroups]
+    const newOptions = subGroups.filter(([value, text]) => {
+      const subGroupText = text || value
+      return String(subGroupText).match(newRegex)
     })
-    return [tierOne, newOptions]
+    return [group, newOptions]
   })
 
   return filterOptions

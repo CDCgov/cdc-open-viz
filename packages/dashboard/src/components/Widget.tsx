@@ -40,10 +40,7 @@ type WidgetProps = {
 const Widget = ({ widgetConfig, addVisualization, type }: WidgetProps) => {
   const { overlay } = useGlobalContext()
   const { config } = useContext(DashboardContext)
-  const rows = config.rows
-  const visualizations = config.visualizations
   const dispatch = useContext(DashboardDispatchContext)
-  const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
 
   const transform = new DataTransform()
 
@@ -55,17 +52,12 @@ const Widget = ({ widgetConfig, addVisualization, type }: WidgetProps) => {
     const { rowIdx, colIdx } = result
 
     if (undefined !== widgetConfig?.rowIdx) {
-      rows[widgetConfig.rowIdx].columns[widgetConfig.colIdx].widget = null // Wipe from old position
-
-      rows[rowIdx].columns[colIdx].widget = widgetConfig.uid // Add to new row and col
+      dispatch({ type: 'MOVE_VISUALIZATION', payload: { rowIdx, colIdx, widget: widgetConfig } })
     } else if (!!addVisualization) {
       // Item does not exist, instantiate a new one
       const newViz = addVisualization()
-      visualizations[newViz.uid] = newViz // Add to widgets collection
-      rows[rowIdx].columns[colIdx].widget = newViz.uid // Store reference in rows collection under the specific column
+      dispatch({ type: 'ADD_VISUALIZATION', payload: { newViz, rowIdx, colIdx } })
     }
-
-    updateConfig({ ...config, rows, visualizations })
   }
 
   const [{ isDragging, ...collected }, drag] = useDrag(
@@ -81,30 +73,19 @@ const Widget = ({ widgetConfig, addVisualization, type }: WidgetProps) => {
 
   const deleteWidget = () => {
     if (!widgetConfig) return
-    rows[widgetConfig.rowIdx].columns[widgetConfig.colIdx].widget = null
-
-    delete visualizations[widgetConfig.uid]
-
-    if (config.dashboard.sharedFilters && config.dashboard.sharedFilters.length > 0) {
-      config.dashboard.sharedFilters.forEach(sharedFilter => {
-        if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(widgetConfig.uid) !== -1) {
-          sharedFilter.usedBy.splice(sharedFilter.usedBy.indexOf(widgetConfig.uid), 1)
-        }
-      })
-    }
-
-    updateConfig({ ...config, rows, visualizations })
+    dispatch({
+      type: 'DELETE_WIDGET',
+      payload: { rowIdx: widgetConfig.rowIdx, colIdx: widgetConfig.colIdx, uid: widgetConfig.uid }
+    })
   }
 
   const editWidget = () => {
     if (!widgetConfig) return
-    visualizations[widgetConfig.uid].editing = true
-
-    updateConfig({ ...config, visualizations })
+    dispatch({ type: 'UPDATE_VISUALIZATION', payload: { vizKey: widgetConfig.uid, configureData: { editing: true } } })
   }
 
   let isConfigurationReady = false
-  const dataConfiguredForRow = !!rows[widgetConfig?.rowIdx]?.dataKey
+  const dataConfiguredForRow = !!config.rows[widgetConfig?.rowIdx]?.dataKey
   if (dataConfiguredForRow || ['dashboardFilters', 'markup-include'].includes(type)) {
     isConfigurationReady = true
   } else {
@@ -138,7 +119,9 @@ const Widget = ({ widgetConfig, addVisualization, type }: WidgetProps) => {
                   title='Configure Data'
                   className='btn btn-configure'
                   onClick={() => {
-                    overlay?.actions.openOverlay(<DataDesignerModal rowIndex={widgetConfig.rowIdx} vizKey={widgetConfig.uid} />)
+                    overlay?.actions.openOverlay(
+                      <DataDesignerModal rowIndex={widgetConfig.rowIdx} vizKey={widgetConfig.uid} />
+                    )
                   }}
                 >
                   {iconHash['gear']}

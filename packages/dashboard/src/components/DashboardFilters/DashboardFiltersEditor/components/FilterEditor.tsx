@@ -24,7 +24,7 @@ type FilterEditorProps = {
 const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilterProp }) => {
   const [columns, setColumns] = useState<string[]>([])
   const transform = new DataTransform()
-  const filterStyles = ['dropdown', 'multi-select', 'nested-dropdown']
+  const filterStyles = Object.values(FILTER_STYLE)
 
   const parentFilters: string[] = (config.dashboard.sharedFilters || [])
     .filter(({ key, type }) => key !== filter.key && type !== 'datafilter')
@@ -214,7 +214,10 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
         <>
           <label>
             <span className='edit-label column-heading'>Filter Style: </span>
-            <select value={filter.filterStyle} onChange={e => handleFilterStyleChange(e.target.value)}>
+            <select
+              value={filter.filterStyle || FILTER_STYLE.dropdown}
+              onChange={e => handleFilterStyleChange(e.target.value)}
+            >
               {filterStyles.map(dataKey => (
                 <option value={dataKey} key={`filter-style-select-item-${dataKey}`}>
                   {dataKey}

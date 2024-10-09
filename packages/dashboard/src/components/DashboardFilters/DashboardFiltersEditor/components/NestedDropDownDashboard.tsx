@@ -51,10 +51,6 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
     populateSubGroupingOptions(selectedOptionDatasetName, newColumnName)
   }
 
-  const updateSubGroupingFilterProperty = newSubGrouping => {
-    updateFilterProp('subGrouping', newSubGrouping)
-  }
-
   const handleSubGroupColumnNameChange = selectedOption => {
     const selectedOptionDatasetName = selectedOption.selectedOptions[0].dataset.set
     const newColumnName = selectedOption.value
@@ -81,7 +77,7 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
       valuesLookup
     }
 
-    updateSubGroupingFilterProperty(newSubGrouping)
+    updateFilterProp('subGrouping', newSubGrouping)
   }
 
   return (

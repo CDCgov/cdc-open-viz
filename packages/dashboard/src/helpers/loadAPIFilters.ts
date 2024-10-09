@@ -3,7 +3,6 @@ import { APIFilterDropdowns } from '../components/DashboardFilters'
 import { SharedFilter } from '../types/SharedFilter'
 import * as apiFilterHelpers from './apiFilterHelpers'
 import { APIFilter } from '../types/APIFilter'
-import { FILTER_STYLE } from '../types/FilterStyles'
 
 export const loadAPIFiltersFactory = (
   dispatch: Function,
@@ -41,10 +40,7 @@ export const loadAPIFiltersFactory = (
                 }
                 const [_key, index] = toFetch[endpoint]
                 const apiFilter = filterLookup.get(_key) as APIFilter
-                const _filterValues =
-                  sharedFilters[index].filterStyle !== FILTER_STYLE.nestedDropdown
-                    ? apiFilterHelpers.getFilterValues(data, apiFilter)
-                    : apiFilterHelpers.getNestedDropdownValues(data, apiFilter)
+                const _filterValues = apiFilterHelpers.getFilterValues(data, apiFilter)
 
                 newDropdowns[_key] = _filterValues
                 const newDefaultSelectedFilter = apiFilterHelpers.setAutoLoadDefaultValue(
