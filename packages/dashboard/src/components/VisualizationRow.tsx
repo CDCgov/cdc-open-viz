@@ -108,9 +108,12 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     const applyFilters = dashboardFilters.filter(v => !v.autoLoad).flatMap(v => v.sharedFilterIndexes)
     if (hasDashboardApplyBehavior(config.visualizations) && vizConfig.autoLoad) {
       return applyFilters.some(index => {
-        const { queuedActive, active } = config.dashboard.sharedFilters[index]
+        const { queuedActive, active, subGrouping } = config.dashboard.sharedFilters[index]
         if (!active && !queuedActive) return true
         if (!queuedActive) return false
+        // for nested dropdowns
+        if (subGrouping) return queuedActive[0] !== active || queuedActive[1] !== subGrouping.active
+        // all other dropdowns
         return queuedActive !== active
       })
     }

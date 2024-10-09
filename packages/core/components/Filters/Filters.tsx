@@ -2,18 +2,31 @@ import { useState, useEffect, useMemo } from 'react'
 import { useId } from 'react'
 
 // CDC
-import Button from './elements/Button'
-import { getQueryParams, updateQueryString } from '../helpers/queryStringUtils'
-import MultiSelect from './MultiSelect'
-import { Visualization } from '../types/Visualization'
-import { MultiSelectFilter, OrderBy, VizFilter } from '../types/VizFilter'
-import { filterVizData } from '../helpers/filterVizData'
-import { addValuesToFilters } from '../helpers/addValuesToFilters'
-import { DimensionsType } from '../types/Dimensions'
-import NestedDropdown from './NestedDropdown'
+import Button from '../elements/Button'
+import { getQueryParams, updateQueryString } from '../../helpers/queryStringUtils'
+import MultiSelect from '../MultiSelect'
+import { Visualization } from '../../types/Visualization'
+import { MultiSelectFilter, OrderBy, VizFilter } from '../../types/VizFilter'
+import { filterVizData } from '../../helpers/filterVizData'
+import { addValuesToFilters } from '../../helpers/addValuesToFilters'
+import { DimensionsType } from '../../types/Dimensions'
+import NestedDropdown from '../NestedDropdown'
 import _ from 'lodash'
+import { getNestedOptions } from './helpers/getNestedOptions'
+import { applyQueuedActive } from './helpers/applyQueuedActive'
 
-export const filterStyleOptions = ['dropdown', 'nested-dropdown', 'pill', 'tab', 'tab bar', 'multi-select']
+export const VIZ_FILTER_STYLE = {
+  dropdown: 'dropdown',
+  nestedDropdown: 'nested-dropdown',
+  pill: 'pill',
+  tab: 'tab',
+  tabBar: 'tab bar',
+  multiSelect: 'multi-select'
+} as const
+
+export type VizFilterStyle = (typeof VIZ_FILTER_STYLE)[keyof typeof VIZ_FILTER_STYLE]
+
+export const filterStyleOptions = Object.values(VIZ_FILTER_STYLE)
 
 export const filterOrderOptions: { label: string; value: OrderBy }[] = [
   {
@@ -186,8 +199,7 @@ export const useFilters = props => {
     const queryParams = getQueryParams()
     newFilters.forEach(newFilter => {
       if (newFilter.queuedActive) {
-        newFilter.active = newFilter.queuedActive
-        delete newFilter.queuedActive
+        applyQueuedActive(newFilter)
         if (newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active) {
           queryParams[newFilter.setByQueryParameter] = newFilter.active
           needsQueryUpdate = true
@@ -457,7 +469,9 @@ const Filters = (props: FilterProps) => {
             )}
             {filterStyle === 'nested-dropdown' && (
               <NestedDropdown
-                currentFilter={singleFilter}
+                activeGroup={(singleFilter.active as string) || singleFilter.queuedActive[0]}
+                activeSubGroup={(singleFilter.subGrouping.active as string) || singleFilter.queuedActive[1]}
+                options={getNestedOptions(singleFilter)}
                 listLabel={label}
                 handleSelectedItems={value => changeFilterActive(outerIndex, value)}
               />
