@@ -1358,8 +1358,8 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                   }
                 })
 
-                // Force wrap when suppressing years so it's easier to read
-                if (config.xAxis.suppressMatchingYears) {
+                // Force wrap when showing years once so it's easier to read
+                if (config.xAxis.showYearsOnce) {
                   areTicksTouching = true
                 }
 

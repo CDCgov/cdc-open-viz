@@ -2836,10 +2836,10 @@ const EditorPanel = () => {
                         updateField={updateField}
                       />
                       <CheckBox
-                        value={config.xAxis.suppressMatchingYears}
+                        value={config.xAxis.showYearsOnce}
                         section='xAxis'
-                        fieldName='suppressMatchingYears'
-                        label='Suppress matching years'
+                        fieldName='showYearsOnce'
+                        label='Show years once'
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>

@@ -127,7 +127,7 @@ export default {
     target: 0,
     maxTickRotation: 0,
     padding: 0,
-    suppressMatchingYears: false
+    showYearsOnce: false
   },
   table: {
     label: 'Data Table',

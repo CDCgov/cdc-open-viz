@@ -906,8 +906,8 @@ export default function CdcChart({
     if (config.runtime[section].dateDisplayFormat.includes('%b.') && formattedDate.includes('May.')) {
       formattedDate = formattedDate.replace(/May\./g, 'May')
     }
-    // Suppress matching years
-    if (config.xAxis.suppressMatchingYears && config.runtime[section].dateDisplayFormat.includes('%Y') && prevDate) {
+    // Show years only once
+    if (config.xAxis.showYearsOnce && config.runtime[section].dateDisplayFormat.includes('%Y') && prevDate) {
       const prevFormattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(prevDate)
       const year = formattedDate.match(/\d{4}/)
       const prevYear = prevFormattedDate.match(/\d{4}/)
