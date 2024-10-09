@@ -91,7 +91,6 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   const [forestXLabelY, setForestXLabelY] = useState(0)
 
   // REFS
-  const annotationRefs = useRef(null)
   const prevTickRef = useRef(null)
   const axisBottomRef = useRef(null)
   const forestPlotRightLabelRef = useRef(null)
