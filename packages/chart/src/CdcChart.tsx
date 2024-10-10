@@ -57,6 +57,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
+import { calcInitialHeight } from './helpers/sizeHelpers'
 import { isLegendWrapViewport, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 
 import './scss/main.scss'
@@ -74,12 +75,12 @@ import LegendWrapper from './components/LegendWrapper'
 import _ from 'lodash'
 
 interface CdcChartProps {
-  configUrl: string
+  configUrl?: string
   config?: ChartConfig
   isEditor?: boolean
   isDebug?: boolean
   isDashboard?: boolean
-  setConfig: (config: ChartConfig) => void
+  setConfig?: (config: ChartConfig) => void
   setEditing?: (editing: boolean) => void
   hostname?: string
   link?: string
@@ -124,19 +125,9 @@ export default function CdcChart({
     isActive: false,
     isBrushing: false
   })
+  const [height, setHeight] = useState(calcInitialHeight(config, currentViewport))
+  const [axisBottomHeight, setAxisBottomHeight] = useState(0)
 
-  let [width] = dimensions
-  const useVertical = config.orientation === 'vertical'
-  const useMobileVertical = config.heights?.mobileVertical && isMobileHeightViewport(currentViewport)
-  const responsiveVertical = useMobileVertical ? 'mobileVertical' : 'vertical'
-  const renderedOrientation = useVertical ? responsiveVertical : 'horizontal'
-  let height = config.aspectRatio ? width * config.aspectRatio : config?.heights?.[renderedOrientation]
-  if (config.visualizationType === 'Pie') height = config?.heights?.[renderedOrientation]
-  height = height + Number(config.orientation === 'horizontal' ? config.yAxis.size : config?.xAxis?.size) + 45
-
-  type Config = typeof config
-  let legendMemo = useRef(new Map()) // map collection
-  let innerContainerRef = useRef()
   const legendRef = useRef(null)
 
   const handleDragStateChange = isDragging => {
@@ -146,7 +137,8 @@ export default function CdcChart({
   if (isDebug) console.log('Chart config, isEditor', config, isEditor)
 
   // Destructure items from config for more readable JSX
-  let { legend, title, description, visualizationType } = config
+  let { legend, title } = config
+  const { description, visualizationType, data, forestPlot, brush } = config
 
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
@@ -155,7 +147,7 @@ export default function CdcChart({
 
   if (config.table && (!config.table?.label || config.table?.label === '')) config.table.label = 'Data Table'
 
-  const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
+  const { lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
   const legendId = useId()
 
   const checkLineToBarGraph = () => {
@@ -702,6 +694,22 @@ export default function CdcChart({
   function isEmpty(obj) {
     return Object.keys(obj).length === 0
   }
+
+  useEffect(() => {
+    const initialHeight = calcInitialHeight(config, currentViewport)
+    const isForestPlot = visualizationType === 'Forest Plot'
+
+    // heights to add
+    const brushHeight = brush?.active ? brush?.height : 0
+    const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
+    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight
+
+    const adjustedHeight = initialHeight + additionalHeight
+
+    if (adjustedHeight === height) return
+
+    setHeight(adjustedHeight)
+  }, [brush, axisBottomHeight, config, currentViewport])
 
   // Load data when component first mounts
   useEffect(() => {
@@ -1375,7 +1383,7 @@ export default function CdcChart({
                     {/* Line Chart */}
                     {config.visualizationType === 'Line' &&
                       (checkLineToBarGraph() ? (
-                        <div style={{ height: config?.heights?.vertical, width: `100%` }}>
+                        <div style={{ height, width: `100%` }}>
                           <ParentSize>
                             {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
                           </ParentSize>
@@ -1553,6 +1561,7 @@ export default function CdcChart({
     parseDate,
     rawData: _.cloneDeep(stateData) ?? {},
     seriesHighlight,
+    setAxisBottomHeight,
     setBrushConfig,
     setConfig,
     setDynamicLegendItems,

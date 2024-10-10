@@ -10,7 +10,6 @@ import { General } from '@cdc/core/types/General'
 import { type Link } from './../components/Sankey/types'
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
-
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 
@@ -78,14 +77,14 @@ export type Legend = {
   singleRow: boolean
   type: string
   verticalSorted: boolean
-  hideSuppressionLink:boolean
-  style:'circles'|'boxes'|'gradient'|'lines'
-  subStyle:'linear blocks'|'smooth'
-  hideSuppressedLabels:boolean
-  tickRotation:string
-  hideBorder:{
-    side:boolean
-    topBottom:boolean
+  hideSuppressionLink: boolean
+  style: 'circles' | 'boxes' | 'gradient' | 'lines'
+  subStyle: 'linear blocks' | 'smooth'
+  hideSuppressedLabels: boolean
+  tickRotation: string
+  hideBorder: {
+    side: boolean
+    topBottom: boolean
   }
 }
 
@@ -106,7 +105,7 @@ export type AllChartsConfig = {
   barHasBorder: 'true' | 'false'
   barHeight: number
   barSpace: number
-  barStyle: 'lollipop'|'rounded'|'flat'
+  barStyle: 'lollipop' | 'rounded' | 'flat'
   barThickness: number
   boxplot: BoxPlot
   brush: {
@@ -136,6 +135,7 @@ export type AllChartsConfig = {
   formattedData: Object[] & { urlFiltered: boolean }
   heights: {
     vertical: number
+    horizontal: number
     mobileVertical: number
   }
   highlightedBarValues: { value: any; color: string; borderWidth: number; legendLabel: string }[]
@@ -181,8 +181,23 @@ export type AllChartsConfig = {
   twoColor: { palette: string }
   type: 'chart' | 'dashboard'
   uid: string | number
+  version: string
   visual: Visual
-  visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting' | 'Sankey' | 'Bump Chart'
+  visualizationType:
+    | 'Area Chart'
+    | 'Bar'
+    | 'Box Plot'
+    | 'Deviation Bar'
+    | 'Forest Plot'
+    | 'Line'
+    | 'Paired Bar'
+    | 'Pie'
+    | 'Scatter Plot'
+    | 'Spark Line'
+    | 'Combo'
+    | 'Forecasting'
+    | 'Sankey'
+    | 'Bump Chart'
   visualizationSubType: string
   xAxis: Axis
   yAxis: Axis
@@ -198,7 +213,12 @@ export type AllChartsConfig = {
     }
     margin: { margin_x: number; margin_y: number }
     nodeColor: { default: boolean; inactive: boolean }
-    opacity: { LinkOpacityInactive: string; LinkOpacityDefault: string; nodeOpacityInactive: boolean; nodeOpacityDefault: boolean }
+    opacity: {
+      LinkOpacityInactive: string
+      LinkOpacityDefault: string
+      nodeOpacityInactive: boolean
+      nodeOpacityDefault: boolean
+    }
     rxValue: number
     nodeFontColor: string
     nodeValueStyle: {
@@ -258,9 +278,8 @@ export type SankeyChartConfig = {
         source: SankeyLink
         target: SankeyLink
         value: number
-      }[],
+      }[]
       storyNodeText: StoryNode[]
-:
     }
   ]
   visualizationType: 'Sankey'

@@ -16,9 +16,8 @@ import { type ChartContext } from '@cdc/chart/src/types/ChartContext'
 import ConfigContext from '../../ConfigContext'
 import { getFontSize } from '@cdc/core/helpers/cove/number'
 
-const ForestPlot = (props: ForestPlotProps) => {
+const ForestPlot = ({ xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver, forestPlotRightLabelRef }: ForestPlotProps) => {
   const { rawData: data, updateConfig } = useContext<ChartContext>(ConfigContext)
-  const { xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver } = props
   const { forestPlot } = config as ChartConfig
   const labelPosition = config.xAxis.tickWidthMax + 10
   const [initialLogTicksSet, setInitialLogTicks] = useState(false)
@@ -243,7 +242,7 @@ const ForestPlot = (props: ForestPlotProps) => {
       )}
 
       {forestPlot.rightLabel && (
-        <Text className='forest-plot__right-label' x={forestPlot.type === 'Linear' ? xScale(0) + 25 : xScale(1) + 25} y={height + labelPosition} textAnchor='start' verticalAnchor='start'>
+        <Text innerRef={forestPlotRightLabelRef} className='forest-plot__right-label' x={forestPlot.type === 'Linear' ? xScale(0) + 25 : xScale(1) + 25} y={height + labelPosition} textAnchor='start' verticalAnchor='start'>
           {forestPlot.rightLabel}
         </Text>
       )}

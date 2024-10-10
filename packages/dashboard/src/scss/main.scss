@@ -179,9 +179,9 @@
   }
 
   .data-table-container {
-    margin: 0;
-    @include breakpointClass(md) {
-      margin: 15px 0;
+    margin: 20px 0 0;
+    &.download-link-above {
+      margin: 0;
     }
   }
 
