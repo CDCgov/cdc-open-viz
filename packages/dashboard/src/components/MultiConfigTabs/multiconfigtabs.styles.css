@@ -1,8 +1,11 @@
 .multi-config-tabs {
   .nav-link {
+    border-radius: 6px 6px 0 0;
     font-weight: 400;
     display: block;
     padding: 0.5rem 1rem;
+    color: var(--primary);
+    border-color: var(--lightGray);
     :is(button) {
       display: none;
       background: none;
@@ -16,6 +19,18 @@
           font-weight: bold;
         }
       }
+
+      background: var(--quaternary);
+    }
+    &:focus {
+      outline: none !important;
+    }
+
+    &.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      font-weight: bold;
     }
   }
   .remove {
