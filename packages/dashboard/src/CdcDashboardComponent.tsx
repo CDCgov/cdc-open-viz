@@ -133,9 +133,19 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
               }
             }
 
-            if (filter.apiFilter) {
+            if (!!filter.setByQueryParameter) {
+              const windowQueryParams = Object.fromEntries(new URLSearchParams(window.location.search))
+              const filterValue = windowQueryParams[filter.setByQueryParameter]
+              if (filter.apiFilter) {
+                updatedQSParams[filter.apiFilter.valueSelector] = filterValue
+              } else {
+                updatedQSParams[filter.setByQueryParameter] = filterValue
+              }
+            }
+
+            if (filter.apiFilter && filter.active) {
               updatedQSParams[filter.apiFilter.valueSelector] = filter.active
-              if (filter.apiFilter.subgroupValueSelector) {
+              if (filter.apiFilter.subgroupValueSelector && filter.subGrouping.active) {
                 updatedQSParams[filter.apiFilter.subgroupValueSelector] = filter.subGrouping.active
               }
             }
