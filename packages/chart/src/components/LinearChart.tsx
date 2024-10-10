@@ -39,6 +39,7 @@ import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
+import BoxPlotChart from './BoxPlot/BoxPlotX'
 
 type LinearChartProps = {
   parentWidth: number
@@ -601,8 +602,11 @@ const LinearChart: React.FC<LinearChartProps> = props => {
               showTooltip={showTooltip}
             />
           )}
-          {visualizationType === 'Box Plot' && (
+          {/* {visualizationType === 'Box Plot' && (
             <BoxPlot seriesScale={seriesScale} xMax={xMax} yMax={yMax} xScale={xScale} yScale={yScale} />
+          )} */}
+          {visualizationType === 'Box Plot' && (
+            <BoxPlotChart seriesScale={seriesScale} xMax={xMax} yMax={yMax} xScale={xScale} yScale={yScale} />
           )}
           {((visualizationType === 'Area Chart' && config.visualizationSubType === 'regular') ||
             visualizationType === 'Combo') && (

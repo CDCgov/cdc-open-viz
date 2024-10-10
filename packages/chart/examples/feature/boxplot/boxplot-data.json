@@ -2,21 +2,21 @@
   {
     "category one": "Group A",
     "value": 10,
-    "valu2": 10
+    "price": 10
   },
   {
     "category one": "Group A",
     "value": 200,
-    "valu2": 10
+    "price": 10
   },
   {
     "category one": "Group A",
     "value": 30,
-    "valu2": 10
+    "price": 10
   },
   {
     "category one": "Group A",
     "value": 50,
-    "valu2": 10
+    "price": 10
   }
 ]

@@ -9,7 +9,6 @@ import { scaleBand, scaleLinear } from '@visx/scale'
 const CoveBoxPlot = ({ xScale, yScale, yMax, xMax, seriesScale }) => {
   const { config, setConfig, transformedData: data } = useContext(ConfigContext)
   const { boxplot } = config
-
   useEffect(() => {
     if (config.legend.hide === false) {
       setConfig({
@@ -60,7 +59,7 @@ const CoveBoxPlot = ({ xScale, yScale, yMax, xMax, seriesScale }) => {
   })
 
   const offset = boxWidth - constrainedWidth
-  console.log(boxWidth, 'boxWidth')
+
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group left={Number(config.yAxis.size)} className='boxplot' key={`boxplot-group`}>
