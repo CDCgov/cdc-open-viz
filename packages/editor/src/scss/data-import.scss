@@ -240,6 +240,8 @@
     background-color: $lightest-gray;
     padding: $gbl-padding;
     width: 50% !important;
-    @import 'data-table';
+    .table-container {
+      overflow: scroll
+    }
   }
 }

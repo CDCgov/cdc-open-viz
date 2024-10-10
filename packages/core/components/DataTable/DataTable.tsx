@@ -21,6 +21,7 @@ import { TableConfig } from './types/TableConfig'
 import { Column } from '../../types/Column'
 import { pivotData } from '../../helpers/pivotData'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
+import './data-table.css'
 
 export type DataTableProps = {
   applyLegendToRow?: Function
@@ -131,26 +132,27 @@ const DataTable = (props: DataTableProps) => {
   }
 
   const rawRows = Object.keys(runtimeData).filter(column => column != 'columns')
-  const rows = isVertical
-    ? rawRows.sort((a, b) => {
-        let dataA
-        let dataB
-        if (config.type === 'map' && config.columns) {
-          const sortByColName = config.columns[sortBy.column].name
-          dataA = runtimeData[a][sortByColName]
-          dataB = runtimeData[b][sortByColName]
-        }
-        if (config.type === 'chart' || config.type === 'dashboard') {
-          dataA = runtimeData[a][sortBy.column]
-          dataB = runtimeData[b][sortBy.column]
-        }
-        if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
-          dataA = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[a][config.xAxis.dataKey])
-          dataB = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[b][config.xAxis.dataKey])
-        }
-        return dataA && dataB ? customSort(dataA, dataB, sortBy, config) : 0
-      })
-    : rawRows
+  const rows =
+    isVertical && sortBy.column
+      ? rawRows.sort((a, b) => {
+          let dataA
+          let dataB
+          if (config.type === 'map' && config.columns) {
+            const sortByColName = config.columns[sortBy.column].name
+            dataA = runtimeData[a][sortByColName]
+            dataB = runtimeData[b][sortByColName]
+          }
+          if (['chart', 'dashboard', 'table'].includes(config.type)) {
+            dataA = runtimeData[a][sortBy.column]
+            dataB = runtimeData[b][sortBy.column]
+          }
+          if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
+            dataA = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[a][config.xAxis.dataKey])
+            dataB = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[b][config.xAxis.dataKey])
+          }
+          return dataA && dataB ? customSort(dataA, dataB, sortBy, config) : 0
+        })
+      : rawRows
 
   const limitHeight = {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
@@ -283,7 +285,7 @@ const DataTable = (props: DataTableProps) => {
                 )
               }
               tableOptions={{
-                className: `${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${
+                className: `table table-striped ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${
                   isVertical ? '' : ' horizontal'
                 }`,
                 'aria-live': 'assertive',
@@ -311,7 +313,7 @@ const DataTable = (props: DataTableProps) => {
                       <th>End Date</th>
                     </tr>
                   }
-                  tableOptions={{ className: 'region-table data-table' }}
+                  tableOptions={{ className: 'table table-striped region-table data-table' }}
                   fontSize={config.fontSize}
                 />
               )}
@@ -329,7 +331,7 @@ const DataTable = (props: DataTableProps) => {
       <ErrorBoundary component='DataTable'>
         <section
           id={tabbingId.replace('#', '')}
-          className={`data-table-container ${viewport} w-100`}
+          className={`data-table-container ${viewport}`}
           aria-label={accessibilityLabel}
         >
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
@@ -344,7 +346,7 @@ const DataTable = (props: DataTableProps) => {
               stickyHeader
               headContent={<BoxplotHeader categories={config.boxplot.categories} />}
               tableOptions={{
-                className: `${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}`,
+                className: `table table-striped ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}`,
                 'aria-live': 'assertive',
                 'aria-rowcount': 11,
                 hidden: !expanded

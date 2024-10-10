@@ -8,7 +8,7 @@ type GroupRowProps = {
 
 const GroupRow = ({ label, colSpan, data }: GroupRowProps) => {
   return (
-    <tr>
+    <tr className='row-group'>
       <th scope='colgroup' colSpan={colSpan}>
         {label}
       </th>
