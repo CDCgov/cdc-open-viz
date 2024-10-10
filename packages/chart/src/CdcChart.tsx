@@ -1320,38 +1320,34 @@ export default function CdcChart({
                 classes={['chart-title', `${config.theme}`, 'cove-component__header']}
                 style={undefined}
               />
-              {/* Intro Text/Message */}
-              {config?.introText && config.visualizationType !== 'Spark Line' && (
-                <section
-                  className={`introText legend_${config.legend.hide ? 'hidden' : 'visible'}_${config.legend.position} `}
-                >
-                  {parse(config.introText)}
-                </section>
-              )}
-
-              {/* Filters */}
-              {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
-                <Filters
-                  config={config}
-                  setConfig={setConfig}
-                  setFilteredData={setFilteredData}
-                  filteredData={filteredData}
-                  excludedData={excludedData}
-                  filterData={filterVizData}
-                  dimensions={dimensions}
-                />
-              )}
-              <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
-              {config.annotations?.length > 0 && (
-                <SkipTo
-                  skipId={handleChartTabbing(config, legendId)}
-                  skipMessage={`Skip over annotations`}
-                  key={`skip-annotations`}
-                />
-              )}
 
               {/* Visualization Wrapper */}
               <div className={getChartWrapperClasses().join(' ')}>
+                {/* Intro Text/Message */}
+                {config?.introText && config.visualizationType !== 'Spark Line' && (
+                  <section className={`introText `}>{parse(config.introText)}</section>
+                )}
+
+                {/* Filters */}
+                {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
+                  <Filters
+                    config={config}
+                    setConfig={setConfig}
+                    setFilteredData={setFilteredData}
+                    filteredData={filteredData}
+                    excludedData={excludedData}
+                    filterData={filterVizData}
+                    dimensions={dimensions}
+                  />
+                )}
+                <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
+                {config.annotations?.length > 0 && (
+                  <SkipTo
+                    skipId={handleChartTabbing(config, legendId)}
+                    skipMessage={`Skip over annotations`}
+                    key={`skip-annotations`}
+                  />
+                )}
                 <LegendWrapper>
                   <div
                     className={
