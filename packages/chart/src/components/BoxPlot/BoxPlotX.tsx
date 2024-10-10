@@ -17,66 +17,62 @@ const data = [
   }
 ]
 
-const BoxPlotChart = ({ xMax, yMax }) => {
+const BoxPlotChart = ({ xMax, yMax, yScale, xScale, seriesScale }) => {
   const { config, colorScale } = useContext(ConfigContext)
 
-  // Define your multiple keys (metrics) to plot
-  const metrics = ['value', 'price']
-  // xScale for the groups (categories)
-  const xScale = scaleBand({
-    domain: data.map(d => d.category),
-    padding: 0.4,
-    range: [0, xMax]
-  })
-
-  // xScale for the metrics (series) within each group
   const xSeriesScale = scaleBand({
-    domain: metrics,
-    padding: 0, // Space between series within each group
-    range: [0, xScale.bandwidth()] // Entire space of the group is divided between metrics
+    domain: config.runtime.seriesLabelsAll,
+    range: [0, xScale.bandwidth()]
   })
-
-  const yScale = scaleLinear({
-    domain: [0, 200],
-    range: [yMax, 0]
-  })
-
-  const boxWidth = xScale.bandwidth() / metrics.length
-
+  const constrainedWidth = Math.min(40, seriesScale.bandwidth())
   return (
-    <svg width={xMax} height={yMax}>
-      <Group left={0}>
-        {data.map((d, i) => (
-          <Group key={`group-${i}`} left={xScale(d.category)}>
-            {metrics.map((metric, j) => {
-              const metricValues = d[metric].sort((a, b) => a - b)
-              const min = metricValues[0]
-              const max = metricValues[metricValues.length - 1]
-              const median = metricValues[Math.floor(metricValues.length / 2)]
-              const firstQuartile = metricValues[Math.floor(metricValues.length / 4)]
-              const thirdQuartile = metricValues[Math.floor((metricValues.length * 3) / 4)]
+    <Group className='hahahah' left={Number(config.yAxis.size)}>
+      {config.boxplot.plots.map((plot, i) => (
+        <Group className='Hajjy' key={`group-${i}`} left={Number(xScale(plot.columnCategory))}>
+          {config.series.map((item, j) => {
+            const metricValues = plot.keyValues[item.dataKey].sort((a, b) => a - b)
+            const min = metricValues[0]
+            const max = metricValues[metricValues.length - 1]
+            const median = metricValues[Math.floor(metricValues.length / 2)]
+            const firstQuartile = metricValues[Math.floor(metricValues.length / 4)]
+            const thirdQuartile = metricValues[Math.floor((metricValues.length * 3) / 4)]
 
-              return (
-                <BoxPlot
-                  key={`boxplot-${metric}-${i}`}
-                  min={min}
-                  max={max}
-                  firstQuartile={firstQuartile}
-                  thirdQuartile={thirdQuartile}
-                  median={median}
-                  boxWidth={xSeriesScale.bandwidth()}
-                  fill={colorScale(metric)}
-                  stroke='black'
-                  valueScale={yScale}
-                  left={xSeriesScale(metric)}
-                />
-              )
-            })}
-          </Group>
-        ))}
-      </Group>
-    </svg>
+            return (
+              <BoxPlot
+                className='murad'
+                key={`boxplot-${item.dataKey}-${i}`}
+                min={min}
+                max={max}
+                firstQuartile={firstQuartile}
+                thirdQuartile={thirdQuartile}
+                median={median}
+                boxWidth={33}
+                fill={colorScale(item.dataKey)}
+                stroke='black'
+                valueScale={yScale}
+              />
+            )
+          })}
+        </Group>
+      ))}
+    </Group>
   )
 }
 
 export default BoxPlotChart
+
+// columnCategory: 'Group A'
+// columnFirstQuartile: '20'
+// columnIqr: '105'
+// columnLowerBounds: 10
+// columnMax: 177.5
+// columnMean: '73'
+// columnMedian: '40'
+// columnMin: 10
+// columnOutliers: []
+// columnSd: '87'
+// columnThirdQuartile: '125'
+// columnTotal: 290
+// columnUpperBounds: 177.5
+// nonOutlierValues: (4)[(10, 30, 50, 200)]
+// values: (4)[(10, 30, 50, 200)]

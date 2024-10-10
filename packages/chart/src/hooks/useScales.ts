@@ -153,12 +153,9 @@ const useScales = (properties: useScaleProps) => {
       round: true,
       domain: [min, max]
     })
-
     xScale = scaleBand({
       range: [0, xMax],
-      round: true,
-      domain: config.boxplot.categories,
-      padding: 0.4
+      domain: config.boxplot.categories
     })
     xScale.type = scaleTypes.BAND
 
