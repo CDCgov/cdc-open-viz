@@ -17,8 +17,7 @@ export const setXAxisLabelOffsetToZero = newConfig =>
 
 const update_4_24_10 = config => {
   const ver = '4.24.10'
-  let newConfig = _.cloneDeep(config)
-  newConfig = setXAxisLabelOffsetToZero(config)
+  let newConfig = setXAxisLabelOffsetToZero(config)
   removeMultiSelectPropFromMultiselect(newConfig)
   newConfig.version = ver
   return newConfig
