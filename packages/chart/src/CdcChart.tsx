@@ -589,6 +589,7 @@ export default function CdcChart({
     ) {
       newConfig.runtime.xAxis = newConfig.yAxis['yAxis'] ? newConfig.yAxis['yAxis'] : newConfig.yAxis
       newConfig.runtime.yAxis = newConfig.xAxis['xAxis'] ? newConfig.xAxis['xAxis'] : newConfig.xAxis
+      newConfig.runtime.yAxis.labelOffset *= -1
 
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'horizontal'

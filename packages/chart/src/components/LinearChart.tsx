@@ -46,7 +46,7 @@ type LinearChartProps = {
   parentHeight: number
 }
 
-const BOTTOM_LABEL_PADDING = 15
+const BOTTOM_LABEL_PADDING = 9
 const X_TICK_LABEL_PADDING = 3
 const DEFAULT_TICK_LENGTH = 8
 
