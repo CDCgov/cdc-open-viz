@@ -1,4 +1,4 @@
-import { addons } from '@storybook/addons';
+import { addons } from '@storybook/manager-api'
 import { managerTheme } from './coveSbThemes'
 
 // Assets
@@ -8,4 +8,4 @@ addons.setConfig({
   theme: managerTheme,
   isToolshown: false,
   configureJsx: true
-});
+})

@@ -1,4 +1,3 @@
-import type { Meta, StoryObj } from '@storybook/react'
 import barConfig from './_mock/line_chart_two_points_new_chart.json'
 import annotationConfig from './_mock/annotation_category_mock.json'
 import areaPrefix from './_mock/annotation_category_mock.json'
@@ -7,14 +6,12 @@ import horizontalBarConfig from './_mock/horizontal_bar.json'
 import Chart from '../CdcChart'
 import { editConfigKeys } from '../helpers/configHelpers'
 
-const meta: Meta<typeof Chart> = {
+export default {
   title: 'Components/Templates/Chart/Prefix Suffix',
   component: Chart
 }
 
-type Story = StoryObj<typeof Chart>
-
-export const Top_Suffix: Story = {
+export const Top_Suffix = {
   args: {
     config: editConfigKeys(barConfig, [
       { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
@@ -24,7 +21,7 @@ export const Top_Suffix: Story = {
   }
 }
 
-export const Top_Suffix_Worst_Case: Story = {
+export const Top_Suffix_Worst_Case = {
   args: {
     config: editConfigKeys(annotationConfig, [
       { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
@@ -33,7 +30,7 @@ export const Top_Suffix_Worst_Case: Story = {
   }
 }
 
-export const Top_Suffix_With_Options: Story = {
+export const Top_Suffix_With_Options = {
   args: {
     config: editConfigKeys(annotationConfig, [
       { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
@@ -43,7 +40,7 @@ export const Top_Suffix_With_Options: Story = {
   }
 }
 
-export const Top_Suffix_One_Char: Story = {
+export const Top_Suffix_One_Char = {
   args: {
     config: editConfigKeys(annotationConfig, [
       { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
@@ -52,12 +49,13 @@ export const Top_Suffix_One_Char: Story = {
   }
 }
 
-export const Suffix: Story = {
+export const Suffix = {
   args: {
     config: annotationConfig
   }
 }
-export const Top_Prefix: Story = {
+
+export const Top_Prefix = {
   args: {
     config: editConfigKeys(annotationConfig, [
       { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
@@ -66,7 +64,8 @@ export const Top_Prefix: Story = {
     ])
   }
 }
-export const Prefix: Story = {
+
+export const Prefix = {
   args: {
     config: editConfigKeys(areaPrefix, [
       { path: ['dataFormat', 'prefix'], value: '$' },
@@ -75,7 +74,7 @@ export const Prefix: Story = {
   }
 }
 
-export const Top_Prefix_And_Suffix: Story = {
+export const Top_Prefix_And_Suffix = {
   args: {
     config: editConfigKeys(annotationConfig, [
       { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
@@ -83,7 +82,8 @@ export const Top_Prefix_And_Suffix: Story = {
     ])
   }
 }
-export const Horizontal_Bar: Story = {
+
+export const Horizontal_Bar = {
   args: {
     config: editConfigKeys(horizontalBarConfig, [
       { path: ['dataFormat', 'suffix'], value: ' suf' },
@@ -92,7 +92,7 @@ export const Horizontal_Bar: Story = {
   }
 }
 
-export const Top_Suffix_On_Line: Story = {
+export const Top_Suffix_On_Line = {
   args: {
     config: editConfigKeys(barConfig, [
       { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
@@ -104,7 +104,7 @@ export const Top_Suffix_On_Line: Story = {
   }
 }
 
-export const Values_On_Line_All_Suffix: Story = {
+export const Values_On_Line_All_Suffix = {
   args: {
     config: editConfigKeys(annotationConfig, [
       { path: ['yAxis', 'labelsAboveGridlines'], value: true },
@@ -115,7 +115,7 @@ export const Values_On_Line_All_Suffix: Story = {
   }
 }
 
-export const Values_on_Line_Top_Suffix_Only_Area_Worst_Case: Story = {
+export const Values_on_Line_Top_Suffix_Only_Area_Worst_Case = {
   args: {
     config: editConfigKeys(annotationConfig, [
       { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
@@ -127,7 +127,7 @@ export const Values_on_Line_Top_Suffix_Only_Area_Worst_Case: Story = {
   }
 }
 
-export const Top_Suffix_Above_Gridlines_With_Options: Story = {
+export const Top_Suffix_Above_Gridlines_With_Options = {
   args: {
     config: editConfigKeys(annotationConfig, [
       { path: ['yAxis', 'tickRotation'], value: 45 },
@@ -138,5 +138,3 @@ export const Top_Suffix_Above_Gridlines_With_Options: Story = {
     ])
   }
 }
-
-export default meta

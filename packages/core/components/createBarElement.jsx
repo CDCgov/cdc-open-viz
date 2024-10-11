@@ -1,5 +1,27 @@
+import React from 'react'
+
 export default function createBarElement(props) {
-  const { config, index, id, className, background, borderColor, borderWidth, width, height, x, y, onMouseOver, onMouseLeave, onClick, tooltipHtml, tooltipId, styleOverrides, seriesHighlight, type } = props
+  const {
+    config,
+    index,
+    id,
+    className,
+    background,
+    borderColor,
+    borderWidth,
+    width,
+    height,
+    x,
+    y,
+    onMouseOver,
+    onMouseLeave,
+    onClick,
+    tooltipHtml,
+    tooltipId,
+    styleOverrides,
+    seriesHighlight,
+    type
+  } = props
 
   const adjustedWidth = Math.max(0, width)
   const adjustedHeight = Math.max(0, height)
@@ -10,10 +32,24 @@ export default function createBarElement(props) {
   const tipRounding = config.tipRounding
   const comboBarSeriesCount = config.visualizationType === 'Combo' && config.runtime?.barSeriesKeys?.length
   const barSeriesCount = config.runtime.seriesKeys.length
-  const isolateSeriesCount = config.visualizationType === 'Bar' && config.legend.axisAlign && seriesHighlight?.length ? seriesHighlight?.length : 0
-  const stackCount = comboBarSeriesCount ? comboBarSeriesCount : isolateSeriesCount ? isolateSeriesCount : barSeriesCount
+  const isolateSeriesCount =
+    config.visualizationType === 'Bar' && config.legend.axisAlign && seriesHighlight?.length
+      ? seriesHighlight?.length
+      : 0
+  const stackCount = comboBarSeriesCount
+    ? comboBarSeriesCount
+    : isolateSeriesCount
+    ? isolateSeriesCount
+    : barSeriesCount
 
-  let radius = config.roundingStyle === 'standard' ? 8 : config.roundingStyle === 'shallow' ? 5 : config.roundingStyle === 'finger' ? 15 : 0
+  let radius =
+    config.roundingStyle === 'standard'
+      ? 8
+      : config.roundingStyle === 'shallow'
+      ? 5
+      : config.roundingStyle === 'finger'
+      ? 15
+      : 0
   if (radius > adjustedWidth / 2 || radius > adjustedHeight / 2) {
     radius = Math.min(adjustedWidth / 2, adjustedHeight / 2)
   }
