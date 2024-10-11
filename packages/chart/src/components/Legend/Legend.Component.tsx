@@ -29,6 +29,8 @@ export interface LegendProps {
   skipId: string
   dimensions: DimensionsType // for responsive width legend
   getTextWidth: (text: string, font: string) => string
+  // currently used to offset additional top space added by a top labelAboveGridline
+  translateY?: number
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
@@ -44,7 +46,8 @@ const Legend: React.FC<LegendProps> = forwardRef(
       formatLabels,
       skipId = 'legend',
       dimensions,
-      getTextWidth
+      getTextWidth,
+      translateY = 0
     },
     ref
   ) => {
@@ -55,10 +58,13 @@ const Legend: React.FC<LegendProps> = forwardRef(
 
     const isBottomOrSmallViewport =
       legend?.position === 'bottom' || (isLegendWrapViewport(currentViewport) && !legend.hide)
+    const isTopOrBottom =
+      legend?.position === 'top' || legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
 
     const legendClasses = {
       marginBottom: getMarginBottom(config, hasSuppression),
-      marginTop: getMarginTop(isBottomOrSmallViewport, config)
+      marginTop: getMarginTop(isBottomOrSmallViewport, config),
+      transform: !isTopOrBottom ? `translateY(${translateY}px)` : 'none'
     }
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
