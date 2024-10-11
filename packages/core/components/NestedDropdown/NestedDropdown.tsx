@@ -1,16 +1,15 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import './nesteddropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
-import { VizFilter } from '../../types/VizFilter'
-import { handleSearchTerm, OptionsMemo } from './nestedDropdownHelpers'
+import { filterSearchTerm, NestedOptions, ValueTextPair } from './nestedDropdownHelpers'
 
 const Options: React.FC<{
-  currentOptions: (string | number)[]
+  subOptions: ValueTextPair[]
   label: string
   handleSubGroupSelect: Function
   userSelectedLabel: string
   userSearchTerm: string
-}> = ({ currentOptions = [], label, handleSubGroupSelect, userSelectedLabel, userSearchTerm }) => {
+}> = ({ subOptions, label, handleSubGroupSelect, userSelectedLabel, userSearchTerm }) => {
   const [isTierOneExpanded, setIsTierOneExpanded] = useState(true)
   const checkMark = <>&#10004;</>
 
@@ -50,7 +49,11 @@ const Options: React.FC<{
         <span className={'font-weight-bold'}>{label} </span>
         {
           <span className='list-arrow' aria-hidden='true'>
-            {isTierOneExpanded ? <Icon display='caretFilledUp' /> : <Icon display='caretFilledDown' />}
+            {isTierOneExpanded ? (
+              <Icon display='caretFilledUp' alt='arrow pointing up' />
+            ) : (
+              <Icon display='caretFilledDown' alt='arrow pointing down' />
+            )}
           </span>
         }
         <ul
@@ -60,8 +63,11 @@ const Options: React.FC<{
           aria-labelledby={label}
           className={isTierOneExpanded ? '' : 'hide'}
         >
-          {currentOptions.map((tierTwo, tierTwoIndex) => {
-            const regionID = label + tierTwo
+          {subOptions.map(subGroup => {
+            const [value, text] = subGroup
+            const subGroupText = text || value
+
+            const regionID = label + value
             const isSelected = regionID === userSelectedLabel
 
             return (
@@ -72,9 +78,9 @@ const Options: React.FC<{
                 role='treeitem'
                 aria-label={regionID}
                 aria-selected={isSelected}
-                data-value={tierTwo}
+                data-value={value}
                 onClick={e => {
-                  handleSubGroupSelect(tierTwo)
+                  handleSubGroupSelect(value)
                 }}
               >
                 {isSelected ? (
@@ -85,7 +91,7 @@ const Options: React.FC<{
                   ''
                 )}
 
-                {tierTwo}
+                {subGroupText}
               </li>
             )
           })}
@@ -95,30 +101,26 @@ const Options: React.FC<{
   )
 }
 
-interface NestedDropdownProps {
+type NestedDropdownProps = {
+  activeGroup: string
+  activeSubGroup?: string
   isEditor?: boolean
-  currentFilter: VizFilter
+  isUrlFilter?: boolean
   listLabel: string
-  handleSelectedItems: Function
+  handleSelectedItems: ([group, subgroup]: [string, string]) => void
+  options: NestedOptions
+  subGroupingActive?: string
 }
 
-const NestedDropdown: React.FC<NestedDropdownProps> = ({ currentFilter, listLabel, handleSelectedItems }) => {
-  const optsMemo: OptionsMemo = useMemo(() => {
-    // keep custom ordered value order
-    const filteredValues =
-      currentFilter.orderedValues?.filter(orderedValue => currentFilter.values.includes(orderedValue)) ||
-      currentFilter.values
-    return filteredValues.map(value => {
-      if (!currentFilter.subGrouping) return [value, []]
-      const { orderedValues, values: filteredSubValues } = currentFilter.subGrouping.valuesLookup[value]
-      // keep custom subFilter order
-      const subFilterValues =
-        orderedValues?.filter(orderedValue => filteredSubValues.includes(orderedValue)) || filteredSubValues
-      return [value, subFilterValues]
-    })
-  }, [currentFilter, currentFilter.subGrouping])
-  const groupFilterActive = currentFilter.active
-  const subGroupFilterActive = currentFilter.subGrouping?.active ?? ''
+const NestedDropdown: React.FC<NestedDropdownProps> = ({
+  options,
+  activeGroup,
+  activeSubGroup,
+  listLabel,
+  handleSelectedItems
+}) => {
+  const groupFilterActive = activeGroup
+  const subGroupFilterActive = activeSubGroup || ''
 
   const [userSearchTerm, setUserSearchTerm] = useState('')
   const [inputValue, setInputValue] = useState(
@@ -130,13 +132,13 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ currentFilter, listLabe
   const searchInput = useRef(null)
   const searchDropdown = useRef(null)
 
-  const chooseSelectedSubGroup = (tierOne: string, tierTwo: string) => {
+  const chooseSelectedSubGroup = (tierOne: string | number, tierTwo: string | number) => {
     searchInput.current.focus()
     const selectedItemValue = `${tierOne} - ${tierTwo}`
     setUserSearchTerm('')
     setIsListOpened(false)
     setInputValue(selectedItemValue)
-    handleSelectedItems([tierOne, tierTwo])
+    handleSelectedItems([String(tierOne), String(tierTwo)])
   }
 
   const handleKeyUp = e => {
@@ -213,8 +215,8 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ currentFilter, listLabe
   }
 
   const filterOptions: OptionsMemo = useMemo(() => {
-    return handleSearchTerm(userSearchTerm, optsMemo)
-  }, [userSearchTerm])
+    return filterSearchTerm(userSearchTerm, options)
+  }, [userSearchTerm, options])
 
   const handleSearchTermChange = e => {
     const newSearchTerm = e.target.value
@@ -226,7 +228,11 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ currentFilter, listLabe
   return (
     <>
       {listLabel && <span className='edit-label column-heading'>{listLabel}</span>}
-      <div id='nested-dropdown-container' className='nested-dropdown' onKeyUp={handleKeyUp}>
+      <div
+        id='nested-dropdown-container'
+        className={`nested-dropdown ${isListOpened ? 'open-filter' : ''}`}
+        onKeyUp={handleKeyUp}
+      >
         <div className='nested-dropdown-input-container' aria-label='searchInput' role='textbox'>
           <input
             className='search-input'
@@ -245,7 +251,11 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ currentFilter, listLabe
             onBlur={() => setInputHasFocus(false)}
           />
           <span className='list-arrow' aria-hidden={true}>
-            {isListOpened ? <Icon display='caretFilledUp' /> : <Icon display='caretFilledDown' />}
+            {isListOpened ? (
+              <Icon display='caretFilledUp' alt='arrow pointing up' />
+            ) : (
+              <Icon display='caretFilledDown' alt='arrow pointing down' />
+            )}
           </span>
         </div>
         <ul
@@ -257,15 +267,17 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ currentFilter, listLabe
           ref={searchDropdown}
           className={`main-nested-dropdown-container ${isListOpened ? '' : 'hide'}`}
         >
-          {filterOptions?.length
-            ? filterOptions.map(([groupName, options]) => {
+          {filterOptions.length
+            ? filterOptions.map(([group, subgroup], index) => {
+                const [groupValue, groupText] = group
+                const groupTextValue = String(groupText || groupValue)
                 return (
                   <Options
-                    key={groupName}
-                    currentOptions={options}
-                    label={groupName}
-                    handleSubGroupSelect={(subGroupValue: string) => {
-                      chooseSelectedSubGroup(groupName, subGroupValue)
+                    key={groupTextValue + '_' + index}
+                    subOptions={subgroup}
+                    label={groupTextValue}
+                    handleSubGroupSelect={subGroupValue => {
+                      chooseSelectedSubGroup(groupValue, subGroupValue)
                     }}
                     userSelectedLabel={groupFilterActive + subGroupFilterActive}
                     userSearchTerm={userSearchTerm}
