@@ -85,8 +85,6 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   const [animatedChart, setAnimatedChart] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
-  // Used to calculate the y position of the x-axis title
-  const [bottomLabelStart, setBottomLabelStart] = useState(0)
   const [forestXLabelY, setForestXLabelY] = useState(0)
 
   // REFS
@@ -133,6 +131,14 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
 
     return initialWidth * 0.73
   }, [dimensions[0], config.legend, currentViewport])
+
+  // Used to calculate the y position of the x-axis title
+  const bottomLabelStart = useMemo(() => {
+    xAxisLabelRefs.current = xAxisLabelRefs.current?.filter(label => label)
+    if (!xAxisLabelRefs.current.length) return
+    const tallestLabel = Math.max(...xAxisLabelRefs.current.map(label => label.getBBox().height))
+    return tallestLabel + X_TICK_LABEL_PADDING + DEFAULT_TICK_LENGTH
+  }, [dimensions[0], config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
 
   // xMax and yMax
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
@@ -323,13 +329,6 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     const suffixElWidth = suffixEl.getBBox().width
     setSuffixWidth(suffixElWidth)
   }, [config.dataFormat.suffix, config.dataFormat.onlyShowTopPrefixSuffix])
-
-  useEffect(() => {
-    xAxisLabelRefs.current = xAxisLabelRefs.current?.filter(label => label)
-    if (!xAxisLabelRefs.current.length) return
-    const tallestLabel = Math.max(...xAxisLabelRefs.current.map(label => label.getBBox().height))
-    setBottomLabelStart(tallestLabel + X_TICK_LABEL_PADDING + DEFAULT_TICK_LENGTH)
-  }, [dimensions[0], config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
 
   // forest plot x-axis label positioning
   useEffect(() => {

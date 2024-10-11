@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useId } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useId, useMemo } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -125,10 +125,23 @@ export default function CdcChart({
     isActive: false,
     isBrushing: false
   })
-  const [height, setHeight] = useState(calcInitialHeight(config, currentViewport))
   const [axisBottomHeight, setAxisBottomHeight] = useState(0)
 
+  const { description, visualizationType, data, forestPlot, brush } = config
+
   const legendRef = useRef(null)
+
+  const height = useMemo(() => {
+    const initialHeight = calcInitialHeight(config, currentViewport)
+    const isForestPlot = visualizationType === 'Forest Plot'
+
+    // Heights to add
+    const brushHeight = brush?.active ? brush?.height : 0
+    const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
+    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight
+
+    return initialHeight + additionalHeight
+  }, [brush, axisBottomHeight, config, currentViewport])
 
   const handleDragStateChange = isDragging => {
     setIsDraggingAnnotation(isDragging)
@@ -138,7 +151,6 @@ export default function CdcChart({
 
   // Destructure items from config for more readable JSX
   let { legend, title } = config
-  const { description, visualizationType, data, forestPlot, brush } = config
 
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
@@ -695,22 +707,6 @@ export default function CdcChart({
   function isEmpty(obj) {
     return Object.keys(obj).length === 0
   }
-
-  useEffect(() => {
-    const initialHeight = calcInitialHeight(config, currentViewport)
-    const isForestPlot = visualizationType === 'Forest Plot'
-
-    // heights to add
-    const brushHeight = brush?.active ? brush?.height : 0
-    const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
-    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight
-
-    const adjustedHeight = initialHeight + additionalHeight
-
-    if (adjustedHeight === height) return
-
-    setHeight(adjustedHeight)
-  }, [brush, axisBottomHeight, config, currentViewport])
 
   // Load data when component first mounts
   useEffect(() => {
