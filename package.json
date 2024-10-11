@@ -9,6 +9,7 @@
     "@babel/core": "^7.23.2",
     "@babel/preset-env": "^7.23.2",
     "@babel/preset-react": "^7.22.15",
+    "@chromatic-com/storybook": "^2.0.2",
     "@faker-js/faker": "^8.4.1",
     "@rollup/plugin-dsv": "^3.0.2",
     "@storybook/addon-a11y": "^7.6.16",
@@ -96,7 +97,8 @@
     "storybook-docs": "storybook dev --docs",
     "build-storybook": "storybook build",
     "predeploy": "storybook build --output-dir .storybook_build && touch .storybook_build/.nojekyll",
-    "deploy": "gh-pages -d .storybook_build -t true"
+    "deploy": "gh-pages -d .storybook_build -t true",
+    "chromatic": "npx chromatic --project-token=chpt_584ebd20c92cb5f"
   },
   "dependencies": {
     "@visx/annotation": "^3.3.0",
