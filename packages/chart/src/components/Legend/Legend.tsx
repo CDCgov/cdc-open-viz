@@ -25,23 +25,21 @@ const Legend = forwardRef((props, ref) => {
   const createLegendLabels = createFormatLabels(config, tableData, data, colorScale)
 
   return (
-    !['Box Plot'].includes(config.visualizationType) && (
-      <Fragment>
-        <LegendComponent
-          getTextWidth={getTextWidth}
-          dimensions={dimensions}
-          ref={ref}
-          skipId={props.skipId || 'legend'}
-          config={config}
-          colorScale={colorScale}
-          seriesHighlight={seriesHighlight}
-          highlight={highlight}
-          highlightReset={highlightReset}
-          currentViewport={currentViewport}
-          formatLabels={createLegendLabels}
-        />
-      </Fragment>
-    )
+    <Fragment>
+      <LegendComponent
+        getTextWidth={getTextWidth}
+        dimensions={dimensions}
+        ref={ref}
+        skipId={props.skipId || 'legend'}
+        config={config}
+        colorScale={colorScale}
+        seriesHighlight={seriesHighlight}
+        highlight={highlight}
+        highlightReset={highlightReset}
+        currentViewport={currentViewport}
+        formatLabels={createLegendLabels}
+      />
+    </Fragment>
   )
 })
 

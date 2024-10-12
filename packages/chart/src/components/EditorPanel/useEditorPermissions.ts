@@ -88,7 +88,7 @@ export const useEditorPermissions = () => {
   const visHasLegend = () => {
     switch (visualizationType) {
       case 'Box Plot':
-        return false
+        return true
       case 'Forest Plot':
         return false
       case 'Spark Line':
