@@ -5,10 +5,11 @@ import ConfigContext from '../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 import { scaleBand, scaleLinear } from '@visx/scale'
-
-const CoveBoxPlot = ({ xScale, yScale, yMax, xMax, seriesScale }) => {
-  const { config, setConfig, transformedData: data } = useContext(ConfigContext)
+import { max, min, median, quantile } from 'd3-array'
+const CoveBoxPlot = ({ xScale, xMax, yMax, min: minValue, max: maxValue }) => {
+  const { config, setConfig, colorScale } = useContext(ConfigContext)
   const { boxplot } = config
+
   useEffect(() => {
     if (config.legend.hide === false) {
       setConfig({
@@ -32,54 +33,67 @@ const CoveBoxPlot = ({ xScale, yScale, yMax, xMax, seriesScale }) => {
       ${boxplot.labels.median}: ${d.columnMedian}
     `
   }
-  const groupScale = scaleBand({
-    range: [0, xMax],
-    domain: ['Group A']
-  })
 
   //  accessors & constants
-  const max = d => Number(d.columnMax)
-  const min = d => Number(d.columnMin)
-  const median = d => Number(d.columnMedian)
-  const thirdQuartile = d => Number(d.columnThirdQuartile)
-  const firstQuartile = d => Number(d.columnFirstQuartile)
+  // const max = d => Number(d.columnMax)
+  // const min = d => Number(d.columnMin)
+  // const median = d => Number(d.columnMedian)
+  // const thirdQuartile = d => Number(d.columnThirdQuartile)
+  // const firstQuartile = d => Number(d.columnFirstQuartile)
   const fillOpacity = 0.5
-  const boxWidth = groupScale.bandwidth()
+  const boxWidth = xScale.bandwidth()
   const constrainedWidth = Math.min(40, boxWidth)
   const color_0 = colorPalettesChart[config?.palette][0] ? colorPalettesChart[config?.palette][0] : '#000'
-  // const seriesScale = scaleBand({
-  //   domain: ['value', 'value2'],
-  //   range: [0, yMax]
-  // })
-  console.log(data.map(d => d['category one']))
-
-  const xScaleX = scaleBand({
-    rangeRound: [0, groupScale.bandwidth()],
-    domain: ['value', 'value2']
+  const seriesScale = scaleBand({
+    range: [0, xScale.bandwidth() / 4],
+    padding: 0.1,
+    domain: config.series.map(item => item.dataKey)
   })
 
-  const offset = boxWidth - constrainedWidth
+  const calculateBoxPlotStats = values => {
+    const sortedValues = values.sort((a, b) => a - b)
+    return {
+      min: min(values),
+      max: max(values),
+      median: median(values),
+      firstQuartile: quantile(sortedValues, 0.25),
+      thirdQuartile: quantile(sortedValues, 0.75)
+    }
+  }
+  const yScale = scaleLinear({
+    range: [yMax, 0],
+    domain: [minValue, maxValue]
+  })
 
   return (
     <ErrorBoundary component='BoxPlot'>
-      <Group left={Number(config.yAxis.size)} className='boxplot' key={`boxplot-group`}>
+      <Group className='boxplot' key={`boxplot-group`}>
         {boxplot.plots.map((d, i) => {
+          const offset = boxWidth - constrainedWidth
+          const radius = 4
+
           return (
-            <Group left={groupScale(d.columnCategory)}>
+            <Group
+              key={`boxplotplot-${d.columnCategory}`}
+              left={Number(xScale(d.columnCategory)) + Number(config.yAxis.size) + offset / 2 + 0.5}
+            >
               {config.series.map(item => {
+                const valuesByKey = d.keyValues[item.dataKey]
+                const { min, max, median, firstQuartile, thirdQuartile } = calculateBoxPlotStats(valuesByKey)
+
                 return (
-                  <Group key={`boxplotplot-${i}`}>
+                  <Group key={`boxplotplot-${item}`}>
                     <BoxPlot
-                      data-left={xScale(item.dataKey)}
+                      //data-left={xScale(d.columnCategory) + config.yAxis.size + offset / 2 + 0.5}
                       key={`box-plot-${i}`}
-                      min={min(d)}
-                      max={max(d)}
-                      left={xScaleX(item.dataKey)}
-                      firstQuartile={firstQuartile(d)}
-                      thirdQuartile={thirdQuartile(d)}
-                      median={median(d)}
-                      boxWidth={constrainedWidth}
-                      fill={color_0}
+                      min={min}
+                      max={max}
+                      left={seriesScale(item.dataKey)}
+                      firstQuartile={firstQuartile}
+                      thirdQuartile={thirdQuartile}
+                      median={median}
+                      boxWidth={seriesScale.bandwidth()}
+                      fill={colorScale(item.dataKey)}
                       fillOpacity={fillOpacity}
                       stroke='black'
                       valueScale={yScale}

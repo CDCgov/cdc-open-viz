@@ -499,6 +499,22 @@ export default function CdcChart({
 
             return result
           }
+
+          const getValuesByGroup = keys => {
+            // Initialize an empty object to hold the result
+            const result = {}
+
+            // Filter data by the specified group
+            // const filteredData = data.filter(item => item['category one'] === groupStr)
+
+            // Loop through each key in the keys array
+            keys.forEach(key => {
+              // Collect the values corresponding to the current key for the filtered group
+              result[key] = filteredData.map(item => item[key])
+            })
+
+            return result
+          }
           const allSeriesKeys = newConfig.series.map(item => item.dataKey)
 
           if (!filteredData) throw new Error('boxplots dont have data yet')
@@ -541,7 +557,7 @@ export default function CdcChart({
             columnOutliers: outliers,
             values: filteredDataValues,
 
-            keyValues: collectValuesByKeys(allSeriesKeys),
+            keyValues: getValuesByGroup(allSeriesKeys),
             nonOutlierValues: nonOutliers
           })
         } catch (e) {
