@@ -2,18 +2,32 @@ import { useState, useEffect, useMemo } from 'react'
 import { useId } from 'react'
 
 // CDC
-import Button from './elements/Button'
-import { getQueryParams, updateQueryString } from '../helpers/queryStringUtils'
-import MultiSelect from './MultiSelect'
-import { Visualization } from '../types/Visualization'
-import { MultiSelectFilter, OrderBy, VizFilter } from '../types/VizFilter'
-import { filterVizData } from '../helpers/filterVizData'
-import { addValuesToFilters } from '../helpers/addValuesToFilters'
-import { DimensionsType } from '../types/Dimensions'
-import NestedDropdown from './NestedDropdown'
+import Button from '../elements/Button'
+import { getQueryParams, updateQueryString } from '../../helpers/queryStringUtils'
+import MultiSelect from '../MultiSelect'
+import { Visualization } from '../../types/Visualization'
+import { MultiSelectFilter, OrderBy, VizFilter } from '../../types/VizFilter'
+import { filterVizData } from '../../helpers/filterVizData'
+import { addValuesToFilters } from '../../helpers/addValuesToFilters'
+import { DimensionsType } from '../../types/Dimensions'
+import NestedDropdown from '../NestedDropdown'
 import _ from 'lodash'
+import { getNestedOptions } from './helpers/getNestedOptions'
+import { applyQueuedActive } from './helpers/applyQueuedActive'
+import { handleSorting } from './helpers/handleSorting'
 
-export const filterStyleOptions = ['dropdown', 'nested-dropdown', 'pill', 'tab', 'tab bar', 'multi-select']
+export const VIZ_FILTER_STYLE = {
+  dropdown: 'dropdown',
+  nestedDropdown: 'nested-dropdown',
+  pill: 'pill',
+  tab: 'tab',
+  tabBar: 'tab bar',
+  multiSelect: 'multi-select'
+} as const
+
+export type VizFilterStyle = (typeof VIZ_FILTER_STYLE)[keyof typeof VIZ_FILTER_STYLE]
+
+export const filterStyleOptions = Object.values(VIZ_FILTER_STYLE)
 
 export const filterOrderOptions: { label: string; value: OrderBy }[] = [
   {
@@ -29,22 +43,6 @@ export const filterOrderOptions: { label: string; value: OrderBy }[] = [
     value: 'cust'
   }
 ]
-
-export const handleSorting = singleFilter => {
-  const singleFilterValues = _.cloneDeep(singleFilter.values)
-  if (singleFilter.order === 'cust') {
-    return singleFilter
-  }
-
-  const sort = (a, b) => {
-    const asc = singleFilter.order !== 'desc'
-    return (asc ? a : b).toString().localeCompare((asc ? b : a).toString(), 'en', { numeric: true })
-  }
-
-  singleFilter.values = singleFilterValues.sort(sort)
-
-  return singleFilter
-}
 
 const hasStandardFilterBehavior = ['chart', 'table']
 
@@ -185,8 +183,7 @@ export const useFilters = props => {
     const queryParams = getQueryParams()
     newFilters.forEach(newFilter => {
       if (newFilter.queuedActive) {
-        newFilter.active = newFilter.queuedActive
-        delete newFilter.queuedActive
+        applyQueuedActive(newFilter)
         if (newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active) {
           queryParams[newFilter.setByQueryParameter] = newFilter.active
           needsQueryUpdate = true
@@ -456,7 +453,9 @@ const Filters = (props: FilterProps) => {
             )}
             {filterStyle === 'nested-dropdown' && (
               <NestedDropdown
-                currentFilter={singleFilter}
+                activeGroup={(singleFilter.active as string) || (singleFilter.queuedActive || [])[0]}
+                activeSubGroup={(singleFilter.subGrouping?.active as string) || (singleFilter.queuedActive || [])[1]}
+                options={getNestedOptions(singleFilter)}
                 listLabel={label}
                 handleSelectedItems={value => changeFilterActive(outerIndex, value)}
               />
@@ -477,14 +476,20 @@ const Filters = (props: FilterProps) => {
   }
 
   if (visualizationConfig?.filters?.length === 0) return
-  const filterSectionClassList = [
-    'filters-section',
-    type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme
-  ]
+
+  const getClasses = () => {
+    const { visualizationType, legend } = visualizationConfig || {}
+    const baseClass = 'filters-section'
+    const conditionalClass = type === 'map' ? general.headerColor : visualizationType === 'Spark Line' ? null : theme
+    const legendClass = legend && !legend.hide && legend.position === 'top' ? 'mb-0' : null
+
+    return [baseClass, conditionalClass, legendClass].filter(Boolean)
+  }
+
   return (
-    <section className={filterSectionClassList.join(' ')}>
+    <section className={getClasses().join(' ')}>
       <p className='filters-section__intro-text'>
-        {filters?.some(f => f.active && f.showDropdown) ? filterConstants.introText : ''}{' '}
+        {filters?.some(filter => filter.active && filter.columnName) ? filterConstants.introText : ''}{' '}
         {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
       </p>
       <div className='filters-section__wrapper'>

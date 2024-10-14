@@ -69,6 +69,16 @@ $colors: (
     @each $key, $value in $colors {
       --#{$key}: #{$value};
     }
+    --editorWidth: 350px;
+
+    --font-small: 0.7em;
+
+    --breakpoint-xs: 480px;
+    --breakpoint-sm: 768px;
+    --breakpoint-md: 960px;
+    --breakpoint-lg: 1170px;
+    --breakpoint-xl: 1280px;
+
   }
 }
 

@@ -18,7 +18,6 @@
   }
 }
 .cdc-open-viz-module {
-  div,
   span,
   applet,
   object,
@@ -69,14 +68,7 @@
   form,
   label,
   legend,
-  table,
   caption,
-  tbody,
-  tfoot,
-  thead,
-  tr,
-  th,
-  td,
   article,
   aside,
   canvas,
@@ -145,12 +137,5 @@
     /* Move the subscripted text down, but only
       half as far down as the superscript moved up */
     bottom: -0.25em;
-  }
-
-  ul > li:first-child {
-    margin-top: auto;
-  }
-  ul > li:last-of-type {
-    margin-bottom: auto;
   }
 }

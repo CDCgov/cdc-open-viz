@@ -6,7 +6,7 @@ import useLegendClasses from '../../hooks/useLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import { handleLineType } from '../../helpers/handleLineType'
 
-import { getMarginTop, getGradientConfig } from './helpers/index'
+import { getMarginTop, getGradientConfig, getMarginBottom } from './helpers/index'
 import { Line } from '@visx/shape'
 import { Label } from '../../types/Label'
 import { ChartConfig } from '../../types/ChartConfig'
@@ -15,6 +15,7 @@ import { forwardRef } from 'react'
 import LegendSuppression from './Legend.Suppression'
 import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
+import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 
 export interface LegendProps {
   colorScale: ColorScale
@@ -51,17 +52,15 @@ const Legend: React.FC<LegendProps> = forwardRef(
     const { runtime, legend } = config
 
     const isBottomOrSmallViewport =
-      legend?.position === 'bottom' ||
-      legend?.position === 'top' ||
-      (['sm', 'xs', 'xxs'].includes(currentViewport) && !legend.hide)
+      legend?.position === 'bottom' || (isLegendWrapViewport(currentViewport) && !legend.hide)
 
     const legendClasses = {
-      marginBottom: (isBottomOrSmallViewport && (legend.hideSuppressionLink ? '15px' : '45px')) || '0px',
+      marginBottom: getMarginBottom(isBottomOrSmallViewport, config),
 
       marginTop:
         isBottomOrSmallViewport && config.orientation === 'horizontal'
           ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px`
-          : getMarginTop(isBottomOrSmallViewport, config.brush.active)
+          : getMarginTop(isBottomOrSmallViewport, config.brush.active, legend)
     }
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
@@ -135,9 +134,9 @@ const Legend: React.FC<LegendProps> = forwardRef(
                         }}
                         role='button'
                       >
-                        <div>
+                        <div className='d-flex justify-content-center align-items-center'>
                           {config.visualizationType === 'Line' && config.legend.style === 'lines' ? (
-                            <svg width={40} height={20}>
+                            <svg width={40} height={25}>
                               <Line
                                 from={{ x: 10, y: 10 }}
                                 to={{ x: 40, y: 10 }}
@@ -147,7 +146,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                               />
                             </svg>
                           ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <div className='d-flex flex-column mt-1'>
                               <LegendShape
                                 shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
                                 viewport={currentViewport}

@@ -541,6 +541,15 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           }
         })
         break
+      case 'toggleDownloadLinkBelow':
+        setState({
+          ...state,
+          table: {
+            ...state.table,
+            showDownloadLinkBelow: !state.table.showDownloadLinkBelow
+          }
+        })
+        break
       case 'toggleDownloadPdfButton':
         setState({
           ...state,
@@ -1158,7 +1167,14 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
         if (paletteName.includes('qualitative') && !paletteName.endsWith('reverse')) {
           nonSequential.push(paletteName)
         }
-        if (!paletteName.includes('qualitative') && !paletteName.endsWith('reverse')) {
+        if (paletteName.includes('colorblindsafe') && !paletteName.endsWith('reverse')) {
+          nonSequential.push(paletteName)
+        }
+        if (
+          !paletteName.includes('qualitative') &&
+          !paletteName.includes('colorblindsafe') &&
+          !paletteName.endsWith('reverse')
+        ) {
           sequential.push(paletteName)
         }
       }
@@ -1166,7 +1182,14 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
         if (paletteName.includes('qualitative') && paletteName.endsWith('reverse')) {
           nonSequential.push(paletteName)
         }
-        if (!paletteName.includes('qualitative') && paletteName.endsWith('reverse')) {
+        if (paletteName.includes('colorblindsafe') && paletteName.endsWith('reverse')) {
+          nonSequential.push(paletteName)
+        }
+        if (
+          !paletteName.includes('qualitative') &&
+          !paletteName.includes('colorblindsafe') &&
+          paletteName.endsWith('reverse')
+        ) {
           sequential.push(paletteName)
         }
       }
@@ -1736,7 +1759,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       type='radio'
                       name='equalnumber'
                       value='equalnumber'
-                      checked={state.legend.type === 'equalnumber'}
+                      checked={state.legend.type === 'equalnumber' || state.legend.type === 'equalinterval'}
                       onChange={e => handleEditorChanges('classificationType', e.target.value)}
                     />
                     Numeric/Quantitative
@@ -3083,6 +3106,16 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     }}
                   />
                   <span className='edit-label'>Enable Image Download</span>
+                </label>
+                <label className='checkbox'>
+                  <input
+                    type='checkbox'
+                    checked={state.table.showDownloadLinkBelow}
+                    onChange={event => {
+                      handleEditorChanges('toggleDownloadLinkBelow', event.target.checked)
+                    }}
+                  />
+                  <span className='edit-label'>Show Download Link Below Table</span>
                 </label>
                 {/* <label className='checkbox'>
                       <input

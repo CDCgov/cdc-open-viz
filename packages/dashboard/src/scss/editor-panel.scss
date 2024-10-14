@@ -17,10 +17,6 @@
 }
 
 .editor-panel {
-  //TODO: Remove after COVE refactor
-  &.cove {
-    @import '@cdc/core/styles/v2/layout/tooltip.scss';
-  }
 
   .two-col-inputs {
     display: flex;
@@ -61,7 +57,7 @@
   }
   .series-list {
     list-style: none;
-    border: $lightGray 1px solid;
+    border: var(--lightGray) 1px solid;
     &:empty {
       border: none !important;
     }
@@ -72,7 +68,7 @@
       justify-content: space-between;
       font-size: 0.9em;
       &:hover {
-        background-color: $lightestGray;
+        background-color: var(--lightestGray);
       }
       span {
         font-size: 0.8em;
@@ -80,12 +76,12 @@
         cursor: pointer;
       }
       + li {
-        border-top: $lightGray 1px solid;
+        border-top: var(--lightGray) 1px solid;
       }
     }
   }
   background: #fff;
-  width: $editorWidth;
+  width: var(--editorWidth);
   overflow-y: overlay;
   position: absolute;
   z-index: 8;
@@ -95,7 +91,7 @@
   top: 0;
   bottom: 0;
   .accordion__heading {
-    background: $lightestGray;
+    background: var(--lightestGray);
   }
   .accordion__item {
     select {
@@ -107,7 +103,7 @@
     }
   }
   .form-container {
-    border-right: $lightGray 1px solid;
+    border-right: var(--lightGray) 1px solid;
     flex-grow: 1;
   }
   .guidance-link {
@@ -115,7 +111,7 @@
     padding: 0.75em 1em;
     svg {
       width: 60px;
-      color: $blue;
+      color: var(--blue);
       margin-right: 1rem;
       height: 60px; // IE11
       path {
@@ -619,7 +615,7 @@
 }
 
 .editor-panel:not(.hidden) + .cdc-dashboard-inner-container {
-  padding-left: $editorWidth;
+  padding-left: var(--editorWidth);
 }
 
 .subheading-3 {

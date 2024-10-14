@@ -1,12 +1,23 @@
-@import '@cdc/core/styles/base';
-@import '@cdc/core/styles/v2/themes/color-definitions';
-
-//TODO: Remove after COVE refactor
-.cove {
-  @import '@cdc/core/styles/v2/layout/tooltip.scss';
-}
-
 .cdc-open-viz-module.type-chart {
+  .viewport-overrides {
+    button {
+      width: 100%;
+      padding: 1em;
+      margin-top: 1em;
+      text-align: left;
+
+      span {
+        display: inline-block;
+        float: right;
+      }
+    }
+
+    .edit-block {
+      margin-top: 0;
+      padding: 1em;
+    }
+  }
+
   .viewport-overrides {
     button {
       width: 100%;

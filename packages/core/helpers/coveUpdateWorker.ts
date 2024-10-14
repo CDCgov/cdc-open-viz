@@ -36,8 +36,4 @@ export const coveUpdateWorker = config => {
   return genConfig
 }
 
-const asyncWorker = async config => {
-  return await coveUpdateWorker(config)
-}
-
-export default asyncWorker
+export default coveUpdateWorker

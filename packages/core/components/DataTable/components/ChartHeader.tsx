@@ -1,8 +1,9 @@
 import { getChartCellValue } from '../helpers/getChartCellValue'
 import { getSeriesName } from '../helpers/getSeriesName'
 import { getDataSeriesColumns } from '../helpers/getDataSeriesColumns'
-import { DownIcon, UpIcon } from './Icons'
 import ScreenReaderText from '@cdc/core/components/elements/ScreenReaderText'
+import { SortIcon } from './SortIcon'
+import { getNewSortBy } from '../helpers/getNewSortBy'
 
 type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; hasRowType? }
 
@@ -17,17 +18,6 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }
       // assign headers with groupHeaderRemoved
       dataSeriesColumns = groupHeaderRemoved
     }
-  }
-
-  const handleHeaderClasses = (sortBy, text) => {
-    let classes = ['sort']
-    if (sortBy.column === text && sortBy.asc) {
-      classes.push('sort-asc')
-    }
-    if (sortBy.column === text && sortBy.desc) {
-      classes.push('sort-desc')
-    }
-    return classes.join(' ')
   }
 
   const ScreenReaderSortByText = ({ text, config, sortBy }) => {
@@ -47,13 +37,18 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }
 
     if (columnHeaderText === notApplicableText) return
 
-    return <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'}  order`}</span>
+    return (
+      <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${
+        sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
+      }  order`}</span>
+    )
   }
 
-  const ColumnHeadingText = ({ column, text, config }) => {
+  const ColumnHeadingText = ({ text, config }) => {
     let notApplicableText = 'Not Applicable'
     if (text === '__series__' && config.table.indexLabel) return `${config.table.indexLabel} `
-    if (text === '__series__' && !config.table.indexLabel) return <ScreenReaderText as='span'>{notApplicableText}</ScreenReaderText>
+    if (text === '__series__' && !config.table.indexLabel)
+      return <ScreenReaderText as='span'>{notApplicableText}</ScreenReaderText>
     return text
   }
 
@@ -71,7 +66,8 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }
       <tr>
         {dataSeriesColumns.map((column, index) => {
           const text = getSeriesName(column, config)
-
+          const newSortBy = getNewSortBy(sortBy, column, index)
+          const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
           return (
             <th
               style={{ minWidth: (config.table.cellMinWidth || 0) + 'px' }}
@@ -81,19 +77,22 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }
               scope='col'
               onClick={() => {
                 if (hasRowType) return
-                setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false, colIndex: index })
+                setSortBy(newSortBy)
               }}
               onKeyDown={e => {
                 if (hasRowType) return
                 if (e.keyCode === 13) {
-                  setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false, colIndex: index })
+                  setSortBy(newSortBy)
                 }
               }}
-              className={handleHeaderClasses(sortBy, text)}
-              {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
+              {...(sortBy.column === column
+                ? sortBy.asc
+                  ? { 'aria-sort': 'ascending' }
+                  : { 'aria-sort': 'descending' }
+                : null)}
             >
-              <ColumnHeadingText text={text} column={column} config={config} />
-              {column === sortBy.column && <span className={'sort-icon'}>{!sortBy.asc ? <UpIcon /> : <DownIcon />}</span>}
+              <ColumnHeadingText text={text} config={config} />
+              {!hasRowType && <SortIcon ascending={sortByAsc} />}
               <ScreenReaderSortByText sortBy={sortBy} config={config} text={text} />
             </th>
           )
@@ -107,7 +106,8 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }
         {['__series__', ...Object.keys(data)].slice(sliceVal).map((row, index) => {
           let column = config.xAxis?.dataKey
           let text = row !== '__series__' ? getChartCellValue(row, column, config, data) : '__series__'
-
+          const newSortBy = getNewSortBy(text, index)
+          const sortByAsc = sortBy.colIndex === index ? sortBy.asc : undefined
           return (
             <th
               style={{ minWidth: (config.table.cellMinWidth || 0) + 'px' }}
@@ -116,18 +116,22 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }
               role='columnheader'
               scope='col'
               onClick={() => {
-                setSortBy({ column: text, asc: sortBy.column === text ? !sortBy.asc : false, colIndex: index })
+                setSortBy(newSortBy)
               }}
               onKeyDown={e => {
                 if (e.keyCode === 13) {
-                  setSortBy({ column: text, asc: sortBy.column === text ? !sortBy.asc : false, colIndex: index })
+                  setSortBy(newSortBy)
                 }
               }}
-              className={handleHeaderClasses(sortBy, text)}
-              {...(sortBy.column === text ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
+              {...(sortBy.column === text
+                ? sortBy.asc
+                  ? { 'aria-sort': 'ascending' }
+                  : { 'aria-sort': 'descending' }
+                : null)}
             >
-              <ColumnHeadingText text={text} column={column} config={config} />
-              {index === sortBy.colIndex && <span className={'sort-icon'}>{!sortBy.asc ? <UpIcon /> : <DownIcon />}</span>}
+              <ColumnHeadingText text={text} config={config} />
+              {!hasRowType && <SortIcon ascending={sortByAsc} />}
+
               <ScreenReaderSortByText text={text} config={config} sortBy={sortBy} />
             </th>
           )

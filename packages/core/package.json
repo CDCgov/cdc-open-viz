@@ -1,13 +1,14 @@
 {
   "name": "@cdc/core",
-  "version": "4.24.5",
+  "version": "4.24.9",
   "description": "Core components, styles, hooks, and helpers, for the CDC Open Visualization project",
   "moduleName": "CdcCore",
   "main": "dist/cdccore",
   "scripts": {
     "test": "vitest run --environment jsdom --reporter verbose",
     "test-watch": "vitest watch --reporter verbose",
-    "test-watch:ui": "vitest --ui"
+    "test-watch:ui": "vitest --ui",
+    "build": "sass styles/cove-main.scss dist/cove-main.css"
   },
   "repository": {
     "type": "git",
@@ -33,5 +34,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "gitHead": "6c7ac5215dcf3bc1cc7d199089c8c2e75f53a93e"
+  "gitHead": "6c7ac5215dcf3bc1cc7d199089c8c2e75f53a93e",
+  "devDependencies": {
+    "sass": "^1.79.4"
+  }
 }
