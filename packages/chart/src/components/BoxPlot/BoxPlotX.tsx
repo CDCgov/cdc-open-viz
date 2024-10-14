@@ -24,6 +24,18 @@ const BoxPlotChart = ({ xMax, yMax, yScale, xScale, seriesScale }) => {
     domain: config.runtime.seriesLabelsAll,
     range: [0, xScale.bandwidth()]
   })
+  const yScaleSeries = scaleLinear({
+    range: [yMax, 0],
+    round: true,
+    domain: [min, max]
+  })
+  const getYScale = (min, max) => {
+    return scaleLinear({
+      range: [yMax, 0],
+      round: true,
+      domain: [min, max]
+    })
+  }
   const constrainedWidth = Math.min(40, seriesScale.bandwidth())
   return (
     <Group className='hahahah' left={Number(config.yAxis.size)}>
