@@ -158,13 +158,16 @@ $medium: 768px;
   &--mobile {
     @extend .territories;
     width: 60%;
+    svg {
+      margin-bottom: 0.5em;
+    }
   }
 
   &--tablet {
     @extend .territories;
     width: 70%;
     svg {
-      margin-bottom: 0.2em;
+      margin-bottom: 0.5em;
     }
   }
 }
