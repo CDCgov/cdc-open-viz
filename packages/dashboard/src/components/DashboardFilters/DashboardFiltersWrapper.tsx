@@ -183,7 +183,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
               handleOnChange={handleOnChange}
             />
             {visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad && (
-              <button onClick={applyFilters}>GO!</button>
+              <button onClick={applyFilters}>{visualizationConfig.applyFiltersButtonText || 'GO!'}</button>
             )}
           </div>
         </Layout.Responsive>
