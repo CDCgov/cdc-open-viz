@@ -23,7 +23,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
   isEditor
 }) => {
   const [filteredData, setFilteredData] = useState<Record<string, any>[]>(
-    filterVizData(config.filters, config.formattedData)
+    filterVizData(config.filters, config.formattedData || config.data)
   )
 
   useEffect(() => {
