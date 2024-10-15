@@ -1,3 +1,4 @@
+import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { removeMultiSelectPropFromMultiselect, setXAxisLabelOffsetToZero } from '../4.24.10'
 import { expect, describe, it } from 'vitest'
 
@@ -12,8 +13,8 @@ describe('removeMultiSelectPropFromMultiSelect() ', () => {
 
 describe('setXAxisLabelOffsetToZero(config) ', () => {
   it('sets the x-axis label offset to 0', () => {
-    const mockConfig = { xAxis: { labelOffset: 5 } } as any
-    const newConfig = setXAxisLabelOffsetToZero(mockConfig)
-    expect(newConfig.xAxis.labelOffset).toBe(0)
+    const mockConfig = { xAxis: { labelOffset: 5 } } as Partial<ChartConfig>
+    setXAxisLabelOffsetToZero(mockConfig)
+    expect(mockConfig.xAxis?.labelOffset).toBe(0)
   })
 })
