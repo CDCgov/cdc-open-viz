@@ -12,12 +12,15 @@ export const removeMultiSelectPropFromMultiselect = newConfig => {
   }
 }
 
-export const setXAxisLabelOffsetToZero = newConfig =>
-  editConfigKeys(newConfig, [{ path: ['xAxis', 'labelOffset'], value: 0 }])
+export const setXAxisLabelOffsetToZero = newConfig => {
+  if (!newConfig.xAxis?.labelOffset) return
+  newConfig.xAxis.labelOffset = 0
+}
 
 const update_4_24_10 = config => {
   const ver = '4.24.10'
-  let newConfig = setXAxisLabelOffsetToZero(config)
+  let newConfig = _.cloneDeep(config)
+  setXAxisLabelOffsetToZero(newConfig)
   removeMultiSelectPropFromMultiselect(newConfig)
   newConfig.version = ver
   return newConfig
