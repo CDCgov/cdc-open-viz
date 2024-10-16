@@ -1,21 +1,22 @@
 import { FilterBase, SubGrouping } from '@cdc/core/types/VizFilter'
 import { APIFilter } from './APIFilter'
+import { FilterStyle } from './FilterStyles'
 export type SharedFilter = FilterBase & {
   type?: 'urlfilter' | 'datafilter' | ''
   fileName?: string
   filterBy?: 'Query String' | 'File Name'
-  filterStyle: 'dropdown' | 'nested-dropdown' | 'multi-select'
+  filterStyle: FilterStyle
   queryParameter?: string
   setByQueryParameter?: string
   active?: string | string[]
   queuedActive?: string | string[]
   usedBy?: (string | number)[] // if number used by whole row, else used by specific viz
+  order: 'cust' | 'desc' | 'asc'
   parents?: string[]
   setBy?: string
   selectLimit?: number
   resetLabel?: string
   labels?: Record<string, any>
-  multiSelect?: boolean
   key: string
   apiFilter?: APIFilter
   datasetKey?: string

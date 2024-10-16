@@ -10,61 +10,6 @@ const meta: Meta<typeof WaffleChart> = {
 
 type Story = StoryObj<typeof WaffleChart>
 
-export const Example_Waffle_Chart_Count: Story = {
-  args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Waffle-Chart-Example-Count.json'
-  },
-  render: args => (
-    <>
-      <WaffleChart {...args} />
-    </>
-  )
-}
-
-export const Waffle_Chart_Average_Max: Story = {
-  args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Waffle-Chart-Average-Max.json'
-  },
-  render: args => (
-    <>
-      <WaffleChart {...args} />
-    </>
-  )
-}
-
-export const Waffle_Chart_Demographics: Story = {
-  args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/waffle-chart-demographics.json'
-  },
-  render: args => (
-    <>
-      <WaffleChart {...args} />
-    </>
-  )
-}
-
-export const Linear_Gauge: Story = {
-  args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/linear-gauge-data-from-file.json'
-  },
-  render: args => (
-    <>
-      <WaffleChart {...args} />
-    </>
-  )
-}
-
-export const Linear_Gauge_With_Message: Story = {
-  args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/gauge-progress-indicator.json'
-  },
-  render: args => (
-    <>
-      <WaffleChart {...args} />
-    </>
-  )
-}
-
 export const Person: Story = {
   args: {
     config: {

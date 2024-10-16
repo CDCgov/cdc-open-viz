@@ -71,7 +71,6 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
   @include breakpointClass(md) {
     font-size: 16px !important;
   }
-  @import 'data-table';
   @import 'global';
   @import 'button-section';
   @import 'series-list';
