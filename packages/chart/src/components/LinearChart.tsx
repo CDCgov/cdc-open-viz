@@ -85,7 +85,6 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   const [animatedChart, setAnimatedChart] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
-  const [forestXLabelY, setForestXLabelY] = useState(0)
 
   // REFS
   const axisBottomRef = useRef(null)
@@ -94,6 +93,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   const suffixRef = useRef(null)
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
+  const xAxisTitleRef = useRef(null)
 
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
@@ -340,7 +340,8 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     const axisBottomY = yMax + Number(config.xAxis.axisPadding)
     const labelRelativeY = rightLabel.getBBox().y - axisBottomY
     const xLabelY = labelRelativeY + rightLabel.getBBox().height + BOTTOM_LABEL_PADDING
-    setForestXLabelY(xLabelY)
+    if (!xAxisTitleRef.current) return
+    xAxisTitleRef.current.setAttribute('y', xLabelY)
   }, [config.data.length, forestRowsHeight])
 
   useEffect(() => {
@@ -1404,9 +1405,10 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                     })}
                     {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
                     <Text
+                      innerRef={xAxisTitleRef}
                       className='x-axis-title-label'
                       x={axisCenter}
-                      y={isForestPlot ? forestXLabelY : axisMaxHeight}
+                      y={isForestPlot ? 0 /* set via ref */ : axisMaxHeight}
                       textAnchor='middle'
                       verticalAnchor='start'
                       fontWeight='bold'
