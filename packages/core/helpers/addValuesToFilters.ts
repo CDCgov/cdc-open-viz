@@ -72,9 +72,9 @@ const handleVizParents = (filter: VizFilter, data: any[] | MapData, filtersLooku
   let filteredData = Array.isArray(data) ? data : Object.values(data).flat(1)
   filter.parents.forEach(parentKey => {
     const parent = filtersLookup[parentKey]
-    if (parent.filterStyle === 'nested-dropdown') {
+    if (parent?.filterStyle === 'nested-dropdown') {
       const { subGrouping } = parent as VizFilter
-      if (subGrouping.active) {
+      if (subGrouping?.active) {
         filteredData = filteredData.filter(d => {
           const matchingParentGroup = parent.active == d[parent.columnName]
           const matchingSubGroup = subGrouping.active == d[subGrouping.columnName]

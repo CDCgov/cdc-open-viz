@@ -105,7 +105,7 @@ export default function CdcChart({
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
-  const [stateData, setStateData] = useState(configObj?.data || [])
+  const [stateData, setStateData] = useState(_.cloneDeep(configObj?.data) || [])
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
   const [seriesHighlight, setSeriesHighlight] = useState<string[]>(
@@ -229,7 +229,7 @@ export default function CdcChart({
   }
 
   const loadConfig = async () => {
-    let response = configObj || (await (await fetch(configUrl)).json())
+    const response = _.cloneDeep(configObj) || (await (await fetch(configUrl)).json())
 
     // If data is included through a URL, fetch that and store
     let data: any[] = response.data || []
@@ -706,7 +706,7 @@ export default function CdcChart({
   // Load data when component first mounts
   useEffect(() => {
     loadConfig()
-  }, []) // eslint-disable-line
+  }, [configObj?.data.length ? configObj.data : null]) // eslint-disable-line
 
   useEffect(() => {
     reloadURLData()
@@ -769,14 +769,6 @@ export default function CdcChart({
       setFilteredData(filterVizData(externalFilters, excludedData))
     }
   }, [externalFilters]) // eslint-disable-line
-
-  // Load data when configObj data changes
-  if (configObj) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-      loadConfig()
-    }, [configObj.data]) // eslint-disable-line
-  }
 
   // This will set the bump chart's default scaling type to date-time
   useEffect(() => {
