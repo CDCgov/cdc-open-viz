@@ -1,6 +1,6 @@
 type Pivot = {
   columnName: string
-  valueColumn: string
+  valueColumns: string[]
 }
 
 export type Table = {
