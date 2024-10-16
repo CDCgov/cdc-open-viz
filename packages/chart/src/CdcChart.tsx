@@ -125,7 +125,6 @@ export default function CdcChart({
     isActive: false,
     isBrushing: false
   })
-  const [height, setHeight] = useState(calcInitialHeight(config, currentViewport))
 
   const { description, visualizationType } = config
 
@@ -1548,7 +1547,6 @@ export default function CdcChart({
     parseDate,
     rawData: _.cloneDeep(stateData) ?? {},
     seriesHighlight,
-    setAxisBottomHeight,
     setBrushConfig,
     setConfig,
     setDynamicLegendItems,

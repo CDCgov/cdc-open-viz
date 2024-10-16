@@ -71,7 +71,6 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     transformedData: data,
     updateConfig,
     seriesHighlight,
-    setAxisBottomHeight,
   } = useContext(ConfigContext)
 
   // CONFIG
