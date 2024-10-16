@@ -60,25 +60,27 @@ const CoveBoxPlot = ({ xScale, yMax, xMax, min: minValue, max: maxValue, yScale 
               key={`boxplotplot-${d.columnCategory}`}
               left={xScale(d.columnCategory) + (xScale.bandwidth() - seriesScale.bandwidth()) / 2}
             >
-              {boxplot.plotNonOutlierValues &&
-                d.nonOutlierValues.map((value, index) => {
-                  return (
-                    <circle
-                      cx={xScale(d.columnCategory)}
-                      cy={yScale(value)}
-                      r={radius}
-                      fill={'#ccc'}
-                      style={{ opacity: 1, fillOpacity: 1, stroke: 'black' }}
-                      key={`boxplot-${i}--circle-${index}`}
-                    />
-                  )
-                })}
               {config.series.map(item => {
+                console.log(d.nonOutlierValues, ' d.nonOutlierValues')
                 const valuesByKey = d.keyValues[item.dataKey]
                 const { min, max, median, firstQuartile, thirdQuartile } = calculateBoxPlotStats(valuesByKey)
                 let iqr = Number(thirdQuartile - firstQuartile).toFixed(config.dataFormat.roundTo)
+
                 return (
                   <Group key={`boxplotplot-${item}`}>
+                    {boxplot.plotNonOutlierValues &&
+                      d.nonOutlierValues.map((value, index) => {
+                        return (
+                          <circle
+                            cx={seriesScale(item.dataKey) + seriesScale.bandwidth() / 2}
+                            cy={yScale(value)}
+                            r={radius}
+                            fill={'#ccc'}
+                            style={{ opacity: 1, fillOpacity: 1, stroke: 'black' }}
+                            key={`boxplot-${i}--circle-${index}`}
+                          />
+                        )
+                      })}
                     <BoxPlot
                       data-left={xScale(d.columnCategory) + config.yAxis.size + offset / 2 + 0.5}
                       key={`box-plot-${i}-${item}`}
