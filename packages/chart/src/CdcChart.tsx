@@ -125,23 +125,11 @@ export default function CdcChart({
     isActive: false,
     isBrushing: false
   })
-  const [axisBottomHeight, setAxisBottomHeight] = useState(0)
 
-  const { description, visualizationType, data, forestPlot, brush } = config
+  const { description, visualizationType } = config
 
   const legendRef = useRef(null)
-
-  const height = useMemo(() => {
-    const initialHeight = calcInitialHeight(config, currentViewport)
-    const isForestPlot = visualizationType === 'Forest Plot'
-
-    // Heights to add
-    const brushHeight = brush?.active ? brush?.height : 0
-    const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
-    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight
-
-    return initialHeight + additionalHeight
-  }, [brush, axisBottomHeight, config, currentViewport])
+  const parentRef = useRef(null)
 
   const handleDragStateChange = isDragging => {
     setIsDraggingAnnotation(isDragging)
@@ -1365,7 +1353,7 @@ export default function CdcChart({
                   >
                     {/* All charts with LinearChart */}
                     {!['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
-                      <div style={{ height, width: `100%` }}>
+                      <div ref={parentRef} style={{ width: `100%` }}>
                         <ParentSize>
                           {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
                         </ParentSize>
@@ -1373,20 +1361,20 @@ export default function CdcChart({
                     )}
 
                     {config.visualizationType === 'Pie' && (
-                      <ParentSize className='justify-content-center d-flex' style={{ height, width: `100%` }}>
+                      <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
                         {parent => <PieChart parentWidth={parent.width} parentHeight={parent.height} />}
                       </ParentSize>
                     )}
                     {/* Line Chart */}
                     {config.visualizationType === 'Line' &&
                       (checkLineToBarGraph() ? (
-                        <div style={{ height, width: `100%` }}>
+                        <div ref={parentRef} style={{ width: `100%` }}>
                           <ParentSize>
                             {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
                           </ParentSize>
                         </div>
                       ) : (
-                        <div style={{ height, width: `100%` }}>
+                        <div ref={parentRef} style={{ width: `100%` }}>
                           <ParentSize>
                             {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
                           </ParentSize>
@@ -1555,10 +1543,10 @@ export default function CdcChart({
     loading,
     missingRequiredSections,
     outerContainerRef,
+    parentRef,
     parseDate,
     rawData: _.cloneDeep(stateData) ?? {},
     seriesHighlight,
-    setAxisBottomHeight,
     setBrushConfig,
     setConfig,
     setDynamicLegendItems,

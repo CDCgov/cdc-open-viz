@@ -33,7 +33,7 @@ type SharedChartContext = {
   // whether or not the user is dragging an annotation
   isDraggingAnnotation?: boolean
   legendIsolateValues?: string[]
-  setAxisBottomHeight?: React.Dispatch<React.SetStateAction<number>>
+  parentRef?: React.RefObject<HTMLDivElement>
   setBrushConfig: Function
   setLegendIsolateValues?: Function
 }

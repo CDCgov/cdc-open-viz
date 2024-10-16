@@ -66,17 +66,28 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     handleDragStateChange,
     isDraggingAnnotation,
     parseDate,
+    parentRef,
     tableData,
     transformedData: data,
     updateConfig,
     seriesHighlight,
-    setAxisBottomHeight,
   } = useContext(ConfigContext)
 
   // CONFIG
   // todo: start destructuring this file for conciseness
-  const { heights, visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, legend, debugSvg } =
-    config
+  const {
+    heights,
+    visualizationType,
+    visualizationSubType,
+    orientation,
+    xAxis,
+    yAxis,
+    runtime,
+    legend,
+    forestPlot,
+    brush,
+    debugSvg
+  } = config
 
   // HOOKS  % STATES
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
@@ -346,9 +357,19 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
 
   useEffect(() => {
     if (!axisBottomRef.current) return
-    const height = axisBottomRef.current.getBBox().height
-    setAxisBottomHeight(height)
-  }, [axisBottomRef.current, config, bottomLabelStart])
+    const axisBottomHeight = axisBottomRef.current.getBBox().height
+
+    const isForestPlot = visualizationType === 'Forest Plot'
+
+    // Heights to add
+    const brushHeight = brush?.active ? brush?.height : 0
+    const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
+    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight
+
+    if (!parentRef.current) return
+
+    parentRef.current.style.height = `${initialHeight + additionalHeight}px`
+  }, [axisBottomRef.current, config, bottomLabelStart, brush, currentViewport])
 
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
