@@ -7,7 +7,7 @@
     background: #fff;
     padding: $gbl-padding;
     width: 50%;
-    border-right: $lightGray 1px solid;
+    border-right: var(--lightGray) 1px solid;
     position: fixed;
     bottom: 0;
     left: 0;
@@ -36,25 +36,25 @@
         list-style: none;
         padding: 0.6rem 0;
         flex-grow: 1;
-        border-bottom: $lightGray 1px solid;
-        color: $mediumGray;
+        border-bottom: var(--lightGray) 1px solid;
+        color: var(--mediumGray);
         align-items: center;
         svg {
           margin-right: 0.3em;
         }
         &:hover {
-          border-bottom-color: $mediumGray;
+          border-bottom-color: var(--mediumGray);
         }
         &.active {
           border-bottom-width: 5px;
-          border-bottom-color: $mediumGray;
-          color: $darkGray;
+          border-bottom-color: var(--mediumGray);
+          color: var(--darkGray);
         }
       }
 
       .tab-content {
         padding-top: $gbl-padding;
-        border-top: 1px solid $baseColor;
+        border-top: 1px solid var(--baseColor);
       }
     }
     table {
@@ -82,16 +82,16 @@
     .cdcdataviz-file-selector {
       padding: 1rem 3rem;
       text-align: center;
-      border: $lightGray 2px dashed;
+      border: var(--lightGray) 2px dashed;
       border-radius: 0.2rem;
       cursor: pointer;
       font-size: 1em;
-      color: $mediumGray;
+      color: var(--mediumGray);
       transition: 0.1s all;
       svg {
         max-width: 35px;
         margin: 0 auto 0.5em;
-        color: $baseColor;
+        color: var(--baseColor);
         transition: 0.1s all;
         path {
           fill: currentColor;
@@ -106,7 +106,7 @@
       }
       span {
         white-space: pre;
-        color: $blue;
+        color: var(--blue);
         text-decoration: underline;
       }
     }
@@ -114,13 +114,14 @@
       font-size: 0.8rem;
       font-style: italic;
       margin: 1em 0 2em 0;
-      color: $mediumGray;
+      color: var(--mediumGray);
     }
     .btn {
       display: inline-block;
       margin: 1em 0;
     }
     .btn.active {
+      $primary: #005eaa;
       background: darken($primary, 15%);
     }
     .input-group {
@@ -134,7 +135,7 @@
 
     .keep-url {
       font-size: 0.8rem;
-      color: $mediumGray;
+      color: var(--mediumGray);
     }
 
     .sample-data-list {
@@ -142,7 +143,7 @@
       list-style: none;
       li {
         margin-top: 0.3rem;
-        color: $blue;
+        color: var(--blue);
         text-decoration: underline;
         cursor: pointer;
       }
@@ -239,6 +240,8 @@
     background-color: $lightest-gray;
     padding: $gbl-padding;
     width: 50% !important;
-    @import 'data-table';
+    .table-container {
+      overflow: scroll
+    }
   }
 }

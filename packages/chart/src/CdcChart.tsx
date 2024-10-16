@@ -9,6 +9,7 @@ import Button from '@cdc/core/components/elements/Button'
 
 //types
 import { DimensionsType } from '@cdc/core/types/Dimensions'
+import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 
 // External Libraries
 import { scaleOrdinal } from '@visx/scale'
@@ -72,6 +73,20 @@ import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import LegendWrapper from './components/LegendWrapper'
 import _ from 'lodash'
 
+interface CdcChartProps {
+  configUrl: string
+  config?: ChartConfig
+  isEditor?: boolean
+  isDebug?: boolean
+  isDashboard?: boolean
+  setConfig: (config: ChartConfig) => void
+  setEditing?: (editing: boolean) => void
+  hostname?: string
+  link?: string
+  setSharedFilter?: (filter: any) => void
+  setSharedFilterValue?: (value: any) => void
+  dashboardConfig?: DashboardConfig
+}
 export default function CdcChart({
   configUrl,
   config: configObj,
@@ -85,7 +100,7 @@ export default function CdcChart({
   setSharedFilter,
   setSharedFilterValue,
   dashboardConfig
-}) {
+}: CdcChartProps) {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
@@ -1305,38 +1320,34 @@ export default function CdcChart({
                 classes={['chart-title', `${config.theme}`, 'cove-component__header']}
                 style={undefined}
               />
-              {/* Intro Text/Message */}
-              {config?.introText && config.visualizationType !== 'Spark Line' && (
-                <section
-                  className={`introText legend_${config.legend.hide ? 'hidden' : 'visible'}_${config.legend.position} `}
-                >
-                  {parse(config.introText)}
-                </section>
-              )}
-
-              {/* Filters */}
-              {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
-                <Filters
-                  config={config}
-                  setConfig={setConfig}
-                  setFilteredData={setFilteredData}
-                  filteredData={filteredData}
-                  excludedData={excludedData}
-                  filterData={filterVizData}
-                  dimensions={dimensions}
-                />
-              )}
-              <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
-              {config.annotations?.length > 0 && (
-                <SkipTo
-                  skipId={handleChartTabbing(config, legendId)}
-                  skipMessage={`Skip over annotations`}
-                  key={`skip-annotations`}
-                />
-              )}
 
               {/* Visualization Wrapper */}
               <div className={getChartWrapperClasses().join(' ')}>
+                {/* Intro Text/Message */}
+                {config?.introText && config.visualizationType !== 'Spark Line' && (
+                  <section className={`introText `}>{parse(config.introText)}</section>
+                )}
+
+                {/* Filters */}
+                {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
+                  <Filters
+                    config={config}
+                    setConfig={setConfig}
+                    setFilteredData={setFilteredData}
+                    filteredData={filteredData}
+                    excludedData={excludedData}
+                    filterData={filterVizData}
+                    dimensions={dimensions}
+                  />
+                )}
+                <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
+                {config.annotations?.length > 0 && (
+                  <SkipTo
+                    skipId={handleChartTabbing(config, legendId)}
+                    skipMessage={`Skip over annotations`}
+                    key={`skip-annotations`}
+                  />
+                )}
                 <LegendWrapper>
                   <div
                     className={

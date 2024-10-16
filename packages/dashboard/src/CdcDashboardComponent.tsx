@@ -19,12 +19,12 @@ import Loading from '@cdc/core/components/Loading'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import getViewport from '@cdc/core/helpers/getViewport'
 
-import CdcMap from '@cdc/map'
-import CdcChart from '@cdc/chart'
-import CdcDataBite from '@cdc/data-bite'
-import CdcWaffleChart from '@cdc/waffle-chart'
-import CdcMarkupInclude from '@cdc/markup-include'
-import CdcFilteredText from '@cdc/filtered-text'
+import CdcChart from '@cdc/chart/src/CdcChart'
+import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
+import CdcMap from '@cdc/map/src/CdcMap'
+import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
+import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
+import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'
 
 import Grid from './components/Grid'
 import Header from './components/Header/Header'
@@ -32,7 +32,6 @@ import DataTable from '@cdc/core/components/DataTable'
 import MediaControls from '@cdc/core/components/MediaControls'
 
 import './scss/main.scss'
-import '@cdc/core/styles/v2/main.scss'
 
 import VisualizationsPanel from './components/VisualizationsPanel'
 import dashboardReducer from './store/dashboard.reducer'
@@ -134,8 +133,21 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
               }
             }
 
-            if (filter.apiFilter) {
+            if (!!filter.setByQueryParameter) {
+              const windowQueryParams = Object.fromEntries(new URLSearchParams(window.location.search))
+              const filterValue = windowQueryParams[filter.setByQueryParameter]
+              if (filter.apiFilter) {
+                updatedQSParams[filter.apiFilter.valueSelector] = filterValue
+              } else {
+                updatedQSParams[filter.setByQueryParameter] = filterValue
+              }
+            }
+
+            if (filter.apiFilter && filter.active) {
               updatedQSParams[filter.apiFilter.valueSelector] = filter.active
+              if (filter.apiFilter.subgroupValueSelector && filter.subGrouping.active) {
+                updatedQSParams[filter.apiFilter.subgroupValueSelector] = filter.subGrouping.active
+              }
             }
           }
         })
