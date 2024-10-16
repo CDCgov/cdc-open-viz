@@ -6,7 +6,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 import { scaleBand, scaleLinear } from '@visx/scale'
 import { max, min, median, quantile } from 'd3-array'
-const CoveBoxPlot = ({ xScale, yMax, min: minValue, max: maxValue }) => {
+const CoveBoxPlot = ({ xScale, yMax, min: minValue, max: maxValue, yScale }) => {
   const { config, colorScale } = useContext(ConfigContext)
   const { boxplot } = config
 
@@ -44,10 +44,10 @@ const CoveBoxPlot = ({ xScale, yMax, min: minValue, max: maxValue }) => {
       thirdQuartile: quantile(sortedValues, 0.75)
     }
   }
-  const yScale = scaleLinear({
-    range: [yMax, 0],
-    domain: [minValue, maxValue]
-  })
+  // const yScale = scaleLinear({
+  //   range: [yMax, 0],
+  //   domain: [minValue, maxValue]
+  // })
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group left={Number(config.yAxis.size)} className='boxplot' key={`boxplot-group`}>
@@ -56,7 +56,7 @@ const CoveBoxPlot = ({ xScale, yMax, min: minValue, max: maxValue }) => {
           const radius = 4
 
           return (
-            <Group key={`boxplotplot-${d.columnCategory}`} left={Number(xScale(d.columnCategory)) + 120}>
+            <Group key={`boxplotplot-${d.columnCategory}`} left={Number(xScale(d.columnCategory))}>
               {config.series.map(item => {
                 const valuesByKey = d.keyValues[item.dataKey]
                 const { min, max, median, firstQuartile, thirdQuartile } = calculateBoxPlotStats(valuesByKey)
