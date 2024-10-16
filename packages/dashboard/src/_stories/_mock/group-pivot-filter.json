@@ -1,0 +1,77 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": []
+  },
+  "rows": [
+    [
+      {
+        "width": 12,
+        "widget": "table1707935263149"
+      },
+      {},
+      {}
+    ]
+  ],
+  "visualizations": {
+    "table1707935263149": {
+      "openModal": false,
+      "uid": "table1707935263149",
+      "type": "table",
+      "table": {
+        "label": "Data Table",
+        "show": true,
+        "showDownloadUrl": false,
+        "showVertical": true,
+        "expanded": true,
+        "groupBy": "city",
+        "pivot": {
+          "columnName": "name",
+          "valueColumns": ["age", "color"]
+        }
+      },
+      "columns": {},
+      "dataFormat": {},
+      "visualizationType": "table",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "filters": [
+        {
+          "filterStyle": "multi-select",
+          "label": "Name",
+          "columnName": "name",
+          "active": ["Jane", "John"],
+          "showDropdown": true
+        }
+      ],
+      "filterBehavior": "Filter Change",
+      "dataKey": "valid-data-chart.csv"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": false,
+    "showDownloadUrl": false,
+    "showVertical": true
+  },
+  "datasets": {
+    "valid-data-chart.csv": {
+      "data": [
+        { "name": "John", "age": 25, "color": "blue", "city": "New York" },
+        { "name": "Jane", "age": 27, "color": "red", "city": "New York" },
+        { "name": "Jane", "age": 30, "color": "yellow", "city": "San Francisco" },
+        { "name": "John", "age": 31, "color": "green", "city": "San Francisco" }
+      ],
+      "dataFileSize": 178,
+      "dataFileName": "valid-data-chart.csv",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "CSV",
+      "preview": true
+    }
+  },
+  "type": "dashboard",
+  "runtime": {},
+  "data": [1, 2, 3]
+}

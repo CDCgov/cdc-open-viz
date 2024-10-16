@@ -44,7 +44,8 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }
     )
   }
 
-  const ColumnHeadingText = ({ text, config }) => {
+  const ColumnHeadingText = ({ column, text, config }) => {
+    if (text === 'pivotColumn') return ''
     let notApplicableText = 'Not Applicable'
     if (text === '__series__' && config.table.indexLabel) return `${config.table.indexLabel} `
     if (text === '__series__' && !config.table.indexLabel)
@@ -91,8 +92,8 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }
                   : { 'aria-sort': 'descending' }
                 : null)}
             >
-              <ColumnHeadingText text={text} config={config} />
-              {!hasRowType && <SortIcon ascending={sortByAsc} />}
+              <ColumnHeadingText text={text} column={column} config={config} />
+              {column === sortBy.column && !hasRowType && <SortIcon ascending={sortByAsc} />}
               <ScreenReaderSortByText sortBy={sortBy} config={config} text={text} />
             </th>
           )
@@ -106,7 +107,7 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }
         {['__series__', ...Object.keys(data)].slice(sliceVal).map((row, index) => {
           let column = config.xAxis?.dataKey
           let text = row !== '__series__' ? getChartCellValue(row, column, config, data) : '__series__'
-          const newSortBy = getNewSortBy(text, index)
+          const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.colIndex === index ? sortBy.asc : undefined
           return (
             <th
@@ -129,8 +130,8 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }
                   : { 'aria-sort': 'descending' }
                 : null)}
             >
-              <ColumnHeadingText text={text} config={config} />
-              {!hasRowType && <SortIcon ascending={sortByAsc} />}
+              <ColumnHeadingText text={text} column={column} config={config} />
+              {index === sortBy.colIndex && !hasRowType && <SortIcon ascending={sortByAsc} />}
 
               <ScreenReaderSortByText text={text} config={config} sortBy={sortBy} />
             </th>

@@ -1,4 +1,13 @@
-export const getNewSortBy = (sortBy, column, index) => {
+type SortBy = {
+  asc: boolean
+  column?: string
+}
+
+export const getNewSortBy = (
+  sortBy: SortBy,
+  column: string,
+  index: number
+): { column: string; asc: boolean; colIndex: number } => {
   let asc
   let sortByCol = column
   const ascending = sortBy.asc === true
