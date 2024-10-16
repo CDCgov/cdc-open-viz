@@ -19,7 +19,7 @@ export type VizFilterStyle =
   | 'nested-dropdown'
 export type GeneralFilter = FilterBase & {
   active: string
-  queuedActive: string
+  queuedActive: string | string[]
   filterStyle: VizFilterStyle
   label: string
   order: OrderBy
