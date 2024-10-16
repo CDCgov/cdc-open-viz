@@ -56,7 +56,23 @@ const CoveBoxPlot = ({ xScale, yMax, xMax, min: minValue, max: maxValue, yScale 
           const radius = 4
 
           return (
-            <Group key={`boxplotplot-${d.columnCategory}`} left={Number(xScale(d.columnCategory))}>
+            <Group
+              key={`boxplotplot-${d.columnCategory}`}
+              left={xScale(d.columnCategory) + (xScale.bandwidth() - seriesScale.bandwidth()) / 2}
+            >
+              {boxplot.plotNonOutlierValues &&
+                d.nonOutlierValues.map((value, index) => {
+                  return (
+                    <circle
+                      cx={xScale(d.columnCategory)}
+                      cy={yScale(value)}
+                      r={radius}
+                      fill={'#ccc'}
+                      style={{ opacity: 1, fillOpacity: 1, stroke: 'black' }}
+                      key={`boxplot-${i}--circle-${index}`}
+                    />
+                  )
+                })}
               {config.series.map(item => {
                 const valuesByKey = d.keyValues[item.dataKey]
                 const { min, max, median, firstQuartile, thirdQuartile } = calculateBoxPlotStats(valuesByKey)
