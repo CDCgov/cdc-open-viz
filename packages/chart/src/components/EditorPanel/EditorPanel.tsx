@@ -2700,11 +2700,7 @@ const EditorPanel = () => {
                         <>
                           <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
                             Format how charts should parse and display your dates using{' '}
-                            <a
-                              href='https://github.com/d3/d3-time-format#locale_format'
-                              target='_blank'
-                              rel='noreferrer'
-                            >
+                            <a href='https://d3js.org/d3-time-format#locale_format' target='_blank' rel='noreferrer'>
                               these guidelines
                             </a>
                             .
