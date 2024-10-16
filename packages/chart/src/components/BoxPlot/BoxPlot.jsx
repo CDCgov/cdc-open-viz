@@ -6,7 +6,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 import { scaleBand, scaleLinear } from '@visx/scale'
 import { max, min, median, quantile } from 'd3-array'
-const CoveBoxPlot = ({ xScale, yMax, min: minValue, max: maxValue, yScale }) => {
+const CoveBoxPlot = ({ xScale, yMax, xMax, min: minValue, max: maxValue, yScale }) => {
   const { config, colorScale } = useContext(ConfigContext)
   const { boxplot } = config
 
