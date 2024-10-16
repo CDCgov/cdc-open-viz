@@ -103,7 +103,7 @@ export default function ChooseTab() {
               type: 'categorical',
               size: 75,
               maxTickRotation: 45,
-              labelOffset: 65
+              labelOffset: 0
             }
           } as Visualization
 

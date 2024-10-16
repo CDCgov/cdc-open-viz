@@ -123,7 +123,7 @@ export default {
     tickLabelColor: '#333',
     tickColor: '#333',
     numTicks: '',
-    labelOffset: 65,
+    labelOffset: 0,
     axisPadding: 200,
     target: 0,
     maxTickRotation: 0,

@@ -243,7 +243,9 @@ const DataTable = (props: DataTableProps) => {
         {!config.table.showDownloadLinkBelow && <TableMediaControls />}
         <section
           id={tabbingId.replace('#', '')}
-          className={`data-table-container ${viewport}`}
+          className={`data-table-container ${viewport} ${
+            !config.table.showDownloadLinkBelow ? 'download-link-above' : ''
+          }`}
           aria-label={accessibilityLabel}
         >
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />

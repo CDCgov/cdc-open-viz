@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
 
 export const removeMultiSelectPropFromMultiselect = newConfig => {
   if (newConfig.type === 'dashboard') {
@@ -29,9 +30,16 @@ export const changePivotColumns = newConfig => {
   return newConfig
 }
 
+export const setXAxisLabelOffsetToZero = newConfig => {
+  if (!newConfig.xAxis?.labelOffset) return
+  newConfig.xAxis.labelOffset = 0
+}
+
 const update_4_24_10 = config => {
   const ver = '4.24.10'
   const newConfig = _.cloneDeep(config)
+  setXAxisLabelOffsetToZero(newConfig)
+  changePivotColumns(newConfig)
   removeMultiSelectPropFromMultiselect(newConfig)
   newConfig.version = ver
   return newConfig

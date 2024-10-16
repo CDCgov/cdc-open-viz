@@ -1,4 +1,5 @@
-import { changePivotColumns, removeMultiSelectPropFromMultiselect } from '../4.24.10'
+import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
+import { changePivotColumns, removeMultiSelectPropFromMultiselect, setXAxisLabelOffsetToZero } from '../4.24.10'
 import { expect, describe, it } from 'vitest'
 
 describe('removeMultiSelectPropFromMultiSelect() ', () => {
@@ -32,5 +33,13 @@ describe('changePivotColumns() ', () => {
       table: { pivot: { valueColumns: ['value'] } }
     }
     expect(changePivotColumns(config)).toEqual(expectedConfig)
+  })
+})
+
+describe('setXAxisLabelOffsetToZero(config) ', () => {
+  it('sets the x-axis label offset to 0', () => {
+    const mockConfig = { xAxis: { labelOffset: 5 } } as Partial<ChartConfig>
+    setXAxisLabelOffsetToZero(mockConfig)
+    expect(mockConfig.xAxis?.labelOffset).toBe(0)
   })
 })
