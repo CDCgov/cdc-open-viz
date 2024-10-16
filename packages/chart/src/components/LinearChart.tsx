@@ -105,7 +105,6 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   const isForestPlot = visualizationType === 'Forest Plot'
 
-  const xLabelOffset = isNaN(parseInt(`${xAxis.labelOffset}`)) ? 0 : parseInt(`${xAxis.labelOffset}`)
   const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
 
   // zero if not forest plot
@@ -520,7 +519,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                   <Text
                     className='x-axis-title-label'
                     x={xMax / 2}
-                    y={axisMaxHeight + xLabelOffset}
+                    y={axisMaxHeight}
                     stroke='#333'
                     textAnchor={'middle'}
                     verticalAnchor='start'
@@ -1407,7 +1406,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                     <Text
                       className='x-axis-title-label'
                       x={axisCenter}
-                      y={isForestPlot ? forestXLabelY : axisMaxHeight + xLabelOffset}
+                      y={isForestPlot ? forestXLabelY : axisMaxHeight}
                       textAnchor='middle'
                       verticalAnchor='start'
                       fontWeight='bold'
