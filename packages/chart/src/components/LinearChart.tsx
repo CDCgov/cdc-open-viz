@@ -65,6 +65,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     handleLineType,
     handleDragStateChange,
     isDraggingAnnotation,
+    legendRef,
     parseDate,
     parentRef,
     tableData,
@@ -356,6 +357,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     xAxisTitleRef.current.setAttribute('y', xLabelY)
   }, [config.data.length, forestRowsHeight])
 
+  // Parent height adjustments
   useEffect(() => {
     if (!axisBottomRef.current) return
     const axisBottomHeight = axisBottomRef.current.getBBox().height
@@ -373,11 +375,17 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
 
     parentRef.current.style.height = `${initialHeight + additionalHeight}px`
 
+    // Adjust the viewBox for the svg
     if (!topLabelOnGridlineHeight) return
-    //set viewbox
     const svg = svgRef.current
     if (!svg) return
     svg.setAttribute('viewBox', `0 ${-topLabelOnGridlineHeight} ${parentWidth} ${parentHeight}`)
+
+    // translate legend match viewBox-adjusted height
+    if (!legendRef.current) return
+    const isTopOrBottom =
+      legend?.position === 'top' || legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
+    legendRef.current.style.transform = !isTopOrBottom ? `translateY(${topLabelOnGridlineHeight}px)` : 'none'
   }, [axisBottomRef.current, config, bottomLabelStart, brush, currentViewport, topYLabelRef.current])
 
   const chartHasTooltipGuides = () => {

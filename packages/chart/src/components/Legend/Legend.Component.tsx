@@ -58,13 +58,10 @@ const Legend: React.FC<LegendProps> = forwardRef(
 
     const isBottomOrSmallViewport =
       legend?.position === 'bottom' || (isLegendWrapViewport(currentViewport) && !legend.hide)
-    const isTopOrBottom =
-      legend?.position === 'top' || legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
 
     const legendClasses = {
       marginBottom: getMarginBottom(config, hasSuppression),
-      marginTop: getMarginTop(isBottomOrSmallViewport, config),
-      transform: !isTopOrBottom ? `translateY(${translateY}px)` : 'none'
+      marginTop: getMarginTop(isBottomOrSmallViewport, config)
     }
 
     const { HighLightedBarUtils } = useHighlightedBars(config)

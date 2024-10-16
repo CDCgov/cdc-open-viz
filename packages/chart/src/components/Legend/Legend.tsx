@@ -18,13 +18,11 @@ const Legend = forwardRef((props, ref) => {
     currentViewport,
     dimensions,
     getTextWidth,
-    topLabelOnGridlineHeightState
   } = useContext(ConfigContext)
   if (!config.legend) return null
   // create fn to reverse labels while legend is Bottom.  Legend-right , legend-left works by default.
 
   const createLegendLabels = createFormatLabels(config, tableData, data, colorScale)
-  const [topLabelOnGridlineHeight] = topLabelOnGridlineHeightState
 
   return (
     !['Box Plot'].includes(config.visualizationType) && (
@@ -41,7 +39,6 @@ const Legend = forwardRef((props, ref) => {
           highlightReset={highlightReset}
           currentViewport={currentViewport}
           formatLabels={createLegendLabels}
-          translateY={topLabelOnGridlineHeight}
         />
       </Fragment>
     )

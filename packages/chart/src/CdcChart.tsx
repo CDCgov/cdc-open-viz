@@ -1539,6 +1539,7 @@ export default function CdcChart({
     isEditor,
     isNumber,
     legend,
+    legendRef,
     lineOptions,
     loading,
     missingRequiredSections,
