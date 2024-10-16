@@ -3,7 +3,6 @@ import { SharedFilter } from '../types/SharedFilter'
 import { capitalizeSplitAndJoin } from '@cdc/core/helpers/cove/string'
 import { AnyVisualization, Visualization } from '@cdc/core/types/Visualization'
 import _ from 'lodash'
-import { P } from 'vitest/dist/reporters-yx5ZTtEV'
 import { DashboardConfig } from '../types/DashboardConfig'
 
 export const isUpdateNeeded = (
