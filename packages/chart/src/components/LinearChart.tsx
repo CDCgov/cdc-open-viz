@@ -344,7 +344,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     setForestXLabelY(xLabelY)
   }, [config.data.length, forestRowsHeight])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!axisBottomRef.current) return
     const height = axisBottomRef.current.getBBox().height
     setAxisBottomHeight(height)
