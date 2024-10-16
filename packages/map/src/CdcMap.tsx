@@ -1463,9 +1463,9 @@ const CdcMap = ({
       if (newData) {
         newState.data = newData
       }
-    } else if(newState.formattedData) {
+    } else if (newState.formattedData) {
       newState.data = newState.formattedData
-    } else if(newState.dataDescription) {
+    } else if (newState.dataDescription) {
       newState.data = transform.autoStandardize(newState.data)
       newState.data = transform.developerStandardize(newState.data, newState.dataDescription)
     }
@@ -1847,7 +1847,9 @@ const CdcMap = ({
                       {'us-region' === geoType && <UsaMap.Region />}
                       {'us-county' === geoType && <UsaMap.County />}
                       {'world' === geoType && <WorldMap />}
-                      {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
+                      {'data' === general.type && logo && (
+                        <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
+                      )}
                     </>
                   )}
                 </section>
