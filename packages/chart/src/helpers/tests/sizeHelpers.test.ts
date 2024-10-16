@@ -1,6 +1,6 @@
-import { calcInitialHeight, getOrientation } from '../helpers/sizeHelpers'
+import { calcInitialHeight, getOrientation } from '../sizeHelpers'
 import { describe, expect, it } from 'vitest'
-import { ChartOrientation, VisualizationType } from '../types/ChartConfig'
+import { ChartOrientation, VisualizationType } from '../../types/ChartConfig'
 
 describe('sizeHelpers', () => {
   describe('getOrientation', () => {
