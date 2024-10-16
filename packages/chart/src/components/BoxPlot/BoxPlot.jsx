@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { BoxPlot } from '@visx/stats'
 import { Group } from '@visx/group'
 import ConfigContext from '../../ConfigContext'
@@ -6,22 +6,14 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 import { scaleBand, scaleLinear } from '@visx/scale'
 import { max, min, median, quantile } from 'd3-array'
-const CoveBoxPlot = ({ xScale, xMax, yMax, min: minValue, max: maxValue }) => {
-  const { config, setConfig, colorScale } = useContext(ConfigContext)
+const CoveBoxPlot = ({ xScale, yMax, min: minValue, max: maxValue }) => {
+  const { config, colorScale } = useContext(ConfigContext)
   const { boxplot } = config
 
   // tooltips
   const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
-  const handleTooltip = d => {
-    return `
-      <strong>${d.columnCategory}</strong></br>
-      ${boxplot.labels.q1}: ${d.columnFirstQuartile}<br/>
-      ${boxplot.labels.q3}: ${d.columnThirdQuartile}<br/>
-      ${boxplot.labels.iqr}: ${d.columnIqr}<br/>
-      ${boxplot.labels.median}: ${d.columnMedian}
-    `
-  }
-  const handleTooltipX = (d, key, q1, q3, median, iqr) => {
+
+  const handleTooltip = (d, key, q1, q3, median, iqr) => {
     return `
       <strong>${d.columnCategory}</strong></br>
        <strong>Key:${key}</strong></br>
@@ -32,24 +24,17 @@ const CoveBoxPlot = ({ xScale, xMax, yMax, min: minValue, max: maxValue }) => {
     `
   }
 
-  //  accessors & constants
-  // const max = d => Number(d.columnMax)
-  // const min = d => Number(d.columnMin)
-  // const median = d => Number(d.columnMedian)
-  // const thirdQuartile = d => Number(d.columnThirdQuartile)
-  // const firstQuartile = d => Number(d.columnFirstQuartile)
   const fillOpacity = 0.5
   const boxWidth = xScale.bandwidth()
   const constrainedWidth = Math.min(40, boxWidth)
-  console.log(config.barThickness, 'config.barThickness')
   const color_0 = colorPalettesChart[config?.palette][0] ? colorPalettesChart[config?.palette][0] : '#000'
   const seriesScale = scaleBand({
     range: [0, config.barThickness * 100 || 1],
-
-    domain: config.series.map(item => item.dataKey)
+    domain: config.series?.map(item => item?.dataKey)
   })
 
   const calculateBoxPlotStats = values => {
+    if (!values || !values.length) return {}
     const sortedValues = values.sort((a, b) => a - b)
     return {
       min: min(values),
@@ -63,7 +48,6 @@ const CoveBoxPlot = ({ xScale, xMax, yMax, min: minValue, max: maxValue }) => {
     range: [yMax, 0],
     domain: [minValue, maxValue]
   })
-  console.log(xScale.bandwidth() / 2, 'bandWidth')
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group left={Number(config.yAxis.size)} className='boxplot' key={`boxplot-group`}>
@@ -118,7 +102,7 @@ const CoveBoxPlot = ({ xScale, xMax, yMax, min: minValue, max: maxValue }) => {
                       }}
                       container
                       containerProps={{
-                        'data-tooltip-html': handleTooltipX(d, item.dataKey, firstQuartile, thirdQuartile, median, iqr),
+                        'data-tooltip-html': handleTooltip(d, item.dataKey, firstQuartile, thirdQuartile, median, iqr),
                         'data-tooltip-id': tooltip_id,
                         tabIndex: -1
                       }}
