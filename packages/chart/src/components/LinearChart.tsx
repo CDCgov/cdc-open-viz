@@ -46,7 +46,7 @@ type LinearChartProps = {
   parentHeight: number
 }
 
-const BOTTOM_LABEL_PADDING = 15
+const BOTTOM_LABEL_PADDING = 9
 const X_TICK_LABEL_PADDING = 3
 const DEFAULT_TICK_LENGTH = 8
 
@@ -67,17 +67,28 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     isDraggingAnnotation,
     legendRef,
     parseDate,
+    parentRef,
     tableData,
     transformedData: data,
     updateConfig,
     seriesHighlight,
-    setAxisBottomHeight,
   } = useContext(ConfigContext)
 
   // CONFIG
   // todo: start destructuring this file for conciseness
-  const { heights, visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, legend, debugSvg } =
-    config
+  const {
+    heights,
+    visualizationType,
+    visualizationSubType,
+    orientation,
+    xAxis,
+    yAxis,
+    runtime,
+    legend,
+    forestPlot,
+    brush,
+    debugSvg
+  } = config
 
   // HOOKS  % STATES
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
@@ -86,9 +97,6 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   const [animatedChart, setAnimatedChart] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
-  // Used to calculate the y position of the x-axis title
-  const [bottomLabelStart, setBottomLabelStart] = useState(0)
-  const [forestXLabelY, setForestXLabelY] = useState(0)
 
   // REFS
   const prevTickRef = useRef(null)
@@ -98,6 +106,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   const suffixRef = useRef(null)
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
+  const xAxisTitleRef = useRef(null)
 
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
@@ -109,7 +118,6 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   const isForestPlot = visualizationType === 'Forest Plot'
 
-  const xLabelOffset = isNaN(parseInt(`${xAxis.labelOffset}`)) ? 0 : parseInt(`${xAxis.labelOffset}`)
   const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
 
   // zero if not forest plot
@@ -145,6 +153,14 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
 
     return initialWidth * 0.73
   }, [dimensions[0], config.legend, currentViewport])
+
+  // Used to calculate the y position of the x-axis title
+  const bottomLabelStart = useMemo(() => {
+    xAxisLabelRefs.current = xAxisLabelRefs.current?.filter(label => label)
+    if (!xAxisLabelRefs.current.length) return
+    const tallestLabel = Math.max(...xAxisLabelRefs.current.map(label => label.getBBox().height))
+    return tallestLabel + X_TICK_LABEL_PADDING + DEFAULT_TICK_LENGTH
+  }, [dimensions[0], config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
 
   // xMax and yMax
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
@@ -340,13 +356,6 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     setSuffixWidth(suffixElWidth)
   }, [config.dataFormat.suffix, config.dataFormat.onlyShowTopPrefixSuffix])
 
-  useEffect(() => {
-    xAxisLabelRefs.current = xAxisLabelRefs.current?.filter(label => label)
-    if (!xAxisLabelRefs.current.length) return
-    const tallestLabel = Math.max(...xAxisLabelRefs.current.map(label => label.getBBox().height))
-    setBottomLabelStart(tallestLabel + X_TICK_LABEL_PADDING + DEFAULT_TICK_LENGTH)
-  }, [dimensions[0], config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
-
   // forest plot x-axis label positioning
   useEffect(() => {
     if (!isForestPlot || xAxis.hideLabel) return
@@ -358,14 +367,25 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     const axisBottomY = yMax + Number(config.xAxis.axisPadding)
     const labelRelativeY = rightLabel.getBBox().y - axisBottomY
     const xLabelY = labelRelativeY + rightLabel.getBBox().height + BOTTOM_LABEL_PADDING
-    setForestXLabelY(xLabelY)
+    if (!xAxisTitleRef.current) return
+    xAxisTitleRef.current.setAttribute('y', xLabelY)
   }, [config.data.length, forestRowsHeight])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!axisBottomRef.current) return
-    const height = axisBottomRef.current.getBBox().height
-    setAxisBottomHeight(height)
-  }, [axisBottomRef.current, config, bottomLabelStart])
+    const axisBottomHeight = axisBottomRef.current.getBBox().height
+
+    const isForestPlot = visualizationType === 'Forest Plot'
+
+    // Heights to add
+    const brushHeight = brush?.active ? brush?.height : 0
+    const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
+    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight
+
+    if (!parentRef.current) return
+
+    parentRef.current.style.height = `${initialHeight + additionalHeight}px`
+  }, [axisBottomRef.current, config, bottomLabelStart, brush, currentViewport])
 
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
@@ -537,7 +557,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                   <Text
                     className='x-axis-title-label'
                     x={xMax / 2}
-                    y={axisMaxHeight + xLabelOffset}
+                    y={axisMaxHeight}
                     stroke='#333'
                     textAnchor={'middle'}
                     verticalAnchor='start'
@@ -1428,9 +1448,10 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                     })}
                     {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
                     <Text
+                      innerRef={xAxisTitleRef}
                       className='x-axis-title-label'
                       x={axisCenter}
-                      y={isForestPlot ? forestXLabelY : axisMaxHeight + xLabelOffset}
+                      y={isForestPlot ? 0 /* set via ref */ : axisMaxHeight}
                       textAnchor='middle'
                       verticalAnchor='start'
                       fontWeight='bold'

@@ -35,6 +35,7 @@ type SharedChartContext = {
   legendIsolateValues?: string[]
   setAxisBottomHeight?: React.Dispatch<React.SetStateAction<number>>
   legendRef?: React.MutableRefObject<null>
+  parentRef?: React.RefObject<HTMLDivElement>
   setBrushConfig: Function
   setLegendIsolateValues?: Function
 }

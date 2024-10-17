@@ -2700,11 +2700,7 @@ const EditorPanel = () => {
                         <>
                           <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
                             Format how charts should parse and display your dates using{' '}
-                            <a
-                              href='https://github.com/d3/d3-time-format#locale_format'
-                              target='_blank'
-                              rel='noreferrer'
-                            >
+                            <a href='https://d3js.org/d3-time-format#locale_format' target='_blank' rel='noreferrer'>
                               these guidelines
                             </a>
                             .
@@ -3082,15 +3078,17 @@ const EditorPanel = () => {
                           updateField={updateField}
                         />
                       )}
-                      <TextField
-                        value={config.xAxis.labelOffset}
-                        section='xAxis'
-                        fieldName='labelOffset'
-                        label='Label offset'
-                        type='number'
-                        className='number-narrow'
-                        updateField={updateField}
-                      />
+                      {config.orientation === 'horizontal' && (
+                        <TextField
+                          value={config.xAxis.labelOffset}
+                          section='xAxis'
+                          fieldName='labelOffset'
+                          label='Label offset'
+                          type='number'
+                          className='number-narrow'
+                          updateField={updateField}
+                        />
+                      )}
 
                       {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                       {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}

@@ -6,7 +6,7 @@ import {
   AccordionItemPanel
 } from 'react-accessible-accordion'
 import { useContext, useMemo, useState } from 'react'
-import { CheckBox, Select } from '@cdc/core/components/EditorPanel/Inputs'
+import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import FieldSetWrapper from '@cdc/core/components/EditorPanel/FieldSetWrapper'
@@ -19,6 +19,7 @@ import { SharedFilter } from '../../../types/SharedFilter'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import DeleteFilterModal from './components/DeleteFilterModal'
 import { addValuesToDashboardFilters } from '../../../helpers/addValuesToDashboardFilters'
+import { FILTER_STYLE } from '../../../types/FilterStyles'
 
 type DashboardFitlersEditorProps = {
   vizConfig: DashboardFilters
@@ -51,16 +52,48 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
 
   const updateFilterProp = (prop: string, index: number, value) => {
     const newSharedFilters = _.cloneDeep(sharedFilters)
-    const oldEndpoint = sharedFilters[index].apiFilter?.apiEndpoint
-    const oldAPIValueSelector = sharedFilters[index].apiFilter?.valueSelector
-    const apiFilterChanged = value.apiEndpoint !== oldEndpoint || value.valueSelector !== oldAPIValueSelector
+    const {
+      apiEndpoint: oldEndpoint,
+      valueSelector: oldValueSelector,
+      textSelector: oldTextSelector,
+      subgroupValueSelector: oldSubgroupValueSelector,
+      subgroupTextSelector: oldSubgroupTextSelector
+    } = sharedFilters[index].apiFilter || {}
+    const apiFilterChanged =
+      value.apiEndpoint !== oldEndpoint ||
+      value.valueSelector !== oldValueSelector ||
+      value.textSelector !== oldTextSelector ||
+      value.subgroupValueSelector !== oldSubgroupValueSelector ||
+      value.subgroupTextSelector !== oldSubgroupTextSelector
+
     newSharedFilters[index][prop] = value
     if (prop === 'columnName') {
       if (newSharedFilters[index].subGrouping) delete newSharedFilters[index].subGrouping
       // changing a data column and want to load the data into the preview options
       const sharedFiltersWithValues = addValuesToDashboardFilters(newSharedFilters, data)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFiltersWithValues })
+    } else if (prop === 'filterStyle') {
+      newSharedFilters[index] = {
+        ...newSharedFilters[index],
+        active: '',
+        apiFilter: {
+          apiEndpoint: '',
+          subgroupValueSelector: '',
+          textSelector: '',
+          valueSelector: ''
+        },
+        filterStyle: value
+      }
+      dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
     } else if (prop === 'apiFilter' && value.apiEndpoint && value.valueSelector && apiFilterChanged) {
+      if (sharedFilters[index].filterStyle === FILTER_STYLE.nestedDropdown && value.subgroupValueSelector) {
+        newSharedFilters[index].subGrouping = {
+          active: '',
+          columnName: '',
+          setByQueryParameter: '',
+          valuesLookup: {}
+        }
+      }
       // changing a api filter and want to load the api data into the preview.
       // automatically dispatches SET_SHARED_FILTERS
       loadAPIFilters(newSharedFilters, {})
@@ -129,6 +162,16 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
               </Tooltip>
             }
           />
+          {vizConfig.filterBehavior === 'Apply Button' && (
+            <TextField
+              label='Apply Filter Button Text'
+              maxLength={20}
+              value={vizConfig.applyFiltersButtonText}
+              updateField={(_section, _subsection, _key, value) => {
+                updateConfig({ ...vizConfig, applyFiltersButtonText: value })
+              }}
+            />
+          )}
           {vizConfig.filterBehavior === 'Filter Change' && (
             <CheckBox
               label='Auto Load'

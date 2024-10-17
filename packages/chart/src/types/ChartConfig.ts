@@ -15,7 +15,22 @@ import { type Annotation } from '@cdc/core/types/Annotation'
 
 export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 export type ChartColumns = Record<string, Column>
-
+export type ChartOrientation = 'vertical' | 'horizontal'
+export type VisualizationType =
+  | 'Area Chart'
+  | 'Bar'
+  | 'Box Plot'
+  | 'Deviation Bar'
+  | 'Forest Plot'
+  | 'Line'
+  | 'Paired Bar'
+  | 'Pie'
+  | 'Scatter Plot'
+  | 'Spark Line'
+  | 'Combo'
+  | 'Forecasting'
+  | 'Sankey'
+  | 'Bump Chart'
 export interface PreliminaryDataItem {
   column: string
   displayLegend: boolean
@@ -152,7 +167,7 @@ export type AllChartsConfig = {
   lollipopShape: string
   lollipopSize: 'small' | 'medium' | 'large'
   newViz: Object
-  orientation: 'vertical' | 'horizontal'
+  orientation: ChartOrientation
   palette: string
   pieType?: string
   preliminaryData: PreliminaryDataItem[]
@@ -183,21 +198,7 @@ export type AllChartsConfig = {
   uid: string | number
   version: string
   visual: Visual
-  visualizationType:
-    | 'Area Chart'
-    | 'Bar'
-    | 'Box Plot'
-    | 'Deviation Bar'
-    | 'Forest Plot'
-    | 'Line'
-    | 'Paired Bar'
-    | 'Pie'
-    | 'Scatter Plot'
-    | 'Spark Line'
-    | 'Combo'
-    | 'Forecasting'
-    | 'Sankey'
-    | 'Bump Chart'
+  visualizationType: VisualizationType
   visualizationSubType: string
   xAxis: Axis
   yAxis: Axis

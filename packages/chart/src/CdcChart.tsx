@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useId } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useId, useMemo } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -125,10 +125,11 @@ export default function CdcChart({
     isActive: false,
     isBrushing: false
   })
-  const [height, setHeight] = useState(calcInitialHeight(config, currentViewport))
-  const [axisBottomHeight, setAxisBottomHeight] = useState(0)
+
+  const { description, visualizationType } = config
 
   const legendRef = useRef(null)
+  const parentRef = useRef(null)
 
   const handleDragStateChange = isDragging => {
     setIsDraggingAnnotation(isDragging)
@@ -138,7 +139,6 @@ export default function CdcChart({
 
   // Destructure items from config for more readable JSX
   let { legend, title } = config
-  const { description, visualizationType, data, forestPlot, brush } = config
 
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
@@ -589,6 +589,7 @@ export default function CdcChart({
     ) {
       newConfig.runtime.xAxis = newConfig.yAxis['yAxis'] ? newConfig.yAxis['yAxis'] : newConfig.yAxis
       newConfig.runtime.yAxis = newConfig.xAxis['xAxis'] ? newConfig.xAxis['xAxis'] : newConfig.xAxis
+      newConfig.runtime.yAxis.labelOffset *= -1
 
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'horizontal'
@@ -694,22 +695,6 @@ export default function CdcChart({
   function isEmpty(obj) {
     return Object.keys(obj).length === 0
   }
-
-  useEffect(() => {
-    const initialHeight = calcInitialHeight(config, currentViewport)
-    const isForestPlot = visualizationType === 'Forest Plot'
-
-    // heights to add
-    const brushHeight = brush?.active ? brush?.height : 0
-    const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
-    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight
-
-    const adjustedHeight = initialHeight + additionalHeight
-
-    if (adjustedHeight === height) return
-
-    setHeight(adjustedHeight)
-  }, [brush, axisBottomHeight, config, currentViewport])
 
   // Load data when component first mounts
   useEffect(() => {
@@ -1342,38 +1327,34 @@ export default function CdcChart({
                 classes={['chart-title', `${config.theme}`, 'cove-component__header']}
                 style={undefined}
               />
-              {/* Intro Text/Message */}
-              {config?.introText && config.visualizationType !== 'Spark Line' && (
-                <section
-                  className={`introText legend_${config.legend.hide ? 'hidden' : 'visible'}_${config.legend.position} `}
-                >
-                  {parse(config.introText)}
-                </section>
-              )}
-
-              {/* Filters */}
-              {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
-                <Filters
-                  config={config}
-                  setConfig={setConfig}
-                  setFilteredData={setFilteredData}
-                  filteredData={filteredData}
-                  excludedData={excludedData}
-                  filterData={filterVizData}
-                  dimensions={dimensions}
-                />
-              )}
-              <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
-              {config.annotations?.length > 0 && (
-                <SkipTo
-                  skipId={handleChartTabbing(config, legendId)}
-                  skipMessage={`Skip over annotations`}
-                  key={`skip-annotations`}
-                />
-              )}
 
               {/* Visualization Wrapper */}
               <div className={getChartWrapperClasses().join(' ')}>
+                {/* Intro Text/Message */}
+                {config?.introText && config.visualizationType !== 'Spark Line' && (
+                  <section className={`introText `}>{parse(config.introText)}</section>
+                )}
+
+                {/* Filters */}
+                {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
+                  <Filters
+                    config={config}
+                    setConfig={setConfig}
+                    setFilteredData={setFilteredData}
+                    filteredData={filteredData}
+                    excludedData={excludedData}
+                    filterData={filterVizData}
+                    dimensions={dimensions}
+                  />
+                )}
+                <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
+                {config.annotations?.length > 0 && (
+                  <SkipTo
+                    skipId={handleChartTabbing(config, legendId)}
+                    skipMessage={`Skip over annotations`}
+                    key={`skip-annotations`}
+                  />
+                )}
                 <LegendWrapper>
                   <div
                     className={
@@ -1386,7 +1367,7 @@ export default function CdcChart({
                   >
                     {/* All charts with LinearChart */}
                     {!['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
-                      <div style={{ height, width: `100%` }}>
+                      <div ref={parentRef} style={{ width: `100%` }}>
                         <ParentSize>
                           {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
                         </ParentSize>
@@ -1394,20 +1375,20 @@ export default function CdcChart({
                     )}
 
                     {config.visualizationType === 'Pie' && (
-                      <ParentSize className='justify-content-center d-flex' style={{ height, width: `100%` }}>
+                      <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
                         {parent => <PieChart parentWidth={parent.width} parentHeight={parent.height} />}
                       </ParentSize>
                     )}
                     {/* Line Chart */}
                     {config.visualizationType === 'Line' &&
                       (checkLineToBarGraph() ? (
-                        <div style={{ height, width: `100%` }}>
+                        <div ref={parentRef} style={{ width: `100%` }}>
                           <ParentSize>
                             {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
                           </ParentSize>
                         </div>
                       ) : (
-                        <div style={{ height, width: `100%` }}>
+                        <div ref={parentRef} style={{ width: `100%` }}>
                           <ParentSize>
                             {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
                           </ParentSize>
@@ -1577,10 +1558,10 @@ export default function CdcChart({
     loading,
     missingRequiredSections,
     outerContainerRef,
+    parentRef,
     parseDate,
     rawData: _.cloneDeep(stateData) ?? {},
     seriesHighlight,
-    setAxisBottomHeight,
     setBrushConfig,
     setConfig,
     setDynamicLegendItems,
