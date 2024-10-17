@@ -379,7 +379,8 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     To accommodate for this we need to...
     1. Add the extra height to the svg (done above)
     2. Adjust the viewBox to move the intended top height into focus
-    3. Move the legend down the same amount so the legend is aligned with the top border */
+    3. if the legend is on the left or right, translate it by
+      the label height so it is aligned with the top border */
     if (!topLabelOnGridlineHeight) return
 
     // Adjust the viewBox for the svg
@@ -390,9 +391,9 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
 
     // translate legend match viewBox-adjusted height
     if (!legendRef.current) return
-    const isTopOrBottom =
-      legend?.position === 'top' || legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
-    legendRef.current.style.transform = !isTopOrBottom ? `translateY(${topLabelOnGridlineHeight}px)` : 'none'
+    const legendIsLeftOrRight =
+      legend?.position !== 'top' && legend?.position !== 'bottom' && !isLegendWrapViewport(currentViewport)
+    legendRef.current.style.transform = legendIsLeftOrRight ? `translateY(${topLabelOnGridlineHeight}px)` : 'none'
   }, [axisBottomRef.current, config, bottomLabelStart, brush, currentViewport, topYLabelRef.current])
 
   const chartHasTooltipGuides = () => {
