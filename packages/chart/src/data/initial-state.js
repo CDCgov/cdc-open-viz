@@ -127,7 +127,8 @@ export default {
     axisPadding: 200,
     target: 0,
     maxTickRotation: 0,
-    padding: 0
+    padding: 0,
+    showYearsOnce: false
   },
   table: {
     label: 'Data Table',

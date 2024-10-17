@@ -665,7 +665,7 @@ export default function CdcChart({
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
-      let svgMarginWidth = 32
+      let svgMarginWidth = 30
       let editorWidth = 350
 
       width = isEditor ? width - editorWidth : width
@@ -877,8 +877,22 @@ export default function CdcChart({
     }
   }
 
-  const formatDate = date => {
-    return timeFormat(config.runtime[section].dateDisplayFormat)(date)
+  const formatDate = (date, prevDate) => {
+    let formattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(date)
+    // Handle the case where all months work with '%b.' except for May
+    if (config.runtime[section].dateDisplayFormat?.includes('%b.') && formattedDate.includes('May.')) {
+      formattedDate = formattedDate.replace(/May\./g, 'May')
+    }
+    // Show years only once
+    if (config.xAxis.showYearsOnce && config.runtime[section].dateDisplayFormat?.includes('%Y') && prevDate) {
+      const prevFormattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(prevDate)
+      const year = formattedDate.match(/\d{4}/)
+      const prevYear = prevFormattedDate.match(/\d{4}/)
+      if (year && prevYear && year[0] === prevYear[0]) {
+        formattedDate = formattedDate.replace(year, '')
+      }
+    }
+    return formattedDate
   }
 
   const formatTooltipsDate = date => {
