@@ -119,7 +119,6 @@ const VisualizationsPanel = () => {
         <Widget addVisualization={() => addVisualization('dashboardFilters', '')} type='dashboardFilters' />
         <Widget addVisualization={() => addVisualization('table', '')} type='table' />
       </div>
-      <span className='subheading-3'>Advanced</span>
       <AdvancedEditor
         loadConfig={loadConfig}
         config={config}

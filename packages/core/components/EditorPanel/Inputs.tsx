@@ -31,16 +31,6 @@ export type CheckboxProps = {
 } & Input &
   Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value'>
 
-export type SelectProps = {
-  value?: string
-  options?: string[]
-  required?: boolean
-  initial?: string
-
-  // all other props
-  [x: string]: any
-} & Input
-
 const TextField = memo((props: TextFieldProps) => {
   const {
     display = true,
@@ -141,6 +131,16 @@ const CheckBox = memo((props: CheckboxProps) => {
   )
 })
 
+export type SelectProps = {
+  value?: string
+  options?: string[] | { label: string; value: string }[]
+  required?: boolean
+  initial?: string
+
+  // all other props
+  [x: string]: any
+} & Input
+
 const Select = memo((props: SelectProps) => {
   const {
     display = true,
@@ -156,11 +156,21 @@ const Select = memo((props: SelectProps) => {
     initial: initialValue,
     ...attributes
   } = props
-  let optionsJsx = options.map((optionName, index) => (
-    <option value={optionName} key={index}>
-      {optionName}
-    </option>
-  ))
+  const optionsJsx = options.map((option, index) => {
+    if (typeof option === 'string') {
+      return (
+        <option value={option} key={index}>
+          {option}
+        </option>
+      )
+    } else {
+      return (
+        <option value={option.value} key={index}>
+          {option.label}
+        </option>
+      )
+    }
+  })
 
   if (initialValue) {
     optionsJsx.unshift(
@@ -180,7 +190,7 @@ const Select = memo((props: SelectProps) => {
         {tooltip}
       </span>
       <select
-        className={required && !value ? 'warning' : ''}
+        className={`form-control ${required && !value ? 'warning' : ''}`}
         name={fieldName}
         value={value}
         onChange={event => {
