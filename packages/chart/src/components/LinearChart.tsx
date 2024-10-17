@@ -65,6 +65,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     handleLineType,
     handleDragStateChange,
     isDraggingAnnotation,
+    legendRef,
     parseDate,
     parentRef,
     tableData,
@@ -100,8 +101,9 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   // REFS
   const axisBottomRef = useRef(null)
   const forestPlotRightLabelRef = useRef(null)
-  const svgRef = useRef()
+  const svgRef = useRef(null)
   const suffixRef = useRef(null)
+  const topYLabelRef = useRef(null)
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
@@ -355,21 +357,44 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     xAxisTitleRef.current.setAttribute('y', xLabelY)
   }, [config.data.length, forestRowsHeight])
 
+  // Parent height adjustments
   useEffect(() => {
     if (!axisBottomRef.current) return
     const axisBottomHeight = axisBottomRef.current.getBBox().height
 
     const isForestPlot = visualizationType === 'Forest Plot'
+    const topLabelOnGridline = topYLabelRef.current && yAxis.labelsAboveGridlines
 
     // Heights to add
     const brushHeight = brush?.active ? brush?.height : 0
     const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
-    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight
-
+    const topLabelOnGridlineHeight = topLabelOnGridline ? topYLabelRef.current.getBBox().height : 0
+    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight + topLabelOnGridlineHeight
+    const newHeight = initialHeight + additionalHeight
     if (!parentRef.current) return
 
-    parentRef.current.style.height = `${initialHeight + additionalHeight}px`
-  }, [axisBottomRef.current, config, bottomLabelStart, brush, currentViewport])
+    parentRef.current.style.height = `${newHeight}px`
+
+    /* Adding text above the top gridline overflows the bounds of the svg.
+    To accommodate for this we need to...
+    1. Add the extra height to the svg (done above)
+    2. Adjust the viewBox to move the intended top height into focus
+    3. if the legend is on the left or right, translate it by
+      the label height so it is aligned with the top border */
+    if (!topLabelOnGridlineHeight) return
+
+    // Adjust the viewBox for the svg
+    const svg = svgRef.current
+    if (!svg) return
+    const parentWidthFromRef = parentRef.current.getBoundingClientRect().width
+    svg.setAttribute('viewBox', `0 ${-topLabelOnGridlineHeight} ${parentWidthFromRef} ${newHeight}`)
+
+    // translate legend match viewBox-adjusted height
+    if (!legendRef.current) return
+    const legendIsLeftOrRight =
+      legend?.position !== 'top' && legend?.position !== 'bottom' && !isLegendWrapViewport(currentViewport)
+    legendRef.current.style.transform = legendIsLeftOrRight ? `translateY(${topLabelOnGridlineHeight}px)` : 'none'
+  }, [axisBottomRef.current, config, bottomLabelStart, brush, currentViewport, topYLabelRef.current])
 
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
@@ -564,6 +589,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
       {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
       <div style={{ width: `${parentWidth}px`, overflow: 'visible' }} className='tooltip-boundary'>
         <svg
+          ref={svgRef}
           onMouseMove={onMouseMove}
           width={parentWidth}
           height={parentHeight}
@@ -572,7 +598,6 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
           } ${isDraggingAnnotation && 'dragging-annotation'}`}
           role='img'
           aria-label={handleChartAriaLabels(config)}
-          ref={svgRef}
           style={{ overflow: 'visible' }}
         >
           {!isDraggingAnnotation && <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>}{' '}
@@ -1158,6 +1183,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
 
                                 {/* VALUE */}
                                 <BlurStrokeText
+                                  innerRef={el => lastTick && (topYLabelRef.current = el)}
                                   display={isLogarithmicAxis ? showTicks : 'block'}
                                   dx={isLogarithmicAxis ? -6 : 0}
                                   x={suffixOneChar ? labelX - suffixWidth : labelX}

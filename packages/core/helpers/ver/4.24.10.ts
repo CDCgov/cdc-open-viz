@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
 
 export const removeMultiSelectPropFromMultiselect = newConfig => {
   if (newConfig.type === 'dashboard') {
