@@ -1,3 +1,4 @@
+import React from 'react'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { SharedFilter } from '../../types/SharedFilter'
 import { APIFilterDropdowns, DropdownOptions } from './DashboardFiltersWrapper'
@@ -45,7 +46,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           (!urlFilterType && !filter.showDropdown && filter.filterStyle !== FILTER_STYLE.nestedDropdown) ||
           (show && !show.includes(filterIndex))
         )
-          return <></>
+          return <React.Fragment key={`${filter.key}-filtersection-${filterIndex}-option`} />
         const values: JSX.Element[] = []
 
         if (filter.resetLabel) {
