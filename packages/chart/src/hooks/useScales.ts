@@ -72,7 +72,6 @@ const useScales = (properties: useScaleProps) => {
     let xAxisMin = Math.min(...xAxisDataMapped.map(Number))
     let xAxisMax = Math.max(...xAxisDataMapped.map(Number))
     xAxisMin -= (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
-    xAxisMax += (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
     xScale = scaleTime({
       domain: [xAxisMin, xAxisMax],
       range: [0, xMax]
@@ -264,14 +263,34 @@ const useScales = (properties: useScaleProps) => {
 
 export default useScales
 
-export const getTickValues = (xAxisDataMapped, xScale, num) => {
+export const getFirstDayOfMonth = ms => {
+  const date = new Date(ms)
+  return new Date(date.getFullYear(), date.getMonth(), 1).getTime()
+}
+
+export const dateFormatHasMonthButNoDays = dateFormat => {
+  return (
+    (dateFormat.includes('%b') ||
+      dateFormat.includes('%B') ||
+      dateFormat.includes('%m') ||
+      dateFormat.includes('%-m') ||
+      dateFormat.includes('%_m')) &&
+    !dateFormat.includes('%d') &&
+    !dateFormat.includes('%-d') &&
+    !dateFormat.includes('%_d') &&
+    !dateFormat.includes('%e')
+  )
+}
+
+export const getTickValues = (xAxisDataMapped, xScale, num, config) => {
   const xDomain = xScale.domain()
 
   if (xScale.type === 'time') {
     const xDomainMax = xAxisDataMapped[xAxisDataMapped.length - 1]
     const xDomainMin = xAxisDataMapped[0]
+
     const step = (xDomainMax - xDomainMin) / (num - 1)
-    const tickValues = []
+    let tickValues = []
     for (let i = xDomainMax; i >= xDomainMin; i -= step) {
       tickValues.push(i)
     }
@@ -279,6 +298,11 @@ export const getTickValues = (xAxisDataMapped, xScale, num) => {
       tickValues.push(xDomainMin)
     }
     tickValues.reverse()
+
+    // Use first days of months when showing months without days
+    if (dateFormatHasMonthButNoDays(config.xAxis.dateDisplayFormat)) {
+      tickValues = tickValues.map(tv => getFirstDayOfMonth(tv))
+    }
 
     return tickValues
   }
