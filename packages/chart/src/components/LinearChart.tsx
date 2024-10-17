@@ -370,16 +370,23 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
     const topLabelOnGridlineHeight = topLabelOnGridline ? topYLabelRef.current.getBBox().height : 0
     const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight + topLabelOnGridlineHeight
-
+    const newHeight = initialHeight + additionalHeight
     if (!parentRef.current) return
 
-    parentRef.current.style.height = `${initialHeight + additionalHeight}px`
+    parentRef.current.style.height = `${newHeight}px`
+
+    /* Adding text above the top gridline overflows the bounds of the svg.
+    To accommodate for this we need to...
+    1. Add the extra height to the svg (done above)
+    2. Adjust the viewBox to move the intended top height into focus
+    3. Move the legend down the same amount so the legend is aligned with the top border */
+    if (!topLabelOnGridlineHeight) return
 
     // Adjust the viewBox for the svg
-    if (!topLabelOnGridlineHeight) return
     const svg = svgRef.current
     if (!svg) return
-    svg.setAttribute('viewBox', `0 ${-topLabelOnGridlineHeight} ${parentWidth} ${parentHeight}`)
+    const parentWidthFromRef = parentRef.current.getBoundingClientRect().width
+    svg.setAttribute('viewBox', `0 ${-topLabelOnGridlineHeight} ${parentWidthFromRef} ${newHeight}`)
 
     // translate legend match viewBox-adjusted height
     if (!legendRef.current) return
