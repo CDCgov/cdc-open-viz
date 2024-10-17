@@ -122,39 +122,82 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
   }
 
   const layoutList = [
-    <li className={curr === '12' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([12])} key='12' title='1 Column'>
+    <li
+      className={curr === '12' ? `current row-menu__list--item` : `row-menu__list--item`}
+      onClick={() => setRowLayout([12])}
+      key='12'
+      title='1 Column'
+    >
       <OneColIcon />
     </li>,
-    <li className={curr === '66' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([6, 6])} key='66' title='2 Columns'>
+    <li
+      className={curr === '66' ? `current row-menu__list--item` : `row-menu__list--item`}
+      onClick={() => setRowLayout([6, 6])}
+      key='66'
+      title='2 Columns'
+    >
       <TwoColIcon />
     </li>,
-    <li className={curr === '444' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([4, 4, 4])} key='444' title='3 Columns'>
+    <li
+      className={curr === '444' ? `current row-menu__list--item` : `row-menu__list--item`}
+      onClick={() => setRowLayout([4, 4, 4])}
+      key='444'
+      title='3 Columns'
+    >
       <ThreeColIcon />
     </li>,
-    <li className={curr === '48' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([4, 8])} key='48' title='2 Columns'>
+    <li
+      className={curr === '48' ? `current row-menu__list--item` : `row-menu__list--item`}
+      onClick={() => setRowLayout([4, 8])}
+      key='48'
+      title='2 Columns'
+    >
       <FourEightColIcon />
     </li>,
-    <li className={curr === '84' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([8, 4])} key='84' title='2 Columns'>
+    <li
+      className={curr === '84' ? `current row-menu__list--item` : `row-menu__list--item`}
+      onClick={() => setRowLayout([8, 4])}
+      key='84'
+      title='2 Columns'
+    >
       <EightFourColIcon />
     </li>,
-    <li className={curr === 'toggle' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([12, 12, 12], true)} key='toggle' title='Toggle between up to three visualizations'>
+    <li
+      className={curr === 'toggle' ? `current row-menu__list--item` : `row-menu__list--item`}
+      onClick={() => setRowLayout([12, 12, 12], true)}
+      key='toggle'
+      title='Toggle between up to three visualizations'
+    >
       <ToggleIcon />
     </li>
   ]
 
   return (
     <nav className='row-menu'>
-      <div className='row-menu__btn'>
-        <ul className='row-menu__flyout'>{layoutList}</ul>
-      </div>
+      <ul className='row-menu__flyout'>{layoutList}</ul>
       <div className='spacer'></div>
-      <button className={rowIdx === 0 ? 'row-menu__btn row-menu__btn-disabled' : 'row-menu__btn'} title='Move Row Up' onClick={() => moveRow('up')}>
+      <button
+        className={`btn btn-primary row-menu__btn border-0`}
+        title='Move Row Up'
+        onClick={() => moveRow('up')}
+        disabled={rowIdx === 0}
+      >
         <Icon display='caretUp' color='#fff' size={25} />
       </button>
-      <button className={rowIdx + 1 === rows.length ? 'row-menu__btn row-menu__btn-disabled' : 'row-menu__btn'} title='Move Row Down' onClick={() => moveRow('down')}>
+      <button
+        className={'btn btn-primary row-menu__btn border-0'}
+        title='Move Row Down'
+        onClick={() => moveRow('down')}
+        disabled={rowIdx + 1 === rows.length}
+      >
         <Icon display='caretDown' color='#fff' size={25} />
       </button>
-      <button className={rowIdx === 0 && rows.length === 1 ? 'row-menu__btn row-menu__btn--remove row-menu__btn-disabled' : 'row-menu__btn row-menu__btn--remove'} title='Delete Row' onClick={deleteRow}>
+      <button
+        className={'btn btn-danger row-menu__btn row-menu__btn--remove border-0'}
+        title='Delete Row'
+        onClick={deleteRow}
+        disabled={rowIdx === 0 && rows.length === 1}
+      >
         <Icon display='close' color='#fff' size={25} />
       </button>
     </nav>
@@ -177,7 +220,10 @@ const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
         visualizationType: type,
         editing: true
       }
-      dispatch({ type: 'ADD_FOOTNOTE', payload: { id: uid, rowIndex: rowIdx, config: newVisualizationConfig as Visualization } })
+      dispatch({
+        type: 'ADD_FOOTNOTE',
+        payload: { id: uid, rowIndex: rowIdx, config: newVisualizationConfig as Visualization }
+      })
     } else {
       dispatch({ type: 'UPDATE_VISUALIZATION', payload: { vizKey: row.footnotesId, configureData: { editing: true } } })
     }

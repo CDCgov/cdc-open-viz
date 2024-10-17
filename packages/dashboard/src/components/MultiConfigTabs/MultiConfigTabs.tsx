@@ -66,8 +66,16 @@ const Tab = ({ name, handleClick, tabs, index, active }) => {
 
   return (
     <li className='nav-item d-flex mt-0'>
-      {canMoveLeft && editing && <button onClick={() => handleReorder(index, -1)}>{'<'}</button>}
-      <div className={`edit nav-link${active ? ' active' : ''}`} aria-current={active ? 'page' : null} onClick={onClick}>
+      {canMoveLeft && editing && (
+        <button className='border-0' onClick={() => handleReorder(index, -1)}>
+          {'<'}
+        </button>
+      )}
+      <div
+        className={`edit nav-link${active ? ' active' : ''}`}
+        aria-current={active ? 'page' : null}
+        onClick={onClick}
+      >
         {editing ? (
           <div className='d-flex'>
             <input type='text' defaultValue={name} onBlur={saveName} ref={inputRef} />
@@ -78,13 +86,17 @@ const Tab = ({ name, handleClick, tabs, index, active }) => {
         ) : (
           <>
             {name}
-            <button className='remove' onClick={handleRemove}>
+            <button className='btn btn-danger border-0 ml-1' onClick={handleRemove}>
               X
             </button>
           </>
         )}
       </div>
-      {canMoveRight && editing && <button onClick={() => handleReorder(index, 1)}>{'>'}</button>}
+      {canMoveRight && editing && (
+        <button className='border-0' onClick={() => handleReorder(index, 1)}>
+          {'>'}
+        </button>
+      )}
     </li>
   )
 }
@@ -92,7 +104,10 @@ const Tab = ({ name, handleClick, tabs, index, active }) => {
 const MultiConfigTabs = () => {
   const { config } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
-  const tabs = useMemo<string[]>(() => (config.multiDashboards || []).map(({ label }) => label), [config.multiDashboards])
+  const tabs = useMemo<string[]>(
+    () => (config.multiDashboards || []).map(({ label }) => label),
+    [config.multiDashboards]
+  )
   const activeTab = useMemo<number>(() => config.activeDashboard, [config.activeDashboard])
 
   const saveAndLoad = (indexToSwitchTo: number) => {
@@ -104,7 +119,14 @@ const MultiConfigTabs = () => {
   return (
     <ul className='nav nav-tabs multi-config-tabs'>
       {tabs.map((tab, index) => (
-        <Tab key={tab + index} name={tab} tabs={tabs} index={index} handleClick={() => saveAndLoad(index)} active={index === activeTab} />
+        <Tab
+          key={tab + index}
+          name={tab}
+          tabs={tabs}
+          index={index}
+          handleClick={() => saveAndLoad(index)}
+          active={index === activeTab}
+        />
       ))}
       <li className='nav-item'>
         <button className='nav-link add' onClick={() => dispatch({ type: 'ADD_NEW_DASHBOARD' })}>
