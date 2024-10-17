@@ -172,7 +172,9 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
           ? data
           : filterOutConditions(data, [...workingVariable.conditions])
 
-      const variableValues: string[] = _.uniq(workingData?.map(dataObject => dataObject[workingVariable.columnName]))
+      const variableValues: string[] = _.uniq(
+        (workingData || []).map(dataObject => dataObject[workingVariable.columnName])
+      )
       const variableDisplay = []
 
       const listConjunction = !isEditor ? 'and' : 'or'

@@ -64,6 +64,7 @@ import DashboardSharedFilters from './components/DashboardFilters'
 import ExpandCollapseButtons from './components/ExpandCollapseButtons'
 import { hasDashboardApplyBehavior } from './helpers/hasDashboardApplyBehavior'
 import { loadAPIFiltersFactory } from './helpers/loadAPIFilters'
+import Loader from '@cdc/core/components/Loader'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -76,6 +77,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
   const [allExpanded, setAllExpanded] = useState(true)
+  const [apiLoading, setAPILoading] = useState(false)
 
   const isPreview = state.tabSelected === 'Dashboard Preview'
 
@@ -101,7 +103,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     const config = _.cloneDeep(state.config)
     if (!config.datasets) return
     const filters = newFilters || config.dashboard.sharedFilters
-    const datasetKeys = Object.keys(config.datasets)
+    const datasetKeys = reloadURLHelpers.getDatasetKeys(config)
 
     const newData = _.cloneDeep(state.data)
     const newDatasets = _.cloneDeep(config.datasets)
@@ -160,6 +162,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             newFileName
           )
 
+          setAPILoading(true)
           await fetchRemoteData(dataUrlFinal).then(responseData => {
             let data: any[] = responseData
             if (responseData && dataset.dataDescription) {
@@ -192,6 +195,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
       const visualizations = reloadURLHelpers.getVisualizationsWithFormattedData(config.visualizations, newData)
       dispatch({ type: 'SET_CONFIG', payload: { dashboard: dashboardConfig, datasets: newDatasets, visualizations } })
+      setAPILoading(false)
     }
   }
 
@@ -485,6 +489,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     body = (
       <>
         {isEditor && <Header />}
+        {apiLoading && <Loader fullScreen={true} />}
         <MultiTabs isEditor={isEditor && !isPreview} />
         <Layout.Responsive isEditor={isEditor}>
           <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>

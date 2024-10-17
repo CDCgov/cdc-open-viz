@@ -12,7 +12,6 @@ import DashboardFiltersEditor from './DashboardFiltersEditor'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import { hasDashboardApplyBehavior } from '../../helpers/hasDashboardApplyBehavior'
 import * as apiFilterHelpers from '../../helpers/apiFilterHelpers'
-import { FILTER_STYLE } from '../../types/FilterStyles'
 import { applyQueuedActive } from '@cdc/core/components/Filters/helpers/applyQueuedActive'
 
 type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
