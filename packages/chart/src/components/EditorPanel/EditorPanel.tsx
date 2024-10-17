@@ -2817,6 +2817,29 @@ const EditorPanel = () => {
                         }
                         updateField={updateField}
                       />
+                      <CheckBox
+                        value={config.xAxis.showYearsOnce}
+                        section='xAxis'
+                        fieldName='showYearsOnce'
+                        label='Show years once'
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon
+                                display='question'
+                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                              />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                When this option is checked and the date format for the axis includes years, each year
+                                will only be shown once in the axis.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        updateField={updateField}
+                      />
                       {visHasBrushChart() && (
                         <CheckBox
                           value={config.brush?.active}

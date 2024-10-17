@@ -107,6 +107,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
+  const prevTickRef = useRef(null)
 
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
@@ -141,8 +142,18 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
 
     if (!legendShowingLeftOrRight) return initialWidth
 
+    if (legendRef.current) {
+      const legendStyle = getComputedStyle(legendRef.current)
+      return (
+        initialWidth -
+        legendRef.current.getBoundingClientRect().width -
+        parseInt(legendStyle.marginLeft) -
+        parseInt(legendStyle.marginRight)
+      )
+    }
+
     return initialWidth * 0.73
-  }, [dimensions[0], config.legend, currentViewport])
+  }, [dimensions[0], config.legend, currentViewport, legendRef.current])
 
   // Used to calculate the y position of the x-axis title
   const bottomLabelStart = useMemo(() => {
@@ -219,7 +230,11 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
       tick = 0
     }
 
-    if (isDateScale(runtime.xAxis) && config.visualizationType !== 'Forest Plot') return formatDate(tick)
+    if (isDateScale(runtime.xAxis) && config.visualizationType !== 'Forest Plot') {
+      const formattedDate = formatDate(tick, prevTickRef.current)
+      prevTickRef.current = tick
+      return formattedDate
+    }
     if (orientation === 'horizontal' && config.visualizationType !== 'Forest Plot')
       return formatNumber(tick, 'left', shouldAbbreviate)
     if (config.xAxis.type === 'continuous' && config.visualizationType !== 'Forest Plot')
@@ -1336,7 +1351,8 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                   ? getTickValues(
                       xAxisDataMapped,
                       xScale,
-                      config.xAxis.type === 'date-time' ? countNumOfTicks('xAxis') : getManualStep()
+                      config.xAxis.type === 'date-time' ? countNumOfTicks('xAxis') : getManualStep(),
+                      config
                     )
                   : undefined
               }
@@ -1386,6 +1402,11 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
                     return
                   }
                 })
+
+                // Force wrap when showing years once so it's easier to read
+                if (config.xAxis.showYearsOnce) {
+                  areTicksTouching = true
+                }
 
                 const dynamicMarginTop =
                   areTicksTouching && config.isResponsiveTicks ? tickWidthMax + DEFAULT_TICK_LENGTH + 20 : 0
