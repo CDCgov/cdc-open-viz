@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
 
 export const removeMultiSelectPropFromMultiselect = newConfig => {
   if (newConfig.type === 'dashboard') {
@@ -10,29 +9,6 @@ export const removeMultiSelectPropFromMultiselect = newConfig => {
       }
     })
   }
-}
-
-export const changePivotColumns = newConfig => {
-  if (newConfig.type === 'dashboard') {
-    Object.keys(newConfig.visualizations).forEach(key => {
-      const currentViz = newConfig.visualizations[key]
-      if (currentViz.table?.pivot?.valueColumn) {
-        newConfig.visualizations[key].table.pivot.valueColumns = [currentViz.table.pivot.valueColumn]
-        delete newConfig.visualizations[key].table.pivot.valueColumn
-      }
-    })
-  }
-  if (newConfig.table?.pivot?.valueColumn) {
-    newConfig.table.pivot.valueColumns = [newConfig.table.pivot.valueColumn]
-    delete newConfig.table.pivot.valueColumn
-  }
-
-  return newConfig
-}
-
-export const setXAxisLabelOffsetToZero = newConfig => {
-  if (!newConfig.xAxis?.labelOffset) return
-  newConfig.xAxis.labelOffset = 0
 }
 
 export const changePivotColumns = newConfig => {

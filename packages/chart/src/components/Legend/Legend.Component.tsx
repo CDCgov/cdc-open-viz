@@ -29,8 +29,6 @@ export interface LegendProps {
   skipId: string
   dimensions: DimensionsType // for responsive width legend
   getTextWidth: (text: string, font: string) => string
-  // currently used to offset additional top space added by a top labelAboveGridline
-  translateY?: number
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
@@ -46,8 +44,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
       formatLabels,
       skipId = 'legend',
       dimensions,
-      getTextWidth,
-      translateY = 0
+      getTextWidth
     },
     ref
   ) => {
