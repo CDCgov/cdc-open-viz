@@ -776,20 +776,6 @@ const EditorPanel = () => {
       return
     }
 
-    if (section === 'boxplot' && subsection === 'labels') {
-      updateConfig({
-        ...config,
-        [section]: {
-          ...config[section],
-          [subsection]: {
-            ...config.boxplot[subsection],
-            [fieldName]: newValue
-          }
-        }
-      })
-      return
-    }
-
     const truthy = val => {
       if (val === 0) return true // indexes can be used as keys
       return !!val
