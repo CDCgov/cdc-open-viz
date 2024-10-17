@@ -168,21 +168,27 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             newFileName
           )
 
-          await fetchRemoteData(dataUrlFinal).then(responseData => {
-            let data: any[] = responseData
-            if (responseData && dataset.dataDescription) {
-              try {
-                data = transform.autoStandardize(data)
-                data = transform.developerStandardize(data, dataset.dataDescription)
-              } catch (e) {
-                dispatchErrorMessages({ type: 'ADD_ERROR_MESSAGE', payload: e })
-                //Data not able to be standardized, leave as is
+          await fetchRemoteData(dataUrlFinal)
+            .then(responseData => {
+              let data: any[] = responseData
+              if (responseData && dataset.dataDescription) {
+                try {
+                  data = transform.autoStandardize(data)
+                  data = transform.developerStandardize(data, dataset.dataDescription)
+                } catch (e) {
+                  //Data not able to be standardized, leave as is
+                }
               }
-            }
-            newDatasets[datasetKey].data = data
-            newDatasets[datasetKey].runtimeDataUrl = dataUrlFinal
-            newData[datasetKey] = data
-          })
+              newDatasets[datasetKey].data = data
+              newDatasets[datasetKey].runtimeDataUrl = dataUrlFinal
+              newData[datasetKey] = data
+            })
+            .catch(() => {
+              dispatchErrorMessages({
+                type: 'ADD_ERROR_MESSAGE',
+                payload: 'There was a problem returning data. Please try again.'
+              })
+            })
         }
       }
     }
