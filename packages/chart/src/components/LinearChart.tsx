@@ -153,7 +153,7 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
     }
 
     return initialWidth * 0.73
-  }, [dimensions[0], config.legend, currentViewport])
+  }, [dimensions[0], config.legend, currentViewport, legendRef.current])
 
   // Used to calculate the y position of the x-axis title
   const bottomLabelStart = useMemo(() => {
