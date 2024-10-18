@@ -3320,7 +3320,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   )
                 })}
               </ul>
-              <span>Accessible Color Schemes</span>
+              <span>Colorblind Safe</span>
               <ul className='color-palette'>
                 {accessibleColors.map(palette => {
                   const colorOne = {
