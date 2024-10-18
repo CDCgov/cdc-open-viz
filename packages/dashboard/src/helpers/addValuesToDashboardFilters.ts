@@ -43,16 +43,8 @@ export const addValuesToDashboardFilters = (
         const active: string[] = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
         filterCopy.active = active.filter(val => defaultValues.includes(val))
       } else {
-        let hasResetLabel = false
-        let resetLabel = ''
-
-        filters.forEach(fil => {
-          if (fil.resetLabel) {
-            hasResetLabel = true
-            resetLabel = resetLabel
-          }
-        })
-        const defaultValue = hasResetLabel ? resetLabel : filterCopy.values[0] || filterCopy.active
+        const resetLabelFilter = filters.find(fil => fil.resetLabel)
+        const defaultValue = resetLabelFilter ? resetLabelFilter.resetLabel : filterCopy.values[0] || filterCopy.active
         const active = Array.isArray(filterCopy.active) ? filterCopy.active[0] : filterCopy.active
         filterCopy.active = filterCopy.values.includes(active) ? active : defaultValue
       }
