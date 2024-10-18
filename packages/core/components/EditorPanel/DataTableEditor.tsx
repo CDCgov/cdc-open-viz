@@ -41,6 +41,13 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
 
   const excludeColumns = (section, subSection, fieldName, excludedColNames: string[]) => {
     const newColumns = _.cloneDeep(config.columns)
+    // Object.keys(newColumns).map(column => {
+    //   if (!excludedColNames.includes(column)) {
+    //     newColumns[column].dataTable = true
+    //     updateField(null, null, 'columns', newColumns)
+    //   }
+    // })
+
     const colNames: string[] = []
     for (let colKey in newColumns) {
       const col = newColumns[colKey]
@@ -48,6 +55,8 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
       if (excludedColNames.includes(col.name)) {
         // ensure all excluded columns are set to false
         newColumns[colKey].dataTable = false
+      } else {
+        newColumns[colKey].dataTable = true
       }
     }
     excludedColNames.forEach(colName => {
