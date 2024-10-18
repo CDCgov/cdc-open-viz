@@ -185,7 +185,8 @@
         display: block;
       }
 
-      select, input {
+      select,
+      input {
         width: 100%;
       }
     }
@@ -240,8 +241,5 @@
     background-color: $lightest-gray;
     padding: $gbl-padding;
     width: 50% !important;
-    .table-container {
-      overflow: scroll
-    }
   }
 }
