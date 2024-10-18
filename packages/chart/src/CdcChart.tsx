@@ -629,7 +629,7 @@ export default function CdcChart({
   }
 
   // Gets filter values from dataset
-  const generateValuesForFilter = (columnName: string, data: Record<string, any[]>) => {
+  const generateValuesForFilter = (columnName: string, data = this.state.data) => {
     const valuesSet = new Set<string>()
 
     // Iterate over all data sets
