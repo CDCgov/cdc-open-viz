@@ -6,6 +6,7 @@ import { Table } from '@cdc/core/types/Table'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 import { mapDataToConfig } from '../../helpers/mapDataToConfig'
 import './visualizations-panel-styles.css'
+import { MultiDashboardConfig } from '../../types/MultiDashboard'
 
 const addVisualization = (type, subType) => {
   const modalWillOpen = type !== 'markup-include'
@@ -30,7 +31,14 @@ const addVisualization = (type, subType) => {
       newVisualizationConfig.visualizationType = type
       break
     case 'table':
-      const tableConfig: Table = { label: 'Data Table', show: true, showDownloadUrl: false, showVertical: true, expanded: true, collapsible: true }
+      const tableConfig: Table = {
+        label: 'Data Table',
+        show: true,
+        showDownloadUrl: false,
+        showVertical: true,
+        expanded: true,
+        collapsible: true
+      }
       newVisualizationConfig.table = tableConfig
       newVisualizationConfig.columns = {}
       newVisualizationConfig.dataFormat = {}
@@ -74,7 +82,18 @@ const VisualizationsPanel = () => {
   const [advancedEditing, setAdvancedEditing] = useState(false)
   const { config } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
-  const loadConfig = newConfig => dispatch({ type: 'APPLY_CONFIG', payload: [mapDataToConfig(newConfig)] })
+  const loadConfig = incomingConfig => {
+    const newConfig = !incomingConfig.multiDashboards
+      ? incomingConfig
+      : ({
+          ...config,
+          ...incomingConfig,
+          ...incomingConfig.multiDashboards[config.activeDashboard],
+          activeDashboard: config.activeDashboard
+        } as MultiDashboardConfig)
+
+    dispatch({ type: 'APPLY_CONFIG', payload: [mapDataToConfig(newConfig)] })
+  }
   return (
     <div className={`visualizations-panel${advancedEditing ? ' advanced-editor' : ''}`}>
       <p style={{ fontSize: '14px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
