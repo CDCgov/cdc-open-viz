@@ -289,7 +289,7 @@ const PanelVisual: FC<PanelProps> = props => {
                     )
                   })}
                 </ul>
-                <span>Accessible Color Schemes</span>
+                <span>Colorblind Safe</span>
                 <ul className='color-palette'>
                   {accessibleColors.map(palette => {
                     const colorOne = {
