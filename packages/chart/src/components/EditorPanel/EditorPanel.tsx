@@ -776,20 +776,6 @@ const EditorPanel = () => {
       return
     }
 
-    if (section === 'boxplot' && subsection === 'labels') {
-      updateConfig({
-        ...config,
-        [section]: {
-          ...config[section],
-          [subsection]: {
-            ...config.boxplot[subsection],
-            [fieldName]: newValue
-          }
-        }
-      })
-      return
-    }
-
     const truthy = val => {
       if (val === 0) return true // indexes can be used as keys
       return !!val
@@ -2700,11 +2686,7 @@ const EditorPanel = () => {
                         <>
                           <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
                             Format how charts should parse and display your dates using{' '}
-                            <a
-                              href='https://github.com/d3/d3-time-format#locale_format'
-                              target='_blank'
-                              rel='noreferrer'
-                            >
+                            <a href='https://d3js.org/d3-time-format#locale_format' target='_blank' rel='noreferrer'>
                               these guidelines
                             </a>
                             .
@@ -2829,6 +2811,29 @@ const EditorPanel = () => {
                               <p>
                                 When this option is checked, you can select source-file values for exclusion from the
                                 date/category axis.{' '}
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        updateField={updateField}
+                      />
+                      <CheckBox
+                        value={config.xAxis.showYearsOnce}
+                        section='xAxis'
+                        fieldName='showYearsOnce'
+                        label='Show years once'
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon
+                                display='question'
+                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                              />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                When this option is checked and the date format for the axis includes years, each year
+                                will only be shown once in the axis.
                               </p>
                             </Tooltip.Content>
                           </Tooltip>
@@ -3059,15 +3064,17 @@ const EditorPanel = () => {
                           updateField={updateField}
                         />
                       )}
-                      <TextField
-                        value={config.xAxis.labelOffset}
-                        section='xAxis'
-                        fieldName='labelOffset'
-                        label='Label offset'
-                        type='number'
-                        className='number-narrow'
-                        updateField={updateField}
-                      />
+                      {config.orientation === 'horizontal' && (
+                        <TextField
+                          value={config.xAxis.labelOffset}
+                          section='xAxis'
+                          fieldName='labelOffset'
+                          label='Label offset'
+                          type='number'
+                          className='number-narrow'
+                          updateField={updateField}
+                        />
+                      )}
 
                       {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                       {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}

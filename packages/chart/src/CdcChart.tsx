@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useId } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useId, useMemo } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -57,6 +57,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
+import { calcInitialHeight } from './helpers/sizeHelpers'
 import { isLegendWrapViewport, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 
 import './scss/main.scss'
@@ -74,12 +75,12 @@ import LegendWrapper from './components/LegendWrapper'
 import _ from 'lodash'
 
 interface CdcChartProps {
-  configUrl: string
+  configUrl?: string
   config?: ChartConfig
   isEditor?: boolean
   isDebug?: boolean
   isDashboard?: boolean
-  setConfig: (config: ChartConfig) => void
+  setConfig?: (config: ChartConfig) => void
   setEditing?: (editing: boolean) => void
   hostname?: string
   link?: string
@@ -105,7 +106,7 @@ export default function CdcChart({
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
-  const [stateData, setStateData] = useState(configObj?.data || [])
+  const [stateData, setStateData] = useState(_.cloneDeep(configObj?.data) || [])
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
   const [seriesHighlight, setSeriesHighlight] = useState<string[]>(
@@ -125,19 +126,10 @@ export default function CdcChart({
     isBrushing: false
   })
 
-  let [width] = dimensions
-  const useVertical = config.orientation === 'vertical'
-  const useMobileVertical = config.heights?.mobileVertical && isMobileHeightViewport(currentViewport)
-  const responsiveVertical = useMobileVertical ? 'mobileVertical' : 'vertical'
-  const renderedOrientation = useVertical ? responsiveVertical : 'horizontal'
-  let height = config.aspectRatio ? width * config.aspectRatio : config?.heights?.[renderedOrientation]
-  if (config.visualizationType === 'Pie') height = config?.heights?.[renderedOrientation]
-  height = height + Number(config.orientation === 'horizontal' ? config.yAxis.size : config?.xAxis?.size) + 45
+  const { description, visualizationType } = config
 
-  type Config = typeof config
-  let legendMemo = useRef(new Map()) // map collection
-  let innerContainerRef = useRef()
   const legendRef = useRef(null)
+  const parentRef = useRef(null)
 
   const handleDragStateChange = isDragging => {
     setIsDraggingAnnotation(isDragging)
@@ -146,7 +138,7 @@ export default function CdcChart({
   if (isDebug) console.log('Chart config, isEditor', config, isEditor)
 
   // Destructure items from config for more readable JSX
-  let { legend, title, description, visualizationType } = config
+  let { legend, title } = config
 
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
@@ -155,7 +147,7 @@ export default function CdcChart({
 
   if (config.table && (!config.table?.label || config.table?.label === '')) config.table.label = 'Data Table'
 
-  const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
+  const { lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
   const legendId = useId()
 
   const checkLineToBarGraph = () => {
@@ -229,7 +221,7 @@ export default function CdcChart({
   }
 
   const loadConfig = async () => {
-    let response = configObj || (await (await fetch(configUrl)).json())
+    const response = _.cloneDeep(configObj) || (await (await fetch(configUrl)).json())
 
     // If data is included through a URL, fetch that and store
     let data: any[] = response.data || []
@@ -597,6 +589,7 @@ export default function CdcChart({
     ) {
       newConfig.runtime.xAxis = newConfig.yAxis['yAxis'] ? newConfig.yAxis['yAxis'] : newConfig.yAxis
       newConfig.runtime.yAxis = newConfig.xAxis['xAxis'] ? newConfig.xAxis['xAxis'] : newConfig.xAxis
+      newConfig.runtime.yAxis.labelOffset *= -1
 
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'horizontal'
@@ -672,7 +665,7 @@ export default function CdcChart({
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
-      let svgMarginWidth = 32
+      let svgMarginWidth = 30
       let editorWidth = 350
 
       width = isEditor ? width - editorWidth : width
@@ -706,7 +699,7 @@ export default function CdcChart({
   // Load data when component first mounts
   useEffect(() => {
     loadConfig()
-  }, []) // eslint-disable-line
+  }, [configObj?.data.length ? configObj.data : null]) // eslint-disable-line
 
   useEffect(() => {
     reloadURLData()
@@ -769,14 +762,6 @@ export default function CdcChart({
       setFilteredData(filterVizData(externalFilters, excludedData))
     }
   }, [externalFilters]) // eslint-disable-line
-
-  // Load data when configObj data changes
-  if (configObj) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-      loadConfig()
-    }, [configObj.data]) // eslint-disable-line
-  }
 
   // This will set the bump chart's default scaling type to date-time
   useEffect(() => {
@@ -892,8 +877,22 @@ export default function CdcChart({
     }
   }
 
-  const formatDate = date => {
-    return timeFormat(config.runtime[section].dateDisplayFormat)(date)
+  const formatDate = (date, prevDate) => {
+    let formattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(date)
+    // Handle the case where all months work with '%b.' except for May
+    if (config.runtime[section].dateDisplayFormat?.includes('%b.') && formattedDate.includes('May.')) {
+      formattedDate = formattedDate.replace(/May\./g, 'May')
+    }
+    // Show years only once
+    if (config.xAxis.showYearsOnce && config.runtime[section].dateDisplayFormat?.includes('%Y') && prevDate) {
+      const prevFormattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(prevDate)
+      const year = formattedDate.match(/\d{4}/)
+      const prevYear = prevFormattedDate.match(/\d{4}/)
+      if (year && prevYear && year[0] === prevYear[0]) {
+        formattedDate = formattedDate.replace(year, '')
+      }
+    }
+    return formattedDate
   }
 
   const formatTooltipsDate = date => {
@@ -1360,7 +1359,7 @@ export default function CdcChart({
                   >
                     {/* All charts with LinearChart */}
                     {!['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
-                      <div style={{ height, width: `100%` }}>
+                      <div ref={parentRef} style={{ width: `100%` }}>
                         <ParentSize>
                           {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
                         </ParentSize>
@@ -1368,20 +1367,20 @@ export default function CdcChart({
                     )}
 
                     {config.visualizationType === 'Pie' && (
-                      <ParentSize className='justify-content-center d-flex' style={{ height, width: `100%` }}>
+                      <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
                         {parent => <PieChart parentWidth={parent.width} parentHeight={parent.height} />}
                       </ParentSize>
                     )}
                     {/* Line Chart */}
                     {config.visualizationType === 'Line' &&
                       (checkLineToBarGraph() ? (
-                        <div style={{ height: config?.heights?.vertical, width: `100%` }}>
+                        <div ref={parentRef} style={{ width: `100%` }}>
                           <ParentSize>
                             {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
                           </ParentSize>
                         </div>
                       ) : (
-                        <div style={{ height, width: `100%` }}>
+                        <div ref={parentRef} style={{ width: `100%` }}>
                           <ParentSize>
                             {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
                           </ParentSize>
@@ -1546,10 +1545,12 @@ export default function CdcChart({
     isEditor,
     isNumber,
     legend,
+    legendRef,
     lineOptions,
     loading,
     missingRequiredSections,
     outerContainerRef,
+    parentRef,
     parseDate,
     rawData: _.cloneDeep(stateData) ?? {},
     seriesHighlight,

@@ -11,7 +11,7 @@ import { Line } from '@visx/shape'
 import { Label } from '../../types/Label'
 import { ChartConfig } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
-import { forwardRef } from 'react'
+import { forwardRef, useState } from 'react'
 import LegendSuppression from './Legend.Suppression'
 import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
@@ -51,16 +51,14 @@ const Legend: React.FC<LegendProps> = forwardRef(
     const { innerClasses, containerClasses } = useLegendClasses(config)
     const { runtime, legend } = config
 
+    const [hasSuppression, setHasSuppression] = useState(false)
+
     const isBottomOrSmallViewport =
       legend?.position === 'bottom' || (isLegendWrapViewport(currentViewport) && !legend.hide)
 
     const legendClasses = {
-      marginBottom: getMarginBottom(isBottomOrSmallViewport, config),
-
-      marginTop:
-        isBottomOrSmallViewport && config.orientation === 'horizontal'
-          ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px`
-          : getMarginTop(isBottomOrSmallViewport, config.brush.active, legend)
+      marginBottom: getMarginBottom(config, hasSuppression),
+      marginTop: getMarginTop(isBottomOrSmallViewport, config)
     }
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
@@ -205,7 +203,11 @@ const Legend: React.FC<LegendProps> = forwardRef(
                   })}
                 </div>
 
-                <LegendSuppression config={config} isBottomOrSmallViewport={isBottomOrSmallViewport} />
+                <LegendSuppression
+                  config={config}
+                  isBottomOrSmallViewport={isBottomOrSmallViewport}
+                  setHasSuppression={setHasSuppression}
+                />
               </>
             )
           }}

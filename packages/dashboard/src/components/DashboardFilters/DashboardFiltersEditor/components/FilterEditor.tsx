@@ -528,14 +528,6 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
                 value={filter.setByQueryParameter || ''}
                 updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)}
               />
-
-              {filter.columnName && columnValues && (
-                <FilterOrder
-                  filter={{ ...filter, values: columnValues }}
-                  updateFilterProp={(prop, index, value) => updateFilterProp(prop, value)}
-                  handleFilterOrder={handleFilterOrder}
-                />
-              )}
             </>
           )}
         </>

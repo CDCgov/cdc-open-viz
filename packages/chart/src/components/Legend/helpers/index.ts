@@ -1,8 +1,3 @@
-export const getMarginTop = (isBottomOrSmallViewport, isBrushActive, legend) => {
-  if (!isBottomOrSmallViewport) return '0px'
-  if (isBrushActive && legend.position === 'bottom') return '35px'
-}
-
 export const getGradientConfig = (config, formatLabels, colorScale) => {
   const defaultValue = [{ datum: '', index: 0, text: '', value: '' }]
 
@@ -15,21 +10,23 @@ export const getGradientConfig = (config, formatLabels, colorScale) => {
   return { colors, labels }
 }
 
-export const getMarginBottom = (isBottomOrSmallViewport, config) => {
-  const isSuppressedActive = config.preliminaryData.some(pd => pd.label) && !config.legend.hideSuppressionLink
-
+export const getMarginTop = (isBottomOrSmallViewport, config) => {
+  if (!isBottomOrSmallViewport) {
+    return '0px'
+  }
+  if (isBottomOrSmallViewport && config.brush?.active) {
+    return '35px'
+  }
+  return '20px'
+}
+export const getMarginBottom = (config, hasSuppression) => {
   const isLegendTop = config.legend?.position === 'top' && !config.legend.hide
 
-  let marginBottom = '0px'
-  if (isLegendTop && !isSuppressedActive) {
-    marginBottom = config.legend.hideBorder.topBottom ? '15px' : '25px'
-  }
-  if (isLegendTop && isSuppressedActive) {
-    marginBottom = '75px'
-  }
-  if (isBottomOrSmallViewport && isSuppressedActive) {
-    marginBottom = '45px'
-  }
+  let marginBottom = 0
 
-  return marginBottom
+  if (isLegendTop) marginBottom = config.legend.hideBorder.topBottom ? 15 : 25
+
+  if (hasSuppression) marginBottom += 40
+
+  return `${marginBottom}px`
 }
