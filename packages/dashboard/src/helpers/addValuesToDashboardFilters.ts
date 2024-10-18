@@ -24,11 +24,15 @@ const getSelector = (filter: SharedFilter) => {
   return filter.type === 'urlfilter' ? filter.apiFilter?.valueSelector : filter.columnName
 }
 
-export const addValuesToDashboardFilters = (filters: SharedFilter[], data: Record<string, any[]>): Array<SharedFilter> => {
+export const addValuesToDashboardFilters = (
+  filters: SharedFilter[],
+  data: Record<string, any[]>
+): Array<SharedFilter> => {
   return filters?.map(filter => {
     if (filter.type === 'urlfilter') return filter
     const filterCopy = _.cloneDeep(filter)
     const filterValues = generateValuesForFilter(getSelector(filter), data)
+
     filterCopy.values = filterValues
     if (filterValues.length > 0) {
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)
@@ -39,7 +43,8 @@ export const addValuesToDashboardFilters = (filters: SharedFilter[], data: Recor
         const active: string[] = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
         filterCopy.active = active.filter(val => defaultValues.includes(val))
       } else {
-        const defaultValue = filterCopy.values[0] || filterCopy.active
+        const resetLabelFilter = filters.find(fil => fil.resetLabel)
+        const defaultValue = resetLabelFilter ? resetLabelFilter.resetLabel : filterCopy.values[0] || filterCopy.active
         const active = Array.isArray(filterCopy.active) ? filterCopy.active[0] : filterCopy.active
         filterCopy.active = filterCopy.values.includes(active) ? active : defaultValue
       }
