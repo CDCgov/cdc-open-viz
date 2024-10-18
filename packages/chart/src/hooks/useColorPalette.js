@@ -5,6 +5,7 @@ export const useColorPalette = (config, updateConfig) => {
   let twoColorPalettes = []
   let sequential = []
   let nonSequential = []
+  const accessibleColors = []
 
   // Get two color palettes if visualization type is Paired Bar
   if (config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar') {
@@ -27,11 +28,11 @@ export const useColorPalette = (config, updateConfig) => {
         seqPalettes.push(paletteName)
       }
 
-      if (
-        (isQualitative || colorblindsafe) &&
-        ((!config.isPaletteReversed && !isReversed) || (config.isPaletteReversed && isReversed))
-      ) {
+      if (isQualitative && ((!config.isPaletteReversed && !isReversed) || (config.isPaletteReversed && isReversed))) {
         nonSeqPalettes.push(paletteName)
+      }
+      if (colorblindsafe && ((!config.isPaletteReversed && !isReversed) || (config.isPaletteReversed && isReversed))) {
+        accessibleColors.push(paletteName)
       }
     }
 
@@ -70,5 +71,6 @@ export const useColorPalette = (config, updateConfig) => {
   }, [config.isPaletteReversed])
 
   // Return all palettes
-  return { twoColorPalettes, sequential, nonSequential }
+
+  return { twoColorPalettes, sequential, nonSequential, accessibleColors }
 }
