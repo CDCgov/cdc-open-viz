@@ -1162,13 +1162,14 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   function filterColorPalettes() {
     let sequential = []
     let nonSequential = []
+    let accessibleColors = []
     for (let paletteName in colorPalettes) {
       if (!isReversed) {
         if (paletteName.includes('qualitative') && !paletteName.endsWith('reverse')) {
           nonSequential.push(paletteName)
         }
         if (paletteName.includes('colorblindsafe') && !paletteName.endsWith('reverse')) {
-          nonSequential.push(paletteName)
+          accessibleColors.push(paletteName)
         }
         if (
           !paletteName.includes('qualitative') &&
@@ -1183,7 +1184,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           nonSequential.push(paletteName)
         }
         if (paletteName.includes('colorblindsafe') && paletteName.endsWith('reverse')) {
-          nonSequential.push(paletteName)
+          accessibleColors.push(paletteName)
         }
         if (
           !paletteName.includes('qualitative') &&
@@ -1195,9 +1196,9 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
       }
     }
 
-    return [sequential, nonSequential]
+    return [sequential, nonSequential, accessibleColors]
   }
-  const [sequential, nonSequential] = filterColorPalettes()
+  const [sequential, nonSequential, accessibleColors] = filterColorPalettes()
 
   useEffect(() => {
     let paletteName = ''
@@ -3287,6 +3288,41 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
               <span>Non-Sequential</span>
               <ul className='color-palette'>
                 {nonSequential.map(palette => {
+                  const colorOne = {
+                    backgroundColor: colorPalettes[palette][2]
+                  }
+
+                  const colorTwo = {
+                    backgroundColor: colorPalettes[palette][4]
+                  }
+
+                  const colorThree = {
+                    backgroundColor: colorPalettes[palette][6]
+                  }
+
+                  // hide palettes with too few colors for region maps
+                  if (colorPalettes[palette].length <= 8 && state.general.geoType === 'us-region') {
+                    return ''
+                  }
+                  return (
+                    <li
+                      title={palette}
+                      key={palette}
+                      onClick={() => {
+                        handleEditorChanges('color', palette)
+                      }}
+                      className={state.color === palette ? 'selected' : ''}
+                    >
+                      <span style={colorOne}></span>
+                      <span style={colorTwo}></span>
+                      <span style={colorThree}></span>
+                    </li>
+                  )
+                })}
+              </ul>
+              <span>Accessible Color Schemes</span>
+              <ul className='color-palette'>
+                {accessibleColors.map(palette => {
                   const colorOne = {
                     backgroundColor: colorPalettes[palette][2]
                   }
