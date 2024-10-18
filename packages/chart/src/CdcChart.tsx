@@ -629,18 +629,25 @@ export default function CdcChart({
   }
 
   // Gets filter values from dataset
-  const generateValuesForFilter = (columnName, data = this.state.data) => {
-    const values: any[] = []
+  const generateValuesForFilter = (columnName: string, data: Record<string, any[]>) => {
+    const valuesSet = new Set<string>()
 
-    data.forEach(row => {
-      const value = row[columnName]
-      //@ts-ignore
-      if (value && false === values.includes(value)) {
-        values.push(value)
-      }
+    // Iterate over all data sets
+    const datasets = Object.values(data) || []
+    datasets.forEach((rows: any[]) => {
+      // Iterate over each row in the dataset
+      rows?.forEach(row => {
+        const value = row[columnName]
+        if (value !== undefined) {
+          // Normalize the value by trimming
+          const normalizedValue = String(value).trim()
+          valuesSet.add(normalizedValue)
+        }
+      })
     })
 
-    return values
+    // Convert Set back to array to return
+    return Array.from(valuesSet)
   }
 
   // Sorts data series for horizontal bar charts
