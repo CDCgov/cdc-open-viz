@@ -1,6 +1,11 @@
 import { memo, useContext } from 'react'
 import { useEditorPermissions } from '../../useEditorPermissions.js'
-import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
+import {
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemPanel,
+  AccordionItemButton
+} from 'react-accessible-accordion'
 import { type ChartConfig } from '../../../../types/ChartConfig.js'
 import { TextField, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
@@ -58,7 +63,7 @@ const RegionSettings = memo(({ config, updateConfig }: { config: ChartConfig; up
           <div className='edit-block' key={`region-${i}`}>
             <button
               type='button'
-              className='remove-column'
+              className='btn btn-danger remove-column'
               onClick={event => {
                 event.preventDefault()
                 removeColumn(i)
@@ -68,8 +73,18 @@ const RegionSettings = memo(({ config, updateConfig }: { config: ChartConfig; up
             </button>
             <TextField value={label} label='Region Label' fieldName='label' i={i} updateField={updateField} />
             <div className='two-col-inputs'>
-              <TextField value={color} label='Text Color' fieldName='color' updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
-              <TextField value={background} label='Background' fieldName='background' updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
+              <TextField
+                value={color}
+                label='Text Color'
+                fieldName='color'
+                updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
+              />
+              <TextField
+                value={background}
+                label='Background'
+                fieldName='background'
+                updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
+              />
             </div>
 
             <Select
@@ -91,11 +106,17 @@ const RegionSettings = memo(({ config, updateConfig }: { config: ChartConfig; up
               options={fromOptions}
             />
 
-            {(config.regions[i].fromType === 'Fixed' || config.regions[i].fromType === 'Previous Days' || !config.regions[i].fromType) && (
+            {(config.regions[i].fromType === 'Fixed' ||
+              config.regions[i].fromType === 'Previous Days' ||
+              !config.regions[i].fromType) && (
               <>
                 <TextField
                   value={from}
-                  label={config.regions[i].fromType === 'Fixed' || !config.regions[i]?.fromType ? 'From Value' : 'Previous Number of Days'}
+                  label={
+                    config.regions[i].fromType === 'Fixed' || !config.regions[i]?.fromType
+                      ? 'From Value'
+                      : 'Previous Number of Days'
+                  }
                   fieldName='from'
                   updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
                   tooltip={
@@ -104,7 +125,10 @@ const RegionSettings = memo(({ config, updateConfig }: { config: ChartConfig; up
                         <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                       </Tooltip.Target>
                       <Tooltip.Content>
-                        <p>When using categorical (linear scale) match the data set value. When using date (linear / date time scale) match the x-axis value.</p>
+                        <p>
+                          When using categorical (linear scale) match the data set value. When using date (linear / date
+                          time scale) match the x-axis value.
+                        </p>
                       </Tooltip.Content>
                     </Tooltip>
                   }
@@ -131,13 +155,20 @@ const RegionSettings = memo(({ config, updateConfig }: { config: ChartConfig; up
               options={toOptions}
             />
 
-            {(config.regions[i].toType === 'Fixed' || !config.regions[i].toType) && <TextField value={to} label='To Value' fieldName='to' updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />}
+            {(config.regions[i].toType === 'Fixed' || !config.regions[i].toType) && (
+              <TextField
+                value={to}
+                label='To Value'
+                fieldName='to'
+                updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
+              />
+            )}
           </div>
         ))}
       {!config.regions && <p style={{ textAlign: 'center' }}>There are currently no regions.</p>}
       <button
         type='button'
-        className='btn full-width'
+        className='btn btn-primary full-width'
         onClick={e => {
           e.preventDefault()
           addColumn()

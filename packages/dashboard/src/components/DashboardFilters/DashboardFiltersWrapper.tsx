@@ -13,6 +13,7 @@ import { ViewPort } from '@cdc/core/types/ViewPort'
 import { hasDashboardApplyBehavior } from '../../helpers/hasDashboardApplyBehavior'
 import * as apiFilterHelpers from '../../helpers/apiFilterHelpers'
 import { applyQueuedActive } from '@cdc/core/components/Filters/helpers/applyQueuedActive'
+import './dashboardfilter.styles.css'
 
 type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
 
@@ -43,7 +44,8 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   const { config: dashboardConfig, reloadURLData, loadAPIFilters, setAPIFilterDropdowns } = state
   const dispatch = useContext(DashboardDispatchContext)
 
-  const applyFilters = () => {
+  const applyFilters = e => {
+    e.preventDefault() // prevent form submission
     const dashboardConfig = _.cloneDeep(state.config.dashboard)
     const nonAutoLoadFilterIndexes = Object.values(state.config.visualizations)
       .filter(v => v.type === 'dashboardFilters')
@@ -171,7 +173,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       {!displayNone && (
         <Layout.Responsive isEditor={isEditor}>
           <div
-            className={`cdc-dashboard-inner-container${
+            className={`${
               isEditor ? ' is-editor' : ''
             } cove-component__content col-12 cove-dashboard-filters-container`}
           >
@@ -180,10 +182,10 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
               filters={dashboardConfig.dashboard.sharedFilters || []}
               apiFilterDropdowns={apiFilterDropdowns}
               handleOnChange={handleOnChange}
+              showSubmit={visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad}
+              applyFilters={applyFilters}
+              applyFiltersButtonText={visualizationConfig.applyFiltersButtonText}
             />
-            {visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad && (
-              <button onClick={applyFilters}>{visualizationConfig.applyFiltersButtonText || 'GO!'}</button>
-            )}
           </div>
         </Layout.Responsive>
       )}
