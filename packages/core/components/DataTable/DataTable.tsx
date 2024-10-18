@@ -73,9 +73,9 @@ const DataTable = (props: DataTableProps) => {
   const runtimeData = useMemo(() => {
     const data = removeNullColumns(parentRuntimeData)
     if (config.table.pivot) {
-      const { columnName, valueColumn } = config.table.pivot
-      if (columnName && valueColumn) {
-        return pivotData(data, columnName, valueColumn)
+      const { columnName, valueColumns } = config.table.pivot
+      if (columnName && valueColumns) {
+        return pivotData(data, columnName, valueColumns)
       }
     }
     return data
@@ -243,7 +243,9 @@ const DataTable = (props: DataTableProps) => {
         {!config.table.showDownloadLinkBelow && <TableMediaControls />}
         <section
           id={tabbingId.replace('#', '')}
-          className={`data-table-container ${viewport}`}
+          className={`data-table-container ${viewport} ${
+            !config.table.showDownloadLinkBelow ? 'download-link-above' : ''
+          }`}
           aria-label={accessibilityLabel}
         >
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />

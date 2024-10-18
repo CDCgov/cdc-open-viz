@@ -103,7 +103,7 @@ export default function ChooseTab() {
               type: 'categorical',
               size: 75,
               maxTickRotation: 45,
-              labelOffset: 65
+              labelOffset: 0
             }
           } as Visualization
 
@@ -232,7 +232,13 @@ export default function ChooseTab() {
         <li>
           <Tooltip position='right'>
             <Tooltip.Target>
-              <IconButton label='Epi Chart' type='chart' subType='Bar' orientation='vertical' icon={<EpiChartIcon />} />
+              <IconButton
+                label='Epi Chart'
+                type='chart'
+                subType='Combo'
+                orientation='vertical'
+                icon={<EpiChartIcon />}
+              />
             </Tooltip.Target>
             <Tooltip.Content>Use bars to show comparisons between data categories.</Tooltip.Content>
           </Tooltip>
