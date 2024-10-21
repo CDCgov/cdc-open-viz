@@ -88,7 +88,7 @@ interface CdcChartProps {
   setSharedFilterValue?: (value: any) => void
   dashboardConfig?: DashboardConfig
 }
-export default function CdcChart({
+const CdcChart = ({
   configUrl,
   config: configObj,
   isEditor = false,
@@ -101,9 +101,10 @@ export default function CdcChart({
   setSharedFilter,
   setSharedFilterValue,
   dashboardConfig
-}: CdcChartProps) {
+}: CdcChartProps) => {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
+  const svgRef = useRef(null)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
   const [stateData, setStateData] = useState(_.cloneDeep(configObj?.data) || [])
@@ -134,7 +135,6 @@ export default function CdcChart({
   const handleDragStateChange = isDragging => {
     setIsDraggingAnnotation(isDragging)
   }
-
   if (isDebug) console.log('Chart config, isEditor', config, isEditor)
 
   // Destructure items from config for more readable JSX
@@ -692,7 +692,7 @@ export default function CdcChart({
     setContainer(node)
   }, []) // eslint-disable-line
 
-  function isEmpty(obj) {
+  const isEmpty = obj => {
     return Object.keys(obj).length === 0
   }
 
@@ -1361,14 +1361,16 @@ export default function CdcChart({
                     {!['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
                       <div ref={parentRef} style={{ width: `100%` }}>
                         <ParentSize>
-                          {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                          {parent => (
+                            <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
+                          )}
                         </ParentSize>
                       </div>
                     )}
 
                     {config.visualizationType === 'Pie' && (
                       <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
-                        {parent => <PieChart parentWidth={parent.width} parentHeight={parent.height} />}
+                        {parent => <PieChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />}
                       </ParentSize>
                     )}
                     {/* Line Chart */}
@@ -1376,13 +1378,17 @@ export default function CdcChart({
                       (checkLineToBarGraph() ? (
                         <div ref={parentRef} style={{ width: `100%` }}>
                           <ParentSize>
-                            {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                            {parent => (
+                              <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
+                            )}
                           </ParentSize>
                         </div>
                       ) : (
                         <div ref={parentRef} style={{ width: `100%` }}>
                           <ParentSize>
-                            {parent => <LinearChart parentWidth={parent.width} parentHeight={parent.height} />}
+                            {parent => (
+                              <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
+                            )}
                           </ParentSize>
                         </div>
                       ))}
@@ -1436,7 +1442,6 @@ export default function CdcChart({
                 {description && config.visualizationType !== 'Spark Line' && (
                   <div className={getChartSubTextClasses().join('')}>{parse(description)}</div>
                 )}
-                {false && <Annotation.List />}
 
                 {/* buttons */}
                 <MediaControls.Section classes={['download-buttons']}>
@@ -1563,6 +1568,7 @@ export default function CdcChart({
     setSeriesHighlight,
     setSharedFilter,
     setSharedFilterValue,
+    svgRef,
     tableData: filteredData || excludedData, // do not clean table data
     transformedData: clean(filteredData || excludedData), // do this right before passing to components
     twoColorPalette,
@@ -1585,3 +1591,5 @@ export default function CdcChart({
     </ConfigContext.Provider>
   )
 }
+
+export default CdcChart

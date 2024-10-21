@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 // Libraries
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -50,7 +50,7 @@ const BOTTOM_LABEL_PADDING = 9
 const X_TICK_LABEL_PADDING = 3
 const DEFAULT_TICK_LENGTH = 8
 
-const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) => {
+const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, parentWidth }, svgRef) => {
   // prettier-ignore
   const {
     brushConfig,
@@ -101,7 +101,6 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
   // REFS
   const axisBottomRef = useRef(null)
   const forestPlotRightLabelRef = useRef(null)
-  const svgRef = useRef(null)
   const suffixRef = useRef(null)
   const topYLabelRef = useRef(null)
   const triggerRef = useRef()
@@ -1538,6 +1537,6 @@ const LinearChart: React.FC<LinearChartProps> = ({ parentHeight, parentWidth }) 
       </div>
     </ErrorBoundary>
   )
-}
+})
 
 export default LinearChart
