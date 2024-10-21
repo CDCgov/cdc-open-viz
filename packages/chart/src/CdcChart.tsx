@@ -699,7 +699,7 @@ const CdcChart = ({
   // Load data when component first mounts
   useEffect(() => {
     loadConfig()
-  }, [configObj?.data.length ? configObj.data : null]) // eslint-disable-line
+  }, [configObj?.data?.length ? configObj.data : null]) // eslint-disable-line
 
   useEffect(() => {
     reloadURLData()
