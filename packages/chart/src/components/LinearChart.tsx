@@ -87,8 +87,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     legend,
     forestPlot,
     brush,
+    dataFormat,
     debugSvg
   } = config
+  const { suffix } = dataFormat
 
   // HOOKS  % STATES
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
@@ -96,13 +98,12 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const { hasTopAxis } = useTopAxis(config)
   const [animatedChart, setAnimatedChart] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
-  const [suffixWidth, setSuffixWidth] = useState(0)
 
   // REFS
   const axisBottomRef = useRef(null)
   const forestPlotRightLabelRef = useRef(null)
   const suffixRef = useRef(null)
-  const topYLabelRef = useRef(null)
+  const yTickLabelRef = useRef([])
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
@@ -117,6 +118,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isHorizontal = orientation === 'horizontal' || config.visualizationType === 'Forest Plot'
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   const isForestPlot = visualizationType === 'Forest Plot'
+  const suffixHasNoSpace = !suffix.includes(' ')
 
   const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
 
@@ -316,9 +318,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleTooltipMouseOver,
     handleTooltipClick,
     handleTooltipMouseOff,
-    tooltipStyles,
     TooltipListItem,
-    getXValueFromCoordinateDate,
     getXValueFromCoordinate
   } = useCoveTooltip({
       xScale,
@@ -350,10 +350,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   useEffect(() => {
     const suffixEl = suffixRef.current
-    if (!suffixEl && !suffixWidth) return
-    if (!suffixEl) return setSuffixWidth(0)
+    if (!suffixEl) return
     const suffixElWidth = suffixEl.getBBox().width
-    setSuffixWidth(suffixElWidth)
+
+    // subtract the width of the suffix from the x position of the text if there is no space
+    if (!suffixHasNoSpace || !yTickLabelRef.current?.length) return
+    yTickLabelRef.current.forEach(el => {
+      el.setAttribute('x', Number(el.getAttribute('x')) - suffixElWidth)
+    })
   }, [config.dataFormat.suffix, config.dataFormat.onlyShowTopPrefixSuffix])
 
   // forest plot x-axis label positioning
@@ -377,12 +381,13 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const axisBottomHeight = axisBottomRef.current.getBBox().height
 
     const isForestPlot = visualizationType === 'Forest Plot'
-    const topLabelOnGridline = topYLabelRef.current && yAxis.labelsAboveGridlines
+    const yTickLabelHeight = yTickLabelRef.current?.[0].getBBox().height
+    const topLabelOnGridline = yAxis.labelsAboveGridlines && yTickLabelHeight
 
     // Heights to add
     const brushHeight = brush?.active ? brush?.height : 0
     const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
-    const topLabelOnGridlineHeight = topLabelOnGridline ? topYLabelRef.current.getBBox().height : 0
+    const topLabelOnGridlineHeight = topLabelOnGridline ? yTickLabelHeight : 0
     const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight + topLabelOnGridlineHeight
     const newHeight = initialHeight + additionalHeight
     if (!parentRef.current) return
@@ -408,7 +413,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const legendIsLeftOrRight =
       legend?.position !== 'top' && legend?.position !== 'bottom' && !isLegendWrapViewport(currentViewport)
     legendRef.current.style.transform = legendIsLeftOrRight ? `translateY(${topLabelOnGridlineHeight}px)` : 'none'
-  }, [axisBottomRef.current, config, bottomLabelStart, brush, currentViewport, topYLabelRef.current])
+  }, [axisBottomRef.current, config, bottomLabelStart, brush, currentViewport, yTickLabelRef.current?.length])
 
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
@@ -1049,8 +1054,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       const { suffix, onlyShowTopPrefixSuffix } = config.dataFormat
                       const { labelsAboveGridlines, hideAxis } = config.yAxis
                       const lastTick = props.ticks.length - 1 === i
-                      const suffixOneChar = suffix.length === 1
-                      const hideTopTick = lastTick && onlyShowTopPrefixSuffix && suffix && !suffixOneChar
+                      const hideTopTick = lastTick && onlyShowTopPrefixSuffix && suffix && !suffixHasNoSpace
                       const valueOnLinePadding = hideAxis ? -8 : -12
                       const labelXPadding = labelsAboveGridlines ? valueOnLinePadding : 2
                       const labelYPadding = labelsAboveGridlines ? 4 : 0
@@ -1184,7 +1188,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                     y={labelY}
                                     angle={-Number(config.yAxis.tickRotation) || 0}
                                     verticalAnchor={labelVerticalAnchor}
-                                    textAnchor={suffixOneChar ? 'end' : 'start'}
+                                    textAnchor={suffixHasNoSpace ? 'end' : 'start'}
                                     fill={config.yAxis.tickLabelColor}
                                     stroke={'#fff'}
                                     paintOrder={'stroke'} // keeps stroke under fill
@@ -1197,10 +1201,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
                                 {/* VALUE */}
                                 <BlurStrokeText
-                                  innerRef={el => lastTick && (topYLabelRef.current = el)}
+                                  innerRef={el => (yTickLabelRef.current[i] = el)}
                                   display={isLogarithmicAxis ? showTicks : 'block'}
                                   dx={isLogarithmicAxis ? -6 : 0}
-                                  x={suffixOneChar ? labelX - suffixWidth : labelX}
+                                  // if suffix has no space, suffix width is subtracted from x via ref
+                                  x={labelX}
                                   y={labelY + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                                   angle={-Number(config.yAxis.tickRotation) || 0}
                                   verticalAnchor={config.runtime.horizontal ? 'start' : labelVerticalAnchor}

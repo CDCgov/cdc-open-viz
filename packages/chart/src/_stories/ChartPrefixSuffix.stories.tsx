@@ -43,11 +43,20 @@ export const Top_Suffix_With_Options: Story = {
   }
 }
 
-export const Top_Suffix_One_Char: Story = {
+export const Top_Suffix_No_Space: Story = {
   args: {
     config: editConfigKeys(annotationConfig, [
       { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
-      { path: ['dataFormat', 'suffix'], value: '%' }
+      { path: ['dataFormat', 'suffix'], value: 'lbs' }
+    ])
+  }
+}
+
+export const Top_Suffix_With_Space: Story = {
+  args: {
+    config: editConfigKeys(annotationConfig, [
+      { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
+      { path: ['dataFormat', 'suffix'], value: 'lbs of something' }
     ])
   }
 }
