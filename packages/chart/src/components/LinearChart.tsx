@@ -369,7 +369,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const xLabelY = labelRelativeY + rightLabel.getBBox().height + BOTTOM_LABEL_PADDING
     if (!xAxisTitleRef.current) return
     xAxisTitleRef.current.setAttribute('y', xLabelY)
-  }, [config.data.length, forestRowsHeight])
+  }, [config?.data?.length, forestRowsHeight])
 
   // Parent height adjustments
   useEffect(() => {
