@@ -1794,7 +1794,7 @@ const EditorPanel = () => {
                           value={config.yAxis.labelsAboveGridlines}
                           section='yAxis'
                           fieldName='labelsAboveGridlines'
-                          label='Labels above gridlines'
+                          label='Tick labels above gridlines'
                           updateField={updateField}
                           disabled={!config.yAxis.gridLines}
                           title={!config.yAxis.gridLines ? 'Show gridlines to enable' : ''}
