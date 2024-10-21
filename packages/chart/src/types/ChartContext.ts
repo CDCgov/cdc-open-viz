@@ -37,6 +37,7 @@ type SharedChartContext = {
   parentRef?: React.RefObject<HTMLDivElement>
   setBrushConfig: Function
   setLegendIsolateValues?: Function
+  svgRef?: React.RefObject<SVGSVGElement>
 }
 
 // Line Chart Specific Context
