@@ -127,10 +127,7 @@ table.data-table {
     &:last-child {
       border-right: 0 !important;
     }
-
-    @media (max-width: var(--breakpoint-sm)) {
-      font-size: var(--font-small) + 0.2em;
-    }
+    font-size: var(--font-size);
   }
 
   td {
