@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useContext, useEffect, useMemo, useRef, useState } from 'react'
 
 // Libraries
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -28,6 +28,8 @@ import CategoricalYAxis from './Axis/Categorical.Axis'
 // Helpers
 import { isConvertLineToBarGraph } from '../helpers/isConvertLineToBarGraph'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
+import { calcInitialHeight } from '../helpers/sizeHelpers'
 
 // Hooks
 import useMinMax from '../hooks/useMinMax'
@@ -39,7 +41,6 @@ import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
-import { calcInitialHeight } from '../helpers/sizeHelpers'
 
 type LinearChartProps = {
   parentWidth: number
@@ -60,7 +61,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     dimensions,
     formatDate,
     formatNumber,
-    getTextWidth,
     handleChartAriaLabels,
     handleLineType,
     handleDragStateChange,
@@ -87,8 +87,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     legend,
     forestPlot,
     brush,
+    dataFormat,
     debugSvg
   } = config
+  const { suffix, onlyShowTopPrefixSuffix } = dataFormat
+  const { labelsAboveGridlines, hideAxis } = config.yAxis
 
   // HOOKS  % STATES
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
@@ -117,6 +120,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isHorizontal = orientation === 'horizontal' || config.visualizationType === 'Forest Plot'
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   const isForestPlot = visualizationType === 'Forest Plot'
+  const suffixHasNoSpace = !suffix.includes(' ')
 
   const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
 
@@ -316,9 +320,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleTooltipMouseOver,
     handleTooltipClick,
     handleTooltipMouseOff,
-    tooltipStyles,
     TooltipListItem,
-    getXValueFromCoordinateDate,
     getXValueFromCoordinate
   } = useCoveTooltip({
       xScale,
@@ -1046,11 +1048,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       const to = { x: tick.to.x - tickLength, y: tick.to.y }
 
                       // Vertical value/suffix vars
-                      const { suffix, onlyShowTopPrefixSuffix } = config.dataFormat
-                      const { labelsAboveGridlines, hideAxis } = config.yAxis
                       const lastTick = props.ticks.length - 1 === i
-                      const suffixOneChar = suffix.length === 1
-                      const hideTopTick = lastTick && onlyShowTopPrefixSuffix && suffix && !suffixOneChar
+                      const hideTopTick = lastTick && onlyShowTopPrefixSuffix && suffix && !suffixHasNoSpace
                       const valueOnLinePadding = hideAxis ? -8 : -12
                       const labelXPadding = labelsAboveGridlines ? valueOnLinePadding : 2
                       const labelYPadding = labelsAboveGridlines ? 4 : 0
@@ -1184,7 +1183,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                     y={labelY}
                                     angle={-Number(config.yAxis.tickRotation) || 0}
                                     verticalAnchor={labelVerticalAnchor}
-                                    textAnchor={suffixOneChar ? 'end' : 'start'}
+                                    textAnchor={suffixHasNoSpace ? 'end' : 'start'}
                                     fill={config.yAxis.tickLabelColor}
                                     stroke={'#fff'}
                                     paintOrder={'stroke'} // keeps stroke under fill
@@ -1200,7 +1199,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                   innerRef={el => lastTick && (topYLabelRef.current = el)}
                                   display={isLogarithmicAxis ? showTicks : 'block'}
                                   dx={isLogarithmicAxis ? -6 : 0}
-                                  x={suffixOneChar ? labelX - suffixWidth : labelX}
+                                  x={suffixHasNoSpace ? labelX - suffixWidth : labelX}
                                   y={labelY + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                                   angle={-Number(config.yAxis.tickRotation) || 0}
                                   verticalAnchor={config.runtime.horizontal ? 'start' : labelVerticalAnchor}

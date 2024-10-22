@@ -7,9 +7,10 @@ import ConfigContext from '../../ConfigContext'
 import chroma from 'chroma-js'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { useBarChart } from '../../hooks/useBarChart'
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
-  const { config, getTextWidth } = useContext(ConfigContext)
+  const { config } = useContext(ConfigContext)
   const { fontSize } = useBarChart()
 
   const { orientation } = config
