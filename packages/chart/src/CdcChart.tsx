@@ -46,7 +46,6 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import Annotation from './components/Annotations'
 
 // Helpers
-import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import numberFromString from '@cdc/core/helpers/numberFromString'
@@ -1534,7 +1533,6 @@ const CdcChart = ({
     formatDate,
     formatNumber,
     formatTooltipsDate,
-    getTextWidth,
     getXAxisData,
     getYAxisData,
     handleChartAriaLabels,
