@@ -42,7 +42,7 @@ export const BarChartVertical = () => {
   } = useBarChart()
 
   // prettier-ignore
-  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig, getTextWidth } = useContext<ChartContext>(ConfigContext)
+  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig } = useContext<ChartContext>(ConfigContext)
   const { HighLightedBarUtils } = useHighlightedBars(config)
   let data = transformedData
   // check if user add suppression
@@ -168,7 +168,6 @@ export const BarChartVertical = () => {
                     defaultBarHeight,
                     config,
                     isNumber,
-                    getTextWidth,
                     barWidth,
                     isVertical: true,
                     yAxisValue

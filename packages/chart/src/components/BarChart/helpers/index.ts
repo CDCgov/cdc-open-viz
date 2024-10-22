@@ -1,3 +1,5 @@
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
+
 // Define an interface for the function's parameter
 interface BarConfigProps {
   defaultBarWidth?: number
@@ -5,7 +7,6 @@ interface BarConfigProps {
   bar?: { [key: string]: any }
   isNumber?: Function
   config: { [key: string]: any }
-  getTextWidth: (a: string, b: string) => string
   barWidth: number
   isVertical: boolean
 }
@@ -17,7 +18,6 @@ export const getBarConfig = ({
   defaultBarWidth,
   config,
   isNumber,
-  getTextWidth,
   barWidth,
   isVertical
 }: BarConfigProps) => {

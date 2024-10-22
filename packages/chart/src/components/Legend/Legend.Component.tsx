@@ -28,7 +28,6 @@ export interface LegendProps {
   seriesHighlight: string[]
   skipId: string
   dimensions: DimensionsType // for responsive width legend
-  getTextWidth: (text: string, font: string) => string
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
@@ -43,8 +42,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
       currentViewport,
       formatLabels,
       skipId = 'legend',
-      dimensions,
-      getTextWidth
+      dimensions
     },
     ref
   ) => {
@@ -77,7 +75,6 @@ const Legend: React.FC<LegendProps> = forwardRef(
         {legend.label && <h3>{parse(legend.label)}</h3>}
         {legend.description && <p>{parse(legend.description)}</p>}
         <LegendGradient
-          getTextWidth={getTextWidth}
           config={config}
           {...getGradientConfig(config, formatLabels, colorScale)}
           dimensions={dimensions}

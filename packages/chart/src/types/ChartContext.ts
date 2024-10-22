@@ -20,7 +20,6 @@ type SharedChartContext = {
   config: ChartConfig
   currentViewport?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   dashboardConfig?: DashboardConfig
-  getTextWidth?: (a: string, b: string) => string
   // process top level chart aria label for each chart type
   handleChartAriaLabels: (config: any) => string
   handleDragStateChange: (isDragging: any) => void

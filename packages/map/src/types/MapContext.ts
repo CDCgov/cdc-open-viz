@@ -55,5 +55,4 @@ export type MapContext = {
   runtimeData: Object[]
   tooltipId: string
   setTopoData: Function
-  getTextWidth: (text: string, font: string) => string | undefined
 }

@@ -2,15 +2,16 @@ import { Group } from '@visx/group'
 import { useContext, useEffect, useRef, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import * as d3 from 'd3'
-import { invertValue } from '@cdc/core/helpers/scaling'
 import { Text } from '@visx/text'
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
+
 interface BrushChartProps {
   xMax: number
   yMax: number
 }
 
 const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
-  const { tableData, config, setBrushConfig, getTextWidth, dashboardConfig, formatDate } = useContext(ConfigContext)
+  const { tableData, config, setBrushConfig, dashboardConfig, formatDate } = useContext(ConfigContext)
   const [brushState, setBrushState] = useState({ isBrushing: false, selection: [] })
   const [brushKey, setBrushKey] = useState(0)
   const sharedFilters = dashboardConfig?.dashboard?.sharedFilters ?? []

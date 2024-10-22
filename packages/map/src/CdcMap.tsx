@@ -30,7 +30,6 @@ import { publish } from '@cdc/core/helpers/events'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import Title from '@cdc/core/components/ui/Title'
-import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
@@ -1730,7 +1729,6 @@ const CdcMap = ({
     tooltipRef,
     topoData,
     setTopoData,
-    getTextWidth,
     mapId
   }
 
