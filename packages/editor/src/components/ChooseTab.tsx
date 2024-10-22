@@ -122,9 +122,7 @@ export default function ChooseTab() {
             if (label === 'Epi Chart') {
               newConfig.xAxis.type = 'date-time'
               newConfig.xAxis.size = 0
-
-              newConfig.barThickness = ' 0.70'
-
+              newConfig.barThickness = ' 0.50'
               newConfig.xAxis.labelOffset = 0
               newConfig.xAxis.maxTickRotation = 45
               newConfig.isResponsiveTicks = true
@@ -232,13 +230,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip position='right'>
             <Tooltip.Target>
-              <IconButton
-                label='Epi Chart'
-                type='chart'
-                subType='Combo'
-                orientation='vertical'
-                icon={<EpiChartIcon />}
-              />
+              <IconButton label='Epi Chart' type='chart' subType='Bar' orientation='vertical' icon={<EpiChartIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Use bars to show comparisons between data categories.</Tooltip.Content>
           </Tooltip>
