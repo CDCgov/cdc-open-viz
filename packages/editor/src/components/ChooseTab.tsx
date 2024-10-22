@@ -25,6 +25,7 @@ import ForestPlotIcon from '@cdc/core/assets/icon-chart-forest-plot.svg'
 import ForecastIcon from '@cdc/core/assets/icon-chart-forecast.svg'
 import DeviationIcon from '@cdc/core/assets/icon-deviation-bar.svg'
 import SankeyIcon from '@cdc/core/assets/icon-sankey.svg'
+import ComboChartIcon from '@cdc/core/assets/icon-combo-chart.svg'
 import EpiChartIcon from '@cdc/core/assets/icon-epi-chart.svg'
 import { Visualization } from '@cdc/core/types/Visualization'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -122,9 +123,7 @@ export default function ChooseTab() {
             if (label === 'Epi Chart') {
               newConfig.xAxis.type = 'date-time'
               newConfig.xAxis.size = 0
-
-              newConfig.barThickness = ' 0.70'
-
+              newConfig.barThickness = ' 0.50'
               newConfig.xAxis.labelOffset = 0
               newConfig.xAxis.maxTickRotation = 45
               newConfig.isResponsiveTicks = true
@@ -232,12 +231,20 @@ export default function ChooseTab() {
         <li>
           <Tooltip position='right'>
             <Tooltip.Target>
+              <IconButton label='Epi Chart' type='chart' subType='Bar' orientation='vertical' icon={<EpiChartIcon />} />
+            </Tooltip.Target>
+            <Tooltip.Content>Use bars to show comparisons between data categories.</Tooltip.Content>
+          </Tooltip>
+        </li>
+        <li>
+          <Tooltip position='right'>
+            <Tooltip.Target>
               <IconButton
-                label='Epi Chart'
+                label='Combo Chart'
                 type='chart'
                 subType='Combo'
                 orientation='vertical'
-                icon={<EpiChartIcon />}
+                icon={<ComboChartIcon />}
               />
             </Tooltip.Target>
             <Tooltip.Content>Use bars to show comparisons between data categories.</Tooltip.Content>
