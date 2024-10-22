@@ -1,21 +1,21 @@
 /* format the white triangle sort icon in data table headers */
 .sort-icon {
   fill: white;
-  width: 15px;
-  height: 20px;
-  float: right;
   position: relative;
+  margin: 0 0.5rem !important;
   :is(svg) {
     position: absolute;
     fill: rgba(255, 255, 255, 0.5);
     &.active {
       fill: white;
     }
+    width: 1rem;
+    height: 1rem;
   }
   .up {
-    top: 0;
+    bottom: 0.5rem;
   }
   .down {
-    bottom: 0;
+    top: 0.5rem;
   }
 }
