@@ -271,10 +271,7 @@ const PanelGeneral: FC<PanelProps> = props => {
               updateField={updateField}
             />
             <CheckBox
-              display={
-                config.visualizationSubType === 'stacked' &&
-                (config.visualizationType === 'Bar' || config.visualizationType === 'Combo')
-              }
+              display={config.visualizationType === 'Bar' || config.visualizationType === 'Combo'}
               tooltip={
                 <Tooltip style={{ textTransform: 'none' }}>
                   <Tooltip.Target>
