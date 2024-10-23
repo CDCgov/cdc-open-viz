@@ -195,7 +195,6 @@ export const useTooltip = props => {
             )
             ?.flatMap(seriesKey => {
               const value = resolvedScaleValues[0]?.[seriesKey]
-              console.log(value, 'value')
               const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
               if (
                 (value === null || value === undefined || value === '' || formattedValue === 'N/A') &&
