@@ -38,7 +38,8 @@ export const BarChartVertical = () => {
     lollipopShapeSize,
     onMouseLeaveBar,
     onMouseOverBar,
-    section
+    section,
+    updateBarsGroup
   } = useBarChart()
 
   // prettier-ignore
@@ -79,7 +80,7 @@ export const BarChartVertical = () => {
           }}
         >
           {barGroups => {
-            return barGroups.map((barGroup, index) => (
+            return updateBarsGroup(barGroups, barWidth).map((barGroup, index) => (
               <Group
                 className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`}
                 key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}

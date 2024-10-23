@@ -447,6 +447,24 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     })
   }
 
+  const updateTicks = ticks => {
+    if (config.xAxis.type !== 'date-time') return ticks
+    const lastIndex = ticks.length - 1
+    const seriesOffset = (seriesScale.bandwidth() * config.series.length) / 2
+
+    return ticks.map(tick => {
+      const isFirst = tick.index === 0
+      const isLast = tick.index === lastIndex
+      const offsetX = isFirst ? seriesOffset : isLast ? -seriesOffset : 0
+
+      return {
+        ...tick,
+        from: { x: tick.from.x + offsetX, y: 0 },
+        to: { x: tick.from.x + offsetX, y: tick.to.y }
+      }
+    })
+  }
+
   const generatePairedBarAxis = () => {
     const axisMaxHeight = bottomLabelStart + BOTTOM_LABEL_PADDING
 
@@ -1415,7 +1433,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
                 return (
                   <Group className='bottom-axis' width={dimensions[0]}>
-                    {props.ticks.map((tick, i, propsTicks) => {
+                    {updateTicks(props.ticks).map((tick, i, propsTicks) => {
                       // when using LogScale show major ticks values only
                       const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
                       const tickLength = showTick === 'block' ? 16 : DEFAULT_TICK_LENGTH
