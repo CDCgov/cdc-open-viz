@@ -132,6 +132,8 @@ const CdcMap = ({
   const [dimensions, setDimensions] = useState<DimensionsType>([0, 0])
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
   const [projection, setProjection] = useState(null)
+  const [showTooltip, setShowTooltip] = useState(true)
+  const [liveRegionMessage, setLiveRegionMessage] = useState('')
 
   const legendRef = useRef(null)
   const tooltipRef = useRef(null)
@@ -1669,16 +1671,6 @@ const CdcMap = ({
 
   // Props passed to all map types
   const mapProps = {
-    projection,
-    setProjection,
-    stateToShow,
-    setStateToShow,
-    setScale,
-    setTranslate,
-    scale,
-    translate,
-    isDraggingAnnotation,
-    handleDragStateChange,
     applyLegendToRow,
     applyTooltipsToGeo,
     capitalize: state.tooltips?.capitalizeLabels,
@@ -1695,41 +1687,55 @@ const CdcMap = ({
     generateColorsArray,
     generateRuntimeData,
     geoClickHandler,
+    handleDragStateChange,
     handleMapAriaLabels,
     hasZoom: state.general.allowMapZoom,
     innerContainerRef,
     isDashboard,
     isDebug,
+    isDraggingAnnotation,
     isEditor,
     loadConfig,
+    mapId,
     navigationHandler,
     position,
+    projection,
     resetLegendToggles,
+    runtimeData,
     runtimeFilters,
     runtimeLegend,
-    runtimeData,
+    scale,
     setAccessibleStatus,
     setFilteredCountryCode,
     setParentConfig: setConfig,
     setPosition,
+    setProjection,
     setRuntimeData,
     setRuntimeFilters,
     setRuntimeLegend,
+    setScale,
     setSharedFilterValue,
+    setShowTooltip,
     setState,
+    setStateToShow,
+    setTopoData,
+    setTranslate,
+    showTooltip,
     state,
+    stateToShow,
     supportedCities,
     supportedCounties,
     supportedCountries,
     supportedTerritories,
     titleCase,
-    type: general.type,
-    viewport: currentViewport,
     tooltipId,
     tooltipRef,
     topoData,
-    setTopoData,
-    mapId
+    liveRegionMessage,
+    setLiveRegionMessage,
+    translate,
+    type: general.type,
+    viewport: currentViewport
   }
 
   if (!mapProps.data || !state.data) return <></>
@@ -1939,7 +1945,8 @@ const CdcMap = ({
             {accessibleStatus}
           </div>
 
-          {!isDraggingAnnotation &&
+          {showTooltip &&
+            !isDraggingAnnotation &&
             !window.matchMedia('(any-hover: none)').matches &&
             'hover' === tooltips.appearanceType && (
               <ReactTooltip
@@ -1960,6 +1967,16 @@ const CdcMap = ({
               display: 'none' // can't use d-none here
             }}
           ></div>
+          <div
+            id='tooltip'
+            role='tooltip'
+            aria-live='assertive'
+            ref={tooltipRef}
+            tabIndex={-1}
+            style={{ position: 'absolute', backgroundColor: 'white', border: '1px solid black', padding: '5px' }}
+          >
+            {liveRegionMessage}
+          </div>
         </Layout.Responsive>
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>

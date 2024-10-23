@@ -16,6 +16,7 @@ import { geoAlbersUsa } from 'd3-composite-projections'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import HexIcon from './HexIcon'
 import { patternSizes } from '../helpers/patternSizes'
+import { handleDismissTooltip } from '@cdc/core/helpers/cove/accessibility'
 import Annotation from '../../Annotation'
 
 import Territory from './Territory'
@@ -59,16 +60,17 @@ const UsaMap = () => {
       data,
       displayGeoName,
       geoClickHandler,
-      handleCircleClick,
+      handleDragStateChange,
       handleMapAriaLabels,
+      mapId,
       setSharedFilterValue,
+      setShowTooltip,
+      showTooltip,
+      setLiveRegionMessage,
       state,
       supportedTerritories,
       titleCase,
       tooltipId,
-      handleDragStateChange,
-      setState,
-      mapId
     } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
@@ -395,7 +397,20 @@ const UsaMap = () => {
         }
 
         return (
-          <g data-name={geoName} key={key} tabIndex={-1}>
+          <g
+            data-name={geoName}
+            key={key}
+            tabIndex={-1}
+            onKeyDown={e => {
+              handleDismissTooltip(e, setShowTooltip)
+              setLiveRegionMessage('Dismissing tooltip')
+            }}
+            onMouseMove={setShowTooltip(true)}
+            onMouseEnter={() => {
+              setShowTooltip(true)
+              setLiveRegionMessage(`Hovering on ${geoDisplayName}`)
+            }}
+          >
             <g
               className='geo-group'
               style={styles}

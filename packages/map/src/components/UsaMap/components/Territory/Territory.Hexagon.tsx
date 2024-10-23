@@ -5,6 +5,7 @@ import { MapContext } from './../../../../types/MapContext'
 import HexIcon from '../HexIcon'
 import { Text } from '@visx/text'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { handleDismissTooltip } from '@cdc/core/helpers/cove/accessibility'
 
 const offsets = {
   'US-VT': [50, -8],
@@ -32,7 +33,7 @@ const nudges = {
 // todo: combine hexagonLabel & geoLabel functions
 // todo: move geoLabel functions outside of components for reusability
 const TerritoryHexagon = ({ label, text, stroke, strokeWidth, textColor, territory, territoryData, ...props }) => {
-  const { state } = useContext<MapContext>(ConfigContext)
+  const { state, setShowTooltip, setLiveRegionMessage } = useContext<MapContext>(ConfigContext)
 
   const isHex = state.general.displayAsHex
 
@@ -115,7 +116,14 @@ const TerritoryHexagon = ({ label, text, stroke, strokeWidth, textColor, territo
       let y = state.hexMap.type === 'shapes' ? '30%' : '50%'
       return (
         <>
-          <Text fontSize={14} x={'50%'} y={y} style={{ fill: 'currentColor', stroke: 'initial', fontWeight: 400, opacity: 1, fillOpacity: 1 }} textAnchor='middle' verticalAnchor='middle'>
+          <Text
+            fontSize={14}
+            x={'50%'}
+            y={y}
+            style={{ fill: 'currentColor', stroke: 'initial', fontWeight: 400, opacity: 1, fillOpacity: 1 }}
+            textAnchor='middle'
+            verticalAnchor='middle'
+          >
             {abbr.substring(3)}
           </Text>
           {state.general.displayAsHex && state.hexMap.type === 'shapes' && getArrowDirection(territoryData, geo, true)}
@@ -127,21 +135,52 @@ const TerritoryHexagon = ({ label, text, stroke, strokeWidth, textColor, territo
 
     return (
       <g>
-        <line x1={centroid[0]} y1={centroid[1]} x2={centroid[0] + dx} y2={centroid[1] + dy} stroke='rgba(0,0,0,.5)' strokeWidth={1} />
-        <text x={4} strokeWidth='0' fontSize={13} style={{ fill: '#202020' }} alignmentBaseline='middle' transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}>
+        <line
+          x1={centroid[0]}
+          y1={centroid[1]}
+          x2={centroid[0] + dx}
+          y2={centroid[1] + dy}
+          stroke='rgba(0,0,0,.5)'
+          strokeWidth={1}
+        />
+        <text
+          x={4}
+          strokeWidth='0'
+          fontSize={13}
+          style={{ fill: '#202020' }}
+          alignmentBaseline='middle'
+          transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
+        >
           {abbr.substring(3)}
         </text>
       </g>
     )
   }
 
-  return territoryData && (
-    <svg viewBox='0 0 45 51' className='territory-wrapper--hex'>
-      <g {...props}>
-        <polygon stroke={stroke} strokeWidth={strokeWidth} points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702' />
-        {state.general.displayAsHex && hexagonLabel(territoryData, stroke, false)}
-      </g>
-    </svg>
+  return (
+    territoryData && (
+      <svg viewBox='0 0 45 51' className='territory-wrapper--hex'>
+        <g
+          {...props}
+          onKeyDown={e => {
+            handleDismissTooltip(e, setShowTooltip)
+            setLiveRegionMessage('Dismissing tooltip')
+          }}
+          onMouseMove={setShowTooltip(true)}
+          onMouseEnter={() => {
+            setShowTooltip(true)
+            setLiveRegionMessage(`Hovering on ${territoryData[state.columns.geo.name]}`)
+          }}
+        >
+          <polygon
+            stroke={stroke}
+            strokeWidth={strokeWidth}
+            points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702'
+          />
+          {state.general.displayAsHex && hexagonLabel(territoryData, stroke, false)}
+        </g>
+      </svg>
+    )
   )
 }
 

@@ -34,3 +34,10 @@ export const getColorContrast = (color1: string, color2: string) => {
   if (!chroma.valid(color1) || !chroma.valid(color2)) return false
   return chroma.contrast(color1, color2)
 }
+
+export const handleDismissTooltip = (e, tooltipShowHandler) => {
+  if (e.key === 'Escape') {
+    tooltipShowHandler(false)
+  }
+  return
+}
