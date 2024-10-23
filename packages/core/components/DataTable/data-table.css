@@ -13,7 +13,7 @@
   border-bottom: 1px solid var(--lightGray);
 }
 
-div.data-table-heading {
+.cdc-open-viz-module div.data-table-heading {
   position: relative;
   background: rgba(0, 0, 0, 0.05);
   padding: 0.5em 0.7em;
