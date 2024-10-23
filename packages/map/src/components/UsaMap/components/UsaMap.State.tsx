@@ -24,7 +24,7 @@ import Territory from './Territory'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { MapContext } from '../../../types/MapContext'
-import { checkColorContrast, getContrastColor, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
+import { checkColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -71,6 +71,7 @@ const UsaMap = () => {
       supportedTerritories,
       titleCase,
       tooltipId,
+      liveRegionRef
     } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
@@ -403,12 +404,12 @@ const UsaMap = () => {
             tabIndex={-1}
             onKeyDown={e => {
               handleDismissTooltip(e, setShowTooltip)
-              setLiveRegionMessage('Dismissing tooltip')
+              liveRegionRef.current.textContent = 'Dismissing tooltip'
             }}
             onMouseMove={setShowTooltip(true)}
             onMouseEnter={() => {
               setShowTooltip(true)
-              setLiveRegionMessage(`Hovering on ${geoDisplayName}`)
+              liveRegionRef.current.textContent = `Hovering on ${geoDisplayName}`
             }}
           >
             <g

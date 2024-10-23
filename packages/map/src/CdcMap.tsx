@@ -136,6 +136,7 @@ const CdcMap = ({
   const [liveRegionMessage, setLiveRegionMessage] = useState('')
 
   const legendRef = useRef(null)
+  const liveRegionRef = useRef(null)
   const tooltipRef = useRef(null)
   const legendId = useId()
   // create random tooltipId
@@ -1729,7 +1730,7 @@ const CdcMap = ({
     supportedTerritories,
     titleCase,
     tooltipId,
-    tooltipRef,
+    liveRegionRef,
     topoData,
     liveRegionMessage,
     setLiveRegionMessage,
@@ -1967,14 +1968,7 @@ const CdcMap = ({
               display: 'none' // can't use d-none here
             }}
           ></div>
-          <div
-            id='tooltip'
-            role='tooltip'
-            aria-live='assertive'
-            ref={tooltipRef}
-            tabIndex={-1}
-            style={{ position: 'absolute', backgroundColor: 'white', border: '1px solid black', padding: '5px' }}
-          >
+          <div role='tooltip' aria-live='assertive' ref={liveRegionRef} tabIndex={-1} className='sr-only'>
             {liveRegionMessage}
           </div>
         </Layout.Responsive>

@@ -6,7 +6,7 @@ import { patternSizes } from './../../helpers/patternSizes'
 import { getContrastColor, handleDismissTooltip } from '@cdc/core/helpers/cove/accessibility'
 
 const TerritoryRectangle = ({ label, text, stroke, strokeWidth, textColor, hasPattern, territory, ...props }) => {
-  const { state, supportedTerritories, setShowTooltip, setLiveRegionMessage } = useContext<MapContext>(ConfigContext)
+  const { state, supportedTerritories, setShowTooltip, liveRegionRef } = useContext<MapContext>(ConfigContext)
   const { territoryData, ...otherProps } = props
 
   return (
@@ -17,12 +17,12 @@ const TerritoryRectangle = ({ label, text, stroke, strokeWidth, textColor, hasPa
         tabIndex={-1}
         onKeyDown={e => {
           handleDismissTooltip(e, setShowTooltip)
-          setLiveRegionMessage('Dismissing tooltip')
+          liveRegionRef.current.textContent = 'Dismissing tooltip'
         }}
         onMouseMove={setShowTooltip(true)}
         onMouseEnter={() => {
           setShowTooltip(true)
-          setLiveRegionMessage(`Hovering on ${territoryData[state.columns.geo.name]}`)
+          liveRegionRef.current.textContent = `Hovering on ${territoryData[state.columns.geo.name]}`
         }}
       >
         <path

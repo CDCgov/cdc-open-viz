@@ -33,7 +33,7 @@ const nudges = {
 // todo: combine hexagonLabel & geoLabel functions
 // todo: move geoLabel functions outside of components for reusability
 const TerritoryHexagon = ({ label, text, stroke, strokeWidth, textColor, territory, territoryData, ...props }) => {
-  const { state, setShowTooltip, setLiveRegionMessage } = useContext<MapContext>(ConfigContext)
+  const { state, setShowTooltip, liveRegionRef } = useContext<MapContext>(ConfigContext)
 
   const isHex = state.general.displayAsHex
 
@@ -164,12 +164,12 @@ const TerritoryHexagon = ({ label, text, stroke, strokeWidth, textColor, territo
           {...props}
           onKeyDown={e => {
             handleDismissTooltip(e, setShowTooltip)
-            setLiveRegionMessage('Dismissing tooltip')
+            liveRegionRef.current.textContent = 'Dismissing tooltip'
           }}
           onMouseMove={setShowTooltip(true)}
           onMouseEnter={() => {
             setShowTooltip(true)
-            setLiveRegionMessage(`Hovering on ${territoryData[state.columns.geo.name]}`)
+            liveRegionRef.current.textContent = `Hovering on ${territoryData[state.columns.geo.name]}`
           }}
         >
           <polygon
