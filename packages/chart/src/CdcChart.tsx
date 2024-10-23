@@ -39,6 +39,7 @@ import { sortAsc, sortDesc } from './helpers/sort'
 import { handleChartAriaLabels } from './helpers/handleChartAriaLabels'
 import { lineOptions } from './helpers/lineOptions'
 import { handleLineType } from './helpers/handleLineType'
+import { handleRankByValue } from './helpers/handleRankByValue'
 import { generateColorsArray } from './helpers/generateColorsArray'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
@@ -135,20 +136,6 @@ const CdcChart = ({
     setIsDraggingAnnotation(isDragging)
   }
 
-  const getNumericValue = number => {
-    if (typeof number === 'string') return parseFloat(number.replace(/,/g, ''))
-    return Number(number)
-  }
-
-  const handleRankByValue = (data, passedConfig = config) => {
-    if (passedConfig.rankByValue) {
-      const series = passedConfig.series[0].dataKey
-      const sorted = data.sort((a, b) => getNumericValue(a[series]) - getNumericValue(b[series]))
-      return passedConfig.rankByValue === 'asc' ? sorted : sorted.reverse()
-    }
-    return data
-  }
-
   if (isDebug) console.log('Chart config, isEditor', config, isEditor)
 
   // Destructure items from config for more readable JSX
@@ -224,7 +211,7 @@ const CdcChart = ({
 
       Object.assign(data, { urlFiltered: true })
 
-      data = handleRankByValue(data)
+      data = handleRankByValue(data, config)
 
       updateConfig({ ...config, runtimeDataUrl: dataUrlFinal, data, formattedData: data })
 

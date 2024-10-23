@@ -172,6 +172,7 @@ export type AllChartsConfig = {
   pieType?: string
   preliminaryData: PreliminaryDataItem[]
   primary?: DataFormat
+  rankByValue: 'asc' | 'desc'
   roundingStyle: string
   runtime: Runtime
   runtimeDataUrl: string

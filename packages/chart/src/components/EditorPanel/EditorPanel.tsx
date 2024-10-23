@@ -37,13 +37,13 @@ import useMinMax from '../../hooks/useMinMax'
 
 import { type ChartContext } from '../../types/ChartContext'
 import { type ChartConfig } from '../../types/ChartConfig'
-import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
 import './editor-panel.scss'
 import { Anchor } from '@cdc/core/types/Axis'
 import EditorPanelContext from './EditorPanelContext'
 import _ from 'lodash'
 import { adjustedSymbols as symbolCodes } from '@cdc/core/helpers/footnoteSymbols'
+import { updateFieldRankByValue } from './helpers/updateFieldRankByValue'
 
 interface PreliminaryProps {
   config: ChartConfig
@@ -614,7 +614,6 @@ const EditorPanel = () => {
     dimensions
   } = useContext<ChartContext>(ConfigContext)
 
-  const transform = new DataTransform()
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
   const properties = { data, config }
   const { leftMax, rightMax } = useMinMax(properties)
@@ -876,40 +875,6 @@ const EditorPanel = () => {
       newSeries.push({ dataKey: seriesKey, type: config.visualizationType, axis: 'Left', tooltip: true })
     }
     updateConfig({ ...config, series: newSeries }) // left axis series keys
-  }
-
-  const indexOfObj = (data, obj) => {
-    for(let i = 0; i < data.length; i++){
-      let keys = Object.keys(data[i])
-      let equal = true
-      for(let j = 0; j < keys.length; j++){
-        if(data[i][keys[j]] !== obj[keys[j]]){
-          equal = false
-          break
-        }
-      }
-      if(equal){
-        return i
-      }
-    }
-    return -1
-  }
-
-  const updateFieldRankByValue = (section, subsection, fieldName, newValue) => {
-    const newConfig = {...config}
-    newConfig.rankByValue = newValue
-
-    if(config.rankByValue && !newValue){
-      const cleanData = config?.xAxis?.dataKey ? transform.cleanData(config.data, config.xAxis.dataKey) : config.data
-      const newData = data.sort((a, b) => {
-        const aIndex = indexOfObj(cleanData, a)
-        const bIndex = indexOfObj(cleanData, b)
-        return aIndex - bIndex
-      })
-      updateConfig(newConfig, newData)
-    } else {
-      updateConfig(newConfig)
-    }
   }
 
   const addNewExclusion = exclusionKey => {
@@ -1589,7 +1554,10 @@ const EditorPanel = () => {
                             fieldName='rankByValue'
                             label='Rank by Value'
                             initial='Select'
-                            updateField={updateFieldRankByValue}
+                            updateField={(_section, _subsection, _fieldName, value) => {
+                              const [newConfig, newData] = updateFieldRankByValue(config, value, data)
+                              updateConfig(newConfig, newData)
+                            }}
                             options={['asc', 'desc']}
                           />
                         )}
