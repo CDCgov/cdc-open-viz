@@ -39,6 +39,7 @@ import { sortAsc, sortDesc } from './helpers/sort'
 import { handleChartAriaLabels } from './helpers/handleChartAriaLabels'
 import { lineOptions } from './helpers/lineOptions'
 import { handleLineType } from './helpers/handleLineType'
+import { handleRankByValue } from './helpers/handleRankByValue'
 import { generateColorsArray } from './helpers/generateColorsArray'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
@@ -134,6 +135,7 @@ const CdcChart = ({
   const handleDragStateChange = isDragging => {
     setIsDraggingAnnotation(isDragging)
   }
+
   if (isDebug) console.log('Chart config, isEditor', config, isEditor)
 
   // Destructure items from config for more readable JSX
@@ -209,6 +211,8 @@ const CdcChart = ({
 
       Object.assign(data, { urlFiltered: true })
 
+      data = handleRankByValue(data, config)
+
       updateConfig({ ...config, runtimeDataUrl: dataUrlFinal, data, formattedData: data })
 
       if (data) {
@@ -271,6 +275,8 @@ const CdcChart = ({
       data = transform.developerStandardize(data, response.dataDescription)
     }
 
+    data = handleRankByValue(data, response)
+
     if (data) {
       setStateData(data)
       setExcludedData(data)
@@ -317,6 +323,8 @@ const CdcChart = ({
   const updateConfig = (_config, dataOverride?: any[]) => {
     const newConfig = _.cloneDeep(_config)
     let data = dataOverride || stateData
+
+    data = handleRankByValue(data, newConfig)
 
     // Deeper copy
     Object.keys(defaults).forEach(key => {
