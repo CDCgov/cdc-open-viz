@@ -603,7 +603,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   ) : (
     <ErrorBoundary component='LinearChart'>
       {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
-      <div style={{ width: `${parentWidth}px`, overflow: 'visible' }} className='tooltip-boundary'>
+      <div
+        style={{ width: `${parentWidth}px`, overflow: 'visible', position: 'relative' }}
+        className='tooltip-boundary'
+      >
         <svg
           ref={svgRef}
           onMouseMove={onMouseMove}
