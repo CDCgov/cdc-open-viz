@@ -7,6 +7,7 @@ import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from
 import { getFilterControllingStatePicked } from './UsaMap/helpers/map'
 
 import ConfigContext from '../context'
+import { handleDismissTooltip } from '@cdc/core/helpers/cove/accessibility'
 
 const CityList = ({
   data,
@@ -18,7 +19,9 @@ const CityList = ({
   setSharedFilterValue,
   isFilterValueSupported,
   tooltipId,
-  projection
+  projection,
+  liveRegionRef,
+  setShowTooltip
 }) => {
   const [citiesData, setCitiesData] = useState({})
   const { scale, state, topoData, runtimeData, position } = useContext(ConfigContext)
@@ -192,12 +195,64 @@ const CityList = ({
     }
 
     const cityStyleShapes = {
-      circle: <GlyphCircle {...shapeProps} />,
+      circle: (
+        <GlyphCircle
+          {...shapeProps}
+          onKeyDown={e => {
+            handleDismissTooltip(e, setShowTooltip)
+            liveRegionRef.current.textContent = 'Dismissing tooltip'
+          }}
+          onMouseMove={setShowTooltip(true)}
+          onMouseEnter={() => {
+            setShowTooltip(true)
+            liveRegionRef.current.textContent = `Hovering on ${stateName}`
+          }}
+        />
+      ),
       pin: pin,
-      square: <GlyphSquare {...shapeProps} />,
-      diamond: <GlyphDiamond {...shapeProps} />,
+      square: (
+        <GlyphSquare
+          {...shapeProps}
+          onKeyDown={e => {
+            handleDismissTooltip(e, setShowTooltip)
+            liveRegionRef.current.textContent = 'Dismissing tooltip'
+          }}
+          onMouseMove={setShowTooltip(true)}
+          onMouseEnter={() => {
+            setShowTooltip(true)
+            liveRegionRef.current.textContent = `Hovering on ${stateName}`
+          }}
+        />
+      ),
+      diamond: (
+        <GlyphDiamond
+          {...shapeProps}
+          onKeyDown={e => {
+            handleDismissTooltip(e, setShowTooltip)
+            liveRegionRef.current.textContent = 'Dismissing tooltip'
+          }}
+          onMouseMove={setShowTooltip(true)}
+          onMouseEnter={() => {
+            setShowTooltip(true)
+            liveRegionRef.current.textContent = `Hovering on ${stateName}`
+          }}
+        />
+      ),
       star: <GlyphStar {...shapeProps} />,
-      triangle: <GlyphTriangle {...shapeProps} />
+      triangle: (
+        <GlyphTriangle
+          {...shapeProps}
+          onKeyDown={e => {
+            handleDismissTooltip(e, setShowTooltip)
+            liveRegionRef.current.textContent = 'Dismissing tooltip'
+          }}
+          onMouseMove={setShowTooltip(true)}
+          onMouseEnter={() => {
+            setShowTooltip(true)
+            liveRegionRef.current.textContent = `Hovering on ${stateName}`
+          }}
+        />
+      )
     }
 
     const { additionalCityStyles } = state.visual || []

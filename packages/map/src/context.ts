@@ -21,6 +21,8 @@ type MapContext = {
   isDashboard
   isDebug
   isEditor
+  // div that has aria-live region set to assertive
+  liveRegionRef: React.RefObject<HTMLDivElement>
   loadConfig
   navigationHandler
   position
