@@ -195,64 +195,12 @@ const CityList = ({
     }
 
     const cityStyleShapes = {
-      circle: (
-        <GlyphCircle
-          {...shapeProps}
-          onKeyDown={e => {
-            handleDismissTooltip(e, setShowTooltip)
-            liveRegionRef.current.textContent = 'Dismissing tooltip'
-          }}
-          onMouseMove={setShowTooltip(true)}
-          onMouseEnter={() => {
-            setShowTooltip(true)
-            liveRegionRef.current.textContent = `Hovering on ${stateName}`
-          }}
-        />
-      ),
+      circle: <GlyphCircle {...shapeProps} />,
       pin: pin,
-      square: (
-        <GlyphSquare
-          {...shapeProps}
-          onKeyDown={e => {
-            handleDismissTooltip(e, setShowTooltip)
-            liveRegionRef.current.textContent = 'Dismissing tooltip'
-          }}
-          onMouseMove={setShowTooltip(true)}
-          onMouseEnter={() => {
-            setShowTooltip(true)
-            liveRegionRef.current.textContent = `Hovering on ${stateName}`
-          }}
-        />
-      ),
-      diamond: (
-        <GlyphDiamond
-          {...shapeProps}
-          onKeyDown={e => {
-            handleDismissTooltip(e, setShowTooltip)
-            liveRegionRef.current.textContent = 'Dismissing tooltip'
-          }}
-          onMouseMove={setShowTooltip(true)}
-          onMouseEnter={() => {
-            setShowTooltip(true)
-            liveRegionRef.current.textContent = `Hovering on ${stateName}`
-          }}
-        />
-      ),
+      square: <GlyphSquare {...shapeProps} />,
+      diamond: <GlyphDiamond {...shapeProps} />,
       star: <GlyphStar {...shapeProps} />,
-      triangle: (
-        <GlyphTriangle
-          {...shapeProps}
-          onKeyDown={e => {
-            handleDismissTooltip(e, setShowTooltip)
-            liveRegionRef.current.textContent = 'Dismissing tooltip'
-          }}
-          onMouseMove={setShowTooltip(true)}
-          onMouseEnter={() => {
-            setShowTooltip(true)
-            liveRegionRef.current.textContent = `Hovering on ${stateName}`
-          }}
-        />
-      )
+      triangle: <GlyphTriangle {...shapeProps} />
     }
 
     const { additionalCityStyles } = state.visual || []
