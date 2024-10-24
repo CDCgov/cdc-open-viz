@@ -123,7 +123,6 @@ const CdcMap = ({
   const [runtimeData, setRuntimeData] = useState({ init: true })
   const [stateToShow, setStateToShow] = useState(null)
   const [modal, setModal] = useState(null)
-  const [accessibleStatus, setAccessibleStatus] = useState('')
   const [filteredCountryCode, setFilteredCountryCode] = useState()
   const [position, setPosition] = useState(state.mapPosition)
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
@@ -133,7 +132,6 @@ const CdcMap = ({
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
   const [projection, setProjection] = useState(null)
   const [showTooltip, setShowTooltip] = useState(true)
-  const [liveRegionMessage, setLiveRegionMessage] = useState('')
 
   const legendRef = useRef(null)
   const liveRegionRef = useRef(null)
@@ -1672,6 +1670,7 @@ const CdcMap = ({
 
   // Props passed to all map types
   const mapProps = {
+    tooltipRef,
     applyLegendToRow,
     applyTooltipsToGeo,
     capitalize: state.tooltips?.capitalizeLabels,
@@ -1706,7 +1705,6 @@ const CdcMap = ({
     runtimeFilters,
     runtimeLegend,
     scale,
-    setAccessibleStatus,
     setFilteredCountryCode,
     setParentConfig: setConfig,
     setPosition,
@@ -1732,8 +1730,6 @@ const CdcMap = ({
     tooltipId,
     liveRegionRef,
     topoData,
-    liveRegionMessage,
-    setLiveRegionMessage,
     translate,
     type: general.type,
     viewport: currentViewport
@@ -1942,10 +1938,6 @@ const CdcMap = ({
             </section>
           )}
 
-          <div aria-live='assertive' className='cdcdataviz-sr-only'>
-            {accessibleStatus}
-          </div>
-
           {showTooltip &&
             !isDraggingAnnotation &&
             !window.matchMedia('(any-hover: none)').matches &&
@@ -1969,7 +1961,7 @@ const CdcMap = ({
             }}
           ></div>
           <div role='tooltip' aria-live='assertive' ref={liveRegionRef} tabIndex={-1} className='sr-only'>
-            {liveRegionMessage}
+            {liveRegionRef.current?.textContent || ''}
           </div>
         </Layout.Responsive>
       </Layout.VisualizationWrapper>

@@ -27,7 +27,6 @@ type MapContext = {
   resetLegendToggles
   runtimeFilters
   runtimeLegend
-  setAccessibleStatus
   setFilteredCountryCode
   setParentConfig
   setPosition

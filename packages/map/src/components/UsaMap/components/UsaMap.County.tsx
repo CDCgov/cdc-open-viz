@@ -8,6 +8,7 @@ import debounce from 'lodash.debounce'
 
 import Loading from '@cdc/core/components/Loading'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import { handleDismissTooltip } from '@cdc/core/helpers/cove/accessibility'
 
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
@@ -142,7 +143,9 @@ const CountyMap = props => {
       tooltipId,
       tooltipRef,
       container,
-      setState
+      setState,
+      liveRegionRef,
+      setShowTooltip
   } = useContext(ConfigContext)
 
   // CREATE STATE LINES
@@ -317,6 +320,31 @@ const CountyMap = props => {
     const context = canvas.getContext('2d')
     const path = geoPath(topoData.projection, context)
 
+    const handleKeyDown = e => {
+      handleDismissTooltip(e, setShowTooltip)
+      liveRegionRef.current.textContent = 'Dismissing tooltip'
+    }
+
+    const handleMouseMove = () => {
+      setShowTooltip(true)
+    }
+
+    /**
+     * Removes HTML elements from a string and adds a line break for voice over on every closing tag.
+     * @param {string} input - The input string containing HTML elements.
+     * @returns {string} - The string with HTML elements removed.
+     */
+    const removeHtmlElements = input => {
+      return input.replace(/<\/?[^>]+(>|$)/g, match => (match.startsWith('</') ? '\n' : ''))
+    }
+
+    const handleMouseEnter = countyId => {
+      setShowTooltip(true)
+      liveRegionRef.current.textContent = `Hovering on ${removeHtmlElements(
+        applyTooltipsToGeo(displayGeoName(countyId), data[countyId])
+      )}`
+    }
+
     // Handle standard county map hover
     if (state.general.type !== 'us-geocode') {
       //If no tooltip is shown, or if the current geo associated with the tooltip shown is no longer containing the mouse, then rerender the tooltip
@@ -365,6 +393,9 @@ const CountyMap = props => {
             context.fill()
             context.stroke()
           }
+          canvas.addEventListener('keydown', handleKeyDown)
+          canvas.addEventListener('mousemove', handleMouseMove)
+          canvas.addEventListener('mouseenter', handleMouseEnter(county.id))
 
           tooltipRef.current.style.display = 'block'
           tooltipRef.current.style.top = tooltipY + 'px'
