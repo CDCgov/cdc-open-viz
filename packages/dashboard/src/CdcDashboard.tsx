@@ -14,39 +14,47 @@ import { DashboardConfig } from './types/DashboardConfig'
 import { coveUpdateWorker } from '@cdc/core/helpers/coveUpdateWorker'
 import _ from 'lodash'
 import { hasDashboardApplyBehavior } from './helpers/hasDashboardApplyBehavior'
+import { getQueryParams } from '@cdc/core/helpers/queryStringUtils'
 
 type MultiDashboardProps = Omit<WCMSProps, 'configUrl'> & {
   configUrl?: string
   config?: MultiDashboardConfig
 }
 
-const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, config: editorConfig, isEditor, isDebug }) => {
+const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
+  configUrl,
+  config: editorConfig,
+  isEditor,
+  isDebug
+}) => {
   const [initial, setInitial] = useState<InitialState>(undefined)
 
-  const getSelectedConfig = (config: MultiDashboardConfig, selectedConfig?: string): number | null => {
+  const getSelectedConfig = (config: MultiDashboardConfig): number | null => {
     if (!config.multiDashboards) return null
-    // TODO: if query parameter select based on query parameter
-    if (selectedConfig) {
-      const foundConfig = Object.values(config.multiDashboards).findIndex(({ label }) => {
-        return label === selectedConfig
-      })
-      if (foundConfig > -1) return foundConfig
+    // if query parameter, select based on query parameter
+    const selectedConfig = getQueryParams()['cove-tab']
+    if (selectedConfig !== undefined && Number(selectedConfig) < config.multiDashboards.length) {
+      return Number(selectedConfig)
     }
     // else select the first available
     return 0
   }
 
-  const formatInitialState = (newConfig: MultiDashboardConfig | DashboardConfig, datasets: Record<string, Object[]>) => {
+  const formatInitialState = (
+    newConfig: MultiDashboardConfig | DashboardConfig,
+    datasets: Record<string, Object[]>
+  ) => {
     const [config, filteredData] = getUpdateConfig(initialState)(newConfig, datasets)
     const versionedConfig = coveUpdateWorker(config)
     return { ...initialState, config: versionedConfig, filteredData, data: datasets }
   }
 
-  const loadConfig = async (selectedConfig?: string) => {
+  const loadConfig = async () => {
     const _config: MultiDashboardConfig = editorConfig || (await (await fetch(configUrl)).json())
-    const selected = getSelectedConfig(_config, selectedConfig)
+    const selected = getSelectedConfig(_config)
 
-    const { newConfig, datasets } = selected !== null ? await loadMultiDashboard(_config, selected) : await loadSingleDashboard(_config)
+    const { newConfig, datasets } =
+      selected !== null ? await loadMultiDashboard(_config, selected) : await loadSingleDashboard(_config)
     setInitial(formatInitialState(newConfig, datasets))
   }
 
@@ -101,7 +109,14 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, confi
         newConfig.visualizations[vizKey] = { ...newConfig.visualizations[vizKey], ...newData }
       })
 
-      const blankFields = { data: [], dataUrl: '', dataFileName: '', dataFileSourceType: '', dataDescription: {}, formattedData: [] }
+      const blankFields = {
+        data: [],
+        dataUrl: '',
+        dataFileName: '',
+        dataFileSourceType: '',
+        dataDescription: {},
+        formattedData: []
+      }
       newConfig = { ...newConfig, ...blankFields }
 
       if (newConfig.dashboard.filters) {
@@ -122,7 +137,13 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, confi
 
   const loadMultiDashboard = async (multiConfig: MultiDashboardConfig, selectedConfig: number) => {
     const selectedDashboard = multiConfig.multiDashboards[selectedConfig]
-    let newConfig = { ...defaults, ...multiConfig, ...selectedDashboard, multiDashboards: multiConfig.multiDashboards, activeDashboard: selectedConfig } as MultiDashboardConfig
+    const newConfig = {
+      ...defaults,
+      ...multiConfig,
+      ...selectedDashboard,
+      multiDashboards: multiConfig.multiDashboards,
+      activeDashboard: selectedConfig
+    } as MultiDashboardConfig
     return await loadData(newConfig)
   }
 
