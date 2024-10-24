@@ -246,10 +246,6 @@ const UsaRegionMap = props => {
             data-tooltip-id={`tooltip__${tooltipId}`}
             data-tooltip-html={toolTip}
             tabIndex={-1}
-            onKeyDown={e => {
-              handleDismissTooltip(e, setShowTooltip)
-              liveRegionRef.current.textContent = 'Dismissing tooltip'
-            }}
             onMouseMove={setShowTooltip(true)}
             onMouseEnter={() => {
               setShowTooltip(true)
@@ -301,7 +297,16 @@ const UsaRegionMap = props => {
 
   return (
     <ErrorBoundary component='UsaRegionMap'>
-      <svg viewBox='0 0 880 500' role='img' aria-label={handleMapAriaLabels(state)}>
+      <svg
+        viewBox='0 0 880 500'
+        role='img'
+        tabIndex={0}
+        aria-label={handleMapAriaLabels(state)}
+        onKeyDown={e => {
+          handleDismissTooltip(e, setShowTooltip)
+          liveRegionRef.current.textContent = 'Dismissing tooltip'
+        }}
+      >
         <Mercator data={focusedStates} scale={620} translate={[1500, 735]}>
           {({ features, projection }) => constructGeoJsx(features, projection)}
         </Mercator>
