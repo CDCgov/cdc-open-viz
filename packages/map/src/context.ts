@@ -45,6 +45,7 @@ type MapContext = {
   titleCase
   tooltipId: string
   viewport
+  setShowTooltip: Function
 }
 
 const ConfigContext = createContext({} as MapContext)

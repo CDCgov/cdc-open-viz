@@ -1,5 +1,6 @@
 import { useState, useEffect, memo, useContext } from 'react'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { handleDismissTooltip } from '@cdc/core/helpers/cove/accessibility'
 
 // 3rd party
 import { geoCentroid } from 'd3-geo'
@@ -40,9 +41,11 @@ const UsaRegionMap = props => {
     displayGeoName,
     geoClickHandler,
     handleMapAriaLabels,
+    liveRegionRef,
+    setShowTooltip,
     state,
     supportedTerritories,
-    tooltipId
+    tooltipId,
   } = useContext(ConfigContext)
 
   // "Choose State" options
@@ -97,7 +100,10 @@ const UsaRegionMap = props => {
       let needsPointer = false
 
       // If we need to add a pointer cursor
-      if ((state.columns.navigate && territoryData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+      if (
+        (state.columns.navigate && territoryData[state.columns.navigate.name]) ||
+        state.tooltips.appearanceType === 'click'
+      ) {
         needsPointer = true
       }
 
@@ -113,7 +119,19 @@ const UsaRegionMap = props => {
         }
       }
 
-      return <Shape key={label} label={label} css={styles} text={styles.color} stroke={geoStrokeColor} strokeWidth={1.5} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id={`tooltip__${tooltipId}`} data-tooltip-html={toolTip} />
+      return (
+        <Shape
+          key={label}
+          label={label}
+          css={styles}
+          text={styles.color}
+          stroke={geoStrokeColor}
+          strokeWidth={1.5}
+          onClick={() => geoClickHandler(territory, territoryData)}
+          data-tooltip-id={`tooltip__${tooltipId}`}
+          data-tooltip-html={toolTip}
+        />
+      )
     }
   })
 
@@ -130,8 +148,22 @@ const UsaRegionMap = props => {
 
     return (
       <g>
-        <line x1={centroid[0]} y1={centroid[1]} x2={centroid[0] + dx} y2={centroid[1] + dy} stroke='rgba(0,0,0,.5)' strokeWidth={1} />
-        <text x={4} strokeWidth='0' fontSize={13} style={{ fill: '#202020' }} alignmentBaseline='middle' transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}>
+        <line
+          x1={centroid[0]}
+          y1={centroid[1]}
+          x2={centroid[0] + dx}
+          y2={centroid[1] + dy}
+          stroke='rgba(0,0,0,.5)'
+          strokeWidth={1}
+        />
+        <text
+          x={4}
+          strokeWidth='0'
+          fontSize={13}
+          style={{ fill: '#202020' }}
+          alignmentBaseline='middle'
+          transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
+        >
           {abbr.substring(3)}
         </text>
       </g>
@@ -183,7 +215,10 @@ const UsaRegionMap = props => {
         }
 
         // When to add pointer cursor
-        if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+        if (
+          (state.columns.navigate && geoData[state.columns.navigate.name]) ||
+          state.tooltips.appearanceType === 'click'
+        ) {
           styles.cursor = 'pointer'
         }
 
@@ -203,7 +238,24 @@ const UsaRegionMap = props => {
         const circleRadius = 15
 
         return (
-          <g key={key} className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id={`tooltip__${tooltipId}`} data-tooltip-html={toolTip} tabIndex={-1}>
+          <g
+            key={key}
+            className='geo-group'
+            style={styles}
+            onClick={() => geoClickHandler(geoDisplayName, geoData)}
+            data-tooltip-id={`tooltip__${tooltipId}`}
+            data-tooltip-html={toolTip}
+            tabIndex={-1}
+            onKeyDown={e => {
+              handleDismissTooltip(e, setShowTooltip)
+              liveRegionRef.current.textContent = 'Dismissing tooltip'
+            }}
+            onMouseMove={setShowTooltip(true)}
+            onMouseEnter={() => {
+              setShowTooltip(true)
+              liveRegionRef.current.textContent = `Hovering on ${geoDisplayName}`
+            }}
+          >
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
             <g id={`region-${index + 1}-label`}>
               <circle fill='#fff' stroke='#999' cx={circleRadius} cy={circleRadius} r={circleRadius} />
