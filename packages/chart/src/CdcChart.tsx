@@ -73,6 +73,7 @@ import SkipTo from '@cdc/core/components/elements/SkipTo'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import LegendWrapper from './components/LegendWrapper'
 import _ from 'lodash'
+import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 
 interface CdcChartProps {
   configUrl?: string
@@ -290,14 +291,6 @@ const CdcChart = ({
       }
     }
     let newConfig = { ...defaults, ...response }
-    if (newConfig.filters) {
-      newConfig.filters.forEach((filter, index) => {
-        const queryStringFilterValue = getQueryStringFilterValue(filter)
-        if (queryStringFilterValue) {
-          newConfig.filters[index].active = queryStringFilterValue
-        }
-      })
-    }
 
     if (newConfig.visualizationType === 'Box Plot') {
       newConfig.legend.hide = true
@@ -373,28 +366,8 @@ const CdcChart = ({
     // After data is grabbed, loop through and generate filter column values if there are any
     let currentData: any[] = []
     if (newConfig.filters) {
-      newConfig.filters.forEach((filter, index) => {
-        const filterValues =
-          filter.filterStyle === 'nested-dropdown'
-            ? filter.values
-            : filter.orderedValues ||
-              generateValuesForFilter(filter.columnName, newExcludedData).sort(
-                filter.order === 'desc' ? sortDesc : sortAsc
-              )
-
-        newConfig.filters[index].values = filterValues
-        // Initial filter should be active
-
-        const includes = (arr: any[], val: any): boolean => (arr || []).map(val => String(val)).includes(String(val))
-        newConfig.filters[index].active =
-          !newConfig.filters[index].active || !includes(filterValues, newConfig.filters[index].active)
-            ? filterValues[0]
-            : newConfig.filters[index].active
-        newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle
-          ? newConfig.filters[index].filterStyle
-          : 'dropdown'
-      })
-      currentData = filterVizData(newConfig.filters, newExcludedData)
+      const filtersWithValues = addValuesToFilters(newConfig.filters, newExcludedData)
+      currentData = filterVizData(filtersWithValues, newExcludedData)
       setFilteredData(currentData)
     }
 
