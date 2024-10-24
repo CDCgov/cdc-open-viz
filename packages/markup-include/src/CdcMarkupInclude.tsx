@@ -175,6 +175,12 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
       const variableValues: string[] = _.uniq(
         (workingData || []).map(dataObject => dataObject[workingVariable.columnName])
       )
+
+      const hasEmptyVariableValue = variableValues.includes('')
+
+      if (hasEmptyVariableValue !== config.contentEditor.emptyVariable)
+        updateConfig({ ...config, contentEditor: { ...contentEditor, emptyVariable: hasEmptyVariableValue } })
+
       const variableDisplay = []
 
       const listConjunction = !isEditor ? 'and' : 'or'
@@ -237,23 +243,27 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   const markup = useInlineHTML ? convertVariablesInMarkup(inlineHTML) : parseBodyMarkup(urlMarkup)
 
+  const hideMarkupInclude = contentEditor.allowHideSection && contentEditor.emptyVariable && !isEditor
+
   if (loading === false) {
     content = (
       <>
         {isEditor && <EditorPanel />}
-        <Layout.Responsive isEditor={isEditor}>
-          <div className='markup-include-content-container cove-component__content no-borders'>
-            <div className={`markup-include-component ${contentClasses.join(' ')}`}>
-              <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
-              <div className={`${innerContainerClasses.join(' ')}`}>
-                <div className='cove-component__content-wrap'>
-                  {!markupError && <Markup allowElements={!!urlMarkup} content={markup} />}
-                  {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
+        {!hideMarkupInclude && (
+          <Layout.Responsive isEditor={isEditor}>
+            <div className='markup-include-content-container cove-component__content no-borders'>
+              <div className={`markup-include-component ${contentClasses.join(' ')}`}>
+                <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
+                <div className={`${innerContainerClasses.join(' ')}`}>
+                  <div className='cove-component__content-wrap'>
+                    {!markupError && <Markup allowElements={!!urlMarkup} content={markup} />}
+                    {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </Layout.Responsive>
+          </Layout.Responsive>
+        )}
       </>
     )
   }

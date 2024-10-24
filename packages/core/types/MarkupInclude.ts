@@ -5,6 +5,8 @@ import { Visualization } from './Visualization'
 export type MarkupIncludeConfig = Visualization & {
   contentEditor: {
     // Changing the base config object creates an infinite loop, nesting it is a workaround
+    allowHideSection?: boolean
+    emptyVariable?: boolean
     inlineHTML: string
     markupVariables: Variable[]
     showHeader: boolean
