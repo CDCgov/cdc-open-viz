@@ -47,10 +47,9 @@ export const addValuesToDashboardFilters = (
         const active: string[] = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
         filterCopy.active = active.filter(val => defaultValues.includes(val))
       } else {
-        const resetLabelFilter = filters.find(fil => fil.resetLabel)
-        const defaultValue = resetLabelFilter ? resetLabelFilter.resetLabel : filterCopy.values[0] || filterCopy.active
-        const active = Array.isArray(filterCopy.active) ? filterCopy.active[0] : filterCopy.active
-        filterCopy.active = filterCopy.values.includes(active) ? active : defaultValue
+        const defaultLabel = filters.find(filter => filter.resetLabel)
+        const defaultValue = defaultLabel ? defaultLabel.resetLabel : filterCopy.values[0] || filterCopy.active
+        filterCopy.active = defaultValue
       }
     }
     return filterCopy
