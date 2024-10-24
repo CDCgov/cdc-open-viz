@@ -29,12 +29,11 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const { skipId, currentViewport, dimensions } = props
 
   const {
-    // prettier-ignore
+    liveRegionRef,
     displayDataAsText,
     resetLegendToggles,
     runtimeFilters,
     runtimeLegend,
-    setAccessibleStatus,
     setRuntimeLegend,
     state,
     viewport,
@@ -59,9 +58,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
     setRuntimeLegend(newLegend)
 
-    setAccessibleStatus(
-      `Disabled legend item ${legendLabel ?? ''}. Please reference the data table to see updated values.`
-    )
+    liveRegionRef.current.textContent = `Disabled legend item ${
+      legendLabel ?? ''
+    }. Please reference the data table to see updated values.`
   }
   const getFormattedLegendItems = () => {
     return runtimeLegend.map((entry, idx) => {
@@ -212,7 +211,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       e.preventDefault()
     }
     resetLegendToggles()
-    setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.')
+    liveRegionRef.current.textContent = 'Legend has been reset, please reference the data table to see updated values.'
     if (legend) {
       legend.focus()
     }

@@ -7,6 +7,7 @@ import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from
 import { getFilterControllingStatePicked } from './UsaMap/helpers/map'
 
 import ConfigContext from '../context'
+import { handleDismissTooltip } from '@cdc/core/helpers/cove/accessibility'
 
 const CityList = ({
   data,
@@ -18,7 +19,9 @@ const CityList = ({
   setSharedFilterValue,
   isFilterValueSupported,
   tooltipId,
-  projection
+  projection,
+  liveRegionRef,
+  setShowTooltip
 }) => {
   const [citiesData, setCitiesData] = useState({})
   const { scale, state, topoData, runtimeData, position } = useContext(ConfigContext)

@@ -3,19 +3,33 @@ import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
 import ConfigContext from '../context'
+import { handleDismissTooltip } from '@cdc/core/helpers/cove/accessibility'
 
-export const BubbleList = ({ data: dataImport, state, projection, applyLegendToRow, applyTooltipsToGeo, handleCircleClick, runtimeData, displayGeoName }) => {
+export const BubbleList = ({
+  data: dataImport,
+  state,
+  projection,
+  applyLegendToRow,
+  applyTooltipsToGeo,
+  handleCircleClick,
+  runtimeData,
+  displayGeoName
+}) => {
   const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
-  const { tooltipId } = useContext(ConfigContext)
+  const { tooltipId, liveRegionRef, setShowTooltip } = useContext(ConfigContext)
 
   const hasBubblesWithZeroOnMap = state.visual.showBubbleZeros ? 0 : 1
   // sort runtime data. Smaller bubbles should appear on top.
-  const sortedRuntimeData = Object.values(runtimeData).sort((a, b) => (a[state.columns.primary.name] < b[state.columns.primary.name] ? 1 : -1))
+  const sortedRuntimeData = Object.values(runtimeData).sort((a, b) =>
+    a[state.columns.primary.name] < b[state.columns.primary.name] ? 1 : -1
+  )
   if (!sortedRuntimeData) return
 
   const clickTolerance = 10
   // Set bubble sizes
-  var size = scaleLinear().domain([hasBubblesWithZeroOnMap, maxDataValue]).range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
+  var size = scaleLinear()
+    .domain([hasBubblesWithZeroOnMap, maxDataValue])
+    .range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
 
   // Start looping through the countries to create the bubbles.
   if (state.general.geoType === 'world') {
@@ -31,7 +45,11 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
         const legendColors = applyLegendToRow(country)
 
         let primaryKey = state.columns.primary.name
-        if ((Math.floor(Number(country[primaryKey])) === 0 || country[primaryKey] === '') && !state.visual.showBubbleZeros) return
+        if (
+          (Math.floor(Number(country[primaryKey])) === 0 || country[primaryKey] === '') &&
+          !state.visual.showBubbleZeros
+        )
+          return
 
         let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 
@@ -42,6 +60,15 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
         const circle = (
           <>
             <circle
+              onKeyDown={e => {
+                handleDismissTooltip(e, setShowTooltip)
+                liveRegionRef.current.textContent = 'Dismissing tooltip'
+              }}
+              onMouseMove={setShowTooltip(true)}
+              onMouseEnter={() => {
+                setShowTooltip(true)
+                liveRegionRef.current.textContent = `Hovering on ${countryName}`
+              }}
               tabIndex={-1}
               key={`circle-${countryName.replace(' ', '')}`}
               className={`bubble country--${countryName}`}
@@ -57,7 +84,14 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
                 pointerY = e.clientY
               }}
               onPointerUp={e => {
-                if (pointerX && pointerY && e.clientX > pointerX - clickTolerance && e.clientX < pointerX + clickTolerance && e.clientY > pointerY - clickTolerance && e.clientY < pointerY + clickTolerance) {
+                if (
+                  pointerX &&
+                  pointerY &&
+                  e.clientX > pointerX - clickTolerance &&
+                  e.clientX < pointerX + clickTolerance &&
+                  e.clientY > pointerY - clickTolerance &&
+                  e.clientY < pointerY + clickTolerance
+                ) {
                   handleCircleClick(country)
                   pointerX = undefined
                   pointerY = undefined
@@ -85,7 +119,14 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
                   pointerY = e.clientY
                 }}
                 onPointerUp={e => {
-                  if (pointerX && pointerY && e.clientX > pointerX - clickTolerance && e.clientX < pointerX + clickTolerance && e.clientY > pointerY - clickTolerance && e.clientY < pointerY + clickTolerance) {
+                  if (
+                    pointerX &&
+                    pointerY &&
+                    e.clientX > pointerX - clickTolerance &&
+                    e.clientX < pointerX + clickTolerance &&
+                    e.clientY > pointerY - clickTolerance &&
+                    e.clientY < pointerY + clickTolerance
+                  ) {
                     handleCircleClick(country)
                     pointerX = undefined
                     pointerY = undefined
@@ -120,7 +161,8 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
         if (item[primaryKey] === null) item[primaryKey] = ''
 
         // Return if hiding zeros on the map
-        if ((Math.floor(Number(item[primaryKey])) === 0 || item[primaryKey] === '') && !state.visual.showBubbleZeros) return
+        if ((Math.floor(Number(item[primaryKey])) === 0 || item[primaryKey] === '') && !state.visual.showBubbleZeros)
+          return
 
         if (!stateData) return true
         let longitude = Number(stateData.Longitude)
@@ -156,7 +198,14 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
                 pointerY = e.clientY
               }}
               onPointerUp={e => {
-                if (pointerX && pointerY && e.clientX > pointerX - clickTolerance && e.clientX < pointerX + clickTolerance && e.clientY > pointerY - clickTolerance && e.clientY < pointerY + clickTolerance) {
+                if (
+                  pointerX &&
+                  pointerY &&
+                  e.clientX > pointerX - clickTolerance &&
+                  e.clientX < pointerX + clickTolerance &&
+                  e.clientY > pointerY - clickTolerance &&
+                  e.clientY < pointerY + clickTolerance
+                ) {
                   handleCircleClick(state)
                   pointerX = undefined
                   pointerY = undefined
@@ -184,7 +233,14 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
                   pointerY = e.clientY
                 }}
                 onPointerUp={e => {
-                  if (pointerX && pointerY && e.clientX > pointerX - clickTolerance && e.clientX < pointerX + clickTolerance && e.clientY > pointerY - clickTolerance && e.clientY < pointerY + clickTolerance) {
+                  if (
+                    pointerX &&
+                    pointerY &&
+                    e.clientX > pointerX - clickTolerance &&
+                    e.clientX < pointerX + clickTolerance &&
+                    e.clientY > pointerY - clickTolerance &&
+                    e.clientY < pointerY + clickTolerance
+                  ) {
                     handleCircleClick(state)
                     pointerX = undefined
                     pointerY = undefined

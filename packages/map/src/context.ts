@@ -21,13 +21,14 @@ type MapContext = {
   isDashboard
   isDebug
   isEditor
+  // div that has aria-live region set to assertive
+  liveRegionRef: React.RefObject<HTMLDivElement>
   loadConfig
   navigationHandler
   position
   resetLegendToggles
   runtimeFilters
   runtimeLegend
-  setAccessibleStatus
   setFilteredCountryCode
   setParentConfig
   setPosition
@@ -44,6 +45,7 @@ type MapContext = {
   titleCase
   tooltipId: string
   viewport
+  setShowTooltip: Function
 }
 
 const ConfigContext = createContext({} as MapContext)

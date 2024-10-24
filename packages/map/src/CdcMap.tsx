@@ -123,7 +123,6 @@ const CdcMap = ({
   const [runtimeData, setRuntimeData] = useState({ init: true })
   const [stateToShow, setStateToShow] = useState(null)
   const [modal, setModal] = useState(null)
-  const [accessibleStatus, setAccessibleStatus] = useState('')
   const [filteredCountryCode, setFilteredCountryCode] = useState()
   const [position, setPosition] = useState(state.mapPosition)
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
@@ -132,8 +131,10 @@ const CdcMap = ({
   const [dimensions, setDimensions] = useState<DimensionsType>([0, 0])
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
   const [projection, setProjection] = useState(null)
+  const [showTooltip, setShowTooltip] = useState(true)
 
   const legendRef = useRef(null)
+  const liveRegionRef = useRef(null)
   const tooltipRef = useRef(null)
   const legendId = useId()
   // create random tooltipId
@@ -1669,16 +1670,7 @@ const CdcMap = ({
 
   // Props passed to all map types
   const mapProps = {
-    projection,
-    setProjection,
-    stateToShow,
-    setStateToShow,
-    setScale,
-    setTranslate,
-    scale,
-    translate,
-    isDraggingAnnotation,
-    handleDragStateChange,
+    tooltipRef,
     applyLegendToRow,
     applyTooltipsToGeo,
     capitalize: state.tooltips?.capitalizeLabels,
@@ -1695,41 +1687,52 @@ const CdcMap = ({
     generateColorsArray,
     generateRuntimeData,
     geoClickHandler,
+    handleDragStateChange,
     handleMapAriaLabels,
     hasZoom: state.general.allowMapZoom,
     innerContainerRef,
     isDashboard,
     isDebug,
+    isDraggingAnnotation,
     isEditor,
     loadConfig,
+    mapId,
     navigationHandler,
     position,
+    projection,
     resetLegendToggles,
+    runtimeData,
     runtimeFilters,
     runtimeLegend,
-    runtimeData,
-    setAccessibleStatus,
+    scale,
     setFilteredCountryCode,
     setParentConfig: setConfig,
     setPosition,
+    setProjection,
     setRuntimeData,
     setRuntimeFilters,
     setRuntimeLegend,
+    setScale,
     setSharedFilterValue,
+    setShowTooltip,
     setState,
+    setStateToShow,
+    setTopoData,
+    setTranslate,
+    showTooltip,
     state,
+    stateToShow,
     supportedCities,
     supportedCounties,
     supportedCountries,
     supportedTerritories,
     titleCase,
-    type: general.type,
-    viewport: currentViewport,
     tooltipId,
-    tooltipRef,
+    liveRegionRef,
     topoData,
-    setTopoData,
-    mapId
+    translate,
+    type: general.type,
+    viewport: currentViewport
   }
 
   if (!mapProps.data || !state.data) return <></>
@@ -1935,11 +1938,8 @@ const CdcMap = ({
             </section>
           )}
 
-          <div aria-live='assertive' className='cdcdataviz-sr-only'>
-            {accessibleStatus}
-          </div>
-
-          {!isDraggingAnnotation &&
+          {showTooltip &&
+            !isDraggingAnnotation &&
             !window.matchMedia('(any-hover: none)').matches &&
             'hover' === tooltips.appearanceType && (
               <ReactTooltip
@@ -1949,17 +1949,22 @@ const CdcMap = ({
                 style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }}
               />
             )}
-          <div
-            ref={tooltipRef}
-            id={`tooltip__${tooltipId}-canvas`}
-            className='tooltip'
-            style={{
-              background: `rgba(255,255,255,${state.tooltips.opacity / 100})`,
-              position: 'absolute',
-              whiteSpace: 'nowrap',
-              display: 'none' // can't use d-none here
-            }}
-          ></div>
+          {showTooltip && (
+            <div
+              ref={tooltipRef}
+              id={`tooltip__${tooltipId}-canvas`}
+              className='tooltip'
+              style={{
+                background: `rgba(255,255,255,${state.tooltips.opacity / 100})`,
+                position: 'absolute',
+                whiteSpace: 'nowrap',
+                display: 'none' // can't use d-none here
+              }}
+            ></div>
+          )}
+          <div role='tooltip' aria-live='assertive' ref={liveRegionRef} tabIndex={-1} className='sr-only'>
+            {liveRegionRef.current?.textContent || ''}
+          </div>
         </Layout.Responsive>
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>
