@@ -66,6 +66,7 @@ global.fetch = fetch
 
 describe('loadAPIFiltersFactory', () => {
   const dispatch = vi.fn()
+  const dispatchErrorMessages = vi.fn()
   const setAPIFilterDropdowns = vi.fn()
   const apiFilterDropdowns = {
     'cdc.gov/filters/Sex': [
@@ -76,7 +77,7 @@ describe('loadAPIFiltersFactory', () => {
   afterEach(() => {
     vi.restoreAllMocks()
   })
-  const loadAPIFilters = loadAPIFiltersFactory(dispatch, setAPIFilterDropdowns, [2])
+  const loadAPIFilters = loadAPIFiltersFactory(dispatch, dispatchErrorMessages, setAPIFilterDropdowns, [2])
   it('creates a function', () => {
     expect(typeof loadAPIFilters).toEqual('function')
   })
