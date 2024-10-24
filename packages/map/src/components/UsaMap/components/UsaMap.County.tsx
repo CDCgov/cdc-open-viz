@@ -320,11 +320,6 @@ const CountyMap = props => {
     const context = canvas.getContext('2d')
     const path = geoPath(topoData.projection, context)
 
-    const handleKeyDown = e => {
-      handleDismissTooltip(e, setShowTooltip)
-      liveRegionRef.current.textContent = 'Dismissing tooltip'
-    }
-
     const handleMouseMove = () => {
       setShowTooltip(true)
     }
@@ -393,7 +388,6 @@ const CountyMap = props => {
             context.fill()
             context.stroke()
           }
-          canvas.addEventListener('keydown', handleKeyDown)
           canvas.addEventListener('mousemove', handleMouseMove)
           canvas.addEventListener('mouseenter', handleMouseEnter(county.id))
 
@@ -631,7 +625,12 @@ const CountyMap = props => {
           tooltipRef.current.style.display = 'none'
           tooltipRef.current.setAttribute('data-index', null)
         }}
+        onKeyDown={e => {
+          handleDismissTooltip(e, setShowTooltip)
+          liveRegionRef.current.textContent = 'Dismissing tooltip'
+        }}
         onClick={canvasClick}
+        tabIndex={0}
         className='county-map-canvas'
       ></canvas>
 

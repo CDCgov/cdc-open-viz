@@ -1949,17 +1949,19 @@ const CdcMap = ({
                 style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }}
               />
             )}
-          <div
-            ref={tooltipRef}
-            id={`tooltip__${tooltipId}-canvas`}
-            className='tooltip'
-            style={{
-              background: `rgba(255,255,255,${state.tooltips.opacity / 100})`,
-              position: 'absolute',
-              whiteSpace: 'nowrap',
-              display: 'none' // can't use d-none here
-            }}
-          ></div>
+          {showTooltip && (
+            <div
+              ref={tooltipRef}
+              id={`tooltip__${tooltipId}-canvas`}
+              className='tooltip'
+              style={{
+                background: `rgba(255,255,255,${state.tooltips.opacity / 100})`,
+                position: 'absolute',
+                whiteSpace: 'nowrap',
+                display: 'none' // can't use d-none here
+              }}
+            ></div>
+          )}
           <div role='tooltip' aria-live='assertive' ref={liveRegionRef} tabIndex={-1} className='sr-only'>
             {liveRegionRef.current?.textContent || ''}
           </div>
