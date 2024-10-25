@@ -15,7 +15,7 @@ export interface BlurStrokeTextProps extends React.ComponentProps<typeof Text> {
 export const BlurStrokeText: React.FC<BlurStrokeTextProps> = ({
   blurRadius = 1,
   stroke = 'white',
-  strokeWidth = 4.5,
+  strokeWidth = 8,
   strokeMiterLimit = 2,
   disableStroke = false,
   disableBlur = false,
