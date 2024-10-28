@@ -36,7 +36,7 @@ const LegendGradient = ({ labels, colors, config, dimensions, currentViewport }:
   const angleInRadians = rotationAngle * (Math.PI / 180)
   const newHeight = height + Number(textWidth) * Math.sin(angleInRadians)
 
-  // configre gradient colors
+  // configure gradient colors
   const stops = colors.map((color, index) => {
     const offset = (index / (colors.length - 1)) * 100
     return <stop key={index} offset={`${offset}%`} style={{ stopColor: color, stopOpacity: 1 }} />
@@ -45,13 +45,14 @@ const LegendGradient = ({ labels, colors, config, dimensions, currentViewport }:
   // render ticks and labels
   const ticks = labels.map((key, index) => {
     const segmentWidth = legendWidth / numTicks
-    const xPositionX = index * segmentWidth + segmentWidth
+    const xPositionX = index * segmentWidth + segmentWidth + margin
     const textAnchor = rotationAngle ? 'end' : 'middle'
     const verticalAnchor = rotationAngle ? 'middle' : 'start'
+    const lastTick = index === labels.length - 1
 
     return (
       <Group top={margin}>
-        <line x1={xPositionX} x2={xPositionX} y1={30} y2={boxHeight} stroke='black' />
+        {!lastTick && <line x1={xPositionX} x2={xPositionX} y1={30} y2={boxHeight} stroke='black' />}
         <Text
           angle={-config.legend.tickRotation}
           x={xPositionX}
@@ -95,19 +96,25 @@ const LegendGradient = ({ labels, colors, config, dimensions, currentViewport }:
         </linearGradient>
 
         {config.legend.subStyle === 'smooth' && (
-          <rect x={1} y={1} width={legendWidth} height={boxHeight} fill={`url(#gradient-smooth-${uniqueID})`} />
+          <rect
+            x={margin}
+            y={margin}
+            width={legendWidth}
+            height={boxHeight}
+            fill={`url(#gradient-smooth-${uniqueID})`}
+          />
         )}
 
         {config.legend.subStyle === 'linear blocks' &&
           colors.map((color, index) => {
             const segmentWidth = legendWidth / numTicks
-            const xPosition = index * segmentWidth
+            const xPosition = index * segmentWidth + margin
             return (
               <Group>
                 <rect
                   key={index}
                   x={xPosition}
-                  y={0}
+                  y={margin}
                   width={segmentWidth}
                   height={boxHeight}
                   fill={color}
