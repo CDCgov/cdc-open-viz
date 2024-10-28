@@ -124,7 +124,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
 
   const useParameters = useMemo(() => {
     const filter = config.filters[filterIndex]
-    return !!(filter.setByQueryParameter && filter.subGrouping.setByQueryParameter)
+    return !!(filter.setByQueryParameter && filter.subGrouping?.setByQueryParameter)
   }, [config, filterIndex])
 
   const handleParametersCheckboxClick = e => {
@@ -218,7 +218,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
             </span>
             <input
               type='text'
-              value={subGrouping.setByQueryParameter}
+              value={subGrouping?.setByQueryParameter}
               onChange={e => {
                 const setByQueryParameter = e.target.value
                 updateSubGroupingFilterProperty({ ...subGrouping, setByQueryParameter })

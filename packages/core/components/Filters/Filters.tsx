@@ -114,10 +114,10 @@ export const useFilters = props => {
         updateQueryString(queryParams)
       }
       if (
-        newFilter?.subGrouping.setByQueryParameter &&
-        queryParams[newFilter?.subGrouping.setByQueryParameter] !== newFilter?.subGrouping.active
+        newFilter?.subGrouping?.setByQueryParameter &&
+        queryParams[newFilter?.subGrouping?.setByQueryParameter] !== newFilter?.subGrouping.active
       ) {
-        queryParams[newFilter?.subGrouping.setByQueryParameter] = newFilter.subGrouping.active
+        queryParams[newFilter?.subGrouping?.setByQueryParameter] = newFilter.subGrouping.active
         updateQueryString(queryParams)
       }
       setFilteredData(newFilters[index])
