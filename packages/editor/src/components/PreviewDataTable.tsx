@@ -1,13 +1,24 @@
 import React, { useState, useContext, useMemo, useCallback, useEffect, memo } from 'react'
-import { useTable, useBlockLayout, useGlobalFilter, useSortBy, useResizeColumns, usePagination } from 'react-table'
+import {
+  useTable,
+  useBlockLayout,
+  useFlexLayout,
+  useGlobalFilter,
+  useSortBy,
+  useResizeColumns,
+  usePagination
+} from 'react-table'
 import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
 import { useDebounce } from 'use-debounce'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+import { MdNavigateNext } from 'react-icons/md'
+import { GrFormPrevious } from 'react-icons/gr'
 
 // Core
 import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
 import { errorMessages } from '../helpers/errorMessages'
 import { DataSet } from '@cdc/dashboard/src/types/DataSet'
+import Icon from '@cdc/core/components/ui/Icon'
 
 const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }: any) => {
   const [filterValue, setFilterValue] = useState(globalFilter)
@@ -44,7 +55,7 @@ const Header = memo(({ globalFilter, data, setGlobalFilter }: any) => (
 ))
 
 const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pageNumber, totalPages }: any) => (
-  <footer className='data-table-pagination'>
+  <footer className='data-table-pagination mt-2'>
     <ul>
       <li>
         <button
@@ -52,10 +63,15 @@ const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pag
           className='btn btn-prev'
           disabled={!canPreviousPage}
           title='Previous Page'
-        ></button>
+        >
+          {' '}
+          <GrFormPrevious />
+        </button>
       </li>
-      <li>
-        <button onClick={() => nextPage()} className='btn btn-next' disabled={!canNextPage} title='Next Page'></button>
+      <li className='mr-2'>
+        <button onClick={() => nextPage()} className='btn btn-next' disabled={!canNextPage} title='Next Page'>
+          <MdNavigateNext />
+        </button>
       </li>
     </ul>
     <span>
@@ -138,8 +154,7 @@ const PreviewDataTable = () => {
       const columnConfig = {
         id: `column-${columnName}`,
         accessor: row => row[columnName],
-        Header: columnName,
-        width: 250
+        Header: columnName
       }
 
       return columnConfig
@@ -183,7 +198,7 @@ const PreviewDataTable = () => {
     previousPage
   } = useTable(
     { columns: tableColumns, data: tableData, initialState: { pageSize: 25 } },
-    useBlockLayout,
+    useFlexLayout,
     useGlobalFilter,
     useSortBy,
     useResizeColumns,
@@ -199,7 +214,7 @@ const PreviewDataTable = () => {
             <p>Import data to preview</p>
           </section>
         </section>
-        <div className='table-container'>
+        <div className='table-container mt-2'>
           <table className='editor data-table' role='table'>
             <thead>
               <tr>
@@ -237,44 +252,42 @@ const PreviewDataTable = () => {
   }
 
   const Table = () => (
-    <>
-      <section className='table-container w-100 mt-2'>
-        <table className='table table-striped table-striped data-table' {...getTableProps()} aria-hidden='true'>
-          <thead>
-            {headerGroups.map(headerGroup => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map(column => (
-                  <th
-                    scope='col'
-                    {...column.getHeaderProps(column.getSortByToggleProps())}
-                    className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : ''}
-                    title={column.Header}
-                  >
-                    {column.render('Header')}
-                    <div {...column.getResizerProps()} className='resizer' />
-                  </th>
+    <div className='table-responsive'>
+      <table className='mt-2 w-100 table table-striped data-table table-sm ' aria-hidden='true' {...getTableProps}>
+        <thead>
+          {headerGroups.map(headerGroup => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map(column => (
+                <th
+                  scope='col'
+                  {...column.getHeaderProps(column.getSortByToggleProps())}
+                  className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : ''}
+                  title={column.Header}
+                >
+                  {column.render('Header')}
+                  <div {...column.getResizerProps()} className='resizer' />
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody {...getTableBodyProps()}>
+          {page.map(row => {
+            prepareRow(row)
+            return (
+              <tr {...row.getRowProps()}>
+                {row.cells.map(cell => (
+                  <td {...cell.getCellProps()} title={cell.value}>
+                    {cell.render('Cell')}
+                  </td>
                 ))}
               </tr>
-            ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-            {page.map(row => {
-              prepareRow(row)
-              return (
-                <tr {...row.getRowProps()}>
-                  {row.cells.map(cell => (
-                    <td {...cell.getCellProps()} title={cell.value}>
-                      {cell.render('Cell')}
-                    </td>
-                  ))}
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </section>
+            )
+          })}
+        </tbody>
+      </table>
       <Footer {...footerProps} />
-    </>
+    </div>
   )
 
   return [

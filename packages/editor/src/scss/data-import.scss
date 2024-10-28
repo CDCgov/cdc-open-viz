@@ -238,8 +238,21 @@
   }
   .right-col {
     position: relative;
-    background-color: $lightest-gray;
+    background-color: var(--gray2);
     padding: $gbl-padding;
     width: 50% !important;
+
+    table {
+      width: 100%;
+      table-layout: unset;
+      border-collapse: collapse;
+
+      th,
+      td {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
   }
 }

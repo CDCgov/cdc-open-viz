@@ -2,6 +2,7 @@ $colors: (
   'baseColor': #333,
   'blue': #005eaa,
   'lightestGray': #f2f2f2,
+  'gray2': #f5f5f5,
   'lightGray': #c7c7c7,
   'mediumGray': #565656,
   'darkGray': #333,
@@ -61,7 +62,7 @@ $colors: (
   'amber-primary': #fbab18,
   'amber-secondary': #ffd54f,
   'amber-tertiary': #ffecb3,
-  'amber-quaternary': #fff7e1,
+  'amber-quaternary': #fff7e1
 );
 
 @mixin theme() {
@@ -75,6 +76,7 @@ $colors: (
 @include theme();
 
 :root {
+  --editorContentPadding: 30px;
   --editorWidth: 350px;
   --breakpoint-xs: 480px;
   --breakpoint-sm: 768px;
@@ -84,10 +86,8 @@ $colors: (
   --font-size: 17px;
 }
 
-
 @media (max-width: 768px) {
   :root {
     --font-size: 0.9em;
   }
 }
-
