@@ -7,11 +7,11 @@ interface LegendProps {
   isBottomOrSmallViewport: boolean
 }
 
-const LegendSuppression: React.FC<LegendProps> = ({ config, isBottomOrSmallViewport }) => {
+const LegendSuppression: React.FC<LegendProps> = ({ config, isBottomOrSmallViewport, setHasSuppression }) => {
   const { preliminaryData, visualizationType, visualizationSubType, legend } = config
 
   const hasOpenCircleEffects = () =>
-    preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style === 'Open Circles') &&
+    preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style !== 'Filled Circles') &&
     ['Line', 'Combo'].includes(visualizationType)
 
   const shouldShowSuppressedLabels = () =>
@@ -100,6 +100,13 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isBottomOrSmallViewp
   const getLegendContainerClass = () =>
     legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''
 
+  const shouldShowSuppressedInfo = () =>
+    !config.legend.hideSuppressionLink &&
+    config.visualizationSubType !== 'stacked' &&
+    preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value && (pd?.style || pd.symbol))
+
+  setHasSuppression(shouldShowSuppressedInfo())
+
   return (
     <React.Fragment>
       {hasOpenCircleEffects() && (
@@ -115,24 +122,22 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isBottomOrSmallViewp
           <div className={getLegendContainerClass()}>{renderSuppressedItems()}</div>
         </React.Fragment>
       )}
-      {!config.legend.hideSuppressionLink &&
-        config.visualizationSubType !== 'stacked' &&
-        preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value && (pd?.style || pd.symbol)) && (
-          <div className='legend-container__outer definition-link'>
-            <Icon alt='info-icon' display='info' />
-            <p>
-              This chart contains
-              <a // prettier-ignore
-                onClick={handleLinkClick}
-                data-tooltip-content='Data is suppressed to maintain statistical reliability. This occurs when the number of respondents or reported values does not meet the minimum reporting threshold.'
-                data-tooltip-id='my-tooltip'
-                href='no-router-link'
-              >
-                suppressed data
-              </a>
-            </p>
-          </div>
-        )}
+      {shouldShowSuppressedInfo() && (
+        <div className='legend-container__outer definition-link'>
+          <Icon alt='info-icon' display='info' />
+          <p>
+            This chart contains
+            <a // prettier-ignore
+              onClick={handleLinkClick}
+              data-tooltip-content='Data is suppressed to maintain statistical reliability. This occurs when the number of respondents or reported values does not meet the minimum reporting threshold.'
+              data-tooltip-id='my-tooltip'
+              href='no-router-link'
+            >
+              suppressed data
+            </a>
+          </p>
+        </div>
+      )}
 
       <ReactTooltip // prettier-ignore
         id='my-tooltip'

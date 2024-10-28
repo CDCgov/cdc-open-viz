@@ -12,27 +12,7 @@ import { type PanelProps } from './../PanelProps'
 import './../panels.scss'
 
 const PanelAnnotate: React.FC<PanelProps> = props => {
-  const { updateConfig, config, unfilteredData, dimensions, isDraggingAnnotation } = useContext(ConfigContext)
-
-  const getColumns = (filter = true) => {
-    const columns = {}
-    unfilteredData.forEach(row => {
-      Object.keys(row).forEach(columnName => (columns[columnName] = true))
-    })
-
-    if (filter) {
-      Object.keys(columns).forEach(key => {
-        if (
-          (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
-          (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key))
-        ) {
-          delete columns[key]
-        }
-      })
-    }
-
-    return Object.keys(columns)
-  }
+  const { updateConfig, config, svgRef } = useContext(ConfigContext)
 
   const handleAnnotationUpdate = (value, property, index) => {
     const svgContainer = document.querySelector('.chart-container  > svg')?.getBoundingClientRect()
@@ -48,8 +28,11 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   }
 
   const handleAddAnnotation = () => {
-    const svgContainer = document.querySelector('.chart-container > svg')?.getBoundingClientRect()
-    const newSvgDims = [svgContainer?.width, svgContainer?.height]
+    // check if svg is animated svg or standard svg
+    const newSvgDims = [
+      svgRef?.current?.width?.baseVal?.value || svgRef?.current?.width,
+      svgRef?.current?.height?.baseVal?.value || svgRef?.current?.height
+    ]
 
     const newAnnotation = {
       text: 'New Annotation',

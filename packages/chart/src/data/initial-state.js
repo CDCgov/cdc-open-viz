@@ -28,6 +28,7 @@ export default {
     showDownloadButton: false,
     showMissingDataLabel: true,
     showSuppressedSymbol: true,
+    showZeroValueData: true,
     hideNullValue: true
   },
   padding: {
@@ -122,10 +123,12 @@ export default {
     tickLabelColor: '#333',
     tickColor: '#333',
     numTicks: '',
-    labelOffset: 65,
+    labelOffset: 0,
     axisPadding: 200,
     target: 0,
-    maxTickRotation: 0
+    maxTickRotation: 0,
+    padding: 5,
+    showYearsOnce: false
   },
   table: {
     label: 'Data Table',
@@ -135,6 +138,7 @@ export default {
     caption: '',
     showDownloadUrl: false,
     showDataTableLink: true,
+    showDownloadLinkBelow: true,
     indexLabel: '',
     download: false,
     showVertical: true,

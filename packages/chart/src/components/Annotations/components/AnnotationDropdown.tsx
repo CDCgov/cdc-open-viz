@@ -30,7 +30,7 @@ const AnnotationDropdown = () => {
   }
 
   const handleSectionClasses = () => {
-    const classes = [`data-table-container`, viewport, `d-block`, `d-lg-none`]
+    const classes = [`data-table-container`, viewport, `d-block`, `d-lg-none`, `w-100`]
 
     if (config.general.showAnnotationDropdown) {
       classes.push('d-lg-block')

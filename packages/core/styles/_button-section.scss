@@ -26,6 +26,10 @@
   & a {
     font-size: 16px;
   }
+  margin-top: 20px;
+  &.below-table {
+    margin-top: 5px;
+  }
 }
 
 // odd wrapper thats different on dashboards

@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { SharedFilter } from '../types/SharedFilter'
+import { FILTER_STYLE } from '../types/FilterStyles'
 
 const findFilterTier = (filters: SharedFilter[], sharedFilter: SharedFilter) => {
   if (!sharedFilter.parents?.length) {
@@ -23,16 +24,33 @@ function getMaxTierAndSetFilterTiers(filters: SharedFilter[]): number {
 }
 
 function filter(data = [], filters: SharedFilter[], condition) {
+  const activeFilters = filters.filter(f => f.resetLabel !== f.active)
   return data.filter(row => {
-    const foundMatchingFilter = filters.find(filter => {
+    const foundMatchingFilter = activeFilters.find(filter => {
       const currentValue = row[filter.columnName]
-      const selectedValue = filter.queuedActive || filter.active
+
+      const selectedValue =
+        filter.queuedActive || filter.filterStyle === FILTER_STYLE.nestedDropdown
+          ? [filter.active, filter.subGrouping?.active]
+          : filter.active
       let isNotTheSelectedValue = true
       if (Array.isArray(selectedValue)) {
         isNotTheSelectedValue = !selectedValue.includes(currentValue)
       } else {
         isNotTheSelectedValue = selectedValue && currentValue != selectedValue
       }
+
+      if (
+        filter.filterStyle === 'nested-dropdown' &&
+        filter.subGrouping &&
+        filter.active === currentValue &&
+        isNotTheSelectedValue === false
+      ) {
+        const subGroupActive = filter.subGrouping.active
+        const selectedSubGroupValue = row[filter.subGrouping.columnName]
+        isNotTheSelectedValue = subGroupActive && selectedSubGroupValue !== subGroupActive
+      }
+
       const isFirstOccurrenceOfTier = filter.tier === condition
       if (filter.type !== 'urlfilter' && isFirstOccurrenceOfTier && isNotTheSelectedValue) {
         return true
