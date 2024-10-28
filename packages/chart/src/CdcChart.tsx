@@ -302,9 +302,6 @@ export default function CdcChart({
       })
     }
 
-    if (newConfig.visualizationType === 'Box Plot') {
-      newConfig.legend.hide = true
-    }
     if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
 
     newConfig.series.forEach(series => {
