@@ -25,6 +25,8 @@ import ForestPlotIcon from '@cdc/core/assets/icon-chart-forest-plot.svg'
 import ForecastIcon from '@cdc/core/assets/icon-chart-forecast.svg'
 import DeviationIcon from '@cdc/core/assets/icon-deviation-bar.svg'
 import SankeyIcon from '@cdc/core/assets/icon-sankey.svg'
+import ComboChartIcon from '@cdc/core/assets/icon-combo-chart.svg'
+import EpiChartIcon from '@cdc/core/assets/icon-epi-chart.svg'
 import { Visualization } from '@cdc/core/types/Visualization'
 import Icon from '@cdc/core/components/ui/Icon'
 
@@ -41,7 +43,16 @@ export default function ChooseTab() {
   /**
    * IconButton component
    */
-  const IconButton = ({ icon, label, type, subType = undefined, orientation = undefined, stacked = false, generalType = 'data' }) => {
+  const IconButton = ({
+    icon,
+    label,
+    type,
+    subType = undefined,
+    orientation = undefined,
+
+    stacked = false,
+    generalType = 'data'
+  }) => {
     let isSubType = false
     let isHorizontalStackedChart = false
     let classNames
@@ -49,8 +60,10 @@ export default function ChooseTab() {
       let geoType = config.general.geoType
       isSubType = subType === geoType
     }
+
     if (type === 'chart') {
       isSubType = subType === config.visualizationType
+
       isHorizontalStackedChart = orientation === config.orientation && stacked === true
     }
 
@@ -76,13 +89,23 @@ export default function ChooseTab() {
         }
         dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
       } else {
-        const confirmation = !config.type || window.confirm('Changing visualization type will clear configuration settings. Do you want to continue?')
+        const confirmation =
+          !config.type ||
+          window.confirm('Changing visualization type will clear configuration settings. Do you want to continue?')
 
         if (confirmation) {
           const newConfig = {
             newViz: true,
             datasets: {},
-            type
+            isResponsiveTicks: false,
+            type,
+            barThickness: '0.37',
+            xAxis: {
+              type: 'categorical',
+              size: 75,
+              maxTickRotation: 45,
+              labelOffset: 0
+            }
           } as Visualization
 
           if (type === 'map') {
@@ -97,6 +120,14 @@ export default function ChooseTab() {
           if (type === 'chart') {
             newConfig.visualizationSubType = stacked ? 'stacked' : 'regular'
             newConfig.orientation = orientation
+            if (label === 'Epi Chart') {
+              newConfig.xAxis.type = 'date-time'
+              newConfig.xAxis.size = 0
+              newConfig.barThickness = ' 0.50'
+              newConfig.xAxis.labelOffset = 0
+              newConfig.xAxis.maxTickRotation = 45
+              newConfig.isResponsiveTicks = true
+            }
           }
 
           dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
@@ -131,10 +162,17 @@ export default function ChooseTab() {
 
   return (
     <div className='choose-vis'>
-      <a href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/index.html' target='_blank' rel='noopener noreferrer' className='guidance-link' style={{ marginTop: 0, marginBottom: '2rem' }}>
+      <a
+        href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/index.html'
+        target='_blank'
+        rel='noopener noreferrer'
+        className='guidance-link'
+        style={{ marginTop: 0, marginBottom: '2rem' }}
+      >
         <div>
           <p>
-            For more information on the types of data visualizations in the WCMS, including examples and best practices, <u>see the WCMS Features Gallery</u>.
+            For more information on the types of data visualizations in the WCMS, including examples and best practices,{' '}
+            <u>see the WCMS Features Gallery</u>.
           </p>
         </div>
       </a>
@@ -172,7 +210,10 @@ export default function ChooseTab() {
             <Tooltip.Target>
               <IconButton label='Gauge Chart' type='waffle-chart' subType='Gauge' icon={<GaugeChartIcon />} />
             </Tooltip.Target>
-            <Tooltip.Content>Specify the calculation of a single data point (such as a percentage value) and present it on a horizontal scale.</Tooltip.Content>
+            <Tooltip.Content>
+              Specify the calculation of a single data point (such as a percentage value) and present it on a horizontal
+              scale.
+            </Tooltip.Content>
           </Tooltip>
         </li>
       </ul>
@@ -183,6 +224,28 @@ export default function ChooseTab() {
           <Tooltip position='right'>
             <Tooltip.Target>
               <IconButton label='Bar' type='chart' subType='Bar' orientation='vertical' icon={<BarIcon />} />
+            </Tooltip.Target>
+            <Tooltip.Content>Use bars to show comparisons between data categories.</Tooltip.Content>
+          </Tooltip>
+        </li>
+        <li>
+          <Tooltip position='right'>
+            <Tooltip.Target>
+              <IconButton label='Epi Chart' type='chart' subType='Bar' orientation='vertical' icon={<EpiChartIcon />} />
+            </Tooltip.Target>
+            <Tooltip.Content>Use bars to show comparisons between data categories.</Tooltip.Content>
+          </Tooltip>
+        </li>
+        <li>
+          <Tooltip position='right'>
+            <Tooltip.Target>
+              <IconButton
+                label='Combo Chart'
+                type='chart'
+                subType='Combo'
+                orientation='vertical'
+                icon={<ComboChartIcon />}
+              />
             </Tooltip.Target>
             <Tooltip.Content>Use bars to show comparisons between data categories.</Tooltip.Content>
           </Tooltip>
@@ -206,15 +269,30 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Paired Bar' type='chart' subType='Paired Bar' orientation='horizontal' icon={<PairedBarIcon />} />
+              <IconButton
+                label='Paired Bar'
+                type='chart'
+                subType='Paired Bar'
+                orientation='horizontal'
+                icon={<PairedBarIcon />}
+              />
             </Tooltip.Target>
-            <Tooltip.Content>Use paired bars to show comparisons between two different data categories.</Tooltip.Content>
+            <Tooltip.Content>
+              Use paired bars to show comparisons between two different data categories.
+            </Tooltip.Content>
           </Tooltip>
         </li>
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Deviation Bar' type='chart' subType='Deviation Bar' orientation='horizontal' stacked={false} icon={<DeviationIcon />} />
+              <IconButton
+                label='Deviation Bar'
+                type='chart'
+                subType='Deviation Bar'
+                orientation='horizontal'
+                stacked={false}
+                icon={<DeviationIcon />}
+              />
             </Tooltip.Target>
             <Tooltip.Content>Use deviation bars to display how individual values differ from a target.</Tooltip.Content>
           </Tooltip>
@@ -222,7 +300,14 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Horizontal Bar (Stacked)' type='chart' subType='Bar' orientation='horizontal' stacked={true} icon={<HorizontalStackIcon />} />
+              <IconButton
+                label='Horizontal Bar (Stacked)'
+                type='chart'
+                subType='Bar'
+                orientation='horizontal'
+                stacked={true}
+                icon={<HorizontalStackIcon />}
+              />
             </Tooltip.Target>
             <Tooltip.Content>Use bars to show comparisons between data categories.</Tooltip.Content>
           </Tooltip>
@@ -234,7 +319,13 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Box Plot' type='chart' subType='Box Plot' orientation='vertical' icon={<BoxPlotIcon />} />
+              <IconButton
+                label='Box Plot'
+                type='chart'
+                subType='Box Plot'
+                orientation='vertical'
+                icon={<BoxPlotIcon />}
+              />
             </Tooltip.Target>
             <Tooltip.Content>Display a box plot</Tooltip.Content>
           </Tooltip>
@@ -242,7 +333,13 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Scatter Plot' type='chart' subType='Scatter Plot' orientation='vertical' icon={<ScatterPlotIcon />} />
+              <IconButton
+                label='Scatter Plot'
+                type='chart'
+                subType='Scatter Plot'
+                orientation='vertical'
+                icon={<ScatterPlotIcon />}
+              />
             </Tooltip.Target>
             <Tooltip.Content>Display a scatter plot</Tooltip.Content>
           </Tooltip>
@@ -250,7 +347,13 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Area Chart' type='chart' subType='Area Chart' orientation='vertical' icon={<AreaChartIcon />} />
+              <IconButton
+                label='Area Chart'
+                type='chart'
+                subType='Area Chart'
+                orientation='vertical'
+                icon={<AreaChartIcon />}
+              />
             </Tooltip.Target>
             <Tooltip.Content>Display an area chart</Tooltip.Content>
           </Tooltip>
@@ -258,7 +361,13 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Forecast Chart' type='chart' subType='Forecasting' orientation='vertical' icon={<ForecastIcon />} />
+              <IconButton
+                label='Forecast Chart'
+                type='chart'
+                subType='Forecasting'
+                orientation='vertical'
+                icon={<ForecastIcon />}
+              />
             </Tooltip.Target>
             <Tooltip.Content>Display a forecasting chart</Tooltip.Content>
           </Tooltip>
@@ -276,7 +385,13 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Sankey Diagram' type='chart' subType='Sankey' orientation='vertical' icon={<SankeyIcon />} />
+              <IconButton
+                label='Sankey Diagram'
+                type='chart'
+                subType='Sankey'
+                orientation='vertical'
+                icon={<SankeyIcon />}
+              />
             </Tooltip.Target>
             <Tooltip.Content>Display a sankey diagram</Tooltip.Content>
           </Tooltip>
@@ -320,7 +435,13 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='U.S. Geocode' type='map' subType='us-county' generalType='us-geocode' icon={<UsaIcon />} />
+              <IconButton
+                label='U.S. Geocode'
+                type='map'
+                subType='us-county'
+                generalType='us-geocode'
+                icon={<UsaIcon />}
+              />
             </Tooltip.Target>
             <Tooltip.Content>United States GeoCode</Tooltip.Content>
           </Tooltip>
@@ -339,7 +460,13 @@ export default function ChooseTab() {
             </Tooltip.Content>
           </Tooltip>
         </label>
-        <input type='file' accept='.txt,.json' className='form-control-file' id='uploadConfig' onChange={handleUpload} />
+        <input
+          type='file'
+          accept='.txt,.json'
+          className='form-control-file'
+          id='uploadConfig'
+          onChange={handleUpload}
+        />
       </div>
     </div>
   )

@@ -38,7 +38,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     setRuntimeLegend,
     state,
     viewport,
-    getTextWidth,
     mapId
   } = useContext(ConfigContext)
 
@@ -278,7 +277,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               dimensions={dimensions}
               currentViewport={currentViewport}
               config={state}
-              getTextWidth={getTextWidth}
             />
             <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
               {state.legend.style === 'gradient' ? '' : legendList()}

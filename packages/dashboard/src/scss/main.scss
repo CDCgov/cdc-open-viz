@@ -1,7 +1,4 @@
-@import '@cdc/core/styles/base';
-@import '@cdc/core/styles/heading-colors';
 @import 'mixins';
-@import 'variables';
 
 .cdc-open-viz-module.type-dashboard {
   @import 'editor-panel';
@@ -88,20 +85,20 @@
       border-bottom: #c7c7c7 1px solid;
       li {
         padding: 0.3em 1.5em;
-        color: $mediumGray;
+        color: var(--mediumGray);
         cursor: pointer;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
         &.active {
-          border-bottom-color: $mediumGray;
+          border-bottom-color: var(--mediumGray);
           border-bottom-style: inherit;
           border-bottom-width: 5px;
-          color: $darkGray;
+          color: var(--darkGray);
         }
         &:hover {
-          border-bottom-color: $darkGray;
-          color: $darkGray;
+          border-bottom-color: var(--darkGray);
+          color: var(--darkGray);
         }
       }
 
@@ -182,15 +179,15 @@
   }
 
   .data-table-container {
-    margin: 0;
-    @include breakpointClass(md) {
-      margin: 15px 0;
+    margin: 20px 0 0;
+    &.download-link-above {
+      margin: 0;
     }
   }
 
   .collapsable-multiviz-container {
     position: relative;
-    border: $lightGray 1px solid;
+    border: var(--lightGray) 1px solid;
     clear: both;
     margin-bottom: 20px;
     .multi-visualiation-heading {
@@ -211,6 +208,7 @@
         position: relative;
       }
       @include breakpoint(xs) {
+        $font-small: 0.7em;
         font-size: $font-small + 0.2em;
       }
     }
@@ -260,6 +258,10 @@
   .multi-table-container {
     display: inline-block;
     width: 100%;
+  }
+
+  .cove-dashboard-filters-container {
+    z-index: 5;
   }
 
   .cove-dashboard-filters {

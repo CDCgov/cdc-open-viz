@@ -3,6 +3,7 @@ import { SubGrouping, VizFilter, OrderBy } from '../../../types/VizFilter'
 import { filterOrderOptions, handleSorting } from '../../Filters'
 import FilterOrder from './components/FilterOrder'
 import { Visualization } from '../../../types/Visualization'
+import { useMemo } from 'react'
 
 type NestedDropdownEditorProps = {
   config: Visualization
@@ -121,6 +122,25 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
 
   const columnNameOptions = dataColumns.filter(columnName => !listOfUsedColumnNames.includes(columnName))
 
+  const useParameters = useMemo(() => {
+    const filter = config.filters[filterIndex]
+    return !!(filter.setByQueryParameter && filter.subGrouping?.setByQueryParameter)
+  }, [config, filterIndex])
+
+  const handleParametersCheckboxClick = e => {
+    const updatedFilters = config.filters
+    const { checked } = e.target
+    const groupColumnName = checked ? filter.columnName : ''
+    const subGroupColumnName = checked ? subGrouping.columnName : ''
+    updatedFilters[filterIndex] = {
+      ...config.filters[filterIndex],
+      setByQueryParameter: groupColumnName,
+      subGrouping: { ...subGrouping, setByQueryParameter: subGroupColumnName }
+    }
+
+    updateField(null, null, 'filters', updatedFilters)
+  }
+
   return (
     <div className='nesteddropdown-editor'>
       <label>
@@ -175,15 +195,13 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
       <label>
         <input
           type='checkbox'
-          checked={!!filter.setByQueryParameter}
+          checked={useParameters}
           aria-label='Create query parameters'
-          onChange={e => {
-            updateGroupingFilterProp('setByQueryParameter', filter.columnName)
-            updateSubGroupingFilterProperty({ ...subGrouping, setByQueryParameter: subGrouping.columnName })
-          }}
+          disabled={!filter.columnName || !subGrouping?.columnName}
+          onChange={e => handleParametersCheckboxClick(e)}
         />
         <span> Create query parameters</span>
-        {!!filter.setByQueryParameter && (
+        {useParameters && (
           <>
             <span className='edit-label column-heading mt-2'>
               Grouping: Default Value Set By Query String Parameter
@@ -200,7 +218,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
             </span>
             <input
               type='text'
-              value={subGrouping.setByQueryParameter}
+              value={subGrouping?.setByQueryParameter}
               onChange={e => {
                 const setByQueryParameter = e.target.value
                 updateSubGroupingFilterProperty({ ...subGrouping, setByQueryParameter })

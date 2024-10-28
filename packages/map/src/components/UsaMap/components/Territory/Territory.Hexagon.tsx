@@ -135,11 +135,11 @@ const TerritoryHexagon = ({ label, text, stroke, strokeWidth, textColor, territo
     )
   }
 
-  return (
+  return territoryData && (
     <svg viewBox='0 0 45 51' className='territory-wrapper--hex'>
       <g {...props}>
         <polygon stroke={stroke} strokeWidth={strokeWidth} points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702' />
-        {state.general.displayAsHex && hexagonLabel(territoryData ? territoryData : geo, stroke, false)}
+        {state.general.displayAsHex && hexagonLabel(territoryData, stroke, false)}
       </g>
     </svg>
   )

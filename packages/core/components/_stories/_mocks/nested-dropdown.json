@@ -1,0 +1,30 @@
+{
+  "key": "New Dashboard Filter 1",
+  "showDropdown": true,
+  "values": ["Age Group", "Age Group 2", "Age Group 3"],
+  "orderedValues": ["Age Group", "Age Group 2", "Age Group 3"],
+  "type": "datafilter",
+  "filterStyle": "nested-dropdown",
+  "columnName": "StratficationCategory1",
+  "active": "",
+  "subGrouping": {
+    "columnName": "Stratification1",
+    "active": "",
+    "valuesLookup": {
+      "Age Group": {
+        "orderedValues": ["50-64 years", "65 years or older", "Overall"],
+        "values": ["50-64 years", "65 years or older", "Overall"]
+      },
+      "Age Group 2": {
+        "orderedValues": ["65 years or older", "Overall"],
+        "values": ["65 years or older", "Overall"]
+      },
+      "Age Group 3": {
+        "orderedValues": ["50-64 years", "Overall"],
+        "values": ["50-64 years", "Overall"]
+      }
+    }
+  },
+  "usedBy": ["chart1724946676832"],
+  "tier": 1
+}

@@ -1,5 +1,4 @@
-@import '@cdc/core/styles/base';
-@import '@cdc/core/styles/heading-colors';
+@import '../../../scss/mixins';
 
 .cdc-map-inner-container {
   .map-container.world aside.side {
@@ -7,7 +6,7 @@
   }
   @include breakpointClass(md) {
     .map-container.world aside.side {
-      border-top: $lightGray 1px solid;
+      border-top: var(--lightGray) 1px solid;
       position: absolute;
       box-shadow: rgba(0, 0, 0, 0.2) 0 10px 18px;
     }
@@ -16,12 +15,10 @@
   aside {
     background-color: #fff;
     z-index: 6;
-    border-top: $lightGray 1px solid;
-
+    border-top: var(--lightGray) 1px solid;
     @include breakpointClass(md) {
-      &.bottom,
-      &.top {
-        border: $lightGray 1px solid;
+      &.bottom, &.top {
+        border: var(--lightGray) 1px solid;
       }
       &.side {
         z-index: 1;
@@ -32,7 +29,7 @@
         align-self: flex-start;
         z-index: 4;
         right: 1em;
-        border: $lightGray 1px solid;
+        border: var(--lightGray) 1px solid;
         top: 2em;
         right: 1em;
 
@@ -101,7 +98,10 @@
         list-style: none;
         padding-top: 1em;
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
+        @include breakpoint(md) {
+          grid-template-columns: 1fr 1fr;
+        }
 
         button {
           font-size: unset;
@@ -129,8 +129,11 @@
           transition: 0.1s opacity;
           display: flex;
           cursor: pointer;
-          white-space: nowrap;
+          white-space: wrap;
           flex-grow: 1;
+          @include breakpoint(md) {
+            white-space: nowrap;
+          }
 
           &.legend-container__li--disabled {
             opacity: 0.4;
@@ -149,11 +152,14 @@
         & > li {
           margin-right: 1em;
           margin-bottom: 1em;
-          white-space: nowrap;
+          white-space: wrap;
           display: flex;
           justify-content: center;
           align-items: center;
           vertical-align: middle;
+          @include breakpoint(md) {
+            white-space: nowrap;
+          }
 
           & svg {
             vertical-align: baseline;

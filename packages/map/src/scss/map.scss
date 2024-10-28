@@ -31,7 +31,7 @@ header + .map-container.full-border {
 // World Specific Styles
 .map-container.world {
   &.data .geography-container {
-    border-bottom: $lightGray 1px solid;
+    border-bottom: var(--lightGray) 1px solid;
   }
   .geography-container {
     cursor: move;
@@ -129,6 +129,7 @@ $medium: 768px;
 }
 
 .territories-label {
+  color: black;
   margin: 2em 5px 2em 1em;
   font-size: 1.1em;
   display: block;
@@ -158,13 +159,16 @@ $medium: 768px;
   &--mobile {
     @extend .territories;
     width: 60%;
+    svg {
+      margin-bottom: 0.5em;
+    }
   }
 
   &--tablet {
     @extend .territories;
     width: 70%;
     svg {
-      margin-bottom: 0.2em;
+      margin-bottom: 0.5em;
     }
   }
 }

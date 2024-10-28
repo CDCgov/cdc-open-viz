@@ -11,10 +11,11 @@ import { Line } from '@visx/shape'
 import { Label } from '../../types/Label'
 import { ChartConfig } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
-import { forwardRef } from 'react'
+import { forwardRef, useState } from 'react'
 import LegendSuppression from './Legend.Suppression'
 import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
+import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 
 export interface LegendProps {
   colorScale: ColorScale
@@ -27,7 +28,6 @@ export interface LegendProps {
   seriesHighlight: string[]
   skipId: string
   dimensions: DimensionsType // for responsive width legend
-  getTextWidth: (text: string, font: string) => string
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
@@ -42,24 +42,21 @@ const Legend: React.FC<LegendProps> = forwardRef(
       currentViewport,
       formatLabels,
       skipId = 'legend',
-      dimensions,
-      getTextWidth
+      dimensions
     },
     ref
   ) => {
     const { innerClasses, containerClasses } = useLegendClasses(config)
     const { runtime, legend } = config
 
+    const [hasSuppression, setHasSuppression] = useState(false)
+
     const isBottomOrSmallViewport =
-      legend?.position === 'bottom' || (['sm', 'xs', 'xxs'].includes(currentViewport) && !legend.hide)
+      legend?.position === 'bottom' || (isLegendWrapViewport(currentViewport) && !legend.hide)
 
     const legendClasses = {
-      marginBottom: getMarginBottom(isBottomOrSmallViewport, config),
-
-      marginTop:
-        isBottomOrSmallViewport && config.orientation === 'horizontal'
-          ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px`
-          : getMarginTop(isBottomOrSmallViewport, config.brush.active, legend)
+      marginBottom: getMarginBottom(config, hasSuppression),
+      marginTop: getMarginTop(isBottomOrSmallViewport, config)
     }
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
@@ -78,7 +75,6 @@ const Legend: React.FC<LegendProps> = forwardRef(
         {legend.label && <h3>{parse(legend.label)}</h3>}
         {legend.description && <p>{parse(legend.description)}</p>}
         <LegendGradient
-          getTextWidth={getTextWidth}
           config={config}
           {...getGradientConfig(config, formatLabels, colorScale)}
           dimensions={dimensions}
@@ -133,9 +129,9 @@ const Legend: React.FC<LegendProps> = forwardRef(
                         }}
                         role='button'
                       >
-                        <div>
+                        <div className='d-flex justify-content-center align-items-center'>
                           {config.visualizationType === 'Line' && config.legend.style === 'lines' ? (
-                            <svg width={40} height={20}>
+                            <svg width={40} height={25}>
                               <Line
                                 from={{ x: 10, y: 10 }}
                                 to={{ x: 40, y: 10 }}
@@ -145,7 +141,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                               />
                             </svg>
                           ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <div className='d-flex flex-column mt-1'>
                               <LegendShape
                                 shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
                                 viewport={currentViewport}
@@ -204,7 +200,11 @@ const Legend: React.FC<LegendProps> = forwardRef(
                   })}
                 </div>
 
-                <LegendSuppression config={config} isBottomOrSmallViewport={isBottomOrSmallViewport} />
+                <LegendSuppression
+                  config={config}
+                  isBottomOrSmallViewport={isBottomOrSmallViewport}
+                  setHasSuppression={setHasSuppression}
+                />
               </>
             )
           }}

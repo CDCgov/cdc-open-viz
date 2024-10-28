@@ -32,11 +32,8 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
   // prettier-ignore
   const {
     config,
-    currentViewport,
     dimensions,
-    isDraggingAnnotation,
     isEditor,
-    isLegendBottom,
     updateConfig
   } = useContext(ConfigContext)
 

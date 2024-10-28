@@ -8,6 +8,8 @@ export type ForestPlotProps = {
   /** config - standard chart config */
   config: ChartConfig
   /** height - height of chart */
+  /** forestPlotLeftLabelRef - ref for left label for resizing svg*/
+  forestPlotRightLabelRef: React.RefObject<SVGSVGElement>
   height: number
   /** width - width of chart */
   width: number

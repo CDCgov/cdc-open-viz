@@ -42,7 +42,7 @@ export const BarChartVertical = () => {
   } = useBarChart()
 
   // prettier-ignore
-  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig, getTextWidth } = useContext<ChartContext>(ConfigContext)
+  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig } = useContext<ChartContext>(ConfigContext)
   const { HighLightedBarUtils } = useHighlightedBars(config)
   let data = transformedData
   // check if user add suppression
@@ -58,7 +58,9 @@ export const BarChartVertical = () => {
 
   return (
     config.visualizationSubType !== 'stacked' &&
-    (config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph)) &&
+    (config.visualizationType === 'Bar' ||
+      config.visualizationType === 'Combo' ||
+      isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph)) &&
     config.orientation === 'vertical' && (
       <Group>
         <BarGroup
@@ -86,27 +88,48 @@ export const BarChartVertical = () => {
               >
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.yAxis.type === 'logarithmic' ? 0.1 : 0
-                  let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
-                  highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
-                  const transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
-                  const displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
+                  let highlightedBarValues = config.highlightedBarValues
+                    .map(item => item.value)
+                    .filter(item => item !== ('' || undefined))
+                  highlightedBarValues =
+                    config.xAxis.type === 'date'
+                      ? HighLightedBarUtils.formatDates(highlightedBarValues)
+                      : highlightedBarValues
+                  const transparentBar =
+                    config.legend.behavior === 'highlight' &&
+                    seriesHighlight.length > 0 &&
+                    seriesHighlight.indexOf(bar.key) === -1
+                  const displayBar =
+                    config.legend.behavior === 'highlight' ||
+                    seriesHighlight.length === 0 ||
+                    seriesHighlight.indexOf(bar.key) !== -1
 
                   let barGroupWidth = seriesScale.range()[1] - seriesScale.range()[0]
                   const defaultBarHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
                   const defaultBarY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
                   let barWidth = config.isLollipopChart ? lollipopBarWidth : seriesScale.bandwidth()
-                  let barX = bar.x + (config.isLollipopChart ? (barGroupWidth / barGroup.bars.length - lollipopBarWidth) / 2 : 0) - (config.xAxis.type === 'date-time' ? barGroupWidth / 2 : 0)
+                  let barX =
+                    bar.x +
+                    (config.isLollipopChart ? (barGroupWidth / barGroup.bars.length - lollipopBarWidth) / 2 : 0) -
+                    (config.xAxis.type === 'date-time' ? barGroupWidth / 2 : 0)
                   setBarWidth(barWidth)
                   setTotalBarsInGroup(barGroup.bars.length)
                   const yAxisValue = formatNumber(/[a-zA-Z]/.test(String(bar.value)) ? '' : bar.value, 'left')
                   const xAxisValue =
-                    config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
+                    config.runtime[section].type === 'date'
+                      ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey]))
+                      : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
                   // tooltips
-                  const additionalColTooltip = getAdditionalColumn(bar.key, data[barGroup.index][config.runtime.originalXAxis.dataKey])
-                  let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
+                  const additionalColTooltip = getAdditionalColumn(
+                    bar.key,
+                    data[barGroup.index][config.runtime.originalXAxis.dataKey]
+                  )
+                  let xAxisTooltip = config.runtime.xAxis.label
+                    ? `${config.runtime.xAxis.label}: ${xAxisValue}`
+                    : xAxisValue
                   const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
 
                   const tooltip = `<ul>
@@ -118,16 +141,37 @@ export const BarChartVertical = () => {
                   // configure colors
                   let labelColor = '#000000'
                   labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor) // Set if background is transparent'
-                  let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key)
+                  let barColor =
+                    config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key]
+                      ? colorScale(config.runtime.seriesLabels[bar.key])
+                      : colorScale(bar.key)
                   const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                   const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
                   const isHighlightedBar = highlightedBarValues?.includes(xAxisValue)
                   const highlightedBarColor = getHighlightedBarColorByValue(xAxisValue)
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
-                  const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
-                  const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
+                  const borderColor = isHighlightedBar
+                    ? highlightedBarColor
+                    : config.barHasBorder === 'true'
+                    ? '#000'
+                    : 'transparent'
+                  const borderWidth = isHighlightedBar
+                    ? highlightedBar.borderWidth
+                    : config.isLollipopChart
+                    ? 0
+                    : config.barHasBorder === 'true'
+                    ? barBorderWidth
+                    : 0
 
-                  const { barHeight, isSuppressed, getBarY, getAbsentDataLabel } = getBarConfig({ bar, defaultBarHeight, config, isNumber, getTextWidth, barWidth, isVertical: true, yAxisValue })
+                  const { barHeight, isSuppressed, getBarY, getAbsentDataLabel } = getBarConfig({
+                    bar,
+                    defaultBarHeight,
+                    config,
+                    isNumber,
+                    barWidth,
+                    isVertical: true,
+                    yAxisValue
+                  })
 
                   const absentDataLabel = getAbsentDataLabel(yAxisValue)
                   const barDefaultLabel = isSuppressed || !config.labels ? '' : yAxisValue
@@ -149,9 +193,11 @@ export const BarChartVertical = () => {
                         ? sharedFilters.map(_sharedFilter => {
                             if (_sharedFilter.setBy === config.uid) {
                               // If the current filter is the reset filter item.
-                              if (_sharedFilter.resetLabel === _sharedFilter.active) return colorScale(config.runtime.seriesLabels[bar.key])
+                              if (_sharedFilter.resetLabel === _sharedFilter.active)
+                                return colorScale(config.runtime.seriesLabels[bar.key])
                               // If the current filter is the bars
-                              if (_sharedFilter.active === transformedData[barGroup.index][config.xAxis.dataKey]) return colorScale(config.runtime.seriesLabels[bar.key])
+                              if (_sharedFilter.active === transformedData[barGroup.index][config.xAxis.dataKey])
+                                return colorScale(config.runtime.seriesLabels[bar.key])
                               return _filteredOutColor
                             } else {
                               // If the setBy isn't the config.uid return the original barColor
@@ -163,14 +209,16 @@ export const BarChartVertical = () => {
                       if (isRegularLollipopColor) _barColor = barColor
 
                       if (isHighlightedBar) _barColor = 'transparent'
-                      if (config.legend.colorCode) _barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
+                      if (config.legend.colorCode)
+                        _barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
                       if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
                       return _barColor
                     }
 
                     // if this is a two tone lollipop slightly lighten the bar.
                     if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
-                    if (config.legend.colorCode) _barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
+                    if (config.legend.colorCode)
+                      _barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
 
                     // if we're highlighting a bar make it invisible since it gets a border
                     if (isHighlightedBar) _barColor = 'transparent'
@@ -217,13 +265,23 @@ export const BarChartVertical = () => {
                           const isValueMatch = String(pd.value) === String(bar.value) && pd.value !== ''
                           const isSuppressed = isValueMatch && selectedSuppressionColumn
 
-                          if (!isSuppressed || barWidth < 10 || !config.general.showSuppressedSymbol || pd.hideBarSymbol) {
+                          if (
+                            !isSuppressed ||
+                            barWidth < 10 ||
+                            !config.general.showSuppressedSymbol ||
+                            pd.hideBarSymbol
+                          ) {
                             return
                           }
                           const hasAsterisk = String(pd.symbol).includes('Asterisk')
                           const yPadding = hasAsterisk ? -5 : -8
                           const verticalAnchor = hasAsterisk ? 'middle' : 'end'
-                          const iconSize = pd.symbol === 'Asterisk' ? barWidth * 1.2 : pd.symbol === 'Double Asterisk' ? barWidth : barWidth / 1.5
+                          const iconSize =
+                            pd.symbol === 'Asterisk'
+                              ? barWidth * 1.2
+                              : pd.symbol === 'Double Asterisk'
+                              ? barWidth
+                              : barWidth / 1.5
                           const fillColor = pd.displayGray ? '#8b8b8a' : '#000'
 
                           return (

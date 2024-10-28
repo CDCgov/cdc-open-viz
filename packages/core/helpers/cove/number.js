@@ -30,10 +30,24 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   if (isNegative) {
     num = Math.abs(num)
   }
-  
+
   // destructure dataFormat values
   let {
-    dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, bottomRoundTo, rightPrefix, rightSuffix, bottomPrefix, bottomSuffix, bottomAbbreviated }
+    dataFormat: {
+      commas,
+      abbreviated,
+      roundTo,
+      prefix,
+      suffix,
+      rightRoundTo,
+      bottomRoundTo,
+      rightPrefix,
+      rightSuffix,
+      bottomPrefix,
+      bottomSuffix,
+      bottomAbbreviated,
+      onlyShowTopPrefixSuffix
+    }
   } = config
 
   // destructure Additional Col dataformat values
@@ -108,7 +122,10 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   // Edge case for small numbers with decimals
   // - if roundTo undefined which means it is blank, then do not round
 
-  if ((axis === 'left' && commas && abbreviated && shouldAbbreviate) || (axis === 'bottom' && commas && abbreviated && shouldAbbreviate)) {
+  if (
+    (axis === 'left' && commas && abbreviated && shouldAbbreviate) ||
+    (axis === 'bottom' && commas && abbreviated && shouldAbbreviate)
+  ) {
     num = num // eslint-disable-line
   } else {
     num = num.toLocaleString('en-US', stringFormattingOptions)
@@ -123,38 +140,42 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
     num = abbreviateNumber(parseFloat(num))
   }
 
-  if (addColPrefix !== undefined && axis === 'left') {
-    result = addColPrefix + result
-  } else {
-    if (prefix && axis === 'left') {
-      result = prefix + result
+  if (!onlyShowTopPrefixSuffix) {
+    if (addColPrefix !== undefined && axis === 'left') {
+      result = addColPrefix + result
+    } else {
+      if (prefix && axis === 'left') {
+        result = prefix + result
+      }
     }
-  }
 
-  if (rightPrefix && axis === 'right') {
-    result += rightPrefix
-  }
+    if (rightPrefix && axis === 'right') {
+      result += rightPrefix
+    }
 
-  if (bottomPrefix && axis === 'bottom') {
-    result += bottomPrefix
+    if (bottomPrefix && axis === 'bottom') {
+      result += bottomPrefix
+    }
   }
 
   result += num
 
-  if (addColSuffix !== undefined && axis === 'left') {
-    result += addColSuffix
-  } else {
-    if (suffix && axis === 'left') {
-      result += suffix
+  if (!onlyShowTopPrefixSuffix) {
+    if (addColSuffix !== undefined && axis === 'left') {
+      result += addColSuffix
+    } else {
+      if (suffix && axis === 'left') {
+        result += suffix
+      }
     }
-  }
 
-  if (rightSuffix && axis === 'right') {
-    result += rightSuffix
-  }
+    if (rightSuffix && axis === 'right') {
+      result += rightSuffix
+    }
 
-  if (bottomSuffix && axis === 'bottom') {
-    result += bottomSuffix
+    if (bottomSuffix && axis === 'bottom') {
+      result += bottomSuffix
+    }
   }
   if (isNegative) {
     result = '-' + result

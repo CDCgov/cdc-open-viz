@@ -5,6 +5,10 @@ import Chart from '../CdcChart'
 import lineChartTwoPointsRegressionTest from './_mock/line_chart_two_points_regression_test.json'
 import lineChartTwoPointsNewChart from './_mock/line_chart_two_points_new_chart.json'
 import lollipop from './_mock/lollipop.json'
+import forestPlot from '../../examples/feature/forest-plot/forest-plot.json'
+import pairedBar from './_mock/paired-bar.json'
+import horizontalBarConfig from './_mock/horizontal_bar.json'
+import pieConfig from './_mock/pie_with_data.json'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',
@@ -37,6 +41,30 @@ export const Suppression: Story = {
   args: {
     config: SuppressedConfig,
     isEditor: false
+  }
+}
+
+export const Forest_Plot: Story = {
+  args: {
+    config: forestPlot
+  }
+}
+
+export const Horizontal_Bar: Story = {
+  args: {
+    config: horizontalBarConfig
+  }
+}
+
+export const Pie: Story = {
+  args: {
+    config: pieConfig
+  }
+}
+
+export const Paired_Bar: Story = {
+  args: {
+    config: pairedBar
   }
 }
 
