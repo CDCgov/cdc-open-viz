@@ -228,6 +228,26 @@ const PanelGeneral: FC<PanelProps> = props => {
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
+                    <p>
+                      Selecting this option will display a thin line slightly above the Date/Category Axis to indicate
+                      "zero value" where zero values are indicated in the Data Series.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+              value={config.general.showZeroValueData}
+              section='general'
+              fieldName='showZeroValueData'
+              label='Display "Zero Data" Label'
+              updateField={updateField}
+            />
+            <CheckBox
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
                     {config.visualizationSubType === 'stacked' && (
                       <p>
                         We do not recommend using stacked vertical/horizontal bar charts for missing data. If you choose
@@ -251,10 +271,7 @@ const PanelGeneral: FC<PanelProps> = props => {
               updateField={updateField}
             />
             <CheckBox
-              display={
-                config.visualizationSubType === 'stacked' &&
-                (config.visualizationType === 'Bar' || config.visualizationType === 'Combo')
-              }
+              display={config.visualizationType === 'Bar' || config.visualizationType === 'Combo'}
               tooltip={
                 <Tooltip style={{ textTransform: 'none' }}>
                   <Tooltip.Target>

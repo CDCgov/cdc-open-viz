@@ -38,9 +38,6 @@ const PieChart = props => {
     config,
     colorScale,
     currentViewport,
-    dimensions,
-    highlight,
-    highlightReset,
     seriesHighlight,
     isDraggingAnnotation
   } = useContext(ConfigContext)
@@ -232,8 +229,6 @@ const PieChart = props => {
     }
   }, [seriesHighlight]) // eslint-disable-line
 
-  const createLegendLabels = createFormatLabels(config, [], _data, _colorScale)
-
   const getSvgClasses = () => {
     let classes = ['animated-pie', 'group']
     if (config.animate === false || animatedPie) {
@@ -280,7 +275,7 @@ const PieChart = props => {
               <TooltipWithBounds
                 key={Math.random()}
                 className={'tooltip cdc-open-viz-module'}
-                left={tooltipLeft}
+                left={tooltipLeft + centerX - radius}
                 top={tooltipTop}
               >
                 <ul>

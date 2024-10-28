@@ -41,7 +41,7 @@ const PanelVisual: FC<PanelProps> = props => {
     visSupportsReverseColorPalette,
     visHasSingleSeriesTooltip
   } = useEditorPermissions()
-  const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
+  const { twoColorPalettes, sequential, nonSequential, accessibleColors } = useColorPalette(config, updateConfig)
 
   const updateColor = (property, _value) => {
     console.log('value', _value)
@@ -270,6 +270,38 @@ const PanelVisual: FC<PanelProps> = props => {
 
                     const colorThree = {
                       backgroundColor: colorPalettes[palette][6]
+                    }
+
+                    return (
+                      <button
+                        title={palette}
+                        key={palette}
+                        onClick={e => {
+                          e.preventDefault()
+                          updateConfig({ ...config, palette })
+                        }}
+                        className={config.palette === palette ? 'selected' : ''}
+                      >
+                        <span style={colorOne}></span>
+                        <span style={colorTwo}></span>
+                        <span style={colorThree}></span>
+                      </button>
+                    )
+                  })}
+                </ul>
+                <span>Colorblind Safe</span>
+                <ul className='color-palette'>
+                  {accessibleColors.map(palette => {
+                    const colorOne = {
+                      backgroundColor: colorPalettes[palette][2]
+                    }
+
+                    const colorTwo = {
+                      backgroundColor: colorPalettes[palette][3]
+                    }
+
+                    const colorThree = {
+                      backgroundColor: colorPalettes[palette][5]
                     }
 
                     return (

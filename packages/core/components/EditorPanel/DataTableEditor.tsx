@@ -41,6 +41,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
 
   const excludeColumns = (section, subSection, fieldName, excludedColNames: string[]) => {
     const newColumns = _.cloneDeep(config.columns)
+
     const colNames: string[] = []
     for (let colKey in newColumns) {
       const col = newColumns[colKey]
@@ -48,6 +49,8 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
       if (excludedColNames.includes(col.name)) {
         // ensure all excluded columns are set to false
         newColumns[colKey].dataTable = false
+      } else {
+        newColumns[colKey].dataTable = true
       }
     }
     excludedColNames.forEach(colName => {
@@ -320,27 +323,27 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
         updateField={updateField}
       />
       {config.table.pivot?.columnName && (
-        <Select
-          label='Pivot Value Column: '
+        <MultiSelect
+          key={config.table.pivot?.columnName}
+          options={groupPivotColumns
+            .filter(col => col !== config.table.pivot?.columnName && col !== config.table.groupBy)
+            .map(c => ({ label: c, value: c }))}
+          selected={config.table.pivot?.valueColumns}
+          label='Pivot Value Column(s) '
+          section='table'
+          subsection='pivot'
+          fieldName='valueColumns'
+          updateField={updateField}
           tooltip={
             <Tooltip style={{ textTransform: 'none' }}>
               <Tooltip.Target>
                 <Icon display='question' style={{ marginLeft: '0.5rem' }} />
               </Tooltip.Target>
               <Tooltip.Content>
-                <p>The column whos values will be pivoted under the column selected as the Filter.</p>
+                <p>The column(s) whos values will be pivoted under the column selected as the Filter.</p>
               </Tooltip.Content>
             </Tooltip>
           }
-          value={config.table.pivot?.valueColumn}
-          initial='-Select-'
-          section='table'
-          options={groupPivotColumns.filter(
-            col => col !== config.table.pivot?.columnName && col !== config.table.groupBy
-          )}
-          subsection='pivot'
-          fieldName='valueColumn'
-          updateField={updateField}
         />
       )}
     </>

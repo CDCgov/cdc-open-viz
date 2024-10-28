@@ -6,9 +6,10 @@ import { Text } from '@visx/text'
 
 import ConfigContext from '../ConfigContext'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 const PairedBarChart = ({ width, height, originalWidth }) => {
-  const { config, colorScale, transformedData: data, formatNumber, seriesHighlight, getTextWidth } = useContext(ConfigContext)
+  const { config, colorScale, transformedData: data, formatNumber, seriesHighlight } = useContext(ConfigContext)
 
   if (!config || config?.series?.length < 2) return
 
@@ -79,14 +80,27 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
 				}
 				`}
         </style>
-        <svg id='cdc-visualization__paired-bar-chart' width={originalWidth} height={height} viewBox={`0 0 ${width + Number(config.runtime.yAxis.size)} ${height}`} role='img' tabIndex={0}>
+        <svg
+          id='cdc-visualization__paired-bar-chart'
+          width={originalWidth}
+          height={height}
+          viewBox={`0 0 ${width + Number(config.runtime.yAxis.size)} ${height}`}
+          role='img'
+          tabIndex={0}
+        >
           <title>{`Paired bar chart graphic with the title ${config.title ? config.title : 'No Title Found'}`}</title>
           <Group top={0} left={Number(config.xAxis.size)}>
             {data
               .filter(item => config.series[0].dataKey === groupOne.dataKey)
               .map((d, index) => {
-                let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.series[0].dataKey) === -1
-                let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(config.series[0].dataKey) !== -1
+                let transparentBar =
+                  config.legend.behavior === 'highlight' &&
+                  seriesHighlight.length > 0 &&
+                  seriesHighlight.indexOf(config.series[0].dataKey) === -1
+                let displayBar =
+                  config.legend.behavior === 'highlight' ||
+                  seriesHighlight.length === 0 ||
+                  seriesHighlight.indexOf(config.series[0].dataKey) !== -1
                 let barWidth = xScale(d[config.series[0].dataKey])
                 let barHeight = Number(config.barHeight) ? Number(config.barHeight) : 25
                 // update bar Y to give dynamic Y when user applyes BarSpace
@@ -95,7 +109,10 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * data.length
                 config.heights.horizontal = totalheight
                 // check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
-                const textWidth = getTextWidth(formatNumber(d[groupOne.dataKey], 'left'), `normal ${fontSize[config.fontSize]}px sans-serif`)
+                const textWidth = getTextWidth(
+                  formatNumber(d[groupOne.dataKey], 'left'),
+                  `normal ${fontSize[config.fontSize]}px sans-serif`
+                )
                 const textFits = textWidth < barWidth - 5 // minus padding dx(5)
 
                 return (
@@ -119,7 +136,14 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                         tabIndex={-1}
                       />
                       {config.yAxis.displayNumbersOnBar && displayBar && (
-                        <Text textAnchor={textFits ? 'start' : 'end'} dx={textFits ? 5 : -5} verticalAnchor='middle' x={halfWidth - barWidth} y={y + config.barHeight / 2} fill={textFits ? groupOne.labelColor : '#000'}>
+                        <Text
+                          textAnchor={textFits ? 'start' : 'end'}
+                          dx={textFits ? 5 : -5}
+                          verticalAnchor='middle'
+                          x={halfWidth - barWidth}
+                          y={y + config.barHeight / 2}
+                          fill={textFits ? groupOne.labelColor : '#000'}
+                        >
                           {formatNumber(d[groupOne.dataKey], 'left')}
                         </Text>
                       )}
@@ -131,8 +155,14 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
               .filter(item => config.series[1].dataKey === groupTwo.dataKey)
               .map((d, index) => {
                 let barWidth = xScale(d[config.series[1].dataKey])
-                let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.series[1].dataKey) === -1
-                let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(config.series[1].dataKey) !== -1
+                let transparentBar =
+                  config.legend.behavior === 'highlight' &&
+                  seriesHighlight.length > 0 &&
+                  seriesHighlight.indexOf(config.series[1].dataKey) === -1
+                let displayBar =
+                  config.legend.behavior === 'highlight' ||
+                  seriesHighlight.length === 0 ||
+                  seriesHighlight.indexOf(config.series[1].dataKey) !== -1
                 let barHeight = config.barHeight ? Number(config.barHeight) : 25
                 // update bar Y to give dynamic Y when user applyes BarSpace
                 let y = 0
@@ -140,7 +170,10 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * data.length
                 config.heights.horizontal = totalheight
                 // check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
-                const textWidth = getTextWidth(formatNumber(d[groupTwo.dataKey], 'left'), `normal ${fontSize[config.fontSize]}px sans-serif`)
+                const textWidth = getTextWidth(
+                  formatNumber(d[groupTwo.dataKey], 'left'),
+                  `normal ${fontSize[config.fontSize]}px sans-serif`
+                )
                 const isTextFits = textWidth < barWidth - 5 // minus padding dx(5)
 
                 return (
@@ -171,7 +204,14 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                         tabIndex={-1}
                       />
                       {config.yAxis.displayNumbersOnBar && displayBar && (
-                        <Text textAnchor={isTextFits ? 'end' : 'start'} dx={isTextFits ? -5 : 5} verticalAnchor='middle' x={halfWidth + barWidth} y={y + config.barHeight / 2} fill={isTextFits ? groupTwo.labelColor : '#000'}>
+                        <Text
+                          textAnchor={isTextFits ? 'end' : 'start'}
+                          dx={isTextFits ? -5 : 5}
+                          verticalAnchor='middle'
+                          x={halfWidth + barWidth}
+                          y={y + config.barHeight / 2}
+                          fill={isTextFits ? groupTwo.labelColor : '#000'}
+                        >
                           {formatNumber(d[groupTwo.dataKey], 'left')}
                         </Text>
                       )}

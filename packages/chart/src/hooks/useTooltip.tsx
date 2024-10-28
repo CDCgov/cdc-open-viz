@@ -58,10 +58,7 @@ export const useTooltip = props => {
     const showMissingDataValue = config.general.showMissingDataLabel && (!value || value === 'null')
     let formattedValue = seriesKey === config.xAxis.dataKey ? value : formatNumber(value, getAxisPosition(seriesKey))
 
-    formattedValue =
-      showMissingDataValue && (config.visualizationSubType === 'stacked' ? !config.general.hideNullValue : true)
-        ? 'N/A'
-        : formattedValue
+    formattedValue = showMissingDataValue ? 'N/A' : formattedValue
 
     return formattedValue
   }
@@ -199,7 +196,14 @@ export const useTooltip = props => {
             ?.flatMap(seriesKey => {
               const value = resolvedScaleValues[0]?.[seriesKey]
               const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
-              return [[seriesKey, formattedValue, getAxisPosition(seriesKey)]]
+              if (
+                (value === null || value === undefined || value === '' || formattedValue === 'N/A') &&
+                config.general.hideNullValue
+              ) {
+                return []
+              } else {
+                return [[seriesKey, formattedValue, getAxisPosition(seriesKey)]]
+              }
             })
         )
       }

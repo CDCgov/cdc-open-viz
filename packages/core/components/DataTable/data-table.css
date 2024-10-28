@@ -1,3 +1,8 @@
+.table {
+  width: unset;
+  min-width: 100%;
+}
+
 .collapsed + .table-container {
   border-bottom: none;
 }
@@ -8,7 +13,7 @@
   border-bottom: 1px solid var(--lightGray);
 }
 
-div.data-table-heading {
+.cdc-open-viz-module div.data-table-heading {
   position: relative;
   background: rgba(0, 0, 0, 0.05);
   padding: 0.5em 0.7em;
@@ -40,13 +45,10 @@ table.horizontal {
 
 table.data-table {
   margin-bottom: 0;
-  min-width: 100%;
   background: #fff;
   position: relative;
   border: none;
-  overflow-x: auto;
   border-collapse: collapse;
-  overflow: auto;
   appearance: none;
   table-layout: fixed;
   * {
@@ -105,12 +107,6 @@ table.data-table {
     }
   }
 
-  tbody {
-    tr {
-      width: 100%;
-    }
-  }
-
   tr {
     &.row-group {
       background-color: var(--tertiary) !important;
@@ -128,28 +124,14 @@ table.data-table {
     padding: 0.3em 0.7em;
     border-right: 1px solid rgba(0, 0, 0, 0.1);
     white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
     &:last-child {
       border-right: 0 !important;
     }
-
-    @media (max-width: var(--breakpoint-sm)) {
-      font-size: var(--font-small) + 0.2em;
-    }
-  }
-  tr {
-    & > * {
-      width: 100%;
-    }
-  }
-  th {
-    flex-grow: 1;
+    font-size: var(--font-size);
   }
 
   td {
     position: relative;
-    flex-grow: 1;
     svg {
       margin-left: 1rem;
     }

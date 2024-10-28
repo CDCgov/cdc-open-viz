@@ -238,9 +238,9 @@ const PreviewDataTable = () => {
 
   const Table = () => (
     <>
-      <section className='table-container'>
-        <table className='table table-striped table-bordered' {...getTableProps()} aria-hidden='true'>
-          <thead className='thead-dark'>
+      <section className='table-container w-100 mt-2'>
+        <table className='table table-striped table-striped data-table' {...getTableProps()} aria-hidden='true'>
+          <thead>
             {headerGroups.map(headerGroup => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map(column => (

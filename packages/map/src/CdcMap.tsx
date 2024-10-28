@@ -30,7 +30,6 @@ import { publish } from '@cdc/core/helpers/events'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import Title from '@cdc/core/components/ui/Title'
-import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
@@ -1463,9 +1462,9 @@ const CdcMap = ({
       if (newData) {
         newState.data = newData
       }
-    } else if(newState.formattedData) {
+    } else if (newState.formattedData) {
       newState.data = newState.formattedData
-    } else if(newState.dataDescription) {
+    } else if (newState.dataDescription) {
       newState.data = transform.autoStandardize(newState.data)
       newState.data = transform.developerStandardize(newState.data, newState.dataDescription)
     }
@@ -1730,7 +1729,6 @@ const CdcMap = ({
     tooltipRef,
     topoData,
     setTopoData,
-    getTextWidth,
     mapId
   }
 
@@ -1847,7 +1845,9 @@ const CdcMap = ({
                       {'us-region' === geoType && <UsaMap.Region />}
                       {'us-county' === geoType && <UsaMap.County />}
                       {'world' === geoType && <WorldMap />}
-                      {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
+                      {'data' === general.type && logo && (
+                        <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
+                      )}
                     </>
                   )}
                 </section>
@@ -1928,8 +1928,6 @@ const CdcMap = ({
                     wrapColumns={table.wrapColumns}
                   />
                 )}
-
-              {state.annotations.length > 0 && <Annotation.Dropdown />}
 
               {state.annotations.length > 0 && <Annotation.Dropdown />}
 
