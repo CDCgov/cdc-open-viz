@@ -157,8 +157,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
 
           const shouldShow = row.toggle === undefined || (row.toggle && show[colIndex])
 
-          const body = <></>
-
           return (
             <div
               key={`vis__${index}__${colIndex}`}
