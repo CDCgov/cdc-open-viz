@@ -4,7 +4,14 @@ import { Group } from '@visx/group'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 
 const ScatterPlot = ({ xScale, yScale }) => {
-  const { transformedData: data, config, tableData, formatNumber, seriesHighlight, colorPalettes } = useContext(ConfigContext)
+  const {
+    transformedData: data,
+    config,
+    tableData,
+    formatNumber,
+    seriesHighlight,
+    colorPalettes
+  } = useContext(ConfigContext)
 
   // TODO: copied from line chart should probably be a constant somewhere.
   const circleRadii = 4.5
@@ -23,10 +30,19 @@ const ScatterPlot = ({ xScale, yScale }) => {
       }
     ])
   const handleTooltip = (item, s, dataIndex) => `<div>
-    ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[s] || ''}<br/>` : ''}
+    ${
+      config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries
+        ? `${config.runtime.seriesLabels[s] || ''}<br/>`
+        : ''
+    }
     ${config.xAxis.label}: ${formatNumber(item[config.xAxis.dataKey], 'bottom')} <br/>
     ${config.yAxis.label}: ${formatNumber(item[s], 'left')}<br/>
-   ${additionalColumns.map(([label, name, options]) => `${label} : ${formatColNumber(tableData[dataIndex][name], 'left', false, config, options)}<br/>`).join('')}
+   ${additionalColumns
+     .map(
+       ([label, name, options]) =>
+         `${label} : ${formatColNumber(tableData[dataIndex][name], 'left', false, config, options)}<br/>`
+     )
+     .join('')}
 </div>`
 
   return (
@@ -36,7 +52,7 @@ const ScatterPlot = ({ xScale, yScale }) => {
         return config.runtime.seriesKeys.map((s, index) => {
           const transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s) === -1
           const displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s) !== -1
-          const seriesColor = config.palette ? colorPalettes[config.palette][index] : '#000'
+          const seriesColor = config?.customColors ? config.customColors[index] : config.palette ? colorPalettes[config.palette][index] : '#000'
 
           let pointStyles = {
             filter: 'unset',
