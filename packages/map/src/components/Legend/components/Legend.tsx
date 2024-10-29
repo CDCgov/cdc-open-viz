@@ -21,12 +21,12 @@ import './index.scss'
 
 type LegendProps = {
   skipId: string
-  currentViewport: ViewportSize
   dimensions: DimensionsType
+  containerWidthPadding: number
 }
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
-  const { skipId, currentViewport, dimensions } = props
+  const { skipId, dimensions, containerWidthPadding } = props
 
   const {
     // prettier-ignore
@@ -271,7 +271,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               colors={getFormattedLegendItems().map(item => item?.color) ?? []}
               values={getFormattedLegendItems().map(item => item?.value) ?? []}
               dimensions={dimensions}
-              currentViewport={currentViewport}
+              containerPaddingAdjustment={containerWidthPadding}
               config={state}
             />
             <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>

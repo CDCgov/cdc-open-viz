@@ -78,7 +78,7 @@ import useTooltip from './hooks/useTooltip'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 
-export const CONTAINER_WIDTH_PADDING = 50
+const CONTAINER_WIDTH_PADDING = 50
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -1855,7 +1855,12 @@ const CdcMap = ({
                 </section>
 
                 {general.showSidebar && 'navigation' !== general.type && (
-                  <Legend dimensions={dimensions} currentViewport={currentViewport} ref={legendRef} skipId={tabId} />
+                  <Legend
+                    dimensions={dimensions}
+                    ref={legendRef}
+                    skipId={tabId}
+                    containerWidthPadding={CONTAINER_WIDTH_PADDING}
+                  />
                 )}
               </div>
 

@@ -78,7 +78,6 @@ const Legend: React.FC<LegendProps> = forwardRef(
           config={config}
           {...getGradientConfig(config, formatLabels, colorScale)}
           dimensions={dimensions}
-          currentViewport={currentViewport}
         />
 
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
