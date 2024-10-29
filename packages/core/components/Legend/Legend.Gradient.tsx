@@ -2,9 +2,9 @@ import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { type ViewportSize, type MapConfig } from '@cdc/map/src/types/MapConfig'
 import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
-import { getGradientLegendWidth } from '@cdc/core/helpers/getGradientLegendWidth'
 import { getTextWidth } from '../../helpers/getTextWidth'
 import { DimensionsType } from '../../types/Dimensions'
+import { CONTAINER_WIDTH_PADDING } from '@cdc/map/src/CdcMap'
 
 type CombinedConfig = MapConfig | ChartConfig
 
@@ -16,10 +16,10 @@ interface GradientProps {
   currentViewport: ViewportSize
 }
 
-const LegendGradient = ({ labels, colors, config, dimensions, currentViewport }: GradientProps): JSX.Element => {
+const LegendGradient = ({ labels, colors, config, dimensions }: GradientProps): JSX.Element => {
   let [width] = dimensions
 
-  const legendWidth = getGradientLegendWidth(width, currentViewport)
+  const legendWidth = Number(width) - CONTAINER_WIDTH_PADDING
   const uniqueID = `${config.uid}-${Date.now()}`
 
   const numTicks = colors?.length

@@ -17,7 +17,8 @@
     z-index: 6;
     border-top: var(--lightGray) 1px solid;
     @include breakpointClass(md) {
-      &.bottom, &.top {
+      &.bottom,
+      &.top {
         border: var(--lightGray) 1px solid;
       }
       &.side {
@@ -65,7 +66,6 @@
     }
 
     .legend-container {
-      padding: 1em;
       position: relative;
       .legend-container__title {
         font-size: 1.3em;
