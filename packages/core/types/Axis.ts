@@ -48,4 +48,5 @@ export type Axis = {
   type: string
   axisBBox: number
   maxValue: string
+  sortByRecentDate: boolean
 }

@@ -64,7 +64,7 @@ const useScales = (properties: useScaleProps) => {
 
   // handle Linear scaled viz
   if (config.xAxis.type === 'date' && !isHorizontal) {
-    const xAxisDataMappedSorted = xAxisDataMapped ? xAxisDataMapped.sort() : []
+    const xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
     xScale = composeScaleBand(xAxisDataMappedSorted, [0, xMax], 1 - config.barThickness)
   }
 
@@ -84,7 +84,8 @@ const useScales = (properties: useScaleProps) => {
     xScale.type = scaleTypes.TIME
 
     let minDistance = Number.MAX_VALUE
-    let xAxisDataMappedSorted = xAxisDataMapped ? xAxisDataMapped.sort() : []
+    let xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
+
     for (let i = 0; i < xAxisDataMappedSorted.length - 1; i++) {
       let distance = xScale(xAxisDataMappedSorted[i + 1]) - xScale(xAxisDataMappedSorted[i])
 
@@ -385,4 +386,22 @@ const composeScaleBand = (domain, range, padding = 0) => {
     range: range,
     padding: padding
   })
+}
+
+const sortXAxisData = (xAxisData, sortByRecentDate) => {
+  if (!xAxisData || xAxisData.length === 0) {
+    return []
+  }
+
+  // Check if the array has only one item
+  if (xAxisData.length === 1) {
+    return xAxisData
+  }
+  if (sortByRecentDate) {
+    // Sort from newest to oldes (recent dates first)
+    return xAxisData.sort((a, b) => Number(b) - Number(a))
+  } else {
+    // Sort from oldest to newest
+    return xAxisData.sort((a, b) => Number(a) - Number(b))
+  }
 }
