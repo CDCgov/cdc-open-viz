@@ -17,6 +17,8 @@ import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 
+const LEGEND_PADDING = 30
+
 export interface LegendProps {
   colorScale: ColorScale
   config: ChartConfig
@@ -78,6 +80,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
           config={config}
           {...getGradientConfig(config, formatLabels, colorScale)}
           dimensions={dimensions}
+          parentPaddingToSubtract={LEGEND_PADDING}
         />
 
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>

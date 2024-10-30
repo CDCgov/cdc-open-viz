@@ -44,3 +44,13 @@ export const Gradient_With_Box: Story = {
     ])
   }
 }
+
+export const Gradient_With_Text: Story = {
+  args: {
+    config: editConfigKeys(UsGradient, [
+      { path: ['legend', 'title'], value: 'Title' },
+      { path: ['legend', 'description'], value: 'Description' },
+      { path: ['legend', 'hideBorder'], value: false }
+    ])
+  }
+}

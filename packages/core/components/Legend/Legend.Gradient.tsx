@@ -15,7 +15,7 @@ interface GradientProps {
   colors: string[]
   config: CombinedConfig
   dimensions: DimensionsType
-  containerPaddingAdjustment?: number
+  parentPaddingToSubtract?: number
 }
 
 const LegendGradient = ({
@@ -23,11 +23,11 @@ const LegendGradient = ({
   colors,
   config,
   dimensions,
-  containerPaddingAdjustment = 0
+  parentPaddingToSubtract = 0
 }: GradientProps): JSX.Element => {
   let [width] = dimensions
 
-  const legendWidth = Number(width) - containerPaddingAdjustment - MARGIN * 2 - BORDER_SIZE * 2
+  const legendWidth = Number(width) - parentPaddingToSubtract - MARGIN * 2 - BORDER_SIZE * 2
   const uniqueID = `${config.uid}-${Date.now()}`
 
   const numTicks = colors?.length

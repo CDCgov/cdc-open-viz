@@ -75,7 +75,7 @@ export default function useDataVizClasses(config, viewport = null) {
     `${hasBorder}`
   ]
 
-  const usePadding = legend?.style !== 'gradient'
+  const usePadding = !legend?.hideBorder.topBottom && !legend?.hideBorder.side
 
   const legendClasses = {
     aside: legendOuterClasses,

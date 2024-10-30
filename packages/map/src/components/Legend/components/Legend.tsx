@@ -15,9 +15,10 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import ConfigContext from '../../../context'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
-import { type ViewportSize } from '../../../types/MapConfig'
 import { Group } from '@visx/group'
 import './index.scss'
+
+const LEGEND_PADDING = 30
 
 type LegendProps = {
   skipId: string
@@ -271,7 +272,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               colors={getFormattedLegendItems().map(item => item?.color) ?? []}
               values={getFormattedLegendItems().map(item => item?.value) ?? []}
               dimensions={dimensions}
-              containerPaddingAdjustment={containerWidthPadding}
+              parentPaddingToSubtract={containerWidthPadding + LEGEND_PADDING}
               config={state}
             />
             <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>

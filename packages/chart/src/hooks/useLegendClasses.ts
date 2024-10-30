@@ -1,8 +1,7 @@
 import { ChartConfig } from '../types/ChartConfig'
 
 const useLegendClasses = (config: ChartConfig) => {
-  const { legend } = config
-  const { position, singleRow, reverseLabelOrder, verticalSorted, hideBorder, style } = legend
+  const { position, singleRow, reverseLabelOrder, verticalSorted, hideBorder } = config.legend
   const containerClasses = ['legend-container']
   const innerClasses = ['legend-container__inner']
 
@@ -51,8 +50,6 @@ const useLegendClasses = (config: ChartConfig) => {
   if (hideBorder.topBottom && ['top'].includes(position)) {
     containerClasses.push('p-0')
   }
-
-  if (style === 'gradient') containerClasses.push('p-0')
 
   return {
     containerClasses,
