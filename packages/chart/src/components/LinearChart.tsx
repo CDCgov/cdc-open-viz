@@ -1476,7 +1476,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                     <Text
                       innerRef={xAxisTitleRef}
                       className='x-axis-title-label'
-                      x={axisCenter}
+                      x={xMax / 2}
                       y={isForestPlot ? 0 /* set via ref */ : axisMaxHeight}
                       textAnchor='middle'
                       verticalAnchor='start'

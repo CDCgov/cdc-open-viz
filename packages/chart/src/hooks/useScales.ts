@@ -76,9 +76,10 @@ const useScales = (properties: useScaleProps) => {
       visualizationType === 'Line'
         ? 0
         : (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
+    const range = config.xAxis.sortByRecentDate ? [xMax, 0] : [0, xMax]
     xScale = scaleTime({
       domain: [xAxisMin, xAxisMax],
-      range: [0, xMax]
+      range: range
     })
 
     xScale.type = scaleTypes.TIME
