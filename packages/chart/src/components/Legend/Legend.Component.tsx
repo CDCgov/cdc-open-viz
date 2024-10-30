@@ -9,7 +9,7 @@ import { handleLineType } from '../../helpers/handleLineType'
 import { getMarginTop, getGradientConfig, getMarginBottom } from './helpers/index'
 import { Line } from '@visx/shape'
 import { Label } from '../../types/Label'
-import { ChartConfig } from '../../types/ChartConfig'
+import { ChartConfig, ViewportSize } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
 import { forwardRef, useState } from 'react'
 import LegendSuppression from './Legend.Suppression'
@@ -20,7 +20,7 @@ import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 export interface LegendProps {
   colorScale: ColorScale
   config: ChartConfig
-  currentViewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
+  currentViewport: ViewportSize
   formatLabels: (labels: Label[]) => Label[]
   highlight: Function
   highlightReset: Function
@@ -129,7 +129,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                         }}
                         role='button'
                       >
-                        <div className='d-flex justify-content-center align-items-center'>
+                        <>
                           {config.visualizationType === 'Line' && config.legend.style === 'lines' ? (
                             <svg width={40} height={25}>
                               <Line
@@ -141,17 +141,14 @@ const Legend: React.FC<LegendProps> = forwardRef(
                               />
                             </svg>
                           ) : (
-                            <div className='d-flex flex-column mt-1'>
+                            <>
                               <LegendShape
                                 shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
-                                viewport={currentViewport}
-                                margin='0'
                                 fill={label.value}
-                                display={true}
                               />
-                            </div>
+                            </>
                           )}
-                        </div>
+                        </>
 
                         <LegendLabel align='left' margin='0 0 0 4px'>
                           {label.text}
