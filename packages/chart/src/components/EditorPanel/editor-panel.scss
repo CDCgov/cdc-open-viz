@@ -1,11 +1,3 @@
-@import '@cdc/core/styles/base';
-@import '@cdc/core/styles/v2/themes/color-definitions';
-
-//TODO: Remove after COVE refactor
-.cove {
-  @import '@cdc/core/styles/v2/layout/tooltip.scss';
-}
-
 .cdc-open-viz-module.type-chart {
   .viewport-overrides {
     button {

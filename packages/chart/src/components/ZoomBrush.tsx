@@ -7,6 +7,7 @@ import ConfigContext from '../ConfigContext'
 import { ScaleLinear, ScaleBand } from 'd3-scale'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 interface Props {
   xScaleBrush: ScaleLinear<number, number>
@@ -15,7 +16,7 @@ interface Props {
   yMax: number
 }
 const ZoomBrush: FC<Props> = props => {
-  const { tableData, config, parseDate, formatDate, setBrushConfig, getTextWidth, dashboardConfig } = useContext(ConfigContext)
+  const { tableData, config, parseDate, formatDate, setBrushConfig, dashboardConfig } = useContext(ConfigContext)
   const sharedFilters = dashboardConfig?.dashboard?.sharedFilters ?? []
   const isDashboardFilters = sharedFilters?.length > 0
   const { fontSize } = useBarChart()
@@ -175,7 +176,6 @@ const ZoomBrush: FC<Props> = props => {
             <BrushHandle
               left={Number(config.runtime.yAxis.size)}
               showTooltip={showTooltip}
-              getTextWidth={getTextWidth}
               pixelDistance={textProps.endPosition - textProps.startPosition}
               textProps={textProps}
               fontSize={fontSize[config.fontSize]}
@@ -202,7 +202,7 @@ const ZoomBrush: FC<Props> = props => {
 }
 
 const BrushHandle = props => {
-  const { x, isBrushActive, isBrushing, className, textProps, fontSize, showTooltip, left, getTextWidth } = props
+  const { x, isBrushActive, isBrushing, className, textProps, fontSize, showTooltip, left } = props
   const pathWidth = 8
   if (!isBrushActive) {
     return null
@@ -217,15 +217,34 @@ const BrushHandle = props => {
   return (
     <>
       {showTooltip && (
-        <Text x={(Number(textProps.xMax) - textWidth) / 2} dy={-12} pointerEvents='visiblePainted' fontSize={fontSize / 1.1}>
+        <Text
+          x={(Number(textProps.xMax) - textWidth) / 2}
+          dy={-12}
+          pointerEvents='visiblePainted'
+          fontSize={fontSize / 1.1}
+        >
           {tooltipText}
         </Text>
       )}
       <Group left={x + pathWidth / 2} top={-2}>
-        <Text pointerEvents='visiblePainted' dominantBaseline='hanging' x={isLeft ? 55 : -50} y={25} verticalAnchor='start' textAnchor={textAnchor} fontSize={fontSize / 1.4}>
+        <Text
+          pointerEvents='visiblePainted'
+          dominantBaseline='hanging'
+          x={isLeft ? 55 : -50}
+          y={25}
+          verticalAnchor='start'
+          textAnchor={textAnchor}
+          fontSize={fontSize / 1.4}
+        >
           {isLeft ? textProps.startValue : textProps.endValue}
         </Text>
-        <path cursor='ew-resize' d='M0.5,10A6,6 0 0 1 6.5,16V14A6,6 0 0 1 0.5,20ZM2.5,18V12M4.5,18V12' fill={'#297EF1'} strokeWidth='1' transform={transform}></path>
+        <path
+          cursor='ew-resize'
+          d='M0.5,10A6,6 0 0 1 6.5,16V14A6,6 0 0 1 0.5,20ZM2.5,18V12M4.5,18V12'
+          fill={'#297EF1'}
+          strokeWidth='1'
+          transform={transform}
+        ></path>
       </Group>
     </>
   )

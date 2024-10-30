@@ -595,7 +595,8 @@ const UsaMap = () => {
 
       {territories.length > 0 && (
         <>
-          <div className='two-col'>
+          {/* Temporarily make the max width fit the image width */}
+          <div className='two-col' style={{ maxWidth: 'calc(100% - 75px)' }}>
             <div>
               <span className='territories-label label'>{state.general.territoriesLabel}</span>
             </div>

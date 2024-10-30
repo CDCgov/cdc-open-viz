@@ -1,3 +1,10 @@
+.cdc-dashboard-inner-container.cove-component__content.cove-dashboard-filters-container:has(
+    > .nested-dropdown.open-filter
+  )
+  :has(> .nested-dropdown-container) {
+  z-index: 9;
+}
+
 .nested-dropdown {
   .nested-dropdown-group {
     list-style: none;

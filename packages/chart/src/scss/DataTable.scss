@@ -1,7 +1,8 @@
-@include breakpointClass(md) {
-  .data-table-container {
-    margin: 5px 0em;
-    width: 100%;
+.data-table-container {
+  margin: 20px 0 0;
+  width: 100%;
+  &.download-link-above {
+    margin: 0;
   }
 }
 

@@ -3,7 +3,7 @@ import { PickD3Scale } from '@visx/scale'
 import { type SharedFilter } from '@cdc/dashboard/src/types/SharedFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
-
+import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 export type ColorScale = PickD3Scale<'ordinal', any, any>
 
 export type TransformedData = {
@@ -13,26 +13,30 @@ export type TransformedData = {
 
 type SharedChartContext = {
   animatedChart?: boolean
-  // process top level chart aria label for each chart type
-  handleChartAriaLabels: (config: any) => string
+  brushConfig: { data: []; isBrushing: boolean; isActive: boolean }
+  capitalize: (value: string) => string
+  clean: Function
   colorScale?: ColorScale
   config: ChartConfig
   currentViewport?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
+  dashboardConfig?: DashboardConfig
+  // process top level chart aria label for each chart type
+  handleChartAriaLabels: (config: any) => string
+  handleDragStateChange: (isDragging: any) => void
   highlight?: Function
   highlightReset?: Function
-  legendIsolateValues?: string[]
-  setLegendIsolateValues?: Function
-  getTextWidth?: (a: string, b: string) => string
-  brushConfig: { data: []; isBrushing: boolean; isActive: boolean }
-  setBrushConfig: Function
-  clean: Function
-  capitalize: (value: string) => string
   // whether or not the legend is appearing below the chart
   isLegendBottom?: boolean
   // whether or not the chart is viewed within the editor screen
   isEditor?: boolean
   // whether or not the user is dragging an annotation
   isDraggingAnnotation?: boolean
+  legendIsolateValues?: string[]
+  legendRef?: React.RefObject<HTMLDivElement>
+  parentRef?: React.RefObject<HTMLDivElement>
+  setBrushConfig: Function
+  setLegendIsolateValues?: Function
+  svgRef?: React.RefObject<SVGSVGElement>
 }
 
 // Line Chart Specific Context
@@ -60,6 +64,7 @@ export type ChartContext =
   | LineChartContext
   | (SharedChartContext & {
       annotations: Annotation[]
+      colorPalettes: any
       dimensions: DimensionsType
       formatDate?: Function
       formatTooltipsDate: Function
@@ -71,11 +76,10 @@ export type ChartContext =
       parseDate?: Function
       rawData?: Object[]
       seriesHighlight?: string[]
-      tableData?: Object[]
-      transformedData?: TransformedData[]
       setSharedFilter?: Function
       sharedFilterValue?: string
-      updateConfig?: Function
-      colorPalettes: any
+      tableData?: Object[]
+      transformedData?: TransformedData[]
       twoColorPalette: any
+      updateConfig?: Function
     })

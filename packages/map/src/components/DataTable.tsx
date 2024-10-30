@@ -13,7 +13,25 @@ import Loading from '@cdc/core/components/Loading'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
-  const { state, tableTitle, indexTitle, mapTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, setFilteredCountryCode } = props
+  const {
+    state,
+    tableTitle,
+    indexTitle,
+    mapTitle,
+    rawData,
+    runtimeData,
+    headerColor,
+    expandDataTable,
+    columns,
+    displayDataAsText,
+    applyLegendToRow,
+    displayGeoName,
+    navigationHandler,
+    viewport,
+    formatLegendLocation,
+    tabbingId,
+    setFilteredCountryCode
+  } = props
 
   const [expanded, setExpanded] = useState(expandDataTable)
   const [sortBy, setSortBy] = useState({ column: 'geo', asc: false })
@@ -140,7 +158,9 @@ const DataTable = props => {
       csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: displayGeoName(row[state.columns.geo.name]), ...row })))
     } else {
       // Unparse + Add column for full Geo name
-      csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: formatLegendLocation(row[state.columns.geo.name]), ...row })))
+      csvData = Papa.unparse(
+        rawData.map(row => ({ FullGeoName: formatLegendLocation(row[state.columns.geo.name]), ...row }))
+      )
     }
 
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
@@ -154,16 +174,36 @@ const DataTable = props => {
     }
 
     return (
-      <a download={fileName} type='button' onClick={saveBlob} href={URL.createObjectURL(blob)} aria-label='Download this data in a CSV file format.' className={`${headerColor} no-border`} id={`${skipId}`} data-html2canvas-ignore role='button'>
+      <a
+        download={fileName}
+        type='button'
+        onClick={saveBlob}
+        href={URL.createObjectURL(blob)}
+        aria-label='Download this data in a CSV file format.'
+        className={`${headerColor} no-border`}
+        id={`${skipId}`}
+        data-html2canvas-ignore
+        role='button'
+      >
         Download Data (CSV)
       </a>
     )
   }, [rawData, state.table])
 
+  const TableMediaControls = ({ belowTable }) => {
+    return (
+      <MediaControls.Section classes={['download-links'] + (belowTable ? 'below-table' : '')}>
+        <MediaControls.Link config={state} />
+        {state.general.showDownloadButton && <DownloadButton />}
+      </MediaControls.Section>
+    )
+  }
+
   // Change accessibility label depending on expanded status
   useEffect(() => {
     const expandedLabel = 'Accessible data table.'
-    const collapsedLabel = 'Accessible data table. This table is currently collapsed visually but can still be read using a screen reader.'
+    const collapsedLabel =
+      'Accessible data table. This table is currently collapsed visually but can still be read using a screen reader.'
 
     if (expanded === true && accessibilityLabel !== expandedLabel) {
       setAccessibilityLabel(expandedLabel)
@@ -180,7 +220,10 @@ const DataTable = props => {
   const rows = Object.keys(runtimeData)
     .filter(row => applyLegendToRow(runtimeData[row]))
     .sort((a, b) => {
-      const sortVal = customSort(runtimeData[a][state.columns[sortBy.column].name], runtimeData[b][state.columns[sortBy.column].name])
+      const sortVal = customSort(
+        runtimeData[a][state.columns[sortBy.column].name],
+        runtimeData[b][state.columns[sortBy.column].name]
+      )
       if (!sortBy.asc) return sortVal
       if (sortVal === 0) return 0
       if (sortVal < 0) return 1
@@ -189,11 +232,12 @@ const DataTable = props => {
 
   return (
     <ErrorBoundary component='DataTable'>
-      <MediaControls.Section classes={['download-links']}>
-        <MediaControls.Link config={state} />
-        {state.general.showDownloadButton && <DownloadButton />}
-      </MediaControls.Section>
-      <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
+      {!state.table.showDownloadLinkBelow && <TableMediaControls />}
+      <section
+        id={tabbingId.replace('#', '')}
+        className={`data-table-container ${viewport}`}
+        aria-label={accessibilityLabel}
+      >
         <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
         <div
           className={expanded ? 'data-table-heading' : 'collapsed data-table-heading'}
@@ -210,9 +254,23 @@ const DataTable = props => {
           <Icon display={expanded ? 'minus' : 'plus'} base />
           {tableTitle}
         </div>
-        <div className='table-container' style={{ maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' }}>
-          <table height={expanded ? null : 0} role='table' aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={state?.data.length ? state.data.length : '-1'}>
-            <caption className='cdcdataviz-sr-only'>{state.dataTable.caption ? state.dataTable.caption : `Datatable showing data for the ${mapLookup[state.general.geoType]} figure.`}</caption>
+        <div
+          className='table-container'
+          style={{ maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' }}
+        >
+          <table
+            height={expanded ? null : 0}
+            role='table'
+            aria-live='assertive'
+            className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}
+            hidden={!expanded}
+            aria-rowcount={state?.data.length ? state.data.length : '-1'}
+          >
+            <caption className='cdcdataviz-sr-only'>
+              {state.dataTable.caption
+                ? state.dataTable.caption
+                : `Datatable showing data for the ${mapLookup[state.general.geoType]} figure.`}
+            </caption>
             <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>
               <tr>
                 {Object.keys(columns)
@@ -240,11 +298,19 @@ const DataTable = props => {
                             setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
                           }
                         }}
-                        className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
-                        {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
+                        className={
+                          sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'
+                        }
+                        {...(sortBy.column === column
+                          ? sortBy.asc
+                            ? { 'aria-sort': 'ascending' }
+                            : { 'aria-sort': 'descending' }
+                          : null)}
                       >
                         {text}
-                        <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} order`}</span>
+                        <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${
+                          sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
+                        } order`}</span>
                       </th>
                     )
                   })}
@@ -283,7 +349,17 @@ const DataTable = props => {
                         }
 
                         return (
-                          <td tabIndex='0' role='gridcell' onClick={e => (state.general.type === 'bubble' && state.general.allowMapZoom && state.general.geoType === 'world' ? setFilteredCountryCode(row) : true)}>
+                          <td
+                            tabIndex='0'
+                            role='gridcell'
+                            onClick={e =>
+                              state.general.type === 'bubble' &&
+                              state.general.allowMapZoom &&
+                              state.general.geoType === 'world'
+                                ? setFilteredCountryCode(row)
+                                : true
+                            }
+                          >
                             {cellValue}
                           </td>
                         )
@@ -295,6 +371,7 @@ const DataTable = props => {
           </table>
         </div>
       </section>
+      {state.table.showDownloadLinkBelow && <TableMediaControls belowTable={true} />}
       <div id={skipId} className='cdcdataviz-sr-only'>
         Skipped data table.
       </div>

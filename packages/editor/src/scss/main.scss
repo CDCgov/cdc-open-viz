@@ -1,4 +1,3 @@
-@import '@cdc/core/styles/base';
 @import 'variables';
 
 .cdc-open-viz-module.cdc-editor {
@@ -31,12 +30,12 @@
       li {
         background: #f2f2f2;
         line-height: 3rem;
-        border-bottom: 1px solid $lightGray;
+        border-bottom: 1px solid var(--lightGray);
         color: #333;
         flex-grow: 1;
         flex-shrink: 0;
         width: 25%;
-        border-right: 1px solid $lightGray;
+        border-right: 1px solid var(--lightGray);
         text-align: center;
         &:last-child {
           border-right: none;
@@ -70,7 +69,7 @@
     }
   }
   .info-box {
-    border: $lightGray 1px solid;
+    border: var(--lightGray) 1px solid;
     padding: 1rem;
     font-size: 0.9rem;
     h4 {
@@ -211,11 +210,6 @@
       margin: 10px 0 0 10px;
     }
   }
-}
-
-//TODO: Remove after refactor to wizard
-.cdc-open-viz-module .cove-temp {
-  @import '@cdc/core/styles/v2/layout/_tooltip.scss';
 }
 
 section.introText {

@@ -8,6 +8,7 @@ export default {
     label: 'Data Table',
     show: true,
     showDownloadUrl: false,
-    showVertical: true,
+    showDownloadLinkBelow: true,
+    showVertical: true
   }
 }

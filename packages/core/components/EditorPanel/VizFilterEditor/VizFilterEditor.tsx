@@ -144,7 +144,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                     <span className='edit-label column-heading'>Filter Style</span>
 
                     <select
-                      value={filter.filterStyle}
+                      value={filter.filterStyle || 'dropdown'}
                       onChange={e => {
                         updateFilterStyle(filterIndex, e.target.value)
                       }}

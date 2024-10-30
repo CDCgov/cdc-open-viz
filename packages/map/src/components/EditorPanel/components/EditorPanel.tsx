@@ -541,6 +541,15 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           }
         })
         break
+      case 'toggleDownloadLinkBelow':
+        setState({
+          ...state,
+          table: {
+            ...state.table,
+            showDownloadLinkBelow: !state.table.showDownloadLinkBelow
+          }
+        })
+        break
       case 'toggleDownloadPdfButton':
         setState({
           ...state,
@@ -1153,12 +1162,20 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   function filterColorPalettes() {
     let sequential = []
     let nonSequential = []
+    let accessibleColors = []
     for (let paletteName in colorPalettes) {
       if (!isReversed) {
         if (paletteName.includes('qualitative') && !paletteName.endsWith('reverse')) {
           nonSequential.push(paletteName)
         }
-        if (!paletteName.includes('qualitative') && !paletteName.endsWith('reverse')) {
+        if (paletteName.includes('colorblindsafe') && !paletteName.endsWith('reverse')) {
+          accessibleColors.push(paletteName)
+        }
+        if (
+          !paletteName.includes('qualitative') &&
+          !paletteName.includes('colorblindsafe') &&
+          !paletteName.endsWith('reverse')
+        ) {
           sequential.push(paletteName)
         }
       }
@@ -1166,15 +1183,22 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
         if (paletteName.includes('qualitative') && paletteName.endsWith('reverse')) {
           nonSequential.push(paletteName)
         }
-        if (!paletteName.includes('qualitative') && paletteName.endsWith('reverse')) {
+        if (paletteName.includes('colorblindsafe') && paletteName.endsWith('reverse')) {
+          accessibleColors.push(paletteName)
+        }
+        if (
+          !paletteName.includes('qualitative') &&
+          !paletteName.includes('colorblindsafe') &&
+          paletteName.endsWith('reverse')
+        ) {
           sequential.push(paletteName)
         }
       }
     }
 
-    return [sequential, nonSequential]
+    return [sequential, nonSequential, accessibleColors]
   }
-  const [sequential, nonSequential] = filterColorPalettes()
+  const [sequential, nonSequential, accessibleColors] = filterColorPalettes()
 
   useEffect(() => {
     let paletteName = ''
@@ -3084,6 +3108,16 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   />
                   <span className='edit-label'>Enable Image Download</span>
                 </label>
+                <label className='checkbox'>
+                  <input
+                    type='checkbox'
+                    checked={state.table.showDownloadLinkBelow}
+                    onChange={event => {
+                      handleEditorChanges('toggleDownloadLinkBelow', event.target.checked)
+                    }}
+                  />
+                  <span className='edit-label'>Show Download Link Below Table</span>
+                </label>
                 {/* <label className='checkbox'>
                       <input
                         type='checkbox'
@@ -3286,6 +3320,41 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   )
                 })}
               </ul>
+              <span>Colorblind Safe</span>
+              <ul className='color-palette'>
+                {accessibleColors.map(palette => {
+                  const colorOne = {
+                    backgroundColor: colorPalettes[palette][2]
+                  }
+
+                  const colorTwo = {
+                    backgroundColor: colorPalettes[palette][4]
+                  }
+
+                  const colorThree = {
+                    backgroundColor: colorPalettes[palette][6]
+                  }
+
+                  // hide palettes with too few colors for region maps
+                  if (colorPalettes[palette].length <= 8 && state.general.geoType === 'us-region') {
+                    return ''
+                  }
+                  return (
+                    <li
+                      title={palette}
+                      key={palette}
+                      onClick={() => {
+                        handleEditorChanges('color', palette)
+                      }}
+                      className={state.color === palette ? 'selected' : ''}
+                    >
+                      <span style={colorOne}></span>
+                      <span style={colorTwo}></span>
+                      <span style={colorThree}></span>
+                    </li>
+                  )
+                })}
+              </ul>
               <label>
                 Geocode Settings
                 <TextField
@@ -3370,14 +3439,10 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     >
                       <option value='circle'>Circle</option>
                       <option value='pin'>Pin</option>
-                      {'us-geocode' !== state.general.type && (
-                        <>
-                          <option value='square'>Square</option>
-                          <option value='triangle'>Triangle</option>
-                          <option value='diamond'>Diamond</option>
-                          <option value='star'>Star</option>
-                        </>
-                      )}
+                      <option value='square'>Square</option>
+                      <option value='triangle'>Triangle</option>
+                      <option value='diamond'>Diamond</option>
+                      <option value='star'>Star</option>
                     </select>
                   </label>
                   <TextField
@@ -3461,11 +3526,10 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       </div>
                     )
                   })}
-                {'us-geocode' !== state.general.type && (
-                  <button type='button' onClick={() => editCityStyles('add', 0, '', '')} className='btn full-width'>
-                    Add city style
-                  </button>
-                )}
+
+                <button type='button' onClick={() => editCityStyles('add', 0, '', '')} className='btn full-width'>
+                  Add city style
+                </button>
               </>
               <label htmlFor='opacity'>
                 <TextField

@@ -24,7 +24,16 @@ const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }: a
     setFilterValue(e.target.value)
   }
 
-  return <input className='filter' value={filterValue} onChange={onChange} type='search' placeholder='Filter...' disabled={disabled} />
+  return (
+    <input
+      className='filter'
+      value={filterValue}
+      onChange={onChange}
+      type='search'
+      placeholder='Filter...'
+      disabled={disabled}
+    />
+  )
 })
 
 const Header = memo(({ globalFilter, data, setGlobalFilter }: any) => (
@@ -38,7 +47,12 @@ const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pag
   <footer className='data-table-pagination'>
     <ul>
       <li>
-        <button onClick={() => previousPage()} className='btn btn-prev' disabled={!canPreviousPage} title='Previous Page'></button>
+        <button
+          onClick={() => previousPage()}
+          className='btn btn-prev'
+          disabled={!canPreviousPage}
+          title='Previous Page'
+        ></button>
       </li>
       <li>
         <button onClick={() => nextPage()} className='btn btn-next' disabled={!canNextPage} title='Next Page'></button>
@@ -167,7 +181,14 @@ const PreviewDataTable = () => {
     pageOptions,
     nextPage,
     previousPage
-  } = useTable({ columns: tableColumns, data: tableData, initialState: { pageSize: 25 } }, useBlockLayout, useGlobalFilter, useSortBy, useResizeColumns, usePagination)
+  } = useTable(
+    { columns: tableColumns, data: tableData, initialState: { pageSize: 25 } },
+    useBlockLayout,
+    useGlobalFilter,
+    useSortBy,
+    useResizeColumns,
+    usePagination
+  )
 
   const PlaceholderTable = () => {
     return (
@@ -206,47 +227,60 @@ const PreviewDataTable = () => {
 
   if (!tableData) return [<Header key='header' />, <PlaceholderTable key='table' />]
 
-  const footerProps = { previousPage, nextPage, canPreviousPage, canNextPage, pageNumber: pageIndex + 1, totalPages: pageOptions.length }
+  const footerProps = {
+    previousPage,
+    nextPage,
+    canPreviousPage,
+    canNextPage,
+    pageNumber: pageIndex + 1,
+    totalPages: pageOptions.length
+  }
 
   const Table = () => (
     <>
-      <section className='data-table-container'>
-        <div className='table-container'>
-          <table className='data-table' {...getTableProps()} aria-hidden='true'>
-            <thead>
-              {headerGroups.map(headerGroup => (
-                <tr {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map(column => (
-                    <th scope='col' {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : ''} title={column.Header}>
-                      {column.render('Header')}
-                      <div {...column.getResizerProps()} className='resizer' />
-                    </th>
+      <section className='table-container w-100 mt-2'>
+        <table className='table table-striped table-striped data-table' {...getTableProps()} aria-hidden='true'>
+          <thead>
+            {headerGroups.map(headerGroup => (
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map(column => (
+                  <th
+                    scope='col'
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : ''}
+                    title={column.Header}
+                  >
+                    {column.render('Header')}
+                    <div {...column.getResizerProps()} className='resizer' />
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {page.map(row => {
+              prepareRow(row)
+              return (
+                <tr {...row.getRowProps()}>
+                  {row.cells.map(cell => (
+                    <td {...cell.getCellProps()} title={cell.value}>
+                      {cell.render('Cell')}
+                    </td>
                   ))}
                 </tr>
-              ))}
-            </thead>
-            <tbody {...getTableBodyProps()}>
-              {page.map(row => {
-                prepareRow(row)
-                return (
-                  <tr {...row.getRowProps()}>
-                    {row.cells.map(cell => (
-                      <td {...cell.getCellProps()} title={cell.value}>
-                        {cell.render('Cell')}
-                      </td>
-                    ))}
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+              )
+            })}
+          </tbody>
+        </table>
       </section>
       <Footer {...footerProps} />
     </>
   )
 
-  return [<Header key='header' data={tableData} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter} />, <Table key='table' />]
+  return [
+    <Header key='header' data={tableData} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter} />,
+    <Table key='table' />
+  ]
 }
 
 export default PreviewDataTable

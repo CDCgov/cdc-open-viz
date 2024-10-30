@@ -2,6 +2,7 @@ export type OrderBy = 'asc' | 'desc' | 'cust'
 
 export type FilterBase = {
   columnName: string
+  orderedValues?: string[]
   values: string[]
   showDropdown: boolean
   id: number
@@ -18,7 +19,7 @@ export type VizFilterStyle =
   | 'nested-dropdown'
 export type GeneralFilter = FilterBase & {
   active: string
-  queuedActive: string
+  queuedActive: string | string[]
   filterStyle: VizFilterStyle
   label: string
   order: OrderBy

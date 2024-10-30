@@ -43,6 +43,7 @@ import { Anchor } from '@cdc/core/types/Axis'
 import EditorPanelContext from './EditorPanelContext'
 import _ from 'lodash'
 import { adjustedSymbols as symbolCodes } from '@cdc/core/helpers/footnoteSymbols'
+import { updateFieldRankByValue } from './helpers/updateFieldRankByValue'
 
 interface PreliminaryProps {
   config: ChartConfig
@@ -742,7 +743,7 @@ const EditorPanel = () => {
       updatedConfig.orientation = 'vertical'
     }
     if (isDateScale(updatedConfig.xAxis) && !updatedConfig.xAxis.padding) {
-      updatedConfig.xAxis.padding = 6
+      updatedConfig.xAxis.padding = 0
     }
     // DEV-8008 - Remove Bar styling when Line is converted to Bar
     if (updatedConfig.visualizationType === 'Line') {
@@ -763,20 +764,6 @@ const EditorPanel = () => {
       ) // eslint-disable-line
 
     if (section === 'boxplot' && subsection === 'legend') {
-      updateConfig({
-        ...config,
-        [section]: {
-          ...config[section],
-          [subsection]: {
-            ...config.boxplot[subsection],
-            [fieldName]: newValue
-          }
-        }
-      })
-      return
-    }
-
-    if (section === 'boxplot' && subsection === 'labels') {
       updateConfig({
         ...config,
         [section]: {
@@ -888,13 +875,6 @@ const EditorPanel = () => {
       newSeries.push({ dataKey: seriesKey, type: config.visualizationType, axis: 'Left', tooltip: true })
     }
     updateConfig({ ...config, series: newSeries }) // left axis series keys
-  }
-
-  const sortSeries = e => {
-    const series = config.series[0].dataKey
-    const sorted = data.sort((a, b) => a[series] - b[series])
-    const newData = e === 'asc' ? sorted : sorted.reverse()
-    updateConfig({ ...config }, newData)
   }
 
   const addNewExclusion = exclusionKey => {
@@ -1407,7 +1387,6 @@ const EditorPanel = () => {
     handleSeriesChange,
     handleAddNewHighlightedBar,
     setCategoryAxis,
-    sortSeries,
     updateField,
     warningMsg,
     highlightedBarValues,
@@ -1571,10 +1550,14 @@ const EditorPanel = () => {
                         )}
                         {visSupportsRankByValue() && config.series && config.series.length === 1 && (
                           <Select
-                            fieldName='visualizationType'
+                            value={config.rankByValue}
+                            fieldName='rankByValue'
                             label='Rank by Value'
                             initial='Select'
-                            onChange={e => sortSeries(e.target.value)}
+                            updateField={(_section, _subsection, _fieldName, value) => {
+                              const [newConfig, newData] = updateFieldRankByValue(config, value, data)
+                              updateConfig(newConfig, newData)
+                            }}
                             options={['asc', 'desc']}
                           />
                         )}
@@ -1803,6 +1786,17 @@ const EditorPanel = () => {
                           updateField={updateField}
                         />
                       )}
+                      {visSupportsValueAxisGridLines() && (
+                        <CheckBox
+                          value={config.yAxis.labelsAboveGridlines}
+                          section='yAxis'
+                          fieldName='labelsAboveGridlines'
+                          label='Tick labels above gridlines'
+                          updateField={updateField}
+                          disabled={!config.yAxis.gridLines}
+                          title={!config.yAxis.gridLines ? 'Show gridlines to enable' : ''}
+                        />
+                      )}
                       <CheckBox
                         value={config.yAxis.enablePadding}
                         section='yAxis'
@@ -2007,6 +2001,14 @@ const EditorPanel = () => {
                   ) : (
                     config.visualizationType !== 'Pie' && (
                       <>
+                        <CheckBox
+                          display={!visHasCategoricalAxis()}
+                          value={config.dataFormat.onlyShowTopPrefixSuffix}
+                          section='dataFormat'
+                          fieldName='onlyShowTopPrefixSuffix'
+                          label='Only Show Top Prefix/Suffix'
+                          updateField={updateField}
+                        />
                         <CheckBox
                           display={!visHasCategoricalAxis()}
                           value={config.yAxis.hideAxis}
@@ -2681,11 +2683,7 @@ const EditorPanel = () => {
                         <>
                           <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
                             Format how charts should parse and display your dates using{' '}
-                            <a
-                              href='https://github.com/d3/d3-time-format#locale_format'
-                              target='_blank'
-                              rel='noreferrer'
-                            >
+                            <a href='https://d3js.org/d3-time-format#locale_format' target='_blank' rel='noreferrer'>
                               these guidelines
                             </a>
                             .
@@ -2810,6 +2808,29 @@ const EditorPanel = () => {
                               <p>
                                 When this option is checked, you can select source-file values for exclusion from the
                                 date/category axis.{' '}
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        updateField={updateField}
+                      />
+                      <CheckBox
+                        value={config.xAxis.showYearsOnce}
+                        section='xAxis'
+                        fieldName='showYearsOnce'
+                        label='Show years once'
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon
+                                display='question'
+                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                              />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                When this option is checked and the date format for the axis includes years, each year
+                                will only be shown once in the axis.
                               </p>
                             </Tooltip.Content>
                           </Tooltip>
@@ -3040,15 +3061,17 @@ const EditorPanel = () => {
                           updateField={updateField}
                         />
                       )}
-                      <TextField
-                        value={config.xAxis.labelOffset}
-                        section='xAxis'
-                        fieldName='labelOffset'
-                        label='Label offset'
-                        type='number'
-                        className='number-narrow'
-                        updateField={updateField}
-                      />
+                      {config.orientation === 'horizontal' && (
+                        <TextField
+                          value={config.xAxis.labelOffset}
+                          section='xAxis'
+                          fieldName='labelOffset'
+                          label='Label offset'
+                          type='number'
+                          className='number-narrow'
+                          updateField={updateField}
+                        />
+                      )}
 
                       {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                       {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}

@@ -1,6 +1,12 @@
-import { Accordion, AccordionItem, AccordionItemButton, AccordionItemHeading, AccordionItemPanel } from 'react-accessible-accordion'
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemButton,
+  AccordionItemHeading,
+  AccordionItemPanel
+} from 'react-accessible-accordion'
 import { useContext, useMemo, useState } from 'react'
-import { CheckBox, Select } from '@cdc/core/components/EditorPanel/Inputs'
+import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import FieldSetWrapper from '@cdc/core/components/EditorPanel/FieldSetWrapper'
@@ -13,6 +19,7 @@ import { SharedFilter } from '../../../types/SharedFilter'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import DeleteFilterModal from './components/DeleteFilterModal'
 import { addValuesToDashboardFilters } from '../../../helpers/addValuesToDashboardFilters'
+import { FILTER_STYLE } from '../../../types/FilterStyles'
 
 type DashboardFitlersEditorProps = {
   vizConfig: DashboardFilters
@@ -29,11 +36,15 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
   const dispatch = useContext(DashboardDispatchContext)
 
   const existingOptions = useMemo(() => {
-    const sharedFilterIndexes = (config.visualizations[vizConfig.uid] as DashboardFilters).sharedFilterIndexes.map(Number)
+    const sharedFilterIndexes = (config.visualizations[vizConfig.uid] as DashboardFilters).sharedFilterIndexes.map(
+      Number
+    )
     return config.dashboard.sharedFilters
       .map<[number, string]>(({ key }, i) => [i, key])
       .filter(([filterIndex]) => !sharedFilterIndexes.includes(filterIndex)) // filter out already added filters
-      .map(([filterIndex, filterName]) => <option key={filterIndex} value={filterIndex}>{`${filterIndex} - ${filterName}`}</option>)
+      .map(([filterIndex, filterName]) => (
+        <option key={filterIndex} value={filterIndex}>{`${filterIndex} - ${filterName}`}</option>
+      ))
   }, [config.visualizations, vizConfig.uid])
 
   const openControls = useState({})
@@ -41,15 +52,48 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
 
   const updateFilterProp = (prop: string, index: number, value) => {
     const newSharedFilters = _.cloneDeep(sharedFilters)
-    const oldEndpoint = sharedFilters[index].apiFilter?.apiEndpoint
-    const oldAPIValueSelector = sharedFilters[index].apiFilter?.valueSelector
-    const apiFilterChanged = value.apiEndpoint !== oldEndpoint || value.valueSelector !== oldAPIValueSelector
+    const {
+      apiEndpoint: oldEndpoint,
+      valueSelector: oldValueSelector,
+      textSelector: oldTextSelector,
+      subgroupValueSelector: oldSubgroupValueSelector,
+      subgroupTextSelector: oldSubgroupTextSelector
+    } = sharedFilters[index].apiFilter || {}
+    const apiFilterChanged =
+      value.apiEndpoint !== oldEndpoint ||
+      value.valueSelector !== oldValueSelector ||
+      value.textSelector !== oldTextSelector ||
+      value.subgroupValueSelector !== oldSubgroupValueSelector ||
+      value.subgroupTextSelector !== oldSubgroupTextSelector
+
     newSharedFilters[index][prop] = value
     if (prop === 'columnName') {
+      if (newSharedFilters[index].subGrouping) delete newSharedFilters[index].subGrouping
       // changing a data column and want to load the data into the preview options
       const sharedFiltersWithValues = addValuesToDashboardFilters(newSharedFilters, data)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFiltersWithValues })
+    } else if (prop === 'filterStyle') {
+      newSharedFilters[index] = {
+        ...newSharedFilters[index],
+        active: '',
+        apiFilter: {
+          apiEndpoint: '',
+          subgroupValueSelector: '',
+          textSelector: '',
+          valueSelector: ''
+        },
+        filterStyle: value
+      }
+      dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
     } else if (prop === 'apiFilter' && value.apiEndpoint && value.valueSelector && apiFilterChanged) {
+      if (sharedFilters[index].filterStyle === FILTER_STYLE.nestedDropdown && value.subgroupValueSelector) {
+        newSharedFilters[index].subGrouping = {
+          active: '',
+          columnName: '',
+          setByQueryParameter: '',
+          valuesLookup: {}
+        }
+      }
       // changing a api filter and want to load the api data into the preview.
       // automatically dispatches SET_SHARED_FILTERS
       loadAPIFilters(newSharedFilters, {})
@@ -110,11 +154,24 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                 </Tooltip.Target>
                 <Tooltip.Content>
-                  <p>The Apply Button option changes the visualization when the user clicks "apply". The Filter Change option immediately changes the visualization when the selection is changed.</p>
+                  <p>
+                    The Apply Button option changes the visualization when the user clicks "apply". The Filter Change
+                    option immediately changes the visualization when the selection is changed.
+                  </p>
                 </Tooltip.Content>
               </Tooltip>
             }
           />
+          {vizConfig.filterBehavior === 'Apply Button' && (
+            <TextField
+              label='Apply Filter Button Text'
+              maxLength={20}
+              value={vizConfig.applyFiltersButtonText}
+              updateField={(_section, _subsection, _key, value) => {
+                updateConfig({ ...vizConfig, applyFiltersButtonText: value })
+              }}
+            />
+          )}
           {vizConfig.filterBehavior === 'Filter Change' && (
             <CheckBox
               label='Auto Load'
@@ -128,7 +185,10 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p>Check if you would like for all URL filters to automatically select a value when a parent filter is changed.</p>
+                    <p>
+                      Check if you would like for all URL filters to automatically select a value when a parent filter
+                      is changed.
+                    </p>
                   </Tooltip.Content>
                 </Tooltip>
               }
@@ -156,7 +216,10 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                     <DeleteFilterModal
                       removeFilterCompletely={removeFilter}
                       removeFilterFromViz={index => {
-                        updateConfig({ ...vizConfig, sharedFilterIndexes: vizConfig.sharedFilterIndexes.filter(i => i !== index) })
+                        updateConfig({
+                          ...vizConfig,
+                          sharedFilterIndexes: vizConfig.sharedFilterIndexes.filter(i => i !== index)
+                        })
                       }}
                       filterIndex={index}
                     />
@@ -185,14 +248,20 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p>This feature is indentended to support legacy functionality. Be advised that any change to the filter in this editor will reflect on the whole dashboard. </p>
+                    <p>
+                      This feature is indentended to support legacy functionality. Be advised that any change to the
+                      filter in this editor will reflect on the whole dashboard.{' '}
+                    </p>
                   </Tooltip.Content>
                 </Tooltip>
               </span>
               <select
                 value={''}
                 onChange={e => {
-                  updateConfig({ ...vizConfig, sharedFilterIndexes: [...vizConfig.sharedFilterIndexes, e.target.value] })
+                  updateConfig({
+                    ...vizConfig,
+                    sharedFilterIndexes: [...vizConfig.sharedFilterIndexes, e.target.value]
+                  })
                   setCanAddExisting(false)
                 }}
               >
