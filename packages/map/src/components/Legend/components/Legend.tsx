@@ -23,11 +23,10 @@ type LegendProps = {
   skipId: string
   dimensions: DimensionsType
   containerWidthPadding: number
-  useLegendPadding?: boolean
 }
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
-  const { skipId, dimensions, containerWidthPadding, useLegendPadding = true } = props
+  const { skipId, dimensions, containerWidthPadding } = props
 
   const {
     // prettier-ignore
@@ -202,7 +201,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     return legendItems
   }
   const { legendClasses } = useDataVizClasses(state, viewport)
-  if (useLegendPadding) legendClasses.section.push('legend-padding')
 
   const handleReset = e => {
     const legend = ref.current

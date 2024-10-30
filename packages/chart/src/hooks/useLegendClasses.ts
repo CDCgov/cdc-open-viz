@@ -1,22 +1,13 @@
-type ConfigType = {
-  legend: {
-    position: 'left' | 'bottom' | 'top' | 'right'
-    singleRow?: boolean
-    reverseLabelOrder?: boolean
-    verticalSorted?: boolean
-    hideBorder: {
-      side?: boolean
-      topBottom?: boolean
-    }
-  }
-}
+import { ChartConfig } from '../types/ChartConfig'
 
-const useLegendClasses = (config: ConfigType) => {
+const useLegendClasses = (config: ChartConfig) => {
+  const { legend } = config
+  const { position, singleRow, reverseLabelOrder, verticalSorted, hideBorder, style } = legend
   const containerClasses = ['legend-container']
   const innerClasses = ['legend-container__inner']
 
   // Handle legend positioning
-  switch (config.legend.position) {
+  switch (position) {
     case 'left':
       containerClasses.push('left')
       break
@@ -34,35 +25,34 @@ const useLegendClasses = (config: ConfigType) => {
   }
 
   // Handle single row configuration for 'bottom' and 'top' positions
-  if (['bottom', 'top'].includes(config.legend.position) && config.legend.singleRow) {
+  if (['bottom', 'top'].includes(position) && singleRow) {
     innerClasses.push('single-row')
   }
 
   // Reverse label order
-  if (config.legend.reverseLabelOrder) {
+  if (reverseLabelOrder) {
     innerClasses.push('d-flex', 'flex-column-reverse')
   }
 
   // Vertical sorting for 'bottom' and 'top' positions
-  if (['bottom', 'top'].includes(config.legend.position) && config.legend.verticalSorted) {
+  if (['bottom', 'top'].includes(position) && verticalSorted) {
     innerClasses.push('vertical-sorted')
   }
 
   // Configure border classes
-  if (
-    config.legend.hideBorder.side &&
-    (['right', 'left'].includes(config.legend.position) || !config.legend.position)
-  ) {
+  if (hideBorder.side && (['right', 'left'].includes(position) || !position)) {
     containerClasses.push('no-border')
   }
 
-  if (config.legend.hideBorder.topBottom && ['top', 'bottom'].includes(config.legend.position)) {
+  if (hideBorder.topBottom && ['top', 'bottom'].includes(position)) {
     containerClasses.push('no-border')
   }
 
-  if (config.legend.hideBorder.topBottom && ['top'].includes(config.legend.position)) {
+  if (hideBorder.topBottom && ['top'].includes(position)) {
     containerClasses.push('p-0')
   }
+
+  if (style === 'gradient') containerClasses.push('p-0')
 
   return {
     containerClasses,

@@ -6,6 +6,7 @@ import { getTextWidth } from '../../helpers/getTextWidth'
 import { DimensionsType } from '../../types/Dimensions'
 
 const MARGIN = 1
+const BOARDER_SIZE = 1
 
 type CombinedConfig = MapConfig | ChartConfig
 
@@ -26,7 +27,7 @@ const LegendGradient = ({
 }: GradientProps): JSX.Element => {
   let [width] = dimensions
 
-  const legendWidth = Number(width) - containerPaddingAdjustment - MARGIN * 2
+  const legendWidth = Number(width) - containerPaddingAdjustment - MARGIN * 2 - BOARDER_SIZE * 2
   const uniqueID = `${config.uid}-${Date.now()}`
 
   const numTicks = colors?.length

@@ -1860,7 +1860,6 @@ const CdcMap = ({
                     ref={legendRef}
                     skipId={tabId}
                     containerWidthPadding={CONTAINER_WIDTH_PADDING}
-                    useLegendPadding={config?.legend.style !== 'gradient'}
                   />
                 )}
               </div>
