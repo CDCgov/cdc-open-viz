@@ -1,9 +1,7 @@
-@import '@cdc/core/styles/v2/themes/color-definitions';
-
 .date-highlight {
   select,
   input {
-    background: $lightestGray;
+    background: var(--lightestGray);
   }
 
   &__day-selection {
@@ -15,17 +13,17 @@
     .week-button {
       margin-bottom: 0;
       border-radius: 50%;
-      color: $darkGray;
+      color: var(--darkGray);
       width: 24px;
       height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: $lightestGray;
+      background: var(--lightestGray);
       margin: 5px 2px 0;
 
       &--active {
-        background: $primary;
+        background: var(--primary);
         color: white;
       }
     }

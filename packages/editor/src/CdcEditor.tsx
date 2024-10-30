@@ -30,7 +30,10 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
   const initialState: EditorState = useMemo(() => {
     let startingTab = 0
 
-    if ((configObj?.data || configObj?.dataUrl) && configObj?.type) {
+    if (
+      (configObj?.data || configObj?.dataUrl || configObj?.originalFormattedData || configObj?.datasets) &&
+      configObj?.type
+    ) {
       startingTab = 2
     }
     const conf = legacyConfigSupport(configObj || { newViz: true, errors: [], currentViewport: 'lg' })

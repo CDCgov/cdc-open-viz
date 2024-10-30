@@ -41,6 +41,7 @@ export const loadAPIFiltersFactory = (
                 const [_key, index] = toFetch[endpoint]
                 const apiFilter = filterLookup.get(_key) as APIFilter
                 const _filterValues = apiFilterHelpers.getFilterValues(data, apiFilter)
+
                 newDropdowns[_key] = _filterValues
                 const newDefaultSelectedFilter = apiFilterHelpers.setAutoLoadDefaultValue(
                   index,

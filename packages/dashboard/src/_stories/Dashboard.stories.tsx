@@ -11,6 +11,7 @@ import MultiVizConfig from './_mock/multi-viz.json'
 import MultiDashboardConfig from './_mock/multi-dashboards.json'
 import Dashboard from '../CdcDashboard'
 import StandaloneTable from './_mock/standalone-table.json'
+import GroupPivotConfig from './_mock/group-pivot-filter.json'
 import PivotFitlerConfig from './_mock/pivot-filter.json'
 import { type DashboardConfig as Config } from '../types/DashboardConfig'
 import { userEvent, within } from '@storybook/testing-library'
@@ -86,6 +87,13 @@ export const PivotFilter: Story = {
   }
 }
 
+export const GroupPivotFilter: Story = {
+  args: {
+    config: GroupPivotConfig,
+    isEditor: false
+  }
+}
+
 export const SingleStateDashboardWithFilters: Story = {
   args: {
     config: SingleStateDashboardFilters,
@@ -127,7 +135,11 @@ export const MultiDashboard: Story = {
 }
 
 const FNrows: ConfigRow[] = [{ ...MultiVizConfig.rows[0], footnotesId: 'footnote123' }]
-const footnoteConfig: Partial<FootnotesConfig> = { dataKey: 'footnote-data.json', dynamicFootnotes: { symbolColumn: 'symbol', textColumn: 'text' }, staticFootnotes: [{ symbol: '**', text: 'This is a static Footnote' }] }
+const footnoteConfig: Partial<FootnotesConfig> = {
+  dataKey: 'footnote-data.json',
+  dynamicFootnotes: { symbolColumn: 'symbol', textColumn: 'text' },
+  staticFootnotes: [{ symbol: '**', text: 'This is a static Footnote' }]
+}
 const FNViz = { ...MultiVizConfig.visualizations, footnote123: footnoteConfig }
 export const Footnotes: Story = {
   args: {

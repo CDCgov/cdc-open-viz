@@ -1,68 +1,67 @@
-@import '../../../core/styles/variables';
 
 &.theme-blue {
   .bite-value {
-    color: $primary;
+    color: var(--primary);
   }
 }
 
 &.theme-purple {
   .bite-value {
-    color: $purple-primary;
+    color: var(--purple-primary);
   }
 }
 
 &.theme-amber {
   .bite-value {
-    color: $amber-primary;
+    color: var(--amber-primary);
   }
 }
 
 &.theme-orange {
   .bite-value {
-    color: $orange-primary;
+    color: var(--orange-primary);
   }
 }
 
 &.theme-brown {
   .bite-value {
-    color: $brown-primary;
+    color: var(--brown-primary);
   }
 }
 
 &.theme-teal {
   .bite-value {
-    color: $teal-primary;
+    color: var(--teal-primary);
   }
 }
 
 &.theme-pink {
   .bite-value {
-    color: $pink-primary;
+    color: var(--pink-primary);
   }
 }
 
 &.theme-slate {
   .bite-value {
-    color: $slate-primary;
+    color: var(--slate-primary);
   }
 }
 
 &.theme-indigo {
   .bite-value {
-    color: $indigo-primary;
+    color: var(--indigo-primary);
   }
 }
 
 &.theme-cyan {
   .bite-value {
-    color: $cyan-primary;
+    color: var(--cyan-primary);
   }
 }
 
 &.theme-green {
   .bite-value {
-    color: $green-primary;
+    color: var(--green-primary);
   }
 }
 
@@ -160,67 +159,67 @@
 
     &.theme-blue {
       .bite-value {
-        color: $primary;
+        color: var(--primary);
       }
     }
 
     &.theme-purple {
       .bite-value {
-        color: $purple-primary;
+        color: var(--purple-primary);
       }
     }
 
     &.theme-amber {
       .bite-value {
-        color: $amber-primary;
+        color: var(--amber-primary);
       }
     }
 
     &.theme-orange {
       .bite-value {
-        color: $orange-primary;
+        color: var(--orange-primary);
       }
     }
 
     &.theme-brown {
       .bite-value {
-        color: $brown-primary;
+        color: var(--brown-primary);
       }
     }
 
     &.theme-teal {
       .bite-value {
-        color: $teal-primary;
+        color: var(--teal-primary);
       }
     }
 
     &.theme-pink {
       .bite-value {
-        color: $pink-primary;
+        color: var(--pink-primary);
       }
     }
 
     &.theme-slate {
       .bite-value {
-        color: $slate-primary;
+        color: var(--slate-primary);
       }
     }
 
     &.theme-indigo {
       .bite-value {
-        color: $indigo-primary;
+        color: var(--indigo-primary);
       }
     }
 
     &.theme-cyan {
       .bite-value {
-        color: $cyan-primary;
+        color: var(--cyan-primary);
       }
     }
 
     &.theme-green {
       .bite-value {
-        color: $green-primary;
+        color: var(--green-primary);
       }
     }
 
@@ -359,10 +358,10 @@
 }
 
 .cove-component__content {
-  background: $lightestGray;
+  background: var(--lightestGray);
 
   &:not(.no-borders) {
-    border-color: $lightGray;
+    border-color: var(--lightGray);
     border-width: 1px;
     border-style: solid;
   }

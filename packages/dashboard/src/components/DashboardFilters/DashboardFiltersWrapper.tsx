@@ -12,8 +12,11 @@ import DashboardFiltersEditor from './DashboardFiltersEditor'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import { hasDashboardApplyBehavior } from '../../helpers/hasDashboardApplyBehavior'
 import * as apiFilterHelpers from '../../helpers/apiFilterHelpers'
+import { applyQueuedActive } from '@cdc/core/components/Filters/helpers/applyQueuedActive'
 
-export type DropdownOptions = Record<'value' | 'text', string>[]
+type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
+
+export type DropdownOptions = (Record<'value' | 'text', string> & SubOptions)[]
 
 /** the cached dropdown options for each filter */
 export type APIFilterDropdowns = {
@@ -57,11 +60,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       if (hasDashboardApplyBehavior(state.config.visualizations)) {
         const queryParams = getQueryParams()
         let needsQueryUpdate = false
-        dashboardConfig.sharedFilters.forEach((sharedFilter, index) => {
+        dashboardConfig.sharedFilters.forEach(sharedFilter => {
           if (sharedFilter.queuedActive) {
-            dashboardConfig.sharedFilters[index].active = sharedFilter.queuedActive
-            delete dashboardConfig.sharedFilters[index].queuedActive
-
+            applyQueuedActive(sharedFilter)
             if (
               sharedFilter.setByQueryParameter &&
               queryParams[sharedFilter.setByQueryParameter] !== sharedFilter.active
@@ -127,7 +128,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         loadAPIFilters(newSharedFilters, loadingFilterMemo)
       }
     } else {
-      if (newSharedFilters[index].apiFilter) {
+      if (newSharedFilters[index].type === 'urlfilter' && newSharedFilters[index].apiFilter) {
         reloadURLData(newSharedFilters)
       } else {
         const clonedState = _.cloneDeep(state)
@@ -170,7 +171,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       {!displayNone && (
         <Layout.Responsive isEditor={isEditor}>
           <div
-            className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''} cove-component__content col-12`}
+            className={`cdc-dashboard-inner-container${
+              isEditor ? ' is-editor' : ''
+            } cove-component__content col-12 cove-dashboard-filters-container`}
           >
             <Filters
               show={visualizationConfig?.sharedFilterIndexes?.map(Number)}
@@ -179,7 +182,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
               handleOnChange={handleOnChange}
             />
             {visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad && (
-              <button onClick={applyFilters}>GO!</button>
+              <button onClick={applyFilters}>{visualizationConfig.applyFiltersButtonText || 'GO!'}</button>
             )}
           </div>
         </Layout.Responsive>

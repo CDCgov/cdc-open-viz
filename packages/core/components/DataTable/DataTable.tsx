@@ -20,6 +20,8 @@ import removeNullColumns from './helpers/removeNullColumns'
 import { TableConfig } from './types/TableConfig'
 import { Column } from '../../types/Column'
 import { pivotData } from '../../helpers/pivotData'
+import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
+import './data-table.css'
 
 export type DataTableProps = {
   applyLegendToRow?: Function
@@ -71,9 +73,9 @@ const DataTable = (props: DataTableProps) => {
   const runtimeData = useMemo(() => {
     const data = removeNullColumns(parentRuntimeData)
     if (config.table.pivot) {
-      const { columnName, valueColumn } = config.table.pivot
-      if (columnName && valueColumn) {
-        return pivotData(data, columnName, valueColumn)
+      const { columnName, valueColumns } = config.table.pivot
+      if (columnName && valueColumns) {
+        return pivotData(data, columnName, valueColumns)
       }
     }
     return data
@@ -130,26 +132,27 @@ const DataTable = (props: DataTableProps) => {
   }
 
   const rawRows = Object.keys(runtimeData).filter(column => column != 'columns')
-  const rows = isVertical
-    ? rawRows.sort((a, b) => {
-        let dataA
-        let dataB
-        if (config.type === 'map' && config.columns) {
-          const sortByColName = config.columns[sortBy.column].name
-          dataA = runtimeData[a][sortByColName]
-          dataB = runtimeData[b][sortByColName]
-        }
-        if (config.type === 'chart' || config.type === 'dashboard') {
-          dataA = runtimeData[a][sortBy.column]
-          dataB = runtimeData[b][sortBy.column]
-        }
-        if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
-          dataA = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[a][config.xAxis.dataKey])
-          dataB = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[b][config.xAxis.dataKey])
-        }
-        return dataA && dataB ? customSort(dataA, dataB, sortBy, config) : 0
-      })
-    : rawRows
+  const rows =
+    isVertical && sortBy.column
+      ? rawRows.sort((a, b) => {
+          let dataA
+          let dataB
+          if (config.type === 'map' && config.columns) {
+            const sortByColName = config.columns[sortBy.column].name
+            dataA = runtimeData[a][sortByColName]
+            dataB = runtimeData[b][sortByColName]
+          }
+          if (['chart', 'dashboard', 'table'].includes(config.type)) {
+            dataA = runtimeData[a][sortBy.column]
+            dataB = runtimeData[b][sortBy.column]
+          }
+          if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
+            dataA = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[a][config.xAxis.dataKey])
+            dataB = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[b][config.xAxis.dataKey])
+          }
+          return dataA && dataB ? customSort(dataA, dataB, sortBy, config) : 0
+        })
+      : rawRows
 
   const limitHeight = {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
@@ -208,17 +211,21 @@ const DataTable = (props: DataTableProps) => {
       }
     }
 
-    const getMediaControlsClasses = () => {
+    const getMediaControlsClasses = belowTable => {
       const classes = ['download-links']
-      const isLegendOnBottom = config?.legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(viewport)
-      if (config.brush?.active && !isLegendOnBottom) classes.push('brush-active')
-      if (config.brush?.active && config.legend.hide) classes.push('brush-active')
+      if (!belowTable) {
+        const isLegendOnBottom = config?.legend?.position === 'bottom' || isLegendWrapViewport(viewport)
+        if (config.brush?.active && !isLegendOnBottom) classes.push('brush-active')
+        if (config.brush?.active && config.legend.hide) classes.push('brush-active')
+      } else {
+        classes.push('below-table')
+      }
       return classes
     }
 
-    return (
-      <ErrorBoundary component='DataTable'>
-        <MediaControls.Section classes={getMediaControlsClasses()}>
+    const TableMediaControls = ({ belowTable }) => {
+      return (
+        <MediaControls.Section classes={getMediaControlsClasses(belowTable)}>
           <MediaControls.Link config={config} dashboardDataConfig={dataConfig} />
           {(config.table.download || config.general?.showDownloadButton) && (
             <DownloadButton
@@ -228,9 +235,17 @@ const DataTable = (props: DataTableProps) => {
             />
           )}
         </MediaControls.Section>
+      )
+    }
+
+    return (
+      <ErrorBoundary component='DataTable'>
+        {!config.table.showDownloadLinkBelow && <TableMediaControls />}
         <section
           id={tabbingId.replace('#', '')}
-          className={`data-table-container ${viewport} w-100`}
+          className={`data-table-container ${viewport} ${
+            !config.table.showDownloadLinkBelow ? 'download-link-above' : ''
+          }`}
           aria-label={accessibilityLabel}
         >
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
@@ -272,7 +287,7 @@ const DataTable = (props: DataTableProps) => {
                 )
               }
               tableOptions={{
-                className: `${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${
+                className: `table table-striped ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${
                   isVertical ? '' : ' horizontal'
                 }`,
                 'aria-live': 'assertive',
@@ -300,12 +315,13 @@ const DataTable = (props: DataTableProps) => {
                       <th>End Date</th>
                     </tr>
                   }
-                  tableOptions={{ className: 'region-table data-table' }}
+                  tableOptions={{ className: 'table table-striped region-table data-table' }}
                   fontSize={config.fontSize}
                 />
               )}
           </div>
         </section>
+        {config.table.showDownloadLinkBelow && <TableMediaControls belowTable={true} />}
         <div id={skipId} className='cdcdataviz-sr-only'>
           Skipped data table.
         </div>
@@ -317,7 +333,7 @@ const DataTable = (props: DataTableProps) => {
       <ErrorBoundary component='DataTable'>
         <section
           id={tabbingId.replace('#', '')}
-          className={`data-table-container ${viewport} w-100`}
+          className={`data-table-container ${viewport}`}
           aria-label={accessibilityLabel}
         >
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
@@ -332,7 +348,7 @@ const DataTable = (props: DataTableProps) => {
               stickyHeader
               headContent={<BoxplotHeader categories={config.boxplot.categories} />}
               tableOptions={{
-                className: `${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}`,
+                className: `table table-striped ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}`,
                 'aria-live': 'assertive',
                 'aria-rowcount': 11,
                 hidden: !expanded

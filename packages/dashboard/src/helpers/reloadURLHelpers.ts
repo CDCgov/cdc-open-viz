@@ -3,6 +3,7 @@ import { SharedFilter } from '../types/SharedFilter'
 import { capitalizeSplitAndJoin } from '@cdc/core/helpers/cove/string'
 import { AnyVisualization, Visualization } from '@cdc/core/types/Visualization'
 import _ from 'lodash'
+import { DashboardConfig } from '../types/DashboardConfig'
 
 export const isUpdateNeeded = (
   filters: SharedFilter[],
@@ -22,6 +23,15 @@ export const isUpdateNeeded = (
     }
   })
   return needsUpdate
+}
+
+type GetDatasetKeysParams = Pick<DashboardConfig, 'visualizations' | 'datasets' | 'rows'>
+export const getDatasetKeys = ({ visualizations, datasets, rows }: GetDatasetKeysParams): string[] => {
+  const vizDataKeys = Object.values(visualizations).map(viz => viz.dataKey)
+  const rowDataKeys = rows.map(row => row.dataKey)
+  // ensure to only load datasets for the specific dashboard tab.
+  const datasetsUsedByDashboard = _.uniq([...vizDataKeys, ...rowDataKeys])
+  return Object.keys(datasets).filter(datasetKey => datasetsUsedByDashboard.includes(datasetKey))
 }
 
 export const getDataURL = (updatedQSParams: Record<string, string | string[]>, dataUrl: URL, newFileName: string) => {
