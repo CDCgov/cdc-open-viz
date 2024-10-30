@@ -272,12 +272,14 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               colors={getFormattedLegendItems().map(item => item?.color) ?? []}
               values={getFormattedLegendItems().map(item => item?.value) ?? []}
               dimensions={dimensions}
-              parentPaddingToSubtract={containerWidthPadding + LEGEND_PADDING}
+              parentPaddingToSubtract={containerWidthPadding + (legend.hideBorder ? 0 : LEGEND_PADDING)}
               config={state}
             />
-            <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
-              {state.legend.style === 'gradient' ? '' : legendList()}
-            </ul>
+            {state.legend.style !== 'gradient' && (
+              <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
+                {legendList()}
+              </ul>
+            )}
             {(state.visual.additionalCityStyles.some(c => c.label) || state.visual.cityStyleLabel) && (
               <>
                 <hr />

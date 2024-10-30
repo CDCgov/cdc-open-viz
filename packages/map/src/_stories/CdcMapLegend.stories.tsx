@@ -54,3 +54,9 @@ export const Gradient_With_Text: Story = {
     ])
   }
 }
+
+export const Legend_Right: Story = {
+  args: {
+    config: editConfigKeys(SingleStateWithFilters, [{ path: ['legend', 'hideBorder'], value: true }])
+  }
+}
