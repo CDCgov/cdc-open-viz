@@ -47,6 +47,7 @@ const CoveBoxPlot = ({ xScale, yMax, xMax, min: minValue, max: maxValue, yScale 
   //   range: [yMax, 0],
   //   domain: [minValue, maxValue]
   // })
+  console.log(boxplot, 'box')
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group left={Number(config.yAxis.size)} className='boxplot' key={`boxplot-group`}>

@@ -449,53 +449,18 @@ const CdcChart = ({
           // ! - Notice d3.quantile doesn't work here, and we had to take a custom route.
           const quartiles = getQuartiles(sortedData)
 
-          const collectValuesByKeys = keys => {
-            // Initialize an object to store the results with each key from the 'keys' array corresponding to an empty array
-            const result = keys.reduce((acc, key) => {
-              acc[key] = []
-              return acc
-            }, {})
-
-            // Iterate over each item in the data array
-            data.forEach(item => {
-              // For each key specified, check if the item has the property and add it to the corresponding array in the result object
-              keys.forEach(key => {
-                if (item.hasOwnProperty(key)) {
-                  result[key].push(item[key])
-                }
-              })
-            })
-
-            return result
-          }
-
-          const getValuesByGroup = keys => {
-            // Initialize an empty object to hold the result
+          const getValuesBySeriesKey = () => {
+            const allSeriesKeys = newConfig.series.map(item => item?.dataKey)
             const result = {}
-
-            // Filter data by the specified group
-            // const filteredData = data.filter(item => item['category one'] === groupStr)
-
-            // Loop through each key in the keys array
-            keys.forEach(key => {
-              // Collect the values corresponding to the current key for the filtered group
+            allSeriesKeys.forEach(key => {
               result[key] = filteredData.map(item => item[key])
             })
 
             return result
           }
-          const allSeriesKeys = newConfig.series.map(item => item.dataKey)
 
           if (!filteredData) throw new Error('boxplots dont have data yet')
           if (!plots) throw new Error('boxplots dont have plots yet')
-
-          if (newConfig.boxplot.firstQuartilePercentage === '') {
-            newConfig.boxplot.firstQuartilePercentage = 0
-          }
-
-          if (newConfig.boxplot.thirdQuartilePercentage === '') {
-            newConfig.boxplot.thirdQuartilePercentage = 0
-          }
 
           const q1 = quartiles.q1
           const q3 = quartiles.q3
@@ -504,12 +469,9 @@ const CdcChart = ({
           const upperBounds = q3 + (q3 - q1) * 1.5
 
           const outliers = sortedData.filter(v => v < lowerBounds || v > upperBounds)
-          let nonOutliers = filteredDataValues
 
-          nonOutliers = nonOutliers.filter(item => !outliers.includes(item))
           const minValue: number = d3.min<number>(filteredDataValues) || 0
           const _colMin = d3.max<number>([minValue, q1 - 1.5 * iqr])
-
           plots.push({
             columnCategory: g,
             columnMax: d3.min([d3.max(filteredDataValues), q1 + 1.5 * iqr]),
@@ -525,9 +487,7 @@ const CdcChart = ({
             columnUpperBounds: d3.min([d3.max(sortedData), q1 + 1.5 * iqr]),
             columnOutliers: outliers,
             values: filteredDataValues,
-
-            keyValues: getValuesByGroup(allSeriesKeys),
-            nonOutlierValues: nonOutliers
+            keyValues: getValuesBySeriesKey()
           })
         } catch (e) {
           console.error('COVE: ', e.message) // eslint-disable-line
@@ -545,8 +505,6 @@ const CdcChart = ({
         return null // resolve eslint
       })
 
-      // any other data we can add to boxplots
-      newConfig.boxplot['allValues'] = allValues
       newConfig.boxplot['categories'] = groups
       newConfig.boxplot.plots = plots
       newConfig.boxplot.tableData = tableData

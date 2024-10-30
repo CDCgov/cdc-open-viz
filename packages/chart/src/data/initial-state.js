@@ -68,9 +68,6 @@ export default {
   boxplot: {
     plots: [],
     borders: 'true',
-    firstQuartilePercentage: 25,
-    thirdQuartilePercentage: 75,
-    boxWidthPercentage: 40,
     plotOutlierValues: false,
     plotNonOutlierValues: true,
     legend: {

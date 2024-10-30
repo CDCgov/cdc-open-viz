@@ -833,19 +833,6 @@ const EditorPanel = () => {
     return null
   }
 
-  useEffect(() => {
-    if (!config.general?.boxplot) return
-    if (!config.general.boxplot.firstQuartilePercentage) {
-      updateConfig({
-        ...config,
-        boxplot: {
-          ...config.boxplot,
-          firstQuartilePercentage: 25
-        }
-      })
-    }
-  }, [config])
-
   const setLollipopShape = shape => {
     updateConfig({
       ...config,
