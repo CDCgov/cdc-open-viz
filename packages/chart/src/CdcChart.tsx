@@ -416,17 +416,8 @@ const CdcChart = ({
       let allKeys = newExcludedData
         ? newExcludedData.map(d => d[newConfig.xAxis.dataKey])
         : data.map(d => d[newConfig.xAxis.dataKey])
-      let allValues = newExcludedData
-        ? newExcludedData.map(d => Number(d[newConfig?.series[0]?.dataKey]))
-        : data.map(d => Number(d[newConfig?.series[0]?.dataKey]))
 
-      const uniqueArray = function (arrArg) {
-        return arrArg.filter(function (elem, pos, arr) {
-          return arr.indexOf(elem) === pos
-        })
-      }
-
-      const groups = uniqueArray(allKeys)
+      const groups = _.uniq(allKeys)
       let tableData: any[] = []
       const plots: any[] = []
 
