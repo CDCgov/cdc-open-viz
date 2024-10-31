@@ -3,7 +3,7 @@
   display: flex;
   justify-content: flex-end;
   margin: 0 1em; // align w/ data table
-
+  margin-left: auto;
   .btn:not(:last-child) {
     margin-right: 10px;
   }
