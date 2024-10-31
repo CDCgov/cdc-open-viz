@@ -109,7 +109,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
-  const prevTickRef = useRef(null)
 
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
@@ -227,16 +226,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     return tick
   }
 
-  const handleBottomTickFormatting = tick => {
+  const handleBottomTickFormatting = (tick, i, ticks) => {
     if (isLogarithmicAxis && tick === 0.1) {
       // when logarithmic scale applied change value FIRST  of  tick
       tick = 0
     }
 
     if (isDateScale(runtime.xAxis) && config.visualizationType !== 'Forest Plot') {
-      const formattedDate = formatDate(tick, prevTickRef.current)
-      prevTickRef.current = tick
-      return formattedDate
+      return formatDate(tick, i, ticks)
     }
     if (orientation === 'horizontal' && config.visualizationType !== 'Forest Plot')
       return formatNumber(tick, 'left', shouldAbbreviate)
