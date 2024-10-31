@@ -6,6 +6,7 @@ import { APIFilter } from '../types/APIFilter'
 
 export const loadAPIFiltersFactory = (
   dispatch: Function,
+  dispatchErrorMessages: Function,
   setAPIFilterDropdowns: Function,
   autoLoadFilterIndexes: number[]
 ) => {
@@ -51,7 +52,12 @@ export const loadAPIFiltersFactory = (
                 )
                 sharedFilters[index] = newDefaultSelectedFilter
               })
-              .catch(console.error)
+              .catch(() => {
+                dispatchErrorMessages({
+                  type: 'ADD_ERROR_MESSAGE',
+                  payload: 'There was a problem returning data. Please try again.'
+                })
+              })
               .finally(() => {
                 resolve()
               })

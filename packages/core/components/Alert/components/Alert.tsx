@@ -1,7 +1,7 @@
 import Icon from '../../ui/Icon'
 
 import DOMPurify from 'dompurify'
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import './Alert.styles.css'
 
@@ -14,10 +14,31 @@ type AlertProps = {
   iconSize?: number
   // heading for the alert box
   heading?: string
+  // dismiss function
+  onDismiss?: Function
+  // make the alert dismiss on it's own
+  autoDismiss?: boolean
+  // set seconds until autoDismiss, default is 5 seconds
+  secondsBeforeDismiss?: number
 }
 
-const Alert: React.FC<AlertProps> = ({ type = 'info', message = '', iconSize = 21, heading }) => {
+const Alert: React.FC<AlertProps> = ({
+  type = 'info',
+  message = '',
+  iconSize = 21,
+  heading,
+  onDismiss,
+  autoDismiss,
+  secondsBeforeDismiss = 5
+}) => {
   // sanitize the text for setting dangerouslySetInnerHTML
+
+  useEffect(() => {
+    if (autoDismiss) {
+      setTimeout(() => onDismiss(), secondsBeforeDismiss * 1000)
+    }
+  }, [])
+
   const sanitizedData = () => ({
     __html: DOMPurify.sanitize(message)
   })
@@ -32,6 +53,9 @@ const Alert: React.FC<AlertProps> = ({ type = 'info', message = '', iconSize = 2
       {type === 'danger' && <Icon display='warningCircle' size={iconSize} />}
       {type === 'info' && <Icon display='info' size={iconSize} />}
       <span dangerouslySetInnerHTML={sanitizedData()} />
+      <button type='button' className='close pl-5' aria-label='Close' onClick={() => onDismiss()}>
+        X
+      </button>
     </div>
   )
 }
