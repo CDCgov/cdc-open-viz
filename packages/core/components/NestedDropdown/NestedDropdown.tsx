@@ -251,11 +251,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
             onBlur={() => setInputHasFocus(false)}
           />
           <span className='list-arrow' aria-hidden={true}>
-            {isListOpened ? (
-              <Icon display='caretFilledUp' alt='arrow pointing up' />
-            ) : (
-              <Icon display='caretFilledDown' alt='arrow pointing down' />
-            )}
+            <Icon display='caretDown' />
           </span>
         </div>
         <ul

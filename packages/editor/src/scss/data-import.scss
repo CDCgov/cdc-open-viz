@@ -69,14 +69,10 @@
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
-        max-width: 40px;
 
         button {
           font-size: 11pt;
         }
-      }
-      td:last-child {
-        max-width: 10px;
       }
     }
     .cdcdataviz-file-selector {
@@ -115,10 +111,6 @@
       font-style: italic;
       margin: 1em 0 2em 0;
       color: var(--mediumGray);
-    }
-    .btn {
-      display: inline-block;
-      margin: 1em 0;
     }
     .btn.active {
       $primary: #005eaa;

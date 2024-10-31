@@ -67,8 +67,6 @@
   ul,
   li,
   fieldset,
-  form,
-  label,
   legend,
   caption,
   article,
@@ -97,14 +95,6 @@
     font-family: sans-serif;
     font-weight: normal;
     vertical-align: baseline;
-  }
-
-  button {
-    border: 0;
-    cursor: pointer;
-    &:focus {
-      outline: 0;
-    }
   }
 
   * {
