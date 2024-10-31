@@ -105,7 +105,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
     legendItems = formattedItems.map((item, idx) => {
       const handleListItemClass = () => {
-        let classes = ['legend-container__li']
+        let classes = ['legend-container__li', 'd-flex', 'align-items-center']
         if (item.disabled) classes.push('legend-container__li--disabled')
         if (item.special) classes.push('legend-container__li--special-class')
         return classes.join(' ')
@@ -126,11 +126,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           }}
           tabIndex={0}
         >
-          <LegendShape
-            shape={state.legend.style === 'boxes' ? 'square' : 'circle'}
-            viewport={viewport}
-            fill={item.color}
-          />
+          <LegendShape shape={state.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
           <span>{item.label}</span>
         </li>
       )
