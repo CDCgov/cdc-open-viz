@@ -2,7 +2,7 @@ export const drawCircle = (circle, context, state) => {
   const percentOfOriginalSize = 0.75
   const adjustedGeoRadius =
     state.mapPosition.zoom > 1 ? Number(circle.geoRadius) * percentOfOriginalSize : circle.geoRadius
-  context.lineWidth = 3
+  context.lineWidth = 1
   context.fillStyle = circle.color
   context.beginPath()
   context.arc(circle.x, circle.y, adjustedGeoRadius, 0, 2 * Math.PI)
@@ -183,7 +183,7 @@ export const createShapeProperties = (type, pixelCoords, legendValues, state, ge
 
   switch (type) {
     case 'circle':
-      return { ...baseProps, geoRadius: geoRadius / 2, type: 'circle' }
+      return { ...baseProps, geoRadius: geoRadius, type: 'circle' }
     case 'pin':
       return { ...baseProps, type: 'pin' }
     case 'square':
