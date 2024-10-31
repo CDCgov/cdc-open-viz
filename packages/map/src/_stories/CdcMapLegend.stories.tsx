@@ -25,14 +25,38 @@ export const Single_State_With_Filters: Story = {
   }
 }
 
-export const US_State_Gradient: Story = {
+export const Gradient: Story = {
   args: {
     config: UsGradient
   }
 }
 
-export const US_State_Gradient_Smooth: Story = {
+export const Gradient_Smooth: Story = {
   args: {
     config: editConfigKeys(UsGradient, [{ path: ['legend', 'subStyle'], value: 'smooth' }])
+  }
+}
+export const Gradient_With_Box: Story = {
+  args: {
+    config: editConfigKeys(UsGradient, [
+      { path: ['legend', 'subStyle'], value: 'linear blocks' },
+      { path: ['legend', 'hideBorder'], value: false }
+    ])
+  }
+}
+
+export const Gradient_With_Text: Story = {
+  args: {
+    config: editConfigKeys(UsGradient, [
+      { path: ['legend', 'title'], value: 'Title' },
+      { path: ['legend', 'description'], value: 'Description' },
+      { path: ['legend', 'hideBorder'], value: false }
+    ])
+  }
+}
+
+export const Legend_Right: Story = {
+  args: {
+    config: editConfigKeys(SingleStateWithFilters, [{ path: ['legend', 'hideBorder'], value: true }])
   }
 }

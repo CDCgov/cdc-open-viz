@@ -30,4 +30,26 @@ export const Legend_On_Right: Story = {
   }
 }
 
+export const Legend_On_Right_With_Box: Story = {
+  args: {
+    config: editConfigKeys(SimplifiedLineConfig, [{ path: ['legend', 'hideBorder'], value: false }])
+  }
+}
+
+export const Legend_Gradient_With_box: Story = {
+  args: {
+    config: editConfigKeys(chartGradientConfig, [{ path: ['legend', 'hideBorder'], value: false }])
+  }
+}
+
+export const Legend_Gradient_With_Text: Story = {
+  args: {
+    config: editConfigKeys(chartGradientConfig, [
+      { path: ['legend', 'title'], value: 'Title' },
+      { path: ['legend', 'description'], value: 'Description' },
+      { path: ['legend', 'hideBorder'], value: false }
+    ])
+  }
+}
+
 export default meta
