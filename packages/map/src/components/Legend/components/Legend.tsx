@@ -15,18 +15,19 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import ConfigContext from '../../../context'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
-import { type ViewportSize } from '../../../types/MapConfig'
 import { Group } from '@visx/group'
 import './index.scss'
 
+const LEGEND_PADDING = 30
+
 type LegendProps = {
   skipId: string
-  currentViewport: ViewportSize
   dimensions: DimensionsType
+  containerWidthPadding: number
 }
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
-  const { skipId, currentViewport, dimensions } = props
+  const { skipId, dimensions, containerWidthPadding } = props
 
   const {
     // prettier-ignore
@@ -271,12 +272,14 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               colors={getFormattedLegendItems().map(item => item?.color) ?? []}
               values={getFormattedLegendItems().map(item => item?.value) ?? []}
               dimensions={dimensions}
-              currentViewport={currentViewport}
+              parentPaddingToSubtract={containerWidthPadding + (legend.hideBorder ? 0 : LEGEND_PADDING)}
               config={state}
             />
-            <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
-              {state.legend.style === 'gradient' ? '' : legendList()}
-            </ul>
+            {state.legend.style !== 'gradient' && (
+              <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
+                {legendList()}
+              </ul>
+            )}
             {(state.visual.additionalCityStyles.some(c => c.label) || state.visual.cityStyleLabel) && (
               <>
                 <hr />
