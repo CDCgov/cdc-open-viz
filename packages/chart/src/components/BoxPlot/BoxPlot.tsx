@@ -4,10 +4,11 @@ import { Group } from '@visx/group'
 import ConfigContext from '../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
-import { scaleBand, scaleLinear } from '@visx/scale'
+import { scaleBand } from '@visx/scale'
+import _ from 'lodash'
 import { max, min, median, quantile } from 'd3-array'
 const CoveBoxPlot = ({ xScale, yMax, xMax, min: minValue, max: maxValue, yScale }) => {
-  const { config, colorScale, seriesHighlight } = useContext(ConfigContext)
+  const { config, colorScale, seriesHighlight, transformedData: data } = useContext(ConfigContext)
   const { boxplot } = config
 
   // tooltips
@@ -43,15 +44,42 @@ const CoveBoxPlot = ({ xScale, yMax, xMax, min: minValue, max: maxValue, yScale 
       thirdQuartile: quantile(sortedValues, 0.75)
     }
   }
-  // const yScale = scaleLinear({
-  //   range: [yMax, 0],
-  //   domain: [minValue, maxValue]
-  // })
-  console.log(boxplot, 'box')
+
+  const getValuesBySeriesKey = (group: string) => {
+    const allSeriesKeys = config.series.map(item => item?.dataKey)
+    const result = {}
+    const filteredData = data.filter(item => item[config.xAxis.dataKey] === group)
+    allSeriesKeys.forEach(key => {
+      result[key] = filteredData.map(item => item[key])
+    })
+
+    return result
+  }
+
+  interface Plot {
+    columnCategory: string
+    keyValues: { [key: string]: number[] }
+  }
+  const createPlots = data => {
+    const dataKeys = data.map(d => d[config.xAxis.dataKey])
+    const plots: Plot[] = []
+    const groups: string[] = _.uniq(dataKeys)
+    if (groups && groups.length > 0) {
+      groups.forEach(group => {
+        plots.push({
+          columnCategory: group,
+          keyValues: getValuesBySeriesKey(group)
+        })
+      })
+    }
+    return plots
+  }
+  console.log(boxplot.plots, 'boxplot.plots')
+
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group left={Number(config.yAxis.size)} className='boxplot' key={`boxplot-group`}>
-        {boxplot.plots.map((d, i) => {
+        {createPlots(data).map((d, i) => {
           const offset = boxWidth - constrainedWidth
           const radius = 4
 

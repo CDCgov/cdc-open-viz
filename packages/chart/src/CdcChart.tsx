@@ -413,11 +413,11 @@ const CdcChart = ({
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
-      let allKeys = newExcludedData
-        ? newExcludedData.map(d => d[newConfig.xAxis.dataKey])
-        : data.map(d => d[newConfig.xAxis.dataKey])
-
+      const combinedData = filteredData || data
+      let allKeys = combinedData.map(d => d[newConfig.xAxis.dataKey])
       const groups = _.uniq(allKeys)
+      console.log(groups, 'groups')
+
       let tableData: any[] = []
       const plots: any[] = []
 
@@ -429,9 +429,8 @@ const CdcChart = ({
           if (!g) throw new Error('No groups resolved in box plots')
 
           // filter data by group
-          let filteredData = newExcludedData
-            ? newExcludedData.filter(item => item[newConfig.xAxis.dataKey] === g)
-            : data.filter(item => item[newConfig.xAxis.dataKey] === g)
+          let filteredData = combinedData.filter(item => item[newConfig.xAxis.dataKey] === g)
+
           let filteredDataValues: number[] = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
 
           // Sort the data for upcoming functions.

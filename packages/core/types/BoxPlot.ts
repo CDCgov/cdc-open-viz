@@ -14,6 +14,7 @@ export type BoxPlot = {
     lowerBounds: string
     upperBounds: string
   }
+  plotNonOutlierValues: boolean
   plots: []
   categories: string[]
   firstQuartilePercentage: number
