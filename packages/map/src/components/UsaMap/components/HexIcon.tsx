@@ -30,7 +30,13 @@ const HexIcon: React.FC<HexIconProps> = props => {
     )
   }
   return (
-    <Group top={centroid[1] - 5} left={centroid[0] - iconSize} color={textColor} textAnchor='start' key={`hex--${item.key}-${item.value}-${index}`}>
+    <Group
+      top={centroid[1] - 5}
+      left={centroid[0] - iconSize}
+      color={textColor}
+      textAnchor='start'
+      key={`hex--${item.key}-${item.value}-${index}`}
+    >
       {item.shape === 'Arrow Down' && <AiOutlineArrowDown />}
       {item.shape === 'Arrow Up' && <AiOutlineArrowUp />}
       {item.shape === 'Arrow Right' && <AiOutlineArrowRight />}
