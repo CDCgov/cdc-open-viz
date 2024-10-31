@@ -266,10 +266,6 @@ $medium: 768px;
   transition: none !important;
 }
 
-// .state {
-// 	display: none;
-// }
-
 .state {
   &--inactive:hover path {
     cursor: pointer;
