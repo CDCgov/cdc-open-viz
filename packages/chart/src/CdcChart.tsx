@@ -129,14 +129,6 @@ const CdcChart = ({
   })
 
   const { description, visualizationType } = config
-  let [width] = dimensions
-  const useVertical = config.orientation === 'vertical'
-  const useMobileVertical = config.heights?.mobileVertical && ['xs', 'xxs'].includes(currentViewport)
-  const responsiveVertical = useMobileVertical ? 'mobileVertical' : 'vertical'
-  const renderedOrientation = useVertical ? responsiveVertical : 'horizontal'
-  let height = config.aspectRatio ? width * config.aspectRatio : config?.heights?.[renderedOrientation]
-  if (config.visualizationType === 'Pie') height = config?.heights?.[renderedOrientation]
-  height = height + Number(config.orientation === 'horizontal' ? config.yAxis.size : config?.xAxis?.size) + 45
 
   const legendRef = useRef(null)
   const parentRef = useRef(null)
