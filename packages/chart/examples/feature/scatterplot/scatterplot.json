@@ -4,6 +4,18 @@
   "chartMessage": {
     "noData": "No Data Available"
   },
+  "customColors": [
+    "red",
+    "orange",
+    "yellow",
+    "green",
+    "blue",
+    "purple",
+    "pink",
+    "brown",
+    "gray",
+    "black"
+  ],
   "title": "",
   "showTitle": true,
   "showDownloadMediaButton": false,
