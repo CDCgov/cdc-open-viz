@@ -25,8 +25,12 @@
     margin: 10px 0;
   }
 
+  .alert-dismissible {
+    padding-right: 4rem !important;
+  }
+
   svg.sankey-chart__diagram {
-    position:relative;
+    position: relative;
     font-family: 'Roboto', sans-serif;
     height: auto;
     width: 100%;
@@ -123,9 +127,6 @@
   @media only screen and (max-width: 600px) {
     .popup {
       display: block; /* Show the popup on smaller screens */
-    }
-    .sankey-chart__diagram {
-      opacity: .1;
     }
   }
 }
