@@ -112,7 +112,8 @@ export type MapConfig = Visualization & {
   }
   legend: {
     additionalCategories
-    categoryValuesOrder
+    // Order of legend items when the data type is category
+    categoryValuesOrder: string[]
     description
     descriptions: {}
     specialClasses: { key; label; value }[]
