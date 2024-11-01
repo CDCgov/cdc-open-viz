@@ -216,12 +216,6 @@ table.data-table {
       }
     }
 
-    button.btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
     button.btn svg {
       margin: 0px 0 3px 0;
     }

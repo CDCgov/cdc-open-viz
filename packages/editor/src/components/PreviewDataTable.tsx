@@ -60,7 +60,7 @@ const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pag
       <li>
         <button
           onClick={() => previousPage()}
-          className='btn btn-prev'
+          className='btn btn-prev display-flex align-items-center justify-content-center'
           disabled={!canPreviousPage}
           title='Previous Page'
         >
@@ -69,7 +69,12 @@ const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pag
         </button>
       </li>
       <li className='mr-2'>
-        <button onClick={() => nextPage()} className='btn btn-next' disabled={!canNextPage} title='Next Page'>
+        <button
+          onClick={() => nextPage()}
+          className='btn btn-next display-flex align-items-center justify-content-center'
+          disabled={!canNextPage}
+          title='Next Page'
+        >
           <MdNavigateNext />
         </button>
       </li>
