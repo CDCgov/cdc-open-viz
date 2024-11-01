@@ -44,6 +44,18 @@ export const useEditorPermissions = () => {
     return true
   }
 
+  const visSupportsDateCategoryAxisMin = () => {
+    const enabledCharts = ['Scatter Plot']
+    if (enabledCharts.includes(visualizationType)) return true
+    return false
+  }
+
+  const visSupportsDateCategoryAxisMax = () => {
+    const enabledCharts = ['Scatter Plot']
+    if (enabledCharts.includes(visualizationType)) return true
+    return false
+  }
+
   const visSupportsSuperTitle = () => {
     const disabledCharts = ['Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
@@ -414,6 +426,8 @@ export const useEditorPermissions = () => {
     visSupportsChartHeight,
     visSupportsMobileChartHeight,
     visSupportsDateCategoryAxis,
+    visSupportsDateCategoryAxisMin,
+    visSupportsDateCategoryAxisMax,
     visSupportsDateCategoryAxisLabel,
     visSupportsDateCategoryAxisLine,
     visSupportsDateCategoryAxisTicks,

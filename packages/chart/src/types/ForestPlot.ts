@@ -50,4 +50,12 @@ export type ForestPlotConfigSettings = {
   // labels under chart
   leftLabel: string
   rightLabel: string
+  /** rightWidthOffsetMobile */
+  rightWidthOffsetMobile: number
+  /** leftWidthOffsetMobile */
+  leftWidthOffsetMobile: number
+  regression: {
+    showDiamond: boolean
+    description: boolean
+  }
 }
