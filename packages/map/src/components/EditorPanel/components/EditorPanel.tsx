@@ -1535,7 +1535,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
       state.legend.categoryValuesOrder.map((value, index) => (
         <Draggable key={value} draggableId={`item-${value}`} index={index}>
           {(provided, snapshot) => (
-            <li style={{ position: 'relative' }}>
+            <li className='p-relative'>
               <div
                 className={snapshot.isDragging ? 'currently-dragging' : ''}
                 style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)}
