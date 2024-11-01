@@ -619,52 +619,35 @@ const EditorPanel = () => {
   const { leftMax, rightMax } = useMinMax(properties)
 
   const {
-    headerColors,
-    visSupportsTooltipLines,
-    visSupportsNonSequentialPallete,
-    visSupportsSequentialPallete,
-    visSupportsReverseColorPalette,
-    visHasLabelOnData,
-    visHasNumbersOnBars,
     visHasAnchors,
-    visHasBarBorders,
-    visHasDataCutoff,
-    visHasSelectableLegendValues,
-    visCanAnimate,
+    visHasBrushChart,
+    visHasCategoricalAxis,
     visHasLegend,
     visHasLegendAxisAlign,
     visHasLegendColorCategory,
-    visHasBrushChart,
+    visHasSelectableLegendValues,
     visSupportsDateCategoryAxis,
-    visSupportsValueAxisMin,
-    visSupportsValueAxisMax,
     visSupportsDateCategoryAxisLabel,
     visSupportsDateCategoryAxisLine,
-    visSupportsDateCategoryAxisTicks,
-    visSupportsDateCategoryTickRotation,
-    visSupportsDateCategoryNumTicks,
+    visSupportsDateCategoryAxisMax,
+    visSupportsDateCategoryAxisMin,
     visSupportsDateCategoryAxisPadding,
-    visSupportsRegions,
+    visSupportsDateCategoryAxisTicks,
+    visSupportsDateCategoryHeight,
+    visSupportsDateCategoryNumTicks,
+    visSupportsDateCategoryTickRotation,
+    visSupportsDynamicSeries,
     visSupportsFilters,
-    visSupportsPreliminaryData,
-    visSupportsValueAxisGridLines,
-    visSupportsValueAxisLine,
-    visSupportsValueAxisTicks,
-    visSupportsValueAxisLabels,
-    visSupportsBarSpace,
-    visSupportsBarThickness,
-    visSupportsFootnotes,
-    visSupportsSuperTitle,
-    visSupportsDataCutoff,
-    visSupportsChartHeight,
     visSupportsLeftValueAxis,
-    visSupportsTooltipOpacity,
+    visSupportsPreliminaryData,
     visSupportsRankByValue,
     visSupportsResponsiveTicks,
-    visSupportsDateCategoryHeight,
-    visHasDataSuppression,
-    visHasCategoricalAxis,
-    visSupportsDynamicSeries
+    visSupportsValueAxisGridLines,
+    visSupportsValueAxisLabels,
+    visSupportsValueAxisLine,
+    visSupportsValueAxisMax,
+    visSupportsValueAxisMin,
+    visSupportsValueAxisTicks
   } = useEditorPermissions()
 
   // when the visualization type changes we
@@ -3326,6 +3309,30 @@ const EditorPanel = () => {
                         </>
                       )}
                     </>
+                  )}
+
+                  {visSupportsDateCategoryAxisMin() && (
+                    <TextField
+                      value={config.xAxis.min}
+                      section='xAxis'
+                      fieldName='min'
+                      type='number'
+                      label='min value'
+                      placeholder='Auto'
+                      updateField={updateField}
+                    />
+                  )}
+
+                  {visSupportsDateCategoryAxisMax() && (
+                    <TextField
+                      value={config.xAxis.max}
+                      section='xAxis'
+                      fieldName='max'
+                      type='number'
+                      label='max value'
+                      placeholder='Auto'
+                      updateField={updateField}
+                    />
                   )}
 
                   {/* anchors */}
