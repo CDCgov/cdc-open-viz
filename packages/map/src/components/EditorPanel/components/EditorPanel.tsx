@@ -25,6 +25,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Icon from '@cdc/core/components/ui/Icon'
 import InputToggle from '@cdc/core/components/inputs/InputToggle'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
+import DraggableList from '@cdc/core/components/ui/DraggableList'
 
 // Assets
 import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg'
@@ -109,17 +110,14 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   } = useMapLayers(state, setState, false, tooltipId)
 
   const categoryMove = (idx1, idx2) => {
-    let categoryValuesOrder = [...state.legend.categoryValuesOrder]
-
-    let [movedItem] = categoryValuesOrder.splice(idx1, 1)
-
-    categoryValuesOrder.splice(idx2, 0, movedItem)
-
+    let newCategoryValuesOrder = [...state.legend.categoryValuesOrder]
+    let [movedItem] = newCategoryValuesOrder.splice(idx1, 1)
+    newCategoryValuesOrder.splice(idx2, 0, movedItem)
     setState({
       ...state,
       legend: {
         ...state.legend,
-        categoryValuesOrder
+        categoryValuesOrder: newCategoryValuesOrder
       }
     })
   }
@@ -1440,35 +1438,9 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             >
               <Droppable droppableId='filter_order'>
                 {provided => (
-                  <ul
-                    {...provided.droppableProps}
-                    className='sort-list'
-                    ref={provided.innerRef}
-                    style={{ marginTop: '1em' }}
-                  >
-                    {state.filters[index]?.values.map((value, index) => {
-                      return (
-                        <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
-                          {(provided, snapshot) => (
-                            <li>
-                              <div
-                                className={snapshot.isDragging ? 'currently-dragging' : ''}
-                                style={getItemStyle(
-                                  snapshot.isDragging,
-                                  provided.draggableProps.style,
-                                  sortableItemStyles
-                                )}
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                {value}
-                              </div>
-                            </li>
-                          )}
-                        </Draggable>
-                      )
-                    })}
+                  <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef}>
+                    <DraggableList draggableItems={state.filters[index]?.values} />
+
                     {provided.placeholder}
                   </ul>
                 )}
@@ -1525,34 +1497,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   }, [state]) // eslint-disable-line
 
   let numberOfItemsLimit = 8
-
-  const getItemStyle = (isDragging, draggableStyle) => ({
-    ...draggableStyle
-  })
-
-  const CategoryList = () => {
-    return state.legend.categoryValuesOrder ? (
-      state.legend.categoryValuesOrder.map((value, index) => (
-        <Draggable key={value} draggableId={`item-${value}`} index={index}>
-          {(provided, snapshot) => (
-            <li className='p-relative'>
-              <div
-                className={snapshot.isDragging ? 'currently-dragging' : ''}
-                style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)}
-                ref={provided.innerRef}
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-              >
-                {value}
-              </div>
-            </li>
-          )}
-        </Draggable>
-      ))
-    ) : (
-      <></>
-    )
-  }
 
   const isLoadedFromUrl = state?.dataKey?.includes('http://') || state?.dataKey?.includes('https://')
 
@@ -2778,7 +2722,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       <Droppable droppableId='category_order'>
                         {provided => (
                           <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef}>
-                            <CategoryList />
+                            <DraggableList draggableItems={state.legend.categoryValuesOrder} />
                             {provided.placeholder}
                           </ul>
                         )}
