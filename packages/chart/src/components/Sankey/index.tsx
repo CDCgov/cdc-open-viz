@@ -14,9 +14,10 @@ import ConfigContext from '@cdc/chart/src/ConfigContext'
 import { ChartContext } from '../../types/ChartContext'
 import type { SankeyNode, SankeyProps } from './types'
 import { SankeyChartConfig, AllChartsConfig } from '../../types/ChartConfig'
+import useSankeyAlert from './useSankeyAlert'
 
 const Sankey = ({ width, height, runtime }: SankeyProps) => {
-  const { config } = useContext<ChartContext>(ConfigContext)
+  const { config, handleChartTabbing, legendId } = useContext<ChartContext>(ConfigContext)
   const { sankey: sankeyConfig } = config
 
   const isSankeyChartConfig = (config: AllChartsConfig | SankeyChartConfig): config is SankeyChartConfig => {
@@ -28,8 +29,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
 
   //Tooltip
   const [tooltipID, setTooltipID] = useState<string>('')
-  //Mobile Pop Up
-  const [showPopup, setShowPopup] = useState(false)
+  const { showAlert, alert } = useSankeyAlert()
 
   const handleNodeClick = (nodeId: string) => {
     // Store the previous tooltipID
@@ -44,16 +44,6 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
     if (previousTooltipID !== nodeId) {
       setTooltipID(nodeId)
     }
-  }
-
-  useEffect(() => {
-    if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
-      setShowPopup(true)
-    }
-  }, [window.innerWidth])
-
-  const closePopUp = () => {
-    setShowPopup(false)
   }
 
   // Uses Visx Groups innerRef to get all Group elements that are mapped.
@@ -313,7 +303,11 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
               data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
             >
-              <tspan className={classStyle}>{sankeyConfig.nodeValueStyle.textBefore + (typeof node.value === 'number' ? node.value.toLocaleString() : node.value) + sankeyConfig.nodeValueStyle.textAfter}</tspan>
+              <tspan className={classStyle}>
+                {sankeyConfig.nodeValueStyle.textBefore +
+                  (typeof node.value === 'number' ? node.value.toLocaleString() : node.value) +
+                  sankeyConfig.nodeValueStyle.textAfter}
+              </tspan>
             </text>
           </>
         )}
@@ -415,7 +409,16 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
             >
               {(data?.storyNodeText?.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}
             </Text>
-            <Text verticalAnchor='end' className={classStyle} x={node.x0! + textPositionHorizontal} y={(node.y1! + node.y0! + 25) / 2} fill={sankeyConfig.storyNodeFontColor || sankeyConfig.nodeFontColor} fontWeight='bold' textAnchor='start' style={{ pointerEvents: 'none' }}>
+            <Text
+              verticalAnchor='end'
+              className={classStyle}
+              x={node.x0! + textPositionHorizontal}
+              y={(node.y1! + node.y0! + 25) / 2}
+              fill={sankeyConfig.storyNodeFontColor || sankeyConfig.nodeFontColor}
+              fontWeight='bold'
+              textAnchor='start'
+              style={{ pointerEvents: 'none' }}
+            >
               {typeof node.value === 'number' ? node.value.toLocaleString() : node.value}
             </Text>
             <Text
@@ -434,7 +437,15 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
           </>
         ) : (
           <>
-            <text x={node.x0! + textPositionHorizontal} y={(node.y1! + node.y0!) / 2 + textPositionVertical} dominantBaseline='text-before-edge' fill={sankeyConfig.nodeFontColor} fontWeight='bold' textAnchor='start' style={{ pointerEvents: 'none' }}>
+            <text
+              x={node.x0! + textPositionHorizontal}
+              y={(node.y1! + node.y0!) / 2 + textPositionVertical}
+              dominantBaseline='text-before-edge'
+              fill={sankeyConfig.nodeFontColor}
+              fontWeight='bold'
+              textAnchor='start'
+              style={{ pointerEvents: 'none' }}
+            >
               <tspan id={node.id} className='node-id'>
                 {node.id}
               </tspan>
@@ -451,7 +462,9 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               style={{ pointerEvents: 'none' }}
             >
               <tspan onClick={() => handleNodeClick(node.id)} className={classStyle}>
-                {sankeyConfig.nodeValueStyle.textBefore + (typeof node.value === 'number' ? node.value.toLocaleString() : node.value) + sankeyConfig.nodeValueStyle.textAfter}
+                {sankeyConfig.nodeValueStyle.textBefore +
+                  (typeof node.value === 'number' ? node.value.toLocaleString() : node.value) +
+                  sankeyConfig.nodeValueStyle.textAfter}
               </tspan>
             </text>
           </>
@@ -460,10 +473,15 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
     )
   })
 
-  return (
+  return !showAlert ? (
     <>
       <div className='sankey-chart'>
-        <svg className='sankey-chart__diagram' width={width} height={Number(config.heights.vertical)} style={{ overflow: 'visible' }}>
+        <svg
+          className='sankey-chart__diagram'
+          width={width}
+          height={Number(config.heights.vertical)}
+          style={{ overflow: 'visible' }}
+        >
           <Group className='links'>{allLinks}</Group>
           <Group className='nodes'>{allNodes}</Group>
           <Group className='finalNodes' style={{ display: 'none' }}>
@@ -473,21 +491,21 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
 
         {/* ReactTooltip needs to remain even if tooltips are disabled -- it handles when a user clicks off of the node and resets
         the sankey diagram. When tooltips are disabled this will nothing */}
-        <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`} afterHide={() => setTooltipID('')} events={['click']} place={'bottom'} style={{ backgroundColor: `rgba(238, 238, 238, 1)`, color: 'black', boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)` }} />
-        {showPopup && (
-          <div className='popup'>
-            <div className='popup-content'>
-              <button className='visually-hidden' onClick={closePopUp}>
-                Select for accessible version.
-              </button>
-              <p>
-                <strong>Please change the orientation of your screen or increase the size of your browser to view the diagram better.</strong>
-              </p>
-            </div>
-          </div>
-        )}
+        <ReactTooltip
+          id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
+          afterHide={() => setTooltipID('')}
+          events={['click']}
+          place={'bottom'}
+          style={{
+            backgroundColor: `rgba(238, 238, 238, 1)`,
+            color: 'black',
+            boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)`
+          }}
+        />
       </div>
     </>
+  ) : (
+    alert
   )
 }
 export default Sankey
