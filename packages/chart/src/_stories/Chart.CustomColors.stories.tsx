@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import Chart from '../CdcChart'
-import scatterPlotCustomColorConfig from './../../examples/feature/scatterplot/scatterplot.json'
+import scatterPlotCustomColorConfig from './_mock/scatterplot_mock.json'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Custom Colors',
