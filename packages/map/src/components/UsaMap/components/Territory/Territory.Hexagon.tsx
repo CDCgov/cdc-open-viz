@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { geoCentroid, geoPath } from 'd3-geo'
+import { geoCentroid } from 'd3-geo'
 import ConfigContext from './../../../../context'
 import { MapContext } from './../../../../types/MapContext'
 import HexIcon from '../HexIcon'
@@ -31,7 +31,19 @@ const nudges = {
 
 // todo: combine hexagonLabel & geoLabel functions
 // todo: move geoLabel functions outside of components for reusability
-const TerritoryHexagon = ({ label, text, stroke, strokeWidth, textColor, territory, territoryData, ...props }) => {
+const TerritoryHexagon = ({
+  dataTooltipHtml,
+  dataTooltipId,
+  handleShapeClick,
+  label,
+  stroke,
+  strokeWidth,
+  territory,
+  territoryData,
+  text,
+  textColor,
+  ...props
+}) => {
   const { state } = useContext<MapContext>(ConfigContext)
 
   const isHex = state.general.displayAsHex
@@ -115,7 +127,17 @@ const TerritoryHexagon = ({ label, text, stroke, strokeWidth, textColor, territo
       let y = state.hexMap.type === 'shapes' ? '30%' : '50%'
       return (
         <>
-          <Text fontSize={14} x={'50%'} y={y} style={{ fill: 'currentColor', stroke: 'initial', fontWeight: 400, opacity: 1, fillOpacity: 1 }} textAnchor='middle' verticalAnchor='middle'>
+          <Text
+            fontSize={14}
+            x={'50%'}
+            y={y}
+            style={{ fill: 'currentColor', stroke: 'initial', fontWeight: 400, opacity: 1, fillOpacity: 1 }}
+            textAnchor='middle'
+            verticalAnchor='middle'
+            onClick={handleShapeClick}
+            data-tooltip-id={dataTooltipId}
+            data-tooltip-html={dataTooltipHtml}
+          >
             {abbr.substring(3)}
           </Text>
           {state.general.displayAsHex && state.hexMap.type === 'shapes' && getArrowDirection(territoryData, geo, true)}
@@ -127,21 +149,44 @@ const TerritoryHexagon = ({ label, text, stroke, strokeWidth, textColor, territo
 
     return (
       <g>
-        <line x1={centroid[0]} y1={centroid[1]} x2={centroid[0] + dx} y2={centroid[1] + dy} stroke='rgba(0,0,0,.5)' strokeWidth={1} />
-        <text x={4} strokeWidth='0' fontSize={13} style={{ fill: '#202020' }} alignmentBaseline='middle' transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}>
+        <line
+          x1={centroid[0]}
+          y1={centroid[1]}
+          x2={centroid[0] + dx}
+          y2={centroid[1] + dy}
+          stroke='rgba(0,0,0,.5)'
+          strokeWidth={1}
+        />
+        <text
+          x={4}
+          strokeWidth='0'
+          fontSize={13}
+          style={{ fill: '#202020' }}
+          alignmentBaseline='middle'
+          transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
+          onClick={handleShapeClick}
+          data-tooltip-id={dataTooltipId}
+          data-tooltip-html={dataTooltipHtml}
+        >
           {abbr.substring(3)}
         </text>
       </g>
     )
   }
 
-  return territoryData && (
-    <svg viewBox='0 0 45 51' className='territory-wrapper--hex'>
-      <g {...props}>
-        <polygon stroke={stroke} strokeWidth={strokeWidth} points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702' />
-        {state.general.displayAsHex && hexagonLabel(territoryData, stroke, false)}
-      </g>
-    </svg>
+  return (
+    territoryData && (
+      <svg viewBox='0 0 45 51' className='territory-wrapper--hex'>
+        <g {...props} data-tooltip-html={dataTooltipHtml} data-tooltip-id={dataTooltipId} onClick={handleShapeClick}>
+          <polygon
+            stroke={stroke}
+            strokeWidth={strokeWidth}
+            points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702'
+          />
+          {state.general.displayAsHex && hexagonLabel(territoryData, stroke, false)}
+        </g>
+      </svg>
+    )
   )
 }
 
