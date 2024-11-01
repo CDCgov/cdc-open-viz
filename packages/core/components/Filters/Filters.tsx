@@ -277,7 +277,8 @@ type FilterProps = {
   // updating function for setting fitlerBehavior
   setConfig: Function
   // exclusions
-  exclusions: any[]
+  exclusions?: any[]
+  getUniqueValues?: (data: Record<string, any>, columnName: string) => string[]
 }
 
 const Filters = (props: FilterProps) => {
