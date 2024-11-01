@@ -211,33 +211,15 @@ table.data-table {
     }
     button {
       background: var(--mediumGray);
-      padding: 0.6rem 0.8rem;
       &:hover {
         background: lighten(var(--mediumGray), 5%);
       }
     }
-    button.btn-next {
-      &::before {
-        content: ' ';
-        background-image: url(../assets/icon-caret-filled-up.svg);
-        background-size: 10px 5px;
-        width: 10px;
-        height: 5px;
-        display: block;
-        transform: rotate(90deg);
-      }
+
+    button.btn svg {
+      margin: 0px 0 3px 0;
     }
-    button.btn-prev {
-      &::before {
-        content: ' ';
-        background-image: url(../assets/icon-caret-filled-up.svg);
-        background-size: 10px 5px;
-        width: 10px;
-        height: 5px;
-        display: block;
-        transform: rotate(-90deg);
-      }
-    }
+
     button[disabled] {
       background: var(--mediumGray);
       opacity: 0.3;
