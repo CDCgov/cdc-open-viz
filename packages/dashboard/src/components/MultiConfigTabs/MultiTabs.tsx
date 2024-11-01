@@ -2,6 +2,7 @@ import { useContext, useMemo } from 'react'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 
 import './multiconfigtabs.styles.css'
+import { updateQueryParam } from '@cdc/core/helpers/queryStringUtils'
 
 const MultiTabs = () => {
   const { config } = useContext(DashboardContext)
@@ -15,6 +16,7 @@ const MultiTabs = () => {
   const load = (indexToSwitchTo: number, e) => {
     e.preventDefault() // some form wrapper is causing this to act as a submit button
     dispatch({ type: 'SWITCH_CONFIG', payload: indexToSwitchTo })
+    updateQueryParam('cove-tab', indexToSwitchTo)
   }
 
   if (!config.multiDashboards) return null

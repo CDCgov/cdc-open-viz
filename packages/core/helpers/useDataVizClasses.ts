@@ -1,38 +1,51 @@
 export default function useDataVizClasses(config, viewport = null) {
-  const { legend } = config
+  const {
+    legend,
+    lineDatapointStyle,
+    showTitle,
+    title,
+    visualizationType,
+    subtext,
+    biteStyle,
+    general,
+    visual,
+    shadow
+  } = config
+
   let lineDatapointClass = ''
 
-  if (config.lineDatapointStyle === 'hover') {
+  if (lineDatapointStyle === 'hover') {
     lineDatapointClass = ' chart-line--hover'
   }
-  if (config.lineDatapointStyle === 'always show') {
+  if (lineDatapointStyle === 'always show') {
     lineDatapointClass = ' chart-line--always'
   }
 
   let innerContainerClasses = ['cove-component__inner']
   let contentClasses = ['cove-component__content']
 
-  const { visualizationType, title, showTitle } = config
-
   if (visualizationType === 'Spark Line' || visualizationType === 'chart') {
     if (title && showTitle) contentClasses.push('component--has-title')
   }
 
-  config.showTitle && contentClasses.push('component--has-title')
-  config.title && config.visualizationType !== 'chart' && config.visualizationType !== 'Spark Line' && contentClasses.push('component--has-title')
-  config.subtext && innerContainerClasses.push('component--has-subtext')
-  config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
-  config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
+  showTitle && contentClasses.push('component--has-title')
+  title &&
+    visualizationType !== 'chart' &&
+    visualizationType !== 'Spark Line' &&
+    contentClasses.push('component--has-title')
+  subtext && innerContainerClasses.push('component--has-subtext')
+  biteStyle && innerContainerClasses.push(`bite__style--${biteStyle}`)
+  general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
 
-  !config.visual?.border && contentClasses.push('no-borders')
-  config.visualizationType === 'Spark Line' && contentClasses.push('sparkline')
-  config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme')
-  config.visual?.accent && contentClasses.push('component--has-accent')
-  config.visual?.background && contentClasses.push('component--has-background')
-  config.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor')
+  !visual?.border && contentClasses.push('no-borders')
+  visualizationType === 'Spark Line' && contentClasses.push('sparkline')
+  visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme')
+  visual?.accent && contentClasses.push('component--has-accent')
+  visual?.background && contentClasses.push('component--has-background')
+  visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor')
 
   // ! these two will be retired.
-  config.shadow && innerContainerClasses.push('shadow')
+  shadow && innerContainerClasses.push('shadow')
   config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
 
   let sparkLineStyles = {
@@ -53,12 +66,20 @@ export default function useDataVizClasses(config, viewport = null) {
     ulClasses.push(getListPosition())
     return ulClasses
   }
-  const hasBorder = config.legend?.hideBorder ? 'no-border' : ''
-  const legendOuterClasses = [`${legend?.position}`, `${getListPosition()}`, `cdcdataviz-sr-focusable`, `${viewport}`, `${hasBorder}`]
+  const hasBorder = legend?.hideBorder ? 'no-border' : ''
+  const legendOuterClasses = [
+    `${legend?.position}`,
+    `${getListPosition()}`,
+    `cdcdataviz-sr-focusable`,
+    `${viewport}`,
+    `${hasBorder}`
+  ]
+
+  const usePadding = !legend?.hideBorder
 
   const legendClasses = {
     aside: legendOuterClasses,
-    section: ['legend-container'],
+    section: ['legend-container', usePadding ? 'legend-padding' : ''],
     ul: getUlClasses(),
     li: ['single-legend-item', 'legend-container__li'],
     title: ['legend-container__title'],

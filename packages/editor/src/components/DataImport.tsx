@@ -40,7 +40,9 @@ export default function DataImport() {
   }
   const transform = new DataTransform()
 
-  const [externalURL, setExternalURL] = useState(config.dataFileSourceType === 'url' ? config.dataFileName : config.dataUrl || '')
+  const [externalURL, setExternalURL] = useState(
+    config.dataFileSourceType === 'url' ? config.dataFileName : config.dataUrl || ''
+  )
 
   const [keepURL, setKeepURL] = useState(!!config.dataUrl)
 
@@ -59,13 +61,13 @@ export default function DataImport() {
     if (size === undefined) return ''
 
     if (size > Math.pow(1024, 3)) {
-      return Math.round((size / Math.pow(1024, 3)) * 100) / 100 + ' GB'
+      return Math.round((size / Math.pow(1024, 3)) * 100) / 100 + 'GB'
     } else if (size > Math.pow(1024, 2)) {
-      return Math.round((size / Math.pow(1024, 2)) * 100) / 100 + ' MB'
+      return Math.round((size / Math.pow(1024, 2)) * 100) / 100 + 'MB'
     } else if (size > 1024) {
-      return Math.round((size / 1024) * 100) / 100 + ' KB'
+      return Math.round((size / 1024) * 100) / 100 + 'KB'
     } else {
-      return size + ' B'
+      return size + 'B'
     }
   }
 
@@ -88,7 +90,11 @@ export default function DataImport() {
   }
 
   const getFileExtension = (url: URL) => {
-    return isSolrCsv(externalURL) ? '.csv' : isSolrJson(externalURL) ? '.json' : Object.keys(supportedDataTypes).find(extension => url.pathname.endsWith(extension))
+    return isSolrCsv(externalURL)
+      ? '.csv'
+      : isSolrJson(externalURL)
+      ? '.json'
+      : Object.keys(supportedDataTypes).find(extension => url.pathname.endsWith(extension))
   }
 
   const loadExternal = async () => {
@@ -96,7 +102,8 @@ export default function DataImport() {
     // Is URL valid?
 
     try {
-      dataURL = isSolrCsv(externalURL) || isSolrJson(externalURL) ? externalURL : new URL(externalURL, window.location.origin)
+      dataURL =
+        isSolrCsv(externalURL) || isSolrJson(externalURL) ? externalURL : new URL(externalURL, window.location.origin)
     } catch {
       throw errorMessages.urlInvalid
     }
@@ -116,7 +123,11 @@ export default function DataImport() {
           const csvTypes = ['text/csv', 'text/plain']
           if ((fileExtension === '.csv' && csvTypes.includes(responseBlob.type)) || isSolrCsv(externalURL)) {
             responseBlob = responseBlob.slice(0, responseBlob.size, 'text/csv')
-          } else if (responseBlob.type === 'application/json' || (fileExtension === '.json' && responseBlob.type === 'text/plain') || isSolrJson(externalURL)) {
+          } else if (
+            responseBlob.type === 'application/json' ||
+            (fileExtension === '.json' && responseBlob.type === 'text/plain') ||
+            isSolrJson(externalURL)
+          ) {
             responseBlob = responseBlob.slice(0, responseBlob.size, 'application/json')
           }
         })
@@ -146,7 +157,8 @@ export default function DataImport() {
    */
   const loadData = async (fileBlob = null, fileName, editingDatasetKey) => {
     let fileData = fileBlob
-    const fileSource = fileData?.path ?? fileName ?? externalURL
+    let fileSource = fileData?.path ?? fileName ?? externalURL
+    if(fileSource && typeof fileSource === 'string') fileSource = fileSource.trim();
     const fileSourceType = fileBlob ? 'file' : 'url'
 
     // Get the raw data as text from the file
@@ -332,19 +344,43 @@ export default function DataImport() {
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
-  const { getRootProps: getRootProps2, getInputProps: getInputProps2, isDragActive: isDragActive2 } = useDropzone({ onDrop })
+  const {
+    getRootProps: getRootProps2,
+    getInputProps: getInputProps2,
+    isDragActive: isDragActive2
+  } = useDropzone({ onDrop })
 
   const loadDataFromUrl = () => {
     return (
       <>
         <form className='input-group d-flex' onSubmit={e => e.preventDefault()}>
-          <input id='external-data' type='text' className='form-control flex-grow-1 border-right-0' placeholder='e.g., https://data.cdc.gov/resources/file.json' aria-label='Load data from external URL' aria-describedby='load-data' value={externalURL} onChange={e => setExternalURL(e.target.value)} />
-          <button className='input-group-text btn btn-primary px-4' type='submit' id='load-data' onClick={() => loadData(null, externalURL, editingDataset)}>
+          <input
+            id='external-data'
+            type='text'
+            className='form-control flex-grow-1 border-right-0'
+            placeholder='e.g., https://data.cdc.gov/resources/file.json'
+            aria-label='Load data from external URL'
+            aria-describedby='load-data'
+            value={externalURL}
+            onChange={e => setExternalURL(e.target.value)}
+          />
+          <button
+            className='input-group-text btn btn-primary px-4'
+            type='submit'
+            id='load-data'
+            onClick={() => loadData(null, externalURL, editingDataset)}
+          >
             Load
           </button>
         </form>
         <label htmlFor='keep-url' className='mt-1 d-flex keep-url'>
-          <input type='checkbox' id='keep-url' checked={keepURL} onChange={() => changeKeepURL(!keepURL, editingDataset)} /> Always load from URL (normally will only pull once)
+          <input
+            type='checkbox'
+            id='keep-url'
+            checked={keepURL}
+            onChange={() => changeKeepURL(!keepURL, editingDataset)}
+          />{' '}
+          Always load from URL (normally will only pull once)
         </label>
       </>
     )
@@ -365,7 +401,15 @@ export default function DataImport() {
     return (
       //todo convert to modal
       <>
-        <button className='btn danger' onClick={() => resetEditor({ type: config.type, visualizationType: config.visualizationType } as Visualization, 'Resetting will remove your data and settings. Do you want to continue?')}>
+        <button
+          className='btn danger'
+          onClick={() =>
+            resetEditor(
+              { type: config.type, visualizationType: config.visualizationType } as Visualization,
+              'Resetting will remove your data and settings. Do you want to continue?'
+            )
+          }
+        >
           Clear
           <CloseIcon />
         </button>
@@ -444,7 +488,8 @@ export default function DataImport() {
     readyToConfigure = Object.keys(config.datasets).length > 0
   } else {
     configureData = config
-    readyToConfigure = !!config.formattedData || (config.data && config.dataDescription && transform.autoStandardize(config.data))
+    readyToConfigure =
+      !!config.formattedData || (config.data && config.dataDescription && transform.autoStandardize(config.data))
   }
 
   if (config.visualizationType === 'Sankey' && config.data) {
@@ -504,7 +549,10 @@ export default function DataImport() {
                       <Icon display='question' />
                     </Tooltip.Target>
                     <Tooltip.Content>
-                      <p style={{ padding: '0.5rem' }}>Name of the query string parameter that will be appended to the URL above with the values provided below.</p>
+                      <p style={{ padding: '0.5rem' }}>
+                        Name of the query string parameter that will be appended to the URL above with the values
+                        provided below.
+                      </p>
                     </Tooltip.Content>
                   </Tooltip>
                 </span>{' '}
@@ -560,7 +608,10 @@ export default function DataImport() {
               <form
                 onSubmit={e => {
                   e.preventDefault()
-                  if (!config.filters[i].orderedValues || config.filters[i].orderedValues.indexOf(e.target[0].value) === -1) {
+                  if (
+                    !config.filters[i].orderedValues ||
+                    config.filters[i].orderedValues.indexOf(e.target[0].value) === -1
+                  ) {
                     let newFilters = [...config.filters]
                     newFilters[i].orderedValues = newFilters[i].orderedValues || []
                     newFilters[i].orderedValues.push(e.target[0].value)
@@ -582,7 +633,12 @@ export default function DataImport() {
       <button
         className='btn full-width'
         onClick={() => {
-          setConfig({ ...config, filters: config.filters ? [...config.filters, { type: 'url', key: Date.now() }] : [{ type: 'url', key: Date.now() }] })
+          setConfig({
+            ...config,
+            filters: config.filters
+              ? [...config.filters, { type: 'url', key: Date.now() }]
+              : [{ type: 'url', key: Date.now() }]
+          })
         }}
       >
         Add New URL Filter
@@ -604,7 +660,7 @@ export default function DataImport() {
                   <th>Name</th>
                   <th>Size</th>
                   <th>Type</th>
-                  <th colSpan={4}>Actions</th>
+                  <th colSpan={3}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -613,18 +669,26 @@ export default function DataImport() {
                     config.datasets[datasetKey].dataFileName && (
                       <tr key={`tr-${datasetKey}`}>
                         <td>
-                          <input className='dataset-name-input' type='text' defaultValue={datasetKey} onBlur={e => renameDataset(datasetKey, e.target.value)} />
+                          <input
+                            className='dataset-name-input'
+                            type='text'
+                            defaultValue={datasetKey}
+                            onBlur={e => renameDataset(datasetKey, e.target.value)}
+                          />
                         </td>
-                        <td>{displaySize(config.datasets[datasetKey].dataFileSize)}</td>
-                        <td>{config.datasets[datasetKey].dataFileFormat}</td>
+                        <td className='p-1'>{displaySize(config.datasets[datasetKey].dataFileSize)}</td>
+                        <td className='p-1'>{config.datasets[datasetKey].dataFileFormat}</td>
                         <td>
-                          <button className='btn btn-primary' onClick={() => setGlobalDatasetProp(datasetKey, 'preview', true)}>
-                            Preview Data
+                          <button
+                            className='btn btn-link p-1'
+                            onClick={() => setGlobalDatasetProp(datasetKey, 'preview', true)}
+                          >
+                            Preview
                           </button>
                         </td>
                         <td>
                           <button
-                            className='btn btn-primary'
+                            className='btn btn-link p-1'
                             onClick={() => {
                               if (editingDataset === datasetKey) {
                                 setEditingDataset(undefined)
@@ -632,16 +696,18 @@ export default function DataImport() {
                                 setKeepURL(false)
                               } else {
                                 setEditingDataset(datasetKey)
-                                setExternalURL(config.datasets[datasetKey].dataUrl || config.datasets[datasetKey].dataFileName)
+                                setExternalURL(
+                                  config.datasets[datasetKey].dataUrl || config.datasets[datasetKey].dataFileName
+                                )
                                 setKeepURL(!!config.datasets[datasetKey].dataUrl)
                               }
                             }}
                           >
-                            Edit Data
+                            Edit
                           </button>
                         </td>
                         <td>
-                          <button className='btn btn-primary' onClick={() => removeDataset(datasetKey)}>
+                          <button className='btn btn-danger' onClick={() => removeDataset(datasetKey)}>
                             X
                           </button>
                         </td>
@@ -661,7 +727,14 @@ export default function DataImport() {
                 <div className='file-loaded-area'>
                   {(config.dataFileSourceType === 'file' || !config.dataFileSourceType) && (
                     <div className='data-source-options'>
-                      <div className={isDragActive2 ? 'drag-active cdcdataviz-file-selector loaded-file' : 'cdcdataviz-file-selector loaded-file'} {...getRootProps2()}>
+                      <div
+                        className={
+                          isDragActive2
+                            ? 'drag-active cdcdataviz-file-selector loaded-file'
+                            : 'cdcdataviz-file-selector loaded-file'
+                        }
+                        {...getRootProps2()}
+                      >
                         <input {...getInputProps2()} />
                         {isDragActive2 ? (
                           <p>Drop file here</p>
@@ -688,7 +761,15 @@ export default function DataImport() {
               </>
             )}
 
-            {showDataDesigner && <DataDesigner visualizationKey={null} configureData={configureData} updateDescriptionProp={(key, value) => updateDescriptionProp(configureData.dataFileName, key, value)} config={config} setConfig={setConfig} />}
+            {showDataDesigner && (
+              <DataDesigner
+                visualizationKey={null}
+                configureData={configureData}
+                updateDescriptionProp={(key, value) => updateDescriptionProp(configureData.dataFileName, key, value)}
+                config={config}
+                setConfig={setConfig}
+              />
+            )}
           </>
         )}
 
@@ -698,7 +779,10 @@ export default function DataImport() {
             <Tabs startingTab={editingDataset && config.datasets[editingDataset].dataFileSourceType === 'url' ? 1 : 0}>
               <TabPane title='Upload File' icon={<FileUploadIcon className='inline-icon' />}>
                 {sharepath && <p className='alert--info'>The share path set for this website is: {sharepath}</p>}
-                <div className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'} {...getRootProps()}>
+                <div
+                  className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'}
+                  {...getRootProps()}
+                >
                   <input {...getInputProps()} />
                   {isDragActive ? (
                     <p>Drop file here</p>
@@ -720,7 +804,11 @@ export default function DataImport() {
               (Array.isArray(errors)
                 ? errors.map((message, index) => (
                     <div className='error-box slim mt-2' key={`error-${message}`}>
-                      <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors(errors.filter((val, i) => i !== index))} />
+                      <span>{message}</span>{' '}
+                      <CloseIcon
+                        className='inline-icon dismiss-error'
+                        onClick={() => setErrors(errors.filter((val, i) => i !== index))}
+                      />
                     </div>
                   ))
                 : errors.message)}
@@ -733,22 +821,30 @@ export default function DataImport() {
         )}
 
         {config.type === 'dashboard' && !addingDataset && (
-          <p>
+          <div className='mt-2'>
             <button className='btn btn-primary' onClick={() => setAddingDataset(true)}>
               + Add More Files
             </button>
-          </p>
+          </div>
         )}
 
         {readyToConfigure && (
-          <p>
-            <button className='btn btn-primary' onClick={() => dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 2 })}>
+          <div className='mt-2'>
+            <button
+              className='btn btn-primary'
+              onClick={() => dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 2 })}
+            >
               Configure your visualization
             </button>
-          </p>
+          </div>
         )}
 
-        <a href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html' target='_blank' rel='noopener noreferrer' className='guidance-link'>
+        <a
+          href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html'
+          target='_blank'
+          rel='noopener noreferrer'
+          className='guidance-link'
+        >
           <div>
             <h3>Get Help</h3>
             <p>Documentation and examples on formatting data and configuring visualizations.</p>

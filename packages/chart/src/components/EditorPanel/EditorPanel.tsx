@@ -450,7 +450,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
           }
         )}
 
-      <button type='button' onClick={addColumn} className='btn full-width'>
+      <button type='button' onClick={addColumn} className='btn btn-primary full-width'>
         {config.visualizationType === 'Line'
           ? 'Add Special Line'
           : config.visualizationType === 'Bar'
@@ -2149,7 +2149,7 @@ const EditorPanel = () => {
                       </Accordion>
 
                       <button
-                        className='btn full-width'
+                        className='btn btn-primary full-width'
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.yAxis.anchors]
@@ -2275,7 +2275,7 @@ const EditorPanel = () => {
                       </Accordion>
 
                       <button
-                        className='btn full-width'
+                        className='btn btn-primary full-width'
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.xAxis.anchors]
@@ -3443,7 +3443,7 @@ const EditorPanel = () => {
                       </Accordion>
 
                       <button
-                        className='btn full-width'
+                        className='btn btn-primary full-width'
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.xAxis.anchors]
@@ -3572,7 +3572,7 @@ const EditorPanel = () => {
                       </Accordion>
 
                       <button
-                        className='btn full-width'
+                        className='btn btn-primary full-width'
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.yAxis.anchors]
