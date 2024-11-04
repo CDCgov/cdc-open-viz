@@ -79,6 +79,7 @@ const LineChart = (props: LineChartProps) => {
             config.preliminaryData,
             config.xAxis.dataKey
           )
+          console.log(suppressedSegments, 'suppressedSegments')
           const splittedData = config?.preliminaryData?.filter(pd => pd.style && !pd.style.includes('Circles'))
           let xPos = d => {
             return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
@@ -222,26 +223,29 @@ const LineChart = (props: LineChartProps) => {
                   />
 
                   {suppressedSegments.map((segment, index) => {
-                    return (
-                      <LinePath
-                        key={index}
-                        data={segment.data}
-                        x={d => xPos(d)}
-                        y={d =>
-                          seriesAxis === 'Right'
-                            ? yScaleRight(getYAxisData(d, seriesKey))
-                            : yScale(Number(getYAxisData(d, seriesKey)))
-                        }
-                        stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
-                        strokeWidth={seriesData[0].weight || 2}
-                        strokeOpacity={1}
-                        shapeRendering='geometricPrecision'
-                        strokeDasharray={handleLineType(segment.style)}
-                        defined={(item, i) => {
-                          return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
-                        }}
-                      />
-                    )
+                    return Object.entries(segment.data).map(([key, value]) => {
+                      console.log(value, 'keyy')
+                      return (
+                        <LinePath
+                          key={index}
+                          data={value}
+                          x={d => xPos(d)}
+                          y={d =>
+                            seriesAxis === 'Right'
+                              ? yScaleRight(getYAxisData(d, seriesKey))
+                              : yScale(Number(getYAxisData(d, seriesKey)))
+                          }
+                          stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
+                          strokeWidth={seriesData[0].weight || 2}
+                          strokeOpacity={1}
+                          shapeRendering='geometricPrecision'
+                          strokeDasharray={handleLineType(segment.style)}
+                          defined={(item, i) => {
+                            return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                          }}
+                        />
+                      )
+                    })
                   })}
                 </>
               ) : (
@@ -341,7 +345,7 @@ const LineChart = (props: LineChartProps) => {
                     return <></>
                   }
                   return (
-                    <text
+                    <Text
                       x={xPos(lastDatum) + 5}
                       y={yScale(getYAxisData(lastDatum, seriesKey))}
                       alignmentBaseline='middle'
@@ -352,7 +356,7 @@ const LineChart = (props: LineChartProps) => {
                       }
                     >
                       {config.runtime.seriesLabels[seriesKey] || seriesKey}
-                    </text>
+                    </Text>
                   )
                 })}
             </Group>

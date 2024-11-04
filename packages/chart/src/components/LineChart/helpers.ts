@@ -92,8 +92,9 @@ export const filterCircles = (
 
 const isCalculable = value => !isNaN(parseFloat(value)) && isFinite(value)
 const handleFirstIndex = (data, seriesKey, preliminaryData) => {
+  let pairCount = '0'
   const result = {
-    data: [],
+    data: { '0': [] },
     style: ''
   }
 
@@ -116,7 +117,7 @@ const handleFirstIndex = (data, seriesKey, preliminaryData) => {
   if (suppressionData && suppressionData.style) {
     // Modify first item and add to result
     const modifiedItem = { ...firstIndexDataItem, [seriesKey]: 0 }
-    result.data.push(modifiedItem)
+    result.data[pairCount].push(modifiedItem)
     result.style = suppressionData.style
 
     // Find the next calculable item index
@@ -125,19 +126,20 @@ const handleFirstIndex = (data, seriesKey, preliminaryData) => {
       nextIndex++
     }
     if (nextIndex < data.length) {
-      result.data.push(data[nextIndex])
+      result.data[pairCount].push(data[nextIndex])
     }
   } else {
     // If no suppression, just add the first item
-    result.data.push(firstIndexDataItem)
+    result.data[pairCount].push(firstIndexDataItem)
   }
 
   return result
 }
 
 const handleLastIndex = (data, seriesKey, preliminaryData) => {
+  let pairCount = '0'
   const result = {
-    data: [],
+    data: { '0': [] },
     style: ''
   }
   let lastAddedIndex = -1 // Tracks the last index added to the result
@@ -152,7 +154,7 @@ const handleLastIndex = (data, seriesKey, preliminaryData) => {
     ) {
       const lastIndex = data.length - 1
       const modifiedItem = { ...data[lastIndex], [seriesKey]: 0 }
-      result.data.push(modifiedItem)
+      result.data[pairCount].push(modifiedItem)
 
       // Find previous calculable item
       let prevIndex = lastIndex - 1
@@ -160,7 +162,7 @@ const handleLastIndex = (data, seriesKey, preliminaryData) => {
         prevIndex--
       }
       if (prevIndex >= 0 && lastAddedIndex !== prevIndex) {
-        result.data.push(data[prevIndex])
+        result.data[pairCount].push(data[prevIndex])
         lastAddedIndex = prevIndex
       }
       result.style = pd.style
@@ -170,47 +172,53 @@ const handleLastIndex = (data, seriesKey, preliminaryData) => {
   return result
 }
 
-function handleMiddleIndices(data, seriesKey, dataKey, preliminaryData) {
-  const result = {
-    data: [],
+function handleMiddleIndices(data, seriesKey, preliminaryData) {
+  // slice data to remove first and last object these no need for handleMiddleIndices
+
+  let result = {
+    data: {},
     style: ''
   }
+  // Variable to count the number of sibling pairs found
+  let pairCount = 1
 
-  const isValidMiddleIndex = index => index > 0 && index < data.length - 1
+  // Function to check if the price is numeric
+  function isNumeric(value) {
+    return !isNaN(value) && !isNaN(parseFloat(value))
+  }
 
-  preliminaryData?.forEach(pd => {
-    if (pd.type === 'effect' || pd.hideLineStyle) return
-    const targetValue = pd.value
+  // Loop through the data array to find each occurrence of the target value
+  data.forEach((item, index) => {
+    preliminaryData.forEach(pd => {
+      const targetValue = pd.value
+      if (item[seriesKey] === targetValue) {
+        let siblingBefore = null
+        let siblingAfter = null
 
-    // Find all indices
-    const matchingIndices = data.reduce((indices, item, index) => {
-      if (item[seriesKey] === targetValue && isValidMiddleIndex(index) && (!pd.column || pd.column === seriesKey)) {
-        indices.push(index)
-      }
-      return indices
-    }, [])
+        // Find the nearest numeric sibling before the current index
+        for (let i = index - 1; i >= 0; i--) {
+          if (isNumeric(data[i][seriesKey])) {
+            siblingBefore = data[i]
+            break // Stop searching once a valid sibling is found
+          }
+        }
 
-    // Process each valid index
-    matchingIndices.forEach(i => {
-      result.style = pd.style
-      // Add previous object if calculable
-      if (isCalculable(data[i - 1][seriesKey])) {
-        result.data.push(data[i - 1])
-      }
+        // Find the nearest numeric sibling after the current index
+        for (let j = index + 1; j < data.length; j++) {
+          if (isNumeric(data[j][seriesKey])) {
+            siblingAfter = data[j]
+            break // Stop searching once a valid sibling is found
+          }
+        }
 
-      // Find and add the next calculable object
-      const nextIndex = data
-        .slice(i + 1)
-        .findIndex(item => item[seriesKey] !== targetValue && isCalculable(item[seriesKey]))
-      if (nextIndex !== -1) {
-        result.data.push(data[i + 1 + nextIndex])
+        // Only add siblings to results if both siblings are found
+        if (siblingBefore && siblingAfter) {
+          result.style = pd.style
+          result.data[pairCount++] = [siblingBefore, siblingAfter]
+        }
       }
     })
   })
-
-  // Deduplicate entries
-  result.data = _.uniqWith(result.data, (a, b) => a[dataKey] === b[dataKey] && a[seriesKey] === b[seriesKey])
-
   return result
 }
 
@@ -221,7 +229,9 @@ export const createDataSegments = (data, seriesKey, preliminaryData, dataKey) =>
   // Process the last index if necessary
   const lastSegment = handleLastIndex(data, seriesKey, preliminaryData)
   // Process the middle segment
-  const middleSegments = handleMiddleIndices(data, seriesKey, dataKey, preliminaryData)
+  const middleSegments = handleMiddleIndices(data, seriesKey, preliminaryData)
+
   // Combine all segments into a single array
-  return [firstSegment, middleSegments, lastSegment].filter(segment => segment.data.length > 0 && segment.style !== '')
+  return [firstSegment, middleSegments, lastSegment]
+  // return [firstSegment, middleSegments, lastSegment].filter(segment => segment.data.length > 0 && segment.style !== '')
 }
