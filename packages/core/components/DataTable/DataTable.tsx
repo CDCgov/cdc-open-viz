@@ -206,6 +206,7 @@ const DataTable = (props: DataTableProps) => {
         : config.runtime?.seriesKeys),
     [config.runtime?.seriesKeys]) // eslint-disable-line
 
+  const hasNoData = runtimeData.length === 0
   if (config.visualizationType !== 'Box Plot') {
     const getDownloadData = () => {
       // only use fullGeoName on County maps and no other
@@ -244,95 +245,98 @@ const DataTable = (props: DataTableProps) => {
       )
     }
 
-    return (
-      <ErrorBoundary component='DataTable'>
-        {!config.table.showDownloadLinkBelow && <TableMediaControls />}
-        <section
-          id={tabbingId.replace('#', '')}
-          className={`data-table-container ${viewport} ${
-            !config.table.showDownloadLinkBelow ? 'download-link-above' : ''
-          }`}
-          aria-label={accessibilityLabel}
-        >
-          <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
-          {config.table.collapsible !== false && (
-            <ExpandCollapse
-              expanded={expanded}
-              setExpanded={setExpanded}
-              fontSize={config.fontSize}
-              tableTitle={tableTitle}
-              viewport={viewport}
-            />
-          )}
-          <div className='table-container' style={limitHeight}>
-            <Table
-              preliminaryData={config.preliminaryData}
-              viewport={viewport}
-              wrapColumns={wrapColumns}
-              childrenMatrix={
-                config.type === 'map'
-                  ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData, viewport })
-                  : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
-              }
-              tableName={config.type}
-              caption={caption}
-              stickyHeader
-              hasRowType={hasRowType}
-              headContent={
-                config.type === 'map' ? (
-                  <MapHeader columns={columns} {...props} sortBy={sortBy} setSortBy={setSortBy} />
-                ) : (
-                  <ChartHeader
-                    data={runtimeData}
-                    {...props}
-                    hasRowType={hasRowType}
-                    isVertical={isVertical}
-                    sortBy={sortBy}
-                    setSortBy={setSortBy}
-                  />
-                )
-              }
-              tableOptions={{
-                className: `table table-striped ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${
-                  isVertical ? '' : ' horizontal'
-                }`,
-                'aria-live': 'assertive',
-                'aria-rowcount': config?.data?.length ? config.data.length : -1,
-                hidden: !expanded
-              }}
-              fontSize={config.fontSize}
-            />
+    if (config.type === 'table')
+      return (
+        <ErrorBoundary component='DataTable'>
+          {!config.table.showDownloadLinkBelow && <TableMediaControls />}
+          <section
+            id={tabbingId.replace('#', '')}
+            className={`data-table-container ${viewport} ${
+              !config.table.showDownloadLinkBelow ? 'download-link-above' : ''
+            }`}
+            aria-label={accessibilityLabel}
+          >
+            <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
+            {config.table.collapsible !== false && (
+              <ExpandCollapse
+                expanded={expanded}
+                setExpanded={setExpanded}
+                fontSize={config.fontSize}
+                tableTitle={tableTitle}
+                viewport={viewport}
+              />
+            )}
+            <div className='table-container' style={limitHeight}>
+              <Table
+                preliminaryData={config.preliminaryData}
+                viewport={viewport}
+                wrapColumns={wrapColumns}
+                noData={hasNoData}
+                childrenMatrix={
+                  config.type === 'map'
+                    ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData, viewport })
+                    : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
+                }
+                tableName={config.type}
+                caption={caption}
+                stickyHeader
+                hasRowType={hasRowType}
+                headContent={
+                  config.type === 'map' ? (
+                    <MapHeader columns={columns} {...props} sortBy={sortBy} setSortBy={setSortBy} />
+                  ) : (
+                    <ChartHeader
+                      data={runtimeData}
+                      {...props}
+                      hasRowType={hasRowType}
+                      isVertical={isVertical}
+                      sortBy={sortBy}
+                      setSortBy={setSortBy}
+                    />
+                  )
+                }
+                tableOptions={{
+                  className: `table table-striped ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${
+                    isVertical ? '' : ' horizontal'
+                  }`,
+                  'aria-live': 'assertive',
+                  'aria-rowcount': config?.data?.length ? config.data.length : -1,
+                  hidden: !expanded
+                }}
+                fontSize={config.fontSize}
+              />
 
-            {/* REGION Data Table */}
-            {noRelativeRegions &&
-              config.regions &&
-              config.regions.length > 0 &&
-              config.visualizationType !== 'Box Plot' && (
-                <Table
-                  viewport={viewport}
-                  wrapColumns={wrapColumns}
-                  childrenMatrix={regionCellMatrix({ config })}
-                  tableName={config.visualizationType}
-                  caption='Table of the highlighted regions in the visualization'
-                  headContent={
-                    <tr>
-                      <th>Region Name</th>
-                      <th>Start Date</th>
-                      <th>End Date</th>
-                    </tr>
-                  }
-                  tableOptions={{ className: 'table table-striped region-table data-table' }}
-                  fontSize={config.fontSize}
-                />
-              )}
+              {/* REGION Data Table */}
+              {noRelativeRegions &&
+                config.regions &&
+                config.regions.length > 0 &&
+                config.visualizationType !== 'Box Plot' && (
+                  <Table
+                    viewport={viewport}
+                    wrapColumns={wrapColumns}
+                    childrenMatrix={regionCellMatrix({ config })}
+                    noData={hasNoData}
+                    tableName={config.visualizationType}
+                    caption='Table of the highlighted regions in the visualization'
+                    headContent={
+                      <tr>
+                        <th>Region Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                      </tr>
+                    }
+                    tableOptions={{ className: 'table table-striped region-table data-table' }}
+                    fontSize={config.fontSize}
+                  />
+                )}
+            </div>
+          </section>
+          {config.table.showDownloadLinkBelow && <TableMediaControls belowTable={true} />}
+          <div id={skipId} className='cdcdataviz-sr-only'>
+            Skipped data table.
           </div>
-        </section>
-        {config.table.showDownloadLinkBelow && <TableMediaControls belowTable={true} />}
-        <div id={skipId} className='cdcdataviz-sr-only'>
-          Skipped data table.
-        </div>
-      </ErrorBoundary>
-    )
+        </ErrorBoundary>
+      )
   } else {
     // Render Data Table for Box Plots
     return (
@@ -349,6 +353,7 @@ const DataTable = (props: DataTableProps) => {
               viewport={viewport}
               wrapColumns={wrapColumns}
               childrenMatrix={boxplotCellMatrix({ rows: tableData, config })}
+              noData={hasNoData}
               tableName={config.visualizationType}
               caption={caption}
               stickyHeader
