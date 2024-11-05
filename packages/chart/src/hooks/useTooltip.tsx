@@ -7,6 +7,7 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 // Third-party library imports
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
+import _ from 'lodash'
 
 export const useTooltip = props => {
   const {
@@ -56,11 +57,9 @@ export const useTooltip = props => {
   const getFormattedValue = (seriesKey, value, config, getAxisPosition) => {
     // handle case where data is missing
     const showMissingDataValue = config.general.showMissingDataLabel && (!value || value === 'null')
-    let formattedValue = seriesKey === config.xAxis.dataKey ? value : formatNumber(value, getAxisPosition(seriesKey))
+    const formattedValue = seriesKey === config.xAxis.dataKey ? value : formatNumber(value, getAxisPosition(seriesKey))
 
-    formattedValue = showMissingDataValue ? 'N/A' : formattedValue
-
-    return formattedValue
+    return showMissingDataValue ? 'N/A' : formattedValue
   }
 
   const getTooltipInformation = (tooltipDataArray, eventSvgCoords) => {
@@ -101,37 +100,9 @@ export const useTooltip = props => {
 
     const closestXScaleValue = getXValueFromCoordinate(x - Number(config.yAxis.size || 0))
 
-    const includedSeries =
-      visualizationType !== 'Pie'
-        ? config.runtime.series.filter(series => series.tooltip === true).map(item => item.dataKey)
-        : config.runtime.series.map(item => item.dataKey)
-    includedSeries.push(config.xAxis.dataKey)
-    if (config.visualizationType === 'Forecasting') {
-      config.runtime.series.map(s => {
-        s.confidenceIntervals.map(c => {
-          if (c.showInTooltip) {
-            includedSeries.push(c.high)
-            includedSeries.push(c.low)
-          }
-        })
-      })
-    }
-    function getColumnNames(columns) {
-      let names = []
-      for (let key in columns) {
-        if (columns.hasOwnProperty(key)) {
-          names.push(columns[key].name)
-        }
-      }
-      return names
-    }
-    includedSeries.push(...getColumnNames(config.columns))
-    includedSeries.push(...getColumnNames(config.columns))
-
-    const yScaleValues = getYScaleValues(closestXScaleValue, includedSeries)
     const xScaleValues = data.filter(d => d[xAxis.dataKey] === getClosestYValue(y))
 
-    const resolvedScaleValues = orientation === 'vertical' ? yScaleValues : xScaleValues
+    const resolvedScaleValues = orientation === 'vertical' ? getYScaleValues(closestXScaleValue) : xScaleValues
 
     const getAxisPosition = seriesKey => {
       const seriesObj = config.runtime.series.filter(s => s.dataKey === seriesKey)[0]
@@ -187,12 +158,12 @@ export const useTooltip = props => {
       if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot' && !config.tooltips.singleSeries) {
         tooltipItems.push(
           ...getIncludedTooltipSeries()
-            ?.filter(
-              seriesKey =>
-                config.runtime.series?.find(item => item.dataKey === seriesKey && item?.tooltip) ||
-                config.xAxis?.dataKey == seriesKey ||
-                visualizationType === 'Forecasting'
-            )
+            ?.filter(seriesKey => {
+              const series = config.runtime.series?.find(
+                s => s.dataKey === seriesKey && s?.tooltip && !s.dynamicCategory
+              )
+              return series || config.xAxis?.dataKey == seriesKey || visualizationType === 'Forecasting'
+            })
             ?.flatMap(seriesKey => {
               const value = resolvedScaleValues[0]?.[seriesKey]
               const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
@@ -206,6 +177,17 @@ export const useTooltip = props => {
               }
             })
         )
+
+        config.runtime.series?.forEach(series => {
+          if (series?.dynamicCategory) {
+            const seriesKey = series.dataKey
+            const resolvedScaleValue = resolvedScaleValues.find(v => v[series.dynamicCategory] === seriesKey)
+            if (!resolvedScaleValue) return
+            const value = resolvedScaleValue[series.originalDataKey]
+            const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
+            tooltipItems.push([seriesKey, formattedValue, getAxisPosition(seriesKey)])
+          }
+        })
       }
 
       // handle tooltip for single hovered series
@@ -376,25 +358,48 @@ export const useTooltip = props => {
   /**
    * Provides an array of objects with the closest y series data items
    * @param {String} closestXScaleValue
-   * @param {Array} includedSeries
    * @returns an array of objects with the closest y series data items
    */
-  const getYScaleValues = (closestXScaleValue, includedSeries) => {
-    try {
-      let dataToSearch
+  const getYScaleValues = closestXScaleValue => {
+    const runtimeSeries = config.runtime.series.filter(
+      series => visualizationType === 'Pie' || (series.tooltip === true && !series.dynamicCategory)
+    )
+    const includedSeries = runtimeSeries.map(item => item.dataKey)
+    includedSeries.push(config.xAxis.dataKey)
+    // get dynamic category series
+    const dynamicDataCategories = _.uniq(
+      config.runtime.series.flatMap(series => {
+        if (series.dynamicCategory) {
+          return [series.dynamicCategory, series.originalDataKey]
+        }
+      })
+    )
+    includedSeries.push(...dynamicDataCategories)
 
-      if (xAxis.type === 'categorical') {
-        dataToSearch = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
-      } else {
-        dataToSearch = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
-      }
+    if (config.visualizationType === 'Forecasting') {
+      config.runtime.series.map(s => {
+        s.confidenceIntervals.map(c => {
+          if (c.showInTooltip) {
+            includedSeries.push(c.high)
+            includedSeries.push(c.low)
+          }
+        })
+      })
+    }
+
+    const colNames = Object.values(config.columns).map(column => column.name)
+    // @ Murad why are we adding them twice?
+    includedSeries.push(...colNames, ...colNames)
+
+    try {
+      const dataToSearch = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
       // Return an empty array if no matching data is found.
       if (!dataToSearch || dataToSearch.length === 0) {
         return []
       }
 
       const yScaleValues = dataToSearch.map(object => {
-        return Object.fromEntries(Object.entries(object).filter(([key, value]) => includedSeries.includes(key)))
+        return _.pick(object, includedSeries)
       })
       return yScaleValues
     } catch (error) {
