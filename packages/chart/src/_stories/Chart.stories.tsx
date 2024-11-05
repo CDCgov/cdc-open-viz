@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import SuppressedConfig from './_mock/bar-chart-suppressed.json'
 
 import Chart from '../CdcChart'
 import lineChartTwoPointsRegressionTest from './_mock/line_chart_two_points_regression_test.json'
@@ -33,13 +32,6 @@ export const line_Chart_Two_Points_New_Chart: Story = {
 export const Lollipop: Story = {
   args: {
     config: lollipop,
-    isEditor: false
-  }
-}
-
-export const Suppression: Story = {
-  args: {
-    config: SuppressedConfig,
     isEditor: false
   }
 }
