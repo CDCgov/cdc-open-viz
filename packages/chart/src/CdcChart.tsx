@@ -438,7 +438,6 @@ const CdcChart = ({
       const combinedData = filteredData || data
       let allKeys = combinedData.map(d => d[newConfig.xAxis.dataKey])
       const groups = _.uniq(allKeys)
-      console.log(groups, 'groups')
 
       let tableData: any[] = []
       const plots: any[] = []

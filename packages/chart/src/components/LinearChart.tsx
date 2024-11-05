@@ -41,7 +41,6 @@ import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
-import BoxPlotChart from './BoxPlot/BoxPlotX'
 
 type LinearChartProps = {
   parentWidth: number

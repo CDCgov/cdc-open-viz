@@ -7,7 +7,7 @@ import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 import { scaleBand } from '@visx/scale'
 import _ from 'lodash'
 import { max, min, median, quantile } from 'd3-array'
-const CoveBoxPlot = ({ xScale, yMax, xMax, min: minValue, max: maxValue, yScale }) => {
+const CoveBoxPlot = ({ xScale, yScale }) => {
   const { config, colorScale, seriesHighlight, transformedData: data } = useContext(ConfigContext)
   const { boxplot } = config
 

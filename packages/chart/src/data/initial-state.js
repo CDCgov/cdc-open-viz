@@ -70,10 +70,6 @@ export default {
     borders: 'true',
     plotOutlierValues: false,
     plotNonOutlierValues: true,
-    legend: {
-      showHowToReadText: false,
-      howToReadText: ''
-    },
     labels: {
       q1: 'Lower Quartile',
       q2: 'q2',
