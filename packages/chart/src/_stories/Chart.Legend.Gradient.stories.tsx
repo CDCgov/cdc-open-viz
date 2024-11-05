@@ -51,5 +51,18 @@ export const Legend_Gradient_With_Text: Story = {
     ])
   }
 }
+export const Legend_Gradient_Wrapping_Label: Story = {
+  args: {
+    config: JSON.parse(
+      JSON.stringify(
+        editConfigKeys(chartGradientConfig, [
+          { path: ['legend', 'title'], value: 'Title' },
+          { path: ['legend', 'description'], value: 'Description' },
+          { path: ['legend', 'hideBorder'], value: false }
+        ])
+      ).replace(/Data 1/g, 'This is a long string that should wrap')
+    )
+  }
+}
 
 export default meta

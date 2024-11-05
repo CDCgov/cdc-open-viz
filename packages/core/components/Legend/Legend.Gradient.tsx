@@ -69,6 +69,7 @@ const LegendGradient = ({
           fontSize='14'
           textAnchor={textAnchor}
           verticalAnchor={verticalAnchor}
+          width={segmentWidth}
         >
           {key}
         </Text>
