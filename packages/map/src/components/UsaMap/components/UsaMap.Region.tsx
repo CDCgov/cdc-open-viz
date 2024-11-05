@@ -11,6 +11,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import topoJSON from '../data/us-regions-topo-2.json'
 import ConfigContext from '../../../context'
 import Annotation from '../../Annotation'
+import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.regions)
 
@@ -69,7 +70,8 @@ const UsaRegionMap = props => {
     setTerritoriesData(territoriesList)
   }, [data])
 
-  const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+  const geoStrokeColor = getGeoStrokeColor(state)
+  const geoFillColor = getGeoFillColor(state)
 
   const territories = territoriesData.map(territory => {
     const Shape = Rect
@@ -79,7 +81,7 @@ const UsaRegionMap = props => {
     let toolTip
 
     let styles: React.CSSProperties = {
-      fill: '#E6E6E6',
+      fill: geoFillColor,
       color: '#202020'
     }
 
@@ -97,7 +99,10 @@ const UsaRegionMap = props => {
       let needsPointer = false
 
       // If we need to add a pointer cursor
-      if ((state.columns.navigate && territoryData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+      if (
+        (state.columns.navigate && territoryData[state.columns.navigate.name]) ||
+        state.tooltips.appearanceType === 'click'
+      ) {
         needsPointer = true
       }
 
@@ -113,7 +118,19 @@ const UsaRegionMap = props => {
         }
       }
 
-      return <Shape key={label} label={label} css={styles} text={styles.color} stroke={geoStrokeColor} strokeWidth={1.5} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id={`tooltip__${tooltipId}`} data-tooltip-html={toolTip} />
+      return (
+        <Shape
+          key={label}
+          label={label}
+          css={styles}
+          text={styles.color}
+          stroke={geoStrokeColor}
+          strokeWidth={1.5}
+          onClick={() => geoClickHandler(territory, territoryData)}
+          data-tooltip-id={`tooltip__${tooltipId}`}
+          data-tooltip-html={toolTip}
+        />
+      )
     }
   })
 
@@ -130,8 +147,22 @@ const UsaRegionMap = props => {
 
     return (
       <g>
-        <line x1={centroid[0]} y1={centroid[1]} x2={centroid[0] + dx} y2={centroid[1] + dy} stroke='rgba(0,0,0,.5)' strokeWidth={1} />
-        <text x={4} strokeWidth='0' fontSize={13} style={{ fill: '#202020' }} alignmentBaseline='middle' transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}>
+        <line
+          x1={centroid[0]}
+          y1={centroid[1]}
+          x2={centroid[0] + dx}
+          y2={centroid[1] + dy}
+          stroke='rgba(0,0,0,.5)'
+          strokeWidth={1}
+        />
+        <text
+          x={4}
+          strokeWidth='0'
+          fontSize={13}
+          style={{ fill: '#202020' }}
+          alignmentBaseline='middle'
+          transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
+        >
           {abbr.substring(3)}
         </text>
       </g>
@@ -146,7 +177,7 @@ const UsaRegionMap = props => {
       const key = isHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
 
       let styles = {
-        fill: '#E6E6E6',
+        fill: geoFillColor,
         cursor: 'default'
       }
 
@@ -172,18 +203,21 @@ const UsaRegionMap = props => {
         const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
 
         styles = {
-          fill: state.general.type !== 'bubble' ? legendColors[0] : '#E6E6E6',
+          fill: state.general.type !== 'bubble' ? legendColors[0] : geoFillColor,
           cursor: 'default',
           '&:hover': {
-            fill: state.general.type !== 'bubble' ? legendColors[1] : '#e6e6e6'
+            fill: state.general.type !== 'bubble' ? legendColors[1] : geoFillColor
           },
           '&:active': {
-            fill: state.general.type !== 'bubble' ? legendColors[2] : '#e6e6e6'
+            fill: state.general.type !== 'bubble' ? legendColors[2] : geoFillColor
           }
         }
 
         // When to add pointer cursor
-        if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+        if (
+          (state.columns.navigate && geoData[state.columns.navigate.name]) ||
+          state.tooltips.appearanceType === 'click'
+        ) {
           styles.cursor = 'pointer'
         }
 
@@ -203,7 +237,15 @@ const UsaRegionMap = props => {
         const circleRadius = 15
 
         return (
-          <g key={key} className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id={`tooltip__${tooltipId}`} data-tooltip-html={toolTip} tabIndex={-1}>
+          <g
+            key={key}
+            className='geo-group'
+            style={styles}
+            onClick={() => geoClickHandler(geoDisplayName, geoData)}
+            data-tooltip-id={`tooltip__${tooltipId}`}
+            data-tooltip-html={toolTip}
+            tabIndex={-1}
+          >
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
             <g id={`region-${index + 1}-label`}>
               <circle fill='#fff' stroke='#999' cx={circleRadius} cy={circleRadius} r={circleRadius} />

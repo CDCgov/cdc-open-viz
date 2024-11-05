@@ -77,6 +77,7 @@ import WorldMap from './components/WorldMap' // Future: Lazy
 import useTooltip from './hooks/useTooltip'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
+import versionNeedsUpdate from '@cdc/core/helpers/ver/versionNeedsUpdate'
 
 const CONTAINER_WIDTH_PADDING = 50
 
@@ -394,9 +395,13 @@ const CdcMap = ({
 
       // Special Classes (No Data)
       if (result[legendIdx].special) {
-        const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
-
-        return specialClassColors[legendIdx]
+        if (versionNeedsUpdate(state.version, '4.24.11')) {
+          const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
+          return specialClassColors[legendIdx]
+        } else {
+          const specialClassColors = ['#A9AEB1', '#71767A']
+          return specialClassColors[legendIdx]
+        }
       }
 
       if (obj.color.includes('qualitative')) return mapColorPalette[colorIdx]

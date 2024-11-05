@@ -24,6 +24,7 @@ import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { MapContext } from '../../../types/MapContext'
 import { checkColorContrast, getContrastColor, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
+import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -120,7 +121,8 @@ const UsaMap = () => {
     }
   }, [data, state.general.territoriesAlwaysShow])
 
-  const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+  const geoStrokeColor = getGeoStrokeColor(state)
+  const geoFillColor = getGeoFillColor(state)
 
   const getTerritoriesClasses = () => {
     const screenWidth = window?.visualViewport?.width
@@ -138,7 +140,7 @@ const UsaMap = () => {
     let toolTip
 
     let styles = {
-      fill: '#E6E6E6',
+      fill: geoFillColor,
       color: '#202020'
     }
 
@@ -239,7 +241,7 @@ const UsaMap = () => {
       const key = isHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
 
       let styles = {
-        fill: '#E6E6E6',
+        fill: geoFillColor,
         cursor: 'default'
       }
 
@@ -267,7 +269,7 @@ const UsaMap = () => {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
 
         styles = {
-          fill: state.general.type !== 'bubble' ? legendColors[0] : '#E6E6E6',
+          fill: state.general.type !== 'bubble' ? legendColors[0] : geoFillColor,
           opacity:
             setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[state.columns.geo.name]
               ? 0.5
@@ -278,10 +280,10 @@ const UsaMap = () => {
               : geoStrokeColor,
           cursor: 'default',
           '&:hover': {
-            fill: state.general.type !== 'bubble' ? legendColors[1] : '#e6e6e6'
+            fill: state.general.type !== 'bubble' ? legendColors[1] : geoFillColor
           },
           '&:active': {
-            fill: state.general.type !== 'bubble' ? legendColors[2] : '#e6e6e6'
+            fill: state.general.type !== 'bubble' ? legendColors[2] : geoFillColor
           }
         }
 

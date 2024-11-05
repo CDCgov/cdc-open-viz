@@ -164,4 +164,6 @@ export type MapConfig = Visualization & {
   hexMap: HexMapSettings
   filterBehavior: string
   visual: MapVisualSettings
+  // version of the map
+  version: `${number}.${number}.${number}`
 }

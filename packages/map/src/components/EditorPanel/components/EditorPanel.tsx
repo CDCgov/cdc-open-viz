@@ -42,6 +42,7 @@ import HexSetting from './HexShapeSettings.jsx'
 import ConfigContext from '../../../context.ts'
 import { MapContext } from '../../../types/MapContext.js'
 import { TextField } from './Inputs'
+import Alert from '@cdc/core/components/Alert'
 
 // Todo: move to useReducer, seperate files out.
 const EditorPanel = ({ columnsRequiredChecker }) => {
@@ -2205,6 +2206,13 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       </Tooltip>
                     </span>
                   </label>
+                  {state.legend.specialClasses.length === 2 && (
+                    <Alert
+                      type='info'
+                      message='If more than two special classes are needed please use patterns for additional legend items'
+                      showCloseButton={false}
+                    />
+                  )}
                   {specialClasses.map((specialClass, i) => (
                     <div className='edit-block' key={`special-class-${i}`}>
                       <button
@@ -2265,15 +2273,17 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       </label>
                     </div>
                   ))}
-                  <button
-                    className='btn full-width'
-                    onClick={e => {
-                      e.preventDefault()
-                      editColumn('primary', 'specialClassAdd', {})
-                    }}
-                  >
-                    Add Special Class
-                  </button>
+                  {state.legend.specialClasses.length < 2 && (
+                    <button
+                      className='btn btn-primary full-width'
+                      onClick={e => {
+                        e.preventDefault()
+                        editColumn('primary', 'specialClassAdd', {})
+                      }}
+                    >
+                      Add Special Class
+                    </button>
+                  )}
                 </fieldset>
               )}
 
@@ -2417,7 +2427,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     </fieldset>
                   ))}
                   <button
-                    className={'btn full-width'}
+                    className={'btn btn-primary full-width'}
                     onClick={event => {
                       event.preventDefault()
                       addAdditionalColumn(additionalColumns.length + 1)
@@ -2473,7 +2483,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       </fieldset>
                     ))}
                   <button
-                    className={'btn full-width'}
+                    className={'btn btn-primary full-width'}
                     onClick={event => {
                       event.preventDefault()
                       const updatedAdditionaCategories = [...(state.legend.additionalCategories || [])]
@@ -2911,7 +2921,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   <p style={{ textAlign: 'center' }}>There are currently no filters.</p>
                 )}
                 <button
-                  className={'btn full-width'}
+                  className={'btn btn-primary full-width'}
                   onClick={event => {
                     event.preventDefault()
                     changeFilter(null, 'addNew')
@@ -3527,7 +3537,11 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     )
                   })}
 
-                <button type='button' onClick={() => editCityStyles('add', 0, '', '')} className='btn full-width'>
+                <button
+                  type='button'
+                  onClick={() => editCityStyles('add', 0, '', '')}
+                  className='btn btn-primary full-width'
+                >
                   Add city style
                 </button>
               </>
@@ -3629,7 +3643,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   </>
                 )
               })}
-              <button className={'btn full-width'} onClick={handleAddLayer}>
+              <button className={'btn btn-primary full-width'} onClick={handleAddLayer}>
                 Add Map Layer
               </button>
               <p className='layer-purpose-details'>
