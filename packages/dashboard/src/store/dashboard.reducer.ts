@@ -105,8 +105,14 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       _.remove(newMultiDashboards, (_, index) => {
         return index === action.payload
       })
+      const config = {
+        ...state.config,
+        multiDashboards: newMultiDashboards,
+        ...newMultiDashboards[0],
+        activeDashboard: 0
+      }
       if (newMultiDashboards.length === 0) return { ...state, config: _.omit(state.config, 'multiDashboards') }
-      return applyMultiDashboards(state, newMultiDashboards)
+      return applyMultiDashboards({ ...state, config }, newMultiDashboards)
     }
     case 'RENAME_DASHBOARD_TAB': {
       const newMultiDashboards = state.config.multiDashboards.map(dashboard => {
