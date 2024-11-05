@@ -19,7 +19,20 @@ const abbreviateNumber = num => {
 }
 
 // Format numeric data based on settings in config
-const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addColParams = null) => {
+type formatNumberProps = {
+  num: number | string
+  axis: 'left' | 'right' | 'bottom'
+  shouldAbbreviate?: boolean
+  config: CdcChartConfig
+  addColParams: {
+    addColCommas: boolean
+    addColRoundTo: number
+    addColPrefix: string
+    addColSuffix: string
+  }
+}
+
+const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addColParams = null): string | number => {
   if (!config) console.error('no config found in formatNumber')
   // if num is NaN return num
   if (isNaN(num) || !num) return num
@@ -34,24 +47,25 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   // destructure dataFormat values
   let {
     dataFormat: {
-      commas,
       abbreviated,
-      roundTo,
-      prefix,
-      suffix,
-      rightRoundTo,
-      bottomRoundTo,
-      rightPrefix,
-      rightSuffix,
-      bottomPrefix,
-      bottomSuffix,
       bottomAbbreviated,
-      onlyShowTopPrefixSuffix
+      bottomPrefix,
+      bottomRoundTo,
+      bottomSuffix,
+      bottomComas,
+      commas,
+      onlyShowTopPrefixSuffix,
+      prefix,
+      rightPrefix,
+      rightRoundTo,
+      rightSuffix,
+      roundTo,
+      suffix
     }
   } = config
 
   // destructure Additional Col dataformat values
-  const { addColCommas, addColRoundTo, addColPrefix, addColSuffix } = addColParams
+  const { addColCommas, addColRoundTo, addColPrefix, addColSuffix } = addColParams || {}
 
   // check if value contains comma and remove it. later will add comma below.
   if (String(num).indexOf(',') !== -1) num = num.replaceAll(',', '')

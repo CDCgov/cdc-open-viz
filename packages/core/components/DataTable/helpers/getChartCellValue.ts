@@ -1,5 +1,5 @@
 import { parseDate, formatDate } from '@cdc/core/helpers/cove/date'
-import { formatNumber } from '@cdc/core/helpers/cove/number'
+import { formatNumber } from '../../../helpers/cove/number'
 import { TableConfig } from '../types/TableConfig'
 
 // if its additional column, return formatting params
@@ -32,7 +32,15 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
   let labelValue = rowObj[column] // just raw X axis string
   if (column === config.xAxis?.dataKey) {
     // not the prettiest, but helper functions work nicely here.
-    cellValue = config.xAxis?.type === 'date' ? formatDate(config.table?.dateDisplayFormat || config.xAxis?.dateDisplayFormat, parseDate(config.xAxis?.dateParseFormat, labelValue)) : labelValue
+    cellValue =
+      config.xAxis?.type === 'date'
+        ? formatDate(
+            config.table?.dateDisplayFormat || config.xAxis?.dateDisplayFormat,
+            parseDate(config.xAxis?.dateParseFormat, labelValue)
+          )
+        : labelValue
+    cellValue =
+      config.xAxis?.type === 'continuous' ? formatNumber(runtimeData[row][column], 'bottom', false, config) : labelValue
   } else {
     let resolvedAxis = 'left'
     let leftAxisItems = config.series ? config.series.filter(item => item?.axis === 'Left') : []
@@ -48,9 +56,13 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
 
     let addColParams = isAdditionalColumn(column, config)
     if (addColParams) {
-      cellValue = config.dataFormat ? formatNumber(runtimeData[row][column], resolvedAxis, false, config, addColParams) : runtimeData[row][column]
+      cellValue = config.dataFormat
+        ? formatNumber(runtimeData[row][column], resolvedAxis, false, config, addColParams)
+        : runtimeData[row][column]
     } else {
-      cellValue = config.dataFormat ? formatNumber(runtimeData[row][column], resolvedAxis, false, config) : runtimeData[row][column]
+      cellValue = config.dataFormat
+        ? formatNumber(runtimeData[row][column], resolvedAxis, false, config)
+        : runtimeData[row][column]
     }
   }
 
@@ -63,7 +75,13 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
     const barSeriesExist = config.runtime?.barSeriesKeys?.includes(column)
     const lineSeriesExist = config.runtime?.lineSeriesKeys?.includes(column)
     const showSymbol = config.general.showSuppressedSymbol
-    if (isValueMatch && isColumnMatch && pd.displayTable && pd.type === 'suppression' && config.visualizationSubType !== 'stacked') {
+    if (
+      isValueMatch &&
+      isColumnMatch &&
+      pd.displayTable &&
+      pd.type === 'suppression' &&
+      config.visualizationSubType !== 'stacked'
+    ) {
       switch (config.visualizationType) {
         case 'Combo':
           cellValue = barSeriesExist && showSymbol ? pd.iconCode : lineSeriesExist && showSymbol ? pd.lineCode : ''
