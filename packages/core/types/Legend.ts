@@ -10,8 +10,7 @@ export type Legend = {
   hideSuppressedLabels: boolean
   highlightOnHover: boolean
   label: string
-  lineMode: boolean
-  position: string
+  position: 'left' | 'bottom' | 'top' | 'right'
   reverseLabelOrder: boolean
   singleRow: boolean
   type: string
