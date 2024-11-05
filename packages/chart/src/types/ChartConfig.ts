@@ -8,6 +8,8 @@ import { Table } from '@cdc/core/types/Table'
 import { BoxPlot } from '@cdc/core/types/BoxPlot'
 import { General } from '@cdc/core/types/General'
 import { type Link } from './../components/Sankey/types'
+import { type DataDescription } from '@cdc/core/types/DataDescription'
+import { type Legend as CoreLegend } from '@cdc/core/types/Legend'
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
 import { VizFilter } from '@cdc/core/types/VizFilter'
@@ -75,27 +77,12 @@ type Exclusions = {
   dateEnd: string
 }
 
-export type Legend = {
+export type Legend = CoreLegend & {
   seriesHighlight: string[]
-  additionalCategories: string[]
-  // general legend onClick behavior
-  behavior: 'highlight' | 'isolate' | string
-  axisAlign: boolean
-  colorCode: string
-  description: string
-  // show or hide the legend
-  hide: boolean
-  highlightOnHover: boolean
-  label: string
-  position: 'left' | 'bottom' | 'top' | 'right'
-  reverseLabelOrder: boolean
-  singleRow: boolean
-  type: string
-  verticalSorted: boolean
   hideSuppressionLink: boolean
   style: 'circles' | 'boxes' | 'gradient' | 'lines'
   subStyle: 'linear blocks' | 'smooth'
-  hideSuppressedLabels: boolean
+
   tickRotation: string
   hideBorder: {
     side: boolean
@@ -136,7 +123,7 @@ export type AllChartsConfig = {
   data: Object[]
   dataUrl: string
   dataCutoff: number
-  dataDescription: string
+  dataDescription: Partial<DataDescription>
   dataFormat: DataFormat
   dataKey: string
   description: string
@@ -166,7 +153,7 @@ export type AllChartsConfig = {
   lollipopColorStyle: 'regular' | 'two-tone'
   lollipopShape: string
   lollipopSize: 'small' | 'medium' | 'large'
-  newViz: Object
+  newViz: boolean
   orientation: ChartOrientation
   palette: string
   pieType?: string
