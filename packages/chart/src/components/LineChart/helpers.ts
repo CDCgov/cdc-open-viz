@@ -182,11 +182,6 @@ function handleMiddleIndices(data, seriesKey, preliminaryData) {
   // Variable to count the number of sibling pairs found
   let pairCount = 1
 
-  // Function to check if the price is numeric
-  function isNumeric(value) {
-    return !isNaN(value) && !isNaN(parseFloat(value))
-  }
-
   // Loop through the data array to find each occurrence of the target value
   data.forEach((item, index) => {
     preliminaryData.forEach(pd => {
@@ -197,7 +192,7 @@ function handleMiddleIndices(data, seriesKey, preliminaryData) {
 
         // Find the nearest numeric sibling before the current index
         for (let i = index - 1; i >= 0; i--) {
-          if (isNumeric(data[i][seriesKey])) {
+          if (isCalculable(data[i][seriesKey])) {
             siblingBefore = data[i]
             break // Stop searching once a valid sibling is found
           }
@@ -205,7 +200,7 @@ function handleMiddleIndices(data, seriesKey, preliminaryData) {
 
         // Find the nearest numeric sibling after the current index
         for (let j = index + 1; j < data.length; j++) {
-          if (isNumeric(data[j][seriesKey])) {
+          if (isCalculable(data[j][seriesKey])) {
             siblingAfter = data[j]
             break // Stop searching once a valid sibling is found
           }
