@@ -128,7 +128,8 @@ export default {
     target: 0,
     maxTickRotation: 0,
     padding: 5,
-    showYearsOnce: false
+    showYearsOnce: false,
+    sortByRecentDate: false
   },
   table: {
     label: 'Data Table',
