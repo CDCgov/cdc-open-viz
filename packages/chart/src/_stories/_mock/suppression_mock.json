@@ -1,0 +1,1549 @@
+{
+  "annotations": [],
+  "type": "chart",
+  "debugSvg": false,
+  "chartMessage": { "noData": "No Data Available" },
+  "title": "",
+  "showTitle": true,
+  "showDownloadMediaButton": false,
+  "theme": "theme-blue",
+  "animate": false,
+  "fontSize": "medium",
+  "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
+  "barHasBorder": "false",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "flat",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "annotationDropdownText": "Annotations",
+    "showDownloadButton": false,
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true
+  },
+  "padding": { "left": 5, "right": 5 },
+  "preliminaryData": [
+    {
+      "type": "suppression",
+      "seriesKey": "",
+      "label": "Suppressed",
+      "column": "",
+      "value": "XYZ",
+      "style": "Dashed Small",
+      "displayTooltip": true,
+      "displayLegend": true,
+      "displayTable": true,
+      "symbol": "",
+      "iconCode": "",
+      "lineCode": "- - -",
+      "hideBarSymbol": false,
+      "hideLineStyle": false,
+      "circleSize": 6,
+      "displayGray": true
+    }
+  ],
+  "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 50,
+    "gridLines": false,
+    "enablePadding": false,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "rightHideAxis": true,
+    "rightAxisSize": 0,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#333",
+    "rightAxisTickLabelColor": "#333",
+    "rightAxisTickColor": "#333",
+    "numTicks": "",
+    "axisPadding": 0,
+    "scalePadding": 10,
+    "tickRotation": 0,
+    "anchors": [],
+    "shoMissingDataLabel": true,
+    "showMissingDataLine": true,
+    "categories": [],
+    "maxValue": 5.58
+  },
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "firstQuartilePercentage": 25,
+    "thirdQuartilePercentage": 75,
+    "boxWidthPercentage": 40,
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "legend": { "showHowToReadText": false, "howToReadText": "" },
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "total": "Total",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    }
+  },
+  "topAxis": { "hasLine": false },
+  "isLegendValue": false,
+  "barThickness": 0.35,
+  "barHeight": 25,
+  "barSpace": 15,
+  "heights": { "vertical": 300, "horizontal": 750 },
+  "xAxis": {
+    "sortDates": false,
+    "anchors": [],
+    "type": "date",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 75,
+    "tickRotation": 0,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "labelOffset": 0,
+    "axisPadding": 200,
+    "target": 0,
+    "maxTickRotation": 0,
+    "padding": 6,
+    "showYearsOnce": false,
+    "dataKey": "week_end",
+    "label": "Week End",
+    "dateParseFormat": "%m/%d/%Y",
+    "dateDisplayFormat": "%m/%d/%Y",
+    "axisBBox": 0,
+    "tickWidthMax": 91
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "indexLabel": "",
+    "download": true,
+    "showVertical": true,
+    "dateDisplayFormat": "",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "show": true
+  },
+  "orientation": "vertical",
+  "color": "pinkpurple",
+  "columns": {},
+  "legend": {
+    "hide": false,
+    "behavior": "isolate",
+    "axisAlign": true,
+    "singleRow": true,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "hideSuppressedLabels": false,
+    "hideSuppressionLink": false,
+    "seriesHighlight": [],
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "hideBorder": { "side": false, "topBottom": true }
+  },
+  "brush": { "height": 25, "active": false },
+  "exclusions": { "active": false, "keys": [] },
+  "palette": "qualitative-bold",
+  "isPaletteReversed": false,
+  "twoColor": { "palette": "monochrome-1", "isPaletteReversed": false },
+  "labels": false,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false
+  },
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
+  "series": [
+    { "dataKey": "cc65+ years", "type": "Line", "axis": "Left", "tooltip": true },
+    { "dataKey": "cc18-64 years", "type": "Line", "axis": "Left", "tooltip": true },
+    { "dataKey": "cc0-17 years", "type": "Line", "axis": "Left", "tooltip": true }
+  ],
+  "tooltips": { "opacity": 90, "singleSeries": false, "dateDisplayFormat": "" },
+  "forestPlot": {
+    "startAt": 0,
+    "colors": { "line": "", "shape": "" },
+    "lineOfNoEffect": { "show": true },
+    "type": "",
+    "pooledResult": { "diamondHeight": 5, "column": "" },
+    "estimateField": "",
+    "estimateRadius": "",
+    "shape": "square",
+    "rowHeight": 20,
+    "description": { "show": true, "text": "description", "location": 0 },
+    "result": { "show": true, "text": "result", "location": 100 },
+    "radius": { "min": 2, "max": 10, "scalingColumn": "" },
+    "regression": { "lower": 0, "upper": 0, "estimateField": 0 },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0,
+    "showZeroLine": false,
+    "leftLabel": "",
+    "rightLabel": ""
+  },
+  "area": { "isStacked": false },
+  "sankey": {
+    "title": { "defaultColor": "black" },
+    "iterations": 1,
+    "rxValue": 0.9,
+    "overallSize": { "width": 900, "height": 700 },
+    "margin": { "margin_y": 25, "margin_x": 0 },
+    "nodeSize": { "nodeWidth": 26, "nodeHeight": 40 },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": { "default": "#ff8500", "inactive": "#808080" },
+    "linkColor": { "default": "#ffc900", "inactive": "#D3D3D3" },
+    "opacity": {
+      "nodeOpacityDefault": 1,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 1,
+      "LinkOpacityInactive": 0.1
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "nodeValueStyle": { "textBefore": "(", "textAfter": ")" },
+    "data": []
+  },
+  "visualizationType": "Line",
+  "data": [
+    {
+      "week_end": "10/7/2023",
+      "pathogen": "Combined",
+      "cc65+ years": "2.92",
+      "cc18-64 years": "1.14",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "10/7/2023",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.87",
+      "cc18-64 years": "1.1",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "10/7/2023",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.04",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "10/7/2023", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "10/14/2023",
+      "pathogen": "Combined",
+      "cc65+ years": "2.68",
+      "cc18-64 years": "1.26",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "10/14/2023",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.63",
+      "cc18-64 years": "1.17",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "10/14/2023",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.05",
+      "cc18-64 years": "0.09",
+      "cc0-17 years": "0"
+    },
+    { "week_end": "10/14/2023", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "10/21/2023",
+      "pathogen": "Combined",
+      "cc65+ years": "2.91",
+      "cc18-64 years": "1.18",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "10/21/2023",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.82",
+      "cc18-64 years": "1.1",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "10/21/2023",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.08",
+      "cc18-64 years": "0.07",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "10/21/2023", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "10/28/2023",
+      "pathogen": "Combined",
+      "cc65+ years": "2.74",
+      "cc18-64 years": "0.99",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "10/28/2023",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.64",
+      "cc18-64 years": "0.92",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "10/28/2023",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.08",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "10/28/2023", "pathogen": "RSV", "cc65+ years": "0.02", "cc18-64 years": "XYZ", "cc0-17 years": "0" },
+    {
+      "week_end": "11/4/2023",
+      "pathogen": "Combined",
+      "cc65+ years": "2.64",
+      "cc18-64 years": "1",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "11/4/2023",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.54",
+      "cc18-64 years": "0.86",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "11/4/2023",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.09",
+      "cc18-64 years": "0.15",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "11/4/2023", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "11/11/2023",
+      "pathogen": "Combined",
+      "cc65+ years": "2.87",
+      "cc18-64 years": "1.12",
+      "cc0-17 years": "1.46"
+    },
+    {
+      "week_end": "11/11/2023",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.75",
+      "cc18-64 years": "0.97",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "11/11/2023",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.1",
+      "cc18-64 years": "0.12",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "11/11/2023",
+      "pathogen": "RSV",
+      "cc65+ years": "0.02",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "11/18/2023",
+      "pathogen": "Combined",
+      "cc65+ years": "2.92",
+      "cc18-64 years": "1.38",
+      "cc0-17 years": "3.43"
+    },
+    {
+      "week_end": "11/18/2023",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.8",
+      "cc18-64 years": "1.17",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "11/18/2023",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.09",
+      "cc18-64 years": "0.2",
+      "cc0-17 years": "1.79"
+    },
+    {
+      "week_end": "11/18/2023",
+      "pathogen": "RSV",
+      "cc65+ years": "0.04",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "11/25/2023",
+      "pathogen": "Combined",
+      "cc65+ years": "2.98",
+      "cc18-64 years": "1.47",
+      "cc0-17 years": "1.55"
+    },
+    {
+      "week_end": "11/25/2023",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.82",
+      "cc18-64 years": "1.14",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "11/25/2023",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.14",
+      "cc18-64 years": "0.29",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "11/25/2023",
+      "pathogen": "RSV",
+      "cc65+ years": "0.04",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "12/2/2023",
+      "pathogen": "Combined",
+      "cc65+ years": "3.54",
+      "cc18-64 years": "1.68",
+      "cc0-17 years": "2.05"
+    },
+    {
+      "week_end": "12/2/2023",
+      "pathogen": "COVID-19",
+      "cc65+ years": "3.26",
+      "cc18-64 years": "1.38",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "12/2/2023",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.24",
+      "cc18-64 years": "0.26",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "12/2/2023",
+      "pathogen": "RSV",
+      "cc65+ years": "0.05",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "12/9/2023",
+      "pathogen": "Combined",
+      "cc65+ years": "3.64",
+      "cc18-64 years": "1.95",
+      "cc0-17 years": "2.39"
+    },
+    {
+      "week_end": "12/9/2023",
+      "pathogen": "COVID-19",
+      "cc65+ years": "3.31",
+      "cc18-64 years": "1.42",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "12/9/2023",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.26",
+      "cc18-64 years": "0.47",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "12/9/2023",
+      "pathogen": "RSV",
+      "cc65+ years": "0.08",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "12/16/2023",
+      "pathogen": "Combined",
+      "cc65+ years": "3.92",
+      "cc18-64 years": "1.99",
+      "cc0-17 years": "3.82"
+    },
+    {
+      "week_end": "12/16/2023",
+      "pathogen": "COVID-19",
+      "cc65+ years": "3.45",
+      "cc18-64 years": "1.38",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "12/16/2023",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.38",
+      "cc18-64 years": "0.57",
+      "cc0-17 years": "2.4"
+    },
+    {
+      "week_end": "12/16/2023",
+      "pathogen": "RSV",
+      "cc65+ years": "0.1",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "12/23/2023",
+      "pathogen": "Combined",
+      "cc65+ years": "4.17",
+      "cc18-64 years": "2.45",
+      "cc0-17 years": "3.82"
+    },
+    {
+      "week_end": "12/23/2023",
+      "pathogen": "COVID-19",
+      "cc65+ years": "3.55",
+      "cc18-64 years": "1.33",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "12/23/2023",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.55",
+      "cc18-64 years": "1.07",
+      "cc0-17 years": "2.83"
+    },
+    {
+      "week_end": "12/23/2023",
+      "pathogen": "RSV",
+      "cc65+ years": "0.1",
+      "cc18-64 years": "0.07",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "12/30/2023",
+      "pathogen": "Combined",
+      "cc65+ years": "4.93",
+      "cc18-64 years": "3.41",
+      "cc0-17 years": "3.36"
+    },
+    {
+      "week_end": "12/30/2023",
+      "pathogen": "COVID-19",
+      "cc65+ years": "4",
+      "cc18-64 years": "1.67",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "12/30/2023",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.84",
+      "cc18-64 years": "1.69",
+      "cc0-17 years": "1.96"
+    },
+    {
+      "week_end": "12/30/2023",
+      "pathogen": "RSV",
+      "cc65+ years": "0.12",
+      "cc18-64 years": "0.08",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "1/6/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "5.58",
+      "cc18-64 years": "3.6",
+      "cc0-17 years": "4.95"
+    },
+    {
+      "week_end": "1/6/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "4.3",
+      "cc18-64 years": "1.96",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "1/6/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "1.2",
+      "cc18-64 years": "1.58",
+      "cc0-17 years": "3.45"
+    },
+    {
+      "week_end": "1/6/2024",
+      "pathogen": "RSV",
+      "cc65+ years": "0.13",
+      "cc18-64 years": "0.11",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "1/13/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "5.57",
+      "cc18-64 years": "3.57",
+      "cc0-17 years": "2.95"
+    },
+    {
+      "week_end": "1/13/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "4.39",
+      "cc18-64 years": "1.91",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "1/13/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "1.12",
+      "cc18-64 years": "1.61",
+      "cc0-17 years": "1.92"
+    },
+    {
+      "week_end": "1/13/2024",
+      "pathogen": "RSV",
+      "cc65+ years": "0.11",
+      "cc18-64 years": "0.1",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "1/20/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "5.06",
+      "cc18-64 years": "3.25",
+      "cc0-17 years": "3.17"
+    },
+    {
+      "week_end": "1/20/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "4.05",
+      "cc18-64 years": "1.95",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "1/20/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.97",
+      "cc18-64 years": "1.28",
+      "cc0-17 years": "1.9"
+    },
+    {
+      "week_end": "1/20/2024",
+      "pathogen": "RSV",
+      "cc65+ years": "0.08",
+      "cc18-64 years": "0.07",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "1/27/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "4.59",
+      "cc18-64 years": "2.85",
+      "cc0-17 years": "2.72"
+    },
+    {
+      "week_end": "1/27/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "3.73",
+      "cc18-64 years": "1.68",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "1/27/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.84",
+      "cc18-64 years": "1.14",
+      "cc0-17 years": "1.72"
+    },
+    {
+      "week_end": "1/27/2024",
+      "pathogen": "RSV",
+      "cc65+ years": "0.06",
+      "cc18-64 years": "0.07",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "2/3/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "4.09",
+      "cc18-64 years": "2.34",
+      "cc0-17 years": "2.86"
+    },
+    {
+      "week_end": "2/3/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "3.24",
+      "cc18-64 years": "1.44",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "2/3/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.81",
+      "cc18-64 years": "0.88",
+      "cc0-17 years": "2.32"
+    },
+    { "week_end": "2/3/2024", "pathogen": "RSV", "cc65+ years": "0.08", "cc18-64 years": "XYZ", "cc0-17 years": "0" },
+    {
+      "week_end": "2/10/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "3.74",
+      "cc18-64 years": "2.11",
+      "cc0-17 years": "2.4"
+    },
+    {
+      "week_end": "2/10/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "3.04",
+      "cc18-64 years": "1.28",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "2/10/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.68",
+      "cc18-64 years": "0.81",
+      "cc0-17 years": "1.69"
+    },
+    { "week_end": "2/10/2024", "pathogen": "RSV", "cc65+ years": "0.06", "cc18-64 years": "XYZ", "cc0-17 years": "0" },
+    {
+      "week_end": "2/17/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "3.37",
+      "cc18-64 years": "1.9",
+      "cc0-17 years": "3.04"
+    },
+    {
+      "week_end": "2/17/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.66",
+      "cc18-64 years": "1.11",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "2/17/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.69",
+      "cc18-64 years": "0.82",
+      "cc0-17 years": "2.13"
+    },
+    { "week_end": "2/17/2024", "pathogen": "RSV", "cc65+ years": "0.06", "cc18-64 years": "XYZ", "cc0-17 years": "0" },
+    {
+      "week_end": "2/24/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "3.07",
+      "cc18-64 years": "1.98",
+      "cc0-17 years": "2.17"
+    },
+    {
+      "week_end": "2/24/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.43",
+      "cc18-64 years": "1.32",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "2/24/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.63",
+      "cc18-64 years": "0.67",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "2/24/2024", "pathogen": "RSV", "cc65+ years": "0.04", "cc18-64 years": "XYZ", "cc0-17 years": "0" },
+    {
+      "week_end": "3/2/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "2.98",
+      "cc18-64 years": "1.88",
+      "cc0-17 years": "3.85"
+    },
+    {
+      "week_end": "3/2/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.38",
+      "cc18-64 years": "1.19",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "3/2/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.59",
+      "cc18-64 years": "0.71",
+      "cc0-17 years": "2.37"
+    },
+    { "week_end": "3/2/2024", "pathogen": "RSV", "cc65+ years": "0.03", "cc18-64 years": "XYZ", "cc0-17 years": "XYZ" },
+    {
+      "week_end": "3/9/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "2.79",
+      "cc18-64 years": "1.57",
+      "cc0-17 years": "2.49"
+    },
+    {
+      "week_end": "3/9/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.13",
+      "cc18-64 years": "0.9",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "3/9/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.64",
+      "cc18-64 years": "0.67",
+      "cc0-17 years": "1.56"
+    },
+    { "week_end": "3/9/2024", "pathogen": "RSV", "cc65+ years": "0.04", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "3/16/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "2.54",
+      "cc18-64 years": "1.51",
+      "cc0-17 years": "2.98"
+    },
+    {
+      "week_end": "3/16/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.04",
+      "cc18-64 years": "0.83",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "3/16/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.5",
+      "cc18-64 years": "0.68",
+      "cc0-17 years": "1.64"
+    },
+    {
+      "week_end": "3/16/2024",
+      "pathogen": "RSV",
+      "cc65+ years": "0.02",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "3/23/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "2.1",
+      "cc18-64 years": "1.31",
+      "cc0-17 years": "2.31"
+    },
+    {
+      "week_end": "3/23/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "1.66",
+      "cc18-64 years": "0.85",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "3/23/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.42",
+      "cc18-64 years": "0.46",
+      "cc0-17 years": "1.59"
+    },
+    { "week_end": "3/23/2024", "pathogen": "RSV", "cc65+ years": "0.02", "cc18-64 years": "XYZ", "cc0-17 years": "0" },
+    {
+      "week_end": "3/30/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "1.8",
+      "cc18-64 years": "1.18",
+      "cc0-17 years": "2.2"
+    },
+    {
+      "week_end": "3/30/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "1.42",
+      "cc18-64 years": "0.77",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "3/30/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.38",
+      "cc18-64 years": "0.41",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "3/30/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "XYZ" },
+    {
+      "week_end": "4/6/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "1.54",
+      "cc18-64 years": "1.08",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "4/6/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "1.21",
+      "cc18-64 years": "0.69",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "4/6/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.32",
+      "cc18-64 years": "0.4",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "4/6/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "XYZ", "cc0-17 years": "0" },
+    {
+      "week_end": "4/13/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "1.4",
+      "cc18-64 years": "0.95",
+      "cc0-17 years": "1.6"
+    },
+    {
+      "week_end": "4/13/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "1.08",
+      "cc18-64 years": "0.63",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "4/13/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.32",
+      "cc18-64 years": "0.33",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "4/13/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "XYZ" },
+    {
+      "week_end": "4/20/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "1.27",
+      "cc18-64 years": "0.75",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "4/20/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "0.99",
+      "cc18-64 years": "0.48",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "4/20/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.27",
+      "cc18-64 years": "0.27",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "4/20/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "XYZ", "cc0-17 years": "0" },
+    {
+      "week_end": "4/27/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "1.05",
+      "cc18-64 years": "0.58",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "4/27/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "0.86",
+      "cc18-64 years": "0.44",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "4/27/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.19",
+      "cc18-64 years": "0.15",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "4/27/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "5/4/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "1.01",
+      "cc18-64 years": "0.53",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "5/4/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "0.85",
+      "cc18-64 years": "0.44",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "5/4/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.16",
+      "cc18-64 years": "0.09",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "5/4/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "XYZ" },
+    {
+      "week_end": "5/11/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "0.86",
+      "cc18-64 years": "0.53",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "5/11/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "0.67",
+      "cc18-64 years": "0.4",
+      "cc0-17 years": "0"
+    },
+    {
+      "week_end": "5/11/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.18",
+      "cc18-64 years": "0.14",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "5/11/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "XYZ", "cc0-17 years": "0" },
+    {
+      "week_end": "5/18/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "0.79",
+      "cc18-64 years": "0.52",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "5/18/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "0.69",
+      "cc18-64 years": "0.37",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "5/18/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.1",
+      "cc18-64 years": "0.14",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "5/18/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "XYZ", "cc0-17 years": "0" },
+    {
+      "week_end": "5/25/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "0.79",
+      "cc18-64 years": "0.43",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "5/25/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "0.71",
+      "cc18-64 years": "0.36",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "5/25/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.08",
+      "cc18-64 years": "0.08",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "5/25/2024", "pathogen": "RSV", "cc65+ years": "0", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "6/1/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "0.78",
+      "cc18-64 years": "0.4",
+      "cc0-17 years": "0"
+    },
+    {
+      "week_end": "6/1/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "0.69",
+      "cc18-64 years": "0.32",
+      "cc0-17 years": "0"
+    },
+    {
+      "week_end": "6/1/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.08",
+      "cc18-64 years": "0.08",
+      "cc0-17 years": "0"
+    },
+    { "week_end": "6/1/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "6/8/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "0.75",
+      "cc18-64 years": "0.33",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "6/8/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "0.66",
+      "cc18-64 years": "0.26",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "6/8/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.09",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "0"
+    },
+    { "week_end": "6/8/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "6/15/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "0.83",
+      "cc18-64 years": "0.43",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "6/15/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "0.76",
+      "cc18-64 years": "0.32",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "6/15/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.06",
+      "cc18-64 years": "0.11",
+      "cc0-17 years": "0"
+    },
+    { "week_end": "6/15/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "XYZ" },
+    {
+      "week_end": "6/22/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "0.99",
+      "cc18-64 years": "0.45",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "6/22/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "0.91",
+      "cc18-64 years": "0.39",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "6/22/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.08",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "0"
+    },
+    { "week_end": "6/22/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "6/29/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "0.98",
+      "cc18-64 years": "0.42",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "6/29/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "0.92",
+      "cc18-64 years": "0.38",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "6/29/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.06",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "0"
+    },
+    { "week_end": "6/29/2024", "pathogen": "RSV", "cc65+ years": "0", "cc18-64 years": "XYZ", "cc0-17 years": "0" },
+    {
+      "week_end": "7/6/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "1.16",
+      "cc18-64 years": "0.44",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "7/6/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "1.11",
+      "cc18-64 years": "0.4",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "7/6/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.06",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "0"
+    },
+    { "week_end": "7/6/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "7/13/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "1.3",
+      "cc18-64 years": "0.47",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "7/13/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "1.23",
+      "cc18-64 years": "0.4",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "7/13/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.07",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "0"
+    },
+    { "week_end": "7/13/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "XYZ", "cc0-17 years": "0" },
+    {
+      "week_end": "7/20/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "1.57",
+      "cc18-64 years": "0.61",
+      "cc0-17 years": "0"
+    },
+    {
+      "week_end": "7/20/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "1.51",
+      "cc18-64 years": "0.54",
+      "cc0-17 years": "0"
+    },
+    {
+      "week_end": "7/20/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.07",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "0"
+    },
+    { "week_end": "7/20/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "7/27/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "1.81",
+      "cc18-64 years": "0.77",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "7/27/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "1.78",
+      "cc18-64 years": "0.75",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "7/27/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.04",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "0"
+    },
+    { "week_end": "7/27/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "8/3/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "2.1",
+      "cc18-64 years": "0.76",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "8/3/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.05",
+      "cc18-64 years": "0.71",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "8/3/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.05",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "8/3/2024", "pathogen": "RSV", "cc65+ years": "0", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "8/10/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "2.29",
+      "cc18-64 years": "0.75",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "8/10/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.23",
+      "cc18-64 years": "0.74",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "8/10/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.05",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "0"
+    },
+    { "week_end": "8/10/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "8/17/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "2.27",
+      "cc18-64 years": "0.88",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "8/17/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.22",
+      "cc18-64 years": "0.87",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "8/17/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.05",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "8/17/2024", "pathogen": "RSV", "cc65+ years": "0", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "8/24/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "2.62",
+      "cc18-64 years": "1",
+      "cc0-17 years": "1.72"
+    },
+    {
+      "week_end": "8/24/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.57",
+      "cc18-64 years": "0.96",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "8/24/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.06",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "8/24/2024", "pathogen": "RSV", "cc65+ years": "0", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "8/31/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "2.83",
+      "cc18-64 years": "1.24",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "8/31/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.77",
+      "cc18-64 years": "1.19",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "8/31/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.06",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "8/31/2024", "pathogen": "RSV", "cc65+ years": "0", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "9/7/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "2.61",
+      "cc18-64 years": "0.9",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "9/7/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.56",
+      "cc18-64 years": "0.88",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "9/7/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.05",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "0"
+    },
+    { "week_end": "9/7/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "9/14/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "2.55",
+      "cc18-64 years": "1.17",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "9/14/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.51",
+      "cc18-64 years": "1.13",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "9/14/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.04",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "0"
+    },
+    { "week_end": "9/14/2024", "pathogen": "RSV", "cc65+ years": "0", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "9/21/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "2.38",
+      "cc18-64 years": "0.8",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "9/21/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.3",
+      "cc18-64 years": "0.78",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "9/21/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.09",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "0"
+    },
+    { "week_end": "9/21/2024", "pathogen": "RSV", "cc65+ years": "XYZ", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "9/28/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "2.24",
+      "cc18-64 years": "0.76",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "9/28/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "2.17",
+      "cc18-64 years": "0.73",
+      "cc0-17 years": "0"
+    },
+    {
+      "week_end": "9/28/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.07",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "9/28/2024", "pathogen": "RSV", "cc65+ years": "0", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "10/5/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "2.02",
+      "cc18-64 years": "1.06",
+      "cc0-17 years": "0"
+    },
+    {
+      "week_end": "10/5/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "1.97",
+      "cc18-64 years": "1.03",
+      "cc0-17 years": "0"
+    },
+    {
+      "week_end": "10/5/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.05",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "0"
+    },
+    { "week_end": "10/5/2024", "pathogen": "RSV", "cc65+ years": "0", "cc18-64 years": "0", "cc0-17 years": "0" },
+    {
+      "week_end": "10/12/2024",
+      "pathogen": "Combined",
+      "cc65+ years": "1.76",
+      "cc18-64 years": "0.73",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "10/12/2024",
+      "pathogen": "COVID-19",
+      "cc65+ years": "1.72",
+      "cc18-64 years": "0.64",
+      "cc0-17 years": "XYZ"
+    },
+    {
+      "week_end": "10/12/2024",
+      "pathogen": "Influenza",
+      "cc65+ years": "0.04",
+      "cc18-64 years": "XYZ",
+      "cc0-17 years": "XYZ"
+    },
+    { "week_end": "10/12/2024", "pathogen": "RSV", "cc65+ years": "0", "cc18-64 years": "0", "cc0-17 years": "XYZ" }
+  ],
+  "dataFileName": "death_demo_test.csv",
+  "dataFileSourceType": "file",
+  "dataDescription": { "horizontal": false, "series": false },
+  "version": "4.24.10",
+  "dynamicMarginTop": 0,
+  "filters": [
+    {
+      "values": ["Combined", "COVID-19", "Influenza", "RSV"],
+      "filterStyle": "dropdown",
+      "id": 1730303199537,
+      "active": "Combined",
+      "columnName": "pathogen",
+      "label": "Pathogen"
+    }
+  ]
+}
