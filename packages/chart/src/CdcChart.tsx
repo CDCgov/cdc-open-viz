@@ -70,7 +70,7 @@ import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import LegendWrapper from './components/LegendWrapper'
-import _, { forEach } from 'lodash'
+import _ from 'lodash'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { Runtime } from '@cdc/core/types/Runtime'
 import { Pivot } from '@cdc/core/types/Table'
@@ -1240,12 +1240,13 @@ const CdcChart = ({
   const getTableRuntimeData = () => {
     if (visualizationType === 'Sankey') return config?.data?.[0]?.tableData
     const data = filteredData || excludedData
-    let usedColumns = Object.values(config.columns)
+    const dynamicSeries = config.series.find(series => !!series.dynamicCategory)
+    if (!dynamicSeries) return data
+    const usedColumns = Object.values(config.columns)
       .filter(col => col.dataTable)
       .map(col => col.name)
+      .concat([dynamicSeries.dynamicCategory, dynamicSeries.dataKey])
     if (config.xAxis?.dataKey) usedColumns.push(config.xAxis.dataKey)
-    const dynamicSeries = config.series.find(series => !!series.dynamicCategory)
-    if (dynamicSeries) usedColumns = usedColumns.concat([dynamicSeries.dynamicCategory, dynamicSeries.dataKey])
     return data.map(d => _.pick(d, usedColumns))
   }
 
