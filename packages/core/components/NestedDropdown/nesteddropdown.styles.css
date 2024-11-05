@@ -20,15 +20,9 @@
   .main-nested-dropdown-container,
   .nested-dropdown-input-container {
     border: 1px solid var(--lightGray);
-    border-radius: 5px;
     min-width: 200px;
     cursor: pointer;
-    /* this is the height that is defined for the .form-control class in _forms.scss in bootstrap. */
-    height: calc(1.5em + 0.75rem + 2px);
     padding: 0.375rem 0.75rem;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
   }
 
   .selectable-item {
@@ -53,7 +47,7 @@
     & > span.list-arrow {
       color: var(--mediumGray);
       position: absolute;
-      top: 6px;
+      top: 9px;
       right: 1px;
       float: right;
     }
@@ -65,6 +59,7 @@
     position: absolute;
     z-index: 3;
     min-width: 200px;
+    background: white;
   }
 
   .hide {

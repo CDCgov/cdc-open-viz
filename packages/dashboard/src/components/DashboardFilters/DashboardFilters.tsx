@@ -93,26 +93,28 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         }
 
         return filter.filterStyle === FILTER_STYLE.multiSelect ? (
-          <MultiSelect
-            key={`${filter.key}-filtersection-${filterIndex}`}
-            label={filter.key}
-            options={multiValues}
-            fieldName={filterIndex}
-            updateField={updateField}
-            selected={filter.active as string[]}
-            limit={filter.selectLimit || 5}
-          />
+          <div className='form-group mr-3 mb-1' key={`${filter.key}-filtersection-${filterIndex}`}>
+            <MultiSelect
+              label={filter.key}
+              options={multiValues}
+              fieldName={filterIndex}
+              updateField={updateField}
+              selected={filter.active as string[]}
+              limit={filter.selectLimit || 5}
+            />
+          </div>
         ) : filter.filterStyle === FILTER_STYLE.nestedDropdown ? (
-          <NestedDropdown
-            key={`${filter.key}-filtersection-${filterIndex}`}
-            activeGroup={filter.active as string}
-            activeSubGroup={filter.subGrouping?.active}
-            options={getNestedDropdownOptions(apiFilterDropdowns[_key])}
-            listLabel={filter.key}
-            handleSelectedItems={value => updateField(null, null, filterIndex, value)}
-          />
+          <div className='form-group mr-3 mb-1' key={`${filter.key}-filtersection-${filterIndex}`}>
+            <NestedDropdown
+              activeGroup={filter.active as string}
+              activeSubGroup={filter.subGrouping?.active}
+              options={getNestedDropdownOptions(apiFilterDropdowns[_key])}
+              listLabel={filter.key}
+              handleSelectedItems={value => updateField(null, null, filterIndex, value)}
+            />
+          </div>
         ) : (
-          <div className='form-group mr-3' key={`${filter.key}-filtersection-${filterIndex}`}>
+          <div className='form-group mr-3 mb-1' key={`${filter.key}-filtersection-${filterIndex}`}>
             <label className='text-capitalize font-weight-bold' htmlFor={`filter-${filterIndex}`}>
               {filter.key}
             </label>
@@ -137,7 +139,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         )
       })}
       {showSubmit && (
-        <button className='btn btn-primary' onClick={applyFilters}>
+        <button className='btn btn-primary mb-1' onClick={applyFilters}>
           {applyFiltersButtonText || 'GO!'}
         </button>
       )}

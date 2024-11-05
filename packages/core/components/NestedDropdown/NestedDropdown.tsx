@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useId } from 'react'
 import './nesteddropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
 import { filterSearchTerm, NestedOptions, ValueTextPair } from './nestedDropdownHelpers'
@@ -119,6 +119,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   listLabel,
   handleSelectedItems
 }) => {
+  const dropdownId = useId()
   const groupFilterActive = activeGroup
   const subGroupFilterActive = activeSubGroup || ''
 
@@ -214,7 +215,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
     }
   }
 
-  const filterOptions: OptionsMemo = useMemo(() => {
+  const filterOptions = useMemo(() => {
     return filterSearchTerm(userSearchTerm, options)
   }, [userSearchTerm, options])
 
@@ -227,13 +228,13 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
 
   return (
     <>
-      {listLabel && <span className='edit-label column-heading'>{listLabel}</span>}
-      <div
-        id='nested-dropdown-container'
-        className={`nested-dropdown ${isListOpened ? 'open-filter' : ''}`}
-        onKeyUp={handleKeyUp}
-      >
-        <div className='nested-dropdown-input-container' aria-label='searchInput' role='textbox'>
+      {listLabel && (
+        <label className='text-capitalize font-weight-bold' htmlFor={dropdownId}>
+          {listLabel}
+        </label>
+      )}
+      <div id={dropdownId} className={`nested-dropdown ${isListOpened ? 'open-filter' : ''}`} onKeyUp={handleKeyUp}>
+        <div className='nested-dropdown-input-container form-control' aria-label='searchInput' role='textbox'>
           <input
             className='search-input'
             ref={searchInput}
