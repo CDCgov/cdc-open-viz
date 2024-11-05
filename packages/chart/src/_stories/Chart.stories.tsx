@@ -9,6 +9,7 @@ import forestPlot from '../../examples/feature/forest-plot/forest-plot.json'
 import pairedBar from './_mock/paired-bar.json'
 import horizontalBarConfig from './_mock/horizontal_bar.json'
 import pieConfig from './_mock/pie_with_data.json'
+import boxPlotConfig from './_mock/boxplot_multiseries.json'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',
@@ -65,6 +66,12 @@ export const Pie: Story = {
 export const Paired_Bar: Story = {
   args: {
     config: pairedBar
+  }
+}
+export const BoxPlot_Multiseries: Story = {
+  args: {
+    config: boxPlotConfig,
+    isEditor: false
   }
 }
 
