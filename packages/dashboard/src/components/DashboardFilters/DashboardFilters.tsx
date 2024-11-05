@@ -95,7 +95,6 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         return filter.filterStyle === FILTER_STYLE.multiSelect ? (
           <div className='form-group mr-3 mb-1' key={`${filter.key}-filtersection-${filterIndex}`}>
             <MultiSelect
-              key={`${filter.key}-filtersection-${filterIndex}`}
               label={filter.key}
               options={multiValues}
               fieldName={filterIndex}

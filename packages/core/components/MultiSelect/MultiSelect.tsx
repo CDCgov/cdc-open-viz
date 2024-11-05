@@ -83,7 +83,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
           {label}
         </label>
       )}
-      <div ref={multiSelectRef} className='cove-multiselect form-control'>
+      <div ref={multiSelectRef} className='cove-multiselect'>
         {tooltip && tooltip}
 
         <div className='wrapper'>
