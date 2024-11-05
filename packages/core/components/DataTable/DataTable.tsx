@@ -90,7 +90,7 @@ const DataTable = (props: DataTableProps) => {
   const [expanded, setExpanded] = useState(expandDataTable)
 
   const [sortBy, setSortBy] = useState<any>({
-    column: config.type === 'map' ? 'geo' : 'date',
+    column: '',
     asc: false,
     colIndex: null
   })
