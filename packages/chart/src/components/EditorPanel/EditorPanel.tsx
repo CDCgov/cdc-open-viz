@@ -2500,12 +2500,19 @@ const EditorPanel = () => {
                               )}
                             </select>
                           </label>
-
                           <CheckBox
                             value={config.xAxis.manual}
                             section='xAxis'
                             fieldName='manual'
                             label='Manual Ticks'
+                            updateField={updateField}
+                          />
+                          <CheckBox
+                            display={config.xAxis.type !== 'categorical'}
+                            value={config.xAxis.sortByRecentDate}
+                            section='xAxis'
+                            fieldName='sortByRecentDate'
+                            label='Show dates newest to oldest'
                             updateField={updateField}
                           />
 
