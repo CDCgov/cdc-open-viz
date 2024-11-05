@@ -79,7 +79,6 @@ const LineChart = (props: LineChartProps) => {
             config.preliminaryData,
             config.xAxis.dataKey
           )
-          console.log(suppressedSegments, 'suppressedSegments')
           const splittedData = config?.preliminaryData?.filter(pd => pd.style && !pd.style.includes('Circles'))
           let xPos = d => {
             return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
@@ -224,7 +223,6 @@ const LineChart = (props: LineChartProps) => {
 
                   {suppressedSegments.map((segment, index) => {
                     return Object.entries(segment.data).map(([key, value]) => {
-                      console.log(value, 'keyy')
                       return (
                         <LinePath
                           key={index}
