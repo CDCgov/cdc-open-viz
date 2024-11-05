@@ -10,7 +10,7 @@ export type BoxPlot = {
     q3: string
     outliers: string
     values: string
-    total: string
+    count: string
     lowerBounds: string
     upperBounds: string
   }

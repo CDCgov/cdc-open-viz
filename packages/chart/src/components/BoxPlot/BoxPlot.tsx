@@ -74,7 +74,6 @@ const CoveBoxPlot = ({ xScale, yMax, xMax, min: minValue, max: maxValue, yScale 
     }
     return plots
   }
-  console.log(boxplot.plots, 'boxplot.plots')
 
   return (
     <ErrorBoundary component='BoxPlot'>

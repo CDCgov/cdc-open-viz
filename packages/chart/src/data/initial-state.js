@@ -85,7 +85,7 @@ export default {
       median: 'Median',
       sd: 'Standard Deviation',
       iqr: 'Interquartile Range',
-      total: 'Total',
+      count: 'Count',
       outliers: 'Outliers',
       values: 'Values',
       lowerBounds: 'Lower Bounds',

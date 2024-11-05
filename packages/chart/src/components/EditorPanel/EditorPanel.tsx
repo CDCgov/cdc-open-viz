@@ -763,7 +763,7 @@ const EditorPanel = () => {
         newValue
       ) // eslint-disable-line
 
-    if (section === 'boxplot' && subsection === 'legend') {
+    if (section === 'boxplot' && (subsection === 'legend' || subsection === 'labels')) {
       updateConfig({
         ...config,
         [section]: {
