@@ -7,6 +7,7 @@ import { DimensionsType } from '../../types/Dimensions'
 
 const MARGIN = 1
 const BORDER_SIZE = 1
+const MOBILE_BREAKPOINT = 576
 
 type CombinedConfig = MapConfig | ChartConfig
 
@@ -25,10 +26,15 @@ const LegendGradient = ({
   dimensions,
   parentPaddingToSubtract = 0
 }: GradientProps): JSX.Element => {
+  const { uid, legend, type } = config
+  const { tickRotation, position, style, subStyle } = legend
+
+  const isLinearBlocks = subStyle === 'linear blocks'
   let [width] = dimensions
 
+  const smallScreen = width <= MOBILE_BREAKPOINT
   const legendWidth = Number(width) - parentPaddingToSubtract - MARGIN * 2 - BORDER_SIZE * 2
-  const uniqueID = `${config.uid}-${Date.now()}`
+  const uniqueID = `${uid}-${Date.now()}`
 
   const numTicks = colors?.length
 
@@ -38,7 +44,7 @@ const LegendGradient = ({
 
   // configure tick witch and angle
   const textWidth = getTextWidth(longestLabel, `normal 14px sans-serif`)
-  const rotationAngle = Number(config.legend.tickRotation) || 0
+  const rotationAngle = Number(tickRotation) || 0
   // Convert the angle from degrees to radians
   const angleInRadians = rotationAngle * (Math.PI / 180)
   const newHeight = height + Number(textWidth) * Math.sin(angleInRadians)
@@ -59,14 +65,14 @@ const LegendGradient = ({
 
     return (
       <Group top={MARGIN}>
-        {!lastTick && <line x1={xPositionX} x2={xPositionX} y1={30} y2={boxHeight} stroke='black' />}
+        {!lastTick && !isLinearBlocks && <line x1={xPositionX} x2={xPositionX} y1={30} y2={boxHeight} stroke='black' />}
         <Text
-          angle={-config.legend.tickRotation}
+          angle={-tickRotation}
           x={xPositionX}
           y={boxHeight}
           dy={10}
           dx={-segmentWidth / 2}
-          fontSize='14'
+          fontSize={smallScreen ? '12' : '14'}
           textAnchor={textAnchor}
           verticalAnchor={verticalAnchor}
           width={segmentWidth}
@@ -76,17 +82,14 @@ const LegendGradient = ({
       </Group>
     )
   })
-  if ((config.type === 'map' && config.legend.position === 'side') || !config.legend.position) {
+  if ((type === 'map' && position === 'side') || !position) {
     return
   }
-  if (
-    config.type === 'chart' &&
-    (config.legend.position === 'left' || config.legend.position === 'right' || !config.legend.position)
-  ) {
+  if (type === 'chart' && (position === 'left' || position === 'right' || !position)) {
     return
   }
 
-  if (config.legend.style === 'gradient') {
+  if (style === 'gradient') {
     return (
       <svg style={{ overflow: 'visible', width: '100%', marginTop: 10 }} height={newHeight}>
         {/* background border*/}
@@ -96,7 +99,7 @@ const LegendGradient = ({
           {stops}
         </linearGradient>
 
-        {config.legend.subStyle === 'smooth' && (
+        {subStyle === 'smooth' && (
           <rect
             x={MARGIN}
             y={MARGIN}
@@ -106,7 +109,7 @@ const LegendGradient = ({
           />
         )}
 
-        {config.legend.subStyle === 'linear blocks' &&
+        {subStyle === 'linear blocks' &&
           colors.map((color, index) => {
             const segmentWidth = legendWidth / numTicks
             const xPosition = index * segmentWidth + MARGIN

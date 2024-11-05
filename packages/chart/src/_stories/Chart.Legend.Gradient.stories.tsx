@@ -12,9 +12,15 @@ const meta: Meta<typeof Chart> = {
 
 type Story = StoryObj<typeof Chart>
 
-export const Legend_Gradient: Story = {
+export const Legend_Gradient_Smooth: Story = {
   args: {
     config: chartGradientConfig
+  }
+}
+
+export const Legend_Gradient_Linear_Blocks: Story = {
+  args: {
+    config: editConfigKeys(chartGradientConfig, [{ path: ['legend', 'subStyle'], value: 'linear blocks' }])
   }
 }
 
