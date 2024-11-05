@@ -1,0 +1,108 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": []
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "table1730380781112"
+        }
+      ],
+      "uuid": 1730380998726
+    }
+  ],
+  "visualizations": {
+    "table1730380781112": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "newViz": false,
+      "openModal": true,
+      "uid": "table1730380781112",
+      "type": "table",
+      "table": {
+        "label": "Data Table",
+        "show": true,
+        "showDownloadUrl": false,
+        "showVertical": true,
+        "expanded": true,
+        "collapsible": true
+      },
+      "columns": {
+        "additionalColumn1": {
+          "label": "New Column",
+          "dataTable": true,
+          "tooltips": false,
+          "prefix": "",
+          "suffix": "",
+          "forestPlot": false,
+          "startingPoint": "0",
+          "forestPlotAlignRight": false,
+          "roundToPlace": 0,
+          "commas": false,
+          "showInViz": false,
+          "forestPlotStartingPoint": 0
+        },
+        "Class": {
+          "name": "Class",
+          "dataTable": false
+        },
+        "Data_Type": {
+          "name": "Data_Type",
+          "dataTable": false
+        },
+        "Question": {
+          "name": "Question",
+          "dataTable": false
+        },
+        "Response": {
+          "name": "Response",
+          "dataTable": false
+        },
+        "Topic": {
+          "name": "Topic",
+          "dataTable": false
+        }
+      },
+      "dataFormat": {},
+      "visualizationType": "table",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "dataKey": "dev-8931-hide-markup-include.csv"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showDownloadLinkBelow": true,
+    "showVertical": true
+  },
+  "newViz": true,
+  "datasets": {
+    "dev-8931-hide-markup-include.csv": {
+      "data": [],
+      "dataFileSize": 10023,
+      "dataFileName": "dev-8931-hide-markup-include.csv",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "CSV",
+      "preview": true
+    }
+  },
+  "isResponsiveTicks": false,
+  "type": "dashboard",
+  "barThickness": "0.37",
+  "xAxis": {
+    "type": "categorical",
+    "size": 75,
+    "maxTickRotation": 45,
+    "labelOffset": 0
+  },
+  "runtime": {},
+  "version": "4.24.10",
+  "uuid": 1730380778769
+}

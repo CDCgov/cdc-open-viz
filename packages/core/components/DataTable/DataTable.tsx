@@ -206,6 +206,7 @@ const DataTable = (props: DataTableProps) => {
         : config.runtime?.seriesKeys),
     [config.runtime?.seriesKeys]) // eslint-disable-line
 
+  const hasNoData = runtimeData.length === 0
   if (config.visualizationType !== 'Box Plot') {
     const getDownloadData = () => {
       // only use fullGeoName on County maps and no other
@@ -269,6 +270,7 @@ const DataTable = (props: DataTableProps) => {
               preliminaryData={config.preliminaryData}
               viewport={viewport}
               wrapColumns={wrapColumns}
+              noData={hasNoData}
               childrenMatrix={
                 config.type === 'map'
                   ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData, viewport })
@@ -312,6 +314,7 @@ const DataTable = (props: DataTableProps) => {
                   viewport={viewport}
                   wrapColumns={wrapColumns}
                   childrenMatrix={regionCellMatrix({ config })}
+                  noData={hasNoData}
                   tableName={config.visualizationType}
                   caption='Table of the highlighted regions in the visualization'
                   headContent={
@@ -349,6 +352,7 @@ const DataTable = (props: DataTableProps) => {
               viewport={viewport}
               wrapColumns={wrapColumns}
               childrenMatrix={boxplotCellMatrix({ rows: tableData, config })}
+              noData={hasNoData}
               tableName={config.visualizationType}
               caption={caption}
               stickyHeader
