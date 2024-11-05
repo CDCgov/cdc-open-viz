@@ -22,6 +22,7 @@ import { Column } from '../../types/Column'
 import { pivotData } from '../../helpers/pivotData'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import './data-table.css'
+import _ from 'lodash'
 
 export type DataTableProps = {
   applyLegendToRow?: Function
@@ -73,9 +74,14 @@ const DataTable = (props: DataTableProps) => {
   const runtimeData = useMemo(() => {
     const data = removeNullColumns(parentRuntimeData)
     if (config.table.pivot) {
+      const excludeColumns = Object.values(config.columns || {})
+        .filter(column => column.dataTable === false)
+        .map(col => col.name)
       const { columnName, valueColumns } = config.table.pivot
       if (columnName && valueColumns) {
-        return pivotData(data, columnName, valueColumns)
+        // remove excluded columns so that they aren't included in the pivot calculation
+        const _data = data.map(row => _.omit(row, excludeColumns))
+        return pivotData(_data, columnName, valueColumns)
       }
     }
     return data
@@ -84,7 +90,7 @@ const DataTable = (props: DataTableProps) => {
   const [expanded, setExpanded] = useState(expandDataTable)
 
   const [sortBy, setSortBy] = useState<any>({
-    column: config.type === 'map' ? 'geo' : 'date',
+    column: '',
     asc: false,
     colIndex: null
   })
@@ -200,6 +206,7 @@ const DataTable = (props: DataTableProps) => {
         : config.runtime?.seriesKeys),
     [config.runtime?.seriesKeys]) // eslint-disable-line
 
+  const hasNoData = runtimeData.length === 0
   if (config.visualizationType !== 'Box Plot') {
     const getDownloadData = () => {
       // only use fullGeoName on County maps and no other
@@ -263,6 +270,7 @@ const DataTable = (props: DataTableProps) => {
               preliminaryData={config.preliminaryData}
               viewport={viewport}
               wrapColumns={wrapColumns}
+              noData={hasNoData}
               childrenMatrix={
                 config.type === 'map'
                   ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData, viewport })
@@ -306,6 +314,7 @@ const DataTable = (props: DataTableProps) => {
                   viewport={viewport}
                   wrapColumns={wrapColumns}
                   childrenMatrix={regionCellMatrix({ config })}
+                  noData={hasNoData}
                   tableName={config.visualizationType}
                   caption='Table of the highlighted regions in the visualization'
                   headContent={
@@ -343,6 +352,7 @@ const DataTable = (props: DataTableProps) => {
               viewport={viewport}
               wrapColumns={wrapColumns}
               childrenMatrix={boxplotCellMatrix({ rows: tableData, config })}
+              noData={hasNoData}
               tableName={config.visualizationType}
               caption={caption}
               stickyHeader

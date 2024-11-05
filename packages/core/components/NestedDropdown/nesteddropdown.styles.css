@@ -19,12 +19,10 @@
 
   .main-nested-dropdown-container,
   .nested-dropdown-input-container {
-    padding: 7px 15px;
-    background: #fff;
     border: 1px solid var(--lightGray);
-    border-radius: 5px;
-    width: 325px;
+    min-width: 200px;
     cursor: pointer;
+    padding: 0.375rem 0.75rem;
   }
 
   .selectable-item {
@@ -47,13 +45,11 @@
   .nested-dropdown-input-container {
     position: relative;
     & > span.list-arrow {
+      color: var(--mediumGray);
       position: absolute;
-      font-size: 10px;
-      top: 4px;
-      right: 12px;
-      padding: 9px;
-      background: #fff;
-      pointer-events: none;
+      top: 9px;
+      right: 1px;
+      float: right;
     }
   }
 
@@ -62,7 +58,8 @@
     overflow-y: scroll;
     position: absolute;
     z-index: 3;
-    width: 325px;
+    min-width: 200px;
+    background: white;
   }
 
   .hide {

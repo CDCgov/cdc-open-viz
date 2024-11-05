@@ -1,5 +1,4 @@
 .cove-multiselect {
-  position: relative;
   .cove-input__label {
     display: block;
   }
@@ -25,10 +24,14 @@
         border-radius: 5px;
       }
       .expand {
-        padding: 0 5px;
-        border-radius: 5px;
-        background: var(--lightGray);
+        padding: 2px 0px;
+        margin-right: -6px;
         float: right;
+        margin-bottom: -3px;
+        color: var(--mediumGray);
+        &:focus {
+          outline: none;
+        }
       }
       border-radius: 5px;
     }
@@ -43,7 +46,8 @@
   .dropdown {
     background: white;
     position: absolute;
-    margin-top: 5px;
+    top: var(--select-height);
+    margin-top: 0px;
     border: 1px solid var(--lightGray);
     padding-left: 0;
     min-height: 40px;

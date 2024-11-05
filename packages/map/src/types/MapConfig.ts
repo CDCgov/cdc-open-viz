@@ -48,7 +48,7 @@ export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 export type LegendShapeItem = {
   column: string
   key: string
-  operator: string
+  operator: '=' | '≠' | '<' | '>' | '<=' | '>='
   shape: string
   value: string
 }

@@ -1,6 +1,5 @@
 import { type ChartConfig } from './ChartConfig'
 import { PickD3Scale } from '@visx/scale'
-import { type SharedFilter } from '@cdc/dashboard/src/types/SharedFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
@@ -70,7 +69,11 @@ export type ChartContext =
       formatTooltipsDate: Function
       formatNumber?: Function
       handleLineType?: Function
+      // 508 compliance: tabbing handler for charts
+      handleChartTabbing?: (chartConfig: ChartConfig, legendId: string) => string
       isNumber?: boolean
+      // 508 compliance: tabbing id for legends
+      legendId: string
       // url param added to allow various console logs and chart helpers
       isDebug?: boolean
       parseDate?: Function

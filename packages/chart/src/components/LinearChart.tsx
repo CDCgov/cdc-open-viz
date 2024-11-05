@@ -279,7 +279,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           tickCount = 4 // same default as standalone components
         }
       }
-      if (Number(tickCount) > Number(max)) {
+      if (Number(tickCount) > Number(max) && !isHorizontal) {
         // cap it and round it so its an integer
         tickCount = Number(min) < 0 ? Math.round(max) * 2 : Math.round(max)
       }
@@ -410,7 +410,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const legendIsLeftOrRight =
       legend?.position !== 'top' && legend?.position !== 'bottom' && !isLegendWrapViewport(currentViewport)
     legendRef.current.style.transform = legendIsLeftOrRight ? `translateY(${topLabelOnGridlineHeight}px)` : 'none'
-  }, [axisBottomRef.current, config, bottomLabelStart, brush, currentViewport, topYLabelRef.current])
+  }, [axisBottomRef.current, config, bottomLabelStart, brush, currentViewport, topYLabelRef.current, initialHeight])
 
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config

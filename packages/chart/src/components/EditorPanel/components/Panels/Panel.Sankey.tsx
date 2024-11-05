@@ -11,7 +11,7 @@ import {
 } from 'react-accessible-accordion'
 import EditorPanelContext, { type EditorPanelContext as EPContext } from '../../EditorPanelContext'
 
-const SankeySettings = () => {
+const SankeySettings: React.FC<PanelProps> = props => {
   const { config, updateConfig } = useContext(ConfigContext)
   const data = config.data?.[0]
   const { updateField } = useContext<EPContext>(EditorPanelContext)
