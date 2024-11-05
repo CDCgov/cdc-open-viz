@@ -35,7 +35,6 @@ import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
 import { handleChartTabbing } from './helpers/handleChartTabbing'
 import { getQuartiles } from './helpers/getQuartiles'
-import { sortAsc, sortDesc } from './helpers/sort'
 import { handleChartAriaLabels } from './helpers/handleChartAriaLabels'
 import { lineOptions } from './helpers/lineOptions'
 import { handleLineType } from './helpers/handleLineType'
@@ -55,17 +54,16 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
-import { calcInitialHeight } from './helpers/sizeHelpers'
-import { isLegendWrapViewport, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
+import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 
 import './scss/main.scss'
 // load both then config below determines which to use
 import DataTable from '@cdc/core/components/DataTable'
+import type { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import Title from '@cdc/core/components/ui/Title'
-import { ChartConfig } from './types/ChartConfig'
+import { AllChartsConfig, ChartConfig } from './types/ChartConfig'
 import { Label } from './types/Label'
 import { type ViewportSize } from './types/ChartConfig'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
@@ -74,6 +72,8 @@ import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import LegendWrapper from './components/LegendWrapper'
 import _ from 'lodash'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
+import { Runtime } from '@cdc/core/types/Runtime'
+import { Pivot } from '@cdc/core/types/Table'
 
 interface CdcChartProps {
   configUrl?: string
@@ -310,7 +310,7 @@ const CdcChart = ({
     updateConfig(processedConfig, data)
   }
 
-  const updateConfig = (_config, dataOverride?: any[]) => {
+  const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
     const newConfig = _.cloneDeep(_config)
     let data = dataOverride || stateData
 
@@ -373,15 +373,15 @@ const CdcChart = ({
     }
 
     //Enforce default values that need to be calculated at runtime
-    newConfig.runtime = {}
-    newConfig.runtime.series = newConfig.dynamicSeries ? [] : newConfig.series
+    newConfig.runtime = {} as Runtime
+    newConfig.runtime.series = newConfig.dynamicSeries ? [] : _.cloneDeep(newConfig.series)
     newConfig.runtime.seriesLabels = {}
     newConfig.runtime.seriesLabelsAll = []
     newConfig.runtime.originalXAxis = newConfig.xAxis
 
     if (newConfig.dynamicSeries) {
       let finalData = dataOverride || newConfig.formattedData || newConfig.data
-      if (finalData && finalData.length && finalData.length > 0) {
+      if (finalData?.length) {
         Object.keys(finalData[0]).forEach(seriesKey => {
           if (
             seriesKey !== newConfig.xAxis.dataKey &&
@@ -403,13 +403,35 @@ const CdcChart = ({
       newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey])
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
     } else {
-      newConfig.runtime.seriesKeys = newConfig.runtime.series
-        ? newConfig.runtime.series.map(series => {
-            newConfig.runtime.seriesLabels[series.dataKey] = series.name || series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.name || series.dataKey)
-            return series.dataKey
+      const finalData = dataOverride || newConfig.formattedData || newConfig.data
+      newConfig.runtime.seriesKeys = (newConfig.runtime.series || []).flatMap(series => {
+        if (series.dynamicCategory) {
+          _.remove(newConfig.runtime.seriesLabelsAll, label => label === series.dataKey)
+          _.remove(newConfig.runtime.series, s => s.dataKey === series.dataKey)
+          // grab the dynamic series keys from the data
+          const seriesKeys: string[] = _.uniq(finalData.map(d => d[series.dynamicCategory]))
+          // for each of those keys perform side effects
+          seriesKeys.forEach(dataKey => {
+            newConfig.runtime.seriesLabels[dataKey] = dataKey
+            newConfig.runtime.seriesLabelsAll.push(dataKey)
+            newConfig.runtime.series.push({
+              dataKey,
+              type: series.type,
+              lineType: series.lineType,
+              originalDataKey: series.dataKey,
+              dynamicCategory: series.dynamicCategory,
+              tooltip: true
+            })
           })
-        : []
+          // return the series keys
+          return seriesKeys
+        } else {
+          newConfig.runtime.seriesLabels[series.dataKey] = series.name || series.label || series.dataKey
+          newConfig.runtime.seriesLabelsAll.push(series.name || series.dataKey)
+          // return the series keys
+          return [series.dataKey]
+        }
+      })
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
@@ -593,21 +615,6 @@ const CdcChart = ({
     setConfig(newConfig)
   }
 
-  // Gets filter values from dataset
-  const generateValuesForFilter = (columnName, data = this.state.data) => {
-    const values: any[] = []
-
-    data.forEach(row => {
-      const value = row[columnName]
-      //@ts-ignore
-      if (value && false === values.includes(value)) {
-        values.push(value)
-      }
-    })
-
-    return values
-  }
-
   // Sorts data series for horizontal bar charts
   const sortData = (a, b) => {
     let sortKey =
@@ -630,7 +637,6 @@ const CdcChart = ({
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
-      let svgMarginWidth = 30
       let editorWidth = 350
 
       width = isEditor ? width - editorWidth : width
@@ -643,7 +649,7 @@ const CdcChart = ({
         width = width - 2.5
       }
 
-      width = width - svgMarginWidth
+      width = width
 
       setDimensions([width, height])
     }
@@ -1211,12 +1217,31 @@ const CdcChart = ({
     // cleaning is deleting data we need in forecasting charts.
     if (!Array.isArray(data)) return []
     if (config.visualizationType === 'Forecasting') return data
+    if (config.series.some(series => !!series.dynamicCategory)) return data
     return config?.xAxis?.dataKey ? transform.cleanData(data, config.xAxis.dataKey) : data
   }
 
-  // required for DataTable
-  const displayGeoName = key => {
-    return key
+  const getTableRuntimeData = () => {
+    if (visualizationType === 'Sankey') return config?.data?.[0]?.tableData
+    const data = filteredData || excludedData
+    const dynamicSeries = config.series.find(series => !!series.dynamicCategory)
+    if (!dynamicSeries) return data
+    const usedColumns = Object.values(config.columns)
+      .filter(col => col.dataTable)
+      .map(col => col.name)
+      .concat([dynamicSeries.dynamicCategory, dynamicSeries.dataKey])
+    if (config.xAxis?.dataKey) usedColumns.push(config.xAxis.dataKey)
+    return data.map(d => _.pick(d, usedColumns))
+  }
+
+  const pivotDynamicSeries = (config: ChartConfig): TableConfig => {
+    const tableConfig: TableConfig = _.cloneDeep(config)
+    const dynamicSeries = tableConfig.series.find(series => !!series.dynamicCategory)
+    if (dynamicSeries) {
+      const pivot: Pivot = { columnName: dynamicSeries.dynamicCategory, valueColumns: [dynamicSeries.dataKey] }
+      tableConfig.table.pivot = pivot
+    }
+    return tableConfig
   }
 
   // Prevent render if loading
@@ -1436,7 +1461,7 @@ const CdcChart = ({
                   config.visualizationType !== 'Sankey') ||
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
                   <DataTable
-                    config={config}
+                    config={pivotDynamicSeries(config)}
                     rawData={
                       config.visualizationType === 'Sankey'
                         ? config?.data?.[0]?.tableData
@@ -1444,15 +1469,11 @@ const CdcChart = ({
                         ? filterVizData(config.filters, config.data)
                         : config.data
                     }
-                    runtimeData={
-                      config.visualizationType === 'Sankey'
-                        ? config?.data?.[0]?.tableData
-                        : filteredData || excludedData
-                    }
+                    runtimeData={getTableRuntimeData()}
                     expandDataTable={config.table.expanded}
                     columns={config.columns}
                     displayDataAsText={displayDataAsText}
-                    displayGeoName={displayGeoName}
+                    displayGeoName={name => name}
                     applyLegendToRow={applyLegendToRow}
                     tableTitle={config.table.label}
                     indexTitle={config.table.indexLabel}
@@ -1495,7 +1516,7 @@ const CdcChart = ({
     debugSvg: isDebug,
     dimensions,
     dynamicLegendItems,
-    excludedData: excludedData,
+    excludedData,
     formatDate,
     formatNumber,
     formatTooltipsDate,
@@ -1503,6 +1524,7 @@ const CdcChart = ({
     getYAxisData,
     handleChartAriaLabels,
     handleLineType,
+    handleChartTabbing,
     highlight,
     highlightReset,
     imageId,
@@ -1514,6 +1536,7 @@ const CdcChart = ({
     isEditor,
     isNumber,
     legend,
+    legendId,
     legendRef,
     lineOptions,
     loading,

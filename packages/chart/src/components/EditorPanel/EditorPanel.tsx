@@ -450,7 +450,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
           }
         )}
 
-      <button type='button' onClick={addColumn} className='btn full-width'>
+      <button type='button' onClick={addColumn} className='btn btn-primary full-width'>
         {config.visualizationType === 'Line'
           ? 'Add Special Line'
           : config.visualizationType === 'Bar'
@@ -619,52 +619,35 @@ const EditorPanel = () => {
   const { leftMax, rightMax } = useMinMax(properties)
 
   const {
-    headerColors,
-    visSupportsTooltipLines,
-    visSupportsNonSequentialPallete,
-    visSupportsSequentialPallete,
-    visSupportsReverseColorPalette,
-    visHasLabelOnData,
-    visHasNumbersOnBars,
     visHasAnchors,
-    visHasBarBorders,
-    visHasDataCutoff,
-    visHasSelectableLegendValues,
-    visCanAnimate,
+    visHasBrushChart,
+    visHasCategoricalAxis,
     visHasLegend,
     visHasLegendAxisAlign,
     visHasLegendColorCategory,
-    visHasBrushChart,
+    visHasSelectableLegendValues,
     visSupportsDateCategoryAxis,
-    visSupportsValueAxisMin,
-    visSupportsValueAxisMax,
     visSupportsDateCategoryAxisLabel,
     visSupportsDateCategoryAxisLine,
-    visSupportsDateCategoryAxisTicks,
-    visSupportsDateCategoryTickRotation,
-    visSupportsDateCategoryNumTicks,
+    visSupportsDateCategoryAxisMax,
+    visSupportsDateCategoryAxisMin,
     visSupportsDateCategoryAxisPadding,
-    visSupportsRegions,
+    visSupportsDateCategoryAxisTicks,
+    visSupportsDateCategoryHeight,
+    visSupportsDateCategoryNumTicks,
+    visSupportsDateCategoryTickRotation,
+    visSupportsDynamicSeries,
     visSupportsFilters,
-    visSupportsPreliminaryData,
-    visSupportsValueAxisGridLines,
-    visSupportsValueAxisLine,
-    visSupportsValueAxisTicks,
-    visSupportsValueAxisLabels,
-    visSupportsBarSpace,
-    visSupportsBarThickness,
-    visSupportsFootnotes,
-    visSupportsSuperTitle,
-    visSupportsDataCutoff,
-    visSupportsChartHeight,
     visSupportsLeftValueAxis,
-    visSupportsTooltipOpacity,
+    visSupportsPreliminaryData,
     visSupportsRankByValue,
     visSupportsResponsiveTicks,
-    visSupportsDateCategoryHeight,
-    visHasDataSuppression,
-    visHasCategoricalAxis,
-    visSupportsDynamicSeries
+    visSupportsValueAxisGridLines,
+    visSupportsValueAxisLabels,
+    visSupportsValueAxisLine,
+    visSupportsValueAxisMax,
+    visSupportsValueAxisMin,
+    visSupportsValueAxisTicks
   } = useEditorPermissions()
 
   // when the visualization type changes we
@@ -2153,7 +2136,7 @@ const EditorPanel = () => {
                       </Accordion>
 
                       <button
-                        className='btn full-width'
+                        className='btn btn-primary full-width'
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.yAxis.anchors]
@@ -2279,7 +2262,7 @@ const EditorPanel = () => {
                       </Accordion>
 
                       <button
-                        className='btn full-width'
+                        className='btn btn-primary full-width'
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.xAxis.anchors]
@@ -3315,6 +3298,30 @@ const EditorPanel = () => {
                     </>
                   )}
 
+                  {visSupportsDateCategoryAxisMin() && (
+                    <TextField
+                      value={config.xAxis.min}
+                      section='xAxis'
+                      fieldName='min'
+                      type='number'
+                      label='min value'
+                      placeholder='Auto'
+                      updateField={updateField}
+                    />
+                  )}
+
+                  {visSupportsDateCategoryAxisMax() && (
+                    <TextField
+                      value={config.xAxis.max}
+                      section='xAxis'
+                      fieldName='max'
+                      type='number'
+                      label='max value'
+                      placeholder='Auto'
+                      updateField={updateField}
+                    />
+                  )}
+
                   {/* anchors */}
                   {visHasAnchors() && config.orientation !== 'horizontal' && (
                     <div className='edit-block'>
@@ -3423,7 +3430,7 @@ const EditorPanel = () => {
                       </Accordion>
 
                       <button
-                        className='btn full-width'
+                        className='btn btn-primary full-width'
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.xAxis.anchors]
@@ -3552,7 +3559,7 @@ const EditorPanel = () => {
                       </Accordion>
 
                       <button
-                        className='btn full-width'
+                        className='btn btn-primary full-width'
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.yAxis.anchors]
