@@ -78,8 +78,6 @@ import useTooltip from './hooks/useTooltip'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 
-const CONTAINER_WIDTH_PADDING = 50
-
 // Data props
 const stateKeys = Object.keys(supportedStates)
 const territoryKeys = Object.keys(supportedTerritories)
@@ -1835,7 +1833,7 @@ const CdcMap = ({
                     closeModal(e)
                   }
                 }}
-                style={{ padding: `15px ${CONTAINER_WIDTH_PADDING / 2}px`, margin: '0px' }}
+                style={{ padding: '15px 0px', margin: '0px' }}
               >
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
                 <section className='outline-none geography-container w-100' ref={mapSvg} tabIndex='0'>
@@ -1855,12 +1853,7 @@ const CdcMap = ({
                 </section>
 
                 {general.showSidebar && 'navigation' !== general.type && (
-                  <Legend
-                    dimensions={dimensions}
-                    ref={legendRef}
-                    skipId={tabId}
-                    containerWidthPadding={CONTAINER_WIDTH_PADDING}
-                  />
+                  <Legend dimensions={dimensions} ref={legendRef} skipId={tabId} containerWidthPadding={0} />
                 )}
               </div>
 
