@@ -79,7 +79,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   return (
     <>
       {label && (
-        <label className='edit-label column-heading' id={multiID + label} htmlFor={multiID}>
+        <label className='text-capitalize font-weight-bold' id={multiID + label} htmlFor={multiID}>
           {label}
         </label>
       )}
