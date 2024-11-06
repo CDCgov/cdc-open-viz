@@ -66,7 +66,6 @@ const ChooseTab = () => {
   const IconButton = props => {
     const { label, type, subType = undefined, orientation = undefined, stacked = false, generalType = 'data' } = props
     let isSubType = false
-    let isHorizontalStackedChart = false
 
     if (type === 'map' && config.general) {
       let geoType = config.general.geoType
@@ -75,8 +74,6 @@ const ChooseTab = () => {
 
     if (type === 'chart') {
       isSubType = subType === config.visualizationType
-
-      isHorizontalStackedChart = orientation === config.orientation && stacked === true
     }
 
     if (type === 'dashboard' || type === 'data-bite' || type === 'markup-include') isSubType = true
@@ -145,31 +142,51 @@ const ChooseTab = () => {
     reader.readAsText(file)
   }
 
-  const configureTabs = (subType: SubType, type: VizType) => {
-    const newConfig = {
-      newViz: true,
-      datasets: {},
-      isResponsiveTicks: false,
-      type,
-      visualizationType: subType,
-      barThickness: '0.37',
-      xAxis: {
-        type: 'categorical',
-        size: 75,
-        maxTickRotation: 45,
-        labelOffset: 0
-      }
+  const generateNewConfig = ({ type, subType }) => {
+    let newConfig = {}
+    switch (type) {
+      case 'chart':
+        newConfig = {
+          newViz: true,
+          datasets: {},
+          isResponsiveTicks: false,
+          type: 'chart',
+          visualizationType: subType,
+          barThickness: '0.37',
+          xAxis: {
+            type: 'categorical',
+            size: 75,
+            maxTickRotation: 45,
+            labelOffset: 0
+          }
+        }
+        break
+
+      case 'Map':
+        newConfig = {
+          newViz: true,
+          datasets: {},
+          type: 'map',
+          visualizationType: subType
+        }
+        break
     }
 
-    dispatch({ type: 'EDITOR_SET_CONFIG', payload: { ...config, newConfig } })
+    return newConfig
+  }
+
+  const configureTabs = props => {
+    const newConfig = generateNewConfig(props)
+    dispatch({ type: 'EDITOR_SET_CONFIG', payload: { ...config, ...newConfig } })
     dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
   }
 
-  const VizButton: React.FC<ButtonProps> = ({ label, icon, id, subType, type }) => {
+  const VizButton = props => {
+    const { label, icon, id } = props
     const isActive = activeButtonId === id
     const handleClick = () => {
       setActiveButtonId(isActive ? null : id)
-      configureTabs(subType, type)
+      configureTabs(props)
     }
 
     return (
@@ -214,13 +231,7 @@ const ChooseTab = () => {
                   <li key={index}>
                     <Tooltip position='right'>
                       <Tooltip.Target>
-                        <VizButton
-                          id={button.id}
-                          label={button.label}
-                          type={button.type}
-                          subType={button.subType}
-                          icon={button.icon}
-                        />
+                        <VizButton {...button} />
                       </Tooltip.Target>
                       <Tooltip.Content>{button.content}</Tooltip.Content>
                     </Tooltip>
