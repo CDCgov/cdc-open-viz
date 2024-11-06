@@ -1,0 +1,208 @@
+{
+	"annotations": [],
+	"general": {
+		"geoBorderColor": "darkGray",
+		"headerColor": "theme-blue",
+		"title": "",
+		"showTitle": true,
+		"showSidebar": true,
+		"showDownloadButton": true,
+		"showDownloadMediaButton": false,
+		"displayAsHex": false,
+		"displayStateLabels": false,
+		"territoriesLabel": "Territories",
+		"territoriesAlwaysShow": false,
+		"language": "en",
+		"geoType": "us",
+		"geoLabelOverride": "State/Territory",
+		"hasRegions": false,
+		"fullBorder": false,
+		"type": "map",
+		"convertFipsCodes": true,
+		"palette": { "isReversed": false },
+		"allowMapZoom": true,
+		"hideGeoColumnInTooltip": false,
+		"hidePrimaryColumnInTooltip": false,
+		"statePicked": { "fipsCode": "01", "stateName": "Alabama" },
+		"expandDataTable": false,
+		"annotationDropdownText": "Annotations",
+		"noStateFoundMessage": "Map Unavailable",
+		"subtext": "<div class=\"text-left\">Data last updated on <span data-timestamp=\"nwss_rsv_sc2_flua_combined_state_map:Data_as_of\"></span> and presented through <span data-timestamp=\"nwss_rsv_sc2_flua_combined_state_map:Data_Presented_Through\"></span>. "
+	},
+	"type": "map",
+	"color": "greenbluereverse",
+	"columns": {
+		"geo": {
+			"name": "State",
+			"label": "Location",
+			"tooltip": false,
+			"dataTable": true
+		},
+		"primary": {
+			"dataTable": true,
+			"tooltip": true,
+			"prefix": "",
+			"suffix": "",
+			"name": "activity_level_label",
+			"label": "Viral Activity Level",
+			"roundToPlace": 0
+		},
+		"navigate": { "name": "" },
+		"latitude": { "name": "" },
+		"longitude": { "name": "" },
+		"additionalColumn1": {
+			"label": "Sites Currently Reporting",
+			"dataTable": true,
+			"tooltips": false,
+			"prefix": "",
+			"suffix": "",
+			"name": "num_sites",
+			"tooltip": true
+		},
+		"additionalColumn2": {
+			"label": "Limited Coverage",
+			"dataTable": true,
+			"tooltips": false,
+			"prefix": "",
+			"suffix": "",
+			"tooltip": false,
+			"name": "hatch"
+		},
+		"additionalColumn3": {
+			"label": "",
+			"dataTable": false,
+			"tooltips": false,
+			"prefix": "",
+			"suffix": "",
+			"tooltip": true,
+			"useCommas": true,
+			"name": "hatch"
+		}
+	},
+	"legend": {
+		"descriptions": {},
+		"specialClasses": [],
+		"unified": false,
+		"singleColumn": false,
+		"singleRow": true,
+		"verticalSorted": false,
+		"showSpecialClassesLast": true,
+		"dynamicDescription": false,
+		"type": "category",
+		"numberOfItems": 8,
+		"position": "bottom",
+		"title": "Wastewater Viral Activity Level",
+		"categoryValuesOrder": [
+			"Very High",
+			"High",
+			"Moderate",
+			"Low",
+			"Minimal",
+			"No Data"
+		],
+		"additionalCategories": [
+			"No Data",
+			"Minimal",
+			"Low",
+			"Moderate",
+			"High",
+			"Very High"
+		],
+		"description": "",
+		"style": "gradient",
+		"subStyle": "linear blocks",
+		"tickRotation": "",
+		"singleColumnLegend": false,
+		"hideBorder": false
+	},
+	"filters": [
+		{
+			"order": "asc",
+			"label": "Select a virus from the dropdown:",
+			"columnName": "pathogen",
+			"values": ["COVID-19", "Influenza A", "RSV"],
+			"active": "COVID-19",
+			"filterStyle": "dropdown"
+		}
+	],
+	"table": {
+		"label": "Data Table",
+		"expanded": false,
+		"limitHeight": true,
+		"height": "500",
+		"caption": "",
+		"showDownloadUrl": true,
+		"showDataTableLink": true,
+		"showFullGeoNameInCSV": false,
+		"forceDisplay": true,
+		"download": true,
+		"indexLabel": "State/Territory",
+		"wrapColumns": false
+	},
+	"tooltips": {
+		"appearanceType": "hover",
+		"linkLabel": "Learn More",
+		"capitalizeLabels": true,
+		"opacity": 90
+	},
+	"visual": {
+		"minBubbleSize": 1,
+		"maxBubbleSize": 20,
+		"extraBubbleBorder": false,
+		"cityStyle": "circle",
+		"geoCodeCircleSize": 2,
+		"showBubbleZeros": false,
+		"cityStyleLabel": "",
+		"additionalCityStyles": []
+	},
+	"mapPosition": { "coordinates": [0, 30], "zoom": 1 },
+	"map": {
+		"layers": [],
+		"patterns": [
+			{
+				"dataKey": "hatch",
+				"pattern": "lines",
+				"dataValue": "Limited Coverage",
+				"label": "Limited Coverage*",
+				"size": "medium"
+			}
+		]
+	},
+	"hexMap": {
+		"type": "",
+		"shapeGroups": [
+			{
+				"legendTitle": "",
+				"legendDescription": "",
+				"items": [
+					{
+						"key": "",
+						"shape": "Arrow Up",
+						"column": "",
+						"operator": "=",
+						"value": ""
+					}
+				]
+			}
+		]
+	},
+	"filterBehavior": "Filter Change",
+	"customColors": [
+		"#34547B",
+		"#4B7F9B",
+		"#4B7F9B",
+		"#6BB0BD",
+		"#9FDAD0",
+		"#C8EFDA",
+		"#B4B4B4",
+		"#B4B4B4",
+		"#B4B4B4",
+		"#B4B4B4"
+	],
+	"datasets": {},
+	"dataFileName": "https://www.cdc.gov/wcms/vizdata/ncezid_didri/NWSSStateMapCombined.json",
+	"dataFileSourceType": "url",
+	"dataDescription": { "horizontal": false, "series": false },
+	"version": "4.24.9",
+	"dataUrl": "https://www.cdc.gov/wcms/vizdata/ncezid_didri/NWSSStateMapCombined.json"
+}
