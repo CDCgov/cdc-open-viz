@@ -8,15 +8,22 @@
   ul + .heading-2 {
     margin-top: 1em;
   }
-  .grid {
+  .visualization-grid {
     margin-top: 1em;
     list-style: none;
-    display: flex;
-    li {
-      margin-right: 1rem;
-      margin-bottom: 1rem;
-      width: 165px;
+    display: grid;
+    &.grid_category_General {
+      grid-template-columns: repeat(4, 180px);
     }
+
+    &.grid_category_Charts {
+      grid-template-columns: repeat(7, 180px);
+      grid-row-gap: 50px;
+    }
+    &.grid_category_Maps {
+      grid-template-columns: repeat(5, 180px);
+    }
+
     button {
       background-color: #fff;
       color: var(--baseColor);
