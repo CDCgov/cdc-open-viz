@@ -18,6 +18,7 @@ import {
   AccordionItemButton
 } from 'react-accessible-accordion'
 import { Draggable } from '@hello-pangea/dnd'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
 
 const SeriesContext = React.createContext({})
 
@@ -683,10 +684,24 @@ const SeriesItem = props => {
                     <Select
                       label='Dynamic Category'
                       value={series.dynamicCategory}
-                      options={getColumns().filter(col => series.dataKey !== col)}
+                      options={['- Select - ', ...getColumns().filter(col => series.dataKey !== col)]}
                       updateField={(_section, _subsection, _fieldName, value) => {
+                        if (value === '- Select -') value = ''
                         updateSeries(i, value, 'dynamicCategory')
                       }}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>
+                              This field is Optional. If you have a dynamic data series you can select the category
+                              field here. You can only add one dynamic category per visualization.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
                     />
                   )}
                   <Series.Input.Weight series={series} index={i} />
