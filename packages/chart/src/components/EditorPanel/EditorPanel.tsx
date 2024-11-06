@@ -746,7 +746,7 @@ const EditorPanel = () => {
         newValue
       ) // eslint-disable-line
 
-    if (section === 'boxplot' && subsection === 'legend') {
+    if (section === 'boxplot' && (subsection === 'legend' || subsection === 'labels')) {
       updateConfig({
         ...config,
         [section]: {
@@ -815,19 +815,6 @@ const EditorPanel = () => {
   if (loading) {
     return null
   }
-
-  useEffect(() => {
-    if (!config.general?.boxplot) return
-    if (!config.general.boxplot.firstQuartilePercentage) {
-      updateConfig({
-        ...config,
-        boxplot: {
-          ...config.boxplot,
-          firstQuartilePercentage: 25
-        }
-      })
-    }
-  }, [config])
 
   const setLollipopShape = shape => {
     updateConfig({
