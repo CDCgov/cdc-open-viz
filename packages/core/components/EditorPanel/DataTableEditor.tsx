@@ -283,7 +283,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           updateField={(_section, _subSection, _fieldName, value) => changeGroupBy(value)}
           initial={PLACEHOLDER}
           options={groupPivotColumns.filter(
-            col => col !== config.table.pivot?.columnName && !config.table.pivot?.valueColumns.includes(col)
+            col => col !== config.table.pivot?.columnName && !(config.table.pivot?.valueColumns || []).includes(col)
           )}
           tooltip={
             <Tooltip style={{ textTransform: 'none' }}>
@@ -314,7 +314,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
         }
         value={config.table.pivot?.columnName}
         options={groupPivotColumns.filter(
-          col => col !== config.table.groupBy && !config.table.pivot?.valueColumns.includes(col)
+          col => col !== config.table.groupBy && !(config.table.pivot?.valueColumns || []).includes(col)
         )}
         initial='-Select-'
         section='table'
