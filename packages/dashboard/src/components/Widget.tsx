@@ -90,7 +90,8 @@ const Widget = ({ widgetConfig, addVisualization, type }: WidgetProps) => {
   const loadSampleData = () => {
     const dataKey = config.rows[widgetConfig.rowIdx]?.dataKey || widgetConfig?.dataKey
     const dataset = config.datasets[dataKey]
-    if (!data[dataset.dataUrl].length) {
+    const _data = data[dataset.dataUrl]
+    if (_data && !_data.length) {
       const url = changeDataLimit(dataset.dataUrl, 100)
       fetchRemoteData(url).then(responseData => {
         responseData.sample = true
