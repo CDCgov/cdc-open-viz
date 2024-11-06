@@ -2209,7 +2209,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   {state.legend.specialClasses.length === 2 && (
                     <Alert
                       type='info'
-                      message='If more than two special classes are needed please use patterns for additional legend items'
+                      message='If a third special class is needed you can apply a pattern to set it apart.'
                       showCloseButton={false}
                     />
                   )}
@@ -3253,7 +3253,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
               <label>
                 <span className='edit-label'>Map Color Palette</span>
               </label>
-              {/* <InputCheckbox  section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
               <InputToggle
                 type='3d'
                 section='general'

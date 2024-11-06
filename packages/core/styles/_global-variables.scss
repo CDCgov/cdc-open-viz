@@ -62,7 +62,12 @@ $colors: (
   'amber-primary': #fbab18,
   'amber-secondary': #ffd54f,
   'amber-tertiary': #ffecb3,
-  'amber-quaternary': #fff7e1
+  'amber-quaternary': #fff7e1,
+
+  'cool-gray-90': #1c1d1f,
+  'cool-gray-50': #71767a,
+  'cool-gray-30': #a9aeb1,
+  'cool-gray-10': #dfe1e2
 );
 
 @mixin theme() {
