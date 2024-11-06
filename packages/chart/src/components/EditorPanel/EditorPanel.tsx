@@ -1397,14 +1397,15 @@ const EditorPanel = () => {
                     </AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    {visSupportsDynamicSeries() && (
+                    {/* FEATURE to be reintroduced by DEV-9747 */}
+                    {/* {visSupportsDynamicSeries() && (
                       <CheckBox
                         value={config.dynamicSeries}
                         fieldName='dynamicSeries'
                         label='Dynamically generate series'
                         updateField={updateField}
                       />
-                    )}
+                    )} */}
                     {config.dynamicSeries && config.visualizationType === 'Line' && (
                       <Select
                         fieldName='dynamicSeriesType'
