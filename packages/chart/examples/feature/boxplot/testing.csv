@@ -1,10 +1,10 @@
-category one,value
-Group A,16
-Group A,24
-Group A,32
-Group A,40
-Group A,43
-Group A,72
+category one,value,price
+Group A,16,33
+Group A,24,54
+Group A,32,32
+Group A,40,45
+Group A,43,32
+Group A,72,33
 Group A,83
 Group A,104
 Group A,137

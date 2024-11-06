@@ -10,13 +10,14 @@ export type BoxPlot = {
     q3: string
     outliers: string
     values: string
-    total: string
+    count: string
     lowerBounds: string
     upperBounds: string
   }
+  plotNonOutlierValues: boolean
   plots: [{ columnOutliers: []; columnLowerBounds: number; columnUpperBounds: number }]
   categories: string[]
-  firstQuartilePercentage: number
   geoType: string
   hideOutliers: boolean
+  borders: string
 }

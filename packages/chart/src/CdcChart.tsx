@@ -292,9 +292,6 @@ const CdcChart = ({
     }
     let newConfig = { ...defaults, ...response }
 
-    if (newConfig.visualizationType === 'Box Plot') {
-      newConfig.legend.hide = true
-    }
     if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
 
     newConfig.series.forEach(series => {
@@ -438,20 +435,10 @@ const CdcChart = ({
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
-      let allKeys = newExcludedData
-        ? newExcludedData.map(d => d[newConfig.xAxis.dataKey])
-        : data.map(d => d[newConfig.xAxis.dataKey])
-      let allValues = newExcludedData
-        ? newExcludedData.map(d => Number(d[newConfig?.series[0]?.dataKey]))
-        : data.map(d => Number(d[newConfig?.series[0]?.dataKey]))
+      const combinedData = filteredData || data
+      let allKeys = combinedData.map(d => d[newConfig.xAxis.dataKey])
+      const groups = _.uniq(allKeys)
 
-      const uniqueArray = function (arrArg) {
-        return arrArg.filter(function (elem, pos, arr) {
-          return arr.indexOf(elem) === pos
-        })
-      }
-
-      const groups = uniqueArray(allKeys)
       let tableData: any[] = []
       const plots: any[] = []
 
@@ -463,9 +450,8 @@ const CdcChart = ({
           if (!g) throw new Error('No groups resolved in box plots')
 
           // filter data by group
-          let filteredData = newExcludedData
-            ? newExcludedData.filter(item => item[newConfig.xAxis.dataKey] === g)
-            : data.filter(item => item[newConfig.xAxis.dataKey] === g)
+          let filteredData = combinedData.filter(item => item[newConfig.xAxis.dataKey] === g)
+
           let filteredDataValues: number[] = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
 
           // Sort the data for upcoming functions.
@@ -474,16 +460,18 @@ const CdcChart = ({
           // ! - Notice d3.quantile doesn't work here, and we had to take a custom route.
           const quartiles = getQuartiles(sortedData)
 
+          const getValuesBySeriesKey = () => {
+            const allSeriesKeys = newConfig.series.map(item => item?.dataKey)
+            const result = {}
+            allSeriesKeys.forEach(key => {
+              result[key] = filteredData.map(item => item[key])
+            })
+
+            return result
+          }
+
           if (!filteredData) throw new Error('boxplots dont have data yet')
           if (!plots) throw new Error('boxplots dont have plots yet')
-
-          if (newConfig.boxplot.firstQuartilePercentage === '') {
-            newConfig.boxplot.firstQuartilePercentage = 0
-          }
-
-          if (newConfig.boxplot.thirdQuartilePercentage === '') {
-            newConfig.boxplot.thirdQuartilePercentage = 0
-          }
 
           const q1 = quartiles.q1
           const q3 = quartiles.q3
@@ -492,9 +480,7 @@ const CdcChart = ({
           const upperBounds = q3 + (q3 - q1) * 1.5
 
           const outliers = sortedData.filter(v => v < lowerBounds || v > upperBounds)
-          let nonOutliers = filteredDataValues
 
-          nonOutliers = nonOutliers.filter(item => !outliers.includes(item))
           const minValue: number = d3.min<number>(filteredDataValues) || 0
           const _colMin = d3.max<number>([minValue, q1 - 1.5 * iqr])
           plots.push({
@@ -504,7 +490,7 @@ const CdcChart = ({
             columnMedian: Number(d3.median(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnFirstQuartile: q1.toFixed(newConfig.dataFormat.roundTo),
             columnMin: _colMin,
-            columnTotal: filteredDataValues.reduce((partialSum, a) => partialSum + a, 0),
+            columnCount: filteredDataValues?.length,
             columnSd: Number(d3.deviation(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnMean: Number(d3.mean(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnIqr: Number(iqr).toFixed(newConfig.dataFormat.roundTo),
@@ -512,7 +498,7 @@ const CdcChart = ({
             columnUpperBounds: d3.min([d3.max(sortedData), q1 + 1.5 * iqr]),
             columnOutliers: outliers,
             values: filteredDataValues,
-            nonOutlierValues: nonOutliers
+            keyValues: getValuesBySeriesKey()
           })
         } catch (e) {
           console.error('COVE: ', e.message) // eslint-disable-line
@@ -530,8 +516,6 @@ const CdcChart = ({
         return null // resolve eslint
       })
 
-      // any other data we can add to boxplots
-      newConfig.boxplot['allValues'] = allValues
       newConfig.boxplot['categories'] = groups
       newConfig.boxplot.plots = plots
       newConfig.boxplot.tableData = tableData

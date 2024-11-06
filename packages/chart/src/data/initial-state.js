@@ -68,15 +68,8 @@ export default {
   boxplot: {
     plots: [],
     borders: 'true',
-    firstQuartilePercentage: 25,
-    thirdQuartilePercentage: 75,
-    boxWidthPercentage: 40,
     plotOutlierValues: false,
     plotNonOutlierValues: true,
-    legend: {
-      showHowToReadText: false,
-      howToReadText: ''
-    },
     labels: {
       q1: 'Lower Quartile',
       q2: 'q2',
@@ -88,7 +81,7 @@ export default {
       median: 'Median',
       sd: 'Standard Deviation',
       iqr: 'Interquartile Range',
-      total: 'Total',
+      count: 'Count',
       outliers: 'Outliers',
       values: 'Values',
       lowerBounds: 'Lower Bounds',

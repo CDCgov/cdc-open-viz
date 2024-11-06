@@ -690,7 +690,17 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               showTooltip={showTooltip}
             />
           )}
-          {visualizationType === 'Box Plot' && <BoxPlot xScale={xScale} yScale={yScale} />}
+          {visualizationType === 'Box Plot' && (
+            <BoxPlot
+              seriesScale={seriesScale}
+              xMax={xMax}
+              yMax={yMax}
+              min={min}
+              max={max}
+              xScale={xScale}
+              yScale={yScale}
+            />
+          )}
           {((visualizationType === 'Area Chart' && config.visualizationSubType === 'regular') ||
             visualizationType === 'Combo') && (
             <AreaChart
