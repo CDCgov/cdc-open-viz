@@ -37,7 +37,6 @@ export const loadAPIFiltersFactory = (
               .then(data => {
                 if (!Array.isArray(data)) {
                   console.error('COVE only supports response data in the shape Array<Object>')
-                  return
                 }
                 const [_key, index] = toFetch[endpoint]
                 const apiFilter = filterLookup.get(_key) as APIFilter

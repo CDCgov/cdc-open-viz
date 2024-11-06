@@ -8,7 +8,7 @@ const reducer = (state: errorMessagesState, action: errorMessagesActions): error
   switch (action.type) {
     case 'ADD_ERROR_MESSAGE': {
       const message = action.payload
-      return [...state, ...message]
+      return [...state, message]
     }
 
     case 'DISMISS_ERROR_MESSAGE': {
