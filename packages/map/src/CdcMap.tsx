@@ -345,7 +345,6 @@ const CdcMap = ({
     const newLegendMemo = new Map() // Reset memoization
     const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
     let primaryCol = obj.columns.primary.name,
-      isSingleState = obj.general.geoType === 'single-state',
       isBubble = obj.general.type === 'bubble',
       categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
       type = obj.legend.type,
@@ -573,7 +572,9 @@ const CdcMap = ({
       newLegendMemo.forEach(assignSpecialClassLastIndex)
       legendSpecialClassLastMemo.current = newLegendSpecialClassLastMemo
 
-      return result
+      // filter special classes from results
+      const specialValues = result.filter(d => d.special).map(d => d.value)
+      return result.filter(d => d.special || !specialValues.includes(d.value))
     }
 
     let uniqueValues = {}
