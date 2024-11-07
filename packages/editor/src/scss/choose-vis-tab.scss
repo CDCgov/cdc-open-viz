@@ -12,15 +12,14 @@
     margin-top: 1em;
     list-style: none;
     display: grid;
-    &.grid_category_General {
+    &.category_general {
       grid-template-columns: repeat(4, 180px);
     }
-
-    &.grid_category_Charts {
+    &.category_charts {
       grid-template-columns: repeat(7, 180px);
       grid-row-gap: 50px;
     }
-    &.grid_category_Maps {
+    &.category_maps {
       grid-template-columns: repeat(5, 180px);
     }
 

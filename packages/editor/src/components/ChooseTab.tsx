@@ -63,69 +63,6 @@ const ChooseTab = () => {
   const dispatch = useContext(EditorDispatchContext)
   const rowLabels = ['General', , 'Charts', 'Maps']
 
-  const IconButton = props => {
-    const { label, type, subType = undefined, orientation = undefined, stacked = false, generalType = 'data' } = props
-    let isSubType = false
-
-    if (type === 'map' && config.general) {
-      let geoType = config.general.geoType
-      isSubType = subType === geoType
-    }
-
-    if (type === 'chart') {
-      isSubType = subType === config.visualizationType
-    }
-
-    if (type === 'dashboard' || type === 'data-bite' || type === 'markup-include') isSubType = true
-
-    const setTypes = () => {
-      const confirmation =
-        !config.type ||
-        window.confirm('Changing visualization type will clear configuration settings. Do you want to continue?')
-
-      if (confirmation) {
-        const newConfig = {
-          newViz: true,
-          datasets: {},
-          isResponsiveTicks: false,
-          type,
-          barThickness: '0.37',
-          xAxis: {
-            type: 'categorical',
-            size: 75,
-            maxTickRotation: 45,
-            labelOffset: 0
-          }
-        }
-
-        if (type === 'map') {
-          newConfig.general = {
-            ...newConfig.general,
-            geoType: subType,
-            type: generalType
-          }
-        } else {
-          newConfig.visualizationType = subType
-        }
-        if (type === 'chart') {
-          newConfig.visualizationSubType = stacked ? 'stacked' : 'regular'
-          newConfig.orientation = orientation
-          if (label === 'Epi Chart') {
-            newConfig.xAxis.type = 'date-time'
-            newConfig.xAxis.size = 0
-            newConfig.barThickness = ' 0.95'
-            newConfig.xAxis.labelOffset = 0
-            newConfig.xAxis.maxTickRotation = 45
-            newConfig.isResponsiveTicks = true
-          }
-        }
-
-        dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
-        dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
-      }
-    }
-  }
-
   const handleUpload = e => {
     const file = e.target.files[0]
     const reader = new FileReader()
@@ -142,34 +79,42 @@ const ChooseTab = () => {
     reader.readAsText(file)
   }
 
-  const generateNewConfig = ({ type, subType }) => {
+  const generateNewConfig = props => {
     let newConfig = {}
-    switch (type) {
-      case 'chart':
+    switch (props.category) {
+      case 'Charts': {
+        const visualizationType = props.subType
+        const visualizationSubType = !props.visualizationSubType ? 'regular' : props.visualizationSubType
         newConfig = {
+          ...props,
+          visualizationType: visualizationType,
+          visualizationSubType: visualizationSubType,
           newViz: true,
-          datasets: {},
-          isResponsiveTicks: false,
-          type: 'chart',
-          visualizationType: subType,
-          barThickness: '0.37',
-          xAxis: {
-            type: 'categorical',
-            size: 75,
-            maxTickRotation: 45,
-            labelOffset: 0
-          }
+          datasets: {}
         }
         break
+      }
 
-      case 'Map':
+      case 'General': {
+        const visualizationType = props.subType
+        newConfig = { ...props, newViz: true, datasets: {}, visualizationType: visualizationType }
+        break
+      }
+
+      case 'Maps': {
+        const visualizationType = props.subType
         newConfig = {
+          ...props,
           newViz: true,
           datasets: {},
-          type: 'map',
-          visualizationType: subType
+          type: 'map'
+        }
+        newConfig['general'] = {
+          geoType: visualizationType,
+          type: 'map'
         }
         break
+      }
     }
 
     return newConfig
@@ -224,7 +169,7 @@ const ChooseTab = () => {
         return (
           <React.Fragment>
             <div className='heading-2'>{label}</div>
-            <ul className={`visualization-grid grid_category_${label}`}>
+            <ul className={`visualization-grid category_${label.toLowerCase()}`}>
               {buttons
                 .filter(button => button.category === label)
                 .map((button, index) => (
@@ -276,6 +221,14 @@ const buttons = [
     type: 'chart',
     subType: 'Bar',
     orientation: 'vertical',
+    barThickness: '0.37',
+    visualizationSubType: 'regular',
+    xAxis: {
+      type: 'categorical',
+      size: 75,
+      maxTickRotation: 45,
+      labelOffset: 0
+    },
     icon: <BarIcon />,
     content: 'Use bars to show comparisons between data categories.'
   },
@@ -286,6 +239,15 @@ const buttons = [
     type: 'chart',
     subType: 'Bar',
     orientation: 'vertical',
+    barThickness: ' 0.95',
+    isResponsiveTicks: true,
+    visualizationSubType: 'regular',
+    xAxis: {
+      type: 'date-time',
+      size: 0,
+      labelOffset: 0,
+      maxTickRotation: 45
+    },
     icon: <EpiChartIcon />,
     content: 'Use bars to show comparisons between data categories.'
   },
@@ -385,6 +347,7 @@ const buttons = [
     label: 'Horizontal Bar (Stacked)',
     type: 'chart',
     subType: 'Bar',
+    visualizationSubType: 'stacked',
     orientation: 'horizontal',
     icon: <HorizontalStackIcon />,
     content: 'Use bars to show comparisons between data categories.'
@@ -490,7 +453,6 @@ const buttons = [
   },
   {
     id: 22,
-
     category: 'Maps',
     label: 'U.S. Geocode',
     type: 'map',
