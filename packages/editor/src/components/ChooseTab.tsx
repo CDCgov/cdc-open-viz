@@ -39,8 +39,10 @@ interface ButtonProps {
 }
 
 const ChooseTab: React.FC = (): JSX.Element => {
-  const { config, tempConfig } = useContext(ConfigContext)
-  const [activeButtonId, setActiveButtonId] = useState(null)
+  const { config } = useContext(ConfigContext)
+  const [activeButtonId, setActiveButtonId] = useState(() => {
+    return localStorage.getItem('activeButtonId') || null
+  })
   const dispatch = useContext(EditorDispatchContext)
   const rowLabels = ['General', , 'Charts', 'Maps']
 
@@ -109,10 +111,12 @@ const ChooseTab: React.FC = (): JSX.Element => {
 
   const VizButton: React.FC<ButtonProps> = props => {
     const { label, icon, id } = props
-    const isActive = activeButtonId === id
-
+    const isActive = id === Number(activeButtonId)
     const handleClick = () => {
-      setActiveButtonId(isActive ? null : id)
+      const newActiveId = id.toString()
+      localStorage.setItem('activeButtonId', newActiveId)
+      setActiveButtonId(newActiveId)
+
       configureTabs(props)
     }
 
@@ -123,12 +127,6 @@ const ChooseTab: React.FC = (): JSX.Element => {
       </button>
     )
   }
-
-  useEffect(() => {
-    if (tempConfig) {
-      dispatch({ type: 'EDITOR_SAVE', payload: tempConfig })
-    }
-  }, [])
 
   return (
     <div className='choose-vis'>
