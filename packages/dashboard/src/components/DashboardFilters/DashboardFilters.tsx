@@ -130,7 +130,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
             >
               {nullVal(filter) && (
                 <option key={`select`} value=''>
-                  {filter.resetLabel || '-Select-'}
+                  {filter.resetLabel || '- Select -'}
                 </option>
               )}
               {values}

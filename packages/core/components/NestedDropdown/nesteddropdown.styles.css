@@ -15,6 +15,7 @@
     position: relative;
     display: inline-block;
     width: 100%;
+    padding: 0;
   }
 
   .main-nested-dropdown-container,
@@ -23,6 +24,7 @@
     min-width: 200px;
     cursor: pointer;
     padding: 0.375rem 0.75rem;
+    font-size: 1em;
   }
 
   .selectable-item {
