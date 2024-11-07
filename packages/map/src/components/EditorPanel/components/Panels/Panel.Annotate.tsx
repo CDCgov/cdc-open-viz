@@ -11,7 +11,12 @@ import ConfigContext from '../../../../context'
 // styles
 
 const PanelAnnotate: React.FC = props => {
-  const { state: config, setState: updateConfig, dimensions, isDraggingAnnotation } = useContext<MapContext>(ConfigContext)
+  const {
+    state: config,
+    setState: updateConfig,
+    dimensions,
+    isDraggingAnnotation
+  } = useContext<MapContext>(ConfigContext)
   const getColumns = (filter = true) => {
     const columns = {}
     config.data.forEach(row => {
@@ -20,7 +25,10 @@ const PanelAnnotate: React.FC = props => {
 
     if (filter) {
       Object.keys(columns).forEach(key => {
-        if ((config.series && config.series.filter(series => series.dataKey === key).length > 0) || (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key))) {
+        if (
+          (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
+          (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key))
+        ) {
           delete columns[key]
         }
       })
@@ -41,7 +49,9 @@ const PanelAnnotate: React.FC = props => {
   }
 
   const handleAddAnnotation = () => {
-    const svgContainer = document.querySelector('.map-container > section > svg, .map-container > section > canvas')?.getBoundingClientRect()
+    const svgContainer = document
+      .querySelector('.map-container > section > svg, .map-container > section > canvas')
+      ?.getBoundingClientRect()
     const newSvgDims = [svgContainer.width, svgContainer.height]
 
     const newAnnotation = {
@@ -139,11 +149,17 @@ const PanelAnnotate: React.FC = props => {
         {config?.annotations &&
           config?.annotations.map((annotation, index) => (
             <Accordion>
-              <Accordion.Section title={annotation.text ? annotation.text.substring(0, 15) + '...' : `Annotation ${index + 1}`}>
+              <Accordion.Section
+                title={annotation.text ? annotation.text.substring(0, 15) + '...' : `Annotation ${index + 1}`}
+              >
                 <div className='annotation-group'>
                   <label>
                     Annotation Text:
-                    <textarea rows={5} value={annotation.text} onChange={e => handleAnnotationUpdate(e.target.value, 'text', index)} />
+                    <textarea
+                      rows={5}
+                      value={annotation.text}
+                      onChange={e => handleAnnotationUpdate(e.target.value, 'text', index)}
+                    />
                   </label>
                   {/* <label>
                       Vertical Anchor
@@ -304,30 +320,18 @@ const PanelAnnotate: React.FC = props => {
                     </select>
                   </label>
 
-                  {/* <label>
-                    Snap to Nearest Point
-                    <input
-                      type='checkbox'
-                      checked={config?.annotations[index]?.snapToNearestPoint}
-                      onClick={e => {
-                        const updatedAnnotations = [...config?.annotations]
-                        updatedAnnotations[index].snapToNearestPoint = e.target.checked
-                        updateConfig({
-                          ...config,
-                          annotations: updatedAnnotations
-                        })
-                      }}
-                    />
-                  </label> */}
-
-                  <Button className='warn btn-warn btn btn-remove delete' onClick={() => handleRemoveAnnotation(index)}>
+                  <Button className='btn btn-danger' onClick={() => handleRemoveAnnotation(index)}>
                     Delete Annotation
                   </Button>
                 </div>
               </Accordion.Section>
             </Accordion>
           ))}
-        {config?.annotations?.length < 3 && <Button onClick={handleAddAnnotation}>Add Annotation</Button>}
+        {config?.annotations?.length < 3 && (
+          <button className='btn btn-primary full-width' onClick={handleAddAnnotation}>
+            Add Annotation
+          </button>
+        )}
       </Accordion.Section>
     </Accordion>
   )

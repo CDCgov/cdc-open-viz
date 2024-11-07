@@ -2266,7 +2266,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     </div>
                   ))}
                   <button
-                    className='btn full-width'
+                    className='btn btn-primary full-width'
                     onClick={e => {
                       e.preventDefault()
                       editColumn('primary', 'specialClassAdd', {})
@@ -2417,7 +2417,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     </fieldset>
                   ))}
                   <button
-                    className={'btn full-width'}
+                    className={'btn btn-primary full-width'}
                     onClick={event => {
                       event.preventDefault()
                       addAdditionalColumn(additionalColumns.length + 1)
@@ -2473,7 +2473,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       </fieldset>
                     ))}
                   <button
-                    className={'btn full-width'}
+                    className={'btn btn-primary full-width'}
                     onClick={event => {
                       event.preventDefault()
                       const updatedAdditionaCategories = [...(state.legend.additionalCategories || [])]
@@ -2911,7 +2911,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   <p style={{ textAlign: 'center' }}>There are currently no filters.</p>
                 )}
                 <button
-                  className={'btn full-width'}
+                  className={'btn btn-primary full-width'}
                   onClick={event => {
                     event.preventDefault()
                     changeFilter(null, 'addNew')
@@ -3527,7 +3527,11 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     )
                   })}
 
-                <button type='button' onClick={() => editCityStyles('add', 0, '', '')} className='btn full-width'>
+                <button
+                  type='button'
+                  onClick={() => editCityStyles('add', 0, '', '')}
+                  className='btn btn-primary full-width'
+                >
                   Add city style
                 </button>
               </>
@@ -3629,7 +3633,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   </>
                 )
               })}
-              <button className={'btn full-width'} onClick={handleAddLayer}>
+              <button className={'btn btn-primary full-width'} onClick={handleAddLayer}>
                 Add Map Layer
               </button>
               <p className='layer-purpose-details'>
