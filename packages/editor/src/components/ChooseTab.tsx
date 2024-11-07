@@ -28,36 +28,17 @@ import ComboChartIcon from '@cdc/core/assets/icon-combo-chart.svg'
 import EpiChartIcon from '@cdc/core/assets/icon-epi-chart.svg'
 import Icon from '@cdc/core/components/ui/Icon'
 
-enum SubType {
-  Bar = 'Bar',
-  Pie = 'Pie',
-  Line = 'Line',
-  Combo = 'Combo',
-  'Paired Bar' = 'Paired Bar',
-  'Area Chart' = 'Area Chart',
-  Forecasting = 'Forecasting',
-  Sankey = 'Sankey',
-  'Box Plot' = 'Box Plot',
-  'Deviation Bar' = 'Deviation Bar',
-  Waffle = 'Waffle',
-  'single-state' = 'single-state',
-  world = 'us-county',
-  'us-geocode' = 'us-geocode',
-  'us-region' = 'us-region'
-}
-type VizType = 'chart' | 'data-bite' | 'map' | 'dashboard'
 interface ButtonProps {
   icon: React.ReactElement
   id: number
   label: string
-  type: VizType
-  subType: SubType
-  orientation: 'vertical' | 'horizontal' | null
-  stacked?: boolean
-  generalType?: string
+  type: string
+  subType: string
+  category: string
+  orientation?: string | null
 }
 
-const ChooseTab = () => {
+const ChooseTab: React.FC = (): JSX.Element => {
   const { config, tempConfig } = useContext(ConfigContext)
   const [activeButtonId, setActiveButtonId] = useState(null)
   const dispatch = useContext(EditorDispatchContext)
@@ -126,9 +107,10 @@ const ChooseTab = () => {
     dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
   }
 
-  const VizButton = props => {
+  const VizButton: React.FC<ButtonProps> = props => {
     const { label, icon, id } = props
     const isActive = activeButtonId === id
+
     const handleClick = () => {
       setActiveButtonId(isActive ? null : id)
       configureTabs(props)
