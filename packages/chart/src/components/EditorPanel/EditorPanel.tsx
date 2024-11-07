@@ -171,7 +171,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                 <p> {type === 'suppression' ? 'Suppressed' : 'Effect'} Data</p>
                 <button
                   type='button'
-                  className='remove-column'
+                  className='btn btn-danger'
                   onClick={event => {
                     event.preventDefault()
                     removeColumn(i)
@@ -530,7 +530,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
               <p>Axis Category {i + 1}</p>
               <button
                 type='button'
-                className='remove-column'
+                className='btn btn-danger'
                 onClick={event => {
                   event.preventDefault()
                   removeColumn(i)
@@ -583,7 +583,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
           )
         })}
 
-      <button type='button' onClick={addColumn} className='btn full-width'>
+      <button type='button' onClick={addColumn} className='btn btn-primary full-width'>
         Add Axis Category
       </button>
     </>
@@ -3188,7 +3188,7 @@ const EditorPanel = () => {
                             highlightedBarValues.map((highlightedBarValue, i) => (
                               <fieldset>
                                 <div className='edit-block' key={`highlighted-bar-${i}`}>
-                                  <button className='remove-column' onClick={e => handleRemoveHighlightedBar(e, i)}>
+                                  <button className='btn btn-danger' onClick={e => handleRemoveHighlightedBar(e, i)}>
                                     Remove
                                   </button>
                                   <p>Highlighted Bar {i + 1}</p>
@@ -3246,7 +3246,7 @@ const EditorPanel = () => {
                                 </div>
                               </fieldset>
                             ))}
-                          <button className='btn full-width' onClick={e => handleAddNewHighlightedBar(e)}>
+                          <button className='btn btn-primary full-width' onClick={e => handleAddNewHighlightedBar(e)}>
                             Add Highlighted Bar
                           </button>
                         </>
@@ -3814,7 +3814,7 @@ const EditorPanel = () => {
                         config.legend.seriesHighlight.map((val, i) => (
                           <fieldset className='edit-block' key={`${val}-${i}`}>
                             <button
-                              className='remove-column'
+                              className='btn btn-danger'
                               onClick={event => {
                                 event.preventDefault()
                                 const updatedSeriesHighlight = [...config.legend.seriesHighlight]
@@ -3843,7 +3843,7 @@ const EditorPanel = () => {
                           </fieldset>
                         ))}
                       <button
-                        className={'btn full-width'}
+                        className={'btn btn-primary full-width'}
                         onClick={event => {
                           event.preventDefault()
                           const legendColumns = getLegendColumns()

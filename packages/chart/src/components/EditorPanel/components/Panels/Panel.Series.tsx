@@ -349,44 +349,6 @@ const SeriesDropdownConfidenceInterval = props => {
                     </div>
                   </div>
 
-                  {/* <label>
-                    High Label
-                    <input
-                      type='text'
-                      key={`series-ci-high-label-${index}`}
-                      value={series.confidenceIntervals[index]?.highLabel ? series.confidenceIntervals[index]?.highLabel : ''}
-                      onChange={e => {
-                        const copiedConfidenceArray = [...config.series[index].confidenceIntervals]
-                        copiedConfidenceArray[ciIndex].highLabel = e.target.value
-                        const copyOfSeries = [...config.series] // copy the entire series array
-                        copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedConfidenceArray }
-                        updateConfig({
-                          ...config,
-                          series: copyOfSeries
-                        })
-                      }}
-                    />
-                  </label> */}
-
-                  {/* <label>
-                    Low label
-                    <input
-                      type='text'
-                      key={`series-ci-high-label-${index}`}
-                      value={series.confidenceIntervals[index]?.lowLabel ? series.confidenceIntervals[index]?.lowLabel : ''}
-                      onChange={e => {
-                        const copiedConfidenceArray = [...config.series[index].confidenceIntervals]
-                        copiedConfidenceArray[ciIndex].lowLabel = e.target.value
-                        const copyOfSeries = [...config.series] // copy the entire series array
-                        copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedConfidenceArray }
-                        updateConfig({
-                          ...config,
-                          series: copyOfSeries
-                        })
-                      }}
-                    />
-                  </label> */}
-
                   <InputSelect
                     initial='Select an option'
                     value={
@@ -433,7 +395,7 @@ const SeriesDropdownConfidenceInterval = props => {
           })}
         </Accordion>
         <button
-          className='btn full-width'
+          className='btn btn-primary full-width'
           onClick={e => {
             e.preventDefault()
             let copiedIndex = null
