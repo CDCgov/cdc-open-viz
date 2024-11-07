@@ -67,16 +67,20 @@ export default function useDataVizClasses(config, viewport = null) {
     if (legend?.style === 'gradient') ulClasses.push('patterns-only')
     return ulClasses
   }
-  const hasBorder = legend?.hideBorder ? 'no-border' : ''
+  const hasSideBorder = legend.position === 'side' && legend?.hideSideBorder ? 'no-side-border' : ''
+  const hasTopBottomBorder = legend?.hideTopBottomBorder && legend.position !== 'side' ? 'no-top-bottom-border' : ''
   const legendOuterClasses = [
     `${legend?.position}`,
     `${getListPosition()}`,
     `cdcdataviz-sr-focusable`,
     `${viewport}`,
-    `${hasBorder}`
+    `${hasSideBorder}`,
+    `${hasTopBottomBorder}`
   ]
 
-  const usePadding = !legend?.hideBorder
+  const usePadding =
+    (legend.position === 'side' && !legend?.hideSideBorder) ||
+    (legend.position !== 'side' && !legend?.hideTopBottomBorder)
 
   const legendClasses = {
     aside: legendOuterClasses,

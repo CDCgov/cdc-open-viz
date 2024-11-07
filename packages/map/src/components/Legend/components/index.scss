@@ -52,7 +52,11 @@
           flex-wrap: wrap;
         }
       }
-      &.no-border {
+      &.no-side-border {
+        border: none;
+      }
+
+      &.no-top-bottom-border {
         border: none;
       }
 

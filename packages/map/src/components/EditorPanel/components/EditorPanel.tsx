@@ -402,12 +402,21 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           }
         })
         break
-      case 'legendBorder':
+      case 'legendBorderSide':
         setState({
           ...state,
           legend: {
             ...state.legend,
-            hideBorder: value
+            hideSideBorder: value
+          }
+        })
+        break
+      case 'legendBorderTopBottom':
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            hideTopBottomBorder: value
           }
         })
         break
@@ -2604,13 +2613,13 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     ></input>
                   </label>
                 )}
-                {
+                {legend.position === 'side' && (
                   <label className='checkbox'>
                     <input
                       type='checkbox'
-                      checked={legend.hideBorder}
+                      checked={legend.hideSideBorder}
                       onChange={event => {
-                        handleEditorChanges('legendBorder', event.target.checked)
+                        handleEditorChanges('legendBorderSide', event.target.checked)
                       }}
                     />
                     <span className='edit-label column-heading'>Hide Legend Box</span>
@@ -2626,7 +2635,30 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       </Tooltip.Content>
                     </Tooltip>
                   </label>
-                }
+                )}
+                {legend.position !== 'side' && (
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={legend.hideTopBottomBorder}
+                      onChange={event => {
+                        handleEditorChanges('legendBorderTopBottom', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label column-heading'>Hide Legend Box</span>
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon
+                          display='question'
+                          style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                        />
+                      </Tooltip.Target>
+                      <Tooltip.Content>
+                        <p> Default option for top and bottom legends is ‘No Box.’</p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  </label>
+                )}
                 {'side' === legend.position && (
                   <label className='checkbox'>
                     <input
