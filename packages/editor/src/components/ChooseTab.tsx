@@ -335,7 +335,7 @@ const buttons = [
     content: 'Use bars to show comparisons between data categories.'
   },
   {
-    id: 12,
+    id: 13,
     category: 'Charts',
     label: 'Pie',
     type: 'chart',
@@ -345,7 +345,7 @@ const buttons = [
     content: 'Present the numerical proportions of a data series.'
   },
   {
-    id: 13,
+    id: 14,
     category: 'Charts',
     label: 'Deviation Bar',
     type: 'chart',
@@ -355,7 +355,7 @@ const buttons = [
     content: 'Use deviation bars to display how individual values differ from a target'
   },
   {
-    id: 14,
+    id: 15,
     category: 'General',
     label: 'Dashboard',
     type: 'dashboard',
@@ -365,7 +365,7 @@ const buttons = [
     content: 'Present multiple data visualizations with shared filter controls.'
   },
   {
-    id: 15,
+    id: 16,
     category: 'General',
     label: 'Data Bite',
     type: 'data-bite',
@@ -375,7 +375,7 @@ const buttons = [
     content: 'Highlight a single aggregated value (e.g., sum or median).'
   },
   {
-    id: 16,
+    id: 17,
     category: 'General',
     label: 'Waffle Chart',
     type: 'waffle-chart',
@@ -385,7 +385,7 @@ const buttons = [
     content: 'Highlight a piece of data in relationship to a data set.'
   },
   {
-    id: 17,
+    id: 18,
     category: 'General',
     label: 'Gauge Chart',
     type: 'waffle-chart',
@@ -396,7 +396,7 @@ const buttons = [
               scale.`
   },
   {
-    id: 18,
+    id: 19,
     category: 'Maps',
     label: 'United States (State- or County-Level)',
     type: 'map',
@@ -406,7 +406,7 @@ const buttons = [
     position: 'right'
   },
   {
-    id: 19,
+    id: 20,
     category: 'Maps',
     label: 'United States (HHS Regions)',
     type: 'map',
@@ -416,7 +416,7 @@ const buttons = [
     position: 'right'
   },
   {
-    id: 20,
+    id: 21,
     category: 'Maps',
     label: 'World',
     type: 'map',
@@ -425,7 +425,7 @@ const buttons = [
     content: 'Present a choropleth map of the world.'
   },
   {
-    id: 21,
+    id: 22,
     category: 'Maps',
     label: 'U.S. State',
     type: 'map',
@@ -434,7 +434,7 @@ const buttons = [
     content: 'Present a choropleth map of an individual U.S. state.'
   },
   {
-    id: 22,
+    id: 23,
     category: 'Maps',
     label: 'U.S. Geocode',
     type: 'map',
