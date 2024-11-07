@@ -154,8 +154,8 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
     const newWorkingData =
       isOrIsNotEqualTo === 'is'
-        ? workingData.filter(dataObject => dataObject[columnName] === value)
-        : workingData.filter(dataObject => dataObject[columnName] !== value)
+        ? workingData?.filter(dataObject => dataObject[columnName] === value)
+        : workingData?.filter(dataObject => dataObject[columnName] !== value)
 
     conditionList.shift()
     return conditionList.length === 0 ? newWorkingData : filterOutConditions(newWorkingData, conditionList)
@@ -245,7 +245,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   const markup = useInlineHTML ? convertVariablesInMarkup(inlineHTML) : parseBodyMarkup(urlMarkup)
 
-  const hideMarkupInclude = contentEditor.allowHideSection && emptyVariableChecker.length > 0 && !isEditor
+  const hideMarkupInclude = contentEditor?.allowHideSection && emptyVariableChecker.length > 0 && !isEditor
 
   if (loading === false) {
     content = (

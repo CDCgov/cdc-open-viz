@@ -1159,7 +1159,7 @@ const CdcChart = ({
           <h3>Finish Configuring</h3>
           <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
           <Button
-            className='btn'
+            className='btn btn-primary'
             style={{ margin: '1em auto' }}
             disabled={missingRequiredSections()}
             onClick={e => confirmDone(e)}

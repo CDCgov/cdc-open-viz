@@ -14,7 +14,15 @@ type CondtionsProps = {
   updateConditionsList: Function
 }
 
-const Conditions: React.FC<CondtionsProps> = ({ conditionControls, conditionLookup, conditionSettings, conditionIndex, removeCondition, selectedColumn, updateConditionsList }) => {
+const Conditions: React.FC<CondtionsProps> = ({
+  conditionControls,
+  conditionLookup,
+  conditionSettings,
+  conditionIndex,
+  removeCondition,
+  selectedColumn,
+  updateConditionsList
+}) => {
   const [openConditionControls, setOpenConditionControls] = conditionControls
   const showCondition = openConditionControls[conditionIndex]
   const setShowCondition = (index, value) => {
@@ -43,7 +51,10 @@ const Conditions: React.FC<CondtionsProps> = ({ conditionControls, conditionLook
         <button onClick={() => setShowCondition(conditionIndex, true)}>
           <Icon display='caretDown' />
         </button>
-        <span> {value ? `${columnName} ${isOrIsNotEqualTo === 'is' ? 'is' : 'is not'} ${value}` : 'New Condition'}</span>
+        <span>
+          {' '}
+          {value ? `${columnName} ${isOrIsNotEqualTo === 'is' ? 'is' : 'is not'} ${value}` : 'New Condition'}
+        </span>
       </div>
     </>
   ) : (
@@ -58,7 +69,7 @@ const Conditions: React.FC<CondtionsProps> = ({ conditionControls, conditionLook
         >
           <Icon display='caretDown' />
         </button>
-        <button className='btn btn-danger btn-sm mt-0 ml-2' onClick={() => removeCondition(conditionIndex)}>
+        <button className='btn btn-warn btn-sm mt-0 ml-2' onClick={() => removeCondition(conditionIndex)}>
           Remove
         </button>
       </div>
@@ -66,7 +77,11 @@ const Conditions: React.FC<CondtionsProps> = ({ conditionControls, conditionLook
         <label className='d-block'>
           <span>Condition : </span>
           <div className='pt-1'>
-            <select className='ml-1' value={columnName} onChange={e => handleConditionChange(e.target.value, 'columnName')}>
+            <select
+              className='ml-1'
+              value={columnName}
+              onChange={e => handleConditionChange(e.target.value, 'columnName')}
+            >
               <option value=''>Select</option>
               {columnNameConditionOptions?.map(columnName => (
                 <option key={columnName} value={columnName}>
@@ -74,7 +89,11 @@ const Conditions: React.FC<CondtionsProps> = ({ conditionControls, conditionLook
                 </option>
               ))}
             </select>
-            <select className='ml-1' value={isOrIsNotEqualTo} onChange={e => handleConditionChange(e.target.value, 'isOrIsNotEqualTo')}>
+            <select
+              className='ml-1'
+              value={isOrIsNotEqualTo}
+              onChange={e => handleConditionChange(e.target.value, 'isOrIsNotEqualTo')}
+            >
               <option value='is'>is</option>
               <option value='isNot'>is not</option>
             </select>
