@@ -7,7 +7,7 @@ function useReduceData(config, data) {
     seriesKeys.reduce((yTotal, k) => (isNaN(Number(xValue[k])) ? yTotal : yTotal + Number(xValue[k])), 0)
   const getSeriesKey = seriesKey => {
     const series = config.runtime.series.find(item => item.dataKey === seriesKey)
-    return series.dynamicCategory ? series.originalDataKey : seriesKey
+    return series?.dynamicCategory ? series.originalDataKey : seriesKey
   }
   const getMaxValueFromData = () => {
     let max = Math.max(
