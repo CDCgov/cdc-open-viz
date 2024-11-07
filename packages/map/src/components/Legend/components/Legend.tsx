@@ -100,8 +100,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     })
   }
 
-  const legendList = () => {
-    const formattedItems = getFormattedLegendItems()
+  const legendList = (patternsOnly = false) => {
+    const formattedItems = patternsOnly ? [] : getFormattedLegendItems()
     let legendItems
 
     legendItems = formattedItems.map((item, idx) => {
@@ -275,11 +275,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               parentPaddingToSubtract={containerWidthPadding + (legend.hideBorder ? 0 : LEGEND_PADDING)}
               config={state}
             />
-            {state.legend.style !== 'gradient' && (
-              <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
-                {legendList()}
-              </ul>
-            )}
+            <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
+              {legendList(state.legend.style === 'gradient')}
+            </ul>
             {(state.visual.additionalCityStyles.some(c => c.label) || state.visual.cityStyleLabel) && (
               <>
                 <hr />
