@@ -244,7 +244,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
             tabIndex={0}
             value={inputValue}
             onChange={handleSearchTermChange}
-            placeholder={'Select an Option'}
+            placeholder={'- Select -'}
             onClick={() => {
               if (inputHasFocus) setIsListOpened(!isListOpened)
             }}
