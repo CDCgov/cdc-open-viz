@@ -1,6 +1,6 @@
-import { ChartConfig } from '../types/ChartConfig'
+import { ChartConfig } from './../../../types/ChartConfig'
 
-const useLegendClasses = (config: ChartConfig) => {
+export const getLegendClasses = (config: ChartConfig) => {
   const { position, singleRow, reverseLabelOrder, verticalSorted, hideBorder } = config.legend
   const containerClasses = ['legend-container']
   const innerClasses = ['legend-container__inner']
@@ -56,4 +56,4 @@ const useLegendClasses = (config: ChartConfig) => {
     innerClasses
   }
 }
-export default useLegendClasses
+export default getLegendClasses
