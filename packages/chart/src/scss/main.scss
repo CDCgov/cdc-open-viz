@@ -261,6 +261,10 @@
     }
   }
 
+  .legend-container__inner.flex-column-reverse div.legend-item:last-child {
+    margin-bottom: 0.2rem !important;
+  }
+
   .dynamic-legend-list {
     // overide traditional legend item that uses !important
     .legend-item {
