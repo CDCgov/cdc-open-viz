@@ -15,6 +15,7 @@ describe('getLegendClasses', () => {
     }
     const result = getLegendClasses(config)
     expect(result.containerClasses).toContain('left')
+    // Left Position Charts can't have single row...
     expect(result.innerClasses).not.toContain('single-row')
   })
 
@@ -30,6 +31,7 @@ describe('getLegendClasses', () => {
     }
     const result = getLegendClasses(config)
     expect(result.containerClasses).toContain('right')
+    // Right Position Charts can't have single row...
     expect(result.innerClasses).not.toContain('single-row')
   })
 
