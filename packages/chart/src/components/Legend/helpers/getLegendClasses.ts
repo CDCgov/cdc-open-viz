@@ -40,11 +40,11 @@ export const getLegendClasses = (config: ChartConfig) => {
 
   // Configure border classes
   if (hideBorder.side && (['right', 'left'].includes(position) || !position)) {
-    containerClasses.push('no-border')
+    containerClasses.push('border-0')
   }
 
   if (hideBorder.topBottom && ['top', 'bottom'].includes(position)) {
-    containerClasses.push('no-border')
+    containerClasses.push('border-0')
   }
 
   if (hideBorder.topBottom && ['top'].includes(position)) {

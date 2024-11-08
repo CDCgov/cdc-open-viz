@@ -93,7 +93,7 @@ describe('getLegendClasses', () => {
       }
     }
     const result = getLegendClasses(config)
-    expect(result.containerClasses).toContain('no-border')
+    expect(result.containerClasses).toContain('border-0')
   })
 
   it('should return correct classes for hide border topBottom', () => {
@@ -107,7 +107,7 @@ describe('getLegendClasses', () => {
       }
     }
     const result = getLegendClasses(config)
-    expect(result.containerClasses).toContain('no-border')
+    expect(result.containerClasses).toContain('border-0')
     expect(result.containerClasses).toContain('p-0')
   })
 })
