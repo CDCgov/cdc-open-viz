@@ -22,6 +22,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 // Types
 import { type ChartContext } from '../../types/ChartContext'
 import { type LineChartProps } from './LineChartProps'
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 const LineChart = (props: LineChartProps) => {
   // prettier-ignore
@@ -39,7 +40,7 @@ const LineChart = (props: LineChartProps) => {
   } = props
 
   // prettier-ignore
-  const { colorScale, config, formatNumber, handleLineType, parseDate, seriesHighlight, tableData, transformedData, updateConfig, brushConfig,clean  } = useContext<ChartContext>(ConfigContext)
+  const { colorScale, config, formatNumber, handleLineType, parseDate, seriesHighlight, tableData, transformedData, updateConfig, brushConfig,clean } = useContext<ChartContext>(ConfigContext)
   const { yScaleRight } = useRightAxis({ config, yMax, data: transformedData, updateConfig })
   if (!handleTooltipMouseOver) return
 
@@ -55,6 +56,21 @@ const LineChart = (props: LineChartProps) => {
 
   const xPos = d => {
     return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+  }
+
+  const truncateText = (text, maxWidth) => {
+    let width = getTextWidth(text, `normal ${16}px sans-serif`)
+    if (width <= maxWidth) {
+      return text // If within maximum width, return full text
+    }
+
+    // Truncate text by progressively removing characters until it fits
+    while (width > maxWidth && text.length > 0) {
+      text = text.slice(0, -1)
+      width = getTextWidth(text + '...')
+    }
+
+    return text + '...'
   }
 
   return (
@@ -346,6 +362,12 @@ const LineChart = (props: LineChartProps) => {
                   if (!lastDatum) {
                     return <></>
                   }
+
+                  const availableSpace = xMax - xPos(lastDatum)
+                  let label = config.runtime.seriesLabels[seriesKey] || seriesKey
+                  // truncate text if it does not fit for availableSpace
+                  label = truncateText(label, availableSpace)
+
                   return (
                     <Text
                       x={xPos(lastDatum) + 5}
@@ -357,7 +379,7 @@ const LineChart = (props: LineChartProps) => {
                           : 'black'
                       }
                     >
-                      {config.runtime.seriesLabels[seriesKey] || seriesKey}
+                      {label}
                     </Text>
                   )
                 })}
