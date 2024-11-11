@@ -15,6 +15,7 @@ import { ChartContext } from '../../types/ChartContext'
 import type { SankeyNode, SankeyProps } from './types'
 import { SankeyChartConfig, AllChartsConfig } from '../../types/ChartConfig'
 import useSankeyAlert from './useSankeyAlert'
+import { getSankeyTooltip } from './helpers/getSankeyTooltip'
 
 const Sankey = ({ width, height, runtime }: SankeyProps) => {
   const { config } = useContext<ChartContext>(ConfigContext)
@@ -163,23 +164,15 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
   const tooltipColumn1Data = ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn1} />)
   const tooltipColumn2Data = ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn2} />)
 
-  const sankeyToolTip = `<div class="sankey-chart__tooltip">
-                    <span class="sankey-chart__tooltip--tooltip-header">${tooltipID}</span>
-                    <span class="sankey-chart__tooltip--tooltip-header">${tooltipVal}</span>
-                    <div class="divider"></div>
-                    <span><strong>Summary: </strong>${tooltipSummary}</span>
-                    <div class="divider"></div>
-                      <div class="sankey-chart__tooltip--info-section">
-                        <div>
-                          <span><strong>${tooltipColumn1Label}<strong></span>
-                          ${tooltipColumn1Data}
-                        </div>
-                        <div>
-                          <span><strong>${tooltipColumn2Label}<strong></span>
-                          ${tooltipColumn2Data}
-                        </div>
-                      </div>
-                    </div>`
+  const sankeyToolTip = getSankeyTooltip({
+    tooltipID,
+    tooltipVal,
+    tooltipSummary,
+    tooltipColumn1Label,
+    tooltipColumn1Data,
+    tooltipColumn2Label,
+    tooltipColumn2Data
+  })
 
   // Draw the nodes
   const allNodes = sankeyData.nodes.map((node, i) => {
