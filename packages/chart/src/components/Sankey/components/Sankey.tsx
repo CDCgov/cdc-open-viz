@@ -5,32 +5,23 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { SankeyGraph, sankey, sankeyLinkHorizontal, sankeyLeft } from 'd3-sankey'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
-import ReactDOMServer from 'react-dom/server'
 
 // Cdc
-import './sankey.scss'
+import './../sankey.scss'
 import 'react-tooltip/dist/react-tooltip.css'
 import ConfigContext from '@cdc/chart/src/ConfigContext'
-import { ChartContext } from '../../types/ChartContext'
-import type { SankeyNode, SankeyProps } from './types'
-import { SankeyChartConfig, AllChartsConfig } from '../../types/ChartConfig'
-import useSankeyAlert from './useSankeyAlert'
-import { getSankeyTooltip } from './helpers/getSankeyTooltip'
+import type { ChartContext } from '../../../types/ChartContext'
+import type { SankeyNode, SankeyProps } from '../types'
+import useSankeyAlert from '../useSankeyAlert'
+import { getSankeyTooltip } from '../helpers/getSankeyTooltip'
 
 const Sankey = ({ width, height, runtime }: SankeyProps) => {
   const { config } = useContext<ChartContext>(ConfigContext)
   const { sankey: sankeyConfig } = config
-
-  const isSankeyChartConfig = (config: AllChartsConfig | SankeyChartConfig): config is SankeyChartConfig => {
-    return config.visualizationType === 'Sankey'
-  }
-
   const [largestGroupWidth, setLargestGroupWidth] = useState(0)
-  const groupRefs = useRef([])
-
-  //Tooltip
   const [tooltipID, setTooltipID] = useState<string>('')
   const { showAlert, alert } = useSankeyAlert()
+  const groupRefs = useRef([])
 
   const handleNodeClick = (nodeId: string) => {
     // Store the previous tooltipID
@@ -60,7 +51,8 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
     setLargestGroupWidth(largest)
   }, [groupRefs, sankeyConfig, window.innerWidth])
 
-  if (!isSankeyChartConfig(config)) return
+  if (config.visualizationType !== 'Sankey') return
+
   const data = config?.data[0]
 
   //Retrieve all the unique values for the Nodes
@@ -98,8 +90,6 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
     let textPositionVertical = 0
     let classStyle = 'node-value--storynode'
     let storyNodes = true
-
-    // TODO: need a dynamic way to apply classes here instead of checking static values.
 
     if (data?.storyNodeText?.every(node => node.StoryNode !== id)) {
       storyNodes = false
@@ -140,18 +130,6 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
     }
 
     return { sourceNodes, activeLinks }
-  }
-
-  const ColumnList = ({ columnData }) => {
-    return (
-      <ul>
-        {columnData?.map((entry, index) => (
-          <li key={index}>
-            {entry.label}: {entry.value} ({entry.additional_info}%)
-          </li>
-        ))}
-      </ul>
-    )
   }
 
   const sankeyToolTip = getSankeyTooltip(data, tooltipID)
@@ -350,7 +328,6 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
           fill={nodeColor}
           fillOpacity={opacityValue}
           rx={sankeyConfig.rxValue}
-          // todo: move enable tooltips to sankey
           data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
           data-tooltip-id={`tooltip`}
           onClick={() => handleNodeClick(node.id)}
@@ -431,7 +408,6 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               y={(node.y1! + node.y0!) / 2 + 30}
               dominantBaseline='text-before-edge'
               fill={sankeyConfig.nodeFontColor}
-              //fontSize={16}
               fontWeight='bold'
               textAnchor='start'
               style={{ pointerEvents: 'none' }}

@@ -1,2 +1,2 @@
-import Sankey from './Sankey'
+import Sankey from './components/Sankey'
 export default Sankey

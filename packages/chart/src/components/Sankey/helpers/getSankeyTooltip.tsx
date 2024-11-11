@@ -1,13 +1,7 @@
 import ReactDOMServer from 'react-dom/server'
-import { ChartConfig } from '../../../types/ChartConfig'
-import ColumnList from '../ColumnList'
+import ColumnList from '../components/ColumnList'
 
-interface SankeyTooltipParams {
-  data: Pick<ChartConfig, 'data'>
-  tooltipID: string
-}
-
-export const getSankeyTooltip = ({ data, tooltipID }: SankeyTooltipParams) => {
+export const getSankeyTooltip = (data: Object, tooltipID: string) => {
   const tooltipVal = `${(data?.tooltips?.find(item => item.node === tooltipID) || {}).value}`
   const tooltipSummary = `${(data?.tooltips?.find(item => item.node === tooltipID) || {}).summary}`
   const tooltipColumn1Label = (data?.tooltips?.find(item => item.node === tooltipID) || {}).column1Label
