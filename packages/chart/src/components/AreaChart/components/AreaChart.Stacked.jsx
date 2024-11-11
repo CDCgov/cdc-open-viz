@@ -33,7 +33,13 @@ const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, 
     data && (
       <svg height={Number(yMax)}>
         <ErrorBoundary component='AreaChartStacked'>
-          <Group className='area-chart' key='area-wrapper' left={Number(config.yAxis.size) + strokeWidth / 2} height={Number(yMax)} style={{ overflow: 'hidden' }}>
+          <Group
+            className='area-chart'
+            key='area-wrapper'
+            left={Number(config.yAxis.size) + strokeWidth / 2}
+            height={Number(yMax)}
+            style={{ overflow: 'hidden' }}
+          >
             <AreaStack
               data={data}
               keys={config.runtime.areaSeriesKeys.map(s => s.dataKey) || config.series.map(s => s.dataKey)}
@@ -44,8 +50,14 @@ const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, 
             >
               {({ stacks, path }) => {
                 return stacks.map((stack, stackIndex) => {
-                  let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(stack.key) === -1
-                  let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(stack.key) !== -1
+                  let transparentArea =
+                    config.legend.behavior === 'highlight' &&
+                    seriesHighlight.length > 0 &&
+                    seriesHighlight.indexOf(stack.key) === -1
+                  let displayArea =
+                    config.legend.behavior === 'highlight' ||
+                    seriesHighlight.length === 0 ||
+                    seriesHighlight.indexOf(stack.key) !== -1
 
                   return (
                     // prettier-ignore

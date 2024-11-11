@@ -226,6 +226,10 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
     }
   }
 
+  if (config.visualizationType === 'Area Chart' && config.visualizationSubType === 'stacked') {
+    min = 0
+  }
+
   return { min, max, leftMax, rightMax }
 }
 export default useMinMax
