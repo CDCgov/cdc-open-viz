@@ -17,7 +17,7 @@ import { SankeyChartConfig, AllChartsConfig } from '../../types/ChartConfig'
 import useSankeyAlert from './useSankeyAlert'
 
 const Sankey = ({ width, height, runtime }: SankeyProps) => {
-  const { config, handleChartTabbing, legendId } = useContext<ChartContext>(ConfigContext)
+  const { config } = useContext<ChartContext>(ConfigContext)
   const { sankey: sankeyConfig } = config
 
   const isSankeyChartConfig = (config: AllChartsConfig | SankeyChartConfig): config is SankeyChartConfig => {
