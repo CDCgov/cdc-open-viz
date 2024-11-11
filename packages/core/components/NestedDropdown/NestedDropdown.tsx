@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo, useId } from 'react'
 import './nesteddropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
 import { filterSearchTerm, NestedOptions, ValueTextPair } from './nestedDropdownHelpers'
+import Loader from '../Loader'
 
 const Options: React.FC<{
   subOptions: ValueTextPair[]
@@ -106,12 +107,10 @@ type NestedDropdownProps = {
   activeGroup: string
   activeSubGroup?: string
   filterIndex: number
-  isEditor?: boolean
-  isUrlFilter?: boolean
   listLabel: string
   handleSelectedItems: ([group, subgroup]: [string, string]) => void
   options: NestedOptions
-  subGroupingActive?: string
+  loading?: boolean
 }
 
 const NestedDropdown: React.FC<NestedDropdownProps> = ({
@@ -120,7 +119,8 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   activeSubGroup,
   filterIndex,
   listLabel,
-  handleSelectedItems
+  handleSelectedItems,
+  loading
 }) => {
   const dropdownId = useId()
   const groupFilterActive = activeGroup
@@ -255,7 +255,12 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
         className={`nested-dropdown nested-dropdown-${filterIndex} ${isListOpened ? 'open-filter' : ''}`}
         onKeyUp={handleKeyUp}
       >
-        <div className='nested-dropdown-input-container' aria-label='searchInput' role='textbox'>
+        <div
+          className={`nested-dropdown-input-container${loading ? ' disabled' : ''}`}
+          aria-label='searchInput'
+          aria-disabled={loading}
+          role='textbox'
+        >
           <input
             id={`nested-dropdown-${filterIndex}`}
             className='search-input'
@@ -266,7 +271,8 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
             tabIndex={0}
             value={inputValue}
             onChange={handleSearchTermChange}
-            placeholder={'- Select -'}
+            placeholder={loading ? 'Loading...' : '- Select -'}
+            disabled={loading}
             onClick={() => {
               if (inputHasFocus) setIsListOpened(!isListOpened)
             }}
@@ -277,6 +283,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
             <Icon display='caretDown' />
           </span>
         </div>
+        {loading && <Loader spinnerType={'text-secondary'} />}
         <ul
           role='tree'
           key={listLabel}
