@@ -1,7 +1,7 @@
 import { useContext, useState, useRef, useEffect } from 'react'
 
 // External Libraries
-import { PlacesType, Tooltip as ReactTooltip } from 'react-tooltip'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { SankeyGraph, sankey, sankeyLinkHorizontal, sankeyLeft } from 'd3-sankey'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
@@ -90,7 +90,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
       [width - textPositionHorizontal - largestGroupWidth, config.heights.vertical - BUFFER]
     ])
 
-  const { nodes, links } = sankeyGenerator(sankeyData)
+  const { links } = sankeyGenerator(sankeyData)
 
   const nodeStyle = (id: string) => {
     let textPositionHorizontal = 30
