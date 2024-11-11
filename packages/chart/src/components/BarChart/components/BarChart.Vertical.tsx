@@ -358,7 +358,7 @@ export const BarChartVertical = () => {
                           <rect
                             display={displaylollipopShape}
                             x={barX - lollipopBarWidth / 2}
-                            y={barY}
+                            y={bar.y}
                             width={lollipopShapeSize}
                             height={lollipopShapeSize}
                             fill={getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key]))}
