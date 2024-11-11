@@ -149,6 +149,18 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
 
     const maxNodeWidth = sankeyGenerator.nodeWidth()
 
+    // get the link length
+    /**
+     * Calculates the length of the link between the source and target nodes
+     * using the Euclidean distance formula.
+     *
+     * @returns {number} The length of the link.
+     */
+    const linkLength = () =>
+      Math.sqrt(
+        Math.pow(links[0].target.x0! - links[0].source.x1!, 2) + Math.pow(links[0].target.y0! - links[0].source.y1!, 2)
+      ) - largestGroupWidth
+
     return (
       <Group className='' key={i}>
         <rect
@@ -168,7 +180,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
         {storyNodes ? (
           <>
             <Text
-              width={maxNodeWidth}
+              width={linkLength()}
               /* Text Position Horizontal
               x0 is the left edge of the node
               # - positions text # units to the right of the left edge of the node */
@@ -198,7 +210,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               {(data?.storyNodeText?.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}
             </Text>
             <Text
-              width={maxNodeWidth}
+              width={linkLength()}
               verticalAnchor='middle'
               className={classStyle}
               x={node.x0! + textPositionHorizontal}
@@ -214,7 +226,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               {typeof node.value === 'number' ? node.value.toLocaleString() : node.value}
             </Text>
             <Text
-              width={sankeyGenerator.nodeWidth()}
+              width={linkLength()}
               x={node.x0! + textPositionHorizontal}
               // plus 50 will move the vertical position down
               y={(node.y1! + node.y0!) / 2 + 50}
