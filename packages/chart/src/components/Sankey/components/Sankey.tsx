@@ -147,11 +147,13 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
       opacityValue = sankeyConfig.opacity.nodeOpacityInactive
     }
 
+    const maxNodeWidth = sankeyGenerator.nodeWidth()
+
     return (
       <Group className='' key={i}>
         <rect
           height={node.y1! - node.y0! + 2} // increasing node size to account for smaller nodes
-          width={sankeyGenerator.nodeWidth()}
+          width={maxNodeWidth}
           x={node.x0}
           y={node.y0! - 1} //adjusting here the node starts so it looks more center with the link
           fill={nodeColor}
@@ -166,6 +168,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
         {storyNodes ? (
           <>
             <Text
+              width={maxNodeWidth}
               /* Text Position Horizontal
               x0 is the left edge of the node
               # - positions text # units to the right of the left edge of the node */
@@ -195,7 +198,8 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               {(data?.storyNodeText?.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}
             </Text>
             <Text
-              verticalAnchor='end'
+              width={maxNodeWidth}
+              verticalAnchor='middle'
               className={classStyle}
               x={node.x0! + textPositionHorizontal}
               y={(node.y1! + node.y0! + 25) / 2}
@@ -210,6 +214,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               {typeof node.value === 'number' ? node.value.toLocaleString() : node.value}
             </Text>
             <Text
+              width={sankeyGenerator.nodeWidth()}
               x={node.x0! + textPositionHorizontal}
               // plus 50 will move the vertical position down
               y={(node.y1! + node.y0!) / 2 + 50}
@@ -217,7 +222,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               fontWeight='bold'
               textAnchor={sankeyData.nodes.length === i ? 'end' : 'start'}
               className='node-text'
-              verticalAnchor='end'
+              verticalAnchor='start'
               style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
               onClick={() => handleNodeClick(node.id)}
               data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
