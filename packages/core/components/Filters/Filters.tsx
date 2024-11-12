@@ -351,7 +351,7 @@ const Filters = (props: FilterProps) => {
         id={`filter-${outerIndex}`}
         name={label}
         aria-label={`Filter by ${label}`}
-        className='form-control'
+        className='cove-form-select'
         data-index='0'
         value={active}
         onChange={e => {

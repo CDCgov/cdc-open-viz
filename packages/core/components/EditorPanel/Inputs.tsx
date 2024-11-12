@@ -190,7 +190,7 @@ const Select = memo((props: SelectProps) => {
         {tooltip}
       </span>
       <select
-        className={`form-control ${required && !value ? 'warning' : ''}`}
+        className={`cove-form-select ${required && !value ? 'warning' : ''}`}
         name={fieldName}
         value={value}
         onChange={event => {
