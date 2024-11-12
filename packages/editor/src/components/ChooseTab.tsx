@@ -1,10 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext } from 'react'
 import '../scss/choose-vis-tab.scss'
 
 import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 
-import InfoIcon from '@cdc/core/assets/icon-info.svg'
 import DashboardIcon from '@cdc/core/assets/icon-dashboard.svg'
 import BarIcon from '@cdc/core/assets/icon-chart-bar.svg'
 import LineIcon from '@cdc/core/assets/icon-chart-line.svg'
@@ -39,10 +38,8 @@ interface ButtonProps {
 }
 
 const ChooseTab: React.FC = (): JSX.Element => {
-  const { config } = useContext(ConfigContext)
-  const [activeButtonId, setActiveButtonId] = useState(() => {
-    return localStorage.getItem('activeButtonId') || null
-  })
+  const { config, tempConfig } = useContext(ConfigContext)
+
   const dispatch = useContext(EditorDispatchContext)
   const rowLabels = ['General', , 'Charts', 'Maps']
 
@@ -105,19 +102,19 @@ const ChooseTab: React.FC = (): JSX.Element => {
 
   const configureTabs = props => {
     const newConfig = generateNewConfig(props)
-    dispatch({ type: 'EDITOR_SET_CONFIG', payload: { ...config, ...newConfig } })
+    dispatch({ type: 'EDITOR_SET_CONFIG', payload: { ...config, ...newConfig, activeVizButtonID: props.id } })
     dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
   }
 
   const VizButton: React.FC<ButtonProps> = props => {
     const { label, icon, id } = props
-    const isActive = id === Number(activeButtonId)
+    const isActive = id === config?.activeVizButtonID || 0
     const handleClick = () => {
-      const newActiveId = id.toString()
-      localStorage.setItem('activeButtonId', newActiveId)
-      setActiveButtonId(newActiveId)
-
       configureTabs(props)
+    }
+
+    if (tempConfig) {
+      dispatch({ type: 'EDITOR_SAVE', payload: tempConfig })
     }
 
     return (
