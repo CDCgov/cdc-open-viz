@@ -1216,7 +1216,7 @@ const CdcChart = ({
     // cleaning is deleting data we need in forecasting charts.
     if (!Array.isArray(data)) return []
     if (config.visualizationType === 'Forecasting') return data
-    if (config.series.some(series => !!series.dynamicCategory)) return data
+    if (config.series?.some(series => !!series.dynamicCategory)) return data
     return config?.xAxis?.dataKey ? transform.cleanData(data, config.xAxis.dataKey) : data
   }
 
