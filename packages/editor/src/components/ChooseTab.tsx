@@ -38,7 +38,7 @@ interface ButtonProps {
 }
 
 const ChooseTab: React.FC = (): JSX.Element => {
-  const { config } = useContext(ConfigContext)
+  const { config, tempConfig } = useContext(ConfigContext)
 
   const dispatch = useContext(EditorDispatchContext)
   const rowLabels = ['General', , 'Charts', 'Maps']
@@ -111,6 +111,10 @@ const ChooseTab: React.FC = (): JSX.Element => {
     const isActive = id === config?.activeVizButtonID || 0
     const handleClick = () => {
       configureTabs(props)
+    }
+
+    if (tempConfig) {
+      dispatch({ type: 'EDITOR_SAVE', payload: tempConfig })
     }
 
     return (
