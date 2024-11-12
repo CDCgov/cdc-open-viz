@@ -120,7 +120,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
             </label>
             <select
               id={`filter-${filterIndex}`}
-              className='form-control'
+              className='cove-form-select'
               data-index='0'
               value={filter.queuedActive || filter.active}
               onChange={val => {
