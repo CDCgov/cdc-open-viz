@@ -234,7 +234,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
         </label>
       )}
       <div id={dropdownId} className={`nested-dropdown ${isListOpened ? 'open-filter' : ''}`} onKeyUp={handleKeyUp}>
-        <div className='nested-dropdown-input-container form-control' aria-label='searchInput' role='textbox'>
+        <div className='nested-dropdown-input-container' aria-label='searchInput' role='textbox'>
           <input
             className='search-input'
             ref={searchInput}
