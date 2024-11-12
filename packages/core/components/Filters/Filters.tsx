@@ -505,7 +505,7 @@ const Filters = (props: FilterProps) => {
         {filters?.some(filter => filter.active && filter.columnName) ? filterConstants.introText : ''}{' '}
         {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
       </p>
-      <div className='d-flex flex-wrap filters-section__wrapper'>
+      <div className='d-flex flex-wrap w-100 filters-section__wrapper'>
         {' '}
         <>
           <Style />
