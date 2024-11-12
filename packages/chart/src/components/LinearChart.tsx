@@ -130,7 +130,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   // height before bottom axis
   const initialHeight = useMemo(
     () => calcInitialHeight(config, currentViewport),
-    [config, currentViewport, parentHeight]
+    [config, currentViewport, parentHeight, config.heights?.vertical, config.heights?.horizontal]
   )
   const forestHeight = useMemo(() => initialHeight + forestRowsHeight, [initialHeight, forestRowsHeight])
 
