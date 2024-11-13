@@ -5,6 +5,7 @@ import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import Icon from '@cdc/core/components/ui/Icon'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { iconHash } from '../helpers/iconHash'
@@ -39,7 +40,7 @@ type WidgetProps = {
 
 const Widget = ({ widgetConfig, addVisualization, type }: WidgetProps) => {
   const { overlay } = useGlobalContext()
-  const { config } = useContext(DashboardContext)
+  const { config, data } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
 
   const transform = new DataTransform()
@@ -79,9 +80,30 @@ const Widget = ({ widgetConfig, addVisualization, type }: WidgetProps) => {
     })
   }
 
+  const changeDataLimit = (dataUrl, limit) => {
+    const url = new URL(dataUrl)
+    url.searchParams.set('$limit', limit)
+    // Replace encoded $ with actual $ for the URL
+    return url.href.replace(/%24/g, '$')
+  }
+
+  const loadSampleData = () => {
+    const dataKey = config.rows[widgetConfig.rowIdx]?.dataKey || widgetConfig?.dataKey
+    const dataset = config.datasets[dataKey]
+    const _data = data[dataset.dataUrl]
+    if (_data && !_data.length) {
+      const url = changeDataLimit(dataset.dataUrl, 100)
+      fetchRemoteData(url).then(responseData => {
+        responseData.sample = true
+        dispatch({ type: 'SET_DATA', payload: { ...data, [dataKey]: responseData } })
+      })
+    }
+  }
+
   const editWidget = () => {
     if (!widgetConfig) return
     dispatch({ type: 'UPDATE_VISUALIZATION', payload: { vizKey: widgetConfig.uid, configureData: { editing: true } } })
+    loadSampleData()
   }
 
   let isConfigurationReady = false

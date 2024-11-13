@@ -604,7 +604,7 @@ const CountyMap = props => {
         className='county-map-canvas'
       ></canvas>
 
-      <button className={`btn btn--reset`} onClick={onReset} ref={resetButton} tabIndex='0'>
+      <button className={`btn btn-primary btn--reset`} onClick={onReset} ref={resetButton} tabIndex='0'>
         Reset Zoom
       </button>
     </ErrorBoundary>

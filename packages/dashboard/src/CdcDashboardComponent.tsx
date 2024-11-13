@@ -35,6 +35,7 @@ import './scss/main.scss'
 
 import VisualizationsPanel from './components/VisualizationsPanel'
 import dashboardReducer from './store/dashboard.reducer'
+import errorMessagesReducer from './store/errorMessage/errorMessage.reducer'
 import { filterData } from './helpers/filterData'
 import { getVizKeys } from './helpers/getVizKeys'
 import Title from '@cdc/core/components/ui/Title'
@@ -65,6 +66,7 @@ import ExpandCollapseButtons from './components/ExpandCollapseButtons'
 import { hasDashboardApplyBehavior } from './helpers/hasDashboardApplyBehavior'
 import { loadAPIFiltersFactory } from './helpers/loadAPIFilters'
 import Loader from '@cdc/core/components/Loader'
+import Alert from '@cdc/core/components/Alert'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -72,6 +74,7 @@ type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
 
 export default function CdcDashboard({ initialState, isEditor = false, isDebug = false }: DashboardProps) {
   const [state, dispatch] = useReducer(dashboardReducer, initialState)
+  const [errorMessages, dispatchErrorMessages] = useReducer(errorMessagesReducer, [])
   const editorContext = useContext(EditorContext)
   const [apiFilterDropdowns, setAPIFilterDropdowns] = useState<APIFilterDropdowns>({})
   const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
@@ -97,7 +100,12 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       .reduce((acc, viz: DashboardFilters) => (viz.autoLoad ? [...acc, ...viz.sharedFilterIndexes] : acc), [])
   }, [state.config.visualizations])
 
-  const loadAPIFilters = loadAPIFiltersFactory(dispatch, setAPIFilterDropdowns, autoLoadFilterIndexes)
+  const loadAPIFilters = loadAPIFiltersFactory(
+    dispatch,
+    dispatchErrorMessages,
+    setAPIFilterDropdowns,
+    autoLoadFilterIndexes
+  )
 
   const reloadURLData = async (newFilters?: SharedFilter[]) => {
     const config = _.cloneDeep(state.config)
@@ -163,20 +171,28 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
           )
 
           setAPILoading(true)
-          await fetchRemoteData(dataUrlFinal).then(responseData => {
-            let data: any[] = responseData
-            if (responseData && dataset.dataDescription) {
-              try {
-                data = transform.autoStandardize(data)
-                data = transform.developerStandardize(data, dataset.dataDescription)
-              } catch (e) {
-                //Data not able to be standardized, leave as is
+          await fetchRemoteData(dataUrlFinal)
+            .then(responseData => {
+              let data: any[] = responseData
+              if (responseData && dataset.dataDescription) {
+                try {
+                  data = transform.autoStandardize(data)
+                  data = transform.developerStandardize(data, dataset.dataDescription)
+                } catch (e) {
+                  //Data not able to be standardized, leave as is
+                  console.error('Error standardizing data:', e)
+                }
               }
-            }
-            newDatasets[datasetKey].data = data
-            newDatasets[datasetKey].runtimeDataUrl = dataUrlFinal
-            newData[datasetKey] = data
-          })
+              newDatasets[datasetKey].data = data
+              newDatasets[datasetKey].runtimeDataUrl = dataUrlFinal
+              newData[datasetKey] = data
+            })
+            .catch(e => {
+              console.error(e)
+              newDatasets[datasetKey].data = []
+              newDatasets[datasetKey].runtimeDataUrl = dataUrlFinal
+              newData[datasetKey] = []
+            })
         }
       }
     }
@@ -492,6 +508,14 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
         {isEditor && <Header />}
         {apiLoading && <Loader fullScreen={true} />}
         <MultiTabs isEditor={isEditor && !isPreview} />
+        {errorMessages.map((message, index) => (
+          <Alert
+            type='danger'
+            onDismiss={() => dispatchErrorMessages({ type: 'DISMISS_ERROR_MESSAGE', payload: index })}
+            message={message}
+            autoDismiss={true}
+          />
+        ))}
         <Layout.Responsive isEditor={isEditor}>
           <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
             <Title

@@ -6,6 +6,7 @@ import './index.scss'
 import MultiConfigTabs from '../MultiConfigTabs'
 import { Tab } from '../../types/Tab'
 import _ from 'lodash'
+import { getVizRowColumnLocator } from '../../helpers/getVizRowColumnLocator'
 
 type HeaderProps = {
   back?: any
@@ -16,7 +17,7 @@ type HeaderProps = {
 const Header = (props: HeaderProps) => {
   const tabs: Tab[] = ['Dashboard Description', 'Data Table Settings', 'Dashboard Preview']
   const { visualizationKey, subEditor } = props
-  const { config, setParentConfig, tabSelected } = useContext(DashboardContext)
+  const { config, setParentConfig, tabSelected, data } = useContext(DashboardContext)
   if (!config) return null
   const dispatch = useContext(DashboardDispatchContext)
   const back = () => {
@@ -24,6 +25,22 @@ const Header = (props: HeaderProps) => {
     const newConfig = _.cloneDeep(config)
     newConfig.visualizations[visualizationKey].editing = false
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
+
+    // the Widget component will do a data fetch if no data is available for the visualization
+    // this is intended to help visualization developers.
+    type SampleData = Record<string, { sample: boolean }> & Object[]
+    if (Object.values(data).some((d: SampleData) => d.sample)) {
+      const sampleDataRemoved = Object.keys(data).reduce((acc, key) => {
+        if ((data[key] as SampleData).sample) {
+          acc[key] = []
+        } else {
+          acc[key] = data[key]
+        }
+        return acc
+      }, {})
+
+      dispatch({ type: 'SET_DATA', payload: sampleDataRemoved })
+    }
   }
 
   const changeConfigValue = (parentObj, key, value) => {
@@ -81,10 +98,18 @@ const Header = (props: HeaderProps) => {
         <div className='heading-1'>
           Dashboard Editor{' '}
           <span className='small'>
-            <input type='checkbox' onChange={handleCheck} checked={multiInitialized} disabled={multiInitialized} /> make multidashboard
+            <input type='checkbox' onChange={handleCheck} checked={multiInitialized} disabled={multiInitialized} /> make
+            multidashboard
           </span>
           <br />
-          {<input type='text' placeholder='Enter Dashboard Name Here' defaultValue={config.dashboard?.title} onChange={e => changeConfigValue('dashboard', 'title', e.target.value)} />}
+          {
+            <input
+              type='text'
+              placeholder='Enter Dashboard Name Here'
+              defaultValue={config.dashboard?.title}
+              onChange={e => changeConfigValue('dashboard', 'title', e.target.value)}
+            />
+          }
         </div>
       )}
       {!subEditor && (
@@ -106,18 +131,34 @@ const Header = (props: HeaderProps) => {
             })}
           </ul>
           <div className='heading-body'>
-            {tabSelected === 'Dashboard Description' && <input type='text' className='description-input' placeholder='Type a dashboard description here.' defaultValue={config.dashboard?.description} onChange={e => changeConfigValue('dashboard', 'description', e.target.value)} />}
+            {tabSelected === 'Dashboard Description' && (
+              <input
+                type='text'
+                className='description-input'
+                placeholder='Type a dashboard description here.'
+                defaultValue={config.dashboard?.description}
+                onChange={e => changeConfigValue('dashboard', 'description', e.target.value)}
+              />
+            )}
             {tabSelected === 'Data Table Settings' && (
               <>
                 <div className='wrap'>
                   <label>
-                    <input type='checkbox' defaultChecked={config.table.show} onChange={e => changeConfigValue('table', 'show', e.target.checked)} />
+                    <input
+                      type='checkbox'
+                      defaultChecked={config.table.show}
+                      onChange={e => changeConfigValue('table', 'show', e.target.checked)}
+                    />
                     Show Data Table(s)
                   </label>
                   <br />
 
                   <label>
-                    <input type='checkbox' defaultChecked={config.table.expanded} onChange={e => changeConfigValue('table', 'expanded', e.target.checked)} />
+                    <input
+                      type='checkbox'
+                      defaultChecked={config.table.expanded}
+                      onChange={e => changeConfigValue('table', 'expanded', e.target.checked)}
+                    />
                     Expanded by Default
                   </label>
                   <br />
@@ -125,19 +166,39 @@ const Header = (props: HeaderProps) => {
 
                 <div className='wrap'>
                   <label>
-                    <input type='checkbox' defaultChecked={config.table.limitHeight} onChange={e => changeConfigValue('table', 'limitHeight', e.target.checked)} />
+                    <input
+                      type='checkbox'
+                      defaultChecked={config.table.limitHeight}
+                      onChange={e => changeConfigValue('table', 'limitHeight', e.target.checked)}
+                    />
                     Limit Table Height
                   </label>
-                  {config.table.limitHeight && <input className='table-height-input' type='text' placeholder='Height (px)' defaultValue={config.table.height} onChange={e => changeConfigValue('table', 'height', e.target.value)} />}
+                  {config.table.limitHeight && (
+                    <input
+                      className='table-height-input'
+                      type='text'
+                      placeholder='Height (px)'
+                      defaultValue={config.table.height}
+                      onChange={e => changeConfigValue('table', 'height', e.target.value)}
+                    />
+                  )}
                 </div>
 
                 <div className='wrap'>
                   <label>
-                    <input type='checkbox' defaultChecked={config.table.download} onChange={e => changeConfigValue('table', 'download', e.target.checked)} />
+                    <input
+                      type='checkbox'
+                      defaultChecked={config.table.download}
+                      onChange={e => changeConfigValue('table', 'download', e.target.checked)}
+                    />
                     Show Download CSV Link
                   </label>
                   <label>
-                    <input type='checkbox' defaultChecked={config.table.showDownloadUrl} onChange={e => changeConfigValue('table', 'showDownloadUrl', e.target.checked)} />
+                    <input
+                      type='checkbox'
+                      defaultChecked={config.table.showDownloadUrl}
+                      onChange={e => changeConfigValue('table', 'showDownloadUrl', e.target.checked)}
+                    />
                     Show URL to Automatically Updated Data
                   </label>
                 </div>

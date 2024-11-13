@@ -1,5 +1,10 @@
 import { useContext, FC } from 'react'
-import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
+import {
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemPanel,
+  AccordionItemButton
+} from 'react-accessible-accordion'
 import { TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -131,15 +136,55 @@ const PanelBoxPlot: FC<PanelProps> = props => {
         <h4 style={{ fontSize: '18px' }}>Labels for Additional Measures</h4>
 
         {/* iqr */}
-        <TextField type='text' value={boxplot.labels.iqr} fieldName='iqr' section='boxplot' subsection='labels' label='Interquartile Range' updateField={updateField} />
+        <TextField
+          type='text'
+          value={boxplot.labels.iqr}
+          fieldName='iqr'
+          section='boxplot'
+          subsection='labels'
+          label='Interquartile Range'
+          updateField={updateField}
+        />
         {/* count */}
-        <TextField type='text' value={boxplot.labels.total} fieldName='total' section='boxplot' subsection='labels' label='Total' updateField={updateField} />
+        <TextField
+          type='text'
+          value={boxplot.labels.count}
+          fieldName='count'
+          section='boxplot'
+          subsection='labels'
+          label='Count'
+          updateField={updateField}
+        />
         {/* mean */}
-        <TextField type='text' value={boxplot.labels.mean} fieldName='mean' section='boxplot' subsection='labels' label='Mean' updateField={updateField} />
+        <TextField
+          type='text'
+          value={boxplot.labels.mean}
+          fieldName='mean'
+          section='boxplot'
+          subsection='labels'
+          label='Mean'
+          updateField={updateField}
+        />
         {/* outliers */}
-        <TextField type='text' value={boxplot.labels.outliers} fieldName='outliers' section='boxplot' subsection='labels' label='Outliers' updateField={updateField} />
+        <TextField
+          type='text'
+          value={boxplot.labels.outliers}
+          fieldName='outliers'
+          section='boxplot'
+          subsection='labels'
+          label='Outliers'
+          updateField={updateField}
+        />
         {/* values */}
-        <TextField type='text' value={boxplot.labels.values} fieldName='values' section='boxplot' subsection='labels' label='Values' updateField={updateField} />
+        <TextField
+          type='text'
+          value={boxplot.labels.values}
+          fieldName='values'
+          section='boxplot'
+          subsection='labels'
+          label='Values'
+          updateField={updateField}
+        />
       </AccordionItemPanel>
     </AccordionItem>
   )

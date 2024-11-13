@@ -40,11 +40,13 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   const minRequiredCIPadding = 1.15 // regardless of Editor if CI data, there must be 10% padding added
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   // do validation bafore applying t0 charts
-  const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0
-  const isMinValid = isLogarithmicAxis ? enteredMinValue >= 0 : (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
+  const isMaxValid = existPositiveValue ? Number(enteredMaxValue) >= maxValue : Number(enteredMaxValue) >= 0
+  const isMinValid = isLogarithmicAxis
+    ? Number(enteredMinValue) >= 0
+    : (Number(enteredMinValue) <= 0 && minValue >= 0) || (Number(enteredMinValue) <= minValue && minValue < 0)
 
-  min = enteredMinValue && isMinValid ? enteredMinValue : minValue
-  max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
+  min = enteredMinValue && isMinValid ? Number(enteredMinValue) : minValue
+  max = enteredMaxValue && isMaxValid ? Number(enteredMaxValue) : Number.MIN_VALUE
 
   const { lower, upper } = config?.confidenceKeys || {}
 
@@ -122,8 +124,8 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
       leftMax = findMaxFromSeriesKeys(data, leftAxisSeriesItems, leftMax, 'left')
       rightMax = findMaxFromSeriesKeys(data, rightAxisSeriesItems, rightMax, 'right')
 
-      if (leftMax < enteredMaxValue) {
-        leftMax = enteredMaxValue
+      if (leftMax < Number(enteredMaxValue)) {
+        leftMax = Number(enteredMaxValue)
       }
     } catch (e) {
       console.error(e.message)
@@ -131,10 +133,18 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   }
 
   // this should not apply to bar charts if there is negative CI data
-  if ((visualizationType === 'Bar' || checkLineToBarGraph() || (visualizationType === 'Combo' && !isAllLine)) && min > 0) {
+  if (
+    (visualizationType === 'Bar' || checkLineToBarGraph() || (visualizationType === 'Combo' && !isAllLine)) &&
+    min > 0
+  ) {
     min = 0
   }
-  if ((config.visualizationType === 'Bar' || checkLineToBarGraph() || (config.visualizationType === 'Combo' && !isAllLine)) && min < 0) {
+  if (
+    (config.visualizationType === 'Bar' ||
+      checkLineToBarGraph() ||
+      (config.visualizationType === 'Combo' && !isAllLine)) &&
+    min < 0
+  ) {
     min = min * 1.1
   }
 
@@ -143,18 +153,22 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
       min = 0
     }
     if (enteredMinValue) {
-      const isMinValid = isLogarithmicAxis ? enteredMinValue >= 0 && enteredMinValue < minValue : enteredMinValue < minValue
-      min = enteredMinValue && isMinValid ? enteredMinValue : minValue
+      const isMinValid = isLogarithmicAxis
+        ? Number(enteredMinValue) >= 0 && Number(enteredMinValue) < minValue
+        : Number(enteredMinValue) < minValue
+      min = Number(enteredMinValue) && isMinValid ? Number(enteredMinValue) : minValue
     }
   }
 
   if (config.visualizationType === 'Deviation Bar' && min > 0) {
     const isMinValid = Number(enteredMinValue) < Math.min(minValue, Number(config.xAxis.target))
-    min = enteredMinValue && isMinValid ? enteredMinValue : 0
+    min = Number(enteredMinValue) && isMinValid ? Number(enteredMinValue) : 0
   }
 
   if (config.visualizationType === 'Line' && !checkLineToBarGraph()) {
-    const isMinValid = isLogarithmicAxis ? enteredMinValue >= 0 && enteredMinValue < minValue : enteredMinValue < minValue
+    const isMinValid = isLogarithmicAxis
+      ? Number(enteredMinValue) >= 0 && Number(enteredMinValue) < minValue
+      : Number(enteredMinValue) < minValue
     // update minValue for (0) Suppression points
     const suppressedMinValue = tableData?.some((dataItem, index) => {
       return config.preliminaryData?.some(pd => {
@@ -171,7 +185,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
         return valueMatch && (index === 0 || index === tableData.length - 1)
       })
     })
-    min = enteredMinValue && isMinValid ? enteredMinValue : suppressedMinValue ? 0 : minValue
+    min = Number(enteredMinValue) && isMinValid ? Number(enteredMinValue) : suppressedMinValue ? 0 : minValue
   }
   //If data value max wasn't provided, calculate it
   if (max === Number.MIN_VALUE) {

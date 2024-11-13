@@ -26,24 +26,7 @@
   }
 }
 
-// note the diff of section and no section above.
-// Can't use nested selectors with top level section overwrites
-section.filters-section {
-  // border: 1px solid #c7c7c7;
-  // padding: 10px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  display: block !important;
-}
-
 div.single-filters {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 15px 0;
-
-  select {
-    width: auto !important;
-  }
 
   label {
     width: 100%;
@@ -55,11 +38,6 @@ div.single-filters {
       border-bottom-left-radius: 15px;
     }
   }
-}
-
-.single-filters--dropdown {
-  width: auto;
-  display: flex;
 }
 
 .single-filters--tab {

@@ -140,43 +140,24 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                   controls={openControls}
                   deleteField={() => removeFilter(filterIndex)}
                 >
-                  <label>
-                    <span className='edit-label column-heading'>Filter Style</span>
-
-                    <select
-                      value={filter.filterStyle || 'dropdown'}
-                      onChange={e => {
-                        updateFilterStyle(filterIndex, e.target.value)
-                      }}
-                    >
-                      {filterStyleOptions.map((item, index) => {
-                        return (
-                          <option key={`filter-style-${index}`} value={item}>
-                            {item}
-                          </option>
-                        )
-                      })}
-                    </select>
-                  </label>
+                  <Select
+                    value={filter.filterStyle}
+                    fieldName='filterStyle'
+                    label='Filter Style'
+                    updateField={(_section, _subsection, _field, value) => updateFilterStyle(filterIndex, value)}
+                    options={filterStyleOptions}
+                  />
 
                   {filter.filterStyle !== 'nested-dropdown' ? (
                     <>
-                      <label>
-                        <span className='edit-label column-heading'>Filter</span>
-                        <select
-                          value={filter.columnName}
-                          onChange={e => {
-                            handleNameChange(filterIndex, e.target.value)
-                          }}
-                        >
-                          <option value=''>- Select Option -</option>
-                          {dataColumns.map((dataKey, filterIndex) => (
-                            <option value={dataKey} key={filterIndex}>
-                              {dataKey}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
+                      <Select
+                        value={filter.columnName}
+                        fieldName='columnName'
+                        label='Filter'
+                        updateField={(_section, _subsection, _field, value) => handleNameChange(filterIndex, value)}
+                        options={dataColumns}
+                        initial='- Select Option -'
+                      />
 
                       <label>
                         <span className='edit-showDropdown column-heading'>Show Filter Input</span>
@@ -233,27 +214,21 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                         />
                       </label>
 
-                      <label>
-                        <span className='edit-filterOrder column-heading'>Filter Order</span>
-                        <select
-                          value={filter.order ? filter.order : 'asc'}
-                          onChange={e => updateFilterProp('order', filterIndex, e.target.value)}
-                        >
-                          {filterOrderOptions.map((option, index) => {
-                            return (
-                              <option value={option.value} key={`filter-${index}`}>
-                                {option.label}
-                              </option>
-                            )
-                          })}
-                        </select>
-                        {filter.order === 'cust' && (
-                          <FilterOrder
-                            orderedValues={filter.orderedValues || filter.values}
-                            handleFilterOrder={(index1, index2) => handleFilterOrder(index1, index2, filterIndex)}
-                          />
-                        )}
-                      </label>
+                      <Select
+                        value={filter.order || 'asc'}
+                        fieldName='order'
+                        label='Filter Order'
+                        updateField={(_section, _subSection, _field, value) =>
+                          updateFilterProp('order', filterIndex, value)
+                        }
+                        options={filterOrderOptions}
+                      />
+                      {filter.order === 'cust' && (
+                        <FilterOrder
+                          orderedValues={filter.orderedValues || filter.values}
+                          handleFilterOrder={(index1, index2) => handleFilterOrder(index1, index2, filterIndex)}
+                        />
+                      )}
                     </>
                   ) : (
                     <NestedDropdownEditor

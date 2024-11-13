@@ -1,4 +1,4 @@
-type Pivot = {
+export type Pivot = {
   columnName: string
   valueColumns: string[]
 }

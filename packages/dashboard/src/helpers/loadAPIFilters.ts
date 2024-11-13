@@ -6,6 +6,7 @@ import { APIFilter } from '../types/APIFilter'
 
 export const loadAPIFiltersFactory = (
   dispatch: Function,
+  dispatchErrorMessages: Function,
   setAPIFilterDropdowns: Function,
   autoLoadFilterIndexes: number[]
 ) => {
@@ -36,7 +37,6 @@ export const loadAPIFiltersFactory = (
               .then(data => {
                 if (!Array.isArray(data)) {
                   console.error('COVE only supports response data in the shape Array<Object>')
-                  return
                 }
                 const [_key, index] = toFetch[endpoint]
                 const apiFilter = filterLookup.get(_key) as APIFilter
@@ -51,7 +51,12 @@ export const loadAPIFiltersFactory = (
                 )
                 sharedFilters[index] = newDefaultSelectedFilter
               })
-              .catch(console.error)
+              .catch(() => {
+                dispatchErrorMessages({
+                  type: 'ADD_ERROR_MESSAGE',
+                  payload: 'There was a problem returning data. Please try again.'
+                })
+              })
               .finally(() => {
                 resolve()
               })
