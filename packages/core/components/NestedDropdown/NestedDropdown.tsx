@@ -5,11 +5,12 @@ import { filterSearchTerm, NestedOptions, ValueTextPair } from './nestedDropdown
 
 const Options: React.FC<{
   subOptions: ValueTextPair[]
+  filterIndex: number
   label: string
   handleSubGroupSelect: Function
   userSelectedLabel: string
   userSearchTerm: string
-}> = ({ subOptions, label, handleSubGroupSelect, userSelectedLabel, userSearchTerm }) => {
+}> = ({ subOptions, filterIndex, label, handleSubGroupSelect, userSelectedLabel, userSearchTerm }) => {
   const [isTierOneExpanded, setIsTierOneExpanded] = useState(true)
   const checkMark = <>&#10004;</>
 
@@ -18,7 +19,7 @@ const Options: React.FC<{
   }, [userSearchTerm])
 
   const handleGroupClick = e => {
-    const leaveExpanded = e.target.className === 'selectable-item' ? true : !isTierOneExpanded
+    const leaveExpanded = e.target.className === `selectable-item-${filterIndex}` ? true : !isTierOneExpanded
     setIsTierOneExpanded(leaveExpanded)
   }
 
@@ -26,10 +27,10 @@ const Options: React.FC<{
     const currentItem = e.target
     if (e.key === 'ArrowRight') setIsTierOneExpanded(true)
     else if (e.key === 'ArrowLeft') {
-      if (currentItem.className === 'selectable-item') currentItem.parentNode.parentNode.focus()
+      if (currentItem.className === `selectable-item-${filterIndex}`) currentItem.parentNode.parentNode.focus()
       setIsTierOneExpanded(false)
     } else if (e.key === 'Enter') {
-      currentItem.className === 'selectable-item'
+      currentItem.className === `selectable-item-${filterIndex}`
         ? handleSubGroupSelect(currentItem.dataset.value)
         : setIsTierOneExpanded(!isTierOneExpanded)
     }
@@ -44,7 +45,7 @@ const Options: React.FC<{
         aria-label={label}
         onClick={handleGroupClick}
         onKeyUp={handleKeyUp}
-        className='nested-dropdown-group'
+        className={`nested-dropdown-group-${filterIndex}`}
       >
         <span className={'font-weight-bold'}>{label} </span>
         {
@@ -73,7 +74,7 @@ const Options: React.FC<{
             return (
               <li
                 key={regionID}
-                className='selectable-item'
+                className={`selectable-item-${filterIndex}`}
                 tabIndex={0}
                 role='treeitem'
                 aria-label={regionID}
@@ -104,6 +105,7 @@ const Options: React.FC<{
 type NestedDropdownProps = {
   activeGroup: string
   activeSubGroup?: string
+  filterIndex: number
   isEditor?: boolean
   isUrlFilter?: boolean
   listLabel: string
@@ -116,6 +118,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   options,
   activeGroup,
   activeSubGroup,
+  filterIndex,
   listLabel,
   handleSelectedItems
 }) => {
@@ -151,7 +154,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
           setIsListOpened(true)
           // Move focus from Input to top of dropdown
           Dropdown.firstChild.focus()
-        } else if (className === 'selectable-item') {
+        } else if (className === `selectable-item-${filterIndex}`) {
           // Move focus to next item on list: next Tier Two item or the next Tier One or SearchInput
           const itemToFocusOnAfterKeyUp = nextSibling ?? parentNode.parentNode.nextSibling ?? searchInput.current
           itemToFocusOnAfterKeyUp.focus()
@@ -176,7 +179,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
             // Move focus to last item of the last collapsed Tier Two in dropdown
             Dropdown.lastChild.lastChild.lastChild.focus()
           }
-        } else if (className === 'selectable-item') {
+        } else if (className === `selectable-item-${filterIndex}`) {
           // Move focus to previous Tier Two or Move focus to current Tier One
           const itemToFocusOnAfterKeyUp = previousSibling ?? parentNode.parentNode
           itemToFocusOnAfterKeyUp.focus()
@@ -226,6 +229,20 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
     setInputValue(newSearchTerm)
   }
 
+  const handleOnBlur = e => {
+    if (
+      e.relatedTarget === null ||
+      ![
+        `nested-dropdown-${filterIndex}`,
+        `nested-dropdown-group-${filterIndex}`,
+        `selectable-item-${filterIndex}`
+      ].includes(e.relatedTarget.className)
+    ) {
+      setInputHasFocus(false)
+      setIsListOpened(false)
+    }
+  }
+
   return (
     <>
       {listLabel && (
@@ -233,9 +250,19 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
           {listLabel}
         </label>
       )}
+<<<<<<< HEAD
       <div id={dropdownId} className={`nested-dropdown ${isListOpened ? 'open-filter' : ''}`} onKeyUp={handleKeyUp}>
         <div className='nested-dropdown-input-container' aria-label='searchInput' role='textbox'>
+=======
+      <div
+        id={dropdownId}
+        className={`nested-dropdown nested-dropdown-${filterIndex} ${isListOpened ? 'open-filter' : ''}`}
+        onKeyUp={handleKeyUp}
+      >
+        <div className='nested-dropdown-input-container form-control' aria-label='searchInput' role='textbox'>
+>>>>>>> e3ce4cfce (dev-9755-Nested-Dropdown-doesnt-close-on-blur)
           <input
+            id={`nested-dropdown-${filterIndex}`}
             className='search-input'
             ref={searchInput}
             aria-label='searchInput'
@@ -249,7 +276,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
               if (inputHasFocus) setIsListOpened(!isListOpened)
             }}
             onFocus={() => setInputHasFocus(true)}
-            onBlur={() => setInputHasFocus(false)}
+            onBlur={e => handleOnBlur(e)}
           />
           <span className='list-arrow' aria-hidden={true}>
             <Icon display='caretDown' />
@@ -272,6 +299,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
                   <Options
                     key={groupTextValue + '_' + index}
                     subOptions={subgroup}
+                    filterIndex={filterIndex}
                     label={groupTextValue}
                     handleSubGroupSelect={subGroupValue => {
                       chooseSelectedSubGroup(groupValue, subGroupValue)
