@@ -30,7 +30,12 @@
           "valueColumns": ["age", "color"]
         }
       },
-      "columns": {},
+      "columns": {
+        "other": {
+          "name": "other",
+          "dataTable": false
+        }
+      },
       "dataFormat": {},
       "visualizationType": "table",
       "dataDescription": {
@@ -59,10 +64,10 @@
   "datasets": {
     "valid-data-chart.csv": {
       "data": [
-        { "name": "John", "age": 25, "color": "blue", "city": "New York" },
-        { "name": "Jane", "age": 27, "color": "red", "city": "New York" },
-        { "name": "Jane", "age": 30, "color": "yellow", "city": "San Francisco" },
-        { "name": "John", "age": 31, "color": "green", "city": "San Francisco" }
+        { "name": "John", "age": 25, "color": "blue", "other": "no", "city": "New York" },
+        { "name": "Jane", "age": 27, "color": "red", "other": "yes", "city": "New York" },
+        { "name": "Jane", "age": 30, "color": "yellow", "other": "no", "city": "San Francisco" },
+        { "name": "John", "age": 31, "color": "green", "other": "yes", "city": "San Francisco" }
       ],
       "dataFileSize": 178,
       "dataFileName": "valid-data-chart.csv",

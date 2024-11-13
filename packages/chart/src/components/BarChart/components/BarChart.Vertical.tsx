@@ -15,11 +15,13 @@ import { BarGroup } from '@visx/shape'
 import Regions from '../../Regions'
 // CDC core components and helpers
 import { isDateScale } from '@cdc/core/helpers/cove/date'
+import isNumber from '@cdc/core/helpers/isNumber'
 import createBarElement from '@cdc/core/components/createBarElement'
 // Third party libraries
 import chroma from 'chroma-js'
 // Types
 import { type ChartContext } from '../../../types/ChartContext'
+import _ from 'lodash'
 
 export const BarChartVertical = () => {
   const { xScale, yScale, xMax, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
@@ -42,7 +44,7 @@ export const BarChartVertical = () => {
   } = useBarChart()
 
   // prettier-ignore
-  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig } = useContext<ChartContext>(ConfigContext)
+  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, getXAxisData, getYAxisData, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig } = useContext<ChartContext>(ConfigContext)
   const { HighLightedBarUtils } = useHighlightedBars(config)
   let data = transformedData
   // check if user add suppression
@@ -56,6 +58,23 @@ export const BarChartVertical = () => {
     data = brushConfig.data
   }
 
+  const getData = () => {
+    const dynamicSeries = config.series.find(s => s.dynamicCategory)
+    if (!dynamicSeries) return data
+    const { dynamicCategory, dataKey } = dynamicSeries
+    const xAxisKey = config.runtime.originalXAxis.dataKey
+    const xAxisGroupDataLookup = _.groupBy(data, xAxisKey)
+    return Object.values(xAxisGroupDataLookup).map(group => {
+      return group.reduce((acc, datum) => {
+        const dataValue = datum[dataKey]
+        const dataCategory = datum[dynamicCategory]
+        acc[dataCategory] = dataValue
+        acc[xAxisKey] = datum[xAxisKey]
+        return acc
+      }, {})
+    })
+  }
+
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' ||
@@ -64,7 +83,7 @@ export const BarChartVertical = () => {
     config.orientation === 'vertical' && (
       <Group>
         <BarGroup
-          data={data}
+          data={getData()}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
           height={yMax}
           x0={d => {
@@ -167,10 +186,8 @@ export const BarChartVertical = () => {
                     bar,
                     defaultBarHeight,
                     config,
-                    isNumber,
                     barWidth,
-                    isVertical: true,
-                    yAxisValue
+                    isVertical: true
                   })
 
                   const absentDataLabel = getAbsentDataLabel(yAxisValue)

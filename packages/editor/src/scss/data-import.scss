@@ -69,14 +69,10 @@
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
-        max-width: 40px;
 
         button {
           font-size: 11pt;
         }
-      }
-      td:last-child {
-        max-width: 10px;
       }
     }
     .cdcdataviz-file-selector {
@@ -115,10 +111,6 @@
       font-style: italic;
       margin: 1em 0 2em 0;
       color: var(--mediumGray);
-    }
-    .btn {
-      display: inline-block;
-      margin: 1em 0;
     }
     .btn.active {
       $primary: #005eaa;
@@ -238,8 +230,21 @@
   }
   .right-col {
     position: relative;
-    background-color: $lightest-gray;
+    background-color: var(--gray2);
     padding: $gbl-padding;
     width: 50% !important;
+
+    table {
+      width: 100%;
+      table-layout: unset;
+      border-collapse: collapse;
+
+      th,
+      td {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
   }
 }

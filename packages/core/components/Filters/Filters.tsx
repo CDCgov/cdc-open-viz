@@ -351,7 +351,7 @@ const Filters = (props: FilterProps) => {
         id={`filter-${outerIndex}`}
         name={label}
         aria-label={`Filter by ${label}`}
-        className='filter-select'
+        className='cove-form-select'
         data-index='0'
         value={active}
         onChange={e => {
@@ -439,6 +439,7 @@ const Filters = (props: FilterProps) => {
 
       const classList = [
         'single-filters',
+        'form-group mr-3',
         mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`
       ]
       const mobileExempt = ['nested-dropdown', 'multi-select'].includes(filterStyle)
@@ -446,7 +447,11 @@ const Filters = (props: FilterProps) => {
       return (
         <div className={classList.join(' ')} key={outerIndex}>
           <>
-            {label && <label htmlFor={`filter-${outerIndex}`}>{label}</label>}
+            {label && (
+              <label className='text-capitalize font-weight-bold mt-1 mb-0' htmlFor={`filter-${outerIndex}`}>
+                {label}
+              </label>
+            )}
             {filterStyle === 'tab' && !mobileFilterStyle && Tabs}
             {filterStyle === 'pill' && !mobileFilterStyle && Pills}
             {filterStyle === 'tab bar' && !mobileFilterStyle && <TabBar filter={singleFilter} index={outerIndex} />}
@@ -463,6 +468,7 @@ const Filters = (props: FilterProps) => {
               <NestedDropdown
                 activeGroup={(singleFilter.active as string) || (singleFilter.queuedActive || [])[0]}
                 activeSubGroup={(singleFilter.subGrouping?.active as string) || (singleFilter.queuedActive || [])[1]}
+                filterIndex={outerIndex}
                 options={getNestedOptions(singleFilter)}
                 listLabel={label}
                 handleSelectedItems={value => changeFilterActive(outerIndex, value)}
@@ -500,14 +506,16 @@ const Filters = (props: FilterProps) => {
         {filters?.some(filter => filter.active && filter.columnName) ? filterConstants.introText : ''}{' '}
         {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
       </p>
-      <div className='filters-section__wrapper'>
+      <div className='d-flex flex-wrap w-100 filters-section__wrapper'>
         {' '}
         <>
           <Style />
           {filterBehavior === 'Apply Button' ? (
             <div className='filters-section__buttons'>
               <Button
-                onClick={() => handleApplyButton(filters)}
+                onClick={e => {
+                  handleApplyButton(filters)
+                }}
                 disabled={!showApplyButton}
                 className={[general?.headerColor ? general.headerColor : theme, 'apply'].join(' ')}
               >

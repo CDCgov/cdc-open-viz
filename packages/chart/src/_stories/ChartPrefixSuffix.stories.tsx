@@ -3,6 +3,7 @@ import barConfig from './_mock/line_chart_two_points_new_chart.json'
 import annotationConfig from './_mock/annotation_category_mock.json'
 import areaPrefix from './_mock/annotation_category_mock.json'
 import horizontalBarConfig from './_mock/horizontal_bar.json'
+import scatterPlotConfig from './_mock/scatterplot_mock.json'
 
 import Chart from '../CdcChart'
 import { editConfigKeys } from '../helpers/configHelpers'
@@ -146,6 +147,13 @@ export const Top_Suffix_Above_Gridlines_With_Options: Story = {
       { path: ['yAxis', 'hideAxis'], value: true }
     ])
   }
+}
+
+export const ScatterPlot_Bottom_Commas: Story = {
+  args: {
+    config: editConfigKeys(scatterPlotConfig, [{ path: ['dataFormat', 'bottomCommas'], value: true }])
+  },
+  isEditor: true
 }
 
 export default meta

@@ -27,3 +27,9 @@ export function updateQueryString(queryParams) {
     .join('&')}`
   window.history.pushState({ path: updateUrl }, '', updateUrl)
 }
+
+export function updateQueryParam(key: string, value: number | string) {
+  const queryParams = getQueryParams()
+  queryParams[key] = value
+  updateQueryString(queryParams)
+}

@@ -19,20 +19,19 @@ import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
 type DeprecatedVisualizationType = {
   columns: Record<string, Partial<Column>>
   confidenceKeys: ConfidenceInterval
-  dataFileName: string
-  dataFileSourceType: string
+  dataFileName?: string
+  dataFileSourceType?: string
   dataFormat: any
-  datasets: Record<string, any>
+  datasets?: Record<string, any>
   filters: VizFilter[]
   general: General
   legend: Legend
   multiDashboards?: any[]
   newViz: boolean
   isResponsiveTicks: boolean
-  barThickness: string
-  openModal: boolean
+  openModal?: boolean
   orientation: 'vertical' | 'horizontal'
-  originalFormattedData: any
+  originalFormattedData?: any
   runtime?: Runtime
   series: Series
   table: Table
@@ -49,7 +48,7 @@ type DeprecatedVisualizationType = {
     | 'filtered-text'
     | 'table'
     | 'navigation'
-  usesSharedFilter: any
+  usesSharedFilter?: any
   visualizationSubType: string
   visualizationType: string
   xAxis: Axis
@@ -63,7 +62,7 @@ type StatefulProperties = {
 
 export type CommonVisualizationProperties = Partial<StatefulProperties> & {
   showEditorPanel?: boolean
-  uid?: string // this is the actual key of the visualization object
+  uid?: string | number // this is the actual key of the visualization object
   visualizationType?: string
   filterBehavior: FilterBehavior
 } & Partial<ConfigureData>

@@ -23,13 +23,26 @@ import Accordion from '@cdc/core/components/ui/Accordion'
 import '@cdc/core/styles/v2/components/editor.scss'
 import './editorPanel.style.css'
 import VariableSection from './Variables'
+import { CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 
-const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
+const headerColors = [
+  'theme-blue',
+  'theme-purple',
+  'theme-brown',
+  'theme-teal',
+  'theme-pink',
+  'theme-orange',
+  'theme-slate',
+  'theme-indigo',
+  'theme-cyan',
+  'theme-green',
+  'theme-amber'
+]
 
 const EditorPanel: React.FC = () => {
   const { config, data, isDashboard, loading, setParentConfig, updateConfig } = useContext(ConfigContext)
   const { contentEditor, theme, visual } = config
-  const { inlineHTML, markupVariables, srcUrl, title, useInlineHTML } = contentEditor
+  const { inlineHTML, markupVariables, srcUrl, title, useInlineHTML, allowHideSection } = contentEditor
   const [displayPanel, setDisplayPanel] = useState(true)
   const updateField = updateFieldFactory(config, updateConfig, true)
   const hasData = data?.[0] !== undefined ?? false
@@ -111,17 +124,40 @@ const EditorPanel: React.FC = () => {
   const editorContent = (
     <Accordion>
       <Accordion.Section title='General'>
-        <InputText value={title || ''} section='contentEditor' fieldName='title' label='Title' placeholder='Markup Include Title' updateField={updateField} />
+        <InputText
+          value={title || ''}
+          section='contentEditor'
+          fieldName='title'
+          label='Title'
+          placeholder='Markup Include Title'
+          updateField={updateField}
+        />
       </Accordion.Section>
       <Accordion.Section title='Content Editor'>
         <span className='divider-heading'>Enter Markup</span>
-        <InputCheckbox inline value={useInlineHTML} section='contentEditor' fieldName='useInlineHTML' label='Use Inline HTML&nbsp;' updateField={updateField} />
+        <InputCheckbox
+          inline
+          value={useInlineHTML}
+          section='contentEditor'
+          fieldName='useInlineHTML'
+          label='Use Inline HTML&nbsp;'
+          updateField={updateField}
+        />
         <div className='column-edit'>
           {useInlineHTML ? (
             <>
               {/* HTML Textbox */}
               <div ref={textAreaInEditorContainer}>
-                <InputText value={inlineHTML} section='contentEditor' fieldName='inlineHTML' label='HTML' placeholder='Add HTML here' type='textarea' rows={10} updateField={updateField} />
+                <InputText
+                  value={inlineHTML}
+                  section='contentEditor'
+                  fieldName='inlineHTML'
+                  label='HTML'
+                  placeholder='Add HTML here'
+                  type='textarea'
+                  rows={10}
+                  updateField={updateField}
+                />
 
                 <hr className='accordion__divider' />
               </div>
@@ -140,23 +176,69 @@ const EditorPanel: React.FC = () => {
                     </Tooltip>
                   </span>
                 </label>
-                {hasData === false && <span className='need-data-source-prompt'>To use variables, add data source.</span>}
+                {hasData === false && (
+                  <span className='need-data-source-prompt'>To use variables, add data source.</span>
+                )}
                 {variableArray && variableArray.length > 0 && (
                   <div className='section-border'>
                     {variableArray?.map((variableObject, index) => {
-                      return <VariableSection key={`${variableObject.name}-${index}`} controls={openVariableControls} data={data} deleteVariable={deleteVariable} updateVariableArray={updateVariableArray} variableConfig={variableObject} variableIndex={index} />
+                      return (
+                        <VariableSection
+                          key={`${variableObject.name}-${index}`}
+                          controls={openVariableControls}
+                          data={data}
+                          deleteVariable={deleteVariable}
+                          updateVariableArray={updateVariableArray}
+                          variableConfig={variableObject}
+                          variableIndex={index}
+                        />
+                      )
                     })}
                   </div>
                 )}
+                <div className='pt-2'>
+                  <CheckBox
+                    value={allowHideSection}
+                    section='contentEditor'
+                    fieldName='allowHideSection'
+                    label='Hide Section on Null'
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display='question'
+                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>{`Hide this entire Markup Include section if any variable is null or blank.`}</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                </div>
+
                 <div className='mb-1 d-flex'>
-                  <button className={'btn btn-primary'} onClick={handleCreateNewVariableButtonClick} disabled={!hasData}>
+                  <button
+                    className={'btn btn-primary'}
+                    onClick={handleCreateNewVariableButtonClick}
+                    disabled={!hasData}
+                  >
                     Create New Variable
                   </button>
                 </div>
               </fieldset>
             </>
           ) : (
-            <InputText value={srcUrl || ''} section='contentEditor' fieldName='srcUrl' label='Source URL;' placeholder='https://www.example.com/file.html' updateField={updateField} />
+            <InputText
+              value={srcUrl || ''}
+              section='contentEditor'
+              fieldName='srcUrl'
+              label='Source URL;'
+              placeholder='https://www.example.com/file.html'
+              updateField={updateField}
+            />
           )}
         </div>
       </Accordion.Section>
@@ -177,11 +259,41 @@ const EditorPanel: React.FC = () => {
           </ul>
         </div>
         <div className='cove-accordion__panel-section checkbox-group'>
-          <InputCheckbox value={visual.border} section='visual' fieldName='border' label='Display Border&nbsp;' updateField={updateField} />
-          <InputCheckbox value={visual.borderColorTheme} section='visual' fieldName='borderColorTheme' label='Use Border Color Theme&nbsp;' updateField={updateField} />
-          <InputCheckbox value={visual.accent} section='visual' fieldName='accent' label='Use Accent Style&nbsp;' updateField={updateField} />
-          <InputCheckbox value={visual.background} section='visual' fieldName='background' label='Use Theme Background Color&nbsp;' updateField={updateField} />
-          <InputCheckbox value={visual.hideBackgroundColor} section='visual' fieldName='hideBackgroundColor' label='Hide Background Color&nbsp;' updateField={updateField} />
+          <InputCheckbox
+            value={visual.border}
+            section='visual'
+            fieldName='border'
+            label='Display Border&nbsp;'
+            updateField={updateField}
+          />
+          <InputCheckbox
+            value={visual.borderColorTheme}
+            section='visual'
+            fieldName='borderColorTheme'
+            label='Use Border Color Theme&nbsp;'
+            updateField={updateField}
+          />
+          <InputCheckbox
+            value={visual.accent}
+            section='visual'
+            fieldName='accent'
+            label='Use Accent Style&nbsp;'
+            updateField={updateField}
+          />
+          <InputCheckbox
+            value={visual.background}
+            section='visual'
+            fieldName='background'
+            label='Use Theme Background Color&nbsp;'
+            updateField={updateField}
+          />
+          <InputCheckbox
+            value={visual.hideBackgroundColor}
+            section='visual'
+            fieldName='hideBackgroundColor'
+            label='Hide Background Color&nbsp;'
+            updateField={updateField}
+          />
         </div>
       </Accordion.Section>
     </Accordion>
@@ -191,7 +303,12 @@ const EditorPanel: React.FC = () => {
 
   return (
     <ErrorBoundary component='EditorPanel'>
-      <Layout.Sidebar displayPanel={displayPanel} isDashboard={isDashboard} title={'Configure Markup Include'} onBackClick={onBackClick}>
+      <Layout.Sidebar
+        displayPanel={displayPanel}
+        isDashboard={isDashboard}
+        title={'Configure Markup Include'}
+        onBackClick={onBackClick}
+      >
         {editorContent}
       </Layout.Sidebar>
     </ErrorBoundary>

@@ -1,9 +1,9 @@
-import { LogScaleConfig, scaleBand, scaleLinear, scaleLog, scalePoint, scaleTime } from '@visx/scale'
+import { LinearScaleConfig, LogScaleConfig, scaleBand, scaleLinear, scaleLog, scalePoint, scaleTime } from '@visx/scale'
 import { useContext } from 'react'
 import ConfigContext from '../ConfigContext'
 import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
-import * as d3 from 'd3'
+
 const scaleTypes = {
   TIME: 'time',
   LOG: 'log',
@@ -31,8 +31,7 @@ const useScales = (properties: useScaleProps) => {
   const seriesDomain = config.runtime.barSeriesKeys || config.runtime.seriesKeys
   const xAxisType = config.runtime.xAxis.type
   const isHorizontal = config.orientation === 'horizontal'
-
-  const { visualizationType } = config
+  const { visualizationType, xAxis, forestPlot } = config
 
   //  define scales
   let xScale = null
@@ -64,11 +63,11 @@ const useScales = (properties: useScaleProps) => {
 
   // handle Linear scaled viz
   if (config.xAxis.type === 'date' && !isHorizontal) {
-    const xAxisDataMappedSorted = xAxisDataMapped ? xAxisDataMapped.sort() : []
+    const xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
     xScale = composeScaleBand(xAxisDataMappedSorted, [0, xMax], 1 - config.barThickness)
   }
 
-  if (config.xAxis.type === 'date-time') {
+  if (xAxis.type === 'date-time' || xAxis.type === 'continuous') {
     let xAxisMin = Math.min(...xAxisDataMapped.map(Number))
     let xAxisMax = Math.max(...xAxisDataMapped.map(Number))
     xAxisMin -= (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
@@ -76,15 +75,17 @@ const useScales = (properties: useScaleProps) => {
       visualizationType === 'Line'
         ? 0
         : (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
+    const range = config.xAxis.sortByRecentDate ? [xMax, 0] : [0, xMax]
     xScale = scaleTime({
       domain: [xAxisMin, xAxisMax],
-      range: [0, xMax]
+      range: range
     })
 
     xScale.type = scaleTypes.TIME
 
     let minDistance = Number.MAX_VALUE
-    let xAxisDataMappedSorted = xAxisDataMapped ? xAxisDataMapped.sort() : []
+    let xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
+
     for (let i = 0; i < xAxisDataMappedSorted.length - 1; i++) {
       let distance = xScale(xAxisDataMappedSorted[i + 1]) - xScale(xAxisDataMappedSorted[i])
 
@@ -106,7 +107,7 @@ const useScales = (properties: useScaleProps) => {
       range: [0, yMax]
     })
     xScale = scaleLinear({
-      domain: [min * leftOffset, Math.max(Number(config.xAxis.target), max)],
+      domain: [min * leftOffset, Math.max(Number(xAxis.target), max)],
       range: [0, xMax],
       round: true,
       nice: true
@@ -116,9 +117,11 @@ const useScales = (properties: useScaleProps) => {
 
   // handle Scatter plot
   if (config.visualizationType === 'Scatter Plot') {
-    if (config.xAxis.type === 'continuous') {
+    if (xAxis.type === 'continuous') {
+      let min = xAxis.min ? xAxis.min : Math.min.apply(null, xScale.domain())
+      let max = xAxis.max ? xAxis.max : Math.max.apply(null, xScale.domain())
       xScale = scaleLinear({
-        domain: [0, Math.max.apply(null, xScale.domain())],
+        domain: [min, max],
         range: [0, xMax]
       })
       xScale.type = scaleTypes.LINEAR
@@ -150,19 +153,19 @@ const useScales = (properties: useScaleProps) => {
     if (highestFence > max) max = highestFence
 
     // Set Scales
+
     yScale = scaleLinear({
       range: [yMax, 0],
       round: true,
       domain: [min, max]
     })
-
     xScale = scaleBand({
       range: [0, xMax],
-      round: true,
-      domain: config.boxplot.categories,
-      padding: 0.4
+      domain: config.boxplot.categories
     })
     xScale.type = scaleTypes.BAND
+
+    seriesScale = composeScalePoint(seriesDomain, [0, yMax])
   }
 
   // handle Paired bar
@@ -193,10 +196,10 @@ const useScales = (properties: useScaleProps) => {
 
   if (visualizationType === 'Forest Plot') {
     const resolvedYRange = () => {
-      if (config.forestPlot.regression.showDiamond || config.forestPlot.regression.description) {
-        return [0 + config.forestPlot.rowHeight * 2, yMax - config.forestPlot.rowHeight]
+      if (forestPlot.regression.showDiamond || forestPlot.regression.description) {
+        return [0 + forestPlot.rowHeight * 2, yMax - forestPlot.rowHeight]
       } else {
-        return [0 + config.forestPlot.rowHeight * 2, yMax]
+        return [0 + forestPlot.rowHeight * 2, yMax]
       }
     }
 
@@ -207,26 +210,26 @@ const useScales = (properties: useScaleProps) => {
 
     const xAxisPadding = 5
 
-    const leftWidthOffset = (Number(config.forestPlot.leftWidthOffset) / 100) * xMax
-    const rightWidthOffset = (Number(config.forestPlot.rightWidthOffset) / 100) * xMax
+    const leftWidthOffset = (Number(forestPlot.leftWidthOffset) / 100) * xMax
+    const rightWidthOffset = (Number(forestPlot.rightWidthOffset) / 100) * xMax
 
-    const rightWidthOffsetMobile = (Number(config.forestPlot.rightWidthOffsetMobile) / 100) * xMax
-    const leftWidthOffsetMobile = (Number(config.forestPlot.leftWidthOffsetMobile) / 100) * xMax
+    const rightWidthOffsetMobile = (Number(forestPlot.rightWidthOffsetMobile) / 100) * xMax
+    const leftWidthOffsetMobile = (Number(forestPlot.leftWidthOffsetMobile) / 100) * xMax
 
     if (screenWidth > 480) {
-      if (config.forestPlot.type === 'Linear') {
+      if (forestPlot.type === 'Linear') {
         xScale = scaleLinear({
           domain: [
-            Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding,
-            Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding
+            Math.min(...data.map(d => parseFloat(d[forestPlot.lower]))) - xAxisPadding,
+            Math.max(...data.map(d => parseFloat(d[forestPlot.upper]))) + xAxisPadding
           ],
           range: [leftWidthOffset, Number(screenWidth) - rightWidthOffset]
         })
         xScale.type = scaleTypes.LINEAR
       }
-      if (config.forestPlot.type === 'Logarithmic') {
-        let max = Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper])))
-        let fp_min = Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower])))
+      if (forestPlot.type === 'Logarithmic') {
+        let max = Math.max(...data.map(d => parseFloat(d[forestPlot.upper])))
+        let fp_min = Math.min(...data.map(d => parseFloat(d[forestPlot.lower])))
 
         xScale = scaleLog<LogScaleConfig>({
           domain: [fp_min, max],
@@ -236,20 +239,20 @@ const useScales = (properties: useScaleProps) => {
         xScale.type = scaleTypes.LOG
       }
     } else {
-      if (config.forestPlot.type === 'Linear') {
-        xScale = scaleLinear({
+      if (forestPlot.type === 'Linear') {
+        xScale = scaleLinear<LinearScaleConfig>({
           domain: [
-            Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding,
-            Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding
+            Math.min(...data.map(d => parseFloat(d[forestPlot.lower]))) - xAxisPadding,
+            Math.max(...data.map(d => parseFloat(d[forestPlot.upper]))) + xAxisPadding
           ],
           range: [leftWidthOffsetMobile, xMax - rightWidthOffsetMobile],
           type: scaleTypes.LINEAR
         })
       }
 
-      if (config.forestPlot.type === 'Logarithmic') {
-        let max = Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper])))
-        let fp_min = Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower])))
+      if (forestPlot.type === 'Logarithmic') {
+        let max = Math.max(...data.map(d => parseFloat(d[forestPlot.upper])))
+        let fp_min = Math.min(...data.map(d => parseFloat(d[forestPlot.lower])))
 
         xScale = scaleLog<LogScaleConfig>({
           domain: [fp_min, max],
@@ -385,4 +388,22 @@ const composeScaleBand = (domain, range, padding = 0) => {
     range: range,
     padding: padding
   })
+}
+
+const sortXAxisData = (xAxisData, sortByRecentDate) => {
+  if (!xAxisData || xAxisData.length === 0) {
+    return []
+  }
+
+  // Check if the array has only one item
+  if (xAxisData.length === 1) {
+    return xAxisData
+  }
+  if (sortByRecentDate) {
+    // Sort from newest to oldes (recent dates first)
+    return xAxisData.sort((a, b) => Number(b) - Number(a))
+  } else {
+    // Sort from oldest to newest
+    return xAxisData.sort((a, b) => Number(a) - Number(b))
+  }
 }
