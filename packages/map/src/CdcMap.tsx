@@ -1854,13 +1854,7 @@ const CdcMap = ({
                 </section>
 
                 {general.showSidebar && 'navigation' !== general.type && (
-                  <Legend
-                    dimensions={dimensions}
-                    ref={legendRef}
-                    skipId={tabId}
-                    containerWidthPadding={0}
-                    currentViewport={currentViewport}
-                  />
+                  <Legend dimensions={dimensions} ref={legendRef} skipId={tabId} containerWidthPadding={0} />
                 )}
               </div>
 
