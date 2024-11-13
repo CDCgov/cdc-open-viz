@@ -51,7 +51,7 @@ export const Gradient_With_Text: Story = {
     config: editConfigKeys(UsGradient, [
       { path: ['legend', 'title'], value: 'Title' },
       { path: ['legend', 'description'], value: 'Description' },
-      { path: ['legend', 'hideBorder'], value: false }
+      { path: ['legend', 'hideBorder'], value: true }
     ])
   }
 }
