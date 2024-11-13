@@ -108,7 +108,6 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
             <NestedDropdown
               activeGroup={filter.active as string}
               activeSubGroup={filter.subGrouping?.active}
-              filterIndex={filterIndex}
               options={getNestedDropdownOptions(apiFilterDropdowns[_key])}
               listLabel={filter.key}
               handleSelectedItems={value => updateField(null, null, filterIndex, value)}
