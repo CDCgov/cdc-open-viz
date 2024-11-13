@@ -468,6 +468,7 @@ const Filters = (props: FilterProps) => {
               <NestedDropdown
                 activeGroup={(singleFilter.active as string) || (singleFilter.queuedActive || [])[0]}
                 activeSubGroup={(singleFilter.subGrouping?.active as string) || (singleFilter.queuedActive || [])[1]}
+                filterIndex={outerIndex}
                 options={getNestedOptions(singleFilter)}
                 listLabel={label}
                 handleSelectedItems={value => changeFilterActive(outerIndex, value)}
