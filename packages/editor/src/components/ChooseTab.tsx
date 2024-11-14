@@ -216,7 +216,7 @@ const buttons = [
     type: 'chart',
     subType: 'Bar',
     orientation: 'vertical',
-    barThickness: ' 0.95',
+    barThickness: '0.95',
     isResponsiveTicks: true,
     visualizationSubType: 'regular',
     xAxis: {
