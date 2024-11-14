@@ -25,7 +25,7 @@ function getMaxTierAndSetFilterTiers(filters: SharedFilter[]): number {
 
 function filter(data = [], filters: SharedFilter[], condition) {
   const activeFilters = filters.filter(
-    filter => filter.resetLabel !== filter.active || filter.values.some(value => value === filter.resetLabel)
+    filter => filter.resetLabel !== filter.active || filter.values?.some(value => value === filter.resetLabel)
   )
 
   return data.filter(row => {
