@@ -9,6 +9,7 @@ import pairedBar from './_mock/paired-bar.json'
 import horizontalBarConfig from './_mock/horizontal_bar.json'
 import pieConfig from './_mock/pie_with_data.json'
 import boxPlotConfig from './_mock/boxplot_multiseries.json'
+import areaChartStacked from './_mock/area_chart_stacked.json'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',
@@ -63,6 +64,13 @@ export const Paired_Bar: Story = {
 export const BoxPlot_Multiseries: Story = {
   args: {
     config: boxPlotConfig,
+    isEditor: false
+  }
+}
+
+export const Area_Chart_stacked: Story = {
+  args: {
+    config: areaChartStacked,
     isEditor: false
   }
 }
