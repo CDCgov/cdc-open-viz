@@ -602,10 +602,7 @@ const CdcChart = ({
         : ''
 
     // Sankey Description box error message
-    newConfig.runtime.editorErrorMessage =
-      newConfig.visualizationType === 'Sankey' && !newConfig.description
-        ? 'SUBTEXT/CITATION field is empty: A description of the Sankey Diagram data must be inputted.'
-        : ''
+    newConfig.runtime.editorErrorMessage = ''
 
     if (newConfig.legend.seriesHighlight?.length) {
       setSeriesHighlight(newConfig.legend?.seriesHighlight)
