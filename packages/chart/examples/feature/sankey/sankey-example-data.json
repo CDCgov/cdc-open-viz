@@ -1,4 +1,5 @@
 {
+  "annotations": [],
   "type": "chart",
   "debugSvg": false,
   "chartMessage": {
@@ -6,7 +7,6 @@
   },
   "title": "",
   "showTitle": true,
-  "enableTooltips": true,
   "showDownloadMediaButton": false,
   "theme": "theme-blue",
   "animate": false,
@@ -15,19 +15,25 @@
   "lineDatapointColor": "Same as Line",
   "barHasBorder": "false",
   "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
   "visualizationSubType": "regular",
   "barStyle": "",
   "roundingStyle": "standard",
   "tipRounding": "top",
   "isResponsiveTicks": false,
   "general": {
-    "showDownloadButton": false
+    "annotationDropdownText": "Annotations",
+    "showDownloadButton": false,
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true
   },
   "padding": {
     "left": 5,
     "right": 5
   },
-  "suppressedData": [],
   "preliminaryData": [],
   "yAxis": {
     "hideAxis": false,
@@ -51,15 +57,45 @@
     "rightAxisTickColor": "#333",
     "numTicks": "",
     "axisPadding": 0,
+    "scalePadding": 10,
     "tickRotation": 0,
-    "anchors": []
+    "anchors": [],
+    "shoMissingDataLabel": true,
+    "showMissingDataLine": true,
+    "categories": []
+  },
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "count": "Count",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    }
+  },
+  "topAxis": {
+    "hasLine": false
   },
   "isLegendValue": false,
   "barThickness": 0.35,
   "barHeight": 25,
   "barSpace": 15,
   "heights": {
-    "vertical": 550,
+    "vertical": "647",
     "horizontal": 750
   },
   "xAxis": {
@@ -79,10 +115,13 @@
     "tickLabelColor": "#333",
     "tickColor": "#333",
     "numTicks": "",
-    "labelOffset": 65,
+    "labelOffset": 0,
     "axisPadding": 0,
     "target": 0,
-    "maxTickRotation": 0
+    "maxTickRotation": 0,
+    "padding": 5,
+    "showYearsOnce": false,
+    "sortByRecentDate": false
   },
   "table": {
     "label": "Data Table",
@@ -92,9 +131,13 @@
     "caption": "",
     "showDownloadUrl": false,
     "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
     "indexLabel": "",
-    "download": false,
+    "download": true,
     "showVertical": true,
+    "dateDisplayFormat": "",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
     "show": true,
     "customTableConfig": true
   },
@@ -104,6 +147,7 @@
   "legend": {
     "hide": false,
     "behavior": "isolate",
+    "axisAlign": true,
     "singleRow": true,
     "colorCode": "",
     "reverseLabelOrder": false,
@@ -113,14 +157,25 @@
     "dynamicLegendItemLimit": 5,
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "",
     "lineMode": false,
     "verticalSorted": false,
-    "highlightOnHover": false
+    "highlightOnHover": false,
+    "hideSuppressedLabels": false,
+    "hideSuppressionLink": false,
+    "seriesHighlight": [],
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    }
   },
   "brush": {
     "height": 25,
-    "data": [],
-    "active": false
+    "active": false,
+    "data": []
   },
   "exclusions": {
     "active": false,
@@ -156,7 +211,52 @@
   "series": [],
   "tooltips": {
     "opacity": 90,
-    "singleSeries": false
+    "singleSeries": false,
+    "dateDisplayFormat": ""
+  },
+  "forestPlot": {
+    "startAt": 0,
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
+    "lineOfNoEffect": {
+      "show": true
+    },
+    "type": "",
+    "pooledResult": {
+      "diamondHeight": 5,
+      "column": ""
+    },
+    "estimateField": "",
+    "estimateRadius": "",
+    "shape": "square",
+    "rowHeight": 20,
+    "description": {
+      "show": true,
+      "text": "description",
+      "location": 0
+    },
+    "result": {
+      "show": true,
+      "text": "result",
+      "location": 100
+    },
+    "radius": {
+      "min": 2,
+      "max": 10,
+      "scalingColumn": ""
+    },
+    "regression": {
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
+    },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0,
+    "showZeroLine": false,
+    "leftLabel": "",
+    "rightLabel": ""
   },
   "area": {
     "isStacked": false
@@ -180,12 +280,22 @@
       "nodeHeight": 40
     },
     "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#ff8500",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#ffc900",
+      "inactive": "#D3D3D3"
+    },
     "opacity": {
       "nodeOpacityDefault": 1,
       "nodeOpacityInactive": 0.1,
       "LinkOpacityDefault": 1,
       "LinkOpacityInactive": 0.1
     },
+    "storyNodeFontColor": "#006778",
     "storyNodeText": [],
     "nodeValueStyle": {
       "textBefore": "(",
@@ -193,6 +303,8 @@
     },
     "data": []
   },
+  "enableTooltips": true,
+  "suppressedData": [],
   "datasets": {},
   "visualizationType": "Sankey",
   "data": [
@@ -1359,5 +1471,6 @@
     "series": false
   },
   "validated": 4.23,
-  "footnotes": "**Counts fewer than 20 are suppressed for confidentiality reasons."
+  "footnotes": "**Counts fewer than 20 are suppressed for confidentiality reasons.",
+  "version": "4.24.10"
 }
