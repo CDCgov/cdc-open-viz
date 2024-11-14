@@ -81,15 +81,17 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           }
         } else {
           // Data Filter
-          filter.values?.forEach((filterOption, index) => {
-            const labeledOpt = filter.labels && filter.labels[filterOption]
-            values.push(
-              <option key={`${filter.key}-option-${index}`} value={filterOption}>
-                {labeledOpt || filterOption}
-              </option>
-            )
-            multiValues.push({ value: filterOption, label: labeledOpt || filterOption })
-          })
+          filter.values
+            .filter(value => value !== filter.resetLabel)
+            ?.forEach((filterOption, index) => {
+              const labeledOpt = filter.labels && filter.labels[filterOption]
+              values.push(
+                <option key={`${filter.key}-option-${index}`} value={filterOption}>
+                  {labeledOpt || filterOption}
+                </option>
+              )
+              multiValues.push({ value: filterOption, label: labeledOpt || filterOption })
+            })
         }
 
         return filter.filterStyle === FILTER_STYLE.multiSelect ? (
