@@ -598,6 +598,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     )
   }
 
+  const isNoDataAvailable = config.filters && config.filters.values.length === 0 && data.length === 0
+
   return isNaN(width) ? (
     <React.Fragment></React.Fragment>
   ) : (
@@ -611,7 +613,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           ref={svgRef}
           onMouseMove={onMouseMove}
           width={parentWidth}
-          height={parentHeight}
+          height={isNoDataAvailable ? 1 : parentHeight}
           className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${
             debugSvg && 'debug'
           } ${isDraggingAnnotation && 'dragging-annotation'}`}
@@ -949,7 +951,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               />
             </Group>
           )}
-          {config.filters && config.filters.values.length === 0 && data.length === 0 && (
+          {isNoDataAvailable && (
             <Text
               x={Number(config.yAxis.size) + Number(xMax / 2)}
               y={initialHeight / 2 - (config.xAxis.padding || 0) / 2}
