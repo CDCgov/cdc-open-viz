@@ -130,6 +130,12 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
               </Tooltip>
             }
           />
+          <TextField
+            label='Filter intro text'
+            value={config.filterIntro}
+            updateField={updateField}
+            fieldName='filterIntro'
+          />
           <br />
           <ul className='filters-list'>
             {/* Whether filters should apply onChange or Apply Button */}
