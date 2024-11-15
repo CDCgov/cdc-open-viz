@@ -116,7 +116,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     categoryValuesOrder.splice(idx2, 0, movedItem)
 
     state.legend.categoryValuesOrder?.forEach(value => {
-      if(categoryValuesOrder.indexOf(value) === -1){
+      if (categoryValuesOrder.indexOf(value) === -1) {
         categoryValuesOrder.push(value)
       }
     })
@@ -1093,6 +1093,14 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             </option>
           </select>
         </label>
+        <label>
+          <TextField
+            value={state.filterIntro}
+            fieldName='filterIntro'
+            label='Filter Intro text'
+            updateField={updateField}
+          />
+        </label>
         {filtersJSX}
       </>
     )
@@ -1261,6 +1269,14 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   })
 
   const updateField = (section, subsection, fieldName, newValue) => {
+    if (!section) {
+      setState({
+        ...state,
+        [fieldName]: newValue
+      })
+      return
+    }
+
     const isArray = Array.isArray(state[section])
 
     let sectionValue = isArray ? [...state[section], newValue] : { ...state[section], [fieldName]: newValue }
@@ -1503,9 +1519,11 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   })
 
   const getCategoryValuesOrder = () => {
-    let values = runtimeLegend ? runtimeLegend.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value) : []
+    let values = runtimeLegend
+      ? runtimeLegend.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value)
+      : []
 
-    if(state.legend.cateogryValuesOrder){
+    if (state.legend.cateogryValuesOrder) {
       return values.sort((a, b) => {
         let aVal = state.legend.cateogryValuesOrder.indexOf(a)
         let bVal = state.legend.cateogryValuesOrder.indexOf(b)
@@ -1517,11 +1535,12 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     } else {
       return values
     }
-    
   }
 
   const CategoryList = () => {
-    return getCategoryValuesOrder().filter(item => !item.special).map((value, index) => (
+    return getCategoryValuesOrder()
+      .filter(item => !item.special)
+      .map((value, index) => (
         <Draggable key={value} draggableId={`item-${value}`} index={index}>
           {(provided, snapshot) => (
             <li style={{ position: 'relative' }}>
@@ -1537,7 +1556,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             </li>
           )}
         </Draggable>
-    ))
+      ))
   }
 
   const isLoadedFromUrl = state?.dataKey?.includes('http://') || state?.dataKey?.includes('https://')

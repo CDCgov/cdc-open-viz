@@ -163,5 +163,6 @@ export type MapConfig = Visualization & {
   }
   hexMap: HexMapSettings
   filterBehavior: string
+  filterIntro: string
   visual: MapVisualSettings
 }

@@ -249,9 +249,7 @@ export const useFilters = props => {
 
   const filterConstants = {
     buttonText: 'Apply Filters',
-    resetText: 'Reset All',
-    introText: `Make a selection from the filters to change the visualization information.`,
-    applyText: 'Select the apply button to update the visualization information.'
+    resetText: 'Reset All'
   }
 
   // prettier-ignore
@@ -502,10 +500,9 @@ const Filters = (props: FilterProps) => {
 
   return (
     <section className={getClasses().join(' ')}>
-      <p className='filters-section__intro-text'>
-        {filters?.some(filter => filter.active && filter.columnName) ? filterConstants.introText : ''}{' '}
-        {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
-      </p>
+      {visualizationConfig.filterIntro && (
+        <p className='filters-section__intro-text'>{visualizationConfig.filterIntro}</p>
+      )}
       <div className='d-flex flex-wrap w-100 filters-section__wrapper'>
         {' '}
         <>
