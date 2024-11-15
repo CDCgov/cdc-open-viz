@@ -184,7 +184,7 @@ export const createShapeProperties = (type, pixelCoords, legendValues, state, ge
 
   switch (type) {
     case 'circle':
-      return { ...baseProps, geoRadius: geoRadius / 2, type: 'circle' }
+      return { ...baseProps, geoRadius: geoRadius, type: 'circle' }
     case 'pin':
       return { ...baseProps, type: 'pin' }
     case 'square':

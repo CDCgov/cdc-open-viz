@@ -174,7 +174,7 @@
     "bottomPrefix": "",
     "bottomAbbreviated": false
   },
-  "confidenceKeys": {},
+  "confidenceKeys": { "lower": "Low_Confidence_Limit", "upper": "High_Confidence_Limit" },
   "visual": {
     "border": true,
     "accent": true,
