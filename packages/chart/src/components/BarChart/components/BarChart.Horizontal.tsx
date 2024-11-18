@@ -37,9 +37,7 @@ export const BarChartHorizontal = () => {
     formatDate,
     parseDate,
     setSharedFilter,
-    isNumber,
-    getYAxisData,
-    getXAxisData
+    isNumber
   } = useContext<ChartContext>(ConfigContext)
   const {
     isHorizontal,
@@ -398,31 +396,6 @@ export const BarChartHorizontal = () => {
             ))
           }}
         </BarGroup>
-
-        {/* {Object.keys(config.confidenceKeys).length > 0
-          ? _data.map(d => {
-              let upperPos
-              let lowerPos
-              let tickWidth = 5
-              const yPos = yScale(getXAxisData(d)) - 0.75 * config.barHeight
-              upperPos = xScale(getYAxisData(d, config.confidenceKeys.upper))
-              lowerPos = xScale(getYAxisData(d, config.confidenceKeys.lower))
-              return (
-                <path
-                  key={`confidence-interval-h-${yPos}-${d[config.runtime.originalXAxis.dataKey]}`}
-                  stroke='#333'
-                  strokeWidth='px'
-                  d={`
-                    M${lowerPos} ${yPos - tickWidth}
-                    L${lowerPos} ${yPos + tickWidth}
-                    M${lowerPos} ${yPos}
-                    L${upperPos} ${yPos}
-                    M${upperPos} ${yPos - tickWidth}
-                    L${upperPos} ${yPos + tickWidth} `}
-                />
-              )
-            })
-          : ''} */}
       </Group>
     )
   )
