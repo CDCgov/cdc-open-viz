@@ -1096,6 +1096,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
         </label>
         <label>
           <TextField
+            type='textarea'
             value={state.filterIntro}
             fieldName='filterIntro'
             label='Filter Intro text'
