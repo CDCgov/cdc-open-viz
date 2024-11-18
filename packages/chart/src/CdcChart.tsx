@@ -490,7 +490,7 @@ const CdcChart = ({
             columnMedian: Number(d3.median(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnFirstQuartile: q1.toFixed(newConfig.dataFormat.roundTo),
             columnMin: _colMin,
-            columnCount: filteredDataValues?.length,
+            columnCount: filteredData.length,
             columnSd: Number(d3.deviation(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnMean: Number(d3.mean(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnIqr: Number(iqr).toFixed(newConfig.dataFormat.roundTo),
@@ -602,10 +602,7 @@ const CdcChart = ({
         : ''
 
     // Sankey Description box error message
-    newConfig.runtime.editorErrorMessage =
-      newConfig.visualizationType === 'Sankey' && !newConfig.description
-        ? 'SUBTEXT/CITATION field is empty: A description of the Sankey Diagram data must be inputted.'
-        : ''
+    newConfig.runtime.editorErrorMessage = ''
 
     if (newConfig.legend.seriesHighlight?.length) {
       setSeriesHighlight(newConfig.legend?.seriesHighlight)
@@ -847,14 +844,15 @@ const CdcChart = ({
     }
   }
 
-  const formatDate = (date, prevDate) => {
+  const formatDate = (date, i, ticks) => {
     let formattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(date)
     // Handle the case where all months work with '%b.' except for May
     if (config.runtime[section].dateDisplayFormat?.includes('%b.') && formattedDate.includes('May.')) {
       formattedDate = formattedDate.replace(/May\./g, 'May')
     }
     // Show years only once
-    if (config.xAxis.showYearsOnce && config.runtime[section].dateDisplayFormat?.includes('%Y') && prevDate) {
+    if (config.xAxis.showYearsOnce && config.runtime[section].dateDisplayFormat?.includes('%Y') && ticks) {
+      const prevDate = ticks[i - 1] ? ticks[i - 1].value : null
       const prevFormattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(prevDate)
       const year = formattedDate.match(/\d{4}/)
       const prevYear = prevFormattedDate.match(/\d{4}/)
@@ -1216,7 +1214,7 @@ const CdcChart = ({
     // cleaning is deleting data we need in forecasting charts.
     if (!Array.isArray(data)) return []
     if (config.visualizationType === 'Forecasting') return data
-    if (config.series.some(series => !!series.dynamicCategory)) return data
+    if (config.series?.some(series => !!series.dynamicCategory)) return data
     return config?.xAxis?.dataKey ? transform.cleanData(data, config.xAxis.dataKey) : data
   }
 

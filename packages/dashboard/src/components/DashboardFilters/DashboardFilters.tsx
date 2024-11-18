@@ -108,6 +108,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
             <NestedDropdown
               activeGroup={filter.active as string}
               activeSubGroup={filter.subGrouping?.active}
+              filterIndex={filterIndex}
               options={getNestedDropdownOptions(apiFilterDropdowns[_key])}
               listLabel={filter.key}
               handleSelectedItems={value => updateField(null, null, filterIndex, value)}
@@ -120,7 +121,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
             </label>
             <select
               id={`filter-${filterIndex}`}
-              className='form-control'
+              className='cove-form-select'
               data-index='0'
               value={filter.queuedActive || filter.active}
               onChange={val => {

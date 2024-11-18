@@ -158,7 +158,7 @@ export default function DataImport() {
   const loadData = async (fileBlob = null, fileName, editingDatasetKey) => {
     let fileData = fileBlob
     let fileSource = fileData?.path ?? fileName ?? externalURL
-    if(fileSource && typeof fileSource === 'string') fileSource = fileSource.trim();
+    if (fileSource && typeof fileSource === 'string') fileSource = fileSource.trim()
     const fileSourceType = fileBlob ? 'file' : 'url'
 
     // Get the raw data as text from the file
@@ -365,7 +365,7 @@ export default function DataImport() {
             onChange={e => setExternalURL(e.target.value)}
           />
           <button
-            className='input-group-text btn btn-primary px-4'
+            className='rounded-0 border-0 btn btn-primary px-4'
             type='submit'
             id='load-data'
             onClick={() => loadData(null, externalURL, editingDataset)}

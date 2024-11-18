@@ -6,7 +6,7 @@
 }
 
 .nested-dropdown {
-  .nested-dropdown-group {
+  [class^='nested-dropdown-group-'] {
     list-style: none;
   }
 
@@ -27,7 +27,7 @@
     font-size: 1em;
   }
 
-  .selectable-item {
+  [class^='selectable-item-'] {
     list-style: none;
     padding-left: 20px;
     position: relative;
@@ -45,6 +45,9 @@
   }
 
   .nested-dropdown-input-container {
+    display: block;
+    width: 100%;
+    border-radius: 0.25rem;
     position: relative;
     & > span.list-arrow {
       color: var(--mediumGray);
