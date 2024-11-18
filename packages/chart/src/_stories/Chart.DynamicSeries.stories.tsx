@@ -17,9 +17,16 @@ export const Line: Story = {
   }
 }
 
-export const Bar: Story = {
+export const Bar_Vertical: Story = {
   args: {
     config: DynamicSeriesBarConfig,
+    isEditor: false
+  }
+}
+
+export const Bar_Horizontal: Story = {
+  args: {
+    config: { ...DynamicSeriesBarConfig, orientation: 'horizontal' },
     isEditor: false
   }
 }

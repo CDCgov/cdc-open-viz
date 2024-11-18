@@ -22,6 +22,8 @@ import chroma from 'chroma-js'
 // Local context and types
 import BarChartContext, { BarChartContextValues } from './context'
 import { ChartContext } from '../../../types/ChartContext'
+import _ from 'lodash'
+import { getBarData } from '../helpers/getBarData'
 
 export const BarChartHorizontal = () => {
   const { xScale, yScale, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
@@ -60,13 +62,17 @@ export const BarChartHorizontal = () => {
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
+  const hasConfidenceInterval = Object.keys(config.confidenceKeys).length > 0
+
+  const _data = getBarData(config, data, hasConfidenceInterval)
+
   return (
     config.visualizationSubType !== 'stacked' &&
     config.visualizationType === 'Bar' &&
     config.orientation === 'horizontal' && (
       <Group>
         <BarGroup
-          data={config.preliminaryData?.some(pd => pd.value && pd.type === 'suppression') ? tableData : data}
+          data={config.preliminaryData?.some(pd => pd.value && pd.type === 'suppression') ? tableData : _data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
           height={yMax}
           x0={d => d[config.runtime.originalXAxis.dataKey]}
@@ -86,6 +92,8 @@ export const BarChartHorizontal = () => {
                 top={barGroup.y}
               >
                 {barGroup.bars.map((bar, index) => {
+                  const datum = _data[barGroup.index]
+                  const dataValue = datum[config.runtime.originalXAxis.dataKey]
                   const scaleVal = config.yAxis.type === 'logarithmic' ? 0.1 : 0
                   let highlightedBarValues = config.highlightedBarValues
                     .map(item => item.value)
@@ -119,9 +127,7 @@ export const BarChartHorizontal = () => {
                   const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const yAxisValue = formatNumber(bar.value, 'left')
                   const xAxisValue =
-                    config.runtime[section].type === 'date'
-                      ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey]))
-                      : data[barGroup.index][config.runtime.originalXAxis.dataKey]
+                    config.runtime[section].type === 'date' ? formatDate(parseDate(dataValue)) : dataValue
 
                   const barPosition = !isPositiveBar ? 'below' : 'above'
                   const absentDataLabel = getAbsentDataLabel(yAxisValue)
@@ -167,7 +173,10 @@ export const BarChartHorizontal = () => {
                     config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key]
                       ? colorScale(config.runtime.seriesLabels[bar.key])
                       : colorScale(bar.key)
-                  barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor) // Color code by category
+                  const hasDynamicCategory = config.series.find(s => s.dynamicCategory)
+                  if (!hasDynamicCategory) {
+                    barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor) // Color code by category
+                  }
                   const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                   const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
                   const isHighlightedBar = highlightedBarValues?.includes(xAxisValue)
@@ -198,6 +207,16 @@ export const BarChartHorizontal = () => {
                     if (isHighlightedBar) return 'transparent'
                     return barColor
                   }
+
+                  // Confidence Interval Variables
+                  const tickWidth = 5
+                  const yPos = barHeight * bar.index + barHeight / 2
+                  const [upperPos, lowerPos] = ['upper', 'lower'].map(position => {
+                    if (!hasConfidenceInterval) return
+                    const d = datum.dynamicData ? datum.CI[bar.key][position] : datum[config.confidenceKeys[position]]
+                    return xScale(d)
+                  })
+                  // End Confidence Interval Variables
 
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
@@ -321,10 +340,10 @@ export const BarChartHorizontal = () => {
                             textAnchor={'start'}
                           >
                             {config.runtime.yAxis.type === 'date'
-                              ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey]))
+                              ? formatDate(parseDate(dataValue))
                               : isHorizontal
-                              ? data[barGroup.index][config.runtime.originalXAxis.dataKey]
-                              : formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
+                              ? dataValue
+                              : formatNumber(dataValue)}
                           </Text>
                         )}
 
@@ -357,6 +376,20 @@ export const BarChartHorizontal = () => {
                             <animate attributeName='height' values={`0, ${lollipopShapeSize}`} dur='2.5s' />
                           </rect>
                         )}
+                        {hasConfidenceInterval && (
+                          <path
+                            key={`confidence-interval-h-${yPos}-${datum[config.runtime.originalXAxis.dataKey]}`}
+                            stroke='#333'
+                            strokeWidth='px'
+                            d={`
+                                M${lowerPos} ${yPos - tickWidth}
+                                L${lowerPos} ${yPos + tickWidth}
+                                M${lowerPos} ${yPos}
+                                L${upperPos} ${yPos}
+                                M${upperPos} ${yPos - tickWidth}
+                                L${upperPos} ${yPos + tickWidth} `}
+                          />
+                        )}
                       </Group>
                     </Group>
                   )
@@ -366,13 +399,12 @@ export const BarChartHorizontal = () => {
           }}
         </BarGroup>
 
-        {Object.keys(config.confidenceKeys).length > 0
-          ? data.map(d => {
-              let xPos, yPos
+        {/* {Object.keys(config.confidenceKeys).length > 0
+          ? _data.map(d => {
               let upperPos
               let lowerPos
               let tickWidth = 5
-              yPos = yScale(getXAxisData(d)) - 0.75 * config.barHeight
+              const yPos = yScale(getXAxisData(d)) - 0.75 * config.barHeight
               upperPos = xScale(getYAxisData(d, config.confidenceKeys.upper))
               lowerPos = xScale(getYAxisData(d, config.confidenceKeys.lower))
               return (
@@ -390,7 +422,7 @@ export const BarChartHorizontal = () => {
                 />
               )
             })
-          : ''}
+          : ''} */}
       </Group>
     )
   )

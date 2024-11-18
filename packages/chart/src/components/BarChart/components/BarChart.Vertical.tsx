@@ -21,7 +21,8 @@ import createBarElement from '@cdc/core/components/createBarElement'
 import chroma from 'chroma-js'
 // Types
 import { type ChartContext } from '../../../types/ChartContext'
-import _, { has } from 'lodash'
+import _ from 'lodash'
+import { getBarData } from '../helpers/getBarData'
 
 export const BarChartVertical = () => {
   const { xScale, yScale, xMax, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
@@ -44,7 +45,7 @@ export const BarChartVertical = () => {
   } = useBarChart()
 
   // prettier-ignore
-  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, getXAxisData, getYAxisData, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig } = useContext<ChartContext>(ConfigContext)
+  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig } = useContext<ChartContext>(ConfigContext)
   const { HighLightedBarUtils } = useHighlightedBars(config)
   let data = transformedData
   // check if user add suppression
@@ -60,32 +61,7 @@ export const BarChartVertical = () => {
 
   const hasConfidenceInterval = Object.keys(config.confidenceKeys).length > 0
 
-  const getData = () => {
-    const dynamicSeries = config.series.find(s => s.dynamicCategory)
-    if (!dynamicSeries) return data
-    const { dynamicCategory, dataKey } = dynamicSeries
-    const xAxisKey = config.runtime.originalXAxis.dataKey
-    const xAxisGroupDataLookup = _.groupBy(data, xAxisKey)
-    return Object.values(xAxisGroupDataLookup).map(group => {
-      return group.reduce((acc, datum) => {
-        const dataValue = datum[dataKey]
-        const dataCategory = datum[dynamicCategory]
-        if (hasConfidenceInterval) {
-          const { lower, upper } = config.confidenceKeys
-          if (!acc.CI) acc.CI = {}
-          const lowerValue = datum[lower]
-          const upperValue = datum[upper]
-          acc.CI[dataCategory] = { lower: lowerValue, upper: upperValue }
-        }
-        acc[dataCategory] = dataValue
-        acc[xAxisKey] = datum[xAxisKey]
-        acc.dynamicData = true
-        return acc
-      }, {})
-    })
-  }
-
-  const _data = getData()
+  const _data = getBarData(config, data, hasConfidenceInterval)
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' ||
