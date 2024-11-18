@@ -340,15 +340,16 @@ export const getTickValues = (xAxisDataMapped, xScale, num, config) => {
 export const filterAndShiftLinearDateTicks = (config, axisProps, xAxisDataMapped) => {
   const filteredTickValues = getTicks(axisProps.scale, axisProps.numTicks)
   if (filteredTickValues.length < xAxisDataMapped.length) {
+    let shift = 0
     const lastIdx = xAxisDataMapped.indexOf(filteredTickValues[filteredTickValues.length - 1])
     if (lastIdx < xAxisDataMapped.length - 1) {
-      const shift = !config.xAxis.sortByRecentDate
+      shift = !config.xAxis.sortByRecentDate
         ? xAxisDataMapped.length - 1 - lastIdx
         : xAxisDataMapped.indexOf(filteredTickValues[0]) * -1
-      return filteredTickValues.map(value => {
-        return axisProps.ticks[axisProps.ticks.findIndex(tick => tick.value === value) + shift]
-      })
     }
+    return filteredTickValues.map(value => {
+      return axisProps.ticks[axisProps.ticks.findIndex(tick => tick.value === value) + shift]
+    })
   }
   return axisProps.ticks
 }
