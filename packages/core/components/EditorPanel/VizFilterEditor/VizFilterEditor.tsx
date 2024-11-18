@@ -131,6 +131,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
             }
           />
           <TextField
+            type='textarea'
             label='Filter intro text'
             value={config.filterIntro}
             updateField={updateField}

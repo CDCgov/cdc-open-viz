@@ -446,7 +446,7 @@ const Filters = (props: FilterProps) => {
         <div className={classList.join(' ')} key={outerIndex}>
           <>
             {label && (
-              <label className='text-capitalize font-weight-bold mt-1 mb-0' htmlFor={`filter-${outerIndex}`}>
+              <label className='font-weight-bold mt-1 mb-0' htmlFor={`filter-${outerIndex}`}>
                 {label}
               </label>
             )}
