@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import CdcMap from '../CdcMap'
 import SingleStateWithFilters from './_mock/DEV-8942.json'
 import UsGradient from './_mock/usa-state-gradient.json'
+import WastewaterMap from './_mock/wastewater-map.json'
 import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
 
 const meta: Meta<typeof CdcMap> = {
@@ -50,7 +51,7 @@ export const Gradient_With_Text: Story = {
     config: editConfigKeys(UsGradient, [
       { path: ['legend', 'title'], value: 'Title' },
       { path: ['legend', 'description'], value: 'Description' },
-      { path: ['legend', 'hideBorder'], value: false }
+      { path: ['legend', 'hideBorder'], value: true }
     ])
   }
 }
@@ -58,5 +59,28 @@ export const Gradient_With_Text: Story = {
 export const Legend_Right: Story = {
   args: {
     config: editConfigKeys(SingleStateWithFilters, [{ path: ['legend', 'hideBorder'], value: true }])
+  }
+}
+
+export const Gradient_With_Patterns: Story = {
+  args: {
+    config: WastewaterMap
+  }
+}
+export const Gradient_Reversed: Story = {
+  args: {
+    config: editConfigKeys(WastewaterMap, [
+      {
+        path: ['customColors'],
+        value: undefined
+      },
+      { path: ['legend', 'specialClasses'], value: ['No Data'] },
+      { path: ['legend', 'showSpecialClassesLast'], value: false },
+      {
+        path: ['legend', 'categoryValuesOrder'],
+        value: ['No Data', 'Minimal', 'Low', 'Moderate', 'High', 'Very High']
+      },
+      { path: ['color'], value: 'greenblue' }
+    ])
   }
 }

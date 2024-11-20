@@ -13,6 +13,7 @@ const cleanDashboardFootnotes = (config: DashboardConfig) => {
         const { dataKey, staticFootnotes } = config.visualizations[row.footnotesId] as Footnotes
         if (!dataKey && !staticFootnotes?.length) {
           delete config.visualizations[row.footnotesId]
+          delete row.footnotesId
         } else {
           footnoteIds.push(row.footnotesId)
         }

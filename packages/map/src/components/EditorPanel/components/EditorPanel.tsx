@@ -110,11 +110,17 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   } = useMapLayers(state, setState, false, tooltipId)
 
   const categoryMove = (idx1, idx2) => {
-    let categoryValuesOrder = [...state.legend.categoryValuesOrder]
+    let categoryValuesOrder = getCategoryValuesOrder()
 
     let [movedItem] = categoryValuesOrder.splice(idx1, 1)
 
     categoryValuesOrder.splice(idx2, 0, movedItem)
+
+    state.legend.categoryValuesOrder?.forEach(value => {
+      if (categoryValuesOrder.indexOf(value) === -1) {
+        categoryValuesOrder.push(value)
+      }
+    })
 
     setState({
       ...state,
@@ -1220,40 +1226,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     columnsRequiredChecker()
   }, [state]) // eslint-disable-line
 
-  useEffect(() => {
-    //If a categorical map is used and the order is either not defined or incorrect, fix it
-    if ('category' === state.legend.type && runtimeLegend && runtimeLegend.runtimeDataHash) {
-      let valid = true
-      if (state.legend.categoryValuesOrder) {
-        runtimeLegend.forEach(item => {
-          if (!item.special && state.legend.categoryValuesOrder.indexOf(item.value) === -1) {
-            valid = false
-          }
-        })
-        let runtimeLegendKeys = runtimeLegend.map(item => item.value)
-        state.legend.categoryValuesOrder.forEach(category => {
-          if (runtimeLegendKeys.indexOf(category) === -1) {
-            valid = false
-          }
-        })
-      } else {
-        valid = false
-      }
-
-      if (!valid) {
-        let arr = runtimeLegend.filter(item => !item.special).map(({ value }) => value)
-
-        setState({
-          ...state,
-          legend: {
-            ...state.legend,
-            categoryValuesOrder: arr
-          }
-        })
-      }
-    }
-  }, [runtimeLegend]) // eslint-disable-line
-
   const columnsOptions = [
     <option value='' key={'Select Option'}>
       - Select Option -
@@ -1531,9 +1503,29 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     ...draggableStyle
   })
 
+  const getCategoryValuesOrder = () => {
+    let values = runtimeLegend
+      ? runtimeLegend.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value)
+      : []
+
+    if (state.legend.cateogryValuesOrder) {
+      return values.sort((a, b) => {
+        let aVal = state.legend.cateogryValuesOrder.indexOf(a)
+        let bVal = state.legend.cateogryValuesOrder.indexOf(b)
+        if (aVal === bVal) return 0
+        if (aVal === -1) return 1
+        if (bVal === -1) return -1
+        return aVal - bVal
+      })
+    } else {
+      return values
+    }
+  }
+
   const CategoryList = () => {
-    return state.legend.categoryValuesOrder ? (
-      state.legend.categoryValuesOrder.map((value, index) => (
+    return getCategoryValuesOrder()
+      .filter(item => !item.special)
+      .map((value, index) => (
         <Draggable key={value} draggableId={`item-${value}`} index={index}>
           {(provided, snapshot) => (
             <li style={{ position: 'relative' }}>
@@ -1550,9 +1542,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           )}
         </Draggable>
       ))
-    ) : (
-      <></>
-    )
   }
 
   const isLoadedFromUrl = state?.dataKey?.includes('http://') || state?.dataKey?.includes('https://')
@@ -2794,7 +2783,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                         )}
                       </Droppable>
                     </DragDropContext>
-                    {state.legend.categoryValuesOrder && state.legend.categoryValuesOrder.length >= 10 && (
+                    {runtimeLegend && runtimeLegend.length >= 10 && (
                       <section className='error-box my-2'>
                         <div>
                           <strong className='pt-1'>Warning</strong>

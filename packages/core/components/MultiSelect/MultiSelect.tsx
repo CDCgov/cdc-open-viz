@@ -79,7 +79,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   return (
     <>
       {label && (
-        <label className='edit-label column-heading' id={multiID + label} htmlFor={multiID}>
+        <label className='text-capitalize font-weight-bold' id={multiID + label} htmlFor={multiID}>
           {label}
         </label>
       )}
@@ -96,23 +96,27 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
             }}
             className='selected'
           >
-            {selectedItems.map(item => (
-              <div key={item.value} aria-labelledby={label ? multiID + label : undefined}>
-                {item.label}
-                <button
-                  aria-label='Remove'
-                  onClick={e => {
-                    e.preventDefault()
-                    handleItemRemove(item)
-                  }}
-                  onKeyUp={e => {
-                    handleItemRemove(item, e)
-                  }}
-                >
-                  x
-                </button>
-              </div>
-            ))}
+            {selectedItems.length ? (
+              selectedItems.map(item => (
+                <div key={item.value} aria-labelledby={label ? multiID + label : undefined}>
+                  {item.label}
+                  <button
+                    aria-label='Remove'
+                    onClick={e => {
+                      e.preventDefault()
+                      handleItemRemove(item)
+                    }}
+                    onKeyUp={e => {
+                      handleItemRemove(item, e)
+                    }}
+                  >
+                    x
+                  </button>
+                </div>
+              ))
+            ) : (
+              <span className='pl-1 pt-1'>- Select -</span>
+            )}
             <button
               aria-label={expanded ? 'Collapse' : 'Expand'}
               aria-labelledby={label ? multiID : undefined}

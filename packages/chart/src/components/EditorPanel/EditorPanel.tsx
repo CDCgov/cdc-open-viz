@@ -171,7 +171,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                 <p> {type === 'suppression' ? 'Suppressed' : 'Effect'} Data</p>
                 <button
                   type='button'
-                  className='remove-column'
+                  className='btn btn-danger'
                   onClick={event => {
                     event.preventDefault()
                     removeColumn(i)
@@ -530,7 +530,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
               <p>Axis Category {i + 1}</p>
               <button
                 type='button'
-                className='remove-column'
+                className='btn btn-danger'
                 onClick={event => {
                   event.preventDefault()
                   removeColumn(i)
@@ -583,7 +583,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
           )
         })}
 
-      <button type='button' onClick={addColumn} className='btn full-width'>
+      <button type='button' onClick={addColumn} className='btn btn-primary full-width'>
         Add Axis Category
       </button>
     </>
@@ -746,7 +746,7 @@ const EditorPanel = () => {
         newValue
       ) // eslint-disable-line
 
-    if (section === 'boxplot' && subsection === 'legend') {
+    if (section === 'boxplot' && (subsection === 'legend' || subsection === 'labels')) {
       updateConfig({
         ...config,
         [section]: {
@@ -815,19 +815,6 @@ const EditorPanel = () => {
   if (loading) {
     return null
   }
-
-  useEffect(() => {
-    if (!config.general?.boxplot) return
-    if (!config.general.boxplot.firstQuartilePercentage) {
-      updateConfig({
-        ...config,
-        boxplot: {
-          ...config.boxplot,
-          firstQuartilePercentage: 25
-        }
-      })
-    }
-  }, [config])
 
   const setLollipopShape = shape => {
     updateConfig({
@@ -1410,14 +1397,15 @@ const EditorPanel = () => {
                     </AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    {visSupportsDynamicSeries() && (
+                    {/* FEATURE to be reintroduced by DEV-9747 */}
+                    {/* {visSupportsDynamicSeries() && (
                       <CheckBox
                         value={config.dynamicSeries}
                         fieldName='dynamicSeries'
                         label='Dynamically generate series'
                         updateField={updateField}
                       />
-                    )}
+                    )} */}
                     {config.dynamicSeries && config.visualizationType === 'Line' && (
                       <Select
                         fieldName='dynamicSeriesType'
@@ -2500,12 +2488,19 @@ const EditorPanel = () => {
                               )}
                             </select>
                           </label>
-
                           <CheckBox
                             value={config.xAxis.manual}
                             section='xAxis'
                             fieldName='manual'
                             label='Manual Ticks'
+                            updateField={updateField}
+                          />
+                          <CheckBox
+                            display={config.xAxis.type !== 'categorical'}
+                            value={config.xAxis.sortByRecentDate}
+                            section='xAxis'
+                            fieldName='sortByRecentDate'
+                            label='Show dates newest to oldest'
                             updateField={updateField}
                           />
 
@@ -2769,34 +2764,35 @@ const EditorPanel = () => {
                           />
                         </>
                       )}
-
-                      <CheckBox
-                        value={config.exclusions.active}
-                        section='exclusions'
-                        fieldName='active'
-                        label={
-                          config.xAxis.type === 'date'
-                            ? 'Limit by start and/or end dates'
-                            : 'Exclude one or more values'
-                        }
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>
-                                When this option is checked, you can select source-file values for exclusion from the
-                                date/category axis.{' '}
-                              </p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                        updateField={updateField}
-                      />
+                      {config.xAxis.type !== 'date-time' && (
+                        <CheckBox
+                          value={config.exclusions.active}
+                          section='exclusions'
+                          fieldName='active'
+                          label={
+                            config.xAxis.type === 'date'
+                              ? 'Limit by start and/or end dates'
+                              : 'Exclude one or more values'
+                          }
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon
+                                  display='question'
+                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>
+                                  When this option is checked, you can select source-file values for exclusion from the
+                                  date/category axis.{' '}
+                                </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                          updateField={updateField}
+                        />
+                      )}
                       <CheckBox
                         value={config.xAxis.showYearsOnce}
                         section='xAxis'
@@ -3193,7 +3189,7 @@ const EditorPanel = () => {
                             highlightedBarValues.map((highlightedBarValue, i) => (
                               <fieldset>
                                 <div className='edit-block' key={`highlighted-bar-${i}`}>
-                                  <button className='remove-column' onClick={e => handleRemoveHighlightedBar(e, i)}>
+                                  <button className='btn btn-danger' onClick={e => handleRemoveHighlightedBar(e, i)}>
                                     Remove
                                   </button>
                                   <p>Highlighted Bar {i + 1}</p>
@@ -3251,7 +3247,7 @@ const EditorPanel = () => {
                                 </div>
                               </fieldset>
                             ))}
-                          <button className='btn full-width' onClick={e => handleAddNewHighlightedBar(e)}>
+                          <button className='btn btn-primary full-width' onClick={e => handleAddNewHighlightedBar(e)}>
                             Add Highlighted Bar
                           </button>
                         </>
@@ -3819,7 +3815,7 @@ const EditorPanel = () => {
                         config.legend.seriesHighlight.map((val, i) => (
                           <fieldset className='edit-block' key={`${val}-${i}`}>
                             <button
-                              className='remove-column'
+                              className='btn btn-danger'
                               onClick={event => {
                                 event.preventDefault()
                                 const updatedSeriesHighlight = [...config.legend.seriesHighlight]
@@ -3848,7 +3844,7 @@ const EditorPanel = () => {
                           </fieldset>
                         ))}
                       <button
-                        className={'btn full-width'}
+                        className={'btn btn-primary full-width'}
                         onClick={event => {
                           event.preventDefault()
                           const legendColumns = getLegendColumns()

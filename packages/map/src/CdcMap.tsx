@@ -79,8 +79,6 @@ import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import { isOlderVersion } from '@cdc/core/helpers/ver/versionNeedsUpdate'
 
-const CONTAINER_WIDTH_PADDING = 50
-
 // Data props
 const stateKeys = Object.keys(supportedStates)
 const territoryKeys = Object.keys(supportedTerritories)
@@ -348,7 +346,6 @@ const CdcMap = ({
     const newLegendMemo = new Map() // Reset memoization
     const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
     let primaryCol = obj.columns.primary.name,
-      isSingleState = obj.general.geoType === 'single-state',
       isBubble = obj.general.type === 'bubble',
       categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
       type = obj.legend.type,
@@ -580,7 +577,9 @@ const CdcMap = ({
       newLegendMemo.forEach(assignSpecialClassLastIndex)
       legendSpecialClassLastMemo.current = newLegendSpecialClassLastMemo
 
-      return result
+      // filter special classes from results
+      const specialValues = result.filter(d => d.special).map(d => d.value)
+      return result.filter(d => d.special || !specialValues.includes(d.value))
     }
 
     let uniqueValues = {}
@@ -1840,7 +1839,7 @@ const CdcMap = ({
                     closeModal(e)
                   }
                 }}
-                style={{ padding: `15px ${CONTAINER_WIDTH_PADDING / 2}px`, margin: '0px' }}
+                style={{ padding: '15px 0px', margin: '0px' }}
               >
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
                 <section className='outline-none geography-container w-100' ref={mapSvg} tabIndex='0'>
@@ -1864,7 +1863,8 @@ const CdcMap = ({
                     dimensions={dimensions}
                     ref={legendRef}
                     skipId={tabId}
-                    containerWidthPadding={CONTAINER_WIDTH_PADDING}
+                    containerWidthPadding={0}
+                    currentViewport={currentViewport}
                   />
                 )}
               </div>

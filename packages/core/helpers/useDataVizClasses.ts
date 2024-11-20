@@ -64,6 +64,7 @@ export default function useDataVizClasses(config, viewport = null) {
   const getUlClasses = () => {
     const ulClasses = ['legend-container__ul']
     ulClasses.push(getListPosition())
+    if (legend?.style === 'gradient') ulClasses.push('patterns-only')
     return ulClasses
   }
   const hasBorder = legend?.hideBorder ? 'no-border' : ''

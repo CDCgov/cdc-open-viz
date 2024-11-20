@@ -15,7 +15,19 @@ import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
 import '@cdc/core/styles/v2/components/editor.scss'
 
-const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
+const headerColors = [
+  'theme-blue',
+  'theme-purple',
+  'theme-brown',
+  'theme-teal',
+  'theme-pink',
+  'theme-orange',
+  'theme-slate',
+  'theme-indigo',
+  'theme-cyan',
+  'theme-green',
+  'theme-amber'
+]
 
 const EditorPanel = memo(props => {
   const { config, updateConfig, loading, stateData: data, setParentConfig, isDashboard } = useContext(ConfigContext)
@@ -127,7 +139,7 @@ const EditorPanel = memo(props => {
         <section className='waiting-container'>
           <h3>Finish Configuring</h3>
           <p>Set all required options to the left and confirm below to display a preview of the markup.</p>
-          <button className='btn' style={{ margin: '1em auto' }} onClick={confirmDone}>
+          <button className='btn btn-primary' style={{ margin: '1em auto' }} onClick={confirmDone}>
             I'm Done
           </button>
         </section>
@@ -144,12 +156,25 @@ const EditorPanel = memo(props => {
   const editorContent = (
     <Accordion>
       <Accordion.Section title='General'>
-        <InputText value={config.title} fieldName='title' label='Title' placeholder='Filterable Text Title' updateField={updateField} />
+        <InputText
+          value={config.title}
+          fieldName='title'
+          label='Title'
+          placeholder='Filterable Text Title'
+          updateField={updateField}
+        />
       </Accordion.Section>
       <Accordion.Section title='Data'>
         <div className='cove-accordion__panel-section'>
           <div className='cove-input-group'>
-            <InputSelect value={config.textColumn || ''} fieldName='textColumn' label='Text Column' updateField={updateField} initial='Select' options={getColumns()} />
+            <InputSelect
+              value={config.textColumn || ''}
+              fieldName='textColumn'
+              label='Text Column'
+              updateField={updateField}
+              initial='Select'
+              options={getColumns()}
+            />
           </div>
         </div>
         <hr className='cove-accordion__divider' />
@@ -161,7 +186,10 @@ const EditorPanel = memo(props => {
               <Icon display='question' style={{ marginLeft: '0.5rem' }} />
             </Tooltip.Target>
             <Tooltip.Content>
-              <p>To refine the highlighted data point, specify one or more filters (e.g., "Male" and "Female" for a column called "Sex").</p>
+              <p>
+                To refine the highlighted data point, specify one or more filters (e.g., "Male" and "Female" for a
+                column called "Sex").
+              </p>
             </Tooltip.Content>
           </Tooltip>
         </label>
@@ -219,7 +247,13 @@ const EditorPanel = memo(props => {
         </Button>
       </Accordion.Section>
       <Accordion.Section title='Visual'>
-        <InputSelect value={config.fontSize} fieldName='fontSize' label='Font Size' updateField={updateField} options={['small', 'medium', 'large']} />
+        <InputSelect
+          value={config.fontSize}
+          fieldName='fontSize'
+          label='Font Size'
+          updateField={updateField}
+          options={['small', 'medium', 'large']}
+        />
         <br />
         <label>
           <span className='edit-label'>Theme</span>
@@ -238,11 +272,48 @@ const EditorPanel = memo(props => {
         </label>
 
         <div className='cove-accordion__panel-section checkbox-group'>
-          <InputCheckbox inline size='small' value={config.visual.border} section='visual' fieldName='border' label='Display Border' updateField={updateField} />
-          <InputCheckbox inline size='small' value={config.visual.borderColorTheme} section='visual' fieldName='borderColorTheme' label='Use theme border color' updateField={updateField} />
-          <InputCheckbox size='small' value={config.visual.accent} section='visual' fieldName='accent' label='Use Accent Style' updateField={updateField} />
-          <InputCheckbox size='small' value={config.visual.background} section='visual' fieldName='background' label='Use Theme Background Color' updateField={updateField} />
-          <InputCheckbox size='small' value={config.visual.hideBackgroundColor} section='visual' fieldName='hideBackgroundColor' label='Hide Background Color' updateField={updateField} />
+          <InputCheckbox
+            inline
+            size='small'
+            value={config.visual.border}
+            section='visual'
+            fieldName='border'
+            label='Display Border'
+            updateField={updateField}
+          />
+          <InputCheckbox
+            inline
+            size='small'
+            value={config.visual.borderColorTheme}
+            section='visual'
+            fieldName='borderColorTheme'
+            label='Use theme border color'
+            updateField={updateField}
+          />
+          <InputCheckbox
+            size='small'
+            value={config.visual.accent}
+            section='visual'
+            fieldName='accent'
+            label='Use Accent Style'
+            updateField={updateField}
+          />
+          <InputCheckbox
+            size='small'
+            value={config.visual.background}
+            section='visual'
+            fieldName='background'
+            label='Use Theme Background Color'
+            updateField={updateField}
+          />
+          <InputCheckbox
+            size='small'
+            value={config.visual.hideBackgroundColor}
+            section='visual'
+            fieldName='hideBackgroundColor'
+            label='Hide Background Color'
+            updateField={updateField}
+          />
         </div>
       </Accordion.Section>
     </Accordion>
@@ -252,7 +323,12 @@ const EditorPanel = memo(props => {
 
   return (
     <ErrorBoundary component='EditorPanel'>
-      <Layout.Sidebar displayPanel={displayPanel} isDashboard={isDashboard} title={'Configure Filtered Text'} onBackClick={onBackClick}>
+      <Layout.Sidebar
+        displayPanel={displayPanel}
+        isDashboard={isDashboard}
+        title={'Configure Filtered Text'}
+        onBackClick={onBackClick}
+      >
         {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
         {config.newViz && showConfigConfirm && <Confirm />}
         {editorContent}

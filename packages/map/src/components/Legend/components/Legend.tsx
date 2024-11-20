@@ -17,6 +17,8 @@ import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
 import { Group } from '@visx/group'
 import './index.scss'
+import { ViewportSize } from '@cdc/chart/src/types/ChartConfig'
+import { isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 
 const LEGEND_PADDING = 30
 
@@ -24,10 +26,11 @@ type LegendProps = {
   skipId: string
   dimensions: DimensionsType
   containerWidthPadding: number
+  currentViewport: ViewportSize
 }
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
-  const { skipId, dimensions, containerWidthPadding } = props
+  const { skipId, dimensions, containerWidthPadding, currentViewport } = props
 
   const {
     // prettier-ignore
@@ -100,8 +103,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     })
   }
 
-  const legendList = () => {
-    const formattedItems = getFormattedLegendItems()
+  const legendList = (patternsOnly = false) => {
+    const formattedItems = patternsOnly ? [] : getFormattedLegendItems()
+    const patternsOnlyFont = isMobileHeightViewport(currentViewport) ? '12px' : '14px'
     let legendItems
 
     legendItems = formattedItems.map((item, idx) => {
@@ -192,7 +196,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                   />
                 </svg>
               </span>
-              <p style={{ lineHeight: '22.4px' }}>{patternData.label || patternData.dataValue || ''}</p>
+              <p style={{ lineHeight: '22.4px', fontSize: patternsOnly ? patternsOnlyFont : '16px' }}>
+                {patternData.label || patternData.dataValue || ''}
+              </p>
             </li>
           </>
         )
@@ -201,6 +207,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
     return legendItems
   }
+  const legendListItems = legendList(state.legend.style === 'gradient')
+
   const { legendClasses } = useDataVizClasses(state, viewport)
 
   const handleReset = e => {
@@ -270,14 +278,13 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             <LegendGradient
               labels={getFormattedLegendItems().map(item => item?.label) ?? []}
               colors={getFormattedLegendItems().map(item => item?.color) ?? []}
-              values={getFormattedLegendItems().map(item => item?.value) ?? []}
               dimensions={dimensions}
               parentPaddingToSubtract={containerWidthPadding + (legend.hideBorder ? 0 : LEGEND_PADDING)}
               config={state}
             />
-            {state.legend.style !== 'gradient' && (
+            {!!legendListItems.length && (
               <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
-                {legendList()}
+                {legendListItems}
               </ul>
             )}
             {(state.visual.additionalCityStyles.some(c => c.label) || state.visual.cityStyleLabel) && (

@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import SuppressedConfig from './_mock/bar-chart-suppressed.json'
 
 import Chart from '../CdcChart'
 import lineChartTwoPointsRegressionTest from './_mock/line_chart_two_points_regression_test.json'
@@ -9,6 +8,8 @@ import forestPlot from '../../examples/feature/forest-plot/forest-plot.json'
 import pairedBar from './_mock/paired-bar.json'
 import horizontalBarConfig from './_mock/horizontal_bar.json'
 import pieConfig from './_mock/pie_with_data.json'
+import boxPlotConfig from './_mock/boxplot_multiseries.json'
+import areaChartStacked from './_mock/area_chart_stacked.json'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',
@@ -37,13 +38,6 @@ export const Lollipop: Story = {
   }
 }
 
-export const Suppression: Story = {
-  args: {
-    config: SuppressedConfig,
-    isEditor: false
-  }
-}
-
 export const Forest_Plot: Story = {
   args: {
     config: forestPlot
@@ -65,6 +59,19 @@ export const Pie: Story = {
 export const Paired_Bar: Story = {
   args: {
     config: pairedBar
+  }
+}
+export const BoxPlot_Multiseries: Story = {
+  args: {
+    config: boxPlotConfig,
+    isEditor: false
+  }
+}
+
+export const Area_Chart_stacked: Story = {
+  args: {
+    config: areaChartStacked,
+    isEditor: false
   }
 }
 

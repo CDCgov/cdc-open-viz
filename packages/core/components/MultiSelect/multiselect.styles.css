@@ -1,8 +1,4 @@
 .cove-multiselect {
-  /* --select-height is the height that is defined for the .form-control class in _forms.scss in bootstrap. */
-  --select-height: calc(1.5em + 0.75rem + 2px);
-  position: relative;
-  height: var(--select-height);
   .cove-input__label {
     display: block;
   }
@@ -11,8 +7,7 @@
     align-items: center;
     .selected {
       border: 1px solid var(--lightGray);
-      padding: 5px;
-      min-height: 40px;
+      padding: 7px;
       min-width: 200px;
       display: inline-block;
       :is(button) {

@@ -70,7 +70,7 @@ import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import LegendWrapper from './components/LegendWrapper'
-import _, { forEach } from 'lodash'
+import _ from 'lodash'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { Runtime } from '@cdc/core/types/Runtime'
 import { Pivot } from '@cdc/core/types/Table'
@@ -292,9 +292,6 @@ const CdcChart = ({
     }
     let newConfig = { ...defaults, ...response }
 
-    if (newConfig.visualizationType === 'Box Plot') {
-      newConfig.legend.hide = true
-    }
     if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
 
     newConfig.series.forEach(series => {
@@ -438,20 +435,10 @@ const CdcChart = ({
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
-      let allKeys = newExcludedData
-        ? newExcludedData.map(d => d[newConfig.xAxis.dataKey])
-        : data.map(d => d[newConfig.xAxis.dataKey])
-      let allValues = newExcludedData
-        ? newExcludedData.map(d => Number(d[newConfig?.series[0]?.dataKey]))
-        : data.map(d => Number(d[newConfig?.series[0]?.dataKey]))
+      const combinedData = filteredData || data
+      let allKeys = combinedData.map(d => d[newConfig.xAxis.dataKey])
+      const groups = _.uniq(allKeys)
 
-      const uniqueArray = function (arrArg) {
-        return arrArg.filter(function (elem, pos, arr) {
-          return arr.indexOf(elem) === pos
-        })
-      }
-
-      const groups = uniqueArray(allKeys)
       let tableData: any[] = []
       const plots: any[] = []
 
@@ -463,9 +450,8 @@ const CdcChart = ({
           if (!g) throw new Error('No groups resolved in box plots')
 
           // filter data by group
-          let filteredData = newExcludedData
-            ? newExcludedData.filter(item => item[newConfig.xAxis.dataKey] === g)
-            : data.filter(item => item[newConfig.xAxis.dataKey] === g)
+          let filteredData = combinedData.filter(item => item[newConfig.xAxis.dataKey] === g)
+
           let filteredDataValues: number[] = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
 
           // Sort the data for upcoming functions.
@@ -474,16 +460,18 @@ const CdcChart = ({
           // ! - Notice d3.quantile doesn't work here, and we had to take a custom route.
           const quartiles = getQuartiles(sortedData)
 
+          const getValuesBySeriesKey = () => {
+            const allSeriesKeys = newConfig.series.map(item => item?.dataKey)
+            const result = {}
+            allSeriesKeys.forEach(key => {
+              result[key] = filteredData.map(item => item[key])
+            })
+
+            return result
+          }
+
           if (!filteredData) throw new Error('boxplots dont have data yet')
           if (!plots) throw new Error('boxplots dont have plots yet')
-
-          if (newConfig.boxplot.firstQuartilePercentage === '') {
-            newConfig.boxplot.firstQuartilePercentage = 0
-          }
-
-          if (newConfig.boxplot.thirdQuartilePercentage === '') {
-            newConfig.boxplot.thirdQuartilePercentage = 0
-          }
 
           const q1 = quartiles.q1
           const q3 = quartiles.q3
@@ -492,9 +480,7 @@ const CdcChart = ({
           const upperBounds = q3 + (q3 - q1) * 1.5
 
           const outliers = sortedData.filter(v => v < lowerBounds || v > upperBounds)
-          let nonOutliers = filteredDataValues
 
-          nonOutliers = nonOutliers.filter(item => !outliers.includes(item))
           const minValue: number = d3.min<number>(filteredDataValues) || 0
           const _colMin = d3.max<number>([minValue, q1 - 1.5 * iqr])
           plots.push({
@@ -504,7 +490,7 @@ const CdcChart = ({
             columnMedian: Number(d3.median(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnFirstQuartile: q1.toFixed(newConfig.dataFormat.roundTo),
             columnMin: _colMin,
-            columnTotal: filteredDataValues.reduce((partialSum, a) => partialSum + a, 0),
+            columnCount: filteredData.length,
             columnSd: Number(d3.deviation(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnMean: Number(d3.mean(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnIqr: Number(iqr).toFixed(newConfig.dataFormat.roundTo),
@@ -512,7 +498,7 @@ const CdcChart = ({
             columnUpperBounds: d3.min([d3.max(sortedData), q1 + 1.5 * iqr]),
             columnOutliers: outliers,
             values: filteredDataValues,
-            nonOutlierValues: nonOutliers
+            keyValues: getValuesBySeriesKey()
           })
         } catch (e) {
           console.error('COVE: ', e.message) // eslint-disable-line
@@ -530,8 +516,6 @@ const CdcChart = ({
         return null // resolve eslint
       })
 
-      // any other data we can add to boxplots
-      newConfig.boxplot['allValues'] = allValues
       newConfig.boxplot['categories'] = groups
       newConfig.boxplot.plots = plots
       newConfig.boxplot.tableData = tableData
@@ -618,10 +602,7 @@ const CdcChart = ({
         : ''
 
     // Sankey Description box error message
-    newConfig.runtime.editorErrorMessage =
-      newConfig.visualizationType === 'Sankey' && !newConfig.description
-        ? 'SUBTEXT/CITATION field is empty: A description of the Sankey Diagram data must be inputted.'
-        : ''
+    newConfig.runtime.editorErrorMessage = ''
 
     if (newConfig.legend.seriesHighlight?.length) {
       setSeriesHighlight(newConfig.legend?.seriesHighlight)
@@ -652,7 +633,6 @@ const CdcChart = ({
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
-      let svgMarginWidth = 30
       let editorWidth = 350
 
       width = isEditor ? width - editorWidth : width
@@ -665,7 +645,7 @@ const CdcChart = ({
         width = width - 2.5
       }
 
-      width = width - svgMarginWidth
+      width = width
 
       setDimensions([width, height])
     }
@@ -864,14 +844,15 @@ const CdcChart = ({
     }
   }
 
-  const formatDate = (date, prevDate) => {
+  const formatDate = (date, i, ticks) => {
     let formattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(date)
     // Handle the case where all months work with '%b.' except for May
     if (config.runtime[section].dateDisplayFormat?.includes('%b.') && formattedDate.includes('May.')) {
       formattedDate = formattedDate.replace(/May\./g, 'May')
     }
     // Show years only once
-    if (config.xAxis.showYearsOnce && config.runtime[section].dateDisplayFormat?.includes('%Y') && prevDate) {
+    if (config.xAxis.showYearsOnce && config.runtime[section].dateDisplayFormat?.includes('%Y') && ticks) {
+      const prevDate = ticks[i - 1] ? ticks[i - 1].value : null
       const prevFormattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(prevDate)
       const year = formattedDate.match(/\d{4}/)
       const prevYear = prevFormattedDate.match(/\d{4}/)
@@ -1176,7 +1157,7 @@ const CdcChart = ({
           <h3>Finish Configuring</h3>
           <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
           <Button
-            className='btn'
+            className='btn btn-primary'
             style={{ margin: '1em auto' }}
             disabled={missingRequiredSections()}
             onClick={e => confirmDone(e)}
@@ -1233,19 +1214,20 @@ const CdcChart = ({
     // cleaning is deleting data we need in forecasting charts.
     if (!Array.isArray(data)) return []
     if (config.visualizationType === 'Forecasting') return data
-    if (config.series.some(series => !!series.dynamicCategory)) return data
+    if (config.series?.some(series => !!series.dynamicCategory)) return data
     return config?.xAxis?.dataKey ? transform.cleanData(data, config.xAxis.dataKey) : data
   }
 
   const getTableRuntimeData = () => {
     if (visualizationType === 'Sankey') return config?.data?.[0]?.tableData
     const data = filteredData || excludedData
-    let usedColumns = Object.values(config.columns)
+    const dynamicSeries = config.series.find(series => !!series.dynamicCategory)
+    if (!dynamicSeries) return data
+    const usedColumns = Object.values(config.columns)
       .filter(col => col.dataTable)
       .map(col => col.name)
+      .concat([dynamicSeries.dynamicCategory, dynamicSeries.dataKey])
     if (config.xAxis?.dataKey) usedColumns.push(config.xAxis.dataKey)
-    const dynamicSeries = config.series.find(series => !!series.dynamicCategory)
-    if (dynamicSeries) usedColumns = usedColumns.concat([dynamicSeries.dynamicCategory, dynamicSeries.dataKey])
     return data.map(d => _.pick(d, usedColumns))
   }
 

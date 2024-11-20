@@ -50,12 +50,14 @@ const Alert: React.FC<AlertProps> = ({
   const styleResets = { width: 'unset', height: 'unset', paddingRight: '5px' }
 
   return (
-    <div className={`alert alert-${type} p-1`} role='alert'>
-      {heading && <h4 className='alert-heading'>{heading}</h4>}
-      {type === 'success' && <Icon display='check' size={iconSize} />}
-      {type === 'danger' && <Icon display='warningCircle' size={iconSize} />}
-      {type === 'info' && <Icon display='info' size={iconSize} />}
-      <span dangerouslySetInnerHTML={sanitizedData()} />
+    <div className={`alert alert-${type} p-1 d-flex justify-content-between`} role='alert'>
+      <div className='d-flex'>
+        {heading && <h4 className='alert-heading'>{heading}</h4>}
+        {type === 'success' && <Icon display='check' size={iconSize} />}
+        {type === 'danger' && <Icon display='warningCircle' size={iconSize} />}
+        {type === 'info' && <Icon display='info' size={iconSize} />}
+        <span dangerouslySetInnerHTML={sanitizedData()} />
+      </div>
       {showCloseButton && (
         <button type='button' className='close pl-5' aria-label='Close' onClick={() => onDismiss()}>
           X

@@ -42,7 +42,14 @@ type CdcDataBiteProps = {
 }
 
 const CdcDataBite = (props: CdcDataBiteProps) => {
-  const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig, link } = props
+  const {
+    configUrl,
+    config: configObj,
+    isDashboard = false,
+    isEditor = false,
+    setConfig: setParentConfig,
+    link
+  } = props
 
   const initialState = {
     config: configObj ?? defaults,
@@ -56,7 +63,18 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
   const { config, loading, currentViewport, coveLoadedHasRan, container } = state
 
-  const { title, dataColumn, dataFunction, imageData, biteBody, biteFontSize, dataFormat, biteStyle, filters, subtext } = config
+  const {
+    title,
+    dataColumn,
+    dataFunction,
+    imageData,
+    biteBody,
+    biteFontSize,
+    dataFormat,
+    biteStyle,
+    filters,
+    subtext
+  } = config
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
 
@@ -312,7 +330,14 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
           rangeMin = applyLocaleString(rangeMin)
           rangeMax = applyLocaleString(rangeMax)
         }
-        dataBite = config.dataFormat.prefix + rangeMin + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix + rangeMax + config.dataFormat.suffix
+        dataBite =
+          config.dataFormat.prefix +
+          rangeMin +
+          config.dataFormat.suffix +
+          ' - ' +
+          config.dataFormat.prefix +
+          rangeMax +
+          config.dataFormat.suffix
         break
       default:
         console.warn('Data bite function not recognized: ' + dataFunction)
@@ -421,7 +446,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       })
     }
 
-    return imageSource.length > 0 && 'graphic' !== biteStyle && 'none' !== imageData.display ? <img alt={imageAlt} src={imageSource} className='bite-image callout' /> : null
+    return imageSource.length > 0 && 'graphic' !== biteStyle && 'none' !== imageData.display ? (
+      <img alt={imageAlt} src={imageSource} className='bite-image callout' />
+    ) : null
   }, [imageData])
 
   if (false === loading) {
@@ -495,7 +522,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
             <h3>Finish Configuring</h3>
             <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
             <button
-              className='btn'
+              className='btn btn-primary'
               style={{ margin: '1em auto' }}
               disabled={missingRequiredSections()}
               onClick={e => {
@@ -518,10 +545,22 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
           <div className={`cove-component__content`}>
             {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
             {(!config.dataColumn || !config.dataFunction) && <Confirm />}
-            <Title config={config} title={title} isDashboard={isDashboard} classes={['bite-header', `${config.theme}`]} />
+            <Title
+              config={config}
+              title={title}
+              isDashboard={isDashboard}
+              classes={['bite-header', `${config.theme}`]}
+            />
             <div className={`bite ${biteClasses.join(' ')}`}>
               <div className={`bite-content-container ${contentClasses.join(' ')}`}>
-                {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}
+                {showBite && 'graphic' === biteStyle && isTop && (
+                  <CircleCallout
+                    theme={config.theme}
+                    text={calculateDataBite()}
+                    biteFontSize={biteFontSize}
+                    dataFormat={dataFormat}
+                  />
+                )}
                 {isTop && <DataImage />}
                 <div className={`bite-content`}>
                   {showBite && 'title' === biteStyle && (
@@ -554,7 +593,14 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                   </Fragment>
                 </div>
                 {isBottom && <DataImage />}
-                {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}
+                {showBite && 'graphic' === biteStyle && !isTop && (
+                  <CircleCallout
+                    theme={config.theme}
+                    text={calculateDataBite()}
+                    biteFontSize={biteFontSize}
+                    dataFormat={dataFormat}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -567,12 +613,22 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   return (
     <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
       {biteStyle !== 'gradient' && (
-        <Layout.VisualizationWrapper ref={outerContainerRef} config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
+        <Layout.VisualizationWrapper
+          ref={outerContainerRef}
+          config={config}
+          isEditor={isEditor}
+          showEditorPanel={config?.showEditorPanel}
+        >
           {body}
         </Layout.VisualizationWrapper>
       )}
       {'gradient' === biteStyle && (
-        <Layout.VisualizationWrapper ref={outerContainerRef} config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
+        <Layout.VisualizationWrapper
+          ref={outerContainerRef}
+          config={config}
+          isEditor={isEditor}
+          showEditorPanel={config?.showEditorPanel}
+        >
           {isEditor && <EditorPanel />}
           <Layout.Responsive isEditor={isEditor}>
             {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
@@ -596,7 +652,16 @@ export const DATA_FUNCTION_MIN = 'Min'
 export const DATA_FUNCTION_MODE = 'Mode'
 export const DATA_FUNCTION_RANGE = 'Range'
 export const DATA_FUNCTION_SUM = 'Sum'
-export const DATA_FUNCTIONS = [DATA_FUNCTION_COUNT, DATA_FUNCTION_MAX, DATA_FUNCTION_MEAN, DATA_FUNCTION_MEDIAN, DATA_FUNCTION_MIN, DATA_FUNCTION_MODE, DATA_FUNCTION_RANGE, DATA_FUNCTION_SUM]
+export const DATA_FUNCTIONS = [
+  DATA_FUNCTION_COUNT,
+  DATA_FUNCTION_MAX,
+  DATA_FUNCTION_MEAN,
+  DATA_FUNCTION_MEDIAN,
+  DATA_FUNCTION_MIN,
+  DATA_FUNCTION_MODE,
+  DATA_FUNCTION_RANGE,
+  DATA_FUNCTION_SUM
+]
 
 export const BITE_LOCATION_TITLE = 'title'
 export const BITE_LOCATION_BODY = 'body'
@@ -623,4 +688,11 @@ export const DATA_OPERATOR_GREATEREQUAL = '>='
 export const DATA_OPERATOR_EQUAL = '='
 export const DATA_OPERATOR_NOTEQUAL = '≠'
 
-export const DATA_OPERATORS = [DATA_OPERATOR_LESS, DATA_OPERATOR_GREATER, DATA_OPERATOR_LESSEQUAL, DATA_OPERATOR_GREATEREQUAL, DATA_OPERATOR_EQUAL, DATA_OPERATOR_NOTEQUAL]
+export const DATA_OPERATORS = [
+  DATA_OPERATOR_LESS,
+  DATA_OPERATOR_GREATER,
+  DATA_OPERATOR_LESSEQUAL,
+  DATA_OPERATOR_GREATEREQUAL,
+  DATA_OPERATOR_EQUAL,
+  DATA_OPERATOR_NOTEQUAL
+]

@@ -351,7 +351,7 @@ const Filters = (props: FilterProps) => {
         id={`filter-${outerIndex}`}
         name={label}
         aria-label={`Filter by ${label}`}
-        className='form-control'
+        className='cove-form-select'
         data-index='0'
         value={active}
         onChange={e => {
@@ -468,6 +468,7 @@ const Filters = (props: FilterProps) => {
               <NestedDropdown
                 activeGroup={(singleFilter.active as string) || (singleFilter.queuedActive || [])[0]}
                 activeSubGroup={(singleFilter.subGrouping?.active as string) || (singleFilter.queuedActive || [])[1]}
+                filterIndex={outerIndex}
                 options={getNestedOptions(singleFilter)}
                 listLabel={label}
                 handleSelectedItems={value => changeFilterActive(outerIndex, value)}
@@ -505,7 +506,7 @@ const Filters = (props: FilterProps) => {
         {filters?.some(filter => filter.active && filter.columnName) ? filterConstants.introText : ''}{' '}
         {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
       </p>
-      <div className='d-flex flex-wrap filters-section__wrapper'>
+      <div className='d-flex flex-wrap w-100 filters-section__wrapper'>
         {' '}
         <>
           <Style />

@@ -62,25 +62,30 @@ const useScales = (properties: useScaleProps) => {
   }
 
   // handle Linear scaled viz
-  if (xAxis.type === 'date' && !isHorizontal) {
-    const xAxisDataMappedSorted = xAxisDataMapped ? xAxisDataMapped.sort() : []
+  if (config.xAxis.type === 'date' && !isHorizontal) {
+    const xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
     xScale = composeScaleBand(xAxisDataMappedSorted, [0, xMax], 1 - config.barThickness)
   }
 
   if (xAxis.type === 'date-time' || xAxis.type === 'continuous') {
     let xAxisMin = Math.min(...xAxisDataMapped.map(Number))
     let xAxisMax = Math.max(...xAxisDataMapped.map(Number))
-    xAxisMin -= (xAxis.padding ? xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
-    xAxisMax += visualizationType === 'Line' ? 0 : (xAxis.padding ? xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
+    xAxisMin -= (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
+    xAxisMax +=
+      visualizationType === 'Line'
+        ? 0
+        : (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
+    const range = config.xAxis.sortByRecentDate ? [xMax, 0] : [0, xMax]
     xScale = scaleTime({
       domain: [xAxisMin, xAxisMax],
-      range: [0, xMax]
+      range: range
     })
 
     xScale.type = scaleTypes.TIME
 
     let minDistance = Number.MAX_VALUE
-    let xAxisDataMappedSorted = xAxisDataMapped ? xAxisDataMapped.sort() : []
+    let xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
+
     for (let i = 0; i < xAxisDataMappedSorted.length - 1; i++) {
       let distance = xScale(xAxisDataMappedSorted[i + 1]) - xScale(xAxisDataMappedSorted[i])
 
@@ -148,19 +153,19 @@ const useScales = (properties: useScaleProps) => {
     if (highestFence > max) max = highestFence
 
     // Set Scales
+
     yScale = scaleLinear({
       range: [yMax, 0],
       round: true,
       domain: [min, max]
     })
-
     xScale = scaleBand({
       range: [0, xMax],
-      round: true,
-      domain: config.boxplot.categories,
-      padding: 0.4
+      domain: config.boxplot.categories
     })
     xScale.type = scaleTypes.BAND
+
+    seriesScale = composeScalePoint(seriesDomain, [0, yMax])
   }
 
   // handle Paired bar
@@ -383,4 +388,22 @@ const composeScaleBand = (domain, range, padding = 0) => {
     range: range,
     padding: padding
   })
+}
+
+const sortXAxisData = (xAxisData, sortByRecentDate) => {
+  if (!xAxisData || xAxisData.length === 0) {
+    return []
+  }
+
+  // Check if the array has only one item
+  if (xAxisData.length === 1) {
+    return xAxisData
+  }
+  if (sortByRecentDate) {
+    // Sort from newest to oldes (recent dates first)
+    return xAxisData.sort((a, b) => Number(b) - Number(a))
+  } else {
+    // Sort from oldest to newest
+    return xAxisData.sort((a, b) => Number(a) - Number(b))
+  }
 }
