@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useMemo } from 'react'
 import ConfigContext from '../../../../ConfigContext'
 
 // Core
@@ -7,10 +7,18 @@ import Check from '@cdc/core/assets/icon-check.svg'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 import { sequentialPalettes } from '@cdc/core/data/colorPalettes'
 import Icon from '@cdc/core/components/ui/Icon'
+import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 
 // Third Party
-import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemPanel,
+  AccordionItemButton
+} from 'react-accessible-accordion'
 import { Draggable } from '@hello-pangea/dnd'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
 
 const SeriesContext = React.createContext({})
 
@@ -48,7 +56,11 @@ const SeriesWrapper = props => {
     updateConfig({ ...config, series })
   }
 
-  return <SeriesContext.Provider value={{ updateSeries, supportedRightAxisTypes, getColumns, selectComponent }}>{props.children}</SeriesContext.Provider>
+  return (
+    <SeriesContext.Provider value={{ updateSeries, supportedRightAxisTypes, getColumns, selectComponent }}>
+      {props.children}
+    </SeriesContext.Provider>
+  )
 }
 
 const SeriesDropdownLineType = props => {
@@ -245,7 +257,9 @@ const SeriesDropdownForecastColor = props => {
     <InputSelect
       key={`${stage}--${stageIndex}`}
       initial='Select an option'
-      value={config.series?.[index].stages?.[stageIndex].color ? config.series?.[index].stages?.[stageIndex].color : 'Select'}
+      value={
+        config.series?.[index].stages?.[stageIndex].color ? config.series?.[index].stages?.[stageIndex].color : 'Select'
+      }
       label={`${stage.key} Series Color`}
       onChange={event => {
         const copyOfSeries = [...config.series] // copy the entire series array
@@ -315,55 +329,33 @@ const SeriesDropdownConfidenceInterval = props => {
                 <AccordionItemPanel>
                   <div className='input-group'>
                     <label htmlFor='showInTooltip'>Show In Tooltip</label>
-                    <div className={'cove-input__checkbox--small'} onClick={e => updateShowInTooltip(e, index, ciIndex)}>
-                      <div className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`} style={{ backgroundColor: '' }}>
+                    <div
+                      className={'cove-input__checkbox--small'}
+                      onClick={e => updateShowInTooltip(e, index, ciIndex)}
+                    >
+                      <div
+                        className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`}
+                        style={{ backgroundColor: '' }}
+                      >
                         {showInTooltip && <Check className='' style={{ fill: '#025eaa' }} />}
                       </div>
-                      <input className='cove-input--hidden' type='checkbox' name={'showInTooltip'} checked={showInTooltip ? showInTooltip : false} readOnly />
+                      <input
+                        className='cove-input--hidden'
+                        type='checkbox'
+                        name={'showInTooltip'}
+                        checked={showInTooltip ? showInTooltip : false}
+                        readOnly
+                      />
                     </div>
                   </div>
 
-                  {/* <label>
-                    High Label
-                    <input
-                      type='text'
-                      key={`series-ci-high-label-${index}`}
-                      value={series.confidenceIntervals[index]?.highLabel ? series.confidenceIntervals[index]?.highLabel : ''}
-                      onChange={e => {
-                        const copiedConfidenceArray = [...config.series[index].confidenceIntervals]
-                        copiedConfidenceArray[ciIndex].highLabel = e.target.value
-                        const copyOfSeries = [...config.series] // copy the entire series array
-                        copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedConfidenceArray }
-                        updateConfig({
-                          ...config,
-                          series: copyOfSeries
-                        })
-                      }}
-                    />
-                  </label> */}
-
-                  {/* <label>
-                    Low label
-                    <input
-                      type='text'
-                      key={`series-ci-high-label-${index}`}
-                      value={series.confidenceIntervals[index]?.lowLabel ? series.confidenceIntervals[index]?.lowLabel : ''}
-                      onChange={e => {
-                        const copiedConfidenceArray = [...config.series[index].confidenceIntervals]
-                        copiedConfidenceArray[ciIndex].lowLabel = e.target.value
-                        const copyOfSeries = [...config.series] // copy the entire series array
-                        copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedConfidenceArray }
-                        updateConfig({
-                          ...config,
-                          series: copyOfSeries
-                        })
-                      }}
-                    />
-                  </label> */}
-
                   <InputSelect
                     initial='Select an option'
-                    value={config.series[index].confidenceIntervals[ciIndex].low ? config.series[index].confidenceIntervals[ciIndex].low : 'Select'}
+                    value={
+                      config.series[index].confidenceIntervals[ciIndex].low
+                        ? config.series[index].confidenceIntervals[ciIndex].low
+                        : 'Select'
+                    }
                     label='Low Confidence Interval'
                     onChange={e => {
                       const copiedConfidenceArray = [...config.series[index].confidenceIntervals]
@@ -379,7 +371,11 @@ const SeriesDropdownConfidenceInterval = props => {
                   />
                   <InputSelect
                     initial='Select an option'
-                    value={config.series[index].confidenceIntervals[ciIndex].high ? config.series[index].confidenceIntervals[ciIndex].high : 'Select'}
+                    value={
+                      config.series[index].confidenceIntervals[ciIndex].high
+                        ? config.series[index].confidenceIntervals[ciIndex].high
+                        : 'Select'
+                    }
                     label='High Confidence Interval'
                     onChange={e => {
                       const copiedConfidenceArray = [...config.series[index].confidenceIntervals]
@@ -399,7 +395,7 @@ const SeriesDropdownConfidenceInterval = props => {
           })}
         </Accordion>
         <button
-          className='btn full-width'
+          className='btn btn-primary full-width'
           onClick={e => {
             e.preventDefault()
             let copiedIndex = null
@@ -409,7 +405,10 @@ const SeriesDropdownConfidenceInterval = props => {
               copiedIndex = []
             }
             const copyOfSeries = [...config.series] // copy the entire series array
-            copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: [...copiedIndex, { high: '', low: '' }] } // update the nested array
+            copyOfSeries[index] = {
+              ...copyOfSeries[index],
+              confidenceIntervals: [...copiedIndex, { high: '', low: '' }]
+            } // update the nested array
             updateConfig({
               ...config,
               series: copyOfSeries
@@ -468,7 +467,19 @@ const SeriesInputWeight = props => {
 const SeriesInputName = props => {
   const { series, index: i } = props
   const { config, updateConfig } = useContext(ConfigContext)
-  const adjustableNameSeriesTypes = ['Bump Chart', 'Bar', 'Line', 'Area Chart', 'Combo', 'Deviation', 'Paired', 'Scatter', 'dashed-sm', 'dashed-md', 'dashed-lg']
+  const adjustableNameSeriesTypes = [
+    'Bump Chart',
+    'Bar',
+    'Line',
+    'Area Chart',
+    'Combo',
+    'Deviation',
+    'Paired',
+    'Scatter',
+    'dashed-sm',
+    'dashed-md',
+    'dashed-lg'
+  ]
 
   if (!adjustableNameSeriesTypes.includes(series.type)) return
 
@@ -532,7 +543,13 @@ const SeriesDisplayInTooltip = props => {
           <div className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`} style={{ backgroundColor: '' }}>
             {series.tooltip && <Check className='' style={{ fill: '#025eaa' }} />}
           </div>
-          <input className='cove-input--hidden' type='checkbox' name={`series-tooltip--${index}`} checked={series.tooltip ? series.tooltip : false} readOnly />
+          <input
+            className='cove-input--hidden'
+            type='checkbox'
+            name={`series-tooltip--${index}`}
+            checked={series.tooltip ? series.tooltip : false}
+            readOnly
+          />
         </div>
       </div>
     </>
@@ -591,17 +608,32 @@ const SeriesButtonRemove = props => {
 
 const SeriesItem = props => {
   const { config } = useContext(ConfigContext)
-
+  const { updateSeries, getColumns } = useContext(SeriesContext)
   const { series, getItemStyle, sortableItemStyles, chartsWithOptions, index: i } = props
-
+  const showDynamicCategory =
+    ['Bar', 'Line'].includes(config.visualizationType) &&
+    !config.series.find(s => s.dynamicCategory && s.dataKey !== series.dataKey)
   return (
     <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
       {(provided, snapshot) => (
-        <div key={i} className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+        <div
+          key={i}
+          className={snapshot.isDragging ? 'currently-dragging' : ''}
+          style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)}
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
           <Accordion allowZeroExpanded>
             <AccordionItem className='series-item series-item--chart'>
               <AccordionItemHeading className='series-item__title'>
-                <AccordionItemButton className={chartsWithOptions.includes(config.visualizationType) ? 'accordion__button' : 'accordion__button hide-arrow'}>
+                <AccordionItemButton
+                  className={
+                    chartsWithOptions.includes(config.visualizationType)
+                      ? 'accordion__button'
+                      : 'accordion__button hide-arrow'
+                  }
+                >
                   <Icon display='move' size={15} style={{ cursor: 'default' }} />
                   {series.dataKey}
                   <Series.Button.Remove series={series} index={i} />
@@ -610,6 +642,30 @@ const SeriesItem = props => {
               {chartsWithOptions.includes(config.visualizationType) && (
                 <AccordionItemPanel>
                   <Series.Input.Name series={series} index={i} />
+                  {showDynamicCategory && (
+                    <Select
+                      label='Dynamic Category'
+                      value={series.dynamicCategory}
+                      options={['- Select - ', ...getColumns().filter(col => series.dataKey !== col)]}
+                      updateField={(_section, _subsection, _fieldName, value) => {
+                        if (value === '- Select -') value = ''
+                        updateSeries(i, value, 'dynamicCategory')
+                      }}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>
+                              This field is Optional. If you have a dynamic data series you can select the category
+                              field here. You can only add one dynamic category per visualization.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                  )}
                   <Series.Input.Weight series={series} index={i} />
                   <Series.Dropdown.SeriesType series={series} index={i} />
                   <Series.Dropdown.AxisPosition series={series} index={i} />
@@ -630,7 +686,16 @@ const SeriesItem = props => {
 const SeriesList = props => {
   const { series, getItemStyle, sortableItemStyles, chartsWithOptions } = props
   return series.map((series, i) => {
-    return <SeriesItem getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} series={series} index={i} key={`series-list-${i}`} />
+    return (
+      <SeriesItem
+        getItemStyle={getItemStyle}
+        sortableItemStyles={sortableItemStyles}
+        chartsWithOptions={chartsWithOptions}
+        series={series}
+        index={i}
+        key={`series-list-${i}`}
+      />
+    )
   })
 }
 

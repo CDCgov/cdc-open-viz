@@ -1,0 +1,55 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": [
+      {
+        "key": "New Dashboard Filter 1",
+        "showDropdown": true,
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=brfss_prevalence_cove_explore_by_t",
+          "valueSelector": "",
+          "textSelector": ""
+        },
+        "tier": 1
+      }
+    ]
+  },
+  "rows": [{ "columns": [{ "width": 12, "widget": "dashboardFilters1730831317688" }, {}, {}] }],
+  "visualizations": {
+    "dashboardFilters1730831317688": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "newViz": true,
+      "openModal": true,
+      "uid": "dashboardFilters1730831317688",
+      "type": "dashboardFilters",
+      "sharedFilterIndexes": [0],
+      "visualizationType": "dashboardFilters"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showDownloadLinkBelow": true,
+    "showVertical": true
+  },
+  "newViz": true,
+  "datasets": {
+    "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=brfss_prevalence_cove_explore_by_topic": {
+      "dataFileSize": 35061,
+      "dataFileName": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=brfss_prevalence_cove_explore_by_topic",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": true,
+      "dataUrl": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=brfss_prevalence_cove_explore_by_topic"
+    }
+  },
+  "isResponsiveTicks": false,
+  "type": "dashboard",
+  "barThickness": "0.37",
+  "xAxis": { "type": "categorical", "size": 75, "maxTickRotation": 45, "labelOffset": 0 },
+  "runtime": {},
+  "version": "4.24.10"
+}

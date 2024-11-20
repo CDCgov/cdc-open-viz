@@ -435,8 +435,7 @@ const PanelVisual: FC<PanelProps> = props => {
               min={15}
             />
           )}
-        {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') ||
-          config.visualizationType === 'Combo') && (
+        {(config.orientation !== 'horizontal' || config.visualizationType === 'Combo') && (
           <TextField
             value={config.barThickness}
             type='number'

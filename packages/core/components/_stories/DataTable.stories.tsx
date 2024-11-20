@@ -2,6 +2,7 @@ import { Meta, StoryObj } from '@storybook/react'
 
 import DataTable from '../DataTable'
 import './styles.scss'
+import NoDataConfig from './_mocks/DataTable/no-data.json'
 import Example_1 from './_mocks/dashboard_no_filter.json'
 import CityStateExample from './_mocks/example-city-state.json'
 import { displayGeoName } from '@cdc/map/src/helpers/displayGeoName'
@@ -62,6 +63,19 @@ export const Grouped: Story = {
   }
 }
 
+const noDataData = NoDataConfig.datasets['dev-8931-hide-markup-include.csv'].data
+export const NoData: Story = {
+  args: {
+    config: NoDataConfig,
+    dataConfig: { data: noDataData },
+    rawData: noDataData,
+    runtimeData: noDataData,
+    expandDataTable: true,
+    tableTitle: 'No Data Table',
+    viewport: 'lg',
+    tabbingId: '#asdf'
+  }
+}
 export const RowType: Story = {
   args: {
     config: {

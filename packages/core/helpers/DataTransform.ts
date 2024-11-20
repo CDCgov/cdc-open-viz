@@ -150,7 +150,8 @@ export class DataTransform {
               }
             })
             description.valueKeysTallSupport.forEach((valueKey, i) => {
-              standardizedMapped[uniqueKey][i === 0 ? row[description.seriesKey] : (row[description.seriesKey] + '-' + valueKey)] = row[valueKey]
+              if(row[description.seriesKey])
+                standardizedMapped[uniqueKey][i === 0 ? row[description.seriesKey] : (row[description.seriesKey] + '-' + valueKey)] = row[valueKey]
             })
           })
 

@@ -1,0 +1,647 @@
+{
+  "annotations": [],
+  "type": "chart",
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "title": "Example Box Plot",
+  "showTitle": true,
+  "showDownloadMediaButton": false,
+  "theme": "theme-blue",
+  "animate": false,
+  "fontSize": "medium",
+  "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
+  "barHasBorder": "false",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "annotationDropdownText": "Annotations",
+    "showDownloadButton": false,
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true
+  },
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "preliminaryData": [],
+  "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 50,
+    "gridLines": true,
+    "enablePadding": false,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "rightHideAxis": true,
+    "rightAxisSize": 50,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#333",
+    "rightAxisTickLabelColor": "#333",
+    "rightAxisTickColor": "#333",
+    "numTicks": "",
+    "axisPadding": 0,
+    "scalePadding": 10,
+    "tickRotation": 0,
+    "anchors": [],
+    "shoMissingDataLabel": true,
+    "showMissingDataLine": true,
+    "categories": [],
+    "dataKey": "value",
+    "isLegendValue": false,
+    "label": "Observations"
+  },
+  "boxplot": {
+    "plots": [
+      {
+        "columnCategory": "category one",
+        "columnMax": 24,
+        "columnThirdQuartile": "24",
+        "columnMedian": "22",
+        "columnFirstQuartile": "20",
+        "columnMin": 19,
+        "columnCount": 4,
+        "columnSd": "2",
+        "columnMean": "22",
+        "columnIqr": "4",
+        "columnLowerBounds": 19,
+        "columnUpperBounds": 24,
+        "columnOutliers": [],
+        "values": [19, 21, 23, 24],
+        "keyValues": {
+          "Value": ["21", "19", "23", "24"],
+          "Price": ["100", "105", "110", "115"]
+        }
+      },
+      {
+        "columnCategory": "category two",
+        "columnMax": 19,
+        "columnThirdQuartile": "19",
+        "columnMedian": "15",
+        "columnFirstQuartile": "11",
+        "columnMin": 10,
+        "columnCount": 4,
+        "columnSd": "4",
+        "columnMean": "15",
+        "columnIqr": "8",
+        "columnLowerBounds": 10,
+        "columnUpperBounds": 19,
+        "columnOutliers": [],
+        "values": [10, 12, 18, 19],
+        "keyValues": {
+          "Value": ["18", "10", "12", "19"],
+          "Price": ["120", "125", "130", "135"]
+        }
+      },
+      {
+        "columnCategory": "category three",
+        "columnMax": 45.25,
+        "columnThirdQuartile": "41",
+        "columnMedian": "36",
+        "columnFirstQuartile": "33",
+        "columnMin": 30,
+        "columnCount": 4,
+        "columnSd": "7",
+        "columnMean": "37",
+        "columnIqr": "9",
+        "columnLowerBounds": 30,
+        "columnUpperBounds": 45.25,
+        "columnOutliers": [],
+        "values": [30, 35, 36, 46],
+        "keyValues": {
+          "Value": ["30", "35", "36", "46"],
+          "Price": ["140", "145", "150", "155"]
+        }
+      },
+      {
+        "columnCategory": "category four",
+        "columnMax": 57.5,
+        "columnThirdQuartile": "50",
+        "columnMedian": "43",
+        "columnFirstQuartile": "35",
+        "columnMin": 21,
+        "columnCount": 10,
+        "columnSd": "20",
+        "columnMean": "48",
+        "columnIqr": "15",
+        "columnLowerBounds": 21,
+        "columnUpperBounds": 57.5,
+        "columnOutliers": [82, 85],
+        "values": [21, 30, 40, 41, 42, 43, 50, 50, 82, 85],
+        "keyValues": {
+          "Value": ["30", "40", "50", "50", "85", "82", "43", "42", "41", "21"],
+          "Price": ["160", "165", "170", "175", "180", "185", "190", "195", "200", "205"]
+        }
+      }
+    ],
+    "borders": "true",
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "count": "Count",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    },
+    "categories": ["category one", "category two", "category three", "category four"],
+    "tableData": [
+      {
+        "columnCategory": "category one",
+        "columnMax": 24,
+        "columnThirdQuartile": "24",
+        "columnMedian": "22",
+        "columnFirstQuartile": "20",
+        "columnMin": 19,
+        "columnCount": 4,
+        "columnSd": "2",
+        "columnMean": "22",
+        "columnOutliers": [],
+        "values": [19, 21, 23, 24],
+        "keyValues": {
+          "Value": ["21", "19", "23", "24"],
+          "Price": ["100", "105", "110", "115"]
+        }
+      },
+      {
+        "columnCategory": "category two",
+        "columnMax": 19,
+        "columnThirdQuartile": "19",
+        "columnMedian": "15",
+        "columnFirstQuartile": "11",
+        "columnMin": 10,
+        "columnCount": 4,
+        "columnSd": "4",
+        "columnMean": "15",
+        "columnOutliers": [],
+        "values": [10, 12, 18, 19],
+        "keyValues": {
+          "Value": ["18", "10", "12", "19"],
+          "Price": ["120", "125", "130", "135"]
+        }
+      },
+      {
+        "columnCategory": "category three",
+        "columnMax": 45.25,
+        "columnThirdQuartile": "41",
+        "columnMedian": "36",
+        "columnFirstQuartile": "33",
+        "columnMin": 30,
+        "columnCount": 4,
+        "columnSd": "7",
+        "columnMean": "37",
+        "columnOutliers": [],
+        "values": [30, 35, 36, 46],
+        "keyValues": {
+          "Value": ["30", "35", "36", "46"],
+          "Price": ["140", "145", "150", "155"]
+        }
+      },
+      {
+        "columnCategory": "category four",
+        "columnMax": 57.5,
+        "columnThirdQuartile": "50",
+        "columnMedian": "43",
+        "columnFirstQuartile": "35",
+        "columnMin": 21,
+        "columnCount": 10,
+        "columnSd": "20",
+        "columnMean": "48",
+        "columnOutliers": [82, 85],
+        "values": [21, 30, 40, 41, 42, 43, 50, 50, 82, 85],
+        "keyValues": {
+          "Value": ["30", "40", "50", "50", "85", "82", "43", "42", "41", "21"],
+          "Price": ["160", "165", "170", "175", "180", "185", "190", "195", "200", "205"]
+        }
+      }
+    ]
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "isLegendValue": false,
+  "barThickness": "0.99",
+  "barHeight": 25,
+  "barSpace": 15,
+  "heights": {
+    "vertical": 300,
+    "horizontal": 750
+  },
+  "xAxis": {
+    "sortDates": false,
+    "anchors": [],
+    "type": "categorical",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 75,
+    "tickRotation": 0,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "labelOffset": 0,
+    "axisPadding": 200,
+    "target": 0,
+    "maxTickRotation": 0,
+    "padding": 5,
+    "showYearsOnce": false,
+    "isLegendValue": false,
+    "dataKey": "Group_Category",
+    "label": "Groups",
+    "axisBBox": 56.06999969482422,
+    "tickWidthMax": 116
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "indexLabel": "",
+    "download": true,
+    "showVertical": false,
+    "dateDisplayFormat": "",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "show": true
+  },
+  "orientation": "vertical",
+  "color": "pinkpurple",
+  "columns": {},
+  "legend": {
+    "hide": false,
+    "behavior": "isolate",
+    "axisAlign": true,
+    "singleRow": false,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "hideSuppressedLabels": false,
+    "hideSuppressionLink": false,
+    "seriesHighlight": [],
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    },
+    "position": "right"
+  },
+  "brush": {
+    "height": 25,
+    "active": false
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "qualitative1",
+  "isPaletteReversed": false,
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "labels": false,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false,
+    "useFormat": false
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false
+  },
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
+  "series": [
+    {
+      "dataKey": "Value",
+      "type": "Bar",
+      "tooltip": true,
+      "axis": "Left"
+    },
+    {
+      "dataKey": "Price",
+      "type": "Bar",
+      "tooltip": true,
+      "axis": "Left"
+    }
+  ],
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": ""
+  },
+  "forestPlot": {
+    "startAt": 0,
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
+    "lineOfNoEffect": {
+      "show": true
+    },
+    "type": "",
+    "pooledResult": {
+      "diamondHeight": 5,
+      "column": ""
+    },
+    "estimateField": "",
+    "estimateRadius": "",
+    "shape": "square",
+    "rowHeight": 20,
+    "description": {
+      "show": true,
+      "text": "description",
+      "location": 0
+    },
+    "result": {
+      "show": true,
+      "text": "result",
+      "location": 100
+    },
+    "radius": {
+      "min": 2,
+      "max": 10,
+      "scalingColumn": ""
+    },
+    "regression": {
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
+    },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0,
+    "showZeroLine": false,
+    "leftLabel": "",
+    "rightLabel": ""
+  },
+  "area": {
+    "isStacked": false
+  },
+  "sankey": {
+    "title": {
+      "defaultColor": "black"
+    },
+    "iterations": 1,
+    "rxValue": 0.9,
+    "overallSize": {
+      "width": 900,
+      "height": 700
+    },
+    "margin": {
+      "margin_y": 25,
+      "margin_x": 0
+    },
+    "nodeSize": {
+      "nodeWidth": 26,
+      "nodeHeight": 40
+    },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#ff8500",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#ffc900",
+      "inactive": "#D3D3D3"
+    },
+    "opacity": {
+      "nodeOpacityDefault": 1,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 1,
+      "LinkOpacityInactive": 0.1
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "nodeValueStyle": {
+      "textBefore": "(",
+      "textAfter": ")"
+    },
+    "data": []
+  },
+  "height": 300,
+
+  "visualizationType": "Box Plot",
+  "description": "Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.",
+  "dataDescription": {
+    "horizontal": false,
+    "series": false,
+    "singleRow": true,
+    "xKey": "category one",
+    "valueKey": "value"
+  },
+  "data": [
+    {
+      "Group_Category": "category one",
+      "Value": "21",
+      "Price": "100",
+      "Month": "January",
+      "Radius": "10"
+    },
+    {
+      "Group_Category": "category one",
+      "Value": "19",
+      "Price": "105",
+      "Month": "January",
+      "Radius": "12"
+    },
+    {
+      "Group_Category": "category one",
+      "Value": "23",
+      "Price": "110",
+      "Month": "February",
+      "Radius": "7"
+    },
+    {
+      "Group_Category": "category one",
+      "Value": "24",
+      "Price": "115",
+      "Month": "February",
+      "Radius": "5"
+    },
+    {
+      "Group_Category": "category two",
+      "Value": "18",
+      "Price": "120",
+      "Month": "March",
+      "Radius": "9"
+    },
+    {
+      "Group_Category": "category two",
+      "Value": "10",
+      "Price": "125",
+      "Month": "March",
+      "Radius": "14"
+    },
+    {
+      "Group_Category": "category two",
+      "Value": "12",
+      "Price": "130",
+      "Month": "April",
+      "Radius": "11"
+    },
+    {
+      "Group_Category": "category two",
+      "Value": "19",
+      "Price": "135",
+      "Month": "April",
+      "Radius": "6"
+    },
+    {
+      "Group_Category": "category three",
+      "Value": "30",
+      "Price": "140",
+      "Month": "May",
+      "Radius": "8"
+    },
+    {
+      "Group_Category": "category three",
+      "Value": "35",
+      "Price": "145",
+      "Month": "May",
+      "Radius": "10"
+    },
+    {
+      "Group_Category": "category three",
+      "Value": "36",
+      "Price": "150",
+      "Month": "June",
+      "Radius": "12"
+    },
+    {
+      "Group_Category": "category three",
+      "Value": "46",
+      "Price": "155",
+      "Month": "June",
+      "Radius": "13"
+    },
+    {
+      "Group_Category": "category four",
+      "Value": "30",
+      "Price": "160",
+      "Month": "July",
+      "Radius": "5"
+    },
+    {
+      "Group_Category": "category four",
+      "Value": "40",
+      "Price": "165",
+      "Month": "July",
+      "Radius": "9"
+    },
+    {
+      "Group_Category": "category four",
+      "Value": "50",
+      "Price": "170",
+      "Month": "August",
+      "Radius": "14"
+    },
+    {
+      "Group_Category": "category four",
+      "Value": "50",
+      "Price": "175",
+      "Month": "August",
+      "Radius": "15"
+    },
+    {
+      "Group_Category": "category four",
+      "Value": "85",
+      "Price": "180",
+      "Month": "September",
+      "Radius": "7"
+    },
+    {
+      "Group_Category": "category four",
+      "Value": "82",
+      "Price": "185",
+      "Month": "September",
+      "Radius": "8"
+    },
+    {
+      "Group_Category": "category four",
+      "Value": "43",
+      "Price": "190",
+      "Month": "October",
+      "Radius": "10"
+    },
+    {
+      "Group_Category": "category four",
+      "Value": "42",
+      "Price": "195",
+      "Month": "October",
+      "Radius": "12"
+    },
+    {
+      "Group_Category": "category four",
+      "Value": "41",
+      "Price": "200",
+      "Month": "November",
+      "Radius": "11"
+    },
+    {
+      "Group_Category": "category four",
+      "Value": "21",
+      "Price": "205",
+      "Month": "November",
+      "Radius": "9"
+    }
+  ],
+  "version": "4.24.10",
+  "dynamicMarginTop": 0
+}

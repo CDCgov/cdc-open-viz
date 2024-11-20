@@ -1,6 +1,6 @@
 import Tooltip from '../ui/Tooltip'
 import Icon from '../ui/Icon'
-import { TextField } from './Inputs'
+import { Select, TextField } from './Inputs'
 import { Visualization } from '../../types/Visualization'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import { Column } from '../../types/Column'
@@ -16,7 +16,13 @@ interface ColumnsEditorProps {
 
 type OpenControls = [Record<string, boolean>, Function] // useState type
 
-const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenControls }> = ({ config, deleteColumn, updateField, colKey, controls }) => {
+const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenControls }> = ({
+  config,
+  deleteColumn,
+  updateField,
+  colKey,
+  controls
+}) => {
   const [openControls, setOpenControls] = controls
 
   const editColumn = (key, value) => {
@@ -63,43 +69,69 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
   const colName = config.columns[colKey]?.name
 
   return (
-    <FieldSetWrapper fieldName={colName} fieldKey={colKey} fieldType='Column' controls={controls} deleteField={() => deleteColumn(colKey)}>
-      <label>
-        <span className='edit-label column-heading'>Column</span>
-        <select
-          value={config.columns[colKey] ? config.columns[colKey].name : undefined}
-          onChange={event => {
-            changeName(event.target.value)
-          }}
-        >
-          {['-Select-', ...getColumns()].map(option => (
-            <option key={option}>{option}</option>
-          ))}
-        </select>
-      </label>
+    <FieldSetWrapper
+      fieldName={colName}
+      fieldKey={colKey}
+      fieldType='Column'
+      controls={controls}
+      deleteField={() => deleteColumn(colKey)}
+    >
+      <Select
+        label='Column'
+        value={config.columns[colKey]?.name}
+        fieldName='name'
+        section={'columns'}
+        initial={'-Select-'}
+        options={getColumns()}
+        updateField={(_section, _subsection, _fieldName, value) => changeName(value)}
+      />
       {config.type !== 'table' && (
-        <label>
-          <span className='edit-label column-heading'>Associate to Series</span>
-          <select
-            value={config.columns[colKey] ? config.columns[colKey].series : ''}
-            onChange={event => {
-              editColumn('series', event.target.value)
-            }}
-          >
-            <option value=''>Select series</option>
-            {(config.series || []).map(series => (
-              <option key={series.dataKey}>{series.dataKey}</option>
-            ))}
-          </select>
-        </label>
+        <Select
+          label='Associate to Series'
+          value={config.columns[colKey]?.series}
+          fieldName={'series'}
+          section='columns'
+          initial={'Select series'}
+          options={config.series?.map(series => series.dataKey) || []}
+          updateField={(_section, _subsection, _fieldName, value) => editColumn('series', value)}
+        />
       )}
 
-      <TextField value={config.columns[colKey].label} section='columns' subsection={colKey} fieldName='label' label='Label' updateField={updateField} />
+      <TextField
+        value={config.columns[colKey].label}
+        section='columns'
+        subsection={colKey}
+        fieldName='label'
+        label='Label'
+        updateField={updateField}
+      />
       <ul className='column-edit'>
         <li className='three-col'>
-          <TextField value={config.columns[colKey].prefix} section='columns' subsection={colKey} fieldName='prefix' label='Prefix' updateField={updateField} />
-          <TextField value={config.columns[colKey].suffix} section='columns' subsection={colKey} fieldName='suffix' label='Suffix' updateField={updateField} />
-          <TextField type='number' value={config.columns[colKey].roundToPlace} section='columns' subsection={colKey} fieldName='roundToPlace' label='Round' updateField={updateField} />
+          <TextField
+            value={config.columns[colKey].prefix}
+            section='columns'
+            subsection={colKey}
+            fieldName='prefix'
+            label='Prefix'
+            updateField={updateField}
+          />
+          <TextField
+            value={config.columns[colKey].suffix}
+            section='columns'
+            subsection={colKey}
+            fieldName='suffix'
+            label='Suffix'
+            updateField={updateField}
+          />
+          <TextField
+            type='number'
+            value={config.columns[colKey].roundToPlace}
+            section='columns'
+            subsection={colKey}
+            fieldName='roundToPlace'
+            label='Round'
+            updateField={updateField}
+          />
         </li>
         <li>
           <label className='checkbox'>
@@ -202,7 +234,13 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
       </ul>
       <label>
         <span className='edit-label column-heading'>Order</span>
-        <input onWheel={e => e.currentTarget.blur()} type='number' min='1' value={config.columns[colKey].order} onChange={e => updateField('columns', colKey, 'order', parseInt(e.target.value))} />
+        <input
+          onWheel={e => e.currentTarget.blur()}
+          type='number'
+          min='1'
+          value={config.columns[colKey].order}
+          onChange={e => updateField('columns', colKey, 'order', parseInt(e.target.value))}
+        />
       </label>
     </FieldSetWrapper>
   )
@@ -252,7 +290,14 @@ const ColumnsEditor: React.FC<ColumnsEditorProps> = ({ config, updateField, dele
             </span>
           </label>
           {additionalColumns.map((val, i) => (
-            <FieldSet key={val + i} controls={openControls} config={config} deleteColumn={deleteColumn} updateField={updateField} colKey={val} />
+            <FieldSet
+              key={val + i}
+              controls={openControls}
+              config={config}
+              deleteColumn={deleteColumn}
+              updateField={updateField}
+              colKey={val}
+            />
           ))}
           <button
             className={'btn btn-primary'}

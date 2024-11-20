@@ -53,15 +53,6 @@ strong {
 }
 
 .btn {
-  background: #005eaa;
-  color: #fff;
-  border: 0;
-  padding: 0.4em 0.8em;
-  font-size: 1em;
-  display: block;
-  border-radius: 0.3em;
-  transition: 0.1s background-color;
-  cursor: pointer;
   &.full-width {
     width: 100%;
   }
@@ -89,17 +80,11 @@ strong {
     }
   }
 
-  &:hover {
-    transition: 0.1s all;
-    background: lighten(#005eaa, 5%);
-  }
-
   svg {
     width: 16px;
     height: 16px;
     position: relative;
     top: 2px;
-    margin-left: 5px;
   }
 }
 
@@ -121,13 +106,6 @@ textarea {
 }
 textarea {
   min-height: 140px;
-}
-select {
-  width: 100%;
-  font-size: 1em;
-  font-weight: normal;
-  text-transform: none;
-  border: rgba(0, 0, 0, 0.3) 1px solid !important;
 }
 
 .input-group-text {
@@ -193,4 +171,25 @@ section.footnotes {
 
 .margin-left-href {
   margin-left: 15px;
+}
+
+.btn.btn-primary:not([disabled]) {
+  background-color: $blue;
+  border-color: $blue;
+  &:hover:not([disabled]) {
+    background-color: darken($blue, 5%);
+    border-color: darken($blue, 5%);
+  }
+}
+
+
+// after migration to TP5 this declaration should be removed and all references
+// to it should be replaced with .form-select
+.cove-form-select {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--lightGray);
+  color: var(--darkGray);
 }

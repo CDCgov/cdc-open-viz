@@ -109,7 +109,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
-  const prevTickRef = useRef(null)
 
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
@@ -130,7 +129,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   // height before bottom axis
   const initialHeight = useMemo(
     () => calcInitialHeight(config, currentViewport),
-    [config, currentViewport, parentHeight]
+    [config, currentViewport, parentHeight, config.heights?.vertical, config.heights?.horizontal]
   )
   const forestHeight = useMemo(() => initialHeight + forestRowsHeight, [initialHeight, forestRowsHeight])
 
@@ -227,16 +226,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     return tick
   }
 
-  const handleBottomTickFormatting = tick => {
+  const handleBottomTickFormatting = (tick, i, ticks) => {
     if (isLogarithmicAxis && tick === 0.1) {
       // when logarithmic scale applied change value FIRST  of  tick
       tick = 0
     }
 
     if (isDateScale(runtime.xAxis) && config.visualizationType !== 'Forest Plot') {
-      const formattedDate = formatDate(tick, prevTickRef.current)
-      prevTickRef.current = tick
-      return formattedDate
+      return formatDate(tick, i, ticks)
     }
     if (orientation === 'horizontal' && config.visualizationType !== 'Forest Plot')
       return formatNumber(tick, 'left', shouldAbbreviate)
@@ -279,7 +276,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           tickCount = 4 // same default as standalone components
         }
       }
-      if (Number(tickCount) > Number(max)) {
+      if (Number(tickCount) > Number(max) && !isHorizontal) {
         // cap it and round it so its an integer
         tickCount = Number(min) < 0 ? Math.round(max) * 2 : Math.round(max)
       }
@@ -410,7 +407,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const legendIsLeftOrRight =
       legend?.position !== 'top' && legend?.position !== 'bottom' && !isLegendWrapViewport(currentViewport)
     legendRef.current.style.transform = legendIsLeftOrRight ? `translateY(${topLabelOnGridlineHeight}px)` : 'none'
-  }, [axisBottomRef.current, config, bottomLabelStart, brush, currentViewport, topYLabelRef.current])
+  }, [axisBottomRef.current, config, bottomLabelStart, brush, currentViewport, topYLabelRef.current, initialHeight])
 
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
@@ -690,7 +687,17 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               showTooltip={showTooltip}
             />
           )}
-          {visualizationType === 'Box Plot' && <BoxPlot xScale={xScale} yScale={yScale} />}
+          {visualizationType === 'Box Plot' && (
+            <BoxPlot
+              seriesScale={seriesScale}
+              xMax={xMax}
+              yMax={yMax}
+              min={min}
+              max={max}
+              xScale={xScale}
+              yScale={yScale}
+            />
+          )}
           {((visualizationType === 'Area Chart' && config.visualizationSubType === 'regular') ||
             visualizationType === 'Combo') && (
             <AreaChart
@@ -1476,7 +1483,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                     <Text
                       innerRef={xAxisTitleRef}
                       className='x-axis-title-label'
-                      x={axisCenter}
+                      x={xMax / 2}
                       y={isForestPlot ? 0 /* set via ref */ : axisMaxHeight}
                       textAnchor='middle'
                       verticalAnchor='start'

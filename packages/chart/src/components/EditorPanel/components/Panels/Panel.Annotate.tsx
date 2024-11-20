@@ -283,7 +283,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     </select>
                   </label>
 
-                  <Button className='warn btn-warn btn btn-remove delete' onClick={() => handleRemoveAnnotation(index)}>
+                  <Button className='btn btn-danger full-width' onClick={() => handleRemoveAnnotation(index)}>
                     Delete Annotation
                   </Button>
                 </div>
@@ -291,9 +291,9 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
             </Accordion>
           ))}
         {config?.annotations?.length < 3 && (
-          <Button onClick={handleAddAnnotation} className='mt-2'>
+          <button onClick={handleAddAnnotation} className='btn btn-primary mt-2 full-width'>
             Add Annotation
-          </Button>
+          </button>
         )}
       </Accordion.Section>
     </Accordion>
