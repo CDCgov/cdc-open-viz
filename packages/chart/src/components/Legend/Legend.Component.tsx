@@ -2,7 +2,7 @@ import parse from 'html-react-parser'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendShape from '@cdc/core/components/LegendShape'
 import Button from '@cdc/core/components/elements/Button'
-import useLegendClasses from '../../hooks/useLegendClasses'
+import { getLegendClasses } from './helpers/getLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import { handleLineType } from '../../helpers/handleLineType'
 
@@ -48,7 +48,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
     },
     ref
   ) => {
-    const { innerClasses, containerClasses } = useLegendClasses(config)
+    const { innerClasses, containerClasses } = getLegendClasses(config)
     const { runtime, legend } = config
 
     const [hasSuppression, setHasSuppression] = useState(false)
