@@ -503,7 +503,7 @@ const Filters = (props: FilterProps) => {
   return (
     <section className={getClasses().join(' ')}>
       <p className='filters-section__intro-text'>
-        {filters?.some(filter => filter.active && filter.columnName) ? filterConstants.introText : ''}{' '}
+        {filters?.some(filter => filter.showDropdown) ? filterConstants.introText : ''}{' '}
         {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
       </p>
       <div className='d-flex flex-wrap w-100 filters-section__wrapper'>
