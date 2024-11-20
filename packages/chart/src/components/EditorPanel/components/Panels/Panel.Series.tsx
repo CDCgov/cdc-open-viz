@@ -612,6 +612,7 @@ const SeriesItem = props => {
   const { series, getItemStyle, sortableItemStyles, chartsWithOptions, index: i } = props
   const showDynamicCategory =
     ['Bar', 'Line'].includes(config.visualizationType) &&
+    config.visualizationSubType !== 'Stacked' &&
     !config.series.find(s => s.dynamicCategory && s.dataKey !== series.dataKey)
   return (
     <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
