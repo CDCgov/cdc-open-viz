@@ -2,7 +2,7 @@
 .download-buttons {
   display: flex;
   justify-content: flex-end;
-  margin: 0 1em; // align w/ data table
+  margin: 0 0 0 auto;
 
   .btn:not(:last-child) {
     margin-right: 10px;

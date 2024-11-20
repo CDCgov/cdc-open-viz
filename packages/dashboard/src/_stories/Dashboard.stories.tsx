@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { faker } from '@faker-js/faker'
 import APIFiltersMapData from './_mock/api-filter-map.json'
 import APIFiltersChartData from './_mock/api-filter-chart.json'
+import APIFilterErrorConfig from './_mock/api-filter-error.json'
 import ExampleConfig_1 from './_mock/dashboard-gallery.json'
 import ExampleConfig_2 from './_mock/dashboard-2.json'
 import ExampleConfig_3 from './_mock/dashboard_no_filter.json'
@@ -62,6 +63,13 @@ export const Bump_Chart_Dashboard: Story = {
 export const Dashboard_Filters: Story = {
   args: {
     config: Dashboard_Filter,
+    isEditor: false
+  }
+}
+
+export const API_Filter_Error: Story = {
+  args: {
+    config: APIFilterErrorConfig,
     isEditor: false
   }
 }

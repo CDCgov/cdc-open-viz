@@ -27,6 +27,7 @@ export type Axis = {
   maxTickRotation?: number
   min?: string
   numTicks?: number
+  padding?: number
   paddingPercent?: number
   rightAxisSize?: number
   rightHideAxis?: boolean
@@ -48,4 +49,5 @@ export type Axis = {
   type: string
   axisBBox: number
   maxValue: string
+  sortByRecentDate: boolean
 }

@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef, useReducer, useState } from 'react'
+import { useEffect, useCallback, useRef, useReducer, useMemo } from 'react'
 import _ from 'lodash'
 // external
 import { Markup } from 'interweave'
@@ -154,17 +154,20 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
     const newWorkingData =
       isOrIsNotEqualTo === 'is'
-        ? workingData.filter(dataObject => dataObject[columnName] === value)
-        : workingData.filter(dataObject => dataObject[columnName] !== value)
+        ? workingData?.filter(dataObject => dataObject[columnName] === value)
+        : workingData?.filter(dataObject => dataObject[columnName] !== value)
 
     conditionList.shift()
     return conditionList.length === 0 ? newWorkingData : filterOutConditions(newWorkingData, conditionList)
   }
 
+  const emptyVariableChecker = []
+
   const convertVariablesInMarkup = inlineMarkup => {
     if (_.isEmpty(markupVariables)) return inlineMarkup
     const variableRegexPattern = /{{(.*?)}}/g
     const convertedInlineMarkup = inlineMarkup.replace(variableRegexPattern, variableTag => {
+      if (emptyVariableChecker.length > 0) return
       const workingVariable = markupVariables.filter(variable => variable.tag === variableTag)[0]
       if (workingVariable === undefined) return [variableTag]
       const workingData =
@@ -173,28 +176,33 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
           : filterOutConditions(data, [...workingVariable.conditions])
 
       const variableValues: string[] = _.uniq(
-        (workingData || []).map(dataObject => dataObject[workingVariable.columnName])
+        (workingData || []).map(dataObject => {
+          const dataObjectValue = dataObject[workingVariable.columnName]
+          return workingVariable.addCommas && !isNaN(parseFloat(dataObjectValue))
+            ? parseFloat(dataObjectValue).toLocaleString('en-US', { useGrouping: true })
+            : dataObjectValue
+        })
       )
+
       const variableDisplay = []
 
       const listConjunction = !isEditor ? 'and' : 'or'
 
       const length = variableValues.length
       if (length === 2) {
-        variableValues.push(variableValues.join(` ${listConjunction} `))
+        const newVariableValues = variableValues.join(` ${listConjunction} `)
+        variableValues.splice(0, 2, newVariableValues)
       }
       if (length > 2) {
         variableValues[length - 1] = `${listConjunction} ${variableValues[length - 1]}`
       }
       variableDisplay.push(variableValues.join(', '))
 
-      let finalDisplay = variableDisplay[0]
+      const finalDisplay = variableDisplay[0]
 
-      if (workingVariable.addCommas && !isNaN(parseFloat(finalDisplay))) {
-        finalDisplay = parseFloat(finalDisplay)
-        finalDisplay = finalDisplay.toLocaleString('en-US', { useGrouping: true })
+      if (finalDisplay === '' && contentEditor.allowHideSection) {
+        emptyVariableChecker.push(true)
       }
-
       return finalDisplay
     })
     return convertedInlineMarkup
@@ -237,23 +245,27 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   const markup = useInlineHTML ? convertVariablesInMarkup(inlineHTML) : parseBodyMarkup(urlMarkup)
 
+  const hideMarkupInclude = contentEditor?.allowHideSection && emptyVariableChecker.length > 0 && !isEditor
+
   if (loading === false) {
     content = (
       <>
         {isEditor && <EditorPanel />}
-        <Layout.Responsive isEditor={isEditor}>
-          <div className='markup-include-content-container cove-component__content no-borders'>
-            <div className={`markup-include-component ${contentClasses.join(' ')}`}>
-              <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
-              <div className={`${innerContainerClasses.join(' ')}`}>
-                <div className='cove-component__content-wrap'>
-                  {!markupError && <Markup allowElements={!!urlMarkup} content={markup} />}
-                  {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
+        {!hideMarkupInclude && (
+          <Layout.Responsive isEditor={isEditor}>
+            <div className='markup-include-content-container cove-component__content no-borders'>
+              <div className={`markup-include-component ${contentClasses.join(' ')}`}>
+                <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
+                <div className={`${innerContainerClasses.join(' ')}`}>
+                  <div className='cove-component__content-wrap'>
+                    {!markupError && <Markup allowElements={!!urlMarkup} content={markup} />}
+                    {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </Layout.Responsive>
+          </Layout.Responsive>
+        )}
       </>
     )
   }

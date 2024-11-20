@@ -11,7 +11,7 @@ import {
 } from 'react-accessible-accordion'
 import EditorPanelContext, { type EditorPanelContext as EPContext } from '../../EditorPanelContext'
 
-const SankeySettings = () => {
+const SankeySettings: React.FC<PanelProps> = props => {
   const { config, updateConfig } = useContext(ConfigContext)
   const data = config.data?.[0]
   const { updateField } = useContext<EPContext>(EditorPanelContext)
@@ -109,7 +109,7 @@ const SankeySettings = () => {
                   onChange={e => updateStoryNode('segmentTextAfter', e.target.value, i)}
                 />
               </label>
-              <Button onClick={e => removeStoryNode(i)} className='btn' style={{ background: 'tomato' }}>
+              <Button onClick={e => removeStoryNode(i)} className='btn btn-danger full-width'>
                 Remove Story Node
               </Button>
             </div>
@@ -117,7 +117,7 @@ const SankeySettings = () => {
         {data?.storyNodeText?.length < 3 && (
           <button
             type='button'
-            className='btn full-width'
+            className='btn btn-primary full-width'
             onClick={e => {
               e.preventDefault()
               addStoryNode()

@@ -39,7 +39,29 @@ type CdcWaffleChartProps = {
 }
 
 const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateConfig }) => {
-  const { title, theme, shape, nodeWidth, nodeSpacer, prefix, suffix, subtext, content, orientation, filters, dataColumn, dataFunction, dataConditionalColumn, dataConditionalOperator, dataConditionalComparate, customDenom, dataDenom, dataDenomColumn, dataDenomFunction, roundToPlace } = config
+  const {
+    title,
+    theme,
+    shape,
+    nodeWidth,
+    nodeSpacer,
+    prefix,
+    suffix,
+    subtext,
+    content,
+    orientation,
+    filters,
+    dataColumn,
+    dataFunction,
+    dataConditionalColumn,
+    dataConditionalOperator,
+    dataConditionalComparate,
+    customDenom,
+    dataDenom,
+    dataDenomColumn,
+    dataDenomFunction,
+    roundToPlace
+  } = config
 
   const gaugeColor = config.visual.colors[config.theme]
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
@@ -150,7 +172,8 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     }
 
     //Get the column's data
-    const columnData = conditionalData.length > 0 ? conditionalData.map(a => a[dataColumn]) : filteredData.map(a => a[dataColumn])
+    const columnData =
+      conditionalData.length > 0 ? conditionalData.map(a => a[dataColumn]) : filteredData.map(a => a[dataColumn])
     const denomColumnData = filteredData.map(a => a[dataDenomColumn])
 
     //Filter the column's data for numerical values only
@@ -209,8 +232,25 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     }
 
     // @ts-ignore
-    return [applyPrecision((waffleNumerator / waffleDenominator) * 100), waffleDenominator, applyPrecision(waffleNumerator)]
-  }, [dataColumn, dataFunction, config.data, filters, dataConditionalColumn, dataConditionalOperator, dataConditionalComparate, customDenom, dataDenomColumn, dataDenomFunction, roundToPlace, dataDenom])
+    return [
+      applyPrecision((waffleNumerator / waffleDenominator) * 100),
+      waffleDenominator,
+      applyPrecision(waffleNumerator)
+    ]
+  }, [
+    dataColumn,
+    dataFunction,
+    config.data,
+    filters,
+    dataConditionalColumn,
+    dataConditionalOperator,
+    dataConditionalComparate,
+    customDenom,
+    dataDenomColumn,
+    dataDenomFunction,
+    roundToPlace,
+    dataDenom
+  ])
 
   const [dataPercentage, waffleDenominator, waffleNumerator] = calculateData()
 
@@ -237,10 +277,22 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
 
     return waffleData.map((node, key) =>
       node.shape === 'square' ? (
-        <Bar className='cdc-waffle-chart__node' style={{ transitionDelay: `${0.1 * key}ms` }} x={node.x} y={node.y} width={nodeWidthNum} height={nodeWidthNum} fill={node.color} fillOpacity={node.opacity} key={key} />
+        <Bar
+          className='cdc-waffle-chart__node'
+          style={{ transitionDelay: `${0.1 * key}ms` }}
+          x={node.x}
+          y={node.y}
+          width={nodeWidthNum}
+          height={nodeWidthNum}
+          fill={node.color}
+          fillOpacity={node.opacity}
+          key={key}
+        />
       ) : node.shape === 'person' ? (
         <path
-          style={{ transform: `translateX(${node.x + nodeWidthNum / 4}px) translateY(${node.y}px) scale(${nodeWidthNum / 20})` }}
+          style={{
+            transform: `translateX(${node.x + nodeWidthNum / 4}px) translateY(${node.y}px) scale(${nodeWidthNum / 20})`
+          }}
           fill={node.color}
           fillOpacity={node.opacity}
           key={key}
@@ -249,7 +301,16 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                           .9375-.9375V13.75h.625A.9375.9375,0,0,0,7.5,12.8125V7.5A1.875,1.875,0,0,0,5.625,5.625Z'
         ></path>
       ) : (
-        <Circle className='cdc-waffle-chart__node' style={{ transitionDelay: `${0.1 * key}ms` }} cx={node.x} cy={node.y} r={nodeWidthNum / 2} fill={node.color} fillOpacity={node.opacity} key={key} />
+        <Circle
+          className='cdc-waffle-chart__node'
+          style={{ transitionDelay: `${0.1 * key}ms` }}
+          cx={node.x}
+          cy={node.y}
+          r={nodeWidthNum / 2}
+          fill={node.color}
+          fillOpacity={node.opacity}
+          key={key}
+        />
       )
     )
   }, [theme, dataPercentage, shape, nodeWidth, nodeSpacer])
@@ -289,7 +350,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         <section className='waiting-container'>
           <h3>Finish Configuring</h3>
           <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-          <button className='btn' style={{ margin: '1em auto' }} onClick={confirmDone}>
+          <button className='btn btn-primary' style={{ margin: '1em auto' }} onClick={confirmDone}>
             I'm Done
           </button>
         </section>
@@ -301,7 +362,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     <div className='cove-component__content'>
       <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
       <div className={contentClasses.join(' ')}>
-        {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error updateConfig={updateConfig} config={config} />}
+        {!config.newViz && config.runtime && config.runtime.editorErrorMessage && (
+          <Error updateConfig={updateConfig} config={config} />
+        )}
         {config.newViz && showConfigConfirm && <Confirm updateConfig={updateConfig} config={config} />}
         <div className='cove-component__content-wrap'>
           {config.visualizationType === 'Gauge' && (
@@ -310,12 +373,20 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                 <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
                   {prefix ? prefix : ' '}
                   {config.showPercent ? dataPercentage : waffleNumerator}
-                  {suffix ? suffix + ' ' : ' '} {config.valueDescription} {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
+                  {suffix ? suffix + ' ' : ' '} {config.valueDescription}{' '}
+                  {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
                 </div>
                 <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
                 <svg height={config.gauge.height} width={'100%'}>
                   <Group>
-                    <foreignObject style={{ border: '1px solid black' }} x={0} y={0} width={config.gauge.width} height={config.gauge.height} fill='#fff' />
+                    <foreignObject
+                      style={{ border: '1px solid black' }}
+                      x={0}
+                      y={0}
+                      width={config.gauge.width}
+                      height={config.gauge.height}
+                      fill='#fff'
+                    />
                     <Bar x={0} y={0} width={xScale(waffleNumerator)} height={config.gauge.height} fill={gaugeColor} />
                   </Group>
                 </svg>
@@ -324,7 +395,11 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
             </div>
           )}
           {config.visualizationType !== 'Gauge' && (
-            <div className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
+            <div
+              className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${
+                config.overallFontSize ? ' font-' + config.overallFontSize : ''
+              }`}
+            >
               <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
                 <svg width={setRatio()} height={setRatio()}>
                   <Group>{buildWaffle()}</Group>
@@ -353,9 +428,22 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   )
 }
 
-const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig }: CdcWaffleChartProps) => {
+const CdcWaffleChart = ({
+  configUrl,
+  config: configObj,
+  isDashboard = false,
+  isEditor = false,
+  setConfig: setParentConfig
+}: CdcWaffleChartProps) => {
   // Default States
-  const [state, dispatch] = useReducer(chartReducer, { config: configObj ?? defaults, loading: true, preview: false, viewport: 'lg', coveLoadedHasRan: false, container: null })
+  const [state, dispatch] = useReducer(chartReducer, {
+    config: configObj ?? defaults,
+    loading: true,
+    preview: false,
+    viewport: 'lg',
+    coveLoadedHasRan: false,
+    container: null
+  })
   const { loading, config, viewport: currentViewport, coveLoadedHasRan, container } = state
   const [showConfigConfirm, setShowConfigConfirm] = useState(false)
 
@@ -429,7 +517,12 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
   if (loading === false) {
     let body = (
       <Layout.Responsive isEditor={isEditor}>
-        <WaffleChart config={config} isEditor={isEditor} showConfigConfirm={showConfigConfirm} updateConfig={updateConfig} />
+        <WaffleChart
+          config={config}
+          isEditor={isEditor}
+          showConfigConfirm={showConfigConfirm}
+          updateConfig={updateConfig}
+        />
       </Layout.Responsive>
     )
 
@@ -443,8 +536,15 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
 
   return (
     <ErrorBoundary component='WaffleChart'>
-      <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}>
-        <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={outerContainerRef} showEditorPanel={config?.showEditorPanel}>
+      <ConfigContext.Provider
+        value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}
+      >
+        <Layout.VisualizationWrapper
+          config={config}
+          isEditor={isEditor}
+          ref={outerContainerRef}
+          showEditorPanel={config?.showEditorPanel}
+        >
           {content}
         </Layout.VisualizationWrapper>
       </ConfigContext.Provider>
@@ -462,7 +562,15 @@ export const DATA_FUNCTION_MIN = 'Min'
 export const DATA_FUNCTION_MODE = 'Mode'
 export const DATA_FUNCTION_SUM = 'Sum'
 
-export const DATA_FUNCTIONS = [DATA_FUNCTION_COUNT, DATA_FUNCTION_MAX, DATA_FUNCTION_MEAN, DATA_FUNCTION_MEDIAN, DATA_FUNCTION_MIN, DATA_FUNCTION_MODE, DATA_FUNCTION_SUM]
+export const DATA_FUNCTIONS = [
+  DATA_FUNCTION_COUNT,
+  DATA_FUNCTION_MAX,
+  DATA_FUNCTION_MEAN,
+  DATA_FUNCTION_MEDIAN,
+  DATA_FUNCTION_MIN,
+  DATA_FUNCTION_MODE,
+  DATA_FUNCTION_SUM
+]
 
 export const DATA_OPERATOR_LESS = '<'
 export const DATA_OPERATOR_GREATER = '>'
@@ -471,4 +579,11 @@ export const DATA_OPERATOR_GREATEREQUAL = '>='
 export const DATA_OPERATOR_EQUAL = '='
 export const DATA_OPERATOR_NOTEQUAL = '≠'
 
-export const DATA_OPERATORS = [DATA_OPERATOR_LESS, DATA_OPERATOR_GREATER, DATA_OPERATOR_LESSEQUAL, DATA_OPERATOR_GREATEREQUAL, DATA_OPERATOR_EQUAL, DATA_OPERATOR_NOTEQUAL]
+export const DATA_OPERATORS = [
+  DATA_OPERATOR_LESS,
+  DATA_OPERATOR_GREATER,
+  DATA_OPERATOR_LESSEQUAL,
+  DATA_OPERATOR_GREATEREQUAL,
+  DATA_OPERATOR_EQUAL,
+  DATA_OPERATOR_NOTEQUAL
+]

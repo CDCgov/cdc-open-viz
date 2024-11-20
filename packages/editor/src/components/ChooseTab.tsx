@@ -1,10 +1,9 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import '../scss/choose-vis-tab.scss'
 
 import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 
-import InfoIcon from '@cdc/core/assets/icon-info.svg'
 import DashboardIcon from '@cdc/core/assets/icon-dashboard.svg'
 import BarIcon from '@cdc/core/assets/icon-chart-bar.svg'
 import LineIcon from '@cdc/core/assets/icon-chart-line.svg'
@@ -21,128 +20,28 @@ import ScatterPlotIcon from '@cdc/core/assets/icon-chart-scatterplot.svg'
 import BoxPlotIcon from '@cdc/core/assets/icon-chart-box-whisker.svg'
 import AreaChartIcon from '@cdc/core/assets/icon-area-chart.svg'
 import GaugeChartIcon from '@cdc/core/assets/icon-linear-gauge.svg'
-import ForestPlotIcon from '@cdc/core/assets/icon-chart-forest-plot.svg'
 import ForecastIcon from '@cdc/core/assets/icon-chart-forecast.svg'
 import DeviationIcon from '@cdc/core/assets/icon-deviation-bar.svg'
 import SankeyIcon from '@cdc/core/assets/icon-sankey.svg'
 import ComboChartIcon from '@cdc/core/assets/icon-combo-chart.svg'
 import EpiChartIcon from '@cdc/core/assets/icon-epi-chart.svg'
-import { Visualization } from '@cdc/core/types/Visualization'
 import Icon from '@cdc/core/components/ui/Icon'
 
-export default function ChooseTab() {
+interface ButtonProps {
+  icon: React.ReactElement
+  id: number
+  label: string
+  type: string
+  subType: string
+  category: string
+  orientation?: string | null
+}
+
+const ChooseTab: React.FC = (): JSX.Element => {
   const { config, tempConfig } = useContext(ConfigContext)
+
   const dispatch = useContext(EditorDispatchContext)
-
-  useEffect(() => {
-    if (tempConfig) {
-      dispatch({ type: 'EDITOR_SAVE', payload: tempConfig })
-    }
-  }, [])
-
-  /**
-   * IconButton component
-   */
-  const IconButton = ({
-    icon,
-    label,
-    type,
-    subType = undefined,
-    orientation = undefined,
-
-    stacked = false,
-    generalType = 'data'
-  }) => {
-    let isSubType = false
-    let isHorizontalStackedChart = false
-    let classNames
-    if (type === 'map' && config.general) {
-      let geoType = config.general.geoType
-      isSubType = subType === geoType
-    }
-
-    if (type === 'chart') {
-      isSubType = subType === config.visualizationType
-
-      isHorizontalStackedChart = orientation === config.orientation && stacked === true
-    }
-
-    if (type === 'dashboard' || type === 'data-bite' || type === 'markup-include') isSubType = true
-
-    // TODO: sorry, we should refactor this at some point.
-    // trying to get this out for 4.22.5 - this is so stacked horizontal and bar charts aren't highlighted at the same time.
-    // this functionality appears to be working but is admittedly confusing.
-    if (type === 'chart' && stacked) {
-      classNames = config.type === type && isSubType && config.visualizationSubType === 'stacked' ? 'active' : ''
-    } else if (type === 'chart' && !stacked && config.visualizationSubType !== 'stacked') {
-      classNames = config.type === type && isSubType ? 'active' : ''
-    }
-
-    if (type !== 'chart') {
-      classNames = config.type === type && isSubType && !isHorizontalStackedChart ? 'active' : ''
-    }
-
-    const setTypes = () => {
-      if (type === config.type) {
-        if (subType !== config.visualizationType) {
-          dispatch({ type: 'EDITOR_SET_CONFIG', payload: { ...config, newViz: true, visualizationType: subType } })
-        }
-        dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
-      } else {
-        const confirmation =
-          !config.type ||
-          window.confirm('Changing visualization type will clear configuration settings. Do you want to continue?')
-
-        if (confirmation) {
-          const newConfig = {
-            newViz: true,
-            datasets: {},
-            isResponsiveTicks: false,
-            type,
-            barThickness: '0.37',
-            xAxis: {
-              type: 'categorical',
-              size: 75,
-              maxTickRotation: 45,
-              labelOffset: 0
-            }
-          } as Visualization
-
-          if (type === 'map') {
-            newConfig.general = {
-              ...newConfig.general,
-              geoType: subType,
-              type: generalType
-            }
-          } else {
-            newConfig.visualizationType = subType
-          }
-          if (type === 'chart') {
-            newConfig.visualizationSubType = stacked ? 'stacked' : 'regular'
-            newConfig.orientation = orientation
-            if (label === 'Epi Chart') {
-              newConfig.xAxis.type = 'date-time'
-              newConfig.xAxis.size = 0
-              newConfig.barThickness = ' 0.50'
-              newConfig.xAxis.labelOffset = 0
-              newConfig.xAxis.maxTickRotation = 45
-              newConfig.isResponsiveTicks = true
-            }
-          }
-
-          dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
-          dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
-        }
-      }
-    }
-
-    return (
-      <button className={classNames} onClick={() => setTypes()} aria-label={label}>
-        {icon}
-        <span className='mt-1'>{label}</span>
-      </button>
-    )
-  }
+  const rowLabels = ['General', , 'Charts', 'Maps']
 
   const handleUpload = e => {
     const file = e.target.files[0]
@@ -158,6 +57,72 @@ export default function ChooseTab() {
       }
     }
     reader.readAsText(file)
+  }
+
+  const generateNewConfig = props => {
+    let newConfig = {}
+    switch (props.category) {
+      case 'Charts': {
+        const visualizationType = props.subType
+        const visualizationSubType = !props.visualizationSubType ? 'regular' : props.visualizationSubType
+        newConfig = {
+          ...props,
+          visualizationType: visualizationType,
+          visualizationSubType: visualizationSubType,
+          newViz: true,
+          datasets: {}
+        }
+        break
+      }
+
+      case 'General': {
+        const visualizationType = props.subType
+        newConfig = { ...props, newViz: true, datasets: {}, visualizationType: visualizationType }
+        break
+      }
+
+      case 'Maps': {
+        const visualizationType = props.subType
+        newConfig = {
+          ...props,
+          newViz: true,
+          datasets: {},
+          type: 'map'
+        }
+        newConfig['general'] = {
+          geoType: visualizationType,
+          type: 'map'
+        }
+        break
+      }
+    }
+
+    return newConfig
+  }
+
+  const configureTabs = props => {
+    const newConfig = generateNewConfig(props)
+    dispatch({ type: 'EDITOR_SET_CONFIG', payload: { ...config, ...newConfig, activeVizButtonID: props.id } })
+    dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
+  }
+
+  const VizButton: React.FC<ButtonProps> = props => {
+    const { label, icon, id } = props
+    const isActive = id === config?.activeVizButtonID || 0
+    const handleClick = () => {
+      configureTabs(props)
+    }
+
+    if (tempConfig) {
+      dispatch({ type: 'EDITOR_SAVE', payload: tempConfig })
+    }
+
+    return (
+      <button className={isActive ? 'active' : ''} onClick={handleClick} aria-label={label}>
+        {icon}
+        <span className='mt-1'>{label}</span>
+      </button>
+    )
   }
 
   return (
@@ -177,276 +142,28 @@ export default function ChooseTab() {
         </div>
       </a>
 
-      <div className='heading-2'>General</div>
-      <ul className='grid cove-temp'>
-        {' '}
-        {/*TODO: Remove cove class during refactor to Wizard*/}
-        <li>
-          <Tooltip position='right'>
-            <Tooltip.Target>
-              <IconButton label='Dashboard' type='dashboard' icon={<DashboardIcon />} />
-            </Tooltip.Target>
-            <Tooltip.Content>Present multiple data visualizations with shared filter controls.</Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton label='Data Bite' type='data-bite' icon={<DataBiteIcon />} />
-            </Tooltip.Target>
-            <Tooltip.Content>Highlight a single aggregated value (e.g., sum or median).</Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton label='Waffle Chart' type='waffle-chart' subType='Waffle' icon={<WaffleChartIcon />} />
-            </Tooltip.Target>
-            <Tooltip.Content>Highlight a piece of data in relationship to a data set.</Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton label='Gauge Chart' type='waffle-chart' subType='Gauge' icon={<GaugeChartIcon />} />
-            </Tooltip.Target>
-            <Tooltip.Content>
-              Specify the calculation of a single data point (such as a percentage value) and present it on a horizontal
-              scale.
-            </Tooltip.Content>
-          </Tooltip>
-        </li>
-      </ul>
+      {rowLabels.map(label => {
+        return (
+          <React.Fragment>
+            <div className='heading-2'>{label}</div>
+            <ul className={`visualization-grid category_${label.toLowerCase()}`}>
+              {buttons
+                .filter(button => button.category === label)
+                .map((button, index) => (
+                  <li key={index}>
+                    <Tooltip position='right'>
+                      <Tooltip.Target>
+                        <VizButton {...button} />
+                      </Tooltip.Target>
+                      <Tooltip.Content>{button.content}</Tooltip.Content>
+                    </Tooltip>
+                  </li>
+                ))}
+            </ul>
+          </React.Fragment>
+        )
+      })}
 
-      <div className='heading-2'>Charts</div>
-      <ul className='grid cove-temp'>
-        <li>
-          <Tooltip position='right'>
-            <Tooltip.Target>
-              <IconButton label='Bar' type='chart' subType='Bar' orientation='vertical' icon={<BarIcon />} />
-            </Tooltip.Target>
-            <Tooltip.Content>Use bars to show comparisons between data categories.</Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip position='right'>
-            <Tooltip.Target>
-              <IconButton label='Epi Chart' type='chart' subType='Bar' orientation='vertical' icon={<EpiChartIcon />} />
-            </Tooltip.Target>
-            <Tooltip.Content>Use bars to show comparisons between data categories.</Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip position='right'>
-            <Tooltip.Target>
-              <IconButton
-                label='Combo Chart'
-                type='chart'
-                subType='Combo'
-                orientation='vertical'
-                icon={<ComboChartIcon />}
-              />
-            </Tooltip.Target>
-            <Tooltip.Content>Use bars to show comparisons between data categories.</Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton label='Line' type='chart' subType='Line' orientation='vertical' icon={<LineIcon />} />
-            </Tooltip.Target>
-            <Tooltip.Content>Present one or more data trends over time.</Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton label='Pie' type='chart' subType='Pie' orientation='vertical' icon={<PieIcon />} />
-            </Tooltip.Target>
-            <Tooltip.Content>Present the numerical proportions of a data series.</Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton
-                label='Paired Bar'
-                type='chart'
-                subType='Paired Bar'
-                orientation='horizontal'
-                icon={<PairedBarIcon />}
-              />
-            </Tooltip.Target>
-            <Tooltip.Content>
-              Use paired bars to show comparisons between two different data categories.
-            </Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton
-                label='Deviation Bar'
-                type='chart'
-                subType='Deviation Bar'
-                orientation='horizontal'
-                stacked={false}
-                icon={<DeviationIcon />}
-              />
-            </Tooltip.Target>
-            <Tooltip.Content>Use deviation bars to display how individual values differ from a target.</Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton
-                label='Horizontal Bar (Stacked)'
-                type='chart'
-                subType='Bar'
-                orientation='horizontal'
-                stacked={true}
-                icon={<HorizontalStackIcon />}
-              />
-            </Tooltip.Target>
-            <Tooltip.Content>Use bars to show comparisons between data categories.</Tooltip.Content>
-          </Tooltip>
-        </li>
-      </ul>
-
-      <ul className='grid cove-temp'>
-        {/* temporarily hiding these */}
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton
-                label='Box Plot'
-                type='chart'
-                subType='Box Plot'
-                orientation='vertical'
-                icon={<BoxPlotIcon />}
-              />
-            </Tooltip.Target>
-            <Tooltip.Content>Display a box plot</Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton
-                label='Scatter Plot'
-                type='chart'
-                subType='Scatter Plot'
-                orientation='vertical'
-                icon={<ScatterPlotIcon />}
-              />
-            </Tooltip.Target>
-            <Tooltip.Content>Display a scatter plot</Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton
-                label='Area Chart'
-                type='chart'
-                subType='Area Chart'
-                orientation='vertical'
-                icon={<AreaChartIcon />}
-              />
-            </Tooltip.Target>
-            <Tooltip.Content>Display an area chart</Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton
-                label='Forecast Chart'
-                type='chart'
-                subType='Forecasting'
-                orientation='vertical'
-                icon={<ForecastIcon />}
-              />
-            </Tooltip.Target>
-            <Tooltip.Content>Display a forecasting chart</Tooltip.Content>
-          </Tooltip>
-        </li>
-
-        {/* <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton label='Forest Plot' type='chart' subType='Forest Plot' orientation='vertical' icon={<ForestPlotIcon />} />
-            </Tooltip.Target>
-            <Tooltip.Content>Display a forest plot</Tooltip.Content>
-          </Tooltip>
-        </li> */}
-
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton
-                label='Sankey Diagram'
-                type='chart'
-                subType='Sankey'
-                orientation='vertical'
-                icon={<SankeyIcon />}
-              />
-            </Tooltip.Target>
-            <Tooltip.Content>Display a sankey diagram</Tooltip.Content>
-          </Tooltip>
-        </li>
-      </ul>
-
-      <div className='heading-2'>Maps</div>
-      <ul className='grid cove-temp'>
-        <li>
-          <Tooltip position='right'>
-            <Tooltip.Target>
-              <IconButton label='United States (State- or County-Level)' type='map' subType='us' icon={<UsaIcon />} />
-            </Tooltip.Target>
-            <Tooltip.Content>Present a U.S. choropleth map at state or county level.</Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip position='right'>
-            <Tooltip.Target>
-              <IconButton label='United States (HHS Regions)' type='map' subType='us-region' icon={<UsaRegionIcon />} />
-            </Tooltip.Target>
-            <Tooltip.Content>Present a U.S. choropleth map at state or county level.</Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton label='World' type='map' subType='world' icon={<GlobeIcon />} />
-            </Tooltip.Target>
-            <Tooltip.Content>Present a choropleth map of the world.</Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton label='U.S. State' type='map' subType='single-state' icon={<AlabamaGraphic />} />
-            </Tooltip.Target>
-            <Tooltip.Content>Present a choropleth map of an individual U.S. state.</Tooltip.Content>
-          </Tooltip>
-        </li>
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton
-                label='U.S. Geocode'
-                type='map'
-                subType='us-county'
-                generalType='us-geocode'
-                icon={<UsaIcon />}
-              />
-            </Tooltip.Target>
-            <Tooltip.Content>United States GeoCode</Tooltip.Content>
-          </Tooltip>
-        </li>
-      </ul>
       <hr />
       <div className='form-group'>
         <label htmlFor='uploadConfig'>
@@ -471,3 +188,254 @@ export default function ChooseTab() {
     </div>
   )
 }
+export default ChooseTab
+
+const buttons = [
+  {
+    id: 1,
+    category: 'Charts',
+    label: 'Bar',
+    type: 'chart',
+    subType: 'Bar',
+    orientation: 'vertical',
+    barThickness: '0.37',
+    visualizationSubType: 'regular',
+    xAxis: {
+      type: 'categorical',
+      size: 75,
+      maxTickRotation: 45,
+      labelOffset: 0
+    },
+    icon: <BarIcon />,
+    content: 'Use bars to show comparisons between data categories.'
+  },
+  {
+    id: 2,
+    category: 'Charts',
+    label: 'Epi Chart',
+    type: 'chart',
+    subType: 'Bar',
+    orientation: 'vertical',
+    barThickness: '0.95',
+    isResponsiveTicks: true,
+    visualizationSubType: 'regular',
+    xAxis: {
+      type: 'date-time',
+      size: 0,
+      labelOffset: 0,
+      maxTickRotation: 45
+    },
+    icon: <EpiChartIcon />,
+    content: 'Use bars to show comparisons between data categories.'
+  },
+  {
+    id: 3,
+    category: 'Charts',
+    label: 'Combo Chart',
+    type: 'chart',
+    subType: 'Combo',
+    orientation: 'vertical',
+    icon: <ComboChartIcon />,
+    content: 'Use bars to show comparisons between data categories.'
+  },
+  {
+    id: 4,
+    category: 'Charts',
+    label: 'Line',
+    type: 'chart',
+    subType: 'Line',
+    orientation: 'vertical',
+    icon: <LineIcon />,
+    content: 'Present one or more data trends over time.'
+  },
+  {
+    id: 5,
+    category: 'Charts',
+    label: 'Paired Bar',
+    type: 'chart',
+    subType: 'Paired Bar',
+    orientation: 'horizontal',
+    icon: <PairedBarIcon />,
+    content: 'Use paired bars to show comparisons between two different data categories.'
+  },
+  {
+    id: 6,
+    category: 'Charts',
+    label: 'Area Chart',
+    type: 'chart',
+    subType: 'Area Chart',
+    orientation: 'vertical',
+    icon: <AreaChartIcon />,
+    content: 'Display an area chart to visualize quantities over time.'
+  },
+  {
+    id: 7,
+    category: 'Charts',
+    label: 'Forecast Chart',
+    type: 'chart',
+    subType: 'Forecasting',
+    orientation: 'vertical',
+    icon: <ForecastIcon />,
+    content: 'Display a forecasting chart to predict future data trends.'
+  },
+  {
+    id: 8,
+    category: 'Charts',
+    label: 'Scatter Plot',
+    type: 'chart',
+    subType: 'Scatter Plot',
+    orientation: 'vertical',
+    icon: <ScatterPlotIcon />,
+    content: 'Display a scatter plot to explore relationships between numeric variables.'
+  },
+  {
+    id: 9,
+    category: 'Charts',
+    label: 'Box Plot',
+    type: 'chart',
+    subType: 'Box Plot',
+    orientation: 'vertical',
+    icon: <BoxPlotIcon />,
+    content: 'Display a box plot to visualize the distribution of numerical data through quartiles.'
+  },
+  {
+    id: 10,
+    category: 'Charts',
+    label: 'Sankey Diagram',
+    type: 'chart',
+    subType: 'Sankey',
+    orientation: 'vertical',
+    icon: <SankeyIcon />,
+    content: 'Display a sankey diagram'
+  },
+  {
+    id: 11,
+    category: 'Charts',
+    label: 'Forecast Chart',
+    type: 'chart',
+    subType: 'Forecasting',
+    orientation: 'vertical',
+    icon: <ForecastIcon />,
+    content: 'Display a forecasting chart'
+  },
+  {
+    id: 12,
+    category: 'Charts',
+    label: 'Horizontal Bar (Stacked)',
+    type: 'chart',
+    subType: 'Bar',
+    visualizationSubType: 'stacked',
+    orientation: 'horizontal',
+    icon: <HorizontalStackIcon />,
+    content: 'Use bars to show comparisons between data categories.'
+  },
+  {
+    id: 13,
+    category: 'Charts',
+    label: 'Pie',
+    type: 'chart',
+    subType: 'Pie',
+    orientation: 'Pie',
+    icon: <PieIcon />,
+    content: 'Present the numerical proportions of a data series.'
+  },
+  {
+    id: 14,
+    category: 'Charts',
+    label: 'Deviation Bar',
+    type: 'chart',
+    subType: 'Deviation Bar',
+    orientation: 'Pie',
+    icon: <DeviationIcon />,
+    content: 'Use deviation bars to display how individual values differ from a target'
+  },
+  {
+    id: 15,
+    category: 'General',
+    label: 'Dashboard',
+    type: 'dashboard',
+    subType: null,
+    orientation: null,
+    icon: <DashboardIcon />,
+    content: 'Present multiple data visualizations with shared filter controls.'
+  },
+  {
+    id: 16,
+    category: 'General',
+    label: 'Data Bite',
+    type: 'data-bite',
+    subType: null,
+    orientation: null,
+    icon: <DataBiteIcon />,
+    content: 'Highlight a single aggregated value (e.g., sum or median).'
+  },
+  {
+    id: 17,
+    category: 'General',
+    label: 'Waffle Chart',
+    type: 'waffle-chart',
+    subType: 'Waffle',
+    orientation: null,
+    icon: <WaffleChartIcon />,
+    content: 'Highlight a piece of data in relationship to a data set.'
+  },
+  {
+    id: 18,
+    category: 'General',
+    label: 'Gauge Chart',
+    type: 'waffle-chart',
+    subType: 'Gauge',
+    orientation: null,
+    icon: <GaugeChartIcon />,
+    content: `Specify the calculation of a single data point (such as a percentage value) and present it on a horizontal
+              scale.`
+  },
+  {
+    id: 19,
+    category: 'Maps',
+    label: 'United States (State- or County-Level)',
+    type: 'map',
+    subType: 'us',
+    icon: <UsaIcon />,
+    content: 'Present a U.S. choropleth map at state or county level.',
+    position: 'right'
+  },
+  {
+    id: 20,
+    category: 'Maps',
+    label: 'United States (HHS Regions)',
+    type: 'map',
+    subType: 'us-region',
+    icon: <UsaRegionIcon />,
+    content: 'Present a U.S. choropleth map at state or county level.',
+    position: 'right'
+  },
+  {
+    id: 21,
+    category: 'Maps',
+    label: 'World',
+    type: 'map',
+    subType: 'world',
+    icon: <GlobeIcon />,
+    content: 'Present a choropleth map of the world.'
+  },
+  {
+    id: 22,
+    category: 'Maps',
+    label: 'U.S. State',
+    type: 'map',
+    subType: 'single-state',
+    icon: <AlabamaGraphic />,
+    content: 'Present a choropleth map of an individual U.S. state.'
+  },
+  {
+    id: 23,
+    category: 'Maps',
+    label: 'U.S. Geocode',
+    type: 'map',
+    subType: 'us-county',
+    generalType: 'us-geocode',
+    icon: <UsaIcon />,
+    content: 'United States GeoCode'
+  }
+]

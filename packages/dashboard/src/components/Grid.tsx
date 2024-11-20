@@ -24,7 +24,7 @@ const Grid = () => {
       {(rows || []).map((row, idx) => (
         <Row row={row} idx={idx} uuid={row.uuid} key={idx} />
       ))}
-      <button className='btn add-row' onClick={addRow}>
+      <button className='btn btn-primary col' onClick={addRow}>
         Add Row
       </button>
     </div>

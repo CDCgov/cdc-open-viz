@@ -1,4 +1,5 @@
 import { Axis } from './Axis'
+import { Series } from './Series'
 
 export type ForecastingSeriesKey = {
   stages: {
@@ -17,7 +18,8 @@ export type Runtime = {
   }
   xAxis: Axis
   yAxis: Axis
-  seriesKeys: any[]
+  series: Series
+  seriesKeys: string[]
   seriesLabels: Record<string, any>
   seriesLabelsAll: string[]
   editorErrorMessage: string

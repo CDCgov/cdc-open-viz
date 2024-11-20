@@ -83,7 +83,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           </Tooltip>
         }
       />
-      {config.type !== 'table' && (
+      {config.type !== 'table' ? (
         <CheckBox
           value={config.table.show}
           fieldName='show'
@@ -107,6 +107,15 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
               </Tooltip.Content>
             </Tooltip>
           }
+        />
+      ) : (
+        <CheckBox
+          value={config.general?.showDownloadButton}
+          fieldName='showDownloadButton'
+          label='Show Download CSV link'
+          section='general'
+          updateField={updateField}
+          className='column-heading'
         />
       )}
 
@@ -249,15 +258,14 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           updateField={updateField}
         />
       )}
-      {config.type !== 'table' && (
-        <CheckBox
-          value={config.table.showDownloadLinkBelow}
-          fieldName='showDownloadLinkBelow'
-          label='Show Download Link Below Table'
-          section='table'
-          updateField={updateField}
-        />
-      )}
+
+      <CheckBox
+        value={config.table.showDownloadLinkBelow}
+        fieldName='showDownloadLinkBelow'
+        label='Show Download Link Below Table'
+        section='table'
+        updateField={updateField}
+      />
       <label>
         <span className='edit-label column-heading'>Table Cell Min Width</span>
         <input
@@ -267,9 +275,17 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
         />
       </label>
       {config?.visualizationType !== 'Sankey' && (
-        <label>
-          <span className='edit-label column-heading'>
-            Group By{' '}
+        <Select
+          value={config.table.groupBy}
+          fieldName={'groupBy'}
+          section='table'
+          label='Group By'
+          updateField={(_section, _subSection, _fieldName, value) => changeGroupBy(value)}
+          initial={PLACEHOLDER}
+          options={groupPivotColumns.filter(
+            col => col !== config.table.pivot?.columnName && !(config.table.pivot?.valueColumns || []).includes(col)
+          )}
+          tooltip={
             <Tooltip style={{ textTransform: 'none' }}>
               <Tooltip.Target>
                 <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -281,27 +297,11 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
                 </p>
               </Tooltip.Content>
             </Tooltip>
-          </span>
-
-          <select
-            value={config.table.groupBy}
-            onChange={event => {
-              changeGroupBy(event.target.value)
-            }}
-          >
-            {[
-              PLACEHOLDER,
-              ...groupPivotColumns.filter(
-                col => col !== config.table.pivot?.columnName && col !== config.table.pivot?.valueColumn
-              )
-            ].map(option => (
-              <option key={option}>{option}</option>
-            ))}
-          </select>
-        </label>
+          }
+        />
       )}
       <Select
-        label='Pivot Column: '
+        label='Pivot Column'
         tooltip={
           <Tooltip style={{ textTransform: 'none' }}>
             <Tooltip.Target>
@@ -314,7 +314,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
         }
         value={config.table.pivot?.columnName}
         options={groupPivotColumns.filter(
-          col => col !== config.table.groupBy && col !== config.table.pivot?.valueColumn
+          col => col !== config.table.groupBy && !(config.table.pivot?.valueColumns || []).includes(col)
         )}
         initial='-Select-'
         section='table'

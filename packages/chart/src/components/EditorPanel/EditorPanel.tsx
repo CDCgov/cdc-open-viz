@@ -171,7 +171,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                 <p> {type === 'suppression' ? 'Suppressed' : 'Effect'} Data</p>
                 <button
                   type='button'
-                  className='remove-column'
+                  className='btn btn-danger'
                   onClick={event => {
                     event.preventDefault()
                     removeColumn(i)
@@ -450,7 +450,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
           }
         )}
 
-      <button type='button' onClick={addColumn} className='btn full-width'>
+      <button type='button' onClick={addColumn} className='btn btn-primary full-width'>
         {config.visualizationType === 'Line'
           ? 'Add Special Line'
           : config.visualizationType === 'Bar'
@@ -530,7 +530,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
               <p>Axis Category {i + 1}</p>
               <button
                 type='button'
-                className='remove-column'
+                className='btn btn-danger'
                 onClick={event => {
                   event.preventDefault()
                   removeColumn(i)
@@ -583,7 +583,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
           )
         })}
 
-      <button type='button' onClick={addColumn} className='btn full-width'>
+      <button type='button' onClick={addColumn} className='btn btn-primary full-width'>
         Add Axis Category
       </button>
     </>
@@ -619,52 +619,35 @@ const EditorPanel = () => {
   const { leftMax, rightMax } = useMinMax(properties)
 
   const {
-    headerColors,
-    visSupportsTooltipLines,
-    visSupportsNonSequentialPallete,
-    visSupportsSequentialPallete,
-    visSupportsReverseColorPalette,
-    visHasLabelOnData,
-    visHasNumbersOnBars,
     visHasAnchors,
-    visHasBarBorders,
-    visHasDataCutoff,
-    visHasSelectableLegendValues,
-    visCanAnimate,
+    visHasBrushChart,
+    visHasCategoricalAxis,
     visHasLegend,
     visHasLegendAxisAlign,
     visHasLegendColorCategory,
-    visHasBrushChart,
+    visHasSelectableLegendValues,
     visSupportsDateCategoryAxis,
-    visSupportsValueAxisMin,
-    visSupportsValueAxisMax,
     visSupportsDateCategoryAxisLabel,
     visSupportsDateCategoryAxisLine,
-    visSupportsDateCategoryAxisTicks,
-    visSupportsDateCategoryTickRotation,
-    visSupportsDateCategoryNumTicks,
+    visSupportsDateCategoryAxisMax,
+    visSupportsDateCategoryAxisMin,
     visSupportsDateCategoryAxisPadding,
-    visSupportsRegions,
+    visSupportsDateCategoryAxisTicks,
+    visSupportsDateCategoryHeight,
+    visSupportsDateCategoryNumTicks,
+    visSupportsDateCategoryTickRotation,
+    visSupportsDynamicSeries,
     visSupportsFilters,
-    visSupportsPreliminaryData,
-    visSupportsValueAxisGridLines,
-    visSupportsValueAxisLine,
-    visSupportsValueAxisTicks,
-    visSupportsValueAxisLabels,
-    visSupportsBarSpace,
-    visSupportsBarThickness,
-    visSupportsFootnotes,
-    visSupportsSuperTitle,
-    visSupportsDataCutoff,
-    visSupportsChartHeight,
     visSupportsLeftValueAxis,
-    visSupportsTooltipOpacity,
+    visSupportsPreliminaryData,
     visSupportsRankByValue,
     visSupportsResponsiveTicks,
-    visSupportsDateCategoryHeight,
-    visHasDataSuppression,
-    visHasCategoricalAxis,
-    visSupportsDynamicSeries
+    visSupportsValueAxisGridLines,
+    visSupportsValueAxisLabels,
+    visSupportsValueAxisLine,
+    visSupportsValueAxisMax,
+    visSupportsValueAxisMin,
+    visSupportsValueAxisTicks
   } = useEditorPermissions()
 
   // when the visualization type changes we
@@ -763,7 +746,7 @@ const EditorPanel = () => {
         newValue
       ) // eslint-disable-line
 
-    if (section === 'boxplot' && subsection === 'legend') {
+    if (section === 'boxplot' && (subsection === 'legend' || subsection === 'labels')) {
       updateConfig({
         ...config,
         [section]: {
@@ -832,19 +815,6 @@ const EditorPanel = () => {
   if (loading) {
     return null
   }
-
-  useEffect(() => {
-    if (!config.general?.boxplot) return
-    if (!config.general.boxplot.firstQuartilePercentage) {
-      updateConfig({
-        ...config,
-        boxplot: {
-          ...config.boxplot,
-          firstQuartilePercentage: 25
-        }
-      })
-    }
-  }, [config])
 
   const setLollipopShape = shape => {
     updateConfig({
@@ -1427,14 +1397,15 @@ const EditorPanel = () => {
                     </AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    {visSupportsDynamicSeries() && (
+                    {/* FEATURE to be reintroduced by DEV-9747 */}
+                    {/* {visSupportsDynamicSeries() && (
                       <CheckBox
                         value={config.dynamicSeries}
                         fieldName='dynamicSeries'
                         label='Dynamically generate series'
                         updateField={updateField}
                       />
-                    )}
+                    )} */}
                     {config.dynamicSeries && config.visualizationType === 'Line' && (
                       <Select
                         fieldName='dynamicSeriesType'
@@ -2166,7 +2137,7 @@ const EditorPanel = () => {
                       </Accordion>
 
                       <button
-                        className='btn full-width'
+                        className='btn btn-primary full-width'
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.yAxis.anchors]
@@ -2292,7 +2263,7 @@ const EditorPanel = () => {
                       </Accordion>
 
                       <button
-                        className='btn full-width'
+                        className='btn btn-primary full-width'
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.xAxis.anchors]
@@ -2517,12 +2488,19 @@ const EditorPanel = () => {
                               )}
                             </select>
                           </label>
-
                           <CheckBox
                             value={config.xAxis.manual}
                             section='xAxis'
                             fieldName='manual'
                             label='Manual Ticks'
+                            updateField={updateField}
+                          />
+                          <CheckBox
+                            display={config.xAxis.type !== 'categorical'}
+                            value={config.xAxis.sortByRecentDate}
+                            section='xAxis'
+                            fieldName='sortByRecentDate'
+                            label='Show dates newest to oldest'
                             updateField={updateField}
                           />
 
@@ -3210,7 +3188,7 @@ const EditorPanel = () => {
                             highlightedBarValues.map((highlightedBarValue, i) => (
                               <fieldset>
                                 <div className='edit-block' key={`highlighted-bar-${i}`}>
-                                  <button className='remove-column' onClick={e => handleRemoveHighlightedBar(e, i)}>
+                                  <button className='btn btn-danger' onClick={e => handleRemoveHighlightedBar(e, i)}>
                                     Remove
                                   </button>
                                   <p>Highlighted Bar {i + 1}</p>
@@ -3268,7 +3246,7 @@ const EditorPanel = () => {
                                 </div>
                               </fieldset>
                             ))}
-                          <button className='btn full-width' onClick={e => handleAddNewHighlightedBar(e)}>
+                          <button className='btn btn-primary full-width' onClick={e => handleAddNewHighlightedBar(e)}>
                             Add Highlighted Bar
                           </button>
                         </>
@@ -3326,6 +3304,30 @@ const EditorPanel = () => {
                         </>
                       )}
                     </>
+                  )}
+
+                  {visSupportsDateCategoryAxisMin() && (
+                    <TextField
+                      value={config.xAxis.min}
+                      section='xAxis'
+                      fieldName='min'
+                      type='number'
+                      label='min value'
+                      placeholder='Auto'
+                      updateField={updateField}
+                    />
+                  )}
+
+                  {visSupportsDateCategoryAxisMax() && (
+                    <TextField
+                      value={config.xAxis.max}
+                      section='xAxis'
+                      fieldName='max'
+                      type='number'
+                      label='max value'
+                      placeholder='Auto'
+                      updateField={updateField}
+                    />
                   )}
 
                   {/* anchors */}
@@ -3436,7 +3438,7 @@ const EditorPanel = () => {
                       </Accordion>
 
                       <button
-                        className='btn full-width'
+                        className='btn btn-primary full-width'
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.xAxis.anchors]
@@ -3565,7 +3567,7 @@ const EditorPanel = () => {
                       </Accordion>
 
                       <button
-                        className='btn full-width'
+                        className='btn btn-primary full-width'
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.yAxis.anchors]
@@ -3812,7 +3814,7 @@ const EditorPanel = () => {
                         config.legend.seriesHighlight.map((val, i) => (
                           <fieldset className='edit-block' key={`${val}-${i}`}>
                             <button
-                              className='remove-column'
+                              className='btn btn-danger'
                               onClick={event => {
                                 event.preventDefault()
                                 const updatedSeriesHighlight = [...config.legend.seriesHighlight]
@@ -3841,7 +3843,7 @@ const EditorPanel = () => {
                           </fieldset>
                         ))}
                       <button
-                        className={'btn full-width'}
+                        className={'btn btn-primary full-width'}
                         onClick={event => {
                           event.preventDefault()
                           const legendColumns = getLegendColumns()

@@ -88,15 +88,24 @@ type IconProps = {
   /* Returns icon data as plain svg */
   base?: boolean
   /* Sets alt text for the icon */
-  alt: string
+  alt?: string
   /* Override the width of the icon (scales height proportionally)*/
   size?: number
   /* Override the color of the icon */
   color?: string
-  style?: string
+  style?: object
+  className?: string // className attribute will be ignored.
 }
 
-const Icon: React.FC<IconProps> = ({ display = '', base = undefined, alt = '', size = undefined, color = undefined, style = undefined, ...attributes }) => {
+const Icon: React.FC<IconProps> = ({
+  display = '',
+  base = undefined,
+  alt = '',
+  size = undefined,
+  color = undefined,
+  style = undefined,
+  ...attributes
+}) => {
   const IconObj = iconHash[display] || null
 
   const filteredAttrs = { ...attributes }
@@ -112,10 +121,14 @@ const Icon: React.FC<IconProps> = ({ display = '', base = undefined, alt = '', s
   return (
     <>
       {base ? (
-        <IconObj title={alt} />
+        <IconObj title={alt || display} />
       ) : (
-        <span className={`cove-icon${attributes.className ? ' ' + attributes.className : ''}`} style={styles} {...filteredAttrs}>
-          <IconObj title={alt} />
+        <span
+          className={`cove-icon${attributes.className ? ' ' + attributes.className : ''}`}
+          style={styles}
+          {...filteredAttrs}
+        >
+          <IconObj title={alt || display} />
         </span>
       )}
     </>
