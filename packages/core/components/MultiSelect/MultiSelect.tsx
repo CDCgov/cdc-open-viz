@@ -4,6 +4,7 @@ import Icon from '../ui/Icon'
 
 import './multiselect.styles.css'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
+import Loader from '../Loader'
 
 interface Option {
   value: string | number
@@ -20,6 +21,7 @@ interface MultiSelectProps {
   selected?: (string | number)[]
   limit?: number
   tooltip?: React.ReactNode
+  loading?: boolean
 }
 
 const MultiSelect: React.FC<MultiSelectProps> = ({
@@ -31,7 +33,8 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   updateField,
   selected = [],
   limit,
-  tooltip
+  tooltip,
+  loading
 }) => {
   const preselectedItems = options.filter(opt => selected.includes(opt.value)).slice(0, limit)
   const [selectedItems, setSelectedItems] = useState<Option[]>(preselectedItems)
@@ -90,11 +93,12 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
           <div
             id={multiID}
             onClick={() => {
-              if (!selectedItems.length) {
+              if (!selectedItems.length && !loading) {
                 setExpanded(true)
               }
             }}
             className='selected'
+            aria-disabled={loading}
           >
             {selectedItems.length ? (
               selectedItems.map(item => (
@@ -115,7 +119,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                 </div>
               ))
             ) : (
-              <span className='pl-1 pt-1'>- Select -</span>
+              <span className='pl-1 pt-1'>{loading ? 'Loading...' : '- Select -'}</span>
             )}
             <button
               aria-label={expanded ? 'Collapse' : 'Expand'}
@@ -129,6 +133,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
               <Icon display={'caretDown'} style={{ cursor: 'pointer' }} />
             </button>
           </div>
+          {loading && <Loader spinnerType={'text-secondary'} />}
           {!!limit && (
             <Tooltip style={{ textTransform: 'none' }}>
               <Tooltip.Target>
@@ -140,6 +145,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
             </Tooltip>
           )}
         </div>
+
         <ul className={'dropdown' + (expanded ? '' : ' d-none')}>
           {options
             .filter(option => !selectedItems.find(item => item.value === option.value))

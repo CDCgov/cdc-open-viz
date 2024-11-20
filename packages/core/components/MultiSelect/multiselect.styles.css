@@ -6,6 +6,9 @@
     display: inline-flex;
     align-items: center;
     .selected {
+      &[aria-disabled='true'] {
+        background: var(--lightestGray);
+      }
       border: 1px solid var(--lightGray);
       padding: 7px;
       min-width: 200px;
@@ -40,6 +43,9 @@
       :is(p) {
         margin-bottom: 0;
       }
+    }
+    .spinner-border {
+      right: 20% !important;
     }
   }
   .dropdown {
