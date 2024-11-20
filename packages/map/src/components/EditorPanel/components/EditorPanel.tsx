@@ -1588,53 +1588,20 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             </AccordionItemHeading>
             <AccordionItemPanel>
               {/* Geography */}
-              <label>
-                <span className='edit-label column-heading'>
-                  <span>Geography</span>
-                </span>
-                <ul className='geo-buttons'>
-                  <button
-                    className={state.general.geoType === 'us' || state.general.geoType === 'us-county' ? 'active' : ''}
-                    onClick={e => {
-                      e.preventDefault()
-                      handleEditorChanges('geoType', 'us')
-                    }}
-                  >
-                    <UsaGraphic />
-                    <span>United States</span>
-                  </button>
-                  <button
-                    className={state.general.geoType === 'us-region' ? 'active' : ''}
-                    onClick={e => {
-                      e.preventDefault()
-                      handleEditorChanges('geoType', 'us-region')
-                    }}
-                  >
-                    <UsaRegionGraphic />
-                    <span>U.S. Region</span>
-                  </button>
-                  <button
-                    className={state.general.geoType === 'world' ? 'active' : ''}
-                    onClick={e => {
-                      e.preventDefault()
-                      handleEditorChanges('geoType', 'world')
-                    }}
-                  >
-                    <WorldGraphic />
-                    <span>World</span>
-                  </button>
-                  <button
-                    className={state.general.geoType === 'single-state' ? 'active' : ''}
-                    onClick={e => {
-                      e.preventDefault()
-                      handleEditorChanges('geoType', 'single-state')
-                    }}
-                  >
-                    <AlabamaGraphic />
-                    <span>U.S. State</span>
-                  </button>
-                </ul>
-              </label>
+              <Select
+                options={[
+                  { value: 'us', label: 'United States' },
+                  { value: 'us-region', label: 'U.S. Region' },
+                  { value: 'world', label: 'World' },
+                  { value: 'single-state', label: 'U.S. State' },
+                  { value: 'leaflet', label: 'Leaflet' },
+                  { value: 'google-map', label: 'Google Map API' }
+                ]}
+                section={'general'}
+                fieldName={'geoType'}
+                label='Geography'
+                updateField={updateField}
+              />
               {/* Select > State or County Map */}
               {(state.general.geoType === 'us' || state.general.geoType === 'us-county') && (
                 <label>
