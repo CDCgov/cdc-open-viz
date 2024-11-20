@@ -130,45 +130,28 @@ $medium: 768px;
 
 .territories-label {
   color: black;
-  margin: 2em 5px 2em 1em;
   font-size: 1.1em;
   display: block;
+  margin-top: 15px;
 }
 
 // Cities and Territories
 .territories {
-  margin: 2em 200px 2em 0;
+  margin-top: 7px;
   font-size: 1.1em;
   width: 100%;
-  display: block;
+  display: flex;
   align-items: center;
-  > span {
-    margin-left: 1em;
-    margin-right: 0.5em;
-  }
+  margin-bottom: 0.5em;
+  gap: 0.5em;
+  flex-wrap: wrap;
   svg {
     max-width: 35px;
     min-width: 25px;
-    margin-left: 0.5em;
     transition: 0.3s all;
+
     text {
       font-size: 0.95em;
-    }
-  }
-
-  &--mobile {
-    @extend .territories;
-    width: 60%;
-    svg {
-      margin-bottom: 0.5em;
-    }
-  }
-
-  &--tablet {
-    @extend .territories;
-    width: 70%;
-    svg {
-      margin-bottom: 0.5em;
     }
   }
 }

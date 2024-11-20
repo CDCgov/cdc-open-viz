@@ -123,14 +123,6 @@ const UsaMap = () => {
   const geoStrokeColor = getGeoStrokeColor(state)
   const geoFillColor = getGeoFillColor(state)
 
-  const getTerritoriesClasses = () => {
-    const screenWidth = window?.visualViewport?.width
-    let className = 'territories'
-    if (screenWidth < 700) return 'territories--mobile'
-    if (screenWidth < 900) return 'territories--tablet'
-    return className
-  }
-
   const territories = territoriesData.map((territory, territoryIndex) => {
     const Shape = isHex ? Territory.Hexagon : Territory.Rectangle
 
@@ -595,12 +587,12 @@ const UsaMap = () => {
       {territories.length > 0 && (
         <>
           {/* Temporarily make the max width fit the image width */}
-          <div className='two-col' style={{ maxWidth: 'calc(100% - 75px)' }}>
+          <div>
             <div>
               <span className='territories-label label'>{state.general.territoriesLabel}</span>
             </div>
             <div>
-              <span className={getTerritoriesClasses()}>{territories}</span>
+              <span className='territories'>{territories}</span>
             </div>
           </div>
         </>
