@@ -42,6 +42,7 @@ import HexSetting from './HexShapeSettings.jsx'
 import ConfigContext from '../../../context.ts'
 import { MapContext } from '../../../types/MapContext.js'
 import { TextField } from './Inputs'
+import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 
 // Todo: move to useReducer, seperate files out.
 const EditorPanel = ({ columnsRequiredChecker }) => {
@@ -116,7 +117,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     categoryValuesOrder.splice(idx2, 0, movedItem)
 
     state.legend.categoryValuesOrder?.forEach(value => {
-      if(categoryValuesOrder.indexOf(value) === -1){
+      if (categoryValuesOrder.indexOf(value) === -1) {
         categoryValuesOrder.push(value)
       }
     })
@@ -1503,9 +1504,11 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   })
 
   const getCategoryValuesOrder = () => {
-    let values = runtimeLegend ? runtimeLegend.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value) : []
+    let values = runtimeLegend
+      ? runtimeLegend.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value)
+      : []
 
-    if(state.legend.cateogryValuesOrder){
+    if (state.legend.cateogryValuesOrder) {
       return values.sort((a, b) => {
         let aVal = state.legend.cateogryValuesOrder.indexOf(a)
         let bVal = state.legend.cateogryValuesOrder.indexOf(b)
@@ -1517,11 +1520,12 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     } else {
       return values
     }
-    
   }
 
   const CategoryList = () => {
-    return getCategoryValuesOrder().filter(item => !item.special).map((value, index) => (
+    return getCategoryValuesOrder()
+      .filter(item => !item.special)
+      .map((value, index) => (
         <Draggable key={value} draggableId={`item-${value}`} index={index}>
           {(provided, snapshot) => (
             <li style={{ position: 'relative' }}>
@@ -1537,7 +1541,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             </li>
           )}
         </Draggable>
-    ))
+      ))
   }
 
   const isLoadedFromUrl = state?.dataKey?.includes('http://') || state?.dataKey?.includes('https://')
@@ -3533,6 +3537,33 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   updateField={updateField}
                 />
               </label>
+              {/* Leaflet Map Type */}
+              {state.general.geoType === 'leaflet' && (
+                <>
+                  <Select
+                    label='Leaflet Theme'
+                    options={[
+                      { label: 'OpenStreetMap (Standard)', value: 'osm' },
+                      { label: 'CartoDB Positron (Light)', value: 'positron' },
+                      { label: 'CartoDB Dark Matter (Dark)', value: 'darkMatter' },
+                      { label: 'Toner', value: 'toner' },
+                      { label: 'Watercolor', value: 'watercolor' },
+                      { label: 'OpenTopoMap', value: 'opentopomap' },
+                      { label: 'Mapbox Satellite', value: 'satellite' },
+                      { label: 'Terrain', value: 'terrain' },
+                      { label: 'Thunderforest Outdoors', value: 'outdoors' },
+                      { label: 'Thunderforest Transport', value: 'transport' },
+                      { label: 'Thunderforest Landscape', value: 'landscape' },
+                      { label: 'Esri World Imagery', value: 'esriWorldImagery' },
+                      { label: 'Esri World Topo Map', value: 'esriWorldTopoMap' },
+                      { label: 'Hike & Bike', value: 'hikeBike' }
+                    ]}
+                    section={'leaflet'}
+                    fieldName='theme'
+                    updateField={updateField}
+                  />
+                </>
+              )}
             </AccordionItemPanel>
           </AccordionItem>
           <AccordionItem>
