@@ -16,6 +16,9 @@
     display: inline-block;
     width: 100%;
     padding: 0;
+    &::placeholder {
+      color: var(--darkGray);
+    }
   }
 
   .main-nested-dropdown-container,
@@ -55,6 +58,10 @@
       top: 9px;
       right: 1px;
       float: right;
+    }
+
+    &.disabled {
+      background-color: var(--lightestGray);
     }
   }
 

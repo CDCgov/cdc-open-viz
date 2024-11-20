@@ -46,6 +46,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   } = useContext(ConfigContext)
 
   const { legend } = state
+  const isLegendGradient = legend.style === 'gradient'
 
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
@@ -207,7 +208,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
     return legendItems
   }
-  const legendListItems = legendList(state.legend.style === 'gradient')
+  const legendListItems = legendList(isLegendGradient)
 
   const { legendClasses } = useDataVizClasses(state, viewport)
 
@@ -250,7 +251,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           className={legendClasses.aside.join(' ') || ''}
           role='region'
           aria-label='Legend'
-          tabIndex={0}
+          tabIndex={isLegendGradient ? -1 : 0}
           ref={ref}
         >
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
