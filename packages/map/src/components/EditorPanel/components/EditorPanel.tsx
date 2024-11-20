@@ -43,6 +43,9 @@ import ConfigContext from '../../../context.ts'
 import { MapContext } from '../../../types/MapContext.js'
 import { TextField } from './Inputs'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
+import { layerSettings } from '../../LeafletMap/components/layerSettings'
+
+const layerOptions = layerSettings.map(l => ({ value: l.key, label: l.name }))
 
 // Todo: move to useReducer, seperate files out.
 const EditorPanel = ({ columnsRequiredChecker }) => {
@@ -3542,22 +3545,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                 <>
                   <Select
                     label='Leaflet Theme'
-                    options={[
-                      { label: 'OpenStreetMap (Standard)', value: 'osm' },
-                      { label: 'CartoDB Positron (Light)', value: 'positron' },
-                      { label: 'CartoDB Dark Matter (Dark)', value: 'darkMatter' },
-                      { label: 'Toner', value: 'toner' },
-                      { label: 'Watercolor', value: 'watercolor' },
-                      { label: 'OpenTopoMap', value: 'opentopomap' },
-                      { label: 'Mapbox Satellite', value: 'satellite' },
-                      { label: 'Terrain', value: 'terrain' },
-                      { label: 'Thunderforest Outdoors', value: 'outdoors' },
-                      { label: 'Thunderforest Transport', value: 'transport' },
-                      { label: 'Thunderforest Landscape', value: 'landscape' },
-                      { label: 'Esri World Imagery', value: 'esriWorldImagery' },
-                      { label: 'Esri World Topo Map', value: 'esriWorldTopoMap' },
-                      { label: 'Hike & Bike', value: 'hikeBike' }
-                    ]}
+                    options={layerOptions}
                     section={'leaflet'}
                     fieldName='theme'
                     updateField={updateField}
