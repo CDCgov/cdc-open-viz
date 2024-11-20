@@ -171,7 +171,8 @@ export default {
     hideBorder: {
       side: false,
       topBottom: true
-    }
+    },
+    position: 'right'
   },
   brush: {
     height: 25,

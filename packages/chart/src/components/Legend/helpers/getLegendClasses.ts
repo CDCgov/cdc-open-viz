@@ -1,6 +1,6 @@
-import { ChartConfig } from '../types/ChartConfig'
+import { ChartConfig } from './../../../types/ChartConfig'
 
-const useLegendClasses = (config: ChartConfig) => {
+export const getLegendClasses = (config: ChartConfig) => {
   const { position, singleRow, reverseLabelOrder, verticalSorted, hideBorder } = config.legend
   const containerClasses = ['legend-container']
   const innerClasses = ['legend-container__inner']
@@ -40,11 +40,11 @@ const useLegendClasses = (config: ChartConfig) => {
 
   // Configure border classes
   if (hideBorder.side && (['right', 'left'].includes(position) || !position)) {
-    containerClasses.push('no-border')
+    containerClasses.push('border-0')
   }
 
   if (hideBorder.topBottom && ['top', 'bottom'].includes(position)) {
-    containerClasses.push('no-border')
+    containerClasses.push('border-0')
   }
 
   if (hideBorder.topBottom && ['top'].includes(position)) {
@@ -56,4 +56,4 @@ const useLegendClasses = (config: ChartConfig) => {
     innerClasses
   }
 }
-export default useLegendClasses
+export default getLegendClasses
