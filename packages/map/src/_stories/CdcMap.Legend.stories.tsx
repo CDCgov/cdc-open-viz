@@ -20,27 +20,21 @@ export const Legend_Right: Story = {
   }
 }
 
-export const Legend_Bottom_Single_Row: Story = {
-  args: {
-    config: editConfigKeys(CustomLayerMap, [{ path: ['legend', 'position'], value: 'bottom' }])
-  }
-}
-
 export const Legend_Bottom: Story = {
   args: {
     config: editConfigKeys(CustomLayerMap, [
       { path: ['legend', 'position'], value: 'bottom' },
-      { path: ['legend', 'singleRow'], value: true }
+      { path: ['legend', 'singleRow'], value: false }
     ])
   }
 }
 
-export const Legend_Bottom_Pattern: Story = {
+export const Legend_Bottom_Single_Row: Story = {
   args: {
     config: editConfigKeys(WastewaterMap, [
       { path: ['legend', 'position'], value: 'bottom' },
       { path: ['legend', 'style'], value: 'circles' },
-      { path: ['legend', 'singleRow'], value: false }
+      { path: ['legend', 'singleRow'], value: true }
     ])
   }
 }
