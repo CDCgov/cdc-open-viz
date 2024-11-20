@@ -470,7 +470,6 @@ const Filters = (props: FilterProps) => {
                 activeSubGroup={(singleFilter.subGrouping?.active as string) || (singleFilter.queuedActive || [])[1]}
                 filterIndex={outerIndex}
                 options={getNestedOptions(singleFilter)}
-                listLabel={label}
                 handleSelectedItems={value => changeFilterActive(outerIndex, value)}
               />
             )}
