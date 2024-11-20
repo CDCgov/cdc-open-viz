@@ -44,7 +44,6 @@ export type PrimaryColumnProperties = Pick<
   EditorColumnProperties,
   'dataTable' | 'label' | 'name' | 'prefix' | 'suffix' | 'tooltip'
 >
-export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 export type LegendShapeItem = {
   column: string
   key: string

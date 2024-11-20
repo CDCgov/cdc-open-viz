@@ -1,11 +1,12 @@
-import { type MapConfig, type ViewportSize } from './MapConfig'
+import { type MapConfig } from './MapConfig'
+import { type ViewPort } from '@cdc/core/types/ViewPort'
 
 export type MapContext = {
   applyLegendToRow
   applyTooltipsToGeo
   closeModal
   columnsInData
-  currentViewport: ViewportSize
+  currentViewport: ViewPort
   data
   displayDataAsText
   displayGeoName

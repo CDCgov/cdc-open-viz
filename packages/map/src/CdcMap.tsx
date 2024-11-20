@@ -7,7 +7,7 @@ import Error from './components/EditorPanel/components/Error'
 import _ from 'lodash'
 
 // types
-import { type ViewportSize } from './types/MapConfig'
+import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { type DimensionsType } from '@cdc/core/types/Dimensions'
 
 // IE11
@@ -116,7 +116,7 @@ const CdcMap = ({
   const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [loading, setLoading] = useState(true)
   const [displayPanel, setDisplayPanel] = useState(true)
-  const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
+  const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
   const [topoData, setTopoData] = useState<Topology | {}>({})
   const [runtimeFilters, setRuntimeFilters] = useState([])
   const [runtimeLegend, setRuntimeLegend] = useState([])
