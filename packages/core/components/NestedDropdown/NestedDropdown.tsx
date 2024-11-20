@@ -107,7 +107,8 @@ type NestedDropdownProps = {
   activeGroup: string
   activeSubGroup?: string
   filterIndex: number
-  listLabel: string
+  isEditor?: boolean
+  isUrlFilter?: boolean
   handleSelectedItems: ([group, subgroup]: [string, string]) => void
   options: NestedOptions
   loading?: boolean
@@ -118,7 +119,6 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   activeGroup,
   activeSubGroup,
   filterIndex,
-  listLabel,
   handleSelectedItems,
   loading
 }) => {
@@ -245,11 +245,6 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
 
   return (
     <>
-      {listLabel && (
-        <label className='text-capitalize font-weight-bold' htmlFor={dropdownId}>
-          {listLabel}
-        </label>
-      )}
       <div
         id={dropdownId}
         className={`nested-dropdown nested-dropdown-${filterIndex} ${isListOpened ? 'open-filter' : ''}`}
@@ -286,7 +281,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
         {loading && <Loader spinnerType={'text-secondary'} />}
         <ul
           role='tree'
-          key={listLabel}
+          key={`Nested-Dropdown-${filterIndex}`}
           tabIndex={-1}
           aria-labelledby='main-nested-dropdown'
           aria-expanded={isListOpened}
