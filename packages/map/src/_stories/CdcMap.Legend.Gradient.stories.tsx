@@ -1,30 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import CdcMap from '../CdcMap'
-import SingleStateWithFilters from './_mock/DEV-8942.json'
 import UsGradient from './_mock/usa-state-gradient.json'
 import WastewaterMap from './_mock/wastewater-map.json'
 import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
 
 const meta: Meta<typeof CdcMap> = {
-  title: 'Components/Templates/Map/Legend',
+  title: 'Components/Templates/Map/Legend/Gradient',
   component: CdcMap
 }
 
 type Story = StoryObj<typeof CdcMap>
 
 export default meta
-
-export const Single_State_With_Filters: Story = {
-  args: {
-    config: editConfigKeys(SingleStateWithFilters, [
-      { path: ['legend', 'style'], value: 'gradient' },
-      { path: ['legend', 'position'], value: 'top' },
-      { path: ['legend', 'hideBorder'], value: true },
-      { path: ['legend', 'title'], value: '' },
-      { path: ['legend', 'description'], value: '' }
-    ])
-  }
-}
 
 export const Gradient: Story = {
   args: {
@@ -53,12 +40,6 @@ export const Gradient_With_Text: Story = {
       { path: ['legend', 'description'], value: 'Description' },
       { path: ['legend', 'hideBorder'], value: true }
     ])
-  }
-}
-
-export const Legend_Right: Story = {
-  args: {
-    config: editConfigKeys(SingleStateWithFilters, [{ path: ['legend', 'hideBorder'], value: true }])
   }
 }
 

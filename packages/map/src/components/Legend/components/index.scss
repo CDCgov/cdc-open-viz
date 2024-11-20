@@ -18,6 +18,9 @@
     border-top: var(--lightGray) 1px solid;
 
     @include breakpointClass(md) {
+      .legend-container.legend-padding {
+        padding: 15px;
+      }
       &.bottom,
       &.top {
         border: var(--lightGray) 1px solid;
@@ -69,7 +72,7 @@
     .legend-container {
       position: relative;
       &.legend-padding {
-        padding: 15px;
+        padding-top: 15px;
       }
       .legend-container__title {
         font-size: 1.3em;
@@ -83,17 +86,7 @@
         padding-top: 1em;
       }
       .legend-container__reset-button {
-        font-size: 0.75em;
-        right: 1em;
-        text-transform: uppercase;
-        transition: 0.2s all;
-        padding: 0.2em 0.5em;
-        border: rgba(0, 0, 0, 0.2) 1px solid;
-        padding: 0.375rem;
-        &:hover {
-          text-decoration: none;
-          transition: 0.2s all;
-        }
+        margin-top: 1em;
       }
       p {
         line-height: 1.4em;
@@ -128,13 +121,16 @@
           flex-shrink: 0;
           display: inline-block;
           padding-right: 1em;
-          padding-bottom: 1em;
+          margin-bottom: 1em;
           vertical-align: middle;
           transition: 0.1s opacity;
           display: flex;
           cursor: pointer;
           white-space: wrap;
           flex-grow: 1;
+          &:last-child {
+            margin-bottom: 0;
+          }
           @include breakpoint(md) {
             white-space: nowrap;
           }
@@ -152,10 +148,10 @@
         align-items: center;
         justify-content: flex-start;
         flex-wrap: wrap;
+        row-gap: 1em;
 
         & > li {
           margin-right: 1em;
-          margin-bottom: 1em;
           white-space: wrap;
           display: flex;
           justify-content: center;
