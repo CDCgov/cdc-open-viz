@@ -42,6 +42,10 @@ import HexSetting from './HexShapeSettings.jsx'
 import ConfigContext from '../../../context.ts'
 import { MapContext } from '../../../types/MapContext.js'
 import { TextField } from './Inputs'
+import { Select } from '@cdc/core/components/EditorPanel/Inputs'
+import { layerSettings } from '../../LeafletMap/components/layerSettings'
+
+const layerOptions = layerSettings.map(l => ({ value: l.key, label: l.name }))
 
 // Todo: move to useReducer, seperate files out.
 const EditorPanel = ({ columnsRequiredChecker }) => {
@@ -116,7 +120,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     categoryValuesOrder.splice(idx2, 0, movedItem)
 
     state.legend.categoryValuesOrder?.forEach(value => {
-      if(categoryValuesOrder.indexOf(value) === -1){
+      if (categoryValuesOrder.indexOf(value) === -1) {
         categoryValuesOrder.push(value)
       }
     })
@@ -1503,9 +1507,11 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   })
 
   const getCategoryValuesOrder = () => {
-    let values = runtimeLegend ? runtimeLegend.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value) : []
+    let values = runtimeLegend
+      ? runtimeLegend.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value)
+      : []
 
-    if(state.legend.cateogryValuesOrder){
+    if (state.legend.cateogryValuesOrder) {
       return values.sort((a, b) => {
         let aVal = state.legend.cateogryValuesOrder.indexOf(a)
         let bVal = state.legend.cateogryValuesOrder.indexOf(b)
@@ -1517,11 +1523,12 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     } else {
       return values
     }
-    
   }
 
   const CategoryList = () => {
-    return getCategoryValuesOrder().filter(item => !item.special).map((value, index) => (
+    return getCategoryValuesOrder()
+      .filter(item => !item.special)
+      .map((value, index) => (
         <Draggable key={value} draggableId={`item-${value}`} index={index}>
           {(provided, snapshot) => (
             <li style={{ position: 'relative' }}>
@@ -1537,7 +1544,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             </li>
           )}
         </Draggable>
-    ))
+      ))
   }
 
   const isLoadedFromUrl = state?.dataKey?.includes('http://') || state?.dataKey?.includes('https://')
@@ -1581,53 +1588,20 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             </AccordionItemHeading>
             <AccordionItemPanel>
               {/* Geography */}
-              <label>
-                <span className='edit-label column-heading'>
-                  <span>Geography</span>
-                </span>
-                <ul className='geo-buttons'>
-                  <button
-                    className={state.general.geoType === 'us' || state.general.geoType === 'us-county' ? 'active' : ''}
-                    onClick={e => {
-                      e.preventDefault()
-                      handleEditorChanges('geoType', 'us')
-                    }}
-                  >
-                    <UsaGraphic />
-                    <span>United States</span>
-                  </button>
-                  <button
-                    className={state.general.geoType === 'us-region' ? 'active' : ''}
-                    onClick={e => {
-                      e.preventDefault()
-                      handleEditorChanges('geoType', 'us-region')
-                    }}
-                  >
-                    <UsaRegionGraphic />
-                    <span>U.S. Region</span>
-                  </button>
-                  <button
-                    className={state.general.geoType === 'world' ? 'active' : ''}
-                    onClick={e => {
-                      e.preventDefault()
-                      handleEditorChanges('geoType', 'world')
-                    }}
-                  >
-                    <WorldGraphic />
-                    <span>World</span>
-                  </button>
-                  <button
-                    className={state.general.geoType === 'single-state' ? 'active' : ''}
-                    onClick={e => {
-                      e.preventDefault()
-                      handleEditorChanges('geoType', 'single-state')
-                    }}
-                  >
-                    <AlabamaGraphic />
-                    <span>U.S. State</span>
-                  </button>
-                </ul>
-              </label>
+              <Select
+                options={[
+                  { value: 'us', label: 'United States' },
+                  { value: 'us-region', label: 'U.S. Region' },
+                  { value: 'world', label: 'World' },
+                  { value: 'single-state', label: 'U.S. State' },
+                  { value: 'leaflet', label: 'Leaflet' },
+                  { value: 'google-map', label: 'Google Map API' }
+                ]}
+                section={'general'}
+                fieldName={'geoType'}
+                label='Geography'
+                updateField={updateField}
+              />
               {/* Select > State or County Map */}
               {(state.general.geoType === 'us' || state.general.geoType === 'us-county') && (
                 <label>
@@ -3533,6 +3507,18 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   updateField={updateField}
                 />
               </label>
+              {/* Leaflet Map Type */}
+              {state.general.geoType === 'leaflet' && (
+                <>
+                  <Select
+                    label='Leaflet Theme'
+                    options={layerOptions}
+                    section={'leaflet'}
+                    fieldName='theme'
+                    updateField={updateField}
+                  />
+                </>
+              )}
             </AccordionItemPanel>
           </AccordionItem>
           <AccordionItem>

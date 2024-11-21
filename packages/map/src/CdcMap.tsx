@@ -7,7 +7,7 @@ import Error from './components/EditorPanel/components/Error'
 import _ from 'lodash'
 
 // types
-import { type ViewportSize } from './types/MapConfig'
+import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { type DimensionsType } from '@cdc/core/types/Dimensions'
 
 // IE11
@@ -74,6 +74,8 @@ import EditorPanel from './components/EditorPanel' // Future: Lazy
 import NavigationMenu from './components/NavigationMenu' // Future: Lazy
 import UsaMap from './components/UsaMap' // Future: Lazy
 import WorldMap from './components/WorldMap' // Future: Lazy
+import LeafletMap from './components/LeafletMap'
+import GoogleMap from './components/GoogleMap'
 import useTooltip from './hooks/useTooltip'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
@@ -116,7 +118,7 @@ const CdcMap = ({
   const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [loading, setLoading] = useState(true)
   const [displayPanel, setDisplayPanel] = useState(true)
-  const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
+  const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
   const [topoData, setTopoData] = useState<Topology | {}>({})
   const [runtimeFilters, setRuntimeFilters] = useState([])
   const [runtimeLegend, setRuntimeLegend] = useState([])
@@ -1862,6 +1864,8 @@ const CdcMap = ({
                       {'us-region' === geoType && <UsaMap.Region />}
                       {'us-county' === geoType && <UsaMap.County />}
                       {'world' === geoType && <WorldMap />}
+                      {'leaflet' === geoType && <LeafletMap />}
+                      {'google-map' === geoType && <GoogleMap />}
                       {'data' === general.type && logo && (
                         <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
                       )}

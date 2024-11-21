@@ -1,0 +1,7 @@
+.leaflet-control-attribution:last-child {
+  display: none;
+}
+
+.map-attribution {
+  display: unset !important;
+}

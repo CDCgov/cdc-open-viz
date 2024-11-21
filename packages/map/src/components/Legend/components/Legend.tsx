@@ -10,6 +10,7 @@ import LegendShape from '@cdc/core/components/LegendShape'
 import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import LegendItemHex from './LegendItem.Hex'
 import Button from '@cdc/core/components/elements/Button'
+import type { ViewPort } from '@cdc/core/types/ViewPort'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import ConfigContext from '../../../context'
@@ -17,7 +18,6 @@ import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
 import { Group } from '@visx/group'
 import './index.scss'
-import { ViewportSize } from '@cdc/chart/src/types/ChartConfig'
 import { isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 
 const LEGEND_PADDING = 30
@@ -26,7 +26,7 @@ type LegendProps = {
   skipId: string
   dimensions: DimensionsType
   containerWidthPadding: number
-  currentViewport: ViewportSize
+  currentViewport: ViewPort
 }
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
