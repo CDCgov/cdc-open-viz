@@ -32,13 +32,14 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
   let labelValue = rowObj[column] // just raw X axis string
   if (column === config.xAxis?.dataKey) {
     cellValue = labelValue
-    const isDateTime = config.xAxis?.type === 'date' || config.xAxis?.type === 'date-time'
+    const isDateTimeAxis = config.xAxis?.type === 'date' || config.xAxis?.type === 'date-time'
+    const isDateDisplaySet = config.table.dateDisplayFormat
 
-    if (isDateTime && config.table.dateDisplayFormat) {
+    if (isDateTimeAxis && isDateDisplaySet) {
       cellValue = formatDate(config.table?.dateDisplayFormat, parseDate(config.table?.dateDisplayFormat, labelValue))
     }
 
-    if (isDateTime && !config.table.dateDisplayFormat) {
+    if (isDateTimeAxis && !isDateDisplaySet) {
       cellValue = formatDate(config.xAxis?.dateDisplayFormat, parseDate(config.xAxis?.dateDisplayFormat, labelValue))
     }
     if (config.xAxis?.type === 'continuous') {
