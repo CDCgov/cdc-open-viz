@@ -70,6 +70,7 @@
     }
 
     .legend-container {
+      --space-between-legend-items: 0.6em;
       position: relative;
       &.legend-padding {
         padding-top: 15px;
@@ -121,7 +122,7 @@
           flex-shrink: 0;
           display: inline-block;
           padding-right: 1em;
-          margin-bottom: 1em;
+          margin-bottom: var(--space-between-legend-items);
           vertical-align: middle;
           transition: 0.1s opacity;
           display: flex;
@@ -148,7 +149,7 @@
         align-items: center;
         justify-content: flex-start;
         flex-wrap: wrap;
-        row-gap: 1em;
+        row-gap: var(--space-between-legend-items);
 
         & > li {
           margin-right: 1em;
