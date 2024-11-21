@@ -380,5 +380,8 @@ canvas {
 }
 
 .data-table-container {
-  margin: 20px 0px 5px;
+  margin: 20px 0px 0px;
+  &.download-link-above {
+    margin-top: 0;
+  }
 }
