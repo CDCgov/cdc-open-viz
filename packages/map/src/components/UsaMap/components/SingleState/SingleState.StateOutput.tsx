@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 import { mesh, Topology } from 'topojson-client'
 import ConfigContext from '../../../../context'
+import { getGeoFillColor, getGeoStrokeColor } from '../../../../helpers/colors'
 
 type StateOutputProps = {
   topoData: Topology
@@ -15,12 +16,19 @@ const StateOutput: React.FC<StateOutputProps> = ({ topoData, path, scale, stateT
     return s.properties.name === state.general.statePicked.stateName
   })
 
-  const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+  const geoStrokeColor = getGeoStrokeColor(state)
+  const geoFillColor = getGeoFillColor(state)
 
   let stateLines = path(mesh(topoData, geo[0]))
 
   return (
-    <g key={'single-state'} className='single-state' style={{ fill: '#E6E6E6' }} stroke={geoStrokeColor} strokeWidth={0.95 / scale}>
+    <g
+      key={'single-state'}
+      className='single-state'
+      style={{ fill: geoFillColor }}
+      stroke={geoStrokeColor}
+      strokeWidth={0.95 / scale}
+    >
       <path tabIndex={-1} className='state-path' d={stateLines} />
     </g>
   )
