@@ -18,7 +18,7 @@ import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from
 import { Group } from '@visx/group'
 import './index.scss'
 import { ViewportSize } from '@cdc/chart/src/types/ChartConfig'
-import { isMobileHeightViewport } from '@cdc/core/helpers/viewports'
+import { isBelowBreakpoint, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 
 const LEGEND_PADDING = 30
 
@@ -47,6 +47,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const { legend } = state
   const isLegendGradient = legend.style === 'gradient'
+  const boxDynamicallyHidden = isBelowBreakpoint('md', currentViewport)
 
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
@@ -280,7 +281,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               labels={getFormattedLegendItems().map(item => item?.label) ?? []}
               colors={getFormattedLegendItems().map(item => item?.color) ?? []}
               dimensions={dimensions}
-              parentPaddingToSubtract={containerWidthPadding + (legend.hideBorder ? 0 : LEGEND_PADDING)}
+              parentPaddingToSubtract={
+                containerWidthPadding + (legend.hideBorder || boxDynamicallyHidden ? 0 : LEGEND_PADDING)
+              }
               config={state}
             />
             {!!legendListItems.length && (
@@ -322,7 +325,11 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 </div>
               </>
             )}
-            {runtimeLegend.disabledAmt > 0 && <Button onClick={handleReset}>Reset</Button>}
+            {runtimeLegend.disabledAmt > 0 && (
+              <Button className={legendClasses.resetButton.join(' ')} onClick={handleReset}>
+                Reset
+              </Button>
+            )}
           </section>
         </aside>
         {state.hexMap.shapeGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && (
