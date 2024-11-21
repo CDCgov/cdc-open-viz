@@ -42,6 +42,7 @@ import HexSetting from './HexShapeSettings.jsx'
 import ConfigContext from '../../../context.ts'
 import { MapContext } from '../../../types/MapContext.js'
 import { TextField } from './Inputs'
+import Alert from '@cdc/core/components/Alert'
 
 // Todo: move to useReducer, seperate files out.
 const EditorPanel = ({ columnsRequiredChecker }) => {
@@ -116,7 +117,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     categoryValuesOrder.splice(idx2, 0, movedItem)
 
     state.legend.categoryValuesOrder?.forEach(value => {
-      if(categoryValuesOrder.indexOf(value) === -1){
+      if (categoryValuesOrder.indexOf(value) === -1) {
         categoryValuesOrder.push(value)
       }
     })
@@ -1503,9 +1504,11 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   })
 
   const getCategoryValuesOrder = () => {
-    let values = runtimeLegend ? runtimeLegend.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value) : []
+    let values = runtimeLegend
+      ? runtimeLegend.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value)
+      : []
 
-    if(state.legend.cateogryValuesOrder){
+    if (state.legend.cateogryValuesOrder) {
       return values.sort((a, b) => {
         let aVal = state.legend.cateogryValuesOrder.indexOf(a)
         let bVal = state.legend.cateogryValuesOrder.indexOf(b)
@@ -1517,11 +1520,12 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     } else {
       return values
     }
-    
   }
 
   const CategoryList = () => {
-    return getCategoryValuesOrder().filter(item => !item.special).map((value, index) => (
+    return getCategoryValuesOrder()
+      .filter(item => !item.special)
+      .map((value, index) => (
         <Draggable key={value} draggableId={`item-${value}`} index={index}>
           {(provided, snapshot) => (
             <li style={{ position: 'relative' }}>
@@ -1537,7 +1541,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             </li>
           )}
         </Draggable>
-    ))
+      ))
   }
 
   const isLoadedFromUrl = state?.dataKey?.includes('http://') || state?.dataKey?.includes('https://')
@@ -2191,6 +2195,13 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       </Tooltip>
                     </span>
                   </label>
+                  {state.legend.specialClasses.length === 2 && (
+                    <Alert
+                      type='info'
+                      message='If a third special class is needed you can apply a pattern to set it apart.'
+                      showCloseButton={false}
+                    />
+                  )}
                   {specialClasses.map((specialClass, i) => (
                     <div className='edit-block' key={`special-class-${i}`}>
                       <button
@@ -2251,15 +2262,17 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       </label>
                     </div>
                   ))}
-                  <button
-                    className='btn btn-primary full-width'
-                    onClick={e => {
-                      e.preventDefault()
-                      editColumn('primary', 'specialClassAdd', {})
-                    }}
-                  >
-                    Add Special Class
-                  </button>
+                  {state.legend.specialClasses.length < 2 && (
+                    <button
+                      className='btn btn-primary full-width'
+                      onClick={e => {
+                        e.preventDefault()
+                        editColumn('primary', 'specialClassAdd', {})
+                      }}
+                    >
+                      Add Special Class
+                    </button>
+                  )}
                 </fieldset>
               )}
 
@@ -3229,7 +3242,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
               <label>
                 <span className='edit-label'>Map Color Palette</span>
               </label>
-              {/* <InputCheckbox  section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
               <InputToggle
                 type='3d'
                 section='general'
