@@ -6,7 +6,7 @@
 }
 
 .nested-dropdown {
-  .nested-dropdown-group {
+  [class^='nested-dropdown-group-'] {
     list-style: none;
   }
 
@@ -16,6 +16,9 @@
     display: inline-block;
     width: 100%;
     padding: 0;
+    &::placeholder {
+      color: var(--darkGray);
+    }
   }
 
   .main-nested-dropdown-container,
@@ -27,7 +30,7 @@
     font-size: 1em;
   }
 
-  .selectable-item {
+  [class^='selectable-item-'] {
     list-style: none;
     padding-left: 20px;
     position: relative;
@@ -45,6 +48,9 @@
   }
 
   .nested-dropdown-input-container {
+    display: block;
+    width: 100%;
+    border-radius: 0.25rem;
     position: relative;
     & > span.list-arrow {
       color: var(--mediumGray);
@@ -52,6 +58,10 @@
       top: 9px;
       right: 1px;
       float: right;
+    }
+
+    &.disabled {
+      background-color: var(--lightestGray);
     }
   }
 

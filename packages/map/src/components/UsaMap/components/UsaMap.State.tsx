@@ -19,6 +19,7 @@ import { patternSizes } from '../helpers/patternSizes'
 import Annotation from '../../Annotation'
 
 import Territory from './Territory'
+import { cityKeys } from '../../../data/supported-geos'
 
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
@@ -59,7 +60,6 @@ const UsaMap = () => {
       data,
       displayGeoName,
       geoClickHandler,
-      handleCircleClick,
       handleMapAriaLabels,
       setSharedFilterValue,
       state,
@@ -67,7 +67,6 @@ const UsaMap = () => {
       titleCase,
       tooltipId,
       handleDragStateChange,
-      setState,
       mapId
     } = useContext<MapContext>(ConfigContext)
 
@@ -246,8 +245,6 @@ const UsaMap = () => {
       // Map the name from the geo data with the appropriate key for the processed data
       let geoKey = geo.properties.iso
       let geoName = geo.properties.name
-
-      // Manually add Washington D.C. in for Hex maps
 
       if (!geoKey) return
 

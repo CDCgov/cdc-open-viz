@@ -22,6 +22,7 @@ import chroma from 'chroma-js'
 // Types
 import { type ChartContext } from '../../../types/ChartContext'
 import _ from 'lodash'
+import { getBarData } from '../helpers/getBarData'
 
 export const BarChartVertical = () => {
   const { xScale, yScale, xMax, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
@@ -44,7 +45,7 @@ export const BarChartVertical = () => {
   } = useBarChart()
 
   // prettier-ignore
-  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, getXAxisData, getYAxisData, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig } = useContext<ChartContext>(ConfigContext)
+  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig } = useContext<ChartContext>(ConfigContext)
   const { HighLightedBarUtils } = useHighlightedBars(config)
   let data = transformedData
   // check if user add suppression
@@ -58,23 +59,9 @@ export const BarChartVertical = () => {
     data = brushConfig.data
   }
 
-  const getData = () => {
-    const dynamicSeries = config.series.find(s => s.dynamicCategory)
-    if (!dynamicSeries) return data
-    const { dynamicCategory, dataKey } = dynamicSeries
-    const xAxisKey = config.runtime.originalXAxis.dataKey
-    const xAxisGroupDataLookup = _.groupBy(data, xAxisKey)
-    return Object.values(xAxisGroupDataLookup).map(group => {
-      return group.reduce((acc, datum) => {
-        const dataValue = datum[dataKey]
-        const dataCategory = datum[dynamicCategory]
-        acc[dataCategory] = dataValue
-        acc[xAxisKey] = datum[xAxisKey]
-        return acc
-      }, {})
-    })
-  }
+  const hasConfidenceInterval = Object.keys(config.confidenceKeys).length > 0
 
+  const _data = getBarData(config, data, hasConfidenceInterval)
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' ||
@@ -83,7 +70,7 @@ export const BarChartVertical = () => {
     config.orientation === 'vertical' && (
       <Group>
         <BarGroup
-          data={getData()}
+          data={_data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
           height={yMax}
           x0={d => {
@@ -106,6 +93,8 @@ export const BarChartVertical = () => {
                 left={barGroup.x0}
               >
                 {barGroup.bars.map((bar, index) => {
+                  const datum = _data[barGroup.index]
+                  const dataValue = datum[config.runtime.originalXAxis.dataKey]
                   const scaleVal = config.yAxis.type === 'logarithmic' ? 0.1 : 0
                   let highlightedBarValues = config.highlightedBarValues
                     .map(item => item.value)
@@ -135,17 +124,12 @@ export const BarChartVertical = () => {
                   setTotalBarsInGroup(barGroup.bars.length)
                   const yAxisValue = formatNumber(/[a-zA-Z]/.test(String(bar.value)) ? '' : bar.value, 'left')
                   const xAxisValue =
-                    config.runtime[section].type === 'date'
-                      ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey]))
-                      : data[barGroup.index][config.runtime.originalXAxis.dataKey]
+                    config.runtime[section].type === 'date' ? formatDate(parseDate(dataValue)) : dataValue
 
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
                   // tooltips
-                  const additionalColTooltip = getAdditionalColumn(
-                    bar.key,
-                    data[barGroup.index][config.runtime.originalXAxis.dataKey]
-                  )
+                  const additionalColTooltip = getAdditionalColumn(bar.key, dataValue)
                   let xAxisTooltip = config.runtime.xAxis.label
                     ? `${config.runtime.xAxis.label}: ${xAxisValue}`
                     : xAxisValue
@@ -160,10 +144,6 @@ export const BarChartVertical = () => {
                   // configure colors
                   let labelColor = '#000000'
                   labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor) // Set if background is transparent'
-                  let barColor =
-                    config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key]
-                      ? colorScale(config.runtime.seriesLabels[bar.key])
-                      : colorScale(bar.key)
                   const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                   const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
                   const isHighlightedBar = highlightedBarValues?.includes(xAxisValue)
@@ -241,6 +221,16 @@ export const BarChartVertical = () => {
                     if (isHighlightedBar) _barColor = 'transparent'
                     return _barColor
                   }
+
+                  // Confidence Interval Variables
+                  const tickWidth = 5
+                  const xPos = barX + (config.xAxis.type !== 'date-time' ? barWidth / 2 : 0)
+                  const [upperPos, lowerPos] = ['upper', 'lower'].map(position => {
+                    if (!hasConfidenceInterval) return
+                    const d = datum.dynamicData ? datum.CI[bar.key][position] : datum[config.confidenceKeys[position]]
+                    return yScale(d)
+                  })
+                  // End Confidence Interval Variables
 
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
@@ -358,7 +348,7 @@ export const BarChartVertical = () => {
                           <rect
                             display={displaylollipopShape}
                             x={barX - lollipopBarWidth / 2}
-                            y={barY}
+                            y={bar.y}
                             width={lollipopShapeSize}
                             height={lollipopShapeSize}
                             fill={getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key]))}
@@ -370,6 +360,19 @@ export const BarChartVertical = () => {
                             <animate attributeName='height' values={`0, ${lollipopShapeSize}`} dur='2.5s' />
                           </rect>
                         )}
+                        {hasConfidenceInterval && (
+                          <path
+                            key={`confidence-interval-v-${datum[config.runtime.originalXAxis.dataKey]}`}
+                            stroke='#333'
+                            strokeWidth='px'
+                            d={`M${xPos - tickWidth} ${upperPos}
+                                L${xPos + tickWidth} ${upperPos}
+                                M${xPos} ${upperPos}
+                                L${xPos} ${lowerPos}
+                                M${xPos - tickWidth} ${lowerPos}
+                                L${xPos + tickWidth} ${lowerPos}`}
+                          />
+                        )}
                       </Group>
                     </Group>
                   )
@@ -378,32 +381,6 @@ export const BarChartVertical = () => {
             ))
           }}
         </BarGroup>
-
-        {Object.keys(config.confidenceKeys).length > 0
-          ? data.map(d => {
-              let xPos, yPos
-              let upperPos
-              let lowerPos
-              let tickWidth = 5
-              xPos = xScale(getXAxisData(d)) + (config.xAxis.type !== 'date-time' ? seriesScale.range()[1] / 2 : 0)
-              upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
-              lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
-              return (
-                <path
-                  key={`confidence-interval-v-${yPos}-${d[config.runtime.originalXAxis.dataKey]}`}
-                  stroke='#333'
-                  strokeWidth='px'
-                  d={`
-                    M${xPos - tickWidth} ${upperPos}
-                    L${xPos + tickWidth} ${upperPos}
-                    M${xPos} ${upperPos}
-                    L${xPos} ${lowerPos}
-                    M${xPos - tickWidth} ${lowerPos}
-                    L${xPos + tickWidth} ${lowerPos}`}
-                />
-              )
-            })
-          : ''}
 
         <Regions xScale={xScale} yMax={yMax} barWidth={barWidth} totalBarsInGroup={totalBarsInGroup} />
       </Group>

@@ -274,6 +274,22 @@ const CdcMap = ({
         if (!uid && geoName) {
           uid = cityKeys.find(key => key === geoName.toUpperCase())
         }
+
+        if (state.general.displayAsHex) {
+          const upperCaseKey = geoName.toUpperCase()
+          const supportedDc = [
+            'WASHINGTON D.C.',
+            'DISTRICT OF COLUMBIA',
+            'WASHINGTON DC',
+            'DC',
+            'WASHINGTON DC.',
+            'D.C.',
+            'D.C'
+          ]
+          if (supportedDc.includes(upperCaseKey)) {
+            uid = 'US-DC'
+          }
+        }
       }
 
       if ('us-region' === obj.general.geoType && obj.columns.geo.name) {
@@ -1854,7 +1870,13 @@ const CdcMap = ({
                 </section>
 
                 {general.showSidebar && 'navigation' !== general.type && (
-                  <Legend dimensions={dimensions} ref={legendRef} skipId={tabId} containerWidthPadding={0} />
+                  <Legend
+                    dimensions={dimensions}
+                    ref={legendRef}
+                    skipId={tabId}
+                    containerWidthPadding={0}
+                    currentViewport={currentViewport}
+                  />
                 )}
               </div>
 

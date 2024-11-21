@@ -6,6 +6,7 @@ import { FILTER_STYLE } from '../../types/FilterStyles'
 import { NestedOptions, ValueTextPair } from '@cdc/core/components/NestedDropdown/nestedDropdownHelpers'
 import NestedDropdown from '@cdc/core/components/NestedDropdown'
 import { MouseEventHandler } from 'react'
+import Loader from '@cdc/core/components/Loader'
 
 type DashboardFilterProps = {
   show: number[]
@@ -64,6 +65,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         }
 
         const _key = filter.apiFilter?.apiEndpoint
+        const loading = !apiFilterDropdowns[_key]
 
         const multiValues: { value; label }[] = []
 
@@ -92,8 +94,9 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           })
         }
 
+        const formGroupClass = `form-group mr-3 mb-1${loading ? ' loading-filter' : ''}`
         return filter.filterStyle === FILTER_STYLE.multiSelect ? (
-          <div className='form-group mr-3 mb-1' key={`${filter.key}-filtersection-${filterIndex}`}>
+          <div className={formGroupClass} key={`${filter.key}-filtersection-${filterIndex}`}>
             <MultiSelect
               label={filter.key}
               options={multiValues}
@@ -101,33 +104,37 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
               updateField={updateField}
               selected={filter.active as string[]}
               limit={filter.selectLimit || 5}
+              loading={loading}
             />
           </div>
         ) : filter.filterStyle === FILTER_STYLE.nestedDropdown ? (
-          <div className='form-group mr-3 mb-1' key={`${filter.key}-filtersection-${filterIndex}`}>
+          <div className={formGroupClass} key={`${filter.key}-filtersection-${filterIndex}`}>
             <NestedDropdown
               activeGroup={filter.active as string}
               activeSubGroup={filter.subGrouping?.active}
+              filterIndex={filterIndex}
               options={getNestedDropdownOptions(apiFilterDropdowns[_key])}
               listLabel={filter.key}
               handleSelectedItems={value => updateField(null, null, filterIndex, value)}
+              loading={loading}
             />
           </div>
         ) : (
-          <div className='form-group mr-3 mb-1' key={`${filter.key}-filtersection-${filterIndex}`}>
+          <div className={formGroupClass} key={`${filter.key}-filtersection-${filterIndex}`}>
             <label className='text-capitalize font-weight-bold' htmlFor={`filter-${filterIndex}`}>
               {filter.key}
             </label>
             <select
               id={`filter-${filterIndex}`}
-              className='form-control'
+              className='cove-form-select'
               data-index='0'
-              value={filter.queuedActive || filter.active}
+              value={loading ? 'Loading...' : filter.queuedActive || filter.active}
               onChange={val => {
                 handleOnChange(filterIndex, val.target.value)
               }}
-              disabled={values.length === 1 && !nullVal(filter)}
+              disabled={loading ? true : values.length === 1 && !nullVal(filter)}
             >
+              {loading && <option value='Loading...'>Loading...</option>}
               {nullVal(filter) && (
                 <option key={`select`} value=''>
                   {filter.resetLabel || '- Select -'}
@@ -135,6 +142,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
               )}
               {values}
             </select>
+            {loading && <Loader spinnerType={'text-secondary'} />}
           </div>
         )
       })}

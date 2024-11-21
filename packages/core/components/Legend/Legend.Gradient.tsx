@@ -27,7 +27,7 @@ const LegendGradient = ({
   parentPaddingToSubtract = 0
 }: GradientProps): JSX.Element => {
   const { uid, legend, type } = config
-  const { tickRotation, position, style, subStyle } = legend
+  const { tickRotation, position, style, subStyle, hideBorder } = legend
 
   const isLinearBlocks = subStyle === 'linear blocks'
   let [width] = dimensions
@@ -76,6 +76,7 @@ const LegendGradient = ({
           textAnchor={textAnchor}
           verticalAnchor={verticalAnchor}
           width={segmentWidth}
+          lineHeight={'14'}
         >
           {key}
         </Text>
@@ -91,7 +92,10 @@ const LegendGradient = ({
 
   if (style === 'gradient') {
     return (
-      <svg cursor={'pointer'} style={{ overflow: 'visible', width: '100%', marginTop: 10 }} height={newHeight}>
+      <svg
+        style={{ overflow: 'visible', width: '100%', marginTop: 10, marginBottom: hideBorder ? 10 : 0 }}
+        height={newHeight}
+      >
         {/* background border*/}
         <rect x={0} y={0} width={legendWidth + MARGIN * 2} height={boxHeight + MARGIN * 2} fill='#d3d3d3' />
         {/* Define the gradient */}

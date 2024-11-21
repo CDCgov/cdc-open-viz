@@ -2764,34 +2764,35 @@ const EditorPanel = () => {
                           />
                         </>
                       )}
-
-                      <CheckBox
-                        value={config.exclusions.active}
-                        section='exclusions'
-                        fieldName='active'
-                        label={
-                          config.xAxis.type === 'date'
-                            ? 'Limit by start and/or end dates'
-                            : 'Exclude one or more values'
-                        }
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>
-                                When this option is checked, you can select source-file values for exclusion from the
-                                date/category axis.{' '}
-                              </p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                        updateField={updateField}
-                      />
+                      {config.xAxis.type !== 'date-time' && (
+                        <CheckBox
+                          value={config.exclusions.active}
+                          section='exclusions'
+                          fieldName='active'
+                          label={
+                            config.xAxis.type === 'date'
+                              ? 'Limit by start and/or end dates'
+                              : 'Exclude one or more values'
+                          }
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon
+                                  display='question'
+                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>
+                                  When this option is checked, you can select source-file values for exclusion from the
+                                  date/category axis.{' '}
+                                </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                          updateField={updateField}
+                        />
+                      )}
                       <CheckBox
                         value={config.xAxis.showYearsOnce}
                         section='xAxis'
@@ -3671,38 +3672,6 @@ const EditorPanel = () => {
                     updateField={updateField}
                   />
 
-                  {/* <fieldset className="checkbox-group">
-                    <CheckBox value={config.legend.dynamicLegend} section="legend" fieldName="dynamicLegend" label="Dynamic Legend" updateField={updateField}/>
-                    {config.legend.dynamicLegend && (
-                      <>
-                        <TextField value={config.legend.dynamicLegendDefaultText} section="legend" fieldName="dynamicLegendDefaultText" label="Dynamic Legend Default Text" updateField={updateField} />
-                        <TextField value={config.legend.dynamicLegendItemLimit} type="number" min="0" section="legend" fieldName="dynamicLegendItemLimit" label={'Dynamic Legend Limit'} className="number-narrow" updateField={updateField}/>
-                        <TextField value={config.legend.dynamicLegendItemLimitMessage} section="legend" fieldName="dynamicLegendItemLimitMessage" label="Dynamic Legend Item Limit Message" updateField={updateField} />
-                        <TextField value={config.legend.dynamicLegendChartMessage} section="legend" fieldName="dynamicLegendChartMessage" label="Dynamic Legend Chart Message" updateField={updateField} />
-                      </>
-                    )}
-                  </fieldset> */}
-
-                  <CheckBox
-                    value={config.legend.hide ? true : false}
-                    section='legend'
-                    fieldName='hide'
-                    label='Hide Legend'
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
                   <CheckBox
                     display={config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)}
                     value={config.legend.hideSuppressedLabels}
