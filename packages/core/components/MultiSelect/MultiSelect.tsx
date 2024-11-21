@@ -98,7 +98,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
               }
             }}
             className='selected'
-            aria-disabled={loading}
+            aria-disabled={loading || !options.length}
           >
             {selectedItems.length ? (
               selectedItems.map(item => (
