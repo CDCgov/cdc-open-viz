@@ -244,17 +244,17 @@ const DataTable = (props: DataTableProps) => {
         </MediaControls.Section>
       )
     }
+    const getClassNames = (): string => {
+      const isBrushActive = config?.brush?.active && config.legend.position !== 'bottom'
+      const downloadLinkClass = !config.table.showDownloadLinkBelow ? 'download-link-above' : ''
+
+      return `data-table-container ${isBrushActive ? 'brush-active' : ''} ${viewport} ${downloadLinkClass}`
+    }
 
     return (
       <ErrorBoundary component='DataTable'>
         {!config.table.showDownloadLinkBelow && <TableMediaControls />}
-        <section
-          id={tabbingId.replace('#', '')}
-          className={`data-table-container  ${
-            config?.brush?.active && config.legend.position !== 'bottom' ? 'brush-active' : ''
-          } ${viewport} ${!config.table.showDownloadLinkBelow ? 'download-link-above' : ''}`}
-          aria-label={accessibilityLabel}
-        >
+        <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           {config.table.collapsible !== false && (
             <ExpandCollapse

@@ -26,11 +26,14 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
 
   const tooltipText = 'Drag edges to focus on a specific segment '
   const textWidth = getTextWidth(tooltipText, `normal ${16 / 1.1}px sans-serif`)
+  const DASHBOARD_MARGIN = 50
+  const BRUSH_HEIGHT_MULTIPLIER = 1.5
+
   const calculateGroupTop = (): number => {
     if (dashboardConfig?.type === 'dashboard') {
-      return Number(yMax) + config.xAxis.axisBBox + brushheight * 1.5 + 50
+      return Number(yMax) + config.xAxis.axisBBox + brushheight * BRUSH_HEIGHT_MULTIPLIER + DASHBOARD_MARGIN
     } else {
-      return Number(yMax) + config.xAxis.axisBBox + brushheight * 1.5
+      return Number(yMax) + config.xAxis.axisBBox + brushheight * BRUSH_HEIGHT_MULTIPLIER
     }
   }
 
