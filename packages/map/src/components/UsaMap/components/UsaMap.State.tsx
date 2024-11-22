@@ -145,7 +145,8 @@ const UsaMap = () => {
 
     const label = supportedTerritories[territory][1]
 
-    if (!territoryData) return <Shape key={label} label={label} style={styles} text={styles.color} />
+    if (!territoryData)
+      return <Shape key={label} label={label} style={styles} text={styles.color} territoryData={territoryData} />
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
