@@ -1362,8 +1362,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               }
             >
               {props => {
-                if (config.xAxis.type === 'date') {
-                  props.ticks = filterAndShiftLinearDateTicks(config, props, xAxisDataMapped)
+                // For these charts, we generated all ticks in tickValues above, and now need to filter/shift them
+                // so the last tick is always labeled
+                if (config.xAxis.type === 'date' && !config.xAxis.manual) {
+                  props.ticks = filterAndShiftLinearDateTicks(config, props, xAxisDataMapped, formatDate)
                 }
 
                 const axisMaxHeight = bottomLabelStart + BOTTOM_LABEL_PADDING

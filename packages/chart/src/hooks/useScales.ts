@@ -337,7 +337,8 @@ export const getTickValues = (xAxisDataMapped, xScale, num, config) => {
 }
 
 // Ensure that the last tick is shown for charts with a "Date (Linear Scale)" scale
-export const filterAndShiftLinearDateTicks = (config, axisProps, xAxisDataMapped) => {
+export const filterAndShiftLinearDateTicks = (config, axisProps, xAxisDataMapped, formatDate) => {
+  let ticks = axisProps.ticks
   const filteredTickValues = getTicks(axisProps.scale, axisProps.numTicks)
   if (filteredTickValues.length < xAxisDataMapped.length) {
     let shift = 0
@@ -347,11 +348,14 @@ export const filterAndShiftLinearDateTicks = (config, axisProps, xAxisDataMapped
         ? xAxisDataMapped.length - 1 - lastIdx
         : xAxisDataMapped.indexOf(filteredTickValues[0]) * -1
     }
-    return filteredTickValues.map(value => {
+    ticks = filteredTickValues.map(value => {
       return axisProps.ticks[axisProps.ticks.findIndex(tick => tick.value === value) + shift]
     })
   }
-  return axisProps.ticks
+  ticks.forEach((tick, i) => {
+    tick.formattedValue = formatDate(tick.value, i, ticks)
+  })
+  return ticks
 }
 
 /// helper functions
