@@ -1,5 +1,6 @@
 import { DataItem, StyleProps, Style } from './LineChartProps'
 import { PreliminaryDataItem } from '../../types/ChartConfig'
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import _ from 'lodash'
 export const createStyles = (props: StyleProps): Style[] => {
   const { preliminaryData, data, stroke, strokeWidth, handleLineType, lineType, seriesKey } = props
@@ -229,4 +230,19 @@ export const createDataSegments = (data, seriesKey, preliminaryData, dataKey) =>
   // Combine all segments into a single array
   return [firstSegment, middleSegments, lastSegment]
   // return [firstSegment, middleSegments, lastSegment].filter(segment => segment.data.length > 0 && segment.style !== '')
+}
+
+export const truncateText = (text, maxWidth) => {
+  let width = getTextWidth(text, `normal ${16}px sans-serif`)
+  if (width <= maxWidth) {
+    return text // If within maximum width, return full text
+  }
+
+  // Truncate text by progressively removing characters until it fits
+  while (width > maxWidth && text.length > 0) {
+    text = text.slice(0, -1)
+    width = getTextWidth(text + '...')
+  }
+
+  return text + '...'
 }

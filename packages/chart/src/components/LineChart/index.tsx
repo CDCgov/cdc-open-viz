@@ -14,7 +14,7 @@ import ConfigContext from '../../ConfigContext'
 import useRightAxis from '../../hooks/useRightAxis'
 
 // Local helpers and components
-import { filterCircles, createStyles, createDataSegments } from './helpers'
+import { filterCircles, createStyles, createDataSegments, truncateText } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
 import LineChartBumpCircle from './components/LineChart.BumpCircle'
 import isNumber from '@cdc/core/helpers/isNumber'
@@ -39,7 +39,7 @@ const LineChart = (props: LineChartProps) => {
   } = props
 
   // prettier-ignore
-  const { colorScale, config, formatNumber, handleLineType, parseDate, seriesHighlight, tableData, transformedData, updateConfig, brushConfig,clean  } = useContext<ChartContext>(ConfigContext)
+  const { colorScale, config, formatNumber, handleLineType, parseDate, seriesHighlight, tableData, transformedData, updateConfig, brushConfig,clean } = useContext<ChartContext>(ConfigContext)
   const { yScaleRight } = useRightAxis({ config, yMax, data: transformedData, updateConfig })
   if (!handleTooltipMouseOver) return
 
@@ -346,6 +346,12 @@ const LineChart = (props: LineChartProps) => {
                   if (!lastDatum) {
                     return <></>
                   }
+
+                  const availableSpace = xMax - xPos(lastDatum)
+                  let label = config.runtime.seriesLabels[seriesKey] || seriesKey
+                  // truncate text if it does not fit for availableSpace
+                  label = truncateText(label, availableSpace)
+
                   return (
                     <Text
                       x={xPos(lastDatum) + 5}
@@ -357,7 +363,7 @@ const LineChart = (props: LineChartProps) => {
                           : 'black'
                       }
                     >
-                      {config.runtime.seriesLabels[seriesKey] || seriesKey}
+                      {label}
                     </Text>
                   )
                 })}
