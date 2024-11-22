@@ -582,7 +582,7 @@ const UsaMap = () => {
           <div>
             <div className='d-flex mt-2'>
               <h5>{general.territoriesLabel}</h5>
-              {'data' === general.type && logo && ('us' !== geoType || 'us-geocode' === general.type) && (
+              {'data' === general.type && logo && (
                 <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
               )}
             </div>
