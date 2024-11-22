@@ -175,7 +175,7 @@ export default {
     position: 'right'
   },
   brush: {
-    height: 25,
+    height: 45,
     active: false
   },
   exclusions: {
