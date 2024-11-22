@@ -246,7 +246,7 @@ const DataTable = (props: DataTableProps) => {
     }
     const getClassNames = (): string => {
       const classes = ['data-table-container']
-      const isBrushActive = config?.brush?.active && config.legend.position !== 'bottom'
+      const isBrushActive = config?.brush?.active && config.legend?.position !== 'bottom'
 
       if (isBrushActive) {
         classes.push('brush-active')
