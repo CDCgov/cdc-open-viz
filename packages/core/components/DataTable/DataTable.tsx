@@ -245,10 +245,21 @@ const DataTable = (props: DataTableProps) => {
       )
     }
     const getClassNames = (): string => {
+      const classes = ['data-table-container']
       const isBrushActive = config?.brush?.active && config.legend.position !== 'bottom'
-      const downloadLinkClass = !config.table.showDownloadLinkBelow ? 'download-link-above' : ''
 
-      return `data-table-container ${isBrushActive ? 'brush-active' : ''} ${viewport} ${downloadLinkClass}`
+      if (isBrushActive) {
+        classes.push('brush-active')
+      }
+
+      classes.push(viewport)
+
+      const downloadLinkClass = !config.table.showDownloadLinkBelow ? 'download-link-above' : ''
+      if (downloadLinkClass) {
+        classes.push(downloadLinkClass)
+      }
+
+      return classes.join(' ')
     }
 
     return (
