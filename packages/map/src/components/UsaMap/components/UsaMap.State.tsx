@@ -134,6 +134,7 @@ const UsaMap = () => {
 
     let styles = {
       fill: geoFillColor,
+      stroke: geoStrokeColor,
       color: '#202020'
     }
 
