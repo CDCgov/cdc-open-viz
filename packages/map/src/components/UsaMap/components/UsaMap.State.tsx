@@ -182,7 +182,6 @@ const UsaMap = () => {
           style={styles}
           text={styles.color}
           strokeWidth={1.5}
-          // textColor={textColor}
           handleShapeClick={() => geoClickHandler(territory, territoryData)}
           dataTooltipId={`tooltip__${tooltipId}`}
           dataTooltipHtml={toolTip}
