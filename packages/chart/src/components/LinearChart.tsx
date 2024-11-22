@@ -875,9 +875,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               }
 
               let anchorPosition = isDateScale(newX) ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
-              if (xScale()?.type === 'date-linear') {
-                anchorPosition = anchorPosition + xScale.bandwidth()
+
+              if (config.xAxis.type === 'date' || config.xAxis.type === 'categorical') {
+                anchorPosition = anchorPosition + xScale.bandwidth() / 2
               }
+
               if (!anchorPosition) return
 
               return (
