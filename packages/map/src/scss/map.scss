@@ -86,25 +86,10 @@ $medium: 768px;
       transition: 0.2s all;
     }
   }
-  // make logo smaller on mobile
-  @media screen and (max-width: $small) {
-    .map-logo {
-      position: absolute;
-      bottom: 4em; // needed to align to top of Territories
-      right: 1em;
-      z-index: 3;
-      width: 50px; // make it smaller
-    }
-  }
-  // everything else but mobile
-  @media screen and (min-width: $small) {
-    .map-logo {
-      position: absolute;
-      bottom: 2em;
-      right: 1em;
-      z-index: 3;
-      width: 75px;
-    }
+  .map-logo {
+    display: block;
+    margin: 0 0 0 auto;
+    max-height: 35px;
   }
 }
 
@@ -113,18 +98,6 @@ $medium: 768px;
   cursor: pointer;
   &:focus {
     outline: 0;
-  }
-}
-
-// for Territories label in one col and Territory blocks wrapping in 2nd column
-.two-col {
-  display: flex;
-  margin-top: 0;
-
-  justify-content: flex-start;
-  > label {
-    margin-top: 0;
-    display: inline-block;
   }
 }
 
@@ -137,14 +110,7 @@ $medium: 768px;
 
 // Cities and Territories
 .territories {
-  margin-top: 7px;
-  font-size: 1.1em;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.5em;
   gap: 0.5em;
-  flex-wrap: wrap;
   svg {
     max-width: 35px;
     min-width: 25px;
