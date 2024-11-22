@@ -1,56 +1,75 @@
 {
+  "annotations": [],
   "general": {
-    "geoBorderColor": "darkGray",
-    "headerColor": "theme-blue",
-    "title": "",
-    "showTitle": true,
+    "title": "Example Data Map with Cities",
+    "subtext": "*: Lorem ipsum; NA: Lorem ipsum.",
+    "type": "data",
+    "geoType": "us",
+    "headerColor": "theme-cyan",
     "showSidebar": true,
-    "showDownloadButton": false,
+    "showTitle": true,
+    "showDownloadButton": true,
+    "expandDataTable": false,
+    "backgroundColor": "#f5f5f5",
+    "geoBorderColor": "darkGray",
+    "territoriesLabel": "Territories",
+    "language": "en",
+    "hasRegions": false,
     "showDownloadMediaButton": false,
     "displayAsHex": false,
     "displayStateLabels": false,
-    "territoriesLabel": "Territories",
-    "territoriesAlwaysShow": false,
-    "language": "en",
-    "geoType": "us",
-    "geoLabelOverride": "State/Territory",
-    "hasRegions": false,
     "fullBorder": false,
-    "type": "map",
-    "convertFipsCodes": true,
     "palette": {
-      "isReversed": true
+      "isReversed": false
     },
     "allowMapZoom": true,
     "hideGeoColumnInTooltip": false,
-    "hidePrimaryColumnInTooltip": true,
+    "hidePrimaryColumnInTooltip": false,
     "statePicked": {
       "fipsCode": "01",
       "stateName": "Alabama"
     },
-    "equalNumberOptIn": true,
-    "subtext": "<div class=\"card mb-3\"><div class=\"card-body bg-gray-l2\"><p>Testing has resumed for commercial contract wastewater sites (about 350 sites) that have had a temporary delay since September 15, 2023. Once sites have six weeks of data, the wastewater viral activity levels will be displayed.</p> </div></div><div class=\"text-left ml-3 pb-3\">Data last updated <span class=\"date\">FromDB</span></div>",
-    "introText": "",
-    "footnotes": ""
+    "showDownloadImgButton": false,
+    "showDownloadPdfButton": false,
+    "territoriesAlwaysShow": false,
+    "geoLabelOverride": "",
+    "convertFipsCodes": true,
+    "noStateFoundMessage": "Map Unavailable",
+    "annotationDropdownText": "Annotations"
   },
   "type": "map",
-  "color": "greenbluereverse",
+  "color": "yelloworangered",
   "columns": {
     "geo": {
-      "name": "state",
-      "label": "Location",
-      "tooltip": false,
-      "dataTable": true
+      "dataTable": true,
+      "label": "",
+      "name": "STATE",
+      "tooltip": false
     },
     "primary": {
-      "dataTable": false,
-      "tooltip": true,
+      "dataTable": true,
+      "label": "Rate",
+      "name": "Rate",
       "prefix": "",
       "suffix": "",
-      "name": "activity_level",
-      "label": "Numeric Activity Level"
+      "tooltip": false,
+      "roundToPlace": 0
     },
     "navigate": {
+      "dataTable": false,
+      "name": "",
+      "tooltip": false
+    },
+    "additionalColumn1": {
+      "label": "Location",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Location",
+      "tooltip": true
+    },
+    "geosInRegion": {
       "name": ""
     },
     "latitude": {
@@ -58,71 +77,54 @@
     },
     "longitude": {
       "name": ""
-    },
-    "additionalColumn1": {
-      "label": "Viral Activity Level",
-      "dataTable": true,
-      "tooltips": false,
-      "prefix": "",
-      "suffix": "",
-      "name": "activity_level_label",
-      "tooltip": true
     }
   },
   "legend": {
-    "descriptions": {},
-    "specialClasses": [],
+    "numberOfItems": 3,
+    "position": "side",
+    "title": "Legend Title",
+    "description": "Legend Text",
+    "type": "equalnumber",
+    "specialClasses": [
+      {
+        "key": "Rate",
+        "value": "*",
+        "label": "*"
+      },
+      {
+        "key": "Rate",
+        "value": "NA",
+        "label": "N/A"
+      }
+    ],
     "unified": false,
     "singleColumn": false,
-    "singleRow": false,
-    "verticalSorted": true,
-    "showSpecialClassesLast": true,
     "dynamicDescription": false,
-    "type": "category",
-    "numberOfItems": 8,
-    "position": "bottom",
-    "title": "Current SARS-CoV-2 Wastewater Viral Activity Level",
-    "categoryValuesOrder": [
-      "10",
-      "9",
-      "8",
-      "7",
-      "6",
-      "5",
-      "4",
-      "3",
-      "2",
-      "1",
-      "No Data"
-    ],
-    "additionalCategories": [
-      "No Data",
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10"
-    ],
-    "description": "Select a level to add or remove it from the visualization. "
+    "descriptions": {},
+    "singleRow": false,
+    "showSpecialClassesLast": false,
+    "verticalSorted": false,
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "singleColumnLegend": false,
+    "hideBorder": false
   },
   "filters": [],
   "table": {
-    "label": "Data Table",
-    "expanded": false,
-    "limitHeight": true,
-    "height": "500",
-    "caption": "",
-    "showDownloadUrl": true,
+    "showDownloadUrl": false,
     "showDataTableLink": true,
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
     "showFullGeoNameInCSV": false,
     "forceDisplay": true,
-    "download": false,
-    "indexLabel": "State/Territory"
+    "download": true,
+    "indexLabel": "",
+    "showDownloadLinkBelow": true
   },
   "tooltips": {
     "appearanceType": "hover",
@@ -131,15 +133,17 @@
     "opacity": 90
   },
   "runtime": {
-    "editorErrorMessage": []
+    "editorErrorMessage": ""
   },
   "visual": {
+    "cityStyle": "pin",
     "minBubbleSize": 1,
     "maxBubbleSize": 20,
     "extraBubbleBorder": false,
-    "cityStyle": "circle",
+    "showBubbleZeros": false,
     "geoCodeCircleSize": 2,
-    "showBubbleZeros": false
+    "cityStyleLabel": "",
+    "additionalCityStyles": []
   },
   "mapPosition": {
     "coordinates": [
@@ -152,9 +156,10 @@
     "layers": [],
     "patterns": [
       {
-        "dataKey": "activity_level_label",
+        "dataKey": "Location",
         "pattern": "circles",
-        "dataValue": "Moderate"
+        "contrastCheck": true,
+        "dataValue": "School"
       }
     ]
   },
@@ -167,7 +172,7 @@
         "items": [
           {
             "key": "",
-            "shape": "Arrow up",
+            "shape": "Arrow Up",
             "column": "",
             "operator": "=",
             "value": ""
@@ -177,403 +182,684 @@
     ]
   },
   "filterBehavior": "Filter Change",
-  "customColors": [
-    "#0A1B40",
-    "#073A5D",
-    "#185A77",
-    "#367A8D",
-    "#5B9CA1",
-    "#86BDB4",
-    "#B4DECA",
-    "#E5FFE3",
-    "#F2FFF1",
-    "#FFFFFF",
-    "#B4B4B4"
-  ],
-  "dataFileSourceType": "url",
-  "dataDescription": {
-    "horizontal": false,
-    "series": false
+  "dataTable": {
+    "title": "Data Table",
+    "forceDisplay": true
   },
-  "validated": 4.23,
+  "sharing": {
+    "enabled": false,
+    "dataHost": "wcms-wp.cdc.gov",
+    "configUrl": "/wcms/4.0/cdc-wp/data-presentation/examples/city-data-map-example.json"
+  },
+  "usingWidgetLoader": true,
   "data": [
     {
-      "state_name": "Utah",
-      "state": "UT",
-      "activity_level": "8",
-      "activity_level_label": "High",
-      "num_sites": "31"
+      "STATE": "AL",
+      "Rate": 1000,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Hawaii",
-      "state": "HI",
-      "activity_level": "2",
-      "activity_level_label": "Minimal",
-      "num_sites": "6"
+      "STATE": "Great Plains Tribal Leaders Health Board",
+      "Rate": 1000,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Minnesota",
-      "state": "MN",
-      "activity_level": "6",
-      "activity_level_label": "Moderate",
-      "num_sites": "15"
+      "STATE": "Montana American Indian Women’s Health Coalition",
+      "Rate": 1000,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Ohio",
-      "state": "OH",
-      "activity_level": "9",
-      "activity_level_label": "Very High",
-      "num_sites": "66"
+      "STATE": "AK",
+      "Rate": 1200,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Arkansas",
-      "state": "AR",
-      "activity_level": "10",
-      "activity_level_label": "Very High",
-      "num_sites": "1"
+      "STATE": "AS",
+      "Rate": 14,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Oregon",
-      "state": "OR",
-      "activity_level": "1",
-      "activity_level_label": "Minimal",
-      "num_sites": "9"
+      "STATE": "EAU CLAIRE",
+      "Rate": 140,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Texas",
-      "state": "TX",
-      "activity_level": "7",
-      "activity_level_label": "High",
-      "num_sites": "14"
+      "STATE": "AZ",
+      "Rate": 9,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "North Dakota",
-      "state": "ND",
-      "activity_level": "No Data",
-      "activity_level_label": "No Data",
-      "num_sites": "0"
+      "STATE": "AR",
+      "Rate": 17,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Pennsylvania",
-      "state": "PA",
-      "activity_level": "6",
-      "activity_level_label": "Moderate",
-      "num_sites": "17"
+      "STATE": "CA",
+      "Rate": "*",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Connecticut",
-      "state": "CT",
-      "activity_level": "No Data",
-      "activity_level_label": "No Data",
-      "num_sites": "0"
+      "STATE": "CO",
+      "Rate": 22,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Vermont",
-      "state": "VT",
-      "activity_level": "10",
-      "activity_level_label": "Very High",
-      "num_sites": "3"
+      "STATE": "CT",
+      "Rate": 10,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Nebraska",
-      "state": "NE",
-      "activity_level": "7",
-      "activity_level_label": "High",
-      "num_sites": "2"
+      "STATE": "DE",
+      "Rate": 12,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Nevada",
-      "state": "NV",
-      "activity_level": "7",
-      "activity_level_label": "High",
-      "num_sites": "1"
+      "STATE": "DC",
+      "Rate": 14,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Puerto Rico",
-      "state": "PR",
-      "activity_level": "No Data",
-      "activity_level_label": "No Data",
-      "num_sites": "0"
+      "STATE": "FL",
+      "Rate": 9,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Washington",
-      "state": "WA",
-      "activity_level": "3",
-      "activity_level_label": "Low",
-      "num_sites": "14"
+      "STATE": "GA",
+      "Rate": 17,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Illinois",
-      "state": "IL",
-      "activity_level": "8",
-      "activity_level_label": "High",
-      "num_sites": "70"
+      "STATE": "GU",
+      "Rate": 20,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Oklahoma",
-      "state": "OK",
-      "activity_level": "No Data",
-      "activity_level_label": "No Data",
-      "num_sites": "0"
+      "STATE": "HI",
+      "Rate": 22,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Virgin Islands",
-      "state": "VI",
-      "activity_level": "No Data",
-      "activity_level_label": "No Data",
-      "num_sites": "0"
+      "STATE": "GAINESVILLE",
+      "Rate": 22,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "District of Columbia",
-      "state": "DC",
-      "activity_level": "No Data",
-      "activity_level_label": "No Data",
-      "num_sites": "0"
+      "STATE": "ID",
+      "Rate": "*",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Delaware",
-      "state": "DE",
-      "activity_level": "8",
-      "activity_level_label": "High",
-      "num_sites": "8"
+      "STATE": "IL",
+      "Rate": 12,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Alaska",
-      "state": "AK",
-      "activity_level": "4",
-      "activity_level_label": "Low",
-      "num_sites": "1"
+      "STATE": "IN",
+      "Rate": 14,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "New Mexico",
-      "state": "NM",
-      "activity_level": "No Data",
-      "activity_level_label": "No Data",
-      "num_sites": "0"
+      "STATE": "IA",
+      "Rate": 9,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "West Virginia",
-      "state": "WV",
-      "activity_level": "8",
-      "activity_level_label": "High",
-      "num_sites": "1"
+      "STATE": "KS",
+      "Rate": "NA",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Missouri",
-      "state": "MO",
-      "activity_level": "7",
-      "activity_level_label": "High",
-      "num_sites": "42"
+      "STATE": "KY",
+      "Rate": 20,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Rhode Island",
-      "state": "RI",
-      "activity_level": "2",
-      "activity_level_label": "Minimal",
-      "num_sites": "6"
+      "STATE": "LA",
+      "Rate": 22,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Georgia",
-      "state": "GA",
-      "activity_level": "4",
-      "activity_level_label": "Low",
-      "num_sites": "8"
+      "STATE": "ME",
+      "Rate": 10,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Montana",
-      "state": "MT",
-      "activity_level": "10",
-      "activity_level_label": "Very High",
-      "num_sites": "4"
+      "STATE": "MH",
+      "Rate": 12,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Michigan",
-      "state": "MI",
-      "activity_level": "10",
-      "activity_level_label": "Very High",
-      "num_sites": "24"
+      "STATE": "MD",
+      "Rate": "*",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Virginia",
-      "state": "VA",
-      "activity_level": "5",
-      "activity_level_label": "Moderate",
-      "num_sites": "32"
+      "STATE": "MA",
+      "Rate": 9,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Guam",
-      "state": "GU",
-      "activity_level": "No Data",
-      "activity_level_label": "No Data",
-      "num_sites": "0"
+      "STATE": "MI",
+      "Rate": 17,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "North Carolina",
-      "state": "NC",
-      "activity_level": "8",
-      "activity_level_label": "High",
-      "num_sites": "7"
+      "STATE": "FM",
+      "Rate": 20,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Wyoming",
-      "state": "WY",
-      "activity_level": "No Data",
-      "activity_level_label": "No Data",
-      "num_sites": "0"
+      "STATE": "MN",
+      "Rate": 22,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Kansas",
-      "state": "KS",
-      "activity_level": "10",
-      "activity_level_label": "Very High",
-      "num_sites": "5"
+      "STATE": "MS",
+      "Rate": 10,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "New Jersey",
-      "state": "NJ",
-      "activity_level": "8",
-      "activity_level_label": "High",
-      "num_sites": "23"
+      "STATE": "MO",
+      "Rate": 11,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Maryland",
-      "state": "MD",
-      "activity_level": "7",
-      "activity_level_label": "High",
-      "num_sites": "2"
+      "STATE": "MT",
+      "Rate": 14,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Alabama",
-      "state": "AL",
-      "activity_level": "7",
-      "activity_level_label": "High",
-      "num_sites": "5"
+      "STATE": "NE",
+      "Rate": 9,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Arizona",
-      "state": "AZ",
-      "activity_level": "7",
-      "activity_level_label": "High",
-      "num_sites": "8"
+      "STATE": "NV",
+      "Rate": 17,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Iowa",
-      "state": "IA",
-      "activity_level": "10",
-      "activity_level_label": "Very High",
-      "num_sites": "5"
+      "STATE": "NH",
+      "Rate": 20,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Massachusetts",
-      "state": "MA",
-      "activity_level": "6",
-      "activity_level_label": "Moderate",
-      "num_sites": "1"
+      "STATE": "NJ",
+      "Rate": 28,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Kentucky",
-      "state": "KY",
-      "activity_level": "5",
-      "activity_level_label": "Moderate",
-      "num_sites": "1"
+      "STATE": "NM",
+      "Rate": 10,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Louisiana",
-      "state": "LA",
-      "activity_level": "No Data",
-      "activity_level_label": "No Data",
-      "num_sites": "0"
+      "STATE": "NY",
+      "Rate": 12,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Mississippi",
-      "state": "MS",
-      "activity_level": "No Data",
-      "activity_level_label": "No Data",
-      "num_sites": "0"
+      "STATE": "NC",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Tennessee",
-      "state": "TN",
-      "activity_level": "6",
-      "activity_level_label": "Moderate",
-      "num_sites": "2"
+      "STATE": "ND",
+      "Rate": 9,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "New Hampshire",
-      "state": "NH",
-      "activity_level": "5",
-      "activity_level_label": "Moderate",
-      "num_sites": "11"
+      "STATE": "MP",
+      "Rate": 17,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Florida",
-      "state": "FL",
-      "activity_level": "6",
-      "activity_level_label": "Moderate",
-      "num_sites": "16"
+      "STATE": "OH",
+      "Rate": "NA",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Indiana",
-      "state": "IN",
-      "activity_level": "8",
-      "activity_level_label": "High",
-      "num_sites": "20"
+      "STATE": "OK",
+      "Rate": 22,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Idaho",
-      "state": "ID",
-      "activity_level": "7",
-      "activity_level_label": "High",
-      "num_sites": "9"
+      "STATE": "OR",
+      "Rate": 10,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "South Carolina",
-      "state": "SC",
-      "activity_level": "4",
-      "activity_level_label": "Low",
-      "num_sites": "3"
+      "STATE": "PW",
+      "Rate": 12,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "South Dakota",
-      "state": "SD",
-      "activity_level": "8",
-      "activity_level_label": "High",
-      "num_sites": "1"
+      "STATE": "PA",
+      "Rate": 14,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "California",
-      "state": "CA",
-      "activity_level": "5",
-      "activity_level_label": "Moderate",
-      "num_sites": "62"
+      "STATE": "PR",
+      "Rate": 6,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "New York",
-      "state": "NY",
-      "activity_level": "8",
-      "activity_level_label": "High",
-      "num_sites": "117"
+      "STATE": "RI",
+      "Rate": 17,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Wisconsin",
-      "state": "WI",
-      "activity_level": "9",
-      "activity_level_label": "Very High",
-      "num_sites": "39"
+      "STATE": "SC",
+      "Rate": 20,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Maine",
-      "state": "ME",
-      "activity_level": "8",
-      "activity_level_label": "High",
-      "num_sites": "14"
+      "STATE": "SD",
+      "Rate": 22,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
     },
     {
-      "state_name": "Colorado",
-      "state": "CO",
-      "activity_level": "5",
-      "activity_level_label": "Moderate",
-      "num_sites": "46"
+      "STATE": "TN",
+      "Rate": 10,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "TX",
+      "Rate": 12,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "VT",
+      "Rate": 9,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "VI",
+      "Rate": 17,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "VA",
+      "Rate": 20,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "WA",
+      "Rate": 22,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "WV",
+      "Rate": 10,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "WI",
+      "Rate": 12,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "WY",
+      "Rate": 14,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Los Angeles",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Grand Rapids, MICHIGAN",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Salem, OReGON",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Round Rock, TEXAS",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "PROVO, UT",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "SALUDA, VIRGINIA",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "ELLENSBURG, WA",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Atlanta",
+      "Rate": 12,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Boston",
+      "Rate": 20,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "New York City",
+      "Rate": 22,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Dallas",
+      "Rate": 18,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Seattle",
+      "Rate": 17,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "New Orleans",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Birmingham",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "St Paul",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Hershey",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Salt Lake City",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Syracuse",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Philadelphia",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Alaska Native Tribal Health Consortium",
+      "Rate": 24,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "American Indian Cancer Foundation",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Arctic Slope Native Association Limited",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "California Rural Indian Health Board Inc.",
+      "Rate": 19,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Cherokee Nation",
+      "Rate": 12,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Cheyenne River Sioux Tribe",
+      "Rate": 11,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Fond du Lac Reservation",
+      "Rate": 22,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Great Plains Tribal Leaders Health Board",
+      "Rate": 18,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Hopi Tribe",
+      "Rate": 19,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Inter-Tribal Council of Michigan, Inc.",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Kaw Nation of Oklahoma",
+      "Rate": 16,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Native American Rehabilitation Association of the Northwest, Inc.",
+      "Rate": 22,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Navajo Nation",
+      "Rate": 24,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Northwest Portland Area Indian Health Board",
+      "Rate": 24,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "South Puget Intertribal Planning Agency",
+      "Rate": 9,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Southcentral Foundation",
+      "Rate": 29,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Southeast Alaska Regional Health Consortium",
+      "Rate": 8,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Yukon-Kuskokwim Health Corporation",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Modesto",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Lakeview",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Lockport",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Warren",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Salem, Oregon",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Salem, Connecticut",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Salem, Alabama",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Salem, Florida",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Salem, Massachusetts",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "San Benito",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Alexandria",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "San Juan",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
     }
-  ]
+  ],
+  "filterStyle": "Filter Changes",
+  "version": "4.24.11"
 }
