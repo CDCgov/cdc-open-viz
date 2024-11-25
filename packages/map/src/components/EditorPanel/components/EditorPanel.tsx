@@ -1524,7 +1524,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
 
   const CategoryList = () => {
     return getCategoryValuesOrder()
-      .filter(item => !item.special)
+      .filter(item => !item?.special)
       .map((value, index) => (
         <Draggable key={value} draggableId={`item-${value}`} index={index}>
           {(provided, snapshot) => (
