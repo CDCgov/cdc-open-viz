@@ -5,7 +5,7 @@
       "fipsCode": "32",
       "stateName": "Nevada"
     },
-    "geoType": "us-county",
+    "geoType": "us",
     "geoBorderColor": "darkGray",
     "headerColor": "theme-blue",
     "showTitle": true,
@@ -19,7 +19,7 @@
     "hasRegions": false,
     "expandDataTable": false,
     "fullBorder": false,
-    "type": "us-geocode",
+    "type": "map",
     "title": "Default US Map",
     "palette": {
       "isReversed": false
@@ -93,7 +93,8 @@
     "forceDisplay": true,
     "download": true,
     "indexLabel": "",
-    "wrapColumns": false
+    "wrapColumns": false,
+    "showDownloadLinkBelow": true
   },
   "tooltips": {
     "appearanceType": "hover",
@@ -144,6 +145,14 @@
     ]
   },
   "filterBehavior": "Filter Change",
+  "customColors": [
+    "red",
+    "orange",
+    "yellow",
+    "green",
+    "blue",
+    "violet"
+  ],
   "dataTable": {
     "title": "Data Table",
     "forceDisplay": true

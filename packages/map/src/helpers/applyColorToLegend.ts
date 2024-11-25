@@ -41,7 +41,7 @@ export const applyColorToLegend = (legendIdx: number, config: ChartConfig, resul
       }
     }
 
-    let colorIdx = legendIdx - specialClasses
+    let colorIdx = legendIdx - specialClasses.length
 
     // Special Classes (No Data)
     if (result[legendIdx].special) {
@@ -56,12 +56,17 @@ export const applyColorToLegend = (legendIdx: number, config: ChartConfig, resul
 
     if (config.color.includes('qualitative')) return mapColorPalette[colorIdx]
 
-    let amt = Math.max(result.length - specialClasses, 1)
+    // If the current version is newer than 4.24.10, use the color palette
+    if (!isOlderVersion(config.version, '4.24.12')) {
+      if (config.customColors) return mapColorPalette[legendIdx - specialClasses.length]
+    }
+
+    let amt = Math.max(result.length - specialClasses.length, 1)
     let distributionArray = colorDistributions[amt]
-    // debugger
     let specificColor
-    if (distributionArray && !config.customColors && isOlderVersion(config.version, '4.24.12')) {
-      specificColor = distributionArray[colorIdx]
+
+    if (distributionArray) {
+      specificColor = distributionArray[legendIdx - specialClasses.length]
     } else if (mapColorPalette[colorIdx]) {
       specificColor = colorIdx
     } else {
