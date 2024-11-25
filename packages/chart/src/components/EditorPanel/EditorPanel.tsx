@@ -1506,7 +1506,7 @@ const EditorPanel = () => {
                               label='Upper'
                               updateField={updateField}
                               initial='Select'
-                              options={getColumns()}
+                              options={getColumns(false)}
                             />
                             <Select
                               value={config.confidenceKeys.lower || ''}
@@ -1515,7 +1515,7 @@ const EditorPanel = () => {
                               label='Lower'
                               updateField={updateField}
                               initial='Select'
-                              options={getColumns()}
+                              options={getColumns(false)}
                             />
                           </>
                         )}
