@@ -56,16 +56,8 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           return <React.Fragment key={`${filter.key}-filtersection-${filterIndex}-option`} />
         const values: JSX.Element[] = []
 
-        if (filter.resetLabel) {
-          values.push(
-            <option key={`${filter.resetLabel}-option`} value={filter.resetLabel}>
-              {filter.resetLabel}
-            </option>
-          )
-        }
-
         const _key = filter.apiFilter?.apiEndpoint
-        const loading = !apiFilterDropdowns[_key]
+        const loading = apiFilterDropdowns[_key] === null
 
         const multiValues: { value; label }[] = []
 
@@ -92,6 +84,16 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
             )
             multiValues.push({ value: filterOption, label: labeledOpt || filterOption })
           })
+        }
+
+        const isDisabled = !values.length
+
+        if (filter.resetLabel) {
+          values.unshift(
+            <option key={`${filter.resetLabel}-option`} value={filter.resetLabel}>
+              {filter.resetLabel}
+            </option>
+          )
         }
 
         const formGroupClass = `form-group mr-3 mb-1${loading ? ' loading-filter' : ''}`
@@ -132,7 +134,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
               onChange={val => {
                 handleOnChange(filterIndex, val.target.value)
               }}
-              disabled={loading ? true : values.length === 1 && !nullVal(filter)}
+              disabled={loading || isDisabled}
             >
               {loading && <option value='Loading...'>Loading...</option>}
               {nullVal(filter) && (

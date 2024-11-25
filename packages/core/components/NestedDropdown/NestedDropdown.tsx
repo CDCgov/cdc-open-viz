@@ -256,7 +256,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
         onKeyUp={handleKeyUp}
       >
         <div
-          className={`nested-dropdown-input-container${loading ? ' disabled' : ''}`}
+          className={`nested-dropdown-input-container${loading || !options.length ? ' disabled' : ''}`}
           aria-label='searchInput'
           aria-disabled={loading}
           role='textbox'
@@ -272,7 +272,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
             value={inputValue}
             onChange={handleSearchTermChange}
             placeholder={loading ? 'Loading...' : '- Select -'}
-            disabled={loading}
+            disabled={loading || !options.length}
             onClick={() => {
               if (inputHasFocus) setIsListOpened(!isListOpened)
             }}

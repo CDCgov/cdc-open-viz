@@ -27,6 +27,13 @@ export const loadAPIFiltersFactory = (
     const sharedAPIFilters = sharedFilters.filter(f => f.apiFilter)
     const filterLookup = new Map(sharedAPIFilters.map(filter => [filter.apiFilter.apiEndpoint, filter.apiFilter]))
     const toFetch = apiFilterHelpers.getToFetch(sharedFilters, dropdowns)
+    const loadingDropdowns = Object.values(toFetch).reduce(
+      (acc, [dropdownsKey]) => ({ ...acc, [dropdownsKey]: null }),
+      {}
+    )
+    setAPIFilterDropdowns(currentState => {
+      return { ...currentState, ...loadingDropdowns }
+    })
     const newDropdowns = _.cloneDeep(dropdowns)
     return Promise.all(
       Object.keys(toFetch).map(

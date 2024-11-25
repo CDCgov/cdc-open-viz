@@ -18,7 +18,7 @@ describe('getLoadingFilterMemo', () => {
     }
     const expectedOutput: APIFilterDropdowns = {
       endpoint1: { text: 'text1', value: 'value1' },
-      endpoint2: null
+      endpoint2: undefined
     }
     expect(getLoadingFilterMemo(sharedAPIFilters, apiFilterDropdowns)).toEqual(expectedOutput)
   })
@@ -36,8 +36,8 @@ describe('getLoadingFilterMemo', () => {
     const sharedAPIFilters = ['endpoint1', 'endpoint2']
     const apiFilterDropdowns: APIFilterDropdowns = {}
     const expectedOutput: APIFilterDropdowns = {
-      endpoint1: null,
-      endpoint2: null
+      endpoint1: undefined,
+      endpoint2: undefined
     }
     expect(getLoadingFilterMemo(sharedAPIFilters, apiFilterDropdowns)).toEqual(expectedOutput)
   })

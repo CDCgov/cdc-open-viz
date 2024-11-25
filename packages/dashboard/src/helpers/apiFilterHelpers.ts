@@ -17,10 +17,10 @@ export const getLoadingFilterMemo = (
   apiFiltersEndpoints.reduce((acc, endpoint, currIndex) => {
     const _key: DropdownsKey = endpoint
     const hasChanged = changedChildFilterIndexes.includes(currIndex)
-    if (apiFilterDropdowns[_key] != null && !hasChanged) {
+    if (apiFilterDropdowns[_key] && !hasChanged) {
       acc[_key] = apiFilterDropdowns[_key]
     } else {
-      acc[_key] = null
+      acc[_key] = undefined
     }
     return acc
   }, {})

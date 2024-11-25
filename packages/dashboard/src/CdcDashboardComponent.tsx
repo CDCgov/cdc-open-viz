@@ -189,6 +189,10 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             })
             .catch(e => {
               console.error(e)
+              dispatchErrorMessages({
+                type: 'ADD_ERROR_MESSAGE',
+                payload: 'There was a problem returning data. Please try again.'
+              })
               newDatasets[datasetKey].data = []
               newDatasets[datasetKey].runtimeDataUrl = dataUrlFinal
               newData[datasetKey] = []
