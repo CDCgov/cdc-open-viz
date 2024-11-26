@@ -1724,6 +1724,7 @@ const CdcMap = ({
     isDebug,
     isEditor,
     loadConfig,
+    logo,
     navigationHandler,
     position,
     resetLegendToggles,
@@ -1867,7 +1868,8 @@ const CdcMap = ({
                       {'us-region' === geoType && <UsaMap.Region />}
                       {'us-county' === geoType && <UsaMap.County />}
                       {'world' === geoType && <WorldMap />}
-                      {'data' === general.type && logo && (
+                      {/* logo is handled in UsaMap.State when applicable */}
+                      {'data' === general.type && logo && ('us' !== geoType || 'us-geocode' === state.general.type) && (
                         <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
                       )}
                     </>

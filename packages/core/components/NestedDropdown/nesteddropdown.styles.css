@@ -62,6 +62,10 @@
 
     &.disabled {
       background-color: var(--lightestGray);
+      & > :is(input) {
+        color: var(--darkGray);
+        background-color: var(--lightestGray);
+      }
     }
   }
 
