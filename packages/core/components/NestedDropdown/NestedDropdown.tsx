@@ -246,7 +246,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   return (
     <>
       {listLabel && (
-        <label className='text-capitalize font-weight-bold' htmlFor={dropdownId}>
+        <label className='font-weight-bold' htmlFor={dropdownId}>
           {listLabel}
         </label>
       )}
