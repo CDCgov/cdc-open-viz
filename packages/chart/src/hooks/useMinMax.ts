@@ -185,7 +185,15 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
         return valueMatch && (index === 0 || index === tableData.length - 1)
       })
     })
-    min = Number(enteredMinValue) && isMinValid ? Number(enteredMinValue) : suppressedMinValue ? 0 : minValue
+    let isCategoricalAxis = config.yAxis.type === 'categorical'
+    min =
+      enteredMinValue !== '' && isMinValid
+        ? Number(enteredMinValue)
+        : suppressedMinValue
+        ? 0
+        : isCategoricalAxis
+        ? 0
+        : minValue
   }
   //If data value max wasn't provided, calculate it
   if (max === Number.MIN_VALUE) {
