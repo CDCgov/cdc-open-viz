@@ -1094,6 +1094,15 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             </option>
           </select>
         </label>
+        <label>
+          <TextField
+            type='textarea'
+            value={state.filterIntro}
+            fieldName='filterIntro'
+            label='Filter Intro text'
+            updateField={updateField}
+          />
+        </label>
         {filtersJSX}
       </>
     )
@@ -1262,6 +1271,14 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   })
 
   const updateField = (section, subsection, fieldName, newValue) => {
+    if (!section) {
+      setState({
+        ...state,
+        [fieldName]: newValue
+      })
+      return
+    }
+
     const isArray = Array.isArray(state[section])
 
     let sectionValue = isArray ? [...state[section], newValue] : { ...state[section], [fieldName]: newValue }
