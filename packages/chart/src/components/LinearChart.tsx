@@ -175,7 +175,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   }
 
   // VARS/MEMOS
-  const labelsOverflow = onlyShowTopPrefixSuffix || labelsAboveGridlines
   const shouldAbbreviate = true
   const isHorizontal = orientation === 'horizontal' || config.visualizationType === 'Forest Plot'
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
@@ -251,8 +250,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       ...config,
       yAxis: {
         ...config.yAxis,
-        scalePadding: labelsOverflow ? autoPadding : config.yAxis.scalePadding,
-        enablePadding: labelsOverflow || config.yAxis.enablePadding
+        scalePadding: onlyShowTopPrefixSuffix ? autoPadding : config.yAxis.scalePadding,
+        enablePadding: onlyShowTopPrefixSuffix || config.yAxis.enablePadding
       }
     },
     minValue,
@@ -456,14 +455,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     if (orientation === 'horizontal') return
 
     const maxValueIsGreaterThanTopGridLine = maxValue > Math.max(...yScale.ticks(handleNumTicks))
-    if (!maxValueIsGreaterThanTopGridLine || !labelsOverflow) return
+    if (!maxValueIsGreaterThanTopGridLine || !onlyShowTopPrefixSuffix) return
 
     const tickGap = yScale.ticks(handleNumTicks)[1] - yScale.ticks(handleNumTicks)[0]
     const nextTick = Math.max(...yScale.ticks(handleNumTicks)) + tickGap
     const newPadding = minValue < 0 ? (nextTick - maxValue) / maxValue / 2 : (nextTick - maxValue) / maxValue
 
     setAutoPadding(newPadding * 100)
-  }, [maxValue, labelsOverflow, yScale, handleNumTicks])
+  }, [maxValue, onlyShowTopPrefixSuffix, yScale, handleNumTicks])
 
   // Render Functions
   const generatePairedBarAxis = () => {
