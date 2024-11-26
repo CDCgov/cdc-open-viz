@@ -52,8 +52,10 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
 
   if (lower && upper && config.visualizationType === 'Bar') {
     const buffer = min < 0 ? 1.1 : 0
-    max = Math.max(maxValue, Math.max(...data.flatMap(d => [d[upper], d[lower]])) * 1.15)
-    min = Math.min(minValue, Math.min(...data.flatMap(d => [d[upper], d[lower]])) * 1.15) * buffer
+    const maxValueWithCI = Math.max(...data.flatMap(d => [d[upper], d[lower]])) * 1.15
+    const minValueWithCIPlusBuffer = Math.min(...data.flatMap(d => [d[upper], d[lower]])) * 1.15 * buffer
+    max = max > maxValueWithCI ? max : maxValueWithCI
+    min = min < minValueWithCIPlusBuffer ? min : minValueWithCIPlusBuffer
   }
 
   if (config.series.filter(s => s?.type === 'Forecasting')) {
