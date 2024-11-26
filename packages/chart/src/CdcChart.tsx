@@ -455,7 +455,7 @@ const CdcChart = ({
           let filteredDataValues: number[] = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
 
           // Sort the data for upcoming functions.
-          let sortedData = filteredDataValues.sort((a, b) => a - b)
+          let sortedData = _.sortBy(filteredDataValues)
 
           // ! - Notice d3.quantile doesn't work here, and we had to take a custom route.
           const quartiles = getQuartiles(sortedData)
@@ -476,28 +476,26 @@ const CdcChart = ({
           const q1 = quartiles.q1
           const q3 = quartiles.q3
           const iqr = q3 - q1
-          const lowerBounds = q1 - (q3 - q1) * 1.5
-          const upperBounds = q3 + (q3 - q1) * 1.5
-
+          const lowerBounds = q1 - 1.5 * iqr
+          const upperBounds = q3 + 1.5 * iqr
           const outliers = sortedData.filter(v => v < lowerBounds || v > upperBounds)
 
-          const minValue: number = d3.min<number>(filteredDataValues) || 0
-          const _colMin = d3.max<number>([minValue, q1 - 1.5 * iqr])
           plots.push({
             columnCategory: g,
-            columnMax: d3.min([d3.max(filteredDataValues), q1 + 1.5 * iqr]),
+            columnMax: d3.min([d3.max(filteredDataValues), q3 + 1.5 * iqr]),
             columnThirdQuartile: Number(q3).toFixed(newConfig.dataFormat.roundTo),
             columnMedian: Number(d3.median(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnFirstQuartile: q1.toFixed(newConfig.dataFormat.roundTo),
-            columnMin: _colMin,
+            columnMin: Math.min(...sortedData),
             columnCount: filteredData.length,
             columnSd: Number(d3.deviation(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnMean: Number(d3.mean(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnIqr: Number(iqr).toFixed(newConfig.dataFormat.roundTo),
-            columnLowerBounds: _colMin,
-            columnUpperBounds: d3.min([d3.max(sortedData), q1 + 1.5 * iqr]),
+            values: _.sortBy(filteredDataValues),
+            columnLowerBounds: lowerBounds,
+            columnUpperBounds: upperBounds,
             columnOutliers: outliers,
-            values: filteredDataValues,
+            columnNonOutliers: sortedData.filter(value => value >= lowerBounds && value <= upperBounds),
             keyValues: getValuesBySeriesKey()
           })
         } catch (e) {
