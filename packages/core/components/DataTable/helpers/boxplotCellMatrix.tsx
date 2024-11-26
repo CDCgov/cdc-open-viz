@@ -18,7 +18,7 @@ const boxplotCellMatrix = ({ rows, config }): CellMatrix => {
       values: labels.values,
       columnCount: labels.count,
       columnSd: 'Standard Deviation',
-      nonOutlierValues: 'Non Outliers',
+      columnNonOutliers: 'Non Outliers',
       columnLowerBounds: labels.lowerBounds,
       columnUpperBounds: labels.upperBounds
     }
@@ -36,8 +36,12 @@ const boxplotCellMatrix = ({ rows, config }): CellMatrix => {
     if (Number(rowid) === 5) return plot.columnCount
     if (Number(rowid) === 6) return plot.columnSd
     if (Number(rowid) === 7) return plot.columnMean
-    if (Number(rowid) === 8) return plot.columnOutliers.length > 0 ? plot.columnOutliers.toString() : '-'
+    if (Number(rowid) === 8) return plot.columnIqr
     if (Number(rowid) === 9) return plot.values.length > 0 ? plot.values.toString() : '-'
+    if (Number(rowid) === 10) return plot.columnLowerBounds
+    if (Number(rowid) === 11) return plot.columnUpperBounds
+    if (Number(rowid) === 12) return plot.columnOutliers.length > 0 ? plot.columnOutliers.toString() : '-'
+    if (Number(rowid) === 11) return plot.columnNonOutliers
     return <p>-</p>
   }
   // get list of data keys for each row
