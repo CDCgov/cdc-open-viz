@@ -100,6 +100,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const [animatedChart, setAnimatedChart] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
+  const [autoPadding, setAutoPadding] = useState(0)
 
   // REFS
   const axisBottomRef = useRef(null)
@@ -114,144 +115,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     freezeOnceVisible: false
   })
 
-  // VARS/MEMOS
-  const shouldAbbreviate = true
-  const isHorizontal = orientation === 'horizontal' || config.visualizationType === 'Forest Plot'
-  const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
-  const isForestPlot = visualizationType === 'Forest Plot'
-  const suffixHasNoSpace = !suffix.includes(' ')
-
-  const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
-
-  // zero if not forest plot
-  const forestRowsHeight = isForestPlot ? config.data.length * config.forestPlot.rowHeight : 0
-
-  // height before bottom axis
-  const initialHeight = useMemo(
-    () => calcInitialHeight(config, currentViewport),
-    [config, currentViewport, parentHeight, config.heights?.vertical, config.heights?.horizontal]
-  )
-  const forestHeight = useMemo(() => initialHeight + forestRowsHeight, [initialHeight, forestRowsHeight])
-
-  // width
-  const width = useMemo(() => {
-    const initialWidth = dimensions[0]
-    const legendHidden = legend?.hide
-    const legendOnTopOrBottom = ['bottom', 'top'].includes(config.legend?.position)
-    const legendWrapped = isLegendWrapViewport(currentViewport)
-
-    const legendShowingLeftOrRight = !isForestPlot && !legendHidden && !legendOnTopOrBottom && !legendWrapped
-
-    if (!legendShowingLeftOrRight) return initialWidth
-
-    if (legendRef.current) {
-      const legendStyle = getComputedStyle(legendRef.current)
-      return (
-        initialWidth -
-        legendRef.current.getBoundingClientRect().width -
-        parseInt(legendStyle.marginLeft) -
-        parseInt(legendStyle.marginRight)
-      )
-    }
-
-    return initialWidth * 0.73
-  }, [dimensions[0], config.legend, currentViewport, legendRef.current])
-
-  // Used to calculate the y position of the x-axis title
-  const bottomLabelStart = useMemo(() => {
-    xAxisLabelRefs.current = xAxisLabelRefs.current?.filter(label => label)
-    if (!xAxisLabelRefs.current.length) return
-    const tallestLabel = Math.max(...xAxisLabelRefs.current.map(label => label.getBBox().height))
-    return tallestLabel + X_TICK_LABEL_PADDING + DEFAULT_TICK_LENGTH
-  }, [dimensions[0], config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
-
-  // xMax and yMax
-  const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
-  const yMax = initialHeight + forestRowsHeight
-
-  const checkLineToBarGraph = () => {
-    return isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph)
-  }
-
-  // GETTERS & FUNCTIONS
-  const getXAxisData = d =>
-    isDateScale(config.runtime.xAxis)
-      ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime()
-      : d[config.runtime.originalXAxis.dataKey]
-  const getYAxisData = (d, seriesKey) => d[seriesKey]
-  const xAxisDataMapped =
-    config.brush.active && brushConfig.data?.length
-      ? brushConfig.data.map(d => getXAxisData(d))
-      : data.map(d => getXAxisData(d))
-  const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
-  const properties = {
-    data,
-    tableData,
-    config,
-    minValue,
-    maxValue,
-    isAllLine,
-    existPositiveValue,
-    xAxisDataMapped,
-    xMax,
-    yMax
-  }
-  const { min, max, leftMax, rightMax } = useMinMax(properties)
-  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
-  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleAnnotation } = useScales({
-    ...properties,
-    min,
-    max,
-    leftMax,
-    rightMax,
-    dimensions,
-    xMax: parentWidth - Number(config.orientation === 'horizontal' ? config.xAxis.size : config.yAxis.size)
-  })
-
-  const handleLeftTickFormatting = (tick, index, ticks) => {
-    if (isLogarithmicAxis && tick === 0.1) {
-      //when logarithmic scale applied change value of first tick
-      tick = 0
-    }
-
-    if (config.data && !config.data[index] && visualizationType === 'Forest Plot') return
-    if (config.visualizationType === 'Forest Plot') return config.data[index][config.xAxis.dataKey]
-    if (isDateScale(runtime.yAxis)) return formatDate(parseDate(tick))
-    if (orientation === 'vertical' && max - min < 3)
-      return formatNumber(tick, 'left', shouldAbbreviate, false, false, '1', { index, length: ticks.length })
-    if (orientation === 'vertical') {
-      // TODO suggestion: pass all options as object key/values to allow for more flexibility
-      return formatNumber(tick, 'left', shouldAbbreviate, false, false, undefined, { index, length: ticks.length })
-    }
-    return tick
-  }
-
-  const handleBottomTickFormatting = (tick, i, ticks) => {
-    if (isLogarithmicAxis && tick === 0.1) {
-      // when logarithmic scale applied change value FIRST  of  tick
-      tick = 0
-    }
-
-    if (isDateScale(runtime.xAxis) && config.visualizationType !== 'Forest Plot') {
-      return formatDate(tick, i, ticks)
-    }
-    if (orientation === 'horizontal' && config.visualizationType !== 'Forest Plot')
-      return formatNumber(tick, 'left', shouldAbbreviate)
-    if (config.xAxis.type === 'continuous' && config.visualizationType !== 'Forest Plot')
-      return formatNumber(tick, 'bottom', shouldAbbreviate)
-    if (config.visualizationType === 'Forest Plot')
-      return formatNumber(
-        tick,
-        'left',
-        config.dataFormat.abbreviated,
-        config.runtime.xAxis.prefix,
-        config.runtime.xAxis.suffix,
-        Number(config.dataFormat.roundTo)
-      )
-    return tick
-  }
-
-  const countNumOfTicks = axis => {
+  // Pre render functions
+  const countNumOfTicks = (axis, max) => {
     let { numTicks } = runtime[axis]
     if (runtime[axis].viewportNumTicks && runtime[axis].viewportNumTicks[currentViewport]) {
       numTicks = runtime[axis].viewportNumTicks[currentViewport]
@@ -309,6 +174,108 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     return tickCount
   }
 
+  // VARS/MEMOS
+  const labelsOverflow = onlyShowTopPrefixSuffix || labelsAboveGridlines
+  const shouldAbbreviate = true
+  const isHorizontal = orientation === 'horizontal' || config.visualizationType === 'Forest Plot'
+  const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
+  const isForestPlot = visualizationType === 'Forest Plot'
+  const suffixHasNoSpace = !suffix.includes(' ')
+  const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
+  const fontSize = { small: 16, medium: 18, large: 20 }
+
+  const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
+
+  // zero if not forest plot
+  const forestRowsHeight = isForestPlot ? config.data.length * config.forestPlot.rowHeight : 0
+
+  // height before bottom axis
+  const initialHeight = useMemo(
+    () => calcInitialHeight(config, currentViewport),
+    [config, currentViewport, parentHeight, config.heights?.vertical, config.heights?.horizontal]
+  )
+  const forestHeight = useMemo(() => initialHeight + forestRowsHeight, [initialHeight, forestRowsHeight])
+
+  // width
+  const width = useMemo(() => {
+    const initialWidth = dimensions[0]
+    const legendHidden = legend?.hide
+    const legendOnTopOrBottom = ['bottom', 'top'].includes(config.legend?.position)
+    const legendWrapped = isLegendWrapViewport(currentViewport)
+
+    const legendShowingLeftOrRight = !isForestPlot && !legendHidden && !legendOnTopOrBottom && !legendWrapped
+
+    if (!legendShowingLeftOrRight) return initialWidth
+
+    if (legendRef.current) {
+      const legendStyle = getComputedStyle(legendRef.current)
+      return (
+        initialWidth -
+        legendRef.current.getBoundingClientRect().width -
+        parseInt(legendStyle.marginLeft) -
+        parseInt(legendStyle.marginRight)
+      )
+    }
+
+    return initialWidth * 0.73
+  }, [dimensions[0], config.legend, currentViewport, legendRef.current])
+
+  // Used to calculate the y position of the x-axis title
+  const bottomLabelStart = useMemo(() => {
+    xAxisLabelRefs.current = xAxisLabelRefs.current?.filter(label => label)
+    if (!xAxisLabelRefs.current.length) return
+    const tallestLabel = Math.max(...xAxisLabelRefs.current.map(label => label.getBBox().height))
+    return tallestLabel + X_TICK_LABEL_PADDING + DEFAULT_TICK_LENGTH
+  }, [dimensions[0], config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
+
+  // xMax and yMax
+  const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
+  const yMax = initialHeight + forestRowsHeight
+
+  const isNoDataAvailable = config.filters && config.filters.values.length === 0 && data.length === 0
+
+  const getXAxisData = d =>
+    isDateScale(config.runtime.xAxis)
+      ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime()
+      : d[config.runtime.originalXAxis.dataKey]
+  const getYAxisData = (d, seriesKey) => d[seriesKey]
+  const xAxisDataMapped =
+    config.brush.active && brushConfig.data?.length
+      ? brushConfig.data.map(d => getXAxisData(d))
+      : data.map(d => getXAxisData(d))
+  const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
+  const properties = {
+    data,
+    tableData,
+    config: {
+      ...config,
+      yAxis: {
+        ...config.yAxis,
+        scalePadding: labelsOverflow ? autoPadding : config.yAxis.scalePadding,
+        enablePadding: labelsOverflow || config.yAxis.enablePadding
+      }
+    },
+    minValue,
+    maxValue,
+    isAllLine,
+    existPositiveValue,
+    xAxisDataMapped,
+    xMax,
+    yMax
+  }
+  const { min, max, leftMax, rightMax } = useMinMax(properties)
+  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
+  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleAnnotation } = useScales({
+    ...properties,
+    min,
+    max,
+    leftMax,
+    rightMax,
+    dimensions,
+    xMax: parentWidth - Number(config.orientation === 'horizontal' ? config.xAxis.size : config.yAxis.size)
+  })
+  const handleNumTicks = isForestPlot ? config.data.length : countNumOfTicks('yAxis', max)
+
   // Tooltip Helpers
   const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip()
 
@@ -325,6 +292,82 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       showTooltip,
       hideTooltip
   })
+
+  // GETTERS & FUNCTIONS
+  const checkLineToBarGraph = () => {
+    return isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph)
+  }
+
+  const handleLeftTickFormatting = (tick, index, ticks) => {
+    if (isLogarithmicAxis && tick === 0.1) {
+      //when logarithmic scale applied change value of first tick
+      tick = 0
+    }
+
+    if (config.data && !config.data[index] && visualizationType === 'Forest Plot') return
+    if (config.visualizationType === 'Forest Plot') return config.data[index][config.xAxis.dataKey]
+    if (isDateScale(runtime.yAxis)) return formatDate(parseDate(tick))
+    if (orientation === 'vertical' && max - min < 3)
+      return formatNumber(tick, 'left', shouldAbbreviate, false, false, '1', { index, length: ticks.length })
+    if (orientation === 'vertical') {
+      // TODO suggestion: pass all options as object key/values to allow for more flexibility
+      return formatNumber(tick, 'left', shouldAbbreviate, false, false, undefined, { index, length: ticks.length })
+    }
+    return tick
+  }
+
+  const handleBottomTickFormatting = (tick, i, ticks) => {
+    if (isLogarithmicAxis && tick === 0.1) {
+      // when logarithmic scale applied change value FIRST  of  tick
+      tick = 0
+    }
+
+    if (isDateScale(runtime.xAxis) && config.visualizationType !== 'Forest Plot') {
+      return formatDate(tick, i, ticks)
+    }
+    if (orientation === 'horizontal' && config.visualizationType !== 'Forest Plot')
+      return formatNumber(tick, 'left', shouldAbbreviate)
+    if (config.xAxis.type === 'continuous' && config.visualizationType !== 'Forest Plot')
+      return formatNumber(tick, 'bottom', shouldAbbreviate)
+    if (config.visualizationType === 'Forest Plot')
+      return formatNumber(
+        tick,
+        'left',
+        config.dataFormat.abbreviated,
+        config.runtime.xAxis.prefix,
+        config.runtime.xAxis.suffix,
+        Number(config.dataFormat.roundTo)
+      )
+    return tick
+  }
+
+  const chartHasTooltipGuides = () => {
+    const { visualizationType } = config
+    if (visualizationType === 'Combo' && runtime.forecastingSeriesKeys > 0) return true
+    if (visualizationType === 'Area Chart') return true
+    if (visualizationType === 'Line') return true
+    if (visualizationType === 'Bar') return true
+    return false
+  }
+
+  const getManualStep = () => {
+    let manualStep = config.xAxis.manualStep
+    if (config.xAxis.viewportStepCount && config.xAxis.viewportStepCount[currentViewport]) {
+      manualStep = config.xAxis.viewportStepCount[currentViewport]
+    }
+    return manualStep
+  }
+
+  const onMouseMove = event => {
+    const svgRect = event.currentTarget.getBoundingClientRect()
+    const x = event.clientX - svgRect.left
+    const y = event.clientY - svgRect.top
+
+    setPoint({
+      x,
+      y
+    })
+  }
 
   // EFFECTS
 
@@ -409,43 +452,20 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     legendRef.current.style.transform = legendIsLeftOrRight ? `translateY(${topLabelOnGridlineHeight}px)` : 'none'
   }, [axisBottomRef.current, config, bottomLabelStart, brush, currentViewport, topYLabelRef.current, initialHeight])
 
-  const chartHasTooltipGuides = () => {
-    const { visualizationType } = config
-    if (visualizationType === 'Combo' && runtime.forecastingSeriesKeys > 0) return true
-    if (visualizationType === 'Area Chart') return true
-    if (visualizationType === 'Line') return true
-    if (visualizationType === 'Bar') return true
-    return false
-  }
+  useEffect(() => {
+    if (orientation === 'horizontal') return
 
-  const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
-  const fontSize = { small: 16, medium: 18, large: 20 }
+    const maxValueIsGreaterThanTopGridLine = maxValue > Math.max(...yScale.ticks(handleNumTicks))
+    if (!maxValueIsGreaterThanTopGridLine || !labelsOverflow) return
 
-  const handleNumTicks = () => {
-    // On forest plots we need to return every "study" or y axis value.
-    if (config.visualizationType === 'Forest Plot') return config.data.length
-    return countNumOfTicks('yAxis')
-  }
+    const tickGap = yScale.ticks(handleNumTicks)[1] - yScale.ticks(handleNumTicks)[0]
+    const nextTick = Math.max(...yScale.ticks(handleNumTicks)) + tickGap
+    const newPadding = minValue < 0 ? (nextTick - maxValue) / maxValue / 2 : (nextTick - maxValue) / maxValue
 
-  const getManualStep = () => {
-    let manualStep = config.xAxis.manualStep
-    if (config.xAxis.viewportStepCount && config.xAxis.viewportStepCount[currentViewport]) {
-      manualStep = config.xAxis.viewportStepCount[currentViewport]
-    }
-    return manualStep
-  }
+    setAutoPadding(newPadding * 100)
+  }, [maxValue, labelsOverflow, yScale, handleNumTicks])
 
-  const onMouseMove = event => {
-    const svgRect = event.currentTarget.getBoundingClientRect()
-    const x = event.clientX - svgRect.left
-    const y = event.clientY - svgRect.top
-
-    setPoint({
-      x,
-      y
-    })
-  }
-
+  // Render Functions
   const generatePairedBarAxis = () => {
     const axisMaxHeight = bottomLabelStart + BOTTOM_LABEL_PADDING
 
@@ -595,8 +615,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     )
   }
 
-  const isNoDataAvailable = config.filters && config.filters.values.length === 0 && data.length === 0
-
   return isNaN(width) ? (
     <React.Fragment></React.Fragment>
   ) : (
@@ -625,7 +643,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             <AxisLeft
               scale={yScale}
               left={Number(runtime.yAxis.size) - config.yAxis.axisPadding}
-              numTicks={handleNumTicks()}
+              numTicks={handleNumTicks}
             >
               {props => {
                 const axisCenter =
@@ -1002,7 +1020,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               label={runtime.yAxis.label || runtime.yAxis.label}
               stroke='#333'
               tickFormat={handleLeftTickFormatting}
-              numTicks={handleNumTicks()}
+              numTicks={handleNumTicks}
             >
               {props => {
                 const axisCenter =
