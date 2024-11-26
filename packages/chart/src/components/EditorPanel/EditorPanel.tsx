@@ -1839,6 +1839,17 @@ const EditorPanel = () => {
                     className='number-narrow'
                     updateField={updateField}
                     min={0}
+                  />{' '}
+                  <TextField
+                    display={config.visualizationType === 'Pie'}
+                    value={config.dataFormat.roundingPercentage ? config.dataFormat.roundingPercentage : 0}
+                    type='number'
+                    section='dataFormat'
+                    fieldName='roundingPercentage'
+                    label='Rounding Percentage'
+                    className='number-narrow'
+                    updateField={updateField}
+                    min={0}
                   />
                   <div className='two-col-inputs'>
                     <TextField
@@ -1886,7 +1897,6 @@ const EditorPanel = () => {
                       }
                     />
                   </div>
-
                   {config.orientation === 'horizontal' ? ( // horizontal - x is vertical y is horizontal
                     <>
                       {visSupportsValueAxisLine() && (
@@ -2028,7 +2038,6 @@ const EditorPanel = () => {
                       </>
                     )
                   )}
-
                   {/* start: anchors */}
                   {visHasAnchors() && config.orientation !== 'horizontal' && (
                     <div className='edit-block'>
@@ -2155,7 +2164,6 @@ const EditorPanel = () => {
                       </button>
                     </div>
                   )}
-
                   {visHasAnchors() && config.orientation === 'horizontal' && (
                     <div className='edit-block'>
                       <span className='edit-label column-heading'>Anchors</span>

@@ -196,7 +196,8 @@ export default {
     abbreviated: false,
     bottomSuffix: '',
     bottomPrefix: '',
-    bottomAbbreviated: false
+    bottomAbbreviated: false,
+    roundingPercentage: '0'
   },
   confidenceKeys: {},
   visual: {
