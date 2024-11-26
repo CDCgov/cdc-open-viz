@@ -24,6 +24,7 @@ type VisualizationWrapperProps = {
   children: React.ReactNode
   currentViewport: ViewPort
   groupName: string
+  hideVisualization: boolean
   row: ConfigRow
 }
 
@@ -31,10 +32,13 @@ const VisualizationWrapper: React.FC<VisualizationWrapperProps> = ({
   allExpanded,
   currentViewport,
   groupName,
+  hideVisualization,
   row,
   children
 }) => {
-  return row.expandCollapseAllButtons ? (
+  return hideVisualization ? (
+    <></>
+  ) : row.expandCollapseAllButtons ? (
     <div className='collapsable-multiviz-container'>
       <CollapsibleVisualizationRow
         allExpanded={allExpanded}
@@ -47,7 +51,7 @@ const VisualizationWrapper: React.FC<VisualizationWrapperProps> = ({
     </div>
   ) : (
     <>
-      <h3>{groupName}</h3>
+      {groupName !== '' ? <h3>{groupName}</h3> : <></>}
       {children}
     </>
   )
@@ -59,6 +63,7 @@ type VizRowProps = {
   groupName: string
   row: ConfigRow
   rowIndex: number
+  inNoDataState: boolean
   setSharedFilter: Function
   updateChildConfig: Function
   apiFilterDropdowns: APIFilterDropdowns
@@ -71,6 +76,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   groupName,
   row,
   rowIndex: index,
+  inNoDataState,
   setSharedFilter,
   updateChildConfig,
   apiFilterDropdowns,
@@ -81,11 +87,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   const setToggled = (colIndex: number) => {
     setShow(show.map((_, i) => i === colIndex))
   }
-  const inNoDataState = useMemo(() => {
-    const vals = Object.values(rawData).flatMap(val => val)
-    if (!vals.length) return true
-    return vals.some(val => val === undefined)
-  }, [rawData])
 
   const footnotesConfig = useMemo(() => {
     if (row.footnotesId) {
@@ -150,10 +151,10 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               {visualizationConfig.dataKey} (Go to Table)
             </a>
           )
-          const hideFilter =
+          const hideVisualization =
             inNoDataState &&
-            visualizationConfig.type === 'dashboardFilters' &&
-            applyButtonNotClicked(visualizationConfig)
+            visualizationConfig.filterBehavior !== 'Apply Button' &&
+            (visualizationConfig.type !== 'dashboardFilters' || applyButtonNotClicked(visualizationConfig))
 
           const shouldShow = row.toggle === undefined || (row.toggle && show[colIndex])
 
@@ -166,6 +167,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                 allExpanded={allExpanded}
                 currentViewport={currentViewport}
                 groupName={groupName}
+                hideVisualization={hideVisualization}
                 row={row}
               >
                 {visualizationConfig.type === 'chart' && (
@@ -272,7 +274,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                     configUrl={undefined}
                   />
                 )}
-                {visualizationConfig.type === 'dashboardFilters' && !hideFilter && (
+                {visualizationConfig.type === 'dashboardFilters' && (
                   <DashboardSharedFilters
                     setConfig={newConfig => {
                       updateChildConfig(col.widget, newConfig)

@@ -546,7 +546,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                     return (
                       <>
                         {/* Expand/Collapse All */}
-                        {row.expandCollapseAllButtons === true && (
+                        {!inNoDataState && row.expandCollapseAllButtons === true && (
                           <ExpandCollapseButtons setAllExpanded={setAllExpanded} />
                         )}
                         {Object.keys(dataGroups).map(groupName => {
@@ -563,6 +563,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                               updateChildConfig={updateChildConfig}
                               apiFilterDropdowns={apiFilterDropdowns}
                               currentViewport={currentViewport}
+                              inNoDataState={inNoDataState}
                             />
                           )
                         })}
@@ -580,10 +581,13 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                         updateChildConfig={updateChildConfig}
                         apiFilterDropdowns={apiFilterDropdowns}
                         currentViewport={currentViewport}
+                        inNoDataState={inNoDataState}
                       />
                     )
                   }
                 })}
+
+            {inNoDataState ? <span>Please complete your selection to continue.</span> : <></>}
 
             {/* Image or PDF Inserts */}
             <section className='download-buttons'>
