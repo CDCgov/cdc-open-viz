@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 
 // Third Party
 import {
@@ -10,6 +10,7 @@ import {
 } from 'react-accessible-accordion'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { useDebounce } from 'use-debounce'
+import _ from 'lodash'
 // import ReactTags from 'react-tag-autocomplete'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import Panels from './Panels'
@@ -64,8 +65,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     runtimeData,
     setRuntimeData,
     generateRuntimeData,
-    position,
-    topoData,
+
 
   } = useContext<MapContext>(ConfigContext)
 
@@ -378,7 +378,8 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           ...state,
           legend: {
             ...state.legend,
-            position: value
+            position: value,
+            hideBorder: _.includes(['top', 'bottom'], value)
           }
         })
         break
