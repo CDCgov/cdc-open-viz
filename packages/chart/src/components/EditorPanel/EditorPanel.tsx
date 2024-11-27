@@ -647,7 +647,8 @@ const EditorPanel = () => {
     visSupportsValueAxisLine,
     visSupportsValueAxisMax,
     visSupportsValueAxisMin,
-    visSupportsValueAxisTicks
+    visSupportsValueAxisTicks,
+    visSupportsYPadding
   } = useEditorPermissions()
 
   // when the visualization type changes we
@@ -1768,14 +1769,16 @@ const EditorPanel = () => {
                           title={!config.yAxis.gridLines ? 'Show gridlines to enable' : ''}
                         />
                       )}
-                      <CheckBox
-                        value={config.yAxis.enablePadding}
-                        section='yAxis'
-                        fieldName='enablePadding'
-                        label='Add Padding to Value Axis Scale'
-                        updateField={updateField}
-                      />
-                      {config.yAxis.enablePadding && (
+                      {visSupportsYPadding() && (
+                        <CheckBox
+                          value={config.yAxis.enablePadding}
+                          section='yAxis'
+                          fieldName='enablePadding'
+                          label='Add Padding to Value Axis Scale'
+                          updateField={updateField}
+                        />
+                      )}
+                      {config.yAxis.enablePadding && visSupportsYPadding() && (
                         <TextField
                           type='number'
                           section='yAxis'
