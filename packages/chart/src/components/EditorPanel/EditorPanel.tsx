@@ -1840,17 +1840,6 @@ const EditorPanel = () => {
                     updateField={updateField}
                     min={0}
                   />{' '}
-                  <TextField
-                    display={config.visualizationType === 'Pie'}
-                    value={config.dataFormat.roundingPercentage ? config.dataFormat.roundingPercentage : 0}
-                    type='number'
-                    section='dataFormat'
-                    fieldName='roundingPercentage'
-                    label='Rounding Percentage'
-                    className='number-narrow'
-                    updateField={updateField}
-                    min={0}
-                  />
                   <div className='two-col-inputs'>
                     <TextField
                       value={config.dataFormat.prefix}

@@ -68,7 +68,6 @@ type DataFormat = {
   roundTo: number
   suffix: string
   onlyShowTopPrefixSuffix?: boolean
-  roundingPercentage: string
 }
 
 type Exclusions = {

@@ -170,7 +170,7 @@ const PieChart = props => {
           )
         })}
         {transitions.map(({ item: arc, key }, i) => {
-          const roundTo = Number(config.dataFormat.roundingPercentage) || 0
+          const roundTo = Number(config.dataFormat.roundTo) || 0
           const [centroidX, centroidY] = path.centroid(arc)
           const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1
 
