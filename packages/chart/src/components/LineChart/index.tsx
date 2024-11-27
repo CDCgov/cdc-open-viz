@@ -3,7 +3,7 @@ import React, { useContext } from 'react'
 // VisX library imports
 import * as allCurves from '@visx/curve'
 import { Group } from '@visx/group'
-import { LinePath, Bar, SplitLinePath } from '@visx/shape'
+import { LinePath, Bar, SplitLinePath, AreaClosed } from '@visx/shape'
 import { Text } from '@visx/text'
 
 // CDC core components
@@ -14,7 +14,7 @@ import ConfigContext from '../../ConfigContext'
 import useRightAxis from '../../hooks/useRightAxis'
 
 // Local helpers and components
-import { filterCircles, createStyles, createDataSegments } from './helpers'
+import { filterCircles, createStyles, createDataSegments, truncateText } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
 import LineChartBumpCircle from './components/LineChart.BumpCircle'
 import isNumber from '@cdc/core/helpers/isNumber'
@@ -39,7 +39,7 @@ const LineChart = (props: LineChartProps) => {
   } = props
 
   // prettier-ignore
-  const { colorScale, config, formatNumber, handleLineType, parseDate, seriesHighlight, tableData, transformedData, updateConfig, brushConfig,clean  } = useContext<ChartContext>(ConfigContext)
+  const { colorScale, config, formatNumber, handleLineType, parseDate, seriesHighlight, tableData, transformedData, updateConfig, brushConfig,clean } = useContext<ChartContext>(ConfigContext)
   const { yScaleRight } = useRightAxis({ config, yMax, data: transformedData, updateConfig })
   if (!handleTooltipMouseOver) return
 
@@ -68,6 +68,14 @@ const LineChart = (props: LineChartProps) => {
           const seriesAxis = seriesData.axis || 'left'
           const displayArea =
             legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
+
+          const handleX = (d: Record<string, any>[]) => {
+            return config.xAxis.type === 'categorical'
+              ? xScale(d[config.xAxis.dataKey]) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+              : config.xAxis.type === 'date-time'
+              ? xScale(new Date(d[config.xAxis.dataKey])) + config.yAxis.size
+              : xScale(parseDate(d[config.xAxis.dataKey])) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+          }
 
           const suppressedSegments = createDataSegments(
             tableData,
@@ -252,6 +260,26 @@ const LineChart = (props: LineChartProps) => {
                 </>
               ) : (
                 <>
+                  {/* Confidence Interval Band */}
+                  {seriesData.confidenceIntervals?.map((ciGroup, ciIndex) => (
+                    <>
+                      <AreaClosed
+                        key={`area-closed-${seriesKey}__${ciIndex}`}
+                        data={data}
+                        x={d => handleX(d, ciGroup)}
+                        y0={d => yScale(d[ciGroup.low])}
+                        y1={d => yScale(d[ciGroup.high])}
+                        opacity={0.5}
+                        fill={colorScale(
+                          config.runtime.seriesLabels
+                            ? config.runtime.seriesLabels[seriesData.dataKey]
+                            : seriesData.dataKey
+                        )}
+                        yScale={yScale}
+                        curve={allCurves[seriesData.lineType as keyof typeof allCurves]}
+                      />
+                    </>
+                  ))}
                   {/* STANDARD LINE */}
                   <LinePath
                     curve={allCurves[seriesData.lineType]}
@@ -346,6 +374,12 @@ const LineChart = (props: LineChartProps) => {
                   if (!lastDatum) {
                     return <></>
                   }
+
+                  const availableSpace = xMax - xPos(lastDatum)
+                  let label = config.runtime.seriesLabels[seriesKey] || seriesKey
+                  // truncate text if it does not fit for availableSpace
+                  label = truncateText(label, availableSpace)
+
                   return (
                     <Text
                       x={xPos(lastDatum) + 5}
@@ -357,7 +391,7 @@ const LineChart = (props: LineChartProps) => {
                           : 'black'
                       }
                     >
-                      {config.runtime.seriesLabels[seriesKey] || seriesKey}
+                      {label}
                     </Text>
                   )
                 })}

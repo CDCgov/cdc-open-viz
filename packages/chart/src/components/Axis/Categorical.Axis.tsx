@@ -44,7 +44,7 @@ const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
     if (categoryObj[lastheight] === '') {
       // Calculate the sum of the numeric values of all other heights
       const sumOfValues = heights.slice(0, -1).reduce((sum, label) => {
-        const value = parseInt(categoryObj[label], 10)
+        const value = Number(categoryObj[label])
         return sum + (isNaN(value) ? 0 : value)
       }, 0)
 
@@ -52,7 +52,7 @@ const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
       const newValue = max - sumOfValues
 
       // Update the last height with the new value
-      categoryObj[lastheight] = newValue.toString()
+      categoryObj[lastheight] = newValue
     }
 
     return [categoryObj]

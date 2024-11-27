@@ -1,4 +1,5 @@
 {
+  "annotations": [],
   "general": {
     "title": "Example Data Map with Cities",
     "subtext": "*: Lorem ipsum; NA: Lorem ipsum.",
@@ -32,7 +33,9 @@
     "showDownloadPdfButton": false,
     "territoriesAlwaysShow": false,
     "geoLabelOverride": "",
-    "convertFipsCodes": true
+    "convertFipsCodes": true,
+    "noStateFoundMessage": "Map Unavailable",
+    "annotationDropdownText": "Annotations"
   },
   "type": "map",
   "color": "yelloworangered",
@@ -49,7 +52,8 @@
       "name": "Rate",
       "prefix": "",
       "suffix": "",
-      "tooltip": false
+      "tooltip": false,
+      "roundToPlace": 0
     },
     "navigate": {
       "dataTable": false,
@@ -99,7 +103,12 @@
     "descriptions": {},
     "singleRow": false,
     "showSpecialClassesLast": false,
-    "verticalSorted": false
+    "verticalSorted": false,
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "singleColumnLegend": false,
+    "hideBorder": false
   },
   "filters": [],
   "table": {
@@ -114,7 +123,8 @@
     "showFullGeoNameInCSV": false,
     "forceDisplay": true,
     "download": true,
-    "indexLabel": ""
+    "indexLabel": "",
+    "showDownloadLinkBelow": true
   },
   "tooltips": {
     "appearanceType": "hover",
@@ -123,7 +133,7 @@
     "opacity": 90
   },
   "runtime": {
-    "editorErrorMessage": []
+    "editorErrorMessage": ""
   },
   "visual": {
     "cityStyle": "pin",
@@ -144,7 +154,14 @@
   },
   "map": {
     "layers": [],
-    "patterns": []
+    "patterns": [
+      {
+        "dataKey": "Location",
+        "pattern": "circles",
+        "contrastCheck": true,
+        "dataValue": "School"
+      }
+    ]
   },
   "hexMap": {
     "type": "",

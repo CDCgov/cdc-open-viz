@@ -18,7 +18,7 @@
   "lollipopShape": "circle",
   "lollipopColorStyle": "two-tone",
   "visualizationSubType": "regular",
-  "barStyle": "",
+  "barStyle": "flat",
   "roundingStyle": "standard",
   "tipRounding": "top",
   "isResponsiveTicks": false,
@@ -59,6 +59,7 @@
     "axisPadding": 0,
     "scalePadding": 10,
     "tickRotation": 0,
+    "anchors": [],
     "shoMissingDataLabel": true,
     "showMissingDataLine": true,
     "categories": []
@@ -99,13 +100,7 @@
   },
   "xAxis": {
     "sortDates": false,
-    "anchors": [
-      {
-        "value": "05-01-2021",
-        "color": "red",
-        "lineStyle": "Dashed Medium"
-      }
-    ],
+    "anchors": [],
     "type": "categorical",
     "showTargetLabel": true,
     "targetLabel": "Target",
@@ -113,7 +108,7 @@
     "hideLabel": false,
     "hideTicks": false,
     "size": 75,
-    "tickRotation": 0,
+    "tickRotation": "45",
     "min": "",
     "max": "",
     "labelColor": "#333",
@@ -124,14 +119,16 @@
     "axisPadding": 200,
     "target": 0,
     "maxTickRotation": 0,
-    "padding": 5,
+    "padding": "0",
     "showYearsOnce": false,
     "sortByRecentDate": false,
-    "dataKey": "Date",
-    "dateParseFormat": "%m-%d-%Y",
-    "dateDisplayFormat": "%m-%d-%Y",
-    "axisBBox": 26.40333366394043,
-    "tickWidthMax": 93
+    "dataKey": "date",
+    "axisBBox": 115.91039276123047,
+    "tickWidthMax": 93,
+    "dateParseFormat": "%Y-%m-%d",
+    "dateDisplayFormat": "%Y-%m-%d",
+    "manual": false,
+    "label": "Date"
   },
   "table": {
     "label": "Data Table",
@@ -144,15 +141,91 @@
     "showDownloadLinkBelow": true,
     "indexLabel": "",
     "download": true,
-    "showVertical": false,
-    "dateDisplayFormat": "",
+    "showVertical": true,
+    "dateDisplayFormat": "%Y-%m-%d",
     "showMissingDataLabel": true,
     "showSuppressedSymbol": true,
     "show": true
   },
   "orientation": "vertical",
   "color": "pinkpurple",
-  "columns": {},
+  "columns": {
+    "male_ci": {
+      "label": "Male (CI)",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "male_ci"
+    },
+    "female_ci": {
+      "label": "Female (CI)",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "female_ci"
+    },
+    "male": {
+      "label": "male",
+      "dataTable": false,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "male"
+    },
+    "female": {
+      "label": "female",
+      "dataTable": false,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "female"
+    },
+    "date": {
+      "label": "Date",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "date"
+    }
+  },
   "legend": {
     "hide": false,
     "behavior": "isolate",
@@ -179,16 +252,17 @@
     "hideBorder": {
       "side": false,
       "topBottom": true
-    },
-    "position": "right"
+    }
   },
   "brush": {
-    "height": 45,
+    "height": 25,
     "active": false
   },
   "exclusions": {
-    "active": false,
-    "keys": []
+    "active": true,
+    "keys": [],
+    "dateStart": "2023-01-02",
+    "dateEnd": "2023-01-11"
   },
   "palette": "qualitative-bold",
   "isPaletteReversed": false,
@@ -206,7 +280,10 @@
     "bottomPrefix": "",
     "bottomAbbreviated": false
   },
-  "confidenceKeys": {},
+  "confidenceKeys": {
+    "upper": "upper",
+    "lower": "lower"
+  },
   "visual": {
     "border": true,
     "accent": true,
@@ -219,16 +296,32 @@
   "highlightedBarValues": [],
   "series": [
     {
-      "dataKey": "Male",
-      "type": "Bar",
-      "tooltip": true,
-      "axis": "Left"
+      "dataKey": "male",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": false,
+      "confidenceIntervals": [
+        {
+          "high": "male_upper",
+          "low": "male_lower"
+        }
+      ],
+      "lineType": "curveMonotoneX",
+      "weight": 3
     },
     {
-      "dataKey": "Female",
-      "type": "Bar",
-      "tooltip": true,
-      "axis": "Left"
+      "dataKey": "female",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": false,
+      "confidenceIntervals": [
+        {
+          "high": "female_upper",
+          "low": "female_lower"
+        }
+      ],
+      "lineType": "curveMonotoneX",
+      "weight": 3
     }
   ],
   "tooltips": {
@@ -325,98 +418,126 @@
     },
     "data": []
   },
-  "height": 300,
-  "dataDescription": {
-    "horizontal": false,
-    "series": true,
-    "singleRow": false,
-    "seriesKey": "Sex",
-    "xKey": "Date",
-    "valueKey": "Cases per 100K"
-  },
   "visualizationType": "Line",
   "data": [
     {
-      "Date": "01-01-2021",
-      "Male": "6714",
-      "Female": "5714"
+      "date": "2023-01-01",
+      "male": 67,
+      "male_lower": 65,
+      "male_upper": 69,
+      "female": 77,
+      "female_lower": 73,
+      "female_upper": 81,
+      "male_ci": "CI (65, 69)",
+      "female_ci": "CI (73, 81)"
     },
     {
-      "Date": "02-01-2021",
-      "Male": "7260",
-      "Female": "6000"
+      "date": "2023-01-02",
+      "male": 11,
+      "male_lower": 10,
+      "male_upper": 13,
+      "female": 21,
+      "female_lower": 18,
+      "female_upper": 24,
+      "male_ci": "CI (10, 13)",
+      "female_ci": "CI (18, 24)"
     },
     {
-      "Date": "03-01-2021",
-      "Male": "6808",
-      "Female": "5808"
+      "date": "2023-01-03",
+      "male": 94,
+      "male_lower": 92,
+      "male_upper": 96,
+      "female": 104,
+      "female_lower": 100,
+      "female_upper": 108,
+      "male_ci": "CI (92, 96)",
+      "female_ci": "CI (100, 108)"
     },
     {
-      "Date": "04-01-2021",
-      "Male": "6225",
-      "Female": "6225"
+      "date": "2023-01-04",
+      "male": 95,
+      "male_lower": 93,
+      "male_upper": 97,
+      "female": 105,
+      "female_lower": 101,
+      "female_upper": 109,
+      "male_ci": "CI (93, 97)",
+      "female_ci": "CI (101, 109)"
     },
     {
-      "Date": "05-01-2021",
-      "Male": "6633",
-      "Female": "5633"
+      "date": "2023-01-05",
+      "male": 79,
+      "male_lower": 77,
+      "male_upper": 81,
+      "female": 89,
+      "female_lower": 85,
+      "female_upper": 93,
+      "male_ci": "CI (77, 81)",
+      "female_ci": "CI (85, 93)"
     },
     {
-      "Date": "06-01-2021",
-      "Male": "10600",
-      "Female": "8600"
+      "date": "2023-01-06",
+      "male": 2,
+      "male_lower": 1,
+      "male_upper": 3,
+      "female": 12,
+      "female_lower": 9,
+      "female_upper": 15,
+      "male_ci": "CI (1, 3)",
+      "female_ci": "CI (9, 15)"
     },
     {
-      "Date": "07-01-2021",
-      "Male": "11300",
-      "Female": "9300"
+      "date": "2023-01-07",
+      "male": 36,
+      "male_lower": 34,
+      "male_upper": 38,
+      "female": 46,
+      "female_lower": 42,
+      "female_upper": 50,
+      "male_ci": "CI (34, 38)",
+      "female_ci": "CI (42, 50)"
     },
     {
-      "Date": "08-01-2021",
-      "Male": "12450",
-      "Female": "9450"
+      "date": "2023-01-08",
+      "male": 9,
+      "male_lower": 7,
+      "male_upper": 11,
+      "female": 19,
+      "female_lower": 16,
+      "female_upper": 22,
+      "male_ci": "CI (7, 11)",
+      "female_ci": "CI (16, 22)"
     },
     {
-      "Date": "09-01-2021",
-      "Male": "14625",
-      "Female": "3625"
+      "date": "2023-01-09",
+      "male": 3,
+      "male_lower": 2,
+      "male_upper": 4,
+      "female": 13,
+      "female_lower": 10,
+      "female_upper": 16,
+      "male_ci": "CI (2, 4)",
+      "female_ci": "CI (10, 16)"
     },
     {
-      "Date": "10-01-2021",
-      "Male": "18238",
-      "Female": "3238"
-    },
-    {
-      "Date": "11-01-2021",
-      "Male": "18214",
-      "Female": "2214"
-    },
-    {
-      "Date": "12-01-2021",
-      "Male": "16411",
-      "Female": "2411"
-    },
-    {
-      "Date": "01-01-2022",
-      "Male": "15808",
-      "Female": "2808"
-    },
-    {
-      "Date": "02-01-2022",
-      "Male": "11210",
-      "Female": "3210"
-    },
-    {
-      "Date": "03-01-2022",
-      "Male": "9660",
-      "Female": "2660"
-    },
-    {
-      "Date": "04-01-2022",
-      "Male": "7325",
-      "Female": "2325"
+      "date": "2023-01-10",
+      "male": 64,
+      "male_lower": 62,
+      "male_upper": 66,
+      "female": 74,
+      "female_lower": 70,
+      "female_upper": 78,
+      "male_ci": "CI (62, 66)",
+      "female_ci": "CI (70, 78)"
     }
   ],
+  "dataFileName": "valid-forecast-data.csv",
+  "dataFileSourceType": "file",
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
   "version": "4.24.10",
-  "dynamicMarginTop": 0
+  "dynamicMarginTop": 0,
+  "regions": []
 }

@@ -77,6 +77,7 @@ import WorldMap from './components/WorldMap' // Future: Lazy
 import useTooltip from './hooks/useTooltip'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
+import { isOlderVersion } from '@cdc/core/helpers/ver/versionNeedsUpdate'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -407,9 +408,13 @@ const CdcMap = ({
 
       // Special Classes (No Data)
       if (result[legendIdx].special) {
-        const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
-
-        return specialClassColors[legendIdx]
+        if (isOlderVersion(state.version, '4.24.11')) {
+          const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
+          return specialClassColors[legendIdx]
+        } else {
+          const specialClassColors = ['#A9AEB1', '#71767A']
+          return specialClassColors[legendIdx]
+        }
       }
 
       if (obj.color.includes('qualitative')) return mapColorPalette[colorIdx]
@@ -1719,6 +1724,7 @@ const CdcMap = ({
     isDebug,
     isEditor,
     loadConfig,
+    logo,
     navigationHandler,
     position,
     resetLegendToggles,
@@ -1862,7 +1868,8 @@ const CdcMap = ({
                       {'us-region' === geoType && <UsaMap.Region />}
                       {'us-county' === geoType && <UsaMap.County />}
                       {'world' === geoType && <WorldMap />}
-                      {'data' === general.type && logo && (
+                      {/* logo is handled in UsaMap.State when applicable */}
+                      {'data' === general.type && logo && ('us' !== geoType || 'us-geocode' === state.general.type) && (
                         <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
                       )}
                     </>

@@ -20,6 +20,8 @@ type AlertProps = {
   autoDismiss?: boolean
   // set seconds until autoDismiss, default is 5 seconds
   secondsBeforeDismiss?: number
+  // provide option for non dismissable alert
+  showCloseButton?: boolean
 }
 
 const Alert: React.FC<AlertProps> = ({
@@ -29,7 +31,8 @@ const Alert: React.FC<AlertProps> = ({
   heading,
   onDismiss,
   autoDismiss,
-  secondsBeforeDismiss = 5
+  secondsBeforeDismiss = 5,
+  showCloseButton = true
 }) => {
   // sanitize the text for setting dangerouslySetInnerHTML
 
@@ -55,9 +58,11 @@ const Alert: React.FC<AlertProps> = ({
         {type === 'info' && <Icon display='info' size={iconSize} />}
         <span dangerouslySetInnerHTML={sanitizedData()} />
       </div>
-      <button type='button' className='close pl-5' aria-label='Close' onClick={() => onDismiss()}>
-        X
-      </button>
+      {showCloseButton && (
+        <button type='button' className='close pl-5' aria-label='Close' onClick={() => onDismiss()}>
+          X
+        </button>
+      )}
     </div>
   )
 }

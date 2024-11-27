@@ -105,6 +105,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       visualizationConfig
     )
 
+    // sets the active filter option that the user just selected.
+    dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+
     if (hasDashboardApplyBehavior(dashboardConfig.visualizations)) {
       const isAutoSelectFilter = visualizationConfig.autoLoad
       const missingFilterSelections = newConfig.dashboard.sharedFilters.some(f => !f.active)

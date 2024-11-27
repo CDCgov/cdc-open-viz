@@ -82,7 +82,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   return (
     <>
       {label && (
-        <label className='text-capitalize font-weight-bold' id={multiID + label} htmlFor={multiID}>
+        <label className='font-weight-bold' id={multiID + label} htmlFor={multiID}>
           {label}
         </label>
       )}
@@ -98,7 +98,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
               }
             }}
             className='selected'
-            aria-disabled={loading}
+            aria-disabled={loading || !options.length}
           >
             {selectedItems.length ? (
               selectedItems.map(item => (
