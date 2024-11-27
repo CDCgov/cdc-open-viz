@@ -226,7 +226,7 @@ const UsaRegionMap = props => {
           const textColor = getContrastColor('#FFF', legendColors[0])
           return (
             <>
-              <rect x={posX} width='36' height='24' rx='6' stroke='#fff' strokeWidth='1' />
+              <rect x={posX} width='36' height='24' rx='2' stroke='#fff' strokeWidth='1' />
               <text x={posX + 8} y='17' fill={textColor}>
                 {tName}
               </text>
