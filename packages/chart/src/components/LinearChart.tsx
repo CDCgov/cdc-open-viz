@@ -35,7 +35,7 @@ import { calcInitialHeight } from '../helpers/sizeHelpers'
 import useMinMax from '../hooks/useMinMax'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
-import useScales, { getTickValues } from '../hooks/useScales'
+import useScales, { getTickValues, filterAndShiftLinearDateTicks } from '../hooks/useScales'
 import useTopAxis from '../hooks/useTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
@@ -1356,10 +1356,18 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       config.xAxis.type === 'date-time' ? countNumOfTicks('xAxis') : getManualStep(),
                       config
                     )
+                  : config.xAxis.type === 'date'
+                  ? xAxisDataMapped
                   : undefined
               }
             >
               {props => {
+                // For these charts, we generated all ticks in tickValues above, and now need to filter/shift them
+                // so the last tick is always labeled
+                if (config.xAxis.type === 'date' && !config.xAxis.manual) {
+                  props.ticks = filterAndShiftLinearDateTicks(config, props, xAxisDataMapped, formatDate)
+                }
+
                 const axisMaxHeight = bottomLabelStart + BOTTOM_LABEL_PADDING
 
                 const axisCenter =
