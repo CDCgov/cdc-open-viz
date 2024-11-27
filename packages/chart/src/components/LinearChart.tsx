@@ -41,6 +41,8 @@ import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
+import { fontSizes } from '@cdc/core/helpers/cove/fontSettings'
+import { countNumOfTicks } from '../helpers/countNumOfTicks'
 
 type LinearChartProps = {
   parentWidth: number
@@ -100,7 +102,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const [animatedChart, setAnimatedChart] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
-  const [autoPadding, setAutoPadding] = useState(0)
+  const [yAxisAutoPadding, setYAxisAutoPadding] = useState(0)
 
   // REFS
   const axisBottomRef = useRef(null)
@@ -110,69 +112,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
+  const lastMaxValue = useRef(maxValue)
 
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
-
-  // Pre render functions
-  const countNumOfTicks = (axis, max) => {
-    let { numTicks } = runtime[axis]
-    if (runtime[axis].viewportNumTicks && runtime[axis].viewportNumTicks[currentViewport]) {
-      numTicks = runtime[axis].viewportNumTicks[currentViewport]
-    }
-    let tickCount = undefined
-
-    if (axis === 'yAxis') {
-      tickCount =
-        isHorizontal && !numTicks
-          ? data.length
-          : isHorizontal && numTicks
-          ? numTicks
-          : !isHorizontal && !numTicks
-          ? undefined
-          : !isHorizontal && numTicks && numTicks
-      // to fix edge case of small numbers with decimals
-      if (tickCount === undefined && !config.dataFormat.roundTo) {
-        // then it is set to Auto
-        if (Number(max) <= 3) {
-          tickCount = 2
-        } else {
-          tickCount = 4 // same default as standalone components
-        }
-      }
-      if (Number(tickCount) > Number(max) && !isHorizontal) {
-        // cap it and round it so its an integer
-        tickCount = Number(min) < 0 ? Math.round(max) * 2 : Math.round(max)
-      }
-    }
-
-    if (axis === 'xAxis') {
-      tickCount =
-        isHorizontal && !numTicks
-          ? undefined
-          : isHorizontal && numTicks
-          ? numTicks
-          : !isHorizontal && !numTicks
-          ? undefined
-          : !isHorizontal && numTicks && numTicks
-      if (isHorizontal && tickCount === undefined && !config.dataFormat.roundTo) {
-        // then it is set to Auto
-        // - check for small numbers situation
-        if (max <= 3) {
-          tickCount = 2
-        } else {
-          tickCount = 4 // same default as standalone components
-        }
-      }
-
-      if (config.visualizationType === 'Forest Plot') {
-        tickCount = config.yAxis.numTicks !== '' ? config.yAxis.numTicks : 4
-      }
-    }
-
-    return tickCount
-  }
 
   // VARS/MEMOS
   const shouldAbbreviate = true
@@ -180,9 +124,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   const isForestPlot = visualizationType === 'Forest Plot'
   const suffixHasNoSpace = !suffix.includes(' ')
+  const labelsOverflow = onlyShowTopPrefixSuffix && !suffixHasNoSpace
   const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
-  const fontSize = { small: 16, medium: 18, large: 20 }
-
   const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
 
   // zero if not forest plot
@@ -250,8 +193,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       ...config,
       yAxis: {
         ...config.yAxis,
-        scalePadding: onlyShowTopPrefixSuffix ? autoPadding : config.yAxis.scalePadding,
-        enablePadding: onlyShowTopPrefixSuffix || config.yAxis.enablePadding
+        scalePadding: labelsOverflow ? yAxisAutoPadding : config.yAxis.scalePadding,
+        enablePadding: labelsOverflow || config.yAxis.enablePadding
       }
     },
     minValue,
@@ -273,7 +216,13 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     dimensions,
     xMax: parentWidth - Number(config.orientation === 'horizontal' ? config.xAxis.size : config.yAxis.size)
   })
-  const handleNumTicks = isForestPlot ? config.data.length : countNumOfTicks('yAxis', max)
+
+  const [yTickCount, xTickCount] = ['yAxis', 'xAxis'].map(axis =>
+    countNumOfTicks({ axis, max, runtime, currentViewport, isHorizontal, data, config, min })
+  )
+  const handleNumTicks = isForestPlot ? config.data.length : yTickCount
+  const maxValueIsGreaterThanTopGridLine = maxValue > Math.max(...yScale.ticks(handleNumTicks))
+  const needsNewRender = maxValueIsGreaterThanTopGridLine && (!yAxisAutoPadding || lastMaxValue.current !== maxValue)
 
   // Tooltip Helpers
   const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip()
@@ -452,17 +401,22 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   }, [axisBottomRef.current, config, bottomLabelStart, brush, currentViewport, topYLabelRef.current, initialHeight])
 
   useEffect(() => {
+    if (lastMaxValue.current === maxValue) return
+    lastMaxValue.current = maxValue
+    if (!yAxisAutoPadding) return
+    setYAxisAutoPadding(0)
+  }, [maxValue])
+  useEffect(() => {
     if (orientation === 'horizontal') return
 
-    const maxValueIsGreaterThanTopGridLine = maxValue > Math.max(...yScale.ticks(handleNumTicks))
-    if (!maxValueIsGreaterThanTopGridLine || !onlyShowTopPrefixSuffix) return
+    if (!maxValueIsGreaterThanTopGridLine || !labelsOverflow) return
 
     const tickGap = yScale.ticks(handleNumTicks)[1] - yScale.ticks(handleNumTicks)[0]
     const nextTick = Math.max(...yScale.ticks(handleNumTicks)) + tickGap
     const newPadding = minValue < 0 ? (nextTick - maxValue) / maxValue / 2 : (nextTick - maxValue) / maxValue
 
-    setAutoPadding(newPadding * 100)
-  }, [maxValue, onlyShowTopPrefixSuffix, yScale, handleNumTicks])
+    setYAxisAutoPadding(newPadding * 100)
+  }, [maxValue, labelsOverflow, yScale, handleNumTicks])
 
   // Render Functions
   const generatePairedBarAxis = () => {
@@ -475,7 +429,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       const numberOfTicks = filteredTicks?.length
       const xMaxHalf = xScale.range()[0] || xMax / 2
       const tickWidthAll = filteredTicks.map(tick =>
-        getTextWidth(formatNumber(tick.value, 'left'), `normal ${fontSize[config.fontSize]}px sans-serif`)
+        getTextWidth(formatNumber(tick.value, 'left'), `normal ${fontSizes[config.fontSize]}px sans-serif`)
       )
       const accumulator = 100
       const sumOfTickWidth = tickWidthAll.reduce((a, b) => a + b, accumulator)
@@ -514,7 +468,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 {props.ticks.map((tick, i) => {
                   const textWidth = getTextWidth(
                     formatNumber(tick.value, 'left'),
-                    `normal ${fontSize[config.fontSize]}px sans-serif`
+                    `normal ${fontSizes[config.fontSize]}px sans-serif`
                   )
                   const isTicksOverlapping = getTickPositions(props.ticks, g1xScale)
                   const maxTickRotation = Number(config.xAxis.maxTickRotation) || 90
@@ -566,7 +520,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   {props.ticks.map((tick, i) => {
                     const textWidth = getTextWidth(
                       formatNumber(tick.value, 'left'),
-                      `normal ${fontSize[config.fontSize]}px sans-serif`
+                      `normal ${fontSizes[config.fontSize]}px sans-serif`
                     )
                     const isTicksOverlapping = getTickPositions(props.ticks, g2xScale)
                     const maxTickRotation = Number(config.xAxis.maxTickRotation) || 90
@@ -613,6 +567,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       </>
     )
   }
+
+  if (needsNewRender) return <></>
 
   return isNaN(width) ? (
     <React.Fragment></React.Fragment>
@@ -1362,14 +1318,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               tickFormat={handleBottomTickFormatting}
               scale={xScale}
               stroke='#333'
-              numTicks={countNumOfTicks('xAxis')}
+              numTicks={xTickCount}
               tickStroke='#333'
               tickValues={
                 config.xAxis.manual
                   ? getTickValues(
                       xAxisDataMapped,
                       xScale,
-                      config.xAxis.type === 'date-time' ? countNumOfTicks('xAxis') : getManualStep(),
+                      config.xAxis.type === 'date-time' ? xTickCount : getManualStep(),
                       config
                     )
                   : undefined
@@ -1388,14 +1344,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 // Calculate sumOfTickWidth here, before map function
                 const tickWidthMax = Math.max(
                   ...props.ticks.map(tick =>
-                    getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                    getTextWidth(tick.formattedValue, `normal ${fontSizes[config.fontSize]}px sans-serif`)
                   )
                 )
                 // const marginTop = 20 // moved to top bc need for yMax calcs
                 const accumulator = ismultiLabel ? 180 : 100
 
                 const textWidths = props.ticks.map(tick =>
-                  getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                  getTextWidth(tick.formattedValue, `normal ${fontSizes[config.fontSize]}px sans-serif`)
                 )
                 const sumOfTickWidth = textWidths.reduce((a, b) => a + b, accumulator)
                 const spaceBetweenEachTick = (xMax - sumOfTickWidth) / (props.ticks.length - 1)
@@ -1441,7 +1397,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       const to = { x: tick.to.x, y: tickLength }
                       const textWidth = getTextWidth(
                         tick.formattedValue,
-                        `normal ${fontSize[config.fontSize]}px sans-serif`
+                        `normal ${fontSizes[config.fontSize]}px sans-serif`
                       )
                       const limitedWidth = 100 / propsTicks.length
                       //reset rotations by updating config
