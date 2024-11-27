@@ -383,6 +383,10 @@ export const useEditorPermissions = () => {
     )
   }
 
+  const visSupportsYPadding = () => {
+    return !config.dataFormat.onlyShowTopPrefixSuffix || !config.dataFormat.suffix?.includes(' ')
+  }
+
   const visHasSingleSeriesTooltip = () => {
     if (visualizationType === 'Bar' || visualizationType === 'Line') {
       return true
@@ -456,6 +460,7 @@ export const useEditorPermissions = () => {
     visSupportsValueAxisMax,
     visSupportsValueAxisMin,
     visSupportsDynamicSeries,
+    visSupportsYPadding,
     visHasSingleSeriesTooltip,
     visHasCategoricalAxis
   }
