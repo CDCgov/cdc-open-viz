@@ -222,8 +222,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   )
   const handleNumTicks = isForestPlot ? config.data.length : yTickCount
   const maxValueIsGreaterThanTopGridLine = maxValue > Math.max(...yScale.ticks(handleNumTicks))
-  const needsYAxisAutoPadding = maxValueIsGreaterThanTopGridLine && labelsOverflow
-  const needsNewRender = needsYAxisAutoPadding && (!yAxisAutoPadding || lastMaxValue.current !== maxValue)
 
   // Tooltip Helpers
   const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip()
@@ -568,8 +566,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       </>
     )
   }
-
-  if (needsNewRender) return <></>
 
   return isNaN(width) ? (
     <React.Fragment></React.Fragment>
