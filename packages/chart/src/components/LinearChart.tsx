@@ -221,7 +221,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     countNumOfTicks({ axis, max, runtime, currentViewport, isHorizontal, data, config, min })
   )
   const handleNumTicks = isForestPlot ? config.data.length : yTickCount
-  const maxValueIsGreaterThanTopGridLine = maxValue > Math.max(...yScale.ticks(handleNumTicks))
+  const maxValueIsGreaterThanTopGridLine = isHorizontal ? false : maxValue > Math.max(...yScale.ticks(handleNumTicks))
 
   // Tooltip Helpers
   const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip()
