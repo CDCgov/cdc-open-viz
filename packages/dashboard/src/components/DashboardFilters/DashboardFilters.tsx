@@ -75,7 +75,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           }
         } else {
           // Data Filter
-          filter.values
+          filter?.values
             .filter(value => value !== filter.resetLabel)
             ?.forEach((filterOption, index) => {
               const labeledOpt = filter.labels && filter.labels[filterOption]
