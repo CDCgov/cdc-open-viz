@@ -758,7 +758,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               isBrush={false}
             />
           )}
-          {/* y anchors */}
+          {/* y anchors
           {config.yAxis.anchors &&
             config.yAxis.anchors.map(anchor => {
               return (
@@ -771,7 +771,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   display={runtime.horizontal ? 'none' : 'block'}
                 />
               )
-            })}
+            })} */}
           {visualizationType === 'Forest Plot' && (
             <ForestPlot
               xScale={xScale}
@@ -816,14 +816,19 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           {/* y anchors */}
           {config.yAxis.anchors &&
             config.yAxis.anchors.map((anchor, index) => {
-              let anchorPosition = yScale(anchor.value)
-              // have to move up
-              // const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
-              if (!anchor.value) return
-              const middleOffset =
-                orientation === 'horizontal' && visualizationType === 'Bar' ? config.barHeight / 4 : 0
+              let position = yScale(anchor.value)
+              let middleOffset = 0
 
-              if (!anchorPosition) return
+              if (!anchor.value) return
+              if (config.yAxis.labelPlacement === 'Below Bar') {
+                const textOffset = -6.5
+                middleOffset = textOffset + Number(config.series.length * config.barHeight) / config.series.length
+              } else {
+                const paddingOffset = 8
+                middleOffset = paddingOffset
+              }
+
+              if (!position) return
 
               return (
                 // prettier-ignore
@@ -832,8 +837,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   strokeDasharray={handleLineType(anchor.lineStyle)}
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   className='anchor-y'
-                  from={{ x: 0 + padding, y: anchorPosition - middleOffset}}
-                  to={{ x: width - config.yAxis.rightAxisSize, y: anchorPosition - middleOffset }}
+                  from={{ x: 0 + padding, y: position - middleOffset}}
+                  to={{ x: width - config.yAxis.rightAxisSize, y: position - middleOffset }}
                 />
               )
             })}
@@ -845,11 +850,21 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 newX = yAxis
               }
 
-              let anchorPosition = isDateScale(newX) ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
+              const getAnchorPosition = (): number | undefined => {
+                let position: number | undefined
 
-              if (config.xAxis.type === 'date' || config.xAxis.type === 'categorical') {
-                anchorPosition = anchorPosition + xScale.bandwidth() / 2
+                if (orientation === 'vertical') {
+                  position = isDateScale(newX) ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
+                  if (config.xAxis.type === 'categorical' || config.xAxis.type === 'date') {
+                    position = position
+                      ? position + (newX.type === 'categorical' || newX.type === 'date' ? xScale.bandwidth() : 0) / 2
+                      : 0
+                  }
+                }
+                return position
               }
+
+              let anchorPosition = getAnchorPosition()
 
               if (!anchorPosition) return
 
