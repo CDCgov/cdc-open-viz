@@ -1842,7 +1842,7 @@ const EditorPanel = () => {
                     className='number-narrow'
                     updateField={updateField}
                     min={0}
-                  />
+                  />{' '}
                   <div className='two-col-inputs'>
                     <TextField
                       value={config.dataFormat.prefix}
@@ -1889,7 +1889,6 @@ const EditorPanel = () => {
                       }
                     />
                   </div>
-
                   {config.orientation === 'horizontal' ? ( // horizontal - x is vertical y is horizontal
                     <>
                       {visSupportsValueAxisLine() && (
@@ -2031,7 +2030,6 @@ const EditorPanel = () => {
                       </>
                     )
                   )}
-
                   {/* start: anchors */}
                   {visHasAnchors() && config.orientation !== 'horizontal' && (
                     <div className='edit-block'>
@@ -2158,7 +2156,6 @@ const EditorPanel = () => {
                       </button>
                     </div>
                   )}
-
                   {visHasAnchors() && config.orientation === 'horizontal' && (
                     <div className='edit-block'>
                       <span className='edit-label column-heading'>Anchors</span>
