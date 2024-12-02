@@ -5,6 +5,7 @@ import Waiting from '@cdc/core/components/Waiting'
 import Annotation from './components/Annotation'
 import Error from './components/EditorPanel/components/Error'
 import _ from 'lodash'
+import { applyColorToLegend } from './helpers/applyColorToLegend'
 
 // types
 import { type ViewportSize } from './types/MapConfig'
@@ -391,49 +392,6 @@ const CdcMap = ({
       10: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     }
 
-    const applyColorToLegend = legendIdx => {
-      // Default to "bluegreen" color scheme if the passed color isn't valid
-      let mapColorPalette = obj.customColors || colorPalettes[obj.color] || colorPalettes['bluegreen']
-
-      // Handle Region Maps need for a 10th color
-      if (general.geoType === 'us-region' && mapColorPalette.length < 10 && mapColorPalette.length > 8) {
-        if (!general.palette.isReversed) {
-          mapColorPalette.push(chroma(mapColorPalette[8]).darken(0.75).hex())
-        } else {
-          mapColorPalette.unshift(chroma(mapColorPalette[0]).darken(0.75).hex())
-        }
-      }
-
-      let colorIdx = legendIdx - specialClasses
-
-      // Special Classes (No Data)
-      if (result[legendIdx].special) {
-        if (isOlderVersion(state.version, '4.24.11')) {
-          const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
-          return specialClassColors[legendIdx]
-        } else {
-          const specialClassColors = ['#A9AEB1', '#71767A']
-          return specialClassColors[legendIdx]
-        }
-      }
-
-      if (obj.color.includes('qualitative')) return mapColorPalette[colorIdx]
-
-      let amt = Math.max(result.length - specialClasses, 1)
-      let distributionArray = colorDistributions[amt]
-
-      let specificColor
-      if (distributionArray) {
-        specificColor = distributionArray[colorIdx]
-      } else if (mapColorPalette[colorIdx]) {
-        specificColor = colorIdx
-      } else {
-        specificColor = mapColorPalette.length - 1
-      }
-
-      return mapColorPalette[specificColor]
-    }
-
     let specialClasses = 0
     let specialClassesHash = {}
 
@@ -454,7 +412,7 @@ const CdcMap = ({
                   label: specialClass.label
                 })
 
-                result[result.length - 1].color = applyColorToLegend(result.length - 1)
+                result[result.length - 1].color = applyColorToLegend(result.length - 1, state, result)
 
                 specialClasses += 1
               }
@@ -486,7 +444,7 @@ const CdcMap = ({
                 value: val
               })
 
-              result[result.length - 1].color = applyColorToLegend(result.length - 1)
+              result[result.length - 1].color = applyColorToLegend(result.length - 1, state, result)
 
               specialClasses += 1
             }
@@ -568,7 +526,7 @@ const CdcMap = ({
 
       // Add color to new legend item
       for (let i = 0; i < result.length; i++) {
-        result[i].color = applyColorToLegend(i)
+        result[i].color = applyColorToLegend(i, state, result)
       }
 
       legendMemo.current = newLegendMemo
@@ -632,7 +590,7 @@ const CdcMap = ({
         let lastIdx = result.length - 1
 
         // Add color to new legend item
-        result[lastIdx].color = applyColorToLegend(lastIdx)
+        result[lastIdx].color = applyColorToLegend(lastIdx, state, result)
       }
     }
 
@@ -684,7 +642,7 @@ const CdcMap = ({
             max
           })
 
-          result[result.length - 1].color = applyColorToLegend(result.length - 1)
+          result[result.length - 1].color = applyColorToLegend(result.length - 1, state, result)
 
           changingNumber -= 1
           numberOfRows -= chunkAmt
@@ -842,12 +800,12 @@ const CdcMap = ({
 
         result.push(range)
 
-        result[result.length - 1].color = applyColorToLegend(result.length - 1)
+        result[result.length - 1].color = applyColorToLegend(result.length - 1, state, result)
       }
     }
 
     result.forEach((legendItem, idx) => {
-      legendItem.color = applyColorToLegend(idx, specialClasses, result)
+      legendItem.color = applyColorToLegend(idx, state, result)
     })
 
     legendMemo.current = newLegendMemo
