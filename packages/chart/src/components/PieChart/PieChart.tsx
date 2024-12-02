@@ -170,6 +170,7 @@ const PieChart = props => {
           )
         })}
         {transitions.map(({ item: arc, key }, i) => {
+          const roundTo = Number(config.dataFormat.roundTo) || 0
           const [centroidX, centroidY] = path.centroid(arc)
           const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1
 
@@ -177,6 +178,11 @@ const PieChart = props => {
           if (_colorScale(arc.data[config.runtime.xAxis.dataKey])) {
             textColor = getContrastColor(textColor, _colorScale(arc.data[config.runtime.xAxis.dataKey]))
           }
+          const degrees = ((arc.endAngle - arc.startAngle) * 180) / Math.PI
+
+          // Calculate the percentage of the full circle (360 degrees)
+          const percentageOfCircle = (degrees / 360) * 100
+          const roundedPercentage = percentageOfCircle.toFixed(roundTo)
 
           return (
             <animated.g key={`${key}${i}`}>
@@ -189,7 +195,7 @@ const PieChart = props => {
                   textAnchor='middle'
                   pointerEvents='none'
                 >
-                  {Math.round((((arc.endAngle - arc.startAngle) * 180) / Math.PI / 360) * 100) + '%'}
+                  {roundedPercentage + '%'}
                 </Text>
               )}
             </animated.g>
