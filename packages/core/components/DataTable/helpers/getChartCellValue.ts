@@ -29,10 +29,10 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
 
   const rowObj = runtimeData[row]
   let cellValue // placeholder for formatting below
-  let labelValue = rowObj[column] // just raw X axis string
+  const labelValue = rowObj[column] // just raw X axis string
   if (column === config.xAxis?.dataKey) {
-    let { type, dateDisplayFormat } = config.xAxis || {}
-    let dateFormat = config.table?.dateDisplayFormat || dateDisplayFormat
+    const { type, dateDisplayFormat } = config.xAxis || {}
+    const dateFormat = config.table?.dateDisplayFormat || dateDisplayFormat
 
     if (type === 'date' || type === 'date-time') {
       cellValue = formatDate(dateFormat, parseDate(dateFormat, labelValue))
