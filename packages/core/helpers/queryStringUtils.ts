@@ -16,9 +16,18 @@ export function getQueryStringFilterValue(filter) {
 export function getQueryParams() {
   const queryParams = {}
   for (const [key, value] of Array.from(new URLSearchParams(window.location.search).entries())) {
-    queryParams[key] = value
+    if (!queryParams[key]) queryParams[key] = value
+    else {
+      // for multiple values of the same key in the query string
+      if (Array.isArray(queryParams[key])) queryParams[key].push(value)
+      else queryParams[key] = [queryParams[key], value]
+    }
   }
   return queryParams
+}
+
+export function getQueryParam(param) {
+  return getQueryParams()[param]
 }
 
 export function updateQueryString(queryParams) {

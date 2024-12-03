@@ -67,6 +67,7 @@ import { hasDashboardApplyBehavior } from './helpers/hasDashboardApplyBehavior'
 import { loadAPIFiltersFactory } from './helpers/loadAPIFilters'
 import Loader from '@cdc/core/components/Loader'
 import Alert from '@cdc/core/components/Alert'
+import { shouldLoadAllFilters } from './helpers/shouldLoadAllFilters'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -257,7 +258,10 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     }
 
     const sharedFiltersWithValues = addValuesToDashboardFilters(config.dashboard.sharedFilters, state.data)
-    loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns)
+    const loadAllFilters = shouldLoadAllFilters(config)
+    loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns, loadAllFilters).then(newFilters => {
+      if (loadAllFilters) reloadURLData(newFilters)
+    })
     updateFilteredData(sharedFiltersWithValues)
   }, [isEditor, isPreview, state.config?.activeDashboard])
 
