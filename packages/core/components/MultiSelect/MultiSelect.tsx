@@ -80,93 +80,86 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 
   const multiID = 'multiSelect_' + label
   return (
-    <>
-      {label && (
-        <label className='font-weight-bold' id={multiID + label} htmlFor={multiID}>
-          {label}
-        </label>
-      )}
-      <div ref={multiSelectRef} className='cove-multiselect'>
-        {tooltip && tooltip}
+    <div ref={multiSelectRef} className='cove-multiselect'>
+      {tooltip && tooltip}
 
-        <div className='wrapper'>
-          <div
-            id={multiID}
-            onClick={() => {
-              if (!selectedItems.length && !loading) {
-                setExpanded(true)
-              }
+      <div className='wrapper'>
+        <div
+          id={multiID}
+          onClick={() => {
+            if (!selectedItems.length && !loading) {
+              setExpanded(true)
+            }
+          }}
+          className='selected'
+          aria-disabled={loading}
+        >
+          {selectedItems.length ? (
+            selectedItems.map(item => (
+              <div key={item.value} aria-labelledby={label ? multiID + label : undefined}>
+                {item.label}
+                <button
+                  aria-label='Remove'
+                  onClick={e => {
+                    e.preventDefault()
+                    handleItemRemove(item)
+                  }}
+                  onKeyUp={e => {
+                    handleItemRemove(item, e)
+                  }}
+                >
+                  x
+                </button>
+              </div>
+            ))
+          ) : (
+            <span className='pl-1 pt-1'>{loading ? 'Loading...' : '- Select -'}</span>
+          )}
+          <button
+            aria-label={expanded ? 'Collapse' : 'Expand'}
+            aria-labelledby={label ? multiID : undefined}
+            className='expand'
+            onClick={e => {
+              e.preventDefault()
+              setExpanded(!expanded)
             }}
-            className='selected'
-            aria-disabled={loading || !options.length}
           >
-            {selectedItems.length ? (
-              selectedItems.map(item => (
-                <div key={item.value} aria-labelledby={label ? multiID + label : undefined}>
-                  {item.label}
-                  <button
-                    aria-label='Remove'
-                    onClick={e => {
-                      e.preventDefault()
-                      handleItemRemove(item)
-                    }}
-                    onKeyUp={e => {
-                      handleItemRemove(item, e)
-                    }}
-                  >
-                    x
-                  </button>
-                </div>
-              ))
-            ) : (
-              <span className='pl-1 pt-1'>{loading ? 'Loading...' : '- Select -'}</span>
-            )}
-            <button
-              aria-label={expanded ? 'Collapse' : 'Expand'}
-              aria-labelledby={label ? multiID : undefined}
-              className='expand'
+            <Icon display={'caretDown'} style={{ cursor: 'pointer' }} />
+          </button>
+        </div>
+        {loading && <Loader spinnerType={'text-secondary'} />}
+        {!!limit && (
+          <Tooltip style={{ textTransform: 'none' }}>
+            <Tooltip.Target>
+              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+            </Tooltip.Target>
+            <Tooltip.Content>
+              <p>Select up to {limit} items</p>
+            </Tooltip.Content>
+          </Tooltip>
+        )}
+      </div>
+
+      <ul className={'dropdown' + (expanded ? '' : ' d-none')}>
+        {options
+          .filter(option => !selectedItems.find(item => item.value === option.value))
+          .map(option => (
+            <li
+              className='cove-multiselect-li'
+              key={option.value}
+              role='option'
+              tabIndex={0}
               onClick={e => {
                 e.preventDefault()
-                setExpanded(!expanded)
+                handleItemSelect(option, e)
               }}
+              onKeyUp={e => handleItemSelect(option, e)}
             >
-              <Icon display={'caretDown'} style={{ cursor: 'pointer' }} />
-            </button>
-          </div>
-          {loading && <Loader spinnerType={'text-secondary'} />}
-          {!!limit && (
-            <Tooltip style={{ textTransform: 'none' }}>
-              <Tooltip.Target>
-                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-              </Tooltip.Target>
-              <Tooltip.Content>
-                <p>Select up to {limit} items</p>
-              </Tooltip.Content>
-            </Tooltip>
-          )}
-        </div>
-
-        <ul className={'dropdown' + (expanded ? '' : ' d-none')}>
-          {options
-            .filter(option => !selectedItems.find(item => item.value === option.value))
-            .map(option => (
-              <li
-                className='cove-multiselect-li'
-                key={option.value}
-                role='option'
-                tabIndex={0}
-                onClick={e => {
-                  e.preventDefault()
-                  handleItemSelect(option, e)
-                }}
-                onKeyUp={e => handleItemSelect(option, e)}
-              >
-                {option.label}
-              </li>
-            ))}
-        </ul>
-      </div>
-    </>
+              {option.label}
+            </li>
+          ))}
+      </ul>
+    </div>
   )
 }
 

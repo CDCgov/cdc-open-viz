@@ -49,11 +49,13 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
     <form className='d-flex flex-wrap'>
       {sharedFilters.map((filter, filterIndex) => {
         const urlFilterType = filter.type === 'urlfilter'
+        const label = filter.key
+
         if (
           (!urlFilterType && !filter.showDropdown && filter.filterStyle !== FILTER_STYLE.nestedDropdown) ||
           (show && !show.includes(filterIndex))
         )
-          return <React.Fragment key={`${filter.key}-filtersection-${filterIndex}-option`} />
+          return <React.Fragment key={`${label}-filtersection-${filterIndex}-option`} />
         const values: JSX.Element[] = []
 
         const _key = filter.apiFilter?.apiEndpoint
@@ -75,17 +77,15 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           }
         } else {
           // Data Filter
-          filter?.values
-            .filter(value => value !== filter.resetLabel)
-            ?.forEach((filterOption, index) => {
-              const labeledOpt = filter.labels && filter.labels[filterOption]
-              values.push(
-                <option key={`${filter.key}-option-${index}`} value={filterOption}>
-                  {labeledOpt || filterOption}
-                </option>
-              )
-              multiValues.push({ value: filterOption, label: labeledOpt || filterOption })
-            })
+          filter.values?.forEach((filterOption, index) => {
+            const labeledOpt = filter.labels && filter.labels[filterOption]
+            values.push(
+              <option key={`${label}-option-${index}`} value={filterOption}>
+                {labeledOpt || filterOption}
+              </option>
+            )
+            multiValues.push({ value: filterOption, label: labeledOpt || filterOption })
+          })
         }
 
         const isDisabled = !values.length
@@ -99,55 +99,60 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         }
 
         const formGroupClass = `form-group mr-3 mb-1${loading ? ' loading-filter' : ''}`
-        return filter.filterStyle === FILTER_STYLE.multiSelect ? (
-          <div className={formGroupClass} key={`${filter.key}-filtersection-${filterIndex}`}>
-            <MultiSelect
-              label={filter.key}
-              options={multiValues}
-              fieldName={filterIndex}
-              updateField={updateField}
-              selected={filter.active as string[]}
-              limit={filter.selectLimit || 5}
-              loading={loading}
-            />
-          </div>
-        ) : filter.filterStyle === FILTER_STYLE.nestedDropdown ? (
-          <div className={formGroupClass} key={`${filter.key}-filtersection-${filterIndex}`}>
-            <NestedDropdown
-              activeGroup={filter.active as string}
-              activeSubGroup={filter.subGrouping?.active}
-              filterIndex={filterIndex}
-              options={getNestedDropdownOptions(apiFilterDropdowns[_key])}
-              listLabel={filter.key}
-              handleSelectedItems={value => updateField(null, null, filterIndex, value)}
-              loading={loading}
-            />
-          </div>
-        ) : (
-          <div className={formGroupClass} key={`${filter.key}-filtersection-${filterIndex}`}>
-            <label className='font-weight-bold' htmlFor={`filter-${filterIndex}`}>
-              {filter.key}
-            </label>
-            <select
-              id={`filter-${filterIndex}`}
-              className='cove-form-select'
-              data-index='0'
-              value={loading ? 'Loading...' : filter.queuedActive || filter.active}
-              onChange={val => {
-                handleOnChange(filterIndex, val.target.value)
-              }}
-              disabled={loading || isDisabled}
-            >
-              {loading && <option value='Loading...'>Loading...</option>}
-              {nullVal(filter) && (
-                <option key={`select`} value=''>
-                  {filter.resetLabel || '- Select -'}
-                </option>
+
+        return (
+          <>
+            <div className={formGroupClass} key={`${label}-filtersection-${filterIndex}`}>
+              {label && (
+                <label className='text-capitalize font-weight-bold mt-1 mb-0' htmlFor={`filter-${filterIndex}`}>
+                  {label}
+                </label>
               )}
-              {values}
-            </select>
-            {loading && <Loader spinnerType={'text-secondary'} />}
-          </div>
+              {filter.filterStyle === FILTER_STYLE.multiSelect ? (
+                <MultiSelect
+                  label={label}
+                  options={multiValues}
+                  fieldName={filterIndex}
+                  updateField={updateField}
+                  selected={filter.active as string[]}
+                  limit={filter.selectLimit || 5}
+                  loading={loading}
+                />
+              ) : filter.filterStyle === FILTER_STYLE.nestedDropdown ? (
+                <NestedDropdown
+                  activeGroup={filter.active as string}
+                  activeSubGroup={filter.subGrouping?.active}
+                  filterIndex={filterIndex}
+                  options={getNestedDropdownOptions(apiFilterDropdowns[_key])}
+                  listLabel={label}
+                  handleSelectedItems={value => updateField(null, null, filterIndex, value)}
+                  loading={loading}
+                />
+              ) : (
+                <>
+                  <select
+                    id={`filter-${filterIndex}`}
+                    className='cove-form-select'
+                    data-index='0'
+                    value={loading ? 'Loading...' : filter.queuedActive || filter.active}
+                    onChange={val => {
+                      handleOnChange(filterIndex, val.target.value)
+                    }}
+                    disabled={loading ? true : values.length === 1 && !nullVal(filter)}
+                  >
+                    {loading && <option value='Loading...'>Loading...</option>}
+                    {nullVal(filter) && (
+                      <option key={`select`} value=''>
+                        {filter.resetLabel || '- Select -'}
+                      </option>
+                    )}
+                    {values}
+                  </select>
+                  {loading && <Loader spinnerType={'text-secondary'} />}
+                </>
+              )}
+            </div>
+          </>
         )
       })}
       {showSubmit && (

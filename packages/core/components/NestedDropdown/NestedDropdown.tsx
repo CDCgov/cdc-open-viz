@@ -245,11 +245,6 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
 
   return (
     <>
-      {listLabel && (
-        <label className='font-weight-bold' htmlFor={dropdownId}>
-          {listLabel}
-        </label>
-      )}
       <div
         id={dropdownId}
         className={`nested-dropdown nested-dropdown-${filterIndex} ${isListOpened ? 'open-filter' : ''}`}
