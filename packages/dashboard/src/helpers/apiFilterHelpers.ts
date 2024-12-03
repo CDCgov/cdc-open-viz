@@ -37,7 +37,7 @@ export const getParentParams = (
       const key = filter.apiFilter.valueSelector || ''
       const subKey = filter.apiFilter.subgroupValueSelector || ''
       const val = filter.queuedActive ? filter.queuedActive[0] : (filter.active as string) || ''
-      const subVal = filter.queuedActive ? filter.queuedActive[1] : filter.subGrouping.active || ''
+      const subVal = filter.queuedActive ? filter.queuedActive[1] : filter.subGrouping?.active || ''
       return [
         { key, value: val },
         { key: subKey, value: subVal }
