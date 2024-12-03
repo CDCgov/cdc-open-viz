@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Tooltip from '../ui/Tooltip'
 import Icon from '../ui/Icon'
 
@@ -36,8 +36,9 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   tooltip,
   loading
 }) => {
-  const preselectedItems = options.filter(opt => selected.includes(opt.value)).slice(0, limit)
-  const [selectedItems, setSelectedItems] = useState<Option[]>(preselectedItems)
+  const preselectedItems = useMemo(() => options.filter(opt => selected.includes(opt.value)).slice(0, limit), [options])
+  const [selectedItems, setSelectedItems] = useState<Option[]>()
+  const items = selectedItems || preselectedItems
   const [expanded, setExpanded] = useState(false)
   const multiSelectRef = useRef(null)
 
@@ -65,15 +66,15 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 
   const handleItemSelect = (option: Option, e = null) => {
     if (e && e.type === 'keyup' && e.key !== 'Enter') return
-    if (limit && selectedItems.length >= limit) return
-    const newItems = [...selectedItems, option]
+    if (limit && items?.length >= limit) return
+    const newItems = [...items, option]
     setSelectedItems(newItems)
     update(newItems)
   }
 
   const handleItemRemove = (option: Option, e = null) => {
     if (e && e.type === 'keyup' && e.key !== 'Enter') return
-    const newItems = selectedItems.filter(item => item.value !== option.value)
+    const newItems = items.filter(item => item.value !== option.value)
     setSelectedItems(newItems)
     update(newItems)
   }
@@ -87,15 +88,15 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
         <div
           id={multiID}
           onClick={() => {
-            if (!selectedItems.length && !loading) {
+            if (!items.length && !loading) {
               setExpanded(true)
             }
           }}
           className='selected'
           aria-disabled={loading}
         >
-          {selectedItems.length ? (
-            selectedItems.map(item => (
+          {items.length ? (
+            items.map(item => (
               <div key={item.value} aria-labelledby={label ? multiID + label : undefined}>
                 {item.label}
                 <button
@@ -142,7 +143,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 
       <ul className={'dropdown' + (expanded ? '' : ' d-none')}>
         {options
-          .filter(option => !selectedItems.find(item => item.value === option.value))
+          .filter(option => !items.find(item => item.value === option.value))
           .map(option => (
             <li
               className='cove-multiselect-li'

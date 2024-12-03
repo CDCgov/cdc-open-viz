@@ -91,7 +91,7 @@ describe('loadAPIFiltersFactory', () => {
   it('loadAPIFilters() load dropdowns for children when parent is selected', async () => {
     const newSharedFilters = await loadAPIFilters(sharedFilters, apiFilterDropdowns)
     expect(dispatch).toHaveBeenCalledTimes(1)
-    expect(setAPIFilterDropdowns).toHaveBeenCalledTimes(5)
+    expect(setAPIFilterDropdowns).toHaveBeenCalledTimes(2)
 
     const expectedDropdowns = {
       'cdc.gov/filters/Quarter': [
@@ -217,5 +217,10 @@ describe('loadAPIFiltersFactory', () => {
     expect(setAPIFilterDropdowns).toHaveBeenCalledTimes(2)
 
     expect(newSharedFilters[2].active).toEqual(['2020', '2021'])
+  })
+  it('loads All filters if loadAll is true', async () => {
+    const _sharedFilters = _.cloneDeep(sharedFilters)
+    const newSharedFilters = await loadAPIFilters(_sharedFilters, {}, true)
+    expect(newSharedFilters[2].active).toEqual([2020])
   })
 })

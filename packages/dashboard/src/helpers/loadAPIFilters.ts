@@ -3,6 +3,7 @@ import { APIFilterDropdowns } from '../components/DashboardFilters'
 import { SharedFilter } from '../types/SharedFilter'
 import * as apiFilterHelpers from './apiFilterHelpers'
 import { APIFilter } from '../types/APIFilter'
+import { getParentParams, notAllParentsSelected } from './apiFilterHelpers'
 
 export const loadAPIFiltersFactory = (
   dispatch: Function,
@@ -13,15 +14,18 @@ export const loadAPIFiltersFactory = (
   const loadAPIFilters = (
     sharedFilters: SharedFilter[],
     dropdowns: APIFilterDropdowns,
-    recursiveLimit = 3
+    loadAll?: boolean,
+    recursiveLimit = 50
   ): Promise<SharedFilter[]> => {
     if (!sharedFilters) return
+    const allIndexes = sharedFilters.map((_, index) => index)
+    const _autoLoadFilterIndexes = loadAll ? allIndexes : autoLoadFilterIndexes
     sharedFilters = sharedFilters.map((filter, index) =>
       apiFilterHelpers.setAutoLoadDefaultValue(
         index,
         dropdowns[filter.apiFilter?.apiEndpoint],
         sharedFilters,
-        autoLoadFilterIndexes
+        _autoLoadFilterIndexes
       )
     )
     const sharedAPIFilters = sharedFilters.filter(f => f.apiFilter)
@@ -54,7 +58,7 @@ export const loadAPIFiltersFactory = (
                   index,
                   _filterValues,
                   sharedFilters,
-                  autoLoadFilterIndexes
+                  _autoLoadFilterIndexes
                 )
                 sharedFilters[index] = newDefaultSelectedFilter
               })
@@ -70,16 +74,22 @@ export const loadAPIFiltersFactory = (
           })
       )
     ).then(() => {
-      const finishedLoading = sharedFilters.reduce((acc, curr, index) => {
-        if (autoLoadFilterIndexes.includes(index) && !curr.active) return false
+      const toLoad = sharedFilters.reduce((acc, curr, index) => {
+        // the filter is autoloading and it hasn't finished yet
+        if (_autoLoadFilterIndexes.includes(index) && !curr.active) {
+          if (notAllParentsSelected(getParentParams(curr, sharedFilters))) {
+            return acc
+          }
+          return [...acc, index]
+        }
         return acc
-      }, true)
-      if (finishedLoading || recursiveLimit === 0) {
+      }, [])
+      if (!toLoad.length || recursiveLimit === 0) {
         setAPIFilterDropdowns(newDropdowns)
         dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFilters })
         return sharedFilters
       } else {
-        return loadAPIFilters(sharedFilters, newDropdowns, recursiveLimit - 1)
+        return loadAPIFilters(sharedFilters, newDropdowns, loadAll, recursiveLimit - 1)
       }
     })
   }

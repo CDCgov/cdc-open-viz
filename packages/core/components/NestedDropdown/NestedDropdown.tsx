@@ -123,13 +123,14 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   loading
 }) => {
   const dropdownId = useId()
-  const groupFilterActive = activeGroup
-  const subGroupFilterActive = activeSubGroup || ''
 
   const [userSearchTerm, setUserSearchTerm] = useState('')
-  const [inputValue, setInputValue] = useState(
-    subGroupFilterActive !== '' ? `${groupFilterActive} - ${subGroupFilterActive}` : ''
-  )
+  const [inputValue, setInputValue] = useState('')
+
+  const initialInputValue = useMemo(() => {
+    // value from props
+    return activeSubGroup ? `${activeGroup} - ${activeSubGroup}` : ''
+  }, [activeSubGroup])
   const [inputHasFocus, setInputHasFocus] = useState(false)
   const [isListOpened, setIsListOpened] = useState(false)
 
@@ -264,7 +265,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
             aria-haspopup='true'
             aria-hidden='false'
             tabIndex={0}
-            value={inputValue}
+            value={inputValue || initialInputValue}
             onChange={handleSearchTermChange}
             placeholder={loading ? 'Loading...' : '- Select -'}
             disabled={loading || !options.length}
@@ -301,7 +302,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
                     handleSubGroupSelect={subGroupValue => {
                       chooseSelectedSubGroup(groupValue, subGroupValue)
                     }}
-                    userSelectedLabel={groupFilterActive + subGroupFilterActive}
+                    userSelectedLabel={activeGroup + activeSubGroup}
                     userSearchTerm={userSearchTerm}
                   />
                 )
