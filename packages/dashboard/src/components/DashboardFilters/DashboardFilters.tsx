@@ -80,7 +80,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           filter.values?.forEach((filterOption, index) => {
             const labeledOpt = filter.labels && filter.labels[filterOption]
             values.push(
-              <option key={`${label}-option-${index}`} value={filterOption}>
+              <option key={`${filter.key}-option-${index}`} value={filterOption}>
                 {labeledOpt || filterOption}
               </option>
             )
