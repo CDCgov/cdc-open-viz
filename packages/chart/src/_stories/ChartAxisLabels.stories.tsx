@@ -13,7 +13,10 @@ type Story = StoryObj<typeof Chart>
 
 export const Abbreviated_Dates: Story = {
   args: {
-    config: editConfigKeys(SimplifiedLineConfig, [{ path: ['xAxis', 'showYearsOnce'], value: true }])
+    config: editConfigKeys(SimplifiedLineConfig, [
+      { path: ['xAxis', 'showYearsOnce'], value: true },
+      { path: ['tooltips', 'dateDisplayFormat'], value: '%b. %d %Y' }
+    ])
   }
 }
 
