@@ -104,13 +104,8 @@ const WorldMap = () => {
         legendColors = applyLegendToRow(geoData)
       }
 
-<<<<<<< HEAD
       const geoStrokeColor = getGeoStrokeColor(state)
       const geoFillColor = getGeoFillColor(state)
-=======
-      const geoStrokeColor =
-        state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
->>>>>>> 20a2d8030 (Enhancement: Dev-9453 World Map No Data Scenario)
 
       let styles: Record<string, string | Record<string, string>> = {
         fill: geoFillColor,
@@ -170,12 +165,10 @@ const WorldMap = () => {
           stroke={geoStrokeColor}
           strokeWidth={strokeWidth}
           style={styles}
+          styles={styles}
           path={path}
-<<<<<<< HEAD
-=======
           data-tooltip-id={`tooltip__${tooltipId}`}
           data-tooltip-html={toolTip}
->>>>>>> 20a2d8030 (Enhancement: Dev-9453 World Map No Data Scenario)
         />
       )
     })

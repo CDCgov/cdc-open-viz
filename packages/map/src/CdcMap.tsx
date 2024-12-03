@@ -17,7 +17,6 @@ import ResizeObserver from 'resize-observer-polyfill'
 
 // Third party
 import { Tooltip as ReactTooltip } from 'react-tooltip'
-import chroma from 'chroma-js'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
@@ -78,7 +77,7 @@ import WorldMap from './components/WorldMap' // Future: Lazy
 import useTooltip from './hooks/useTooltip'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
-import { isOlderVersion } from '@cdc/core/helpers/ver/versionNeedsUpdate'
+import { getGeoFillColor } from './helpers/colors'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -819,7 +818,7 @@ const CdcMap = ({
         result.push({
           min: null,
           max: null,
-          color: '#E6E6E6'
+          color: getGeoFillColor(state)
         })
       }
     }
