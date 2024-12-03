@@ -121,10 +121,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     return false
   }
   return (
-    <div
-      className={`row mb-5 ${row.equalHeight ? 'equal-height' : ''} ${row.toggle ? 'toggle' : ''}`}
-      key={`row__${index}`}
-    >
+    <div className={`row${row.equalHeight ? ' equal-height' : ''}${row.toggle ? ' toggle' : ''}`} key={`row__${index}`}>
       {row.toggle && (
         <Toggle row={row} visualizations={config.visualizations} active={show.indexOf(true)} setToggled={setToggled} />
       )}
@@ -151,6 +148,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               {visualizationConfig.dataKey} (Go to Table)
             </a>
           )
+
           const hideVisualization =
             inNoDataState &&
             visualizationConfig.filterBehavior !== 'Apply Button' &&
@@ -161,7 +159,9 @@ const VisualizationRow: React.FC<VizRowProps> = ({
           return (
             <div
               key={`vis__${index}__${colIndex}`}
-              className={`p-1 col-12 col-md-${col.width} ${!shouldShow ? 'd-none' : ''}`}
+              className={`col-12 col-md-${col.width}${!shouldShow ? ' d-none' : ''}${
+                hideVisualization ? ' hide-parent-visualization' : ' mt-5 p-1'
+              }`}
             >
               <VisualizationWrapper
                 allExpanded={allExpanded}
