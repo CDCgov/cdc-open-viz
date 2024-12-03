@@ -758,20 +758,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               isBrush={false}
             />
           )}
-          {/* y anchors
-          {config.yAxis.anchors &&
-            config.yAxis.anchors.map(anchor => {
-              return (
-                <Line
-                  strokeDasharray={handleLineType(anchor.lineStyle)}
-                  stroke='rgba(0,0,0,1)'
-                  className='customAnchor'
-                  from={{ x: 0 + config.yAxis.size, y: yScale(anchor.value) }}
-                  to={{ x: xMax, y: yScale(anchor.value) }}
-                  display={runtime.horizontal ? 'none' : 'block'}
-                />
-              )
-            })} */}
           {visualizationType === 'Forest Plot' && (
             <ForestPlot
               xScale={xScale}
@@ -853,13 +839,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               const getAnchorPosition = (): number | undefined => {
                 let position: number | undefined
 
-                if (orientation === 'vertical') {
-                  position = isDateScale(newX) ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
-                  if (config.xAxis.type === 'categorical' || config.xAxis.type === 'date') {
-                    position = position
-                      ? position + (newX.type === 'categorical' || newX.type === 'date' ? xScale.bandwidth() : 0) / 2
-                      : 0
-                  }
+                position = isDateScale(newX) ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
+                if (config.xAxis.type === 'categorical' || config.xAxis.type === 'date') {
+                  position = position
+                    ? position + (newX.type === 'categorical' || newX.type === 'date' ? xScale.bandwidth() : 0) / 2
+                    : 0
                 }
                 return position
               }
