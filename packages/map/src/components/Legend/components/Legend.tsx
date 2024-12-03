@@ -93,6 +93,10 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         formattedText = '0'
       }
 
+      if (entry.max === null && entry.min === null) {
+        formattedText = 'No data'
+      }
+
       let legendLabel = formattedText
 
       if (entry.hasOwnProperty('special')) {
