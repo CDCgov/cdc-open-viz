@@ -810,6 +810,20 @@ const CdcMap = ({
 
     legendMemo.current = newLegendMemo
 
+    if (state.general.geoType === 'world') {
+      const runtimeDataKeys = Object.keys(runtimeData)
+      const isCountriesWithNoDataState =
+        obj.data === undefined ? false : !countryKeys.every(countryKey => runtimeDataKeys.includes(countryKey))
+
+      if (result.length > 0 && isCountriesWithNoDataState) {
+        result.push({
+          min: null,
+          max: null,
+          color: '#E6E6E6'
+        })
+      }
+    }
+
     //----------
     // DEV-784
     // before returning the legend result

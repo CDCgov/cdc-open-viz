@@ -14,7 +14,9 @@ const useTooltip = props => {
     if (geoType === 'us-county' && type !== 'us-geocode') {
       let stateFipsCode = row[config.columns.geo.name].substring(0, 2)
       const stateName = supportedStatesFipsCodes[stateFipsCode]
-      toolTipText += hideGeoColumnInTooltip ? `<strong>${stateName}</strong><br/>` : `<strong>Location:  ${stateName}</strong><br/>`
+      toolTipText += hideGeoColumnInTooltip
+        ? `<strong>${stateName}</strong><br/>`
+        : `<strong>Location:  ${stateName}</strong><br/>`
     }
     return toolTipText
   }
@@ -73,7 +75,8 @@ const useTooltip = props => {
   const handleTooltipPrimaryColumn = (tooltipValue, column) => {
     const { hidePrimaryColumnInTooltip } = config.general as { hidePrimaryColumnInTooltip: boolean }
     let tooltipPrefix = column.label?.length > 0 ? column.label : ''
-    if ((column.name === config.columns.primary.name && hidePrimaryColumnInTooltip) || !tooltipPrefix) return `<li class="tooltip-body">${tooltipValue}</li>`
+    if ((column.name === config.columns.primary.name && hidePrimaryColumnInTooltip) || !tooltipPrefix)
+      return `<li class="tooltip-body">${tooltipValue}</li>`
     return `<li class="tooltip-body">${tooltipPrefix}: ${tooltipValue}</li>`
   }
 
@@ -91,7 +94,7 @@ const useTooltip = props => {
       legend: { specialClasses }
     } = config
 
-    if (tooltipEnabledMaps.includes(currentMapType) && undefined !== row) {
+    if (tooltipEnabledMaps.includes(currentMapType) && (row !== undefined || config.general.geoType === 'world')) {
       toolTipText += `<ul>`
 
       // if tooltips are allowed, loop through each column
@@ -102,7 +105,7 @@ const useTooltip = props => {
           let tooltipValue = handleTooltipSpecialClassText(specialClasses, column, row, '', columnKey)
 
           if (!tooltipValue) {
-            tooltipValue = displayDataAsText(row[column.name], columnKey)
+            tooltipValue = row ? displayDataAsText(row[column.name], columnKey) : 'No Data'
           }
 
           toolTipText += handleTooltipPrimaryColumn(tooltipValue, column)
@@ -115,7 +118,7 @@ const useTooltip = props => {
   }
 
   const buildTooltip = (row, geoName, toolTipText = '') => {
-    if (!row) return
+    if (!row && config.general.geoType !== 'world') return
 
     // Handle County Location Columns
     toolTipText += handleTooltipStateNameColumn(toolTipText, row)
