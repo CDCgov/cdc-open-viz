@@ -85,7 +85,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   const isPreview = state.tabSelected === 'Dashboard Preview'
 
   const inNoDataState = useMemo(() => {
-    const vals = Object.values(state.data)
+    const vals = Object.values(state.data).flatMap(val => val)
     if (!vals.length) return true
     return vals.some(val => val === undefined)
   }, [state.data])
@@ -441,8 +441,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             )
             break
           case 'dashboardFilters':
-            const hideFilter = visualizationConfig.autoLoad && inNoDataState
-            body = !hideFilter ? (
+            body = (
               <>
                 <Header visualizationKey={visualizationKey} subEditor='Filter Dropdowns' />
                 <DashboardSharedFilters
@@ -452,8 +451,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                   setConfig={_updateConfig}
                 />
               </>
-            ) : (
-              <></>
             )
             break
           case 'table':
@@ -587,7 +584,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                   }
                 })}
 
-            {inNoDataState ? <span>Please complete your selection to continue.</span> : <></>}
+            {inNoDataState ? <div className='mt-5'>Please complete your selection to continue.</div> : <></>}
 
             {/* Image or PDF Inserts */}
             <section className='download-buttons'>
