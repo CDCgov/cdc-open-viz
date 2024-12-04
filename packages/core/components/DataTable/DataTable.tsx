@@ -202,7 +202,7 @@ const DataTable = (props: DataTableProps) => {
       : config.visualizationType === 'Pie'
       ? [config.yAxis.dataKey]
       : config.visualizationType === 'Box Plot'
-        ? Object.entries(config.boxplot.tableData[0])
+        ? Object.entries(config.boxplot.plots[0])
         : config.runtime?.seriesKeys),
     [config.runtime?.seriesKeys]) // eslint-disable-line
 
