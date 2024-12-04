@@ -240,9 +240,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       hideTooltip
   })
   // get the number of months between the first and last date
-  const dateSpanMonths =
-    [0, data.length - 1].map(i => parseDate(data[i][runtime.xAxis.dataKey])).reduce((a, b) => Math.abs(a - b), 0) /
-    (1000 * 60 * 60 * 24 * 30)
+  const dateSpanMonths = data.length
+    ? [0, data.length - 1].map(i => parseDate(data[i][runtime.xAxis.dataKey])).reduce((a, b) => Math.abs(a - b), 0) /
+      (1000 * 60 * 60 * 24 * 30)
+    : 0
   const useDateSpanMonths = isDateTime && dateSpanMonths > xTickCount
 
   // GETTERS & FUNCTIONS
