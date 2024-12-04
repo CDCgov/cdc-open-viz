@@ -26,6 +26,9 @@ import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
 
 export const BarChartHorizontal = () => {
+  // get style :root variables
+  const root = document.documentElement
+  const coolGray90 = getComputedStyle(root).getPropertyValue('--cool-gray-90')
   const { xScale, yScale, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
   const {
     transformedData: data,
@@ -211,7 +214,14 @@ export const BarChartHorizontal = () => {
                   const yPos = barHeight * bar.index + barHeight / 2
                   const [upperPos, lowerPos] = ['upper', 'lower'].map(position => {
                     if (!hasConfidenceInterval) return
-                    const d = datum.dynamicData ? datum.CI[bar.key][position] : datum[config.confidenceKeys[position]]
+                    let d = datum
+                    if (datum.dynamicData) {
+                      d = datum.CI[bar.key][position]
+                    } else if (config.series[index].confidenceIntervals) {
+                      config.series[index].confidenceIntervals.forEach((ci, ciIndex) => {
+                        d = datum[position === 'lower' ? ci.low : ci.high]
+                      })
+                    }
                     return xScale(d)
                   })
                   // End Confidence Interval Variables
@@ -376,8 +386,9 @@ export const BarChartHorizontal = () => {
                         )}
                         {hasConfidenceInterval && (
                           <path
+                            className={`confidence-interval-h-${yPos}-${datum[config.runtime.originalXAxis.dataKey]}`}
                             key={`confidence-interval-h-${yPos}-${datum[config.runtime.originalXAxis.dataKey]}`}
-                            stroke='#333'
+                            stroke={coolGray90}
                             strokeWidth='px'
                             d={`
                                 M${lowerPos} ${yPos - tickWidth}
