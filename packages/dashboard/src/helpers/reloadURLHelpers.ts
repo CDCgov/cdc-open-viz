@@ -4,6 +4,7 @@ import { capitalizeSplitAndJoin } from '@cdc/core/helpers/cove/string'
 import { AnyVisualization, Visualization } from '@cdc/core/types/Visualization'
 import _ from 'lodash'
 import { DashboardConfig } from '../types/DashboardConfig'
+import { ConfigRow } from '../types/ConfigRow'
 
 export const isUpdateNeeded = (
   filters: SharedFilter[],
@@ -104,9 +105,10 @@ export const getVisualizationsWithFormattedData = (visualizations: Record<string
 export const filterUsedByDataUrl = (
   filter: SharedFilter,
   datasetKey: string,
-  visualizations: Record<string, AnyVisualization>
+  visualizations: Record<string, AnyVisualization>,
+  rows: ConfigRow[]
 ) => {
   if (!filter.usedBy || !filter.usedBy.length) return true
-  const vizUsingFilters = filter.usedBy?.map(vizKey => visualizations[vizKey])
+  const vizUsingFilters = filter.usedBy?.map(vizOrRowKey => visualizations[vizOrRowKey] || rows[vizOrRowKey])
   return vizUsingFilters?.some(viz => viz?.dataKey === datasetKey)
 }
