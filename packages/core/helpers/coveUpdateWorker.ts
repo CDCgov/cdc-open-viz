@@ -10,6 +10,7 @@ import update_4_24_7 from './ver/4.24.7'
 import update_4_24_9 from './ver/4.24.9'
 import versionNeedsUpdate from './ver/versionNeedsUpdate'
 import update_4_24_10 from './ver/4.24.10'
+import update_4_24_12 from './ver/4.24.12'
 
 export const coveUpdateWorker = config => {
   let genConfig = config
@@ -20,7 +21,8 @@ export const coveUpdateWorker = config => {
     ['4.24.5', update_4_24_5],
     ['4.24.7', update_4_24_7, true],
     ['4.24.9', update_4_24_9],
-    ['4.24.10', update_4_24_10]
+    ['4.24.10', update_4_24_10],
+    ['4.24.12', update_4_24_12]
   ]
 
   versions.forEach(([version, updateFunction, alwaysRun]: [string, UpdateFunction, boolean?]) => {

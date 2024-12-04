@@ -11,6 +11,8 @@ import horizontalBarConfig from './_mock/horizontal_bar.json'
 import pieConfig from './_mock/pie_with_data.json'
 import boxPlotConfig from './_mock/boxplot_multiseries.json'
 import areaChartStacked from './_mock/area_chart_stacked.json'
+import multipleLines from './_mock/short_dates.json'
+import { editConfigKeys } from '../helpers/configHelpers'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',
@@ -26,6 +28,13 @@ export const line_Chart_Confidence_Intervals: Story = {
   }
 }
 
+export const Bar_Chart_Confidence_Intervals: Story = {
+  args: {
+    config: editConfigKeys(lineChartConfidenceIntervals, [{ path: ['visualizationType'], value: 'Bar' }]),
+    isEditor: false
+  }
+}
+
 export const line_Chart_Two_Points_Regression_Test: Story = {
   args: {
     config: lineChartTwoPointsRegressionTest,
@@ -36,6 +45,12 @@ export const line_Chart_Two_Points_New_Chart: Story = {
   args: {
     config: lineChartTwoPointsNewChart,
     isEditor: false
+  }
+}
+
+export const multiple_lines: Story = {
+  args: {
+    config: editConfigKeys(multipleLines, [{ path: ['tooltips', 'dateDisplayFormat'], value: '%b. %d %Y' }])
   }
 }
 

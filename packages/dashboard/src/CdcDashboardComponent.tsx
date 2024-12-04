@@ -67,6 +67,7 @@ import { hasDashboardApplyBehavior } from './helpers/hasDashboardApplyBehavior'
 import { loadAPIFiltersFactory } from './helpers/loadAPIFilters'
 import Loader from '@cdc/core/components/Loader'
 import Alert from '@cdc/core/components/Alert'
+import { shouldLoadAllFilters } from './helpers/shouldLoadAllFilters'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -85,7 +86,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   const isPreview = state.tabSelected === 'Dashboard Preview'
 
   const inNoDataState = useMemo(() => {
-    const vals = Object.values(state.data)
+    const vals = Object.values(state.data).flatMap(val => val)
     if (!vals.length) return true
     return vals.some(val => val === undefined)
   }, [state.data])
@@ -257,7 +258,10 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     }
 
     const sharedFiltersWithValues = addValuesToDashboardFilters(config.dashboard.sharedFilters, state.data)
-    loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns)
+    const loadAllFilters = shouldLoadAllFilters(config)
+    loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns, loadAllFilters).then(newFilters => {
+      if (loadAllFilters) reloadURLData(newFilters)
+    })
     updateFilteredData(sharedFiltersWithValues)
   }, [isEditor, isPreview, state.config?.activeDashboard])
 
@@ -441,8 +445,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             )
             break
           case 'dashboardFilters':
-            const hideFilter = visualizationConfig.autoLoad && inNoDataState
-            body = !hideFilter ? (
+            body = (
               <>
                 <Header visualizationKey={visualizationKey} subEditor='Filter Dropdowns' />
                 <DashboardSharedFilters
@@ -452,8 +455,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                   setConfig={_updateConfig}
                 />
               </>
-            ) : (
-              <></>
             )
             break
           case 'table':
@@ -587,7 +588,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                   }
                 })}
 
-            {inNoDataState ? <span>Please complete your selection to continue.</span> : <></>}
+            {inNoDataState ? <div className='mt-5'>Please complete your selection to continue.</div> : <></>}
 
             {/* Image or PDF Inserts */}
             <section className='download-buttons'>

@@ -60,7 +60,7 @@ export const BarChartHorizontal = () => {
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
-  const hasConfidenceInterval = Object.keys(config.confidenceKeys).length > 0
+  const hasConfidenceInterval = config.series.filter(s => s.confidenceIntervals).length > 0
 
   const _data = getBarData(config, data, hasConfidenceInterval)
 

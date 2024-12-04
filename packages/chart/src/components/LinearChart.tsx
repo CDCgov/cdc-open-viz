@@ -52,6 +52,7 @@ type LinearChartProps = {
 const BOTTOM_LABEL_PADDING = 9
 const X_TICK_LABEL_PADDING = 3
 const DEFAULT_TICK_LENGTH = 8
+const MONTH_AS_MS = 1000 * 60 * 60 * 24 * 30
 
 const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, parentWidth }, svgRef) => {
   // prettier-ignore
@@ -123,6 +124,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isHorizontal = orientation === 'horizontal' || config.visualizationType === 'Forest Plot'
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   const isForestPlot = visualizationType === 'Forest Plot'
+  const isDateTime = config.xAxis.type === 'date-time'
   const suffixHasNoSpace = !suffix.includes(' ')
   const labelsOverflow = onlyShowTopPrefixSuffix && !suffixHasNoSpace
   const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
@@ -238,6 +240,13 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       showTooltip,
       hideTooltip
   })
+  // get the number of months between the first and last date
+  const { dataKey } = runtime.xAxis
+  const dateSpanMonths =
+    data.length && isDateTime
+      ? [0, data.length - 1].map(i => parseDate(data[i][dataKey])).reduce((a, b) => Math.abs(a - b)) / MONTH_AS_MS
+      : 0
+  const useDateSpanMonths = isDateTime && dateSpanMonths > xTickCount
 
   // GETTERS & FUNCTIONS
   const checkLineToBarGraph = () => {
@@ -758,20 +767,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               isBrush={false}
             />
           )}
-          {/* y anchors */}
-          {config.yAxis.anchors &&
-            config.yAxis.anchors.map(anchor => {
-              return (
-                <Line
-                  strokeDasharray={handleLineType(anchor.lineStyle)}
-                  stroke='rgba(0,0,0,1)'
-                  className='customAnchor'
-                  from={{ x: 0 + config.yAxis.size, y: yScale(anchor.value) }}
-                  to={{ x: xMax, y: yScale(anchor.value) }}
-                  display={runtime.horizontal ? 'none' : 'block'}
-                />
-              )
-            })}
           {visualizationType === 'Forest Plot' && (
             <ForestPlot
               xScale={xScale}
@@ -816,14 +811,19 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           {/* y anchors */}
           {config.yAxis.anchors &&
             config.yAxis.anchors.map((anchor, index) => {
-              let anchorPosition = yScale(anchor.value)
-              // have to move up
-              // const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
-              if (!anchor.value) return
-              const middleOffset =
-                orientation === 'horizontal' && visualizationType === 'Bar' ? config.barHeight / 4 : 0
+              let position = yScale(anchor.value)
+              let middleOffset = 0
 
-              if (!anchorPosition) return
+              if (!anchor.value) return
+              if (config.yAxis.labelPlacement === 'Below Bar') {
+                const textOffset = -6.5
+                middleOffset = textOffset + Number(config.series.length * config.barHeight) / config.series.length
+              } else {
+                const paddingOffset = 8
+                middleOffset = paddingOffset
+              }
+
+              if (!position) return
 
               return (
                 // prettier-ignore
@@ -832,8 +832,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   strokeDasharray={handleLineType(anchor.lineStyle)}
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   className='anchor-y'
-                  from={{ x: 0 + padding, y: anchorPosition - middleOffset}}
-                  to={{ x: width - config.yAxis.rightAxisSize, y: anchorPosition - middleOffset }}
+                  from={{ x: 0 + padding, y: position - middleOffset}}
+                  to={{ x: width - config.yAxis.rightAxisSize, y: position - middleOffset }}
                 />
               )
             })}
@@ -845,11 +845,19 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 newX = yAxis
               }
 
-              let anchorPosition = isDateScale(newX) ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
+              const getAnchorPosition = (): number | undefined => {
+                let position: number | undefined
 
-              if (config.xAxis.type === 'date' || config.xAxis.type === 'categorical') {
-                anchorPosition = anchorPosition + xScale.bandwidth() / 2
+                position = isDateScale(newX) ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
+                if (config.xAxis.type === 'categorical' || config.xAxis.type === 'date') {
+                  position = position
+                    ? position + (newX.type === 'categorical' || newX.type === 'date' ? xScale.bandwidth() : 0) / 2
+                    : 0
+                }
+                return position
               }
+
+              let anchorPosition = getAnchorPosition()
 
               if (!anchorPosition) return
 
@@ -1317,16 +1325,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               tickFormat={handleBottomTickFormatting}
               scale={xScale}
               stroke='#333'
-              numTicks={xTickCount}
+              numTicks={useDateSpanMonths ? dateSpanMonths : xTickCount}
               tickStroke='#333'
               tickValues={
                 config.xAxis.manual
-                  ? getTickValues(
-                      xAxisDataMapped,
-                      xScale,
-                      config.xAxis.type === 'date-time' ? xTickCount : getManualStep(),
-                      config
-                    )
+                  ? getTickValues(xAxisDataMapped, xScale, isDateTime ? xTickCount : getManualStep(), config)
                   : config.xAxis.type === 'date'
                   ? xAxisDataMapped
                   : undefined
@@ -1341,10 +1344,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
                 const axisMaxHeight = bottomLabelStart + BOTTOM_LABEL_PADDING
 
-                const axisCenter =
-                  config.visualizationType !== 'Forest Plot'
-                    ? (props.axisToPoint.x - props.axisFromPoint.x) / 2
-                    : dimensions[0] / 2
                 const containsMultipleWords = inputString => /\s/.test(inputString)
                 const ismultiLabel = props.ticks.some(tick => containsMultipleWords(tick.value))
 
@@ -1395,17 +1394,34 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 config.dynamicMarginTop = dynamicMarginTop
                 config.xAxis.tickWidthMax = tickWidthMax
 
+                const distanceBetweenTicks =
+                  useDateSpanMonths &&
+                  xScale
+                    .ticks(xTickCount)
+                    .map(t => props.ticks.findIndex(tick => tick.value.getTime() === t.getTime()))
+                    .slice(0, 2)
+                    .reduce((acc, curr) => curr - acc)
+
+                // filter out every [distanceBetweenTicks] tick starting from the end, so the last tick is always labeled
+                const filteredTicks = useDateSpanMonths
+                  ? [...props.ticks]
+                      .reverse()
+                      .filter((_, i) => i % distanceBetweenTicks === 0)
+                      .reverse()
+                      .map((tick, i, arr) => ({
+                        ...tick,
+                        // reformat in case showYearsOnce, since first month of year may have changed
+                        formattedValue: handleBottomTickFormatting(tick.value, i, arr)
+                      }))
+                  : props.ticks
+
                 return (
                   <Group className='bottom-axis' width={dimensions[0]}>
-                    {props.ticks.map((tick, i, propsTicks) => {
+                    {filteredTicks.map((tick, i, propsTicks) => {
                       // when using LogScale show major ticks values only
                       const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
                       const tickLength = showTick === 'block' ? 16 : DEFAULT_TICK_LENGTH
                       const to = { x: tick.to.x, y: tickLength }
-                      const textWidth = getTextWidth(
-                        tick.formattedValue,
-                        `normal ${fontSizes[config.fontSize]}px sans-serif`
-                      )
                       const limitedWidth = 100 / propsTicks.length
                       //reset rotations by updating config
                       config.yAxis.tickRotation =

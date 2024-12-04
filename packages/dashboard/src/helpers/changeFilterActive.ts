@@ -13,6 +13,9 @@ const handleChildren = (sharedFilters: SharedFilter[], parentIndex: number) => {
   if (childFilterIndexes.length) {
     childFilterIndexes.forEach(filterIndex => {
       sharedFilters[filterIndex].active = ''
+      if (sharedFilters[filterIndex].subGrouping) {
+        sharedFilters[filterIndex].subGrouping.active = ''
+      }
     })
   }
   return childFilterIndexes
