@@ -1994,16 +1994,20 @@ const EditorPanel = () => {
                           updateField={updateField}
                         />
                         <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
-                        <TextField
-                          value={config.yAxis.min}
-                          section='yAxis'
-                          fieldName='min'
-                          type='number'
-                          label='left axis min value'
-                          placeholder='Auto'
-                          updateField={updateField}
-                        />
-                        <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
+                        {(config.visualizationType !== 'Area Chart' || config.visualizationSubType === 'regular') && (
+                          <>
+                            <TextField
+                              value={config.yAxis.min}
+                              section='yAxis'
+                              fieldName='min'
+                              type='number'
+                              label='left axis min value'
+                              placeholder='Auto'
+                              updateField={updateField}
+                            />
+                            <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
+                          </>
+                        )}
                       </>
                     )
                   )}
