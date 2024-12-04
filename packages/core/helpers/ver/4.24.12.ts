@@ -9,6 +9,24 @@ import type { AllChartsConfig } from '@cdc/chart/src/types/ChartConfig'
  * @returns newConfig
  */
 const migrateConfidenceKeys = (newConfig: AllChartsConfig) => {
+  if (newConfig.type === 'dashboard') {
+    Object.keys(newConfig.visualizations).forEach(key => {
+      const currentViz = newConfig.visualizations[key]
+      // Move confidence keys to series
+      if (currentViz.confidenceKeys && currentViz.series.length === 1 && currentViz.series[0].type === 'Bar') {
+        return currentViz.series.forEach((series, index) => {
+          currentViz.series[index].confidenceIntervals = [
+            {
+              low: String(currentViz.confidenceKeys.lower),
+              high: String(currentViz.confidenceKeys.upper),
+              showInTooltip: true
+            }
+          ]
+        })
+      }
+    })
+  }
+
   // Move confidence keys to series
   if (newConfig.confidenceKeys && newConfig.series.length === 1 && newConfig.series[0].type === 'Bar') {
     return newConfig.series.forEach((series, index) => {
