@@ -12,7 +12,6 @@ import pieConfig from './_mock/pie_with_data.json'
 import boxPlotConfig from './_mock/boxplot_multiseries.json'
 import areaChartStacked from './_mock/area_chart_stacked.json'
 import multipleLines from './_mock/short_dates.json'
-import { editConfigKeys } from '../helpers/configHelpers'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',
@@ -24,13 +23,6 @@ type Story = StoryObj<typeof Chart>
 export const line_Chart_Confidence_Intervals: Story = {
   args: {
     config: lineChartConfidenceIntervals,
-    isEditor: false
-  }
-}
-
-export const Bar_Chart_Confidence_Intervals: Story = {
-  args: {
-    config: editConfigKeys(lineChartConfidenceIntervals, [{ path: ['visualizationType'], value: 'Bar' }]),
     isEditor: false
   }
 }

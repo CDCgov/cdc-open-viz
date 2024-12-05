@@ -304,7 +304,8 @@ const SeriesDropdownConfidenceInterval = props => {
   const { config, updateConfig } = useContext(ConfigContext)
   const { series, index } = props
   const { getColumns } = useContext(SeriesContext)
-  if (series.type !== 'Forecasting' && series.type !== 'Line' && series.type !== 'Bar') return
+
+  if (series.type !== 'Forecasting' && series.type !== 'Line') return
 
   return (
     <div className='edit-block'>
@@ -392,7 +393,7 @@ const SeriesDropdownConfidenceInterval = props => {
                         series: copyOfSeries
                       })
                     }}
-                    options={getColumns(false)}
+                    options={getColumns()}
                   />
                   <InputSelect
                     initial='Select an option'
@@ -412,7 +413,7 @@ const SeriesDropdownConfidenceInterval = props => {
                         series: copyOfSeries
                       })
                     }}
-                    options={getColumns(false)}
+                    options={getColumns()}
                   />
                 </AccordionItemPanel>
               </AccordionItem>
