@@ -46,7 +46,13 @@ export const BarChartVertical = () => {
 
   // prettier-ignore
   const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig } = useContext<ChartContext>(ConfigContext)
+
   const { HighLightedBarUtils } = useHighlightedBars(config)
+
+  const root = document.documentElement
+
+  const coolGray90 = getComputedStyle(root).getPropertyValue('--cool-gray-90')
+
   let data = transformedData
   // check if user add suppression
   const isSuppressionActive = config.preliminaryData.some(pd => pd.value && pd.type === 'suppression')
@@ -367,7 +373,7 @@ export const BarChartVertical = () => {
                         {hasConfidenceInterval && (
                           <path
                             key={`confidence-interval-v-${datum[config.runtime.originalXAxis.dataKey]}`}
-                            stroke='#333'
+                            stroke={coolGray90}
                             strokeWidth='px'
                             d={`M${xPos - tickWidth} ${upperPos}
                                 L${xPos + tickWidth} ${upperPos}
