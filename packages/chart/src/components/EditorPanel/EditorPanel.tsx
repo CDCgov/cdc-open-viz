@@ -1497,6 +1497,29 @@ const EditorPanel = () => {
                             </Panels.Series.Wrapper>
                           )}
                         </>
+                        {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
+                          <>
+                            <span className='divider-heading'>Confidence Keys</span>
+                            <Select
+                              value={config.confidenceKeys.upper || ''}
+                              section='confidenceKeys'
+                              fieldName='upper'
+                              label='Upper'
+                              updateField={updateField}
+                              initial='Select'
+                              options={getColumns()}
+                            />
+                            <Select
+                              value={config.confidenceKeys.lower || ''}
+                              section='confidenceKeys'
+                              fieldName='lower'
+                              label='Lower'
+                              updateField={updateField}
+                              initial='Select'
+                              options={getColumns()}
+                            />
+                          </>
+                        )}
                         {visSupportsRankByValue() && config.series && config.series.length === 1 && (
                           <Select
                             value={config.rankByValue}
