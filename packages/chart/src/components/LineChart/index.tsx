@@ -14,7 +14,7 @@ import ConfigContext from '../../ConfigContext'
 import useRightAxis from '../../hooks/useRightAxis'
 
 // Local helpers and components
-import { filterCircles, createStyles, createDataSegments, truncateText } from './helpers'
+import { filterCircles, createStyles, createDataSegments } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
 import LineChartBumpCircle from './components/LineChart.BumpCircle'
 import isNumber from '@cdc/core/helpers/isNumber'
@@ -347,10 +347,7 @@ const LineChart = (props: LineChartProps) => {
                     return <></>
                   }
 
-                  const availableSpace = xMax - xPos(lastDatum)
-                  let label = config.runtime.seriesLabels[seriesKey] || seriesKey
-                  // truncate text if it does not fit for availableSpace
-                  label = truncateText(label, availableSpace)
+                  const label = config.runtime.seriesLabels[seriesKey] || seriesKey
 
                   return (
                     <Text
