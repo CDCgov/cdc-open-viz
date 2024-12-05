@@ -29,32 +29,9 @@ const SeriesWrapper = props => {
 
   const supportedRightAxisTypes = ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg']
 
-  const updateNestedProperty = (obj, propertyPath, value) => {
-    if (!Array.isArray(propertyPath)) {
-      obj[propertyPath] = value
-      return
-    }
-
-    let current = obj
-    for (let i = 0; i < propertyPath.length - 1; i++) {
-      if (!current[propertyPath[i]]) {
-        current[propertyPath[i]] = {}
-      }
-      current = current[propertyPath[i]]
-    }
-    current[propertyPath[propertyPath.length - 1]] = value
-  }
-
   const updateSeries = (index, value, property) => {
     let series = [...config.series]
     series[index][property] = value
-
-    // if property is an array, we need to update the series object with the array
-    if (Array.isArray(property)) {
-      updateNestedProperty(series[index], property, value)
-    } else {
-      series[index][property] = value
-    }
 
     // Reset bars to the left axis if changed.
     if (property === 'type') {
@@ -71,7 +48,7 @@ const SeriesWrapper = props => {
       forecastingStages.forEach(stage => {
         forecastingStageArr.push({ key: stage })
       })
-
+      // debugger
       series[index].stages = forecastingStageArr
       series[index].stageColumn = series[index].dataKey
     }
@@ -304,8 +281,7 @@ const SeriesDropdownConfidenceInterval = props => {
   const { config, updateConfig } = useContext(ConfigContext)
   const { series, index } = props
   const { getColumns } = useContext(SeriesContext)
-
-  if (series.type !== 'Forecasting' && series.type !== 'Line') return
+  if (series.type !== 'Forecasting') return
 
   return (
     <div className='edit-block'>
@@ -351,29 +327,27 @@ const SeriesDropdownConfidenceInterval = props => {
                   </>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {series.type !== 'Line' && (
-                    <div className='input-group'>
-                      <label htmlFor='showInTooltip'>Show In Tooltip</label>
+                  <div className='input-group'>
+                    <label htmlFor='showInTooltip'>Show In Tooltip</label>
+                    <div
+                      className={'cove-input__checkbox--small'}
+                      onClick={e => updateShowInTooltip(e, index, ciIndex)}
+                    >
                       <div
-                        className={'cove-input__checkbox--small'}
-                        onClick={e => updateShowInTooltip(e, index, ciIndex)}
+                        className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`}
+                        style={{ backgroundColor: '' }}
                       >
-                        <div
-                          className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`}
-                          style={{ backgroundColor: '' }}
-                        >
-                          {showInTooltip && <Check className='' style={{ fill: '#025eaa' }} />}
-                        </div>
-                        <input
-                          className='cove-input--hidden'
-                          type='checkbox'
-                          name={'showInTooltip'}
-                          checked={showInTooltip ? showInTooltip : false}
-                          readOnly
-                        />
+                        {showInTooltip && <Check className='' style={{ fill: '#025eaa' }} />}
                       </div>
+                      <input
+                        className='cove-input--hidden'
+                        type='checkbox'
+                        name={'showInTooltip'}
+                        checked={showInTooltip ? showInTooltip : false}
+                        readOnly
+                      />
                     </div>
-                  )}
+                  </div>
 
                   <InputSelect
                     initial='Select an option'
@@ -421,7 +395,7 @@ const SeriesDropdownConfidenceInterval = props => {
           })}
         </Accordion>
         <button
-          className='btn btn-primary full-width mt-2 mb-4'
+          className='btn btn-primary full-width'
           onClick={e => {
             e.preventDefault()
             let copiedIndex = null

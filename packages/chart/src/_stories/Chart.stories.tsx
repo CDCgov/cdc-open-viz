@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from '@storybook/react'
 import Chart from '../CdcChart'
 import lineChartTwoPointsRegressionTest from './_mock/line_chart_two_points_regression_test.json'
 import lineChartTwoPointsNewChart from './_mock/line_chart_two_points_new_chart.json'
-import lineChartConfidenceIntervals from './_mock/line_chart_confidence_intervals.json'
 import lollipop from './_mock/lollipop.json'
 import forestPlot from '../../examples/feature/forest-plot/forest-plot.json'
 import pairedBar from './_mock/paired-bar.json'
@@ -19,13 +18,6 @@ const meta: Meta<typeof Chart> = {
 }
 
 type Story = StoryObj<typeof Chart>
-
-export const line_Chart_Confidence_Intervals: Story = {
-  args: {
-    config: lineChartConfidenceIntervals,
-    isEditor: false
-  }
-}
 
 export const line_Chart_Two_Points_Regression_Test: Story = {
   args: {
