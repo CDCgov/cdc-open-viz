@@ -227,7 +227,11 @@ export const BarChartVertical = () => {
                   const xPos = barX + (config.xAxis.type !== 'date-time' ? barWidth / 2 : 0)
                   const [upperPos, lowerPos] = ['upper', 'lower'].map(position => {
                     if (!hasConfidenceInterval) return
-                    const d = datum.dynamicData ? datum.CI[bar.key][position] : datum[config.confidenceKeys[position]]
+                    const d = datum.dynamicData
+                      ? datum.CI[bar.key][position]
+                      : datum.category === bar.key
+                      ? datum[config.confidenceKeys[position]]
+                      : null
                     return yScale(d)
                   })
                   // End Confidence Interval Variables
