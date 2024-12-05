@@ -12,6 +12,7 @@ import { useContext } from 'react'
 import ConfigContext from '../ConfigContext'
 import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
+import _ from 'lodash'
 
 const scaleTypes = {
   TIME: 'time',
@@ -163,6 +164,9 @@ const useScales = (properties: useScaleProps) => {
 
     // Set Scales
 
+    const categories = _.uniq(data.map(d => d[config.xAxis.dataKey]))
+    const range = [0, config.barThickness * 100 || 1]
+    const domain = _.map(config.series, 'dataKey')
     yScale = scaleLinear({
       range: [yMax, 0],
       round: true,
@@ -170,11 +174,10 @@ const useScales = (properties: useScaleProps) => {
     })
     xScale = scaleBand({
       range: [0, xMax],
-      domain: config.boxplot.categories
+      domain: categories
     })
     xScale.type = scaleTypes.BAND
-
-    seriesScale = composeScalePoint(seriesDomain, [0, yMax])
+    seriesScale = composeScaleBand(domain, range)
   }
 
   // handle Paired bar

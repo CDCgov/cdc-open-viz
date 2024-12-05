@@ -4,33 +4,24 @@
  * @param {Array} arr - The array of integers or decimals.
  * @returns {Object} An object containing the q1 and q3 values.
  */
-export const getQuartiles = arr => {
-  arr.sort((a, b) => a - b)
+import _ from 'lodash'
 
-  // Calculate the median index for the full array
-  const medianIndex = Math.floor(arr.length / 2)
+export const getQuartiles = (values: number[]): { q1: number; q3: number } => {
+  const sortedData: number[] = _.sortBy(values)
 
-  // Determine if the full array length is even
-  const isFullEven = arr.length % 2 === 0
-
-  // Define the subarrays for Q1 and Q3
-  const q1Array = arr.slice(0, medianIndex)
-  const q3Array = arr.slice(isFullEven ? medianIndex : medianIndex + 1)
-
-  // Helper function to calculate median of any array
-  const median = subArray => {
-    const midIndex = Math.floor(subArray.length / 2)
-    if (subArray.length % 2 === 0) {
-      return (subArray[midIndex - 1] + subArray[midIndex]) / 2
+  const quantile = (sortedData: number[], q: number): number => {
+    const position: number = (sortedData.length - 1) * q
+    const base: number = Math.floor(position)
+    const rest: number = position - base
+    if (sortedData[base + 1] !== undefined) {
+      return sortedData[base] + rest * (sortedData[base + 1] - sortedData[base])
     } else {
-      return subArray[midIndex]
+      return sortedData[base]
     }
   }
 
-  // Calculate Q1 and Q3 using the helper function
-  const q1 = median(q1Array)
-  const q3 = median(q3Array)
+  const q1: number = quantile(sortedData, 0.25)
+  const q3: number = quantile(sortedData, 0.75)
 
-  // Return an object containing the q1 and q3 values
   return { q1, q3 }
 }
