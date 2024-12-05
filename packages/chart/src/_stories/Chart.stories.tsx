@@ -11,6 +11,9 @@ import pieConfig from './_mock/pie_with_data.json'
 import boxPlotConfig from './_mock/boxplot_multiseries.json'
 import areaChartStacked from './_mock/area_chart_stacked.json'
 import multipleLines from './_mock/short_dates.json'
+import lineChartDynamicCI from './_mock/line_chart_dynamic_ci.json'
+import lineChartNonDynamicCI from './_mock/line_chart_non_dynamic_ci.json'
+import { editConfigKeys } from '../helpers/configHelpers'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',
@@ -18,6 +21,20 @@ const meta: Meta<typeof Chart> = {
 }
 
 type Story = StoryObj<typeof Chart>
+
+export const line_Chart_Dynamic_Confidence_Intervals: Story = {
+  args: {
+    config: lineChartDynamicCI,
+    isEditor: false
+  }
+}
+
+export const line_Chart_Non_Dynamic_Confidence_Intervals: Story = {
+  args: {
+    config: lineChartNonDynamicCI,
+    isEditor: false
+  }
+}
 
 export const line_Chart_Two_Points_Regression_Test: Story = {
   args: {

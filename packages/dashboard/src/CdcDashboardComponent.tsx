@@ -130,7 +130,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
         filters.forEach(filter => {
           if (
             filter.type === 'urlfilter' &&
-            reloadURLHelpers.filterUsedByDataUrl(filter, datasetKey, config.visualizations)
+            reloadURLHelpers.filterUsedByDataUrl(filter, datasetKey, config.visualizations, config.rows)
           ) {
             if (filter.filterBy === 'File Name') {
               newFileName = reloadURLHelpers.getNewFileName(newFileName, filter, datasetKey)

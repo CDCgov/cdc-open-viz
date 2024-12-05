@@ -1347,6 +1347,9 @@ const EditorPanel = () => {
     updateConfig(updatedConfig)
   }
 
+  const hasDynamicCategory = ![undefined, '- Select - '].includes(config.series?.[0]?.dynamicCategory)
+  const hasMultipleSeries = config.series?.length > 1
+
   const editorContextValues = {
     addNewExclusion,
     data,
@@ -1497,7 +1500,8 @@ const EditorPanel = () => {
                             </Panels.Series.Wrapper>
                           )}
                         </>
-                        {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
+                        {((config.series && config.series.length <= 1 && config.visualizationType === 'Bar') ||
+                          (config.series && config.series.length <= 1 && config.visualizationType === 'Line')) && (
                           <>
                             <span className='divider-heading'>Confidence Keys</span>
                             <Select
@@ -3727,7 +3731,7 @@ const EditorPanel = () => {
                     </>
                   } */}
                   <Select
-                    display={config.series?.length > 1}
+                    display={hasDynamicCategory || hasMultipleSeries}
                     value={config.legend.behavior}
                     section='legend'
                     fieldName='behavior'

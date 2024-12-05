@@ -41,7 +41,7 @@ const boxplotCellMatrix = ({ rows, config }): CellMatrix => {
     if (Number(rowid) === 10) return plot.columnLowerBounds
     if (Number(rowid) === 11) return plot.columnUpperBounds
     if (Number(rowid) === 12) return plot.columnOutliers.length > 0 ? plot.columnOutliers.toString() : '-'
-    if (Number(rowid) === 11) return plot.columnNonOutliers
+    if (Number(rowid) === 13) return plot.columnNonOutliers.length > 0 ? plot.columnNonOutliers.toString() : '-'
     return <p>-</p>
   }
   // get list of data keys for each row
