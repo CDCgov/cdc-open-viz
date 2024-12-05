@@ -1994,7 +1994,7 @@ const EditorPanel = () => {
                           updateField={updateField}
                         />
                         <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
-                        {(config.visualizationType !== 'Area Chart' || config.visualizationSubType === 'regular') && (
+                        {config.visualizationType !== 'Area Chart' && config.visualizationSubType !== 'stacked' && (
                           <>
                             <TextField
                               value={config.yAxis.min}
@@ -2745,35 +2745,33 @@ const EditorPanel = () => {
                           />
                         </>
                       )}
-                      {config.xAxis.type !== 'date-time' && (
-                        <CheckBox
-                          value={config.exclusions.active}
-                          section='exclusions'
-                          fieldName='active'
-                          label={
-                            config.xAxis.type === 'date'
-                              ? 'Limit by start and/or end dates'
-                              : 'Exclude one or more values'
-                          }
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon
-                                  display='question'
-                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>
-                                  When this option is checked, you can select source-file values for exclusion from the
-                                  date/category axis.{' '}
-                                </p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                          updateField={updateField}
-                        />
-                      )}
+                      <CheckBox
+                        value={config.exclusions.active}
+                        section='exclusions'
+                        fieldName='active'
+                        label={
+                          config.xAxis.type === 'date' || config.xAxis.type === 'date-time'
+                            ? 'Limit by start and/or end dates'
+                            : 'Exclude one or more values'
+                        }
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon
+                                display='question'
+                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                              />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                When this option is checked, you can select source-file values for exclusion from the
+                                date/category axis.{' '}
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        updateField={updateField}
+                      />
                       <CheckBox
                         value={config.xAxis.showYearsOnce}
                         section='xAxis'
