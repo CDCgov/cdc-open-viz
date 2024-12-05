@@ -203,30 +203,36 @@ describe('filterUsedByDataUrl', () => {
   it('should return true when filter has no usedBy property', () => {
     const filter = { datasetKey: 'dataset1' }
     const datasetKey = 'dataset1'
-    expect(filterUsedByDataUrl(filter, datasetKey, visualizations)).toBe(true)
+    expect(filterUsedByDataUrl(filter, datasetKey, visualizations, [])).toBe(true)
   })
 
   it('should return true when filter has an empty usedBy array', () => {
     const filter = { usedBy: [], datasetKey: 'dataset1' }
     const datasetKey = 'dataset1'
-    expect(filterUsedByDataUrl(filter, datasetKey, visualizations)).toBe(true)
+    expect(filterUsedByDataUrl(filter, datasetKey, visualizations, [])).toBe(true)
   })
 
   it('should return true when filter has usedBy array with visualization keys that match the datasetKey', () => {
     const filter = { usedBy: ['viz1', 'viz3'], datasetKey: 'dataset1' }
     const datasetKey = 'dataset1'
-    expect(filterUsedByDataUrl(filter, datasetKey, visualizations)).toBe(true)
+    expect(filterUsedByDataUrl(filter, datasetKey, visualizations, [])).toBe(true)
   })
 
   it('should return false when filter has usedBy array with visualization keys that do not match the datasetKey', () => {
     const filter = { usedBy: ['viz2'], datasetKey: 'dataset1' }
     const datasetKey = 'dataset1'
-    expect(filterUsedByDataUrl(filter, datasetKey, visualizations)).toBe(false)
+    expect(filterUsedByDataUrl(filter, datasetKey, visualizations, [])).toBe(false)
   })
 
   it('should return true when filter has usedBy array with a mix of matching and non-matching visualization keys', () => {
     const filter = { usedBy: ['viz1', 'viz2'], datasetKey: 'dataset1' }
     const datasetKey = 'dataset1'
-    expect(filterUsedByDataUrl(filter, datasetKey, visualizations)).toBe(true)
+    expect(filterUsedByDataUrl(filter, datasetKey, visualizations, [])).toBe(true)
+  })
+
+  it('should return true when used by a row', () => {
+    const filter = { usedBy: ['viz1', 'viz2', 2], datasetKey: 'dataset1' }
+    const datasetKey = 'dataset1'
+    expect(filterUsedByDataUrl(filter, datasetKey, visualizations, [{}, {}, { dataKey: 'dataset1' }])).toBe(true)
   })
 })

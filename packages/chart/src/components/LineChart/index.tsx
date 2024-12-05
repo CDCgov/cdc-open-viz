@@ -3,7 +3,7 @@ import React, { useContext } from 'react'
 // VisX library imports
 import * as allCurves from '@visx/curve'
 import { Group } from '@visx/group'
-import { LinePath, Bar, SplitLinePath } from '@visx/shape'
+import { LinePath, Bar, SplitLinePath, AreaClosed } from '@visx/shape'
 import { Text } from '@visx/text'
 
 // CDC core components
@@ -39,7 +39,7 @@ const LineChart = (props: LineChartProps) => {
   } = props
 
   // prettier-ignore
-  const { colorScale, config, formatNumber, handleLineType, parseDate, seriesHighlight, tableData, transformedData, updateConfig, brushConfig,clean } = useContext<ChartContext>(ConfigContext)
+  const { colorScale, config, formatNumber, handleLineType, parseDate, seriesHighlight, tableData, transformedData, updateConfig, brushConfig,clean  } = useContext<ChartContext>(ConfigContext)
   const { yScaleRight } = useRightAxis({ config, yMax, data: transformedData, updateConfig })
   if (!handleTooltipMouseOver) return
 
@@ -252,6 +252,52 @@ const LineChart = (props: LineChartProps) => {
                 </>
               ) : (
                 <>
+                  {/* Confidence Interval Band */}
+                  {config.confidenceKeys &&
+                    config.series.map((seriesData, seriesKey) => {
+                      if (seriesData.dynamicCategory) {
+                        // Get unique categories from the data
+                        const uniqueCategories = [...new Set(data.map(d => d[seriesData.dynamicCategory]))]
+
+                        return uniqueCategories.map((category, categoryIndex) => {
+                          const categoryData = data.filter(d => d[seriesData.dynamicCategory] === category)
+
+                          return (
+                            <AreaClosed
+                              key={`area-closed-${seriesKey}-${categoryIndex}`}
+                              data={categoryData}
+                              x={d => xPos(d)}
+                              y0={d => yScale(d[config.confidenceKeys.lower])} // Lower bound of the confidence interval
+                              y1={d => yScale(d[config.confidenceKeys.upper])} // Upper bound of the confidence interval
+                              opacity={0.5}
+                              fill={colorScale(category)} // Optional: Color based on category
+                              yScale={yScale}
+                              curve={allCurves[seriesData.lineType as keyof typeof allCurves]}
+                            />
+                          )
+                        })
+                      }
+
+                      // Default behavior for non-dynamic categories
+                      return (
+                        <AreaClosed
+                          key={`area-closed-${seriesKey}`}
+                          data={data}
+                          x={d => xPos(d)}
+                          y0={d => yScale(d[config.confidenceKeys.lower])}
+                          y1={d => yScale(d[config.confidenceKeys.upper])}
+                          opacity={0.5}
+                          fill={colorScale(
+                            config.runtime.seriesLabels
+                              ? config.runtime.seriesLabels[seriesData.dataKey]
+                              : seriesData.dataKey
+                          )}
+                          yScale={yScale}
+                          curve={allCurves[seriesData.lineType as keyof typeof allCurves]}
+                        />
+                      )
+                    })}
+
                   {/* STANDARD LINE */}
                   <LinePath
                     curve={allCurves[seriesData.lineType]}
@@ -346,9 +392,6 @@ const LineChart = (props: LineChartProps) => {
                   if (!lastDatum) {
                     return <></>
                   }
-
-                  const label = config.runtime.seriesLabels[seriesKey] || seriesKey
-
                   return (
                     <Text
                       x={xPos(lastDatum) + 5}
@@ -360,7 +403,7 @@ const LineChart = (props: LineChartProps) => {
                           : 'black'
                       }
                     >
-                      {label}
+                      {config.runtime.seriesLabels[seriesKey] || seriesKey}
                     </Text>
                   )
                 })}
