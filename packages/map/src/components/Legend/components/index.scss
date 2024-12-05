@@ -112,11 +112,6 @@
 
         &:not(.vertical-sorted, .legend-container__ul--single-column, .single-row) {
           width: 100%;
-          @include breakpoint(sm) {
-            .legend-container__li {
-              width: 50%;
-            }
-          }
         }
         .legend-container__li {
           flex-shrink: 0;
