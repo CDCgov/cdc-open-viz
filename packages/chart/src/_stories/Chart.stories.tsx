@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from '@storybook/react'
 import Chart from '../CdcChart'
 import lineChartTwoPointsRegressionTest from './_mock/line_chart_two_points_regression_test.json'
 import lineChartTwoPointsNewChart from './_mock/line_chart_two_points_new_chart.json'
-import lineChartConfidenceIntervals from './_mock/line_chart_confidence_intervals.json'
 import lollipop from './_mock/lollipop.json'
 import forestPlot from '../../examples/feature/forest-plot/forest-plot.json'
 import pairedBar from './_mock/paired-bar.json'
@@ -12,7 +11,6 @@ import pieConfig from './_mock/pie_with_data.json'
 import boxPlotConfig from './_mock/boxplot_multiseries.json'
 import areaChartStacked from './_mock/area_chart_stacked.json'
 import multipleLines from './_mock/short_dates.json'
-import { editConfigKeys } from '../helpers/configHelpers'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',
@@ -20,20 +18,6 @@ const meta: Meta<typeof Chart> = {
 }
 
 type Story = StoryObj<typeof Chart>
-
-export const line_Chart_Confidence_Intervals: Story = {
-  args: {
-    config: lineChartConfidenceIntervals,
-    isEditor: false
-  }
-}
-
-export const Bar_Chart_Confidence_Intervals: Story = {
-  args: {
-    config: editConfigKeys(lineChartConfidenceIntervals, [{ path: ['visualizationType'], value: 'Bar' }]),
-    isEditor: false
-  }
-}
 
 export const line_Chart_Two_Points_Regression_Test: Story = {
   args: {

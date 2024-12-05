@@ -59,7 +59,7 @@ export const BarChartVertical = () => {
     data = brushConfig.data
   }
 
-  const hasConfidenceInterval = config.series.filter(s => s.confidenceIntervals).length > 0
+  const hasConfidenceInterval = Object.keys(config.confidenceKeys).length > 0
 
   const _data = getBarData(config, data, hasConfidenceInterval)
   return (
@@ -225,16 +225,9 @@ export const BarChartVertical = () => {
                   // Confidence Interval Variables
                   const tickWidth = 5
                   const xPos = barX + (config.xAxis.type !== 'date-time' ? barWidth / 2 : 0)
-                  const [upperPos, lowerPos] = ['high', 'low'].map(position => {
+                  const [upperPos, lowerPos] = ['upper', 'lower'].map(position => {
                     if (!hasConfidenceInterval) return
-                    let d = datum
-                    if (datum.dynamicData) {
-                      d = datum.CI[bar.key][position]
-                    } else if (config.series[index].confidenceIntervals) {
-                      config.series[index].confidenceIntervals.forEach((ci, ciIndex) => {
-                        d = datum[config.series[index].confidenceIntervals[ciIndex][position]]
-                      })
-                    }
+                    const d = datum.dynamicData ? datum.CI[bar.key][position] : datum[config.confidenceKeys[position]]
                     return yScale(d)
                   })
                   // End Confidence Interval Variables
