@@ -64,6 +64,10 @@ export const BarChartHorizontal = () => {
 
   const _data = getBarData(config, data, hasConfidenceInterval)
 
+  const root = document.documentElement
+
+  const coolGray90 = getComputedStyle(root).getPropertyValue('--cool-gray-90')
+
   return (
     config.visualizationSubType !== 'stacked' &&
     config.visualizationType === 'Bar' &&
@@ -377,7 +381,7 @@ export const BarChartHorizontal = () => {
                         {hasConfidenceInterval && (
                           <path
                             key={`confidence-interval-h-${yPos}-${datum[config.runtime.originalXAxis.dataKey]}`}
-                            stroke='#333'
+                            stroke={coolGray90}
                             strokeWidth='px'
                             d={`
                                 M${lowerPos} ${yPos - tickWidth}
