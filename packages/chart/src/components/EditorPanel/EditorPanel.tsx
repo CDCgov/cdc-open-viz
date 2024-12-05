@@ -1500,7 +1500,7 @@ const EditorPanel = () => {
                             </Panels.Series.Wrapper>
                           )}
                         </>
-                        {((config.series && config.series.length <= 1 && config.visualizationType === 'Bar') ||
+                        {((config.series && config.series.length && config.visualizationType === 'Bar') ||
                           (config.series && config.series.length <= 1 && config.visualizationType === 'Line')) && (
                           <>
                             <span className='divider-heading'>Confidence Keys</span>
