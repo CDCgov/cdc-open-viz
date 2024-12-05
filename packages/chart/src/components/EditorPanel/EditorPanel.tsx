@@ -1347,6 +1347,9 @@ const EditorPanel = () => {
     updateConfig(updatedConfig)
   }
 
+  const hasDynamicCategory = ![undefined, '- Select - '].includes(config.series?.[0]?.dynamicCategory)
+  const hasMultipleSeries = config.series?.length > 1
+
   const editorContextValues = {
     addNewExclusion,
     data,
@@ -3704,7 +3707,7 @@ const EditorPanel = () => {
                     </>
                   } */}
                   <Select
-                    display={config.series?.length > 1}
+                    display={hasDynamicCategory || hasMultipleSeries}
                     value={config.legend.behavior}
                     section='legend'
                     fieldName='behavior'
