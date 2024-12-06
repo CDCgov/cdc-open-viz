@@ -104,7 +104,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           <>
             <div className={formGroupClass} key={`${label}-filtersection-${filterIndex}`}>
               {label && (
-                <label className='text-capitalize font-weight-bold mt-1 mb-0' htmlFor={`filter-${filterIndex}`}>
+                <label className='font-weight-bold mt-1 mb-0' htmlFor={`filter-${filterIndex}`}>
                   {label}
                 </label>
               )}
