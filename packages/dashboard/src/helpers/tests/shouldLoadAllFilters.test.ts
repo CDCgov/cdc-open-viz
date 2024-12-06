@@ -1,11 +1,10 @@
-import { MultiDashboardConfig } from '../../types/MultiDashboard'
 import { shouldLoadAllFilters } from '../shouldLoadAllFilters'
 
 describe('shouldLoadAllFilters', () => {
   it('returns false if not autoloading', () => {
     delete window.location
     window.location = new URL('https://www.example.com')
-    expect(shouldLoadAllFilters({})).toBe(false)
+    expect(shouldLoadAllFilters({ rows: [] })).toBe(false)
   })
   it('returns true if missing data', () => {
     delete window.location
@@ -16,6 +15,7 @@ describe('shouldLoadAllFilters', () => {
           dataKey: 'abcd'
         }
       },
+      rows: [],
       datasets: {
         abcd: {
           data: []
@@ -31,6 +31,7 @@ describe('shouldLoadAllFilters', () => {
               dataKey: 'abcd'
             }
           },
+          rows: [],
           datasets: {
             abcd: {
               data: []
@@ -56,6 +57,7 @@ describe('shouldLoadAllFilters', () => {
           datakey: 'abcd'
         }
       },
+      rows: [],
       datasets: {
         abcd: {
           data: [{}]

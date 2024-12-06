@@ -68,6 +68,7 @@ import { loadAPIFiltersFactory } from './helpers/loadAPIFilters'
 import Loader from '@cdc/core/components/Loader'
 import Alert from '@cdc/core/components/Alert'
 import { shouldLoadAllFilters } from './helpers/shouldLoadAllFilters'
+import { shouldLoadUnfilteredDataset } from './helpers/shouldLoadUnfilteredDataset'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -147,10 +148,9 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             if (!!filter.setByQueryParameter) {
               const windowQueryParams = Object.fromEntries(new URLSearchParams(window.location.search))
               const filterValue = windowQueryParams[filter.setByQueryParameter]
-              if (filter.apiFilter) {
-                updatedQSParams[filter.apiFilter.valueSelector] = filterValue
-              } else {
-                updatedQSParams[filter.setByQueryParameter] = filterValue
+              const queryParam = filter.apiFilter?.valueSelector || filter.setByQueryParameter
+              if (filterValue) {
+                updatedQSParams[queryParam] = filterValue
               }
             }
 
@@ -163,7 +163,11 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
           }
         })
 
-        if (!!newFilters || reloadURLHelpers.isUpdateNeeded(filters, currentQSParams, updatedQSParams)) {
+        const dataNeedsUpdate =
+          reloadURLHelpers.isUpdateNeeded(filters, currentQSParams, updatedQSParams) ||
+          shouldLoadUnfilteredDataset(config, datasetKey)
+
+        if (!!newFilters || dataNeedsUpdate) {
           dataWasFetched = true
           const dataUrlFinal = reloadURLHelpers.getDataURL(
             { ...currentQSParams, ...updatedQSParams },
@@ -198,6 +202,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
               newDatasets[datasetKey].runtimeDataUrl = dataUrlFinal
               newData[datasetKey] = []
             })
+        } else if (shouldLoadUnfilteredDataset(config, datasetKey)) {
+          setAPILoading(false)
         }
       }
     }
@@ -253,12 +259,13 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   useEffect(() => {
     if (isEditor && !isPreview) return
     const { config } = state
-    if (!hasDashboardApplyBehavior(config.visualizations)) {
+    const loadAllFilters = shouldLoadAllFilters(config)
+    if (!hasDashboardApplyBehavior(config.visualizations) && !loadAllFilters) {
       reloadURLData()
     }
 
     const sharedFiltersWithValues = addValuesToDashboardFilters(config.dashboard.sharedFilters, state.data)
-    const loadAllFilters = shouldLoadAllFilters(config)
+
     loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns, loadAllFilters).then(newFilters => {
       if (loadAllFilters) reloadURLData(newFilters)
     })
