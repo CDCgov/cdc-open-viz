@@ -1342,25 +1342,46 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   props.ticks = filterAndShiftLinearDateTicks(config, props, xAxisDataMapped, formatDate)
                 }
 
+                const distanceBetweenTicks =
+                  useDateSpanMonths &&
+                  xScale
+                    .ticks(xTickCount)
+                    .map(t => props.ticks.findIndex(tick => tick.value.getTime() === t.getTime()))
+                    .slice(0, 2)
+                    .reduce((acc, curr) => curr - acc)
+
+                // filter out every [distanceBetweenTicks] tick starting from the end, so the last tick is always labeled
+                const filteredTicks = useDateSpanMonths
+                  ? [...props.ticks]
+                      .reverse()
+                      .filter((_, i) => i % distanceBetweenTicks === 0)
+                      .reverse()
+                      .map((tick, i, arr) => ({
+                        ...tick,
+                        // reformat in case showYearsOnce, since first month of year may have changed
+                        formattedValue: handleBottomTickFormatting(tick.value, i, arr)
+                      }))
+                  : props.ticks
+
                 const axisMaxHeight = bottomLabelStart + BOTTOM_LABEL_PADDING
 
                 const containsMultipleWords = inputString => /\s/.test(inputString)
-                const ismultiLabel = props.ticks.some(tick => containsMultipleWords(tick.value))
+                const ismultiLabel = filteredTicks.some(tick => containsMultipleWords(tick.value))
 
                 // Calculate sumOfTickWidth here, before map function
                 const tickWidthMax = Math.max(
-                  ...props.ticks.map(tick =>
+                  ...filteredTicks.map(tick =>
                     getTextWidth(tick.formattedValue, `normal ${fontSizes[config.fontSize]}px sans-serif`)
                   )
                 )
                 // const marginTop = 20 // moved to top bc need for yMax calcs
                 const accumulator = ismultiLabel ? 180 : 100
 
-                const textWidths = props.ticks.map(tick =>
+                const textWidths = filteredTicks.map(tick =>
                   getTextWidth(tick.formattedValue, `normal ${fontSizes[config.fontSize]}px sans-serif`)
                 )
                 const sumOfTickWidth = textWidths.reduce((a, b) => a + b, accumulator)
-                const spaceBetweenEachTick = (xMax - sumOfTickWidth) / (props.ticks.length - 1)
+                const spaceBetweenEachTick = (xMax - sumOfTickWidth) / (filteredTicks.length - 1)
 
                 // Check if ticks are overlapping
                 // Determine the position of each tick
@@ -1388,32 +1409,21 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   areTicksTouching = true
                 }
 
+                // force wrap it last tick is close to the end of the axis
+                const lastTickWidth = textWidths[textWidths.length - 1]
+                const lastTickPosition = positions[positions.length - 1] + lastTickWidth
+                const lastTickEnd = lastTickPosition + lastTickWidth / 2
+                const lastTickEndThreshold = xMax - lastTickWidth
+
+                if (lastTickEnd > lastTickEndThreshold) {
+                  areTicksTouching = true
+                }
+
                 const dynamicMarginTop =
                   areTicksTouching && config.isResponsiveTicks ? tickWidthMax + DEFAULT_TICK_LENGTH + 20 : 0
 
                 config.dynamicMarginTop = dynamicMarginTop
                 config.xAxis.tickWidthMax = tickWidthMax
-
-                const distanceBetweenTicks =
-                  useDateSpanMonths &&
-                  xScale
-                    .ticks(xTickCount)
-                    .map(t => props.ticks.findIndex(tick => tick.value.getTime() === t.getTime()))
-                    .slice(0, 2)
-                    .reduce((acc, curr) => curr - acc)
-
-                // filter out every [distanceBetweenTicks] tick starting from the end, so the last tick is always labeled
-                const filteredTicks = useDateSpanMonths
-                  ? [...props.ticks]
-                      .reverse()
-                      .filter((_, i) => i % distanceBetweenTicks === 0)
-                      .reverse()
-                      .map((tick, i, arr) => ({
-                        ...tick,
-                        // reformat in case showYearsOnce, since first month of year may have changed
-                        formattedValue: handleBottomTickFormatting(tick.value, i, arr)
-                      }))
-                  : props.ticks
 
                 return (
                   <Group className='bottom-axis' width={dimensions[0]}>

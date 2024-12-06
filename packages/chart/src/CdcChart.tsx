@@ -613,11 +613,12 @@ const CdcChart = ({
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
-      let editorWidth = 350
+      const svgMarginWidth = 15
+      const editorWidth = 350
 
       width = isEditor ? width - editorWidth : width
 
-      let newViewport = getViewport(width)
+      const newViewport = getViewport(width)
 
       setCurrentViewport(newViewport)
 
@@ -625,7 +626,7 @@ const CdcChart = ({
         width = width - 2.5
       }
 
-      width = width
+      width = width - svgMarginWidth
 
       setDimensions([width, height])
     }
