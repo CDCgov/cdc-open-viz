@@ -613,7 +613,7 @@ const CdcChart = ({
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
-      const svgMarginWidth = 35
+      const svgMarginWidth = 15
       const editorWidth = 350
 
       width = isEditor ? width - editorWidth : width
