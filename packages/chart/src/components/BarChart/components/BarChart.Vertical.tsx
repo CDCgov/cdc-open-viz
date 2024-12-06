@@ -91,11 +91,11 @@ export const BarChartVertical = () => {
           }}
         >
           {barGroups => {
-            return barGroups.map((barGroup, index) => (
+            return barGroups.map((barGroup, _index) => (
               <Group
-                className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`}
-                key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
-                id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
+                className={`bar-group-${barGroup.index}-${barGroup.x0}--${_index} ${config.orientation}`}
+                key={`bar-group-${barGroup.index}-${barGroup.x0}--${_index}`}
+                id={`bar-group-${barGroup.index}-${barGroup.x0}--${_index}`}
                 left={barGroup.x0}
               >
                 {barGroup.bars.map((bar, index) => {
@@ -231,15 +231,17 @@ export const BarChartVertical = () => {
                   // Confidence Interval Variables
                   const tickWidth = 5
                   const xPos = barX + (config.xAxis.type !== 'date-time' ? barWidth / 2 : 0)
-                  const [upperPos, lowerPos] = ['upper', 'lower'].map(position => {
-                    if (!hasConfidenceInterval) return
-                    const d = datum.dynamicData
-                      ? datum.CI[bar.key][position]
-                      : datum.category === bar.key
-                      ? datum[config.confidenceKeys[position]]
-                      : null
-                    return yScale(d)
-                  })
+
+                  const upperPos = yScale(
+                    datum.dynamicData && datum.CI[bar.key]
+                      ? datum.CI[bar.key].upper
+                      : datum[config.confidenceKeys.upper]
+                  )
+                  const lowerPos = yScale(
+                    datum.dynamicData && datum.CI[bar.key]
+                      ? datum.CI[bar.key].lower
+                      : datum[config.confidenceKeys.lower]
+                  )
                   // End Confidence Interval Variables
 
                   return (
@@ -370,7 +372,7 @@ export const BarChartVertical = () => {
                             <animate attributeName='height' values={`0, ${lollipopShapeSize}`} dur='2.5s' />
                           </rect>
                         )}
-                        {hasConfidenceInterval && (
+                        {hasConfidenceInterval && bar.value !== undefined && datum && (
                           <path
                             key={`confidence-interval-v-${datum[config.runtime.originalXAxis.dataKey]}`}
                             stroke={coolGray90}
