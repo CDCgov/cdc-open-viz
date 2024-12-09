@@ -408,7 +408,7 @@ const UsaMap = () => {
               tabIndex={-1}
             >
               {/* state path */}
-              <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
+              <path tabIndex={-1} className='single-geo' strokeWidth={1} d={path} />
 
               {/* apply patterns on top of state path*/}
               {state.map.patterns.map((patternData, patternIndex) => {
