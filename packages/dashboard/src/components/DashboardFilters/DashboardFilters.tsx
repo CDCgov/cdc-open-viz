@@ -7,6 +7,7 @@ import { NestedOptions, ValueTextPair } from '@cdc/core/components/NestedDropdow
 import NestedDropdown from '@cdc/core/components/NestedDropdown'
 import { MouseEventHandler } from 'react'
 import Loader from '@cdc/core/components/Loader'
+import _ from 'lodash'
 
 type DashboardFilterProps = {
   show: number[]
@@ -62,7 +63,18 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         const loading = apiFilterDropdowns[_key] === null
 
         const multiValues: { value; label }[] = []
+        const nestedOptions: NestedOptions = Object.entries(filter?.subGrouping?.valuesLookup || {}).map(
+          ([key, data]) => [
+            [key, key], // Main option: [value, text]
+            Array.isArray(data?.values) ? data.values.map(value => [value, value]) : [] // Ensure `values` is an array
+          ]
+        )
 
+        const activeSubGroupValue = _.get(
+          filter?.subGrouping?.valuesLookup,
+          [filter?.active as string, 'values', 0],
+          null // Default to null if the path is invalid
+        )
         if (_key && apiFilterDropdowns[_key]) {
           // URL Filter
           if (filter.filterStyle !== FILTER_STYLE.nestedDropdown) {
@@ -120,9 +132,9 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
             ) : filter.filterStyle === FILTER_STYLE.nestedDropdown ? (
               <NestedDropdown
                 activeGroup={filter.active as string}
-                activeSubGroup={filter.subGrouping?.active}
+                activeSubGroup={_key ? filter.subGrouping?.active : activeSubGroupValue}
                 filterIndex={filterIndex}
-                options={getNestedDropdownOptions(apiFilterDropdowns[_key])}
+                options={_key ? getNestedDropdownOptions(apiFilterDropdowns[_key]) : nestedOptions}
                 listLabel={label}
                 handleSelectedItems={value => updateField(null, null, filterIndex, value)}
                 loading={loading}
