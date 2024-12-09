@@ -17,3 +17,13 @@ export const Default_Patterns: Story = {
     config: defaultPatterns
   }
 }
+
+export const Default_Patterns_Dark: Story = {
+  args: {
+    isEditor: true,
+    config: editConfigKeys(defaultPatterns, [
+      { path: ['color'], value: 'bluegreen' },
+      { path: ['legend', 'specialClasses'], value: [] }
+    ])
+  }
+}
