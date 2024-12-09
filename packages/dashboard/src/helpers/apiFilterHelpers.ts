@@ -135,7 +135,10 @@ export const setAutoLoadDefaultValue = (
   const sharedFiltersCopy = _.cloneDeep(sharedFilters)
   const sharedFilter = _.cloneDeep(sharedFiltersCopy[sharedFilterIndex])
   if (!autoLoadFilterIndexes.length || !dropdownOptions?.length) return sharedFilter // no autoLoading happening
-  if (autoLoadFilterIndexes.includes(sharedFilterIndex) || sharedFilter.setByQueryParameter) {
+  const hasQueryParameter = sharedFilter.setByQueryParameter
+    ? Boolean(getQueryParam(sharedFilter.setByQueryParameter))
+    : false
+  if (autoLoadFilterIndexes.includes(sharedFilterIndex) || hasQueryParameter) {
     const filterParents = sharedFiltersCopy.filter(f => sharedFilter.parents?.includes(f.key))
     const notAllParentFiltersSelected = filterParents.some(p => !(p.active || p.queuedActive))
     if (filterParents && notAllParentFiltersSelected) return sharedFilter

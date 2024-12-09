@@ -38,7 +38,7 @@ const LegendGradient = ({
 
   const numTicks = colors?.length
 
-  const longestLabel = labels && labels.length > 0 ? labels.reduce((a, b) => (a.length > b.length ? a : b)) : ''
+  const longestLabel = (labels || []).reduce((a: string, b) => (a.length > String(b).length ? a : b), '')
   const boxHeight = 20
   let height = 50
 
