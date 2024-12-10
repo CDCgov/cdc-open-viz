@@ -5,6 +5,7 @@ import ConfigContext from '../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 import { handleTooltip, calculateBoxPlotStats, createPlots } from './helpers/index'
+import { v4 as uuidv4 } from 'uuid'
 import _ from 'lodash'
 
 const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
@@ -28,7 +29,7 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
               key={`boxplotplot-${d.columnCategory}`}
               left={xScale(d.columnCategory) + (xScale.bandwidth() - seriesScale.bandwidth()) / 2}
             >
-              {config.series.map(item => {
+              {config.series.map((item, index) => {
                 const valuesByKey = d.keyValues[item.dataKey]
                 const { min, max, median, firstQuartile, thirdQuartile } = calculateBoxPlotStats(valuesByKey)
                 let iqr = Number(thirdQuartile - firstQuartile).toFixed(config.dataFormat.roundTo)
@@ -44,7 +45,7 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                 const fillOpacity = isTransparent ? 0.3 : 0.5
 
                 return (
-                  <Group key={`boxplotplot-${item}`}>
+                  <Group key={`boxplotplot-${item.dataKey}-${index}`}>
                     {boxplot.plotNonOutlierValues &&
                       valuesByKey.map((value, index) => {
                         return (
