@@ -34,6 +34,7 @@ type PatternSelection = {
   label: string
   // size of pattern
   size: 'small' | 'medium' | 'large'
+  color: string
   contrastCheck: boolean
 }
 

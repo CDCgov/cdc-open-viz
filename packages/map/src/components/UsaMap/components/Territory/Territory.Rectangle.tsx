@@ -2,8 +2,8 @@ import { useContext } from 'react'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import ConfigContext from './../../../../context'
 import { type MapContext } from '../../../../types/MapContext'
-import { patternSizes } from './../../helpers/patternSizes'
-import { checkColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { patternSizes } from '../../helpers/patternSizes'
+import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { type TerritoryShape } from './TerritoryShape'
 
 const TerritoryRectangle: React.FC<TerritoryShape> = ({
@@ -20,7 +20,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
   backgroundColor,
   ...props
 }) => {
-  const { state, supportedTerritories } = useContext<MapContext>(ConfigContext)
+  const { state } = useContext<MapContext>(ConfigContext)
   const { territoryData, ...otherProps } = props
   const rectanglePath =
     'M42,0.5 C42.8284271,0.5 43.5,1.17157288 43.5,2 L43.5,2 L43.5,26 C43.5,26.8284271 42.8284271,27.5 42,27.5 L42,27.5 L3,27.5 C2.17157288,27.5 1.5,26.8284271 1.5,26 L1.5,26 L1.5,2 C1.5,1.17157288 2.17157288,0.5 3,0.5 L3,0.5 Z'
@@ -53,7 +53,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
         </text>
 
         {state.map.patterns.map((patternData, patternIndex) => {
-          const patternColor = getContrastColor('#FFF', backgroundColor)
+          const patternColor = patternData.color || getContrastColor('#FFF', backgroundColor)
           const hasMatchingValues = patternData.dataValue === territoryData[patternData.dataKey]
 
           if (!hasMatchingValues) return null
