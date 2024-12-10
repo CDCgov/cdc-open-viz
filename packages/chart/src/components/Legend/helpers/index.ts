@@ -15,7 +15,8 @@ export const getMarginTop = (isBottomOrSmallViewport, config) => {
     return '0px'
   }
   if (isBottomOrSmallViewport && config.brush?.active) {
-    return '35px'
+    const BRUSH_HEIGHT_MULTIPLIER = 1.5
+    return `${config.brush.height * BRUSH_HEIGHT_MULTIPLIER}px`
   }
   return '20px'
 }

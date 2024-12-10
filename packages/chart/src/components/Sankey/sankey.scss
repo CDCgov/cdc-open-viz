@@ -7,7 +7,7 @@
 
 .cdc-open-viz-module .sankey-chart {
   --font-size-small: 12px;
-  --font-size-medium: 14px;
+  --font-size-medium: 16px;
   --font-size-large: 18px;
   --font-size-xl: 24px;
 
@@ -107,21 +107,21 @@
     }
   }
 
-  //small
-  @media only screen and (max-width: 799px) {
-    .node-text {
-      font-size: var(--font-size-small);
-    }
-    .node-value--storynode {
-      font-size: var(--storynode-font-size--small);
-    }
-    .node-id {
-      font-size: var(--font-size-small);
-    }
-    .node-value {
-      font-size: var(--font-size-small);
-    }
-  }
+  // //small
+  // @media only screen and (max-width: 799px) {
+  //   .node-text {
+  //     font-size: var(--font-size-small);
+  //   }
+  //   .node-value--storynode {
+  //     font-size: var(--storynode-font-size--small);
+  //   }
+  //   .node-id {
+  //     font-size: var(--font-size-small);
+  //   }
+  //   .node-value {
+  //     font-size: var(--font-size-small);
+  //   }
+  // }
 
   //x-small
   @media only screen and (max-width: 600px) {

@@ -21,6 +21,7 @@ import {
   drawShape,
   createShapeProperties
 } from '../helpers/shapes'
+import { getGeoStrokeColor } from '../../../helpers/colors'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -131,22 +132,23 @@ const CountyMap = props => {
   const {
       applyLegendToRow,
       applyTooltipsToGeo,
+      container,
       containerEl,
       data,
       displayGeoName,
       geoClickHandler,
       handleMapAriaLabels,
-      runtimeLegend,
-      state,
       runtimeFilters,
+      runtimeLegend,
+      setState,
+      state,
       tooltipId,
       tooltipRef,
-      container,
-      setState
   } = useContext(ConfigContext)
 
   // CREATE STATE LINES
   const projection = geoAlbersUsaTerritories()
+  const geoStrokeColor = getGeoStrokeColor(state)
 
   const [focus, setFocus] = useState({})
   const [topoData, setTopoData] = useState({})
@@ -210,8 +212,6 @@ const CountyMap = props => {
   }
 
   const runtimeKeys = Object.keys(data)
-
-  const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgb(90, 90, 90)' : 'rgb(255, 255, 255)'
   const lineWidth = 0.3
 
   const onReset = () => {
@@ -449,7 +449,7 @@ const CountyMap = props => {
     }
 
     if (focus.index !== -1) {
-      context.strokeStyle = 'black'
+      context.strokeStyle = geoStrokeColor
       context.lineWidth = 1
       context.beginPath()
       path(topoData.mapData[focus.index])
@@ -493,7 +493,6 @@ const CountyMap = props => {
 
       // Enforces stroke style of the county lines
       context.strokeStyle = geoStrokeColor
-      context.lineWidth = lineWidth
 
       // Iterates through each state/county topo and renders it
       topoData.mapData.forEach((geo, i) => {
@@ -518,7 +517,7 @@ const CountyMap = props => {
 
       // If the focused state is found in the geo data, render it with a thicker outline
       if (focus.index !== -1) {
-        context.strokeStyle = 'black'
+        context.strokeStyle = geoStrokeColor
         context.lineWidth = 2
         context.beginPath()
         path(topoData.mapData[focus.index])
@@ -531,8 +530,7 @@ const CountyMap = props => {
           context.beginPath()
           path(layer)
           context.fillStyle = layer.properties.fill
-          context.globalAlpha = layer.properties['fill-opacity']
-          context.strokeStyle = layer.properties['stroke']
+          context.strokeStyle = geoStrokeColor
           context.lineWidth = layer.properties['stroke-width']
           context.fill()
           context.stroke()
@@ -540,7 +538,7 @@ const CountyMap = props => {
       }
 
       if (state.general.type === 'us-geocode') {
-        context.strokeStyle = 'black'
+        context.strokeStyle = geoStrokeColor
         const geoRadius = (state.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
         const { additionalCityStyles } = state.visual || []
         const cityStyles = Object.values(data)
@@ -604,7 +602,7 @@ const CountyMap = props => {
         className='county-map-canvas'
       ></canvas>
 
-      <button className={`btn btn-primary btn--reset`} onClick={onReset} ref={resetButton} tabIndex='0'>
+      <button className={`btn btn--reset btn-primary`} onClick={onReset} ref={resetButton} tabIndex='0'>
         Reset Zoom
       </button>
     </ErrorBoundary>

@@ -1,118 +1,268 @@
 {
-	"data": [
-		{
-			"Current Week Positivity": "20",
-			"State": "REGION 1",
-			"Change": "0.2"
-		},
-		{
-			"Current Week Positivity": "27",
-			"State": "region 2",
-			"Change": "-0.5"
-		},
-		{
-			"Current Week Positivity": "26",
-			"State": "region 3",
-			"Change": "-.08"
-		},
-		{
-			"Current Week Positivity": "30",
-			"State": "region 4",
-			"Change": "0.8"
-		},
-		{
-			"Current Week Positivity": "14",
-			"State": "region 5",
-			"Change": "0.5"
-		},
-		{
-			"Current Week Positivity": "25",
-			"State": "region 6",
-			"Change": "0.05"
-		},
-		{
-			"Current Week Positivity": "0",
-			"State": "region 7",
-			"Change": "0"
-		},
-		{
-			"Current Week Positivity": "14",
-			"State": "region 8",
-			"Change": "-1.2"
-		},
-		{
-			"Current Week Positivity": "28",
-			"State": "region 9",
-			"Change": "1.5"
-		},
-		{
-			"Current Week Positivity": "12",
-			"State": "region 10",
-			"Change": "0.5"
-		}
-	],
-
-	"dataFileSourceType": "file",
-	"dataDescription": {
-		"horizontal": true
-	},
-	"newViz": true,
-	"type": "map",
-	"general": {
-		"geoType": "us-region",
-		"geoBorderColor": "darkGray",
-		"headerColor": "theme-blue",
-		"showTitle": true,
-		"showSidebar": true,
-		"showDownloadButton": true,
-		"showDownloadMediaButton": false,
-		"displayAsHex": false,
-		"displayStateLabels": false,
-		"territoriesLabel": "Territories",
-		"language": "en",
-		"hasRegions": false,
-		"expandDataTable": true,
-		"fullBorder": false,
-		"type": "data",
-		"title": "Default US Map"
-	},
-
-	"geoType": "us-region",
-	"geoBorderColor": "darkGray",
-	"headerColor": "theme-blue",
-	"showTitle": true,
-	"showSidebar": true,
-	"showDownloadButton": true,
-	"showDownloadMediaButton": false,
-	"displayAsHex": false,
-	"displayStateLabels": false,
-	"territoriesLabel": "Territories",
-	"language": "en",
-	"hasRegions": false,
-	"expandDataTable": true,
-	"fullBorder": false,
-	"color": "pinkpurple",
-	"columns": {
-		"geo": { "name": "State", "label": "Location", "tooltip": false, "dataTable": true },
-		"primary": { "dataTable": true, "tooltip": true, "prefix": "", "suffix": "", "name": "Current Week Positivity", "label": "" },
-		"navigate": { "name": "Current Week Positivity" }
-	},
-	"legend": {
-		"descriptions": {},
-		"specialClasses": [],
-		"unified": false,
-		"singleColumn": false,
-		"dynamicDescription": false,
-		"type": "category",
-		"numberOfItems": 10,
-		"position": "side",
-		"title": "Legend"
-	},
-	"filters": [],
-	"dataTable": { "title": "Data Table", "forceDisplay": true },
-	"tooltips": {
-		"appearanceType": "hover",
-		"linkLabel": "Learn More",
-		"capitalizeLabels": true
-	}
+  "annotations": [],
+  "general": {
+    "geoType": "us-region",
+    "type": "data",
+    "noStateFoundMessage": "Map Unavailable",
+    "annotationDropdownText": "Annotations",
+    "geoBorderColor": "darkGray",
+    "headerColor": "theme-blue",
+    "title": "",
+    "showTitle": true,
+    "showSidebar": true,
+    "showDownloadButton": true,
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": false,
+    "territoriesLabel": "Territories",
+    "territoriesAlwaysShow": false,
+    "language": "en",
+    "geoLabelOverride": "",
+    "hasRegions": false,
+    "fullBorder": false,
+    "convertFipsCodes": true,
+    "palette": {
+      "isReversed": false
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "statePicked": {
+      "fipsCode": "01",
+      "stateName": "Alabama"
+    },
+    "expandDataTable": false
+  },
+  "type": "map",
+  "color": "pinkpurple",
+  "columns": {
+    "geo": {
+      "name": "State",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "dataTable": true,
+      "tooltip": true,
+      "prefix": "",
+      "suffix": "",
+      "name": "Current Week Positivity",
+      "label": "",
+      "roundToPlace": 0
+    },
+    "navigate": {
+      "name": ""
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": false,
+    "singleColumn": false,
+    "singleRow": false,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false,
+    "dynamicDescription": false,
+    "type": "equalnumber",
+    "numberOfItems": 3,
+    "position": "side",
+    "title": "",
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "singleColumnLegend": false,
+    "hideBorder": false
+  },
+  "filters": [],
+  "table": {
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": true,
+    "indexLabel": ""
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": true,
+    "opacity": 90
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle",
+    "cityStyleLabel": "",
+    "showBubbleZeros": false,
+    "additionalCityStyles": [],
+    "geoCodeCircleSize": 8
+  },
+  "mapPosition": {
+    "coordinates": [
+      0,
+      30
+    ],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow Up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
+  "datasets": {},
+  "isResponsiveTicks": false,
+  "barThickness": "0.37",
+  "xAxis": {
+    "type": "categorical",
+    "size": 75,
+    "maxTickRotation": 45,
+    "labelOffset": 0
+  },
+  "data": [
+    {
+      "Current Week Positivity": "20",
+      "State": "REGION 1",
+      "Change": "0.2"
+    },
+    {
+      "Current Week Positivity": "27",
+      "State": "region 2",
+      "Change": "-0.5"
+    },
+    {
+      "Current Week Positivity": "26",
+      "State": "region 3",
+      "Change": "-.08"
+    },
+    {
+      "Current Week Positivity": "30",
+      "State": "region 4",
+      "Change": "0.8"
+    },
+    {
+      "Current Week Positivity": "14",
+      "State": "region 5",
+      "Change": "0.5"
+    },
+    {
+      "Current Week Positivity": "25",
+      "State": "region 6",
+      "Change": "0.05"
+    },
+    {
+      "Current Week Positivity": "0",
+      "State": "region 7",
+      "Change": "0"
+    },
+    {
+      "Current Week Positivity": "14",
+      "State": "region 8",
+      "Change": "-1.2"
+    },
+    {
+      "Current Week Positivity": "28",
+      "State": "region 9",
+      "Change": "1.5"
+    },
+    {
+      "Current Week Positivity": "12",
+      "State": "region 10",
+      "Change": "0.5"
+    }
+  ],
+  "dataFileName": "valid-region-data.json",
+  "dataFileSourceType": "file",
+  "formattedData": [
+    {
+      "Current Week Positivity": "20",
+      "State": "REGION 1",
+      "Change": "0.2"
+    },
+    {
+      "Current Week Positivity": "27",
+      "State": "region 2",
+      "Change": "-0.5"
+    },
+    {
+      "Current Week Positivity": "26",
+      "State": "region 3",
+      "Change": "-.08"
+    },
+    {
+      "Current Week Positivity": "30",
+      "State": "region 4",
+      "Change": "0.8"
+    },
+    {
+      "Current Week Positivity": "14",
+      "State": "region 5",
+      "Change": "0.5"
+    },
+    {
+      "Current Week Positivity": "25",
+      "State": "region 6",
+      "Change": "0.05"
+    },
+    {
+      "Current Week Positivity": "0",
+      "State": "region 7",
+      "Change": "0"
+    },
+    {
+      "Current Week Positivity": "14",
+      "State": "region 8",
+      "Change": "-1.2"
+    },
+    {
+      "Current Week Positivity": "28",
+      "State": "region 9",
+      "Change": "1.5"
+    },
+    {
+      "Current Week Positivity": "12",
+      "State": "region 10",
+      "Change": "0.5"
+    }
+  ],
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
+  "version": "4.24.11"
 }
