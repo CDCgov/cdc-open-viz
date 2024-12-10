@@ -5,7 +5,6 @@ import ConfigContext from '../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 import { handleTooltip, calculateBoxPlotStats, createPlots } from './helpers/index'
-import { v4 as uuidv4 } from 'uuid'
 import _ from 'lodash'
 
 const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
