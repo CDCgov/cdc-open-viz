@@ -30,9 +30,11 @@ const getSelector = (filter: SharedFilter) => {
 
 export const addValuesToDashboardFilters = (
   filters: SharedFilter[],
-  data: Record<string, any[]>
+  data: Record<string, any[]>,
+  filtersToSkip: number[] = []
 ): Array<SharedFilter> => {
-  return filters?.map(filter => {
+  return filters?.map((filter, index) => {
+    if (filtersToSkip.includes(index)) return filter
     if (filter.type === 'urlfilter') return filter
     const filterCopy = _.cloneDeep(filter)
     const filterValues = generateValuesForFilter(getSelector(filter), data)
