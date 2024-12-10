@@ -19,3 +19,18 @@
     top: 0.5rem;
   }
 }
+
+@media (max-width: 576px) {
+  .sort-icon {
+    :is(svg) {
+      width: 0.9rem;
+      height: 0.9rem;
+    }
+    .up {
+      bottom: 0.3rem;
+    }
+    .down {
+      top: 0.3rem;
+    }
+  }
+}

@@ -363,20 +363,23 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
               {isNestedDropDown && <APIInputs isSubgroup={true} />}
 
               {!!parentFilters.length && (
-                <MultiSelect
-                  label='Parent Filter(s): '
-                  options={parentFilters.map(key => ({ value: key, label: key }))}
-                  fieldName='parents'
-                  selected={filter.parents}
-                  updateField={(_section, _subsection, _fieldname, newItems) => {
-                    updateFilterProp('parents', newItems)
-                  }}
-                />
+                <label>
+                  <span className='edit-label column-heading mt-1'>Used By: </span>
+                  <MultiSelect
+                    label='Parent Filter(s): '
+                    options={parentFilters.map(key => ({ value: key, label: key }))}
+                    fieldName='parents'
+                    selected={filter.parents}
+                    updateField={(_section, _subsection, _fieldname, newItems) => {
+                      updateFilterProp('parents', newItems)
+                    }}
+                  />
+                </label>
               )}
 
-              <MultiSelect
-                label='Used By: (optional)'
-                tooltip={
+              <label>
+                <span className='edit-label column-heading mt-1'>
+                  Used By: (optional)
                   <Tooltip style={{ textTransform: 'none' }}>
                     <Tooltip.Target>
                       <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -388,17 +391,19 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
                       </p>
                     </Tooltip.Content>
                   </Tooltip>
-                }
-                options={[...usedByOptions, ...(filter.usedBy || [])].map(opt => ({
-                  value: opt,
-                  label: usedByNameLookup[opt]
-                }))}
-                fieldName='usedBy'
-                selected={filter.usedBy}
-                updateField={(_section, _subsection, _fieldname, newItems) => {
-                  updateFilterProp('usedBy', newItems)
-                }}
-              />
+                </span>
+                <MultiSelect
+                  options={usedByOptions.map(opt => ({
+                    value: opt,
+                    label: usedByNameLookup[opt]
+                  }))}
+                  fieldName='usedBy'
+                  selected={filter.usedBy}
+                  updateField={(_section, _subsection, _fieldname, newItems) => {
+                    updateFilterProp('usedBy', newItems)
+                  }}
+                />
+              </label>
 
               <TextField
                 label='Reset Label: '

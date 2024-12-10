@@ -3,7 +3,9 @@ import {
   getToFetch,
   getFilterValues,
   getLoadingFilterMemo,
-  getParentParams
+  getParentParams,
+  setActiveNestedDropdown,
+  setActiveMultiDropdown
 } from '../apiFilterHelpers'
 import _ from 'lodash'
 import type { APIFilterDropdowns } from '../../components/DashboardFilters'
@@ -18,7 +20,7 @@ describe('getLoadingFilterMemo', () => {
     }
     const expectedOutput: APIFilterDropdowns = {
       endpoint1: { text: 'text1', value: 'value1' },
-      endpoint2: null
+      endpoint2: undefined
     }
     expect(getLoadingFilterMemo(sharedAPIFilters, apiFilterDropdowns)).toEqual(expectedOutput)
   })
@@ -36,8 +38,8 @@ describe('getLoadingFilterMemo', () => {
     const sharedAPIFilters = ['endpoint1', 'endpoint2']
     const apiFilterDropdowns: APIFilterDropdowns = {}
     const expectedOutput: APIFilterDropdowns = {
-      endpoint1: null,
-      endpoint2: null
+      endpoint1: undefined,
+      endpoint2: undefined
     }
     expect(getLoadingFilterMemo(sharedAPIFilters, apiFilterDropdowns)).toEqual(expectedOutput)
   })
@@ -277,6 +279,85 @@ describe('getToFetch', () => {
     const apiFilterDropdowns = { '/endpoint1': true }
     const result = getToFetch(sharedAPIFilters, apiFilterDropdowns)
     expect(result).toEqual({})
+  })
+})
+
+describe('setActiveNestedDropdown', () => {
+  const dropdownOptions = [
+    { value: 'option1', subOptions: [{ value: 'subOption1' }], label: 'Option 1' },
+    { value: 'option2', subOptions: [{ value: 'subOption2' }], label: 'Option 2' }
+  ]
+
+  const sharedFilters = [
+    {
+      key: 'filter1',
+      active: null,
+      filterStyle: FILTER_STYLE.nestedDropdown,
+      subGrouping: {},
+      queuedActive: null,
+      parents: []
+    },
+    {
+      key: 'filter2',
+      active: null,
+      setByQueryParameter: 'group',
+      filterStyle: FILTER_STYLE.nestedDropdown,
+      subGrouping: { setByQueryParameter: 'subgroup' },
+      queuedActive: null,
+      parents: ['filter1']
+    }
+  ] as SharedFilter[]
+
+  it('should set the active value for a nested dropdown', () => {
+    setActiveNestedDropdown(dropdownOptions, sharedFilters[0])
+    expect(sharedFilters[0].active).toEqual('option1')
+    expect(sharedFilters[0].subGrouping.active).toEqual('subOption1')
+  })
+  it('should set the active value for nested dropdown with query parameters', () => {
+    delete window.location
+    window.location = new URL('https://www.example.com?group=option2&subgroup=subOption2')
+    setActiveNestedDropdown(dropdownOptions, sharedFilters[1])
+    expect(sharedFilters[1].active).toEqual('option2')
+    expect(sharedFilters[1].subGrouping.active).toEqual('subOption2')
+  })
+})
+
+describe('setActiveMultiDropdown', () => {
+  const dropdownOptions = [
+    { value: 'option1', label: 'Option 1' },
+    { value: 'option2', label: 'Option 2' }
+  ]
+
+  const sharedFilters = [
+    {
+      key: 'filter1',
+      active: null,
+      filterStyle: FILTER_STYLE.multiSelect,
+      queuedActive: null,
+      parents: []
+    },
+    {
+      key: 'filter2',
+      active: null,
+      filterStyle: FILTER_STYLE.multiSelect,
+      setByQueryParameter: 'group',
+      queuedActive: null,
+      parents: ['filter1']
+    }
+  ] as SharedFilter[]
+  it('should set the active value for a multi dropdown', () => {
+    setActiveMultiDropdown(dropdownOptions, sharedFilters[0])
+    expect(sharedFilters[0].active).toEqual(['option1'])
+  })
+  it('should set the active value for a multi dropdown with queryParameters', () => {
+    delete window.location
+    window.location = new URL('https://www.example.com?group=option1&group=option2')
+    setActiveMultiDropdown(dropdownOptions, sharedFilters[1])
+    expect(sharedFilters[1].active).toEqual(['option1', 'option2'])
+    delete window.location
+    window.location = new URL('https://www.example.com?group=option1,option2')
+    setActiveMultiDropdown(dropdownOptions, sharedFilters[1])
+    expect(sharedFilters[1].active).toEqual(['option1', 'option2'])
   })
 })
 

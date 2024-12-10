@@ -8,10 +8,16 @@ type CollapsableVizRow = {
   groupName: string
   currentViewport: string
 }
-const CollapsibleVisualizationRow: React.FC<CollapsableVizRow> = ({ allExpanded, fontSize, groupName, currentViewport, children }) => {
+const CollapsibleVisualizationRow: React.FC<CollapsableVizRow> = ({
+  allExpanded,
+  fontSize,
+  groupName,
+  currentViewport,
+  children
+}) => {
   const [isExpanded, setIsExpanded] = useState(allExpanded)
   const fontSizes = { small: 16, medium: 18, large: 20 }
-  const titleFontSize = ['sm', 'xs', 'xxs'].includes(currentViewport) ? '13px' : `${fontSizes[fontSize]}px`
+  const titleFontSize = ['xs', 'xxs'].includes(currentViewport) ? '13px' : `${fontSizes[fontSize]}px`
 
   useEffect(() => {
     setIsExpanded(allExpanded)

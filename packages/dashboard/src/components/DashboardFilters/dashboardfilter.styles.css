@@ -8,4 +8,20 @@
     height: calc(1.5em + 0.75rem + 2px);
     align-self: flex-end;
   }
+  .loading-filter {
+    position: relative;
+    .spinner-border {
+      position: absolute;
+      top: 55%;
+      right: 10%;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+  :is(select):disabled {
+    background-color: var(--lightestGray);
+    & > :is(option) {
+      color: var(--darkGray);
+    }
+  }
 }

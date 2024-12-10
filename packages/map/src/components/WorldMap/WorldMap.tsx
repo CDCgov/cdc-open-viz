@@ -11,6 +11,7 @@ import CityList from '../CityList'
 import BubbleList from '../BubbleList'
 import ConfigContext from '../../context'
 import ZoomControls from '../ZoomControls'
+import { getGeoFillColor, getGeoStrokeColor } from '../../helpers/colors'
 
 const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 
@@ -77,7 +78,12 @@ const WorldMap = () => {
     const geosJsx = geographies.map(({ feature: geo, path }, i) => {
       // If the geo.properties.state value is found in the data use that, otherwise fall back to geo.properties.iso
       const dataHasStateName = state.data.some(d => d[state.columns.geo.name] === geo.properties.state)
-      const geoKey = geo.properties.state && data[geo.properties.state] ? geo.properties.state : geo.properties.name ? geo.properties.name : geo.properties.iso
+      const geoKey =
+        geo.properties.state && data[geo.properties.state]
+          ? geo.properties.state
+          : geo.properties.name
+          ? geo.properties.name
+          : geo.properties.iso
 
       const additionalData = {
         name: geo.properties.name
@@ -98,33 +104,36 @@ const WorldMap = () => {
         legendColors = applyLegendToRow(geoData)
       }
 
-      const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+      const geoStrokeColor = getGeoStrokeColor(state)
+      const geoFillColor = getGeoFillColor(state)
 
       let styles: Record<string, string | Record<string, string>> = {
-        fill: '#E6E6E6',
+        fill: geoFillColor,
         cursor: 'default'
       }
 
       const strokeWidth = 0.9
 
       // If a legend applies, return it with appropriate information.
+      const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
       if (legendColors && legendColors[0] !== '#000000' && state.general.type !== 'bubble') {
-        const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
-
         styles = {
           ...styles,
-          fill: state.general.type !== 'world-geocode' ? legendColors[0] : '#E6E6E6',
+          fill: state.general.type !== 'world-geocode' ? legendColors[0] : geoFillColor,
           cursor: 'default',
           '&:hover': {
-            fill: state.general.type !== 'world-geocode' ? legendColors[1] : '#E6E6E6'
+            fill: state.general.type !== 'world-geocode' ? legendColors[1] : geoFillColor
           },
           '&:active': {
-            fill: state.general.type !== 'world-geocode' ? legendColors[2] : '#E6E6E6'
+            fill: state.general.type !== 'world-geocode' ? legendColors[2] : geoFillColor
           }
         }
 
         // When to add pointer cursor
-        if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+        if (
+          (state.columns.navigate && geoData[state.columns.navigate.name]) ||
+          state.tooltips.appearanceType === 'click'
+        ) {
           styles.cursor = 'pointer'
         }
 
@@ -147,11 +156,38 @@ const WorldMap = () => {
       }
 
       // Default return state, just geo with no additional information
-      return <Geo additionaldata={JSON.stringify(additionalData)} geodata={JSON.stringify(geoData)} state={state} key={i + '-geo'} stroke={geoStrokeColor} strokeWidth={strokeWidth} style={styles} path={path} />
+      return (
+        <Geo
+          additionaldata={JSON.stringify(additionalData)}
+          geodata={JSON.stringify(geoData)}
+          state={state}
+          key={i + '-geo'}
+          stroke={geoStrokeColor}
+          strokeWidth={strokeWidth}
+          style={styles}
+          styles={styles}
+          path={path}
+          data-tooltip-id={`tooltip__${tooltipId}`}
+          data-tooltip-html={toolTip}
+        />
+      )
     })
 
     // Cities
-    geosJsx.push(<CityList applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} data={data} displayGeoName={displayGeoName} geoClickHandler={geoClickHandler} key='cities' projection={projection} state={state} titleCase={titleCase} tooltipId={tooltipId} />)
+    geosJsx.push(
+      <CityList
+        applyLegendToRow={applyLegendToRow}
+        applyTooltipsToGeo={applyTooltipsToGeo}
+        data={data}
+        displayGeoName={displayGeoName}
+        geoClickHandler={geoClickHandler}
+        key='cities'
+        projection={projection}
+        state={state}
+        titleCase={titleCase}
+        tooltipId={tooltipId}
+      />
+    )
 
     // Bubbles
     if (state.general.type === 'bubble') {
@@ -166,7 +202,9 @@ const WorldMap = () => {
           applyTooltipsToGeo={applyTooltipsToGeo}
           displayGeoName={displayGeoName}
           tooltipId={tooltipId}
-          handleCircleClick={country => handleCircleClick(country, state, setState, setRuntimeData, generateRuntimeData)}
+          handleCircleClick={country =>
+            handleCircleClick(country, state, setState, setRuntimeData, generateRuntimeData)
+          }
         />
       )
     }
@@ -178,19 +216,42 @@ const WorldMap = () => {
     <ErrorBoundary component='WorldMap'>
       {hasZoom ? (
         <svg viewBox='0 0 880 500' role='img' aria-label={handleMapAriaLabels(state)}>
-          <rect height={500} width={880} onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)} fill='white' />
-          <ZoomableGroup zoom={position.zoom} center={position.coordinates} onMoveEnd={handleMoveEnd} maxZoom={4} projection={projection} width={880} height={500}>
+          <rect
+            height={500}
+            width={880}
+            onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)}
+            fill='white'
+          />
+          <ZoomableGroup
+            zoom={position.zoom}
+            center={position.coordinates}
+            onMoveEnd={handleMoveEnd}
+            maxZoom={4}
+            projection={projection}
+            width={880}
+            height={500}
+          >
             <Mercator data={world}>{({ features }) => constructGeoJsx(features)}</Mercator>
           </ZoomableGroup>
         </svg>
       ) : (
         <svg viewBox='0 0 880 500'>
-          <ZoomableGroup zoom={1} center={position.coordinates} onMoveEnd={handleMoveEnd} maxZoom={0} projection={projection} width={880} height={500}>
+          <ZoomableGroup
+            zoom={1}
+            center={position.coordinates}
+            onMoveEnd={handleMoveEnd}
+            maxZoom={0}
+            projection={projection}
+            width={880}
+            height={500}
+          >
             <Mercator data={world}>{({ features }) => constructGeoJsx(features)}</Mercator>
           </ZoomableGroup>
         </svg>
       )}
-      {(state.general.type === 'data' || (state.general.type === 'world-geocode' && hasZoom) || (state.general.type === 'bubble' && hasZoom)) && (
+      {(state.general.type === 'data' ||
+        (state.general.type === 'world-geocode' && hasZoom) ||
+        (state.general.type === 'bubble' && hasZoom)) && (
         <ZoomControls
           // prettier-ignore
           generateRuntimeData={generateRuntimeData}

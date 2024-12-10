@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../../../context'
 import { MapContext } from '../../../../types/MapContext'
+import { getGeoFillColor } from '../../../../helpers/colors'
 
 interface CountyOutputProps {
   counties: any[]
@@ -11,7 +12,10 @@ interface CountyOutputProps {
 }
 
 const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoStrokeColor, tooltipId }) => {
-  const { applyTooltipsToGeo, applyLegendToRow, displayGeoName, state, data, geoClickHandler } = useContext<MapContext>(ConfigContext)
+  const { applyTooltipsToGeo, applyLegendToRow, displayGeoName, state, data, geoClickHandler } =
+    useContext<MapContext>(ConfigContext)
+
+  const geoFillColor = getGeoFillColor(state)
   return (
     <>
       {counties.map(county => {
@@ -50,19 +54,49 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
           }
 
           // When to add pointer cursor
-          if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'hover') {
+          if (
+            (state.columns.navigate && geoData[state.columns.navigate.name]) ||
+            state.tooltips.appearanceType === 'hover'
+          ) {
             styles.cursor = 'pointer'
           }
 
           return (
-            <g key={`key--${county.id}`} className={`county county--${geoDisplayName.split(' ').join('')} county--${geoData[state.columns.geo.name]}`} style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id={`tooltip__${tooltipId}`} data-tooltip-html={toolTip}>
-              <path tabIndex={-1} className={`county`} stroke={geoStrokeColor} d={countyPath} strokeWidth={0.75 / scale} />
+            <g
+              key={`key--${county.id}`}
+              className={`county county--${geoDisplayName.split(' ').join('')} county--${
+                geoData[state.columns.geo.name]
+              }`}
+              style={styles}
+              onClick={() => geoClickHandler(geoDisplayName, geoData)}
+              data-tooltip-id={`tooltip__${tooltipId}`}
+              data-tooltip-html={toolTip}
+            >
+              <path
+                tabIndex={-1}
+                className={`county`}
+                stroke={geoStrokeColor}
+                d={countyPath}
+                strokeWidth={0.75 / scale}
+              />
             </g>
           )
         } else {
           return (
-            <g key={`key--${county.id}`} className={`county county--${geoDisplayName.split(' ').join('')}`} style={{ fill: '#e6e6e6' }} data-tooltip-id={`tooltip__${tooltipId}`} data-tooltip-html={toolTip}>
-              <path tabIndex={-1} className={`county`} stroke={geoStrokeColor} d={countyPath} strokeWidth={0.75 / scale} />
+            <g
+              key={`key--${county.id}`}
+              className={`county county--${geoDisplayName.split(' ').join('')}`}
+              style={{ fill: geoFillColor }}
+              data-tooltip-id={`tooltip__${tooltipId}`}
+              data-tooltip-html={toolTip}
+            >
+              <path
+                tabIndex={-1}
+                className={`county`}
+                stroke={geoStrokeColor}
+                d={countyPath}
+                strokeWidth={0.75 / scale}
+              />
             </g>
           )
         }

@@ -67,6 +67,8 @@ import { hasDashboardApplyBehavior } from './helpers/hasDashboardApplyBehavior'
 import { loadAPIFiltersFactory } from './helpers/loadAPIFilters'
 import Loader from '@cdc/core/components/Loader'
 import Alert from '@cdc/core/components/Alert'
+import { shouldLoadAllFilters } from './helpers/shouldLoadAllFilters'
+import { shouldLoadUnfilteredDataset } from './helpers/shouldLoadUnfilteredDataset'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -85,7 +87,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   const isPreview = state.tabSelected === 'Dashboard Preview'
 
   const inNoDataState = useMemo(() => {
-    const vals = Object.values(state.data)
+    const vals = Object.values(state.data).flatMap(val => val)
     if (!vals.length) return true
     return vals.some(val => val === undefined)
   }, [state.data])
@@ -129,7 +131,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
         filters.forEach(filter => {
           if (
             filter.type === 'urlfilter' &&
-            reloadURLHelpers.filterUsedByDataUrl(filter, datasetKey, config.visualizations)
+            reloadURLHelpers.filterUsedByDataUrl(filter, datasetKey, config.visualizations, config.rows)
           ) {
             if (filter.filterBy === 'File Name') {
               newFileName = reloadURLHelpers.getNewFileName(newFileName, filter, datasetKey)
@@ -146,10 +148,9 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             if (!!filter.setByQueryParameter) {
               const windowQueryParams = Object.fromEntries(new URLSearchParams(window.location.search))
               const filterValue = windowQueryParams[filter.setByQueryParameter]
-              if (filter.apiFilter) {
-                updatedQSParams[filter.apiFilter.valueSelector] = filterValue
-              } else {
-                updatedQSParams[filter.setByQueryParameter] = filterValue
+              const queryParam = filter.apiFilter?.valueSelector || filter.setByQueryParameter
+              if (filterValue) {
+                updatedQSParams[queryParam] = filterValue
               }
             }
 
@@ -162,7 +163,11 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
           }
         })
 
-        if (!!newFilters || reloadURLHelpers.isUpdateNeeded(filters, currentQSParams, updatedQSParams)) {
+        const dataNeedsUpdate =
+          reloadURLHelpers.isUpdateNeeded(filters, currentQSParams, updatedQSParams) ||
+          shouldLoadUnfilteredDataset(config, datasetKey)
+
+        if (!!newFilters || dataNeedsUpdate) {
           dataWasFetched = true
           const dataUrlFinal = reloadURLHelpers.getDataURL(
             { ...currentQSParams, ...updatedQSParams },
@@ -189,10 +194,16 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             })
             .catch(e => {
               console.error(e)
+              dispatchErrorMessages({
+                type: 'ADD_ERROR_MESSAGE',
+                payload: 'There was a problem returning data. Please try again.'
+              })
               newDatasets[datasetKey].data = []
               newDatasets[datasetKey].runtimeDataUrl = dataUrlFinal
               newData[datasetKey] = []
             })
+        } else if (shouldLoadUnfilteredDataset(config, datasetKey)) {
+          setAPILoading(false)
         }
       }
     }
@@ -248,12 +259,16 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   useEffect(() => {
     if (isEditor && !isPreview) return
     const { config } = state
-    if (!hasDashboardApplyBehavior(config.visualizations)) {
+    const loadAllFilters = shouldLoadAllFilters(config)
+    if (!hasDashboardApplyBehavior(config.visualizations) && !loadAllFilters) {
       reloadURLData()
     }
 
     const sharedFiltersWithValues = addValuesToDashboardFilters(config.dashboard.sharedFilters, state.data)
-    loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns)
+
+    loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns, loadAllFilters).then(newFilters => {
+      if (loadAllFilters) reloadURLData(newFilters)
+    })
     updateFilteredData(sharedFiltersWithValues)
   }, [isEditor, isPreview, state.config?.activeDashboard])
 
@@ -437,8 +452,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             )
             break
           case 'dashboardFilters':
-            const hideFilter = visualizationConfig.autoLoad && inNoDataState
-            body = !hideFilter ? (
+            body = (
               <>
                 <Header visualizationKey={visualizationKey} subEditor='Filter Dropdowns' />
                 <DashboardSharedFilters
@@ -448,8 +462,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                   setConfig={_updateConfig}
                 />
               </>
-            ) : (
-              <></>
             )
             break
           case 'table':
@@ -542,7 +554,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                     return (
                       <>
                         {/* Expand/Collapse All */}
-                        {row.expandCollapseAllButtons === true && (
+                        {!inNoDataState && row.expandCollapseAllButtons === true && (
                           <ExpandCollapseButtons setAllExpanded={setAllExpanded} />
                         )}
                         {Object.keys(dataGroups).map(groupName => {
@@ -559,6 +571,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                               updateChildConfig={updateChildConfig}
                               apiFilterDropdowns={apiFilterDropdowns}
                               currentViewport={currentViewport}
+                              inNoDataState={inNoDataState}
                             />
                           )
                         })}
@@ -576,10 +589,13 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                         updateChildConfig={updateChildConfig}
                         apiFilterDropdowns={apiFilterDropdowns}
                         currentViewport={currentViewport}
+                        inNoDataState={inNoDataState}
                       />
                     )
                   }
                 })}
+
+            {inNoDataState ? <div className='mt-5'>Please complete your selection to continue.</div> : <></>}
 
             {/* Image or PDF Inserts */}
             <section className='download-buttons'>

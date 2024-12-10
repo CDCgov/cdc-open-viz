@@ -153,7 +153,6 @@ export const useEditorPermissions = () => {
     }
   }
   const visHasBrushChart = () => {
-    return false
     if (config.xAxis.type === 'categorical') return false
     return ['Line', 'Bar', 'Area Chart', 'Combo'].includes(visualizationType) && orientation === 'vertical'
   }
@@ -384,6 +383,10 @@ export const useEditorPermissions = () => {
     )
   }
 
+  const visSupportsYPadding = () => {
+    return !config.dataFormat.onlyShowTopPrefixSuffix || !config.dataFormat.suffix?.includes(' ')
+  }
+
   const visHasSingleSeriesTooltip = () => {
     if (visualizationType === 'Bar' || visualizationType === 'Line') {
       return true
@@ -457,6 +460,7 @@ export const useEditorPermissions = () => {
     visSupportsValueAxisMax,
     visSupportsValueAxisMin,
     visSupportsDynamicSeries,
+    visSupportsYPadding,
     visHasSingleSeriesTooltip,
     visHasCategoricalAxis
   }
