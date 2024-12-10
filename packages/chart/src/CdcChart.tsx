@@ -469,9 +469,11 @@ const CdcChart = ({
             const iqr = q3 - q1
             const lowerBounds = q1 - 1.5 * iqr
             const upperBounds = q3 + 1.5 * iqr
+            const filteredData = sortedData.filter(d => d <= upperBounds)
+            const max = d3.max(filteredData)
             plots.push({
               columnCategory: g,
-              columnMax: d3.min([d3.max(sortedData), q3 + 1.5 * iqr]),
+              columnMax: max,
               columnThirdQuartile: _.round(q3, newConfig.dataFormat.roundTo),
               columnMedian: Number(d3.median(sortedData)).toFixed(newConfig.dataFormat.roundTo),
               columnFirstQuartile: _.round(q1, newConfig.dataFormat.roundTo),
