@@ -125,7 +125,7 @@ const UsaRegionMap = props => {
           css={styles}
           text={styles.color}
           stroke={geoStrokeColor}
-          strokeWidth={1.5}
+          strokeWidth={1}
           onClick={() => geoClickHandler(territory, territoryData)}
           data-tooltip-id={`tooltip__${tooltipId}`}
           data-tooltip-html={toolTip}
@@ -224,10 +224,11 @@ const UsaRegionMap = props => {
         const TerratoryRect = props => {
           const { posX = 0, tName } = props
           const textColor = getContrastColor('#FFF', legendColors[0])
+          const geoStrokeColor = getGeoStrokeColor(state)
           return (
             <>
-              <rect x={posX} width='36' height='24' rx='2' stroke='#fff' strokeWidth='1' />
-              <text x={posX + 8} y='17' fill={textColor}>
+              <rect x={posX} width='36' height='24' rx='2' stroke={geoStrokeColor} strokeWidth='1' />
+              <text textAnchor='middle' x={36 / 2 + posX} y='17' fill={textColor}>
                 {tName}
               </text>
             </>
@@ -246,7 +247,7 @@ const UsaRegionMap = props => {
             data-tooltip-html={toolTip}
             tabIndex={-1}
           >
-            <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
+            <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1} d={path} />
             <g id={`region-${index + 1}-label`}>
               <circle fill='#fff' stroke='#999' cx={circleRadius} cy={circleRadius} r={circleRadius} />
               <text fill='#333' x='15px' y='20px' textAnchor='middle'>
@@ -281,7 +282,7 @@ const UsaRegionMap = props => {
       // Default return state, just geo with no additional information
       return (
         <g key={key} className='geo-group' style={styles}>
-          <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
+          <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1} d={path} />
           {(isHex || showLabel) && geoLabel(geo, styles.fill, projection)}
         </g>
       )
