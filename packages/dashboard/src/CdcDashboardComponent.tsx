@@ -208,16 +208,26 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       }
     }
 
-    if (dataWasFetched) {
-      dispatch({ type: 'SET_DATA', payload: newData })
-      const filtersWithNewValues = addValuesToDashboardFilters(filters, newData)
+    const datasetsWithFiles = _.pickBy(newDatasets, dataset => !dataset.dataUrl)
+
+    if (dataWasFetched || Object.keys(datasetsWithFiles).length) {
+      const dataFiles = Object.keys(datasetsWithFiles).reduce((acc, key) => {
+        acc[key] = datasetsWithFiles[key].data
+        return acc
+      }, {})
+      const _newData = { ...newData, ...dataFiles }
+      dispatch({ type: 'SET_DATA', payload: _newData })
+      const appliedFilterIndexes = Object.values(config.visualizations)
+        .filter(viz => viz.type === 'dashboardFilters')
+        .flatMap(viz => viz.sharedFilterIndexes)
+      const filtersWithNewValues = addValuesToDashboardFilters(filters, _newData, appliedFilterIndexes)
       const dashboardConfig = newFilters
         ? { ...config.dashboard, sharedFilters: filtersWithNewValues }
         : config.dashboard
       const filteredData = getFilteredData(
         { ...state, config: { ...state.config, dashboard: dashboardConfig } },
         {},
-        newData
+        _newData
       )
       dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
       const visualizations = reloadURLHelpers.getVisualizationsWithFormattedData(config.visualizations, newData)
