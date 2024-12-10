@@ -274,7 +274,9 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
               </select>
             </label>
           ) : (
-            <button onClick={() => setCanAddExisting(true)} className='btn btn-primary full-width mt-1'>
+
+            <button onClick={() => setCanAddExisting(true)} className='btn btn-primary full-width mt-2'>
+
               Add Existing Dashboard Filter
             </button>
           )}
