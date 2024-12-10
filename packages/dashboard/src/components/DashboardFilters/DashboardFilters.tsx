@@ -166,7 +166,17 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         )
       })}
       {showSubmit && (
-        <button className='btn btn-primary mb-1' onClick={applyFilters}>
+        <button
+          className='btn btn-primary mb-1'
+          onClick={applyFilters}
+          disabled={show.some(filterIndex => {
+            const emptyFilterValues = [undefined, '', '- Select -']
+            return (
+              emptyFilterValues.includes(sharedFilters[filterIndex].queuedActive) &&
+              emptyFilterValues.includes(sharedFilters[filterIndex].active)
+            )
+          })}
+        >
           {applyFiltersButtonText || 'GO!'}
         </button>
       )}
