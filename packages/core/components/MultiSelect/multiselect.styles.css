@@ -71,3 +71,7 @@
     }
   }
 }
+
+.accordion__panel .cove-multiselect .dropdown {
+  position: relative;
+}
