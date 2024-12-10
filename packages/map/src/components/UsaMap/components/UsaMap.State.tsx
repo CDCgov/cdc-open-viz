@@ -192,7 +192,7 @@ const UsaMap = () => {
           label={label}
           style={styles}
           text={styles.color}
-          strokeWidth={1.5}
+          strokeWidth={1}
           textColor={textColor}
           handleShapeClick={() => geoClickHandler(territory, territoryData)}
           dataTooltipId={`tooltip__${tooltipId}`}
@@ -401,7 +401,7 @@ const UsaMap = () => {
               tabIndex={-1}
             >
               {/* state path */}
-              <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
+              <path tabIndex={-1} className='single-geo' strokeWidth={1} d={path} />
 
               {/* apply patterns on top of state path*/}
               {map.patterns.map((patternData, patternIndex) => {
