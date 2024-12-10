@@ -82,7 +82,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
       const isMatch = circleData?.some(
         cd => cd[config.xAxis.dataKey] === d[config.xAxis.dataKey] && cd[seriesKey] === d[seriesKey]
       )
-      if (isMatch) {
+      if (isMatch || !filtered) {
         return <></>
       }
       return (
