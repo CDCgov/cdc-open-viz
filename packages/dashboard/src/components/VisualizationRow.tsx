@@ -122,9 +122,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   }
   return (
     <div className={`row${row.equalHeight ? ' equal-height' : ''}${row.toggle ? ' toggle' : ''}`} key={`row__${index}`}>
-      {row.toggle && (
-        <Toggle row={row} visualizations={config.visualizations} active={show.indexOf(true)} setToggled={setToggled} />
-      )}
       {row.columns.map((col, colIndex) => {
         if (col.width) {
           if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`col col-${col.width}`}></div>
@@ -163,6 +160,14 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                 hideVisualization ? ' hide-parent-visualization' : ' mt-5 p-1'
               }`}
             >
+              {row.toggle && !hideVisualization && (
+                <Toggle
+                  row={row}
+                  visualizations={config.visualizations}
+                  active={show.indexOf(true)}
+                  setToggled={setToggled}
+                />
+              )}
               <VisualizationWrapper
                 allExpanded={allExpanded}
                 currentViewport={currentViewport}
