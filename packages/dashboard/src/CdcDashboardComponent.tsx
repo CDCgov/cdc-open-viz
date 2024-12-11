@@ -87,7 +87,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   const isPreview = state.tabSelected === 'Dashboard Preview'
 
   const inNoDataState = useMemo(() => {
-    const vals = Object.values(state.data).flatMap(val => val)
+    const vals = reloadURLHelpers.getDatasetKeys(state.config).map(key => state.data[key])
     if (!vals.length) return true
     return vals.some(val => val === undefined)
   }, [state.data])
@@ -707,7 +707,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
           isDebug,
           loadAPIFilters,
           setAPIFilterDropdowns,
-          reloadURLData
+          reloadURLData,
+          setAPILoading
         }}
       >
         <DashboardDispatchContext.Provider value={dispatch}>
