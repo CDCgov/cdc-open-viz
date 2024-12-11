@@ -96,7 +96,10 @@ const VisualizationRow: React.FC<VizRowProps> = ({
         // the multiViz filtering filtering is applied after the dashboard filters
         const categoryFootnote = footnoteConfig.formattedData.filter(d => d[row.multiVizColumn] === vizCategory)
         footnoteConfig.formattedData = categoryFootnote
+      } else {
+        footnoteConfig.formattedData = dashboardFilteredData[row.footnotesId]
       }
+
       return footnoteConfig
     }
     return null
@@ -315,7 +318,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
         }
         return <React.Fragment key={`vis__${index}__${colIndex}`}></React.Fragment>
       })}
-      {row.footnotesId ? (
+      {row.footnotesId && !inNoDataState ? (
         <FootnotesStandAlone
           isEditor={false}
           visualizationKey={row.footnotesId}
