@@ -11,7 +11,7 @@ interface BrushChartProps {
 }
 
 const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
-  const { tableData, config, setBrushConfig, dashboardConfig, formatDate } = useContext(ConfigContext)
+  const { tableData, config, setBrushConfig, dashboardConfig, formatDate, parseDate } = useContext(ConfigContext)
   const [brushState, setBrushState] = useState({ isBrushing: false, selection: [] })
   const [brushKey, setBrushKey] = useState(0)
   const sharedFilters = dashboardConfig?.dashboard?.sharedFilters ?? []
@@ -112,15 +112,16 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
         }
       })
 
-      const firstDate = (newFilteredData.length && newFilteredData[0][config?.runtime?.originalXAxis?.dataKey]) ?? ''
-      const lastDate =
+      const startDate = (newFilteredData.length && newFilteredData[0][config?.runtime?.originalXAxis?.dataKey]) ?? ''
+      const endDate =
         (newFilteredData.length &&
           newFilteredData[newFilteredData.length - 1][config?.runtime?.originalXAxis?.dataKey]) ??
         ''
       // add custom blue colored handlers to each corners of brush
       svg.selectAll('.handle--custom').remove()
       // append handler
-      svg.call(brushHandle, selection, firstDate, lastDate)
+      const [formattedStartDate, formattedEndDate] = [startDate, endDate].map(date => formatDate(parseDate(date)))
+      svg.call(brushHandle, selection, formattedStartDate, formattedEndDate)
 
       setBrushConfig({
         active: config.brush.active,
