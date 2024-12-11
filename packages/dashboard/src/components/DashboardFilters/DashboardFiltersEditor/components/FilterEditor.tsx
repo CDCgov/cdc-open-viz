@@ -364,7 +364,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
 
               {!!parentFilters.length && (
                 <label>
-                  <span className='edit-label column-heading mt-1'>Used By: </span>
+                  <span className='edit-label column-heading mt-1'>Parent Filter(s): </span>
                   <MultiSelect
                     label='Parent Filter(s): '
                     options={parentFilters.map(key => ({ value: key, label: key }))}
