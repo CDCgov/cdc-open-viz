@@ -1,10 +1,11 @@
+import { filter } from 'lodash'
 import { shouldLoadAllFilters } from '../shouldLoadAllFilters'
 
 describe('shouldLoadAllFilters', () => {
   it('returns false if not autoloading', () => {
     delete window.location
     window.location = new URL('https://www.example.com')
-    expect(shouldLoadAllFilters({ rows: [] })).toBe(false)
+    expect(shouldLoadAllFilters({ rows: [], visualizations: {} })).toBe(false)
   })
   it('returns true if missing data', () => {
     delete window.location
@@ -54,7 +55,7 @@ describe('shouldLoadAllFilters', () => {
     const config = {
       visualizations: {
         abc: {
-          datakey: 'abcd'
+          dataKey: 'abcd'
         }
       },
       rows: [],
@@ -65,5 +66,44 @@ describe('shouldLoadAllFilters', () => {
       }
     }
     expect(shouldLoadAllFilters(config)).toBe(false)
+  })
+  it('returns true when theres an autoloading filter and no apply filters', () => {
+    const config = {
+      visualizations: {
+        abc: {
+          visualizationType: 'dashboardFilters',
+          dataKey: 'abcd',
+          autoLoad: true
+        }
+      },
+      rows: [],
+      datasets: {
+        abcd: { data: [] }
+      }
+    }
+    expect(shouldLoadAllFilters(config)).toBe(true)
+  })
+
+  it('returns false when theres an autoloading filter and apply filters', () => {
+    const config = {
+      visualizations: {
+        abc: {
+          visualizationType: 'dashboardFilters',
+          dataKey: 'abcd',
+          autoLoad: true
+        },
+        abc2: {
+          visualizationType: 'dashboardFilters',
+          dataKey: 'abcde',
+          filterBehavior: 'Apply Button'
+        }
+      },
+      rows: [],
+      datasets: {
+        abcd: { data: [] },
+        abcde: { data: [] }
+      }
+    }
+    expect(shouldLoadAllFilters(config)).toBe(true)
   })
 })
