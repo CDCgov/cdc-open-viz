@@ -315,7 +315,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
         }
         return <React.Fragment key={`vis__${index}__${colIndex}`}></React.Fragment>
       })}
-      {row.footnotesId ? (
+      {row.footnotesId && !inNoDataState ? (
         <FootnotesStandAlone
           isEditor={false}
           visualizationKey={row.footnotesId}
