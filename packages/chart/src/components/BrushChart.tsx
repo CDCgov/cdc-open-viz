@@ -103,7 +103,6 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
 
       // If ascending is false, reverse the sorted array
       const finalData = !sortByRecentDate ? sortedData : sortedData.reverse()
-      console.log(sortByRecentDate, 'sortByRecentDate')
 
       // Retrieve the start and end dates based on the sorted data array
       const startDate = _.get(_.first(finalData), config.xAxis.dataKey, '')
