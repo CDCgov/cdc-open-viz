@@ -1426,7 +1426,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           {filter.order === 'cust' && (
             <DragDropContext
               onDragEnd={({ source, destination }) =>
-                handleFilterOrder(source.index, destination.index, index, state.filters[index])
+                handleFilterOrder(source.index, destination?.index, index, state.filters?.[index])
               }
             >
               <Droppable droppableId='filter_order'>
