@@ -91,18 +91,30 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           // Data Filter
           filter.values?.forEach((filterOption, index) => {
             const labeledOpt = filter.labels && filter.labels[filterOption]
-            values.push(
-              <option key={`${filter.key}-option-${index}`} value={filterOption}>
-                {labeledOpt || filterOption}
-              </option>
-            )
+            const resetLabelHasMatch = (filterOption || labeledOpt) === filter.resetLabel
+
+            if (!resetLabelHasMatch) {
+              values.push(
+                <option key={`${filter.key}-option-${index}`} value={filterOption}>
+                  {labeledOpt || filterOption}
+                </option>
+              )
+            } else {
+              // add label to the front of list if it matches with reset label
+              values.unshift(
+                <option key={`${filter.key}-option-${index}`} value={filterOption}>
+                  {labeledOpt || filterOption}
+                </option>
+              )
+            }
+
             multiValues.push({ value: filterOption, label: labeledOpt || filterOption })
           })
         }
 
         const isDisabled = !values.length
-
-        if (filter.resetLabel) {
+        // push reset label only if it does not includes in filter values  options
+        if (filter.resetLabel && !filter.values.includes(filter.resetLabel)) {
           values.unshift(
             <option key={`${filter.resetLabel}-option`} value={filter.resetLabel}>
               {filter.resetLabel}

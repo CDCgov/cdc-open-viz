@@ -24,7 +24,7 @@ function getMaxTierAndSetFilterTiers(filters: SharedFilter[]): number {
 }
 
 function filter(data = [], filters: SharedFilter[], condition) {
-  const activeFilters = filters.filter(f => f.resetLabel !== f.active)
+  const activeFilters = _.filter(filters, f => (f.resetLabel === f.active ? f.values?.includes(f.resetLabel) : true))
   return data.filter(row => {
     const foundMatchingFilter = activeFilters.find(filter => {
       const currentValue = row[filter.columnName]
