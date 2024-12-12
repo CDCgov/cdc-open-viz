@@ -113,7 +113,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         }
 
         const isDisabled = !values.length
-        // push reset lanbel only if it does not includes in filter values  options
+        // push reset label only if it does not includes in filter values  options
         if (filter.resetLabel && !filter.values.includes(filter.resetLabel)) {
           values.unshift(
             <option key={`${filter.resetLabel}-option`} value={filter.resetLabel}>
