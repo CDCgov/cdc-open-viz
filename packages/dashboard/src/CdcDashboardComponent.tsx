@@ -491,11 +491,12 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             body = (
               <>
                 <Header visualizationKey={visualizationKey} subEditor='Footnotes' />
+                {/* Datasets are passed in just for reference and need to be removed */}
                 <FootnotesStandAlone
                   visualizationKey={visualizationKey}
                   config={{ ...visualizationConfig, datasets: state.config.datasets }}
                   isEditor={true}
-                  updateConfig={_updateConfig}
+                  updateConfig={conf => _updateConfig(_.omit(conf, 'datasets'))}
                 />
               </>
             )
