@@ -110,5 +110,10 @@ export const filterUsedByDataUrl = (
 ) => {
   if (!filter.usedBy || !filter.usedBy.length) return true
   const vizUsingFilters = filter.usedBy?.map(vizOrRowKey => visualizations[vizOrRowKey] || rows[vizOrRowKey])
+  // push any footnotes which are using the filter also
+  filter.usedBy?.forEach(vizOrRowKey => {
+    if (rows[vizOrRowKey] && rows[vizOrRowKey].footnotesId)
+      return vizUsingFilters.push(visualizations[rows[vizOrRowKey].footnotesId])
+  })
   return vizUsingFilters?.some(viz => viz?.dataKey === datasetKey)
 }
