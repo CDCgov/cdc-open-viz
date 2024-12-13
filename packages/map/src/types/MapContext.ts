@@ -25,7 +25,6 @@ export type MapContext = {
   isFilterValueSupported: boolean
   loadConfig
   logo: string
-  navigationHandler
   position
   resetLegendToggles
   runtimeFilters
