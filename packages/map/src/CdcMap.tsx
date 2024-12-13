@@ -19,7 +19,8 @@ import Title from '@cdc/core/components/ui/Title'
 import Waiting from '@cdc/core/components/Waiting'
 
 // types
-import { MapConfig, type ViewportSize } from './types/MapConfig'
+import { type Coordinate, type MapConfig } from './types/MapConfig'
+import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { type DimensionsType } from '@cdc/core/types/Dimensions'
 
 // Data
@@ -117,7 +118,7 @@ const CdcMap = ({
   const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [loading, setLoading] = useState(true)
   const [displayPanel, setDisplayPanel] = useState(true)
-  const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
+  const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
   const [topoData, setTopoData] = useState<{}>({})
   const [runtimeFilters, setRuntimeFilters] = useState([])
   const [runtimeLegend, setRuntimeLegend] = useState([])
@@ -195,7 +196,7 @@ const CdcMap = ({
         const coordinates = countryCoordinates[filteredCountryCode]
         const long = coordinates[1]
         const lat = coordinates[0]
-        const reversedCoordinates: [number, number] = [long, lat]
+        const reversedCoordinates: Coordinate = [long, lat]
 
         setState({
           ...state,

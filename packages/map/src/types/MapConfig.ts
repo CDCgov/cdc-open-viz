@@ -15,7 +15,6 @@ export type MapVisualSettings = {
   /** cityStyle - optional visual indicator of label on the Legend */
   cityStyleLabel: string
   /** geoCodeCircleSize - controls the size of the city style option (circle or pin) */
-
   geoCodeCircleSize: number
   /** showBubbleZeros - shows circles on maps when the data is provided even if it's a zero value */
   showBubbleZeros: boolean
@@ -46,7 +45,7 @@ export type PrimaryColumnProperties = Pick<
   EditorColumnProperties,
   'dataTable' | 'label' | 'name' | 'prefix' | 'suffix' | 'tooltip'
 >
-export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
+
 export type LegendShapeItem = {
   column: string
   key: string

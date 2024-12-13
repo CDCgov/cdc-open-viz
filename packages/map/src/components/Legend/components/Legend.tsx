@@ -17,7 +17,7 @@ import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
 import { Group } from '@visx/group'
 import './index.scss'
-import { ViewportSize } from '@cdc/chart/src/types/ChartConfig'
+import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { isBelowBreakpoint, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 
@@ -27,7 +27,7 @@ type LegendProps = {
   skipId: string
   dimensions: DimensionsType
   containerWidthPadding: number
-  currentViewport: ViewportSize
+  currentViewport: ViewPort
 }
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
