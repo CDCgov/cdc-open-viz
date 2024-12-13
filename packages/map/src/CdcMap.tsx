@@ -1522,7 +1522,6 @@ const CdcMap = ({
     setState,
     state,
     titleCase,
-    type: general.type,
     viewport: currentViewport,
     tooltipId,
     tooltipRef,
