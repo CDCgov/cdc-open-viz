@@ -57,13 +57,13 @@ import { publish } from '@cdc/core/helpers/events'
 
 // Map Helpers
 import { applyColorToLegend } from './helpers/applyColorToLegend'
+import { closeModal } from './helpers/closeModal'
 import { generateColorsArray } from './helpers/generateColorsArray'
 import { generateRuntimeLegendHash } from './helpers/generateRuntimeLegendHash'
 import { getGeoFillColor } from './helpers/colors'
 import { getUniqueValues } from './helpers/getUniqueValues'
 import { hashObj } from './helpers/hashObj'
 import { navigationHandler } from './helpers/navigationHandler'
-import { closeModal } from './helpers/closeModal'
 
 // Child Components
 import Annotation from './components/Annotation'
@@ -966,67 +966,6 @@ const CdcMap = ({
   }, []) // eslint-disable-line
   const mapSvg = useRef(null)
 
-  const displayDataAsText = (value, columnName) => {
-    if (value === null || value === '' || value === undefined) {
-      return ''
-    }
-
-    // if string of letters like 'Home' then don't need to format as a number
-    if (
-      typeof value === 'string' &&
-      value.length > 0 &&
-      /[a-zA-Z]/.test(value) &&
-      state.legend.type === 'equalnumber'
-    ) {
-      return value
-    }
-
-    let formattedValue = value
-
-    let columnObj = state.columns[columnName]
-
-    if (columnObj === undefined) {
-      // then use left axis config
-      columnObj = state.columns.primary
-      // NOTE: Left Value Axis uses different names
-      // so map them below so the code below works
-      // - copy commas to useCommas to work below
-      columnObj['useCommas'] = columnObj.commas
-      // - copy roundTo to roundToPlace to work below
-      columnObj['roundToPlace'] = columnObj.roundTo ? columnObj.roundTo : ''
-    }
-
-    if (columnObj) {
-      // If value is a number, apply specific formattings
-      if (Number(value)) {
-        const hasDecimal = columnObj.roundToPlace && (columnObj.roundToPlace !== '' || columnObj.roundToPlace !== null)
-        const decimalPoint = columnObj.roundToPlace ? Number(columnObj.roundToPlace) : 0
-
-        // Rounding
-        if (columnObj.hasOwnProperty('roundToPlace') && hasDecimal) {
-          formattedValue = Number(value).toFixed(decimalPoint)
-        }
-
-        if (columnObj.hasOwnProperty('useCommas') && columnObj.useCommas === true) {
-          // Formats number to string with commas - allows up to 5 decimal places, if rounding is not defined.
-          // Otherwise, uses the rounding value set at 'columnObj.roundToPlace'.
-          formattedValue = Number(value).toLocaleString('en-US', {
-            style: 'decimal',
-            minimumFractionDigits: hasDecimal ? decimalPoint : 0,
-            maximumFractionDigits: hasDecimal ? decimalPoint : 5
-          })
-        }
-      }
-
-      // Check if it's a special value. If it is not, apply the designated prefix and suffix
-      if (false === state.legend.specialClasses.includes(String(value))) {
-        formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
-      }
-    }
-
-    return formattedValue
-  }
-
   // this is passed DOWN into the various components
   // then they do a lookup based on the bin number as index into here
   const applyLegendToRow = rowObj => {
@@ -1189,7 +1128,7 @@ const CdcMap = ({
   }
 
   // todo: convert to store or context eventually.
-  const { buildTooltip } = useTooltip({ state, displayGeoName, displayDataAsText, supportedStatesFipsCodes })
+  const { buildTooltip } = useTooltip({ state, displayGeoName, supportedStatesFipsCodes })
 
   const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
     let toolTipText = buildTooltip(row, geoName, '')
@@ -1625,7 +1564,6 @@ const CdcMap = ({
     currentViewport,
     data: runtimeData,
     dimensions,
-    displayDataAsText,
     displayGeoName,
     filteredCountryCode,
     generateColorsArray,
@@ -1848,7 +1786,6 @@ const CdcMap = ({
                     showFullGeoNameInCSV={table.showFullGeoNameInCSV}
                     runtimeLegend={runtimeLegend}
                     runtimeData={runtimeData}
-                    displayDataAsText={displayDataAsText}
                     displayGeoName={displayGeoName}
                     applyLegendToRow={applyLegendToRow}
                     tableTitle={table.label}

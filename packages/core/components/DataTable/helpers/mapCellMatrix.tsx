@@ -2,12 +2,23 @@ import LegendShape from '@cdc/core/components/LegendShape'
 import CellAnchor from '../components/CellAnchor'
 import { DataTableProps } from '../DataTable'
 import { ReactNode } from 'react'
+import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 
 type MapRowsProps = DataTableProps & {
   rows: string[]
 }
 
-const mapCellArray = ({ rows, columns, runtimeData, config, applyLegendToRow, displayGeoName, formatLegendLocation, displayDataAsText, navigationHandler, setFilteredCountryCode }: MapRowsProps): ReactNode[][] => {
+const mapCellArray = ({
+  rows,
+  columns,
+  runtimeData,
+  config,
+  applyLegendToRow,
+  displayGeoName,
+  formatLegendLocation,
+  navigationHandler,
+  setFilteredCountryCode
+}: MapRowsProps): ReactNode[][] => {
   return rows.map(row =>
     Object.keys(columns)
       .filter(column => columns[column].dataTable === true && columns[column].name)
@@ -19,8 +30,14 @@ const mapCellArray = ({ rows, columns, runtimeData, config, applyLegendToRow, di
           const legendColor = applyLegendToRow(rowObj)
 
           let labelValue
-          const mapZoomHandler = config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world' ? () => setFilteredCountryCode(row) : undefined
-          if ((config.general.geoType !== 'single-state' && config.general.geoType !== 'us-county') || config.general.type === 'us-geocode') {
+          const mapZoomHandler =
+            config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world'
+              ? () => setFilteredCountryCode(row)
+              : undefined
+          if (
+            (config.general.geoType !== 'single-state' && config.general.geoType !== 'us-county') ||
+            config.general.type === 'us-geocode'
+          ) {
             const capitalize = str => {
               return str.charAt(0).toUpperCase() + str.slice(1)
             }
@@ -32,7 +49,13 @@ const mapCellArray = ({ rows, columns, runtimeData, config, applyLegendToRow, di
           cellValue = (
             <div className='col-12'>
               <LegendShape fill={legendColor[0]} />
-              <CellAnchor markup={labelValue} row={rowObj} columns={columns} navigationHandler={navigationHandler} mapZoomHandler={mapZoomHandler} />
+              <CellAnchor
+                markup={labelValue}
+                row={rowObj}
+                columns={columns}
+                navigationHandler={navigationHandler}
+                mapZoomHandler={mapZoomHandler}
+              />
             </div>
           )
         } else {
@@ -49,7 +72,7 @@ const mapCellArray = ({ rows, columns, runtimeData, config, applyLegendToRow, di
               }
             })
           }
-          cellValue = displayDataAsText(specialValFound || runtimeData[row][columnName], column)
+          cellValue = displayDataAsText(specialValFound || runtimeData[row][columnName], column, config)
         }
 
         return cellValue

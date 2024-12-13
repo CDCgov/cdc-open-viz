@@ -19,6 +19,7 @@ import { Group } from '@visx/group'
 import './index.scss'
 import { ViewportSize } from '@cdc/chart/src/types/ChartConfig'
 import { isBelowBreakpoint, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
+import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 
 const LEGEND_PADDING = 30
 
@@ -34,7 +35,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const {
     // prettier-ignore
-    displayDataAsText,
     resetLegendToggles,
     runtimeFilters,
     runtimeLegend,
@@ -75,9 +75,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   }
   const getFormattedLegendItems = () => {
     return runtimeLegend.map((entry, idx) => {
-      const entryMax = displayDataAsText(entry.max, 'primary')
+      const entryMax = displayDataAsText(entry.max, 'primary', state)
 
-      const entryMin = displayDataAsText(entry.min, 'primary')
+      const entryMin = displayDataAsText(entry.min, 'primary', state)
       let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
 
       // If interval, add some formatting
@@ -86,7 +86,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       }
 
       if (legend.type === 'category') {
-        formattedText = displayDataAsText(entry.value, 'primary')
+        formattedText = displayDataAsText(entry.value, 'primary', state)
       }
 
       if (entry.max === 0 && entry.min === 0) {

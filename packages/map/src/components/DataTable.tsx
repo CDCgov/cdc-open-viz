@@ -345,7 +345,7 @@ const DataTable = props => {
                             </>
                           )
                         } else {
-                          cellValue = displayDataAsText(runtimeData[row][state.columns[column].name], column)
+                          cellValue = displayDataAsText(runtimeData[row][state.columns[column].name], column, state)
                         }
 
                         return (
