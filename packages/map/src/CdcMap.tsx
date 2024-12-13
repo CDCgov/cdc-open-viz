@@ -64,6 +64,7 @@ import { getGeoFillColor } from './helpers/colors'
 import { getUniqueValues } from './helpers/getUniqueValues'
 import { hashObj } from './helpers/hashObj'
 import { navigationHandler } from './helpers/navigationHandler'
+import { validateFipsCodeLength } from './helpers/validateFipsCodeLength'
 
 // Child Components
 import Annotation from './components/Annotation'
@@ -1191,27 +1192,6 @@ const CdcMap = ({
     }
   }
 
-  const validateFipsCodeLength = newState => {
-    if (
-      newState.general.geoType === 'us-county' ||
-      newState.general.geoType === 'single-state' ||
-      (newState.general.geoType === 'us' && newState?.data)
-    ) {
-      newState?.data.forEach(dataPiece => {
-        if (dataPiece[newState.columns.geo.name]) {
-          if (
-            !isNaN(parseInt(dataPiece[newState.columns.geo.name])) &&
-            dataPiece[newState.columns.geo.name].length === 4
-          ) {
-            dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
-          }
-          dataPiece[newState.columns.geo.name] = dataPiece[newState.columns.geo.name].toString()
-        }
-      })
-    }
-    return newState
-  }
-
   const handleMapAriaLabels = (state = '', testing = false) => {
     if (testing) console.log(`handleMapAriaLabels Testing On: ${state}`) // eslint-disable-line
     try {
@@ -1558,7 +1538,6 @@ const CdcMap = ({
     handleDragStateChange,
     applyLegendToRow,
     applyTooltipsToGeo,
-    columnsInData: state?.data?.[0] ? Object.keys(state.data[0]) : [],
     container,
     content: modal,
     currentViewport,

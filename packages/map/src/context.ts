@@ -4,7 +4,6 @@ import { MapConfig } from './types/MapConfig'
 type MapContext = {
   applyLegendToRow
   applyTooltipsToGeo
-  columnsInData
   currentViewport
   data
   displayGeoName

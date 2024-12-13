@@ -3,7 +3,6 @@ import { type MapConfig, type ViewportSize } from './MapConfig'
 export type MapContext = {
   applyLegendToRow
   applyTooltipsToGeo
-  columnsInData
   currentViewport: ViewportSize
   data
   displayDataAsText

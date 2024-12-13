@@ -1,7 +1,6 @@
 import { MapConfig } from '@cdc/map/src/types/MapConfig'
 
 export const displayDataAsText = (value: string | number, columnName, state: MapConfig) => {
-  console.log('state', state)
   if (value === null || value === '' || value === undefined) {
     return ''
   }
