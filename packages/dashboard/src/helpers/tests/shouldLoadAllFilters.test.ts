@@ -68,6 +68,8 @@ describe('shouldLoadAllFilters', () => {
     expect(shouldLoadAllFilters(config)).toBe(false)
   })
   it('returns true when theres an autoloading filter and no apply filters', () => {
+    delete window.location
+    window.location = new URL('https://www.example.com')
     const config = {
       visualizations: {
         abc: {
@@ -85,6 +87,8 @@ describe('shouldLoadAllFilters', () => {
   })
 
   it('returns false when theres an autoloading filter and apply filters', () => {
+    delete window.location
+    window.location = new URL('https://www.example.com')
     const config = {
       visualizations: {
         abc: {
@@ -104,6 +108,6 @@ describe('shouldLoadAllFilters', () => {
         abcde: { data: [] }
       }
     }
-    expect(shouldLoadAllFilters(config)).toBe(true)
+    expect(shouldLoadAllFilters(config)).toBe(false)
   })
 })

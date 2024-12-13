@@ -77,4 +77,19 @@ describe('shouldLoadUnfilteredDataset', () => {
 
     expect(result).toBe(false)
   })
+
+  it('should return false if the dataset is used by a footnote on a filtered row', () => {
+    const config: MultiDashboard | DashboardConfig = {
+      visualizations: {
+        viz1: { dataKey: 'dataset2' } as AnyVisualization,
+        footnotes1: { dataKey: 'dataset1' } as AnyVisualization
+      },
+      rows: [{ dataKey: 'dataset2', footnotesId: 'footnotes1' }],
+      dashboard: { sharedFilters: [{ usedBy: [0] }] }
+    }
+    const datasetKey = 'dataset1'
+    const result = shouldLoadUnfilteredDataset(config, datasetKey)
+
+    expect(result).toBe(false)
+  })
 })
