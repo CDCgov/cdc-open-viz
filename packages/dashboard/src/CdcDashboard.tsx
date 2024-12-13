@@ -76,7 +76,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
           const data = await processData(initialConfig.datasets[key], shouldLoadUnfilteredDataset(activeConfig, key))
           datasets[key] = data
         } catch (e) {
-          console.log(e)
+          console.error(e)
         }
       })
     )

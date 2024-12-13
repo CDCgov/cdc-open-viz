@@ -21,7 +21,6 @@ export const shouldLoadAllFilters = (config): boolean => {
       .filter(Boolean)
       .concat(rowDataSetKeys)
     const missingData = dataKeys.find(dataset => !config.datasets[dataset].data?.length)
-    console.log('config', config)
     return Boolean(missingData)
   }
   return false
