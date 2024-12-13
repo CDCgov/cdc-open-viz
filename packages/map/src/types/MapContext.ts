@@ -35,9 +35,8 @@ export type MapContext = {
   setRuntimeFilters
   setRuntimeLegend
   setSharedFilterValue
-  setState
+  setState: (newState: MapConfig) => MapConfig
   state: MapConfig
-  titleCase
   viewport
   setStateToShow: (string) => void
   stateToShow: string

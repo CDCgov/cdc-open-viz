@@ -26,6 +26,7 @@ import { MapContext } from '../../../types/MapContext'
 import { checkColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
+import { titleCase } from '../../../helpers/titleCase'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -63,7 +64,6 @@ const UsaMap = () => {
       geoClickHandler,
       setSharedFilterValue,
       state,
-      titleCase,
       tooltipId,
       handleDragStateChange,
       mapId,

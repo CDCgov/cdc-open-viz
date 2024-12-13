@@ -16,6 +16,7 @@ import useStateZoom from '../../../hooks/useStateZoom'
 import { Text } from '@visx/text'
 import { getGeoStrokeColor } from '../../../helpers/colors'
 import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
+import { titleCase } from '../../../helpers/titleCase'
 
 // SVG ITEMS
 const WIDTH = 880
@@ -30,7 +31,6 @@ const SingleStateMap = props => {
     geoClickHandler,
     applyLegendToRow,
     displayGeoName,
-    titleCase,
     setSharedFilterValue,
     isFilterValueSupported,
     runtimeFilters,

@@ -32,7 +32,6 @@ type MapContext = {
   setSharedFilterValue
   setState
   state: MapConfig
-  titleCase
   tooltipId: string
   viewport
 }
