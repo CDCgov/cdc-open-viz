@@ -205,15 +205,18 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
         />
       )}
       {config?.visualizationType !== 'Sankey' && (
-        <MultiSelect
-          key={excludedColumns.join('') + 'excluded'}
-          options={dataColumns.map(c => ({ label: c, value: c }))}
-          selected={excludedColumns}
-          fieldName='dataTable'
-          label='Exclude Columns'
-          section='columns'
-          updateField={excludeColumns}
-        />
+        <label>
+          <span className='edit-label column-heading mt-1'>Exclude Columns </span>
+          <MultiSelect
+            key={excludedColumns.join('') + 'excluded'}
+            options={dataColumns.map(c => ({ label: c, value: c }))}
+            selected={excludedColumns}
+            label={'Exclude Columns'}
+            fieldName='dataTable'
+            section='columns'
+            updateField={excludeColumns}
+          />
+        </label>
       )}
       <CheckBox
         value={config.table.collapsible}
@@ -323,18 +326,9 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
         updateField={updateField}
       />
       {config.table.pivot?.columnName && (
-        <MultiSelect
-          key={config.table.pivot?.columnName}
-          options={groupPivotColumns
-            .filter(col => col !== config.table.pivot?.columnName && col !== config.table.groupBy)
-            .map(c => ({ label: c, value: c }))}
-          selected={config.table.pivot?.valueColumns}
-          label='Pivot Value Column(s) '
-          section='table'
-          subsection='pivot'
-          fieldName='valueColumns'
-          updateField={updateField}
-          tooltip={
+        <label>
+          <span className='edit-label column-heading mt-1'>
+            Pivot Value Column(s)
             <Tooltip style={{ textTransform: 'none' }}>
               <Tooltip.Target>
                 <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -343,8 +337,20 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
                 <p>The column(s) whos values will be pivoted under the column selected as the Filter.</p>
               </Tooltip.Content>
             </Tooltip>
-          }
-        />
+          </span>
+          <MultiSelect
+            key={config.table.pivot?.columnName}
+            options={groupPivotColumns
+              .filter(col => col !== config.table.pivot?.columnName && col !== config.table.groupBy)
+              .map(c => ({ label: c, value: c }))}
+            selected={config.table.pivot?.valueColumns}
+            label='Pivot Value Column(s) '
+            section='table'
+            subsection='pivot'
+            fieldName='valueColumns'
+            updateField={updateField}
+          />
+        </label>
       )}
     </>
   )
