@@ -1399,19 +1399,6 @@ const CdcMap = ({
     }
   }, [state]) // eslint-disable-line
 
-  // DEV-769 make "Data Table" both a required field and default value
-  useEffect(() => {
-    if (state.table?.label === '' || state.table?.label === undefined) {
-      setState({
-        ...state,
-        table: {
-          ...state.table,
-          title: 'Data Table'
-        }
-      })
-    }
-  }, [state.table]) // eslint-disable-line
-
   // When geo label override changes
   // - redo the tooltips
   useEffect(() => {
