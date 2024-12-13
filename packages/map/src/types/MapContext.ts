@@ -39,10 +39,6 @@ export type MapContext = {
   setSharedFilterValue
   setState
   state: MapConfig
-  supportedCities
-  supportedCounties
-  supportedCountries
-  supportedTerritories
   titleCase
   viewport
   setStateToShow: (string) => void

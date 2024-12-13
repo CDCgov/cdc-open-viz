@@ -36,10 +36,6 @@ type MapContext = {
   setSharedFilterValue
   setState
   state: MapConfig
-  supportedCities
-  supportedCounties
-  supportedCountries
-  supportedTerritories
   titleCase
   tooltipId: string
   viewport

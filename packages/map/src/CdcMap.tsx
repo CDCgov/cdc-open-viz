@@ -1,48 +1,38 @@
+// Vendor
 import React, { useState, useEffect, useRef, useCallback, useId } from 'react'
 import * as d3 from 'd3'
-import Layout from '@cdc/core/components/Layout'
-import Waiting from '@cdc/core/components/Waiting'
-import Annotation from './components/Annotation'
-import Error from './components/EditorPanel/components/Error'
 import _ from 'lodash'
-import { applyColorToLegend } from './helpers/applyColorToLegend'
-
-// types
-import { type ViewportSize } from './types/MapConfig'
-import { type DimensionsType } from '@cdc/core/types/Dimensions'
-
-// IE11
 import 'whatwg-fetch'
 import ResizeObserver from 'resize-observer-polyfill'
-
-// Third party
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 
-// Helpers
-import { navigationHandler } from './helpers/navigationHandler'
-import { hashObj } from './helpers/hashObj'
-import { generateRuntimeLegendHash } from './helpers/generateRuntimeLegendHash'
-import { generateColorsArray } from './helpers/generateColorsArray'
-import { getUniqueValues } from './helpers/getUniqueValues'
-import { publish } from '@cdc/core/helpers/events'
-import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
+// Core Components
+import DataTable from '@cdc/core/components/DataTable'
+import Filters, { useFilters } from '@cdc/core/components/Filters'
+import Layout from '@cdc/core/components/Layout'
+import MediaControls from '@cdc/core/components/MediaControls'
+import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Title from '@cdc/core/components/ui/Title'
+import Waiting from '@cdc/core/components/Waiting'
+
+// types
+import { MapConfig, type ViewportSize } from './types/MapConfig'
+import { type DimensionsType } from '@cdc/core/types/Dimensions'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
 import {
-  supportedStates,
-  supportedTerritories,
-  supportedCountries,
-  supportedCounties,
-  supportedCities,
-  supportedStatesFipsCodes,
   stateFipsToTwoDigit,
-  supportedRegions
+  supportedCities,
+  supportedCounties,
+  supportedCountries,
+  supportedRegions,
+  supportedStates,
+  supportedStatesFipsCodes,
+  supportedTerritories
 } from './data/supported-geos'
 import colorPalettes from '@cdc/core/data/colorPalettes'
 import initialState from './data/initial-state'
@@ -52,33 +42,41 @@ import ExternalIcon from './images/external-link.svg'
 
 // Sass
 import './scss/main.scss'
-
-// TODO: combine in scss.
 import './scss/btn.scss'
 
-// Core
-import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import MediaControls from '@cdc/core/components/MediaControls'
+// Core Helpers
+import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import getViewport from '@cdc/core/helpers/getViewport'
 import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import numberFromString from '@cdc/core/helpers/numberFromString'
-import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
+import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
+import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
+import { publish } from '@cdc/core/helpers/events'
+
+// Map Helpers
+import { applyColorToLegend } from './helpers/applyColorToLegend'
+import { generateColorsArray } from './helpers/generateColorsArray'
+import { generateRuntimeLegendHash } from './helpers/generateRuntimeLegendHash'
+import { getGeoFillColor } from './helpers/colors'
+import { getUniqueValues } from './helpers/getUniqueValues'
+import { hashObj } from './helpers/hashObj'
+import { navigationHandler } from './helpers/navigationHandler'
 
 // Child Components
+import Annotation from './components/Annotation'
 import ConfigContext from './context'
-import Filters, { useFilters } from '@cdc/core/components/Filters'
-import Modal from './components/Modal'
+import EditorPanel from './components/EditorPanel'
+import Error from './components/EditorPanel/components/Error'
 import Legend from './components/Legend'
+import Modal from './components/Modal'
+import NavigationMenu from './components/NavigationMenu'
+import UsaMap from './components/UsaMap'
+import WorldMap from './components/WorldMap'
 
-import EditorPanel from './components/EditorPanel' // Future: Lazy
-import NavigationMenu from './components/NavigationMenu' // Future: Lazy
-import UsaMap from './components/UsaMap' // Future: Lazy
-import WorldMap from './components/WorldMap' // Future: Lazy
+// Hooks
 import useTooltip from './hooks/useTooltip'
-import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
-import SkipTo from '@cdc/core/components/elements/SkipTo'
-import { getGeoFillColor } from './helpers/colors'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -114,12 +112,12 @@ const CdcMap = ({
   const transform = new DataTransform()
   const [translate, setTranslate] = useState([0, 0])
   const [scale, setScale] = useState(1)
-  const [state, setState] = useState({ ...initialState })
+  const [state, setState] = useState<MapConfig>({ ...initialState })
   const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [loading, setLoading] = useState(true)
   const [displayPanel, setDisplayPanel] = useState(true)
   const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
-  const [topoData, setTopoData] = useState<Topology | {}>({})
+  const [topoData, setTopoData] = useState<{}>({})
   const [runtimeFilters, setRuntimeFilters] = useState([])
   const [runtimeLegend, setRuntimeLegend] = useState([])
   const [runtimeData, setRuntimeData] = useState({ init: true })
@@ -376,7 +374,7 @@ const CdcMap = ({
 
     result.runtimeDataHash = runtimeData.fromHash
 
-    // Unified will based the legend off ALL of the data maps received. Otherwise, it will use
+    // Unified will base the legend off ALL of the data maps received. Otherwise, it will use
     let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData)
 
     const colorDistributions = {
@@ -684,7 +682,7 @@ const CdcMap = ({
 
         const breaks = getBreaks(scale)
 
-        // if seperating zero force it into breaks
+        // if separating zero force it into breaks
         if (breaks[0] !== 0) {
           breaks.unshift(0)
         }
@@ -699,7 +697,7 @@ const CdcMap = ({
               min = 0
             }
 
-            // if we're on the second break, and seperating out zero, increment min to 1.
+            // if we're on the second break, and separating out zero, increment min to 1.
             if (index === 1 && state.legend.separateZero) {
               min = 1
             }
@@ -1010,7 +1008,7 @@ const CdcMap = ({
       return ''
     }
 
-    // if string of letters like 'Home' then dont need to format as a number
+    // if string of letters like 'Home' then don't need to format as a number
     if (
       typeof value === 'string' &&
       value.length > 0 &&
@@ -1218,7 +1216,7 @@ const CdcMap = ({
       value = dict[value]
     }
 
-    // if you get here and it's 2 letters then DONT titleCase state abbreviations like "AL"
+    // if you get here and it's 2 letters then dont titleCase state abbreviations like "AL"
     if (value.length === 2) {
       return value
     } else {
@@ -1274,7 +1272,7 @@ const CdcMap = ({
       })
     }
 
-    // If modals are set or we are on a mobile viewport, display modal
+    // If modals are set, or we are on a mobile viewport, display modal
     if (window.matchMedia('(any-hover: none)').matches || 'click' === state.tooltips.appearanceType) {
       setModal({
         geoName: key,
@@ -1447,7 +1445,7 @@ const CdcMap = ({
 
     // This code goes through and adds the defaults for every property declaring in the initial state at the top.
     // This allows you to easily add new properties to the config without having to worry about accounting for backwards compatibility.
-    // Right now this does not work recursively -- only on first and second level properties. So state -> prop1 -> childprop1
+    // Right now this does not work recursively -- only on first and second level properties. So state -> prop1 -> childPropOne
     Object.keys(newState).forEach(key => {
       if ('object' === typeof newState[key] && false === Array.isArray(newState[key])) {
         if (initialState[key]) {
@@ -1694,10 +1692,6 @@ const CdcMap = ({
     setSharedFilterValue,
     setState,
     state,
-    supportedCities,
-    supportedCounties,
-    supportedCountries,
-    supportedTerritories,
     titleCase,
     type: general.type,
     viewport: currentViewport,
