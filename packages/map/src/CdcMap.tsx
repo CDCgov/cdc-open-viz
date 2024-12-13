@@ -22,6 +22,7 @@ import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 
 // Helpers
+import { navigationHandler } from './helpers/navigationHandler'
 import { hashObj } from './helpers/hashObj'
 import { generateRuntimeLegendHash } from './helpers/generateRuntimeLegendHash'
 import { generateColorsArray } from './helpers/generateColorsArray'
@@ -1244,7 +1245,7 @@ const CdcMap = ({
             key='modal-navigation-link'
             onClick={e => {
               e.preventDefault()
-              navigationHandler(row[state.columns.navigate.name])
+              navigationHandler(row[state.columns.navigate.name], customNavigationHandler)
             }}
           >
             {state.tooltips.linkLabel}
@@ -1255,24 +1256,6 @@ const CdcMap = ({
     }
 
     return toolTipText
-  }
-
-  const navigationHandler = urlString => {
-    // Call custom navigation method if passed
-    if (customNavigationHandler) {
-      customNavigationHandler(urlString)
-      return
-    }
-
-    // Abort if value is blank
-    if (0 === urlString.length) {
-      throw Error('Blank string passed as URL. Navigation aborted.')
-    }
-
-    const urlObj = new URL(urlString, window.location.origin)
-
-    // Open constructed link in new tab/window
-    window.open(urlObj.toString(), '_blank')
   }
 
   const geoClickHandler = (key, value) => {
@@ -1303,7 +1286,7 @@ const CdcMap = ({
 
     // Otherwise if this item has a link specified for it, do regular navigation.
     if (state.columns.navigate && value[state.columns.navigate.name]) {
-      navigationHandler(value[state.columns.navigate.name])
+      navigationHandler(value[state.columns.navigate.name], customNavigationHandler)
     }
   }
 
@@ -1865,7 +1848,7 @@ const CdcMap = ({
                   data={runtimeData}
                   options={general}
                   columns={state.columns}
-                  navigationHandler={val => navigationHandler(val)}
+                  navigationHandler={val => navigationHandler(val, customNavigationHandler)}
                 />
               )}
 
