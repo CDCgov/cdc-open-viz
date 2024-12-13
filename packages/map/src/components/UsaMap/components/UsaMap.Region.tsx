@@ -1,18 +1,22 @@
 import { useState, useEffect, memo, useContext } from 'react'
-import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 
 // 3rd party
 import { geoCentroid } from 'd3-geo'
 import { feature } from 'topojson-client'
 import { Mercator } from '@visx/geo'
 
-// cdc
+// Cdc Components
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import topoJSON from '../data/us-regions-topo-2.json'
 import ConfigContext from '../../../context'
 import Annotation from '../../Annotation'
-import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
+
+// Data
+import topoJSON from '../data/us-regions-topo-2.json'
 import { supportedTerritories } from '../../../data/supported-geos'
+
+// Helpers
+import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.regions)
