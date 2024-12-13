@@ -7,7 +7,6 @@ type MapContext = {
   columnsInData
   currentViewport
   data
-  displayDataAsText
   displayGeoName
   filteredCountryCode
   generateColorsArray
