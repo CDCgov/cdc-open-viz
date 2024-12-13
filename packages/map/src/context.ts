@@ -22,7 +22,6 @@ type MapContext = {
   isDebug
   isEditor
   loadConfig
-  navigationHandler
   position
   resetLegendToggles
   runtimeFilters
