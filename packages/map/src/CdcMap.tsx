@@ -1619,7 +1619,6 @@ const CdcMap = ({
     handleDragStateChange,
     applyLegendToRow,
     applyTooltipsToGeo,
-    capitalize: state.tooltips?.capitalizeLabels,
     columnsInData: state?.data?.[0] ? Object.keys(state.data[0]) : [],
     container,
     content: modal,
