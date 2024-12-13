@@ -63,6 +63,7 @@ import { getGeoFillColor } from './helpers/colors'
 import { getUniqueValues } from './helpers/getUniqueValues'
 import { hashObj } from './helpers/hashObj'
 import { navigationHandler } from './helpers/navigationHandler'
+import { closeModal } from './helpers/closeModal'
 
 // Child Components
 import Annotation from './components/Annotation'
@@ -139,7 +140,7 @@ const CdcMap = ({
   const tooltipId = `${Math.random().toString(16).slice(-4)}`
   const mapId = useId()
 
-  const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
+  const { handleSorting } = useFilters({ config: state, setConfig: setState })
   let legendMemo = useRef(new Map())
   let legendSpecialClassLastMemo = useRef(new Map())
   let innerContainerRef = useRef()
@@ -965,16 +966,6 @@ const CdcMap = ({
   }, []) // eslint-disable-line
   const mapSvg = useRef(null)
 
-  const closeModal = ({ target }) => {
-    if (
-      'string' === typeof target.className &&
-      (target.className.includes('modal-close') || target.className.includes('modal-background')) &&
-      null !== modal
-    ) {
-      setModal(null)
-    }
-  }
-
   const displayDataAsText = (value, columnName) => {
     if (value === null || value === '' || value === undefined) {
       return ''
@@ -1629,7 +1620,6 @@ const CdcMap = ({
     applyLegendToRow,
     applyTooltipsToGeo,
     capitalize: state.tooltips?.capitalizeLabels,
-    closeModal,
     columnsInData: state?.data?.[0] ? Object.keys(state.data[0]) : [],
     container,
     content: modal,
@@ -1770,10 +1760,10 @@ const CdcMap = ({
                 role='region'
                 tabIndex='0'
                 className={mapContainerClasses.join(' ')}
-                onClick={e => closeModal(e)}
+                onClick={e => closeModal(e, modal, setModal)}
                 onKeyDown={e => {
-                  if (e.keyCode === 13) {
-                    closeModal(e)
+                  if (e.key === 'Enter') {
+                    closeModal(e, modal, setModal)
                   }
                 }}
                 style={{ padding: '15px 0px', margin: '0px' }}
