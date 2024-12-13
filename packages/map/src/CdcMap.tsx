@@ -96,7 +96,6 @@ const indexOfIgnoreType = (arr, item) => {
 }
 
 const CdcMap = ({
-  className,
   config,
   navigationHandler: customNavigationHandler,
   isDashboard = false,
@@ -165,10 +164,7 @@ const CdcMap = ({
     }
 
     // Navigate is required for navigation maps
-    if (
-      'navigation' === state.general.type &&
-      ('' === state.columns.navigate.name || undefined === state.columns.navigate)
-    ) {
+    if ('navigation' === state.general.type && '' === state.columns.navigate.name) {
       columnList.push('Navigation')
     }
 
@@ -197,7 +193,7 @@ const CdcMap = ({
         const coordinates = countryCoordinates[filteredCountryCode]
         const long = coordinates[1]
         const lat = coordinates[0]
-        const reversedCoordinates = [long, lat]
+        const reversedCoordinates: [number, number] = [long, lat]
 
         setState({
           ...state,
@@ -247,7 +243,7 @@ const CdcMap = ({
   // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
   // eslint-disable-next-line
   const addUIDs = useCallback((obj, fromColumn) => {
-    obj.data.forEach((row, index) => {
+    obj.data.forEach(row => {
       let uid = null
 
       if (row.uid) row.uid = null // Wipe existing UIDs
@@ -376,20 +372,6 @@ const CdcMap = ({
 
     // Unified will base the legend off ALL of the data maps received. Otherwise, it will use
     let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData)
-
-    const colorDistributions = {
-      1: [1],
-      2: [1, 3],
-      3: [1, 3, 5],
-      4: [0, 2, 4, 6],
-      5: [0, 2, 4, 6, 7],
-      6: [0, 2, 3, 4, 5, 7],
-      7: [0, 2, 3, 4, 5, 6, 7],
-      8: [0, 2, 3, 4, 5, 6, 7, 8],
-      9: [0, 1, 2, 3, 4, 5, 6, 7, 8],
-      10: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    }
-
     let specialClasses = 0
     let specialClassesHash = {}
 
@@ -415,7 +397,7 @@ const CdcMap = ({
                 specialClasses += 1
               }
 
-              let specialColor = ''
+              let specialColor: number
 
               // color the state if val is in row
               specialColor = result.findIndex(p => p.value === val)
@@ -647,7 +629,6 @@ const CdcMap = ({
         }
       } else {
         // get nums
-        let hasZeroInData = dataSet.filter(obj => obj[state.columns.primary.name] === 0).length > 0
         let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
 
         domainNums = d3.extent(domainNums)
@@ -713,20 +694,12 @@ const CdcMap = ({
             return Math.pow(10, -n)
           }
 
-          const setMax = (index, min) => {
+          const setMax = index => {
             let max = Number(breaks[index + 1]) - getDecimalPlace(Number(state?.columns?.primary?.roundToPlace))
-
-            // check if min and max range are the same
-            // if (min === max + 1) {
-            //     max = breaks[index + 1]
-            // }
 
             if (index === 0 && state.legend.separateZero) {
               max = 0
             }
-            // if ((index === state.legend.specialClasses.length && state.legend.specialClasses.length !== 0) && !state.legend.separateZero && hasZeroInData) {
-            //     max = 0;
-            // }
 
             if (index + 1 === breaks.length) {
               max = domainNums[1]
@@ -744,7 +717,7 @@ const CdcMap = ({
             color: scale(item)
           })
 
-          dataSet.forEach((row, dataIndex) => {
+          dataSet.forEach(row => {
             let number = row[state.columns.primary.name]
             let updated = result.length - 1
 
@@ -959,7 +932,7 @@ const CdcMap = ({
             // Strip hidden characters before we check length
             navigateUrl = navigateUrl.replace(/(\r\n|\n|\r)/gm, '')
           }
-          if (0 === navigateUrl.length) {
+          if (0 === navigateUrl?.length) {
             return false
           }
         }
@@ -990,7 +963,6 @@ const CdcMap = ({
     }
     setContainer(node)
   }, []) // eslint-disable-line
-
   const mapSvg = useRef(null)
 
   const closeModal = ({ target }) => {
@@ -1106,6 +1078,7 @@ const CdcMap = ({
   const titleCase = string => {
     // guard clause else error in editor
     if (!string) return
+
     if (string !== undefined) {
       const toTitleCase = word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()
 
