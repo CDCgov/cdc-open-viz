@@ -14,7 +14,6 @@ export type MapContext = {
   handleCircleClick: Function
   handleDragStateChange: Function
   isDraggingAnnotation: boolean
-  handleMapAriaLabels
   hasZoom
   innerContainerRef
   isDashboard

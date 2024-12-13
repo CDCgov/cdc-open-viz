@@ -1192,42 +1192,6 @@ const CdcMap = ({
     }
   }
 
-  const handleMapAriaLabels = (state = '', testing = false) => {
-    if (testing) console.log(`handleMapAriaLabels Testing On: ${state}`) // eslint-disable-line
-    try {
-      if (!state.general.geoType) throw Error('handleMapAriaLabels: no geoType found in state')
-      let ariaLabel = ''
-      switch (state.general.geoType) {
-        case 'world':
-          ariaLabel += 'World map'
-          break
-        case 'us':
-          ariaLabel += 'United States map'
-          break
-        case 'us-county':
-          ariaLabel += `United States county map`
-          break
-        case 'single-state':
-          ariaLabel += `${state.general.statePicked.stateName} county map`
-          break
-        case 'us-region':
-          ariaLabel += `United States HHS Region map`
-          break
-        default:
-          ariaLabel = 'Data visualization container'
-          break
-      }
-
-      if (state.general.title) {
-        ariaLabel += ` with the title: ${state.general.title}`
-      }
-
-      return ariaLabel
-    } catch (e) {
-      console.error('COVE: ', e.message) // eslint-disable-line
-    }
-  }
-
   const reloadURLData = async () => {
     if (state.dataUrl) {
       const dataUrl = new URL(state.runtimeDataUrl || state.dataUrl, window.location.origin)
@@ -1535,7 +1499,6 @@ const CdcMap = ({
     generateColorsArray,
     generateRuntimeData,
     geoClickHandler,
-    handleMapAriaLabels,
     hasZoom: state.general.allowMapZoom,
     innerContainerRef,
     isDashboard,

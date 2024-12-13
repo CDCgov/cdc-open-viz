@@ -11,7 +11,6 @@ type MapContext = {
   generateColorsArray
   generateRuntimeData
   geoClickHandler
-  handleMapAriaLabels
   handleCircleClick: Function
   hasZoom
   innerContainerRef

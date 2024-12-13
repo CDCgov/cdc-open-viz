@@ -90,7 +90,7 @@ export type MapConfig = Visualization & {
     fullBorder: boolean
     geoBorderColor: string
     geoLabelOverride: string
-    geoType: 'us' | 'us-county' | 'world'
+    geoType: 'us' | 'us-region' | 'us-county' | 'world' | 'us-geocode' | 'world-geocode' | 'bubble' | 'single-state'
     hasRegions: boolean
     headerColor: ComponentThemes
     hideGeoColumnInTooltip: boolean

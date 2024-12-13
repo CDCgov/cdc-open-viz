@@ -13,6 +13,7 @@ import ConfigContext from '../../context'
 import ZoomControls from '../ZoomControls'
 import { getGeoFillColor, getGeoStrokeColor } from '../../helpers/colors'
 import { supportedCountries } from '../../data/supported-geos'
+import { handleMapAriaLabels } from '../../helpers/handleMapAriaLabels'
 
 const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 
@@ -27,7 +28,6 @@ const WorldMap = () => {
     displayGeoName,
     generateRuntimeData,
     geoClickHandler,
-    handleMapAriaLabels,
     hasZoom,
     position,
     setFilteredCountryCode,

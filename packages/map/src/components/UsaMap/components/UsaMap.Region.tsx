@@ -13,6 +13,7 @@ import ConfigContext from '../../../context'
 import Annotation from '../../Annotation'
 import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import { supportedTerritories } from '../../../data/supported-geos'
+import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.regions)
 
@@ -41,7 +42,6 @@ const UsaRegionMap = props => {
     data,
     displayGeoName,
     geoClickHandler,
-    handleMapAriaLabels,
     state,
     tooltipId
   } = useContext(ConfigContext)
