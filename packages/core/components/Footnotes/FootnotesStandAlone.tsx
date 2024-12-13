@@ -15,20 +15,33 @@ type StandAloneProps = {
   viewport?: ViewPort
 }
 
-const FootnotesStandAlone: React.FC<StandAloneProps> = ({ visualizationKey, config, viewport, isEditor, updateConfig }) => {
+const FootnotesStandAlone: React.FC<StandAloneProps> = ({
+  visualizationKey,
+  config,
+  viewport,
+  isEditor,
+  updateConfig
+}) => {
   const updateField = updateFieldFactory<Footnote[]>(config, updateConfig)
   if (isEditor)
     return (
-      <EditorWrapper component={FootnotesStandAlone} visualizationKey={visualizationKey} visualizationConfig={config} updateConfig={updateConfig} type={'Footnotes'} viewport={viewport}>
+      <EditorWrapper
+        component={FootnotesStandAlone}
+        visualizationKey={visualizationKey}
+        visualizationConfig={config}
+        updateConfig={updateConfig}
+        type={'Footnotes'}
+        viewport={viewport}
+      >
         <FootnotesEditor key={visualizationKey} config={config} updateField={updateField} />
       </EditorWrapper>
     )
 
   // get the api footnotes from the config
   const apiFootnotes = useMemo(() => {
-    if (config.dataKey && config.dynamicFootnotes) {
+    const configData = config.formattedData || config.data
+    if (configData && config.dataKey && config.dynamicFootnotes) {
       const { symbolColumn, textColumn, orderColumn } = config.dynamicFootnotes
-      const configData = config.formattedData || config.data
       const _data = configData.map(row => _.pick(row, [symbolColumn, textColumn, orderColumn]))
       _data.sort((a, b) => a[orderColumn] - b[orderColumn])
       return _data.map(row => ({ symbol: row[symbolColumn], text: row[textColumn] }))
