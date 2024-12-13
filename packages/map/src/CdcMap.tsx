@@ -1679,7 +1679,6 @@ const CdcMap = ({
     isEditor,
     loadConfig,
     logo,
-    navigationHandler,
     position,
     resetLegendToggles,
     runtimeFilters,
