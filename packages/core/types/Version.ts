@@ -1,1 +1,1 @@
-export type Version = `${number}.${number}.${number}`
+export type Version = `${number}.${number}.${number}` | `${number}.${number}.${number}-${string}`
