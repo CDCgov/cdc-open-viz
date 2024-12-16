@@ -212,7 +212,7 @@ const CountyMap = props => {
   }
 
   const runtimeKeys = Object.keys(data)
-  const lineWidth = 0.3
+  const lineWidth = 1
 
   const onReset = () => {
     setState({
