@@ -19,8 +19,10 @@ export const shouldLoadUnfilteredDataset = (config: MultiDashboard | DashboardCo
   }, [])
   const datasetIsUsedByCurrentTab = Boolean(datasetUsedByVisualizations.length || datasetUsedByRows.length)
 
-  const datasetIsNotFiltered = !config.dashboard.sharedFilters?.find(
-    filter => _.intersection(filter.usedBy, [...datasetUsedByVisualizations, ...datasetUsedByRows]).length
+  const datasetIsNotAPIFiltered = !config.dashboard.sharedFilters?.find(
+    filter =>
+      filter.type !== 'datafilter' &&
+      _.intersection(filter.usedBy, [...datasetUsedByVisualizations, ...datasetUsedByRows]).length
   )
-  return !hasApplyBehavior && datasetIsUsedByCurrentTab && datasetIsNotFiltered
+  return !hasApplyBehavior && datasetIsUsedByCurrentTab && datasetIsNotAPIFiltered
 }
