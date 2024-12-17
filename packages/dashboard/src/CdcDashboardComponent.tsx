@@ -217,9 +217,14 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       }, {})
       const _newData = { ...newData, ...dataFiles }
       dispatch({ type: 'SET_DATA', payload: _newData })
+      const dataFilterIndexes = config.dashboard.sharedFilters.reduce((acc, filter, index) => {
+        if (filter.type === 'datafilter') acc.push(index)
+        return acc
+      }, [])
       const appliedFilterIndexes = Object.values(config.visualizations)
         .filter(viz => viz.type === 'dashboardFilters')
         .flatMap(viz => viz.sharedFilterIndexes)
+        .filter(index => !dataFilterIndexes.includes(index))
       const filtersWithNewValues = addValuesToDashboardFilters(filters, _newData, appliedFilterIndexes)
       const dashboardConfig = newFilters
         ? { ...config.dashboard, sharedFilters: filtersWithNewValues }
