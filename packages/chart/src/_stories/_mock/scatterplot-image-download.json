@@ -1,0 +1,1244 @@
+{
+    "annotations": [],
+    "type": "chart",
+    "debugSvg": false,
+    "chartMessage": {
+        "noData": "No Data Available"
+    },
+    "title": "",
+    "showTitle": true,
+    "showDownloadMediaButton": false,
+    "theme": "theme-blue",
+    "animate": false,
+    "fontSize": "medium",
+    "lineDatapointStyle": "hover",
+    "lineDatapointColor": "Same as Line",
+    "barHasBorder": "false",
+    "isLollipopChart": false,
+    "lollipopShape": "circle",
+    "lollipopColorStyle": "two-tone",
+    "visualizationSubType": "regular",
+    "barStyle": "",
+    "roundingStyle": "standard",
+    "tipRounding": "top",
+    "isResponsiveTicks": true,
+    "general": {
+        "annotationDropdownText": "Annotations",
+        "showDownloadButton": false,
+        "showMissingDataLabel": true,
+        "showSuppressedSymbol": true,
+        "hideNullValue": true,
+        "showZeroValueDataLabel": true
+    },
+    "padding": {
+        "left": 5,
+        "right": 5
+    },
+    "preliminaryData": [],
+    "yAxis": {
+        "hideAxis": false,
+        "displayNumbersOnBar": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 50,
+        "gridLines": false,
+        "enablePadding": false,
+        "min": "",
+        "max": "",
+        "labelColor": "#333",
+        "tickLabelColor": "#333",
+        "tickColor": "#333",
+        "rightHideAxis": true,
+        "rightAxisSize": 0,
+        "rightLabel": "",
+        "rightLabelOffsetSize": 0,
+        "rightAxisLabelColor": "#333",
+        "rightAxisTickLabelColor": "#333",
+        "rightAxisTickColor": "#333",
+        "numTicks": "",
+        "axisPadding": 0,
+        "scalePadding": 10,
+        "tickRotation": 0,
+        "anchors": [],
+        "shoMissingDataLabel": true,
+        "showMissingDataLine": true,
+        "categories": [],
+        "maxValue": 10,
+        "label": "Score"
+    },
+    "boxplot": {
+        "plots": [],
+        "borders": "true",
+        "firstQuartilePercentage": 25,
+        "thirdQuartilePercentage": 75,
+        "boxWidthPercentage": 40,
+        "plotOutlierValues": false,
+        "plotNonOutlierValues": true,
+        "legend": {
+            "showHowToReadText": false,
+            "howToReadText": ""
+        },
+        "labels": {
+            "q1": "Lower Quartile",
+            "q2": "q2",
+            "q3": "Upper Quartile",
+            "q4": "q4",
+            "minimum": "Minimum",
+            "maximum": "Maximum",
+            "mean": "Mean",
+            "median": "Median",
+            "sd": "Standard Deviation",
+            "iqr": "Interquartile Range",
+            "total": "Total",
+            "outliers": "Outliers",
+            "values": "Values",
+            "lowerBounds": "Lower Bounds",
+            "upperBounds": "Upper Bounds"
+        }
+    },
+    "topAxis": {
+        "hasLine": false
+    },
+    "isLegendValue": false,
+    "barThickness": 0.35,
+    "barHeight": 25,
+    "barSpace": 15,
+    "heights": {
+        "vertical": 300,
+        "horizontal": 750
+    },
+    "xAxis": {
+        "sortDates": false,
+        "anchors": [],
+        "type": "continuous",
+        "showTargetLabel": true,
+        "targetLabel": "Target",
+        "hideAxis": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": "20",
+        "tickRotation": 0,
+        "min": "",
+        "max": "",
+        "labelColor": "#333",
+        "tickLabelColor": "#333",
+        "tickColor": "#333",
+        "numTicks": "",
+        "labelOffset": "0",
+        "axisPadding": 200,
+        "target": 0,
+        "maxTickRotation": "45",
+        "label": "Annual Household Income",
+        "dataKey": "Annual Income",
+        "axisBBox": 133.94000244140625,
+        "tickWidthMax": 76
+    },
+    "table": {
+        "label": "Data Table",
+        "expanded": false,
+        "limitHeight": false,
+        "height": "",
+        "caption": "",
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "indexLabel": "",
+        "download": true,
+        "showVertical": true,
+        "dateDisplayFormat": "",
+        "showMissingDataLabel": true,
+        "showSuppressedSymbol": true,
+        "show": true,
+        "columnName": "Annual Income",
+        "pivot": "Annual Income",
+        "showDownloadImgButton": true
+    },
+    "orientation": "vertical",
+    "color": "pinkpurple",
+    "columns": {
+        "Sex": {
+            "label": "Sex",
+            "dataTable": true,
+            "tooltips": true,
+            "prefix": "",
+            "suffix": "",
+            "forestPlot": false,
+            "startingPoint": "0",
+            "forestPlotAlignRight": false,
+            "roundToPlace": 0,
+            "commas": false,
+            "showInViz": false,
+            "forestPlotStartingPoint": 0,
+            "name": "Sex"
+        }
+    },
+    "legend": {
+        "hide": false,
+        "behavior": "isolate",
+        "axisAlign": true,
+        "singleRow": true,
+        "colorCode": "",
+        "reverseLabelOrder": false,
+        "description": "",
+        "dynamicLegend": false,
+        "dynamicLegendDefaultText": "Show All",
+        "dynamicLegendItemLimit": 5,
+        "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+        "dynamicLegendChartMessage": "Select Options from the Legend",
+        "label": "",
+        "lineMode": false,
+        "verticalSorted": false,
+        "highlightOnHover": false,
+        "hideSuppressedLabels": false,
+        "hideSuppressionLink": false,
+        "seriesHighlight": [],
+        "style": "circles",
+        "subStyle": "linear blocks",
+        "tickRotation": "",
+        "hideBorder": {
+            "side": false,
+            "topBottom": true
+        }
+    },
+    "brush": {
+        "height": 25,
+        "active": false
+    },
+    "exclusions": {
+        "active": false,
+        "keys": []
+    },
+    "palette": "qualitative4",
+    "isPaletteReversed": false,
+    "twoColor": {
+        "palette": "monochrome-1",
+        "isPaletteReversed": false
+    },
+    "labels": false,
+    "dataFormat": {
+        "commas": false,
+        "prefix": "",
+        "suffix": "",
+        "abbreviated": false,
+        "bottomSuffix": "",
+        "bottomPrefix": "$",
+        "bottomAbbreviated": false,
+        "bottomCommas": true
+    },
+    "confidenceKeys": {},
+    "visual": {
+        "border": true,
+        "accent": true,
+        "background": true,
+        "verticalHoverLine": false,
+        "horizontalHoverLine": false
+    },
+    "useLogScale": false,
+    "filterBehavior": "Filter Change",
+    "highlightedBarValues": [],
+    "series": [
+        {
+            "dataKey": "Y1 Score",
+            "type": "Scatter Plot",
+            "axis": "Left",
+            "tooltip": true
+        },
+        {
+            "dataKey": "Y2 Score",
+            "type": "Scatter Plot",
+            "axis": "Left",
+            "tooltip": true
+        }
+    ],
+    "tooltips": {
+        "opacity": 90,
+        "singleSeries": false,
+        "dateDisplayFormat": ""
+    },
+    "forestPlot": {
+        "startAt": 0,
+        "colors": {
+            "line": "",
+            "shape": ""
+        },
+        "lineOfNoEffect": {
+            "show": true
+        },
+        "type": "",
+        "pooledResult": {
+            "diamondHeight": 5,
+            "column": ""
+        },
+        "estimateField": "",
+        "estimateRadius": "",
+        "shape": "square",
+        "rowHeight": 20,
+        "description": {
+            "show": true,
+            "text": "description",
+            "location": 0
+        },
+        "result": {
+            "show": true,
+            "text": "result",
+            "location": 100
+        },
+        "radius": {
+            "min": 2,
+            "max": 10,
+            "scalingColumn": ""
+        },
+        "regression": {
+            "lower": 0,
+            "upper": 0,
+            "estimateField": 0
+        },
+        "leftWidthOffset": 0,
+        "rightWidthOffset": 0,
+        "showZeroLine": false,
+        "leftLabel": "",
+        "rightLabel": ""
+    },
+    "area": {
+        "isStacked": false
+    },
+    "sankey": {
+        "title": {
+            "defaultColor": "black"
+        },
+        "iterations": 1,
+        "rxValue": 0.9,
+        "overallSize": {
+            "width": 900,
+            "height": 700
+        },
+        "margin": {
+            "margin_y": 25,
+            "margin_x": 0
+        },
+        "nodeSize": {
+            "nodeWidth": 26,
+            "nodeHeight": 40
+        },
+        "nodePadding": 55,
+        "nodeFontColor": "black",
+        "nodeColor": {
+            "default": "#ff8500",
+            "inactive": "#808080"
+        },
+        "linkColor": {
+            "default": "#ffc900",
+            "inactive": "#D3D3D3"
+        },
+        "opacity": {
+            "nodeOpacityDefault": 1,
+            "nodeOpacityInactive": 0.1,
+            "LinkOpacityDefault": 1,
+            "LinkOpacityInactive": 0.1
+        },
+        "storyNodeFontColor": "#006778",
+        "storyNodeText": [],
+        "nodeValueStyle": {
+            "textBefore": "(",
+            "textAfter": ")"
+        },
+        "data": []
+    },
+    "datasets": {},
+    "visualizationType": "Scatter Plot",
+    "data": [
+        {
+            "Sex": "Male",
+            "Y1 Score": "4",
+            "Y2 Score": "5",
+            "Annual Income": "52000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "78000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "110000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "85000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "6",
+            "Y2 Score": "7",
+            "Annual Income": "88000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "2",
+            "Y2 Score": "4",
+            "Annual Income": "32000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "4",
+            "Y2 Score": "5",
+            "Annual Income": "77000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "7",
+            "Y2 Score": "7",
+            "Annual Income": "120000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "2",
+            "Y2 Score": "3",
+            "Annual Income": "21000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "98000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "8",
+            "Y2 Score": "8",
+            "Annual Income": "132000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "8",
+            "Y2 Score": "9",
+            "Annual Income": "146000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "6",
+            "Y2 Score": "5",
+            "Annual Income": "98000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "86000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "3",
+            "Y2 Score": "5",
+            "Annual Income": "45000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "1",
+            "Y2 Score": "4",
+            "Annual Income": "21000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "92000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "68000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "54000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "4",
+            "Y2 Score": "5",
+            "Annual Income": "55000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "6",
+            "Y2 Score": "7",
+            "Annual Income": "102000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "2",
+            "Y2 Score": "3",
+            "Annual Income": "32000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "4",
+            "Y2 Score": "5",
+            "Annual Income": "67000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "68000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "2",
+            "Y2 Score": "5",
+            "Annual Income": "28000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "126000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "8",
+            "Y2 Score": "9",
+            "Annual Income": "168000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "8",
+            "Y2 Score": "9",
+            "Annual Income": "178000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "6",
+            "Y2 Score": "7",
+            "Annual Income": "86000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "66000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "3",
+            "Y2 Score": "7",
+            "Annual Income": "42000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "1",
+            "Y2 Score": "3",
+            "Annual Income": "14000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "72000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "78000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "132000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "4",
+            "Y2 Score": "5",
+            "Annual Income": "75000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "6",
+            "Y2 Score": "7",
+            "Annual Income": "89000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "2",
+            "Y2 Score": "6",
+            "Annual Income": "32000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "4",
+            "Y2 Score": "5",
+            "Annual Income": "64000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "104000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "2",
+            "Y2 Score": "4",
+            "Annual Income": "29000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "78000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "8",
+            "Y2 Score": "9",
+            "Annual Income": "136000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "8",
+            "Y2 Score": "9",
+            "Annual Income": "232000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "6",
+            "Y2 Score": "7",
+            "Annual Income": "105000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "86000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "3",
+            "Y2 Score": "4",
+            "Annual Income": "56000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "1",
+            "Y2 Score": "2",
+            "Annual Income": "26000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "120000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "68000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "67000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "4",
+            "Y2 Score": "5",
+            "Annual Income": "78000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "6",
+            "Y2 Score": "7",
+            "Annual Income": "101000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "2",
+            "Y2 Score": "4",
+            "Annual Income": "32000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "4",
+            "Y2 Score": "5",
+            "Annual Income": "71000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "136000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "2",
+            "Y2 Score": "3",
+            "Annual Income": "36000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "124000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "8",
+            "Y2 Score": "9",
+            "Annual Income": "202000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "8",
+            "Y2 Score": "9",
+            "Annual Income": "206000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "6",
+            "Y2 Score": "7",
+            "Annual Income": "78000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "56000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "3",
+            "Y2 Score": "4",
+            "Annual Income": "62000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "1",
+            "Y2 Score": "3",
+            "Annual Income": "27000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "9",
+            "Y2 Score": "10",
+            "Annual Income": "168000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "9",
+            "Y2 Score": "7",
+            "Annual Income": "252000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "9",
+            "Y2 Score": "8",
+            "Annual Income": "208000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "9",
+            "Y2 Score": "10",
+            "Annual Income": "278000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "9",
+            "Y2 Score": "10",
+            "Annual Income": "306000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "9",
+            "Y2 Score": "10",
+            "Annual Income": "112000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "10",
+            "Y2 Score": "10",
+            "Annual Income": "256000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "10",
+            "Y2 Score": "8",
+            "Annual Income": "288000"
+        },
+        {
+            "Sex": "Male",
+            "Y1 Score": "10",
+            "Y2 Score": "9",
+            "Annual Income": "152000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "5",
+            "Y2 Score": "5",
+            "Annual Income": "48000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "80000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "110000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "85000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "6",
+            "Y2 Score": "7",
+            "Annual Income": "88000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "3",
+            "Y2 Score": "4",
+            "Annual Income": "32000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "4",
+            "Y2 Score": "5",
+            "Annual Income": "77000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "7",
+            "Y2 Score": "7",
+            "Annual Income": "127000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "2",
+            "Y2 Score": "3",
+            "Annual Income": "24000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "98000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "8",
+            "Y2 Score": "8",
+            "Annual Income": "132000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "8",
+            "Y2 Score": "9",
+            "Annual Income": "146000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "6",
+            "Y2 Score": "5",
+            "Annual Income": "98000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "86000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "3",
+            "Y2 Score": "5",
+            "Annual Income": "45000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "1",
+            "Y2 Score": "4",
+            "Annual Income": "21000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "92000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "68000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "54000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "4",
+            "Y2 Score": "5",
+            "Annual Income": "55000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "6",
+            "Y2 Score": "7",
+            "Annual Income": "102000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "2",
+            "Y2 Score": "3",
+            "Annual Income": "32000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "4",
+            "Y2 Score": "5",
+            "Annual Income": "67000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "68000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "2",
+            "Y2 Score": "5",
+            "Annual Income": "28000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "126000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "8",
+            "Y2 Score": "9",
+            "Annual Income": "168000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "8",
+            "Y2 Score": "9",
+            "Annual Income": "178000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "6",
+            "Y2 Score": "7",
+            "Annual Income": "86000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "66000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "3",
+            "Y2 Score": "7",
+            "Annual Income": "42000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "1",
+            "Y2 Score": "3",
+            "Annual Income": "18000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "72000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "78000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "132000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "4",
+            "Y2 Score": "5",
+            "Annual Income": "75000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "6",
+            "Y2 Score": "7",
+            "Annual Income": "89000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "2",
+            "Y2 Score": "6",
+            "Annual Income": "32000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "4",
+            "Y2 Score": "5",
+            "Annual Income": "64000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "104000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "2",
+            "Y2 Score": "4",
+            "Annual Income": "29000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "78000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "8",
+            "Y2 Score": "9",
+            "Annual Income": "136000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "8",
+            "Y2 Score": "9",
+            "Annual Income": "232000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "6",
+            "Y2 Score": "7",
+            "Annual Income": "105000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "86000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "3",
+            "Y2 Score": "4",
+            "Annual Income": "56000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "3",
+            "Y2 Score": "2",
+            "Annual Income": "26000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "120000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "5",
+            "Y2 Score": "6",
+            "Annual Income": "68000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "67000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "4",
+            "Y2 Score": "5",
+            "Annual Income": "78000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "6",
+            "Y2 Score": "7",
+            "Annual Income": "101000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "2",
+            "Y2 Score": "4",
+            "Annual Income": "32000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "4",
+            "Y2 Score": "5",
+            "Annual Income": "71000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "136000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "2",
+            "Y2 Score": "3",
+            "Annual Income": "36000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "7",
+            "Y2 Score": "8",
+            "Annual Income": "124000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "8",
+            "Y2 Score": "9",
+            "Annual Income": "200000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "8",
+            "Y2 Score": "9",
+            "Annual Income": "206000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "6",
+            "Y2 Score": "9",
+            "Annual Income": "78000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "5",
+            "Y2 Score": "7",
+            "Annual Income": "56000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "3",
+            "Y2 Score": "5",
+            "Annual Income": "68000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "3",
+            "Y2 Score": "3",
+            "Annual Income": "27000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "9",
+            "Y2 Score": "10",
+            "Annual Income": "168000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "9",
+            "Y2 Score": "6",
+            "Annual Income": "205000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "9",
+            "Y2 Score": "8",
+            "Annual Income": "208000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "9",
+            "Y2 Score": "10",
+            "Annual Income": "278000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "9",
+            "Y2 Score": "10",
+            "Annual Income": "308000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "8",
+            "Y2 Score": "10",
+            "Annual Income": "112000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "10",
+            "Y2 Score": "10",
+            "Annual Income": "256000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "10",
+            "Y2 Score": "8",
+            "Annual Income": "288000"
+        },
+        {
+            "Sex": "Female",
+            "Y1 Score": "10",
+            "Y2 Score": "9",
+            "Annual Income": "175000"
+        }
+    ],
+    "dataFileName": "https://wwwdev.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data/indexed-data-files/59-scatter-plot-tight-correlation-multiple-series-sexFilter.csv",
+    "dataFileSourceType": "url",
+    "version": "4.24.9",
+    "dynamicMarginTop": 104,
+    "filters": [
+        {
+            "values": [
+                "Male",
+                "Female"
+            ],
+            "filterStyle": "tab",
+            "id": 1725636095102,
+            "active": "Male",
+            "columnName": "Sex",
+            "order": "desc",
+            "label": "Sex"
+        }
+    ]
+}
