@@ -1,16 +1,16 @@
-import { filter } from 'lodash'
 import { shouldLoadAllFilters } from '../shouldLoadAllFilters'
 
 describe('shouldLoadAllFilters', () => {
   it('returns false if not autoloading', () => {
     delete window.location
     window.location = new URL('https://www.example.com')
-    expect(shouldLoadAllFilters({ rows: [], visualizations: {} })).toBe(false)
+    expect(shouldLoadAllFilters({ rows: [], visualizations: {}, dashboard: {} })).toBe(false)
   })
   it('returns true if missing data', () => {
     delete window.location
     window.location = new URL('https://www.example.com?cove-auto-load=true')
     const config = {
+      dashboard: {},
       visualizations: {
         abc: {
           dataKey: 'abcd'
@@ -27,6 +27,7 @@ describe('shouldLoadAllFilters', () => {
     const config2 = {
       multiDashboards: [
         {
+          dashboard: {},
           visualizations: {
             abc: {
               dataKey: 'abcd'
@@ -53,6 +54,7 @@ describe('shouldLoadAllFilters', () => {
     delete window.location
     window.location = new URL('https://www.example.com?cove-auto-load=true')
     const config = {
+      dashboard: {},
       visualizations: {
         abc: {
           dataKey: 'abcd'
@@ -71,6 +73,7 @@ describe('shouldLoadAllFilters', () => {
     delete window.location
     window.location = new URL('https://www.example.com')
     const config = {
+      dashboard: {},
       visualizations: {
         abc: {
           visualizationType: 'dashboardFilters',
@@ -90,6 +93,7 @@ describe('shouldLoadAllFilters', () => {
     delete window.location
     window.location = new URL('https://www.example.com')
     const config = {
+      dashboard: {},
       visualizations: {
         abc: {
           visualizationType: 'dashboardFilters',
