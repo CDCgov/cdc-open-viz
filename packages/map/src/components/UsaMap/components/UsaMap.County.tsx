@@ -22,6 +22,7 @@ import {
   createShapeProperties
 } from '../helpers/shapes'
 import { getGeoStrokeColor } from '../../../helpers/colors'
+import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -137,7 +138,6 @@ const CountyMap = props => {
       data,
       displayGeoName,
       geoClickHandler,
-      handleMapAriaLabels,
       runtimeFilters,
       runtimeLegend,
       setState,

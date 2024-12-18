@@ -1,5 +1,6 @@
 import { ComponentStyles } from '@cdc/core/types/ComponentStyles'
 import { ComponentThemes } from '@cdc/core/types/ComponentThemes'
+import { Version } from '@cdc/core/types/Version'
 
 export type Config = {
   // supporting text in the box
@@ -37,4 +38,5 @@ export type Config = {
   visual: ComponentStyles
   visualizationSubType: 'linear' | ''
   visualizationType: 'Gauge' | 'Waffle'
+  version: Version
 }

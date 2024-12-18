@@ -1,5 +1,7 @@
+import { displayDataAsText } from '../../../core/helpers/displayDataAsText'
+
 const useTooltip = props => {
-  const { state, displayGeoName, displayDataAsText, supportedStatesFipsCodes } = props
+  const { state, displayGeoName, supportedStatesFipsCodes } = props
 
   const config = state
 
@@ -64,7 +66,7 @@ const useTooltip = props => {
     if (specialClasses && specialClasses.length && typeof specialClasses[0] === 'object') {
       for (const specialClass of specialClasses) {
         if (column.name === specialClass.key && String(row[specialClass.key]) === specialClass.value) {
-          value = displayDataAsText(specialClass.label, columnKey)
+          value = displayDataAsText(specialClass.label, columnKey, state)
           break
         }
       }
@@ -105,7 +107,7 @@ const useTooltip = props => {
           let tooltipValue = handleTooltipSpecialClassText(specialClasses, column, row, '', columnKey)
 
           if (!tooltipValue) {
-            tooltipValue = row ? displayDataAsText(row[column.name], columnKey) : 'No Data'
+            tooltipValue = row ? displayDataAsText(row[column.name], columnKey, state) : 'No Data'
           }
 
           toolTipText += handleTooltipPrimaryColumn(tooltipValue, column)
