@@ -19,7 +19,7 @@ const Row: FC<RowProps> = props => {
   const whiteSpace = wrapColumns ? 'unset' : 'nowrap'
   const minWidth = cellMinWidth + 'px'
   const fontSizes = { small: 16, medium: 18, large: 20 }
-  const cellFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '11px' : `${fontSizes[fontSize]}px`
+  const cellFontSize = ['xs', 'xxs'].includes(viewport) ? '12px' : `${fontSizes[fontSize]}px`
 
   return (
     <tr>

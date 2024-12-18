@@ -37,7 +37,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
 
   const { visualizationType, series } = config
   const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
-  const minRequiredCIPadding = 1.15 // regardless of Editor if CI data, there must be 10% padding added
+  const paddingAddedToAxis = config.yAxis.enablePadding ? 1 + config.yAxis.scalePadding / 100 : 1
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   // do validation bafore applying t0 charts
   const isMaxValid = existPositiveValue ? Number(enteredMaxValue) >= maxValue : Number(enteredMaxValue) >= 0
@@ -52,8 +52,10 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
 
   if (lower && upper && config.visualizationType === 'Bar') {
     const buffer = min < 0 ? 1.1 : 0
-    max = Math.max(maxValue, Math.max(...data.flatMap(d => [d[upper], d[lower]])) * 1.15)
-    min = Math.min(minValue, Math.min(...data.flatMap(d => [d[upper], d[lower]])) * 1.15) * buffer
+    const maxValueWithCI = Math.max(...data.flatMap(d => [d[upper], d[lower]])) * paddingAddedToAxis
+    const minValueWithCIPlusBuffer = Math.min(...data.flatMap(d => [d[upper], d[lower]])) * paddingAddedToAxis * buffer
+    max = max > maxValueWithCI ? max : maxValueWithCI
+    min = min < minValueWithCIPlusBuffer ? min : minValueWithCIPlusBuffer
   }
 
   if (config.series.filter(s => s?.type === 'Forecasting')) {
@@ -185,7 +187,15 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
         return valueMatch && (index === 0 || index === tableData.length - 1)
       })
     })
-    min = Number(enteredMinValue) && isMinValid ? Number(enteredMinValue) : suppressedMinValue ? 0 : minValue
+    let isCategoricalAxis = config.yAxis.type === 'categorical'
+    min =
+      enteredMinValue !== '' && isMinValid
+        ? Number(enteredMinValue)
+        : suppressedMinValue
+        ? 0
+        : isCategoricalAxis
+        ? 0
+        : minValue
   }
   //If data value max wasn't provided, calculate it
   if (max === Number.MIN_VALUE) {

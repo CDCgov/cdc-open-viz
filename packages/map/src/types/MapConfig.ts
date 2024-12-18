@@ -1,6 +1,7 @@
 import { ComponentThemes } from '@cdc/core/types/ComponentThemes'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { EditorColumnProperties } from '@cdc/core/types/EditorColumnProperties'
+import { Version } from '@cdc/core/types/Version'
 
 export type MapVisualSettings = {
   /** minBubbleSize - Minimum Circle Size when the map has a type of bubble */
@@ -33,6 +34,7 @@ type PatternSelection = {
   label: string
   // size of pattern
   size: 'small' | 'medium' | 'large'
+  color: string
   contrastCheck: boolean
 }
 
@@ -162,5 +164,8 @@ export type MapConfig = Visualization & {
   }
   hexMap: HexMapSettings
   filterBehavior: string
+  filterIntro: string
   visual: MapVisualSettings
+  // version of the map
+  version: Version
 }

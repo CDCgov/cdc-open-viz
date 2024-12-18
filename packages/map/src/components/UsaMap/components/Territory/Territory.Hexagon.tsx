@@ -176,7 +176,7 @@ const TerritoryHexagon = ({
 
   return (
     territoryData && (
-      <svg viewBox='0 0 45 51' className='territory-wrapper--hex'>
+      <svg viewBox='-1 -1 46 53' className='territory-wrapper--hex'>
         <g {...props} data-tooltip-html={dataTooltipHtml} data-tooltip-id={dataTooltipId} onClick={handleShapeClick}>
           <polygon
             stroke={stroke}

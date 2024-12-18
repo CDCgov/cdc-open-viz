@@ -3,7 +3,6 @@ import CdcDashboard from './CdcDashboardComponent'
 import { MultiDashboardConfig } from './types/MultiDashboard'
 import Loading from '@cdc/core/components/Loading'
 import defaults from './data/initial-state'
-import { processData } from './helpers/processData'
 import { getVizKeys } from './helpers/getVizKeys'
 import { processDataLegacy } from './helpers/processDataLegacy'
 import { WCMSProps } from '@cdc/core/types/WCMSProps'
@@ -13,7 +12,6 @@ import { InitialState } from './types/InitialState'
 import { DashboardConfig } from './types/DashboardConfig'
 import { coveUpdateWorker } from '@cdc/core/helpers/coveUpdateWorker'
 import _ from 'lodash'
-import { hasDashboardApplyBehavior } from './helpers/hasDashboardApplyBehavior'
 import { getQueryParams } from '@cdc/core/helpers/queryStringUtils'
 
 type MultiDashboardProps = Omit<WCMSProps, 'configUrl'> & {
@@ -62,18 +60,13 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
     loadConfig()
   }, [])
 
-  const loadData = async (initialConfig: DashboardConfig | MultiDashboardConfig) => {
+  const prepareDatasets = (initialConfig: DashboardConfig | MultiDashboardConfig) => {
     let newConfig = { ...initialConfig }
-    let datasets: Record<string, Object[]> = {}
-    await Promise.all(
-      Object.keys(initialConfig.datasets).map(async key => {
-        const legacySupportApply = (initialConfig as any).filterBehavior === 'Apply Button'
-        const hasApplyBehavior = hasDashboardApplyBehavior(initialConfig.visualizations) || legacySupportApply
-        const data = await processData(initialConfig.datasets[key], !hasApplyBehavior)
-        datasets[key] = data || []
-      })
-    )
-
+    const datasets: Record<string, Object[]> = Object.keys(initialConfig.datasets).reduce((acc, key) => {
+      const dataset = initialConfig.datasets[key]
+      acc[key] = dataset.formattedData || dataset.data
+      return acc
+    }, {})
     getVizKeys(newConfig).forEach(vizKey => {
       const formattedData = datasets[newConfig.visualizations[vizKey].dataKey]
       if (formattedData) {
@@ -92,7 +85,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
     let newConfig = { ...defaults, ...config } as DashboardConfig
 
     if (config.datasets) {
-      return await loadData(newConfig)
+      return prepareDatasets(newConfig)
     } else {
       const dataKey = newConfig.dataFileName || 'backwards-compatibility'
       const data = await processDataLegacy(config)
@@ -144,7 +137,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
       multiDashboards: multiConfig.multiDashboards,
       activeDashboard: selectedConfig
     } as MultiDashboardConfig
-    return await loadData(newConfig)
+    return prepareDatasets(newConfig)
   }
 
   if (!initial) return <Loading />

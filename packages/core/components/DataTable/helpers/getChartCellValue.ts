@@ -29,18 +29,18 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
 
   const rowObj = runtimeData[row]
   let cellValue // placeholder for formatting below
-  let labelValue = rowObj[column] // just raw X axis string
+  const labelValue = rowObj[column] // just raw X axis string
   if (column === config.xAxis?.dataKey) {
-    // not the prettiest, but helper functions work nicely here.
-    cellValue =
-      config.xAxis?.type === 'date'
-        ? formatDate(
-            config.table?.dateDisplayFormat || config.xAxis?.dateDisplayFormat,
-            parseDate(config.xAxis?.dateParseFormat, labelValue)
-          )
-        : labelValue
-    cellValue =
-      config.xAxis?.type === 'continuous' ? formatNumber(runtimeData[row][column], 'bottom', false, config) : labelValue
+    const { type, dateDisplayFormat, dateParseFormat } = config.xAxis || {}
+    const dateFormat = config.table?.dateDisplayFormat || dateDisplayFormat
+
+    if (type === 'date' || type === 'date-time') {
+      cellValue = formatDate(dateFormat, parseDate(dateParseFormat, labelValue))
+    } else if (type === 'continuous') {
+      cellValue = formatNumber(runtimeData[row][column], 'bottom', false, config)
+    } else {
+      cellValue = labelValue
+    }
   } else {
     let resolvedAxis = 'left'
     let leftAxisItems = config.series ? config.series.filter(item => item?.axis === 'Left') : []

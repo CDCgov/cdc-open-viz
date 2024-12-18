@@ -129,5 +129,6 @@ export default {
       }
     ]
   },
-  filterBehavior: 'Filter Change'
+  filterBehavior: 'Filter Change',
+  filterIntro: ''
 }

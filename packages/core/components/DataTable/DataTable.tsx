@@ -202,7 +202,7 @@ const DataTable = (props: DataTableProps) => {
       : config.visualizationType === 'Pie'
       ? [config.yAxis.dataKey]
       : config.visualizationType === 'Box Plot'
-        ? Object.entries(config.boxplot.tableData[0])
+        ? config?.boxplot?.plots?.[0] ? Object.entries(config.boxplot.plots[0]) : []
         : config.runtime?.seriesKeys),
     [config.runtime?.seriesKeys]) // eslint-disable-line
 
@@ -244,17 +244,28 @@ const DataTable = (props: DataTableProps) => {
         </MediaControls.Section>
       )
     }
+    const getClassNames = (): string => {
+      const classes = ['data-table-container']
+      const isBrushActive = config?.brush?.active && config.legend?.position !== 'bottom'
+
+      if (isBrushActive) {
+        classes.push('brush-active')
+      }
+
+      classes.push(viewport)
+
+      const downloadLinkClass = !config.table.showDownloadLinkBelow ? 'download-link-above' : ''
+      if (downloadLinkClass) {
+        classes.push(downloadLinkClass)
+      }
+
+      return classes.join(' ')
+    }
 
     return (
       <ErrorBoundary component='DataTable'>
         {!config.table.showDownloadLinkBelow && <TableMediaControls />}
-        <section
-          id={tabbingId.replace('#', '')}
-          className={`data-table-container ${viewport} ${
-            !config.table.showDownloadLinkBelow ? 'download-link-above' : ''
-          }`}
-          aria-label={accessibilityLabel}
-        >
+        <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           {config.table.collapsible !== false && (
             <ExpandCollapse

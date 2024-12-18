@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 
 // Third Party
 import {
@@ -10,6 +10,7 @@ import {
 } from 'react-accessible-accordion'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { useDebounce } from 'use-debounce'
+import _ from 'lodash'
 // import ReactTags from 'react-tag-autocomplete'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import Panels from './Panels'
@@ -42,6 +43,7 @@ import HexSetting from './HexShapeSettings.jsx'
 import ConfigContext from '../../../context.ts'
 import { MapContext } from '../../../types/MapContext.js'
 import { TextField } from './Inputs'
+import Alert from '@cdc/core/components/Alert'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 
 // Todo: move to useReducer, seperate files out.
@@ -64,8 +66,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     runtimeData,
     setRuntimeData,
     generateRuntimeData,
-    position,
-    topoData,
+
 
   } = useContext<MapContext>(ConfigContext)
 
@@ -378,7 +379,8 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           ...state,
           legend: {
             ...state.legend,
-            position: value
+            position: value,
+            hideBorder: _.includes(['top', 'bottom'], value)
           }
         })
         break
@@ -1102,6 +1104,15 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             </option>
           </select>
         </label>
+        <label>
+          <TextField
+            type='textarea'
+            value={state.filterIntro}
+            fieldName='filterIntro'
+            label='Filter Intro text'
+            updateField={updateField}
+          />
+        </label>
         {filtersJSX}
       </>
     )
@@ -1270,6 +1281,14 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   })
 
   const updateField = (section, subsection, fieldName, newValue) => {
+    if (!section) {
+      setState({
+        ...state,
+        [fieldName]: newValue
+      })
+      return
+    }
+
     const isArray = Array.isArray(state[section])
 
     let sectionValue = isArray ? [...state[section], newValue] : { ...state[section], [fieldName]: newValue }
@@ -1416,7 +1435,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           {filter.order === 'cust' && (
             <DragDropContext
               onDragEnd={({ source, destination }) =>
-                handleFilterOrder(source.index, destination.index, index, state.filters[index])
+                handleFilterOrder(source.index, destination?.index, index, state.filters?.[index])
               }
             >
               <Droppable droppableId='filter_order'>
@@ -1532,7 +1551,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
 
   const CategoryList = () => {
     return getCategoryValuesOrder()
-      .filter(item => !item.special)
+      .filter(item => !item?.special)
       .map((value, index) => (
         <Draggable key={value} draggableId={`item-${value}`} index={index}>
           {(provided, snapshot) => (
@@ -2229,6 +2248,13 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       </Tooltip>
                     </span>
                   </label>
+                  {state.legend.specialClasses.length === 2 && (
+                    <Alert
+                      type='info'
+                      message='If a third special class is needed you can apply a pattern to set it apart.'
+                      showCloseButton={false}
+                    />
+                  )}
                   {specialClasses.map((specialClass, i) => (
                     <div className='edit-block' key={`special-class-${i}`}>
                       <button
@@ -2289,15 +2315,17 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       </label>
                     </div>
                   ))}
-                  <button
-                    className='btn btn-primary full-width'
-                    onClick={e => {
-                      e.preventDefault()
-                      editColumn('primary', 'specialClassAdd', {})
-                    }}
-                  >
-                    Add Special Class
-                  </button>
+                  {state.legend.specialClasses.length < 2 && (
+                    <button
+                      className='btn btn-primary full-width'
+                      onClick={e => {
+                        e.preventDefault()
+                        editColumn('primary', 'specialClassAdd', {})
+                      }}
+                    >
+                      Add Special Class
+                    </button>
+                  )}
                 </fieldset>
               )}
 
@@ -3267,7 +3295,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
               <label>
                 <span className='edit-label'>Map Color Palette</span>
               </label>
-              {/* <InputCheckbox  section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
               <InputToggle
                 type='3d'
                 section='general'
