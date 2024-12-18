@@ -31,11 +31,11 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
   let cellValue // placeholder for formatting below
   const labelValue = rowObj[column] // just raw X axis string
   if (column === config.xAxis?.dataKey) {
-    const { type, dateDisplayFormat } = config.xAxis || {}
+    const { type, dateDisplayFormat, dateParseFormat } = config.xAxis || {}
     const dateFormat = config.table?.dateDisplayFormat || dateDisplayFormat
 
     if (type === 'date' || type === 'date-time') {
-      cellValue = formatDate(dateFormat, parseDate(dateFormat, labelValue))
+      cellValue = formatDate(dateFormat, parseDate(dateParseFormat, labelValue))
     } else if (type === 'continuous') {
       cellValue = formatNumber(runtimeData[row][column], 'bottom', false, config)
     } else {
