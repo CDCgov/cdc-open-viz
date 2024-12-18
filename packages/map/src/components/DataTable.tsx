@@ -118,14 +118,14 @@ const DataTable = props => {
     if (columns.navigate && row[columns.navigate.name]) {
       markup = (
         <span
-          onClick={() => navigationHandler(row[columns.navigate.name])}
+          onClick={() => navigationHandler(state.general.navigationTarget, row[columns.navigate.name])}
           className='table-link'
           title='Click for more information (Opens in a new window)'
           role='link'
           tabIndex='0'
           onKeyDown={e => {
             if (e.keyCode === 13) {
-              navigationHandler(row[columns.navigate.name])
+              navigationHandler(state.general.navigationTarget, row[columns.navigate.name])
             }
           }}
         >
