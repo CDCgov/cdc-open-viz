@@ -5,6 +5,7 @@ import { ConfigRow } from './ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { Table } from '@cdc/core/types/Table'
 import { Dashboard } from './Dashboard'
+import { Version } from '@cdc/core/types/Version'
 
 export type DashboardConfig = DataSet & {
   dashboard: Dashboard
@@ -18,4 +19,5 @@ export type DashboardConfig = DataSet & {
   runtime: Runtime
   downloadImageButton: boolean
   downloadPdfButton: boolean
+  version: Version
 }

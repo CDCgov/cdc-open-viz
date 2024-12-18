@@ -5,6 +5,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 // United States Topojson resources
 import topoJSON from '../data/us-topo.json'
 import hexTopoJSON from '../data/us-hex-topo.json'
+import { supportedTerritories } from '../../../data/supported-geos'
 
 import { geoCentroid, geoPath } from 'd3-geo'
 import { feature } from 'topojson-client'
@@ -17,15 +18,15 @@ import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import HexIcon from './HexIcon'
 import { patternSizes } from '../helpers/patternSizes'
 import Annotation from '../../Annotation'
-
 import Territory from './Territory'
-import { cityKeys } from '../../../data/supported-geos'
 
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { MapContext } from '../../../types/MapContext'
-import { checkColorContrast, getContrastColor, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
+import { checkColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
+import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
+import { titleCase } from '../../../helpers/titleCase'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -61,11 +62,8 @@ const UsaMap = () => {
       data,
       displayGeoName,
       geoClickHandler,
-      handleMapAriaLabels,
       setSharedFilterValue,
       state,
-      supportedTerritories,
-      titleCase,
       tooltipId,
       handleDragStateChange,
       mapId,
