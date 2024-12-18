@@ -10,7 +10,6 @@ import LegendShape from '@cdc/core/components/LegendShape'
 import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import LegendItemHex from './LegendItem.Hex'
 import Button from '@cdc/core/components/elements/Button'
-import type { ViewPort } from '@cdc/core/types/ViewPort'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import ConfigContext from '../../../context'
@@ -18,7 +17,9 @@ import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
 import { Group } from '@visx/group'
 import './index.scss'
+import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { isBelowBreakpoint, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
+import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 
 const LEGEND_PADDING = 30
 
@@ -34,7 +35,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const {
     // prettier-ignore
-    displayDataAsText,
     resetLegendToggles,
     runtimeFilters,
     runtimeLegend,
@@ -75,9 +75,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   }
   const getFormattedLegendItems = () => {
     return runtimeLegend.map((entry, idx) => {
-      const entryMax = displayDataAsText(entry.max, 'primary')
+      const entryMax = displayDataAsText(entry.max, 'primary', state)
 
-      const entryMin = displayDataAsText(entry.min, 'primary')
+      const entryMin = displayDataAsText(entry.min, 'primary', state)
       let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
 
       // If interval, add some formatting
@@ -86,7 +86,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       }
 
       if (legend.type === 'category') {
-        formattedText = displayDataAsText(entry.value, 'primary')
+        formattedText = displayDataAsText(entry.value, 'primary', state)
       }
 
       if (entry.max === 0 && entry.min === 0) {

@@ -1,47 +1,39 @@
+// Vendor
 import React, { useState, useEffect, useRef, useCallback, useId } from 'react'
 import * as d3 from 'd3'
-import Layout from '@cdc/core/components/Layout'
-import Waiting from '@cdc/core/components/Waiting'
-import Annotation from './components/Annotation'
-import Error from './components/EditorPanel/components/Error'
 import _ from 'lodash'
-import { applyColorToLegend } from './helpers/applyColorToLegend'
-
-// types
-import { type ViewPort } from '@cdc/core/types/ViewPort'
-import { type DimensionsType } from '@cdc/core/types/Dimensions'
-
-// IE11
 import 'whatwg-fetch'
 import ResizeObserver from 'resize-observer-polyfill'
-
-// Third party
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 
-// Helpers
-import { hashObj } from './helpers/hashObj'
-import { generateRuntimeLegendHash } from './helpers/generateRuntimeLegendHash'
-import { generateColorsArray } from './helpers/generateColorsArray'
-import { getUniqueValues } from './helpers/getUniqueValues'
-import { publish } from '@cdc/core/helpers/events'
-import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
+// Core Components
+import DataTable from '@cdc/core/components/DataTable'
+import Filters, { useFilters } from '@cdc/core/components/Filters'
+import Layout from '@cdc/core/components/Layout'
+import MediaControls from '@cdc/core/components/MediaControls'
+import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Title from '@cdc/core/components/ui/Title'
+import Waiting from '@cdc/core/components/Waiting'
+
+// types
+import { type Coordinate, type MapConfig } from './types/MapConfig'
+import { type ViewPort } from '@cdc/core/types/ViewPort'
+import { type DimensionsType } from '@cdc/core/types/Dimensions'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
 import {
-  supportedStates,
-  supportedTerritories,
-  supportedCountries,
-  supportedCounties,
-  supportedCities,
-  supportedStatesFipsCodes,
   stateFipsToTwoDigit,
-  supportedRegions
+  supportedCities,
+  supportedCounties,
+  supportedCountries,
+  supportedRegions,
+  supportedStates,
+  supportedStatesFipsCodes,
+  supportedTerritories
 } from './data/supported-geos'
 import colorPalettes from '@cdc/core/data/colorPalettes'
 import initialState from './data/initial-state'
@@ -51,34 +43,45 @@ import ExternalIcon from './images/external-link.svg'
 
 // Sass
 import './scss/main.scss'
-
-// TODO: combine in scss.
 import './scss/btn.scss'
 
-// Core
-import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import MediaControls from '@cdc/core/components/MediaControls'
+// Core Helpers
+import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import getViewport from '@cdc/core/helpers/getViewport'
 import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import numberFromString from '@cdc/core/helpers/numberFromString'
-import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
+import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
+import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
+import { publish } from '@cdc/core/helpers/events'
+
+// Map Helpers
+import { applyColorToLegend } from './helpers/applyColorToLegend'
+import { closeModal } from './helpers/closeModal'
+import { generateColorsArray } from './helpers/generateColorsArray'
+import { generateRuntimeLegendHash } from './helpers/generateRuntimeLegendHash'
+import { getGeoFillColor } from './helpers/colors'
+import { getUniqueValues } from './helpers/getUniqueValues'
+import { hashObj } from './helpers/hashObj'
+import { navigationHandler } from './helpers/navigationHandler'
+import { validateFipsCodeLength } from './helpers/validateFipsCodeLength'
+import { titleCase } from './helpers/titleCase'
 
 // Child Components
+import Annotation from './components/Annotation'
 import ConfigContext from './context'
-import Filters, { useFilters } from '@cdc/core/components/Filters'
-import Modal from './components/Modal'
+import EditorPanel from './components/EditorPanel'
+import Error from './components/EditorPanel/components/Error'
 import Legend from './components/Legend'
-
-import EditorPanel from './components/EditorPanel' // Future: Lazy
-import NavigationMenu from './components/NavigationMenu' // Future: Lazy
-import UsaMap from './components/UsaMap' // Future: Lazy
-import WorldMap from './components/WorldMap' // Future: Lazy
+import Modal from './components/Modal'
+import NavigationMenu from './components/NavigationMenu'
+import UsaMap from './components/UsaMap'
+import WorldMap from './components/WorldMap'
 import GoogleMap from './components/GoogleMap'
+
+// hooks
 import useTooltip from './hooks/useTooltip'
-import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
-import SkipTo from '@cdc/core/components/elements/SkipTo'
-import { getGeoFillColor } from './helpers/colors'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -98,7 +101,6 @@ const indexOfIgnoreType = (arr, item) => {
 }
 
 const CdcMap = ({
-  className,
   config,
   navigationHandler: customNavigationHandler,
   isDashboard = false,
@@ -114,12 +116,12 @@ const CdcMap = ({
   const transform = new DataTransform()
   const [translate, setTranslate] = useState([0, 0])
   const [scale, setScale] = useState(1)
-  const [state, setState] = useState({ ...initialState })
+  const [state, setState] = useState<MapConfig>({ ...initialState })
   const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [loading, setLoading] = useState(true)
   const [displayPanel, setDisplayPanel] = useState(true)
   const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
-  const [topoData, setTopoData] = useState<Topology | {}>({})
+  const [topoData, setTopoData] = useState<{}>({})
   const [runtimeFilters, setRuntimeFilters] = useState([])
   const [runtimeLegend, setRuntimeLegend] = useState([])
   const [runtimeData, setRuntimeData] = useState({ init: true })
@@ -142,7 +144,7 @@ const CdcMap = ({
   const tooltipId = `${Math.random().toString(16).slice(-4)}`
   const mapId = useId()
 
-  const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
+  const { handleSorting } = useFilters({ config: state, setConfig: setState })
   let legendMemo = useRef(new Map())
   let legendSpecialClassLastMemo = useRef(new Map())
   let innerContainerRef = useRef()
@@ -167,10 +169,7 @@ const CdcMap = ({
     }
 
     // Navigate is required for navigation maps
-    if (
-      'navigation' === state.general.type &&
-      ('' === state.columns.navigate.name || undefined === state.columns.navigate)
-    ) {
+    if ('navigation' === state.general.type && '' === state.columns.navigate.name) {
       columnList.push('Navigation')
     }
 
@@ -199,7 +198,7 @@ const CdcMap = ({
         const coordinates = countryCoordinates[filteredCountryCode]
         const long = coordinates[1]
         const lat = coordinates[0]
-        const reversedCoordinates = [long, lat]
+        const reversedCoordinates: Coordinate = [long, lat]
 
         setState({
           ...state,
@@ -249,7 +248,7 @@ const CdcMap = ({
   // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
   // eslint-disable-next-line
   const addUIDs = useCallback((obj, fromColumn) => {
-    obj.data.forEach((row, index) => {
+    obj.data.forEach(row => {
       let uid = null
 
       if (row.uid) row.uid = null // Wipe existing UIDs
@@ -376,22 +375,8 @@ const CdcMap = ({
 
     result.runtimeDataHash = runtimeData.fromHash
 
-    // Unified will based the legend off ALL of the data maps received. Otherwise, it will use
+    // Unified will base the legend off ALL of the data maps received. Otherwise, it will use
     let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData)
-
-    const colorDistributions = {
-      1: [1],
-      2: [1, 3],
-      3: [1, 3, 5],
-      4: [0, 2, 4, 6],
-      5: [0, 2, 4, 6, 7],
-      6: [0, 2, 3, 4, 5, 7],
-      7: [0, 2, 3, 4, 5, 6, 7],
-      8: [0, 2, 3, 4, 5, 6, 7, 8],
-      9: [0, 1, 2, 3, 4, 5, 6, 7, 8],
-      10: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    }
-
     let specialClasses = 0
     let specialClassesHash = {}
 
@@ -417,7 +402,7 @@ const CdcMap = ({
                 specialClasses += 1
               }
 
-              let specialColor = ''
+              let specialColor: number
 
               // color the state if val is in row
               specialColor = result.findIndex(p => p.value === val)
@@ -649,7 +634,6 @@ const CdcMap = ({
         }
       } else {
         // get nums
-        let hasZeroInData = dataSet.filter(obj => obj[state.columns.primary.name] === 0).length > 0
         let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
 
         domainNums = d3.extent(domainNums)
@@ -684,7 +668,7 @@ const CdcMap = ({
 
         const breaks = getBreaks(scale)
 
-        // if seperating zero force it into breaks
+        // if separating zero force it into breaks
         if (breaks[0] !== 0) {
           breaks.unshift(0)
         }
@@ -699,7 +683,7 @@ const CdcMap = ({
               min = 0
             }
 
-            // if we're on the second break, and seperating out zero, increment min to 1.
+            // if we're on the second break, and separating out zero, increment min to 1.
             if (index === 1 && state.legend.separateZero) {
               min = 1
             }
@@ -715,20 +699,12 @@ const CdcMap = ({
             return Math.pow(10, -n)
           }
 
-          const setMax = (index, min) => {
+          const setMax = index => {
             let max = Number(breaks[index + 1]) - getDecimalPlace(Number(state?.columns?.primary?.roundToPlace))
-
-            // check if min and max range are the same
-            // if (min === max + 1) {
-            //     max = breaks[index + 1]
-            // }
 
             if (index === 0 && state.legend.separateZero) {
               max = 0
             }
-            // if ((index === state.legend.specialClasses.length && state.legend.specialClasses.length !== 0) && !state.legend.separateZero && hasZeroInData) {
-            //     max = 0;
-            // }
 
             if (index + 1 === breaks.length) {
               max = domainNums[1]
@@ -746,7 +722,7 @@ const CdcMap = ({
             color: scale(item)
           })
 
-          dataSet.forEach((row, dataIndex) => {
+          dataSet.forEach(row => {
             let number = row[state.columns.primary.name]
             let updated = result.length - 1
 
@@ -961,7 +937,7 @@ const CdcMap = ({
             // Strip hidden characters before we check length
             navigateUrl = navigateUrl.replace(/(\r\n|\n|\r)/gm, '')
           }
-          if (0 === navigateUrl.length) {
+          if (0 === navigateUrl?.length) {
             return false
           }
         }
@@ -992,79 +968,7 @@ const CdcMap = ({
     }
     setContainer(node)
   }, []) // eslint-disable-line
-
   const mapSvg = useRef(null)
-
-  const closeModal = ({ target }) => {
-    if (
-      'string' === typeof target.className &&
-      (target.className.includes('modal-close') || target.className.includes('modal-background')) &&
-      null !== modal
-    ) {
-      setModal(null)
-    }
-  }
-
-  const displayDataAsText = (value, columnName) => {
-    if (value === null || value === '' || value === undefined) {
-      return ''
-    }
-
-    // if string of letters like 'Home' then dont need to format as a number
-    if (
-      typeof value === 'string' &&
-      value.length > 0 &&
-      /[a-zA-Z]/.test(value) &&
-      state.legend.type === 'equalnumber'
-    ) {
-      return value
-    }
-
-    let formattedValue = value
-
-    let columnObj = state.columns[columnName]
-
-    if (columnObj === undefined) {
-      // then use left axis config
-      columnObj = state.columns.primary
-      // NOTE: Left Value Axis uses different names
-      // so map them below so the code below works
-      // - copy commas to useCommas to work below
-      columnObj['useCommas'] = columnObj.commas
-      // - copy roundTo to roundToPlace to work below
-      columnObj['roundToPlace'] = columnObj.roundTo ? columnObj.roundTo : ''
-    }
-
-    if (columnObj) {
-      // If value is a number, apply specific formattings
-      if (Number(value)) {
-        const hasDecimal = columnObj.roundToPlace && (columnObj.roundToPlace !== '' || columnObj.roundToPlace !== null)
-        const decimalPoint = columnObj.roundToPlace ? Number(columnObj.roundToPlace) : 0
-
-        // Rounding
-        if (columnObj.hasOwnProperty('roundToPlace') && hasDecimal) {
-          formattedValue = Number(value).toFixed(decimalPoint)
-        }
-
-        if (columnObj.hasOwnProperty('useCommas') && columnObj.useCommas === true) {
-          // Formats number to string with commas - allows up to 5 decimal places, if rounding is not defined.
-          // Otherwise, uses the rounding value set at 'columnObj.roundToPlace'.
-          formattedValue = Number(value).toLocaleString('en-US', {
-            style: 'decimal',
-            minimumFractionDigits: hasDecimal ? decimalPoint : 0,
-            maximumFractionDigits: hasDecimal ? decimalPoint : 5
-          })
-        }
-      }
-
-      // Check if it's a special value. If it is not, apply the designated prefix and suffix
-      if (false === state.legend.specialClasses.includes(String(value))) {
-        formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
-      }
-    }
-
-    return formattedValue
-  }
 
   // this is passed DOWN into the various components
   // then they do a lookup based on the bin number as index into here
@@ -1099,50 +1003,6 @@ const CdcMap = ({
       return generateColorsArray()
     } catch (e) {
       console.error('COVE: ', e) // eslint-disable-line
-    }
-  }
-
-  // if city has a hyphen then in tooltip it ends up UPPER CASE instead of just regular Upper Case
-  // - this function is used to prevent that and instead give the formatting that is wanted
-  // Example:  Desired city display in tooltip on map: "Inter-Tribal Indian Reservation"
-  const titleCase = string => {
-    // guard clause else error in editor
-    if (!string) return
-    if (string !== undefined) {
-      const toTitleCase = word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()
-
-      if (string.toUpperCase().includes('U.S.') || string.toUpperCase().includes('US')) {
-        return string
-          .split(' ')
-          .map(word => {
-            if (word.toUpperCase() === 'U.S.' || word.toUpperCase() === 'US') {
-              return word.toUpperCase()
-            } else {
-              return toTitleCase(word)
-            }
-          })
-          .join(' ')
-      }
-      // if hyphen found, then split, uppercase each word, and put back together
-      if (string.includes('–') || string.includes('-')) {
-        let dashSplit = string.includes('–') ? string.split('–') : string.split('-') // determine hyphen or en dash to split on
-        let splitCharacter = string.includes('–') ? '–' : '-' // print hyphen or en dash later on.
-        let frontSplit = dashSplit[0]
-          .split(' ')
-          .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-          .join(' ')
-        let backSplit = dashSplit[1]
-          .split(' ')
-          .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-          .join(' ')
-        return frontSplit + splitCharacter + backSplit
-      } else {
-        // just return with each word uppercase
-        return string
-          .split(' ')
-          .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-          .join(' ')
-      }
     }
   }
 
@@ -1218,7 +1078,7 @@ const CdcMap = ({
       value = dict[value]
     }
 
-    // if you get here and it's 2 letters then DONT titleCase state abbreviations like "AL"
+    // if you get here and it's 2 letters then dont titleCase state abbreviations like "AL"
     if (value.length === 2) {
       return value
     } else {
@@ -1227,7 +1087,7 @@ const CdcMap = ({
   }
 
   // todo: convert to store or context eventually.
-  const { buildTooltip } = useTooltip({ state, displayGeoName, displayDataAsText, supportedStatesFipsCodes })
+  const { buildTooltip } = useTooltip({ state, displayGeoName, supportedStatesFipsCodes })
 
   const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
     let toolTipText = buildTooltip(row, geoName, '')
@@ -1245,7 +1105,7 @@ const CdcMap = ({
             key='modal-navigation-link'
             onClick={e => {
               e.preventDefault()
-              navigationHandler(row[state.columns.navigate.name])
+              navigationHandler(row[state.columns.navigate.name], customNavigationHandler)
             }}
           >
             {state.tooltips.linkLabel}
@@ -1256,24 +1116,6 @@ const CdcMap = ({
     }
 
     return toolTipText
-  }
-
-  const navigationHandler = urlString => {
-    // Call custom navigation method if passed
-    if (customNavigationHandler) {
-      customNavigationHandler(urlString)
-      return
-    }
-
-    // Abort if value is blank
-    if (0 === urlString.length) {
-      throw Error('Blank string passed as URL. Navigation aborted.')
-    }
-
-    const urlObj = new URL(urlString, window.location.origin)
-
-    // Open constructed link in new tab/window
-    window.open(urlObj.toString(), '_blank')
   }
 
   const geoClickHandler = (key, value) => {
@@ -1292,7 +1134,7 @@ const CdcMap = ({
       })
     }
 
-    // If modals are set or we are on a mobile viewport, display modal
+    // If modals are set, or we are on a mobile viewport, display modal
     if (window.matchMedia('(any-hover: none)').matches || 'click' === state.tooltips.appearanceType) {
       setModal({
         geoName: key,
@@ -1304,64 +1146,7 @@ const CdcMap = ({
 
     // Otherwise if this item has a link specified for it, do regular navigation.
     if (state.columns.navigate && value[state.columns.navigate.name]) {
-      navigationHandler(value[state.columns.navigate.name])
-    }
-  }
-
-  const validateFipsCodeLength = newState => {
-    if (
-      newState.general.geoType === 'us-county' ||
-      newState.general.geoType === 'single-state' ||
-      (newState.general.geoType === 'us' && newState?.data)
-    ) {
-      newState?.data.forEach(dataPiece => {
-        if (dataPiece[newState.columns.geo.name]) {
-          if (
-            !isNaN(parseInt(dataPiece[newState.columns.geo.name])) &&
-            dataPiece[newState.columns.geo.name].length === 4
-          ) {
-            dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
-          }
-          dataPiece[newState.columns.geo.name] = dataPiece[newState.columns.geo.name].toString()
-        }
-      })
-    }
-    return newState
-  }
-
-  const handleMapAriaLabels = (state = '', testing = false) => {
-    if (testing) console.log(`handleMapAriaLabels Testing On: ${state}`) // eslint-disable-line
-    try {
-      if (!state.general.geoType) throw Error('handleMapAriaLabels: no geoType found in state')
-      let ariaLabel = ''
-      switch (state.general.geoType) {
-        case 'world':
-          ariaLabel += 'World map'
-          break
-        case 'us':
-          ariaLabel += 'United States map'
-          break
-        case 'us-county':
-          ariaLabel += `United States county map`
-          break
-        case 'single-state':
-          ariaLabel += `${state.general.statePicked.stateName} county map`
-          break
-        case 'us-region':
-          ariaLabel += `United States HHS Region map`
-          break
-        default:
-          ariaLabel = 'Data visualization container'
-          break
-      }
-
-      if (state.general.title) {
-        ariaLabel += ` with the title: ${state.general.title}`
-      }
-
-      return ariaLabel
-    } catch (e) {
-      console.error('COVE: ', e.message) // eslint-disable-line
+      navigationHandler(value[state.columns.navigate.name], customNavigationHandler)
     }
   }
 
@@ -1465,7 +1250,7 @@ const CdcMap = ({
 
     // This code goes through and adds the defaults for every property declaring in the initial state at the top.
     // This allows you to easily add new properties to the config without having to worry about accounting for backwards compatibility.
-    // Right now this does not work recursively -- only on first and second level properties. So state -> prop1 -> childprop1
+    // Right now this does not work recursively -- only on first and second level properties. So state -> prop1 -> childPropOne
     Object.keys(newState).forEach(key => {
       if ('object' === typeof newState[key] && false === Array.isArray(newState[key])) {
         if (initialState[key]) {
@@ -1535,19 +1320,6 @@ const CdcMap = ({
       addUIDs(state, state.columns.geo.name)
     }
   }, [state]) // eslint-disable-line
-
-  // DEV-769 make "Data Table" both a required field and default value
-  useEffect(() => {
-    if (state.table?.label === '' || state.table?.label === undefined) {
-      setState({
-        ...state,
-        table: {
-          ...state.table,
-          title: 'Data Table'
-        }
-      })
-    }
-  }, [state.table]) // eslint-disable-line
 
   // When geo label override changes
   // - redo the tooltips
@@ -1675,21 +1447,16 @@ const CdcMap = ({
     handleDragStateChange,
     applyLegendToRow,
     applyTooltipsToGeo,
-    capitalize: state.tooltips?.capitalizeLabels,
-    closeModal,
-    columnsInData: state?.data?.[0] ? Object.keys(state.data[0]) : [],
     container,
     content: modal,
     currentViewport,
     data: runtimeData,
     dimensions,
-    displayDataAsText,
     displayGeoName,
     filteredCountryCode,
     generateColorsArray,
     generateRuntimeData,
     geoClickHandler,
-    handleMapAriaLabels,
     hasZoom: state.general.allowMapZoom,
     innerContainerRef,
     isDashboard,
@@ -1697,7 +1464,6 @@ const CdcMap = ({
     isEditor,
     loadConfig,
     logo,
-    navigationHandler,
     position,
     resetLegendToggles,
     runtimeFilters,
@@ -1713,12 +1479,6 @@ const CdcMap = ({
     setSharedFilterValue,
     setState,
     state,
-    supportedCities,
-    supportedCounties,
-    supportedCountries,
-    supportedTerritories,
-    titleCase,
-    type: general.type,
     viewport: currentViewport,
     tooltipId,
     tooltipRef,
@@ -1822,10 +1582,10 @@ const CdcMap = ({
                 role='region'
                 tabIndex='0'
                 className={mapContainerClasses.join(' ')}
-                onClick={e => closeModal(e)}
+                onClick={e => closeModal(e, modal, setModal)}
                 onKeyDown={e => {
-                  if (e.keyCode === 13) {
-                    closeModal(e)
+                  if (e.key === 'Enter') {
+                    closeModal(e, modal, setModal)
                   }
                 }}
                 style={{ padding: '15px 0px', margin: '0px' }}
@@ -1867,7 +1627,7 @@ const CdcMap = ({
                   data={runtimeData}
                   options={general}
                   columns={state.columns}
-                  navigationHandler={val => navigationHandler(val)}
+                  navigationHandler={val => navigationHandler(val, customNavigationHandler)}
                 />
               )}
 
@@ -1912,7 +1672,6 @@ const CdcMap = ({
                     showFullGeoNameInCSV={table.showFullGeoNameInCSV}
                     runtimeLegend={runtimeLegend}
                     runtimeData={runtimeData}
-                    displayDataAsText={displayDataAsText}
                     displayGeoName={displayGeoName}
                     applyLegendToRow={applyLegendToRow}
                     tableTitle={table.label}

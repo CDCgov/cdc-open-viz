@@ -4,8 +4,6 @@ import { type ViewPort } from '@cdc/core/types/ViewPort'
 export type MapContext = {
   applyLegendToRow
   applyTooltipsToGeo
-  closeModal
-  columnsInData
   currentViewport: ViewPort
   data
   displayDataAsText
@@ -17,7 +15,6 @@ export type MapContext = {
   handleCircleClick: Function
   handleDragStateChange: Function
   isDraggingAnnotation: boolean
-  handleMapAriaLabels
   hasZoom
   innerContainerRef
   isDashboard
@@ -26,7 +23,6 @@ export type MapContext = {
   isFilterValueSupported: boolean
   loadConfig
   logo: string
-  navigationHandler
   position
   resetLegendToggles
   runtimeFilters
@@ -39,13 +35,8 @@ export type MapContext = {
   setRuntimeFilters
   setRuntimeLegend
   setSharedFilterValue
-  setState
+  setState: (newState: MapConfig) => MapConfig
   state: MapConfig
-  supportedCities
-  supportedCounties
-  supportedCountries
-  supportedTerritories
-  titleCase
   viewport
   setStateToShow: (string) => void
   stateToShow: string

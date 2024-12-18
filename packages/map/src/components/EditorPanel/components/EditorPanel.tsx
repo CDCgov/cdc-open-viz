@@ -51,7 +51,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   // prettier-ignore
   const {
     changeFilterActive,
-    columnsInData = [],
     isDashboard,
     isDebug,
     isEditor,
@@ -71,6 +70,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   } = useContext<MapContext>(ConfigContext)
 
   const { general, columns, legend, table, tooltips } = state
+  const columnsInData = state?.data?.[0] ? Object.keys(state.data[0]) : []
 
   const [configTextboxValue, setConfigTextbox] = useState({}) // eslint-disable-line
 

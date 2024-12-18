@@ -1,7 +1,7 @@
-import { ComponentThemes } from '@cdc/core/types/ComponentThemes'
-import { Visualization } from '@cdc/core/types/Visualization'
-import { EditorColumnProperties } from '@cdc/core/types/EditorColumnProperties'
-import { Version } from '@cdc/core/types/Version'
+import { type ComponentThemes } from '@cdc/core/types/ComponentThemes'
+import { type Visualization } from '@cdc/core/types/Visualization'
+import { type EditorColumnProperties } from '@cdc/core/types/EditorColumnProperties'
+import { type Version } from '@cdc/core/types/Version'
 
 export type MapVisualSettings = {
   /** minBubbleSize - Minimum Circle Size when the map has a type of bubble */
@@ -15,9 +15,8 @@ export type MapVisualSettings = {
   /** cityStyle - optional visual indicator of label on the Legend */
   cityStyleLabel: string
   /** geoCodeCircleSize - controls the size of the city style option (circle or pin) */
-
   geoCodeCircleSize: number
-  /** showBubbleZeros - shows circles on maps when the data is provided even if its a zero value */
+  /** showBubbleZeros - shows circles on maps when the data is provided even if it's a zero value */
   showBubbleZeros: boolean
   /** additionalCityStyles - shows Circle, Square, Triangle, Rhombus/Diamond, Star, Map Pin on maps when the additionalCityStyles is added */
   additionalCityStyles: [] | [{ label: string; column: string; value: string; shape: string }]
@@ -46,6 +45,7 @@ export type PrimaryColumnProperties = Pick<
   EditorColumnProperties,
   'dataTable' | 'label' | 'name' | 'prefix' | 'suffix' | 'tooltip'
 >
+
 export type LegendShapeItem = {
   column: string
   key: string
@@ -76,7 +76,7 @@ export type MapConfig = Visualization & {
     navigate: NavigateColumnProperties
     latitude: LatitudeColumnProperties
     longitude: LongitudeColumnProperties
-    categorical: { name }
+    categorical: { name: string }
   }
   dataUrl: string
   runtimeDataUrl: string
@@ -89,7 +89,7 @@ export type MapConfig = Visualization & {
     fullBorder: boolean
     geoBorderColor: string
     geoLabelOverride: string
-    geoType: 'us' | 'us-county' | 'world' | 'single-state' | 'leaflet' | 'google-map'
+    geoType: 'us' | 'us-county' | 'world' | 'single-state' | 'google-map'
     hasRegions: boolean
     headerColor: ComponentThemes
     hideGeoColumnInTooltip: boolean
@@ -149,7 +149,7 @@ export type MapConfig = Visualization & {
   tooltips: {
     appearanceType: 'hover' | 'click'
     linkLabel: string
-    capitalizeLabels: true
+    capitalizeLabels: boolean
     opacity: number
   }
   runtime: {
