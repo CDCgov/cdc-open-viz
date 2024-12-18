@@ -62,9 +62,10 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
 
   const prepareDatasets = (initialConfig: DashboardConfig | MultiDashboardConfig) => {
     let newConfig = { ...initialConfig }
-    const datasets: Record<string, Object[]> = Object.keys(initialConfig.datasets).reduce((datasets, key) => {
-      datasets[key] = undefined
-      return datasets
+    const datasets: Record<string, Object[]> = Object.keys(initialConfig.datasets).reduce((acc, key) => {
+      const dataset = initialConfig.datasets[key]
+      acc[key] = dataset.formattedData || dataset.data
+      return acc
     }, {})
     getVizKeys(newConfig).forEach(vizKey => {
       const formattedData = datasets[newConfig.visualizations[vizKey].dataKey]
