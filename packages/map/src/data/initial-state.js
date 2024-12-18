@@ -56,9 +56,6 @@ export default {
     latitude: { name: '' },
     longitude: { name: '' }
   },
-  leaflet: {
-    theme: 'osm'
-  },
   legend: {
     descriptions: {},
     specialClasses: [],
