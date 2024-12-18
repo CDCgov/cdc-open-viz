@@ -74,9 +74,10 @@ const Widget = ({ widgetConfig, addVisualization, type }: WidgetProps) => {
 
   const deleteWidget = () => {
     if (!widgetConfig) return
+
     dispatch({
       type: 'DELETE_WIDGET',
-      payload: { rowIdx: widgetConfig.rowIdx, colIdx: widgetConfig.colIdx, uid: widgetConfig.uid }
+      payload: { uid: widgetConfig.uid as string }
     })
   }
 
@@ -102,7 +103,10 @@ const Widget = ({ widgetConfig, addVisualization, type }: WidgetProps) => {
 
   const editWidget = () => {
     if (!widgetConfig) return
-    dispatch({ type: 'UPDATE_VISUALIZATION', payload: { vizKey: widgetConfig.uid, configureData: { editing: true } } })
+    dispatch({
+      type: 'UPDATE_VISUALIZATION',
+      payload: { vizKey: widgetConfig.uid as string, configureData: { editing: true } }
+    })
     loadSampleData()
   }
 
