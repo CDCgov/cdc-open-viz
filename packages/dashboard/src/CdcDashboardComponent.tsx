@@ -43,13 +43,12 @@ import { type TableConfig } from '@cdc/core/components/DataTable/types/TableConf
 
 // types
 import { type SharedFilter } from './types/SharedFilter'
-import { type APIFilter } from './types/APIFilter'
 import { type WCMSProps } from '@cdc/core/types/WCMSProps'
 import { type InitialState } from './types/InitialState'
 import MultiTabs from './components/MultiConfigTabs'
 import _ from 'lodash'
 import EditorContext from '../../editor/src/ConfigContext'
-import { APIFilterDropdowns, DropdownOptions } from './components/DashboardFilters'
+import { APIFilterDropdowns } from './components/DashboardFilters'
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import VisualizationRow from './components/VisualizationRow'
@@ -63,12 +62,10 @@ import { addValuesToDashboardFilters } from './helpers/addValuesToDashboardFilte
 import { DashboardFilters } from './types/DashboardFilters'
 import DashboardSharedFilters from './components/DashboardFilters'
 import ExpandCollapseButtons from './components/ExpandCollapseButtons'
-import { hasDashboardApplyBehavior } from './helpers/hasDashboardApplyBehavior'
 import { loadAPIFiltersFactory } from './helpers/loadAPIFilters'
 import Loader from '@cdc/core/components/Loader'
 import Alert from '@cdc/core/components/Alert'
 import { shouldLoadAllFilters } from './helpers/shouldLoadAllFilters'
-import { shouldLoadUnfilteredDataset } from './helpers/shouldLoadUnfilteredDataset'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -163,9 +160,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
           }
         })
 
-        const dataNeedsUpdate =
-          reloadURLHelpers.isUpdateNeeded(filters, currentQSParams, updatedQSParams) ||
-          shouldLoadUnfilteredDataset(config, datasetKey)
+        const dataNeedsUpdate = reloadURLHelpers.isUpdateNeeded(filters, currentQSParams, updatedQSParams)
 
         if (!!newFilters || dataNeedsUpdate) {
           dataWasFetched = true
@@ -202,8 +197,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
               newDatasets[datasetKey].runtimeDataUrl = dataUrlFinal
               newData[datasetKey] = []
             })
-        } else if (shouldLoadUnfilteredDataset(config, datasetKey)) {
-          setAPILoading(false)
         }
       }
     }
@@ -226,9 +219,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
         .flatMap(viz => viz.sharedFilterIndexes)
         .filter(index => !dataFilterIndexes.includes(index))
       const filtersWithNewValues = addValuesToDashboardFilters(filters, _newData, appliedFilterIndexes)
-      const dashboardConfig = newFilters
-        ? { ...config.dashboard, sharedFilters: filtersWithNewValues }
-        : config.dashboard
+
+      const dashboardConfig = { ...config.dashboard, sharedFilters: filtersWithNewValues }
       const filteredData = getFilteredData(
         { ...state, config: { ...state.config, dashboard: dashboardConfig } },
         {},
@@ -272,19 +264,16 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   }
 
   useEffect(() => {
-    if (isEditor && !isPreview) return
     const { config } = state
-    const loadAllFilters = shouldLoadAllFilters(config)
-    if (!hasDashboardApplyBehavior(config.visualizations) && !loadAllFilters) {
-      reloadURLData()
-    }
-
+    const loadAllFilters = shouldLoadAllFilters(config, isEditor && !isPreview)
     const sharedFiltersWithValues = addValuesToDashboardFilters(config.dashboard.sharedFilters, state.data)
 
     loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns, loadAllFilters).then(newFilters => {
-      if (loadAllFilters) reloadURLData(newFilters)
+      const allValuesSelected = newFilters.every(filter => {
+        return filter.type === 'datafilter' || filter.active
+      })
+      if (allValuesSelected) reloadURLData(newFilters)
     })
-    updateFilteredData(sharedFiltersWithValues)
   }, [isEditor, isPreview, state.config?.activeDashboard])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
@@ -306,13 +295,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     if (isEditor) {
       editorContext.setTempConfig(updatedConfig)
     }
-  }
-
-  const updateFilteredData = (sharedFilters = undefined) => {
-    const clonedState = _.cloneDeep(state)
-    if (sharedFilters) clonedState.config.dashboard.sharedFilters = sharedFilters
-    const newFilteredData = getFilteredData(clonedState)
-    dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
   }
 
   const resizeObserver = new ResizeObserver(entries => {
