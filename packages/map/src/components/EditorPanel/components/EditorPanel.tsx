@@ -43,9 +43,6 @@ import ConfigContext from '../../../context.ts'
 import { MapContext } from '../../../types/MapContext.js'
 import { TextField } from './Inputs'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
-import { layerSettings } from '../../LeafletMap/components/layerSettings'
-
-const layerOptions = layerSettings.map(l => ({ value: l.key, label: l.name }))
 
 // Todo: move to useReducer, seperate files out.
 const EditorPanel = ({ columnsRequiredChecker }) => {
@@ -727,6 +724,14 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
               }
             })
             break
+          case 'google-map':
+            setState({
+              ...state,
+              general: {
+                ...state.general,
+                geoType: 'google-map'
+              }
+            })
           default:
             break
         }
@@ -1588,20 +1593,79 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             </AccordionItemHeading>
             <AccordionItemPanel>
               {/* Geography */}
-              <Select
-                options={[
-                  { value: 'us', label: 'United States' },
-                  { value: 'us-region', label: 'U.S. Region' },
-                  { value: 'world', label: 'World' },
-                  { value: 'single-state', label: 'U.S. State' },
-                  { value: 'leaflet', label: 'Leaflet' },
-                  { value: 'google-map', label: 'Google Map API' }
-                ]}
-                section={'general'}
-                fieldName={'geoType'}
-                label='Geography'
-                updateField={updateField}
-              />
+              {/*<Select*/}
+              {/*  options={[*/}
+              {/*    { value: 'us', label: 'United States' },*/}
+              {/*    { value: 'us-region', label: 'U.S. Region' },*/}
+              {/*    { value: 'world', label: 'World' },*/}
+              {/*    { value: 'single-state', label: 'U.S. State' },*/}
+              {/*    { value: 'google-map', label: 'Google Map API' }*/}
+              {/*  ]}*/}
+              {/*  section={'general'}*/}
+              {/*  fieldName={'geoType'}*/}
+              {/*  label='Geography'*/}
+              {/*  updateField={updateField}*/}
+              {/*/>*/}
+
+              <label>
+                <span className='edit-label column-heading'>
+                  <span>Geography</span>
+                </span>
+                <ul className='geo-buttons d-grid' style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                  <button
+                    className={`${
+                      state.general.geoType === 'us' || state.general.geoType === 'us-county' ? 'active' : ''
+                    } full-width`}
+                    onClick={e => {
+                      e.preventDefault()
+                      handleEditorChanges('geoType', 'us')
+                    }}
+                  >
+                    <UsaGraphic />
+                    <span>United States</span>
+                  </button>
+                  <button
+                    className={`${state.general.geoType === 'us-region' ? 'active' : ''} full-width`}
+                    onClick={e => {
+                      e.preventDefault()
+                      handleEditorChanges('geoType', 'us-region')
+                    }}
+                  >
+                    <UsaRegionGraphic />
+                    <span>U.S. Region</span>
+                  </button>
+                  <button
+                    className={`${state.general.geoType === 'world' ? 'active' : ''} full-width`}
+                    onClick={e => {
+                      e.preventDefault()
+                      handleEditorChanges('geoType', 'world')
+                    }}
+                  >
+                    <WorldGraphic />
+                    <span>World</span>
+                  </button>
+                  <button
+                    className={`${state.general.geoType === 'single-state' ? 'active' : ''} full-width`}
+                    onClick={e => {
+                      e.preventDefault()
+                      handleEditorChanges('geoType', 'single-state')
+                    }}
+                  >
+                    <AlabamaGraphic />
+                    <span>U.S. State</span>
+                  </button>
+                  <button
+                    className={`${state.general.geoType === 'google-map' ? 'active' : ''} full-width`}
+                    onClick={e => {
+                      e.preventDefault()
+                      handleEditorChanges('geoType', 'google-map')
+                    }}
+                  >
+                    <UsaGraphic />
+                    <span>Google Map Api</span>
+                  </button>
+                </ul>
+              </label>
               {/* Select > State or County Map */}
               {(state.general.geoType === 'us' || state.general.geoType === 'us-county') && (
                 <label>

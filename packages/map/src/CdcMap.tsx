@@ -74,7 +74,6 @@ import EditorPanel from './components/EditorPanel' // Future: Lazy
 import NavigationMenu from './components/NavigationMenu' // Future: Lazy
 import UsaMap from './components/UsaMap' // Future: Lazy
 import WorldMap from './components/WorldMap' // Future: Lazy
-import LeafletMap from './components/LeafletMap'
 import GoogleMap from './components/GoogleMap'
 import useTooltip from './hooks/useTooltip'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
@@ -1848,7 +1847,6 @@ const CdcMap = ({
                       {'us-region' === geoType && <UsaMap.Region />}
                       {'us-county' === geoType && <UsaMap.County />}
                       {'world' === geoType && <WorldMap />}
-                      {'leaflet' === geoType && <LeafletMap />}
                       {'google-map' === geoType && <GoogleMap />}
                       {'data' === general.type && logo && (
                         <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />

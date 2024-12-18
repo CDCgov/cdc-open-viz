@@ -87,7 +87,7 @@ export type MapConfig = Visualization & {
     fullBorder: boolean
     geoBorderColor: string
     geoLabelOverride: string
-    geoType: 'us' | 'us-county' | 'world' | 'single-state' | 'leaflet' | 'google-maps' | 'esri'
+    geoType: 'us' | 'us-county' | 'world' | 'single-state' | 'leaflet' | 'google-map'
     hasRegions: boolean
     headerColor: ComponentThemes
     hideGeoColumnInTooltip: boolean
