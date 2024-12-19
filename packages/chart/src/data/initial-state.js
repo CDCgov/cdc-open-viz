@@ -49,7 +49,7 @@ export default {
     labelColor: '#333',
     tickLabelColor: '#333',
     tickColor: '#333',
-    rightHideAxis: true,
+    rightHideAxis: false,
     rightAxisSize: 0,
     rightLabel: '',
     rightLabelOffsetSize: 0,
@@ -171,10 +171,11 @@ export default {
     hideBorder: {
       side: false,
       topBottom: true
-    }
+    },
+    position: 'right'
   },
   brush: {
-    height: 25,
+    height: 45,
     active: false
   },
   exclusions: {

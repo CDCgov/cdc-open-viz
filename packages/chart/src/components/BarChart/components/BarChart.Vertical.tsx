@@ -21,7 +21,8 @@ import createBarElement from '@cdc/core/components/createBarElement'
 import chroma from 'chroma-js'
 // Types
 import { type ChartContext } from '../../../types/ChartContext'
-import _, { has } from 'lodash'
+import _ from 'lodash'
+import { getBarData } from '../helpers/getBarData'
 
 export const BarChartVertical = () => {
   const { xScale, yScale, xMax, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
@@ -44,8 +45,14 @@ export const BarChartVertical = () => {
   } = useBarChart()
 
   // prettier-ignore
-  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, getXAxisData, getYAxisData, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig } = useContext<ChartContext>(ConfigContext)
+  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig } = useContext<ChartContext>(ConfigContext)
+
   const { HighLightedBarUtils } = useHighlightedBars(config)
+
+  const root = document.documentElement
+
+  const coolGray90 = getComputedStyle(root).getPropertyValue('--cool-gray-90')
+
   let data = transformedData
   // check if user add suppression
   const isSuppressionActive = config.preliminaryData.some(pd => pd.value && pd.type === 'suppression')
@@ -60,32 +67,7 @@ export const BarChartVertical = () => {
 
   const hasConfidenceInterval = Object.keys(config.confidenceKeys).length > 0
 
-  const getData = () => {
-    const dynamicSeries = config.series.find(s => s.dynamicCategory)
-    if (!dynamicSeries) return data
-    const { dynamicCategory, dataKey } = dynamicSeries
-    const xAxisKey = config.runtime.originalXAxis.dataKey
-    const xAxisGroupDataLookup = _.groupBy(data, xAxisKey)
-    return Object.values(xAxisGroupDataLookup).map(group => {
-      return group.reduce((acc, datum) => {
-        const dataValue = datum[dataKey]
-        const dataCategory = datum[dynamicCategory]
-        if (hasConfidenceInterval) {
-          const { lower, upper } = config.confidenceKeys
-          if (!acc.CI) acc.CI = {}
-          const lowerValue = datum[lower]
-          const upperValue = datum[upper]
-          acc.CI[dataCategory] = { lower: lowerValue, upper: upperValue }
-        }
-        acc[dataCategory] = dataValue
-        acc[xAxisKey] = datum[xAxisKey]
-        acc.dynamicData = true
-        return acc
-      }, {})
-    })
-  }
-
-  const _data = getData()
+  const _data = getBarData(config, data, hasConfidenceInterval)
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' ||
@@ -109,11 +91,11 @@ export const BarChartVertical = () => {
           }}
         >
           {barGroups => {
-            return barGroups.map((barGroup, index) => (
+            return barGroups.map((barGroup, _index) => (
               <Group
-                className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`}
-                key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
-                id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
+                className={`bar-group-${barGroup.index}-${barGroup.x0}--${_index} ${config.orientation}`}
+                key={`bar-group-${barGroup.index}-${barGroup.x0}--${_index}`}
+                id={`bar-group-${barGroup.index}-${barGroup.x0}--${_index}`}
                 left={barGroup.x0}
               >
                 {barGroup.bars.map((bar, index) => {
@@ -249,11 +231,17 @@ export const BarChartVertical = () => {
                   // Confidence Interval Variables
                   const tickWidth = 5
                   const xPos = barX + (config.xAxis.type !== 'date-time' ? barWidth / 2 : 0)
-                  const [upperPos, lowerPos] = ['upper', 'lower'].map(position => {
-                    if (!hasConfidenceInterval) return
-                    const d = datum.dynamicData ? datum.CI[bar.key][position] : datum[config.confidenceKeys[position]]
-                    return yScale(d)
-                  })
+
+                  const upperPos = yScale(
+                    datum.dynamicData && datum.CI[bar.key]
+                      ? datum.CI[bar.key].upper
+                      : datum[config.confidenceKeys.upper]
+                  )
+                  const lowerPos = yScale(
+                    datum.dynamicData && datum.CI[bar.key]
+                      ? datum.CI[bar.key].lower
+                      : datum[config.confidenceKeys.lower]
+                  )
                   // End Confidence Interval Variables
 
                   return (
@@ -372,7 +360,7 @@ export const BarChartVertical = () => {
                           <rect
                             display={displaylollipopShape}
                             x={barX - lollipopBarWidth / 2}
-                            y={barY}
+                            y={bar.y}
                             width={lollipopShapeSize}
                             height={lollipopShapeSize}
                             fill={getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key]))}
@@ -384,10 +372,10 @@ export const BarChartVertical = () => {
                             <animate attributeName='height' values={`0, ${lollipopShapeSize}`} dur='2.5s' />
                           </rect>
                         )}
-                        {hasConfidenceInterval && (
+                        {hasConfidenceInterval && bar.value !== undefined && datum && (
                           <path
                             key={`confidence-interval-v-${datum[config.runtime.originalXAxis.dataKey]}`}
-                            stroke='#333'
+                            stroke={coolGray90}
                             strokeWidth='px'
                             d={`M${xPos - tickWidth} ${upperPos}
                                 L${xPos + tickWidth} ${upperPos}

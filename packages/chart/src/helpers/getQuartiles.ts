@@ -4,27 +4,24 @@
  * @param {Array} arr - The array of integers or decimals.
  * @returns {Object} An object containing the q1 and q3 values.
  */
-export const getQuartiles = arr => {
-  arr.sort((a, b) => a - b)
+import _ from 'lodash'
 
-  // Calculate the index of the median value of the array
-  const medianIndex = Math.floor(arr.length / 2)
+export const getQuartiles = (values: number[]): { q1: number; q3: number } => {
+  const sortedData: number[] = _.sortBy(values)
 
-  // Check if the length of the array is even or odd
-  const isEvenLength = arr.length % 2 === 0
+  const quantile = (sortedData: number[], q: number): number => {
+    const position: number = (sortedData.length - 1) * q
+    const base: number = Math.floor(position)
+    const rest: number = position - base
+    if (sortedData[base + 1] !== undefined) {
+      return sortedData[base] + rest * (sortedData[base + 1] - sortedData[base])
+    } else {
+      return sortedData[base]
+    }
+  }
 
-  // Split the array into two subarrays based on the median index
-  const q1Array = isEvenLength ? arr.slice(0, medianIndex) : arr.slice(0, medianIndex + 1)
-  const q3Array = isEvenLength ? arr.slice(medianIndex) : arr.slice(medianIndex + 1)
+  const q1: number = quantile(sortedData, 0.25)
+  const q3: number = quantile(sortedData, 0.75)
 
-  // Calculate the median of the first subarray to get the q1 value
-  const q1Index = Math.floor(q1Array.length / 2)
-  const q1 = isEvenLength ? (q1Array[q1Index - 1] + q1Array[q1Index]) / 2 : q1Array[q1Index]
-
-  // Calculate the median of the second subarray to get the q3 value
-  const q3Index = Math.floor(q3Array.length / 2)
-  const q3 = isEvenLength ? (q3Array[q3Index - 1] + q3Array[q3Index]) / 2 : q3Array[q3Index]
-
-  // Return an object containing the q1 and q3 values
   return { q1, q3 }
 }

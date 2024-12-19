@@ -7,6 +7,7 @@ import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from
 import { getFilterControllingStatePicked } from './UsaMap/helpers/map'
 
 import ConfigContext from '../context'
+import { getGeoStrokeColor } from '../helpers/colors'
 
 const CityList = ({
   data,
@@ -79,6 +80,8 @@ const CityList = ({
       fillOpacity: state.general.type === 'bubble' ? 0.4 : 1
     }
 
+    const geoStrokeColor = getGeoStrokeColor(state)
+
     const pin = (
       <path
         className='marker'
@@ -88,7 +91,7 @@ const CityList = ({
         data-tooltip-id={`tooltip__${tooltipId}`}
         data-tooltip-html={toolTip}
         transform={`scale(${radius / 9})`}
-        stroke={state.general.geoBorderColor === 'sameAsBackground' ? '#ffffff' : '#000000'}
+        stroke={geoStrokeColor}
         strokeWidth={'2px'}
         tabIndex='-1'
         {...additionalProps}
@@ -185,7 +188,7 @@ const CityList = ({
       title: 'Select for more information',
       'data-tooltip-id': `tooltip__${tooltipId}`,
       'data-tooltip-html': toolTip,
-      stroke: state.general.geoBorderColor === 'sameAsBackground' ? '#ffffff' : '#000000',
+      stroke: geoStrokeColor,
       strokeWidth: '2px',
       tabIndex: -1,
       ...additionalProps

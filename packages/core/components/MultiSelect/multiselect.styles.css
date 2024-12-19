@@ -6,6 +6,9 @@
     display: inline-flex;
     align-items: center;
     .selected {
+      &[aria-disabled='true'] {
+        background: var(--lightestGray);
+      }
       border: 1px solid var(--lightGray);
       padding: 7px;
       min-width: 200px;
@@ -41,6 +44,9 @@
         margin-bottom: 0;
       }
     }
+    .spinner-border {
+      right: 20% !important;
+    }
   }
   .dropdown {
     background: white;
@@ -64,4 +70,8 @@
       }
     }
   }
+}
+
+.accordion__panel .cove-multiselect .dropdown {
+  position: relative;
 }

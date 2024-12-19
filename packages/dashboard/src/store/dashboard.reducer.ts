@@ -150,7 +150,8 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     case 'SWITCH_CONFIG': {
       const slot = action.payload
       const newConfigFields = state.config.multiDashboards[slot]
-      return { ...state, config: { ...state.config, ...newConfigFields, activeDashboard: slot } }
+      const _newDatasets = _.cloneDeep(state.data)
+      return { ...state, data: _newDatasets, config: { ...state.config, ...newConfigFields, activeDashboard: slot } }
     }
     case 'TOGGLE_ROW': {
       const { rowIndex, colIndex } = action.payload

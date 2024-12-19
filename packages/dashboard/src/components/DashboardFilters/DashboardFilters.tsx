@@ -6,6 +6,8 @@ import { FILTER_STYLE } from '../../types/FilterStyles'
 import { NestedOptions, ValueTextPair } from '@cdc/core/components/NestedDropdown/nestedDropdownHelpers'
 import NestedDropdown from '@cdc/core/components/NestedDropdown'
 import { MouseEventHandler } from 'react'
+import Loader from '@cdc/core/components/Loader'
+import _ from 'lodash'
 
 type DashboardFilterProps = {
   show: number[]
@@ -48,25 +50,31 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
     <form className='d-flex flex-wrap'>
       {sharedFilters.map((filter, filterIndex) => {
         const urlFilterType = filter.type === 'urlfilter'
+        const label = filter.key
+
         if (
           (!urlFilterType && !filter.showDropdown && filter.filterStyle !== FILTER_STYLE.nestedDropdown) ||
           (show && !show.includes(filterIndex))
         )
-          return <React.Fragment key={`${filter.key}-filtersection-${filterIndex}-option`} />
+          return <React.Fragment key={`${label}-filtersection-${filterIndex}-option`} />
         const values: JSX.Element[] = []
 
-        if (filter.resetLabel) {
-          values.push(
-            <option key={`${filter.resetLabel}-option`} value={filter.resetLabel}>
-              {filter.resetLabel}
-            </option>
-          )
-        }
-
         const _key = filter.apiFilter?.apiEndpoint
+        const loading = apiFilterDropdowns[_key] === null
 
         const multiValues: { value; label }[] = []
+        const nestedOptions: NestedOptions = Object.entries(filter?.subGrouping?.valuesLookup || {}).map(
+          ([key, data]) => [
+            [key, key], // Main option: [value, text]
+            Array.isArray(data?.values) ? data.values.map(value => [value, value]) : [] // Ensure `values` is an array
+          ]
+        )
 
+        const activeSubGroupValue = _.get(
+          filter?.subGrouping?.valuesLookup,
+          [filter?.active as string, 'values', 0],
+          null // Default to null if the path is invalid
+        )
         if (_key && apiFilterDropdowns[_key]) {
           // URL Filter
           if (filter.filterStyle !== FILTER_STYLE.nestedDropdown) {
@@ -83,64 +91,104 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           // Data Filter
           filter.values?.forEach((filterOption, index) => {
             const labeledOpt = filter.labels && filter.labels[filterOption]
-            values.push(
-              <option key={`${filter.key}-option-${index}`} value={filterOption}>
-                {labeledOpt || filterOption}
-              </option>
-            )
+            const resetLabelHasMatch = (filterOption || labeledOpt) === filter.resetLabel
+
+            if (!resetLabelHasMatch) {
+              values.push(
+                <option key={`${filter.key}-option-${index}`} value={filterOption}>
+                  {labeledOpt || filterOption}
+                </option>
+              )
+            } else {
+              // add label to the front of list if it matches with reset label
+              values.unshift(
+                <option key={`${filter.key}-option-${index}`} value={filterOption}>
+                  {labeledOpt || filterOption}
+                </option>
+              )
+            }
+
             multiValues.push({ value: filterOption, label: labeledOpt || filterOption })
           })
         }
 
-        return filter.filterStyle === FILTER_STYLE.multiSelect ? (
-          <div className='form-group mr-3 mb-1' key={`${filter.key}-filtersection-${filterIndex}`}>
-            <MultiSelect
-              label={filter.key}
-              options={multiValues}
-              fieldName={filterIndex}
-              updateField={updateField}
-              selected={filter.active as string[]}
-              limit={filter.selectLimit || 5}
-            />
-          </div>
-        ) : filter.filterStyle === FILTER_STYLE.nestedDropdown ? (
-          <div className='form-group mr-3 mb-1' key={`${filter.key}-filtersection-${filterIndex}`}>
-            <NestedDropdown
-              activeGroup={filter.active as string}
-              activeSubGroup={filter.subGrouping?.active}
-              filterIndex={filterIndex}
-              options={getNestedDropdownOptions(apiFilterDropdowns[_key])}
-              listLabel={filter.key}
-              handleSelectedItems={value => updateField(null, null, filterIndex, value)}
-            />
-          </div>
-        ) : (
-          <div className='form-group mr-3 mb-1' key={`${filter.key}-filtersection-${filterIndex}`}>
-            <label className='text-capitalize font-weight-bold' htmlFor={`filter-${filterIndex}`}>
-              {filter.key}
-            </label>
-            <select
-              id={`filter-${filterIndex}`}
-              className='cove-form-select'
-              data-index='0'
-              value={filter.queuedActive || filter.active}
-              onChange={val => {
-                handleOnChange(filterIndex, val.target.value)
-              }}
-              disabled={values.length === 1 && !nullVal(filter)}
-            >
-              {nullVal(filter) && (
-                <option key={`select`} value=''>
-                  {filter.resetLabel || '- Select -'}
-                </option>
-              )}
-              {values}
-            </select>
+        const isDisabled = !values.length
+        // push reset label only if it does not includes in filter values  options
+        if (filter.resetLabel && !filter.values.includes(filter.resetLabel)) {
+          values.unshift(
+            <option key={`${filter.resetLabel}-option`} value={filter.resetLabel}>
+              {filter.resetLabel}
+            </option>
+          )
+        }
+
+        const formGroupClass = `form-group mr-3 mb-1${loading ? ' loading-filter' : ''}`
+
+        return (
+          <div className={formGroupClass} key={`${label}-filtersection-${filterIndex}`}>
+            {label && (
+              <label className='font-weight-bold mt-1 mb-0' htmlFor={`filter-${filterIndex}`}>
+                {label}
+              </label>
+            )}
+            {filter.filterStyle === FILTER_STYLE.multiSelect ? (
+              <MultiSelect
+                label={label}
+                options={multiValues}
+                fieldName={filterIndex}
+                updateField={updateField}
+                selected={filter.active as string[]}
+                limit={filter.selectLimit || 5}
+                loading={loading}
+              />
+            ) : filter.filterStyle === FILTER_STYLE.nestedDropdown ? (
+              <NestedDropdown
+                activeGroup={filter.active as string}
+                activeSubGroup={_key ? filter.subGrouping?.active : activeSubGroupValue}
+                filterIndex={filterIndex}
+                options={_key ? getNestedDropdownOptions(apiFilterDropdowns[_key]) : nestedOptions}
+                listLabel={label}
+                handleSelectedItems={value => updateField(null, null, filterIndex, value)}
+                loading={loading}
+              />
+            ) : (
+              <>
+                <select
+                  id={`filter-${filterIndex}`}
+                  className='cove-form-select'
+                  data-index='0'
+                  value={loading ? 'Loading...' : filter.queuedActive || filter.active}
+                  onChange={val => {
+                    handleOnChange(filterIndex, val.target.value)
+                  }}
+                  disabled={loading || isDisabled}
+                >
+                  {loading && <option value='Loading...'>Loading...</option>}
+                  {nullVal(filter) && (
+                    <option key={`select`} value=''>
+                      {filter.resetLabel || '- Select -'}
+                    </option>
+                  )}
+                  {values}
+                </select>
+                {loading && <Loader spinnerType={'text-secondary'} />}
+              </>
+            )}
           </div>
         )
       })}
       {showSubmit && (
-        <button className='btn btn-primary mb-1' onClick={applyFilters}>
+        <button
+          className='btn btn-primary mb-1'
+          onClick={applyFilters}
+          disabled={show.some(filterIndex => {
+            const emptyFilterValues = [undefined, '', '- Select -']
+            return (
+              emptyFilterValues.includes(sharedFilters[filterIndex].queuedActive) &&
+              emptyFilterValues.includes(sharedFilters[filterIndex].active)
+            )
+          })}
+        >
           {applyFiltersButtonText || 'GO!'}
         </button>
       )}

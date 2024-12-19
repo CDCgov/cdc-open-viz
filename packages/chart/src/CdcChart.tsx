@@ -436,89 +436,71 @@ const CdcChart = ({
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
       const combinedData = filteredData || data
-      let allKeys = combinedData.map(d => d[newConfig.xAxis.dataKey])
-      const groups = _.uniq(allKeys)
-
-      let tableData: any[] = []
+      const groups = _.uniq(_.map(combinedData, newConfig.xAxis.dataKey))
+      const seriesKeys = _.map(newConfig.series, 'dataKey')
       const plots: any[] = []
 
-      // group specific statistics
-      // prevent re-renders
-      if (!groups) return
       groups.forEach(g => {
-        try {
-          if (!g) throw new Error('No groups resolved in box plots')
+        seriesKeys.forEach(seriesKey => {
+          try {
+            if (!g) throw new Error('No groups resolved in box plots')
 
-          // filter data by group
-          let filteredData = combinedData.filter(item => item[newConfig.xAxis.dataKey] === g)
+            // Start handle operations on combinedData
+            const { count, sortedData } = _.chain(combinedData)
+              // Filter by xAxis data key
+              .filter(item => item[newConfig.xAxis.dataKey] === g)
+              // perform multiple operations on the filtered data
+              .thru(filteredData => ({
+                count: filteredData.length,
+                sortedData: _.map(filteredData, item => Number(item[seriesKey])).sort()
+              }))
+              // get the results from the chain
+              .value()
 
-          let filteredDataValues: number[] = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
+            // ! - Notice d3.quantile doesn't work here, and we had to take a custom route.
+            const quartiles = getQuartiles(sortedData)
 
-          // Sort the data for upcoming functions.
-          let sortedData = filteredDataValues.sort((a, b) => a - b)
+            if (!sortedData) throw new Error('boxplots dont have data yet')
+            if (!plots) throw new Error('boxplots dont have plots yet')
 
-          // ! - Notice d3.quantile doesn't work here, and we had to take a custom route.
-          const quartiles = getQuartiles(sortedData)
+            const q1 = quartiles.q1
+            const q3 = quartiles.q3
 
-          const getValuesBySeriesKey = () => {
-            const allSeriesKeys = newConfig.series.map(item => item?.dataKey)
-            const result = {}
-            allSeriesKeys.forEach(key => {
-              result[key] = filteredData.map(item => item[key])
+            const iqr = q3 - q1
+            const lowerBounds = q1 - 1.5 * iqr
+            const upperBounds = q3 + 1.5 * iqr
+            const filteredData = sortedData.filter(d => d <= upperBounds)
+            const max = d3.max(filteredData)
+            plots.push({
+              columnCategory: g,
+              columnMax: max,
+              columnThirdQuartile: _.round(q3, newConfig.dataFormat.roundTo),
+              columnMedian: Number(d3.median(sortedData)).toFixed(newConfig.dataFormat.roundTo),
+              columnFirstQuartile: _.round(q1, newConfig.dataFormat.roundTo),
+              columnMin: _.min(sortedData),
+              columnCount: count,
+              columnSd: Number(d3.deviation(sortedData)).toFixed(newConfig.dataFormat.roundTo),
+              columnMean: Number(d3.mean(sortedData)).toFixed(newConfig.dataFormat.roundTo),
+              columnIqr: _.round(iqr, newConfig.dataFormat.roundTo),
+              values: sortedData,
+              columnLowerBounds: lowerBounds,
+              columnUpperBounds: upperBounds,
+              columnOutliers: _.filter(sortedData, value => value < lowerBounds || value > upperBounds),
+              columnNonOutliers: _.filter(sortedData, value => value >= lowerBounds && value <= upperBounds)
             })
-
-            return result
+          } catch (e) {
+            console.error('COVE: ', e.message) // eslint-disable-line
           }
-
-          if (!filteredData) throw new Error('boxplots dont have data yet')
-          if (!plots) throw new Error('boxplots dont have plots yet')
-
-          const q1 = quartiles.q1
-          const q3 = quartiles.q3
-          const iqr = q3 - q1
-          const lowerBounds = q1 - (q3 - q1) * 1.5
-          const upperBounds = q3 + (q3 - q1) * 1.5
-
-          const outliers = sortedData.filter(v => v < lowerBounds || v > upperBounds)
-
-          const minValue: number = d3.min<number>(filteredDataValues) || 0
-          const _colMin = d3.max<number>([minValue, q1 - 1.5 * iqr])
-          plots.push({
-            columnCategory: g,
-            columnMax: d3.min([d3.max(filteredDataValues), q1 + 1.5 * iqr]),
-            columnThirdQuartile: Number(q3).toFixed(newConfig.dataFormat.roundTo),
-            columnMedian: Number(d3.median(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
-            columnFirstQuartile: q1.toFixed(newConfig.dataFormat.roundTo),
-            columnMin: _colMin,
-            columnCount: filteredData.length,
-            columnSd: Number(d3.deviation(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
-            columnMean: Number(d3.mean(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
-            columnIqr: Number(iqr).toFixed(newConfig.dataFormat.roundTo),
-            columnLowerBounds: _colMin,
-            columnUpperBounds: d3.min([d3.max(sortedData), q1 + 1.5 * iqr]),
-            columnOutliers: outliers,
-            values: filteredDataValues,
-            keyValues: getValuesBySeriesKey()
-          })
-        } catch (e) {
-          console.error('COVE: ', e.message) // eslint-disable-line
-        }
+        })
       })
+      // Generate a flat list of categories based on seriesKeys and groups
+      const categories =
+        seriesKeys.length > 1
+          ? _.flatMap(groups, value => _.map(seriesKeys, key => `${_.capitalize(key)} - ${_.capitalize(value)}`))
+          : groups
 
-      // make deep copy so we can remove some fields for data
-      // this appears to be the easiest option instead of running logic against the datatable cell...
-      tableData = JSON.parse(JSON.stringify(plots))
-      tableData.map(table => {
-        table.columnIqr = undefined
-        table.nonOutlierValues = undefined
-        table.columnLowerBounds = undefined
-        table.columnUpperBounds = undefined
-        return null // resolve eslint
-      })
-
-      newConfig.boxplot['categories'] = groups
+      newConfig.boxplot['categories'] = categories
       newConfig.boxplot.plots = plots
-      newConfig.boxplot.tableData = tableData
     }
 
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {
@@ -602,10 +584,7 @@ const CdcChart = ({
         : ''
 
     // Sankey Description box error message
-    newConfig.runtime.editorErrorMessage =
-      newConfig.visualizationType === 'Sankey' && !newConfig.description
-        ? 'SUBTEXT/CITATION field is empty: A description of the Sankey Diagram data must be inputted.'
-        : ''
+    newConfig.runtime.editorErrorMessage = ''
 
     if (newConfig.legend.seriesHighlight?.length) {
       setSeriesHighlight(newConfig.legend?.seriesHighlight)
@@ -636,11 +615,12 @@ const CdcChart = ({
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
-      let editorWidth = 350
+      const svgMarginWidth = 15
+      const editorWidth = 350
 
       width = isEditor ? width - editorWidth : width
 
-      let newViewport = getViewport(width)
+      const newViewport = getViewport(width)
 
       setCurrentViewport(newViewport)
 
@@ -648,7 +628,7 @@ const CdcChart = ({
         width = width - 2.5
       }
 
-      width = width
+      width = width - svgMarginWidth
 
       setDimensions([width, height])
     }

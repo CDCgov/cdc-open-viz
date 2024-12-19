@@ -31,6 +31,7 @@ type DashboardFiltersProps = {
   isEditor?: boolean
   setConfig: (config: DashboardFilters) => void
   currentViewport?: ViewPort
+  setAPILoading: (loading: boolean) => void
 }
 
 const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
@@ -41,7 +42,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   isEditor = false
 }) => {
   const state = useContext(DashboardContext)
-  const { config: dashboardConfig, reloadURLData, loadAPIFilters, setAPIFilterDropdowns } = state
+  const { config: dashboardConfig, reloadURLData, loadAPIFilters, setAPIFilterDropdowns, setAPILoading } = state
   const dispatch = useContext(DashboardDispatchContext)
 
   const applyFilters = e => {
@@ -81,7 +82,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
           updateQueryString(queryParams)
         }
       }
-
+      setAPILoading(true)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: dashboardConfig.sharedFilters })
       dispatch({ type: 'SET_FILTERED_DATA', payload: getFilteredData(_.cloneDeep(state)) })
       loadAPIFilters(dashboardConfig.sharedFilters, apiFilterDropdowns)
@@ -104,6 +105,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       newConfig.dashboard.sharedFilters,
       visualizationConfig
     )
+
+    // sets the active filter option that the user just selected.
+    dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
 
     if (hasDashboardApplyBehavior(dashboardConfig.visualizations)) {
       const isAutoSelectFilter = visualizationConfig.autoLoad

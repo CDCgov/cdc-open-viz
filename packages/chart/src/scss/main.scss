@@ -140,7 +140,7 @@
   .subtext--responsive-ticks,
   .section-subtext {
     &--brush-active {
-      margin-top: 2.5em;
+      margin-top: 3em !important;
     }
   }
 
@@ -159,7 +159,7 @@
     border: 1px solid var(--lightGray);
     position: relative;
 
-    &.no-border {
+    &.border-0 {
       border: 1px solid transparent;
       padding: 0;
     }
@@ -259,6 +259,10 @@
         }
       }
     }
+  }
+
+  .legend-container__inner.flex-column-reverse div.legend-item:last-child {
+    margin-bottom: 0.2rem !important;
   }
 
   .dynamic-legend-list {

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo, useId } from 'react'
 import './nesteddropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
 import { filterSearchTerm, NestedOptions, ValueTextPair } from './nestedDropdownHelpers'
+import Loader from '../Loader'
 
 const Options: React.FC<{
   subOptions: ValueTextPair[]
@@ -106,12 +107,10 @@ type NestedDropdownProps = {
   activeGroup: string
   activeSubGroup?: string
   filterIndex: number
-  isEditor?: boolean
-  isUrlFilter?: boolean
   listLabel: string
   handleSelectedItems: ([group, subgroup]: [string, string]) => void
   options: NestedOptions
-  subGroupingActive?: string
+  loading?: boolean
 }
 
 const NestedDropdown: React.FC<NestedDropdownProps> = ({
@@ -120,16 +119,18 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   activeSubGroup,
   filterIndex,
   listLabel,
-  handleSelectedItems
+  handleSelectedItems,
+  loading
 }) => {
   const dropdownId = useId()
-  const groupFilterActive = activeGroup
-  const subGroupFilterActive = activeSubGroup || ''
 
   const [userSearchTerm, setUserSearchTerm] = useState('')
-  const [inputValue, setInputValue] = useState(
-    subGroupFilterActive !== '' ? `${groupFilterActive} - ${subGroupFilterActive}` : ''
-  )
+  const [inputValue, setInputValue] = useState('')
+
+  const initialInputValue = useMemo(() => {
+    // value from props
+    return activeSubGroup ? `${activeGroup} - ${activeSubGroup}` : ''
+  }, [activeSubGroup])
   const [inputHasFocus, setInputHasFocus] = useState(false)
   const [isListOpened, setIsListOpened] = useState(false)
 
@@ -245,17 +246,17 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
 
   return (
     <>
-      {listLabel && (
-        <label className='text-capitalize font-weight-bold' htmlFor={dropdownId}>
-          {listLabel}
-        </label>
-      )}
       <div
         id={dropdownId}
         className={`nested-dropdown nested-dropdown-${filterIndex} ${isListOpened ? 'open-filter' : ''}`}
         onKeyUp={handleKeyUp}
       >
-        <div className='nested-dropdown-input-container' aria-label='searchInput' role='textbox'>
+        <div
+          className={`nested-dropdown-input-container${loading || !options.length ? ' disabled' : ''}`}
+          aria-label='searchInput'
+          aria-disabled={loading}
+          role='textbox'
+        >
           <input
             id={`nested-dropdown-${filterIndex}`}
             className='search-input'
@@ -264,9 +265,10 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
             aria-haspopup='true'
             aria-hidden='false'
             tabIndex={0}
-            value={inputValue}
+            value={inputValue || initialInputValue}
             onChange={handleSearchTermChange}
-            placeholder={'- Select -'}
+            placeholder={loading ? 'Loading...' : '- Select -'}
+            disabled={loading || !options.length}
             onClick={() => {
               if (inputHasFocus) setIsListOpened(!isListOpened)
             }}
@@ -277,6 +279,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
             <Icon display='caretDown' />
           </span>
         </div>
+        {loading && <Loader spinnerType={'text-secondary'} />}
         <ul
           role='tree'
           key={listLabel}
@@ -299,7 +302,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
                     handleSubGroupSelect={subGroupValue => {
                       chooseSelectedSubGroup(groupValue, subGroupValue)
                     }}
-                    userSelectedLabel={groupFilterActive + subGroupFilterActive}
+                    userSelectedLabel={activeGroup + activeSubGroup}
                     userSearchTerm={userSearchTerm}
                   />
                 )

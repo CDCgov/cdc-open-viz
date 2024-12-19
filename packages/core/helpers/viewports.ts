@@ -1,9 +1,10 @@
-function isLegendWrapViewport(currentViewport) {
-  return ['xs', 'xxs'].includes(currentViewport)
-}
+import { ViewportSize } from '@cdc/map/src/types/MapConfig'
 
-function isMobileHeightViewport(currentViewport) {
-  return ['xs', 'xxs'].includes(currentViewport)
-}
+const BREAKPOINTS = ['xxs', 'xs', 'sm', 'md', 'lg']
 
-export { isLegendWrapViewport, isMobileHeightViewport }
+export const isBelowBreakpoint = (breakpoint: ViewportSize, currentViewport: ViewportSize) =>
+  BREAKPOINTS.indexOf(currentViewport) < BREAKPOINTS.indexOf(breakpoint)
+
+export const isLegendWrapViewport = currentViewport => isBelowBreakpoint('sm', currentViewport)
+
+export const isMobileHeightViewport = currentViewport => isBelowBreakpoint('sm', currentViewport)

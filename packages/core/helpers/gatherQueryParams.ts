@@ -5,9 +5,8 @@ const strip = (paramVal: string) => {
 }
 
 const isNumber = (value: string) => {
-  const hasLetters = value.match(/[a-zA-Z]/)
-  if (hasLetters) return false
-  return !isNaN(parseInt(value))
+  // matches int and float and negative numbers
+  return String(value).match(/^[-]?[0-9\.]+$/)
 }
 
 export const gatherQueryParams = (baseEndpoint: string, params: { key: string; value: string }[]) => {

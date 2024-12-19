@@ -4,81 +4,22 @@ import { Group } from '@visx/group'
 import ConfigContext from '../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
-import { scaleBand } from '@visx/scale'
+import { handleTooltip, calculateBoxPlotStats, createPlots } from './helpers/index'
 import _ from 'lodash'
-import { max, min, median, quantile } from 'd3-array'
-const CoveBoxPlot = ({ xScale, yScale }) => {
+
+const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
   const { config, colorScale, seriesHighlight, transformedData: data } = useContext(ConfigContext)
   const { boxplot } = config
 
-  // tooltips
   const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
-
-  const handleTooltip = (d, key, q1, q3, median, iqr) => {
-    return `
-      <strong>${d.columnCategory}</strong></br>
-       <strong>Key:${key}</strong></br>
-      ${boxplot.labels.q1}: ${q1}<br/>
-      ${boxplot.labels.q3}: ${q3}<br/>
-      ${boxplot.labels.iqr}: ${iqr}<br/>
-      ${boxplot.labels.median}: ${median}
-    `
-  }
-
   const boxWidth = xScale.bandwidth()
   const constrainedWidth = Math.min(40, boxWidth)
-  const color_0 = colorPalettesChart[config?.palette][0] ? colorPalettesChart[config?.palette][0] : '#000'
-  const seriesScale = scaleBand({
-    range: [0, config.barThickness * 100 || 1],
-    domain: config.series?.map(item => item?.dataKey)
-  })
-
-  const calculateBoxPlotStats = values => {
-    if (!values || !values.length) return {}
-    const sortedValues = values.sort((a, b) => a - b)
-    return {
-      min: min(values),
-      max: max(values),
-      median: median(values),
-      firstQuartile: quantile(sortedValues, 0.25),
-      thirdQuartile: quantile(sortedValues, 0.75)
-    }
-  }
-
-  const getValuesBySeriesKey = (group: string) => {
-    const allSeriesKeys = config.series.map(item => item?.dataKey)
-    const result = {}
-    const filteredData = data.filter(item => item[config.xAxis.dataKey] === group)
-    allSeriesKeys.forEach(key => {
-      result[key] = filteredData.map(item => item[key])
-    })
-
-    return result
-  }
-
-  interface Plot {
-    columnCategory: string
-    keyValues: { [key: string]: number[] }
-  }
-  const createPlots = data => {
-    const dataKeys = data.map(d => d[config.xAxis.dataKey])
-    const plots: Plot[] = []
-    const groups: string[] = _.uniq(dataKeys)
-    if (groups && groups.length > 0) {
-      groups.forEach(group => {
-        plots.push({
-          columnCategory: group,
-          keyValues: getValuesBySeriesKey(group)
-        })
-      })
-    }
-    return plots
-  }
+  const color_0 = _.get(colorPalettesChart, [config.palette, 0], '#000')
 
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group left={Number(config.yAxis.size)} className='boxplot' key={`boxplot-group`}>
-        {createPlots(data).map((d, i) => {
+        {createPlots(data, config).map((d, i) => {
           const offset = boxWidth - constrainedWidth
           const radius = 4
 
@@ -87,12 +28,12 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
               key={`boxplotplot-${d.columnCategory}`}
               left={xScale(d.columnCategory) + (xScale.bandwidth() - seriesScale.bandwidth()) / 2}
             >
-              {config.series.map(item => {
+              {config.series.map((item, index) => {
                 const valuesByKey = d.keyValues[item.dataKey]
                 const { min, max, median, firstQuartile, thirdQuartile } = calculateBoxPlotStats(valuesByKey)
                 let iqr = Number(thirdQuartile - firstQuartile).toFixed(config.dataFormat.roundTo)
 
-                const transparentPlot =
+                const isTransparent =
                   config.legend.behavior === 'highlight' &&
                   seriesHighlight.length > 0 &&
                   seriesHighlight.indexOf(item.dataKey) === -1
@@ -100,10 +41,10 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
                   config.legend.behavior === 'highlight' ||
                   seriesHighlight.length === 0 ||
                   seriesHighlight.indexOf(item.dataKey) !== -1
-                const fillOpacity = transparentPlot ? 0.3 : 0.5
+                const fillOpacity = isTransparent ? 0.3 : 0.5
 
                 return (
-                  <Group key={`boxplotplot-${item}`}>
+                  <Group key={`boxplotplot-${item.dataKey}-${index}`}>
                     {boxplot.plotNonOutlierValues &&
                       valuesByKey.map((value, index) => {
                         return (
@@ -123,8 +64,8 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
                         display={displayPlot ? 'block' : 'none'}
                         data-left={xScale(d.columnCategory) + config.yAxis.size + offset / 2 + 0.5}
                         key={`box-plot-${i}-${item}`}
-                        min={min}
-                        max={max}
+                        min={Number(min)}
+                        max={Number(max)}
                         left={seriesScale(item.dataKey)}
                         firstQuartile={firstQuartile}
                         thirdQuartile={thirdQuartile}
@@ -163,6 +104,7 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
                         container
                         containerProps={{
                           'data-tooltip-html': handleTooltip(
+                            boxplot,
                             d,
                             item.dataKey,
                             firstQuartile,

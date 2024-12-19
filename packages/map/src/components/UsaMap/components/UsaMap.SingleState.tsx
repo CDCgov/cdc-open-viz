@@ -14,6 +14,7 @@ import ZoomControls from '../../ZoomControls'
 import { MapContext } from '../../../types/MapContext'
 import useStateZoom from '../../../hooks/useStateZoom'
 import { Text } from '@visx/text'
+import { getGeoStrokeColor } from '../../../helpers/colors'
 
 // SVG ITEMS
 const WIDTH = 880
@@ -49,7 +50,7 @@ const SingleStateMap = props => {
   const cityListProjection = geoAlbersUsaTerritories()
     .translate([WIDTH / 2, HEIGHT / 2])
     .scale(1)
-  const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+  const geoStrokeColor = getGeoStrokeColor(state)
   const path = geoPath().projection(projection)
 
   useEffect(() => {
