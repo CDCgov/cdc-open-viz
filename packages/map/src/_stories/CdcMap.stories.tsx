@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react'
 import CdcMap from '../CdcMap'
 import EqualNumberOptInExample from './_mock/DEV-7286.json'
 import SingleStateWithFilters from './_mock/DEV-8942.json'
+import exampleCityState from './_mock/example-city-state.json'
+import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map',
@@ -91,6 +93,63 @@ export const Custom_Map_Layers: Story = {
 export const Single_State_With_Filters: Story = {
   args: {
     config: SingleStateWithFilters
+  }
+}
+
+let newConfig = editConfigKeys(exampleCityState, [
+  { path: ['customColors'], value: ['red', 'orange', 'yellow', 'green', 'blue', 'violet'] }
+])
+newConfig = editConfigKeys(newConfig, [
+  {
+    path: ['legend', 'specialClasses'],
+    value: [
+      {
+        key: 'Rate',
+        value: '*',
+        label: '*'
+      }
+    ]
+  }
+])
+let exampleCityStateStandardColors = editConfigKeys(exampleCityState, [
+  {
+    path: ['legend', 'specialClasses'],
+    value: [
+      {
+        key: 'Rate',
+        value: '*',
+        label: '*'
+      }
+    ]
+  }
+])
+export const Custom_Color_Distributions_With_Special_Classes: Story = {
+  args: {
+    config: newConfig
+  }
+}
+
+export const Custom_Color_Distributions_Without_Special_Classes: Story = {
+  args: {
+    config: editConfigKeys(newConfig, [{ path: ['legend', 'specialClasses'], value: [] }])
+  }
+}
+
+export const Standard_Color_Distributions_With_Special_Classes: Story = {
+  args: {
+    config: exampleCityStateStandardColors
+  }
+}
+
+export const Standard_Color_Distributions_Without_Special_Classes: Story = {
+  args: {
+    config: editConfigKeys(exampleCityStateStandardColors, [{ path: ['legend', 'specialClasses'], value: [] }])
+  }
+}
+
+export const Custom_Color_Distributions_With_Update_Needed: Story = {
+  args: {
+    config: editConfigKeys(newConfig, [{ path: ['version'], value: '4.24.11' }])
   }
 }
 

@@ -67,7 +67,12 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
 
   const addNewFilter = () => {
     const filters = config.filters ? [...config.filters] : []
-    const newVizFilter: VizFilter = { values: [], filterStyle: 'dropdown', id: Date.now() } as VizFilter
+    const newVizFilter: VizFilter = {
+      values: [],
+      filterStyle: 'dropdown',
+      id: Date.now(),
+      showDropdown: true
+    } as VizFilter
     filters.push(newVizFilter)
     updateField(null, null, 'filters', filters)
   }
@@ -124,6 +129,13 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                 </Tooltip.Content>
               </Tooltip>
             }
+          />
+          <TextField
+            type='textarea'
+            label='Filter intro text'
+            value={config.filterIntro}
+            updateField={updateField}
+            fieldName='filterIntro'
           />
           <br />
           <ul className='filters-list'>

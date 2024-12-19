@@ -1,4 +1,4 @@
-export type Link = { source: string; target: string; value: number }
+export type Link = { source: string; target: string; value: number; id: string }
 
 export type Data = {
   links: Link[]

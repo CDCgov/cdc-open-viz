@@ -1,6 +1,5 @@
 .cdc-open-viz-module .cdc-map-inner-container .filters-section,
 .cove .cdc-map-inner-container .filters-section {
-
   &__title {
     margin: 15px 0;
   }
@@ -20,10 +19,8 @@
 
   @include breakpoint(md) {
     display: flex;
-    gap: 30px;
     flex-wrap: wrap;
   }
-
 
   label:not(:empty) {
     margin-right: 0.4em;

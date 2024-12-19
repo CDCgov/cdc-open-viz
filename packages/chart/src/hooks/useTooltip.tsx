@@ -553,8 +553,12 @@ export const useTooltip = props => {
             (!pd.column || key === pd.column)
         )) ||
       {}
-    const newValue = label || value
+    let newValue = label || value
     const style = displayGray ? { color: '#8b8b8a' } : {}
+
+    if (index == 1 && config.dataFormat.onlyShowTopPrefixSuffix) {
+      newValue = `${config.dataFormat.prefix}${newValue}${config.dataFormat.suffix}`
+    }
 
     return <li style={style} className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${newValue}`}</li>
   }

@@ -647,7 +647,8 @@ const EditorPanel = () => {
     visSupportsValueAxisLine,
     visSupportsValueAxisMax,
     visSupportsValueAxisMin,
-    visSupportsValueAxisTicks
+    visSupportsValueAxisTicks,
+    visSupportsYPadding
   } = useEditorPermissions()
 
   // when the visualization type changes we
@@ -1346,6 +1347,9 @@ const EditorPanel = () => {
     updateConfig(updatedConfig)
   }
 
+  const hasDynamicCategory = ![undefined, '- Select - '].includes(config.series?.[0]?.dynamicCategory)
+  const hasMultipleSeries = config.series?.length > 1
+
   const editorContextValues = {
     addNewExclusion,
     data,
@@ -1496,7 +1500,8 @@ const EditorPanel = () => {
                             </Panels.Series.Wrapper>
                           )}
                         </>
-                        {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
+                        {((config.series && config.series.length && config.visualizationType === 'Bar') ||
+                          (config.series && config.series.length <= 1 && config.visualizationType === 'Line')) && (
                           <>
                             <span className='divider-heading'>Confidence Keys</span>
                             <Select
@@ -1768,14 +1773,16 @@ const EditorPanel = () => {
                           title={!config.yAxis.gridLines ? 'Show gridlines to enable' : ''}
                         />
                       )}
-                      <CheckBox
-                        value={config.yAxis.enablePadding}
-                        section='yAxis'
-                        fieldName='enablePadding'
-                        label='Add Padding to Value Axis Scale'
-                        updateField={updateField}
-                      />
-                      {config.yAxis.enablePadding && (
+                      {visSupportsYPadding() && (
+                        <CheckBox
+                          value={config.yAxis.enablePadding}
+                          section='yAxis'
+                          fieldName='enablePadding'
+                          label='Add Padding to Value Axis Scale'
+                          updateField={updateField}
+                        />
+                      )}
+                      {config.yAxis.enablePadding && visSupportsYPadding() && (
                         <TextField
                           type='number'
                           section='yAxis'
@@ -1839,7 +1846,7 @@ const EditorPanel = () => {
                     className='number-narrow'
                     updateField={updateField}
                     min={0}
-                  />
+                  />{' '}
                   <div className='two-col-inputs'>
                     <TextField
                       value={config.dataFormat.prefix}
@@ -1886,7 +1893,6 @@ const EditorPanel = () => {
                       }
                     />
                   </div>
-
                   {config.orientation === 'horizontal' ? ( // horizontal - x is vertical y is horizontal
                     <>
                       {visSupportsValueAxisLine() && (
@@ -2015,20 +2021,23 @@ const EditorPanel = () => {
                           updateField={updateField}
                         />
                         <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
-                        <TextField
-                          value={config.yAxis.min}
-                          section='yAxis'
-                          fieldName='min'
-                          type='number'
-                          label='left axis min value'
-                          placeholder='Auto'
-                          updateField={updateField}
-                        />
-                        <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
+                        {config.visualizationType !== 'Area Chart' && config.visualizationSubType !== 'stacked' && (
+                          <>
+                            <TextField
+                              value={config.yAxis.min}
+                              section='yAxis'
+                              fieldName='min'
+                              type='number'
+                              label='left axis min value'
+                              placeholder='Auto'
+                              updateField={updateField}
+                            />
+                            <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
+                          </>
+                        )}
                       </>
                     )
                   )}
-
                   {/* start: anchors */}
                   {visHasAnchors() && config.orientation !== 'horizontal' && (
                     <div className='edit-block'>
@@ -2155,7 +2164,6 @@ const EditorPanel = () => {
                       </button>
                     </div>
                   )}
-
                   {visHasAnchors() && config.orientation === 'horizontal' && (
                     <div className='edit-block'>
                       <span className='edit-label column-heading'>Anchors</span>
@@ -2764,13 +2772,12 @@ const EditorPanel = () => {
                           />
                         </>
                       )}
-
                       <CheckBox
                         value={config.exclusions.active}
                         section='exclusions'
                         fieldName='active'
                         label={
-                          config.xAxis.type === 'date'
+                          config.xAxis.type === 'date' || config.xAxis.type === 'date-time'
                             ? 'Limit by start and/or end dates'
                             : 'Exclude one or more values'
                         }
@@ -2869,26 +2876,27 @@ const EditorPanel = () => {
                             </>
                           )}
 
-                          {config.xAxis.type === 'date' && (
-                            <>
-                              <TextField
-                                type='date'
-                                section='exclusions'
-                                fieldName='dateStart'
-                                label='Start Date'
-                                updateField={updateField}
-                                value={config.exclusions.dateStart || ''}
-                              />
-                              <TextField
-                                type='date'
-                                section='exclusions'
-                                fieldName='dateEnd'
-                                label='End Date'
-                                updateField={updateField}
-                                value={config.exclusions.dateEnd || ''}
-                              />
-                            </>
-                          )}
+                          {config.xAxis.type === 'date' ||
+                            (config.xAxis.type === 'date-time' && (
+                              <>
+                                <TextField
+                                  type='date'
+                                  section='exclusions'
+                                  fieldName='dateStart'
+                                  label='Start Date'
+                                  updateField={updateField}
+                                  value={config.exclusions.dateStart || ''}
+                                />
+                                <TextField
+                                  type='date'
+                                  section='exclusions'
+                                  fieldName='dateEnd'
+                                  label='End Date'
+                                  updateField={updateField}
+                                  value={config.exclusions.dateEnd || ''}
+                                />
+                              </>
+                            ))}
                         </>
                       )}
 
@@ -3671,38 +3679,6 @@ const EditorPanel = () => {
                     updateField={updateField}
                   />
 
-                  {/* <fieldset className="checkbox-group">
-                    <CheckBox value={config.legend.dynamicLegend} section="legend" fieldName="dynamicLegend" label="Dynamic Legend" updateField={updateField}/>
-                    {config.legend.dynamicLegend && (
-                      <>
-                        <TextField value={config.legend.dynamicLegendDefaultText} section="legend" fieldName="dynamicLegendDefaultText" label="Dynamic Legend Default Text" updateField={updateField} />
-                        <TextField value={config.legend.dynamicLegendItemLimit} type="number" min="0" section="legend" fieldName="dynamicLegendItemLimit" label={'Dynamic Legend Limit'} className="number-narrow" updateField={updateField}/>
-                        <TextField value={config.legend.dynamicLegendItemLimitMessage} section="legend" fieldName="dynamicLegendItemLimitMessage" label="Dynamic Legend Item Limit Message" updateField={updateField} />
-                        <TextField value={config.legend.dynamicLegendChartMessage} section="legend" fieldName="dynamicLegendChartMessage" label="Dynamic Legend Chart Message" updateField={updateField} />
-                      </>
-                    )}
-                  </fieldset> */}
-
-                  <CheckBox
-                    value={config.legend.hide ? true : false}
-                    section='legend'
-                    fieldName='hide'
-                    label='Hide Legend'
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
                   <CheckBox
                     display={config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)}
                     value={config.legend.hideSuppressedLabels}
@@ -3755,7 +3731,7 @@ const EditorPanel = () => {
                     </>
                   } */}
                   <Select
-                    display={config.series?.length > 1}
+                    display={hasDynamicCategory || hasMultipleSeries}
                     value={config.legend.behavior}
                     section='legend'
                     fieldName='behavior'

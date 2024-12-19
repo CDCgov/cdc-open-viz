@@ -19,11 +19,13 @@ import { patternSizes } from '../helpers/patternSizes'
 import Annotation from '../../Annotation'
 
 import Territory from './Territory'
+import { cityKeys } from '../../../data/supported-geos'
 
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { MapContext } from '../../../types/MapContext'
 import { checkColorContrast, getContrastColor, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
+import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -59,7 +61,6 @@ const UsaMap = () => {
       data,
       displayGeoName,
       geoClickHandler,
-      handleCircleClick,
       handleMapAriaLabels,
       setSharedFilterValue,
       state,
@@ -67,11 +68,12 @@ const UsaMap = () => {
       titleCase,
       tooltipId,
       handleDragStateChange,
-      setState,
-      mapId
+      mapId,
+      logo,
     } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
+  const { general, columns, feature, tooltips, hexMap, map, annotations } = state
 
   if (setSharedFilterValue) {
     Object.keys(supportedStates).forEach(supportedState => {
@@ -101,16 +103,16 @@ const UsaMap = () => {
   useEffect(() => {
     setTranslate([455, 250])
     setExtent(null)
-  }, [state.general.geoType])
+  }, [general.geoType])
 
-  const isHex = state.general.displayAsHex
+  const isHex = general.displayAsHex
 
   const [territoriesData, setTerritoriesData] = useState([])
 
   const territoriesKeys = Object.keys(supportedTerritories) // data will have already mapped abbreviated territories to their full names
 
   useEffect(() => {
-    if (state.general.territoriesAlwaysShow) {
+    if (general.territoriesAlwaysShow) {
       // show all Territories whether in the data or not
       setTerritoriesData(territoriesKeys)
     } else {
@@ -118,17 +120,10 @@ const UsaMap = () => {
       const territoriesList = territoriesKeys.filter(key => data[key])
       setTerritoriesData(territoriesList)
     }
-  }, [data, state.general.territoriesAlwaysShow])
+  }, [data, general.territoriesAlwaysShow])
 
-  const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
-
-  const getTerritoriesClasses = () => {
-    const screenWidth = window?.visualViewport?.width
-    let className = 'territories'
-    if (screenWidth < 700) return 'territories--mobile'
-    if (screenWidth < 900) return 'territories--tablet'
-    return className
-  }
+  const geoStrokeColor = getGeoStrokeColor(state)
+  const geoFillColor = getGeoFillColor(state)
 
   const territories = territoriesData.map((territory, territoryIndex) => {
     const Shape = isHex ? Territory.Hexagon : Territory.Rectangle
@@ -138,13 +133,24 @@ const UsaMap = () => {
     let toolTip
 
     let styles = {
-      fill: '#E6E6E6',
+      fill: geoFillColor,
+      stroke: geoStrokeColor,
       color: '#202020'
     }
 
     const label = supportedTerritories[territory][1]
 
-    if (!territoryData) return <Shape key={label} label={label} style={styles} text={styles.color} />
+    if (!territoryData)
+      return (
+        <Shape
+          key={label}
+          label={label}
+          style={styles}
+          text={styles.color}
+          territoryData={territoryData}
+          backgroundColor={styles.fill}
+        />
+      )
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
@@ -156,10 +162,7 @@ const UsaMap = () => {
       let needsPointer = false
 
       // If we need to add a pointer cursor
-      if (
-        (state.columns.navigate && territoryData[state.columns.navigate.name]) ||
-        state.tooltips.appearanceType === 'click'
-      ) {
+      if ((columns.navigate && territoryData[columns.navigate.name]) || tooltips.appearanceType === 'click') {
         needsPointer = true
       }
 
@@ -167,15 +170,11 @@ const UsaMap = () => {
         color: textColor,
         fill: legendColors[0],
         opacity:
-          setSharedFilterValue &&
-          isFilterValueSupported &&
-          setSharedFilterValue !== territoryData[state.columns.geo.name]
+          setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== territoryData[columns.geo.name]
             ? 0.5
             : 1,
         stroke:
-          setSharedFilterValue &&
-          isFilterValueSupported &&
-          setSharedFilterValue === territoryData[state.columns.geo.name]
+          setSharedFilterValue && isFilterValueSupported && setSharedFilterValue === territoryData[columns.geo.name]
             ? 'rgba(0, 0, 0, 1)'
             : geoStrokeColor,
         cursor: needsPointer ? 'pointer' : 'default',
@@ -193,7 +192,7 @@ const UsaMap = () => {
           label={label}
           style={styles}
           text={styles.color}
-          strokeWidth={1.5}
+          strokeWidth={1}
           textColor={textColor}
           handleShapeClick={() => geoClickHandler(territory, territoryData)}
           dataTooltipId={`tooltip__${tooltipId}`}
@@ -201,6 +200,7 @@ const UsaMap = () => {
           territory={territory}
           territoryData={territoryData}
           tabIndex={-1}
+          backgroundColor={styles.fill}
         />
       )
     }
@@ -213,7 +213,7 @@ const UsaMap = () => {
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
-    let showLabel = state.general.displayStateLabels
+    let showLabel = general.displayStateLabels
 
     // Order alphabetically. Important for accessibility if ever read out loud.
     geographies.map(state => {
@@ -239,15 +239,13 @@ const UsaMap = () => {
       const key = isHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
 
       let styles = {
-        fill: '#E6E6E6',
+        fill: geoFillColor,
         cursor: 'default'
       }
 
       // Map the name from the geo data with the appropriate key for the processed data
       let geoKey = geo.properties.iso
       let geoName = geo.properties.name
-
-      // Manually add Washington D.C. in for Hex maps
 
       if (!geoKey) return
 
@@ -267,29 +265,26 @@ const UsaMap = () => {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
 
         styles = {
-          fill: state.general.type !== 'bubble' ? legendColors[0] : '#E6E6E6',
+          fill: state.general.type !== 'bubble' ? legendColors[0] : geoFillColor,
           opacity:
-            setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[state.columns.geo.name]
+            setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[columns.geo.name]
               ? 0.5
               : 1,
           stroke:
-            setSharedFilterValue && isFilterValueSupported && setSharedFilterValue === geoData[state.columns.geo.name]
+            setSharedFilterValue && isFilterValueSupported && setSharedFilterValue === geoData[columns.geo.name]
               ? 'rgba(0, 0, 0, 1)'
               : geoStrokeColor,
           cursor: 'default',
           '&:hover': {
-            fill: state.general.type !== 'bubble' ? legendColors[1] : '#e6e6e6'
+            fill: state.general.type !== 'bubble' ? legendColors[1] : geoFillColor
           },
           '&:active': {
-            fill: state.general.type !== 'bubble' ? legendColors[2] : '#e6e6e6'
+            fill: state.general.type !== 'bubble' ? legendColors[2] : geoFillColor
           }
         }
 
         // When to add pointer cursor
-        if (
-          (state.columns.navigate && geoData[state.columns.navigate.name]) ||
-          state.tooltips.appearanceType === 'click'
-        ) {
+        if ((columns.navigate && geoData[columns.navigate.name]) || tooltips.appearanceType === 'click') {
           styles.cursor = 'pointer'
         }
 
@@ -302,7 +297,7 @@ const UsaMap = () => {
 
           return (
             <>
-              {state.hexMap.shapeGroups.map((group, groupIndex) => {
+              {hexMap.shapeGroups.map((group, groupIndex) => {
                 return group.items.map((item, itemIndex) => {
                   switch (item.operator) {
                     case '=':
@@ -406,10 +401,10 @@ const UsaMap = () => {
               tabIndex={-1}
             >
               {/* state path */}
-              <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
+              <path tabIndex={-1} className='single-geo' strokeWidth={1} d={path} />
 
               {/* apply patterns on top of state path*/}
-              {state.map.patterns.map((patternData, patternIndex) => {
+              {map.patterns.map((patternData, patternIndex) => {
                 const { pattern, dataKey, size } = patternData
                 const currentFill = styles.fill
                 const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
@@ -422,7 +417,7 @@ const UsaMap = () => {
                   <>
                     {pattern === 'waves' && (
                       <PatternWaves
-                        id={`${mapId}--${dataKey}--${geoIndex}`}
+                        id={`${mapId}--${String(dataKey).replace(' ', '-')}--${geoIndex}`}
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
@@ -430,7 +425,7 @@ const UsaMap = () => {
                     )}
                     {pattern === 'circles' && (
                       <PatternCircles
-                        id={`${mapId}--${dataKey}--${geoIndex}`}
+                        id={`${mapId}--${String(dataKey).replace(' ', '-')}--${geoIndex}`}
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
@@ -438,7 +433,7 @@ const UsaMap = () => {
                     )}
                     {pattern === 'lines' && (
                       <PatternLines
-                        id={`${mapId}--${dataKey}--${geoIndex}`}
+                        id={`${mapId}--${String(dataKey).replace(' ', '-')}--${geoIndex}`}
                         height={patternSizes[size] ?? 6}
                         width={patternSizes[size] ?? 6}
                         stroke={patternColor}
@@ -451,13 +446,13 @@ const UsaMap = () => {
                       tabIndex={-1}
                       stroke='transparent'
                       d={path}
-                      fill={`url(#${mapId}--${dataKey}--${geoIndex})`}
+                      fill={`url(#${mapId}--${String(dataKey).replace(' ', '-')}--${geoIndex})`}
                     />
                   </>
                 )
               })}
               {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
-              {isHex && state.hexMap.type === 'shapes' && getArrowDirection(geoData, geo, legendColors[0])}
+              {isHex && hexMap.type === 'shapes' && getArrowDirection(geoData, geo, legendColors[0])}
             </g>
           </g>
         )
@@ -495,7 +490,7 @@ const UsaMap = () => {
     )
 
     // Bubbles
-    if (state.general.type === 'bubble') {
+    if (general.type === 'bubble') {
       geosJsx.push(
         <BubbleList
           key='bubbles'
@@ -529,12 +524,12 @@ const UsaMap = () => {
     let textColor = getContrastColor('#FFF', bgColor)
 
     // always make HI black since it is off to the side
-    if (abbr === 'US-HI' && !state.general.displayAsHex) {
+    if (abbr === 'US-HI' && !general.displayAsHex) {
       textColor = '#000'
     }
 
     let x = 0,
-      y = state.hexMap.type === 'shapes' && state.general.displayAsHex ? -10 : 5
+      y = hexMap.type === 'shapes' && general.displayAsHex ? -10 : 5
 
     // used to nudge/move some of the labels for better readability
     if (nudges[abbr] && false === isHex) {
@@ -581,7 +576,7 @@ const UsaMap = () => {
   return (
     <ErrorBoundary component='UsaMap'>
       <svg viewBox='0 0 880 500' role='img' aria-label={handleMapAriaLabels(state)}>
-        {state.general.displayAsHex ? (
+        {general.displayAsHex ? (
           <Mercator data={unitedStatesHex} scale={650} translate={[1600, 775]}>
             {({ features, projection }) => constructGeoJsx(features, projection)}
           </Mercator>
@@ -590,18 +585,21 @@ const UsaMap = () => {
             {({ features, projection }) => constructGeoJsx(features, projection)}
           </AlbersUsa>
         )}
-        {state.annotations.length > 0 && <Annotation.Draggable onDragStateChange={handleDragStateChange} />}
+        {annotations.length > 0 && <Annotation.Draggable onDragStateChange={handleDragStateChange} />}
       </svg>
 
       {territories.length > 0 && (
         <>
           {/* Temporarily make the max width fit the image width */}
-          <div className='two-col' style={{ maxWidth: 'calc(100% - 75px)' }}>
-            <div>
-              <span className='territories-label label'>{state.general.territoriesLabel}</span>
+          <div>
+            <div className='d-flex mt-2'>
+              <h5>{general.territoriesLabel}</h5>
+              {'data' === general.type && logo && (
+                <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
+              )}
             </div>
             <div>
-              <span className={getTerritoriesClasses()}>{territories}</span>
+              <span className='mt-1 mb-2 d-flex flex-wrap territories'>{territories}</span>
             </div>
           </div>
         </>

@@ -3,7 +3,7 @@ import { APIFilterDropdowns, DropdownOptions } from '../components/DashboardFilt
 import { APIFilter } from '../types/APIFilter'
 import { SharedFilter } from '../types/SharedFilter'
 import _ from 'lodash'
-import { getQueryParams } from '@cdc/core/helpers/queryStringUtils'
+import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
 import { FILTER_STYLE } from '../types/FilterStyles'
 
 /** key for the dropdowns object */
@@ -17,10 +17,10 @@ export const getLoadingFilterMemo = (
   apiFiltersEndpoints.reduce((acc, endpoint, currIndex) => {
     const _key: DropdownsKey = endpoint
     const hasChanged = changedChildFilterIndexes.includes(currIndex)
-    if (apiFilterDropdowns[_key] != null && !hasChanged) {
+    if (apiFilterDropdowns[_key] && !hasChanged) {
       acc[_key] = apiFilterDropdowns[_key]
     } else {
-      acc[_key] = null
+      acc[_key] = undefined
     }
     return acc
   }, {})
@@ -37,7 +37,7 @@ export const getParentParams = (
       const key = filter.apiFilter.valueSelector || ''
       const subKey = filter.apiFilter.subgroupValueSelector || ''
       const val = filter.queuedActive ? filter.queuedActive[0] : (filter.active as string) || ''
-      const subVal = filter.queuedActive ? filter.queuedActive[1] : filter.subGrouping.active || ''
+      const subVal = filter.queuedActive ? filter.queuedActive[1] : filter.subGrouping?.active || ''
       return [
         { key, value: val },
         { key: subKey, value: subVal }
@@ -52,6 +52,8 @@ export const getParentParams = (
     }
   })
 }
+
+export const notAllParentsSelected = parentParams => parentParams?.some(({ value }) => value === '')
 
 export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): DropdownOptions => {
   const { textSelector, valueSelector, subgroupTextSelector, subgroupValueSelector } = apiFilter
@@ -83,14 +85,45 @@ export const getToFetch = (
     const _key = baseEndpoint
     if (apiFilterDropdowns[_key]) return // don't reload cached filter
     const parentParams = getParentParams(filter, sharedFilters)
-    const notAllParentsSelected = parentParams?.some(({ value }) => value === '')
 
-    if (notAllParentsSelected) return // don't send request for dependent children filter options
+    if (notAllParentsSelected(parentParams)) return // don't send request for dependent children filter options
 
     const endpoint = baseEndpoint + (parentParams ? gatherQueryParams(baseEndpoint, parentParams) : '')
     toFetch[endpoint] = [_key, index]
   })
   return toFetch
+}
+
+export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
+  const defaultQueryParamValue = getQueryParam(sharedFilter?.setByQueryParameter)
+  const defaultValue = dropdownOptions[0]?.value
+  const subDefaultValue = dropdownOptions[0]?.subOptions[0].value
+  const subDefaultQueryParamValue = getQueryParam(sharedFilter?.subGrouping.setByQueryParameter)
+  if (!sharedFilter.active) {
+    sharedFilter.active = defaultQueryParamValue || defaultValue
+    sharedFilter.subGrouping.active = subDefaultQueryParamValue || subDefaultValue
+  } else {
+    const currentOption = dropdownOptions.find(option => option.value === sharedFilter.active)
+    sharedFilter.active = currentOption ? currentOption.value : defaultValue
+    if (currentOption) {
+      const currentSubOption = currentOption.subOptions.find(option => option.value === sharedFilter.subGrouping.active)
+      sharedFilter.subGrouping.active = currentSubOption?.value || subDefaultValue
+    } else {
+      sharedFilter.subGrouping.active = subDefaultValue
+    }
+  }
+}
+
+export const setActiveMultiDropdown = (dropdownOptions, sharedFilter) => {
+  const defaultQueryParamValue = getQueryParam(sharedFilter?.setByQueryParameter)
+  const multiDefaultQueryParamValue = Array.isArray(defaultQueryParamValue)
+    ? defaultQueryParamValue
+    : defaultQueryParamValue?.split(',')
+  const multiDefaultValue = defaultQueryParamValue ? multiDefaultQueryParamValue : [dropdownOptions[0]?.value]
+  const currentOption = ((sharedFilter.active as string[]) || []).filter(activeVal =>
+    dropdownOptions.find(option => option.value === activeVal)
+  )
+  sharedFilter.active = currentOption.length ? currentOption : multiDefaultValue
 }
 
 export const setAutoLoadDefaultValue = (
@@ -102,24 +135,26 @@ export const setAutoLoadDefaultValue = (
   const sharedFiltersCopy = _.cloneDeep(sharedFilters)
   const sharedFilter = _.cloneDeep(sharedFiltersCopy[sharedFilterIndex])
   if (!autoLoadFilterIndexes.length || !dropdownOptions?.length) return sharedFilter // no autoLoading happening
-  if (autoLoadFilterIndexes.includes(sharedFilterIndex)) {
+  const hasQueryParameter = sharedFilter.setByQueryParameter
+    ? Boolean(getQueryParam(sharedFilter.setByQueryParameter))
+    : false
+  if (autoLoadFilterIndexes.includes(sharedFilterIndex) || hasQueryParameter) {
     const filterParents = sharedFiltersCopy.filter(f => sharedFilter.parents?.includes(f.key))
     const notAllParentFiltersSelected = filterParents.some(p => !(p.active || p.queuedActive))
     if (filterParents && notAllParentFiltersSelected) return sharedFilter
-    const defaultValue =
-      sharedFilter.filterStyle === FILTER_STYLE.multiSelect ? [dropdownOptions[0]?.value] : dropdownOptions[0]?.value
-    if (!sharedFilter.active) {
-      const queryParams = getQueryParams()
-      const defaultQueryParamValue = queryParams[sharedFilter?.setByQueryParameter]
-      sharedFilter.active = defaultQueryParamValue || defaultValue
-    } else if (sharedFilter.filterStyle === FILTER_STYLE.multiSelect) {
-      const currentOption = (sharedFilter.active as string[]).filter(activeVal =>
-        dropdownOptions.find(option => option.value === activeVal)
-      )
-      sharedFilter.active = currentOption.length ? currentOption : defaultValue
+    if (sharedFilter.filterStyle === FILTER_STYLE.multiSelect) {
+      setActiveMultiDropdown(dropdownOptions, sharedFilter)
+    } else if (sharedFilter.filterStyle === FILTER_STYLE.nestedDropdown) {
+      setActiveNestedDropdown(dropdownOptions, sharedFilter)
     } else {
-      const currentOption = dropdownOptions.find(option => option.value === sharedFilter.active)
-      sharedFilter.active = currentOption ? currentOption.value : defaultValue
+      const defaultValue = dropdownOptions[0]?.value
+      const defaultQueryParamValue = getQueryParam(sharedFilter?.setByQueryParameter)
+      if (!sharedFilter.active) {
+        sharedFilter.active = defaultQueryParamValue || defaultValue
+      } else {
+        const currentOption = dropdownOptions.find(option => option.value === sharedFilter.active)
+        sharedFilter.active = currentOption ? currentOption.value : defaultValue
+      }
     }
   }
   return sharedFilter
