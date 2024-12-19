@@ -18,9 +18,6 @@
     border-top: var(--cool-gray-10) 1px solid;
 
     @include breakpointClass(md) {
-      .legend-container.legend-padding {
-        padding: 15px;
-      }
       &.bottom,
       &.top {
         border: var(--cool-gray-10) 1px solid;
@@ -70,21 +67,26 @@
     }
 
     .legend-container {
-      --space-between-legend-items: 0.6em;
       position: relative;
-      &.legend-padding {
-        padding-top: 15px;
+      .legend-container__title,
+      .legend-container__description,
+      tspan,
+      span {
+        font-family: var(--app-font-main);
       }
+      .tspan {
+        font-size: var(--legend-item-font-size) !important;
+      }
+
       .legend-container__title {
-        font-size: 1.3em;
+        font-size: var(--legend-title-font-size);
+        font-weight: var(--legend-title-font-weight);
         padding-bottom: 0;
         display: inline-block;
+        color: black;
       }
-      .legend-container__title + p,
-      .legend-container__title + ul,
-      p + ul,
-      p + p {
-        padding-top: 1em;
+      .legend-container__description {
+        font-size: var(--legend-description-font-size);
       }
       .legend-container__reset-button {
         margin-top: 1em;
@@ -92,11 +94,17 @@
       p {
         line-height: 1.4em;
       }
+
+      .legend-container__ul {
+        line-height: 1;
+        row-gap: var(--space-between-legend-item-rows);
+        column-gap: var(--space-between-legend-item-columns);
+      }
       .legend-container__ul:not(.single-row) {
         list-style: none;
-        padding-top: 1em;
         display: grid;
         grid-template-columns: 1fr;
+
         @include breakpoint(md) {
           grid-template-columns: 1fr 1fr;
         }
@@ -117,7 +125,6 @@
           flex-shrink: 0;
           display: inline-block;
           padding-right: 1em;
-          margin-bottom: var(--space-between-legend-items);
           vertical-align: middle;
           transition: 0.1s opacity;
           display: flex;
@@ -145,10 +152,8 @@
         align-items: center;
         justify-content: flex-start;
         flex-wrap: wrap;
-        row-gap: var(--space-between-legend-items);
 
         & > li {
-          margin-right: 1em;
           white-space: wrap;
           display: flex;
           justify-content: center;

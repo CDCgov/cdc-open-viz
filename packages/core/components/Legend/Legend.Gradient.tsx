@@ -92,10 +92,7 @@ const LegendGradient = ({
 
   if (style === 'gradient') {
     return (
-      <svg
-        style={{ overflow: 'visible', width: '100%', marginTop: 10, marginBottom: hideBorder ? 10 : 0 }}
-        height={newHeight}
-      >
+      <svg style={{ overflow: 'visible', width: '100%' }} height={newHeight}>
         {/* background border*/}
         <rect x={0} y={0} width={legendWidth + MARGIN * 2} height={boxHeight + MARGIN * 2} fill='#d3d3d3' />
         {/* Define the gradient */}

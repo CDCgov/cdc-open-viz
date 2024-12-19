@@ -153,11 +153,31 @@
   .legend-container {
     background: #fff;
     width: 100%;
-    padding: 15px;
     vertical-align: top;
     text-align: left;
     border: 1px solid var(--lightGray);
     position: relative;
+
+    h3,
+    p,
+    tspan,
+    div {
+      // TODO: when we have updated each section to use the new font, we can transition to using a global style
+      font-family: var(--app-font-main);
+    }
+
+    h3 {
+      font-size: var(--legend-title-font-size);
+    }
+
+    p {
+      font-size: var(--legend-description-font-size);
+    }
+
+    tspan,
+    div {
+      font-size: var(--legend-item-font-size);
+    }
 
     &.border-0 {
       border: 1px solid transparent;
@@ -165,11 +185,14 @@
     }
 
     &__inner {
+      display: flex;
+      flex-direction: column;
+      row-gap: var(--space-between-legend-item-rows);
+      column-gap: var(--space-between-legend-item-columns);
       &.double-column,
       &.single-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        grid-column-gap: 1.5em;
       }
 
       &.vertical-sorted {
@@ -197,8 +220,7 @@
     .legend-item {
       text-align: left;
       user-select: none;
-      white-space: nowrap;
-
+      line-height: var(--legend-item-font-size);
       .visx-legend-label {
         word-wrap: break-word;
         white-space: pre-wrap;
@@ -216,18 +238,7 @@
       flex: 0 0 auto;
     }
 
-    h3 {
-      font-size: 1.3rem;
-    }
-
-    h3,
-    p {
-      margin-bottom: 0.4em;
-    }
-
     & div.legend-item {
-      margin-bottom: 0.2em !important;
-
       &:last-child {
         margin: 0 !important;
       }
@@ -297,7 +308,6 @@
     align-items: center;
     font-size: 1em;
     vertical-align: middle;
-    margin-bottom: 0.5em;
 
     & > span {
       display: flex;
@@ -305,7 +315,7 @@
       align-items: center;
       white-space: nowrap;
       font-size: 1em;
-      margin-right: 8px;
+      margin-right: 9px;
       max-height: 1px;
     }
 
