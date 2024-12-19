@@ -2,6 +2,7 @@ import { ComponentThemes } from '@cdc/core/types/ComponentThemes'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { EditorColumnProperties } from '@cdc/core/types/EditorColumnProperties'
 import { Version } from '@cdc/core/types/Version'
+import { VizFilter } from '@cdc/core/types/VizFilter'
 
 export type MapVisualSettings = {
   /** minBubbleSize - Minimum Circle Size when the map has a type of bubble */
@@ -81,7 +82,7 @@ export type MapConfig = Visualization & {
   }
   dataUrl: string
   runtimeDataUrl: string
-  filters: any[]
+  filters: VizFilter[]
   general: {
     allowMapZoom: boolean
     convertFipsCodes: boolean
