@@ -264,26 +264,33 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           ref={ref}
         >
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
-            {legend.title && <h3 className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</h3>}
-            {legend.dynamicDescription === false && legend.description && (
-              <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>
+            {(legend.title || legend.description || legend.dynamicDescription) && (
+              <div className='mb-3'>
+                {legend.title && <h3 className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</h3>}
+                {legend.dynamicDescription === false && legend.description && (
+                  <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>
+                )}
+                {legend.dynamicDescription === true &&
+                  runtimeFilters.map((filter, idx) => {
+                    const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
+
+                    // Do we have a custom description for this?
+                    const desc = legend.descriptions[lookupStr] || ''
+
+                    if (desc.length > 0) {
+                      return (
+                        <p
+                          key={`dynamic-description-${lookupStr}`}
+                          className={`dynamic-legend-description-${lookupStr} mt-2`}
+                        >
+                          {desc}
+                        </p>
+                      )
+                    }
+                    return true
+                  })}
+              </div>
             )}
-            {legend.dynamicDescription === true &&
-              runtimeFilters.map((filter, idx) => {
-                const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
-
-                // Do we have a custom description for this?
-                const desc = legend.descriptions[lookupStr] || ''
-
-                if (desc.length > 0) {
-                  return (
-                    <p key={`dynamic-description-${lookupStr}`} className={`dynamic-legend-description-${lookupStr}`}>
-                      {desc}
-                    </p>
-                  )
-                }
-                return true
-              })}
 
             <LegendGradient
               labels={getFormattedLegendItems().map(item => item?.label) ?? []}
