@@ -65,9 +65,22 @@ const cleanSharedFilters = (config: DashboardConfig) => {
   if (config.dashboard?.sharedFilters) {
     config.dashboard.sharedFilters.forEach((filter, index) => {
       delete config.dashboard.sharedFilters[index].active
+      if (filter.subGrouping) delete config.dashboard.sharedFilters[index].subGrouping.active
       if (filter.type === 'urlfilter') {
         delete config.dashboard.sharedFilters[index].values
       }
+    })
+  }
+}
+
+const cleanVisualizationFilters = (config: DashboardConfig) => {
+  if (config.visualizations) {
+    Object.keys(config.visualizations).forEach(vizKey => {
+      const vizFilters = config.visualizations[vizKey].filters || []
+      vizFilters.forEach((_filter, index) => {
+        delete config.visualizations[vizKey].filters[index].active
+        delete config.visualizations[vizKey].filters[index].values
+      })
     })
   }
 }
@@ -88,6 +101,7 @@ export const formatConfigBeforeSave = configToStrip => {
         cleanDashboardData(strippedConfig.multiDashboards[i])
         cleanSharedFilters(strippedConfig.multiDashboards[i])
         cleanDashboardFootnotes(strippedConfig.multiDashboards[i])
+        cleanVisualizationFilters(strippedConfig.multiDashboards[i])
       })
       delete strippedConfig.dashboard
       delete strippedConfig.rows
@@ -98,6 +112,7 @@ export const formatConfigBeforeSave = configToStrip => {
     cleanDashboardData(strippedConfig)
     cleanSharedFilters(strippedConfig)
     cleanDashboardFootnotes(strippedConfig)
+    cleanVisualizationFilters(strippedConfig)
     removeRuntimeDataURLs(strippedConfig)
   } else {
     delete strippedConfig.runtime
