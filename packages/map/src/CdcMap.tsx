@@ -78,8 +78,9 @@ import Modal from './components/Modal'
 import NavigationMenu from './components/NavigationMenu'
 import UsaMap from './components/UsaMap'
 import WorldMap from './components/WorldMap'
+import GoogleMap from './components/GoogleMap'
 
-// Hooks
+// hooks
 import useTooltip from './hooks/useTooltip'
 
 // Data props
@@ -1600,6 +1601,7 @@ const CdcMap = ({
                       {'us-county' === geoType && <UsaMap.County />}
                       {'world' === geoType && <WorldMap />}
                       {/* logo is handled in UsaMap.State when applicable */}
+                      {'google-map' === geoType && <GoogleMap />}
                       {'data' === general.type && logo && ('us' !== geoType || 'us-geocode' === state.general.type) && (
                         <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
                       )}
