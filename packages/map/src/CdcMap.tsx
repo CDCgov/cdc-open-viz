@@ -1104,7 +1104,11 @@ const CdcMap = ({
             key='modal-navigation-link'
             onClick={e => {
               e.preventDefault()
-              navigationHandler(row[state.columns.navigate.name], customNavigationHandler)
+              navigationHandler(
+                state.general.navigationTarget,
+                row[state.columns.navigate.name],
+                customNavigationHandler
+              )
             }}
           >
             {state.tooltips.linkLabel}
@@ -1145,7 +1149,7 @@ const CdcMap = ({
 
     // Otherwise if this item has a link specified for it, do regular navigation.
     if (state.columns.navigate && value[state.columns.navigate.name]) {
-      navigationHandler(value[state.columns.navigate.name], customNavigationHandler)
+      navigationHandler(state.general.navigationTarget, value[state.columns.navigate.name], customNavigationHandler)
     }
   }
 
@@ -1625,7 +1629,9 @@ const CdcMap = ({
                   data={runtimeData}
                   options={general}
                   columns={state.columns}
-                  navigationHandler={val => navigationHandler(val, customNavigationHandler)}
+                  navigationHandler={val =>
+                    navigationHandler(state.general.navigationBehavior, val, customNavigationHandler)
+                  }
                 />
               )}
 

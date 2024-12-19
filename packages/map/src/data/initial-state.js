@@ -1,6 +1,7 @@
 export default {
   annotations: [],
   general: {
+    navigationTarget: '_self',
     noStateFoundMessage: 'Map Unavailable',
     annotationDropdownText: 'Annotations',
     geoBorderColor: 'darkGray',
