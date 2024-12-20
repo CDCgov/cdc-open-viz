@@ -426,10 +426,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const nextTick = Math.max(...yScale.ticks(handleNumTicks)) + tickGap
     const divideBy = minValue < 0 ? maxValue / 2 : maxValue
     const calculatedPadding = (nextTick - maxValue) / divideBy
-    console.log('🧙‍♂️ ✨ useEffect ✨ calculatedPadding:', calculatedPadding)
 
     // if auto padding is too close to next tick, add one more ticks worth of padding
-    const PADDING_THRESHOLD = 0.02
+    const PADDING_THRESHOLD = 0.024
     const newPadding =
       calculatedPadding > PADDING_THRESHOLD ? calculatedPadding : calculatedPadding + tickGap / divideBy
 
