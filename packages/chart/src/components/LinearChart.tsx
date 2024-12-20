@@ -437,6 +437,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   // Render Functions
   const generatePairedBarAxis = () => {
     const axisMaxHeight = bottomLabelStart + BOTTOM_LABEL_PADDING
+
     const getTickPositions = (ticks, xScale) => {
       if (!ticks.length) return false
       // filter out first index
