@@ -428,7 +428,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const calculatedPadding = (nextTick - maxValue) / divideBy
 
     // if auto padding is too close to next tick, add one more ticks worth of padding
-    const PADDING_THRESHOLD = 0.024
+    const PADDING_THRESHOLD = 0.025
     const newPadding =
       calculatedPadding > PADDING_THRESHOLD ? calculatedPadding : calculatedPadding + tickGap / divideBy
 
