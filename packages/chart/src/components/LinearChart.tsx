@@ -127,6 +127,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isDateTime = config.xAxis.type === 'date-time'
   const suffixHasNoSpace = !suffix.includes(' ')
   const labelsOverflow = onlyShowTopPrefixSuffix && !suffixHasNoSpace
+  console.log('🧙‍♂️ ✨ LinearChart ✨ labelsOverflow:', labelsOverflow)
   const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
   const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
 
@@ -425,13 +426,16 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const nextTick = Math.max(...yScale.ticks(handleNumTicks)) + tickGap
     const divideBy = minValue < 0 ? maxValue / 2 : maxValue
     const calculatedPadding = (nextTick - maxValue) / divideBy
+    console.log('🧙‍♂️ ✨ useEffect ✨ calculatedPadding:', calculatedPadding)
 
     // if auto padding is too close to next tick, add one more ticks worth of padding
     const PADDING_THRESHOLD = 0.02
     const newPadding =
       calculatedPadding > PADDING_THRESHOLD ? calculatedPadding : calculatedPadding + tickGap / divideBy
 
-    setYAxisAutoPadding(newPadding * 100)
+    /* sometimes even though the padding is getting to the next tick exactly,
+    d3 still doesn't show the tick. we add 0.1 to ensure to tip it over the edge */
+    setYAxisAutoPadding(newPadding * 100 + 0.1)
   }, [maxValue, labelsOverflow, yScale, handleNumTicks])
 
   // Render Functions
