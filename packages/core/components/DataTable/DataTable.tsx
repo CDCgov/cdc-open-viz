@@ -89,8 +89,11 @@ const DataTable = (props: DataTableProps) => {
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
+  const hasDateAxis = config.xAxis && config.xAxis.type === 'date-time'
+  const dateKey = hasDateAxis && config.xAxis.dataKey
+
   const [sortBy, setSortBy] = useState<any>({
-    column: '',
+    column: dateKey || '',
     asc: false,
     colIndex: null
   })
