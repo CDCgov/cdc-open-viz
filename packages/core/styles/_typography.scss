@@ -20,11 +20,13 @@
 }
 
 // TODO: when we have updated each section to use the new font, we can transition to using a global style
-.chart-container {
+.chart-container,
+.map-container {
   .legend-container {
     font-family: var(--app-font-main);
     h3,
-    p {
+    p,
+    span {
       font-family: var(--app-font-main);
     }
   }
