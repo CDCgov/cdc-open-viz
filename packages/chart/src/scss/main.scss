@@ -158,14 +158,6 @@
     border: 1px solid var(--lightGray);
     position: relative;
 
-    h3,
-    p,
-    tspan,
-    div {
-      // TODO: when we have updated each section to use the new font, we can transition to using a global style
-      font-family: var(--app-font-main);
-    }
-
     h3 {
       font-size: var(--legend-title-font-size);
     }

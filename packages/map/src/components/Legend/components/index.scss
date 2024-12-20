@@ -68,12 +68,7 @@
 
     .legend-container {
       position: relative;
-      .legend-container__title,
-      .legend-container__description,
-      tspan,
-      span {
-        font-family: var(--app-font-main);
-      }
+
       .tspan {
         font-size: var(--legend-item-font-size) !important;
       }
