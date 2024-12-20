@@ -69,7 +69,7 @@ const Conditions: React.FC<CondtionsProps> = ({
         >
           <Icon display='caretDown' />
         </button>
-        <button className='btn btn-warn btn-sm mt-0 ml-2' onClick={() => removeCondition(conditionIndex)}>
+        <button className='btn btn-warn btn-sm mt-0 ms-2' onClick={() => removeCondition(conditionIndex)}>
           Remove
         </button>
       </div>
@@ -78,7 +78,7 @@ const Conditions: React.FC<CondtionsProps> = ({
           <span>Condition : </span>
           <div className='pt-1'>
             <select
-              className='ml-1'
+              className='ms-1'
               value={columnName}
               onChange={e => handleConditionChange(e.target.value, 'columnName')}
             >
@@ -90,14 +90,14 @@ const Conditions: React.FC<CondtionsProps> = ({
               ))}
             </select>
             <select
-              className='ml-1'
+              className='ms-1'
               value={isOrIsNotEqualTo}
               onChange={e => handleConditionChange(e.target.value, 'isOrIsNotEqualTo')}
             >
               <option value='is'>is</option>
               <option value='isNot'>is not</option>
             </select>
-            <select className='ml-1' value={value} onChange={e => handleConditionChange(e.target.value, 'value')}>
+            <select className='ms-1' value={value} onChange={e => handleConditionChange(e.target.value, 'value')}>
               <option value=''>Select</option>
 
               {conditionLookup[columnName]?.map(valueItem => {

@@ -10,9 +10,8 @@ interface LegendShapeProps {
 const LegendShape: React.FC<LegendShapeProps> = props => {
   const { fill, borderColor, display = 'inline-block', shape = 'circle' } = props
   const dimensions = { width: '1em', height: '1em' }
-  const marginRight = ['circle', 'square'].includes(shape) ? '5px' : '0'
+  const isCircleOrSquare = ['circle', 'square'].includes(shape)
   const styles = {
-    marginRight: marginRight,
     borderRadius: shape === 'circle' ? '50%' : '0px',
     verticalAlign: 'middle',
     display: display,
@@ -22,7 +21,7 @@ const LegendShape: React.FC<LegendShapeProps> = props => {
     backgroundColor: fill
   }
 
-  return <span className='legend-item' style={styles} />
+  return <span className={`legend-item ${isCircleOrSquare ? 'me-2' : ''}`} style={styles} />
 }
 
 export default LegendShape

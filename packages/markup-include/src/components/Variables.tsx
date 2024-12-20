@@ -18,7 +18,14 @@ type VariableSectionProps = {
   variableIndex: number
 }
 
-const VariableSection: React.FC<VariableSectionProps> = ({ controls, data, deleteVariable, updateVariableArray, variableConfig, variableIndex }) => {
+const VariableSection: React.FC<VariableSectionProps> = ({
+  controls,
+  data,
+  deleteVariable,
+  updateVariableArray,
+  variableConfig,
+  variableIndex
+}) => {
   const [openVariableControls, setOpenVariableControls] = controls
   const show = openVariableControls[variableIndex]
   const setShow = (key, value) => {
@@ -84,7 +91,9 @@ const VariableSection: React.FC<VariableSectionProps> = ({ controls, data, delet
   }
 
   const handleVariableDoneClick = () => {
-    const filteredConditionsList = conditionsList.filter(condition => condition.columnName !== '' && condition.value !== '')
+    const filteredConditionsList = conditionsList.filter(
+      condition => condition.columnName !== '' && condition.value !== ''
+    )
     const newVariable = {
       columnName: selectedColumn,
       conditions: filteredConditionsList,
@@ -117,7 +126,7 @@ const VariableSection: React.FC<VariableSectionProps> = ({ controls, data, delet
               <Icon display='caretUp' />
             </button>
             <button
-              className='btn btn-danger btn-sm mt-0 ml-2'
+              className='btn btn-danger btn-sm mt-0 ms-2'
               onClick={event => {
                 event.preventDefault()
                 deleteVariable(variableIndex)
@@ -128,12 +137,22 @@ const VariableSection: React.FC<VariableSectionProps> = ({ controls, data, delet
           </div>
           <label className='d-block'>
             <span className='edit-label column-heading'>Variable Name:</span>
-            <input className={`variable-${variableIndex} ml-1`} type='text' value={variableName} onChange={e => setVariableName(e.target.value)} />
+            <input
+              className={`variable-${variableIndex} ms-1`}
+              type='text'
+              value={variableName}
+              onChange={e => setVariableName(e.target.value)}
+            />
           </label>
           <div className='pt-2'>
             <label className='d-block'>
               <span className='edit-label column-heading'>Column:</span>
-              <select className={`variable-${variableIndex} ml-1`} onChange={e => handleVariableColumnChange(e.target.value)} value={selectedColumn} disabled={columnSelectDisabled}>
+              <select
+                className={`variable-${variableIndex} ms-1`}
+                onChange={e => handleVariableColumnChange(e.target.value)}
+                value={selectedColumn}
+                disabled={columnSelectDisabled}
+              >
                 <option value=''>Select</option>
                 {columnNames.map(columnName => (
                   <option key={columnName} value={columnName}>
@@ -151,7 +170,10 @@ const VariableSection: React.FC<VariableSectionProps> = ({ controls, data, delet
               tooltip={
                 <Tooltip style={{ textTransform: 'none' }}>
                   <Tooltip.Target>
-                    <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                    <Icon
+                      display='question'
+                      style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                    />
                   </Tooltip.Target>
                   <Tooltip.Content>
                     <p>{`Selecting this option will add commas to the numeric value.`}</p>
@@ -183,7 +205,7 @@ const VariableSection: React.FC<VariableSectionProps> = ({ controls, data, delet
             <button onClick={handleAddConditionClick} disabled={addConditionDisabled}>
               Add Condition
             </button>
-            <button className='ml-2' onClick={handleVariableDoneClick} disabled={addConditionDisabled}>
+            <button className='ms-2' onClick={handleVariableDoneClick} disabled={addConditionDisabled}>
               Done
             </button>
           </div>
