@@ -127,7 +127,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isDateTime = config.xAxis.type === 'date-time'
   const suffixHasNoSpace = !suffix.includes(' ')
   const labelsOverflow = onlyShowTopPrefixSuffix && !suffixHasNoSpace
-  console.log('🧙‍♂️ ✨ LinearChart ✨ labelsOverflow:', labelsOverflow)
   const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
   const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
 
