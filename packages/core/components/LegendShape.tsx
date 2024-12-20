@@ -21,7 +21,7 @@ const LegendShape: React.FC<LegendShapeProps> = props => {
     backgroundColor: fill
   }
 
-  return <span className={`legend-item ${isCircleOrSquare ? 'mr-2' : ''}`} style={styles} />
+  return <span className={`legend-item ${isCircleOrSquare ? 'me-2' : ''}`} style={styles} />
 }
 
 export default LegendShape

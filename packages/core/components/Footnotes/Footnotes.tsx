@@ -12,7 +12,7 @@ const Footnotes: React.FC<FootnotesProps> = ({ footnotes }) => {
         {footnotes.map((note, i) => {
           return (
             <li key={note.symbol + i} className='mb-1'>
-              {note.symbol && <span className='mr-1'>{note.symbol}</span>}
+              {note.symbol && <span className='me-1'>{note.symbol}</span>}
               {note.text}
             </li>
           )

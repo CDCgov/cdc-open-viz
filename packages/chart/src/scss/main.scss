@@ -226,14 +226,7 @@
 
     .legend-item > .legend-item {
       display: inline-block;
-      margin-right: 0.5rem;
       flex: 0 0 auto;
-    }
-
-    & div.legend-item {
-      &:last-child {
-        margin: 0 !important;
-      }
     }
 
     .legend-item {
