@@ -7,6 +7,7 @@ import { Text } from '@visx/text'
 import ConfigContext from '../ConfigContext'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
+import { fontSize } from '@cdc/core/helpers/cove/fontSettings'
 
 const PairedBarChart = ({ width, height, originalWidth }) => {
   const { config, colorScale, transformedData: data, formatNumber, seriesHighlight } = useContext(ConfigContext)
@@ -15,7 +16,6 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
 
   const borderWidth = config.barHasBorder === 'true' ? 1 : 0
   const halfWidth = width / 2
-  const fontSize = { small: 16, medium: 18, large: 20 }
   const offset = 1.02 // Offset of the left bar from the Axis
 
   const groupOne = {
@@ -111,7 +111,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 // check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
                 const textWidth = getTextWidth(
                   formatNumber(d[groupOne.dataKey], 'left'),
-                  `normal ${fontSize[config.fontSize]}px sans-serif`
+                  `normal ${fontSize}px sans-serif`
                 )
                 const textFits = textWidth < barWidth - 5 // minus padding dx(5)
 
@@ -172,7 +172,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 // check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
                 const textWidth = getTextWidth(
                   formatNumber(d[groupTwo.dataKey], 'left'),
-                  `normal ${fontSize[config.fontSize]}px sans-serif`
+                  `normal ${fontSize}px sans-serif`
                 )
                 const isTextFits = textWidth < barWidth - 5 // minus padding dx(5)
 

@@ -30,7 +30,7 @@ export default function DeviationBar({ height, xScale }) {
       : roundingStyle === 'finger'
       ? '15px'
       : '0px'
-  const fontSize = { small: 16, medium: 18, large: 20 }
+  const fontSize = 18
   const isRounded = config.barStyle === 'rounded'
   const target = Number(config.xAxis.target)
   const seriesKey = config.series[0].dataKey
@@ -65,7 +65,7 @@ export default function DeviationBar({ height, xScale }) {
       const firstBarValue = data[0][seriesKey]
       const barPosition = firstBarValue < target ? 'left' : 'right'
       const label = `${config.xAxis.targetLabel} ${formatNumber(config.xAxis.target || 0, 'left')}`
-      const labelWidth = getTextWidth(label, `bold ${fontSize[config.fontSize]}px sans-serif`)
+      const labelWidth = getTextWidth(label, `bold ${fontSize}px sans-serif`)
       let labelY = config.isLollipopChart ? lollipopBarHeight / 2 : Number(config.barHeight) / 2
       let paddingX = 0
       let labelX = 0
@@ -165,10 +165,7 @@ export default function DeviationBar({ height, xScale }) {
           config.heights.horizontal = totalheight
 
           // text,labels postiions
-          const textWidth = getTextWidth(
-            formatNumber(barValue, 'left'),
-            `normal ${fontSize[config.fontSize]}px sans-serif`
-          )
+          const textWidth = getTextWidth(formatNumber(barValue, 'left'), `normal ${fontSize}px sans-serif`)
           const textFits = textWidth < barWidth - 6
           const textX = barBaseX
           const textY = barY + barHeight / 2

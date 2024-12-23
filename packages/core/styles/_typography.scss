@@ -11,7 +11,8 @@
   }
 }
 
-.subtext p {
+.subtext p,
+p.subtext {
   font-family: var(--app-font-main);
 }
 

@@ -23,7 +23,7 @@ import { HtmlLabel, CircleSubject, EditableAnnotation, Connector, Annotation as 
 import { Drag } from '@visx/drag'
 import { MarkerArrow } from '@visx/marker'
 import { LinePath } from '@visx/shape'
-import { fontSizes } from '@cdc/core/helpers/cove/fontSettings'
+import { fontSize } from '@cdc/core/helpers/cove/fontSettings'
 
 // styles
 import './AnnotationDraggable.styles.css'
@@ -134,7 +134,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
                   </p>
                 </>
               )}
-              <div style={{ fontSize: fontSizes[config.fontSize] }} dangerouslySetInnerHTML={sanitizedData()} />
+              <div style={{ fontSize: fontSize }} dangerouslySetInnerHTML={sanitizedData()} />
             </div>
           </HtmlLabel>
           {annotation.connectionType === 'line' && (
