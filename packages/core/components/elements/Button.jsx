@@ -5,24 +5,40 @@ import LoadSpin from '../ui/LoadSpin'
 
 import '../../styles/v2/components/button.scss'
 
-const Button = ({ style, role, hoverStyle = {}, fluid = false, loading = false, loadingText = 'Loading...', flexCenter, active = false, onClick, children, ...attributes }) => {
+const Button = ({
+  style,
+  role,
+  hoverStyle = {},
+  fluid = false,
+  loading = false,
+  loadingText = 'Loading...',
+  flexCenter,
+  active = false,
+  onClick,
+  children,
+  ...attributes
+}) => {
   const buttonRef = useRef(null)
 
-  const [ buttonState, setButtonState ] = useState('out')
-  const [ customStyles, setCustomStyles ] = useState({ ...style })
-  const [ childrenWidth, setChildrenWidth ] = useState()
-  const [ loadtextWidth, setLoadtextWidth ] = useState()
+  const [buttonState, setButtonState] = useState('out')
+  const [customStyles, setCustomStyles] = useState({ ...style })
+  const [childrenWidth, setChildrenWidth] = useState()
+  const [loadtextWidth, setLoadtextWidth] = useState()
 
   const attributesObj = {
     ...attributes,
     style: customStyles,
-    className: 'cove-button' + (flexCenter || 'loader' === role ? ' cove-button--flex-center' : '') + (fluid ? ' fluid' : '') + (loading ? ' loading' : '') + (attributes.className ? ' ' + attributes.className : ''),
+    className:
+      'cove-button' +
+      (flexCenter || 'loader' === role ? ' cove-button--flex-center' : '') +
+      (fluid ? ' fluid' : '') +
+      (loading ? ' loading' : '') +
+      (attributes.className ? ' ' + attributes.className : ''),
     onMouseOver: () => setButtonState('in'),
     onMouseOut: () => setButtonState('out'),
     onFocus: () => setButtonState('in'),
     onBlur: () => setButtonState('out')
   }
-
 
   useEffect(() => {
     if ('loader' === role && buttonRef.current) {
@@ -54,9 +70,8 @@ const Button = ({ style, role, hoverStyle = {}, fluid = false, loading = false, 
       buttonRef.current.parentNode.removeChild(ghostSpan)
       buttonRef.current.parentNode.removeChild(ghostLoaderSpan)
     }
-    return () => {
-    }
-  }, [ buttonRef, children, loadingText, role ])
+    return () => {}
+  }, [buttonRef, children, loadingText, role])
 
   useEffect(() => {
     //Adjust button styles depending on cursor, focus, and active, states
@@ -64,9 +79,10 @@ const Button = ({ style, role, hoverStyle = {}, fluid = false, loading = false, 
 
     // If button state is out, check if its 'active'; we want to keep hover styles applied to 'active' buttons
     if (buttonState === 'out')
-      // If button state is out, and not 'active', reset display styles back to default
-      if (!active) setCustomStyles({ ...style })
-  }, [ buttonState, active, style ])
+      if (!active)
+        // If button state is out, and not 'active', reset display styles back to default
+        setCustomStyles({ ...style })
+  }, [buttonState, active, style])
 
   return (
     <button
@@ -82,16 +98,19 @@ const Button = ({ style, role, hoverStyle = {}, fluid = false, loading = false, 
         <>
           {'loader' === role && (
             <>
-              <span className="cove-button__text" style={loading ? { width: loadtextWidth + 'px' } : { width: childrenWidth + 'px' }}>
-                <div className="cove-button__text--loading" style={loading ? { opacity: 1 } : null}>
+              <span
+                className='cove-button__text'
+                style={loading ? { width: loadtextWidth + 'px' } : { width: childrenWidth + 'px' }}
+              >
+                <div className='cove-button__text--loading' style={loading ? { opacity: 1 } : null}>
                   {loadingText}
                 </div>
-                <div className="cove-button__text--children" style={loading ? { opacity: 0 } : null}>
+                <div className='cove-button__text--children' style={loading ? { opacity: 0 } : null}>
                   {children}
                 </div>
               </span>
-              <div className="cove-button__load-spin" style={loading ? { width: '28px', opacity: 1 } : null}>
-                <LoadSpin className="ml-1" size={20}/>
+              <div className='cove-button__load-spin' style={loading ? { width: '28px', opacity: 1 } : null}>
+                <LoadSpin className='ms-1' size={20} />
               </div>
             </>
           )}
@@ -104,7 +123,7 @@ const Button = ({ style, role, hoverStyle = {}, fluid = false, loading = false, 
 
 Button.propTypes = {
   /** Specify special role type for button */
-  role: PropTypes.oneOf([ 'loader' ]),
+  role: PropTypes.oneOf(['loader']),
   /** Provide object with styles that overwrite base styles when hovered */
   hoverStyle: PropTypes.object,
   /** Enables button to stretch to the full width of the content */

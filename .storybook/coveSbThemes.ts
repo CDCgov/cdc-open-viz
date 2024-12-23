@@ -19,7 +19,7 @@ export const managerTheme = create({
   appBorderRadius: 0,
 
   // Typography
-  fontBase: '"Open Sans", sans-serif',
+  fontBase: '"Nunito", sans-serif',
   fontCode: 'monospace',
 
   // Text colors
@@ -36,7 +36,7 @@ export const managerTheme = create({
   inputBg: 'white',
   inputBorder: 'silver',
   inputTextColor: '#383838',
-  inputBorderRadius: 0,
+  inputBorderRadius: 0
 })
 
 export const previewTheme = create({
@@ -55,7 +55,7 @@ export const previewTheme = create({
   appBorderRadius: 4,
 
   // Typography
-  fontBase: '"Open Sans", sans-serif',
+  fontBase: '"Nunito", sans-serif',
   fontCode: 'monospace',
 
   // Text colors
@@ -71,6 +71,5 @@ export const previewTheme = create({
   inputBg: 'white',
   inputBorder: 'silver',
   inputTextColor: '#383838',
-  inputBorderRadius: 4,
+  inputBorderRadius: 4
 })
-

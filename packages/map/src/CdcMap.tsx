@@ -1108,7 +1108,7 @@ const CdcMap = ({
             }}
           >
             {state.tooltips.linkLabel}
-            {isDomainExternal(row[state.columns.navigate.name]) && <ExternalIcon className='inline-icon ml-1' />}
+            {isDomainExternal(row[state.columns.navigate.name]) && <ExternalIcon className='inline-icon ms-1' />}
           </a>
         )
       }

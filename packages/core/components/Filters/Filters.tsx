@@ -438,7 +438,7 @@ const Filters = (props: FilterProps) => {
 
       const classList = [
         'single-filters',
-        'form-group mr-3',
+        'form-group me-3',
         mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`
       ]
       const mobileExempt = ['nested-dropdown', 'multi-select'].includes(filterStyle)
