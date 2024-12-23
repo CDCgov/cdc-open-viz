@@ -41,7 +41,8 @@ export const filterOrderOptions: { label: string; value: OrderBy }[] = [
   {
     label: 'Custom',
     value: 'cust'
-  }
+  },
+  { label: 'Order By Data Column', value: 'column' }
 ]
 
 const hasStandardFilterBehavior = ['chart', 'table']
