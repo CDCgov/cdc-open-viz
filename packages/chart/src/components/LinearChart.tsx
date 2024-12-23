@@ -420,8 +420,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const maxValueIsGreaterThanTopGridLine = maxValue > Math.max(...yScale.ticks(handleNumTicks))
 
     if (!maxValueIsGreaterThanTopGridLine || !labelsOverflow) return
-
-    const tickGap = yScale.ticks(handleNumTicks)[1] - yScale.ticks(handleNumTicks)[0]
+    const ticks = yScale.ticks(handleNumTicks)
+    const tickGap = ticks.length === 1 ? ticks[0] : ticks[1] - ticks[0]
     const nextTick = Math.max(...yScale.ticks(handleNumTicks)) + tickGap
     const divideBy = minValue < 0 ? maxValue / 2 : maxValue
     const calculatedPadding = (nextTick - maxValue) / divideBy
