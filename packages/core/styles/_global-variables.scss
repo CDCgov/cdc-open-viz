@@ -81,14 +81,24 @@ $colors: (
 @include theme();
 
 :root {
+  // Spacing
   --editorContentPadding: 30px;
   --editorWidth: 350px;
+  --space-between-legend-item-rows: 1rem;
+  --space-between-legend-item-columns: 1.5rem;
+  // Breakpoints
   --breakpoint-xs: 480px;
   --breakpoint-sm: 768px;
   --breakpoint-md: 960px;
   --breakpoint-lg: 1170px;
   --breakpoint-xl: 1280px;
+  // Font
+  --app-font-main: 'Nunito', sans-serif;
+  // Font sizes
   --font-size: 17px;
+  --legend-title-font-size: 1rem;
+  --legend-description-font-size: 1rem;
+  --legend-item-font-size: 0.889rem;
 }
 
 @media (max-width: 576px) {

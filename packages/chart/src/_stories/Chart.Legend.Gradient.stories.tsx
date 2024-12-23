@@ -51,7 +51,7 @@ export const Legend_Gradient_With_box: Story = {
 export const Legend_Gradient_With_Text: Story = {
   args: {
     config: editConfigKeys(chartGradientConfig, [
-      { path: ['legend', 'title'], value: 'Title' },
+      { path: ['legend', 'label'], value: 'Title' },
       { path: ['legend', 'description'], value: 'Description' },
       { path: ['legend', 'hideBorder'], value: false }
     ])
