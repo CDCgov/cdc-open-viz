@@ -30,6 +30,7 @@ export type DataTableProps = {
   columns?: Record<string, Column>
   config: TableConfig
   dataConfig?: Object
+  defaultSortBy?: string
   displayDataAsText?: Function
   displayGeoName?: Function
   expandDataTable: boolean
@@ -59,6 +60,7 @@ const DataTable = (props: DataTableProps) => {
   const {
     config,
     dataConfig,
+    defaultSortBy,
     tableTitle,
     vizTitle,
     rawData,
@@ -89,11 +91,8 @@ const DataTable = (props: DataTableProps) => {
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
-  const hasDateAxis = config.xAxis && ['date-time', 'date'].includes(config.xAxis.type)
-  const dateKey = hasDateAxis && config.xAxis.dataKey
-
   const [sortBy, setSortBy] = useState<any>({
-    column: dateKey || '',
+    column: defaultSortBy || '',
     asc: false,
     colIndex: null
   })
