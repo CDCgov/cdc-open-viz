@@ -1,24 +1,3 @@
-&.font-small {
-  .chart-container {
-    font-size: 0.9em !important;
-  }
-}
-
-&.font-medium {
-  font-size: 1em !important;
-}
-
-&.font-large {
-  .chart-container {
-    font-size: 1.1em !important;
-  }
-}
-
-.subtext {
-  font-style: italic;
-  font-size: 0.9em !important;
-}
-
 // TODO: when we have updated each section to use the new font, we can transition to using a global style
 .chart-container,
 .map-container {
@@ -30,4 +9,20 @@
       font-family: var(--app-font-main);
     }
   }
+}
+
+.subtext p {
+  font-family: var(--app-font-main);
+}
+
+.data-table-container {
+  font-family: var(--app-font-main);
+}
+
+.download-links a {
+  font-family: var(--app-font-main);
+}
+
+section.footnotes {
+  font-family: var(--app-font-main);
 }
