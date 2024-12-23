@@ -7,6 +7,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import useIntersectionObserver from '../hooks/useIntersectionObserver'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
+import { fontSize } from '@cdc/core/helpers/cove/fontSettings'
 
 export default function DeviationBar({ height, xScale }) {
   const {
@@ -30,7 +31,6 @@ export default function DeviationBar({ height, xScale }) {
       : roundingStyle === 'finger'
       ? '15px'
       : '0px'
-  const fontSize = 18
   const isRounded = config.barStyle === 'rounded'
   const target = Number(config.xAxis.target)
   const seriesKey = config.series[0].dataKey

@@ -47,7 +47,7 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
     }
 
     if (config.type === 'filtered-text') {
-      classes.push('type-filtered-text')
+      classes.push('type-filtered-text', `font-${config.fontSize}`)
       classes = classes.filter(item => item !== 'cove-component__content')
       return classes
     }
@@ -63,7 +63,7 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
     }
 
     if (config.type === 'data-bite') {
-      classes.push('cdc-open-viz-module', 'type-data-bite', currentViewport, config.theme)
+      classes.push('cdc-open-viz-module', 'type-data-bite', currentViewport, config.theme, `font-${config.fontSize}`)
       if (isEditor) {
         classes.push('is-editor')
       }
