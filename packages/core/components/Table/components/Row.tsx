@@ -1,7 +1,6 @@
 import { ReactNode, FC } from 'react'
 import Cell from './Cell'
 import { PreliminaryDataItem } from '@cdc/chart/src/types/ChartConfig'
-import { fontSize } from '@cdc/core/helpers/cove/fontSettings'
 
 type RowProps = {
   childRow: ReactNode[]
@@ -15,10 +14,9 @@ type RowProps = {
 }
 
 const Row: FC<RowProps> = props => {
-  const { childRow, rowKey, wrapColumns, cellMinWidth = 0, isTotal, fontSize, viewport, preliminaryData } = props
+  const { childRow, rowKey, wrapColumns, cellMinWidth = 0, isTotal, viewport, preliminaryData } = props
   const whiteSpace = wrapColumns ? 'unset' : 'nowrap'
   const minWidth = cellMinWidth + 'px'
-  const cellFontSize = ['xs', 'xxs'].includes(viewport) ? '12px' : `${fontSize}px`
 
   return (
     <tr>
@@ -33,7 +31,7 @@ const Row: FC<RowProps> = props => {
           <Cell
             ariaLabel={style?.color ? 'suppressed data' : ''}
             key={rowKey + '__' + i}
-            style={{ whiteSpace, minWidth, fontSize: cellFontSize, ...style }}
+            style={{ whiteSpace, minWidth, ...style }}
             isBold={isTotal}
           >
             {child}
