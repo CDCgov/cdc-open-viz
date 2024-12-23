@@ -2,12 +2,13 @@ import { getChartCellValue } from '../helpers/getChartCellValue'
 import { getSeriesName } from '../helpers/getSeriesName'
 import { getDataSeriesColumns } from '../helpers/getDataSeriesColumns'
 import ScreenReaderText from '@cdc/core/components/elements/ScreenReaderText'
+import { fontSize } from '@cdc/core/helpers/cove/fontSettings'
 import { SortIcon } from './SortIcon'
 import { getNewSortBy } from '../helpers/getNewSortBy'
 
-type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; hasRowType? }
+type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; hasRowType?; viewport }
 
-const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }: ChartHeaderProps) => {
+const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType, viewport }: ChartHeaderProps) => {
   const groupBy = config.table?.groupBy
   if (!data) return
   let dataSeriesColumns = getDataSeriesColumns(config, isVertical, data)
@@ -63,15 +64,18 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }
       }
     }
 
+    const headerFontSize = ['xs', 'xxs'].includes(viewport) ? '12px' : `${fontSize}px`
+
     return (
       <tr>
         {dataSeriesColumns.map((column, index) => {
           const text = getSeriesName(column, config)
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
+
           return (
             <th
-              style={{ minWidth: (config.table.cellMinWidth || 0) + 'px' }}
+              style={{ minWidth: (config.table.cellMinWidth || 0) + 'px', fontSize: headerFontSize }}
               key={`col-header-${column}__${index}`}
               tabIndex={0}
               role='columnheader'
@@ -111,7 +115,7 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }
           const sortByAsc = sortBy.colIndex === index ? sortBy.asc : undefined
           return (
             <th
-              style={{ minWidth: (config.table.cellMinWidth || 0) + 'px' }}
+              style={{ minWidth: (config.table.cellMinWidth || 0) + 'px', fontSize: headerFontSize }}
               key={`col-header-${text}__${index}`}
               tabIndex={0}
               role='columnheader'

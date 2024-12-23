@@ -1,7 +1,7 @@
 import { ReactNode, FC } from 'react'
 import Cell from './Cell'
 import { PreliminaryDataItem } from '@cdc/chart/src/types/ChartConfig'
-import { fontSize } from '../../../helpers/cove/fontSettings'
+import { fontSize } from '@cdc/core/helpers/cove/fontSettings'
 
 type RowProps = {
   childRow: ReactNode[]

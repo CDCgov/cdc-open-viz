@@ -124,7 +124,6 @@ table.data-table {
     &:last-child {
       border-right: 0 !important;
     }
-    font-size: var(--font-size);
   }
 
   td {

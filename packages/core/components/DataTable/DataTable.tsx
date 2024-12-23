@@ -296,6 +296,7 @@ const DataTable = (props: DataTableProps) => {
                     isVertical={isVertical}
                     sortBy={sortBy}
                     setSortBy={setSortBy}
+                    viewport={viewport}
                   />
                 )
               }
