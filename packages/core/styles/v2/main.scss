@@ -3,7 +3,6 @@
 
 .cove {
   @import 'base';
-  color: $baseColor;
   font-size: 16px;
   line-height: 1.4;
 
@@ -18,7 +17,6 @@
   font-weight: 400;
   font-style: normal;
   text-rendering: optimizeLegibility;
-  color: #111;
 
   strong {
     font-weight: 600;
