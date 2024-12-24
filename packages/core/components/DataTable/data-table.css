@@ -15,8 +15,8 @@
 
 .cdc-open-viz-module div.data-table-heading {
   position: relative;
-  background: rgba(0, 0, 0, 0.05);
-  border: var(--lightGray) 1px solid;
+  border: var(--cool-gray-10) 1px solid;
+  border-radius: 6px;
 
   svg {
     position: absolute;

@@ -438,7 +438,7 @@ const Filters = (props: FilterProps) => {
 
       const classList = [
         'single-filters',
-        'form-group me-3',
+        'form-group',
         mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`
       ]
       const mobileExempt = ['nested-dropdown', 'multi-select'].includes(filterStyle)
@@ -447,7 +447,7 @@ const Filters = (props: FilterProps) => {
         <div className={classList.join(' ')} key={outerIndex}>
           <>
             {label && (
-              <label className='font-weight-bold mt-1 mb-0' htmlFor={`filter-${outerIndex}`}>
+              <label className='font-weight-bold mb-2' htmlFor={`filter-${outerIndex}`}>
                 {label}
               </label>
             )}
@@ -504,7 +504,7 @@ const Filters = (props: FilterProps) => {
       {visualizationConfig.filterIntro && (
         <p className='filters-section__intro-text'>{visualizationConfig.filterIntro}</p>
       )}
-      <div className='d-flex flex-wrap w-100 filters-section__wrapper'>
+      <div className='d-flex flex-wrap w-100 mt-3 mb-4 pb-2 filters-section__wrapper'>
         {' '}
         <>
           <Style />
