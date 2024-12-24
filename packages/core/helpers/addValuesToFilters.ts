@@ -28,13 +28,16 @@ const cleanLookup = (lookup: Record<string, { values: string[]; orderedValues?: 
 // Gets filter values from dataset
 const generateValuesForFilter = (filter: VizFilter, data: any[] | MapData) => {
   const columnName = filter.columnName
+  const orderColumn = filter.orderColumn
   const values: string[] = []
+  const valuesWithOrders: [string, string][] = []
   const subGroupingColumn = filter.subGrouping?.columnName
   const subValues = cleanLookup(filter.subGrouping?.valuesLookup)
   if (Array.isArray(data)) {
     data.forEach(row => {
-      const value = row[columnName]
+      const value: string = row[columnName]
       if (value !== undefined && !values.includes(value)) {
+        if (orderColumn) valuesWithOrders.push([value, row[orderColumn]])
         values.push(value)
       }
       if (subGroupingColumn) {
@@ -57,12 +60,17 @@ const generateValuesForFilter = (filter: VizFilter, data: any[] | MapData) => {
       rows.forEach(row => {
         const value = row[columnName]
         if (value !== undefined && !values.includes(value)) {
+          if (orderColumn) valuesWithOrders.push([value, row[orderColumn]])
           values.push(value)
         }
       })
     })
   }
-  filter.values = values
+  if (orderColumn) {
+    filter.values = valuesWithOrders.sort((a, b) => a[1].localeCompare(b[1])).map(([value]) => value)
+  } else {
+    filter.values = values
+  }
   if (subGroupingColumn) {
     filter.subGrouping.valuesLookup = subValues
   }
