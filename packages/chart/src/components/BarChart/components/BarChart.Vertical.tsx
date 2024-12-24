@@ -233,12 +233,12 @@ export const BarChartVertical = () => {
                   const xPos = barX + (config.xAxis.type !== 'date-time' ? barWidth / 2 : 0)
 
                   const upperPos = yScale(
-                    datum.dynamicData && datum.CI[bar.key]
+                    datum.dynamicData && datum?.CI?.[bar.key]
                       ? datum.CI[bar.key].upper
                       : datum[config.confidenceKeys.upper]
                   )
                   const lowerPos = yScale(
-                    datum.dynamicData && datum.CI[bar.key]
+                    datum.dynamicData && datum?.CI?.[bar.key]
                       ? datum.CI[bar.key].lower
                       : datum[config.confidenceKeys.lower]
                   )

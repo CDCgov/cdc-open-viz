@@ -1570,10 +1570,10 @@ const CdcMap = ({
                 <Filters
                   config={state}
                   setConfig={setState}
-                  getUniqueValues={getUniqueValues}
                   filteredData={runtimeFilters}
                   setFilteredData={setRuntimeFilters}
                   dimensions={dimensions}
+                  standaloneMap={!config}
                 />
               )}
 
