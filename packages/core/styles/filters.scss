@@ -2,9 +2,7 @@
   &__wrapper {
     flex-wrap: wrap;
     display: flex;
-    gap: 7px 15px;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    gap: 18px 27px;
     label {
       display: inherit;
       margin-bottom: 5px;
@@ -27,9 +25,9 @@
 }
 
 div.single-filters {
-
   label {
     width: 100%;
+    font-weight: 700;
   }
 
   &__tab-bar {
