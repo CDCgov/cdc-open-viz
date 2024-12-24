@@ -11,7 +11,6 @@ export default {
   showDownloadMediaButton: false,
   theme: 'theme-blue',
   animate: false,
-  fontSize: 'medium',
   lineDatapointStyle: 'hover',
   lineDatapointColor: 'Same as Line',
   barHasBorder: 'false',

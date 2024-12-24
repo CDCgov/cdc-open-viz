@@ -268,13 +268,7 @@ const DataTable = (props: DataTableProps) => {
         <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           {config.table.collapsible !== false && (
-            <ExpandCollapse
-              expanded={expanded}
-              setExpanded={setExpanded}
-              fontSize={config.fontSize}
-              tableTitle={tableTitle}
-              viewport={viewport}
-            />
+            <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} viewport={viewport} />
           )}
           <div className='table-container' style={limitHeight}>
             <Table
@@ -302,6 +296,7 @@ const DataTable = (props: DataTableProps) => {
                     isVertical={isVertical}
                     sortBy={sortBy}
                     setSortBy={setSortBy}
+                    viewport={viewport}
                   />
                 )
               }
@@ -313,7 +308,6 @@ const DataTable = (props: DataTableProps) => {
                 'aria-rowcount': config?.data?.length ? config.data.length : -1,
                 hidden: !expanded
               }}
-              fontSize={config.fontSize}
             />
 
             {/* REGION Data Table */}
@@ -336,7 +330,6 @@ const DataTable = (props: DataTableProps) => {
                     </tr>
                   }
                   tableOptions={{ className: 'table table-striped region-table data-table' }}
-                  fontSize={config.fontSize}
                 />
               )}
           </div>
@@ -374,7 +367,6 @@ const DataTable = (props: DataTableProps) => {
                 'aria-rowcount': 11,
                 hidden: !expanded
               }}
-              fontSize={config.fontSize}
             />
           </div>
         </section>

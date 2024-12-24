@@ -178,7 +178,7 @@ const ZoomBrush: FC<Props> = props => {
               showTooltip={showTooltip}
               pixelDistance={textProps.endPosition - textProps.startPosition}
               textProps={textProps}
-              fontSize={fontSize[config.fontSize]}
+              fontSize={fontSize}
               {...props}
               isBrushing={brushRef.current?.state.isBrushing}
             />

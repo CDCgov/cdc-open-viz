@@ -17,10 +17,17 @@ type VisualizationWrapper = {
 }
 
 const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) => {
-  const { config = {}, isEditor = false, currentViewport = 'lg', imageId = '', showEditorPanel = true, className } = props
+  const {
+    config = {},
+    isEditor = false,
+    currentViewport = 'lg',
+    imageId = '',
+    showEditorPanel = true,
+    className
+  } = props
 
   const getWrappingClasses = () => {
-    let classes = ['cdc-open-viz-module', `${currentViewport}`, `font-${config?.fontSize}`, `${config?.theme}`]
+    let classes = ['cdc-open-viz-module', `${currentViewport}`, `${config?.theme}`]
 
     if (className) {
       classes.push(className)
@@ -40,7 +47,7 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
     }
 
     if (config.type === 'filtered-text') {
-      classes.push('type-filtered-text')
+      classes.push('type-filtered-text', `font-${config.fontSize}`)
       classes = classes.filter(item => item !== 'cove-component__content')
       return classes
     }
@@ -67,7 +74,14 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
     }
 
     if (config.type === 'waffle-chart') {
-      classes.push('cove', 'cdc-open-viz-module', 'type-waffle-chart', currentViewport, config.theme, 'font-' + config.overallFontSize)
+      classes.push(
+        'cove',
+        'cdc-open-viz-module',
+        'type-waffle-chart',
+        currentViewport,
+        config.theme,
+        'font-' + config.overallFontSize
+      )
 
       if (isEditor) {
         classes.push('is-editor')
