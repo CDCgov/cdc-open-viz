@@ -57,7 +57,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
       legend?.position === 'bottom' || (isLegendWrapViewport(currentViewport) && !legend.hide)
 
     const legendClasses = {
-      marginBottom: getMarginBottom(config, hasSuppression),
+      marginBottom: getMarginBottom(isBottomOrSmallViewport, config, hasSuppression),
       marginTop: getMarginTop(isBottomOrSmallViewport, config)
     }
 
