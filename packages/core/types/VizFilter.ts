@@ -1,4 +1,4 @@
-export type OrderBy = 'asc' | 'desc' | 'cust'
+export type OrderBy = 'asc' | 'desc' | 'cust' | 'column'
 
 export type FilterBase = {
   columnName: string
@@ -23,6 +23,7 @@ export type GeneralFilter = FilterBase & {
   filterStyle: VizFilterStyle
   label: string
   order: OrderBy
+  orderColumn?: string
   orderedValues?: string[] // should only exist if the order is 'cust'
   queryParameter: string
   setByQueryParameter: string
