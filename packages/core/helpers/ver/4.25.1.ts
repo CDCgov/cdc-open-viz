@@ -1,7 +1,7 @@
 import _ from 'lodash'
 
 const removeTerritoriesLabel = config => {
-  if (config.general.territoriesLabel) {
+  if (config.general?.territoriesLabel) {
     delete config.general.territoriesLabel
   }
   return config
