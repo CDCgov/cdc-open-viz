@@ -55,6 +55,7 @@ const DEFAULT_TICK_LENGTH = 8
 const MONTH_AS_MS = 1000 * 60 * 60 * 24 * 30
 const TICK_LABEL_FONT_SIZE = 16
 const TICK_LABEL_MARGIN_RIGHT = 4.5
+const GET_TEXT_WIDTH_FONT = `normal ${fontSize}px Nunito, sans-serif`
 
 const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, parentWidth }, svgRef) => {
   // prettier-ignore
@@ -440,7 +441,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       const numberOfTicks = filteredTicks?.length
       const xMaxHalf = xScale.range()[0] || xMax / 2
       const tickWidthAll = filteredTicks.map(tick =>
-        getTextWidth(formatNumber(tick.value, 'left'), `normal ${fontSize}px Nunito`)
+        getTextWidth(formatNumber(tick.value, 'left'), GET_TEXT_WIDTH_FONT)
       )
       const accumulator = 100
       const sumOfTickWidth = tickWidthAll.reduce((a, b) => a + b, accumulator)
@@ -477,7 +478,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             return (
               <Group className='bottom-axis'>
                 {props.ticks.map((tick, i) => {
-                  const textWidth = getTextWidth(formatNumber(tick.value, 'left'), `normal ${fontSize}px Nunito`)
                   const isTicksOverlapping = getTickPositions(props.ticks, g1xScale)
                   const maxTickRotation = Number(config.xAxis.maxTickRotation) || 90
                   const isResponsiveTicks = config.isResponsiveTicks && isTicksOverlapping
@@ -527,7 +527,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               <>
                 <Group className='bottom-axis'>
                   {props.ticks.map((tick, i) => {
-                    const textWidth = getTextWidth(formatNumber(tick.value, 'left'), `normal ${fontSize}px Nunito`)
                     const isTicksOverlapping = getTickPositions(props.ticks, g2xScale)
                     const maxTickRotation = Number(config.xAxis.maxTickRotation) || 90
                     const isResponsiveTicks = config.isResponsiveTicks && isTicksOverlapping
@@ -1377,14 +1376,12 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
                 // Calculate sumOfTickWidth here, before map function
                 const tickWidthMax = Math.max(
-                  ...filteredTicks.map(tick => getTextWidth(tick.formattedValue, `normal ${fontSize}px Nunito`))
+                  ...filteredTicks.map(tick => getTextWidth(tick.formattedValue, GET_TEXT_WIDTH_FONT))
                 )
                 // const marginTop = 20 // moved to top bc need for yMax calcs
                 const accumulator = ismultiLabel ? 180 : 100
 
-                const textWidths = filteredTicks.map(tick =>
-                  getTextWidth(tick.formattedValue, `normal ${fontSize}px Nunito`)
-                )
+                const textWidths = filteredTicks.map(tick => getTextWidth(tick.formattedValue, GET_TEXT_WIDTH_FONT))
                 const sumOfTickWidth = textWidths.reduce((a, b) => a + b, accumulator)
                 const spaceBetweenEachTick = (xMax - sumOfTickWidth) / (filteredTicks.length - 1)
 
