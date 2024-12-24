@@ -41,18 +41,25 @@ export const filterOrderOptions: { label: string; value: OrderBy }[] = [
   {
     label: 'Custom',
     value: 'cust'
-  }
+  },
+  { label: 'Order By Data Column', value: 'column' }
 ]
-
-const hasStandardFilterBehavior = ['chart', 'table']
 
 export const useFilters = props => {
   const [showApplyButton, setShowApplyButton] = useState(false)
 
   // Desconstructing: notice, adding more descriptive visualizationConfig name over config
   // visualizationConfig feels more robust for all vis types so that its not confused with config/state/etc.
-  const { config: visualizationConfig, setConfig, filteredData, setFilteredData, excludedData, getUniqueValues } = props
-  const { type, data } = visualizationConfig
+  const {
+    config: visualizationConfig,
+    setConfig,
+    filteredData,
+    setFilteredData,
+    excludedData,
+    getUniqueValues,
+    standaloneMap
+  } = props
+  const { data } = visualizationConfig
 
   /**
    * Re-orders a filter based on two indices and updates the runtime filters array and filters state
@@ -72,9 +79,7 @@ export const useFilters = props => {
     const [movedItem] = updatedValues.splice(idx1, 1)
     updatedValues.splice(idx2, 0, movedItem)
 
-    const filtersCopy = hasStandardFilterBehavior.includes(visualizationConfig.type)
-      ? [...visualizationConfig.filters]
-      : [...filteredData]
+    const filtersCopy = !standaloneMap ? [...visualizationConfig.filters] : [...filteredData]
     const filterItem = { ...filtersCopy[filterIndex] }
 
     // Overwrite filterItem.values since thats what we map through in the editor panel
@@ -86,7 +91,7 @@ export const useFilters = props => {
     // Update the filters
     filtersCopy[filterIndex] = filterItem
 
-    if (visualizationConfig.type === 'map') {
+    if (standaloneMap) {
       setFilteredData(filtersCopy)
     }
 
@@ -94,7 +99,7 @@ export const useFilters = props => {
   }
 
   const changeFilterActive = (index, value) => {
-    let newFilters = visualizationConfig.type === 'map' ? [...filteredData] : [...visualizationConfig.filters]
+    let newFilters = standaloneMap ? [...filteredData] : [...visualizationConfig.filters]
 
     if (visualizationConfig.filterBehavior === 'Apply Button') {
       newFilters[index].queuedActive = value
@@ -132,15 +137,12 @@ export const useFilters = props => {
     }
 
     // Used for setting active filter, fromHash breaks the filteredData functionality.
-    if (visualizationConfig.type === 'map' && visualizationConfig.filterBehavior === 'Filter Change') {
+    if (standaloneMap && visualizationConfig.filterBehavior === 'Filter Change') {
       setFilteredData(newFilters)
     }
 
     // If we're on a chart and not using the apply button
-    if (
-      hasStandardFilterBehavior.includes(visualizationConfig.type) &&
-      visualizationConfig.filterBehavior === 'Filter Change'
-    ) {
+    if (!standaloneMap && visualizationConfig.filterBehavior === 'Filter Change') {
       const newFilteredData = filterVizData(newFilters, excludedData)
       setFilteredData(newFilteredData)
 
@@ -204,11 +206,9 @@ export const useFilters = props => {
 
     setConfig({ ...visualizationConfig, filters: newFilters })
 
-    if (type === 'map') {
+    if (standaloneMap) {
       setFilteredData(newFilters, excludedData)
-    }
-
-    if (hasStandardFilterBehavior.includes(visualizationConfig.type)) {
+    } else {
       setFilteredData(filterVizData(newFilters, excludedData))
     }
 
@@ -240,7 +240,7 @@ export const useFilters = props => {
 
     setConfig({ ...visualizationConfig, filters: newFilters })
 
-    if (type === 'map') {
+    if (standaloneMap) {
       setFilteredData(newFilters, excludedData)
     } else {
       setFilteredData(filterVizData(newFilters, excludedData))
@@ -276,11 +276,12 @@ type FilterProps = {
   setConfig: Function
   // exclusions
   exclusions: any[]
+  standaloneMap?: boolean
 }
 
 const Filters = (props: FilterProps) => {
-  const { config: visualizationConfig, filteredData, dimensions } = props
-  const { filters, type, general, theme, filterBehavior } = visualizationConfig
+  const { config: visualizationConfig, filteredData, dimensions, standaloneMap } = props
+  const { filters, general, theme, filterBehavior } = visualizationConfig
   const [mobileFilterStyle, setMobileFilterStyle] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState<EventTarget>(null)
   const id = useId()
@@ -363,7 +364,7 @@ const Filters = (props: FilterProps) => {
 
   const vizFiltersWithValues = useMemo(() => {
     // Here charts is using config.filters where maps is using a runtime value
-    let vizfilters = type === 'map' ? filteredData : filters
+    let vizfilters = standaloneMap ? filteredData : filters
     if (!vizfilters) return []
     if (vizfilters.fromHash) delete vizfilters.fromHash // support for Maps config
     return addValuesToFilters(vizfilters as VizFilter[], visualizationConfig.data)
@@ -492,7 +493,7 @@ const Filters = (props: FilterProps) => {
   const getClasses = () => {
     const { visualizationType, legend } = visualizationConfig || {}
     const baseClass = 'filters-section'
-    const conditionalClass = type === 'map' ? general.headerColor : visualizationType === 'Spark Line' ? null : theme
+    const conditionalClass = standaloneMap ? general.headerColor : visualizationType === 'Spark Line' ? null : theme
     const legendClass = legend && !legend.hide && legend.position === 'top' ? 'mb-0' : null
 
     return [baseClass, conditionalClass, legendClass].filter(Boolean)

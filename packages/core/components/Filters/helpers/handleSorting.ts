@@ -7,6 +7,11 @@ export const handleSorting = singleFilter => {
     return singleFilter
   }
 
+  if (singleFilter.order === 'column') {
+    // sorting is done in the generateValuesForFilter function
+    return singleFilter
+  }
+
   const sort = (a, b) => {
     const asc = singleFilter.order !== 'desc'
     return String(asc ? a : b).localeCompare(String(asc ? b : a), 'en', { numeric: true })
