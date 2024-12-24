@@ -136,7 +136,7 @@ export const BarChartHorizontal = () => {
                   const barDefaultLabel = !config.yAxis.displayNumbersOnBar ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
-                  const textWidth = getTextWidth(barDefaultLabel, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                  const textWidth = getTextWidth(barDefaultLabel, `normal ${fontSize}px sans-serif`)
                   const textFits = Number(textWidth) < defaultBarWidth - 5
 
                   // control text position

@@ -24,7 +24,7 @@
     margin-right: 10px;
   }
   & a {
-    font-size: 16px;
+    font-size: var(--download-link-font-size);
   }
   margin-top: 20px;
   &.below-table {

@@ -31,9 +31,6 @@
     z-index: 2;
     position: relative;
   }
-  @media (max-width: var(--breakpoint-sm)) {
-    font-size: var(--font-small) + 0.2em;
-  }
 }
 
 table.horizontal {
@@ -127,7 +124,6 @@ table.data-table {
     &:last-child {
       border-right: 0 !important;
     }
-    font-size: var(--font-size);
   }
 
   td {

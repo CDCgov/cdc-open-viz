@@ -13,7 +13,6 @@ export type Table = {
   downloadPdfButton?: boolean
   excludeColumns?: string[]
   expanded?: boolean
-  fontSize: 'small' | 'medium' | 'large'
   groupBy?: string
   height?: number
   indexLabel?: string

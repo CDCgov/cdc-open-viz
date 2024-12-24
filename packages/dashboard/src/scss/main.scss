@@ -138,7 +138,6 @@
   }
 
   .btn {
-
     // Expand and Collapse Buttons for Multiviz Dashboard
     &.expand-collapse-buttons {
       background-color: var(--lightestGray);
@@ -193,8 +192,7 @@
         position: relative;
       }
       @include breakpoint(xs) {
-        $font-small: 0.7em;
-        font-size: $font-small + 0.2em;
+        font-size: 0.9em;
       }
     }
     .data-table-heading {

@@ -478,32 +478,6 @@
     }
   }
 
-  @include breakpointClass(xs) {
-    &.font-small {
-      font-size: 0.8em;
-
-      .chart-container > svg {
-        font-size: 12px;
-      }
-    }
-
-    &.font-medium {
-      font-size: 0.9em;
-
-      .chart-container > svg {
-        font-size: 14px;
-      }
-    }
-
-    &.font-large {
-      font-size: 1em;
-
-      .chart-container > svg {
-        font-size: 16px;
-      }
-    }
-  }
-
   @include breakpointClass(sm) {
     .chart-container {
       .no-wrap {
@@ -540,48 +514,6 @@
           filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
           transform-origin: 50% 50%;
         }
-      }
-    }
-
-    &.font-small {
-      font-size: 0.9em;
-
-      .chart-container > svg {
-        font-size: 14px;
-      }
-    }
-
-    &.font-large {
-      font-size: 1.1em;
-
-      .chart-container > svg {
-        font-size: 18px;
-      }
-    }
-  }
-
-  @include breakpointClass(lg) {
-    &.font-small {
-      font-size: 1em;
-
-      .chart-container > svg {
-        font-size: 16px;
-      }
-    }
-
-    &.font-medium {
-      font-size: 1.1em;
-
-      .chart-container > svg {
-        font-size: 18px;
-      }
-    }
-
-    &.font-large {
-      font-size: 1.2em;
-
-      .chart-container > svg {
-        font-size: 20px;
       }
     }
   }

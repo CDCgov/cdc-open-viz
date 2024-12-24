@@ -1,11 +1,9 @@
 import Icon from '../../ui/Icon'
-import { fontSizes } from '../../../helpers/cove/fontSettings'
+import { fontSize } from '@cdc/core/helpers/cove/fontSettings'
 
 const ExpandCollapse = ({ expanded, setExpanded, tableTitle, fontSize, viewport }) => {
-  const titleFontSize = ['xs', 'xxs'].includes(viewport) ? '13px' : `${fontSizes[fontSize]}px`
   return (
     <div
-      style={{ fontSize: titleFontSize }}
       role='button'
       className={expanded ? 'data-table-heading' : 'collapsed data-table-heading'}
       onClick={() => {

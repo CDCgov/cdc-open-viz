@@ -95,7 +95,7 @@ const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
           barStacks.map(barStack =>
             barStack.bars.map(bar => {
               const isLastIndex = config.yAxis.categories.length - 1 === barStack.index
-              const textSize = fontSize[config.fontSize] / 1.3
+              const textSize = fontSize / 1.3
               const textColor = chroma(bar.color).luminance() < 0.4 ? '#fff' : '#000'
               const textWidth = getTextWidth(bar.key, `normal ${textSize}px sans-serif`)
               const displayText = Number(textWidth) < bar.width && bar.height > textSize

@@ -136,13 +136,6 @@ const PanelVisual: FC<PanelProps> = props => {
             />
           </fieldset>
         )}
-        <Select
-          value={config.fontSize}
-          fieldName='fontSize'
-          label='Font Size'
-          updateField={updateField}
-          options={['small', 'medium', 'large']}
-        />
         {visHasBarBorders() && (
           <Select
             value={config.barHasBorder}
