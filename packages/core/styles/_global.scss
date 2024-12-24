@@ -161,12 +161,7 @@ section.introText {
 
 section.footnotes {
   border-top: 1px solid #ddd;
-  margin-top: 20px;
-  padding: 15px;
-}
-
-.cdc-chart-inner-container .subtext {
-  margin-top: 20px;
+  width: 100%;
 }
 
 .margin-left-href {
@@ -181,7 +176,6 @@ section.footnotes {
     border-color: darken($blue, 5%);
   }
 }
-
 
 // after migration to TP5 this declaration should be removed and all references
 // to it should be replaced with .form-select

@@ -221,11 +221,12 @@ const DataTable = (props: DataTableProps) => {
     const getMediaControlsClasses = belowTable => {
       const classes = ['download-links']
       if (!belowTable) {
+        classes.push('mt-4', 'mb-2')
         const isLegendOnBottom = config?.legend?.position === 'bottom' || isLegendWrapViewport(viewport)
         if (config.brush?.active && !isLegendOnBottom) classes.push('brush-active')
         if (config.brush?.active && config.legend.hide) classes.push('brush-active')
       } else {
-        classes.push('below-table')
+        classes.push('mt-2')
       }
       return classes
     }
@@ -246,18 +247,17 @@ const DataTable = (props: DataTableProps) => {
     }
     const getClassNames = (): string => {
       const classes = ['data-table-container']
-      const isBrushActive = config?.brush?.active && config.legend?.position !== 'bottom'
 
+      if (config.table.showDownloadLinkBelow) {
+        classes.push('mt-4')
+      }
+
+      const isBrushActive = config?.brush?.active && config.legend?.position !== 'bottom'
       if (isBrushActive) {
         classes.push('brush-active')
       }
 
       classes.push(viewport)
-
-      const downloadLinkClass = !config.table.showDownloadLinkBelow ? 'download-link-above' : ''
-      if (downloadLinkClass) {
-        classes.push(downloadLinkClass)
-      }
 
       return classes.join(' ')
     }
