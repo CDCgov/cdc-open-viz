@@ -415,7 +415,7 @@ const UsaMap = () => {
                   <>
                     {pattern === 'waves' && (
                       <PatternWaves
-                        id={`${mapId}--${dataKey}--${geoIndex}`}
+                        id={`${mapId}--${String(dataKey).replace(' ', '-')}--${geoIndex}`}
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
@@ -423,7 +423,7 @@ const UsaMap = () => {
                     )}
                     {pattern === 'circles' && (
                       <PatternCircles
-                        id={`${mapId}--${dataKey}--${geoIndex}`}
+                        id={`${mapId}--${String(dataKey).replace(' ', '-')}--${geoIndex}`}
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
@@ -431,7 +431,7 @@ const UsaMap = () => {
                     )}
                     {pattern === 'lines' && (
                       <PatternLines
-                        id={`${mapId}--${dataKey}--${geoIndex}`}
+                        id={`${mapId}--${String(dataKey).replace(' ', '-')}--${geoIndex}`}
                         height={patternSizes[size] ?? 6}
                         width={patternSizes[size] ?? 6}
                         stroke={patternColor}
@@ -444,7 +444,7 @@ const UsaMap = () => {
                       tabIndex={-1}
                       stroke='transparent'
                       d={path}
-                      fill={`url(#${mapId}--${dataKey}--${geoIndex})`}
+                      fill={`url(#${mapId}--${String(dataKey).replace(' ', '-')}--${geoIndex})`}
                     />
                   </>
                 )

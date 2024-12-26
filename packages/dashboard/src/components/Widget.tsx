@@ -74,9 +74,10 @@ const Widget = ({ widgetConfig, addVisualization, type }: WidgetProps) => {
 
   const deleteWidget = () => {
     if (!widgetConfig) return
+
     dispatch({
       type: 'DELETE_WIDGET',
-      payload: { rowIdx: widgetConfig.rowIdx, colIdx: widgetConfig.colIdx, uid: widgetConfig.uid }
+      payload: { uid: widgetConfig.uid as string }
     })
   }
 
@@ -90,7 +91,7 @@ const Widget = ({ widgetConfig, addVisualization, type }: WidgetProps) => {
   const loadSampleData = () => {
     const dataKey = config.rows[widgetConfig.rowIdx]?.dataKey || widgetConfig?.dataKey
     const dataset = config.datasets[dataKey]
-    const _data = data[dataset.dataUrl]
+    const _data = data[dataset?.dataUrl]
     if (_data && !_data.length) {
       const url = changeDataLimit(dataset.dataUrl, 100)
       fetchRemoteData(url).then(responseData => {
@@ -102,7 +103,10 @@ const Widget = ({ widgetConfig, addVisualization, type }: WidgetProps) => {
 
   const editWidget = () => {
     if (!widgetConfig) return
-    dispatch({ type: 'UPDATE_VISUALIZATION', payload: { vizKey: widgetConfig.uid, configureData: { editing: true } } })
+    dispatch({
+      type: 'UPDATE_VISUALIZATION',
+      payload: { vizKey: widgetConfig.uid as string, configureData: { editing: true } }
+    })
     loadSampleData()
   }
 

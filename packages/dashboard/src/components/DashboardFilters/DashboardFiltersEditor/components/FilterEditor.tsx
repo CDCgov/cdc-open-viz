@@ -41,11 +41,10 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
       if (viz.type === 'dashboardFilters') return false
       const vizName = viz.general?.title || viz.title || vizKey
       nameLookup[vizKey] = vizName
-      const notAdded = !filter.usedBy || filter.usedBy.indexOf(vizKey) === -1
       const usesSharedFilter = viz.usesSharedFilter
       const rowIndex = vizLookup.row
       const dataConfiguredOnRow = config.rows[rowIndex].dataKey
-      return filter.setBy !== vizKey && notAdded && !usesSharedFilter && !dataConfiguredOnRow
+      return filter.setBy !== vizKey && !usesSharedFilter && !dataConfiguredOnRow
     })
     const rowOptions: number[] = []
 
@@ -227,7 +226,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
           </label>
           {filter.filterStyle === FILTER_STYLE.dropdown && (
             <label>
-              <span className='mr-1'>Show Dropdown</span>
+              <span className='me-1'>Show Dropdown</span>
               <input
                 type='checkbox'
                 checked={filter.showDropdown}
@@ -478,31 +477,31 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
                 </select>
               </label>
               <label>
-                <span className='edit-label column-heading'>Used By: </span>
-                <ul>
-                  {filter.usedBy &&
-                    filter.usedBy.map(opt => (
-                      <li key={`used-by-list-item-${opt}`}>
-                        <span>{usedByNameLookup[opt] || opt}</span>{' '}
-                        <button
-                          onClick={e => {
-                            e.preventDefault()
-                            removeFilterUsedBy(filter, opt)
-                          }}
-                        >
-                          X
-                        </button>
-                      </li>
-                    ))}
-                </ul>
-                <select value='' onChange={e => addFilterUsedBy(filter, e.target.value)}>
-                  <option value=''>- Select Option -</option>
-                  {usedByOptions.map(opt => (
-                    <option value={opt} key={`used-by-select-item-${opt}`}>
-                      {usedByNameLookup[opt] || opt}
-                    </option>
-                  ))}
-                </select>
+                <span className='edit-label column-heading mt-1'>
+                  Used By: (optional)
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p>
+                        Select if you would like specific visualizations or rows to use this filter. Otherwise the
+                        filter will be added to all api requests.
+                      </p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                </span>
+                <MultiSelect
+                  options={usedByOptions.map(opt => ({
+                    value: opt,
+                    label: usedByNameLookup[opt]
+                  }))}
+                  fieldName='usedBy'
+                  selected={filter.usedBy}
+                  updateField={(_section, _subsection, _fieldname, newItems) => {
+                    updateFilterProp('usedBy', newItems)
+                  }}
+                />
               </label>
               <TextField
                 label='Reset Label: '

@@ -2,7 +2,7 @@ import { ChartConfig } from './../../../types/ChartConfig'
 
 export const getLegendClasses = (config: ChartConfig) => {
   const { position, singleRow, reverseLabelOrder, verticalSorted, hideBorder } = config.legend
-  const containerClasses = ['legend-container']
+  const containerClasses = ['legend-container', 'p-3']
   const innerClasses = ['legend-container__inner']
 
   // Handle legend positioning

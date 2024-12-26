@@ -17,7 +17,7 @@ import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 
-const LEGEND_PADDING = 30
+const LEGEND_PADDING = 36
 
 export interface LegendProps {
   colorScale: ColorScale
@@ -57,7 +57,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
       legend?.position === 'bottom' || (isLegendWrapViewport(currentViewport) && !legend.hide)
 
     const legendClasses = {
-      marginBottom: getMarginBottom(config, hasSuppression),
+      marginBottom: getMarginBottom(isBottomOrSmallViewport, config, hasSuppression),
       marginTop: getMarginTop(isBottomOrSmallViewport, config)
     }
 
@@ -74,8 +74,12 @@ const Legend: React.FC<LegendProps> = forwardRef(
         aria-label='legend'
         tabIndex={0}
       >
-        {legend.label && <h3>{parse(legend.label)}</h3>}
-        {legend.description && <p>{parse(legend.description)}</p>}
+        {(legend.label || legend.description) && (
+          <div className='mb-3'>
+            {legend.label && <h3 className='fw-bold'>{parse(legend.label)}</h3>}
+            {legend.description && <p className='mt-2'>{parse(legend.description)}</p>}
+          </div>
+        )}
         <LegendGradient
           config={config}
           {...getGradientConfig(config, formatLabels, colorScale)}
@@ -152,7 +156,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                           )}
                         </>
 
-                        <LegendLabel align='left' margin='0 0 0 4px'>
+                        <LegendLabel align='left' className='m-0'>
                           {label.text}
                         </LegendLabel>
                       </LegendItem>
@@ -191,9 +195,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                           fill='transparent'
                           borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`}
                         />{' '}
-                        <LegendLabel align='left' margin='0 0 0 4px'>
-                          {bar.legendLabel ? bar.legendLabel : bar.value}
-                        </LegendLabel>
+                        <LegendLabel align='left'>{bar.legendLabel ? bar.legendLabel : bar.value}</LegendLabel>
                       </LegendItem>
                     )
                   })}

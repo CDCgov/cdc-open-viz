@@ -86,7 +86,7 @@ const Tab = ({ name, handleClick, tabs, index, active }) => {
         ) : (
           <>
             {name}
-            <button className='btn btn-danger border-0 ml-1' onClick={handleRemove}>
+            <button className='btn btn-danger border-0 ms-1' onClick={handleRemove}>
               X
             </button>
           </>

@@ -160,13 +160,8 @@ section.introText {
 }
 
 section.footnotes {
-  border-top: 1px solid #ddd;
-  margin-top: 20px;
-  padding: 15px;
-}
-
-.cdc-chart-inner-container .subtext {
-  margin-top: 20px;
+  border-top: 1px solid var(--cool-gray-10);
+  width: 100%;
 }
 
 .margin-left-href {
@@ -182,14 +177,16 @@ section.footnotes {
   }
 }
 
-
 // after migration to TP5 this declaration should be removed and all references
 // to it should be replaced with .form-select
 .cove-form-select {
+  font-family: var(--app-font-secondary);
+  font-weight: 300;
+  font-size: var(--filter-select-font-size);
   display: block;
   width: 100%;
   padding: 0.375rem 0.75rem;
   border-radius: 0.25rem;
-  border: 1px solid var(--lightGray);
-  color: var(--darkGray);
+  border: 1px solid var(--cool-gray-10);
+  color: var(--cool-gray-90);
 }

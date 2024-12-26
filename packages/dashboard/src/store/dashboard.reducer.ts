@@ -203,11 +203,9 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       return { ...state, config: { ...state.config, rows: newRows } }
     }
     case 'DELETE_WIDGET': {
-      const { rowIdx, colIdx, uid } = action.payload
+      const { uid } = action.payload
       const newRows = _.cloneDeep(state.config.rows)
-      newRows[rowIdx].columns[colIdx].widget = null
       const newVisualizations = _.cloneDeep(state.config.visualizations)
-      delete newVisualizations[uid]
       const newSharedFilters = _.cloneDeep(state.config.dashboard.sharedFilters)
       if (newSharedFilters && newSharedFilters.length > 0) {
         newSharedFilters.forEach(sharedFilter => {
@@ -216,13 +214,19 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
           }
         })
       }
+
+      const filteredRows = _.map(newRows, row => ({
+        ...row,
+        columns: _.filter(row.columns, column => column.widget !== uid)
+      }))
+
       return {
         ...state,
         config: {
           ...state.config,
           dashboard: { ...state.config.dashboard, sharedFilters: newSharedFilters },
           visualizations: newVisualizations,
-          rows: newRows
+          rows: filteredRows
         }
       }
     }

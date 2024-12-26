@@ -138,7 +138,6 @@
   }
 
   .btn {
-
     // Expand and Collapse Buttons for Multiviz Dashboard
     &.expand-collapse-buttons {
       background-color: var(--lightestGray);
@@ -161,13 +160,6 @@
 
   .multi-table-container {
     margin: 15px 0 0;
-  }
-
-  .data-table-container {
-    margin: 20px 0 0;
-    &.download-link-above {
-      margin: 0;
-    }
   }
 
   .collapsable-multiviz-container {
@@ -193,8 +185,7 @@
         position: relative;
       }
       @include breakpoint(xs) {
-        $font-small: 0.7em;
-        font-size: $font-small + 0.2em;
+        font-size: 0.9em;
       }
     }
     .data-table-heading {

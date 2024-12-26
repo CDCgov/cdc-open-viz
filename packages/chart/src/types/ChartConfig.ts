@@ -132,7 +132,6 @@ export type AllChartsConfig = {
   exclusions: Exclusions
   filters: VizFilter[]
   filterBehavior: FilterBehavior
-  fontSize: 'small' | 'medium' | 'large'
   footnotes: string
   forestPlot: ForestPlotConfigSettings
   formattedData: Object[] & { urlFiltered: boolean }

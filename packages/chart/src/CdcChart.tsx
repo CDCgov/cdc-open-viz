@@ -1252,7 +1252,7 @@ const CdcChart = ({
   }
 
   const getChartSubTextClasses = () => {
-    const classes = ['subtext ']
+    const classes = ['subtext mt-4']
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
 
     if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
@@ -1465,8 +1465,8 @@ const CdcChart = ({
                 )}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
+                {config?.footnotes && <section className='footnotes pt-2 mt-4'>{parse(config.footnotes)}</section>}
               </div>
-              {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
             </div>
           )}
         </Layout.Responsive>
