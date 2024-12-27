@@ -160,7 +160,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
             <div
               key={`vis__${index}__${colIndex}`}
               className={`col-12 col-md-${col.width}${!shouldShow ? ' d-none' : ''}${
-                hideVisualization ? ' hide-parent-visualization' : ' mt-5 p-1'
+                hideVisualization ? ' hide-parent-visualization' : ' mt-4'
               }`}
             >
               {row.toggle && !hideVisualization && (
