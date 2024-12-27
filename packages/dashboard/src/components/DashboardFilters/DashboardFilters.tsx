@@ -122,12 +122,12 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           )
         }
 
-        const formGroupClass = `form-group me-3 mb-1${loading ? ' loading-filter' : ''}`
+        const formGroupClass = `form-group me-4 mb-1${loading ? ' loading-filter' : ''}`
 
         return (
           <div className={formGroupClass} key={`${label}-filtersection-${filterIndex}`}>
             {label && (
-              <label className='font-weight-bold mt-1 mb-0' htmlFor={`filter-${filterIndex}`}>
+              <label className='font-weight-bold mb-2' htmlFor={`filter-${filterIndex}`}>
                 {label}
               </label>
             )}

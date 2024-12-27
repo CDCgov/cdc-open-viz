@@ -502,9 +502,9 @@ const Filters = (props: FilterProps) => {
   return (
     <section className={getClasses().join(' ')}>
       {visualizationConfig.filterIntro && (
-        <p className='filters-section__intro-text'>{visualizationConfig.filterIntro}</p>
+        <p className='filters-section__intro-text mb-3'>{visualizationConfig.filterIntro}</p>
       )}
-      <div className='d-flex flex-wrap w-100 mt-3 mb-4 pb-2 filters-section__wrapper'>
+      <div className='d-flex flex-wrap w-100 mb-4 pb-2 filters-section__wrapper'>
         {' '}
         <>
           <Style />
