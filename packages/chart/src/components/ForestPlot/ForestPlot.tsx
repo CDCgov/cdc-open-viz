@@ -14,7 +14,7 @@ import { type ChartContext } from '@cdc/chart/src/types/ChartContext'
 
 // cdc
 import ConfigContext from '../../ConfigContext'
-import { fontSize } from '@cdc/core/helpers/cove/fontSettings'
+import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
 
 const ForestPlot = ({
   xScale,
@@ -138,7 +138,6 @@ const ForestPlot = ({
             y={0}
             textAnchor='middle'
             verticalAnchor='start'
-            fontSize={fontSize}
             fill={'black'}
           >
             {forestPlot.title}
@@ -245,7 +244,6 @@ const ForestPlot = ({
                   y={yScale(i)}
                   textAnchor='middle'
                   verticalAnchor='middle'
-                  fontSize={fontSize}
                   fill={shapeColor}
                 >
                   {d[forestPlot.estimateField]}
@@ -256,7 +254,7 @@ const ForestPlot = ({
             <LinePath
               data={regressionPoints}
               x={d => d.x}
-              y={d => d.y - fontSize / 2}
+              y={d => d.y - appFontSize / 2}
               stroke='black'
               strokeWidth={2}
               fill={'black'}
@@ -325,7 +323,6 @@ const ForestPlot = ({
               y={yScale(i)}
               textAnchor={column.forestPlotAlignRight ? 'end' : 'start'}
               verticalAnchor='middle'
-              fontSize={fontSize}
               fill={'black'}
             >
               {d[column.name]}
@@ -344,7 +341,6 @@ const ForestPlot = ({
               y={yScale(i)}
               textAnchor={'start'}
               verticalAnchor='middle'
-              fontSize={fontSize}
               fill={'black'}
             >
               {d[config.xAxis.dataKey]}
@@ -354,15 +350,7 @@ const ForestPlot = ({
 
       {/* X Axis Datakey Header */}
       {!forestPlot.hideDateCategoryCol && config.xAxis.dataKey && (
-        <Text
-          className={config.xAxis.dataKey}
-          x={0}
-          y={0}
-          textAnchor={'start'}
-          verticalAnchor='start'
-          fontSize={fontSize}
-          fill={'black'}
-        >
+        <Text className={config.xAxis.dataKey} x={0} y={0} textAnchor={'start'} verticalAnchor='start' fill={'black'}>
           {config.xAxis.dataKey}
         </Text>
       )}
@@ -376,7 +364,6 @@ const ForestPlot = ({
             y={0}
             textAnchor={column.forestPlotAlignRight ? 'end' : 'start'}
             verticalAnchor='start'
-            fontSize={fontSize}
             fill={'black'}
           >
             {column.label}

@@ -1297,7 +1297,7 @@ const CdcChart = ({
               <div className={getChartWrapperClasses().join(' ')}>
                 {/* Intro Text/Message */}
                 {config?.introText && config.visualizationType !== 'Spark Line' && (
-                  <section className={`introText `}>{parse(config.introText)}</section>
+                  <section className={`introText mb-4`}>{parse(config.introText)}</section>
                 )}
 
                 {/* Filters */}
@@ -1378,7 +1378,7 @@ const CdcChart = ({
                           dimensions={dimensions}
                         />
                         {config?.introText && (
-                          <section className='introText' style={{ padding: '0px 0 35px' }}>
+                          <section className='introText mb-4' style={{ padding: '0px 0 35px' }}>
                             {parse(config.introText)}
                           </section>
                         )}

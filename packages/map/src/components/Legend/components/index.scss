@@ -16,6 +16,7 @@
     background-color: #fff;
     z-index: 6;
     border-top: var(--cool-gray-10) 1px solid;
+    border-radius: 6px;
 
     @include breakpointClass(md) {
       &.bottom,

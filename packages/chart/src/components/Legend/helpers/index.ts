@@ -25,7 +25,7 @@ export const getMarginBottom = (isBottomOrSmallViewport, config, hasSuppression)
 
   let marginBottom = 0
 
-  if (isLegendTop) marginBottom = config.legend.hideBorder.topBottom ? 15 : 25
+  if (isLegendTop) marginBottom = 25
 
   if (isBottomOrSmallViewport) marginBottom += 9
 

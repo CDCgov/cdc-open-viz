@@ -1,13 +1,13 @@
 import { Brush } from '@visx/brush'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
-import { useBarChart } from '../hooks/useBarChart'
 import { FC, useContext, useEffect, useRef, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import { ScaleLinear, ScaleBand } from 'd3-scale'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
+import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
 
 interface Props {
   xScaleBrush: ScaleLinear<number, number>
@@ -19,7 +19,6 @@ const ZoomBrush: FC<Props> = props => {
   const { tableData, config, parseDate, formatDate, setBrushConfig, dashboardConfig } = useContext(ConfigContext)
   const sharedFilters = dashboardConfig?.dashboard?.sharedFilters ?? []
   const isDashboardFilters = sharedFilters?.length > 0
-  const { fontSize } = useBarChart()
   const [showTooltip, setShowTooltip] = useState(false)
   const [brushKey, setBrushKey] = useState(0)
   const brushRef = useRef(null)
@@ -178,7 +177,6 @@ const ZoomBrush: FC<Props> = props => {
               showTooltip={showTooltip}
               pixelDistance={textProps.endPosition - textProps.startPosition}
               textProps={textProps}
-              fontSize={fontSize}
               {...props}
               isBrushing={brushRef.current?.state.isBrushing}
             />
@@ -202,7 +200,7 @@ const ZoomBrush: FC<Props> = props => {
 }
 
 const BrushHandle = props => {
-  const { x, isBrushActive, isBrushing, className, textProps, fontSize, showTooltip, left } = props
+  const { x, isBrushActive, isBrushing, className, textProps, showTooltip, left } = props
   const pathWidth = 8
   if (!isBrushActive) {
     return null
@@ -212,7 +210,7 @@ const BrushHandle = props => {
   const transform = isLeft ? 'scale(-1, 1)' : 'translate(0,0)'
   const textAnchor = isLeft ? 'end' : 'start'
   const tooltipText = isLeft ? ` Drag edges to focus on a specific segment ` : ''
-  const textWidth = getTextWidth(tooltipText, `normal ${fontSize / 1.1}px sans-serif`)
+  const textWidth = getTextWidth(tooltipText, `normal ${appFontSize / 1.1}px sans-serif`)
 
   return (
     <>
@@ -221,7 +219,7 @@ const BrushHandle = props => {
           x={(Number(textProps.xMax) - textWidth) / 2}
           dy={-12}
           pointerEvents='visiblePainted'
-          fontSize={fontSize / 1.1}
+          fontSize={appFontSize / 1.1}
         >
           {tooltipText}
         </Text>
@@ -234,7 +232,7 @@ const BrushHandle = props => {
           y={25}
           verticalAnchor='start'
           textAnchor={textAnchor}
-          fontSize={fontSize / 1.4}
+          fontSize={appFontSize / 1.4}
         >
           {isLeft ? textProps.startValue : textProps.endValue}
         </Text>

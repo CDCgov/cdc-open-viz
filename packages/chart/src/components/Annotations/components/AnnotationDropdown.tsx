@@ -3,13 +3,13 @@ import ConfigContext from '../../../ConfigContext'
 import './AnnotationDropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
 import Annotation from '..'
-import { fontSize } from '@cdc/core/helpers/cove/fontSettings'
+import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
 
 const AnnotationDropdown = () => {
   const { currentViewport: viewport, config } = useContext(ConfigContext)
   const [expanded, setExpanded] = useState(false)
 
-  const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${fontSize}px`
+  const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${appFontSize}px`
 
   const {
     config: { annotations }
