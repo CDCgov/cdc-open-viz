@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
-import { fontSize } from '@cdc/core/helpers/cove/fontSettings'
+import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
 export const useBarChart = () => {
   const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, setSeriesHighlight, seriesHighlight } =
     useContext(ConfigContext)
@@ -140,7 +140,7 @@ export const useBarChart = () => {
       barHeight = heights.stacked
     }
 
-    const labelHeight = isLabelBelowBar ? fontSize * 1.2 : 0
+    const labelHeight = isLabelBelowBar ? appFontSize * 1.2 : 0
     let barSpace = Number(config.barSpace)
 
     // calculate height of container based height, space and fontSize of labels
@@ -245,7 +245,6 @@ export const useBarChart = () => {
     radius,
     stackCount,
     barStackedSeriesKeys,
-    fontSize,
     hasMultipleSeries,
     applyRadius,
     updateBars,
