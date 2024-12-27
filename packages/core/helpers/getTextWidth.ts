@@ -5,11 +5,6 @@
  * @returns The width of the text in pixels, or undefined if the context could not be obtained.
  */
 export const getTextWidth = (text: string, font?: string): number | undefined => {
-  console.log('******')
-  console.log([text, font])
-
-  //font = font.replace(' 18px ', ' 1em ')
-  console.log([text, font])
   // Create a canvas element
   const canvas = document.createElement('canvas')
   const context = canvas.getContext('2d')
@@ -19,7 +14,5 @@ export const getTextWidth = (text: string, font?: string): number | undefined =>
   }
 
   context.font = font || getComputedStyle(document.body).font
-  let x = Math.ceil(context.measureText(text).width)
-  console.log(x)
-  return x
+  return Math.ceil(context.measureText(text).width)
 }
