@@ -2,7 +2,7 @@ import { ChartConfig } from './../../../types/ChartConfig'
 
 export const getLegendClasses = (config: ChartConfig) => {
   const { position, singleRow, reverseLabelOrder, verticalSorted, hideBorder } = config.legend
-  const containerClasses = ['legend-container', 'p-3']
+  const containerClasses = ['legend-container']
   const innerClasses = ['legend-container__inner']
 
   // Handle legend positioning
@@ -38,17 +38,19 @@ export const getLegendClasses = (config: ChartConfig) => {
     innerClasses.push('vertical-sorted')
   }
 
-  // Configure border classes
-  if (hideBorder.side && (['right', 'left'].includes(position) || !position)) {
-    containerClasses.push('border-0')
+  // Configure border and padding classes
+  if (['right', 'left'].includes(position) || !position) {
+    if (hideBorder.side) {
+      containerClasses.push('border-0')
+      containerClasses.push('p-0')
+    } else containerClasses.push('p-3')
   }
 
-  if (hideBorder.topBottom && ['top', 'bottom'].includes(position)) {
-    containerClasses.push('border-0')
-  }
-
-  if (hideBorder.topBottom && ['top'].includes(position)) {
-    containerClasses.push('p-0')
+  if (['top', 'bottom'].includes(position)) {
+    if (hideBorder.topBottom) {
+      containerClasses.push('border-0')
+      containerClasses.push('p-0')
+    } else containerClasses.push('p-3')
   }
 
   return {
