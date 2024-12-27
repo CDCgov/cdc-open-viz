@@ -12,7 +12,6 @@
     label {
       display: inherit;
       margin-bottom: 5px;
-      font-weight: 600;
       font-size: 16px;
     }
   }
@@ -20,10 +19,6 @@
   @include breakpoint(md) {
     display: flex;
     flex-wrap: wrap;
-  }
-
-  label:not(:empty) {
-    margin-right: 0.4em;
   }
 
   .single-filter {

@@ -103,7 +103,7 @@
     border: none;
   }
 
-    .link.link-replace {
+  .link.link-replace {
     display: block;
     color: #005eaa;
     background: unset;
@@ -125,7 +125,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: .9em;
+      font-size: 0.9em;
 
       button {
         padding: 0 4px;
@@ -135,7 +135,7 @@
       }
     }
 
-    li+li {
+    li + li {
       border-top: #c7c7c7 1px solid;
     }
   }
