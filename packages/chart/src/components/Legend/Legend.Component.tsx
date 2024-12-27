@@ -137,10 +137,10 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       >
                         <>
                           {config.visualizationType === 'Line' && config.legend.style === 'lines' ? (
-                            <svg width={40} height={25}>
+                            <svg width={30} height={5} className='me-2'>
                               <Line
-                                from={{ x: 10, y: 10 }}
-                                to={{ x: 40, y: 10 }}
+                                from={{ x: 0, y: 3 }}
+                                to={{ x: 30, y: 3 }}
                                 stroke={label.value}
                                 strokeWidth={2}
                                 strokeDasharray={handleLineType(config.series[i]?.type ? config.series[i]?.type : '')}
