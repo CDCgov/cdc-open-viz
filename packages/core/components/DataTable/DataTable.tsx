@@ -209,6 +209,24 @@ const DataTable = (props: DataTableProps) => {
     [config.runtime?.seriesKeys]) // eslint-disable-line
 
   const hasNoData = runtimeData.length === 0
+
+  const getClassNames = (): string => {
+    const classes = ['data-table-container']
+
+    if (config.table.showDownloadLinkBelow) {
+      classes.push('mt-4')
+    }
+
+    const isBrushActive = config?.brush?.active && config.legend?.position !== 'bottom'
+    if (isBrushActive) {
+      classes.push('brush-active')
+    }
+
+    classes.push(viewport)
+
+    return classes.join(' ')
+  }
+
   if (config.visualizationType !== 'Box Plot') {
     const getDownloadData = () => {
       // only use fullGeoName on County maps and no other
@@ -246,22 +264,6 @@ const DataTable = (props: DataTableProps) => {
           )}
         </MediaControls.Section>
       )
-    }
-    const getClassNames = (): string => {
-      const classes = ['data-table-container']
-
-      if (config.table.showDownloadLinkBelow) {
-        classes.push('mt-4')
-      }
-
-      const isBrushActive = config?.brush?.active && config.legend?.position !== 'bottom'
-      if (isBrushActive) {
-        classes.push('brush-active')
-      }
-
-      classes.push(viewport)
-
-      return classes.join(' ')
     }
 
     return (
@@ -346,11 +348,7 @@ const DataTable = (props: DataTableProps) => {
     // Render Data Table for Box Plots
     return (
       <ErrorBoundary component='DataTable'>
-        <section
-          id={tabbingId.replace('#', '')}
-          className={`data-table-container ${viewport}`}
-          aria-label={accessibilityLabel}
-        >
+        <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
           <div className='table-container' style={limitHeight}>

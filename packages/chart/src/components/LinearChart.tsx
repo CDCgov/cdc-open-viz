@@ -41,7 +41,6 @@ import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
-import { fontSize } from '@cdc/core/helpers/cove/fontSettings'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
 
 type LinearChartProps = {
@@ -55,7 +54,7 @@ const DEFAULT_TICK_LENGTH = 8
 const MONTH_AS_MS = 1000 * 60 * 60 * 24 * 30
 const TICK_LABEL_FONT_SIZE = 16
 const TICK_LABEL_MARGIN_RIGHT = 4.5
-const GET_TEXT_WIDTH_FONT = `normal ${fontSize}px Nunito, sans-serif`
+const GET_TEXT_WIDTH_FONT = `normal ${TICK_LABEL_FONT_SIZE}px Nunito, sans-serif`
 
 const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, parentWidth }, svgRef) => {
   // prettier-ignore

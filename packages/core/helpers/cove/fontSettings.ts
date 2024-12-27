@@ -1,2 +1,2 @@
 // TODO: handle with css
-export const fontSize = 18
+export const appFontSize = 18

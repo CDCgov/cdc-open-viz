@@ -18,6 +18,7 @@
 
   &__buttons {
     width: 100%;
+    font-size: var(--filter-buttons-font-size);
     .apply {
       margin-right: 10px;
     }
