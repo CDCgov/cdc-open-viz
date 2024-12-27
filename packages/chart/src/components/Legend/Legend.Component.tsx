@@ -110,8 +110,10 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       }
                     }
 
-                    if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                      className.push('inactive')
+                    if (seriesHighlight.length) {
+                      if (!seriesHighlight.includes(itemName)) {
+                        className.push('inactive')
+                      } else className.push('highlighted')
                     }
 
                     if (config.legend.style === 'gradient') {
