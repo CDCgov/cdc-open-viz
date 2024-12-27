@@ -343,8 +343,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               </>
             )}
             {runtimeLegend.disabledAmt > 0 && (
-              <Button className={legendClasses.resetButton.join(' ')} onClick={handleReset}>
-                Reset
+              <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
+                Show All
               </Button>
             )}
           </section>

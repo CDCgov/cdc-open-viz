@@ -23,7 +23,7 @@ type SharedChartContext = {
   handleChartAriaLabels: (config: any) => string
   handleDragStateChange: (isDragging: any) => void
   highlight?: Function
-  highlightReset?: Function
+  handleShowAll?: Function
   // whether or not the legend is appearing below the chart
   isLegendBottom?: boolean
   // whether or not the chart is viewed within the editor screen

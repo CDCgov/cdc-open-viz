@@ -25,7 +25,7 @@ export interface LegendProps {
   currentViewport: ViewportSize
   formatLabels: (labels: Label[]) => Label[]
   highlight: Function
-  highlightReset: Function
+  handleShowAll: Function
   ref: React.Ref<() => void>
   seriesHighlight: string[]
   skipId: string
@@ -40,7 +40,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
       colorScale,
       seriesHighlight,
       highlight,
-      highlightReset,
+      handleShowAll,
       currentViewport,
       formatLabels,
       skipId = 'legend',
@@ -213,8 +213,8 @@ const Legend: React.FC<LegendProps> = forwardRef(
           }}
         </LegendOrdinal>
         {seriesHighlight.length > 0 && (
-          <Button onClick={labels => highlightReset(labels)} style={{ marginTop: '1rem' }}>
-            Reset
+          <Button onClick={labels => handleShowAll(labels)} style={{ marginTop: '1rem' }}>
+            Show All
           </Button>
         )}
       </aside>
