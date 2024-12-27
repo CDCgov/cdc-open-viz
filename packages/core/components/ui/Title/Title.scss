@@ -7,6 +7,8 @@ header.cove-component__header {
   sup {
     font-size: var(--superTitle-font-size);
     font-family: var(--app-font-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
   }
 
   h2 {
