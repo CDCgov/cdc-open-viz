@@ -152,6 +152,9 @@ const CdcChart = ({
   const { lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
   const legendId = useId()
 
+  const hasDateAxis = config.xAxis && ['date-time', 'date'].includes(config.xAxis.type)
+  const dataTableDefaultSortBy = hasDateAxis && config.xAxis.dataKey
+
   const checkLineToBarGraph = () => {
     return isConvertLineToBarGraph(config.visualizationType, filteredData, config.allowLineToBarGraph)
   }
@@ -1452,6 +1455,7 @@ const CdcChart = ({
                     runtimeData={getTableRuntimeData()}
                     expandDataTable={config.table.expanded}
                     columns={config.columns}
+                    defaultSortBy={dataTableDefaultSortBy}
                     displayDataAsText={displayDataAsText}
                     displayGeoName={name => name}
                     applyLegendToRow={applyLegendToRow}
