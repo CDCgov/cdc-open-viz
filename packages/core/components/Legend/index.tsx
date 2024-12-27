@@ -28,7 +28,7 @@ const ResetButton = props => {
   if (config.runtime.disabledAmt === 0) return <></>
 
   return (
-    <button onClick={handleReset} className={legendClasses.resetButton.join(' ') || ''}>
+    <button onClick={handleReset} className={legendClasses.showAllButton.join(' ') || ''}>
       Reset
     </button>
   )
