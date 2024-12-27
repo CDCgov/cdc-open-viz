@@ -766,7 +766,7 @@ const CdcChart = ({
   const highlight = (label: Label) => {
     // If we're highlighting all the series, reset them
     if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && config.visualizationType !== 'Forecasting') {
-      highlightReset()
+      handleShowAll()
       return
     }
 
@@ -805,7 +805,7 @@ const CdcChart = ({
   }
 
   // Called on reset button click, unhighlights all data series
-  const highlightReset = () => {
+  const handleShowAll = () => {
     try {
       const legend = legendRef.current
       if (!legend) throw new Error('No legend available to set previous focus on.')
@@ -1510,7 +1510,7 @@ const CdcChart = ({
     handleLineType,
     handleChartTabbing,
     highlight,
-    highlightReset,
+    handleShowAll,
     imageId,
     isDashboard,
     isLegendBottom: legend?.position === 'bottom' || isLegendWrapViewport(currentViewport),

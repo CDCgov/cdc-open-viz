@@ -116,12 +116,14 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const legendList = (patternsOnly = false) => {
     const formattedItems = patternsOnly ? [] : getFormattedLegendItems()
     const patternsOnlyFont = isMobileHeightViewport(currentViewport) ? '12px' : '14px'
+    const hasDisabledItems = formattedItems.some(item => item.disabled)
     let legendItems
 
     legendItems = formattedItems.map((item, idx) => {
       const handleListItemClass = () => {
         let classes = ['legend-container__li', 'd-flex', 'align-items-center']
         if (item.disabled) classes.push('legend-container__li--disabled')
+        else if (hasDisabledItems) classes.push('legend-container__li--not-disabled')
         if (item.special) classes.push('legend-container__li--special-class')
         return classes.join(' ')
       }
@@ -341,8 +343,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               </>
             )}
             {runtimeLegend.disabledAmt > 0 && (
-              <Button className={legendClasses.resetButton.join(' ')} onClick={handleReset}>
-                Reset
+              <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
+                Show All
               </Button>
             )}
           </section>

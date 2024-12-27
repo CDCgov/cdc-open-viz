@@ -610,7 +610,7 @@ const EditorPanel = () => {
     lineOptions,
     rawData,
     highlight,
-    highlightReset,
+    handleShowAll,
     dimensions
   } = useContext<ChartContext>(ConfigContext)
 
@@ -3797,7 +3797,7 @@ const EditorPanel = () => {
                                 updatedSeriesHighlight.splice(i, 1)
                                 updateField('legend', null, 'seriesHighlight', updatedSeriesHighlight)
                                 if (!updatedSeriesHighlight.length) {
-                                  highlightReset()
+                                  handleShowAll()
                                 }
                               }}
                             >

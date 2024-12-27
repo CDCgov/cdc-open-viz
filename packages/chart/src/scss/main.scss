@@ -238,6 +238,11 @@
         opacity: 0.5;
         transition: 0.2s all;
       }
+      &.highlighted {
+        outline: 1px solid #005ea2;
+        outline-offset: 5px;
+        border-radius: 1px;
+      }
     }
 
     &__outer {
