@@ -1633,6 +1633,7 @@ const EditorPanel = () => {
                         fieldName='label'
                         label='Label '
                         updateField={updateField}
+                        maxLength={35}
                       />
                       {config.runtime.seriesKeys &&
                         config.runtime.seriesKeys.length === 1 &&
@@ -2306,6 +2307,7 @@ const EditorPanel = () => {
                     fieldName='rightLabel'
                     label='Label'
                     updateField={updateField}
+                    maxLength={35}
                   />
                   <TextField
                     value={config.yAxis.rightNumTicks}
@@ -2596,6 +2598,7 @@ const EditorPanel = () => {
                         fieldName='label'
                         label='Label'
                         updateField={updateField}
+                        maxLength={35}
                       />
 
                       {config.xAxis.type === 'continuous' && (
