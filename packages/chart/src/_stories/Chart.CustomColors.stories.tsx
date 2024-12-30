@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import Chart from '../CdcChart'
+import Chart from '../CdcChart.Component'
 import scatterPlotCustomColorConfig from './_mock/scatterplot_mock.json'
 
 const meta: Meta<typeof Chart> = {

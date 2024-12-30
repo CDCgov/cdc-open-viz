@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 
 import CdcMap from '@cdc/map/src/CdcMap' // TODO: Lazy load this
-import CdcChart from '../../../chart/src/CdcChart' // TODO: Lazy load this
+import CdcChart from '@cdc/chart/src/CdcChart.Component' // TODO: Lazy load this
 import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
 import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
 import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'

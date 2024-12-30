@@ -5,7 +5,7 @@ import areaPrefix from './_mock/annotation_category_mock.json'
 import horizontalBarConfig from './_mock/horizontal_bar.json'
 import scatterPlotConfig from './_mock/scatterplot_mock.json'
 
-import Chart from '../CdcChart'
+import Chart from '../CdcChart.Component'
 import { editConfigKeys } from '../helpers/configHelpers'
 
 const meta: Meta<typeof Chart> = {
