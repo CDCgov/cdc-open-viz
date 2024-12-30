@@ -231,18 +231,8 @@ const CdcChart = ({
     }
   }
 
-  const prepareConfig = async configObj => {
+  const prepareConfig = configObj => {
     const response = _.cloneDeep(configObj)
-
-    // If data is included through a URL, fetch that and store
-    let data: any[] = response.data || []
-
-    // if (response.dataDescription) {
-    //   data = transform.autoStandardize(data)
-    //   data = transform.developerStandardize(data, response.dataDescription)
-    // }
-
-    data = handleRankByValue(data, response)
 
     // force showVertical for data tables false if it does not exist
     if (response !== undefined && response.table !== undefined) {
@@ -603,10 +593,9 @@ const CdcChart = ({
     return Object.keys(obj).length === 0
   }
 
-  // Load data when component first mounts
   useEffect(() => {
     prepareConfig(configObj)
-  }, [configObj]) // eslint-disable-line
+  }, []) // eslint-disable-line
 
   useEffect(() => {
     reloadURLData()

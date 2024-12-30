@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { userEvent, within } from '@storybook/testing-library'
-import Chart from '../CdcChart.Component'
+import Chart from '../CdcChartComponent'
 import pieChartExample from './_mock/pie_config.json'
 import pieData from './_mock/pie_data.json'
 import urlFilterExample from './_mock/url_filter.json'

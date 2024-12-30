@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import SimplifiedLineConfig from './_mock/simplified_line.json'
 
-import Chart from '../CdcChart.Component'
+import Chart from '../CdcChartComponent'
 import { editConfigKeys } from '../helpers/configHelpers'
 
 const meta: Meta<typeof Chart> = {

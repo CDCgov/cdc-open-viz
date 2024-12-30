@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import Chart from '../CdcChart.Component'
+import Chart from '../CdcChartComponent'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Tooltip',

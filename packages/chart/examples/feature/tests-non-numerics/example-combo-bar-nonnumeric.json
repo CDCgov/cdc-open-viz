@@ -59,7 +59,15 @@
     "dateParseFormat": "%d/%m/%Y",
     "dateDisplayFormat": "%d/%m/%Y"
   },
-  "table": { "label": "Data Table", "expanded": true, "limitHeight": false, "height": "", "caption": "", "download": true, "show": true },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "download": true,
+    "show": true
+  },
   "orientation": "vertical",
   "legend": {
     "behavior": "highlight",
@@ -84,7 +92,14 @@
   "visual": { "border": true, "accent": true, "background": true },
   "data": [
     { "Date": "1/15/2016", "Data 1": "N/A", "Data 2": "110", "Data 3": "100", "Data 4": "90", "Monthly-Goal": "100" },
-    { "Date": "2/15/2016", "Data 1": "100", "Data 2": "goop", "Data 3": "100", "Data 4": "100", "Monthly-Goal": "100" },
+    {
+      "Date": "2/15/2016",
+      "Data 1": "Hello",
+      "Data 2": "goop",
+      "Data 3": "100",
+      "Data 4": "100",
+      "Monthly-Goal": "100"
+    },
     { "Date": "3/15/2016", "Data 1": "", "Data 2": "90", "Data 3": "100.5", "Data 4": "120", "Monthly-Goal": "110" },
     { "Date": "4/15/2016", "Data 1": "80", "Data 2": "2,00", "Data 3": "110", "Data 4": "120", "Monthly-Goal": "110" },
     { "Date": "5/15/2016", "Data 1": "70", "Data 2": "90", "Data 3": "110", "Data 4": "130", "Monthly-Goal": "120" },

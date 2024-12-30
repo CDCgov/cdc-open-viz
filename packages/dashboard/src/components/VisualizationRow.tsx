@@ -3,7 +3,7 @@ import React, { useContext, useMemo } from 'react'
 import Toggle from './Toggle'
 import _ from 'lodash'
 import { ConfigRow } from '../types/ConfigRow'
-import CdcChart from '@cdc/chart/src/CdcChart'
+import CdcChart from '@cdc/chart/src/CdcChartComponent'
 import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
 import CdcMap from '@cdc/map/src/CdcMap'
 import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
@@ -181,6 +181,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                 {visualizationConfig.type === 'chart' && (
                   <CdcChart
                     key={col.widget}
+                    data={visualizationConfig.data}
                     config={visualizationConfig}
                     dashboardConfig={config}
                     isEditor={false}

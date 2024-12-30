@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react'
-import CdcChart from './CdcChart.Component'
+import CdcChart from './CdcChartComponent'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import defaults from './data/initial-state'
 import _ from 'lodash'
