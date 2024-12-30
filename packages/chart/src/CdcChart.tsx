@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useId, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useId, useReducer } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -105,6 +105,7 @@ const CdcChart = ({
 }: CdcChartProps) => {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
+
   const svgRef = useRef(null)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
