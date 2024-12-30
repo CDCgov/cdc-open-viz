@@ -17,14 +17,16 @@ const getColorScale = (config: ChartConfig, data: Object[]): ((value: string) =>
 
   let colorScale = scaleOrdinal<string, string>({
     domain: config?.runtime?.seriesLabelsAll,
-    range: generatePalette(series.length)
+    range: generatePalette(series.length),
+    unknown: null
   })
 
   if (visualizationType === 'Deviation Bar') {
     const { targetLabel } = config.xAxis
     colorScale = scaleOrdinal<string, string>({
       domain: [`Below ${targetLabel}`, `Above ${targetLabel}`],
-      range: generatePalette(2)
+      range: generatePalette(2),
+      unknown: null
     })
   }
   if (visualizationType === 'Bar' && visualizationSubType === 'regular' && series?.length === 1 && legend?.colorCode) {
@@ -32,7 +34,8 @@ const getColorScale = (config: ChartConfig, data: Object[]): ((value: string) =>
     const domain = Array.from(set)
     colorScale = scaleOrdinal<string, string>({
       domain: domain,
-      range: generatePalette([...domain].length)
+      range: generatePalette([...domain].length),
+      unknown: null
     })
   }
   if (config.series.some(s => s.name)) {
@@ -41,7 +44,8 @@ const getColorScale = (config: ChartConfig, data: Object[]): ((value: string) =>
 
     colorScale = colorScale = scaleOrdinal<string, string>({
       domain: [...domain],
-      range: generatePalette(series.length)
+      range: generatePalette(series.length),
+      unknown: null
     })
   }
 

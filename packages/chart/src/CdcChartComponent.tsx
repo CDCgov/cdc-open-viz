@@ -75,6 +75,7 @@ import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { Runtime } from '@cdc/core/types/Runtime'
 import { Pivot } from '@cdc/core/types/Table'
 import ChartActions from './store/chart.actions'
+import getColorScale from './helpers/getColorScale'
 
 interface CdcChartProps {
   configUrl?: string
@@ -98,6 +99,8 @@ const reducer = (state, action: ChartActions) => {
       return { ...state, config: action.payload }
     case 'UPDATE_CONFIG':
       return { ...state, config: action.payload }
+    case 'SET_COLOR_SCALE':
+      return { ...state, colorScale: action.payload }
   }
 }
 
@@ -124,10 +127,8 @@ const CdcChart = ({
 
   const [loading, setLoading] = useState(true)
   const [state, dispatch] = useReducer(reducer, initialState)
-  console.log(state, 'state')
-  const { config } = state
+  const { config, colorScale } = state
   const svgRef = useRef(null)
-  const [colorScale, setColorScale] = useState(null)
 
   const [stateData, setStateData] = useState(data)
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
@@ -557,6 +558,7 @@ const CdcChart = ({
     if (newConfig.legend.seriesHighlight?.length) {
       setSeriesHighlight(newConfig.legend?.seriesHighlight)
     }
+
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
 
     setConfig(newConfig)
@@ -718,7 +720,7 @@ const CdcChart = ({
           unknown: null
         })
 
-      setColorScale(newColorScale)
+      // setColorScale(newColorScale)
       setLoading(false)
     }
 
@@ -726,6 +728,13 @@ const CdcChart = ({
       stateData.sort(sortData)
     }
   }, [config, stateData]) // eslint-disable-line
+
+  useEffect(() => {
+    if (config && data) {
+      const colorScale = getColorScale(state.config, stateData)
+      dispatch({ type: 'SET_COLOR_SCALE', payload: colorScale })
+    }
+  }, [config, data])
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = (label: Label) => {

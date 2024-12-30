@@ -41,7 +41,7 @@ export default function ConfigureTab({ containerEl }) {
     case 'chart':
       return (
         <ErrorBoundary component='CdcChart'>
-          <CdcChart isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
+          <CdcChart isEditor={true} isDebug={isDebug} config={config} data={config.data} setConfig={setTempConfig} />
         </ErrorBoundary>
       )
     case 'dashboard':
