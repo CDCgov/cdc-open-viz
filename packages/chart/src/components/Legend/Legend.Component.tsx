@@ -53,12 +53,13 @@ const Legend: React.FC<LegendProps> = forwardRef(
 
     const [hasSuppression, setHasSuppression] = useState(false)
 
-    const isBottomOrSmallViewport =
-      legend?.position === 'bottom' || (isLegendWrapViewport(currentViewport) && !legend.hide)
+    const isLegendBottom =
+      legend?.position === 'bottom' ||
+      (isLegendWrapViewport(currentViewport) && !legend.hide && legend?.position !== 'top')
 
     const legendClasses = {
-      marginBottom: getMarginBottom(isBottomOrSmallViewport, config, hasSuppression),
-      marginTop: getMarginTop(isBottomOrSmallViewport, config)
+      marginBottom: getMarginBottom(isLegendBottom, config, hasSuppression),
+      marginTop: getMarginTop(isLegendBottom, config)
     }
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
@@ -75,7 +76,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
         tabIndex={0}
       >
         {(legend.label || legend.description) && (
-          <div className='mb-3'>
+          <div className={legend.description ? 'mb-3' : 'mb-2'}>
             {legend.label && <h3 className='fw-bold'>{parse(legend.label)}</h3>}
             {legend.description && <p className='mt-2'>{parse(legend.description)}</p>}
           </div>
@@ -205,7 +206,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
 
                 <LegendSuppression
                   config={config}
-                  isBottomOrSmallViewport={isBottomOrSmallViewport}
+                  isLegendBottom={isLegendBottom}
                   setHasSuppression={setHasSuppression}
                 />
               </>
