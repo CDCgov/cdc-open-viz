@@ -3,9 +3,7 @@ import ChartActions from './chart.actions'
 export const initialState = {
   isLoading: false,
   config: {},
-  data: [],
-  filteredData: [],
-  brushData: []
+  data: []
 }
 type State = typeof initialState
 export const reducer = (state: State, action: ChartActions) => {

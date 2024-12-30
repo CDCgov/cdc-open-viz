@@ -49,7 +49,6 @@ const CdcChartWrapper: FC<Props> = props => {
       setIsLoading(true)
       try {
         const rawConfig = await loadConfig()
-
         const rawData = await loadData(rawConfig)
         setRawData(rawData)
         setConfig(rawConfig)

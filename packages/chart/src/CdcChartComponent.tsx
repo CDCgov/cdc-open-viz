@@ -74,6 +74,7 @@ import _ from 'lodash'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { Runtime } from '@cdc/core/types/Runtime'
 import { Pivot } from '@cdc/core/types/Table'
+import ChartActions from './store/chart.actions'
 
 interface CdcChartProps {
   configUrl?: string
@@ -89,6 +90,19 @@ interface CdcChartProps {
   setSharedFilterValue?: (value: any) => void
   dashboardConfig?: DashboardConfig
   data: object[]
+}
+
+const reducer = (state, action: ChartActions) => {
+  switch (action.type) {
+    case 'SET_CONFIG':
+      return { ...state, config: action.payload }
+    case 'UPDATE_CONFIG':
+      return { ...state, config: action.payload }
+  }
+}
+
+const initialState = {
+  config: defaults
 }
 
 const CdcChart = ({
@@ -107,11 +121,14 @@ const CdcChart = ({
   data
 }: CdcChartProps) => {
   const transform = new DataTransform()
-  const [loading, setLoading] = useState(true)
 
+  const [loading, setLoading] = useState(true)
+  const [state, dispatch] = useReducer(reducer, initialState)
+  console.log(state, 'state')
+  const { config } = state
   const svgRef = useRef(null)
   const [colorScale, setColorScale] = useState(null)
-  const [config, setConfig] = useState(configObj)
+
   const [stateData, setStateData] = useState(data)
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
@@ -255,6 +272,10 @@ const CdcChart = ({
     const processedConfig = { ...coveUpdateWorker(newConfig) }
 
     updateConfig(processedConfig, data)
+  }
+
+  const setConfig = newConfig => {
+    dispatch({ type: 'SET_CONFIG', payload: newConfig })
   }
 
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
@@ -536,6 +557,7 @@ const CdcChart = ({
     if (newConfig.legend.seriesHighlight?.length) {
       setSeriesHighlight(newConfig.legend?.seriesHighlight)
     }
+    dispatch({ type: 'SET_CONFIG', payload: newConfig })
 
     setConfig(newConfig)
   }
