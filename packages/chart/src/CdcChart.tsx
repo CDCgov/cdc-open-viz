@@ -1513,7 +1513,6 @@ const CdcChart = ({
     handleShowAll,
     imageId,
     isDashboard,
-    isLegendBottom: legend?.position === 'bottom' || isLegendWrapViewport(currentViewport),
     isDebug,
     isDraggingAnnotation,
     handleDragStateChange,
