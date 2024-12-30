@@ -269,6 +269,9 @@ const CdcChart = ({
       }
       if (!series.axis) series.axis = 'Left'
     })
+    if (['Bump Chart'].includes(newConfig.visualizationType)) {
+      newConfig.xAxis.type = 'date-time'
+    }
 
     const processedConfig = { ...coveUpdateWorker(newConfig) }
 
@@ -564,24 +567,6 @@ const CdcChart = ({
     setConfig(newConfig)
   }
 
-  // Sorts data series for horizontal bar charts
-  const sortData = (a, b) => {
-    let sortKey =
-      config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal'
-        ? config.xAxis.dataKey
-        : config.yAxis.sortKey
-    let aData = parseFloat(a[sortKey])
-    let bData = parseFloat(b[sortKey])
-
-    if (aData < bData) {
-      return config.sortData === 'ascending' ? 1 : -1
-    } else if (aData > bData) {
-      return config.sortData === 'ascending' ? -1 : 1
-    } else {
-      return 0
-    }
-  }
-
   // Observes changes to outermost container and changes viewport size in state
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -683,56 +668,11 @@ const CdcChart = ({
     }
   }, [externalFilters]) // eslint-disable-line
 
-  // This will set the bump chart's default scaling type to date-time
-  useEffect(() => {
-    if (['Bump Chart'].includes(config.visualizationType)) {
-      setConfig({
-        ...config,
-        xAxis: {
-          ...config.xAxis,
-          type: 'date-time'
-        }
-      })
-    }
-  }, [config.visualizationType])
-
-  // Generates color palette to pass to child chart component
-  useEffect(() => {
-    if (stateData && config.xAxis && config.runtime?.seriesKeys) {
-      const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
-        ? config.twoColor.palette
-        : config.palette
-      const allPalettes: Record<string, string[]> = { ...colorPalettes, ...twoColorPalette }
-      let palette = config.customColors || allPalettes[configPalette]
-      let numberOfKeys = config.runtime.seriesKeys.length
-      let newColorScale
-
-      while (numberOfKeys > palette.length) {
-        palette = palette.concat(palette)
-      }
-
-      palette = palette.slice(0, numberOfKeys)
-
-      newColorScale = () =>
-        scaleOrdinal({
-          domain: config.runtime.seriesLabelsAll,
-          range: palette,
-          unknown: null
-        })
-
-      // setColorScale(newColorScale)
-      setLoading(false)
-    }
-
-    if (config && stateData && config.sortData) {
-      stateData.sort(sortData)
-    }
-  }, [config, stateData]) // eslint-disable-line
-
   useEffect(() => {
     if (config && data) {
       const colorScale = getColorScale(state.config, stateData)
       dispatch({ type: 'SET_COLOR_SCALE', payload: colorScale })
+      setLoading(false)
     }
   }, [config, data])
 
@@ -1101,7 +1041,7 @@ const CdcChart = ({
       updateConfig(newConfig)
     }
 
-    const styles = {
+    const styles: React.CSSProperties = {
       position: 'relative',
       height: '100vh',
       width: '100%',
@@ -1130,7 +1070,7 @@ const CdcChart = ({
   }
 
   const Error = () => {
-    const styles = {
+    const styles: React.CSSProperties = {
       position: 'absolute',
       background: 'white',
       zIndex: '999',

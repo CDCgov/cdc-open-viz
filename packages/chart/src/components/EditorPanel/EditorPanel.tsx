@@ -735,6 +735,10 @@ const EditorPanel = () => {
       updatedConfig.barStyle = 'flat'
       updatedConfig.isLollipopChart = false
     }
+
+    if (['Bump Chart'].includes(updatedConfig.visualizationType)) {
+      updatedConfig.xAxis.type = 'date-time'
+    }
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
