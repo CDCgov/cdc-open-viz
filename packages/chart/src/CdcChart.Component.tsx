@@ -88,7 +88,9 @@ interface CdcChartProps {
   setSharedFilter?: (filter: any) => void
   setSharedFilterValue?: (value: any) => void
   dashboardConfig?: DashboardConfig
+  data: object[]
 }
+
 const CdcChart = ({
   configUrl,
   config: configObj,
@@ -101,15 +103,16 @@ const CdcChart = ({
   link,
   setSharedFilter,
   setSharedFilterValue,
-  dashboardConfig
+  dashboardConfig,
+  data
 }: CdcChartProps) => {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
 
   const svgRef = useRef(null)
   const [colorScale, setColorScale] = useState(null)
-  const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
-  const [stateData, setStateData] = useState(_.cloneDeep(configObj?.data) || [])
+  const [config, setConfig] = useState(configObj)
+  const [stateData, setStateData] = useState(data)
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
   const [seriesHighlight, setSeriesHighlight] = useState<string[]>(
@@ -228,64 +231,18 @@ const CdcChart = ({
     }
   }
 
-  const loadConfig = async () => {
-    const response = _.cloneDeep(configObj) || (await (await fetch(configUrl)).json())
+  const prepareConfig = async configObj => {
+    const response = _.cloneDeep(configObj)
 
     // If data is included through a URL, fetch that and store
     let data: any[] = response.data || []
 
-    const urlFilters = response.filters
-      ? response.filters.filter(filter => filter.type === 'url').length > 0
-        ? true
-        : false
-      : false
-
-    if (response.dataUrl && !urlFilters) {
-      try {
-        const ext = getFileExtension(response.dataUrl)
-        if ('csv' === ext || isSolrCsv(response.dataUrl)) {
-          data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
-            .then(response => response.text())
-            .then(responseText => {
-              // for every comma NOT inside quotes, replace with a pipe delimiter
-              // - this will let commas inside the quotes not be parsed as a new column
-              // - Limitation: if a delimiter other than comma is used in the csv this will break
-              // Examples of other delimiters that would break: tab
-              responseText = responseText.replace(/(".*?")|,/g, (...m) => m[1] || '|')
-              // now strip the double quotes
-              responseText = responseText.replace(/["]+/g, '')
-              const parsedCsv = Papa.parse(responseText, {
-                //quotes: "true",  // dont need these
-                //quoteChar: "'",  // has no effect that I can tell
-                header: true,
-                dynamicTyping: true,
-                skipEmptyLines: true,
-                delimiter: '|' // we are using pipe symbol as delimiter so setting this explicitly for Papa.parse
-              })
-              return parsedCsv.data
-            })
-        }
-
-        if ('json' === ext || isSolrJson(response.dataUrl)) {
-          data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
-        }
-      } catch {
-        console.error(`COVE: Cannot parse URL: ${response.dataUrl}`) // eslint-disable-line
-        data = []
-      }
-    }
-
-    if (response.dataDescription) {
-      data = transform.autoStandardize(data)
-      data = transform.developerStandardize(data, response.dataDescription)
-    }
+    // if (response.dataDescription) {
+    //   data = transform.autoStandardize(data)
+    //   data = transform.developerStandardize(data, response.dataDescription)
+    // }
 
     data = handleRankByValue(data, response)
-
-    if (data) {
-      setStateData(data)
-      setExcludedData(data)
-    }
 
     // force showVertical for data tables false if it does not exist
     if (response !== undefined && response.table !== undefined) {
@@ -304,10 +261,6 @@ const CdcChart = ({
       }
       if (!series.axis) series.axis = 'Left'
     })
-
-    if (data) {
-      newConfig.data = data
-    }
 
     const processedConfig = { ...coveUpdateWorker(newConfig) }
 
@@ -652,8 +605,8 @@ const CdcChart = ({
 
   // Load data when component first mounts
   useEffect(() => {
-    loadConfig()
-  }, [configObj?.data?.length ? configObj.data : null]) // eslint-disable-line
+    prepareConfig(configObj)
+  }, [configObj]) // eslint-disable-line
 
   useEffect(() => {
     reloadURLData()

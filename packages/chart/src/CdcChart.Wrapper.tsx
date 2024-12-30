@@ -4,7 +4,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import defaults from './data/initial-state'
 import _ from 'lodash'
 import { ChartConfig } from './types/ChartConfig'
-
+import Loading from '@cdc/core/components/Loading'
 interface Props {
   configUrl: string
   isEditor: boolean
@@ -62,12 +62,11 @@ const CdcChartWrapper: FC<Props> = props => {
     load()
   }, [])
 
-  //   if (isLoading) {
-  //     return <h1>loading</h1>
-  //   }
-  console.log(config, 'initialConfig')
+  if (isLoading) {
+    return <Loading />
+  }
 
-  return <CdcChart {...props} isDashboard={isDashboard} config={config as ChartConfig} />
+  return <CdcChart {...props} isDashboard={isDashboard} config={config as ChartConfig} data={rawData} />
 }
 
 export default CdcChartWrapper
