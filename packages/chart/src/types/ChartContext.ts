@@ -24,7 +24,6 @@ type SharedChartContext = {
   handleDragStateChange: (isDragging: any) => void
   highlight?: Function
   handleShowAll?: Function
-  highlightReset?: Function
   // whether or not the chart is viewed within the editor screen
   isEditor?: boolean
   // whether or not the user is dragging an annotation
