@@ -12,7 +12,6 @@ import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 
 // External Libraries
-import { scaleOrdinal } from '@visx/scale'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse, timeFormat } from 'd3-time-format'
 import Papa from 'papaparse'
@@ -101,22 +100,30 @@ const reducer = (state, action: ChartActions) => {
       return { ...state, config: action.payload }
     case 'SET_COLOR_SCALE':
       return { ...state, colorScale: action.payload }
+    case 'SET_STATE_DATA':
+      return { ...state, stateData: action.payload }
+    case 'SET_EXCLUDED_DATA':
+      return { ...state, excludedData: action.payload }
+    case 'SET_FILTERED_DATA':
+      return { ...state, filteredData: action.payload }
   }
 }
 
 const initialState = {
-  config: defaults
+  config: defaults,
+  stateData: [],
+  colorScale: null,
+  excludedData: [],
+  filteredData: []
 }
 
 const CdcChart = ({
-  configUrl,
   config: configObj,
   isEditor = false,
   isDebug = false,
   isDashboard = false,
   setConfig: setParentConfig,
   setEditing,
-  hostname,
   link,
   setSharedFilter,
   setSharedFilterValue,
@@ -127,16 +134,16 @@ const CdcChart = ({
 
   const [loading, setLoading] = useState(true)
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { config, colorScale } = state
+  const { config, colorScale, stateData, excludedData, filteredData: XXX } = state
   const svgRef = useRef(null)
-
-  const [stateData, setStateData] = useState(data)
-  const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
-  const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
+  console.log(XXX, 'XXXX')
   const [seriesHighlight, setSeriesHighlight] = useState<string[]>(
     configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : []
   )
   const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
+
+  const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
+
   const [dimensions, setDimensions] = useState<DimensionsType>([0, 0])
   const [externalFilters, setExternalFilters] = useState<any[]>()
   const [container, setContainer] = useState()
@@ -149,7 +156,9 @@ const CdcChart = ({
     isActive: false,
     isBrushing: false
   })
-
+  // const setFilteredData = filteredData => {
+  //   dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
+  // }
   const { description, visualizationType } = config
 
   const legendRef = useRef(null)
@@ -242,9 +251,10 @@ const CdcChart = ({
       updateConfig({ ...config, runtimeDataUrl: dataUrlFinal, data, formattedData: data })
 
       if (data) {
-        setStateData(data)
-        setExcludedData(data)
-        setFilteredData(filterVizData(config.filters, data))
+        const filteredData = filterVizData(config.filters, data)
+        dispatch({ type: 'SET_STATE_DATA', payload: data })
+        dispatch({ type: 'SET_EXCLUDED_DATA', payload: data })
+        setFilteredData(filteredData)
       }
     }
   }
@@ -329,8 +339,7 @@ const CdcChart = ({
     } else {
       newExcludedData = dataOverride || stateData
     }
-
-    setExcludedData(newExcludedData)
+    dispatch({ type: 'SET_EXCLUDED_DATA', payload: newExcludedData })
 
     // After data is grabbed, loop through and generate filter column values if there are any
     let currentData: any[] = []
@@ -338,6 +347,7 @@ const CdcChart = ({
       const filtersWithValues = addValuesToFilters(newConfig.filters, newExcludedData)
       currentData = filterVizData(filtersWithValues, newExcludedData)
       setFilteredData(currentData)
+      dispatch({ type: 'SET_FILTERED_DATA', payload: currentData })
     }
 
     if (newConfig.xAxis.type === 'date-time' && config.orientation === 'horizontal') {
@@ -604,6 +614,7 @@ const CdcChart = ({
 
   useEffect(() => {
     prepareConfig(configObj)
+    dispatch({ type: 'SET_STATE_DATA', payload: data })
   }, []) // eslint-disable-line
 
   useEffect(() => {
@@ -644,6 +655,7 @@ const CdcChart = ({
    * For some reason e.detail is returning [order: "asc"] even though
    * we're not passing that in. The code here checks for an active prop instead of an empty array.
    */
+
   useEffect(() => {
     if (externalFilters && externalFilters[0]) {
       const hasActiveProperty = externalFilters[0].hasOwnProperty('active')
@@ -652,7 +664,8 @@ const CdcChart = ({
         let configCopy = { ...config }
         delete configCopy['filters']
         setConfig(configCopy)
-        setFilteredData(filterVizData(externalFilters, excludedData))
+        const filteredData = filterVizData(externalFilters, excludedData)
+        setFilteredData(filteredData)
       }
     }
 
