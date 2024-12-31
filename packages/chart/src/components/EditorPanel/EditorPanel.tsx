@@ -1115,10 +1115,11 @@ const EditorPanel = () => {
   const validateMinValue = () => {
     const enteredValue = parseFloat(config[section].min)
     let minVal = Number(minValue)
+    const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
     let message = ''
 
     switch (true) {
-      case config.useLogScale && ['Line', 'Combo', 'Bar'].includes(config.visualizationType) && enteredValue < 0:
+      case isLogarithmicAxis && ['Line', 'Combo', 'Bar'].includes(config.visualizationType) && enteredValue < 0:
         message = 'Negative numbers are not supported in logarithmic scale'
         break
       case (config.visualizationType === 'Line' || config.visualizationType === 'Spark Line') && enteredValue > minVal:
@@ -1130,7 +1131,7 @@ const EditorPanel = () => {
       case (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) &&
         minVal > 0 &&
         enteredValue > 0:
-        message = config.useLogScale ? 'Value must be equal to 0' : 'Value must be less than or equal to 0'
+        message = isLogarithmicAxis ? 'Value must be equal to 0' : 'Value must be less than or equal to 0'
         break
       case config.visualizationType === 'Deviation Bar' && enteredValue >= Math.min(minVal, config.xAxis.target):
         message = 'Value must be less than ' + Math.min(minVal, config.xAxis.target)
