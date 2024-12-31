@@ -24,7 +24,7 @@ export const useResizeObserver = (isEditor: boolean) => {
     }
   })
 
-  return { resizeObserver, dimensions, currentViewport, currentViewport }
+  return { resizeObserver, dimensions, currentViewport }
 }
 
 export default useResizeObserver
