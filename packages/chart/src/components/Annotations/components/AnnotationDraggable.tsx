@@ -16,8 +16,6 @@ import {
   handleTextY
 } from './helpers'
 
-import useColorScale from '../../../hooks/useColorScale'
-
 // visx
 import { HtmlLabel, CircleSubject, EditableAnnotation, Connector, Annotation as VisxAnnotation } from '@visx/annotation'
 import { Drag } from '@visx/drag'
@@ -33,13 +31,13 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
     config,
     dimensions,
     isEditor,
-    updateConfig
+    updateConfig,
+    colorScale
   } = useContext(ConfigContext)
 
   // destructure config items here...
   const { annotations } = config
   const [height] = dimensions
-  const { colorScale } = useColorScale()
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
 
   return (
