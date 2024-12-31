@@ -8,7 +8,6 @@ import Layout from '@cdc/core/components/Layout'
 import Button from '@cdc/core/components/elements/Button'
 
 //types
-import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 
 // External Libraries
@@ -50,11 +49,11 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
+import { reducer, initialState } from './store/chart.reducer'
 
 import './scss/main.scss'
 // load both then config below determines which to use
@@ -63,8 +62,8 @@ import type { TableConfig } from '@cdc/core/components/DataTable/types/TableConf
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import Title from '@cdc/core/components/ui/Title'
 import { AllChartsConfig, ChartConfig } from './types/ChartConfig'
+import { ChartdDispatchContext } from './ConfigContext'
 import { Label } from './types/Label'
-import { type ViewportSize } from './types/ChartConfig'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
@@ -73,7 +72,6 @@ import _ from 'lodash'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { Runtime } from '@cdc/core/types/Runtime'
 import { Pivot } from '@cdc/core/types/Table'
-import ChartActions from './store/chart.actions'
 import getColorScale from './helpers/getColorScale'
 
 interface CdcChartProps {
@@ -90,31 +88,6 @@ interface CdcChartProps {
   setSharedFilterValue?: (value: any) => void
   dashboardConfig?: DashboardConfig
   data: object[]
-}
-
-const reducer = (state, action: ChartActions) => {
-  switch (action.type) {
-    case 'SET_CONFIG':
-      return { ...state, config: action.payload }
-    case 'UPDATE_CONFIG':
-      return { ...state, config: action.payload }
-    case 'SET_COLOR_SCALE':
-      return { ...state, colorScale: action.payload }
-    case 'SET_STATE_DATA':
-      return { ...state, stateData: action.payload }
-    case 'SET_EXCLUDED_DATA':
-      return { ...state, excludedData: action.payload }
-    case 'SET_FILTERED_DATA':
-      return { ...state, filteredData: action.payload }
-  }
-}
-
-const initialState = {
-  config: defaults,
-  stateData: [],
-  colorScale: null,
-  excludedData: [],
-  filteredData: []
 }
 
 const CdcChart = ({
@@ -134,38 +107,35 @@ const CdcChart = ({
 
   const [loading, setLoading] = useState(true)
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { config, colorScale, stateData, excludedData, filteredData: XXX } = state
+  const {
+    config,
+    colorScale,
+    stateData,
+    excludedData,
+    filteredData,
+    seriesHighlight,
+    currentViewport,
+    dimensions,
+    container,
+    coveLoadedEventRan,
+    isDraggingAnnotation,
+    imageId,
+    brushConfig
+  } = state
   const svgRef = useRef(null)
-  console.log(XXX, 'XXXX')
-  const [seriesHighlight, setSeriesHighlight] = useState<string[]>(
-    configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : []
-  )
-  const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
 
-  const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
-
-  const [dimensions, setDimensions] = useState<DimensionsType>([0, 0])
   const [externalFilters, setExternalFilters] = useState<any[]>()
-  const [container, setContainer] = useState()
-  const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
-  const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
-  const [dynamicLegendItems, setDynamicLegendItems] = useState<any[]>([])
-  const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
-  const [brushConfig, setBrushConfig] = useState({
-    data: [],
-    isActive: false,
-    isBrushing: false
-  })
-  // const setFilteredData = filteredData => {
-  //   dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
-  // }
+
+  const setFilteredData = filteredData => {
+    dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
+  }
   const { description, visualizationType } = config
 
   const legendRef = useRef(null)
   const parentRef = useRef(null)
 
   const handleDragStateChange = isDragging => {
-    setIsDraggingAnnotation(isDragging)
+    dispatch({ type: 'SET_DRAG_ANNOTATIONS', payload: isDragging })
   }
 
   if (isDebug) console.log('Chart config, isEditor', config, isEditor)
@@ -188,6 +158,14 @@ const CdcChart = ({
 
   const checkLineToBarGraph = () => {
     return isConvertLineToBarGraph(config.visualizationType, filteredData, config.allowLineToBarGraph)
+  }
+
+  const setSeriesHighlight = (value?: string[]) => {
+    const highlight = value || _.get(configObj, 'legend.seriesHighlight', [])
+    dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: highlight })
+  }
+  const setCurrentViewport = viewportSize => {
+    dispatch({ type: 'SET_VIEWPORT', payload: viewportSize })
   }
 
   const reloadURLData = async () => {
@@ -595,8 +573,7 @@ const CdcChart = ({
       }
 
       width = width - svgMarginWidth
-
-      setDimensions([width, height])
+      dispatch({ type: 'SET_DIMENSIONS', payload: [width, height] })
     }
   })
 
@@ -604,8 +581,7 @@ const CdcChart = ({
     if (node !== null) {
       resizeObserver.observe(node)
     }
-
-    setContainer(node)
+    dispatch({ type: 'SET_CONTAINER', payload: node })
   }, []) // eslint-disable-line
 
   const isEmpty = obj => {
@@ -627,7 +603,7 @@ const CdcChart = ({
   useEffect(() => {
     if (container && !isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
-      setCoveLoadedEventRan(true)
+      dispatch({ type: 'SET_LOADED_EVENT', payload: true })
     }
   }, [container, config]) // eslint-disable-line
 
@@ -1426,7 +1402,6 @@ const CdcChart = ({
     dashboardConfig,
     debugSvg: isDebug,
     dimensions,
-    dynamicLegendItems,
     excludedData,
     formatDate,
     formatNumber,
@@ -1457,9 +1432,7 @@ const CdcChart = ({
     parseDate,
     rawData: _.cloneDeep(stateData) ?? {},
     seriesHighlight,
-    setBrushConfig,
     setConfig,
-    setDynamicLegendItems,
     setEditing,
     setFilteredData,
     setParentConfig,
@@ -1476,16 +1449,18 @@ const CdcChart = ({
 
   return (
     <ConfigContext.Provider value={contextValues}>
-      <Layout.VisualizationWrapper
-        config={config}
-        isEditor={isEditor}
-        currentViewport={currentViewport}
-        ref={outerContainerRef}
-        imageId={imageId}
-        showEditorPanel={config?.showEditorPanel}
-      >
-        {body}
-      </Layout.VisualizationWrapper>
+      <ChartdDispatchContext.Provider value={dispatch}>
+        <Layout.VisualizationWrapper
+          config={config}
+          isEditor={isEditor}
+          currentViewport={currentViewport}
+          ref={outerContainerRef}
+          imageId={imageId}
+          showEditorPanel={config?.showEditorPanel}
+        >
+          {body}
+        </Layout.VisualizationWrapper>
+      </ChartdDispatchContext.Provider>
     </ConfigContext.Provider>
   )
 }
