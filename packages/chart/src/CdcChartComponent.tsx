@@ -125,7 +125,6 @@ const CdcChart = ({
   const svgRef = useRef(null)
 
   const [externalFilters, setExternalFilters] = useState<any[]>()
-
   const setFilteredData = filteredData => {
     dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
   }
@@ -163,9 +162,6 @@ const CdcChart = ({
   const setSeriesHighlight = (value?: string[]) => {
     const highlight = value || _.get(configObj, 'legend.seriesHighlight', [])
     dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: highlight })
-  }
-  const setCurrentViewport = viewportSize => {
-    dispatch({ type: 'SET_VIEWPORT', payload: viewportSize })
   }
 
   const reloadURLData = async () => {
@@ -237,34 +233,29 @@ const CdcChart = ({
     }
   }
 
-  const prepareConfig = configObj => {
-    const response = _.cloneDeep(configObj)
+  const prepareConfig = (configObj: ChartConfig) => {
+    const response = _.defaultsDeep({}, configObj, { table: { showVertical: false } })
 
-    // force showVertical for data tables false if it does not exist
-    if (response !== undefined && response.table !== undefined) {
-      if (!response.table || !response.table.showVertical) {
-        response.table = response.table || {}
-        response.table.showVertical = false
-      }
-    }
-    let newConfig = { ...defaults, ...response }
+    // Merge with defaults
+    const newConfig = _.defaultsDeep(response, defaults)
 
-    if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
+    // Handle table.show
+    newConfig.table.show ??= !isDashboard
 
+    // Update series configurations
     newConfig.series.forEach(series => {
-      if (series.tooltip === undefined || series.tooltip === null) {
-        series.tooltip = true
-      }
-      if (!series.axis) series.axis = 'Left'
+      _.defaults(series, { tooltip: true, axis: 'Left' })
     })
-    if (['Bump Chart'].includes(newConfig.visualizationType)) {
+
+    // Handle visualization type
+    if (newConfig.visualizationType === 'Bump Chart') {
       newConfig.xAxis.type = 'date-time'
     }
 
-    const processedConfig = { ...coveUpdateWorker(newConfig) }
-
-    updateConfig(processedConfig, data)
+    // Process and update configuration
+    updateConfig({ ...coveUpdateWorker(newConfig) }, data)
   }
+  console.log(data, 'data')
 
   const setConfig = newConfig => {
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
@@ -272,7 +263,7 @@ const CdcChart = ({
 
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
     const newConfig = _.cloneDeep(_config)
-    let data = dataOverride || stateData
+    let data: object[] = _.isArray(dataOverride) ? dataOverride : _.isArray(stateData) ? stateData : []
 
     data = handleRankByValue(data, newConfig)
 
@@ -312,10 +303,10 @@ const CdcChart = ({
           newExcludedData = data.filter(e => timestamp(e[newConfig.xAxis.dataKey]) <= endDate)
         }
       } else {
-        newExcludedData = dataOverride || stateData
+        newExcludedData = data
       }
     } else {
-      newExcludedData = dataOverride || stateData
+      newExcludedData = data
     }
     dispatch({ type: 'SET_EXCLUDED_DATA', payload: newExcludedData })
 
@@ -324,6 +315,7 @@ const CdcChart = ({
     if (newConfig.filters) {
       const filtersWithValues = addValuesToFilters(newConfig.filters, newExcludedData)
       currentData = filterVizData(filtersWithValues, newExcludedData)
+      console.log(currentData, 'currentDatacurrentData')
       setFilteredData(currentData)
       dispatch({ type: 'SET_FILTERED_DATA', payload: currentData })
     }
@@ -565,8 +557,7 @@ const CdcChart = ({
       width = isEditor ? width - editorWidth : width
 
       const newViewport = getViewport(width)
-
-      setCurrentViewport(newViewport)
+      dispatch({ type: 'SET_VIEWPORT', payload: newViewport })
 
       if (entry.target.dataset.lollipop === 'true') {
         width = width - 2.5
@@ -591,7 +582,7 @@ const CdcChart = ({
   useEffect(() => {
     prepareConfig(configObj)
     dispatch({ type: 'SET_STATE_DATA', payload: data })
-  }, []) // eslint-disable-line
+  }, [configObj]) // eslint-disable-line
 
   useEffect(() => {
     reloadURLData()
@@ -1390,7 +1381,7 @@ const CdcChart = ({
   const capitalize = str => {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
-
+  console.log(filteredData, 'filteredData')
   const contextValues = {
     brushConfig,
     capitalize,

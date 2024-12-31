@@ -1,4 +1,5 @@
 import ChartActions from './chart.actions'
+import { DimensionsType } from '@cdc/core/types/Dimensions'
 import defaults from '../data/initial-state.js'
 import { type ViewportSize } from '../types/ChartConfig'
 export const initialState = {
@@ -9,7 +10,7 @@ export const initialState = {
   filteredData: undefined,
   seriesHighlight: [],
   currentViewport: 'lg' as ViewportSize,
-  dimensions: [],
+  dimensions: [0, 0],
   container: null as HTMLElement | null,
   coveLoadedEventRan: false,
   isDraggingAnnotation: false,
