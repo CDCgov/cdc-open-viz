@@ -231,6 +231,15 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
 
   const handleEditorChanges = async (property, value) => {
     switch (property) {
+      case 'navigationTarget':
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            navigationTarget: value
+          }
+        })
+        break
       // change these to be more generic.
       // updateVisualPropertyValue
       // updateGeneralPropertyValue, etc.
@@ -1526,6 +1535,22 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   )}
                 </select>
               </label>
+
+              {/* Navigation Behavior */}
+              {state.general.type === 'navigation' && (
+                <label>
+                  <span className='edit-label column-heading'>Navigation Behavior</span>
+                  <select
+                    value={state.general.navigationTarget}
+                    onChange={event => {
+                      handleEditorChanges('navigationTarget', event.target.value)
+                    }}
+                  >
+                    <option value='_self'>Same Window</option>
+                    <option value='_blank'>New Window</option>
+                  </select>
+                </label>
+              )}
               <label>
                 <span className='edit-label'>Data Classification Type</span>
                 <div>
