@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
+import ConfigContext from '../context'
 
 const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoName, mapTabbingID }) => {
+  const { state } = useContext(ConfigContext)
   const [activeGeo, setActiveGeo] = useState('')
-
   const [dropdownItems, setDropdownItems] = useState({})
 
   const handleSubmit = event => {
@@ -10,7 +11,7 @@ const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoN
     if (activeGeo !== '') {
       const urlString = data[dropdownItems[activeGeo]][columns.navigate.name]
 
-      navigationHandler(urlString)
+      navigationHandler(state.general.navigationTarget, urlString)
     }
   }
 
@@ -55,7 +56,7 @@ const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoN
         <label htmlFor={mapTabbingID.replace('#', '')}>
           <div className='select-heading'>{navSelect}</div>
           <select value={activeGeo} id={mapTabbingID.replace('#', '')} onChange={e => setActiveGeo(e.target.value)}>
-            {Object.keys(dropdownItems).map((key, i) => (
+            {Object.keys(dropdownItems).map(key => (
               <option key={key} value={key}>
                 {key}
               </option>
