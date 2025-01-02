@@ -65,8 +65,8 @@ const useTooltip = props => {
   const handleTooltipSpecialClassText = (specialClasses, column, row, value, columnKey) => {
     if (specialClasses && specialClasses.length && typeof specialClasses[0] === 'object') {
       for (const specialClass of specialClasses) {
-        if (column.name === specialClass.key && String(row[specialClass.key]) === specialClass.value) {
-          value = displayDataAsText(specialClass.label, columnKey, state)
+        if (column.name === specialClass.key && String(row?.[specialClass.key]) === specialClass.value) {
+          value = displayDataAsText(specialClass.label, columnKey)
           break
         }
       }

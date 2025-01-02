@@ -65,12 +65,7 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
 
 .cdc-open-viz-module {
   position: relative;
-  color: $baseColor;
-  font-size: 14px !important;
   line-height: 1.4;
-  @include breakpointClass(md) {
-    font-size: 16px !important;
-  }
   @import 'global';
   @import 'button-section';
   @import 'series-list';

@@ -14,9 +14,18 @@ import { type ChartContext } from '@cdc/chart/src/types/ChartContext'
 
 // cdc
 import ConfigContext from '../../ConfigContext'
-import { getFontSize } from '@cdc/core/helpers/cove/number'
+import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
 
-const ForestPlot = ({ xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver, forestPlotRightLabelRef }: ForestPlotProps) => {
+const ForestPlot = ({
+  xScale,
+  yScale,
+  config,
+  height,
+  width,
+  handleTooltipMouseOff,
+  handleTooltipMouseOver,
+  forestPlotRightLabelRef
+}: ForestPlotProps) => {
   const { rawData: data, updateConfig } = useContext<ChartContext>(ConfigContext)
   const { forestPlot } = config as ChartConfig
   const labelPosition = config.xAxis.tickWidthMax + 10
@@ -33,7 +42,10 @@ const ForestPlot = ({ xScale, yScale, config, height, width, handleTooltipMouseO
       const colsToCheck = 10
       for (let i = 0; i < colsToCheck; i++) {
         defaultColumns.forEach(col => {
-          if (config.forestPlot[col] && config.forestPlot[col] !== newConfig.columns[config.forestPlot[`additionalColumn${i}`]]?.name) {
+          if (
+            config.forestPlot[col] &&
+            config.forestPlot[col] !== newConfig.columns[config.forestPlot[`additionalColumn${i}`]]?.name
+          ) {
             delete newConfig.columns[`additionalColumn${i}`] // Remove old value if found to prevent duplicates
             newConfig.columns[config.forestPlot[col]] = {}
             newConfig.columns[config.forestPlot[col]].dataKey = newConfig.forestPlot[col]
@@ -83,9 +95,15 @@ const ForestPlot = ({ xScale, yScale, config, height, width, handleTooltipMouseO
   const regressionPoints = pooledData
     ? [
         { x: xScale(pooledData[config.forestPlot.lower]), y: height - Number(config.forestPlot.rowHeight) },
-        { x: xScale(pooledData[config.forestPlot.estimateField]), y: height - forestPlot.pooledResult.diamondHeight - Number(config.forestPlot.rowHeight) },
+        {
+          x: xScale(pooledData[config.forestPlot.estimateField]),
+          y: height - forestPlot.pooledResult.diamondHeight - Number(config.forestPlot.rowHeight)
+        },
         { x: xScale(pooledData[config.forestPlot.upper]), y: height - Number(config.forestPlot.rowHeight) },
-        { x: xScale(pooledData[config.forestPlot.estimateField]), y: height + forestPlot.pooledResult.diamondHeight - Number(config.forestPlot.rowHeight) },
+        {
+          x: xScale(pooledData[config.forestPlot.estimateField]),
+          y: height + forestPlot.pooledResult.diamondHeight - Number(config.forestPlot.rowHeight)
+        },
         { x: xScale(pooledData[config.forestPlot.lower]), y: height - Number(config.forestPlot.rowHeight) }
       ]
     : []
@@ -114,16 +132,37 @@ const ForestPlot = ({ xScale, yScale, config, height, width, handleTooltipMouseO
     <>
       <Group width={width}>
         {forestPlot.title && (
-          <Text className={`forest-plot--title`} x={forestPlot.type === 'Linear' ? xScale(0) : xScale(1)} y={0} textAnchor='middle' verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+          <Text
+            className={`forest-plot--title`}
+            x={forestPlot.type === 'Linear' ? xScale(0) : xScale(1)}
+            y={0}
+            textAnchor='middle'
+            verticalAnchor='start'
+            fill={'black'}
+          >
             {forestPlot.title}
           </Text>
         )}
 
         {/* Line of no effect on Continuous Scale. */}
-        {forestPlot.lineOfNoEffect.show && forestPlot.type === 'Linear' && <Line from={{ x: xScale(0), y: 0 + topMarginOffset }} to={{ x: xScale(0), y: height }} className='forestplot__line-of-no-effect' stroke={forestPlot.regression.baseLineColor || 'black'} />}
+        {forestPlot.lineOfNoEffect.show && forestPlot.type === 'Linear' && (
+          <Line
+            from={{ x: xScale(0), y: 0 + topMarginOffset }}
+            to={{ x: xScale(0), y: height }}
+            className='forestplot__line-of-no-effect'
+            stroke={forestPlot.regression.baseLineColor || 'black'}
+          />
+        )}
 
         {/* Line of no effect on Logarithmic Scale. */}
-        {forestPlot.lineOfNoEffect.show && forestPlot.type === 'Logarithmic' && <Line from={{ x: xScale(1), y: 0 + topMarginOffset }} to={{ x: xScale(1), y: height }} className='forestplot__line-of-no-effect' stroke={forestPlot.regression.baseLineColor || 'black'} />}
+        {forestPlot.lineOfNoEffect.show && forestPlot.type === 'Logarithmic' && (
+          <Line
+            from={{ x: xScale(1), y: 0 + topMarginOffset }}
+            to={{ x: xScale(1), y: height }}
+            className='forestplot__line-of-no-effect'
+            stroke={forestPlot.regression.baseLineColor || 'black'}
+          />
+        )}
 
         {data.map((d, i) => {
           // calculate both square and circle size based on radius.min and radius.max
@@ -133,7 +172,8 @@ const ForestPlot = ({ xScale, yScale, config, height, width, handleTooltipMouseO
           })
 
           // glyph settings
-          const rectSize = forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][forestPlot.radius.scalingColumn]) : 4
+          const rectSize =
+            forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][forestPlot.radius.scalingColumn]) : 4
           const shapeColor = forestPlot.colors.shape ? forestPlot.colors.shape : 'black'
           const lineColor = forestPlot.colors.line ? forestPlot.colors.line : 'black'
 
@@ -167,41 +207,124 @@ const ForestPlot = ({ xScale, yScale, config, height, width, handleTooltipMouseO
               />
 
               {/* main line */}
-              <line stroke={lineColor} className={`line-${d[config.yAxis.dataKey]}`} key={i} x1={xScale(d[forestPlot.lower])} x2={xScale(d[forestPlot.upper])} y1={yScale(i)} y2={yScale(i)} />
+              <line
+                stroke={lineColor}
+                className={`line-${d[config.yAxis.dataKey]}`}
+                key={i}
+                x1={xScale(d[forestPlot.lower])}
+                x2={xScale(d[forestPlot.upper])}
+                y1={yScale(i)}
+                y2={yScale(i)}
+              />
               {forestPlot.shape === 'circle' && (
-                <Circle className='forest-plot--circle' cx={xScale(Number(d[forestPlot.estimateField]))} cy={yScale(i)} r={forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][forestPlot.radius.scalingColumn]) : 4} fill={shapeColor} style={{ opacity: 1, filter: 'unset' }} />
+                <Circle
+                  className='forest-plot--circle'
+                  cx={xScale(Number(d[forestPlot.estimateField]))}
+                  cy={yScale(i)}
+                  r={forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][forestPlot.radius.scalingColumn]) : 4}
+                  fill={shapeColor}
+                  style={{ opacity: 1, filter: 'unset' }}
+                />
               )}
-              {forestPlot.shape === 'square' && <rect className='forest-plot--square' x={xScale(Number(d[forestPlot.estimateField]))} y={yScale(i) - rectSize / 2} width={rectSize} height={rectSize} fill={shapeColor} style={{ opacity: 1, filter: 'unset' }} />}
+              {forestPlot.shape === 'square' && (
+                <rect
+                  className='forest-plot--square'
+                  x={xScale(Number(d[forestPlot.estimateField]))}
+                  y={yScale(i) - rectSize / 2}
+                  width={rectSize}
+                  height={rectSize}
+                  fill={shapeColor}
+                  style={{ opacity: 1, filter: 'unset' }}
+                />
+              )}
               {forestPlot.shape === 'text' && (
-                <Text className='forest-plot--text' x={xScale(Number(d[forestPlot.estimateField]))} y={yScale(i)} textAnchor='middle' verticalAnchor='middle' fontSize={getFontSize(config.fontSize)} fill={shapeColor}>
+                <Text
+                  className='forest-plot--text'
+                  x={xScale(Number(d[forestPlot.estimateField]))}
+                  y={yScale(i)}
+                  textAnchor='middle'
+                  verticalAnchor='middle'
+                  fill={shapeColor}
+                >
                   {d[forestPlot.estimateField]}
                 </Text>
               )}
             </Group>
           ) : (
-            <LinePath data={regressionPoints} x={d => d.x} y={d => d.y - getFontSize(config.fontSize) / 2} stroke='black' strokeWidth={2} fill={'black'} curve={curveLinearClosed} />
+            <LinePath
+              data={regressionPoints}
+              x={d => d.x}
+              y={d => d.y - appFontSize / 2}
+              stroke='black'
+              strokeWidth={2}
+              fill={'black'}
+              curve={curveLinearClosed}
+            />
           )
         })}
 
         {/* regression diamond */}
-        {regressionPoints && forestPlot.regression.showDiamond && <LinePath data={regressionPoints} x={d => d.x} y={d => d.y} stroke='black' strokeWidth={2} fill={forestPlot.regression.baseLineColor} curve={curveLinearClosed} />}
+        {regressionPoints && forestPlot.regression.showDiamond && (
+          <LinePath
+            data={regressionPoints}
+            x={d => d.x}
+            y={d => d.y}
+            stroke='black'
+            strokeWidth={2}
+            fill={forestPlot.regression.baseLineColor}
+            curve={curveLinearClosed}
+          />
+        )}
         {/* regression text */}
         {forestPlot.regression.description && (
-          <Text x={0 - Number(config.xAxis.size)} width={width} y={height - config.forestPlot.rowHeight - Number(forestPlot.rowHeight) / 3} verticalAnchor='start' textAnchor='start' style={{ fontWeight: 'bold', fontSize: 12 }}>
+          <Text
+            x={0 - Number(config.xAxis.size)}
+            width={width}
+            y={height - config.forestPlot.rowHeight - Number(forestPlot.rowHeight) / 3}
+            verticalAnchor='start'
+            textAnchor='start'
+            style={{ fontWeight: 'bold', fontSize: 12 }}
+          >
             {forestPlot.regression.description}
           </Text>
         )}
 
-        <Bar key='forest-plot-tooltip-area' className='forest-plot-tooltip-area' width={width} height={height} fill={false ? 'red' : 'transparent'} fillOpacity={0.5} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} />
+        <Bar
+          key='forest-plot-tooltip-area'
+          className='forest-plot-tooltip-area'
+          width={width}
+          height={height}
+          fill={false ? 'red' : 'transparent'}
+          fillOpacity={0.5}
+          onMouseMove={e => handleTooltipMouseOver(e, data)}
+          onMouseOut={handleTooltipMouseOff}
+        />
       </Group>
-      <Line from={topLine[0]} to={topLine[1]} style={{ stroke: 'black', strokeWidth: 2 }} className='forestplot__top-line' />
-      <Line from={bottomLine[0]} to={bottomLine[1]} style={{ stroke: 'black', strokeWidth: 2 }} className='forestplot__bottom-line' />
+      <Line
+        from={topLine[0]}
+        to={topLine[1]}
+        style={{ stroke: 'black', strokeWidth: 2 }}
+        className='forestplot__top-line'
+      />
+      <Line
+        from={bottomLine[0]}
+        to={bottomLine[1]}
+        style={{ stroke: 'black', strokeWidth: 2 }}
+        className='forestplot__bottom-line'
+      />
 
       {/* column data */}
       {columnsOnChart.map(column => {
         return data.map((d, i) => {
           return (
-            <Text className={`${d[column.name]}`} x={column.forestPlotAlignRight ? width : column.forestPlotStartingPoint} y={yScale(i)} textAnchor={column.forestPlotAlignRight ? 'end' : 'start'} verticalAnchor='middle' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+            <Text
+              className={`${d[column.name]}`}
+              x={column.forestPlotAlignRight ? width : column.forestPlotStartingPoint}
+              y={yScale(i)}
+              textAnchor={column.forestPlotAlignRight ? 'end' : 'start'}
+              verticalAnchor='middle'
+              fill={'black'}
+            >
               {d[column.name]}
             </Text>
           )
@@ -212,7 +335,14 @@ const ForestPlot = ({ xScale, yScale, config, height, width, handleTooltipMouseO
       {!forestPlot.hideDateCategoryCol &&
         data.map((d, i) => {
           return (
-            <Text className={`${d[config.xAxis.dataKey]}`} x={0} y={yScale(i)} textAnchor={'start'} verticalAnchor='middle' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+            <Text
+              className={`${d[config.xAxis.dataKey]}`}
+              x={0}
+              y={yScale(i)}
+              textAnchor={'start'}
+              verticalAnchor='middle'
+              fill={'black'}
+            >
               {d[config.xAxis.dataKey]}
             </Text>
           )
@@ -220,7 +350,7 @@ const ForestPlot = ({ xScale, yScale, config, height, width, handleTooltipMouseO
 
       {/* X Axis Datakey Header */}
       {!forestPlot.hideDateCategoryCol && config.xAxis.dataKey && (
-        <Text className={config.xAxis.dataKey} x={0} y={0} textAnchor={'start'} verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+        <Text className={config.xAxis.dataKey} x={0} y={0} textAnchor={'start'} verticalAnchor='start' fill={'black'}>
           {config.xAxis.dataKey}
         </Text>
       )}
@@ -228,7 +358,14 @@ const ForestPlot = ({ xScale, yScale, config, height, width, handleTooltipMouseO
       {/* column headers */}
       {columnsOnChart.map(column => {
         return (
-          <Text className={`${column.label}`} x={column.forestPlotAlignRight ? width : column.forestPlotStartingPoint} y={0} textAnchor={column.forestPlotAlignRight ? 'end' : 'start'} verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+          <Text
+            className={`${column.label}`}
+            x={column.forestPlotAlignRight ? width : column.forestPlotStartingPoint}
+            y={0}
+            textAnchor={column.forestPlotAlignRight ? 'end' : 'start'}
+            verticalAnchor='start'
+            fill={'black'}
+          >
             {column.label}
           </Text>
         )
@@ -236,13 +373,26 @@ const ForestPlot = ({ xScale, yScale, config, height, width, handleTooltipMouseO
 
       {/* left bottom label */}
       {forestPlot.leftLabel && (
-        <Text className='forest-plot__left-label' x={forestPlot.type === 'Linear' ? xScale(0) - 25 : xScale(1) - 25} y={height + labelPosition} textAnchor='end' verticalAnchor='start'>
+        <Text
+          className='forest-plot__left-label'
+          x={forestPlot.type === 'Linear' ? xScale(0) - 25 : xScale(1) - 25}
+          y={height + labelPosition}
+          textAnchor='end'
+          verticalAnchor='start'
+        >
           {forestPlot.leftLabel}
         </Text>
       )}
 
       {forestPlot.rightLabel && (
-        <Text innerRef={forestPlotRightLabelRef} className='forest-plot__right-label' x={forestPlot.type === 'Linear' ? xScale(0) + 25 : xScale(1) + 25} y={height + labelPosition} textAnchor='start' verticalAnchor='start'>
+        <Text
+          innerRef={forestPlotRightLabelRef}
+          className='forest-plot__right-label'
+          x={forestPlot.type === 'Linear' ? xScale(0) + 25 : xScale(1) + 25}
+          y={height + labelPosition}
+          textAnchor='start'
+          verticalAnchor='start'
+        >
           {forestPlot.rightLabel}
         </Text>
       )}

@@ -1112,7 +1112,7 @@ const CdcMap = ({
             }}
           >
             {state.tooltips.linkLabel}
-            {isDomainExternal(row[state.columns.navigate.name]) && <ExternalIcon className='inline-icon ml-1' />}
+            {isDomainExternal(row[state.columns.navigate.name]) && <ExternalIcon className='inline-icon ms-1' />}
           </a>
         )
       }
@@ -1564,20 +1564,16 @@ const CdcMap = ({
                 <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
               )}
 
-              {general.introText && (
-                <section className='introText' style={{ padding: '15px', margin: '0px' }}>
-                  {parse(general.introText)}
-                </section>
-              )}
+              {general.introText && <section className='introText mb-4 mt-3'>{parse(general.introText)}</section>}
 
               {state?.filters?.length > 0 && (
                 <Filters
                   config={state}
                   setConfig={setState}
-                  getUniqueValues={getUniqueValues}
                   filteredData={runtimeFilters}
                   setFilteredData={setRuntimeFilters}
                   dimensions={dimensions}
+                  standaloneMap={!config}
                 />
               )}
 
@@ -1638,7 +1634,7 @@ const CdcMap = ({
               {/* Link */}
               {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
 
-              {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+              {subtext.length > 0 && <p className='subtext mt-4'>{parse(subtext)}</p>}
 
               <MediaControls.Section classes={['download-buttons']}>
                 {state.general.showDownloadImgButton && (
@@ -1697,7 +1693,7 @@ const CdcMap = ({
 
               {state.annotations.length > 0 && <Annotation.Dropdown />}
 
-              {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
+              {general.footnotes && <section className='footnotes pt-2 mt-4'>{parse(general.footnotes)}</section>}
             </section>
           )}
 

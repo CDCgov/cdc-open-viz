@@ -7,7 +7,6 @@ import { Visualization } from '../../../types/Visualization'
 
 export type TableConfig = Visualization & {
   boxplot?: BoxPlot
-  fontSize: 'small' | 'medium' | 'large'
   regions?: Region[]
   runtime?: Runtime
   runtimeSeriesLabels?: Object

@@ -10,22 +10,26 @@ export const getGradientConfig = (config, formatLabels, colorScale) => {
   return { colors, labels }
 }
 
-export const getMarginTop = (isBottomOrSmallViewport, config) => {
-  if (!isBottomOrSmallViewport) {
+export const getMarginTop = (isLegendBottom, config) => {
+  if (!isLegendBottom) {
     return '0px'
   }
-  if (isBottomOrSmallViewport && config.brush?.active) {
+  if (isLegendBottom && config.brush?.active) {
     const BRUSH_HEIGHT_MULTIPLIER = 1.5
     return `${config.brush.height * BRUSH_HEIGHT_MULTIPLIER}px`
   }
-  return '20px'
+  return '27px'
 }
-export const getMarginBottom = (config, hasSuppression) => {
+export const getMarginBottom = (isLegendBottom, config, hasSuppression) => {
   const isLegendTop = config.legend?.position === 'top' && !config.legend.hide
 
   let marginBottom = 0
 
-  if (isLegendTop) marginBottom = config.legend.hideBorder.topBottom ? 15 : 25
+  if (isLegendTop) marginBottom = 27
+
+  if (isLegendTop && config.dataFormat?.onlyShowTopPrefixSuffix) marginBottom += 9
+
+  if (isLegendBottom) marginBottom += 9
 
   if (hasSuppression) marginBottom += 40
 
