@@ -37,10 +37,21 @@ const Column = ({ data, rowIdx, colIdx }) => {
     classNames.push('column--populated')
   }
 
+  const handleTitle = config => {
+    if (!config) return
+    if (config.type === 'map') return config.general.title
+    if (config.type === 'markup-include') return config.contentEditor.title
+    return config.title
+  }
+
   return (
     <div className={classNames.join(' ')} ref={drop}>
       {widget ? (
-        <Widget widgetConfig={{ rowIdx, colIdx, ...widget }} type={widget.visualizationType ?? widget.general?.geoType} />
+        <Widget
+          title={handleTitle(widget)}
+          widgetConfig={{ rowIdx, colIdx, ...widget }}
+          type={widget.visualizationType ?? widget.general?.geoType}
+        />
       ) : (
         <p className='builder-column__text'>
           Drag and drop <br /> visualization
