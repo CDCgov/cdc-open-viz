@@ -14,6 +14,7 @@ import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
+import { Version } from '@cdc/core/types/Version'
 
 export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 export type ChartColumns = Record<string, Column>
@@ -131,7 +132,6 @@ export type AllChartsConfig = {
   exclusions: Exclusions
   filters: VizFilter[]
   filterBehavior: FilterBehavior
-  fontSize: 'small' | 'medium' | 'large'
   footnotes: string
   forestPlot: ForestPlotConfigSettings
   formattedData: Object[] & { urlFiltered: boolean }
@@ -184,7 +184,7 @@ export type AllChartsConfig = {
   twoColor: { palette: string }
   type: 'chart' | 'dashboard'
   uid: string | number
-  version: string
+  version: Version
   visual: Visual
   visualizationType: VisualizationType
   visualizationSubType: string

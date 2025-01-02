@@ -1,5 +1,6 @@
 import { Runtime } from '@cdc/core/types/Runtime'
 import { Variable } from './Variable'
+import { Version } from '@cdc/core/types/Version'
 
 export type Config = {
   contentEditor: {
@@ -25,4 +26,5 @@ export type Config = {
     hideBackgroundColor: boolean
     borderColorTheme: boolean
   }
+  version: Version
 }

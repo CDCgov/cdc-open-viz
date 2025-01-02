@@ -27,7 +27,7 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
   } = props
 
   const getWrappingClasses = () => {
-    let classes = ['cdc-open-viz-module', `${currentViewport}`, `font-${config?.fontSize}`, `${config?.theme}`]
+    let classes = ['cdc-open-viz-module', `${currentViewport}`, `${config?.theme}`]
 
     if (className) {
       classes.push(className)
@@ -47,7 +47,7 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
     }
 
     if (config.type === 'filtered-text') {
-      classes.push('type-filtered-text')
+      classes.push('type-filtered-text', `font-${config.fontSize}`)
       classes = classes.filter(item => item !== 'cove-component__content')
       return classes
     }

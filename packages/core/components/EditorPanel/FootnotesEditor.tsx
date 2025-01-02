@@ -39,13 +39,40 @@ const FootnotesEditor: React.FC<FootnotesEditorProps> = ({ config, updateField }
     <>
       <em>Dynamic Footnotes</em>
       <div className='row border p-2'>
-        <InputSelect label='Select a Footnote Dataset' value={config.dataKey} options={dataSetOptions} fieldName='dataKey' updateField={updateField} />
+        <InputSelect
+          label='Select a Footnote Dataset'
+          value={config.dataKey}
+          options={dataSetOptions}
+          fieldName='dataKey'
+          updateField={updateField}
+        />
 
         {config.dataKey && (
           <div className='p-3'>
-            <InputSelect label='Footnote Symbol Column' value={config.dynamicFootnotes?.symbolColumn} options={dataColumns} section='dynamicFootnotes' fieldName='symbolColumn' updateField={updateField} />
-            <InputSelect label='Footnote Text Column' value={config.dynamicFootnotes?.textColumn} options={dataColumns} section='dynamicFootnotes' fieldName='textColumn' updateField={updateField} />
-            <InputSelect label='Footnote Order Column' value={config.dynamicFootnotes?.orderColumn} options={dataColumns} section='dynamicFootnotes' fieldName='orderColumn' updateField={updateField} />
+            <InputSelect
+              label='Footnote Symbol Column'
+              value={config.dynamicFootnotes?.symbolColumn}
+              options={dataColumns}
+              section='dynamicFootnotes'
+              fieldName='symbolColumn'
+              updateField={updateField}
+            />
+            <InputSelect
+              label='Footnote Text Column'
+              value={config.dynamicFootnotes?.textColumn}
+              options={dataColumns}
+              section='dynamicFootnotes'
+              fieldName='textColumn'
+              updateField={updateField}
+            />
+            <InputSelect
+              label='Footnote Order Column'
+              value={config.dynamicFootnotes?.orderColumn}
+              options={dataColumns}
+              section='dynamicFootnotes'
+              fieldName='orderColumn'
+              updateField={updateField}
+            />
           </div>
         )}
       </div>
@@ -57,10 +84,25 @@ const FootnotesEditor: React.FC<FootnotesEditorProps> = ({ config, updateField }
       {config.staticFootnotes?.map((note, index) => (
         <div key={index} className='row border p-2'>
           <div className='col-8'>
-            <InputSelect label='Symbol' value={note.symbol} options={[['', '--Select--'], ...footnotesSymbols]} fieldName='symbol' updateField={(section, subsection, fieldName, value) => updateStaticFootnote(index, { ...note, symbol: value })} />{' '}
-            <TextField label='Text' value={note.text} fieldName='text' updateField={(section, subsection, fieldName, value) => updateStaticFootnote(index, { ...note, text: value })} />
+            <InputSelect
+              label='Symbol'
+              value={note.symbol}
+              options={[['', '--Select--'], ...footnotesSymbols]}
+              fieldName='symbol'
+              updateField={(section, subsection, fieldName, value) =>
+                updateStaticFootnote(index, { ...note, symbol: value })
+              }
+            />{' '}
+            <TextField
+              label='Text'
+              value={note.text}
+              fieldName='text'
+              updateField={(section, subsection, fieldName, value) =>
+                updateStaticFootnote(index, { ...note, text: value })
+              }
+            />
           </div>
-          <div className='col-2 ml-4'>
+          <div className='col-2 ms-4'>
             <button className='btn btn-danger p-1' onClick={() => deleteStaticFootnote(index)}>
               Delete
             </button>

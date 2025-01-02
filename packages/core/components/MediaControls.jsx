@@ -137,7 +137,7 @@ const handleTheme = state => {
 
 // Download CSV
 const Button = ({ state, text, type, title, elementToCapture }) => {
-  const buttonClasses = ['btn', 'btn-download', `${handleTheme(state)}`]
+  const buttonClasses = ['btn', 'btn-primary']
   return (
     <button
       className={buttonClasses.join(' ')}

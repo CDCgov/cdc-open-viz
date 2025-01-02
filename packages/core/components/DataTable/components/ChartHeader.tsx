@@ -5,9 +5,9 @@ import ScreenReaderText from '@cdc/core/components/elements/ScreenReaderText'
 import { SortIcon } from './SortIcon'
 import { getNewSortBy } from '../helpers/getNewSortBy'
 
-type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; hasRowType? }
+type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; hasRowType?; viewport }
 
-const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }: ChartHeaderProps) => {
+const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType, viewport }: ChartHeaderProps) => {
   const groupBy = config.table?.groupBy
   if (!data) return
   let dataSeriesColumns = getDataSeriesColumns(config, isVertical, data)
@@ -69,6 +69,7 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }
           const text = getSeriesName(column, config)
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
+
           return (
             <th
               style={{ minWidth: (config.table.cellMinWidth || 0) + 'px' }}

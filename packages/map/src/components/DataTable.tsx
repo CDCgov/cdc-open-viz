@@ -10,6 +10,7 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 
 import Loading from '@cdc/core/components/Loading'
+import { navigationHandler } from '../helpers/navigationHandler'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
@@ -26,7 +27,6 @@ const DataTable = props => {
     displayDataAsText,
     applyLegendToRow,
     displayGeoName,
-    navigationHandler,
     viewport,
     formatLegendLocation,
     tabbingId,
@@ -192,7 +192,7 @@ const DataTable = props => {
 
   const TableMediaControls = ({ belowTable }) => {
     return (
-      <MediaControls.Section classes={['download-links'] + (belowTable ? 'below-table' : '')}>
+      <MediaControls.Section classes={['download-links']}>
         <MediaControls.Link config={state} />
         {state.general.showDownloadButton && <DownloadButton />}
       </MediaControls.Section>
@@ -345,7 +345,7 @@ const DataTable = props => {
                             </>
                           )
                         } else {
-                          cellValue = displayDataAsText(runtimeData[row][state.columns[column].name], column)
+                          cellValue = displayDataAsText(runtimeData[row][state.columns[column].name], column, state)
                         }
 
                         return (

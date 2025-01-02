@@ -12,6 +12,9 @@ import BubbleList from '../BubbleList'
 import ConfigContext from '../../context'
 import ZoomControls from '../ZoomControls'
 import { getGeoFillColor, getGeoStrokeColor } from '../../helpers/colors'
+import { supportedCountries } from '../../data/supported-geos'
+import { handleMapAriaLabels } from '../../helpers/handleMapAriaLabels'
+import { titleCase } from '../../helpers/titleCase'
 
 const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 
@@ -26,7 +29,6 @@ const WorldMap = () => {
     displayGeoName,
     generateRuntimeData,
     geoClickHandler,
-    handleMapAriaLabels,
     hasZoom,
     position,
     setFilteredCountryCode,
@@ -34,11 +36,7 @@ const WorldMap = () => {
     setRuntimeData,
     setState,
     state,
-    supportedCountries,
-    titleCase,
     tooltipId,
-    setScale,
-    setTranslate
   } = useContext(ConfigContext)
 
   // TODO Refactor - state should be set together here to avoid rerenders

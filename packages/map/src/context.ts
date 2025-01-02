@@ -4,17 +4,13 @@ import { MapConfig } from './types/MapConfig'
 type MapContext = {
   applyLegendToRow
   applyTooltipsToGeo
-  closeModal
-  columnsInData
   currentViewport
   data
-  displayDataAsText
   displayGeoName
   filteredCountryCode
   generateColorsArray
   generateRuntimeData
   geoClickHandler
-  handleMapAriaLabels
   handleCircleClick: Function
   hasZoom
   innerContainerRef
@@ -22,7 +18,6 @@ type MapContext = {
   isDebug
   isEditor
   loadConfig
-  navigationHandler
   position
   resetLegendToggles
   runtimeFilters
@@ -37,11 +32,6 @@ type MapContext = {
   setSharedFilterValue
   setState
   state: MapConfig
-  supportedCities
-  supportedCounties
-  supportedCountries
-  supportedTerritories
-  titleCase
   tooltipId: string
   viewport
 }
