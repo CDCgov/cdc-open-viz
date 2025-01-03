@@ -10,14 +10,50 @@ const buttonText = {
   link: 'Link to Dataset'
 }
 
-function saveImage(element) {
+const saveImage = (element, widthInInches) => {
+  const ppi = 300
+  const aspectRatio = 16 / 9
+  const widthInPixels = widthInInches * ppi
+  const heightInPixels = widthInPixels / aspectRatio
+
+  const scale = widthInPixels / element.offsetWidth
+
+  const options = {
+    width: widthInPixels,
+    height: heightInPixels,
+    style: {
+      transform: `scale(${scale})`,
+      transformOrigin: 'top left',
+      width: `${element.offsetWidth}px`,
+      height: `${element.offsetHeight}px`
+    }
+  }
+
   domtoimage
-    .toPng(element)
+    .toPng(element, options)
     .then(dataUrl => {
-      const link = document.createElement('a')
-      link.href = dataUrl
-      link.download = 'screenshot.png'
-      link.click()
+      const img = new Image()
+      img.src = dataUrl
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = widthInPixels
+        canvas.height = heightInPixels
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, widthInPixels, heightInPixels)
+
+        canvas.toBlob(
+          blob => {
+            const url = URL.createObjectURL(blob)
+            const link = document.createElement('a')
+            link.href = url
+            link.download = 'screenshot.png'
+            link.click()
+            URL.revokeObjectURL(url)
+          },
+          'image/png',
+          1
+        )
+      }
     })
     .catch(error => {
       console.error('Failed to capture image:', error)
@@ -96,9 +132,10 @@ const generateMedia = (state, type, elementToCapture) => {
           el.className?.indexOf && el.className.search(/download-buttons|download-links|data-table-container/) !== -1
       }).then(canvas => {
         if (state.visualizationType === 'Scatter Plot') {
-          saveImage(baseSvg)
+          saveImage(baseSvg, 13.3333, 8.5)
         } else {
-          saveImageAs(canvas.toDataURL(), filename + '.png')
+          saveImage(baseSvg, 13.3333, 8.5)
+          // saveImageAs(canvas.toDataURL(), filename + '.png')
         }
       })
       return
