@@ -11,6 +11,7 @@ import SkipTo from '@cdc/core/components/elements/SkipTo'
 
 import Loading from '@cdc/core/components/Loading'
 import { navigationHandler } from '../helpers/navigationHandler'
+import useResizeObserver from '../hooks/useResizeObserver'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
@@ -27,7 +28,6 @@ const DataTable = props => {
     displayDataAsText,
     applyLegendToRow,
     displayGeoName,
-    viewport,
     formatLegendLocation,
     tabbingId,
     setFilteredCountryCode
@@ -35,9 +35,8 @@ const DataTable = props => {
 
   const [expanded, setExpanded] = useState(expandDataTable)
   const [sortBy, setSortBy] = useState({ column: 'geo', asc: false })
-
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
-
+  const { currentViewport: viewport } = useResizeObserver(false)
   const fileName = `${mapTitle || 'data-table'}.csv`
 
   // Catch all sorting method used on load by default but also on user click

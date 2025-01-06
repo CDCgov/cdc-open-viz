@@ -1,57 +1,29 @@
-import { useContext, useState, useEffect, useRef } from 'react'
-
-// helpers
-import { applyBandScaleOffset, handleConnectionHorizontalType, handleConnectionVerticalType, createPoints } from '@cdc/chart/src/components/Annotations/components/helpers'
+import { useContext, useState, useRef } from 'react'
 
 // visx
-import { HtmlLabel, CircleSubject, LineSubject, EditableAnnotation, Connector, Annotation as VisxAnnotation } from '@visx/annotation'
+import { HtmlLabel, CircleSubject, EditableAnnotation, Connector, Annotation as VisxAnnotation } from '@visx/annotation'
 import { Drag, raise } from '@visx/drag'
 import { MarkerArrow } from '@visx/marker'
-import { LinePath } from '@visx/shape'
-import * as allCurves from '@visx/curve'
-import { Annotation } from '@cdc/core/types/Annotation'
 
 // styles
 import './Annotation.Draggable.styles.css'
 import ConfigContext from '../../context'
 import { MapContext } from '../../types/MapContext'
+import useResizeObserver from '../../hooks/useResizeObserver'
 
 const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
   const [draggingItems, setDraggingItems] = useState([])
-  const { state: config, dimensions, setState: updateConfig, isEditor, isDraggingAnnotation } = useContext<MapContext>(ConfigContext)
+  const {
+    state: config,
+    setState: updateConfig,
+    isDraggingAnnotation,
+    isEditor
+  } = useContext<MapContext>(ConfigContext)
+  const { dimensions } = useResizeObserver(isEditor)
   const [width, height] = dimensions
   const { annotations } = config
-  // const { colorScale } = useColorScale()
   const prevDimensions = useRef(dimensions)
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
-
-  const handleMobileXPosition = annotation => {
-    if (annotation.snapToNearestPoint) {
-      return Number(annotation.dx) + xScale(annotation.xKey) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size)
-    }
-    return Number(annotation.x) + Number(annotation.dx)
-  }
-
-  const handleMobileYPosition = annotation => {
-    if (annotation.snapToNearestPoint) {
-      return yScale(annotation.yKey) + Number(annotation.dy)
-    }
-    return Number(annotation.dy) + Number(annotation.y)
-  }
-
-  const handleTextX = annotation => {
-    if (annotation.snapToNearestPoint) {
-      return Number(annotation.dx) + Number(xScale(annotation.xKey)) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size) - 16 / 3
-    }
-    return Number(annotation.dx) + Number(annotation.x) - 16 / 3
-  }
-
-  const handleTextY = annotation => {
-    if (annotation.snapToNearestPoint) {
-      return yScale(annotation.yKey) + Number(annotation.dy) + 5
-    }
-    return Number(annotation.y) + Number(annotation.dy) + 16 / 3
-  }
 
   return (
     annotations &&
@@ -118,7 +90,9 @@ const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
                         style={{
                           padding: '10px',
                           borderRadius: 5, // Optional: set border radius
-                          backgroundColor: `rgba(255, 255, 255, ${annotation?.opacity ? Number(annotation?.opacity) / 100 : 1})`
+                          backgroundColor: `rgba(255, 255, 255, ${
+                            annotation?.opacity ? Number(annotation?.opacity) / 100 : 1
+                          })`
                         }}
                         role='presentation'
                         // ! IMPORTANT: Workaround for 508
@@ -131,13 +105,31 @@ const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
                       />
                     </HtmlLabel>
 
-                    {annotation.connectionType === 'line' && <Connector type='line' pathProps={{ markerStart: 'url(#marker-start)' }} />}
+                    {annotation.connectionType === 'line' && (
+                      <Connector type='line' pathProps={{ markerStart: 'url(#marker-start)' }} />
+                    )}
 
-                    {annotation.connectionType === 'elbow' && <Connector type='elbow' pathProps={{ markerStart: 'url(#marker-start)' }} />}
+                    {annotation.connectionType === 'elbow' && (
+                      <Connector type='elbow' pathProps={{ markerStart: 'url(#marker-start)' }} />
+                    )}
 
                     {/* MARKERS */}
-                    {annotation.marker === 'circle' && <CircleSubject className='circle-subject' stroke={'black'} radius={8} />}
-                    {annotation.marker === 'arrow' && <MarkerArrow fill='black' id='marker-start' x={annotation.x} y={annotation.dy} stroke='#333' markerWidth={10} size={10} strokeWidth={1} orient='auto-start-reverse' />}
+                    {annotation.marker === 'circle' && (
+                      <CircleSubject className='circle-subject' stroke={'black'} radius={8} />
+                    )}
+                    {annotation.marker === 'arrow' && (
+                      <MarkerArrow
+                        fill='black'
+                        id='marker-start'
+                        x={annotation.x}
+                        y={annotation.dy}
+                        stroke='#333'
+                        markerWidth={10}
+                        size={10}
+                        strokeWidth={1}
+                        orient='auto-start-reverse'
+                      />
+                    )}
                   </AnnotationComponent>
                 </>
               )

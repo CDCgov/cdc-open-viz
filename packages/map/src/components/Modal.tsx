@@ -2,13 +2,15 @@ import { useContext } from 'react'
 import LegendShape from '@cdc/core/components/LegendShape'
 import ConfigContext from '../context'
 import Icon from '@cdc/core/components/ui/Icon'
+import useResizeObserver from '../hooks/useResizeObserver'
 
 const Modal = () => {
-  const { applyTooltipsToGeo, applyLegendToRow, viewport, content, state } = useContext(ConfigContext)
+  const { applyTooltipsToGeo, applyLegendToRow, content, state } = useContext(ConfigContext)
   const { capitalizeLabels } = state.tooltips
   const tooltip = applyTooltipsToGeo(content.geoName, content.keyedData, 'jsx')
   const type = state.general.type
   const legendColors = applyLegendToRow(content.keyedData)
+  const { currentViewport: viewport } = useResizeObserver(false)
 
   return (
     <section
