@@ -13,7 +13,7 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
 
   const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
   const boxWidth = xScale.bandwidth()
-  const defaultColor = '#777772'
+  const defaultColor = '#1d1c1f'
   const constrainedWidth = Math.min(40, boxWidth)
   const color_0 = _.get(colorPalettesChart, [config.palette, 0], '#000')
   return (
@@ -53,6 +53,7 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                             cx={seriesScale(item.dataKey) + seriesScale.bandwidth() / 2}
                             cy={yScale(value)}
                             r={radius}
+                            opacity={fillOpacity}
                             fill={defaultColor}
                             style={{ stroke: defaultColor }}
                             key={`boxplot-${i}--circle-${index}`}
@@ -73,17 +74,19 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                         boxWidth={seriesScale.bandwidth()}
                         fill={colorScale(item.dataKey)}
                         fillOpacity={1}
-                        stroke={fillOpacity ? defaultColor : 'rgba(0,0,0,0.1)'}
+                        stroke={defaultColor}
                         valueScale={yScale}
                         outliers={boxplot.plotOutlierValues ? _.map(d.columnOutliers[item.dataKey], item => item) : []}
                         outlierProps={{
                           style: {
                             fill: defaultColor,
+                            opacity: fillOpacity,
                             stroke: defaultColor
                           }
                         }}
                         medianProps={{
                           style: {
+                            opacity: fillOpacity,
                             stroke: defaultColor
                           }
                         }}
@@ -96,6 +99,8 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                         }}
                         maxProps={{
                           style: {
+                            opacity: fillOpacity,
+
                             stroke: defaultColor
                           }
                         }}
