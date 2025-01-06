@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef, useCallback, useId } from 'react'
 import * as d3 from 'd3'
 import _ from 'lodash'
 import 'whatwg-fetch'
-import ResizeObserver from 'resize-observer-polyfill'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
@@ -20,8 +19,6 @@ import Waiting from '@cdc/core/components/Waiting'
 
 // types
 import { type Coordinate, type MapConfig } from './types/MapConfig'
-import { type ViewPort } from '@cdc/core/types/ViewPort'
-import { type DimensionsType } from '@cdc/core/types/Dimensions'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
@@ -48,7 +45,6 @@ import './scss/btn.scss'
 // Core Helpers
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import getViewport from '@cdc/core/helpers/getViewport'
 import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
@@ -67,6 +63,7 @@ import { hashObj } from './helpers/hashObj'
 import { navigationHandler } from './helpers/navigationHandler'
 import { validateFipsCodeLength } from './helpers/validateFipsCodeLength'
 import { titleCase } from './helpers/titleCase'
+import { indexOfIgnoreType } from './helpers/indexOfIgnoreType'
 
 // Child Components
 import Annotation from './components/Annotation'
@@ -81,6 +78,7 @@ import WorldMap from './components/WorldMap'
 
 // Hooks
 import useTooltip from './hooks/useTooltip'
+import useResizeObserver from './hooks/useResizeObserver'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -89,15 +87,6 @@ const regionKeys = Object.keys(supportedRegions)
 const countryKeys = Object.keys(supportedCountries)
 const countyKeys = Object.keys(supportedCounties)
 const cityKeys = Object.keys(supportedCities)
-
-const indexOfIgnoreType = (arr, item) => {
-  for (let i = 0; i < arr.length; i++) {
-    if (item === arr[i]) {
-      return i
-    }
-  }
-  return -1
-}
 
 const CdcMap = ({
   config,
@@ -119,7 +108,6 @@ const CdcMap = ({
   const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [loading, setLoading] = useState(true)
   const [displayPanel, setDisplayPanel] = useState(true)
-  const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
   const [topoData, setTopoData] = useState<{}>({})
   const [runtimeFilters, setRuntimeFilters] = useState([])
   const [runtimeLegend, setRuntimeLegend] = useState([])
@@ -132,9 +120,9 @@ const CdcMap = ({
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
   const [container, setContainer] = useState()
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
-  const [dimensions, setDimensions] = useState<DimensionsType>([0, 0])
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
   const [projection, setProjection] = useState(null)
+  const { currentViewport, resizeObserver, dimensions } = useResizeObserver(isEditor)
 
   const legendRef = useRef(null)
   const tooltipRef = useRef(null)
@@ -226,22 +214,6 @@ const CdcMap = ({
       setPosition(state.mapPosition)
     }
   }, [state.mapPosition, setPosition])
-
-  const resizeObserver = new ResizeObserver(entries => {
-    for (let entry of entries) {
-      let { width, height } = entry.contentRect
-      let newViewport = getViewport(entry.contentRect.width)
-
-      let editorWidth = 350
-
-      setCurrentViewport(newViewport)
-
-      if (isEditor) {
-        width = width - editorWidth
-      }
-      setDimensions([width, height])
-    }
-  })
 
   // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
   // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
@@ -1324,12 +1296,6 @@ const CdcMap = ({
     }
   }, [state]) // eslint-disable-line
 
-  // When geo label override changes
-  // - redo the tooltips
-  useEffect(() => {
-    applyTooltipsToGeo()
-  }, [state.general.geoLabelOverride]) // eslint-disable-line
-
   useEffect(() => {
     // UID
     if (state.data && state.columns.geo.name && state.columns.geo.name !== state.data.fromColumn) {
@@ -1452,9 +1418,7 @@ const CdcMap = ({
     applyTooltipsToGeo,
     container,
     content: modal,
-    currentViewport,
     data: runtimeData,
-    dimensions,
     displayGeoName,
     filteredCountryCode,
     generateColorsArray,
@@ -1482,7 +1446,6 @@ const CdcMap = ({
     setSharedFilterValue,
     setState,
     state,
-    viewport: currentViewport,
     tooltipId,
     tooltipRef,
     topoData,

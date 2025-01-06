@@ -4,9 +4,11 @@ import './AnnotationDropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
 import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
 import AnnotationList from './AnnotationList'
+import useResizeObserver from '../../hooks/useResizeObserver'
 
 const AnnotationDropdown = () => {
-  const { currentViewport: viewport, state: config } = useContext(ConfigContext)
+  const { state: config, isEditor } = useContext(ConfigContext)
+  const { currentViewport: viewport } = useResizeObserver(isEditor)
   const [expanded, setExpanded] = useState(false)
 
   const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${appFontSize}px`
