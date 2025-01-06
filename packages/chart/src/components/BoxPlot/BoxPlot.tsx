@@ -13,9 +13,9 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
 
   const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
   const boxWidth = xScale.bandwidth()
+  const defaultColor = '#777772'
   const constrainedWidth = Math.min(40, boxWidth)
   const color_0 = _.get(colorPalettesChart, [config.palette, 0], '#000')
-
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group left={Number(config.yAxis.size)} className='boxplot' key={`boxplot-group`}>
@@ -53,8 +53,8 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                             cx={seriesScale(item.dataKey) + seriesScale.bandwidth() / 2}
                             cy={yScale(value)}
                             r={radius}
-                            fill={'#ccc'}
-                            style={{ opacity: fillOpacity, fillOpacity: 1, stroke: 'black' }}
+                            fill={defaultColor}
+                            style={{ stroke: defaultColor }}
                             key={`boxplot-${i}--circle-${index}`}
                           />
                         )
@@ -72,33 +72,31 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                         median={median}
                         boxWidth={seriesScale.bandwidth()}
                         fill={colorScale(item.dataKey)}
-                        fillOpacity={fillOpacity}
-                        stroke={fillOpacity ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.1)'}
+                        fillOpacity={1}
+                        stroke={fillOpacity ? defaultColor : 'rgba(0,0,0,0.1)'}
                         valueScale={yScale}
-                        outliers={boxplot.plotOutlierValues ? d.columnOutliers : []}
+                        outliers={boxplot.plotOutlierValues ? _.map(d.columnOutliers[item.dataKey], item => item) : []}
                         outlierProps={{
                           style: {
-                            fill: `${color_0}`,
-                            opacity: fillOpacity
+                            fill: defaultColor,
+                            stroke: defaultColor
                           }
                         }}
                         medianProps={{
                           style: {
-                            stroke: 'black',
-                            opacity: fillOpacity
+                            stroke: defaultColor
                           }
                         }}
                         boxProps={{
                           style: {
-                            stroke: 'black',
-                            strokeWidth: boxplot.borders === 'true' ? 1 : 0,
+                            stroke: defaultColor,
+                            strokeWidth: boxplot.borders === 'true' ? 1.5 : 0,
                             opacity: fillOpacity
                           }
                         }}
                         maxProps={{
                           style: {
-                            stroke: 'black',
-                            opacity: fillOpacity
+                            stroke: defaultColor
                           }
                         }}
                         container
