@@ -1711,16 +1711,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                 }
               />
               {'us' === state.general.geoType && (
-                <TextField
-                  value={general.territoriesLabel}
-                  updateField={updateField}
-                  section='general'
-                  fieldName='territoriesLabel'
-                  label='Territories Label'
-                  placeholder='Territories'
-                />
-              )}
-              {'us' === state.general.geoType && (
                 <label className='checkbox'>
                   <input
                     type='checkbox'
