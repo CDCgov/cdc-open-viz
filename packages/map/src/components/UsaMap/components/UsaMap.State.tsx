@@ -27,6 +27,7 @@ import { checkColorContrast, getContrastColor } from '@cdc/core/helpers/cove/acc
 import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { titleCase } from '../../../helpers/titleCase'
+import TerritoriesSection from './TerritoriesSection'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -586,22 +587,7 @@ const UsaMap = () => {
         {annotations.length > 0 && <Annotation.Draggable onDragStateChange={handleDragStateChange} />}
       </svg>
 
-      {territories.length > 0 && (
-        <>
-          {/* Temporarily make the max width fit the image width */}
-          <div>
-            <div className='d-flex mt-2'>
-              <h5>{general.territoriesLabel}</h5>
-              {'data' === general.type && logo && (
-                <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
-              )}
-            </div>
-            <div>
-              <span className='mt-1 mb-2 d-flex flex-wrap territories'>{territories}</span>
-            </div>
-          </div>
-        </>
-      )}
+      <TerritoriesSection territories={territories} logo={logo} config={state} />
     </ErrorBoundary>
   )
 }
