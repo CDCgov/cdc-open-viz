@@ -6,9 +6,9 @@ import { Line } from '@visx/shape'
 const ShapeComponent = ({ fill, size, left, top, display, index }) => {
   const glyphs = {
     0: GlyphCircle,
-    1: GlyphDiamond,
-    2: GlyphSquare,
-    3: GlyphTriangle,
+    1: GlyphSquare,
+    2: GlyphTriangle,
+    3: GlyphDiamond,
     4: GlyphTriangle
   }
 

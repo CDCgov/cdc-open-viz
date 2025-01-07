@@ -22,6 +22,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 // Types
 import { type ChartContext } from '../../types/ChartContext'
 import { type LineChartProps } from './LineChartProps'
+import LineChartShape from './components/LineChartShape'
 
 const LineChart = (props: LineChartProps) => {
   // prettier-ignore
@@ -132,7 +133,7 @@ const LineChart = (props: LineChartProps) => {
                         </Text>
                       )}
 
-                      {lineDatapointStyle === 'always show' && (
+                      {lineDatapointStyle === 'always show' && config.visual.lineDatapointSymbol === 'none' && (
                         <LineChartCircle
                           mode='ALWAYS_SHOW_POINTS'
                           dataIndex={dataIndex}
@@ -173,12 +174,32 @@ const LineChart = (props: LineChartProps) => {
                         seriesAxis={seriesAxis}
                         key={`isolated-circle-${dataIndex}`}
                       />
+
+                      {config.visual.lineDatapointSymbol === 'standard' && (
+                        <LineChartShape
+                          tableData={tableData}
+                          dataIndex={index}
+                          d={d}
+                          circleData={circleData}
+                          data={_data}
+                          config={config}
+                          seriesKey={seriesKey}
+                          displayArea={displayArea}
+                          tooltipData={tooltipData}
+                          xScale={xScale}
+                          yScale={yScale}
+                          colorScale={colorScale}
+                          parseDate={parseDate}
+                          yScaleRight={yScaleRight}
+                          seriesAxis={seriesAxis}
+                        />
+                      )}
                     </React.Fragment>
                   )
                 )
               })}
               <>
-                {lineDatapointStyle === 'hover' && (
+                {lineDatapointStyle === 'hover' && config.visual.lineDatapointSymbol === 'none' && (
                   <LineChartCircle
                     tableData={tableData}
                     dataIndex={0}
@@ -198,6 +219,7 @@ const LineChart = (props: LineChartProps) => {
                   />
                 )}
               </>
+
               {/* SPLIT LINE */}
               {isSplitLine ? (
                 <>

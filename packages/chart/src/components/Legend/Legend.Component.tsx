@@ -140,7 +140,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                         <>
                           {config.visualizationType === 'Line' && config.legend.style === 'lines' ? (
                             <React.Fragment>
-                              <LegendLineShape index={i} label={label} colorScale={colorScale} config={config} />
+                              <LegendLineShape index={i} label={label} config={config} />
                             </React.Fragment>
                           ) : (
                             <>
