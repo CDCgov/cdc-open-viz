@@ -1,10 +1,12 @@
 import { FC, useEffect, useState } from 'react'
 import CdcChart from './CdcChartComponent'
-import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import defaults from './data/initial-state'
 import _ from 'lodash'
 import { ChartConfig } from './types/ChartConfig'
 import Loading from '@cdc/core/components/Loading'
+import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
+import { isSolrJson, isSolrCsv } from '@cdc/core/helpers/isSolr.js'
+import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 interface Props {
   configUrl: string
   isEditor: boolean
@@ -33,12 +35,39 @@ const CdcChartWrapper: FC<Props> = props => {
     let data = _.get(response, 'data', [])
     // Check for URL filters
     const hasUrlFilters = _.some(_.get(response, 'filters', []), { type: 'url' })
-    try {
-      if (response.dataUrl && !hasUrlFilters) {
-        data = await fetchRemoteData(response.dataUrl)
+    if (response.dataUrl && !hasUrlFilters) {
+      try {
+        const ext = getFileExtension(response.dataUrl)
+        if ('csv' === ext || isSolrCsv(response.dataUrl)) {
+          data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
+            .then(response => response.text())
+            .then(responseText => {
+              // for every comma NOT inside quotes, replace with a pipe delimiter
+              // - this will let commas inside the quotes not be parsed as a new column
+              // - Limitation: if a delimiter other than comma is used in the csv this will break
+              // Examples of other delimiters that would break: tab
+              responseText = responseText.replace(/(".*?")|,/g, (...m) => m[1] || '|')
+              // now strip the double quotes
+              responseText = responseText.replace(/["]+/g, '')
+              const parsedCsv = Papa.parse(responseText, {
+                //quotes: "true",  // dont need these
+                //quoteChar: "'",  // has no effect that I can tell
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true,
+                delimiter: '|' // we are using pipe symbol as delimiter so setting this explicitly for Papa.parse
+              })
+              return parsedCsv.data
+            })
+        }
+
+        if ('json' === ext || isSolrJson(response.dataUrl)) {
+          data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
+        }
+      } catch {
+        console.error(`COVE: Cannot parse URL: ${response.dataUrl}`) // eslint-disable-line
+        data = []
       }
-    } catch (err) {
-      data = []
     }
 
     return data
