@@ -7,7 +7,7 @@ import chroma from 'chroma-js'
  *
  * !important - DO NOT CHANGE.
  */
-export const WCAG_TEXT_CONTRAST_RATIO = 4.5
+export const WCAG_TEXT_CONTRAST_RATIO = 4.9
 export const WCAG_NON_TEXT_CONTRAST_RATIO = 3.5
 
 export const getContrastColor = (textColor: string, bgColor: string) => {
