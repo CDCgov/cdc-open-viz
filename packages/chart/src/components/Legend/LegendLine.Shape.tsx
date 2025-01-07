@@ -40,7 +40,14 @@ const LegendLineShape = props => {
         strokeDasharray={handleLineType(config.series[index]?.type ? config.series[index]?.type : '')}
       />
 
-      <ShapeComponent index={index} display={config.legend.hasShape} left={15} top={3} fill={label.value} size={55} />
+      <ShapeComponent
+        index={index}
+        display={config.legend.hasShape && index !== 5}
+        left={15}
+        top={3}
+        fill={label.value}
+        size={55}
+      />
     </svg>
   )
 }

@@ -123,7 +123,7 @@ const LineChartShape = (props: LineChartShapeProps) => {
 
       return (
         <ShapeComponent
-          display={true}
+          display={config.visual.lineDatapointSymbol === 'standard' && dataIndex !== 5}
           left={getXPos(hoveredXValue)}
           top={hoveredSeriesAxis === 'right' ? yScaleRight(hoveredSeriesValue) : yScale(hoveredSeriesValue)}
           size={45}
@@ -139,7 +139,7 @@ const LineChartShape = (props: LineChartShapeProps) => {
   if (config.lineDatapointStyle === 'always show') {
     return (
       <ShapeComponent
-        display={config.visual.lineDatapointSymbol === 'standard'}
+        display={config.visual.lineDatapointSymbol === 'standard' && dataIndex !== 5}
         left={cx}
         top={cy}
         size={45}
