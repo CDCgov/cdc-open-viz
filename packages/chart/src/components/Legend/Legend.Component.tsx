@@ -1,13 +1,11 @@
 import parse from 'html-react-parser'
+import React from 'react'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendShape from '@cdc/core/components/LegendShape'
 import Button from '@cdc/core/components/elements/Button'
 import { getLegendClasses } from './helpers/getLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
-import { handleLineType } from '../../helpers/handleLineType'
-
 import { getMarginTop, getGradientConfig, getMarginBottom } from './helpers/index'
-import { Line } from '@visx/shape'
 import { Label } from '../../types/Label'
 import { ChartConfig, ViewportSize } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
@@ -16,6 +14,7 @@ import LegendSuppression from './Legend.Suppression'
 import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
+import LegendLineShape from './LegendLine.Shape'
 
 const LEGEND_PADDING = 36
 
@@ -140,15 +139,9 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       >
                         <>
                           {config.visualizationType === 'Line' && config.legend.style === 'lines' ? (
-                            <svg width={30} height={5} className='me-2'>
-                              <Line
-                                from={{ x: 0, y: 3 }}
-                                to={{ x: 30, y: 3 }}
-                                stroke={label.value}
-                                strokeWidth={2}
-                                strokeDasharray={handleLineType(config.series[i]?.type ? config.series[i]?.type : '')}
-                              />
-                            </svg>
+                            <React.Fragment>
+                              <LegendLineShape index={i} label={label} colorScale={colorScale} config={config} />
+                            </React.Fragment>
                           ) : (
                             <>
                               <LegendShape
@@ -158,7 +151,6 @@ const Legend: React.FC<LegendProps> = forwardRef(
                             </>
                           )}
                         </>
-
                         <LegendLabel align='left' className='m-0'>
                           {label.text}
                         </LegendLabel>

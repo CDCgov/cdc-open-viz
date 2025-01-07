@@ -84,7 +84,7 @@ export type Legend = CoreLegend & {
   hideSuppressionLink: boolean
   style: 'circles' | 'boxes' | 'gradient' | 'lines'
   subStyle: 'linear blocks' | 'smooth'
-  shape: 'circle' | 'square' | 'triangle' | 'diamond' | 'inverted triangle'
+  hasShape: boolean
   tickRotation: string
   hideBorder: {
     side: boolean

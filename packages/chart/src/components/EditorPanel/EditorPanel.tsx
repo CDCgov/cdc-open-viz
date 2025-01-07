@@ -930,10 +930,6 @@ const EditorPanel = () => {
         }
 
         break
-      case 'shapes':
-        if (config.visualizationType === 'Line' || config.visualizationType === 'Combo') {
-          options.push('circle', 'square', 'triangle', 'diamond', 'inverted triangle')
-        }
     }
     return options
   }
@@ -3665,7 +3661,7 @@ const EditorPanel = () => {
                     updateField={updateField}
                     options={getLegendStyleOptions('style')}
                   />
-                  <Select
+                  <CheckBox
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
@@ -3679,13 +3675,12 @@ const EditorPanel = () => {
                         </Tooltip.Content>
                       </Tooltip>
                     }
-                    display={!config.legend.hide}
-                    value={config.legend.shape}
+                    display={!config.legend.hide && config.legend.style === 'lines'}
+                    value={config.legend.hasShape}
                     section='legend'
-                    fieldName='shape'
+                    fieldName='hasShape'
                     label='Shapes'
                     updateField={updateField}
-                    options={getLegendStyleOptions('shapes')}
                   />
 
                   <Select
