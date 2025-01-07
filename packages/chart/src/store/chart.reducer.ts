@@ -1,8 +1,8 @@
 import ChartActions from './chart.actions'
-import { DimensionsType } from '@cdc/core/types/Dimensions'
 import defaults from '../data/initial-state.js'
 import { type ViewportSize } from '../types/ChartConfig'
 export const initialState = {
+  isLoading: true,
   config: defaults,
   stateData: [],
   colorScale: null,
@@ -25,6 +25,8 @@ type State = typeof initialState
 
 export const reducer = (state: State, action: ChartActions) => {
   switch (action.type) {
+    case 'SET_LOADING':
+      return { ...state, isLoading: action.payload }
     case 'SET_CONFIG':
       return { ...state, config: action.payload }
     case 'UPDATE_CONFIG':

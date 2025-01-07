@@ -7,6 +7,7 @@ type Action<T, P = undefined, R = undefined> = {
 
 // Action Types
 type SET_CONFIG = Action<'SET_CONFIG', object>
+type SET_LOADING = Action<'SET_LOADING', boolean>
 type UPDATE_CONFIG = Action<'UPDATE_CONFIG', object>
 type SET_COLOR_SCALE = Action<'SET_COLOR_SCALE', Function>
 type SET_STATE_DATA = Action<'SET_STATE_DATA', object[]>
@@ -33,5 +34,6 @@ type ChartActions =
   | SET_LOADED_EVENT
   | SET_DRAG_ANNOTATIONS
   | SET_BRUSH_CONFIG
+  | SET_LOADING
 
 export default ChartActions

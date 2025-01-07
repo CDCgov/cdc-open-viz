@@ -105,7 +105,6 @@ const CdcChart = ({
 }: CdcChartProps) => {
   const transform = new DataTransform()
 
-  const [loading, setLoading] = useState(true)
   const [state, dispatch] = useReducer(reducer, initialState)
   const {
     config,
@@ -120,7 +119,8 @@ const CdcChart = ({
     coveLoadedEventRan,
     isDraggingAnnotation,
     imageId,
-    brushConfig
+    brushConfig,
+    isLoading
   } = state
   const svgRef = useRef(null)
 
@@ -315,9 +315,7 @@ const CdcChart = ({
     if (newConfig.filters) {
       const filtersWithValues = addValuesToFilters(newConfig.filters, newExcludedData)
       currentData = filterVizData(filtersWithValues, newExcludedData)
-      console.log(currentData, 'currentDatacurrentData')
       setFilteredData(currentData)
-      dispatch({ type: 'SET_FILTERED_DATA', payload: currentData })
     }
 
     if (newConfig.xAxis.type === 'date-time' && config.orientation === 'horizontal') {
@@ -652,7 +650,7 @@ const CdcChart = ({
     if (config && data) {
       const colorScale = getColorScale(state.config, stateData)
       dispatch({ type: 'SET_COLOR_SCALE', payload: colorScale })
-      setLoading(false)
+      dispatch({ type: 'SET_LOADING', payload: false })
     }
   }, [config, data])
 
@@ -1158,7 +1156,7 @@ const CdcChart = ({
     return classes
   }
 
-  if (!loading) {
+  if (!isLoading) {
     const tableLink = (
       <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
         {config.dataKey} (Go to Table)
@@ -1381,7 +1379,6 @@ const CdcChart = ({
   const capitalize = str => {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
-  console.log(filteredData, 'filteredData')
   const contextValues = {
     brushConfig,
     capitalize,
@@ -1416,7 +1413,6 @@ const CdcChart = ({
     legendId,
     legendRef,
     lineOptions,
-    loading,
     missingRequiredSections,
     outerContainerRef,
     parentRef,
