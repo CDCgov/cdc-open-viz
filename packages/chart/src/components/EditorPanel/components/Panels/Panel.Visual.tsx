@@ -165,6 +165,34 @@ const PanelVisual: FC<PanelProps> = props => {
           config.visualizationType === 'Line') && (
           <>
             <Select
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon
+                      display='question'
+                      style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                    />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>
+                      Shapes will display in order circle, square, triangle, diamond, inverted triangle. Use with no
+                      more than 5 datapoints.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+              value={config.visual.lineDatapointSymbol}
+              section='visual'
+              fieldName='lineDatapointSymbol'
+              label='Line Datapoint Symbols'
+              updateField={updateField}
+              options={['None', 'Standard']}
+            />
+            {config.series.length > 5 && config.visual.lineDatapointSymbol === 'Standard' && (
+              <small className='text-danger'>Standard only supports up to 5 data points</small>
+            )}
+
+            <Select
               value={config.lineDatapointStyle}
               fieldName='lineDatapointStyle'
               label='Line Datapoint Style'
