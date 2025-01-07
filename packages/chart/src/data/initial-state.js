@@ -166,7 +166,7 @@ export default {
     seriesHighlight: [],
     style: 'circles',
     subStyle: 'linear blocks',
-    shape: '',
+    shape: 'circle',
     tickRotation: '',
     hideBorder: {
       side: false,
@@ -205,7 +205,7 @@ export default {
     background: true,
     verticalHoverLine: false,
     horizontalHoverLine: false,
-    lineDatapointSymbol: 'None'
+    lineDatapointSymbol: 'none'
   },
   useLogScale: false,
   filterBehavior: 'Filter Change',

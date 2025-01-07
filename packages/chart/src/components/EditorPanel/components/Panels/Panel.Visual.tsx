@@ -186,9 +186,9 @@ const PanelVisual: FC<PanelProps> = props => {
               fieldName='lineDatapointSymbol'
               label='Line Datapoint Symbols'
               updateField={updateField}
-              options={['None', 'Standard']}
+              options={['none', 'standard']}
             />
-            {config.series.length > 5 && config.visual.lineDatapointSymbol === 'Standard' && (
+            {config.series.length > 5 && config.visual.lineDatapointSymbol === 'standard' && (
               <small className='text-danger'>Standard only supports up to 5 data points</small>
             )}
 

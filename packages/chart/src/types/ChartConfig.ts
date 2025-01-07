@@ -100,7 +100,7 @@ type Visual = {
   hideBackgroundColor?: boolean
   verticalHoverLine?: boolean
   horizontalHoverLine?: boolean
-  lineDatapointSymbol: 'None' | 'Standard'
+  lineDatapointSymbol: 'none' | 'standard'
 }
 
 export type AllChartsConfig = {

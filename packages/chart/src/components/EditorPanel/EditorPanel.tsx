@@ -931,7 +931,7 @@ const EditorPanel = () => {
 
         break
       case 'shapes':
-        if (config.visualizationType === 'Line') {
+        if (config.visualizationType === 'Line' || config.visualizationType === 'Combo') {
           options.push('circle', 'square', 'triangle', 'diamond', 'inverted triangle')
         }
     }
