@@ -3,7 +3,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import * as d3 from 'd3'
 import { Text } from '@visx/text'
-import { ChartdDispatchContext } from '../ConfigContext'
+import { ChartDispatchContext } from '../ConfigContext'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import _ from 'lodash'
 
@@ -15,7 +15,7 @@ interface BrushChartProps {
 const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
   const { tableData, config, setBrushConfig, dashboardConfig, formatDate, parseDate, brushConfig } =
     useContext(ConfigContext)
-  const dispatch = useContext(ChartdDispatchContext)
+  const dispatch = useContext(ChartDispatchContext)
   const [brushState, setBrushState] = useState({ isBrushing: false, selection: [] })
   const [brushKey, setBrushKey] = useState(0)
   const sharedFilters = dashboardConfig?.dashboard?.sharedFilters ?? []

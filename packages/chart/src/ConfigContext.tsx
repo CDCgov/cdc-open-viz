@@ -5,7 +5,7 @@ import ChartActions from './store/chart.actions'
 import { initialState } from './store/chart.reducer'
 
 // export const ConfigContext = createContext(initialState)
-export const ChartdDispatchContext = createContext<Dispatch<ChartActions>>(() => {})
+export const ChartDispatchContext = createContext<Dispatch<ChartActions>>(() => {})
 
 const ConfigContext = createContext({} as ChartContext)
 

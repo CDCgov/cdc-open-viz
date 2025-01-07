@@ -62,7 +62,7 @@ import type { TableConfig } from '@cdc/core/components/DataTable/types/TableConf
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import Title from '@cdc/core/components/ui/Title'
 import { AllChartsConfig, ChartConfig } from './types/ChartConfig'
-import { ChartdDispatchContext } from './ConfigContext'
+import { ChartDispatchContext } from './ConfigContext'
 import { Label } from './types/Label'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
@@ -1440,7 +1440,7 @@ const CdcChart = ({
 
   return (
     <ConfigContext.Provider value={contextValues}>
-      <ChartdDispatchContext.Provider value={dispatch}>
+      <ChartDispatchContext.Provider value={dispatch}>
         <Layout.VisualizationWrapper
           config={config}
           isEditor={isEditor}
@@ -1451,7 +1451,7 @@ const CdcChart = ({
         >
           {body}
         </Layout.VisualizationWrapper>
-      </ChartdDispatchContext.Provider>
+      </ChartDispatchContext.Provider>
     </ConfigContext.Provider>
   )
 }
