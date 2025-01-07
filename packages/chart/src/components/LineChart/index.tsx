@@ -22,7 +22,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 // Types
 import { type ChartContext } from '../../types/ChartContext'
 import { type LineChartProps } from './LineChartProps'
-import LineChartShape from './components/LineChartShape'
+import LineChartShape from './components/LineChart.Shape'
 
 const LineChart = (props: LineChartProps) => {
   // prettier-ignore
