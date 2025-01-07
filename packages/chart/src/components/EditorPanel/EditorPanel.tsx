@@ -906,7 +906,7 @@ const EditorPanel = () => {
     return Object.keys(columns)
   }
 
-  const getLegendStyleOptions = (option: 'style' | 'subStyle'): string[] => {
+  const getLegendStyleOptions = (option: 'style' | 'subStyle' | 'shapes'): string[] => {
     const options: string[] = []
 
     switch (option) {
@@ -930,6 +930,10 @@ const EditorPanel = () => {
         }
 
         break
+      case 'shapes':
+        if (config.visualizationType === 'Line') {
+          options.push('circle', 'square', 'triangle', 'diamond', 'inverted triangle')
+        }
     }
     return options
   }
@@ -3660,6 +3664,28 @@ const EditorPanel = () => {
                     label='Legend Style'
                     updateField={updateField}
                     options={getLegendStyleOptions('style')}
+                  />
+                  <Select
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display='question'
+                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Choose option Shapes in Line Datapoint Symbols to display.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    display={!config.legend.hide}
+                    value={config.legend.shape}
+                    section='legend'
+                    fieldName='shape'
+                    label='Shapes'
+                    updateField={updateField}
+                    options={getLegendStyleOptions('shapes')}
                   />
 
                   <Select
