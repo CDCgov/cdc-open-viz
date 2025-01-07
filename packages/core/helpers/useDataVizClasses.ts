@@ -1,7 +1,7 @@
 import useResizeObserver from '@cdc/map/src/hooks/useResizeObserver'
 import { isBelowBreakpoint } from './viewports'
 
-export default function useDataVizClasses(config) {
+export default function useDataVizClasses(config, viewport = null) {
   const {
     legend,
     lineDatapointStyle,
@@ -14,8 +14,6 @@ export default function useDataVizClasses(config) {
     visual,
     shadow
   } = config
-
-  const { currentViewport: viewport } = useResizeObserver(false)
 
   let lineDatapointClass = ''
 

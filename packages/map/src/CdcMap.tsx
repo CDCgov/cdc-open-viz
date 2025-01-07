@@ -118,11 +118,10 @@ const CdcMap = ({
   const [filteredCountryCode, setFilteredCountryCode] = useState()
   const [position, setPosition] = useState(state.mapPosition)
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
-  const [container, setContainer] = useState()
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
   const [projection, setProjection] = useState(null)
-  const { currentViewport, resizeObserver, dimensions } = useResizeObserver(isEditor)
+  const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
 
   const legendRef = useRef(null)
   const tooltipRef = useRef(null)
@@ -933,12 +932,6 @@ const CdcMap = ({
     }
   })
 
-  const outerContainerRef = useCallback(node => {
-    if (node !== null) {
-      resizeObserver.observe(node)
-    }
-    setContainer(node)
-  }, []) // eslint-disable-line
   const mapSvg = useRef(null)
 
   // this is passed DOWN into the various components
@@ -1450,7 +1443,10 @@ const CdcMap = ({
     tooltipRef,
     topoData,
     setTopoData,
-    mapId
+    mapId,
+    outerContainerRef,
+    dimensions,
+    currentViewport
   }
 
   if (!mapProps.data || !state.data) return <></>

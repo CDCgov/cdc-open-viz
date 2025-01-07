@@ -1,7 +1,7 @@
 import colorPalettes from '@cdc/core/data/colorPalettes'
 import chroma from 'chroma-js'
-import { isOlderVersion } from '@cdc/core/helpers/ver/versionNeedsUpdate'
 import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
+import isOlderVersion from '@cdc/core/helpers/isOlderVersion'
 
 /**
  * applyColorToLegend
@@ -45,7 +45,7 @@ export const applyColorToLegend = (legendIdx: number, config: ChartConfig, resul
 
     // Special Classes (No Data)
     if (result[legendIdx].special) {
-      if (isOlderVersion(config.version, '4.24.11')) {
+      if (isOlderVersion('4.24.11', config.version)) {
         const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
         return specialClassColors[legendIdx]
       } else {
@@ -57,7 +57,7 @@ export const applyColorToLegend = (legendIdx: number, config: ChartConfig, resul
     if (config.color.includes('qualitative')) return mapColorPalette[colorIdx]
 
     // If the current version is newer than 4.24.10, use the color palette
-    if (!isOlderVersion(config.version, '4.24.12')) {
+    if (!isOlderVersion('4.24.12', config.version)) {
       if (config.customColors) return mapColorPalette[legendIdx - specialClasses.length]
     }
 

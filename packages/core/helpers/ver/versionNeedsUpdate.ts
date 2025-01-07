@@ -7,5 +7,3 @@ export default function versionNeedsUpdate(previousVersion: string, currentVersi
   if (currMajor === prevMajor && currMinor === prevMinor && currPatch > prevPatch) return true
   return false
 }
-
-export const isOlderVersion = versionNeedsUpdate
