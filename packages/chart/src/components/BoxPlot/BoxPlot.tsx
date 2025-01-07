@@ -13,7 +13,9 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
 
   const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
   const boxWidth = xScale.bandwidth()
-  const defaultColor = '#1d1c1f'
+
+  const bodyStyles = getComputedStyle(document.body)
+  const defaultColor = bodyStyles.getPropertyValue('--cool-gray-50').trim()
   const constrainedWidth = Math.min(40, boxWidth)
   const color_0 = _.get(colorPalettesChart, [config.palette, 0], '#000')
   return (
