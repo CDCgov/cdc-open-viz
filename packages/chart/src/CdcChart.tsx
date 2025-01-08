@@ -74,6 +74,7 @@ import _ from 'lodash'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { Runtime } from '@cdc/core/types/Runtime'
 import { Pivot } from '@cdc/core/types/Table'
+import getColorScale from './helpers/getColorScale'
 
 interface CdcChartProps {
   configUrl?: string
@@ -732,26 +733,7 @@ const CdcChart = ({
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (stateData && config.xAxis && config.runtime?.seriesKeys) {
-      const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
-        ? config.twoColor.palette
-        : config.palette
-      const allPalettes: Record<string, string[]> = { ...colorPalettes, ...twoColorPalette }
-      let palette = config.customColors || allPalettes[configPalette]
-      let numberOfKeys = config.runtime.seriesKeys.length
-      let newColorScale
-
-      while (numberOfKeys > palette.length) {
-        palette = palette.concat(palette)
-      }
-
-      palette = palette.slice(0, numberOfKeys)
-
-      newColorScale = () =>
-        scaleOrdinal({
-          domain: config.runtime.seriesLabelsAll,
-          range: palette,
-          unknown: null
-        })
+      const newColorScale = getColorScale(config, stateData)
 
       setColorScale(newColorScale)
       setLoading(false)
