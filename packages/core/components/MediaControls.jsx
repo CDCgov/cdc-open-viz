@@ -132,9 +132,9 @@ const generateMedia = (state, type, elementToCapture) => {
           el.className?.indexOf && el.className.search(/download-buttons|download-links|data-table-container/) !== -1
       }).then(canvas => {
         if (state.visualizationType === 'Scatter Plot') {
-          saveImage(baseSvg, 13.3333, 8.5)
+          saveImage(baseSvg, 13.3333, 7.5)
         } else {
-          saveImage(baseSvg, 13.3333, 8.5)
+          saveImage(baseSvg, 13.3333, 7.5)
           // saveImageAs(canvas.toDataURL(), filename + '.png')
         }
       })
