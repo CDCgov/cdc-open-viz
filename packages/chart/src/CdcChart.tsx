@@ -75,6 +75,7 @@ import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { Runtime } from '@cdc/core/types/Runtime'
 import { Pivot } from '@cdc/core/types/Table'
 import getColorScale from './helpers/getColorScale'
+import { handleBoxPlotConfig } from './helpers/handleBoxPlotConfig'
 
 interface CdcChartProps {
   configUrl?: string
@@ -160,6 +161,33 @@ const CdcChart = ({
     return isConvertLineToBarGraph(config.visualizationType, filteredData, config.allowLineToBarGraph)
   }
 
+  const loadConfig = async (configObj: ChartConfig, configUrl: string): Promise<ChartConfig> => {
+    const response = _.cloneDeep(configObj) || (await (await fetch(configUrl)).json())
+
+    return response
+  }
+
+  const prepareConfig = (loadedConfig: ChartConfig, data): ChartConfig => {
+    let newConfig = _.defaultsDeep(loadedConfig, defaults)
+    _.defaultsDeep(newConfig, {
+      table: { showVertical: false }
+    })
+
+    _.set(newConfig, 'table.show', _.get(newConfig, 'table.show', !isDashboard))
+
+    _.forEach(newConfig.series, series => {
+      _.defaults(series, {
+        tooltip: true,
+        axis: 'Left'
+      })
+    })
+
+    if (data) {
+      newConfig.data = data
+    }
+    return { ...coveUpdateWorker(newConfig) }
+  }
+
   const reloadURLData = async () => {
     if (config.dataUrl) {
       const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl, window.location.origin)
@@ -228,10 +256,7 @@ const CdcChart = ({
     }
   }
 
-  const loadConfig = async () => {
-    const response = _.cloneDeep(configObj) || (await (await fetch(configUrl)).json())
-
-    // If data is included through a URL, fetch that and store
+  const loadData = async response => {
     let data: any[] = response.data || []
 
     const urlFilters = response.filters
@@ -281,37 +306,7 @@ const CdcChart = ({
     }
 
     data = handleRankByValue(data, response)
-
-    if (data) {
-      setStateData(data)
-      setExcludedData(data)
-    }
-
-    // force showVertical for data tables false if it does not exist
-    if (response !== undefined && response.table !== undefined) {
-      if (!response.table || !response.table.showVertical) {
-        response.table = response.table || {}
-        response.table.showVertical = false
-      }
-    }
-    let newConfig = { ...defaults, ...response }
-
-    if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
-
-    newConfig.series.forEach(series => {
-      if (series.tooltip === undefined || series.tooltip === null) {
-        series.tooltip = true
-      }
-      if (!series.axis) series.axis = 'Left'
-    })
-
-    if (data) {
-      newConfig.data = data
-    }
-
-    const processedConfig = { ...coveUpdateWorker(newConfig) }
-
-    updateConfig(processedConfig, data)
+    return data
   }
 
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
@@ -439,71 +434,16 @@ const CdcChart = ({
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
-      const combinedData = filteredData || data
-      const groups = _.uniq(_.map(combinedData, newConfig.xAxis.dataKey))
+      const plots = handleBoxPlotConfig(newConfig, stateData)
+      const groups = _.uniqBy(stateData, newConfig.xAxis.dataKey)
+
       const seriesKeys = _.map(newConfig.series, 'dataKey')
-      const plots: any[] = []
 
-      groups.forEach(g => {
-        seriesKeys.forEach(seriesKey => {
-          try {
-            if (!g) throw new Error('No groups resolved in box plots')
-
-            // Start handle operations on combinedData
-            const { count, sortedData } = _.chain(combinedData)
-              // Filter by xAxis data key
-              .filter(item => item[newConfig.xAxis.dataKey] === g)
-              // perform multiple operations on the filtered data
-              .thru(filteredData => ({
-                count: filteredData.length,
-                sortedData: _.map(filteredData, item => Number(item[seriesKey])).sort()
-              }))
-              // get the results from the chain
-              .value()
-
-            // ! - Notice d3.quantile doesn't work here, and we had to take a custom route.
-            const quartiles = getQuartiles(sortedData)
-
-            if (!sortedData) throw new Error('boxplots dont have data yet')
-            if (!plots) throw new Error('boxplots dont have plots yet')
-
-            const q1 = quartiles.q1
-            const q3 = quartiles.q3
-
-            const iqr = q3 - q1
-            const lowerBounds = q1 - 1.5 * iqr
-            const upperBounds = q3 + 1.5 * iqr
-            const filteredData = sortedData.filter(d => d <= upperBounds)
-            const max = d3.max(filteredData)
-            plots.push({
-              columnCategory: g,
-              columnMax: max,
-              columnThirdQuartile: _.round(q3, newConfig.dataFormat.roundTo),
-              columnMedian: Number(d3.median(sortedData)).toFixed(newConfig.dataFormat.roundTo),
-              columnFirstQuartile: _.round(q1, newConfig.dataFormat.roundTo),
-              columnMin: _.min(sortedData),
-              columnCount: count,
-              columnSd: Number(d3.deviation(sortedData)).toFixed(newConfig.dataFormat.roundTo),
-              columnMean: Number(d3.mean(sortedData)).toFixed(newConfig.dataFormat.roundTo),
-              columnIqr: _.round(iqr, newConfig.dataFormat.roundTo),
-              values: sortedData,
-              columnLowerBounds: lowerBounds,
-              columnUpperBounds: upperBounds,
-              columnOutliers: _.filter(sortedData, value => value < lowerBounds || value > upperBounds),
-              columnNonOutliers: _.filter(sortedData, value => value >= lowerBounds && value <= upperBounds)
-            })
-          } catch (e) {
-            console.error('COVE: ', e.message) // eslint-disable-line
-          }
-        })
-      })
-      // Generate a flat list of categories based on seriesKeys and groups
       const categories =
         seriesKeys.length > 1
-          ? _.flatMap(groups, value => _.map(seriesKeys, key => `${_.capitalize(key)} - ${_.capitalize(value)}`))
+          ? groups.flatMap(value => seriesKeys.map(key => `${_.capitalize(key)} - ${_.capitalize(value)}`))
           : groups
-
-      newConfig.boxplot['categories'] = categories
+      newConfig.boxplot['categories'] = categories as string[]
       newConfig.boxplot.plots = plots
     }
 
@@ -646,14 +586,25 @@ const CdcChart = ({
     setContainer(node)
   }, []) // eslint-disable-line
 
-  const isEmpty = obj => {
-    return Object.keys(obj).length === 0
-  }
-
   // Load data when component first mounts
   useEffect(() => {
-    loadConfig()
-  }, [configObj?.data?.length ? configObj.data : null]) // eslint-disable-line
+    const load = async () => {
+      try {
+        const loadedConfig = await loadConfig(configObj, configUrl)
+        const data = await loadData(loadedConfig)
+        if (data && loadedConfig) {
+          const preparedConfig = await prepareConfig(loadedConfig, data)
+          setStateData(data)
+          setExcludedData(data)
+          updateConfig(preparedConfig, data)
+        }
+      } catch (err) {
+        console.error('Could not Load!')
+      }
+    }
+
+    load()
+  }, [])
 
   useEffect(() => {
     reloadURLData()
@@ -663,7 +614,7 @@ const CdcChart = ({
    * When cove has a config and container ref publish the cove_loaded event.
    */
   useEffect(() => {
-    if (container && !isEmpty(config) && !coveLoadedEventRan) {
+    if (container && !_.isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
       setCoveLoadedEventRan(true)
     }
