@@ -733,7 +733,7 @@ const CdcChart = ({
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (stateData && config.xAxis && config.runtime?.seriesKeys) {
-      const newColorScale = getColorScale(config, stateData)
+      const newColorScale = getColorScale(config)
 
       setColorScale(newColorScale)
       setLoading(false)
