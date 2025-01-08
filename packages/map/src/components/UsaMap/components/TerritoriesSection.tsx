@@ -36,13 +36,13 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
           <div>
             {usTerritories.length > 0 && (
               <>
-                <h5 className='territories'>U.S. Territories</h5>
+                <h5 className='territories-label'>U.S. Territories</h5>
                 <span className='mt-1 mb-2 d-flex flex-wrap territories'>{usTerritories}</span>
               </>
             )}
             {freelyAssociatedStates.length > 0 && (
               <>
-                <h5 className='territories'>Freely Associated States</h5>
+                <h5 className='territories-label'>Freely Associated States</h5>
                 <span className='mt-1 mb-2 d-flex flex-wrap territories'>{freelyAssociatedStates}</span>
               </>
             )}

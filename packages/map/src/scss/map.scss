@@ -102,15 +102,11 @@ $medium: 768px;
 }
 
 .territories-label {
-  color: black;
-  font-size: 1.1em;
-  display: block;
-  margin-top: 15px;
+  font-size: 1em;
 }
 
 // Cities and Territories
 .territories {
-  font-size: 1em;
   gap: 0.5em;
   svg {
     max-width: 35px;
