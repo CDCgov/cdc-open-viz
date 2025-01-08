@@ -217,7 +217,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
           >
             <Filters
               show={visualizationConfig?.sharedFilterIndexes?.map(Number)}
-              filters={updateChildFilters(dashboardConfig.dashboard.sharedFilters, state) || []}
+              filters={updateChildFilters(dashboardConfig.dashboard.sharedFilters, state.data) || []}
               apiFilterDropdowns={apiFilterDropdowns}
               handleOnChange={handleOnChange}
               showSubmit={visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad}

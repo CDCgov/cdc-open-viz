@@ -1,11 +1,8 @@
 import { SharedFilter } from '../types/SharedFilter'
 import _ from 'lodash'
 
-export const updateChildFilters = (
-  newSharedFilters: SharedFilter[],
-  state: { data: Record<string, any> }
-): SharedFilter[] => {
-  const data = Object.values(state.data).flat()
+export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Record<string, any>): SharedFilter[] => {
+  const dateSet = Object.values(data).flat()
 
   // Find indexes of all child filters
   const childFilterIndexes = newSharedFilters
@@ -24,7 +21,7 @@ export const updateChildFilters = (
 
     if (parentFilter) {
       // Filter dataset based on parent's active value
-      const parentActiveValuesArr = data.filter(
+      const parentActiveValuesArr = dateSet.filter(
         (d: Record<string, any>) => d[parentFilter.columnName] === parentFilter.active
       )
 
