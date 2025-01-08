@@ -21,7 +21,7 @@ const AnnotationDropdown = () => {
   }
 
   const handleAccordionClassName = () => {
-    const classNames = ['data-table-heading', 'annotation__dropdown-list']
+    const classNames = ['data-table-heading', 'annotation__dropdown-list', 'p-3']
     if (!expanded) {
       classNames.push('collapsed')
     }
