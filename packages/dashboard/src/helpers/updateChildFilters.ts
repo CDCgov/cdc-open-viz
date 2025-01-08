@@ -32,7 +32,8 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
       if (uniqChildValues.length > 0) {
         updatedFilters[childIndex] = {
           ...childFilter,
-          values: uniqChildValues
+          values: uniqChildValues,
+          active: ''
         }
       }
     }
