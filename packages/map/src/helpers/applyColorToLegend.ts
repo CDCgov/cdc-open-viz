@@ -45,7 +45,7 @@ export const applyColorToLegend = (legendIdx: number, config: ChartConfig, resul
 
     // Special Classes (No Data)
     if (result[legendIdx].special) {
-      if (isOlderVersion('4.24.11', config.version)) {
+      if (!config?.migrations?.addColorMigration) {
         const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
         return specialClassColors[legendIdx]
       } else {
@@ -57,7 +57,7 @@ export const applyColorToLegend = (legendIdx: number, config: ChartConfig, resul
     if (config.color.includes('qualitative')) return mapColorPalette[colorIdx]
 
     // If the current version is newer than 4.24.10, use the color palette
-    if (!isOlderVersion('4.24.12', config.version)) {
+    if (!config?.migrations?.addColorMigration) {
       if (config.customColors) return mapColorPalette[legendIdx - specialClasses.length]
     }
 
