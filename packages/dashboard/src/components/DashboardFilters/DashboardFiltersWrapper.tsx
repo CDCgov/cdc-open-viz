@@ -34,6 +34,40 @@ type DashboardFiltersProps = {
   setAPILoading: (loading: boolean) => void
 }
 
+const updateChildFilters = (newSharedFilters, state) => {
+  const dataSetArr = Object.values(state.data).flat()
+
+  // Find all child filters and their parent filter
+  const childFilterIndexes = newSharedFilters
+    .map((filter, index) => (filter.parents ? index : -1)) // Get indexes of all child filters
+    .filter(index => index !== -1) // Filter out invalid indexes
+
+  if (childFilterIndexes.length === 0) return newSharedFilters // No child filters found
+
+  // Update child filters
+  let updatedFilters = [...newSharedFilters]
+  childFilterIndexes.forEach(childIndex => {
+    const childFilter = newSharedFilters[childIndex]
+    const parentFilter = newSharedFilters.find(filter => String(childFilter.parents) === String(filter.key))
+
+    if (parentFilter) {
+      // Get active values for the parent filter
+      const parentActiveValuesArr = dataSetArr.filter(d => d[parentFilter.columnName] === parentFilter.active)
+      const uniqChildValues = _.uniq(parentActiveValuesArr.map(d => d[childFilter.columnName]).filter(Boolean))
+
+      // Update the child filter if active values exist
+      if (uniqChildValues.length > 0) {
+        updatedFilters[childIndex] = {
+          ...childFilter,
+          values: uniqChildValues
+        }
+      }
+    }
+  })
+
+  return updatedFilters
+}
+
 const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   apiFilterDropdowns,
   visualizationConfig,
@@ -183,7 +217,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
           >
             <Filters
               show={visualizationConfig?.sharedFilterIndexes?.map(Number)}
-              filters={dashboardConfig.dashboard.sharedFilters || []}
+              filters={updateChildFilters(dashboardConfig.dashboard.sharedFilters, state) || []}
               apiFilterDropdowns={apiFilterDropdowns}
               handleOnChange={handleOnChange}
               showSubmit={visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad}
