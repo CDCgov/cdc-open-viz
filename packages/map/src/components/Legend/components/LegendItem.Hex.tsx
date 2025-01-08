@@ -1,11 +1,9 @@
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react-icons/ai'
 import parse from 'html-react-parser'
-import useResizeObserver from '../../../hooks/useResizeObserver'
 
 const LegendItemHex = props => {
-  const { state } = props
-  const { currentViewport: viewport } = useResizeObserver(false)
+  const { state, currentViewport: viewport } = props
 
   const getItemShape = shape => {
     switch (shape) {

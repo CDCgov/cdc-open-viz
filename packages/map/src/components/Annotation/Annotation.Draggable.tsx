@@ -9,7 +9,6 @@ import { MarkerArrow } from '@visx/marker'
 import './Annotation.Draggable.styles.css'
 import ConfigContext from '../../context'
 import { MapContext } from '../../types/MapContext'
-import useResizeObserver from '../../hooks/useResizeObserver'
 
 const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
   const [draggingItems, setDraggingItems] = useState([])
@@ -17,9 +16,9 @@ const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
     state: config,
     setState: updateConfig,
     isDraggingAnnotation,
-    isEditor
+    isEditor,
+    dimensions
   } = useContext<MapContext>(ConfigContext)
-  const { dimensions } = useResizeObserver(isEditor)
   const [width, height] = dimensions
   const { annotations } = config
   const prevDimensions = useRef(dimensions)
