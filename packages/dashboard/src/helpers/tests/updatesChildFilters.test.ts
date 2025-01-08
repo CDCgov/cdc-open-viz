@@ -14,7 +14,7 @@ describe('updateChildFilters', () => {
       {
         tier: 2,
         columnName: 'lastName',
-        active: 'Deer',
+        active: '',
         key: 'Child Filter',
         parents: 'Parent Filter',
         values: ['Deer', 'Adams', 'Sally', 'Gorman', 'Roberts']
@@ -67,12 +67,14 @@ describe('updateChildFilters', () => {
         tier: 2,
         columnName: 'brand',
         key: 'Child Filter 1',
+        active: '',
         parents: 'Parent Filter',
         values: ['Sony', 'Samsung', 'IKEA', 'Nike']
       },
       {
         tier: 3,
         columnName: 'priceRange',
+        active: '',
         key: 'Child Filter 2',
         parents: 'Parent Filter',
         values: ['Under $50', '$50-$100', 'Over $100']
@@ -101,6 +103,7 @@ describe('updateChildFilters', () => {
       {
         tier: 2,
         columnName: 'brand',
+        active: '',
         key: 'Child Filter 1',
         parents: 'Parent Filter',
         values: ['Sony', 'Samsung'] // Updated to match 'Electronics'
@@ -108,6 +111,7 @@ describe('updateChildFilters', () => {
       {
         tier: 3,
         columnName: 'priceRange',
+        active: '',
         key: 'Child Filter 2',
         parents: 'Parent Filter',
         values: ['$50-$100', 'Over $100'] // Updated to match 'Electronics'
