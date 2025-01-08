@@ -25,26 +25,64 @@ function saveImage(element) {
 }
 
 const saveImageAs = (uri, filename) => {
-  const ie = navigator.userAgent.match(/MSIE\s([\d.]+)/)
-  const ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/)
-  const ieEdge = navigator.userAgent.match(/Edge/g)
-  const ieVer = ie ? ie[1] : ie11 ? 11 : ieEdge ? 12 : -1
+  // Target resolution in inches
+  const targetWidthInInches = 13.33 // 13.33 inches for 4000 pixels at 300 DPI
+  const targetHeightInInches = 7.5 // 7.5 inches for 2250 pixels at 300 DPI
+  const dpi = 300
 
-  if (ieVer > -1) {
-    const fileAsBlob = new Blob([uri], {
-      type: 'image/png'
-    })
-    window.navigator.msSaveBlob(fileAsBlob, filename)
-  } else {
-    const link = document.createElement('a')
-    if (typeof link.download === 'string') {
-      link.href = uri
-      link.download = filename
-      link.onclick = e => document.body.removeChild(e.target)
-      document.body.appendChild(link)
-      link.click()
+  // Calculate target resolution in pixels
+  const targetWidth = targetWidthInInches * dpi
+  const targetHeight = targetHeightInInches * dpi
+
+  // Check for the device pixel ratio to handle different screen densities
+  const dpr = window.devicePixelRatio || 1 // Default to 1 if DPR is not available
+
+  // Create an image to load the URI
+  const img = new Image()
+  img.src = uri
+
+  img.onload = () => {
+    // Create a canvas to adjust the image size
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+
+    // Set canvas size to the target resolution, scaled by device pixel ratio
+    canvas.width = targetWidth * dpr
+    canvas.height = targetHeight * dpr
+
+    // Scale the context to handle high DPI
+    ctx.scale(dpr, dpr)
+
+    // ctx.filter = 'grayscale(100%)'
+
+    // Draw the image on the canvas, scaling it to fit the target resolution
+    ctx.drawImage(img, 0, 0, targetWidth, targetHeight)
+
+    // Convert canvas to data URL with high quality
+    const finalUri = canvas.toDataURL('image/jpeg', 1) // Highest quality
+
+    // Saving logic for IE and modern browsers
+    const ie = navigator.userAgent.match(/MSIE\s([\d.]+)/)
+    const ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/)
+    const ieEdge = navigator.userAgent.match(/Edge/g)
+    const ieVer = ie ? ie[1] : ie11 ? 11 : ieEdge ? 12 : -1
+
+    if (ieVer > -1) {
+      // IE-specific file saving logic
+      const fileAsBlob = new Blob([finalUri], { type: 'image/jpeg' })
+      window.navigator.msSaveBlob(fileAsBlob, filename)
     } else {
-      window.open(uri)
+      // Modern browsers
+      const link = document.createElement('a')
+      if (typeof link.download === 'string') {
+        link.href = finalUri
+        link.download = filename
+        link.onclick = e => document.body.removeChild(e.target)
+        document.body.appendChild(link)
+        link.click()
+      } else {
+        window.open(finalUri)
+      }
     }
   }
 }
@@ -52,6 +90,13 @@ const saveImageAs = (uri, filename) => {
 const generateMedia = (state, type, elementToCapture) => {
   // Identify Selector
   const baseSvg = document.querySelector(`[data-download-id=${elementToCapture}]`)
+  const aside = document.querySelector('aside') // Assuming aside contains the legend
+
+  // Temporarily change the legend (aside) border color to black
+  const originalBorder = aside ? aside.style.border : null
+  if (aside) {
+    aside.style.border = '1px solid var(--cool-gray-90)'
+  }
 
   // Handles different state title locations between components
   // Apparently some packages use state.title where others use state.general.title
@@ -98,7 +143,14 @@ const generateMedia = (state, type, elementToCapture) => {
         if (state.visualizationType === 'Scatter Plot') {
           saveImage(baseSvg)
         } else {
-          saveImageAs(canvas.toDataURL(), filename + '.png')
+          saveImageAs(canvas.toDataURL(), filename + '.jpeg')
+
+          // Reset the aside border color after a delay
+          setTimeout(() => {
+            if (aside && originalBorder !== null) {
+              aside.style.border = originalBorder
+            }
+          }, 1500) // Wait for half a second before resetting
         }
       })
       return

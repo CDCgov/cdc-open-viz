@@ -9,7 +9,7 @@ type TerritoriesSectionProps = {
 const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, logo, config }) => {
   const usTerritories = territories
     .filter(territory => {
-      return ['US-AS', 'US-GU', 'US-MP', 'US-PR', 'US-VI'].includes(territory.props.territory)
+      return ['US-AS', 'US-GU', 'US-MP', 'US-PR', 'US-VI'].includes(territory?.props?.territory)
     })
     .sort((a, b) => {
       return a.props.territory.localeCompare(b.props.territory)
@@ -17,7 +17,7 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
 
   const freelyAssociatedStates = territories
     .filter(territory => {
-      return ['US-FM', 'US-MH', 'US-PW'].includes(territory.props.territory)
+      return ['US-FM', 'US-MH', 'US-PW'].includes(territory?.props?.territory)
     })
     .sort((a, b) => {
       return a.props.territory.localeCompare(b.props.territory)
