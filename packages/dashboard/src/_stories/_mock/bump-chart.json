@@ -1,3554 +1,1902 @@
 {
-  "dashboard": {
-    "theme": "theme-blue",
-    "description": "",
-    "title": "Bump Chart"
+  "table": { "label": "Data Table", "show": false, "showDownloadUrl": false, "showVertical": true, "expanded": false },
+  "datasets": {
+    "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000": {
+      "dataFileSize": 772031,
+      "dataFileName": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": false,
+      "dataUrl": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000"
+    },
+    "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$where=Measure=%22Over-the-Counter%22%20&$limit=2000": {
+      "dataFileSize": 755134,
+      "dataFileName": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$where=Measure=%22Over-the-Counter%22%20&$limit=2000",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": false,
+      "dataUrl": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$where=Measure=%22Over-the-Counter%22%20&$limit=2000"
+    },
+    "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$where=Measure=%22Vending%20Machines%22%20&$limit=2000": {
+      "dataFileSize": 722520,
+      "dataFileName": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$where=Measure=%22Vending%20Machines%22%20&$limit=2000",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": false,
+      "dataUrl": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$where=Measure=%22Vending%20Machines%22%20&$limit=2000"
+    },
+    "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$where=Measure=%22Preemption%20on%20Smokefree%20Indoor%20Air%22%20&$limit=2000": {
+      "dataFileSize": 778566,
+      "dataFileName": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$where=Measure=%22Preemption%20on%20Smokefree%20Indoor%20Air%22%20&$limit=2000",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": false,
+      "dataUrl": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$where=Measure=%22Preemption%20on%20Smokefree%20Indoor%20Air%22%20&$limit=2000"
+    },
+    "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$where=Measure=%22Preemption%20on%20Licensure%20%22%20&$limit=2000": {
+      "dataFileSize": 725577,
+      "dataFileName": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$where=Measure=%22Preemption%20on%20Licensure%20%22%20&$limit=2000",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": false,
+      "dataUrl": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$where=Measure=%22Preemption%20on%20Licensure%20%22%20&$limit=2000"
+    },
+    "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$where=Measure=%22Preemption%20on%20Youth%20Access%22%20&$limit=2000": {
+      "dataFileSize": 724576,
+      "dataFileName": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$where=Measure=%22Preemption%20on%20Youth%20Access%22%20&$limit=2000",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": false,
+      "dataUrl": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$where=Measure=%22Preemption%20on%20Youth%20Access%22%20&$limit=2000"
+    },
+    "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=20": {
+      "dataFileSize": 11033,
+      "dataFileName": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=20",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": false,
+      "dataUrl": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=20"
+    },
+    "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2001": {
+      "dataFileSize": 735826,
+      "dataFileName": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2001",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": false,
+      "dataUrl": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2001"
+    },
+    "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_all_locations&$limit=201": {
+      "dataFileSize": 69695,
+      "dataFileName": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_all_locations&$limit=201",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": false,
+      "dataUrl": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_all_locations&$limit=201"
+    },
+    "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200": {
+      "dataFileSize": 110309,
+      "dataFileName": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": false,
+      "dataUrl": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200"
+    },
+    "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200&$where=TopicDesc=%22Smokefree%20Indoor%20Air%22": {
+      "dataFileSize": 110309,
+      "dataFileName": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200&$where=TopicDesc=%22Smokefree%20Indoor%20Air%22",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": false,
+      "dataUrl": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200&$where=TopicDesc=%22Smokefree%20Indoor%20Air%22"
+    },
+    "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200&$select=DISTINCT%20PreemptionSummary&$order=PreemptionSummary": {
+      "dataFileSize": 223,
+      "dataFileName": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200&$select=DISTINCT%20PreemptionSummary&$order=PreemptionSummary",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": false,
+      "dataUrl": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200&$select=DISTINCT%20PreemptionSummary&$order=PreemptionSummary"
+    },
+    "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi_dashboard&$where=TopicDesc=%22Cigarette Tax ($ per pack)%22%20&$limit=2003": {
+      "dataFileSize": 309448,
+      "dataFileName": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi_dashboard&$where=TopicDesc=%22Cigarette Tax ($ per pack)%22%20&$limit=2003",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": true,
+      "dataUrl": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi_dashboard&$where=TopicDesc=%22Cigarette Tax ($ per pack)%22%20&$limit=2003"
+    }
   },
-  "rows": [
+  "isResponsiveTicks": false,
+  "type": "dashboard",
+  "barThickness": "0.37",
+  "xAxis": { "type": "categorical", "size": 75, "maxTickRotation": 45, "labelOffset": 65 },
+  "version": "4.24.10",
+  "multiDashboards": [
     {
-      "columns": [
+      "label": "Dashboard",
+      "visualizations": {
+        "chart1732045729499": {
+          "annotations": [],
+          "type": "chart",
+          "debugSvg": false,
+          "chartMessage": { "noData": "No Data Available" },
+          "title": "",
+          "showTitle": true,
+          "showDownloadMediaButton": false,
+          "theme": "theme-blue",
+          "animate": false,
+          "fontSize": "medium",
+          "lineDatapointStyle": "hover",
+          "lineDatapointColor": "Same as Line",
+          "barHasBorder": "false",
+          "isLollipopChart": false,
+          "lollipopShape": "circle",
+          "lollipopColorStyle": "two-tone",
+          "visualizationSubType": "regular",
+          "barStyle": "flat",
+          "roundingStyle": "standard",
+          "tipRounding": "top",
+          "isResponsiveTicks": false,
+          "general": {
+            "annotationDropdownText": "Annotations",
+            "showDownloadButton": false,
+            "showMissingDataLabel": true,
+            "showSuppressedSymbol": true,
+            "showZeroValueData": true,
+            "hideNullValue": true
+          },
+          "padding": { "left": 5, "right": 5 },
+          "preliminaryData": [],
+          "yAxis": {
+            "hideAxis": false,
+            "displayNumbersOnBar": false,
+            "hideLabel": false,
+            "hideTicks": false,
+            "size": 50,
+            "gridLines": false,
+            "enablePadding": false,
+            "min": "",
+            "max": "",
+            "labelColor": "#333",
+            "tickLabelColor": "#333",
+            "tickColor": "#333",
+            "rightHideAxis": true,
+            "rightAxisSize": 0,
+            "rightLabel": "",
+            "rightLabelOffsetSize": 0,
+            "rightAxisLabelColor": "#333",
+            "rightAxisTickLabelColor": "#333",
+            "rightAxisTickColor": "#333",
+            "numTicks": "",
+            "axisPadding": 0,
+            "scalePadding": 10,
+            "tickRotation": 0,
+            "anchors": [],
+            "shoMissingDataLabel": true,
+            "showMissingDataLine": true,
+            "categories": [],
+            "type": "linear",
+            "label": "$ per pack"
+          },
+          "boxplot": {
+            "plots": [],
+            "borders": "true",
+            "plotOutlierValues": false,
+            "plotNonOutlierValues": true,
+            "labels": {
+              "q1": "Lower Quartile",
+              "q2": "q2",
+              "q3": "Upper Quartile",
+              "q4": "q4",
+              "minimum": "Minimum",
+              "maximum": "Maximum",
+              "mean": "Mean",
+              "median": "Median",
+              "sd": "Standard Deviation",
+              "iqr": "Interquartile Range",
+              "count": "Count",
+              "outliers": "Outliers",
+              "values": "Values",
+              "lowerBounds": "Lower Bounds",
+              "upperBounds": "Upper Bounds"
+            }
+          },
+          "topAxis": { "hasLine": false },
+          "isLegendValue": false,
+          "barThickness": 0.35,
+          "barHeight": 25,
+          "barSpace": 15,
+          "heights": { "vertical": 300, "horizontal": 750 },
+          "xAxis": {
+            "sortDates": false,
+            "anchors": [],
+            "type": "categorical",
+            "showTargetLabel": true,
+            "targetLabel": "Target",
+            "hideAxis": false,
+            "hideLabel": false,
+            "hideTicks": false,
+            "size": 75,
+            "tickRotation": 0,
+            "min": "",
+            "max": "",
+            "labelColor": "#333",
+            "tickLabelColor": "#333",
+            "tickColor": "#333",
+            "numTicks": "",
+            "labelOffset": 0,
+            "axisPadding": 200,
+            "target": 0,
+            "maxTickRotation": 0,
+            "padding": 5,
+            "showYearsOnce": false,
+            "sortByRecentDate": false,
+            "dataKey": "YearQuarter",
+            "axisBBox": 26.360000610351562,
+            "tickWidthMax": 71,
+            "manual": false
+          },
+          "table": {
+            "label": "Data Table",
+            "expanded": true,
+            "limitHeight": false,
+            "height": "",
+            "caption": "",
+            "showDownloadUrl": false,
+            "showDataTableLink": false,
+            "showDownloadLinkBelow": true,
+            "indexLabel": "",
+            "download": true,
+            "showVertical": true,
+            "dateDisplayFormat": "",
+            "showMissingDataLabel": true,
+            "showSuppressedSymbol": true,
+            "show": false,
+            "columnName": "",
+            "pivot": "",
+            "groupBy": "TopicDesc"
+          },
+          "orientation": "vertical",
+          "color": "pinkpurple",
+          "columns": {
+            "Data_Value": {
+              "label": "Data_Value",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "forestPlot": false,
+              "startingPoint": "0",
+              "forestPlotAlignRight": false,
+              "roundToPlace": 0,
+              "commas": false,
+              "showInViz": false,
+              "forestPlotStartingPoint": 0,
+              "name": "Data_Value",
+              "series": ""
+            },
+            "100SmokefreeInOneLocation": { "name": "100SmokefreeInOneLocation", "dataTable": false },
+            "100SmokefreeInThreeLocations": { "name": "100SmokefreeInThreeLocations", "dataTable": false },
+            "100SmokefreeInTwoLocations": { "name": "100SmokefreeInTwoLocations", "dataTable": false },
+            "DisplayOrder": { "name": "DisplayOrder", "dataTable": false },
+            "Label_Value": { "name": "Label_Value", "dataTable": false },
+            "Location": { "name": "Location", "dataTable": false },
+            "LocationAbbr": { "name": "LocationAbbr", "dataTable": false },
+            "NoLawDesignatedAreasOrSeparateVentilationLaw": {
+              "name": "NoLawDesignatedAreasOrSeparateVentilationLaw",
+              "dataTable": true
+            },
+            "NoPreemption": { "name": "NoPreemption", "dataTable": false },
+            "PreemptionFoOnePolicy": { "name": "PreemptionFoOnePolicy", "dataTable": false },
+            "PreemptionForThreePolicies": { "name": "PreemptionForThreePolicies", "dataTable": false },
+            "PreemptionForTwoPolicies": { "name": "PreemptionForTwoPolicies", "dataTable": false },
+            "PreemptionSummary": { "name": "PreemptionSummary", "dataTable": false },
+            "PreemptionSummaryCount": { "name": "PreemptionSummaryCount", "dataTable": false },
+            "Restriction": { "name": "Restriction", "dataTable": false },
+            "RestrictionCount": { "name": "RestrictionCount", "dataTable": false },
+            "TopicDesc": { "name": "TopicDesc", "dataTable": true },
+            "YearQuarter": {
+              "label": "YearQuarter",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "forestPlot": false,
+              "startingPoint": "0",
+              "forestPlotAlignRight": false,
+              "roundToPlace": 0,
+              "commas": false,
+              "showInViz": false,
+              "forestPlotStartingPoint": 0,
+              "name": "YearQuarter"
+            }
+          },
+          "legend": {
+            "hide": true,
+            "behavior": "isolate",
+            "axisAlign": true,
+            "singleRow": true,
+            "colorCode": "",
+            "reverseLabelOrder": false,
+            "description": "",
+            "dynamicLegend": false,
+            "dynamicLegendDefaultText": "Show All",
+            "dynamicLegendItemLimit": 5,
+            "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+            "dynamicLegendChartMessage": "Select Options from the Legend",
+            "label": "",
+            "lineMode": false,
+            "verticalSorted": false,
+            "highlightOnHover": false,
+            "hideSuppressedLabels": false,
+            "hideSuppressionLink": false,
+            "seriesHighlight": [],
+            "style": "circles",
+            "subStyle": "linear blocks",
+            "tickRotation": "",
+            "hideBorder": { "side": false, "topBottom": true },
+            "position": "right"
+          },
+          "brush": { "height": 25, "active": false },
+          "exclusions": { "active": false, "keys": [] },
+          "palette": "qualitative-bold",
+          "isPaletteReversed": false,
+          "twoColor": { "palette": "monochrome-1", "isPaletteReversed": false },
+          "labels": false,
+          "dataFormat": {
+            "commas": false,
+            "prefix": "",
+            "suffix": "",
+            "abbreviated": false,
+            "bottomSuffix": "",
+            "bottomPrefix": "",
+            "bottomAbbreviated": false
+          },
+          "confidenceKeys": {},
+          "visual": {
+            "border": true,
+            "accent": true,
+            "background": true,
+            "verticalHoverLine": false,
+            "horizontalHoverLine": false
+          },
+          "useLogScale": false,
+          "filterBehavior": "Apply Button",
+          "highlightedBarValues": [],
+          "series": [
+            {
+              "dataKey": "Data_Value",
+              "type": "Line",
+              "axis": "Left",
+              "tooltip": true,
+              "dynamicCategory": "YearQuarter"
+            }
+          ],
+          "tooltips": { "opacity": 90, "singleSeries": false, "dateDisplayFormat": "" },
+          "forestPlot": {
+            "startAt": 0,
+            "colors": { "line": "", "shape": "" },
+            "lineOfNoEffect": { "show": true },
+            "type": "",
+            "pooledResult": { "diamondHeight": 5, "column": "" },
+            "estimateField": "",
+            "estimateRadius": "",
+            "shape": "square",
+            "rowHeight": 20,
+            "description": { "show": true, "text": "description", "location": 0 },
+            "result": { "show": true, "text": "result", "location": 100 },
+            "radius": { "min": 2, "max": 10, "scalingColumn": "" },
+            "regression": { "lower": 0, "upper": 0, "estimateField": 0 },
+            "leftWidthOffset": 0,
+            "rightWidthOffset": 0,
+            "showZeroLine": false,
+            "leftLabel": "",
+            "rightLabel": ""
+          },
+          "area": { "isStacked": false },
+          "sankey": {
+            "title": { "defaultColor": "black" },
+            "iterations": 1,
+            "rxValue": 0.9,
+            "overallSize": { "width": 900, "height": 700 },
+            "margin": { "margin_y": 25, "margin_x": 0 },
+            "nodeSize": { "nodeWidth": 26, "nodeHeight": 40 },
+            "nodePadding": 55,
+            "nodeFontColor": "black",
+            "nodeColor": { "default": "#ff8500", "inactive": "#808080" },
+            "linkColor": { "default": "#ffc900", "inactive": "#D3D3D3" },
+            "opacity": {
+              "nodeOpacityDefault": 1,
+              "nodeOpacityInactive": 0.1,
+              "LinkOpacityDefault": 1,
+              "LinkOpacityInactive": 0.1
+            },
+            "storyNodeFontColor": "#006778",
+            "storyNodeText": [],
+            "nodeValueStyle": { "textBefore": "(", "textAfter": ")" },
+            "data": []
+          },
+          "filters": [],
+          "openModal": true,
+          "uid": "chart1732045729499",
+          "visualizationType": "Line",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi_dashboard&$where=TopicDesc=%22Cigarette Tax ($ per pack)%22%20&$limit=2003",
+          "dataDescription": { "horizontal": false, "series": false },
+          "version": "4.24.12",
+          "dynamicMarginTop": 0
+        },
+        "map1732051228260": {
+          "annotations": [],
+          "general": {
+            "geoType": "us",
+            "noStateFoundMessage": "Map Unavailable",
+            "annotationDropdownText": "Annotations",
+            "geoBorderColor": "darkGray",
+            "headerColor": "theme-blue",
+            "title": "",
+            "showTitle": false,
+            "showSidebar": true,
+            "showDownloadButton": true,
+            "showDownloadMediaButton": false,
+            "displayAsHex": false,
+            "displayStateLabels": false,
+            "territoriesLabel": "Territories",
+            "territoriesAlwaysShow": false,
+            "language": "en",
+            "geoLabelOverride": "",
+            "hasRegions": false,
+            "fullBorder": false,
+            "type": "data",
+            "convertFipsCodes": true,
+            "palette": { "isReversed": true },
+            "allowMapZoom": true,
+            "hideGeoColumnInTooltip": true,
+            "hidePrimaryColumnInTooltip": false,
+            "statePicked": { "fipsCode": "01", "stateName": "Alabama" },
+            "expandDataTable": false
+          },
+          "type": "map",
+          "color": "sequential-blue-2(MPX)reverse",
+          "columns": {
+            "geo": { "name": "LocationAbbr", "label": "Location", "tooltip": false, "dataTable": true },
+            "primary": {
+              "dataTable": true,
+              "tooltip": true,
+              "prefix": "",
+              "suffix": "",
+              "name": "Data_Value",
+              "label": "",
+              "roundToPlace": 0
+            },
+            "navigate": { "name": "" },
+            "latitude": { "name": "" },
+            "longitude": { "name": "" },
+            "additionalColumn1": {
+              "label": " ",
+              "dataTable": false,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "name": "Label_Value",
+              "tooltip": true
+            }
+          },
+          "legend": {
+            "descriptions": {},
+            "specialClasses": [],
+            "unified": false,
+            "singleColumn": false,
+            "singleRow": false,
+            "verticalSorted": false,
+            "showSpecialClassesLast": false,
+            "dynamicDescription": false,
+            "type": "category",
+            "numberOfItems": 3,
+            "position": "bottom",
+            "title": "",
+            "style": "circles",
+            "subStyle": "linear blocks",
+            "tickRotation": "",
+            "singleColumnLegend": false,
+            "hideBorder": false
+          },
+          "filters": [],
+          "table": {
+            "wrapColumns": false,
+            "label": "Data Table",
+            "expanded": false,
+            "limitHeight": false,
+            "height": "",
+            "caption": "",
+            "showDownloadUrl": false,
+            "showDataTableLink": true,
+            "showDownloadLinkBelow": true,
+            "showFullGeoNameInCSV": false,
+            "forceDisplay": false,
+            "download": true,
+            "indexLabel": ""
+          },
+          "tooltips": { "appearanceType": "hover", "linkLabel": "Learn More", "capitalizeLabels": true, "opacity": 90 },
+          "visual": {
+            "minBubbleSize": 1,
+            "maxBubbleSize": 20,
+            "extraBubbleBorder": false,
+            "cityStyle": "circle",
+            "cityStyleLabel": "",
+            "showBubbleZeros": false,
+            "additionalCityStyles": [],
+            "geoCodeCircleSize": 8
+          },
+          "mapPosition": { "coordinates": [0, 30], "zoom": 1 },
+          "map": { "layers": [], "patterns": [] },
+          "hexMap": {
+            "type": "",
+            "shapeGroups": [
+              {
+                "legendTitle": "",
+                "legendDescription": "",
+                "items": [{ "key": "", "shape": "Arrow Up", "column": "", "operator": "=", "value": "" }]
+              }
+            ]
+          },
+          "filterBehavior": "Filter Change",
+          "filterIntro": "",
+          "openModal": true,
+          "uid": "map1732051228260",
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=20",
+          "version": "4.24.10"
+        },
+        "dashboardFilters1732051920923": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1732051920923",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [0],
+          "visualizationType": "dashboardFilters",
+          "dataKey": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=20",
+          "dataDescription": { "horizontal": false, "series": false },
+          "autoLoad": true
+        },
+        "markup-include1732733401191": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "openModal": false,
+          "uid": "markup-include1732733401191",
+          "type": "markup-include",
+          "contentEditor": {
+            "inlineHTML": "<header class=\"cove-component__header component__header theme-blue mb-0\"><h2>Smokefree Indoor Air,  {{YearQuarter1}}</h2></header>",
+            "markupVariables": [
+              { "columnName": "YearQuarter", "conditions": [], "name": "YearQuarter1", "tag": "{{YearQuarter1}}" }
+            ],
+            "showHeader": true,
+            "srcUrl": "#example",
+            "title": "",
+            "useInlineHTML": true
+          },
+          "theme": "theme-blue",
+          "visual": {
+            "border": false,
+            "accent": false,
+            "background": false,
+            "hideBackgroundColor": false,
+            "borderColorTheme": false
+          },
+          "showEditorPanel": true,
+          "visualizationType": "markup-include",
+          "dataKey": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200",
+          "dataDescription": { "horizontal": false, "series": false },
+          "version": "4.24.12"
+        },
+        "markup-include1732733902024": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "openModal": false,
+          "uid": "markup-include1732733902024",
+          "type": "markup-include",
+          "contentEditor": {
+            "inlineHTML": "<header class=\"cove-component__header component__header theme-blue mb-0\"><h2>Preemption Summary {{YearQuarter2}}</h2></header>",
+            "markupVariables": [
+              { "columnName": "YearQuarter", "conditions": [], "name": "YearQuarter2", "tag": "{{YearQuarter2}}" }
+            ],
+            "showHeader": true,
+            "srcUrl": "#example",
+            "title": "",
+            "useInlineHTML": true
+          },
+          "theme": "theme-blue",
+          "visual": {
+            "border": false,
+            "accent": false,
+            "background": false,
+            "hideBackgroundColor": false,
+            "borderColorTheme": false
+          },
+          "showEditorPanel": true,
+          "visualizationType": "markup-include",
+          "dataKey": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200",
+          "dataDescription": { "horizontal": false, "series": false },
+          "version": "4.24.10"
+        },
+        "map1732734226070": {
+          "annotations": [],
+          "general": {
+            "geoType": "us",
+            "noStateFoundMessage": "Map Unavailable",
+            "annotationDropdownText": "Annotations",
+            "geoBorderColor": "darkGray",
+            "headerColor": "theme-blue",
+            "title": "",
+            "showTitle": true,
+            "showSidebar": true,
+            "showDownloadButton": true,
+            "showDownloadMediaButton": false,
+            "displayAsHex": false,
+            "displayStateLabels": false,
+            "territoriesLabel": "Territories",
+            "territoriesAlwaysShow": false,
+            "language": "en",
+            "geoLabelOverride": "",
+            "hasRegions": false,
+            "fullBorder": false,
+            "type": "data",
+            "convertFipsCodes": true,
+            "palette": { "isReversed": true },
+            "allowMapZoom": true,
+            "hideGeoColumnInTooltip": false,
+            "hidePrimaryColumnInTooltip": false,
+            "statePicked": { "fipsCode": "01", "stateName": "Alabama" },
+            "expandDataTable": false
+          },
+          "type": "map",
+          "color": "sequential-blue-2(MPX)reverse",
+          "columns": {
+            "geo": { "name": "LocationAbbr", "label": "Location", "tooltip": false, "dataTable": true },
+            "primary": {
+              "dataTable": true,
+              "tooltip": true,
+              "prefix": "",
+              "suffix": "",
+              "name": "Data_Value",
+              "label": "",
+              "roundToPlace": 0
+            },
+            "navigate": { "name": "" },
+            "latitude": { "name": "" },
+            "longitude": { "name": "" }
+          },
+          "legend": {
+            "descriptions": {},
+            "specialClasses": [],
+            "unified": false,
+            "singleColumn": false,
+            "singleRow": false,
+            "verticalSorted": false,
+            "showSpecialClassesLast": false,
+            "dynamicDescription": false,
+            "type": "category",
+            "numberOfItems": 3,
+            "position": "bottom",
+            "title": "",
+            "style": "circles",
+            "subStyle": "linear blocks",
+            "tickRotation": "",
+            "singleColumnLegend": false,
+            "hideBorder": false
+          },
+          "filters": [],
+          "table": {
+            "wrapColumns": false,
+            "label": "Data Table",
+            "expanded": false,
+            "limitHeight": false,
+            "height": "",
+            "caption": "",
+            "showDownloadUrl": false,
+            "showDataTableLink": true,
+            "showDownloadLinkBelow": true,
+            "showFullGeoNameInCSV": false,
+            "forceDisplay": false,
+            "download": true,
+            "indexLabel": ""
+          },
+          "tooltips": { "appearanceType": "hover", "linkLabel": "Learn More", "capitalizeLabels": true, "opacity": 90 },
+          "visual": {
+            "minBubbleSize": 1,
+            "maxBubbleSize": 20,
+            "extraBubbleBorder": false,
+            "cityStyle": "circle",
+            "cityStyleLabel": "",
+            "showBubbleZeros": false,
+            "additionalCityStyles": [],
+            "geoCodeCircleSize": 8
+          },
+          "mapPosition": { "coordinates": [0, 30], "zoom": 1 },
+          "map": { "layers": [], "patterns": [] },
+          "hexMap": {
+            "type": "",
+            "shapeGroups": [
+              {
+                "legendTitle": "",
+                "legendDescription": "",
+                "items": [{ "key": "", "shape": "Arrow Up", "column": "", "operator": "=", "value": "" }]
+              }
+            ]
+          },
+          "filterBehavior": "Filter Change",
+          "filterIntro": "",
+          "openModal": true,
+          "uid": "map1732734226070",
+          "dataKey": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200&$select=DISTINCT%20PreemptionSummary&$order=PreemptionSummary",
+          "dataDescription": { "horizontal": false, "series": false },
+          "version": "4.24.10"
+        },
+        "table1732735270942": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": false,
+          "openModal": true,
+          "uid": "table1732735270942",
+          "type": "table",
+          "table": {
+            "label": "Data Table",
+            "show": true,
+            "showDownloadUrl": false,
+            "showVertical": true,
+            "expanded": false,
+            "collapsible": true,
+            "pivot": { "columnName": "Label_Value", "valueColumns": ["Data_Value"] }
+          },
+          "columns": {
+            "100SmokefreeInOneLocation": { "name": "100SmokefreeInOneLocation", "dataTable": false },
+            "100SmokefreeInThreeLocations": { "name": "100SmokefreeInThreeLocations", "dataTable": false },
+            "100SmokefreeInTwoLocations": { "name": "100SmokefreeInTwoLocations", "dataTable": false },
+            "DisplayOrder": { "name": "DisplayOrder", "dataTable": false },
+            "LocationAbbr": { "name": "LocationAbbr", "dataTable": false },
+            "NoLawDesignatedAreasOrSeparateVentilationLaw": {
+              "name": "NoLawDesignatedAreasOrSeparateVentilationLaw",
+              "dataTable": false
+            },
+            "NoPreemption": { "name": "NoPreemption", "dataTable": false },
+            "PreemptionFoOnePolicy": { "name": "PreemptionFoOnePolicy", "dataTable": false },
+            "PreemptionForThreePolicies": { "name": "PreemptionForThreePolicies", "dataTable": false },
+            "PreemptionForTwoPolicies": { "name": "PreemptionForTwoPolicies", "dataTable": false },
+            "PreemptionSummary": { "name": "PreemptionSummary", "dataTable": false },
+            "PreemptionSummaryCount": { "name": "PreemptionSummaryCount", "dataTable": false },
+            "YearQuarter": { "name": "YearQuarter", "dataTable": false },
+            "TopicDesc": { "name": "TopicDesc", "dataTable": false },
+            "RestrictionCount": { "name": "RestrictionCount", "dataTable": false },
+            "Restriction": { "name": "Restriction", "dataTable": true, "order": 1 },
+            "Location": {
+              "label": "State",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "forestPlot": false,
+              "startingPoint": "0",
+              "forestPlotAlignRight": false,
+              "roundToPlace": 0,
+              "commas": false,
+              "showInViz": false,
+              "forestPlotStartingPoint": 0,
+              "name": "Location",
+              "order": 1
+            }
+          },
+          "dataFormat": {},
+          "visualizationType": "table",
+          "dataKey": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200&$where=TopicDesc=%22Smokefree%20Indoor%20Air%22",
+          "dataDescription": { "horizontal": false, "series": false }
+        },
+        "dashboardFilters1733263191487": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1733263191487",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [1],
+          "visualizationType": "dashboardFilters"
+        },
+        "table1734545973794": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": false,
+          "openModal": true,
+          "uid": "table1734545973794",
+          "type": "table",
+          "table": {
+            "label": "Data Table",
+            "show": true,
+            "showDownloadUrl": false,
+            "showVertical": true,
+            "expanded": true,
+            "collapsible": true
+          },
+          "columns": {
+            "Location": {
+              "label": "Location",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "forestPlot": false,
+              "startingPoint": "0",
+              "forestPlotAlignRight": false,
+              "roundToPlace": 0,
+              "commas": false,
+              "showInViz": false,
+              "forestPlotStartingPoint": 0,
+              "name": "Location",
+              "order": 1
+            },
+            "100SmokefreeInOneLocation": { "name": "100SmokefreeInOneLocation", "dataTable": false },
+            "100SmokefreeInThreeLocations": { "name": "100SmokefreeInThreeLocations", "dataTable": false },
+            "100SmokefreeInTwoLocations": { "name": "100SmokefreeInTwoLocations", "dataTable": false },
+            "Data_Value": { "name": "Data_Value", "dataTable": false },
+            "DisplayOrder": { "name": "DisplayOrder", "dataTable": false },
+            "YearQuarter": { "name": "YearQuarter", "dataTable": false }
+          },
+          "dataFormat": {},
+          "visualizationType": "table",
+          "dataKey": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200",
+          "dataDescription": { "horizontal": false, "series": false }
+        },
+        "markup-include1734729533556": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "openModal": false,
+          "uid": "markup-include1734729533556",
+          "type": "markup-include",
+          "contentEditor": {
+            "inlineHTML": "<header class=\"cove-component__header component__header theme-blue mb-0\"><h2>Cigarette Tax ($ per pack)</h2></header>",
+            "markupVariables": [],
+            "showHeader": true,
+            "srcUrl": "#example",
+            "title": "",
+            "useInlineHTML": true
+          },
+          "theme": "theme-blue",
+          "visual": {
+            "border": false,
+            "accent": false,
+            "background": false,
+            "hideBackgroundColor": false,
+            "borderColorTheme": false
+          },
+          "showEditorPanel": true,
+          "visualizationType": "markup-include",
+          "dataKey": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200",
+          "dataDescription": { "horizontal": false, "series": false },
+          "version": "4.24.10"
+        },
+        "table1734732581749": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": false,
+          "openModal": true,
+          "uid": "table1734732581749",
+          "type": "table",
+          "table": {
+            "label": "Data Table",
+            "show": true,
+            "showDownloadUrl": false,
+            "showVertical": true,
+            "expanded": false,
+            "collapsible": true
+          },
+          "columns": {
+            "YearQuarter": {
+              "label": "Time Period",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "forestPlot": false,
+              "startingPoint": "0",
+              "forestPlotAlignRight": false,
+              "roundToPlace": 0,
+              "commas": false,
+              "showInViz": false,
+              "forestPlotStartingPoint": 0,
+              "name": "YearQuarter",
+              "order": 1
+            },
+            "Data_Value": {
+              "label": "Cigarette Tax ($ per pack)",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "forestPlot": false,
+              "startingPoint": "0",
+              "forestPlotAlignRight": false,
+              "roundToPlace": 0,
+              "commas": false,
+              "showInViz": false,
+              "forestPlotStartingPoint": 0,
+              "name": "Data_Value"
+            },
+            "100SmokefreeInOneLocation": { "name": "100SmokefreeInOneLocation", "dataTable": false },
+            "100SmokefreeInThreeLocations": { "name": "100SmokefreeInThreeLocations", "dataTable": false },
+            "100SmokefreeInTwoLocations": { "name": "100SmokefreeInTwoLocations", "dataTable": false },
+            "DisplayOrder": { "name": "DisplayOrder", "dataTable": false },
+            "Label_Value": { "name": "Label_Value", "dataTable": false },
+            "Location": { "name": "Location", "dataTable": false },
+            "LocationAbbr": { "name": "LocationAbbr", "dataTable": false },
+            "NoLawDesignatedAreasOrSeparateVentilationLaw": {
+              "name": "NoLawDesignatedAreasOrSeparateVentilationLaw",
+              "dataTable": false
+            },
+            "NoPreemption": { "name": "NoPreemption", "dataTable": false },
+            "PreemptionFoOnePolicy": { "name": "PreemptionFoOnePolicy", "dataTable": false },
+            "PreemptionForThreePolicies": { "name": "PreemptionForThreePolicies", "dataTable": false },
+            "PreemptionForTwoPolicies": { "name": "PreemptionForTwoPolicies", "dataTable": false },
+            "PreemptionSummary": { "name": "PreemptionSummary", "dataTable": false },
+            "PreemptionSummaryCount": { "name": "PreemptionSummaryCount", "dataTable": false },
+            "Restriction": { "name": "Restriction", "dataTable": false },
+            "RestrictionCount": { "name": "RestrictionCount", "dataTable": false },
+            "TopicDesc": { "name": "TopicDesc", "dataTable": false }
+          },
+          "dataFormat": {},
+          "visualizationType": "table",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi_dashboard&$where=TopicDesc=%22Cigarette Tax ($ per pack)%22%20&$limit=2003",
+          "dataDescription": { "horizontal": false, "series": false }
+        },
+        "chart1734734074310": {
+          "annotations": [],
+          "type": "chart",
+          "debugSvg": false,
+          "chartMessage": { "noData": "No Data Available" },
+          "title": "",
+          "showTitle": true,
+          "showDownloadMediaButton": false,
+          "theme": "theme-blue",
+          "animate": false,
+          "fontSize": "medium",
+          "lineDatapointStyle": "hover",
+          "lineDatapointColor": "Same as Line",
+          "barHasBorder": "false",
+          "isLollipopChart": false,
+          "lollipopShape": "circle",
+          "lollipopColorStyle": "two-tone",
+          "visualizationSubType": "regular",
+          "barStyle": "flat",
+          "roundingStyle": "standard",
+          "tipRounding": "top",
+          "isResponsiveTicks": false,
+          "general": {
+            "annotationDropdownText": "Annotations",
+            "showDownloadButton": false,
+            "showMissingDataLabel": true,
+            "showSuppressedSymbol": true,
+            "showZeroValueData": true,
+            "hideNullValue": true
+          },
+          "padding": { "left": 5, "right": 5 },
+          "preliminaryData": [],
+          "yAxis": {
+            "hideAxis": false,
+            "displayNumbersOnBar": false,
+            "hideLabel": false,
+            "hideTicks": false,
+            "size": 50,
+            "gridLines": false,
+            "enablePadding": false,
+            "min": "",
+            "max": "",
+            "labelColor": "#333",
+            "tickLabelColor": "#333",
+            "tickColor": "#333",
+            "rightHideAxis": false,
+            "rightAxisSize": 0,
+            "rightLabel": "",
+            "rightLabelOffsetSize": 0,
+            "rightAxisLabelColor": "#333",
+            "rightAxisTickLabelColor": "#333",
+            "rightAxisTickColor": "#333",
+            "numTicks": "",
+            "axisPadding": 0,
+            "scalePadding": 10,
+            "tickRotation": 0,
+            "anchors": [],
+            "shoMissingDataLabel": true,
+            "showMissingDataLine": true,
+            "categories": [],
+            "label": "$ per pack"
+          },
+          "boxplot": {
+            "plots": [],
+            "borders": "true",
+            "plotOutlierValues": false,
+            "plotNonOutlierValues": true,
+            "labels": {
+              "q1": "Lower Quartile",
+              "q2": "q2",
+              "q3": "Upper Quartile",
+              "q4": "q4",
+              "minimum": "Minimum",
+              "maximum": "Maximum",
+              "mean": "Mean",
+              "median": "Median",
+              "sd": "Standard Deviation",
+              "iqr": "Interquartile Range",
+              "count": "Count",
+              "outliers": "Outliers",
+              "values": "Values",
+              "lowerBounds": "Lower Bounds",
+              "upperBounds": "Upper Bounds"
+            }
+          },
+          "topAxis": { "hasLine": false },
+          "isLegendValue": false,
+          "barThickness": 0.35,
+          "barHeight": 25,
+          "barSpace": 15,
+          "heights": { "vertical": 300, "horizontal": 750 },
+          "xAxis": {
+            "sortDates": false,
+            "anchors": [],
+            "type": "categorical",
+            "showTargetLabel": true,
+            "targetLabel": "Target",
+            "hideAxis": false,
+            "hideLabel": false,
+            "hideTicks": false,
+            "size": 75,
+            "tickRotation": 0,
+            "min": "",
+            "max": "",
+            "labelColor": "#333",
+            "tickLabelColor": "#333",
+            "tickColor": "#333",
+            "numTicks": "",
+            "labelOffset": 0,
+            "axisPadding": 200,
+            "target": 0,
+            "maxTickRotation": 0,
+            "padding": 5,
+            "showYearsOnce": false,
+            "sortByRecentDate": false,
+            "dataKey": "YearQuarter",
+            "axisBBox": 26.360000610351562,
+            "tickWidthMax": 71
+          },
+          "table": {
+            "label": "Data Table",
+            "expanded": true,
+            "limitHeight": false,
+            "height": "",
+            "caption": "",
+            "showDownloadUrl": false,
+            "showDataTableLink": true,
+            "showDownloadLinkBelow": true,
+            "indexLabel": "",
+            "download": true,
+            "showVertical": true,
+            "dateDisplayFormat": "",
+            "showMissingDataLabel": true,
+            "showSuppressedSymbol": true,
+            "show": false
+          },
+          "orientation": "vertical",
+          "color": "pinkpurple",
+          "columns": {},
+          "legend": {
+            "hide": true,
+            "behavior": "isolate",
+            "axisAlign": true,
+            "singleRow": true,
+            "colorCode": "",
+            "reverseLabelOrder": false,
+            "description": "",
+            "dynamicLegend": false,
+            "dynamicLegendDefaultText": "Show All",
+            "dynamicLegendItemLimit": 5,
+            "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+            "dynamicLegendChartMessage": "Select Options from the Legend",
+            "label": "",
+            "lineMode": false,
+            "verticalSorted": false,
+            "highlightOnHover": false,
+            "hideSuppressedLabels": false,
+            "hideSuppressionLink": false,
+            "seriesHighlight": [],
+            "style": "circles",
+            "subStyle": "linear blocks",
+            "tickRotation": "",
+            "hideBorder": { "side": false, "topBottom": true },
+            "position": "right"
+          },
+          "brush": { "height": 45, "active": false },
+          "exclusions": { "active": false, "keys": [] },
+          "palette": "qualitative-bold",
+          "isPaletteReversed": false,
+          "twoColor": { "palette": "monochrome-1", "isPaletteReversed": false },
+          "labels": false,
+          "dataFormat": {
+            "commas": false,
+            "prefix": "",
+            "suffix": "",
+            "abbreviated": false,
+            "bottomSuffix": "",
+            "bottomPrefix": "",
+            "bottomAbbreviated": false
+          },
+          "confidenceKeys": {},
+          "visual": {
+            "border": true,
+            "accent": true,
+            "background": true,
+            "verticalHoverLine": false,
+            "horizontalHoverLine": false
+          },
+          "useLogScale": false,
+          "filterBehavior": "Filter Change",
+          "highlightedBarValues": [],
+          "series": [
+            {
+              "dataKey": "Data_Value",
+              "type": "Line",
+              "axis": "Left",
+              "tooltip": true,
+              "dynamicCategory": "YearQuarter",
+              "name": "hello"
+            }
+          ],
+          "tooltips": { "opacity": 90, "singleSeries": false, "dateDisplayFormat": "" },
+          "forestPlot": {
+            "startAt": 0,
+            "colors": { "line": "", "shape": "" },
+            "lineOfNoEffect": { "show": true },
+            "type": "",
+            "pooledResult": { "diamondHeight": 5, "column": "" },
+            "estimateField": "",
+            "estimateRadius": "",
+            "shape": "square",
+            "rowHeight": 20,
+            "description": { "show": true, "text": "description", "location": 0 },
+            "result": { "show": true, "text": "result", "location": 100 },
+            "radius": { "min": 2, "max": 10, "scalingColumn": "" },
+            "regression": { "lower": 0, "upper": 0, "estimateField": 0 },
+            "leftWidthOffset": 0,
+            "rightWidthOffset": 0,
+            "showZeroLine": false,
+            "leftLabel": "",
+            "rightLabel": ""
+          },
+          "area": { "isStacked": false },
+          "sankey": {
+            "title": { "defaultColor": "black" },
+            "iterations": 1,
+            "rxValue": 0.9,
+            "overallSize": { "width": 900, "height": 700 },
+            "margin": { "margin_y": 25, "margin_x": 0 },
+            "nodeSize": { "nodeWidth": 26, "nodeHeight": 40 },
+            "nodePadding": 55,
+            "nodeFontColor": "black",
+            "nodeColor": { "default": "#ff8500", "inactive": "#808080" },
+            "linkColor": { "default": "#ffc900", "inactive": "#D3D3D3" },
+            "opacity": {
+              "nodeOpacityDefault": 1,
+              "nodeOpacityInactive": 0.1,
+              "LinkOpacityDefault": 1,
+              "LinkOpacityInactive": 0.1
+            },
+            "storyNodeFontColor": "#006778",
+            "storyNodeText": [],
+            "nodeValueStyle": { "textBefore": "(", "textAfter": ")" },
+            "data": []
+          },
+          "filters": [],
+          "openModal": true,
+          "uid": "chart1734734074310",
+          "visualizationType": "Line",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi_dashboard&$where=TopicDesc=%22Cigarette Tax ($ per pack)%22%20&$limit=2003",
+          "dataDescription": { "horizontal": false, "series": false },
+          "version": "4.24.10",
+          "dynamicMarginTop": 0
+        }
+      },
+      "dashboard": {
+        "theme": "theme-blue",
+        "sharedFilters": [
+          {
+            "key": "Quarter",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "filterBy": "Query String",
+            "queryParameter": "",
+            "datasetKey": "",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200&$select=DISTINCT%20YearQuarter&$order=YearQuarter DESC",
+              "valueSelector": "YearQuarter",
+              "textSelector": ""
+            },
+            "usedBy": ["map1732051228260", 5, 6, 7, 8],
+            "tier": 1
+          },
+          {
+            "key": "Location",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=2003&$select=DISTINCT%20Location&$order=Location",
+              "valueSelector": "Location",
+              "textSelector": ""
+            },
+            "usedBy": [],
+            "tier": 1
+          }
+        ]
+      },
+      "rows": [
         {
-          "width": 6,
-          "widget": "markup-include1719606699638"
+          "columns": [{ "width": 12, "widget": "markup-include1734729533556" }],
+          "uuid": 1734729526862,
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200"
+        },
+        { "columns": [{ "width": 12, "widget": "dashboardFilters1733263191487" }], "uuid": 1734729526862 },
+        {
+          "columns": [{ "width": 12, "widget": "chart1734734074310" }],
+          "uuid": 1734734064140,
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi_dashboard&$where=TopicDesc=%22Cigarette Tax ($ per pack)%22%20&$limit=2003"
         },
         {
-          "width": 6,
-          "widget": "markup-include1719606700773"
+          "columns": [{ "width": 12, "widget": "chart1732045729499" }, {}, {}],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi_dashboard&$where=TopicDesc=%22Cigarette Tax ($ per pack)%22%20&$limit=2003",
+          "uuid": 1734734064140
+        },
+        {
+          "columns": [{ "width": 12, "widget": "table1734732581749" }],
+          "uuid": 1734734060035,
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi_dashboard&$where=TopicDesc=%22Cigarette Tax ($ per pack)%22%20&$limit=2003"
+        },
+        {
+          "columns": [{ "width": 12, "widget": "dashboardFilters1732051920923" }],
+          "uuid": 1734734057763,
+          "dataDescription": {},
+          "dataKey": ""
+        },
+        {
+          "columns": [{ "width": 12, "widget": "markup-include1732733401191" }],
+          "uuid": 1734734055596,
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200"
+        },
+        { "columns": [{ "width": 12, "widget": "map1732051228260" }], "uuid": 1734734053403 },
+        {
+          "columns": [{ "width": 12, "widget": "table1732735270942" }],
+          "uuid": 1734734051596,
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200&$where=TopicDesc=%22Smokefree%20Indoor%20Air%22"
+        },
+        {
+          "columns": [{ "width": 12, "widget": "markup-include1732733902024" }],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200",
+          "uuid": 1734734049780
+        },
+        {
+          "columns": [{ "width": 12, "widget": "map1732734226070" }],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200&$select=DISTINCT%20PreemptionSummary&$order=PreemptionSummary",
+          "uuid": 1734734047762
+        },
+        {
+          "columns": [{ "width": 12, "widget": "table1734545973794" }],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=statesystem_legi_dashboard&$limit=200",
+          "uuid": 1734734045123
         }
       ],
-      "uuid": 1719606685381
+      "type": "dashboard",
+      "version": "4.24.10"
     },
     {
-      "columns": [
-        {
-          "width": 12,
-          "widget": "chart1719598308434"
+      "dashboard": {
+        "sharedFilters": [
+          {
+            "key": "Topic",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?%24datakey=statesystem_legi&%24limit=20&%24select=distinct%20Topic%2c%20TopicOrder&%24order=TopicOrder",
+              "valueSelector": "Topic",
+              "textSelector": ""
+            }
+          },
+          {
+            "key": "Location",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000&$select=DISTINCT%20Location&$order=Location",
+              "valueSelector": "Location",
+              "textSelector": ""
+            },
+            "parents": ["Topic"]
+          },
+          {
+            "key": "Tobacco Type",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "filterStyle": "multi-select",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$select=DISTINCT%20TobaccoType&$order=TobaccoType&$where=TobaccoType!=%22%22&$limit=2000",
+              "subgroupValueSelector": "",
+              "textSelector": "",
+              "valueSelector": "TobaccoType"
+            },
+            "selectLimit": "4",
+            "parents": ["Topic", "Location"]
+          },
+          {
+            "key": "Quarter (Select up to 4)",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000&$select=DISTINCT%20YearQuarter&$order=YearQuarter DESC",
+              "subgroupValueSelector": "",
+              "textSelector": "",
+              "valueSelector": "YearQuarter"
+            },
+            "parents": ["Tobacco Type"],
+            "filterStyle": "multi-select",
+            "selectLimit": "4"
+          }
+        ]
+      },
+      "visualizations": {
+        "dashboardFilters1728943790834": {
+          "filters": [],
+          "filterBehavior": "Apply Button",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1728943790834",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [0, 1],
+          "visualizationType": "dashboardFilters",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000",
+          "dataDescription": { "horizontal": false, "series": false },
+          "applyFiltersButtonText": "View Results"
         },
-        {},
-        {}
+        "table1728944573162": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": false,
+          "openModal": true,
+          "uid": "table1728944573162",
+          "type": "table",
+          "table": {
+            "label": "",
+            "show": true,
+            "showDownloadUrl": false,
+            "showVertical": true,
+            "expanded": true,
+            "collapsible": true,
+            "groupBy": "Provision",
+            "pivot": { "columnName": "YearQuarter", "valueColumns": ["Value"] }
+          },
+          "columns": {
+            "GeoLocation": { "name": "GeoLocation", "dataTable": false },
+            "Location": { "name": "Location", "dataTable": false },
+            "LocationAbbr": { "name": "LocationAbbr", "dataTable": false },
+            "Measure": { "name": "Measure", "dataTable": false },
+            "MeasureId": { "name": "MeasureId", "dataTable": false },
+            "OldTopicId": { "name": "OldTopicId", "dataTable": false },
+            "Quarter": { "name": "Quarter", "dataTable": false },
+            "RowDisplayOrder": { "name": "RowDisplayOrder", "dataTable": false },
+            "RowNum": { "name": "RowNum", "dataTable": false },
+            "RowType": { "name": "RowType", "dataTable": true },
+            "Topic": { "name": "Topic", "dataTable": false },
+            "TopicId": { "name": "TopicId", "dataTable": false },
+            "Year": { "name": "Year", "dataTable": false },
+            "Provision": { "name": "Provision", "dataTable": true },
+            "TobaccoType": {
+              "label": "TobaccoType",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "forestPlot": false,
+              "startingPoint": "0",
+              "forestPlotAlignRight": false,
+              "roundToPlace": 0,
+              "commas": false,
+              "showInViz": false,
+              "forestPlotStartingPoint": 0,
+              "name": "TobaccoType",
+              "order": 1
+            }
+          },
+          "dataFormat": {},
+          "visualizationType": "table",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000",
+          "dataDescription": { "horizontal": false, "series": false }
+        },
+        "dashboardFilters1729529112232": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1729529112232",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [2, 3],
+          "visualizationType": "dashboardFilters",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000",
+          "dataDescription": { "horizontal": false, "series": false },
+          "autoLoad": true
+        },
+        "markup-include1729713861750": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "openModal": false,
+          "uid": "markup-include1729713861750",
+          "type": "markup-include",
+          "contentEditor": {
+            "inlineHTML": "<h2>{{topic}}</h2>\n<h2><em>{{State}} | {{Quarter}}</em></h2>",
+            "markupVariables": [
+              { "columnName": "Location", "conditions": [], "name": "State", "tag": "{{State}}" },
+              { "columnName": "YearQuarter", "conditions": [], "name": "Quarter", "tag": "{{Quarter}}" },
+              { "columnName": "Topic", "conditions": [], "name": "topic", "tag": "{{topic}}" }
+            ],
+            "showHeader": true,
+            "srcUrl": "#example",
+            "title": "",
+            "useInlineHTML": true
+          },
+          "theme": "theme-blue",
+          "visual": {
+            "border": false,
+            "accent": false,
+            "background": false,
+            "hideBackgroundColor": false,
+            "borderColorTheme": false
+          },
+          "showEditorPanel": true,
+          "visualizationType": "markup-include",
+          "version": "4.24.10",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000",
+          "dataDescription": { "series": false }
+        }
+      },
+      "rows": [
+        {
+          "columns": [{ "width": 12, "widget": "dashboardFilters1728943790834" }],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000"
+        },
+        {
+          "columns": [{ "width": 12, "widget": "markup-include1729713861750" }],
+          "uuid": 1729713854035,
+          "dataDescription": { "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000"
+        },
+        {
+          "columns": [{ "width": 12, "widget": "dashboardFilters1729529112232" }],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000",
+          "uuid": 1729713854035
+        },
+        {
+          "columns": [{ "width": 12, "widget": "table1728944573162" }],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000",
+          "uuid": 1729713849067,
+          "multiVizColumn": "Measure",
+          "expandCollapseAllButtons": true
+        }
       ],
-      "uuid": 1719606685381
+      "label": "Compare Years",
+      "type": "dashboard",
+      "version": "4.24.10"
+    },
+    {
+      "dashboard": {
+        "sharedFilters": [
+          {
+            "key": "Topic",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?%24datakey=statesystem_legi&%24limit=20&%24select=distinct%20Topic%2c%20TopicOrder&%24order=TopicOrder",
+              "valueSelector": "Topic",
+              "textSelector": ""
+            }
+          },
+          {
+            "key": "Quarter",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000&$select=DISTINCT%20YearQuarter&$order=YearQuarter DESC",
+              "valueSelector": "YearQuarter",
+              "textSelector": ""
+            },
+            "parents": ["Topic"]
+          },
+          {
+            "key": "Tobacco Type",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$select=DISTINCT%20TobaccoType&$order=TobaccoType&$where=TobaccoType!=%22%22&$limit=2000",
+              "subgroupValueSelector": "",
+              "textSelector": "",
+              "valueSelector": "TobaccoType"
+            },
+            "parents": ["Topic", "Quarter"],
+            "filterStyle": "multi-select",
+            "selectLimit": "4"
+          },
+          {
+            "key": "Location (Select up to 4)",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000&$select=DISTINCT%20Location&$order=Location",
+              "subgroupValueSelector": "",
+              "textSelector": "",
+              "valueSelector": "Location"
+            },
+            "parents": ["Tobacco Type"],
+            "filterStyle": "multi-select",
+            "selectLimit": "4"
+          }
+        ]
+      },
+      "visualizations": {
+        "dashboardFilters1729534195633": {
+          "filters": [],
+          "filterBehavior": "Apply Button",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1729534195633",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [0, 1],
+          "visualizationType": "dashboardFilters",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000",
+          "dataDescription": { "horizontal": false, "series": false },
+          "applyFiltersButtonText": "View Results"
+        },
+        "dashboardFilters1729534404497": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1729534404497",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [2, 3],
+          "visualizationType": "dashboardFilters",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000",
+          "dataDescription": { "horizontal": false, "series": false },
+          "autoLoad": true
+        },
+        "table1729537182122": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": false,
+          "openModal": true,
+          "uid": "table1729537182122",
+          "type": "table",
+          "table": {
+            "label": "",
+            "show": true,
+            "showDownloadUrl": false,
+            "showVertical": true,
+            "expanded": true,
+            "collapsible": true,
+            "groupBy": "Provision",
+            "pivot": { "columnName": "Location", "valueColumns": ["Value"] }
+          },
+          "columns": {
+            "GeoLocation": { "name": "GeoLocation", "dataTable": false },
+            "LocationAbbr": { "name": "LocationAbbr", "dataTable": false },
+            "Measure": { "name": "Measure", "dataTable": false },
+            "MeasureId": { "name": "MeasureId", "dataTable": false },
+            "OldTopicId": { "name": "OldTopicId", "dataTable": false },
+            "Quarter": { "name": "Quarter", "dataTable": false },
+            "RowDisplayOrder": { "name": "RowDisplayOrder", "dataTable": false },
+            "RowNum": { "name": "RowNum", "dataTable": false },
+            "Topic": { "name": "Topic", "dataTable": false },
+            "TopicId": { "name": "TopicId", "dataTable": false },
+            "Value": { "name": "Value", "dataTable": true },
+            "Year": { "name": "Year", "dataTable": false },
+            "YearQuarter": { "name": "YearQuarter", "dataTable": false },
+            "Provision": { "name": "Provision", "dataTable": true },
+            "TobaccoType": {
+              "label": "TobaccoType",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "forestPlot": false,
+              "startingPoint": "0",
+              "forestPlotAlignRight": false,
+              "roundToPlace": 0,
+              "commas": false,
+              "showInViz": false,
+              "forestPlotStartingPoint": 0,
+              "name": "TobaccoType",
+              "order": 1
+            }
+          },
+          "dataFormat": {},
+          "visualizationType": "table",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000",
+          "dataDescription": { "horizontal": false, "series": false }
+        },
+        "markup-include1729635163324": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "openModal": false,
+          "uid": "markup-include1729635163324",
+          "type": "markup-include",
+          "contentEditor": {
+            "inlineHTML": "<h2>{{topic}}</h2>\n<h2><em>{{StateName}} | {{QuarterTitle}}</em></h2>",
+            "markupVariables": [
+              { "columnName": "Location", "conditions": [], "name": "StateName", "tag": "{{StateName}}" },
+              { "columnName": "YearQuarter", "conditions": [], "name": "QuarterTitle", "tag": "{{QuarterTitle}}" },
+              { "columnName": "Topic", "conditions": [], "name": "topic", "tag": "{{topic}}" }
+            ],
+            "showHeader": true,
+            "srcUrl": "#example",
+            "title": "",
+            "useInlineHTML": true
+          },
+          "theme": "theme-blue",
+          "visual": {
+            "border": false,
+            "accent": false,
+            "background": false,
+            "hideBackgroundColor": false,
+            "borderColorTheme": false
+          },
+          "showEditorPanel": true,
+          "visualizationType": "markup-include",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000",
+          "dataDescription": { "horizontal": false, "series": false },
+          "version": "4.24.12"
+        }
+      },
+      "rows": [
+        {
+          "columns": [{ "width": 12, "widget": "dashboardFilters1729534195633" }],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000"
+        },
+        {
+          "columns": [{ "width": 12, "widget": "markup-include1729635163324" }],
+          "uuid": 1729635180241,
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000"
+        },
+        {
+          "columns": [{ "width": 12, "widget": "dashboardFilters1729534404497" }],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000",
+          "uuid": 1729635180241
+        },
+        {
+          "columns": [{ "width": 12, "widget": "table1729537182122" }],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2000",
+          "uuid": 1729635175872,
+          "multiVizColumn": "Measure",
+          "expandCollapseAllButtons": true
+        }
+      ],
+      "label": "Compare Locations",
+      "type": "dashboard",
+      "version": "4.24.10"
+    },
+    {
+      "label": "All Locations",
+      "visualizations": {
+        "dashboardFilters1729541409268": {
+          "filters": [],
+          "filterBehavior": "Apply Button",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1729541409268",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [0, 1],
+          "visualizationType": "dashboardFilters",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2001",
+          "dataDescription": { "horizontal": false, "series": false },
+          "autoLoad": false,
+          "applyFiltersButtonText": "View Results",
+          "showEditorPanel": false
+        },
+        "table1729541872326": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": false,
+          "openModal": true,
+          "uid": "table1729541872326",
+          "type": "table",
+          "table": {
+            "label": "",
+            "show": true,
+            "showDownloadUrl": false,
+            "showVertical": true,
+            "expanded": true,
+            "collapsible": false,
+            "pivot": { "columnName": "YearQuarter", "valueColumns": ["Value"] }
+          },
+          "columns": {
+            "GeoLocation": { "name": "GeoLocation", "dataTable": false },
+            "LocationAbbr": { "name": "LocationAbbr", "dataTable": false },
+            "Measure": { "name": "Measure", "dataTable": false },
+            "MeasureId": { "name": "MeasureId", "dataTable": false },
+            "OldTopicId": { "name": "OldTopicId", "dataTable": false },
+            "Provision": { "name": "Provision", "dataTable": false },
+            "Quarter": { "name": "Quarter", "dataTable": false },
+            "RowDisplayOrder": { "name": "RowDisplayOrder", "dataTable": false },
+            "RowNum": { "name": "RowNum", "dataTable": false },
+            "TobaccoType": { "name": "TobaccoType", "dataTable": false },
+            "Topic": { "name": "Topic", "dataTable": false },
+            "Year": { "name": "Year", "dataTable": false },
+            "TopicId": { "name": "TopicId", "dataTable": false },
+            "Location": {
+              "label": "State",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "forestPlot": false,
+              "startingPoint": "0",
+              "forestPlotAlignRight": false,
+              "roundToPlace": 0,
+              "commas": false,
+              "showInViz": false,
+              "forestPlotStartingPoint": 0,
+              "name": "Location",
+              "order": 1
+            }
+          },
+          "dataFormat": {},
+          "visualizationType": "table",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2001",
+          "dataDescription": { "horizontal": false, "series": false }
+        },
+        "dashboardFilters1729542268478": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1729542268478",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [2, 3],
+          "visualizationType": "dashboardFilters",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2001",
+          "dataDescription": { "horizontal": false, "series": false },
+          "autoLoad": true
+        },
+        "markup-include1733861851857": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "openModal": false,
+          "uid": "markup-include1733861851857",
+          "type": "markup-include",
+          "contentEditor": {
+            "inlineHTML": "<h2>{{topic}}</h2>",
+            "markupVariables": [{ "columnName": "Topic", "conditions": [], "name": "topic", "tag": "{{topic}}" }],
+            "showHeader": true,
+            "srcUrl": "#example",
+            "title": "",
+            "useInlineHTML": true,
+            "allowHideSection": false
+          },
+          "theme": "theme-blue",
+          "visual": {
+            "border": false,
+            "accent": false,
+            "background": false,
+            "hideBackgroundColor": false,
+            "borderColorTheme": false
+          },
+          "showEditorPanel": true,
+          "visualizationType": "markup-include",
+          "dataDescription": { "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2001",
+          "version": "4.24.10"
+        }
+      },
+      "dashboard": {
+        "sharedFilters": [
+          {
+            "key": "Topic",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?%24datakey=statesystem_legi&%24limit=20&%24select=distinct%20Topic%2c%20TopicOrder&%24order=TopicOrder",
+              "valueSelector": "Topic",
+              "textSelector": ""
+            },
+            "usedBy": [2, 3, 4, 1],
+            "tier": 1
+          },
+          {
+            "key": "Sub-Measure",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2001&$select=DISTINCT%20Provision&$order=Provision",
+              "valueSelector": "Provision",
+              "textSelector": ""
+            },
+            "parents": ["Topic"],
+            "usedBy": [2, 3, 4, 1],
+            "tier": 2
+          },
+          {
+            "key": "Tobacco Type",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$select=DISTINCT%20TobaccoType&$order=TobaccoType&$where=TobaccoType!=%22%22&$limit=2001",
+              "valueSelector": "TobaccoType",
+              "textSelector": ""
+            },
+            "parents": ["Topic", "Sub-Measure"],
+            "usedBy": [3],
+            "tier": 2
+          },
+          {
+            "key": "Quarter (Select up to 4)",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "filterStyle": "multi-select",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2001&$select=DISTINCT%20YearQuarter&$order=YearQuarter DESC",
+              "subgroupValueSelector": "",
+              "textSelector": "",
+              "valueSelector": "YearQuarter"
+            },
+            "selectLimit": "4",
+            "parents": ["Tobacco Type"],
+            "usedBy": [3],
+            "tier": 3
+          }
+        ]
+      },
+      "rows": [
+        {
+          "columns": [{ "width": 12, "widget": "dashboardFilters1729541409268" }],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2001"
+        },
+        {
+          "columns": [{ "width": 12, "widget": "markup-include1733861851857" }],
+          "dataDescription": { "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2001",
+          "uuid": 1733861955862
+        },
+        {
+          "columns": [{ "width": 12, "widget": "dashboardFilters1729542268478" }],
+          "uuid": 1733861954085,
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2001"
+        },
+        {
+          "columns": [{ "width": 12, "widget": "table1729541872326" }],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=statesystem_legi&$limit=2001",
+          "uuid": 1733861952573
+        }
+      ],
+      "type": "dashboard",
+      "version": "4.24.10"
     }
   ],
-  "visualizations": {
-    "chart1719598308434": {
-      "type": "chart",
-      "debugSvg": false,
-      "chartMessage": {
-        "noData": "No Data Available"
-      },
-      "title": "Bump Chart",
-      "showTitle": false,
-      "showDownloadMediaButton": false,
-      "theme": "theme-blue",
-      "animate": false,
-      "fontSize": "medium",
-      "lineDatapointStyle": "hover",
-      "lineDatapointColor": "Same as Line",
-      "barHasBorder": "false",
-      "isLollipopChart": false,
-      "lollipopShape": "circle",
-      "lollipopColorStyle": "two-tone",
-      "visualizationSubType": "regular",
-      "barStyle": "",
-      "roundingStyle": "standard",
-      "tipRounding": "top",
-      "isResponsiveTicks": true,
-      "general": {
-        "showDownloadButton": false
-      },
-      "padding": {
-        "left": 5,
-        "right": 5
-      },
-      "preliminaryData": [],
-      "yAxis": {
-        "hideAxis": false,
-        "displayNumbersOnBar": false,
-        "hideLabel": false,
-        "hideTicks": true,
-        "size": "93",
-        "gridLines": true,
-        "enablePadding": true,
-        "min": "0",
-        "max": "",
-        "labelColor": "#333",
-        "tickLabelColor": "#333",
-        "tickColor": "#333",
-        "rightHideAxis": true,
-        "rightAxisSize": 0,
-        "rightLabel": "",
-        "rightLabelOffsetSize": 0,
-        "rightAxisLabelColor": "#333",
-        "rightAxisTickLabelColor": "#333",
-        "rightAxisTickColor": "#333",
-        "numTicks": "10",
-        "axisPadding": 0,
-        "scalePadding": "5",
-        "tickRotation": 0,
-        "anchors": []
-      },
-      "boxplot": {
-        "plots": [],
-        "borders": "true",
-        "firstQuartilePercentage": 25,
-        "thirdQuartilePercentage": 75,
-        "boxWidthPercentage": 40,
-        "plotOutlierValues": false,
-        "plotNonOutlierValues": true,
-        "legend": {
-          "showHowToReadText": false,
-          "howToReadText": ""
-        },
-        "labels": {
-          "q1": "Lower Quartile",
-          "q2": "q2",
-          "q3": "Upper Quartile",
-          "q4": "q4",
-          "minimum": "Minimum",
-          "maximum": "Maximum",
-          "mean": "Mean",
-          "median": "Median",
-          "sd": "Standard Deviation",
-          "iqr": "Interquartile Range",
-          "total": "Total",
-          "outliers": "Outliers",
-          "values": "Values",
-          "lowerBounds": "Lower Bounds",
-          "upperBounds": "Upper Bounds"
-        }
-      },
-      "topAxis": {
-        "hasLine": false
-      },
-      "isLegendValue": false,
-      "barThickness": 0.035,
-      "barHeight": 25,
-      "barSpace": 15,
-      "heights": {
-        "vertical": "600",
-        "horizontal": 750
-      },
-      "xAxis": {
-        "sortDates": false,
-        "anchors": [],
-        "type": "date-time",
-        "showTargetLabel": true,
-        "targetLabel": "Target",
-        "hideAxis": false,
-        "hideLabel": false,
-        "hideTicks": true,
-        "size": 75,
-        "tickRotation": 0,
-        "min": "",
-        "max": "",
-        "labelColor": "#333",
-        "tickLabelColor": "#333",
-        "tickColor": "#333",
-        "numTicks": "7",
-        "labelOffset": 65,
-        "axisPadding": 200,
-        "target": 0,
-        "maxTickRotation": 50,
-        "showSuppressedSymbol": true,
-        "showSuppressedLine": true,
-        "padding": "0",
-        "dataKey": "year",
-        "dateParseFormat": "%Y",
-        "dateDisplayFormat": "%Y",
-        "tickWidthMax": 41
-      },
-      "table": {
-        "label": "Data Table",
-        "expanded": true,
-        "limitHeight": true,
-        "height": "500",
-        "caption": "",
-        "showDownloadUrl": false,
-        "showDataTableLink": false,
-        "indexLabel": "",
-        "download": true,
-        "showVertical": true,
-        "dateDisplayFormat": "",
-        "show": true,
-        "collapsible": true
-      },
-      "orientation": "vertical",
-      "color": "pinkpurple",
-      "columns": {
-        "Sibling": {
-          "label": "Sibling",
-          "dataTable": false,
-          "tooltips": false,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "Sibling"
-        },
-        "Neck": {
-          "label": "Neck",
-          "dataTable": false,
-          "tooltips": false,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "Neck"
-        },
-        "Girlfriend": {
-          "label": "Girlfriend",
-          "dataTable": false,
-          "tooltips": false,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "Girlfriend"
-        },
-        "Bullying": {
-          "label": "Bullying",
-          "dataTable": false,
-          "tooltips": false,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "Bullying"
-        },
-        "Mother": {
-          "label": "Mother",
-          "dataTable": false,
-          "tooltips": false,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "Mother"
-        },
-        "Overdose": {
-          "label": "Overdose",
-          "dataTable": false,
-          "tooltips": false,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "Overdose"
-        },
-        "Depression": {
-          "label": "Depression",
-          "dataTable": false,
-          "tooltips": false,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "Depression"
-        },
-        "Vehicle": {
-          "label": "Vehicle",
-          "dataTable": false,
-          "tooltips": false,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "Vehicle"
-        },
-        "Friends": {
-          "label": "Friends",
-          "dataTable": false,
-          "tooltips": false,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "Friends"
-        },
-        "Head": {
-          "label": "Head",
-          "dataTable": false,
-          "tooltips": false,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "Head"
-        },
-        "year": {
-          "label": "year",
-          "dataTable": false,
-          "tooltips": false,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "year"
-        },
-        "Name": {
-          "label": "Name",
-          "dataTable": true,
-          "tooltips": true,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "Name"
-        },
-        "Timestamp": {
-          "label": "Timestamp",
-          "dataTable": true,
-          "tooltips": true,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "Timestamp"
-        },
-        "Rank": {
-          "label": "Rank",
-          "dataTable": true,
-          "tooltips": false,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "Rank"
-        },
-        "Frequency": {
-          "label": "Frequency",
-          "dataTable": true,
-          "tooltips": true,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "Frequency"
-        },
-        "Representative Sentence": {
-          "label": "Representative Sentence",
-          "dataTable": true,
-          "tooltips": false,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "Representative Sentence"
-        },
-        "Rank Change": {
-          "label": "Rank Change",
-          "dataTable": false,
-          "tooltips": true,
-          "prefix": "",
-          "suffix": "",
-          "forestPlot": false,
-          "startingPoint": "0",
-          "forestPlotAlignRight": false,
-          "roundToPlace": 0,
-          "commas": false,
-          "showInViz": false,
-          "forestPlotStartingPoint": 0,
-          "name": "Rank Change"
-        }
-      },
-      "legend": {
-        "hide": false,
-        "behavior": "isolate",
-        "axisAlign": true,
-        "singleRow": true,
-        "colorCode": "",
-        "reverseLabelOrder": false,
-        "description": "* To highlight a data series in the chart, select the corresponding name in the legend. To undo the highlight, select the reset button.",
-        "dynamicLegend": false,
-        "dynamicLegendDefaultText": "Show All",
-        "dynamicLegendItemLimit": 5,
-        "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
-        "dynamicLegendChartMessage": "Select Options from the Legend",
-        "lineMode": false,
-        "verticalSorted": false,
-        "highlightOnHover": false,
-        "hideSuppressedLabels": false,
-        "seriesHighlight": []
-      },
-      "brush": {
-        "height": 25,
-        "active": false
-      },
-      "exclusions": {
-        "active": false,
-        "keys": []
-      },
-      "palette": "qualitative-soft",
-      "isPaletteReversed": false,
-      "twoColor": {
-        "palette": "monochrome-1",
-        "isPaletteReversed": false
-      },
-      "labels": false,
-      "dataFormat": {
-        "commas": false,
-        "prefix": "",
-        "suffix": "",
-        "abbreviated": false,
-        "bottomSuffix": "",
-        "bottomPrefix": "",
-        "bottomAbbreviated": false
-      },
-      "confidenceKeys": {},
-      "visual": {
-        "border": true,
-        "accent": true,
-        "background": true,
-        "verticalHoverLine": false,
-        "horizontalHoverLine": false
-      },
-      "useLogScale": false,
-      "filterBehavior": "Filter Change",
-      "highlightedBarValues": [],
-      "series": [
-        {
-          "dataKey": "Sibling",
-          "type": "Bump Chart",
-          "axis": "Left",
-          "tooltip": true,
-          "lineType": "curveMonotoneX",
-          "name": ""
-        },
-        {
-          "dataKey": "Neck",
-          "type": "Bump Chart",
-          "axis": "Left",
-          "tooltip": false,
-          "lineType": "curveMonotoneX"
-        },
-        {
-          "dataKey": "Girlfriend",
-          "type": "Bump Chart",
-          "axis": "Left",
-          "tooltip": false,
-          "lineType": "curveMonotoneX"
-        },
-        {
-          "dataKey": "Bullying",
-          "type": "Bump Chart",
-          "axis": "Left",
-          "tooltip": false,
-          "lineType": "curveMonotoneX"
-        },
-        {
-          "dataKey": "Mother",
-          "type": "Bump Chart",
-          "axis": "Left",
-          "tooltip": false,
-          "lineType": "curveMonotoneX"
-        },
-        {
-          "dataKey": "Overdose",
-          "type": "Bump Chart",
-          "axis": "Left",
-          "tooltip": false,
-          "lineType": "curveMonotoneX"
-        },
-        {
-          "dataKey": "Depression",
-          "type": "Bump Chart",
-          "axis": "Left",
-          "tooltip": false,
-          "lineType": "curveMonotoneX"
-        },
-        {
-          "dataKey": "Vehicle",
-          "type": "Bump Chart",
-          "axis": "Left",
-          "tooltip": false,
-          "lineType": "curveMonotoneX"
-        },
-        {
-          "dataKey": "Friends",
-          "type": "Bump Chart",
-          "axis": "Left",
-          "tooltip": false,
-          "lineType": "curveMonotoneX"
-        },
-        {
-          "dataKey": "Head",
-          "type": "Bump Chart",
-          "axis": "Left",
-          "tooltip": false,
-          "lineType": "curveMonotoneX"
-        }
-      ],
-      "tooltips": {
-        "opacity": 90,
-        "singleSeries": false,
-        "dateDisplayFormat": ""
-      },
-      "forestPlot": {
-        "startAt": 0,
-        "colors": {
-          "line": "",
-          "shape": ""
-        },
-        "lineOfNoEffect": {
-          "show": true
-        },
-        "type": "",
-        "pooledResult": {
-          "diamondHeight": 5,
-          "column": ""
-        },
-        "estimateField": "",
-        "estimateRadius": "",
-        "shape": "square",
-        "rowHeight": 20,
-        "description": {
-          "show": true,
-          "text": "description",
-          "location": 0
-        },
-        "result": {
-          "show": true,
-          "text": "result",
-          "location": 100
-        },
-        "radius": {
-          "min": 2,
-          "max": 10,
-          "scalingColumn": ""
-        },
-        "regression": {
-          "lower": 0,
-          "upper": 0,
-          "estimateField": 0
-        },
-        "leftWidthOffset": 0,
-        "rightWidthOffset": 0,
-        "showZeroLine": false,
-        "leftLabel": "",
-        "rightLabel": ""
-      },
-      "area": {
-        "isStacked": false
-      },
-      "sankey": {
-        "title": {
-          "defaultColor": "black"
-        },
-        "iterations": 1,
-        "rxValue": 0.9,
-        "overallSize": {
-          "width": 900,
-          "height": 700
-        },
-        "margin": {
-          "margin_y": 25,
-          "margin_x": 0
-        },
-        "nodeSize": {
-          "nodeWidth": 26,
-          "nodeHeight": 40
-        },
-        "nodePadding": 55,
-        "nodeFontColor": "black",
-        "nodeColor": {
-          "default": "#ff8500",
-          "inactive": "#808080"
-        },
-        "linkColor": {
-          "default": "#ffc900",
-          "inactive": "#D3D3D3"
-        },
-        "opacity": {
-          "nodeOpacityDefault": 1,
-          "nodeOpacityInactive": 0.1,
-          "LinkOpacityDefault": 1,
-          "LinkOpacityInactive": 0.1
-        },
-        "storyNodeFontColor": "#006778",
-        "storyNodeText": [],
-        "nodeValueStyle": {
-          "textBefore": "(",
-          "textAfter": ")"
-        },
-        "data": []
-      },
-      "filters": [],
-      "openModal": true,
-      "uid": "chart1719598308434",
-      "visualizationType": "Bump Chart",
-      "dataDescription": {
-        "horizontal": false,
-        "series": false
-      },
-      "editing": false,
-      "originalFormattedData": [
-        {
-          "Sibling": "1",
-          "year": "2014",
-          "Name": "Sibling",
-          "Timestamp": "1/1/14",
-          "Rank": "1",
-          "Frequency": "149",
-          "Rank Change": "-",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2015",
-          "Name": "Sibling",
-          "Timestamp": "1/1/15",
-          "Rank": "2",
-          "Frequency": "172",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2016",
-          "Name": "Sibling",
-          "Timestamp": "1/1/16",
-          "Rank": "2",
-          "Frequency": "230",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2017",
-          "Name": "Sibling",
-          "Timestamp": "1/1/17",
-          "Rank": "2",
-          "Frequency": "379",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2018",
-          "Name": "Sibling",
-          "Timestamp": "1/1/18",
-          "Rank": "2",
-          "Frequency": "357",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2019",
-          "Name": "Sibling",
-          "Timestamp": "1/1/19",
-          "Rank": "2",
-          "Frequency": "358",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2020",
-          "Name": "Sibling",
-          "Timestamp": "1/1/20",
-          "Rank": "2",
-          "Frequency": "458",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Neck": "2",
-          "year": "2014",
-          "Name": "Neck",
-          "Timestamp": "1/1/14",
-          "Rank": "2",
-          "Frequency": "131",
-          "Rank Change": "-",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2015",
-          "Name": "Neck",
-          "Timestamp": "1/1/15",
-          "Rank": "1",
-          "Frequency": "316",
-          "Rank Change": "1",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2016",
-          "Name": "Neck",
-          "Timestamp": "1/1/16",
-          "Rank": "1",
-          "Frequency": "437",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2017",
-          "Name": "Neck",
-          "Timestamp": "1/1/17",
-          "Rank": "1",
-          "Frequency": "621",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2018",
-          "Name": "Neck",
-          "Timestamp": "1/1/18",
-          "Rank": "1",
-          "Frequency": "526",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2019",
-          "Name": "Neck",
-          "Timestamp": "1/1/19",
-          "Rank": "1",
-          "Frequency": "555",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2020",
-          "Name": "Neck",
-          "Timestamp": "1/1/20",
-          "Rank": "1",
-          "Frequency": "527",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Girlfriend": "3",
-          "year": "2014",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/14",
-          "Rank": "3",
-          "Frequency": "101",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "4",
-          "year": "2015",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/15",
-          "Rank": "4",
-          "Frequency": "155",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "3",
-          "year": "2016",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/16",
-          "Rank": "3",
-          "Frequency": "219",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "4",
-          "year": "2017",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/17",
-          "Rank": "4",
-          "Frequency": "260",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "3",
-          "year": "2018",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/18",
-          "Rank": "3",
-          "Frequency": "294",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "4",
-          "year": "2019",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/19",
-          "Rank": "4",
-          "Frequency": "262",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "4",
-          "year": "2020",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/20",
-          "Rank": "4",
-          "Frequency": "242",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Bullying": "4",
-          "year": "2014",
-          "Name": "Bullying",
-          "Timestamp": "1/1/14",
-          "Rank": "4",
-          "Frequency": "95",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "8",
-          "year": "2015",
-          "Name": "Bullying",
-          "Timestamp": "1/1/15",
-          "Rank": "8",
-          "Frequency": "90",
-          "Rank Change": "-4",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "5",
-          "year": "2016",
-          "Name": "Bullying",
-          "Timestamp": "1/1/16",
-          "Rank": "5",
-          "Frequency": "144",
-          "Rank Change": "3",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "10",
-          "year": "2017",
-          "Name": "Bullying",
-          "Timestamp": "1/1/17",
-          "Rank": "10",
-          "Frequency": "165",
-          "Rank Change": "-5",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "6",
-          "year": "2018",
-          "Name": "Bullying",
-          "Timestamp": "1/1/18",
-          "Rank": "6",
-          "Frequency": "213",
-          "Rank Change": "-4",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "9",
-          "year": "2019",
-          "Name": "Bullying",
-          "Timestamp": "1/1/19",
-          "Rank": "9",
-          "Frequency": "151",
-          "Rank Change": "-3",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "10",
-          "year": "2020",
-          "Name": "Bullying",
-          "Timestamp": "1/1/20",
-          "Rank": "10",
-          "Frequency": "112",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Mother": "5",
-          "year": "2014",
-          "Name": "Mother",
-          "Timestamp": "1/1/14",
-          "Rank": "5",
-          "Frequency": "89",
-          "Rank Change": "-",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "7",
-          "year": "2015",
-          "Name": "Mother",
-          "Timestamp": "1/1/15",
-          "Rank": "7",
-          "Frequency": "104",
-          "Rank Change": "-2",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "6",
-          "year": "2016",
-          "Name": "Mother",
-          "Timestamp": "1/1/16",
-          "Rank": "6",
-          "Frequency": "141",
-          "Rank Change": "1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "5",
-          "year": "2017",
-          "Name": "Mother",
-          "Timestamp": "1/1/17",
-          "Rank": "5",
-          "Frequency": "230",
-          "Rank Change": "1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "4",
-          "year": "2018",
-          "Name": "Mother",
-          "Timestamp": "1/1/18",
-          "Rank": "4",
-          "Frequency": "241",
-          "Rank Change": "1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "5",
-          "year": "2019",
-          "Name": "Mother",
-          "Timestamp": "1/1/19",
-          "Rank": "5",
-          "Frequency": "190",
-          "Rank Change": "-1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "6",
-          "year": "2020",
-          "Name": "Mother",
-          "Timestamp": "1/1/20",
-          "Rank": "6",
-          "Frequency": "206",
-          "Rank Change": "-1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Overdose": "6",
-          "year": "2014",
-          "Name": "Overdose",
-          "Timestamp": "1/1/14",
-          "Rank": "6",
-          "Frequency": "76",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "6",
-          "year": "2015",
-          "Name": "Overdose",
-          "Timestamp": "1/1/15",
-          "Rank": "6",
-          "Frequency": "114",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "7",
-          "year": "2016",
-          "Name": "Overdose",
-          "Timestamp": "1/1/16",
-          "Rank": "7",
-          "Frequency": "137",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "6",
-          "year": "2017",
-          "Name": "Overdose",
-          "Timestamp": "1/1/17",
-          "Rank": "6",
-          "Frequency": "227",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "7",
-          "year": "2018",
-          "Name": "Overdose",
-          "Timestamp": "1/1/18",
-          "Rank": "7",
-          "Frequency": "185",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "6",
-          "year": "2019",
-          "Name": "Overdose",
-          "Timestamp": "1/1/19",
-          "Rank": "6",
-          "Frequency": "190",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "5",
-          "year": "2020",
-          "Name": "Overdose",
-          "Timestamp": "1/1/20",
-          "Rank": "5",
-          "Frequency": "210",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Depression": "7",
-          "year": "2014",
-          "Name": "Depression",
-          "Timestamp": "1/1/14",
-          "Rank": "7",
-          "Frequency": "57",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "9",
-          "year": "2015",
-          "Name": "Depression",
-          "Timestamp": "1/1/15",
-          "Rank": "9",
-          "Frequency": "89",
-          "Rank Change": "-2",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "9",
-          "year": "2016",
-          "Name": "Depression",
-          "Timestamp": "1/1/16",
-          "Rank": "9",
-          "Frequency": "125",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "7",
-          "year": "2017",
-          "Name": "Depression",
-          "Timestamp": "1/1/17",
-          "Rank": "7",
-          "Frequency": "181",
-          "Rank Change": "2",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "8",
-          "year": "2018",
-          "Name": "Depression",
-          "Timestamp": "1/1/18",
-          "Rank": "8",
-          "Frequency": "168",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "7",
-          "year": "2019",
-          "Name": "Depression",
-          "Timestamp": "1/1/19",
-          "Rank": "7",
-          "Frequency": "172",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "7",
-          "year": "2020",
-          "Name": "Depression",
-          "Timestamp": "1/1/20",
-          "Rank": "8",
-          "Frequency": "206",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Vehicle": "8",
-          "year": "2014",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/14",
-          "Rank": "8",
-          "Frequency": "55",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "3",
-          "year": "2015",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/15",
-          "Rank": "3",
-          "Frequency": "171",
-          "Rank Change": "5",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "4",
-          "year": "2016",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/16",
-          "Rank": "4",
-          "Frequency": "209",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "3",
-          "year": "2017",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/17",
-          "Rank": "3",
-          "Frequency": "304",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "5",
-          "year": "2018",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/18",
-          "Rank": "5",
-          "Frequency": "236",
-          "Rank Change": "-2",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "3",
-          "year": "2019",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/19",
-          "Rank": "3",
-          "Frequency": "266",
-          "Rank Change": "2",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "3",
-          "year": "2020",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/20",
-          "Rank": "3",
-          "Frequency": "293",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Friends": "9",
-          "year": "2014",
-          "Name": "Friends",
-          "Timestamp": "1/1/14",
-          "Rank": "9",
-          "Frequency": "41",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "10",
-          "year": "2015",
-          "Name": "Friends",
-          "Timestamp": "1/1/15",
-          "Rank": "10",
-          "Frequency": "78",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "10",
-          "year": "2016",
-          "Name": "Friends",
-          "Timestamp": "1/1/16",
-          "Rank": "10",
-          "Frequency": "87",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "9",
-          "year": "2017",
-          "Name": "Friends",
-          "Timestamp": "1/1/17",
-          "Rank": "9",
-          "Frequency": "170",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "9",
-          "year": "2018",
-          "Name": "Friends",
-          "Timestamp": "1/1/18",
-          "Rank": "9",
-          "Frequency": "165",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "10",
-          "year": "2019",
-          "Name": "Friends",
-          "Timestamp": "1/1/19",
-          "Rank": "10",
-          "Frequency": "127",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "9",
-          "year": "2020",
-          "Name": "Friends",
-          "Timestamp": "1/1/20",
-          "Rank": "9",
-          "Frequency": "137",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Head": "10",
-          "year": "2014",
-          "Name": "Head",
-          "Timestamp": "1/1/14",
-          "Rank": "10",
-          "Frequency": "20",
-          "Rank Change": "-",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "5",
-          "year": "2015",
-          "Name": "Head",
-          "Timestamp": "1/1/15",
-          "Rank": "5",
-          "Frequency": "119",
-          "Rank Change": "5",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "8",
-          "year": "2016",
-          "Name": "Head",
-          "Timestamp": "1/1/16",
-          "Rank": "8",
-          "Frequency": "134",
-          "Rank Change": "-3",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "8",
-          "year": "2017",
-          "Name": "Head",
-          "Timestamp": "1/1/17",
-          "Rank": "8",
-          "Frequency": "171",
-          "Rank Change": "0",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "10",
-          "year": "2018",
-          "Name": "Head",
-          "Timestamp": "1/1/18",
-          "Rank": "10",
-          "Frequency": "141",
-          "Rank Change": "-2",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "8",
-          "year": "2019",
-          "Name": "Head",
-          "Timestamp": "1/1/19",
-          "Rank": "8",
-          "Frequency": "152",
-          "Rank Change": "2",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "8",
-          "year": "2020",
-          "Name": "Head",
-          "Timestamp": "1/1/20",
-          "Rank": "8",
-          "Frequency": "199",
-          "Rank Change": "0",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        }
-      ],
-      "version": "4.24.4",
-      "footnotes": "NVDRS, 2014-2020. Data are outputs from unsupervised topic modeling (BERTopic) of sentences in NVDRS data related to adolescent suicides. All narratives were split into sentences and fed in to the model grouping sentences into topics. The top ten topics are shown with the most representative four key terms in each topic and a representative sentence. The frequency of sentences within each topic was annually tracked.",
-      "dynamicMarginTop": 0,
-      "data": [
-        {
-          "Sibling": "1",
-          "year": "2014",
-          "Name": "Sibling",
-          "Timestamp": "1/1/14",
-          "Rank": "1",
-          "Frequency": "149",
-          "Rank Change": "-",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2015",
-          "Name": "Sibling",
-          "Timestamp": "1/1/15",
-          "Rank": "2",
-          "Frequency": "172",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2016",
-          "Name": "Sibling",
-          "Timestamp": "1/1/16",
-          "Rank": "2",
-          "Frequency": "230",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2017",
-          "Name": "Sibling",
-          "Timestamp": "1/1/17",
-          "Rank": "2",
-          "Frequency": "379",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2018",
-          "Name": "Sibling",
-          "Timestamp": "1/1/18",
-          "Rank": "2",
-          "Frequency": "357",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2019",
-          "Name": "Sibling",
-          "Timestamp": "1/1/19",
-          "Rank": "2",
-          "Frequency": "358",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2020",
-          "Name": "Sibling",
-          "Timestamp": "1/1/20",
-          "Rank": "2",
-          "Frequency": "458",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Neck": "2",
-          "year": "2014",
-          "Name": "Neck",
-          "Timestamp": "1/1/14",
-          "Rank": "2",
-          "Frequency": "131",
-          "Rank Change": "-",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2015",
-          "Name": "Neck",
-          "Timestamp": "1/1/15",
-          "Rank": "1",
-          "Frequency": "316",
-          "Rank Change": "1",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2016",
-          "Name": "Neck",
-          "Timestamp": "1/1/16",
-          "Rank": "1",
-          "Frequency": "437",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2017",
-          "Name": "Neck",
-          "Timestamp": "1/1/17",
-          "Rank": "1",
-          "Frequency": "621",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2018",
-          "Name": "Neck",
-          "Timestamp": "1/1/18",
-          "Rank": "1",
-          "Frequency": "526",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2019",
-          "Name": "Neck",
-          "Timestamp": "1/1/19",
-          "Rank": "1",
-          "Frequency": "555",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2020",
-          "Name": "Neck",
-          "Timestamp": "1/1/20",
-          "Rank": "1",
-          "Frequency": "527",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Girlfriend": "3",
-          "year": "2014",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/14",
-          "Rank": "3",
-          "Frequency": "101",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "4",
-          "year": "2015",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/15",
-          "Rank": "4",
-          "Frequency": "155",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "3",
-          "year": "2016",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/16",
-          "Rank": "3",
-          "Frequency": "219",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "4",
-          "year": "2017",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/17",
-          "Rank": "4",
-          "Frequency": "260",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "3",
-          "year": "2018",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/18",
-          "Rank": "3",
-          "Frequency": "294",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "4",
-          "year": "2019",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/19",
-          "Rank": "4",
-          "Frequency": "262",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "4",
-          "year": "2020",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/20",
-          "Rank": "4",
-          "Frequency": "242",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Bullying": "4",
-          "year": "2014",
-          "Name": "Bullying",
-          "Timestamp": "1/1/14",
-          "Rank": "4",
-          "Frequency": "95",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "8",
-          "year": "2015",
-          "Name": "Bullying",
-          "Timestamp": "1/1/15",
-          "Rank": "8",
-          "Frequency": "90",
-          "Rank Change": "-4",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "5",
-          "year": "2016",
-          "Name": "Bullying",
-          "Timestamp": "1/1/16",
-          "Rank": "5",
-          "Frequency": "144",
-          "Rank Change": "3",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "10",
-          "year": "2017",
-          "Name": "Bullying",
-          "Timestamp": "1/1/17",
-          "Rank": "10",
-          "Frequency": "165",
-          "Rank Change": "-5",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "6",
-          "year": "2018",
-          "Name": "Bullying",
-          "Timestamp": "1/1/18",
-          "Rank": "6",
-          "Frequency": "213",
-          "Rank Change": "-4",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "9",
-          "year": "2019",
-          "Name": "Bullying",
-          "Timestamp": "1/1/19",
-          "Rank": "9",
-          "Frequency": "151",
-          "Rank Change": "-3",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "10",
-          "year": "2020",
-          "Name": "Bullying",
-          "Timestamp": "1/1/20",
-          "Rank": "10",
-          "Frequency": "112",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Mother": "5",
-          "year": "2014",
-          "Name": "Mother",
-          "Timestamp": "1/1/14",
-          "Rank": "5",
-          "Frequency": "89",
-          "Rank Change": "-",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "7",
-          "year": "2015",
-          "Name": "Mother",
-          "Timestamp": "1/1/15",
-          "Rank": "7",
-          "Frequency": "104",
-          "Rank Change": "-2",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "6",
-          "year": "2016",
-          "Name": "Mother",
-          "Timestamp": "1/1/16",
-          "Rank": "6",
-          "Frequency": "141",
-          "Rank Change": "1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "5",
-          "year": "2017",
-          "Name": "Mother",
-          "Timestamp": "1/1/17",
-          "Rank": "5",
-          "Frequency": "230",
-          "Rank Change": "1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "4",
-          "year": "2018",
-          "Name": "Mother",
-          "Timestamp": "1/1/18",
-          "Rank": "4",
-          "Frequency": "241",
-          "Rank Change": "1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "5",
-          "year": "2019",
-          "Name": "Mother",
-          "Timestamp": "1/1/19",
-          "Rank": "5",
-          "Frequency": "190",
-          "Rank Change": "-1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "6",
-          "year": "2020",
-          "Name": "Mother",
-          "Timestamp": "1/1/20",
-          "Rank": "6",
-          "Frequency": "206",
-          "Rank Change": "-1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Overdose": "6",
-          "year": "2014",
-          "Name": "Overdose",
-          "Timestamp": "1/1/14",
-          "Rank": "6",
-          "Frequency": "76",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "6",
-          "year": "2015",
-          "Name": "Overdose",
-          "Timestamp": "1/1/15",
-          "Rank": "6",
-          "Frequency": "114",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "7",
-          "year": "2016",
-          "Name": "Overdose",
-          "Timestamp": "1/1/16",
-          "Rank": "7",
-          "Frequency": "137",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "6",
-          "year": "2017",
-          "Name": "Overdose",
-          "Timestamp": "1/1/17",
-          "Rank": "6",
-          "Frequency": "227",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "7",
-          "year": "2018",
-          "Name": "Overdose",
-          "Timestamp": "1/1/18",
-          "Rank": "7",
-          "Frequency": "185",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "6",
-          "year": "2019",
-          "Name": "Overdose",
-          "Timestamp": "1/1/19",
-          "Rank": "6",
-          "Frequency": "190",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "5",
-          "year": "2020",
-          "Name": "Overdose",
-          "Timestamp": "1/1/20",
-          "Rank": "5",
-          "Frequency": "210",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Depression": "7",
-          "year": "2014",
-          "Name": "Depression",
-          "Timestamp": "1/1/14",
-          "Rank": "7",
-          "Frequency": "57",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "9",
-          "year": "2015",
-          "Name": "Depression",
-          "Timestamp": "1/1/15",
-          "Rank": "9",
-          "Frequency": "89",
-          "Rank Change": "-2",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "9",
-          "year": "2016",
-          "Name": "Depression",
-          "Timestamp": "1/1/16",
-          "Rank": "9",
-          "Frequency": "125",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "7",
-          "year": "2017",
-          "Name": "Depression",
-          "Timestamp": "1/1/17",
-          "Rank": "7",
-          "Frequency": "181",
-          "Rank Change": "2",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "8",
-          "year": "2018",
-          "Name": "Depression",
-          "Timestamp": "1/1/18",
-          "Rank": "8",
-          "Frequency": "168",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "7",
-          "year": "2019",
-          "Name": "Depression",
-          "Timestamp": "1/1/19",
-          "Rank": "7",
-          "Frequency": "172",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "7",
-          "year": "2020",
-          "Name": "Depression",
-          "Timestamp": "1/1/20",
-          "Rank": "8",
-          "Frequency": "206",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Vehicle": "8",
-          "year": "2014",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/14",
-          "Rank": "8",
-          "Frequency": "55",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "3",
-          "year": "2015",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/15",
-          "Rank": "3",
-          "Frequency": "171",
-          "Rank Change": "5",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "4",
-          "year": "2016",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/16",
-          "Rank": "4",
-          "Frequency": "209",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "3",
-          "year": "2017",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/17",
-          "Rank": "3",
-          "Frequency": "304",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "5",
-          "year": "2018",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/18",
-          "Rank": "5",
-          "Frequency": "236",
-          "Rank Change": "-2",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "3",
-          "year": "2019",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/19",
-          "Rank": "3",
-          "Frequency": "266",
-          "Rank Change": "2",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "3",
-          "year": "2020",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/20",
-          "Rank": "3",
-          "Frequency": "293",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Friends": "9",
-          "year": "2014",
-          "Name": "Friends",
-          "Timestamp": "1/1/14",
-          "Rank": "9",
-          "Frequency": "41",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "10",
-          "year": "2015",
-          "Name": "Friends",
-          "Timestamp": "1/1/15",
-          "Rank": "10",
-          "Frequency": "78",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "10",
-          "year": "2016",
-          "Name": "Friends",
-          "Timestamp": "1/1/16",
-          "Rank": "10",
-          "Frequency": "87",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "9",
-          "year": "2017",
-          "Name": "Friends",
-          "Timestamp": "1/1/17",
-          "Rank": "9",
-          "Frequency": "170",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "9",
-          "year": "2018",
-          "Name": "Friends",
-          "Timestamp": "1/1/18",
-          "Rank": "9",
-          "Frequency": "165",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "10",
-          "year": "2019",
-          "Name": "Friends",
-          "Timestamp": "1/1/19",
-          "Rank": "10",
-          "Frequency": "127",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "9",
-          "year": "2020",
-          "Name": "Friends",
-          "Timestamp": "1/1/20",
-          "Rank": "9",
-          "Frequency": "137",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Head": "10",
-          "year": "2014",
-          "Name": "Head",
-          "Timestamp": "1/1/14",
-          "Rank": "10",
-          "Frequency": "20",
-          "Rank Change": "-",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "5",
-          "year": "2015",
-          "Name": "Head",
-          "Timestamp": "1/1/15",
-          "Rank": "5",
-          "Frequency": "119",
-          "Rank Change": "5",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "8",
-          "year": "2016",
-          "Name": "Head",
-          "Timestamp": "1/1/16",
-          "Rank": "8",
-          "Frequency": "134",
-          "Rank Change": "-3",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "8",
-          "year": "2017",
-          "Name": "Head",
-          "Timestamp": "1/1/17",
-          "Rank": "8",
-          "Frequency": "171",
-          "Rank Change": "0",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "10",
-          "year": "2018",
-          "Name": "Head",
-          "Timestamp": "1/1/18",
-          "Rank": "10",
-          "Frequency": "141",
-          "Rank Change": "-2",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "8",
-          "year": "2019",
-          "Name": "Head",
-          "Timestamp": "1/1/19",
-          "Rank": "8",
-          "Frequency": "152",
-          "Rank Change": "2",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "8",
-          "year": "2020",
-          "Name": "Head",
-          "Timestamp": "1/1/20",
-          "Rank": "8",
-          "Frequency": "199",
-          "Rank Change": "0",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        }
-      ],
-      "formattedData": [
-        {
-          "Sibling": "1",
-          "year": "2014",
-          "Name": "Sibling",
-          "Timestamp": "1/1/14",
-          "Rank": "1",
-          "Frequency": "149",
-          "Rank Change": "-",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2015",
-          "Name": "Sibling",
-          "Timestamp": "1/1/15",
-          "Rank": "2",
-          "Frequency": "172",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2016",
-          "Name": "Sibling",
-          "Timestamp": "1/1/16",
-          "Rank": "2",
-          "Frequency": "230",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2017",
-          "Name": "Sibling",
-          "Timestamp": "1/1/17",
-          "Rank": "2",
-          "Frequency": "379",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2018",
-          "Name": "Sibling",
-          "Timestamp": "1/1/18",
-          "Rank": "2",
-          "Frequency": "357",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2019",
-          "Name": "Sibling",
-          "Timestamp": "1/1/19",
-          "Rank": "2",
-          "Frequency": "358",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2020",
-          "Name": "Sibling",
-          "Timestamp": "1/1/20",
-          "Rank": "2",
-          "Frequency": "458",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Neck": "2",
-          "year": "2014",
-          "Name": "Neck",
-          "Timestamp": "1/1/14",
-          "Rank": "2",
-          "Frequency": "131",
-          "Rank Change": "-",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2015",
-          "Name": "Neck",
-          "Timestamp": "1/1/15",
-          "Rank": "1",
-          "Frequency": "316",
-          "Rank Change": "1",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2016",
-          "Name": "Neck",
-          "Timestamp": "1/1/16",
-          "Rank": "1",
-          "Frequency": "437",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2017",
-          "Name": "Neck",
-          "Timestamp": "1/1/17",
-          "Rank": "1",
-          "Frequency": "621",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2018",
-          "Name": "Neck",
-          "Timestamp": "1/1/18",
-          "Rank": "1",
-          "Frequency": "526",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2019",
-          "Name": "Neck",
-          "Timestamp": "1/1/19",
-          "Rank": "1",
-          "Frequency": "555",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2020",
-          "Name": "Neck",
-          "Timestamp": "1/1/20",
-          "Rank": "1",
-          "Frequency": "527",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Girlfriend": "3",
-          "year": "2014",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/14",
-          "Rank": "3",
-          "Frequency": "101",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "4",
-          "year": "2015",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/15",
-          "Rank": "4",
-          "Frequency": "155",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "3",
-          "year": "2016",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/16",
-          "Rank": "3",
-          "Frequency": "219",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "4",
-          "year": "2017",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/17",
-          "Rank": "4",
-          "Frequency": "260",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "3",
-          "year": "2018",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/18",
-          "Rank": "3",
-          "Frequency": "294",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "4",
-          "year": "2019",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/19",
-          "Rank": "4",
-          "Frequency": "262",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "4",
-          "year": "2020",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/20",
-          "Rank": "4",
-          "Frequency": "242",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Bullying": "4",
-          "year": "2014",
-          "Name": "Bullying",
-          "Timestamp": "1/1/14",
-          "Rank": "4",
-          "Frequency": "95",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "8",
-          "year": "2015",
-          "Name": "Bullying",
-          "Timestamp": "1/1/15",
-          "Rank": "8",
-          "Frequency": "90",
-          "Rank Change": "-4",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "5",
-          "year": "2016",
-          "Name": "Bullying",
-          "Timestamp": "1/1/16",
-          "Rank": "5",
-          "Frequency": "144",
-          "Rank Change": "3",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "10",
-          "year": "2017",
-          "Name": "Bullying",
-          "Timestamp": "1/1/17",
-          "Rank": "10",
-          "Frequency": "165",
-          "Rank Change": "-5",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "6",
-          "year": "2018",
-          "Name": "Bullying",
-          "Timestamp": "1/1/18",
-          "Rank": "6",
-          "Frequency": "213",
-          "Rank Change": "-4",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "9",
-          "year": "2019",
-          "Name": "Bullying",
-          "Timestamp": "1/1/19",
-          "Rank": "9",
-          "Frequency": "151",
-          "Rank Change": "-3",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "10",
-          "year": "2020",
-          "Name": "Bullying",
-          "Timestamp": "1/1/20",
-          "Rank": "10",
-          "Frequency": "112",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Mother": "5",
-          "year": "2014",
-          "Name": "Mother",
-          "Timestamp": "1/1/14",
-          "Rank": "5",
-          "Frequency": "89",
-          "Rank Change": "-",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "7",
-          "year": "2015",
-          "Name": "Mother",
-          "Timestamp": "1/1/15",
-          "Rank": "7",
-          "Frequency": "104",
-          "Rank Change": "-2",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "6",
-          "year": "2016",
-          "Name": "Mother",
-          "Timestamp": "1/1/16",
-          "Rank": "6",
-          "Frequency": "141",
-          "Rank Change": "1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "5",
-          "year": "2017",
-          "Name": "Mother",
-          "Timestamp": "1/1/17",
-          "Rank": "5",
-          "Frequency": "230",
-          "Rank Change": "1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "4",
-          "year": "2018",
-          "Name": "Mother",
-          "Timestamp": "1/1/18",
-          "Rank": "4",
-          "Frequency": "241",
-          "Rank Change": "1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "5",
-          "year": "2019",
-          "Name": "Mother",
-          "Timestamp": "1/1/19",
-          "Rank": "5",
-          "Frequency": "190",
-          "Rank Change": "-1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "6",
-          "year": "2020",
-          "Name": "Mother",
-          "Timestamp": "1/1/20",
-          "Rank": "6",
-          "Frequency": "206",
-          "Rank Change": "-1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Overdose": "6",
-          "year": "2014",
-          "Name": "Overdose",
-          "Timestamp": "1/1/14",
-          "Rank": "6",
-          "Frequency": "76",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "6",
-          "year": "2015",
-          "Name": "Overdose",
-          "Timestamp": "1/1/15",
-          "Rank": "6",
-          "Frequency": "114",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "7",
-          "year": "2016",
-          "Name": "Overdose",
-          "Timestamp": "1/1/16",
-          "Rank": "7",
-          "Frequency": "137",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "6",
-          "year": "2017",
-          "Name": "Overdose",
-          "Timestamp": "1/1/17",
-          "Rank": "6",
-          "Frequency": "227",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "7",
-          "year": "2018",
-          "Name": "Overdose",
-          "Timestamp": "1/1/18",
-          "Rank": "7",
-          "Frequency": "185",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "6",
-          "year": "2019",
-          "Name": "Overdose",
-          "Timestamp": "1/1/19",
-          "Rank": "6",
-          "Frequency": "190",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "5",
-          "year": "2020",
-          "Name": "Overdose",
-          "Timestamp": "1/1/20",
-          "Rank": "5",
-          "Frequency": "210",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Depression": "7",
-          "year": "2014",
-          "Name": "Depression",
-          "Timestamp": "1/1/14",
-          "Rank": "7",
-          "Frequency": "57",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "9",
-          "year": "2015",
-          "Name": "Depression",
-          "Timestamp": "1/1/15",
-          "Rank": "9",
-          "Frequency": "89",
-          "Rank Change": "-2",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "9",
-          "year": "2016",
-          "Name": "Depression",
-          "Timestamp": "1/1/16",
-          "Rank": "9",
-          "Frequency": "125",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "7",
-          "year": "2017",
-          "Name": "Depression",
-          "Timestamp": "1/1/17",
-          "Rank": "7",
-          "Frequency": "181",
-          "Rank Change": "2",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "8",
-          "year": "2018",
-          "Name": "Depression",
-          "Timestamp": "1/1/18",
-          "Rank": "8",
-          "Frequency": "168",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "7",
-          "year": "2019",
-          "Name": "Depression",
-          "Timestamp": "1/1/19",
-          "Rank": "7",
-          "Frequency": "172",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "7",
-          "year": "2020",
-          "Name": "Depression",
-          "Timestamp": "1/1/20",
-          "Rank": "8",
-          "Frequency": "206",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Vehicle": "8",
-          "year": "2014",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/14",
-          "Rank": "8",
-          "Frequency": "55",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "3",
-          "year": "2015",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/15",
-          "Rank": "3",
-          "Frequency": "171",
-          "Rank Change": "5",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "4",
-          "year": "2016",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/16",
-          "Rank": "4",
-          "Frequency": "209",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "3",
-          "year": "2017",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/17",
-          "Rank": "3",
-          "Frequency": "304",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "5",
-          "year": "2018",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/18",
-          "Rank": "5",
-          "Frequency": "236",
-          "Rank Change": "-2",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "3",
-          "year": "2019",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/19",
-          "Rank": "3",
-          "Frequency": "266",
-          "Rank Change": "2",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "3",
-          "year": "2020",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/20",
-          "Rank": "3",
-          "Frequency": "293",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Friends": "9",
-          "year": "2014",
-          "Name": "Friends",
-          "Timestamp": "1/1/14",
-          "Rank": "9",
-          "Frequency": "41",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "10",
-          "year": "2015",
-          "Name": "Friends",
-          "Timestamp": "1/1/15",
-          "Rank": "10",
-          "Frequency": "78",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "10",
-          "year": "2016",
-          "Name": "Friends",
-          "Timestamp": "1/1/16",
-          "Rank": "10",
-          "Frequency": "87",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "9",
-          "year": "2017",
-          "Name": "Friends",
-          "Timestamp": "1/1/17",
-          "Rank": "9",
-          "Frequency": "170",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "9",
-          "year": "2018",
-          "Name": "Friends",
-          "Timestamp": "1/1/18",
-          "Rank": "9",
-          "Frequency": "165",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "10",
-          "year": "2019",
-          "Name": "Friends",
-          "Timestamp": "1/1/19",
-          "Rank": "10",
-          "Frequency": "127",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "9",
-          "year": "2020",
-          "Name": "Friends",
-          "Timestamp": "1/1/20",
-          "Rank": "9",
-          "Frequency": "137",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Head": "10",
-          "year": "2014",
-          "Name": "Head",
-          "Timestamp": "1/1/14",
-          "Rank": "10",
-          "Frequency": "20",
-          "Rank Change": "-",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "5",
-          "year": "2015",
-          "Name": "Head",
-          "Timestamp": "1/1/15",
-          "Rank": "5",
-          "Frequency": "119",
-          "Rank Change": "5",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "8",
-          "year": "2016",
-          "Name": "Head",
-          "Timestamp": "1/1/16",
-          "Rank": "8",
-          "Frequency": "134",
-          "Rank Change": "-3",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "8",
-          "year": "2017",
-          "Name": "Head",
-          "Timestamp": "1/1/17",
-          "Rank": "8",
-          "Frequency": "171",
-          "Rank Change": "0",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "10",
-          "year": "2018",
-          "Name": "Head",
-          "Timestamp": "1/1/18",
-          "Rank": "10",
-          "Frequency": "141",
-          "Rank Change": "-2",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "8",
-          "year": "2019",
-          "Name": "Head",
-          "Timestamp": "1/1/19",
-          "Rank": "8",
-          "Frequency": "152",
-          "Rank Change": "2",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "8",
-          "year": "2020",
-          "Name": "Head",
-          "Timestamp": "1/1/20",
-          "Rank": "8",
-          "Frequency": "199",
-          "Rank Change": "0",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        }
-      ],
-      "dataKey": "_NOTUSED-bump-chart-data.json"
-    },
-    "markup-include1719606699638": {
-      "filters": [],
-      "filterBehavior": "Filter Change",
-      "openModal": false,
-      "uid": "markup-include1719606699638",
-      "type": "markup-include",
-      "contentEditor": {
-        "inlineHTML": "<h3 style=\"font-size:18px; padding-left: 15px; padding-bottom: 10px\"><strong>Greatest Positive Change In Rank</strong></h3>\n<h4 style=\"font-size:16px; padding-left: 15px\"><strong>Vehicle:</strong></h4>\n<p style=\"font-size:16px; padding-left: 15px\">Rank Changed From #8 to #3 from 2014 to 2020</p>\n<p style=\"font-size:16px; padding-left: 15px\">Largest Rank Change of +5 Took Place Between 2014 and 2015</p>",
-        "markupVariables": [],
-        "showHeader": true,
-        "srcUrl": "#example",
-        "title": "",
-        "useInlineHTML": true
-      },
-      "theme": "theme-blue",
-      "visual": {
-        "border": true,
-        "accent": false,
-        "background": false,
-        "hideBackgroundColor": false,
-        "borderColorTheme": false
-      },
-      "showEditorPanel": true,
-      "visualizationType": "markup-include",
-      "editing": false,
-      "data": {},
-      "version": "4.24.4"
-    },
-    "markup-include1719606700773": {
-      "filters": [],
-      "filterBehavior": "Filter Change",
-      "openModal": false,
-      "uid": "markup-include1719606700773",
-      "type": "markup-include",
-      "contentEditor": {
-        "inlineHTML": "<h3 style=\"font-size:18px; padding-left: 15px; ; padding-bottom: 10px\"><strong>Greatest Negative Change In Rank</strong></h3>\n<h4 style=\"font-size:16px; padding-left: 15px\"><strong>Bullying:</strong></h4>\n<p style=\"font-size:16px; padding-left: 15px\">Rank Changed From #4 to #10 from 2014 to 2020</p>\n<p style=\"font-size:16px; padding-left: 15px\">Largest Rank Change of -5 Took Place Between 2016 and 2017</p>",
-        "markupVariables": [],
-        "showHeader": true,
-        "srcUrl": "#example",
-        "title": "",
-        "useInlineHTML": true
-      },
-      "theme": "theme-blue",
-      "visual": {
-        "border": true,
-        "accent": false,
-        "background": false,
-        "hideBackgroundColor": false,
-        "borderColorTheme": false
-      },
-      "showEditorPanel": true,
-      "visualizationType": "markup-include",
-      "editing": false,
-      "data": {},
-      "version": "4.24.4"
-    }
-  },
-  "table": {
-    "label": "Data Table",
-    "show": false,
-    "showDownloadUrl": false,
-    "showVertical": true
-  },
-  "datasets": {
-    "_NOTUSED-bump-chart-data.json": {
-      "data": [
-        {
-          "Sibling": "1",
-          "year": "2014",
-          "Name": "Sibling",
-          "Timestamp": "1/1/14",
-          "Rank": "1",
-          "Frequency": "149",
-          "Rank Change": "-",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2015",
-          "Name": "Sibling",
-          "Timestamp": "1/1/15",
-          "Rank": "2",
-          "Frequency": "172",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2016",
-          "Name": "Sibling",
-          "Timestamp": "1/1/16",
-          "Rank": "2",
-          "Frequency": "230",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2017",
-          "Name": "Sibling",
-          "Timestamp": "1/1/17",
-          "Rank": "2",
-          "Frequency": "379",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2018",
-          "Name": "Sibling",
-          "Timestamp": "1/1/18",
-          "Rank": "2",
-          "Frequency": "357",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2019",
-          "Name": "Sibling",
-          "Timestamp": "1/1/19",
-          "Rank": "2",
-          "Frequency": "358",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Sibling": "2",
-          "year": "2020",
-          "Name": "Sibling",
-          "Timestamp": "1/1/20",
-          "Rank": "2",
-          "Frequency": "458",
-          "Rank Change": "0",
-          "Representative Sentence": "Victims Sister Informed Police That She Had Found Him And Called Police."
-        },
-        {
-          "Neck": "2",
-          "year": "2014",
-          "Name": "Neck",
-          "Timestamp": "1/1/14",
-          "Rank": "2",
-          "Frequency": "131",
-          "Rank Change": "-",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2015",
-          "Name": "Neck",
-          "Timestamp": "1/1/15",
-          "Rank": "1",
-          "Frequency": "316",
-          "Rank Change": "1",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2016",
-          "Name": "Neck",
-          "Timestamp": "1/1/16",
-          "Rank": "1",
-          "Frequency": "437",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2017",
-          "Name": "Neck",
-          "Timestamp": "1/1/17",
-          "Rank": "1",
-          "Frequency": "621",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2018",
-          "Name": "Neck",
-          "Timestamp": "1/1/18",
-          "Rank": "1",
-          "Frequency": "526",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2019",
-          "Name": "Neck",
-          "Timestamp": "1/1/19",
-          "Rank": "1",
-          "Frequency": "555",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Neck": "1",
-          "year": "2020",
-          "Name": "Neck",
-          "Timestamp": "1/1/20",
-          "Rank": "1",
-          "Frequency": "527",
-          "Rank Change": "0",
-          "Representative Sentence": "Rope Was Wrapped Around Victims Neck."
-        },
-        {
-          "Girlfriend": "3",
-          "year": "2014",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/14",
-          "Rank": "3",
-          "Frequency": "101",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "4",
-          "year": "2015",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/15",
-          "Rank": "4",
-          "Frequency": "155",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "3",
-          "year": "2016",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/16",
-          "Rank": "3",
-          "Frequency": "219",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "4",
-          "year": "2017",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/17",
-          "Rank": "4",
-          "Frequency": "260",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "3",
-          "year": "2018",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/18",
-          "Rank": "3",
-          "Frequency": "294",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "4",
-          "year": "2019",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/19",
-          "Rank": "4",
-          "Frequency": "262",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Girlfriend": "4",
-          "year": "2020",
-          "Name": "Girlfriend",
-          "Timestamp": "1/1/20",
-          "Rank": "4",
-          "Frequency": "242",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Relationship Problems With Girlfriend Whom He Worked With."
-        },
-        {
-          "Bullying": "4",
-          "year": "2014",
-          "Name": "Bullying",
-          "Timestamp": "1/1/14",
-          "Rank": "4",
-          "Frequency": "95",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "8",
-          "year": "2015",
-          "Name": "Bullying",
-          "Timestamp": "1/1/15",
-          "Rank": "8",
-          "Frequency": "90",
-          "Rank Change": "-4",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "5",
-          "year": "2016",
-          "Name": "Bullying",
-          "Timestamp": "1/1/16",
-          "Rank": "5",
-          "Frequency": "144",
-          "Rank Change": "3",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "10",
-          "year": "2017",
-          "Name": "Bullying",
-          "Timestamp": "1/1/17",
-          "Rank": "10",
-          "Frequency": "165",
-          "Rank Change": "-5",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "6",
-          "year": "2018",
-          "Name": "Bullying",
-          "Timestamp": "1/1/18",
-          "Rank": "6",
-          "Frequency": "213",
-          "Rank Change": "-4",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "9",
-          "year": "2019",
-          "Name": "Bullying",
-          "Timestamp": "1/1/19",
-          "Rank": "9",
-          "Frequency": "151",
-          "Rank Change": "-3",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Bullying": "10",
-          "year": "2020",
-          "Name": "Bullying",
-          "Timestamp": "1/1/20",
-          "Rank": "10",
-          "Frequency": "112",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Been Bullied And Had Been Taunted While At School."
-        },
-        {
-          "Mother": "5",
-          "year": "2014",
-          "Name": "Mother",
-          "Timestamp": "1/1/14",
-          "Rank": "5",
-          "Frequency": "89",
-          "Rank Change": "-",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "7",
-          "year": "2015",
-          "Name": "Mother",
-          "Timestamp": "1/1/15",
-          "Rank": "7",
-          "Frequency": "104",
-          "Rank Change": "-2",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "6",
-          "year": "2016",
-          "Name": "Mother",
-          "Timestamp": "1/1/16",
-          "Rank": "6",
-          "Frequency": "141",
-          "Rank Change": "1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "5",
-          "year": "2017",
-          "Name": "Mother",
-          "Timestamp": "1/1/17",
-          "Rank": "5",
-          "Frequency": "230",
-          "Rank Change": "1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "4",
-          "year": "2018",
-          "Name": "Mother",
-          "Timestamp": "1/1/18",
-          "Rank": "4",
-          "Frequency": "241",
-          "Rank Change": "1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "5",
-          "year": "2019",
-          "Name": "Mother",
-          "Timestamp": "1/1/19",
-          "Rank": "5",
-          "Frequency": "190",
-          "Rank Change": "-1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Mother": "6",
-          "year": "2020",
-          "Name": "Mother",
-          "Timestamp": "1/1/20",
-          "Rank": "6",
-          "Frequency": "206",
-          "Rank Change": "-1",
-          "Representative Sentence": "Mother Mentioned She Has Seen Some Sadness And Depression From Victim."
-        },
-        {
-          "Overdose": "6",
-          "year": "2014",
-          "Name": "Overdose",
-          "Timestamp": "1/1/14",
-          "Rank": "6",
-          "Frequency": "76",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "6",
-          "year": "2015",
-          "Name": "Overdose",
-          "Timestamp": "1/1/15",
-          "Rank": "6",
-          "Frequency": "114",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "7",
-          "year": "2016",
-          "Name": "Overdose",
-          "Timestamp": "1/1/16",
-          "Rank": "7",
-          "Frequency": "137",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "6",
-          "year": "2017",
-          "Name": "Overdose",
-          "Timestamp": "1/1/17",
-          "Rank": "6",
-          "Frequency": "227",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "7",
-          "year": "2018",
-          "Name": "Overdose",
-          "Timestamp": "1/1/18",
-          "Rank": "7",
-          "Frequency": "185",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "6",
-          "year": "2019",
-          "Name": "Overdose",
-          "Timestamp": "1/1/19",
-          "Rank": "6",
-          "Frequency": "190",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Overdose": "5",
-          "year": "2020",
-          "Name": "Overdose",
-          "Timestamp": "1/1/20",
-          "Rank": "5",
-          "Frequency": "210",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Attempted To Overdose On Prescription Drugs In The Past."
-        },
-        {
-          "Depression": "7",
-          "year": "2014",
-          "Name": "Depression",
-          "Timestamp": "1/1/14",
-          "Rank": "7",
-          "Frequency": "57",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "9",
-          "year": "2015",
-          "Name": "Depression",
-          "Timestamp": "1/1/15",
-          "Rank": "9",
-          "Frequency": "89",
-          "Rank Change": "-2",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "9",
-          "year": "2016",
-          "Name": "Depression",
-          "Timestamp": "1/1/16",
-          "Rank": "9",
-          "Frequency": "125",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "7",
-          "year": "2017",
-          "Name": "Depression",
-          "Timestamp": "1/1/17",
-          "Rank": "7",
-          "Frequency": "181",
-          "Rank Change": "2",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "8",
-          "year": "2018",
-          "Name": "Depression",
-          "Timestamp": "1/1/18",
-          "Rank": "8",
-          "Frequency": "168",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "7",
-          "year": "2019",
-          "Name": "Depression",
-          "Timestamp": "1/1/19",
-          "Rank": "7",
-          "Frequency": "172",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Depression": "7",
-          "year": "2020",
-          "Name": "Depression",
-          "Timestamp": "1/1/20",
-          "Rank": "8",
-          "Frequency": "206",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Has History Of Depression."
-        },
-        {
-          "Vehicle": "8",
-          "year": "2014",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/14",
-          "Rank": "8",
-          "Frequency": "55",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "3",
-          "year": "2015",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/15",
-          "Rank": "3",
-          "Frequency": "171",
-          "Rank Change": "5",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "4",
-          "year": "2016",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/16",
-          "Rank": "4",
-          "Frequency": "209",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "3",
-          "year": "2017",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/17",
-          "Rank": "3",
-          "Frequency": "304",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "5",
-          "year": "2018",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/18",
-          "Rank": "5",
-          "Frequency": "236",
-          "Rank Change": "-2",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "3",
-          "year": "2019",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/19",
-          "Rank": "3",
-          "Frequency": "266",
-          "Rank Change": "2",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Vehicle": "3",
-          "year": "2020",
-          "Name": "Vehicle",
-          "Timestamp": "1/1/20",
-          "Rank": "3",
-          "Frequency": "293",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Drove Very Quickly Into Power Pole."
-        },
-        {
-          "Friends": "9",
-          "year": "2014",
-          "Name": "Friends",
-          "Timestamp": "1/1/14",
-          "Rank": "9",
-          "Frequency": "41",
-          "Rank Change": "-",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "10",
-          "year": "2015",
-          "Name": "Friends",
-          "Timestamp": "1/1/15",
-          "Rank": "10",
-          "Frequency": "78",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "10",
-          "year": "2016",
-          "Name": "Friends",
-          "Timestamp": "1/1/16",
-          "Rank": "10",
-          "Frequency": "87",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "9",
-          "year": "2017",
-          "Name": "Friends",
-          "Timestamp": "1/1/17",
-          "Rank": "9",
-          "Frequency": "170",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "9",
-          "year": "2018",
-          "Name": "Friends",
-          "Timestamp": "1/1/18",
-          "Rank": "9",
-          "Frequency": "165",
-          "Rank Change": "0",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "10",
-          "year": "2019",
-          "Name": "Friends",
-          "Timestamp": "1/1/19",
-          "Rank": "10",
-          "Frequency": "127",
-          "Rank Change": "-1",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Friends": "9",
-          "year": "2020",
-          "Name": "Friends",
-          "Timestamp": "1/1/20",
-          "Rank": "9",
-          "Frequency": "137",
-          "Rank Change": "1",
-          "Representative Sentence": "Victim Had Been Home All Night With Two Friends."
-        },
-        {
-          "Head": "10",
-          "year": "2014",
-          "Name": "Head",
-          "Timestamp": "1/1/14",
-          "Rank": "10",
-          "Frequency": "20",
-          "Rank Change": "-",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "5",
-          "year": "2015",
-          "Name": "Head",
-          "Timestamp": "1/1/15",
-          "Rank": "5",
-          "Frequency": "119",
-          "Rank Change": "5",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "8",
-          "year": "2016",
-          "Name": "Head",
-          "Timestamp": "1/1/16",
-          "Rank": "8",
-          "Frequency": "134",
-          "Rank Change": "-3",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "8",
-          "year": "2017",
-          "Name": "Head",
-          "Timestamp": "1/1/17",
-          "Rank": "8",
-          "Frequency": "171",
-          "Rank Change": "0",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "10",
-          "year": "2018",
-          "Name": "Head",
-          "Timestamp": "1/1/18",
-          "Rank": "10",
-          "Frequency": "141",
-          "Rank Change": "-2",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "8",
-          "year": "2019",
-          "Name": "Head",
-          "Timestamp": "1/1/19",
-          "Rank": "8",
-          "Frequency": "152",
-          "Rank Change": "2",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        },
-        {
-          "Head": "8",
-          "year": "2020",
-          "Name": "Head",
-          "Timestamp": "1/1/20",
-          "Rank": "8",
-          "Frequency": "199",
-          "Rank Change": "0",
-          "Representative Sentence": "Wounds Were Found At The Left Side Of Victims Head."
-        }
-      ],
-      "dataFileSize": 18482,
-      "dataFileName": "_NOTUSED-bump-chart-data.json",
-      "dataFileSourceType": "file",
-      "dataFileFormat": "JSON",
-      "preview": true
-    }
-  },
-  "type": "dashboard",
-  "version": "4.24.4",
-  "runtime": {},
-  "uuid": 1719606681758
+  "uuid": 1734734041467
 }

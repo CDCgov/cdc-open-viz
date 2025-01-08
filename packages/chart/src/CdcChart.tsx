@@ -152,6 +152,9 @@ const CdcChart = ({
   const { lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
   const legendId = useId()
 
+  const hasDateAxis = config.xAxis && ['date-time', 'date'].includes(config.xAxis.type)
+  const dataTableDefaultSortBy = hasDateAxis && config.xAxis.dataKey
+
   const checkLineToBarGraph = () => {
     return isConvertLineToBarGraph(config.visualizationType, filteredData, config.allowLineToBarGraph)
   }
@@ -763,7 +766,7 @@ const CdcChart = ({
   const highlight = (label: Label) => {
     // If we're highlighting all the series, reset them
     if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && config.visualizationType !== 'Forecasting') {
-      highlightReset()
+      handleShowAll()
       return
     }
 
@@ -802,7 +805,7 @@ const CdcChart = ({
   }
 
   // Called on reset button click, unhighlights all data series
-  const highlightReset = () => {
+  const handleShowAll = () => {
     try {
       const legend = legendRef.current
       if (!legend) throw new Error('No legend available to set previous focus on.')
@@ -1294,7 +1297,7 @@ const CdcChart = ({
               <div className={getChartWrapperClasses().join(' ')}>
                 {/* Intro Text/Message */}
                 {config?.introText && config.visualizationType !== 'Spark Line' && (
-                  <section className={`introText `}>{parse(config.introText)}</section>
+                  <section className={`introText mb-4`}>{parse(config.introText)}</section>
                 )}
 
                 {/* Filters */}
@@ -1375,7 +1378,7 @@ const CdcChart = ({
                           dimensions={dimensions}
                         />
                         {config?.introText && (
-                          <section className='introText' style={{ padding: '0px 0 35px' }}>
+                          <section className='introText mb-4' style={{ padding: '0px 0 35px' }}>
                             {parse(config.introText)}
                           </section>
                         )}
@@ -1452,6 +1455,7 @@ const CdcChart = ({
                     runtimeData={getTableRuntimeData()}
                     expandDataTable={config.table.expanded}
                     columns={config.columns}
+                    defaultSortBy={dataTableDefaultSortBy}
                     displayDataAsText={displayDataAsText}
                     displayGeoName={name => name}
                     applyLegendToRow={applyLegendToRow}
@@ -1506,10 +1510,9 @@ const CdcChart = ({
     handleLineType,
     handleChartTabbing,
     highlight,
-    highlightReset,
+    handleShowAll,
     imageId,
     isDashboard,
-    isLegendBottom: legend?.position === 'bottom' || isLegendWrapViewport(currentViewport),
     isDebug,
     isDraggingAnnotation,
     handleDragStateChange,

@@ -1,5 +1,4 @@
 import Icon from '../../ui/Icon'
-import { fontSize } from '@cdc/core/helpers/cove/fontSettings'
 
 const ExpandCollapse = ({ expanded, setExpanded, tableTitle, fontSize, viewport }) => {
   return (

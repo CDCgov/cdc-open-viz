@@ -4,7 +4,7 @@ import ConfigContext from '../context'
 import Icon from '@cdc/core/components/ui/Icon'
 
 const Modal = () => {
-  const { applyTooltipsToGeo, applyLegendToRow, viewport, content, state } = useContext(ConfigContext)
+  const { applyTooltipsToGeo, applyLegendToRow, content, state, currentViewport: viewport } = useContext(ConfigContext)
   const { capitalizeLabels } = state.tooltips
   const tooltip = applyTooltipsToGeo(content.geoName, content.keyedData, 'jsx')
   const type = state.general.type

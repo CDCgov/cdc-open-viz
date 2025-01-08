@@ -1,3 +1,4 @@
+import useResizeObserver from '@cdc/map/src/hooks/useResizeObserver'
 import { isBelowBreakpoint } from './viewports'
 
 export default function useDataVizClasses(config, viewport = null) {
@@ -89,7 +90,7 @@ export default function useDataVizClasses(config, viewport = null) {
     title: ['legend-container__title fw-bold'],
     description: ['legend-container__description mt-2'],
     div: [legend?.position === 'bottom' && legend?.singleRow ? 'shape-container single-row' : 'shape-container'],
-    resetButton: ['legend-container__reset-button']
+    showAllButton: ['legend-container__reset-button']
   }
 
   return { innerContainerClasses, contentClasses, lineDatapointClass, sparkLineStyles, legendClasses }

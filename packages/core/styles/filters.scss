@@ -6,8 +6,8 @@
     label {
       display: inherit;
       margin-bottom: 5px;
-      font-weight: 600;
-      font-size: 16px;
+      font-weight: 700;
+      font-size: var(--filter-label-font-size);
     }
   }
 
@@ -18,6 +18,7 @@
 
   &__buttons {
     width: 100%;
+    font-size: var(--filter-buttons-font-size);
     .apply {
       margin-right: 10px;
     }

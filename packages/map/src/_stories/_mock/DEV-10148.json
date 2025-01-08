@@ -3,10 +3,10 @@
   "general": {
     "title": "Example Data Map with Cities",
     "subtext": "*: Lorem ipsum; NA: Lorem ipsum.",
-    "type": "data",
+    "type": "navigation",
     "geoType": "us",
     "headerColor": "theme-cyan",
-    "showSidebar": true,
+    "showSidebar": false,
     "showTitle": true,
     "showDownloadButton": true,
     "expandDataTable": false,
@@ -31,7 +31,7 @@
     },
     "showDownloadImgButton": false,
     "showDownloadPdfButton": false,
-    "territoriesAlwaysShow": true,
+    "territoriesAlwaysShow": false,
     "geoLabelOverride": "",
     "convertFipsCodes": true,
     "noStateFoundMessage": "Map Unavailable",
@@ -57,7 +57,7 @@
     },
     "navigate": {
       "dataTable": false,
-      "name": "",
+      "name": "URL",
       "tooltip": false
     },
     "additionalColumn1": {
@@ -175,6 +175,7 @@
     ]
   },
   "filterBehavior": "Filter Change",
+  "filterIntro": "",
   "dataTable": {
     "title": "Data Table",
     "forceDisplay": true

@@ -4,7 +4,6 @@ import { MapConfig } from './types/MapConfig'
 type MapContext = {
   applyLegendToRow
   applyTooltipsToGeo
-  currentViewport
   data
   displayGeoName
   filteredCountryCode
@@ -33,7 +32,6 @@ type MapContext = {
   setState
   state: MapConfig
   tooltipId: string
-  viewport
 }
 
 const ConfigContext = createContext({} as MapContext)

@@ -16,6 +16,7 @@
     background-color: #fff;
     z-index: 6;
     border-top: var(--cool-gray-10) 1px solid;
+    border-radius: 6px;
 
     @include breakpointClass(md) {
       &.bottom,
@@ -135,6 +136,11 @@
 
           &.legend-container__li--disabled {
             opacity: 0.4;
+          }
+          &.legend-container__li--not-disabled {
+            outline: 1px solid #005ea2;
+            outline-offset: 5px;
+            border-radius: 1px;
           }
         }
       }

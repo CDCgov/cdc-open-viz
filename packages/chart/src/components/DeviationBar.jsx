@@ -7,7 +7,6 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import useIntersectionObserver from '../hooks/useIntersectionObserver'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
-import { fontSize } from '@cdc/core/helpers/cove/fontSettings'
 
 export default function DeviationBar({ height, xScale }) {
   const {
@@ -65,7 +64,7 @@ export default function DeviationBar({ height, xScale }) {
       const firstBarValue = data[0][seriesKey]
       const barPosition = firstBarValue < target ? 'left' : 'right'
       const label = `${config.xAxis.targetLabel} ${formatNumber(config.xAxis.target || 0, 'left')}`
-      const labelWidth = getTextWidth(label, `bold ${fontSize}px sans-serif`)
+      const labelWidth = getTextWidth(label)
       let labelY = config.isLollipopChart ? lollipopBarHeight / 2 : Number(config.barHeight) / 2
       let paddingX = 0
       let labelX = 0
@@ -165,7 +164,7 @@ export default function DeviationBar({ height, xScale }) {
           config.heights.horizontal = totalheight
 
           // text,labels postiions
-          const textWidth = getTextWidth(formatNumber(barValue, 'left'), `normal ${fontSize}px sans-serif`)
+          const textWidth = getTextWidth(formatNumber(barValue, 'left'))
           const textFits = textWidth < barWidth - 6
           const textX = barBaseX
           const textY = barY + barHeight / 2

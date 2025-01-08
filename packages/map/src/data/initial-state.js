@@ -1,6 +1,7 @@
 export default {
   annotations: [],
   general: {
+    navigationTarget: '_self',
     noStateFoundMessage: 'Map Unavailable',
     annotationDropdownText: 'Annotations',
     geoBorderColor: 'darkGray',
@@ -12,7 +13,6 @@ export default {
     showDownloadMediaButton: false,
     displayAsHex: false,
     displayStateLabels: false,
-    territoriesLabel: 'Territories',
     territoriesAlwaysShow: false,
     language: 'en',
     geoType: 'single-state',

@@ -129,7 +129,7 @@ export const useFilters = props => {
     }
 
     if (!visualizationConfig.dynamicSeries) {
-      newFilters = addValuesToFilters(newFilters, excludedData)
+      newFilters = addValuesToFilters(newFilters, excludedData || data)
       setConfig({
         ...visualizationConfig,
         filters: newFilters
@@ -143,7 +143,7 @@ export const useFilters = props => {
 
     // If we're on a chart and not using the apply button
     if (!standaloneMap && visualizationConfig.filterBehavior === 'Filter Change') {
-      const newFilteredData = filterVizData(newFilters, excludedData)
+      const newFilteredData = filterVizData(newFilters, excludedData || data)
       setFilteredData(newFilteredData)
 
       if (visualizationConfig.dynamicSeries) {
@@ -207,9 +207,9 @@ export const useFilters = props => {
     setConfig({ ...visualizationConfig, filters: newFilters })
 
     if (standaloneMap) {
-      setFilteredData(newFilters, excludedData)
+      setFilteredData(newFilters, excludedData || data)
     } else {
-      setFilteredData(filterVizData(newFilters, excludedData))
+      setFilteredData(filterVizData(newFilters, excludedData || data))
     }
 
     setShowApplyButton(false)
@@ -241,9 +241,9 @@ export const useFilters = props => {
     setConfig({ ...visualizationConfig, filters: newFilters })
 
     if (standaloneMap) {
-      setFilteredData(newFilters, excludedData)
+      setFilteredData(newFilters, excludedData || data)
     } else {
-      setFilteredData(filterVizData(newFilters, excludedData))
+      setFilteredData(filterVizData(newFilters, excludedData || data))
     }
   }
 
@@ -465,8 +465,8 @@ const Filters = (props: FilterProps) => {
             )}
             {filterStyle === 'nested-dropdown' && (
               <NestedDropdown
-                activeGroup={(singleFilter.active as string) || (singleFilter.queuedActive || [])[0]}
-                activeSubGroup={(singleFilter.subGrouping?.active as string) || (singleFilter.queuedActive || [])[1]}
+                activeGroup={(singleFilter.active as string) || (singleFilter.queuedActive || data)[0]}
+                activeSubGroup={(singleFilter.subGrouping?.active as string) || (singleFilter.queuedActive || data)[1]}
                 filterIndex={outerIndex}
                 options={getNestedOptions(singleFilter)}
                 listLabel={label}
@@ -502,9 +502,9 @@ const Filters = (props: FilterProps) => {
   return (
     <section className={getClasses().join(' ')}>
       {visualizationConfig.filterIntro && (
-        <p className='filters-section__intro-text'>{visualizationConfig.filterIntro}</p>
+        <p className='filters-section__intro-text mb-3'>{visualizationConfig.filterIntro}</p>
       )}
-      <div className='d-flex flex-wrap w-100 mt-3 mb-4 pb-2 filters-section__wrapper'>
+      <div className='d-flex flex-wrap w-100 mb-4 pb-2 filters-section__wrapper'>
         {' '}
         <>
           <Style />

@@ -104,6 +104,7 @@ export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
     sharedFilter.subGrouping.active = subDefaultQueryParamValue || subDefaultValue
   } else {
     const currentOption = dropdownOptions.find(option => option.value === sharedFilter.active)
+    // const currentOption = dropdownOptions.find(option => option.value.toString() === sharedFilter.active.toString())
     sharedFilter.active = currentOption ? currentOption.value : defaultValue
     if (currentOption) {
       const currentSubOption = currentOption.subOptions.find(option => option.value === sharedFilter.subGrouping.active)
@@ -153,6 +154,9 @@ export const setAutoLoadDefaultValue = (
         sharedFilter.active = defaultQueryParamValue || defaultValue
       } else {
         const currentOption = dropdownOptions.find(option => option.value === sharedFilter.active)
+        // const currentOption = dropdownOptions.find(option => {
+        //   return option.value.toString() === sharedFilter.active.toString()
+        // })
         sharedFilter.active = currentOption ? currentOption.value : defaultValue
       }
     }

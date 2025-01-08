@@ -1,2096 +1,1624 @@
 {
-    "dashboard": {
-        "theme": "theme-blue",
-        "title": "Dashboard with No Filters"
+  "table": { "label": "Data Table", "show": false, "showDownloadUrl": false, "showVertical": true },
+  "datasets": {
+    "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation": {
+      "dataFileSize": 38605,
+      "dataFileName": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": true,
+      "dataUrl": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation"
     },
-    "rows": [
-        [
-            {
-                "width": 12,
-                "widget": "map1629143821077"
-            },
-            {},
-            {}
-        ],
-        [
-            {
-                "width": 6,
-                "widget": "data-bite1629144030877"
-            },
-            {
-                "width": 6,
-                "widget": "data-bite1629144267659"
-            },
-            {
-                "width": null
-            }
-        ]
-    ],
-    "visualizations": {
-        "map1629143821077": {
-            "general": {
-                "geoType": "us",
-                "geoBorderColor": "darkGray",
-                "headerColor": "theme-blue",
-                "showTitle": true,
-                "showSidebar": true,
-                "showDownloadButton": true,
-                "showDownloadMediaButton": false,
-                "displayAsHex": false,
-                "displayStateLabels": false,
-                "territoriesLabel": "Territories",
-                "language": "en",
-                "hasRegions": false,
-                "expandDataTable": true,
-                "fullBorder": false,
-                "type": "data",
-                "title": "",
-                "territoriesAlwaysShow": false,
-                "geoLabelOverride": "",
-                "palette": {
-                    "isReversed": false
-                },
-                "allowMapZoom": true,
-                "hideGeoColumnInTooltip": false,
-                "hidePrimaryColumnInTooltip": false,
-                "statePicked": {
-                    "fipsCode": "01",
-                    "stateName": "Alabama"
-                }
-            },
-            "type": "map",
-            "color": "yellowpurple",
-            "columns": {
-                "geo": {
-                    "name": "Location",
-                    "label": "Location",
-                    "tooltip": false,
-                    "dataTable": true
-                },
-                "primary": {
-                    "dataTable": true,
-                    "tooltip": true,
-                    "prefix": "",
-                    "suffix": "",
-                    "name": "Rate",
-                    "label": ""
-                },
-                "navigate": {
-                    "name": ""
-                },
-                "latitude": {
-                    "name": ""
-                },
-                "longitude": {
-                    "name": ""
-                }
-            },
-            "legend": {
-                "descriptions": {},
-                "specialClasses": [],
-                "unified": false,
-                "singleColumn": false,
-                "dynamicDescription": false,
-                "type": "equalnumber",
-                "numberOfItems": 3,
-                "position": "side",
-                "title": "Legend",
-                "singleRow": false,
-                "showSpecialClassesLast": false
-            },
-            "filters": [],
-            "dataTable": {
-                "title": "Data Table",
-                "forceDisplay": false
-            },
-            "table": {
-                "showDownloadUrl": false,
-                "showDataTableLink": true
-            },
-            "tooltips": {
-                "appearanceType": "hover",
-                "linkLabel": "Learn More",
-                "capitalizeLabels": true
-            },
-            "runtime": {
-                "editorErrorMessage": []
-            },
-            "visual": {
-                "minBubbleSize": 1,
-                "maxBubbleSize": 20,
-                "extraBubbleBorder": false,
-                "cityStyle": "circle",
-                "geoCodeCircleSize": 2,
-                "showBubbleZeros": false
-            },
-            "mapPosition": {
-                "coordinates": [
-                    0,
-                    30
-                ],
-                "zoom": 1
-            },
-            "map": {
-                "layers": []
-            },
-            "filterBehavior": "Filter Change",
-            "uid": "map1629143821077",
-            "data": [
-                {
-                    "Location": "Alabama",
-                    "Rate": 1375
-                },
-                {
-                    "Location": "Alaska",
-                    "Rate": 1377
-                },
-                {
-                    "Location": "American Samoa",
-                    "Rate": 1388
-                },
-                {
-                    "Location": "Arizona",
-                    "Rate": 1401
-                },
-                {
-                    "Location": "Arkansas",
-                    "Rate": 1398
-                },
-                {
-                    "Location": "California",
-                    "Rate": 1381
-                },
-                {
-                    "Location": "Colorado",
-                    "Rate": 1369
-                },
-                {
-                    "Location": "Connecticut",
-                    "Rate": 1403
-                },
-                {
-                    "Location": "Delaware\t",
-                    "Rate": "1384"
-                },
-                {
-                    "Location": "District of Columbia",
-                    "Rate": 1400
-                },
-                {
-                    "Location": "Florida",
-                    "Rate": 1387
-                },
-                {
-                    "Location": "Georgia",
-                    "Rate": 1365
-                },
-                {
-                    "Location": "Guam",
-                    "Rate": 1356
-                },
-                {
-                    "Location": "Hawaii",
-                    "Rate": 1362
-                },
-                {
-                    "Location": "Idaho",
-                    "Rate": 1374
-                },
-                {
-                    "Location": "Illinois",
-                    "Rate": 1402
-                },
-                {
-                    "Location": "Indiana",
-                    "Rate": 1404
-                },
-                {
-                    "Location": "Iowa",
-                    "Rate": 1394
-                },
-                {
-                    "Location": "Kansas",
-                    "Rate": 1367
-                },
-                {
-                    "Location": "Kentucky",
-                    "Rate": 1359
-                },
-                {
-                    "Location": "Louisiana",
-                    "Rate": 1409
-                },
-                {
-                    "Location": "Maine",
-                    "Rate": 1385
-                },
-                {
-                    "Location": "Marshall Islands",
-                    "Rate": 1467
-                },
-                {
-                    "Location": "Maryland",
-                    "Rate": 1386
-                },
-                {
-                    "Location": "Massachusetts",
-                    "Rate": 1366
-                },
-                {
-                    "Location": "Michigan",
-                    "Rate": 1390
-                },
-                {
-                    "Location": "Minnesota",
-                    "Rate": 1392
-                },
-                {
-                    "Location": "Mississippi",
-                    "Rate": 1406
-                },
-                {
-                    "Location": "Missouri",
-                    "Rate": 1378
-                },
-                {
-                    "Location": "Montana",
-                    "Rate": 1364
-                },
-                {
-                    "Location": "Nebraska",
-                    "Rate": 1391
-                },
-                {
-                    "Location": "Nevada",
-                    "Rate": 1416
-                },
-                {
-                    "Location": "New Hampshire",
-                    "Rate": 1405
-                },
-                {
-                    "Location": "New Jersey",
-                    "Rate": 1469
-                },
-                {
-                    "Location": "New Mexico",
-                    "Rate": 1399
-                },
-                {
-                    "Location": "New York",
-                    "Rate": 1360
-                },
-                {
-                    "Location": "North Carolina",
-                    "Rate": 1358
-                },
-                {
-                    "Location": "North Dakota",
-                    "Rate": 1355
-                },
-                {
-                    "Location": "Northern Mariana Islands",
-                    "Rate": "1368"
-                },
-                {
-                    "Location": "Ohio",
-                    "Rate": 1466
-                },
-                {
-                    "Location": "Oklahoma",
-                    "Rate": 1372
-                },
-                {
-                    "Location": "Oregon",
-                    "Rate": 1438
-                },
-                {
-                    "Location": "Pennsylvania",
-                    "Rate": 1354
-                },
-                {
-                    "Location": "Puerto Rico",
-                    "Rate": 1422
-                },
-                {
-                    "Location": "Republic of Palau",
-                    "Rate": "1471"
-                },
-                {
-                    "Location": "Rhode Island",
-                    "Rate": 1411
-                },
-                {
-                    "Location": "South Carolina",
-                    "Rate": 1389
-                },
-                {
-                    "Location": "South Dakota",
-                    "Rate": 1432
-                },
-                {
-                    "Location": "Tennessee",
-                    "Rate": 1376
-                },
-                {
-                    "Location": "Texas",
-                    "Rate": 1420
-                },
-                {
-                    "Location": "U.S. Virgin Islands",
-                    "Rate": "1383"
-                },
-                {
-                    "Location": "Utah",
-                    "Rate": 1380
-                },
-                {
-                    "Location": "Vermont",
-                    "Rate": 1429
-                },
-                {
-                    "Location": "Virginia",
-                    "Rate": 1441
-                },
-                {
-                    "Location": "Washington",
-                    "Rate": 1393
-                },
-                {
-                    "Location": "West Virginia",
-                    "Rate": 1397
-                },
-                {
-                    "Location": "Wisconsin",
-                    "Rate": 1430
-                },
-                {
-                    "Location": "Wyoming",
-                    "Rate": 1454
-                }
-            ],
-            "dataKey": "dashboard_example_map.csv",
-            "formattedData": [
-                {
-                    "Location": "Alabama",
-                    "Rate": 1375
-                },
-                {
-                    "Location": "Alaska",
-                    "Rate": 1377
-                },
-                {
-                    "Location": "American Samoa",
-                    "Rate": 1388
-                },
-                {
-                    "Location": "Arizona",
-                    "Rate": 1401
-                },
-                {
-                    "Location": "Arkansas",
-                    "Rate": 1398
-                },
-                {
-                    "Location": "California",
-                    "Rate": 1381
-                },
-                {
-                    "Location": "Colorado",
-                    "Rate": 1369
-                },
-                {
-                    "Location": "Connecticut",
-                    "Rate": 1403
-                },
-                {
-                    "Location": "Delaware\t",
-                    "Rate": "1384"
-                },
-                {
-                    "Location": "District of Columbia",
-                    "Rate": 1400
-                },
-                {
-                    "Location": "Florida",
-                    "Rate": 1387
-                },
-                {
-                    "Location": "Georgia",
-                    "Rate": 1365
-                },
-                {
-                    "Location": "Guam",
-                    "Rate": 1356
-                },
-                {
-                    "Location": "Hawaii",
-                    "Rate": 1362
-                },
-                {
-                    "Location": "Idaho",
-                    "Rate": 1374
-                },
-                {
-                    "Location": "Illinois",
-                    "Rate": 1402
-                },
-                {
-                    "Location": "Indiana",
-                    "Rate": 1404
-                },
-                {
-                    "Location": "Iowa",
-                    "Rate": 1394
-                },
-                {
-                    "Location": "Kansas",
-                    "Rate": 1367
-                },
-                {
-                    "Location": "Kentucky",
-                    "Rate": 1359
-                },
-                {
-                    "Location": "Louisiana",
-                    "Rate": 1409
-                },
-                {
-                    "Location": "Maine",
-                    "Rate": 1385
-                },
-                {
-                    "Location": "Marshall Islands",
-                    "Rate": 1467
-                },
-                {
-                    "Location": "Maryland",
-                    "Rate": 1386
-                },
-                {
-                    "Location": "Massachusetts",
-                    "Rate": 1366
-                },
-                {
-                    "Location": "Michigan",
-                    "Rate": 1390
-                },
-                {
-                    "Location": "Minnesota",
-                    "Rate": 1392
-                },
-                {
-                    "Location": "Mississippi",
-                    "Rate": 1406
-                },
-                {
-                    "Location": "Missouri",
-                    "Rate": 1378
-                },
-                {
-                    "Location": "Montana",
-                    "Rate": 1364
-                },
-                {
-                    "Location": "Nebraska",
-                    "Rate": 1391
-                },
-                {
-                    "Location": "Nevada",
-                    "Rate": 1416
-                },
-                {
-                    "Location": "New Hampshire",
-                    "Rate": 1405
-                },
-                {
-                    "Location": "New Jersey",
-                    "Rate": 1469
-                },
-                {
-                    "Location": "New Mexico",
-                    "Rate": 1399
-                },
-                {
-                    "Location": "New York",
-                    "Rate": 1360
-                },
-                {
-                    "Location": "North Carolina",
-                    "Rate": 1358
-                },
-                {
-                    "Location": "North Dakota",
-                    "Rate": 1355
-                },
-                {
-                    "Location": "Northern Mariana Islands",
-                    "Rate": "1368"
-                },
-                {
-                    "Location": "Ohio",
-                    "Rate": 1466
-                },
-                {
-                    "Location": "Oklahoma",
-                    "Rate": 1372
-                },
-                {
-                    "Location": "Oregon",
-                    "Rate": 1438
-                },
-                {
-                    "Location": "Pennsylvania",
-                    "Rate": 1354
-                },
-                {
-                    "Location": "Puerto Rico",
-                    "Rate": 1422
-                },
-                {
-                    "Location": "Republic of Palau",
-                    "Rate": "1471"
-                },
-                {
-                    "Location": "Rhode Island",
-                    "Rate": 1411
-                },
-                {
-                    "Location": "South Carolina",
-                    "Rate": 1389
-                },
-                {
-                    "Location": "South Dakota",
-                    "Rate": 1432
-                },
-                {
-                    "Location": "Tennessee",
-                    "Rate": 1376
-                },
-                {
-                    "Location": "Texas",
-                    "Rate": 1420
-                },
-                {
-                    "Location": "U.S. Virgin Islands",
-                    "Rate": "1383"
-                },
-                {
-                    "Location": "Utah",
-                    "Rate": 1380
-                },
-                {
-                    "Location": "Vermont",
-                    "Rate": 1429
-                },
-                {
-                    "Location": "Virginia",
-                    "Rate": 1441
-                },
-                {
-                    "Location": "Washington",
-                    "Rate": 1393
-                },
-                {
-                    "Location": "West Virginia",
-                    "Rate": 1397
-                },
-                {
-                    "Location": "Wisconsin",
-                    "Rate": 1430
-                },
-                {
-                    "Location": "Wyoming",
-                    "Rate": 1454
-                }
-            ],
-            "dataDescription": {
-                "horizontal": false,
-                "series": false
-            },
-            "originalFormattedData": [
-                {
-                    "Location": "Alabama",
-                    "Rate": 1375
-                },
-                {
-                    "Location": "Alaska",
-                    "Rate": 1377
-                },
-                {
-                    "Location": "American Samoa",
-                    "Rate": 1388
-                },
-                {
-                    "Location": "Arizona",
-                    "Rate": 1401
-                },
-                {
-                    "Location": "Arkansas",
-                    "Rate": 1398
-                },
-                {
-                    "Location": "California",
-                    "Rate": 1381
-                },
-                {
-                    "Location": "Colorado",
-                    "Rate": 1369
-                },
-                {
-                    "Location": "Connecticut",
-                    "Rate": 1403
-                },
-                {
-                    "Location": "Delaware\t",
-                    "Rate": "1384"
-                },
-                {
-                    "Location": "District of Columbia",
-                    "Rate": 1400
-                },
-                {
-                    "Location": "Florida",
-                    "Rate": 1387
-                },
-                {
-                    "Location": "Georgia",
-                    "Rate": 1365
-                },
-                {
-                    "Location": "Guam",
-                    "Rate": 1356
-                },
-                {
-                    "Location": "Hawaii",
-                    "Rate": 1362
-                },
-                {
-                    "Location": "Idaho",
-                    "Rate": 1374
-                },
-                {
-                    "Location": "Illinois",
-                    "Rate": 1402
-                },
-                {
-                    "Location": "Indiana",
-                    "Rate": 1404
-                },
-                {
-                    "Location": "Iowa",
-                    "Rate": 1394
-                },
-                {
-                    "Location": "Kansas",
-                    "Rate": 1367
-                },
-                {
-                    "Location": "Kentucky",
-                    "Rate": 1359
-                },
-                {
-                    "Location": "Louisiana",
-                    "Rate": 1409
-                },
-                {
-                    "Location": "Maine",
-                    "Rate": 1385
-                },
-                {
-                    "Location": "Marshall Islands",
-                    "Rate": 1467
-                },
-                {
-                    "Location": "Maryland",
-                    "Rate": 1386
-                },
-                {
-                    "Location": "Massachusetts",
-                    "Rate": 1366
-                },
-                {
-                    "Location": "Michigan",
-                    "Rate": 1390
-                },
-                {
-                    "Location": "Minnesota",
-                    "Rate": 1392
-                },
-                {
-                    "Location": "Mississippi",
-                    "Rate": 1406
-                },
-                {
-                    "Location": "Missouri",
-                    "Rate": 1378
-                },
-                {
-                    "Location": "Montana",
-                    "Rate": 1364
-                },
-                {
-                    "Location": "Nebraska",
-                    "Rate": 1391
-                },
-                {
-                    "Location": "Nevada",
-                    "Rate": 1416
-                },
-                {
-                    "Location": "New Hampshire",
-                    "Rate": 1405
-                },
-                {
-                    "Location": "New Jersey",
-                    "Rate": 1469
-                },
-                {
-                    "Location": "New Mexico",
-                    "Rate": 1399
-                },
-                {
-                    "Location": "New York",
-                    "Rate": 1360
-                },
-                {
-                    "Location": "North Carolina",
-                    "Rate": 1358
-                },
-                {
-                    "Location": "North Dakota",
-                    "Rate": 1355
-                },
-                {
-                    "Location": "Northern Mariana Islands",
-                    "Rate": "1368"
-                },
-                {
-                    "Location": "Ohio",
-                    "Rate": 1466
-                },
-                {
-                    "Location": "Oklahoma",
-                    "Rate": 1372
-                },
-                {
-                    "Location": "Oregon",
-                    "Rate": 1438
-                },
-                {
-                    "Location": "Pennsylvania",
-                    "Rate": 1354
-                },
-                {
-                    "Location": "Puerto Rico",
-                    "Rate": 1422
-                },
-                {
-                    "Location": "Republic of Palau",
-                    "Rate": "1471"
-                },
-                {
-                    "Location": "Rhode Island",
-                    "Rate": 1411
-                },
-                {
-                    "Location": "South Carolina",
-                    "Rate": 1389
-                },
-                {
-                    "Location": "South Dakota",
-                    "Rate": 1432
-                },
-                {
-                    "Location": "Tennessee",
-                    "Rate": 1376
-                },
-                {
-                    "Location": "Texas",
-                    "Rate": 1420
-                },
-                {
-                    "Location": "U.S. Virgin Islands",
-                    "Rate": "1383"
-                },
-                {
-                    "Location": "Utah",
-                    "Rate": 1380
-                },
-                {
-                    "Location": "Vermont",
-                    "Rate": 1429
-                },
-                {
-                    "Location": "Virginia",
-                    "Rate": 1441
-                },
-                {
-                    "Location": "Washington",
-                    "Rate": 1393
-                },
-                {
-                    "Location": "West Virginia",
-                    "Rate": 1397
-                },
-                {
-                    "Location": "Wisconsin",
-                    "Rate": 1430
-                },
-                {
-                    "Location": "Wyoming",
-                    "Rate": 1454
-                }
-            ]
-        },
-        "data-bite1629144030877": {
-            "type": "data-bite",
-            "data": [
-                {
-                    "Location": "Alabama",
-                    "Rate": 1375
-                },
-                {
-                    "Location": "Alaska",
-                    "Rate": 1377
-                },
-                {
-                    "Location": "American Samoa",
-                    "Rate": 1388
-                },
-                {
-                    "Location": "Arizona",
-                    "Rate": 1401
-                },
-                {
-                    "Location": "Arkansas",
-                    "Rate": 1398
-                },
-                {
-                    "Location": "California",
-                    "Rate": 1381
-                },
-                {
-                    "Location": "Colorado",
-                    "Rate": 1369
-                },
-                {
-                    "Location": "Connecticut",
-                    "Rate": 1403
-                },
-                {
-                    "Location": "Delaware\t",
-                    "Rate": "1384"
-                },
-                {
-                    "Location": "District of Columbia",
-                    "Rate": 1400
-                },
-                {
-                    "Location": "Florida",
-                    "Rate": 1387
-                },
-                {
-                    "Location": "Georgia",
-                    "Rate": 1365
-                },
-                {
-                    "Location": "Guam",
-                    "Rate": 1356
-                },
-                {
-                    "Location": "Hawaii",
-                    "Rate": 1362
-                },
-                {
-                    "Location": "Idaho",
-                    "Rate": 1374
-                },
-                {
-                    "Location": "Illinois",
-                    "Rate": 1402
-                },
-                {
-                    "Location": "Indiana",
-                    "Rate": 1404
-                },
-                {
-                    "Location": "Iowa",
-                    "Rate": 1394
-                },
-                {
-                    "Location": "Kansas",
-                    "Rate": 1367
-                },
-                {
-                    "Location": "Kentucky",
-                    "Rate": 1359
-                },
-                {
-                    "Location": "Louisiana",
-                    "Rate": 1409
-                },
-                {
-                    "Location": "Maine",
-                    "Rate": 1385
-                },
-                {
-                    "Location": "Marshall Islands",
-                    "Rate": 1467
-                },
-                {
-                    "Location": "Maryland",
-                    "Rate": 1386
-                },
-                {
-                    "Location": "Massachusetts",
-                    "Rate": 1366
-                },
-                {
-                    "Location": "Michigan",
-                    "Rate": 1390
-                },
-                {
-                    "Location": "Minnesota",
-                    "Rate": 1392
-                },
-                {
-                    "Location": "Mississippi",
-                    "Rate": 1406
-                },
-                {
-                    "Location": "Missouri",
-                    "Rate": 1378
-                },
-                {
-                    "Location": "Montana",
-                    "Rate": 1364
-                },
-                {
-                    "Location": "Nebraska",
-                    "Rate": 1391
-                },
-                {
-                    "Location": "Nevada",
-                    "Rate": 1416
-                },
-                {
-                    "Location": "New Hampshire",
-                    "Rate": 1405
-                },
-                {
-                    "Location": "New Jersey",
-                    "Rate": 1469
-                },
-                {
-                    "Location": "New Mexico",
-                    "Rate": 1399
-                },
-                {
-                    "Location": "New York",
-                    "Rate": 1360
-                },
-                {
-                    "Location": "North Carolina",
-                    "Rate": 1358
-                },
-                {
-                    "Location": "North Dakota",
-                    "Rate": 1355
-                },
-                {
-                    "Location": "Northern Mariana Islands",
-                    "Rate": "1368"
-                },
-                {
-                    "Location": "Ohio",
-                    "Rate": 1466
-                },
-                {
-                    "Location": "Oklahoma",
-                    "Rate": 1372
-                },
-                {
-                    "Location": "Oregon",
-                    "Rate": 1438
-                },
-                {
-                    "Location": "Pennsylvania",
-                    "Rate": 1354
-                },
-                {
-                    "Location": "Puerto Rico",
-                    "Rate": 1422
-                },
-                {
-                    "Location": "Republic of Palau",
-                    "Rate": "1471"
-                },
-                {
-                    "Location": "Rhode Island",
-                    "Rate": 1411
-                },
-                {
-                    "Location": "South Carolina",
-                    "Rate": 1389
-                },
-                {
-                    "Location": "South Dakota",
-                    "Rate": 1432
-                },
-                {
-                    "Location": "Tennessee",
-                    "Rate": 1376
-                },
-                {
-                    "Location": "Texas",
-                    "Rate": 1420
-                },
-                {
-                    "Location": "U.S. Virgin Islands",
-                    "Rate": "1383"
-                },
-                {
-                    "Location": "Utah",
-                    "Rate": 1380
-                },
-                {
-                    "Location": "Vermont",
-                    "Rate": 1429
-                },
-                {
-                    "Location": "Virginia",
-                    "Rate": 1441
-                },
-                {
-                    "Location": "Washington",
-                    "Rate": 1393
-                },
-                {
-                    "Location": "West Virginia",
-                    "Rate": 1397
-                },
-                {
-                    "Location": "Wisconsin",
-                    "Rate": 1430
-                },
-                {
-                    "Location": "Wyoming",
-                    "Rate": 1454
-                }
-            ],
-            "dataBite": "",
-            "dataFunction": "Mean (Average)",
-            "dataColumn": "Rate",
-            "bitePosition": "Left",
-            "biteFontSize": 24,
-            "fontSize": "medium",
-            "imageUrl": "",
-            "biteBody": "<span style=\"font-size: 35px;\">Average Amount</span> <br>Reflects the average of the  data column selected.  This number is calculated within the Data Bite module.\n",
-            "prefix": "",
-            "suffix": "",
-            "dataFormat": {
-                "roundToPlace": 0,
-                "commas": true,
-                "prefix": "",
-                "suffix": ""
-            },
-            "biteStyle": "graphic",
-            "filters": [],
-            "subtext": "",
-            "title": "",
-            "theme": "theme-pink",
-            "shadow": false,
-            "uid": "data-bite1629144030877",
-            "visualizationType": "data-bite",
-            "dataKey": "dashboard_example_map.csv",
-            "formattedData": [
-                {
-                    "Location": "Alabama",
-                    "Rate": 1375
-                },
-                {
-                    "Location": "Alaska",
-                    "Rate": 1377
-                },
-                {
-                    "Location": "American Samoa",
-                    "Rate": 1388
-                },
-                {
-                    "Location": "Arizona",
-                    "Rate": 1401
-                },
-                {
-                    "Location": "Arkansas",
-                    "Rate": 1398
-                },
-                {
-                    "Location": "California",
-                    "Rate": 1381
-                },
-                {
-                    "Location": "Colorado",
-                    "Rate": 1369
-                },
-                {
-                    "Location": "Connecticut",
-                    "Rate": 1403
-                },
-                {
-                    "Location": "Delaware\t",
-                    "Rate": "1384"
-                },
-                {
-                    "Location": "District of Columbia",
-                    "Rate": 1400
-                },
-                {
-                    "Location": "Florida",
-                    "Rate": 1387
-                },
-                {
-                    "Location": "Georgia",
-                    "Rate": 1365
-                },
-                {
-                    "Location": "Guam",
-                    "Rate": 1356
-                },
-                {
-                    "Location": "Hawaii",
-                    "Rate": 1362
-                },
-                {
-                    "Location": "Idaho",
-                    "Rate": 1374
-                },
-                {
-                    "Location": "Illinois",
-                    "Rate": 1402
-                },
-                {
-                    "Location": "Indiana",
-                    "Rate": 1404
-                },
-                {
-                    "Location": "Iowa",
-                    "Rate": 1394
-                },
-                {
-                    "Location": "Kansas",
-                    "Rate": 1367
-                },
-                {
-                    "Location": "Kentucky",
-                    "Rate": 1359
-                },
-                {
-                    "Location": "Louisiana",
-                    "Rate": 1409
-                },
-                {
-                    "Location": "Maine",
-                    "Rate": 1385
-                },
-                {
-                    "Location": "Marshall Islands",
-                    "Rate": 1467
-                },
-                {
-                    "Location": "Maryland",
-                    "Rate": 1386
-                },
-                {
-                    "Location": "Massachusetts",
-                    "Rate": 1366
-                },
-                {
-                    "Location": "Michigan",
-                    "Rate": 1390
-                },
-                {
-                    "Location": "Minnesota",
-                    "Rate": 1392
-                },
-                {
-                    "Location": "Mississippi",
-                    "Rate": 1406
-                },
-                {
-                    "Location": "Missouri",
-                    "Rate": 1378
-                },
-                {
-                    "Location": "Montana",
-                    "Rate": 1364
-                },
-                {
-                    "Location": "Nebraska",
-                    "Rate": 1391
-                },
-                {
-                    "Location": "Nevada",
-                    "Rate": 1416
-                },
-                {
-                    "Location": "New Hampshire",
-                    "Rate": 1405
-                },
-                {
-                    "Location": "New Jersey",
-                    "Rate": 1469
-                },
-                {
-                    "Location": "New Mexico",
-                    "Rate": 1399
-                },
-                {
-                    "Location": "New York",
-                    "Rate": 1360
-                },
-                {
-                    "Location": "North Carolina",
-                    "Rate": 1358
-                },
-                {
-                    "Location": "North Dakota",
-                    "Rate": 1355
-                },
-                {
-                    "Location": "Northern Mariana Islands",
-                    "Rate": "1368"
-                },
-                {
-                    "Location": "Ohio",
-                    "Rate": 1466
-                },
-                {
-                    "Location": "Oklahoma",
-                    "Rate": 1372
-                },
-                {
-                    "Location": "Oregon",
-                    "Rate": 1438
-                },
-                {
-                    "Location": "Pennsylvania",
-                    "Rate": 1354
-                },
-                {
-                    "Location": "Puerto Rico",
-                    "Rate": 1422
-                },
-                {
-                    "Location": "Republic of Palau",
-                    "Rate": "1471"
-                },
-                {
-                    "Location": "Rhode Island",
-                    "Rate": 1411
-                },
-                {
-                    "Location": "South Carolina",
-                    "Rate": 1389
-                },
-                {
-                    "Location": "South Dakota",
-                    "Rate": 1432
-                },
-                {
-                    "Location": "Tennessee",
-                    "Rate": 1376
-                },
-                {
-                    "Location": "Texas",
-                    "Rate": 1420
-                },
-                {
-                    "Location": "U.S. Virgin Islands",
-                    "Rate": "1383"
-                },
-                {
-                    "Location": "Utah",
-                    "Rate": 1380
-                },
-                {
-                    "Location": "Vermont",
-                    "Rate": 1429
-                },
-                {
-                    "Location": "Virginia",
-                    "Rate": 1441
-                },
-                {
-                    "Location": "Washington",
-                    "Rate": 1393
-                },
-                {
-                    "Location": "West Virginia",
-                    "Rate": 1397
-                },
-                {
-                    "Location": "Wisconsin",
-                    "Rate": 1430
-                },
-                {
-                    "Location": "Wyoming",
-                    "Rate": 1454
-                }
-            ],
-            "dataDescription": {
-                "horizontal": false,
-                "series": false
-            }
-        },
-        "data-bite1629144267659": {
-            "type": "data-bite",
-            "data": [
-                {
-                    "Location": "Alabama",
-                    "Rate": 1375
-                },
-                {
-                    "Location": "Alaska",
-                    "Rate": 1377
-                },
-                {
-                    "Location": "American Samoa",
-                    "Rate": 1388
-                },
-                {
-                    "Location": "Arizona",
-                    "Rate": 1401
-                },
-                {
-                    "Location": "Arkansas",
-                    "Rate": 1398
-                },
-                {
-                    "Location": "California",
-                    "Rate": 1381
-                },
-                {
-                    "Location": "Colorado",
-                    "Rate": 1369
-                },
-                {
-                    "Location": "Connecticut",
-                    "Rate": 1403
-                },
-                {
-                    "Location": "Delaware\t",
-                    "Rate": "1384"
-                },
-                {
-                    "Location": "District of Columbia",
-                    "Rate": 1400
-                },
-                {
-                    "Location": "Florida",
-                    "Rate": 1387
-                },
-                {
-                    "Location": "Georgia",
-                    "Rate": 1365
-                },
-                {
-                    "Location": "Guam",
-                    "Rate": 1356
-                },
-                {
-                    "Location": "Hawaii",
-                    "Rate": 1362
-                },
-                {
-                    "Location": "Idaho",
-                    "Rate": 1374
-                },
-                {
-                    "Location": "Illinois",
-                    "Rate": 1402
-                },
-                {
-                    "Location": "Indiana",
-                    "Rate": 1404
-                },
-                {
-                    "Location": "Iowa",
-                    "Rate": 1394
-                },
-                {
-                    "Location": "Kansas",
-                    "Rate": 1367
-                },
-                {
-                    "Location": "Kentucky",
-                    "Rate": 1359
-                },
-                {
-                    "Location": "Louisiana",
-                    "Rate": 1409
-                },
-                {
-                    "Location": "Maine",
-                    "Rate": 1385
-                },
-                {
-                    "Location": "Marshall Islands",
-                    "Rate": 1467
-                },
-                {
-                    "Location": "Maryland",
-                    "Rate": 1386
-                },
-                {
-                    "Location": "Massachusetts",
-                    "Rate": 1366
-                },
-                {
-                    "Location": "Michigan",
-                    "Rate": 1390
-                },
-                {
-                    "Location": "Minnesota",
-                    "Rate": 1392
-                },
-                {
-                    "Location": "Mississippi",
-                    "Rate": 1406
-                },
-                {
-                    "Location": "Missouri",
-                    "Rate": 1378
-                },
-                {
-                    "Location": "Montana",
-                    "Rate": 1364
-                },
-                {
-                    "Location": "Nebraska",
-                    "Rate": 1391
-                },
-                {
-                    "Location": "Nevada",
-                    "Rate": 1416
-                },
-                {
-                    "Location": "New Hampshire",
-                    "Rate": 1405
-                },
-                {
-                    "Location": "New Jersey",
-                    "Rate": 1469
-                },
-                {
-                    "Location": "New Mexico",
-                    "Rate": 1399
-                },
-                {
-                    "Location": "New York",
-                    "Rate": 1360
-                },
-                {
-                    "Location": "North Carolina",
-                    "Rate": 1358
-                },
-                {
-                    "Location": "North Dakota",
-                    "Rate": 1355
-                },
-                {
-                    "Location": "Northern Mariana Islands",
-                    "Rate": "1368"
-                },
-                {
-                    "Location": "Ohio",
-                    "Rate": 1466
-                },
-                {
-                    "Location": "Oklahoma",
-                    "Rate": 1372
-                },
-                {
-                    "Location": "Oregon",
-                    "Rate": 1438
-                },
-                {
-                    "Location": "Pennsylvania",
-                    "Rate": 1354
-                },
-                {
-                    "Location": "Puerto Rico",
-                    "Rate": 1422
-                },
-                {
-                    "Location": "Republic of Palau",
-                    "Rate": "1471"
-                },
-                {
-                    "Location": "Rhode Island",
-                    "Rate": 1411
-                },
-                {
-                    "Location": "South Carolina",
-                    "Rate": 1389
-                },
-                {
-                    "Location": "South Dakota",
-                    "Rate": 1432
-                },
-                {
-                    "Location": "Tennessee",
-                    "Rate": 1376
-                },
-                {
-                    "Location": "Texas",
-                    "Rate": 1420
-                },
-                {
-                    "Location": "U.S. Virgin Islands",
-                    "Rate": "1383"
-                },
-                {
-                    "Location": "Utah",
-                    "Rate": 1380
-                },
-                {
-                    "Location": "Vermont",
-                    "Rate": 1429
-                },
-                {
-                    "Location": "Virginia",
-                    "Rate": 1441
-                },
-                {
-                    "Location": "Washington",
-                    "Rate": 1393
-                },
-                {
-                    "Location": "West Virginia",
-                    "Rate": 1397
-                },
-                {
-                    "Location": "Wisconsin",
-                    "Rate": 1430
-                },
-                {
-                    "Location": "Wyoming",
-                    "Rate": 1454
-                }
-            ],
-            "dataBite": "",
-            "dataFunction": "Sum",
-            "dataColumn": "Rate",
-            "bitePosition": "Left",
-            "biteFontSize": 24,
-            "fontSize": "medium",
-            "imageUrl": "",
-            "biteBody": "<span style=\"font-size: 35px;\">Sum Total</span> <br>Reflects the Sum total of the rate column. \n This number is calculated within the Data Bite module.\n",
-            "prefix": "",
-            "suffix": "",
-            "dataFormat": {
-                "roundToPlace": 0,
-                "commas": true,
-                "prefix": "",
-                "suffix": ""
-            },
-            "biteStyle": "graphic",
-            "filters": [],
-            "subtext": "",
-            "title": "",
-            "theme": "theme-pink",
-            "shadow": false,
-            "uid": "data-bite1629144267659",
-            "visualizationType": "data-bite",
-            "dataKey": "dashboard_example_map.csv",
-            "formattedData": [
-                {
-                    "Location": "Alabama",
-                    "Rate": 1375
-                },
-                {
-                    "Location": "Alaska",
-                    "Rate": 1377
-                },
-                {
-                    "Location": "American Samoa",
-                    "Rate": 1388
-                },
-                {
-                    "Location": "Arizona",
-                    "Rate": 1401
-                },
-                {
-                    "Location": "Arkansas",
-                    "Rate": 1398
-                },
-                {
-                    "Location": "California",
-                    "Rate": 1381
-                },
-                {
-                    "Location": "Colorado",
-                    "Rate": 1369
-                },
-                {
-                    "Location": "Connecticut",
-                    "Rate": 1403
-                },
-                {
-                    "Location": "Delaware\t",
-                    "Rate": "1384"
-                },
-                {
-                    "Location": "District of Columbia",
-                    "Rate": 1400
-                },
-                {
-                    "Location": "Florida",
-                    "Rate": 1387
-                },
-                {
-                    "Location": "Georgia",
-                    "Rate": 1365
-                },
-                {
-                    "Location": "Guam",
-                    "Rate": 1356
-                },
-                {
-                    "Location": "Hawaii",
-                    "Rate": 1362
-                },
-                {
-                    "Location": "Idaho",
-                    "Rate": 1374
-                },
-                {
-                    "Location": "Illinois",
-                    "Rate": 1402
-                },
-                {
-                    "Location": "Indiana",
-                    "Rate": 1404
-                },
-                {
-                    "Location": "Iowa",
-                    "Rate": 1394
-                },
-                {
-                    "Location": "Kansas",
-                    "Rate": 1367
-                },
-                {
-                    "Location": "Kentucky",
-                    "Rate": 1359
-                },
-                {
-                    "Location": "Louisiana",
-                    "Rate": 1409
-                },
-                {
-                    "Location": "Maine",
-                    "Rate": 1385
-                },
-                {
-                    "Location": "Marshall Islands",
-                    "Rate": 1467
-                },
-                {
-                    "Location": "Maryland",
-                    "Rate": 1386
-                },
-                {
-                    "Location": "Massachusetts",
-                    "Rate": 1366
-                },
-                {
-                    "Location": "Michigan",
-                    "Rate": 1390
-                },
-                {
-                    "Location": "Minnesota",
-                    "Rate": 1392
-                },
-                {
-                    "Location": "Mississippi",
-                    "Rate": 1406
-                },
-                {
-                    "Location": "Missouri",
-                    "Rate": 1378
-                },
-                {
-                    "Location": "Montana",
-                    "Rate": 1364
-                },
-                {
-                    "Location": "Nebraska",
-                    "Rate": 1391
-                },
-                {
-                    "Location": "Nevada",
-                    "Rate": 1416
-                },
-                {
-                    "Location": "New Hampshire",
-                    "Rate": 1405
-                },
-                {
-                    "Location": "New Jersey",
-                    "Rate": 1469
-                },
-                {
-                    "Location": "New Mexico",
-                    "Rate": 1399
-                },
-                {
-                    "Location": "New York",
-                    "Rate": 1360
-                },
-                {
-                    "Location": "North Carolina",
-                    "Rate": 1358
-                },
-                {
-                    "Location": "North Dakota",
-                    "Rate": 1355
-                },
-                {
-                    "Location": "Northern Mariana Islands",
-                    "Rate": "1368"
-                },
-                {
-                    "Location": "Ohio",
-                    "Rate": 1466
-                },
-                {
-                    "Location": "Oklahoma",
-                    "Rate": 1372
-                },
-                {
-                    "Location": "Oregon",
-                    "Rate": 1438
-                },
-                {
-                    "Location": "Pennsylvania",
-                    "Rate": 1354
-                },
-                {
-                    "Location": "Puerto Rico",
-                    "Rate": 1422
-                },
-                {
-                    "Location": "Republic of Palau",
-                    "Rate": "1471"
-                },
-                {
-                    "Location": "Rhode Island",
-                    "Rate": 1411
-                },
-                {
-                    "Location": "South Carolina",
-                    "Rate": 1389
-                },
-                {
-                    "Location": "South Dakota",
-                    "Rate": 1432
-                },
-                {
-                    "Location": "Tennessee",
-                    "Rate": 1376
-                },
-                {
-                    "Location": "Texas",
-                    "Rate": 1420
-                },
-                {
-                    "Location": "U.S. Virgin Islands",
-                    "Rate": "1383"
-                },
-                {
-                    "Location": "Utah",
-                    "Rate": 1380
-                },
-                {
-                    "Location": "Vermont",
-                    "Rate": 1429
-                },
-                {
-                    "Location": "Virginia",
-                    "Rate": 1441
-                },
-                {
-                    "Location": "Washington",
-                    "Rate": 1393
-                },
-                {
-                    "Location": "West Virginia",
-                    "Rate": 1397
-                },
-                {
-                    "Location": "Wisconsin",
-                    "Rate": 1430
-                },
-                {
-                    "Location": "Wyoming",
-                    "Rate": 1454
-                }
-            ],
-            "dataDescription": {
-                "horizontal": false,
-                "series": false
-            }
-        }
+    "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$where=category=\"Gender\"": {
+      "dataFileSize": 40157,
+      "dataFileName": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$where=category=\"Gender\"",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": false,
+      "dataUrl": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$where=category=\"Gender\""
     },
-    "table": {
-        "label": "Data Table",
-        "show": true
+    "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebyindicator": {
+      "dataFileSize": 41976,
+      "dataFileName": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebyindicator",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": false,
+      "dataUrl": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebyindicator"
     },
-    "type": "dashboard",
-    "uuid": 1629144022257,
-    "datasets": {
-        "dashboard_example_map.csv": {
-            "data": [
-                {
-                    "Location": "Alabama",
-                    "Rate": 1375
-                },
-                {
-                    "Location": "Alaska",
-                    "Rate": 1377
-                },
-                {
-                    "Location": "American Samoa",
-                    "Rate": 1388
-                },
-                {
-                    "Location": "Arizona",
-                    "Rate": 1401
-                },
-                {
-                    "Location": "Arkansas",
-                    "Rate": 1398
-                },
-                {
-                    "Location": "California",
-                    "Rate": 1381
-                },
-                {
-                    "Location": "Colorado",
-                    "Rate": 1369
-                },
-                {
-                    "Location": "Connecticut",
-                    "Rate": 1403
-                },
-                {
-                    "Location": "Delaware\t",
-                    "Rate": "1384"
-                },
-                {
-                    "Location": "District of Columbia",
-                    "Rate": 1400
-                },
-                {
-                    "Location": "Florida",
-                    "Rate": 1387
-                },
-                {
-                    "Location": "Georgia",
-                    "Rate": 1365
-                },
-                {
-                    "Location": "Guam",
-                    "Rate": 1356
-                },
-                {
-                    "Location": "Hawaii",
-                    "Rate": 1362
-                },
-                {
-                    "Location": "Idaho",
-                    "Rate": 1374
-                },
-                {
-                    "Location": "Illinois",
-                    "Rate": 1402
-                },
-                {
-                    "Location": "Indiana",
-                    "Rate": 1404
-                },
-                {
-                    "Location": "Iowa",
-                    "Rate": 1394
-                },
-                {
-                    "Location": "Kansas",
-                    "Rate": 1367
-                },
-                {
-                    "Location": "Kentucky",
-                    "Rate": 1359
-                },
-                {
-                    "Location": "Louisiana",
-                    "Rate": 1409
-                },
-                {
-                    "Location": "Maine",
-                    "Rate": 1385
-                },
-                {
-                    "Location": "Marshall Islands",
-                    "Rate": 1467
-                },
-                {
-                    "Location": "Maryland",
-                    "Rate": 1386
-                },
-                {
-                    "Location": "Massachusetts",
-                    "Rate": 1366
-                },
-                {
-                    "Location": "Michigan",
-                    "Rate": 1390
-                },
-                {
-                    "Location": "Minnesota",
-                    "Rate": 1392
-                },
-                {
-                    "Location": "Mississippi",
-                    "Rate": 1406
-                },
-                {
-                    "Location": "Missouri",
-                    "Rate": 1378
-                },
-                {
-                    "Location": "Montana",
-                    "Rate": 1364
-                },
-                {
-                    "Location": "Nebraska",
-                    "Rate": 1391
-                },
-                {
-                    "Location": "Nevada",
-                    "Rate": 1416
-                },
-                {
-                    "Location": "New Hampshire",
-                    "Rate": 1405
-                },
-                {
-                    "Location": "New Jersey",
-                    "Rate": 1469
-                },
-                {
-                    "Location": "New Mexico",
-                    "Rate": 1399
-                },
-                {
-                    "Location": "New York",
-                    "Rate": 1360
-                },
-                {
-                    "Location": "North Carolina",
-                    "Rate": 1358
-                },
-                {
-                    "Location": "North Dakota",
-                    "Rate": 1355
-                },
-                {
-                    "Location": "Northern Mariana Islands",
-                    "Rate": "1368"
-                },
-                {
-                    "Location": "Ohio",
-                    "Rate": 1466
-                },
-                {
-                    "Location": "Oklahoma",
-                    "Rate": 1372
-                },
-                {
-                    "Location": "Oregon",
-                    "Rate": 1438
-                },
-                {
-                    "Location": "Pennsylvania",
-                    "Rate": 1354
-                },
-                {
-                    "Location": "Puerto Rico",
-                    "Rate": 1422
-                },
-                {
-                    "Location": "Republic of Palau",
-                    "Rate": "1471"
-                },
-                {
-                    "Location": "Rhode Island",
-                    "Rate": 1411
-                },
-                {
-                    "Location": "South Carolina",
-                    "Rate": 1389
-                },
-                {
-                    "Location": "South Dakota",
-                    "Rate": 1432
-                },
-                {
-                    "Location": "Tennessee",
-                    "Rate": 1376
-                },
-                {
-                    "Location": "Texas",
-                    "Rate": 1420
-                },
-                {
-                    "Location": "U.S. Virgin Islands",
-                    "Rate": "1383"
-                },
-                {
-                    "Location": "Utah",
-                    "Rate": 1380
-                },
-                {
-                    "Location": "Vermont",
-                    "Rate": 1429
-                },
-                {
-                    "Location": "Virginia",
-                    "Rate": 1441
-                },
-                {
-                    "Location": "Washington",
-                    "Rate": 1393
-                },
-                {
-                    "Location": "West Virginia",
-                    "Rate": 1397
-                },
-                {
-                    "Location": "Wisconsin",
-                    "Rate": 1430
-                },
-                {
-                    "Location": "Wyoming",
-                    "Rate": 1454
-                }
-            ],
-            "dataFileSize": 971,
-            "dataFileName": "dashboard_example_map.csv",
-            "dataFileSourceType": "file",
-            "dataFileFormat": "CSV",
-            "preview": true
-        }
+    "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=100": {
+      "dataFileSize": 77231,
+      "dataFileName": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=100",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": false,
+      "dataUrl": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=100"
+    },
+    "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=101": {
+      "dataFileSize": 78022,
+      "dataFileName": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=101",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": false,
+      "dataUrl": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=101"
     }
+  },
+  "isResponsiveTicks": false,
+  "type": "dashboard",
+  "barThickness": "0.37",
+  "xAxis": { "type": "categorical", "size": 75, "maxTickRotation": 45, "labelOffset": 65 },
+  "version": "4.24.10",
+  "uuid": 1735059712130,
+  "multiDashboards": [
+    {
+      "label": "Explore by Location",
+      "visualizations": {
+        "dashboardFilters1728490994697": {
+          "filters": [],
+          "filterBehavior": "Apply Button",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1728490994697",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [0, 1, 2, 3, 4],
+          "visualizationType": "dashboardFilters",
+          "dataDescription": { "horizontal": false, "series": false }
+        },
+        "table1728589193203": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": false,
+          "openModal": true,
+          "uid": "table1728589193203",
+          "type": "table",
+          "table": {
+            "label": "Data Table",
+            "show": true,
+            "showDownloadUrl": false,
+            "showVertical": true,
+            "expanded": true,
+            "collapsible": true,
+            "groupBy": "Year",
+            "pivot": { "columnName": "Category", "valueColumns": ["Sub_Category"] }
+          },
+          "columns": {
+            "Category": { "name": "Category", "dataTable": false },
+            "CreatedOn": { "name": "CreatedOn", "dataTable": false },
+            "Data_Source_URL": { "name": "Data_Source_URL", "dataTable": false },
+            "Data_Value_Footnote_Symbol": { "name": "Data_Value_Footnote_Symbol", "dataTable": false },
+            "Footnotes": { "name": "Footnotes", "dataTable": false },
+            "Full_Question": { "name": "Full_Question", "dataTable": false },
+            "GeoLocation_Lat": { "name": "GeoLocation_Lat", "dataTable": false },
+            "GeoLocation_Long": { "name": "GeoLocation_Long", "dataTable": false },
+            "High_CI": { "name": "High_CI", "dataTable": false },
+            "Location": { "name": "Location", "dataTable": false },
+            "Low_CI": { "name": "Low_CI", "dataTable": false },
+            "Indicator": { "name": "Indicator", "dataTable": false },
+            "Population_Survey": { "name": "Population_Survey", "dataTable": false },
+            "Sub_Category_Filter": { "name": "Sub_Category_Filter", "dataTable": false },
+            "Topic": { "name": "Topic", "dataTable": false },
+            "WHO_Region": { "name": "WHO_Region", "dataTable": false },
+            "Year": { "name": "Year", "dataTable": true },
+            "Sub_Category": {
+              "label": "Sub_Category",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "forestPlot": false,
+              "startingPoint": "0",
+              "forestPlotAlignRight": false,
+              "roundToPlace": 0,
+              "commas": false,
+              "showInViz": false,
+              "forestPlotStartingPoint": 0,
+              "name": "Sub_Category",
+              "order": 1
+            },
+            "Percentage": {
+              "label": "Percentage",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "forestPlot": false,
+              "startingPoint": "0",
+              "forestPlotAlignRight": false,
+              "roundToPlace": 0,
+              "commas": false,
+              "showInViz": false,
+              "forestPlotStartingPoint": 0,
+              "name": "Percentage",
+              "order": 2
+            },
+            "95%_CI": {
+              "label": "95%_CI",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "forestPlot": false,
+              "startingPoint": "0",
+              "forestPlotAlignRight": false,
+              "roundToPlace": 0,
+              "commas": false,
+              "showInViz": false,
+              "forestPlotStartingPoint": 0,
+              "name": "95%_CI",
+              "order": 3
+            }
+          },
+          "dataFormat": {},
+          "visualizationType": "table",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation",
+          "dataDescription": { "horizontal": false, "series": false }
+        },
+        "chart1728590913140": {
+          "annotations": [],
+          "type": "chart",
+          "debugSvg": false,
+          "chartMessage": { "noData": "No Data Available" },
+          "title": " ",
+          "showTitle": false,
+          "showDownloadMediaButton": false,
+          "theme": "theme-blue",
+          "animate": false,
+          "fontSize": "medium",
+          "lineDatapointStyle": "hover",
+          "lineDatapointColor": "Same as Line",
+          "barHasBorder": "false",
+          "isLollipopChart": false,
+          "lollipopShape": "circle",
+          "lollipopColorStyle": "two-tone",
+          "visualizationSubType": "regular",
+          "barStyle": "",
+          "roundingStyle": "standard",
+          "tipRounding": "top",
+          "isResponsiveTicks": false,
+          "general": {
+            "annotationDropdownText": "Annotations",
+            "showDownloadButton": false,
+            "showMissingDataLabel": true,
+            "showSuppressedSymbol": true,
+            "showZeroValueData": true,
+            "hideNullValue": true
+          },
+          "padding": { "left": 5, "right": 5 },
+          "preliminaryData": [],
+          "yAxis": {
+            "hideAxis": false,
+            "displayNumbersOnBar": false,
+            "hideLabel": false,
+            "hideTicks": false,
+            "size": 50,
+            "gridLines": true,
+            "enablePadding": false,
+            "min": "",
+            "max": "",
+            "labelColor": "#333",
+            "tickLabelColor": "#333",
+            "tickColor": "#333",
+            "rightHideAxis": true,
+            "rightAxisSize": 0,
+            "rightLabel": "",
+            "rightLabelOffsetSize": 0,
+            "rightAxisLabelColor": "#333",
+            "rightAxisTickLabelColor": "#333",
+            "rightAxisTickColor": "#333",
+            "numTicks": "",
+            "axisPadding": 0,
+            "scalePadding": 10,
+            "tickRotation": 0,
+            "anchors": [],
+            "shoMissingDataLabel": true,
+            "showMissingDataLine": true,
+            "categories": [],
+            "type": "linear",
+            "labelsAboveGridlines": false
+          },
+          "boxplot": {
+            "plots": [],
+            "borders": "true",
+            "plotOutlierValues": false,
+            "plotNonOutlierValues": true,
+            "labels": {
+              "q1": "Lower Quartile",
+              "q2": "q2",
+              "q3": "Upper Quartile",
+              "q4": "q4",
+              "minimum": "Minimum",
+              "maximum": "Maximum",
+              "mean": "Mean",
+              "median": "Median",
+              "sd": "Standard Deviation",
+              "iqr": "Interquartile Range",
+              "total": "Total",
+              "outliers": "Outliers",
+              "values": "Values",
+              "lowerBounds": "Lower Bounds",
+              "upperBounds": "Upper Bounds"
+            },
+            "firstQuartilePercentage": 25,
+            "thirdQuartilePercentage": 75,
+            "boxWidthPercentage": 40,
+            "legend": { "showHowToReadText": false, "howToReadText": "" }
+          },
+          "topAxis": { "hasLine": false },
+          "isLegendValue": false,
+          "barThickness": 0.35,
+          "barHeight": 25,
+          "barSpace": 15,
+          "heights": { "vertical": 300, "horizontal": 750 },
+          "xAxis": {
+            "sortDates": false,
+            "anchors": [],
+            "type": "categorical",
+            "showTargetLabel": true,
+            "targetLabel": "Target",
+            "hideAxis": false,
+            "hideLabel": false,
+            "hideTicks": false,
+            "size": 75,
+            "tickRotation": 0,
+            "min": "",
+            "max": "",
+            "labelColor": "#333",
+            "tickLabelColor": "#333",
+            "tickColor": "#333",
+            "numTicks": "",
+            "labelOffset": 65,
+            "axisPadding": 200,
+            "target": 0,
+            "maxTickRotation": 0,
+            "padding": 0,
+            "showYearsOnce": false,
+            "sortByRecentDate": false,
+            "dataKey": "Sub_Category",
+            "axisBBox": 0,
+            "tickWidthMax": null
+          },
+          "table": {
+            "label": "Data Table",
+            "expanded": true,
+            "limitHeight": false,
+            "height": "",
+            "caption": "",
+            "showDownloadUrl": false,
+            "showDataTableLink": true,
+            "showDownloadLinkBelow": true,
+            "indexLabel": "",
+            "download": true,
+            "showVertical": true,
+            "dateDisplayFormat": "",
+            "showMissingDataLabel": true,
+            "showSuppressedSymbol": true,
+            "show": false
+          },
+          "orientation": "vertical",
+          "color": "pinkpurple",
+          "columns": {},
+          "legend": {
+            "hide": false,
+            "behavior": "isolate",
+            "axisAlign": true,
+            "singleRow": true,
+            "colorCode": "Sub_Category",
+            "reverseLabelOrder": false,
+            "description": "",
+            "dynamicLegend": false,
+            "dynamicLegendDefaultText": "Show All",
+            "dynamicLegendItemLimit": 5,
+            "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+            "dynamicLegendChartMessage": "Select Options from the Legend",
+            "label": "Gender",
+            "lineMode": false,
+            "verticalSorted": false,
+            "highlightOnHover": false,
+            "hideSuppressedLabels": false,
+            "hideSuppressionLink": false,
+            "seriesHighlight": [],
+            "style": "circles",
+            "subStyle": "linear blocks",
+            "tickRotation": "",
+            "hideBorder": { "side": false, "topBottom": false },
+            "position": "right"
+          },
+          "brush": { "height": 25, "active": false },
+          "exclusions": { "active": false, "keys": [] },
+          "palette": "sequential-blue",
+          "isPaletteReversed": false,
+          "twoColor": { "palette": "monochrome-1", "isPaletteReversed": false },
+          "labels": true,
+          "dataFormat": {
+            "commas": false,
+            "prefix": "",
+            "suffix": "",
+            "abbreviated": false,
+            "bottomSuffix": "",
+            "bottomPrefix": "",
+            "bottomAbbreviated": false
+          },
+          "confidenceKeys": {},
+          "visual": {
+            "border": true,
+            "accent": true,
+            "background": true,
+            "verticalHoverLine": false,
+            "horizontalHoverLine": false
+          },
+          "useLogScale": false,
+          "filterBehavior": "Filter Change",
+          "highlightedBarValues": [],
+          "series": [
+            {
+              "dataKey": "Percentage",
+              "type": "Bar",
+              "axis": "Left",
+              "tooltip": true,
+              "dynamicCategory": "Sub_Category"
+            }
+          ],
+          "tooltips": { "opacity": 90, "singleSeries": false, "dateDisplayFormat": "" },
+          "forestPlot": {
+            "startAt": 0,
+            "colors": { "line": "", "shape": "" },
+            "lineOfNoEffect": { "show": true },
+            "type": "",
+            "pooledResult": { "diamondHeight": 5, "column": "" },
+            "estimateField": "",
+            "estimateRadius": "",
+            "shape": "square",
+            "rowHeight": 20,
+            "description": { "show": true, "text": "description", "location": 0 },
+            "result": { "show": true, "text": "result", "location": 100 },
+            "radius": { "min": 2, "max": 10, "scalingColumn": "" },
+            "regression": { "lower": 0, "upper": 0, "estimateField": 0 },
+            "leftWidthOffset": 0,
+            "rightWidthOffset": 0,
+            "showZeroLine": false,
+            "leftLabel": "",
+            "rightLabel": ""
+          },
+          "area": { "isStacked": false },
+          "sankey": {
+            "title": { "defaultColor": "black" },
+            "iterations": 1,
+            "rxValue": 0.9,
+            "overallSize": { "width": 900, "height": 700 },
+            "margin": { "margin_y": 25, "margin_x": 0 },
+            "nodeSize": { "nodeWidth": 26, "nodeHeight": 40 },
+            "nodePadding": 55,
+            "nodeFontColor": "black",
+            "nodeColor": { "default": "#ff8500", "inactive": "#808080" },
+            "linkColor": { "default": "#ffc900", "inactive": "#D3D3D3" },
+            "opacity": {
+              "nodeOpacityDefault": 1,
+              "nodeOpacityInactive": 0.1,
+              "LinkOpacityDefault": 1,
+              "LinkOpacityInactive": 0.1
+            },
+            "storyNodeFontColor": "#006778",
+            "storyNodeText": [],
+            "nodeValueStyle": { "textBefore": "(", "textAfter": ")" },
+            "data": []
+          },
+          "filters": [],
+          "openModal": true,
+          "uid": "chart1728590913140",
+          "visualizationType": "Bar",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=101",
+          "dataDescription": { "horizontal": false, "series": false },
+          "version": "4.24.10",
+          "introText": "",
+          "dynamicMarginTop": 0,
+          "superTitle": ""
+        },
+        "table1728590930478": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": false,
+          "openModal": true,
+          "uid": "table1728590930478",
+          "type": "table",
+          "table": {
+            "label": "Data Table",
+            "show": true,
+            "showDownloadUrl": false,
+            "showVertical": true,
+            "expanded": true,
+            "collapsible": true,
+            "groupBy": "Year",
+            "pivot": { "columnName": "Category", "valueColumns": ["Sub_Category"] }
+          },
+          "columns": {
+            "Category": { "name": "Category", "dataTable": false },
+            "CreatedOn": { "name": "CreatedOn", "dataTable": false },
+            "Data_Source_URL": { "name": "Data_Source_URL", "dataTable": false },
+            "Data_Value_Footnote_Symbol": { "name": "Data_Value_Footnote_Symbol", "dataTable": false },
+            "Footnotes": { "name": "Footnotes", "dataTable": false },
+            "Full_Question": { "name": "Full_Question", "dataTable": false },
+            "GeoLocation_Lat": { "name": "GeoLocation_Lat", "dataTable": false },
+            "GeoLocation_Long": { "name": "GeoLocation_Long", "dataTable": false },
+            "High_CI": { "name": "High_CI", "dataTable": false },
+            "Indicator": { "name": "Indicator", "dataTable": false },
+            "Location": { "name": "Location", "dataTable": false },
+            "Low_CI": { "name": "Low_CI", "dataTable": false },
+            "Sub_Category_Filter": { "name": "Sub_Category_Filter", "dataTable": false },
+            "Topic": { "name": "Topic", "dataTable": false },
+            "Population_Survey": { "name": "Population_Survey", "dataTable": false },
+            "WHO_Region": { "name": "WHO_Region", "dataTable": false },
+            "Year": { "name": "Year", "dataTable": true },
+            "Percentage": {
+              "label": "Percentage",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "forestPlot": false,
+              "startingPoint": "0",
+              "forestPlotAlignRight": false,
+              "roundToPlace": 0,
+              "commas": false,
+              "showInViz": false,
+              "forestPlotStartingPoint": 0,
+              "name": "Percentage",
+              "order": 2
+            }
+          },
+          "dataFormat": {},
+          "visualizationType": "table",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation",
+          "dataDescription": { "horizontal": false, "series": false }
+        },
+        "markup-include1731599569065": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "openModal": false,
+          "uid": "markup-include1731599569065",
+          "type": "markup-include",
+          "contentEditor": {
+            "inlineHTML": "<h2>Trends over Time</h2>\n<h3>Percentage of students who smoked cigarettes on at least 1 day during the month preceding the survey</h3>\n<h3><em>Topic: {{topic1}}</em></h3>",
+            "markupVariables": [{ "columnName": "Topic", "conditions": [], "name": "topic1", "tag": "{{topic1}}" }],
+            "showHeader": true,
+            "srcUrl": "#example",
+            "title": "",
+            "useInlineHTML": true
+          },
+          "theme": "theme-blue",
+          "visual": {
+            "border": false,
+            "accent": false,
+            "background": false,
+            "hideBackgroundColor": false,
+            "borderColorTheme": false
+          },
+          "showEditorPanel": true,
+          "visualizationType": "markup-include",
+          "version": "4.24.12",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=100",
+          "dataDescription": { "series": false }
+        },
+        "dashboardFilters1731599671758": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1731599671758",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [5, 6],
+          "visualizationType": "dashboardFilters",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebyindicator&$where=category=\"Gender\"",
+          "dataDescription": { "horizontal": false, "series": false },
+          "autoLoad": true
+        },
+        "markup-include1732125919543": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "openModal": false,
+          "uid": "markup-include1732125919543",
+          "type": "markup-include",
+          "contentEditor": {
+            "inlineHTML": "<h2>Details for a Specific Year</h2>\n<h3>Percentage of students who smoked cigarettes on at least 1 day during the month preceding the survey.</h3>\n<h3><em>Topic: {{topic1}}</em></h3>",
+            "markupVariables": [],
+            "showHeader": true,
+            "srcUrl": "#example",
+            "title": "",
+            "useInlineHTML": true
+          },
+          "theme": "theme-blue",
+          "visual": {
+            "border": false,
+            "accent": false,
+            "background": false,
+            "hideBackgroundColor": false,
+            "borderColorTheme": false
+          },
+          "showEditorPanel": true,
+          "visualizationType": "markup-include",
+          "version": "4.24.10",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation",
+          "dataDescription": { "horizontal": false, "series": false }
+        },
+        "chart1733154229951": {
+          "annotations": [],
+          "type": "chart",
+          "debugSvg": false,
+          "chartMessage": { "noData": "No Data Available" },
+          "title": "New Chart",
+          "showTitle": true,
+          "showDownloadMediaButton": false,
+          "theme": "theme-blue",
+          "animate": false,
+          "fontSize": "medium",
+          "lineDatapointStyle": "hover",
+          "lineDatapointColor": "Same as Line",
+          "barHasBorder": "false",
+          "isLollipopChart": false,
+          "lollipopShape": "circle",
+          "lollipopColorStyle": "two-tone",
+          "visualizationSubType": "regular",
+          "barStyle": "flat",
+          "roundingStyle": "standard",
+          "tipRounding": "top",
+          "isResponsiveTicks": false,
+          "general": {
+            "annotationDropdownText": "Annotations",
+            "showDownloadButton": false,
+            "showMissingDataLabel": true,
+            "showSuppressedSymbol": true,
+            "showZeroValueData": true,
+            "hideNullValue": true
+          },
+          "padding": { "left": 5, "right": 5 },
+          "preliminaryData": [],
+          "yAxis": {
+            "hideAxis": false,
+            "displayNumbersOnBar": false,
+            "hideLabel": false,
+            "hideTicks": false,
+            "size": 50,
+            "gridLines": false,
+            "enablePadding": false,
+            "min": "",
+            "max": "",
+            "labelColor": "#333",
+            "tickLabelColor": "#333",
+            "tickColor": "#333",
+            "rightHideAxis": true,
+            "rightAxisSize": 0,
+            "rightLabel": "",
+            "rightLabelOffsetSize": 0,
+            "rightAxisLabelColor": "#333",
+            "rightAxisTickLabelColor": "#333",
+            "rightAxisTickColor": "#333",
+            "numTicks": "",
+            "axisPadding": 0,
+            "scalePadding": 10,
+            "tickRotation": 0,
+            "anchors": [],
+            "shoMissingDataLabel": true,
+            "showMissingDataLine": true,
+            "categories": [],
+            "label": "Percentage (%)"
+          },
+          "boxplot": {
+            "plots": [],
+            "borders": "true",
+            "plotOutlierValues": false,
+            "plotNonOutlierValues": true,
+            "labels": {
+              "q1": "Lower Quartile",
+              "q2": "q2",
+              "q3": "Upper Quartile",
+              "q4": "q4",
+              "minimum": "Minimum",
+              "maximum": "Maximum",
+              "mean": "Mean",
+              "median": "Median",
+              "sd": "Standard Deviation",
+              "iqr": "Interquartile Range",
+              "count": "Count",
+              "outliers": "Outliers",
+              "values": "Values",
+              "lowerBounds": "Lower Bounds",
+              "upperBounds": "Upper Bounds"
+            }
+          },
+          "topAxis": { "hasLine": false },
+          "isLegendValue": false,
+          "barThickness": 0.35,
+          "barHeight": 25,
+          "barSpace": 15,
+          "heights": { "vertical": 300, "horizontal": 750 },
+          "xAxis": {
+            "sortDates": false,
+            "anchors": [],
+            "type": "date",
+            "showTargetLabel": true,
+            "targetLabel": "Target",
+            "hideAxis": false,
+            "hideLabel": false,
+            "hideTicks": false,
+            "size": 75,
+            "tickRotation": 0,
+            "min": "",
+            "max": "",
+            "labelColor": "#333",
+            "tickLabelColor": "#333",
+            "tickColor": "#333",
+            "numTicks": "",
+            "labelOffset": 0,
+            "axisPadding": 200,
+            "target": 0,
+            "maxTickRotation": 0,
+            "padding": 5,
+            "showYearsOnce": false,
+            "sortByRecentDate": false,
+            "dataKey": "Year",
+            "label": "Year",
+            "dateParseFormat": "%Y",
+            "dateDisplayFormat": "%Y",
+            "tickWidthMax": 41
+          },
+          "table": {
+            "label": "Data Table",
+            "expanded": true,
+            "limitHeight": false,
+            "height": "",
+            "caption": "",
+            "showDownloadUrl": false,
+            "showDataTableLink": true,
+            "showDownloadLinkBelow": true,
+            "indexLabel": "",
+            "download": true,
+            "showVertical": true,
+            "dateDisplayFormat": "%Y",
+            "showMissingDataLabel": true,
+            "showSuppressedSymbol": true,
+            "show": false
+          },
+          "orientation": "vertical",
+          "color": "pinkpurple",
+          "columns": {
+            "Sub_Category": {
+              "label": "Sub_Category",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "forestPlot": false,
+              "startingPoint": "0",
+              "forestPlotAlignRight": false,
+              "roundToPlace": 0,
+              "commas": false,
+              "showInViz": false,
+              "forestPlotStartingPoint": 0,
+              "name": "Sub_Category",
+              "series": "Percentage"
+            }
+          },
+          "legend": {
+            "hide": false,
+            "behavior": "isolate",
+            "axisAlign": true,
+            "singleRow": true,
+            "colorCode": "",
+            "reverseLabelOrder": false,
+            "description": "",
+            "dynamicLegend": false,
+            "dynamicLegendDefaultText": "Show All",
+            "dynamicLegendItemLimit": 5,
+            "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+            "dynamicLegendChartMessage": "Select Options from the Legend",
+            "label": "",
+            "lineMode": false,
+            "verticalSorted": false,
+            "highlightOnHover": false,
+            "hideSuppressedLabels": false,
+            "hideSuppressionLink": false,
+            "seriesHighlight": [],
+            "style": "circles",
+            "subStyle": "linear blocks",
+            "tickRotation": "",
+            "hideBorder": { "side": false, "topBottom": true },
+            "position": "right"
+          },
+          "brush": { "height": 45, "active": false },
+          "exclusions": { "active": false, "keys": [] },
+          "palette": "qualitative-bold",
+          "isPaletteReversed": false,
+          "twoColor": { "palette": "monochrome-1", "isPaletteReversed": false },
+          "labels": false,
+          "dataFormat": {
+            "commas": false,
+            "prefix": "",
+            "suffix": "",
+            "abbreviated": false,
+            "bottomSuffix": "",
+            "bottomPrefix": "",
+            "bottomAbbreviated": false
+          },
+          "confidenceKeys": {},
+          "visual": {
+            "border": true,
+            "accent": true,
+            "background": true,
+            "verticalHoverLine": false,
+            "horizontalHoverLine": false
+          },
+          "useLogScale": false,
+          "filterBehavior": "Filter Change",
+          "highlightedBarValues": [],
+          "series": [
+            {
+              "dataKey": "Percentage",
+              "type": "Line",
+              "axis": "Left",
+              "tooltip": true,
+              "dynamicCategory": "Sub_Category"
+            }
+          ],
+          "tooltips": { "opacity": 90, "singleSeries": false, "dateDisplayFormat": "%Y" },
+          "forestPlot": {
+            "startAt": 0,
+            "colors": { "line": "", "shape": "" },
+            "lineOfNoEffect": { "show": true },
+            "type": "",
+            "pooledResult": { "diamondHeight": 5, "column": "" },
+            "estimateField": "",
+            "estimateRadius": "",
+            "shape": "square",
+            "rowHeight": 20,
+            "description": { "show": true, "text": "description", "location": 0 },
+            "result": { "show": true, "text": "result", "location": 100 },
+            "radius": { "min": 2, "max": 10, "scalingColumn": "" },
+            "regression": { "lower": 0, "upper": 0, "estimateField": 0 },
+            "leftWidthOffset": 0,
+            "rightWidthOffset": 0,
+            "showZeroLine": false,
+            "leftLabel": "",
+            "rightLabel": ""
+          },
+          "area": { "isStacked": false },
+          "sankey": {
+            "title": { "defaultColor": "black" },
+            "iterations": 1,
+            "rxValue": 0.9,
+            "overallSize": { "width": 900, "height": 700 },
+            "margin": { "margin_y": 25, "margin_x": 0 },
+            "nodeSize": { "nodeWidth": 26, "nodeHeight": 40 },
+            "nodePadding": 55,
+            "nodeFontColor": "black",
+            "nodeColor": { "default": "#ff8500", "inactive": "#808080" },
+            "linkColor": { "default": "#ffc900", "inactive": "#D3D3D3" },
+            "opacity": {
+              "nodeOpacityDefault": 1,
+              "nodeOpacityInactive": 0.1,
+              "LinkOpacityDefault": 1,
+              "LinkOpacityInactive": 0.1
+            },
+            "storyNodeFontColor": "#006778",
+            "storyNodeText": [],
+            "nodeValueStyle": { "textBefore": "(", "textAfter": ")" },
+            "data": []
+          },
+          "filters": [],
+          "openModal": true,
+          "uid": "chart1733154229951",
+          "visualizationType": "Line",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation",
+          "dataDescription": { "horizontal": false, "series": false },
+          "version": "4.24.10",
+          "dynamicMarginTop": 0
+        },
+        "dashboardFilters1734380608107": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1734380608107",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [7, 8, 9],
+          "visualizationType": "dashboardFilters",
+          "autoLoad": true
+        }
+      },
+      "dashboard": {
+        "theme": "theme-blue",
+        "sharedFilters": [
+          {
+            "key": "WHO Region",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$select=DISTINCT%20Who_Region&$order=Who_Region",
+              "valueSelector": "Who_Region",
+              "textSelector": ""
+            },
+            "tier": 1,
+            "usedBy": [],
+            "setByQueryParameter": "Who_Region"
+          },
+          {
+            "key": "Location",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$select=DISTINCT%20Location&$order=Location",
+              "valueSelector": "Location",
+              "textSelector": ""
+            },
+            "tier": 2,
+            "parents": ["WHO Region"],
+            "setByQueryParameter": "Location"
+          },
+          {
+            "key": "Population Survey",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$select=DISTINCT%20Population_Survey&$order=Population_Survey",
+              "valueSelector": "Population_Survey",
+              "textSelector": ""
+            },
+            "tier": 2,
+            "parents": ["WHO Region", "Location"],
+            "setByQueryParameter": "Population_Survey"
+          },
+          {
+            "key": "Topic",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$select=DISTINCT%20Topic&$order=Topic",
+              "valueSelector": "Topic",
+              "textSelector": ""
+            },
+            "tier": 2,
+            "parents": ["WHO Region", "Location", "Population Survey"],
+            "setByQueryParameter": "Topic"
+          },
+          {
+            "key": "Indicator",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$select=DISTINCT%20Indicator&$order=Indicator",
+              "valueSelector": "Indicator",
+              "textSelector": ""
+            },
+            "tier": 1,
+            "parents": ["WHO Region", "Location", "Population Survey", "Topic"],
+            "usedBy": [],
+            "setByQueryParameter": "Indicator"
+          },
+          {
+            "key": "Breakdown",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=100&$select=DISTINCT Category",
+              "valueSelector": "Category",
+              "textSelector": ""
+            },
+            "parents": [],
+            "usedBy": ["table1728589193203", "chart1733154229951"],
+            "tier": 1
+          },
+          {
+            "key": "Breakdown Detail",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=100&$select=DISTINCT Sub_Category_Filter",
+              "valueSelector": "Sub_Category_Filter",
+              "textSelector": ""
+            },
+            "parents": ["Breakdown"],
+            "usedBy": ["table1728589193203", "chart1733154229951"],
+            "tier": 2
+          },
+          {
+            "key": "Year",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=101&$select=DISTINCT%20Year&$order=Year",
+              "valueSelector": "Year",
+              "textSelector": ""
+            },
+            "usedBy": [6],
+            "tier": 1,
+            "queuedActive": "2001"
+          },
+          {
+            "key": "Gender",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=101&$select=DISTINCT%20Category&$order=Category",
+              "valueSelector": "Category",
+              "textSelector": ""
+            },
+            "parents": ["Year"],
+            "usedBy": [6],
+            "tier": 2,
+            "queuedActive": "Gender"
+          },
+          {
+            "key": "Breakdown Detail More",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=101&$select=DISTINCT%20Sub_Category&$order=Sub_Category",
+              "valueSelector": "Sub_Category",
+              "textSelector": ""
+            },
+            "parents": ["Year", "Gender"],
+            "usedBy": [6],
+            "tier": 2
+          }
+        ]
+      },
+      "rows": [
+        {
+          "columns": [{ "width": 12, "widget": "dashboardFilters1728490994697" }, {}, {}],
+          "dataDescription": {},
+          "dataKey": ""
+        },
+        {
+          "columns": [{ "width": 12, "widget": "markup-include1731599569065" }],
+          "uuid": 1731599544627,
+          "dataDescription": { "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=100"
+        },
+        {
+          "columns": [{ "width": 12, "widget": "dashboardFilters1731599671758" }],
+          "uuid": 1731599662715,
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$where=category=\"Gender\""
+        },
+        {
+          "columns": [
+            { "width": 4, "widget": "chart1733154229951" },
+            { "width": 4, "widget": "table1728589193203" },
+            { "width": 4 }
+          ],
+          "uuid": 1733323767637
+        },
+        {
+          "columns": [{ "width": 12, "widget": "markup-include1732125919543" }],
+          "uuid": 1733323767637,
+          "dataDescription": { "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=101"
+        },
+        { "columns": [{ "width": 12, "widget": "dashboardFilters1734380608107" }], "uuid": 1734380612520 },
+        {
+          "columns": [
+            { "width": 12, "widget": "chart1728590913140" },
+            { "width": 12, "widget": "table1728590930478" },
+            { "width": 12 }
+          ],
+          "toggle": true,
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=101",
+          "uuid": 1734380612520
+        }
+      ],
+      "type": "dashboard",
+      "version": "4.24.10"
+    },
+    {
+      "label": "Explore by Indicator",
+      "visualizations": {
+        "dashboardFilters1733159130084": {
+          "filters": [],
+          "filterBehavior": "Apply Button",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1733159130084",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [0, 1, 2, 3],
+          "visualizationType": "dashboardFilters",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebyindicator",
+          "dataDescription": { "horizontal": false, "series": false },
+          "applyFiltersButtonText": "Run Report"
+        },
+        "markup-include1734386641623": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "openModal": false,
+          "uid": "markup-include1734386641623",
+          "type": "markup-include",
+          "contentEditor": {
+            "inlineHTML": "<h2>Percentage of students who smoked cigarettes on at least 1 day during the month preceding the survey</h2>\n<h3><em>Topic: {{topic_perc}}</em></h3>",
+            "markupVariables": [
+              {
+                "columnName": "TopicOrMPOWER_SubCategory",
+                "conditions": [],
+                "name": "topic_perc",
+                "tag": "{{topic_perc}}"
+              }
+            ],
+            "showHeader": true,
+            "srcUrl": "#example",
+            "title": "",
+            "useInlineHTML": true,
+            "allowHideSection": false
+          },
+          "theme": "theme-blue",
+          "visual": {
+            "border": false,
+            "accent": false,
+            "background": false,
+            "hideBackgroundColor": false,
+            "borderColorTheme": false
+          },
+          "showEditorPanel": true,
+          "visualizationType": "markup-include",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebyindicator",
+          "dataDescription": { "horizontal": false, "series": false },
+          "version": "4.24.10"
+        },
+        "dashboardFilters1734387344839": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1734387344839",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [10, 11],
+          "visualizationType": "dashboardFilters"
+        },
+        "map1734387896105": {
+          "annotations": [],
+          "general": {
+            "geoType": "world",
+            "noStateFoundMessage": "Map Unavailable",
+            "annotationDropdownText": "Annotations",
+            "geoBorderColor": "darkGray",
+            "headerColor": "theme-blue",
+            "title": "",
+            "showTitle": true,
+            "showSidebar": true,
+            "showDownloadButton": true,
+            "showDownloadMediaButton": false,
+            "displayAsHex": false,
+            "displayStateLabels": false,
+            "territoriesLabel": "Territories",
+            "territoriesAlwaysShow": false,
+            "language": "en",
+            "geoLabelOverride": "",
+            "hasRegions": false,
+            "fullBorder": false,
+            "type": "data",
+            "convertFipsCodes": true,
+            "palette": { "isReversed": false },
+            "allowMapZoom": true,
+            "hideGeoColumnInTooltip": false,
+            "hidePrimaryColumnInTooltip": true,
+            "statePicked": { "fipsCode": "01", "stateName": "Alabama" },
+            "expandDataTable": false
+          },
+          "type": "map",
+          "color": "pinkpurple",
+          "columns": {
+            "geo": { "name": "FIPS Codes", "label": "Location", "tooltip": false, "dataTable": true },
+            "primary": {
+              "dataTable": true,
+              "tooltip": true,
+              "prefix": "",
+              "suffix": "",
+              "name": "",
+              "label": "",
+              "roundToPlace": 0
+            },
+            "navigate": { "name": "" },
+            "latitude": { "name": "" },
+            "longitude": { "name": "" }
+          },
+          "legend": {
+            "descriptions": {},
+            "specialClasses": [],
+            "unified": false,
+            "singleColumn": false,
+            "singleRow": false,
+            "verticalSorted": false,
+            "showSpecialClassesLast": false,
+            "dynamicDescription": false,
+            "type": "equalnumber",
+            "numberOfItems": 3,
+            "position": "side",
+            "title": "",
+            "style": "circles",
+            "subStyle": "linear blocks",
+            "tickRotation": "",
+            "singleColumnLegend": false,
+            "hideBorder": false
+          },
+          "filters": [],
+          "table": {
+            "wrapColumns": false,
+            "label": "Data Table",
+            "expanded": false,
+            "limitHeight": false,
+            "height": "",
+            "caption": "",
+            "showDownloadUrl": false,
+            "showDataTableLink": true,
+            "showDownloadLinkBelow": true,
+            "showFullGeoNameInCSV": false,
+            "forceDisplay": true,
+            "download": true,
+            "indexLabel": ""
+          },
+          "tooltips": { "appearanceType": "hover", "linkLabel": "Learn More", "capitalizeLabels": true, "opacity": 90 },
+          "visual": {
+            "minBubbleSize": 1,
+            "maxBubbleSize": 20,
+            "extraBubbleBorder": false,
+            "cityStyle": "circle",
+            "cityStyleLabel": "",
+            "showBubbleZeros": false,
+            "additionalCityStyles": [],
+            "geoCodeCircleSize": 8
+          },
+          "mapPosition": { "coordinates": [0, 30], "zoom": 1 },
+          "map": { "layers": [], "patterns": [] },
+          "hexMap": {
+            "type": "",
+            "shapeGroups": [
+              {
+                "legendTitle": "",
+                "legendDescription": "",
+                "items": [{ "key": "", "shape": "Arrow Up", "column": "", "operator": "=", "value": "" }]
+              }
+            ]
+          },
+          "filterBehavior": "Filter Change",
+          "filterIntro": "",
+          "openModal": true,
+          "uid": "map1734387896105",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebyindicator",
+          "dataDescription": { "horizontal": false, "series": false },
+          "version": "4.24.10"
+        },
+        "chart1734387923111": {
+          "annotations": [],
+          "type": "chart",
+          "debugSvg": false,
+          "chartMessage": { "noData": "No Data Available" },
+          "title": "",
+          "showTitle": true,
+          "showDownloadMediaButton": false,
+          "theme": "theme-blue",
+          "animate": false,
+          "fontSize": "medium",
+          "lineDatapointStyle": "hover",
+          "lineDatapointColor": "Same as Line",
+          "barHasBorder": "false",
+          "isLollipopChart": false,
+          "lollipopShape": "circle",
+          "lollipopColorStyle": "two-tone",
+          "visualizationSubType": "regular",
+          "barStyle": "",
+          "roundingStyle": "standard",
+          "tipRounding": "top",
+          "isResponsiveTicks": false,
+          "general": {
+            "annotationDropdownText": "Annotations",
+            "showDownloadButton": false,
+            "showMissingDataLabel": true,
+            "showSuppressedSymbol": true,
+            "showZeroValueData": true,
+            "hideNullValue": true
+          },
+          "padding": { "left": 5, "right": 5 },
+          "preliminaryData": [],
+          "yAxis": {
+            "hideAxis": false,
+            "displayNumbersOnBar": false,
+            "hideLabel": false,
+            "hideTicks": false,
+            "size": 50,
+            "gridLines": false,
+            "enablePadding": false,
+            "min": "",
+            "max": "",
+            "labelColor": "#333",
+            "tickLabelColor": "#333",
+            "tickColor": "#333",
+            "rightHideAxis": false,
+            "rightAxisSize": 0,
+            "rightLabel": "",
+            "rightLabelOffsetSize": 0,
+            "rightAxisLabelColor": "#333",
+            "rightAxisTickLabelColor": "#333",
+            "rightAxisTickColor": "#333",
+            "numTicks": "",
+            "axisPadding": 0,
+            "scalePadding": 10,
+            "tickRotation": 0,
+            "anchors": [],
+            "shoMissingDataLabel": true,
+            "showMissingDataLine": true,
+            "categories": []
+          },
+          "boxplot": {
+            "plots": [],
+            "borders": "true",
+            "plotOutlierValues": false,
+            "plotNonOutlierValues": true,
+            "labels": {
+              "q1": "Lower Quartile",
+              "q2": "q2",
+              "q3": "Upper Quartile",
+              "q4": "q4",
+              "minimum": "Minimum",
+              "maximum": "Maximum",
+              "mean": "Mean",
+              "median": "Median",
+              "sd": "Standard Deviation",
+              "iqr": "Interquartile Range",
+              "count": "Count",
+              "outliers": "Outliers",
+              "values": "Values",
+              "lowerBounds": "Lower Bounds",
+              "upperBounds": "Upper Bounds"
+            }
+          },
+          "topAxis": { "hasLine": false },
+          "isLegendValue": false,
+          "barThickness": 0.35,
+          "barHeight": 25,
+          "barSpace": 15,
+          "heights": { "vertical": 300, "horizontal": 750 },
+          "xAxis": {
+            "sortDates": false,
+            "anchors": [],
+            "type": "categorical",
+            "showTargetLabel": true,
+            "targetLabel": "Target",
+            "hideAxis": false,
+            "hideLabel": false,
+            "hideTicks": false,
+            "size": 75,
+            "tickRotation": 0,
+            "min": "",
+            "max": "",
+            "labelColor": "#333",
+            "tickLabelColor": "#333",
+            "tickColor": "#333",
+            "numTicks": "",
+            "labelOffset": 0,
+            "axisPadding": 200,
+            "target": 0,
+            "maxTickRotation": 0,
+            "padding": 5,
+            "showYearsOnce": false,
+            "sortByRecentDate": false
+          },
+          "table": {
+            "label": "Data Table",
+            "expanded": true,
+            "limitHeight": false,
+            "height": "",
+            "caption": "",
+            "showDownloadUrl": false,
+            "showDataTableLink": true,
+            "showDownloadLinkBelow": true,
+            "indexLabel": "",
+            "download": true,
+            "showVertical": true,
+            "dateDisplayFormat": "",
+            "showMissingDataLabel": true,
+            "showSuppressedSymbol": true,
+            "show": false
+          },
+          "orientation": "horizontal",
+          "color": "pinkpurple",
+          "columns": {},
+          "legend": {
+            "hide": false,
+            "behavior": "isolate",
+            "axisAlign": true,
+            "singleRow": true,
+            "colorCode": "",
+            "reverseLabelOrder": false,
+            "description": "",
+            "dynamicLegend": false,
+            "dynamicLegendDefaultText": "Show All",
+            "dynamicLegendItemLimit": 5,
+            "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+            "dynamicLegendChartMessage": "Select Options from the Legend",
+            "label": "",
+            "lineMode": false,
+            "verticalSorted": false,
+            "highlightOnHover": false,
+            "hideSuppressedLabels": false,
+            "hideSuppressionLink": false,
+            "seriesHighlight": [],
+            "style": "circles",
+            "subStyle": "linear blocks",
+            "tickRotation": "",
+            "hideBorder": { "side": false, "topBottom": true },
+            "position": "right"
+          },
+          "brush": { "height": 45, "active": false },
+          "exclusions": { "active": false, "keys": [] },
+          "palette": "qualitative-bold",
+          "isPaletteReversed": false,
+          "twoColor": { "palette": "monochrome-1", "isPaletteReversed": false },
+          "labels": false,
+          "dataFormat": {
+            "commas": false,
+            "prefix": "",
+            "suffix": "",
+            "abbreviated": false,
+            "bottomSuffix": "",
+            "bottomPrefix": "",
+            "bottomAbbreviated": false
+          },
+          "confidenceKeys": {},
+          "visual": {
+            "border": true,
+            "accent": true,
+            "background": true,
+            "verticalHoverLine": false,
+            "horizontalHoverLine": false
+          },
+          "useLogScale": false,
+          "filterBehavior": "Filter Change",
+          "highlightedBarValues": [],
+          "series": [],
+          "tooltips": { "opacity": 90, "singleSeries": false, "dateDisplayFormat": "" },
+          "forestPlot": {
+            "startAt": 0,
+            "colors": { "line": "", "shape": "" },
+            "lineOfNoEffect": { "show": true },
+            "type": "",
+            "pooledResult": { "diamondHeight": 5, "column": "" },
+            "estimateField": "",
+            "estimateRadius": "",
+            "shape": "square",
+            "rowHeight": 20,
+            "description": { "show": true, "text": "description", "location": 0 },
+            "result": { "show": true, "text": "result", "location": 100 },
+            "radius": { "min": 2, "max": 10, "scalingColumn": "" },
+            "regression": { "lower": 0, "upper": 0, "estimateField": 0 },
+            "leftWidthOffset": 0,
+            "rightWidthOffset": 0,
+            "showZeroLine": false,
+            "leftLabel": "",
+            "rightLabel": ""
+          },
+          "area": { "isStacked": false },
+          "sankey": {
+            "title": { "defaultColor": "black" },
+            "iterations": 1,
+            "rxValue": 0.9,
+            "overallSize": { "width": 900, "height": 700 },
+            "margin": { "margin_y": 25, "margin_x": 0 },
+            "nodeSize": { "nodeWidth": 26, "nodeHeight": 40 },
+            "nodePadding": 55,
+            "nodeFontColor": "black",
+            "nodeColor": { "default": "#ff8500", "inactive": "#808080" },
+            "linkColor": { "default": "#ffc900", "inactive": "#D3D3D3" },
+            "opacity": {
+              "nodeOpacityDefault": 1,
+              "nodeOpacityInactive": 0.1,
+              "LinkOpacityDefault": 1,
+              "LinkOpacityInactive": 0.1
+            },
+            "storyNodeFontColor": "#006778",
+            "storyNodeText": [],
+            "nodeValueStyle": { "textBefore": "(", "textAfter": ")" },
+            "data": []
+          },
+          "filters": [],
+          "newViz": true,
+          "openModal": true,
+          "uid": "chart1734387923111",
+          "visualizationType": "Bar",
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebyindicator",
+          "dataDescription": { "horizontal": false, "series": false },
+          "version": "4.24.10"
+        },
+        "table1734387934696": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": false,
+          "openModal": true,
+          "uid": "table1734387934696",
+          "type": "table",
+          "table": {
+            "label": "Data Table",
+            "show": true,
+            "showDownloadUrl": false,
+            "showVertical": true,
+            "expanded": true,
+            "collapsible": true
+          },
+          "columns": {},
+          "dataFormat": {},
+          "visualizationType": "table"
+        }
+      },
+      "dashboard": {
+        "sharedFilters": [
+          {
+            "key": "WHO Region",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$select=DISTINCT%20Who_Region&$order=Who_Region",
+              "valueSelector": "Who_Region",
+              "textSelector": ""
+            },
+            "tier": 1,
+            "usedBy": []
+          },
+          {
+            "key": "Location",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$select=DISTINCT%20Location&$order=Location",
+              "valueSelector": "Location",
+              "textSelector": ""
+            },
+            "tier": 2,
+            "parents": ["WHO Region"]
+          },
+          {
+            "key": "Population Survey",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$limit=2000&$select=DISTINCT%20Population_Survey&$order=Population_Survey",
+              "valueSelector": "Population_Survey",
+              "textSelector": ""
+            },
+            "tier": 2,
+            "parents": ["WHO Region", "Location"]
+          },
+          {
+            "key": "Topic",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$select=DISTINCT%20Topic&$order=Topic",
+              "valueSelector": "Topic",
+              "textSelector": ""
+            },
+            "tier": 2,
+            "parents": ["WHO Region", "Location", "Population Survey"]
+          },
+          {
+            "key": "Indicator",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$select=DISTINCT%20Indicator&$order=Indicator",
+              "valueSelector": "Indicator",
+              "textSelector": ""
+            },
+            "tier": 1,
+            "parents": ["WHO Region", "Location", "Population Survey", "Topic"],
+            "usedBy": []
+          },
+          {
+            "key": "Gender",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$select=DISTINCT Category",
+              "valueSelector": "Category",
+              "textSelector": ""
+            },
+            "parents": [],
+            "usedBy": ["chart1733154229951", "table1728589193203"],
+            "tier": 1
+          },
+          {
+            "key": "Breakdown Detail",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$select=DISTINCT Sub_Category_Filter",
+              "valueSelector": "Sub_Category_Filter",
+              "textSelector": ""
+            },
+            "parents": ["Gender"],
+            "usedBy": ["table1728589193203", "chart1733154229951"],
+            "tier": 2
+          },
+          {
+            "key": "Year",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$select=DISTINCT%20Year&$order=Year",
+              "valueSelector": "Year",
+              "textSelector": ""
+            },
+            "usedBy": [6],
+            "tier": 1
+          },
+          {
+            "key": "Gender",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$select=DISTINCT%20Category&$order=Category",
+              "valueSelector": "Category",
+              "textSelector": ""
+            },
+            "parents": [],
+            "usedBy": [6],
+            "tier": 1
+          },
+          {
+            "key": "Breakdown Detail",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebylocation&$select=DISTINCT%20Sub_Category&$order=Sub_Category",
+              "valueSelector": "Sub_Category",
+              "textSelector": ""
+            },
+            "parents": ["Year", "Gender"],
+            "usedBy": [6],
+            "tier": 2
+          },
+          {
+            "key": "Gender",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebyindicator&$select=DISTINCT%20Category&$order=Category",
+              "valueSelector": "Category",
+              "textSelector": ""
+            },
+            "parents": ["WHO Region"]
+          },
+          {
+            "key": "Breakdown Detail",
+            "showDropdown": true,
+            "type": "urlfilter",
+            "apiFilter": {
+              "apiEndpoint": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebyindicator&$select=DISTINCT%20Sub_Category_Filter&$order=Sub_Category_Filter",
+              "valueSelector": "Sub_Category_Filter",
+              "textSelector": ""
+            },
+            "parents": ["Gender"]
+          }
+        ]
+      },
+      "rows": [
+        {
+          "columns": [{ "width": 12, "widget": "dashboardFilters1733159130084" }],
+          "dataDescription": {},
+          "dataKey": ""
+        },
+        {
+          "columns": [{ "width": 12, "widget": "markup-include1734386641623" }],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebyindicator"
+        },
+        { "columns": [{ "width": 12, "widget": "dashboardFilters1734387344839" }] },
+        {
+          "columns": [
+            { "width": 12, "widget": "map1734387896105" },
+            { "width": 12, "widget": "chart1734387923111" },
+            { "width": 12, "widget": "table1734387934696" }
+          ],
+          "toggle": true,
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=gtss_explorebyindicator"
+        }
+      ],
+      "type": "dashboard",
+      "version": "4.24.10"
+    }
+  ]
 }

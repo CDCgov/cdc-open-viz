@@ -155,7 +155,8 @@
     width: 100%;
     vertical-align: top;
     text-align: left;
-    border: 1px solid var(--lightGray);
+    border: 1px solid var(--cool-gray-10);
+    border-radius: 6px;
     position: relative;
 
     h3 {
@@ -236,6 +237,11 @@
       &.inactive {
         opacity: 0.5;
         transition: 0.2s all;
+      }
+      &.highlighted {
+        outline: 1px solid #005ea2;
+        outline-offset: 5px;
+        border-radius: 1px;
       }
     }
 

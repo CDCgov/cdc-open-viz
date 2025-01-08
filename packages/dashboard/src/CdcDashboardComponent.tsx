@@ -266,7 +266,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   useEffect(() => {
     const { config } = state
     const loadAllFilters = shouldLoadAllFilters(config, isEditor && !isPreview)
-    const sharedFiltersWithValues = addValuesToDashboardFilters(config.dashboard.sharedFilters, state.data)
+    // Fix the dashboard
+    const sharedFiltersWithValues = addValuesToDashboardFilters(config.dashboard.sharedFilters, state.data) || []
 
     loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns, loadAllFilters).then(newFilters => {
       const allValuesSelected = newFilters.every(filter => {

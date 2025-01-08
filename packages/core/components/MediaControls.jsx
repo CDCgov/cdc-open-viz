@@ -1,6 +1,7 @@
 import React from 'react'
 // import html2pdf from 'html2pdf.js'
 import html2canvas from 'html2canvas'
+// import domtoimage from 'dom-to-image'
 
 const buttonText = {
   pdf: 'Download PDF',
@@ -8,6 +9,20 @@ const buttonText = {
   csv: 'Download Data (CSV)',
   link: 'Link to Dataset'
 }
+
+// function saveImage(element) {
+//   domtoimage
+//     .toPng(element)
+//     .then(dataUrl => {
+//       const link = document.createElement('a')
+//       link.href = dataUrl
+//       link.download = 'screenshot.png'
+//       link.click()
+//     })
+//     .catch(error => {
+//       console.error('Failed to capture image:', error)
+//     })
+// }
 
 const saveImageAs = (uri, filename) => {
   const ie = navigator.userAgent.match(/MSIE\s([\d.]+)/)
@@ -80,7 +95,11 @@ const generateMedia = (state, type, elementToCapture) => {
         ignoreElements: el =>
           el.className?.indexOf && el.className.search(/download-buttons|download-links|data-table-container/) !== -1
       }).then(canvas => {
-        saveImageAs(canvas.toDataURL(), filename + '.png')
+        if (state.visualizationType === 'Scatter Plot') {
+          // saveImage(baseSvg)
+        } else {
+          saveImageAs(canvas.toDataURL(), filename + '.png')
+        }
       })
       return
     case 'pdf':
@@ -151,7 +170,6 @@ const Link = ({ config, dashboardDataConfig }) => {
   ) : null
 }
 
-// TODO: convert to standardized COVE section
 const Section = ({ children, classes }) => {
   return (
     <section className={classes.join(' ')}>

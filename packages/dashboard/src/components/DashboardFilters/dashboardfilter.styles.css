@@ -2,6 +2,8 @@
   :is(label) {
     margin-bottom: 0;
     margin-top: 0.5rem;
+    font-size: var(--filter-label-font-size);
+    font-weight: 700;
   }
   .btn {
     /* this is the height that is defined for the .form-control class in _forms.scss in bootstrap. */

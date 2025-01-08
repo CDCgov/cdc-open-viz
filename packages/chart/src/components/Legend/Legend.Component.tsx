@@ -25,7 +25,7 @@ export interface LegendProps {
   currentViewport: ViewportSize
   formatLabels: (labels: Label[]) => Label[]
   highlight: Function
-  highlightReset: Function
+  handleShowAll: Function
   ref: React.Ref<() => void>
   seriesHighlight: string[]
   skipId: string
@@ -40,7 +40,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
       colorScale,
       seriesHighlight,
       highlight,
-      highlightReset,
+      handleShowAll,
       currentViewport,
       formatLabels,
       skipId = 'legend',
@@ -53,12 +53,13 @@ const Legend: React.FC<LegendProps> = forwardRef(
 
     const [hasSuppression, setHasSuppression] = useState(false)
 
-    const isBottomOrSmallViewport =
-      legend?.position === 'bottom' || (isLegendWrapViewport(currentViewport) && !legend.hide)
+    const isLegendBottom =
+      legend?.position === 'bottom' ||
+      (isLegendWrapViewport(currentViewport) && !legend.hide && legend?.position !== 'top')
 
     const legendClasses = {
-      marginBottom: getMarginBottom(isBottomOrSmallViewport, config, hasSuppression),
-      marginTop: getMarginTop(isBottomOrSmallViewport, config)
+      marginBottom: getMarginBottom(isLegendBottom, config, hasSuppression),
+      marginTop: getMarginTop(isLegendBottom, config)
     }
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
@@ -75,7 +76,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
         tabIndex={0}
       >
         {(legend.label || legend.description) && (
-          <div className='mb-3'>
+          <div className={legend.description ? 'mb-3' : 'mb-2'}>
             {legend.label && <h3 className='fw-bold'>{parse(legend.label)}</h3>}
             {legend.description && <p className='mt-2'>{parse(legend.description)}</p>}
           </div>
@@ -110,8 +111,10 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       }
                     }
 
-                    if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                      className.push('inactive')
+                    if (seriesHighlight.length) {
+                      if (!seriesHighlight.includes(itemName)) {
+                        className.push('inactive')
+                      } else className.push('highlighted')
                     }
 
                     if (config.legend.style === 'gradient') {
@@ -137,10 +140,10 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       >
                         <>
                           {config.visualizationType === 'Line' && config.legend.style === 'lines' ? (
-                            <svg width={40} height={25}>
+                            <svg width={30} height={5} className='me-2'>
                               <Line
-                                from={{ x: 10, y: 10 }}
-                                to={{ x: 40, y: 10 }}
+                                from={{ x: 0, y: 3 }}
+                                to={{ x: 30, y: 3 }}
                                 stroke={label.value}
                                 strokeWidth={2}
                                 strokeDasharray={handleLineType(config.series[i]?.type ? config.series[i]?.type : '')}
@@ -203,7 +206,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
 
                 <LegendSuppression
                   config={config}
-                  isBottomOrSmallViewport={isBottomOrSmallViewport}
+                  isLegendBottom={isLegendBottom}
                   setHasSuppression={setHasSuppression}
                 />
               </>
@@ -211,8 +214,8 @@ const Legend: React.FC<LegendProps> = forwardRef(
           }}
         </LegendOrdinal>
         {seriesHighlight.length > 0 && (
-          <Button onClick={labels => highlightReset(labels)} style={{ marginTop: '1rem' }}>
-            Reset
+          <Button onClick={labels => handleShowAll(labels)} style={{ marginTop: '1rem' }}>
+            Show All
           </Button>
         )}
       </aside>

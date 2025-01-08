@@ -91,11 +91,14 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   const footnotesConfig = useMemo(() => {
     if (row.footnotesId) {
       const footnoteConfig = getFootnotesVizConfig(row.footnotesId, index, config)
+      const staticFootnote = footnoteConfig.staticFootnotes && footnoteConfig.staticFootnotes
       if (row.multiVizColumn && filteredDataOverride) {
         const vizCategory = filteredDataOverride[0][row.multiVizColumn]
         // the multiViz filtering filtering is applied after the dashboard filters
-        const categoryFootnote = footnoteConfig.formattedData.filter(d => d[row.multiVizColumn] === vizCategory)
-        footnoteConfig.formattedData = categoryFootnote
+        const dynamicFootnote =
+          footnoteConfig.formattedData &&
+          footnoteConfig.formattedData.filter(d => d[row.multiVizColumn] === vizCategory)
+        footnoteConfig.formattedData = { ...dynamicFootnote, ...staticFootnote }
       } else {
         footnoteConfig.formattedData = dashboardFilteredData[row.footnotesId]
       }
@@ -160,7 +163,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
             <div
               key={`vis__${index}__${colIndex}`}
               className={`col-12 col-md-${col.width}${!shouldShow ? ' d-none' : ''}${
-                hideVisualization ? ' hide-parent-visualization' : ' mt-5 p-1'
+                hideVisualization ? ' hide-parent-visualization' : ' mt-4'
               }`}
             >
               {row.toggle && !hideVisualization && (
