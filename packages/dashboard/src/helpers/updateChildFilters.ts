@@ -1,0 +1,45 @@
+import { SharedFilter } from '../types/SharedFilter'
+import _ from 'lodash'
+
+export const updateChildFilters = (
+  newSharedFilters: SharedFilter[],
+  state: { data: Record<string, any> }
+): SharedFilter[] => {
+  const data = Object.values(state.data).flat()
+
+  // Find indexes of all child filters
+  const childFilterIndexes = newSharedFilters
+    .map((filter, index) => (filter.parents ? index : -1))
+    .filter(index => index !== -1)
+
+  if (childFilterIndexes.length === 0) return newSharedFilters
+
+  // deep copy of the shared filters
+  const updatedFilters = _.cloneDeep(newSharedFilters)
+
+  // Update each child filter
+  childFilterIndexes.forEach(childIndex => {
+    const childFilter = newSharedFilters[childIndex]
+    const parentFilter = newSharedFilters.find(filter => String(childFilter.parents) === String(filter.key))
+
+    if (parentFilter) {
+      // Filter dataset based on parent's active value
+      const parentActiveValuesArr = data.filter(
+        (d: Record<string, any>) => d[parentFilter.columnName] === parentFilter.active
+      )
+
+      // Get unique active values for the child filter
+      const uniqChildValues = _.uniq(parentActiveValuesArr.map(d => d[childFilter.columnName]).filter(Boolean))
+
+      // Update the child filter if unique values exist
+      if (uniqChildValues.length > 0) {
+        updatedFilters[childIndex] = {
+          ...childFilter,
+          values: uniqChildValues
+        }
+      }
+    }
+  })
+
+  return updatedFilters
+}
