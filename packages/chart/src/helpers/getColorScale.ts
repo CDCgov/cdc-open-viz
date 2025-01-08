@@ -1,10 +1,8 @@
 import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
 import { scaleOrdinal } from '@visx/scale'
-import { useContext } from 'react'
-import ConfigContext from '../ConfigContext'
+import { ChartConfig } from '../types/ChartConfig'
 
-const useColorScale = () => {
-  const { config, data } = useContext(ConfigContext)
+const getColorScale = (config: ChartConfig, data: Object[]): ((value: string) => string) => {
   const { visualizationSubType, visualizationType, series, legend } = config
 
   const generatePalette = colorsCount => {
@@ -17,34 +15,41 @@ const useColorScale = () => {
     return palette.slice(0, colorsCount)
   }
 
-  let colorScale = scaleOrdinal({
+  let colorScale = scaleOrdinal<string, string>({
     domain: config?.runtime?.seriesLabelsAll,
-    range: generatePalette(series.length)
+    range: generatePalette(series.length),
+    unknown: null
   })
 
   if (visualizationType === 'Deviation Bar') {
     const { targetLabel } = config.xAxis
-    colorScale = scaleOrdinal({
+    colorScale = scaleOrdinal<string, string>({
       domain: [`Below ${targetLabel}`, `Above ${targetLabel}`],
-      range: generatePalette(2)
+      range: generatePalette(2),
+      unknown: null
     })
   }
   if (visualizationType === 'Bar' && visualizationSubType === 'regular' && series?.length === 1 && legend?.colorCode) {
     const set = new Set(data?.map(d => d[legend.colorCode]))
-    colorScale = scaleOrdinal({
-      domain: [...set],
-      range: generatePalette([...set].length)
+    const domain = Array.from(set)
+    colorScale = scaleOrdinal<string, string>({
+      domain: domain,
+      range: generatePalette([...domain].length),
+      unknown: null
     })
   }
   if (config.series.some(s => s.name)) {
     const set = new Set(series.map(d => d.name || d.dataKey))
-    colorScale = colorScale = scaleOrdinal({
-      domain: [...set],
-      range: generatePalette(series.length)
+    const domain = Array.from(set)
+
+    colorScale = colorScale = scaleOrdinal<string, string>({
+      domain: [...domain],
+      range: generatePalette(series.length),
+      unknown: null
     })
   }
 
-  return { colorScale }
+  return colorScale
 }
 
-export default useColorScale
+export default getColorScale
