@@ -110,6 +110,7 @@ $medium: 768px;
 
 // Cities and Territories
 .territories {
+  font-size: 1em;
   gap: 0.5em;
   svg {
     max-width: 35px;
@@ -194,7 +195,6 @@ $medium: 768px;
     transform: none;
   }
   .territories {
-    font-size: 1em;
     > span {
       margin-left: 0;
     }

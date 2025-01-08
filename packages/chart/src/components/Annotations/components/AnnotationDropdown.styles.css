@@ -1,5 +1,6 @@
 .cdc-open-viz-module {
   .annotation__dropdown-list {
+    padding: 1rem;
     border: 1px solid red;
     list-style: none;
   }
