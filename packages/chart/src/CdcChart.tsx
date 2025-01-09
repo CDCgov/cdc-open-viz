@@ -745,11 +745,11 @@ const CdcChart = ({
       }
 
       palette = palette.slice(0, numberOfKeys)
-
+      const isReversed = false
       newColorScale = () =>
         scaleOrdinal({
-          domain: config.runtime.seriesLabelsAll,
-          range: palette,
+          domain: isReversed ? [...config.runtime.seriesLabelsAll].reverse() : config.runtime.seriesLabelsAll,
+          range: isReversed ? [...palette].reverse() : palette,
           unknown: null
         })
 
