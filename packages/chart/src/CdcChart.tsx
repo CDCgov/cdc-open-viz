@@ -5,8 +5,7 @@ import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
 
 import Layout from '@cdc/core/components/Layout'
-import Button from '@cdc/core/components/elements/Button'
-
+import Confirm from '@cdc/core/components/elements/Confirm'
 //types
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
@@ -78,6 +77,8 @@ import getColorScale from './helpers/getColorScale'
 import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
 import { getComboChartConfig } from './helpers/getComboChartConfig'
 import { getExcludedData } from './helpers/getExcludedData'
+import { missingRequiredSections } from '@cdc/core/helpers/missingRequiredSections'
+import Error from '@cdc/core/components/elements/Error'
 
 interface CdcChartProps {
   configUrl?: string
@@ -892,89 +893,6 @@ const CdcChart = ({
     return String(result)
   }
 
-  const missingRequiredSections = () => {
-    if (config.visualizationType === 'Sankey') return false // skip checks for now
-    if (config.visualizationType === 'Forecasting') return false // skip required checks for now.
-    if (config.visualizationType === 'Forest Plot') return false // skip required checks for now.
-    if (config.visualizationType === 'Pie') {
-      if (undefined === config?.yAxis.dataKey) {
-        return true
-      }
-    } else {
-      if ((undefined === config?.series || false === config?.series.length > 0) && !config?.dynamicSeries) {
-        return true
-      }
-    }
-
-    if (!config.xAxis.dataKey) {
-      return true
-    }
-
-    return false
-  }
-
-  const Confirm = () => {
-    const confirmDone = e => {
-      if (e) {
-        e.preventDefault()
-      }
-
-      let newConfig = { ...config }
-      delete newConfig.newViz
-
-      updateConfig(newConfig)
-    }
-
-    const styles: React.CSSProperties = {
-      position: 'relative',
-      height: '100vh',
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      gridArea: 'content'
-    }
-
-    return (
-      <section className='waiting' style={styles}>
-        <section className='waiting-container'>
-          <h3>Finish Configuring</h3>
-          <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-          <Button
-            className='btn btn-primary'
-            style={{ margin: '1em auto' }}
-            disabled={missingRequiredSections()}
-            onClick={e => confirmDone(e)}
-          >
-            I'm Done
-          </Button>
-        </section>
-      </section>
-    )
-  }
-
-  const Error = () => {
-    const styles: React.CSSProperties = {
-      position: 'absolute',
-      background: 'white',
-      zIndex: '999',
-      height: '100vh',
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      gridArea: 'content'
-    }
-    return (
-      <section className='waiting' style={styles}>
-        <section className='waiting-container'>
-          <h3>Error With Configuration</h3>
-          <p>{config.runtime.editorErrorMessage}</p>
-        </section>
-      </section>
-    )
-  }
-
   // this is passed DOWN into the various components
   // then they do a lookup based on the bin number as index into here (TT)
   const applyLegendToRow = rowObj => {
@@ -1068,13 +986,16 @@ const CdcChart = ({
         {config.dataKey} (Go to Table)
       </a>
     )
+
     body = (
       <>
         {isEditor && <EditorPanel />}
         <Layout.Responsive isEditor={isEditor}>
-          {config.newViz && <Confirm />}
-          {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && <Error />}
-          {!missingRequiredSections() && !config.newViz && (
+          {config.newViz && <Confirm updateConfig={updateConfig} config={config} />}
+          {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && (
+            <Error errorMessage={config.runtime.editorErrorMessage} />
+          )}
+          {!missingRequiredSections(config) && !config.newViz && (
             <div
               className={`cdc-chart-inner-container cove-component__content type-${makeClassName(
                 config.visualizationType
