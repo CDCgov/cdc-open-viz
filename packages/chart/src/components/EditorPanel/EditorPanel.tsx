@@ -963,7 +963,7 @@ const EditorPanel = () => {
 
   const convertStateToConfig = () => {
     let strippedState = JSON.parse(JSON.stringify(config))
-    if (false === missingRequiredSections()) {
+    if (false === missingRequiredSections(config)) {
       delete strippedState.newViz
     }
     delete strippedState.runtime
