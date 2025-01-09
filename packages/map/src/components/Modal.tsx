@@ -17,7 +17,6 @@ const Modal = () => {
       }
       aria-hidden='true'
     >
-      {type === 'data' && <LegendShape fill={legendColors[0]} />}
       <div className='content'>{tooltip}</div>
       <Icon display='close' alt='Close Modal' size={20} color='#000' className='modal-close' />
     </section>
