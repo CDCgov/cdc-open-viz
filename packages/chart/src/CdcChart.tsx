@@ -535,7 +535,7 @@ const CdcChart = ({
     }
 
     load()
-  }, [])
+  }, [configObj?.data?.length ? configObj.data : null])
 
   useEffect(() => {
     reloadURLData()
