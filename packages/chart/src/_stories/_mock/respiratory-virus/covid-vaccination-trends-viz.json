@@ -1,0 +1,394 @@
+{
+  "annotations": [],
+  "type": "chart",
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "title": "",
+  "showTitle": true,
+  "showDownloadMediaButton": false,
+  "theme": "theme-blue",
+  "animate": false,
+  "fontSize": "medium",
+  "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
+  "barHasBorder": "false",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "flat",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "annotationDropdownText": "Annotations",
+    "showDownloadButton": false,
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true,
+    "showAnnotationDropdown": false
+  },
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "preliminaryData": [],
+  "yAxis": {
+    "hideAxis": true,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": true,
+    "size": "30",
+    "gridLines": true,
+    "enablePadding": true,
+    "min": "0",
+    "max": "99",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "rightHideAxis": true,
+    "rightAxisSize": 0,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#333",
+    "rightAxisTickLabelColor": "#333",
+    "rightAxisTickColor": "#333",
+    "numTicks": "5",
+    "axisPadding": 0,
+    "scalePadding": 10,
+    "tickRotation": 0,
+    "anchors": [],
+    "shoMissingDataLabel": true,
+    "showMissingDataLine": true,
+    "categories": [],
+    "label": "",
+    "maxValue": 108.9
+  },
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "total": "Total",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    },
+    "firstQuartilePercentage": 25,
+    "thirdQuartilePercentage": 75,
+    "boxWidthPercentage": 40,
+    "legend": {
+      "showHowToReadText": false,
+      "howToReadText": ""
+    }
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "isLegendValue": false,
+  "barThickness": 0.35,
+  "barHeight": 25,
+  "barSpace": 15,
+  "heights": {
+    "vertical": "250",
+    "horizontal": 750,
+    "mobileVertical": "150"
+  },
+  "xAxis": {
+    "sortDates": false,
+    "anchors": [],
+    "type": "date-time",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "0",
+    "tickRotation": 0,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "4",
+    "labelOffset": 0,
+    "axisPadding": 200,
+    "target": 0,
+    "maxTickRotation": "45",
+    "padding": "0",
+    "showYearsOnce": true,
+    "sortByRecentDate": false,
+    "dataKey": "week_end",
+    "label": "",
+    "dateParseFormat": "%Y-%m-%d",
+    "dateDisplayFormat": "%b. %-d %Y",
+    "axisBBox": 24.273334503173828,
+    "tickWidthMax": 94,
+    "viewportNumTicks": {
+      "xxs": "4"
+    },
+    "manual": false
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "indexLabel": "Week Ending",
+    "download": true,
+    "showVertical": true,
+    "dateDisplayFormat": "",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "show": true
+  },
+  "orientation": "vertical",
+  "color": "pinkpurple",
+  "columns": {},
+  "legend": {
+    "hide": false,
+    "behavior": "isolate",
+    "axisAlign": true,
+    "singleRow": true,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "hideSuppressedLabels": false,
+    "hideSuppressionLink": false,
+    "seriesHighlight": [],
+    "style": "lines",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    },
+    "position": "bottom"
+  },
+  "brush": {
+    "height": 25,
+    "active": false
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "qualitative-bold",
+  "isPaletteReversed": false,
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "labels": false,
+  "dataFormat": {
+    "commas": true,
+    "prefix": "",
+    "suffix": " percent vaccinated",
+    "abbreviated": true,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false,
+    "roundTo": "1",
+    "onlyShowTopPrefixSuffix": true
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": true,
+    "horizontalHoverLine": false
+  },
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
+  "series": [
+    {
+      "dataKey": "Adults",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true,
+      "name": "Adults (18+)"
+    },
+    {
+      "dataKey": "Children",
+      "type": "dashed-md",
+      "axis": "Left",
+      "tooltip": true,
+      "name": "Children (under 18)"
+    }
+  ],
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": "%B %-d, %Y"
+  },
+  "forestPlot": {
+    "startAt": 0,
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
+    "lineOfNoEffect": {
+      "show": true
+    },
+    "type": "",
+    "pooledResult": {
+      "diamondHeight": 5,
+      "column": ""
+    },
+    "estimateField": "",
+    "estimateRadius": "",
+    "shape": "square",
+    "rowHeight": 20,
+    "description": {
+      "show": true,
+      "text": "description",
+      "location": 0
+    },
+    "result": {
+      "show": true,
+      "text": "result",
+      "location": 100
+    },
+    "radius": {
+      "min": 2,
+      "max": 10,
+      "scalingColumn": ""
+    },
+    "regression": {
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
+    },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0,
+    "showZeroLine": false,
+    "leftLabel": "",
+    "rightLabel": ""
+  },
+  "area": {
+    "isStacked": false
+  },
+  "sankey": {
+    "title": {
+      "defaultColor": "black"
+    },
+    "iterations": 1,
+    "rxValue": 0.9,
+    "overallSize": {
+      "width": 900,
+      "height": 700
+    },
+    "margin": {
+      "margin_y": 25,
+      "margin_x": 0
+    },
+    "nodeSize": {
+      "nodeWidth": 26,
+      "nodeHeight": 40
+    },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#ff8500",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#ffc900",
+      "inactive": "#D3D3D3"
+    },
+    "opacity": {
+      "nodeOpacityDefault": 1,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 1,
+      "LinkOpacityInactive": 0.1
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "nodeValueStyle": {
+      "textBefore": "(",
+      "textAfter": ")"
+    },
+    "data": []
+  },
+  "visualizationType": "Line",
+  "customColors": [
+    "#f06f19",
+    "#f06f19",
+    "#f06f19",
+    "#000000",
+    "#0A6C75",
+    "#C0F2FD",
+    "#C0F2FD",
+    "#C0F2FD",
+    "#C0F2FD"
+  ],
+  "dataFileName": "https://www.cdc.gov/wcms/vizdata/Respitory_Viruses/NISVaccinationsCumulative7a.json",
+  "dataFileSourceType": "url",
+  "dataUrl": "https://www.cdc.gov/wcms/vizdata/Respitory_Viruses/NISVaccinationsCumulative7a.json",
+  "dataDescription": {
+    "horizontal": false,
+    "series": true,
+    "singleRow": false,
+    "xKey": "week_end",
+    "valueKeysTallSupport": [
+      "value"
+    ],
+    "ignoredKeys": [
+      "suppression_flag",
+      "95_confidence_interval_lower",
+      "95_confidence_interval_upper",
+      "95_confidence_internal_range"
+    ],
+    "seriesKey": "demographic_group"
+  },
+  "version": "4.24.10",
+  "description": "<div class=\"text-left\"><p class=\"fnote\">95% confidence intervals for the point estimates are presented at the data.cdc.gov link below.<br><br> Data last updated on <span data-timestamp=\"NISVaccinationsCumulative7a:Data_as_of\"></span> and presented through <span data-timestamp=\"NISVaccinationsCumulative7a:Data_Presented_Through\"></span>. <a href=\"https://data.cdc.gov/Vaccinations/Weekly-Respiratory-Virus-Vaccination-Data-Children/5c6r-xi2t\">View this dataset</a> on data.CDC.gov.</p></div>",
+  "dynamicMarginTop": 0,
+  "filters": [
+    {
+      "values": [
+        "COVID-19",
+        "Influenza",
+        "RSV"
+      ],
+      "filterStyle": "dropdown",
+      "id": 1726688167656,
+      "columnName": "pathogen",
+      "showDropdown": false,
+      "active": "COVID-19"
+    }
+  ],
+  "runtimeDataUrl": "https:/https://www.cdc.gov/wcms-wp.cdc.govhttps://www.cdc.gov/wcms/vizdata/Respitory_Viruses/NISVaccinationsCumulative7a.json",
+  "showLineSeriesLabels": false,
+  "colorMatchLineSeriesLabels": false
+}

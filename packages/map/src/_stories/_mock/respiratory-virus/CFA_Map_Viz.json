@@ -1,0 +1,199 @@
+{
+  "annotations": [],
+  "general": {
+    "noStateFoundMessage": "Map Unavailable",
+    "annotationDropdownText": "Annotations",
+    "geoBorderColor": "darkGray",
+    "headerColor": "theme-blue",
+    "title": "",
+    "showTitle": true,
+    "showSidebar": true,
+    "showDownloadButton": true,
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": false,
+    "territoriesLabel": "Territories",
+    "territoriesAlwaysShow": false,
+    "language": "en",
+    "geoType": "us",
+    "geoLabelOverride": "",
+    "hasRegions": false,
+    "fullBorder": false,
+    "type": "map",
+    "convertFipsCodes": true,
+    "palette": {
+      "isReversed": false
+    },
+    "allowMapZoom": false,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "statePicked": {
+      "fipsCode": "01",
+      "stateName": "Alabama"
+    },
+    "expandDataTable": false,
+    "subtext": "<div class=\"text-left\">Data last updated on <span data-timestamp=\"CFACombinedRtMap:Data_as_of\"></span> and presented through <span data-timestamp=\"CFACombinedRtMap:Data_Presented_Through\"></span>. "
+  },
+  "type": "map",
+  "color": "pinkpurple",
+  "columns": {
+    "geo": {
+      "name": "geography",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "dataTable": true,
+      "tooltip": true,
+      "prefix": "",
+      "suffix": "",
+      "name": "category",
+      "label": "Category",
+      "roundToPlace": 0
+    },
+    "navigate": {
+      "name": ""
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": false,
+    "singleColumn": false,
+    "singleRow": true,
+    "verticalSorted": false,
+    "showSpecialClassesLast": true,
+    "dynamicDescription": false,
+    "type": "category",
+    "numberOfItems": 3,
+    "position": "top",
+    "title": "Epidemic Trend",
+    "style": "gradient",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "singleColumnLegend": false,
+    "hideBorder": true,
+    "categoryValuesOrder": [
+      "Declining",
+      "Likely Declining",
+      "Not Changing",
+      "Likely Growing",
+      "Growing",
+      "Not Estimated"
+    ],
+    "additionalCategories": [
+      "Declining",
+      "Likely Declining",
+      "Not Changing",
+      "Likely Growing",
+      "Growing",
+      "Not Estimated"
+    ]
+  },
+  "filters": [
+    {
+      "order": "asc",
+      "label": "",
+      "columnName": "pathogen",
+      "values": [
+        "COVID-19",
+        "Influenza"
+      ],
+      "active": "COVID-19",
+      "filterStyle": "tab bar"
+    }
+  ],
+  "table": {
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": true,
+    "indexLabel": "",
+    "showDownloadLinkBelow": true
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": true,
+    "opacity": 90
+  },
+  "visual": {
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle",
+    "cityStyleLabel": "",
+    "showBubbleZeros": false,
+    "additionalCityStyles": [],
+    "geoCodeCircleSize": 8
+  },
+  "mapPosition": {
+    "coordinates": [
+      0,
+      30
+    ],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow Up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
+  "customColors": [
+    "#006166",
+    "#006166",
+    "#3bbbb0",
+    "#bdbdbd",
+    "#b83d93",
+    "#6d085a",
+    "#ffffff",
+    "#ffffff"
+  ],
+  "dataFileName": "https://www.cdc.gov/wcms/vizdata/Respitory_Viruses/CFACombinedRtMap.json",
+  "dataFileSourceType": "url",
+  "dataDescription": {
+    "horizontal": false,
+    "series": false,
+    "singleRow": false
+  },
+  "version": "4.24.10",
+  "editor": {
+    "activeFilterValueForDescription": [
+      0,
+      0
+    ]
+  },
+  "dataUrl": "https://www.cdc.gov/wcms/vizdata/Respitory_Viruses/CFACombinedRtMap.json"
+}
