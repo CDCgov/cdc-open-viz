@@ -42,7 +42,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     setAccessibleStatus,
     setRuntimeLegend,
     state,
-    viewport,
+    currentViewport: viewport,
     mapId
   } = useContext(ConfigContext)
 
