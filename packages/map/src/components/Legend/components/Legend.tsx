@@ -1,5 +1,5 @@
 //TODO: Move legends to core
-import { forwardRef, useContext, useId } from 'react'
+import { forwardRef, useContext } from 'react'
 import parse from 'html-react-parser'
 
 //types
@@ -31,7 +31,8 @@ type LegendProps = {
 }
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
-  const { skipId, dimensions, containerWidthPadding, currentViewport } = props
+  const { skipId, containerWidthPadding } = props
+  const { isEditor, dimensions, currentViewport } = useContext(ConfigContext)
 
   const {
     // prettier-ignore
@@ -41,7 +42,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     setAccessibleStatus,
     setRuntimeLegend,
     state,
-    viewport,
+    currentViewport: viewport,
     mapId
   } = useContext(ConfigContext)
 

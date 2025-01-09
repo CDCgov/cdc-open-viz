@@ -1,3 +1,4 @@
+import useResizeObserver from '@cdc/map/src/hooks/useResizeObserver'
 import { isBelowBreakpoint } from './viewports'
 
 export default function useDataVizClasses(config, viewport = null) {

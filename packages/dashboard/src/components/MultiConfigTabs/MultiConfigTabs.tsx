@@ -117,7 +117,7 @@ const MultiConfigTabs = () => {
 
   if (!config.multiDashboards) return null
   return (
-    <ul className='nav nav-tabs multi-config-tabs'>
+    <ul className='nav nav-tabs multi-config-tabs mb-4'>
       {tabs.map((tab, index) => (
         <Tab
           key={tab + index}
