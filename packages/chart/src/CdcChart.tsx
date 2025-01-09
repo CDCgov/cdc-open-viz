@@ -1,23 +1,33 @@
-import React, { useState, useEffect, useCallback, useRef, useId, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useId } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
-
+// Core components
 import Layout from '@cdc/core/components/Layout'
 import Confirm from '@cdc/core/components/elements/Confirm'
+import Error from '@cdc/core/components/elements/Error'
+import SkipTo from '@cdc/core/components/elements/SkipTo'
+import Title from '@cdc/core/components/ui/Title'
+import DataTable from '@cdc/core/components/DataTable'
+// Local Components
+import LegendWrapper from './components/LegendWrapper'
 //types
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
-
+import type { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
+import { AllChartsConfig, ChartConfig } from './types/ChartConfig'
+import { type ViewportSize } from './types/ChartConfig'
+import { Pivot } from '@cdc/core/types/Table'
+import { Runtime } from '@cdc/core/types/Runtime'
+import { Label } from './types/Label'
 // External Libraries
-
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse, timeFormat } from 'd3-time-format'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
-
+import _ from 'lodash'
 // Primary Components
 import ConfigContext from './ConfigContext'
 import PieChart from './components/PieChart'
@@ -43,42 +53,29 @@ import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
 import Annotation from './components/Annotations'
-
-// Helpers
+// Core Helpers
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
+import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
+import { missingRequiredSections } from '@cdc/core/helpers/missingRequiredSections'
+import { filterVizData } from '@cdc/core/helpers/filterVizData'
+import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
+import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
+import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
-import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+// Local helpers
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
-import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
-
-import './scss/main.scss'
-// load both then config below determines which to use
-import DataTable from '@cdc/core/components/DataTable'
-import type { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
-import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
-import Title from '@cdc/core/components/ui/Title'
-import { AllChartsConfig, ChartConfig } from './types/ChartConfig'
-import { Label } from './types/Label'
-import { type ViewportSize } from './types/ChartConfig'
-import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
-import SkipTo from '@cdc/core/components/elements/SkipTo'
-import { filterVizData } from '@cdc/core/helpers/filterVizData'
-import LegendWrapper from './components/LegendWrapper'
-import _ from 'lodash'
-import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
-import { Runtime } from '@cdc/core/types/Runtime'
-import { Pivot } from '@cdc/core/types/Table'
-import getColorScale from './helpers/getColorScale'
 import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
 import { getComboChartConfig } from './helpers/getComboChartConfig'
 import { getExcludedData } from './helpers/getExcludedData'
-import { missingRequiredSections } from '@cdc/core/helpers/missingRequiredSections'
-import Error from '@cdc/core/components/elements/Error'
+import { getColorScale } from './helpers/getColorScale'
+// styles
+import './scss/main.scss'
 
 interface CdcChartProps {
   configUrl?: string
@@ -324,7 +321,7 @@ const CdcChart = ({
       }
     })
 
-    let newExcludedData: any[] = getExcludedData(newConfig, dataOverride || stateData)
+    const newExcludedData: any[] = getExcludedData(newConfig, dataOverride || stateData)
 
     setExcludedData(newExcludedData)
 

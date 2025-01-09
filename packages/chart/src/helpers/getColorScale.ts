@@ -2,7 +2,7 @@ import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/
 import { scaleOrdinal } from '@visx/scale'
 import { ChartConfig } from '../types/ChartConfig'
 
-const getColorScale = (config: ChartConfig): ((value: string) => string) => {
+export const getColorScale = (config: ChartConfig): ((value: string) => string) => {
   const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
     ? config.twoColor.palette
     : config.palette
@@ -26,5 +26,3 @@ const getColorScale = (config: ChartConfig): ((value: string) => string) => {
 
   return newColorScale
 }
-
-export default getColorScale
