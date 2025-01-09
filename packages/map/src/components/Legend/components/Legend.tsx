@@ -20,7 +20,6 @@ import './index.scss'
 import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { isBelowBreakpoint, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
-import useResizeObserver from '../../../hooks/useResizeObserver'
 
 const LEGEND_PADDING = 30
 
@@ -33,8 +32,7 @@ type LegendProps = {
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const { skipId, containerWidthPadding } = props
-  const { isEditor } = useContext(ConfigContext)
-  const { currentViewport, dimensions } = useResizeObserver(isEditor)
+  const { isEditor, dimensions, currentViewport } = useContext(ConfigContext)
 
   const {
     // prettier-ignore
@@ -44,7 +42,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     setAccessibleStatus,
     setRuntimeLegend,
     state,
-    viewport,
+    currentViewport: viewport,
     mapId
   } = useContext(ConfigContext)
 
@@ -224,7 +222,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   }
   const legendListItems = legendList(isLegendGradient)
 
-  const { legendClasses } = useDataVizClasses(state)
+  const { legendClasses } = useDataVizClasses(state, viewport)
 
   const handleReset = e => {
     const legend = ref.current
