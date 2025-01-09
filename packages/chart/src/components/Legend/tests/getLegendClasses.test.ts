@@ -47,9 +47,24 @@ describe('getLegendClasses', () => {
     }
     const result = getLegendClasses(config)
     expect(result.containerClasses).toContain('bottom')
-    expect(result.innerClasses).toContain('double-column')
     expect(result.innerClasses).toContain('bottom')
     expect(result.innerClasses).toContain('single-row')
+  })
+
+  it('should return correct classes for TOP position with double column', () => {
+    const config: ChartConfig = {
+      legend: {
+        position: 'top',
+        singleRow: false,
+        reverseLabelOrder: false,
+        verticalSorted: false,
+        hideBorder: { side: false, topBottom: false }
+      }
+    }
+    const result = getLegendClasses(config)
+    expect(result.containerClasses).toContain('top')
+    expect(result.innerClasses).toContain('top')
+    expect(result.innerClasses).toContain('double-column')
   })
 
   it('should return correct classes for hide border side', () => {
