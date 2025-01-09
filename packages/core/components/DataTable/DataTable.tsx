@@ -31,7 +31,6 @@ export type DataTableProps = {
   config: TableConfig
   dataConfig?: Object
   defaultSortBy?: string
-  displayDataAsText?: Function
   displayGeoName?: Function
   expandDataTable: boolean
   formatLegendLocation?: Function

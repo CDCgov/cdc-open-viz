@@ -36,7 +36,7 @@ import useMinMax from '../hooks/useMinMax'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import useScales, { getTickValues, filterAndShiftLinearDateTicks } from '../hooks/useScales'
-import useTopAxis from '../hooks/useTopAxis'
+import getTopAxis from '../helpers/getTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
@@ -103,7 +103,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   // HOOKS  % STATES
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
   const { visSupportsReactTooltip } = useEditorPermissions()
-  const { hasTopAxis } = useTopAxis(config)
+  const { hasTopAxis } = getTopAxis(config)
   const [animatedChart, setAnimatedChart] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
