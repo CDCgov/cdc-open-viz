@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef, useId, useMemo } from 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
-import * as d3 from 'd3-array'
+
 import Layout from '@cdc/core/components/Layout'
 import Button from '@cdc/core/components/elements/Button'
 
@@ -12,7 +12,7 @@ import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 
 // External Libraries
-import { scaleOrdinal } from '@visx/scale'
+
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse, timeFormat } from 'd3-time-format'
 import Papa from 'papaparse'
@@ -34,7 +34,7 @@ import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
 import { handleChartTabbing } from './helpers/handleChartTabbing'
-import { getQuartiles } from './helpers/getQuartiles'
+
 import { handleChartAriaLabels } from './helpers/handleChartAriaLabels'
 import { lineOptions } from './helpers/lineOptions'
 import { handleLineType } from './helpers/handleLineType'
@@ -75,7 +75,9 @@ import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { Runtime } from '@cdc/core/types/Runtime'
 import { Pivot } from '@cdc/core/types/Table'
 import getColorScale from './helpers/getColorScale'
-import { handleBoxPlotConfig } from './helpers/handleBoxPlotConfig'
+import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
+import { getComboChartConfig } from './helpers/getComboChartConfig'
+import { getExcludedData } from './helpers/getExcludedData'
 
 interface CdcChartProps {
   configUrl?: string
@@ -99,7 +101,6 @@ const CdcChart = ({
   isDashboard = false,
   setConfig: setParentConfig,
   setEditing,
-  hostname,
   link,
   setSharedFilter,
   setSharedFilterValue,
@@ -322,40 +323,7 @@ const CdcChart = ({
       }
     })
 
-    let newExcludedData: any[] = []
-
-    if (newConfig.exclusions && newConfig.exclusions.active) {
-      if (newConfig.xAxis.type === 'categorical' && newConfig.exclusions.keys?.length > 0) {
-        newExcludedData = data.filter(e => !newConfig.exclusions.keys.includes(e[newConfig.xAxis.dataKey]))
-      } else if (
-        isDateScale(newConfig.xAxis) &&
-        (newConfig.exclusions.dateStart || newConfig.exclusions.dateEnd) &&
-        newConfig.xAxis.dateParseFormat
-      ) {
-        // Filter dates
-        const timestamp = e => new Date(e).getTime()
-
-        let startDate = timestamp(newConfig.exclusions.dateStart)
-        let endDate = timestamp(newConfig.exclusions.dateEnd) + 86399999 //Increase by 24h in ms (86400000ms - 1ms) to include selected end date for .getTime() comparative
-
-        let startDateValid = undefined !== typeof startDate && false === isNaN(startDate)
-        let endDateValid = undefined !== typeof endDate && false === isNaN(endDate)
-
-        if (startDateValid && endDateValid) {
-          newExcludedData = data.filter(
-            e => timestamp(e[newConfig.xAxis.dataKey]) >= startDate && timestamp(e[newConfig.xAxis.dataKey]) <= endDate
-          )
-        } else if (startDateValid) {
-          newExcludedData = data.filter(e => timestamp(e[newConfig.xAxis.dataKey]) >= startDate)
-        } else if (endDateValid) {
-          newExcludedData = data.filter(e => timestamp(e[newConfig.xAxis.dataKey]) <= endDate)
-        }
-      } else {
-        newExcludedData = dataOverride || stateData
-      }
-    } else {
-      newExcludedData = dataOverride || stateData
-    }
+    let newExcludedData: any[] = getExcludedData(newConfig, dataOverride || stateData)
 
     setExcludedData(newExcludedData)
 
@@ -434,47 +402,12 @@ const CdcChart = ({
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
-      const plots = handleBoxPlotConfig(newConfig, stateData)
-      const groups = _.uniqBy(stateData, newConfig.xAxis.dataKey)
-
-      const seriesKeys = _.map(newConfig.series, 'dataKey')
-
-      const categories =
-        seriesKeys.length > 1
-          ? groups.flatMap(value => seriesKeys.map(key => `${_.capitalize(key)} - ${_.capitalize(value)}`))
-          : groups
-      newConfig.boxplot['categories'] = categories as string[]
+      const [plots, categories] = getBoxPlotConfig(newConfig, stateData)
+      newConfig.boxplot['categories'] = categories
       newConfig.boxplot.plots = plots
     }
-
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {
-      newConfig.runtime.barSeriesKeys = []
-      newConfig.runtime.lineSeriesKeys = []
-      newConfig.runtime.areaSeriesKeys = []
-      newConfig.runtime.forecastingSeriesKeys = []
-
-      newConfig.series.forEach(series => {
-        if (series.type === 'Area Chart') {
-          newConfig.runtime.areaSeriesKeys.push(series)
-        }
-        if (series.type === 'Forecasting') {
-          newConfig.runtime.forecastingSeriesKeys.push(series)
-        }
-        if (series.type === 'Bar' || series.type === 'Combo') {
-          newConfig.runtime.barSeriesKeys.push(series.dataKey)
-        }
-        if (
-          series.type === 'Line' ||
-          series.type === 'dashed-sm' ||
-          series.type === 'dashed-md' ||
-          series.type === 'dashed-lg'
-        ) {
-          newConfig.runtime.lineSeriesKeys.push(series.dataKey)
-        }
-        if (series.type === 'Combo') {
-          series.type = 'Bar'
-        }
-      })
+      newConfig.runtime = getComboChartConfig(newConfig)
     }
 
     if (newConfig.visualizationType === 'Forecasting' && newConfig.series) {
