@@ -1289,7 +1289,7 @@ const CdcChart = ({
                 isDashboard={isDashboard}
                 title={title}
                 superTitle={config.superTitle}
-                classes={['chart-title', `${config.theme}`, 'cove-component__header']}
+                classes={['chart-title', `${config.theme}`, 'cove-component__header', 'mb-3']}
                 style={undefined}
               />
 
