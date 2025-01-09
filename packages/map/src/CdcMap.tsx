@@ -1523,7 +1523,7 @@ const CdcMap = ({
                 <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
               )}
 
-              {general.introText && <section className='introText mb-4 mt-3'>{parse(general.introText)}</section>}
+              {general.introText && <section className='introText mb-4'>{parse(general.introText)}</section>}
 
               {state?.filters?.length > 0 && (
                 <Filters

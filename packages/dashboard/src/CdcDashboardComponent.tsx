@@ -534,7 +534,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
               classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]}
             />
             {/* Description */}
-            {description && <div className='subtext'>{parse(description)}</div>}
+            {description && <div className='subtext mb-3'>{parse(description)}</div>}
             {/* Visualizations */}
             {config.rows &&
               config.rows
