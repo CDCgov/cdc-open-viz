@@ -1,12 +1,19 @@
 import { MapConfig } from '@cdc/map/src/types/MapConfig'
 
 export const displayDataAsText = (value: string | number, columnName, state: MapConfig) => {
+  if (!state) return value
+
   if (value === null || value === '' || value === undefined) {
     return ''
   }
 
   // if string of letters like 'Home' then don't need to format as a number
-  if (typeof value === 'string' && value.length > 0 && /[a-zA-Z]/.test(value) && state.legend.type === 'equalnumber') {
+  if (
+    typeof value === 'string' &&
+    value.length > 0 &&
+    /[a-zA-Z]/.test(value) &&
+    state?.legend?.type === 'equalnumber'
+  ) {
     return value
   }
 
