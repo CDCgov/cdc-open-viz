@@ -944,10 +944,10 @@ const CdcChart = ({
   let body = <Loading />
 
   const makeClassName = string => {
-    if (!string || !string.toLowerCase) return
-    return string.toLowerCase().replaceAll(/ /g, '-')
-  }
+    if (!_.isString(string)) return undefined
 
+    return _.kebabCase(string)
+  }
   const getChartWrapperClasses = () => {
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
     const classes = ['chart-container', 'p-relative']
