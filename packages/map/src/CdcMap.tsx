@@ -19,7 +19,6 @@ import Waiting from '@cdc/core/components/Waiting'
 
 // types
 import { type Coordinate, type MapConfig } from './types/MapConfig'
-import { type RuntimeLegendResult } from './types/RuntimeLegendResult'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
