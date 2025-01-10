@@ -92,8 +92,7 @@
   "scripts": {
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
     "publish": "npx lerna publish",
-    "generate:stories": "node packages/map/src/_stories/generateRespiratoryStories.cjs",
-    "storybook": "yarn generate:stories && storybook dev -p 6006",
+    "storybook": "storybook dev -p 6006",
     "storybook-docs": "storybook dev --docs",
     "build-storybook": "storybook build",
     "predeploy": "storybook build --output-dir .storybook_build && touch .storybook_build/.nojekyll",
