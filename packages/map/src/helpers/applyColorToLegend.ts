@@ -10,7 +10,7 @@ import isOlderVersion from '@cdc/core/helpers/isOlderVersion'
  * @param result hash of legend items
  * @returns
  */
-export const applyColorToLegend = (legendIdx: number, config: ChartConfig, result = []) => {
+export const applyColorToLegend = (legendIdx: number, config: ChartConfig, result) => {
   try {
     if (!config) throw new Error('Config is required')
 
@@ -44,7 +44,7 @@ export const applyColorToLegend = (legendIdx: number, config: ChartConfig, resul
     let colorIdx = legendIdx - specialClasses.length
 
     // Special Classes (No Data)
-    if (result[legendIdx].special) {
+    if (result['items']?.[legendIdx].special) {
       if (!config?.migrations?.addColorMigration) {
         const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
         return specialClassColors[legendIdx]
@@ -61,7 +61,7 @@ export const applyColorToLegend = (legendIdx: number, config: ChartConfig, resul
       if (config.customColors) return mapColorPalette[legendIdx - specialClasses.length]
     }
 
-    let amt = Math.max(result.length - specialClasses.length, 1)
+    let amt = Math.max(result.items.length - specialClasses.length, 1)
     let distributionArray = colorDistributions[amt]
     let specificColor
 

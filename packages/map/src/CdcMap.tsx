@@ -19,6 +19,7 @@ import Waiting from '@cdc/core/components/Waiting'
 
 // types
 import { type Coordinate, type MapConfig } from './types/MapConfig'
+import { type RuntimeLegendResult } from './types/RuntimeLegendResult'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
@@ -43,6 +44,7 @@ import './scss/main.scss'
 import './scss/btn.scss'
 
 // Core Helpers
+import { displayGeoName } from './helpers/displayGeoName'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
@@ -118,24 +120,25 @@ const CdcMap = ({
   const [filteredCountryCode, setFilteredCountryCode] = useState()
   const [position, setPosition] = useState(state.mapPosition)
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
-  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
   const [projection, setProjection] = useState(null)
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
 
-  const legendRef = useRef(null)
-  const tooltipRef = useRef(null)
-  const legendId = useId()
-  // create random tooltipId
+  // Refs
+  const mapSvg = useRef<HTMLElement>(null)
+  const legendRef = useRef<HTMLElement>(null)
+  const tooltipRef = useRef<HTMLElement>(null)
+  const legendMemo = useRef(new Map())
+  const legendSpecialClassLastMemo = useRef(new Map())
+  const innerContainerRef = useRef()
+
+  // Ids
   const tooltipId = `${Math.random().toString(16).slice(-4)}`
+  const imageId = `cove-${Math.random().toString(16).slice(-4)}`
   const mapId = useId()
+  const legendId = useId()
 
   const { handleSorting } = useFilters({ config: state, setConfig: setState })
-  let legendMemo = useRef(new Map())
-  let legendSpecialClassLastMemo = useRef(new Map())
-  let innerContainerRef = useRef()
-
-  if (isDebug) console.log('CdcMap state=', state) // <eslint-disable-line></eslint-disable-line>
 
   const handleDragStateChange = isDragging => {
     setIsDraggingAnnotation(isDragging)
@@ -327,7 +330,6 @@ const CdcMap = ({
     obj.data.fromColumn = fromColumn
   })
 
-  // eslint-disable-next-line
   const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
     const newLegendMemo = new Map() // Reset memoization
     const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
@@ -335,8 +337,14 @@ const CdcMap = ({
       isBubble = obj.general.type === 'bubble',
       categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
       type = obj.legend.type,
-      number = obj.legend.numberOfItems,
-      result = []
+      number = obj.legend.numberOfItems
+
+    let result = {
+      items: [],
+      description: '',
+      fromHash: '',
+      runtimeDataHash: ''
+    }
 
     // Add a hash for what we're working from if passed
     if (hash) {
@@ -361,13 +369,17 @@ const CdcMap = ({
               if (undefined === specialClassesHash[val]) {
                 specialClassesHash[val] = true
 
-                result.push({
+                result.items.push({
                   special: true,
                   value: val,
                   label: specialClass.label
                 })
 
-                result[result.length - 1].color = applyColorToLegend(result.length - 1, state, result)
+                result['items'][result.items.length - 1].color = applyColorToLegend(
+                  result.items.length - 1,
+                  state,
+                  result
+                )
 
                 specialClasses += 1
               }
@@ -375,7 +387,7 @@ const CdcMap = ({
               let specialColor: number
 
               // color the state if val is in row
-              specialColor = result.findIndex(p => p.value === val)
+              specialColor = result.items.findIndex(p => p.value === val)
 
               newLegendMemo.set(hashObj(row), specialColor)
 
@@ -394,21 +406,25 @@ const CdcMap = ({
             if (undefined === specialClassesHash[val]) {
               specialClassesHash[val] = true
 
-              result.push({
+              result.items.push({
                 special: true,
                 value: val
               })
 
-              result[result.length - 1].color = applyColorToLegend(result.length - 1, state, result)
+              result['items'][result.items.length - 1].color = applyColorToLegend(
+                result.items.length - 1,
+                state,
+                result
+              )
 
               specialClasses += 1
             }
 
-            let specialColor = ''
+            let specialColor: number
 
             // color the state if val is in row
             if (Object.values(row).includes(val)) {
-              specialColor = result.findIndex(p => p.value === val)
+              specialColor = result.items.findIndex(p => p.value === val)
             }
 
             newLegendMemo.set(hashObj(row), specialColor)
@@ -467,11 +483,11 @@ const CdcMap = ({
 
       // Add legend item for each
       sorted.forEach(val => {
-        result.push({
+        result.items.push({
           value: val
         })
 
-        let lastIdx = result.length - 1
+        let lastIdx = result.items.length - 1
         let arr = uniqueValues.get(val)
 
         if (arr) {
@@ -480,35 +496,35 @@ const CdcMap = ({
       })
 
       // Add color to new legend item
-      for (let i = 0; i < result.length; i++) {
-        result[i].color = applyColorToLegend(i, state, result)
+      for (let i = 0; i < result.items.length; i++) {
+        result['items'][i].color = applyColorToLegend(i, state, result)
       }
 
       legendMemo.current = newLegendMemo
 
       // before returning the legend result
       // add property for bin number and set to index location
-      result.forEach((row, i) => {
+      result.items.forEach((row, i) => {
         row.bin = i // set bin number to index
       })
 
       // Move all special legend items from "Special Classes"  to the end of the legend
       if (state.legend.showSpecialClassesLast) {
-        let specialRows = result.filter(d => d.special === true)
-        let otherRows = result.filter(d => !d.special)
-        result = [...otherRows, ...specialRows]
+        let specialRows = result.items.filter(d => d.special === true)
+        let otherRows = result.items.filter(d => !d.special)
+        result['items'] = [...otherRows, ...specialRows]
       }
 
       const assignSpecialClassLastIndex = (value, key) => {
-        const newIndex = result.findIndex(d => d.bin === value)
+        const newIndex = result.items.findIndex(d => d.bin === value)
         newLegendSpecialClassLastMemo.set(key, newIndex)
       }
       newLegendMemo.forEach(assignSpecialClassLastIndex)
       legendSpecialClassLastMemo.current = newLegendSpecialClassLastMemo
 
       // filter special classes from results
-      const specialValues = result.filter(d => d.special).map(d => d.value)
-      return result.filter(d => d.special || !specialValues.includes(d.value))
+      const specialValues = result.items.filter(d => d.special).map(d => d.value)
+      return result.items.filter(d => d.special || !specialValues.includes(d.value))
     }
 
     let uniqueValues = {}
@@ -528,7 +544,7 @@ const CdcMap = ({
 
           let row = dataSet.splice(i, 1)[0]
 
-          newLegendMemo.set(hashObj(row), result.length)
+          newLegendMemo.set(hashObj(row), result.items.length)
           i--
         }
       }
@@ -537,15 +553,15 @@ const CdcMap = ({
         legendNumber -= 1 // This zero takes up one legend item
 
         // Add new legend item
-        result.push({
+        result.items.push({
           min: 0,
           max: 0
         })
 
-        let lastIdx = result.length - 1
+        let lastIdx = result.items.length - 1
 
         // Add color to new legend item
-        result[lastIdx].color = applyColorToLegend(lastIdx, state, result)
+        result['items'][lastIdx].color = applyColorToLegend(lastIdx, state, result)
       }
     }
 
@@ -587,17 +603,16 @@ const CdcMap = ({
           let min = removedRows[0][primaryCol],
             max = removedRows[removedRows.length - 1][primaryCol]
 
-          // eslint-disable-next-line
           removedRows.forEach(row => {
-            newLegendMemo.set(hashObj(row), result.length)
+            newLegendMemo.set(hashObj(row), result.items.length)
           })
 
-          result.push({
+          result.items.push({
             min,
             max
           })
 
-          result[result.length - 1].color = applyColorToLegend(result.length - 1, state, result)
+          result['items'][result.items.length - 1].color = applyColorToLegend(result.items.length - 1, state, result)
 
           changingNumber -= 1
           numberOfRows -= chunkAmt
@@ -643,7 +658,6 @@ const CdcMap = ({
           breaks.unshift(0)
         }
 
-        // eslint-disable-next-line array-callback-return
         breaks.map((item, index) => {
           const setMin = index => {
             let min = breaks[index]
@@ -686,7 +700,7 @@ const CdcMap = ({
           let min = setMin(index)
           let max = setMax(index, min)
 
-          result.push({
+          result.items.push({
             min,
             max,
             color: scale(item)
@@ -694,9 +708,9 @@ const CdcMap = ({
 
           dataSet.forEach(row => {
             let number = row[state.columns.primary.name]
-            let updated = result.length - 1
+            let updated = result.items.length - 1
 
-            if (result[updated]?.min === (null || undefined) || result[updated]?.max === (null || undefined)) return
+            if (result['items'][updated]?.min === undefined || result['items'][updated]?.max === undefined) return
 
             if (number >= result[updated].min && number <= result[updated].max) {
               newLegendMemo.set(hashObj(row), updated)
@@ -735,7 +749,7 @@ const CdcMap = ({
 
         // Add rows in dataSet that belong to this new legend item since we've got the data sorted
         while (pointer < dataSet.length && dataSet[pointer][primaryCol] <= max) {
-          newLegendMemo.set(hashObj(dataSet[pointer]), result.length)
+          newLegendMemo.set(hashObj(dataSet[pointer]), result.items.length)
           pointer += 1
         }
 
@@ -744,13 +758,13 @@ const CdcMap = ({
           max: Math.round(max * 100) / 100
         }
 
-        result.push(range)
+        result.items.push(range)
 
-        result[result.length - 1].color = applyColorToLegend(result.length - 1, state, result)
+        result['items'][result.items.length - 1].color = applyColorToLegend(result.items.length - 1, state, result)
       }
     }
 
-    result.forEach((legendItem, idx) => {
+    result.items.forEach((legendItem, idx) => {
       legendItem.color = applyColorToLegend(idx, state, result)
     })
 
@@ -761,8 +775,8 @@ const CdcMap = ({
       const isCountriesWithNoDataState =
         obj.data === undefined ? false : !countryKeys.every(countryKey => runtimeDataKeys.includes(countryKey))
 
-      if (result.length > 0 && isCountriesWithNoDataState) {
-        result.push({
+      if (result.items.length > 0 && isCountriesWithNoDataState) {
+        result.items.push({
           min: null,
           max: null,
           color: getGeoFillColor(state)
@@ -770,33 +784,28 @@ const CdcMap = ({
       }
     }
 
-    //----------
-    // DEV-784
-    // before returning the legend result
-    // add property for bin number and set to index location
-    result.forEach((row, i) => {
+    result.items.forEach((row, i) => {
       row.bin = i // set bin number to index
     })
 
     // Move all special legend items from "Special Classes"  to the end of the legend
     if (state.legend.showSpecialClassesLast) {
-      let specialRows = result.filter(d => d.special === true)
-      let otherRows = result.filter(d => !d.special)
-      result = [...otherRows, ...specialRows]
+      let specialRows = result.items.filter(d => d.special === true)
+      let otherRows = result.items.filter(d => !d.special)
+      result['items'] = [...otherRows, ...specialRows]
     }
-    //-----------
 
     const assignSpecialClassLastIndex = (value, key) => {
-      const newIndex = result.findIndex(d => d.bin === value)
+      const newIndex = result.items.findIndex(d => d.bin === value)
       newLegendSpecialClassLastMemo.set(key, newIndex)
     }
+
     newLegendMemo.forEach(assignSpecialClassLastIndex)
     legendSpecialClassLastMemo.current = newLegendSpecialClassLastMemo
 
-    return result
+    return result.items
   })
 
-  // eslint-disable-next-line
   const generateRuntimeFilters = useCallback((obj, hash, runtimeFilters) => {
     if (typeof obj === 'undefined' || undefined === obj.filters || obj.filters.length === 0) return []
 
@@ -846,8 +855,6 @@ const CdcMap = ({
               values = obj.filters[idx].values
             }
           }
-        } else {
-          values = values
         }
 
         if (undefined === newFilter) {
@@ -932,14 +939,12 @@ const CdcMap = ({
     }
   })
 
-  const mapSvg = useRef(null)
-
   // this is passed DOWN into the various components
   // then they do a lookup based on the bin number as index into here
   const applyLegendToRow = rowObj => {
     try {
       if (!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
-      // Navigation mapchanged
+      // Navigation map changed
       if ('navigation' === state.general.type) {
         let mapColorPalette = colorPalettes[state.color] || colorPalettes['bluegreenreverse']
         return generateColorsArray(mapColorPalette[3])
@@ -1001,53 +1006,6 @@ const CdcMap = ({
     }
 
     return formattedName
-  }
-
-  // Attempts to find the corresponding value
-  const displayGeoName = key => {
-    if (!state.general.convertFipsCodes) return key
-
-    // World Map
-    // If we're returning a city name instead of a country ISO code, capitalize it for the data table.
-    if (state.type === 'map' && state.general.geoType === 'world') {
-      if (String(key).length > 3) return titleCase(key)
-    }
-    let value = key
-    // Map to first item in values array which is the preferred label
-    if (stateKeys.includes(value)) {
-      value = titleCase(supportedStates[key][0])
-    }
-
-    if (territoryKeys.includes(value)) {
-      value = titleCase(supportedTerritories[key][0])
-    }
-
-    if (countryKeys.includes(value)) {
-      value = supportedCountries[key][0]
-    }
-
-    if (countyKeys.includes(value)) {
-      value = titleCase(supportedCounties[key])
-    }
-
-    const dict = {
-      'Washington D.C.': 'District of Columbia',
-      'WASHINGTON DC': 'District of Columbia',
-      DC: 'District of Columbia',
-      'WASHINGTON DC.': 'District of Columbia',
-      Congo: 'Republic of the Congo'
-    }
-
-    if (true === Object.keys(dict).includes(value)) {
-      value = dict[value]
-    }
-
-    // if you get here and it's 2 letters then dont titleCase state abbreviations like "AL"
-    if (value.length === 2) {
-      return value
-    } else {
-      return titleCase(value)
-    }
   }
 
   // todo: convert to store or context eventually.
@@ -1180,7 +1138,7 @@ const CdcMap = ({
     }
   }
 
-  const loadConfig = async configObj => {
+  const loadConfig = async (configObj: MapConfig) => {
     // Set loading flag
     if (!loading) setLoading(true)
 
@@ -1266,7 +1224,7 @@ const CdcMap = ({
 
     // Once we have a config verify that it is an object and load it
     if ('object' === typeof configData) {
-      loadConfig(configData)
+      await loadConfig(configData)
     }
   }
 
@@ -1458,7 +1416,7 @@ const CdcMap = ({
     false === loading
 
   const handleMapTabbing = () => {
-    let tabbingID
+    let tabbingID = ''
 
     // 1) skip to legend
     if (general.showSidebar) {
@@ -1549,7 +1507,7 @@ const CdcMap = ({
                 style={{ padding: '15px 0px', margin: '0px' }}
               >
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-                <section className='outline-none geography-container w-100' ref={mapSvg} tabIndex='0'>
+                <section className='outline-none geography-container w-100' ref={mapSvg} tabIndex={0}>
                   {currentViewport && (
                     <>
                       {modal && <Modal />}
@@ -1584,8 +1542,8 @@ const CdcMap = ({
                   data={runtimeData}
                   options={general}
                   columns={state.columns}
-                  navigationHandler={val =>
-                    navigationHandler(state.general.navigationBehavior, val, customNavigationHandler)
+                  navigationHandler={(urlString: string) =>
+                    navigationHandler(state.general.navigationBehavior, urlString, customNavigationHandler)
                   }
                 />
               )}

@@ -111,9 +111,10 @@ export type MapConfig = Visualization & {
     territoriesLabel: string
     title: string
     type: 'data' | 'navigation' | 'us-geocode' | 'world-geocode' | 'bubble'
+    navigationBehavior: '_blank' | '_self'
   }
   legend: {
-    additionalCategories
+    additionalCategories: object
     categoryValuesOrder
     description
     descriptions: {}
