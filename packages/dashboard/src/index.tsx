@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 
 import MultiDashboardWrapper from './CdcDashboard'
+import '@cdc/core/styles/cove-main.scss'
 import './coreStyles_dashboard.scss'
 
 let isEditor = window.location.href.includes('editor=true')

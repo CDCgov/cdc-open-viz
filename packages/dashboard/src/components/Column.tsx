@@ -40,7 +40,7 @@ const Column = ({ data, rowIdx, colIdx }) => {
   const handleTitle = config => {
     if (!config) return
     if (config.type === 'map') return config.general.title
-    if (config.type === 'markup-include') return config.contentEditor.title
+    if (config.type === 'markup-include') return config.contentEditor?.title
     return config.title
   }
 
