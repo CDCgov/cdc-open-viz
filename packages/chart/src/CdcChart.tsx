@@ -165,7 +165,7 @@ const CdcChart: React.FC<CdcChartProps> = props => {
         }
         setConfig(newConfig)
       } catch (err) {
-        console.error('Could reLoad URL Data!')
+        console.error('Could not reLoad URL Data!')
       } finally {
         setIsloading(false)
       }
