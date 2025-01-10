@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 
 import CdcMap from '@cdc/map/src/CdcMap' // TODO: Lazy load this
-import CdcChart from '../../../chart/src/CdcChart' // TODO: Lazy load this
+import CdcChartComponent from '@cdc/chart/src/CdcChartComponent'
 import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
 import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
 import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
@@ -41,7 +41,7 @@ export default function ConfigureTab({ containerEl }) {
     case 'chart':
       return (
         <ErrorBoundary component='CdcChart'>
-          <CdcChart isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
+          <CdcChartComponent isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
         </ErrorBoundary>
       )
     case 'dashboard':
