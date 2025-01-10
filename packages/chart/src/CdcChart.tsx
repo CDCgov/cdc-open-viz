@@ -171,7 +171,7 @@ const CdcChart: React.FC<CdcChartProps> = props => {
     return <Loading />
   }
 
-  return <CdcChartComponent config={config} configUrl={configUrl} isEditor={isEditor} isDebug={isDebug} />
+  return <CdcChartComponent config={config} isEditor={isEditor} isDebug={isDebug} />
 }
 
 export default CdcChart

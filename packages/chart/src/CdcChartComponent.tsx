@@ -77,7 +77,6 @@ import { getColorScale } from './helpers/getColorScale'
 import './scss/main.scss'
 
 interface CdcChartComponentProps {
-  configUrl?: string
   config?: ChartConfig
   isEditor?: boolean
   isDebug?: boolean
