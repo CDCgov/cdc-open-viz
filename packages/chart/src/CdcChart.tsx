@@ -149,6 +149,7 @@ const CdcChart: React.FC<CdcChartProps> = props => {
 
   useEffect(() => {
     const reload = async () => {
+      setIsloading(true)
       try {
         const [data, runtimeDataUrl, dataLoadedFromUrl] = await reloadURLData()
         let newData = data
@@ -165,6 +166,8 @@ const CdcChart: React.FC<CdcChartProps> = props => {
         setConfig(newConfig)
       } catch (err) {
         console.error('Could reLoad URL Data!')
+      } finally {
+        setIsloading(false)
       }
     }
 
