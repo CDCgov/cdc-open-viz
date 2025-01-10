@@ -1,5 +1,5 @@
 //TODO: Move legends to core
-import { forwardRef, useContext, useId } from 'react'
+import { forwardRef, useContext } from 'react'
 import parse from 'html-react-parser'
 
 //types
@@ -31,7 +31,8 @@ type LegendProps = {
 }
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
-  const { skipId, dimensions, containerWidthPadding, currentViewport } = props
+  const { skipId, containerWidthPadding } = props
+  const { isEditor, dimensions, currentViewport } = useContext(ConfigContext)
 
   const {
     // prettier-ignore
@@ -41,7 +42,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     setAccessibleStatus,
     setRuntimeLegend,
     state,
-    viewport,
+    currentViewport: viewport,
     mapId
   } = useContext(ConfigContext)
 
@@ -116,12 +117,14 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const legendList = (patternsOnly = false) => {
     const formattedItems = patternsOnly ? [] : getFormattedLegendItems()
     const patternsOnlyFont = isMobileHeightViewport(currentViewport) ? '12px' : '14px'
+    const hasDisabledItems = formattedItems.some(item => item.disabled)
     let legendItems
 
     legendItems = formattedItems.map((item, idx) => {
       const handleListItemClass = () => {
         let classes = ['legend-container__li', 'd-flex', 'align-items-center']
         if (item.disabled) classes.push('legend-container__li--disabled')
+        else if (hasDisabledItems) classes.push('legend-container__li--not-disabled')
         if (item.special) classes.push('legend-container__li--special-class')
         return classes.join(' ')
       }
@@ -264,26 +267,33 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           ref={ref}
         >
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
-            {legend.title && <h3 className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</h3>}
-            {legend.dynamicDescription === false && legend.description && (
-              <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>
+            {(legend.title || legend.description || legend.dynamicDescription) && (
+              <div className='mb-3'>
+                {legend.title && <h3 className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</h3>}
+                {legend.dynamicDescription === false && legend.description && (
+                  <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>
+                )}
+                {legend.dynamicDescription === true &&
+                  runtimeFilters.map((filter, idx) => {
+                    const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
+
+                    // Do we have a custom description for this?
+                    const desc = legend.descriptions[lookupStr] || ''
+
+                    if (desc.length > 0) {
+                      return (
+                        <p
+                          key={`dynamic-description-${lookupStr}`}
+                          className={`dynamic-legend-description-${lookupStr} mt-2`}
+                        >
+                          {desc}
+                        </p>
+                      )
+                    }
+                    return true
+                  })}
+              </div>
             )}
-            {legend.dynamicDescription === true &&
-              runtimeFilters.map((filter, idx) => {
-                const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
-
-                // Do we have a custom description for this?
-                const desc = legend.descriptions[lookupStr] || ''
-
-                if (desc.length > 0) {
-                  return (
-                    <p key={`dynamic-description-${lookupStr}`} className={`dynamic-legend-description-${lookupStr}`}>
-                      {desc}
-                    </p>
-                  )
-                }
-                return true
-              })}
 
             <LegendGradient
               labels={getFormattedLegendItems().map(item => item?.label) ?? []}
@@ -334,8 +344,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               </>
             )}
             {runtimeLegend.disabledAmt > 0 && (
-              <Button className={legendClasses.resetButton.join(' ')} onClick={handleReset}>
-                Reset
+              <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
+                Show All
               </Button>
             )}
           </section>

@@ -22,7 +22,6 @@ export const Additional_Tooltip: Story = {
       showDownloadMediaButton: false,
       theme: 'theme-orange',
       animate: false,
-      fontSize: 'medium',
       lineDatapointStyle: 'hover',
       barHasBorder: 'false',
       isLollipopChart: false,

@@ -1,3 +1,6 @@
+import useResizeObserver from '@cdc/map/src/hooks/useResizeObserver'
+import { isBelowBreakpoint } from './viewports'
+
 export default function useDataVizClasses(config, viewport = null) {
   const {
     legend,
@@ -77,16 +80,17 @@ export default function useDataVizClasses(config, viewport = null) {
   ]
 
   const usePadding = !legend?.hideBorder
+  const legendPadding = `m${isBelowBreakpoint('md', viewport) ? 't' : ''}-3`
 
   const legendClasses = {
     aside: legendOuterClasses,
-    section: ['legend-container', usePadding ? 'legend-padding' : ''],
+    section: ['legend-container', usePadding ? legendPadding : ''],
     ul: getUlClasses(),
     li: ['single-legend-item', 'legend-container__li'],
-    title: ['legend-container__title'],
-    description: ['legend-container__description'],
+    title: ['legend-container__title fw-bold'],
+    description: ['legend-container__description mt-2'],
     div: [legend?.position === 'bottom' && legend?.singleRow ? 'shape-container single-row' : 'shape-container'],
-    resetButton: ['legend-container__reset-button']
+    showAllButton: ['legend-container__reset-button']
   }
 
   return { innerContainerClasses, contentClasses, lineDatapointClass, sparkLineStyles, legendClasses }

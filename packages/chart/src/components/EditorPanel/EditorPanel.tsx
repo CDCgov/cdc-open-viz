@@ -610,7 +610,7 @@ const EditorPanel = () => {
     lineOptions,
     rawData,
     highlight,
-    highlightReset,
+    handleShowAll,
     dimensions
   } = useContext<ChartContext>(ConfigContext)
 
@@ -963,7 +963,7 @@ const EditorPanel = () => {
 
   const convertStateToConfig = () => {
     let strippedState = JSON.parse(JSON.stringify(config))
-    if (false === missingRequiredSections()) {
+    if (false === missingRequiredSections(config)) {
       delete strippedState.newViz
     }
     delete strippedState.runtime
@@ -1633,6 +1633,7 @@ const EditorPanel = () => {
                         fieldName='label'
                         label='Label '
                         updateField={updateField}
+                        maxLength={35}
                       />
                       {config.runtime.seriesKeys &&
                         config.runtime.seriesKeys.length === 1 &&
@@ -2306,6 +2307,7 @@ const EditorPanel = () => {
                     fieldName='rightLabel'
                     label='Label'
                     updateField={updateField}
+                    maxLength={35}
                   />
                   <TextField
                     value={config.yAxis.rightNumTicks}
@@ -2596,6 +2598,7 @@ const EditorPanel = () => {
                         fieldName='label'
                         label='Label'
                         updateField={updateField}
+                        maxLength={35}
                       />
 
                       {config.xAxis.type === 'continuous' && (
@@ -3797,7 +3800,7 @@ const EditorPanel = () => {
                                 updatedSeriesHighlight.splice(i, 1)
                                 updateField('legend', null, 'seriesHighlight', updatedSeriesHighlight)
                                 if (!updatedSeriesHighlight.length) {
-                                  highlightReset()
+                                  handleShowAll()
                                 }
                               }}
                             >

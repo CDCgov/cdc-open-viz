@@ -1,12 +1,27 @@
 import React from 'react'
 // import html2pdf from 'html2pdf.js'
 import html2canvas from 'html2canvas'
+import domtoimage from 'dom-to-image'
 
 const buttonText = {
   pdf: 'Download PDF',
   image: 'Download Image',
   csv: 'Download Data (CSV)',
   link: 'Link to Dataset'
+}
+
+function saveImage(element) {
+  domtoimage
+    .toPng(element)
+    .then(dataUrl => {
+      const link = document.createElement('a')
+      link.href = dataUrl
+      link.download = 'screenshot.png'
+      link.click()
+    })
+    .catch(error => {
+      console.error('Failed to capture image:', error)
+    })
 }
 
 const saveImageAs = (uri, filename) => {
@@ -42,13 +57,30 @@ const generateMedia = (state, type, elementToCapture) => {
   // Apparently some packages use state.title where others use state.general.title
   const handleFileName = state => {
     // dashboard titles
-    if (state?.dashboard?.title) return state.dashboard.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+    if (state?.dashboard?.title)
+      return (
+        state.dashboard.title.replace(/\s+/g, '-').toLowerCase() +
+        '-' +
+        date.getDate() +
+        date.getMonth() +
+        date.getFullYear()
+      )
 
     // map titles
-    if (state?.general?.title) return state.general.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+    if (state?.general?.title)
+      return (
+        state.general.title.replace(/\s+/g, '-').toLowerCase() +
+        '-' +
+        date.getDate() +
+        date.getMonth() +
+        date.getFullYear()
+      )
 
     // chart titles
-    if (state?.title) return state.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+    if (state?.title)
+      return (
+        state.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+      )
 
     return 'no-title'
   }
@@ -59,8 +91,15 @@ const generateMedia = (state, type, elementToCapture) => {
 
   switch (type) {
     case 'image':
-      html2canvas(baseSvg, {ignoreElements: el => el.className?.indexOf && el.className.search(/download-buttons|download-links|data-table-container/) !== -1}).then(canvas => {
-        saveImageAs(canvas.toDataURL(), filename + '.png')
+      html2canvas(baseSvg, {
+        ignoreElements: el =>
+          el.className?.indexOf && el.className.search(/download-buttons|download-links|data-table-container/) !== -1
+      }).then(canvas => {
+        if (state.visualizationType === 'Scatter Plot') {
+          saveImage(baseSvg)
+        } else {
+          saveImageAs(canvas.toDataURL(), filename + '.png')
+        }
       })
       return
     case 'pdf':
@@ -98,9 +137,14 @@ const handleTheme = state => {
 
 // Download CSV
 const Button = ({ state, text, type, title, elementToCapture }) => {
-  const buttonClasses = ['btn', 'btn-download', `${handleTheme(state)}`]
+  const buttonClasses = ['btn', 'btn-primary']
   return (
-    <button className={buttonClasses.join(' ')} title={title} onClick={() => generateMedia(state, type, elementToCapture)} style={{ lineHeight: '1.4em' }}>
+    <button
+      className={buttonClasses.join(' ')}
+      title={title}
+      onClick={() => generateMedia(state, type, elementToCapture)}
+      style={{ lineHeight: '1.4em' }}
+    >
       {buttonText[type]}
     </button>
   )
@@ -108,7 +152,7 @@ const Button = ({ state, text, type, title, elementToCapture }) => {
 
 // Link to CSV/JSON data
 const Link = ({ config, dashboardDataConfig }) => {
-  let dataConfig = dashboardDataConfig || config;
+  let dataConfig = dashboardDataConfig || config
   // Handles Maps & Charts
   if (dataConfig.dataFileSourceType === 'url' && dataConfig.dataFileName && config.table.showDownloadUrl) {
     return (
@@ -126,7 +170,6 @@ const Link = ({ config, dashboardDataConfig }) => {
   ) : null
 }
 
-// TODO: convert to standardized COVE section
 const Section = ({ children, classes }) => {
   return (
     <section className={classes.join(' ')}>

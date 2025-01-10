@@ -30,7 +30,7 @@ const BarChartStackedHorizontal = () => {
   } = useContext<ChartContext>(ConfigContext)
 
   // prettier-ignore
-  const { barBorderWidth, displayNumbersOnBar, fontSize, getAdditionalColumn, hoveredBar, isHorizontal, isLabelBelowBar, onMouseLeaveBar, onMouseOverBar, updateBars, barStackedSeriesKeys } = useBarChart()
+  const { barBorderWidth, displayNumbersOnBar, getAdditionalColumn, hoveredBar, isHorizontal, isLabelBelowBar, onMouseLeaveBar, onMouseOverBar, updateBars, barStackedSeriesKeys } = useBarChart()
 
   const { orientation, visualizationSubType } = config
   return (
@@ -69,7 +69,7 @@ const BarChartStackedHorizontal = () => {
                 const yAxisTooltip = config.runtime.yAxis.label
                   ? `${config.runtime.yAxis.label}: ${yAxisValue}`
                   : yAxisValue
-                const textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                const textWidth = getTextWidth(xAxisValue)
                 const additionalColTooltip = getAdditionalColumn(hoveredBar)
                 const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${xAxisValue}`
                 const tooltip = `<ul>

@@ -8,18 +8,15 @@ type RowProps = {
   wrapColumns: boolean
   isTotal?: boolean
   cellMinWidth?: number
-  fontSize: 'small' | 'medium' | 'large'
   viewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   style?: object
   preliminaryData?: PreliminaryDataItem[]
 }
 
 const Row: FC<RowProps> = props => {
-  const { childRow, rowKey, wrapColumns, cellMinWidth = 0, isTotal, fontSize, viewport, preliminaryData } = props
+  const { childRow, rowKey, wrapColumns, cellMinWidth = 0, isTotal, viewport, preliminaryData } = props
   const whiteSpace = wrapColumns ? 'unset' : 'nowrap'
   const minWidth = cellMinWidth + 'px'
-  const fontSizes = { small: 16, medium: 18, large: 20 }
-  const cellFontSize = ['xs', 'xxs'].includes(viewport) ? '12px' : `${fontSizes[fontSize]}px`
 
   return (
     <tr>
@@ -34,7 +31,7 @@ const Row: FC<RowProps> = props => {
           <Cell
             ariaLabel={style?.color ? 'suppressed data' : ''}
             key={rowKey + '__' + i}
-            style={{ whiteSpace, minWidth, fontSize: cellFontSize, ...style }}
+            style={{ whiteSpace, minWidth, ...style }}
             isBold={isTotal}
           >
             {child}

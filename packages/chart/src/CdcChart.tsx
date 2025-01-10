@@ -1,24 +1,33 @@
-import React, { useState, useEffect, useCallback, useRef, useId, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useId } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
-import * as d3 from 'd3-array'
+// Core components
 import Layout from '@cdc/core/components/Layout'
-import Button from '@cdc/core/components/elements/Button'
-
+import Confirm from '@cdc/core/components/elements/Confirm'
+import Error from '@cdc/core/components/elements/Error'
+import SkipTo from '@cdc/core/components/elements/SkipTo'
+import Title from '@cdc/core/components/ui/Title'
+import DataTable from '@cdc/core/components/DataTable'
+// Local Components
+import LegendWrapper from './components/LegendWrapper'
 //types
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
-
+import type { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
+import { AllChartsConfig, ChartConfig } from './types/ChartConfig'
+import { type ViewportSize } from './types/ChartConfig'
+import { Pivot } from '@cdc/core/types/Table'
+import { Runtime } from '@cdc/core/types/Runtime'
+import { Label } from './types/Label'
 // External Libraries
-import { scaleOrdinal } from '@visx/scale'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse, timeFormat } from 'd3-time-format'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
-
+import _ from 'lodash'
 // Primary Components
 import ConfigContext from './ConfigContext'
 import PieChart from './components/PieChart'
@@ -34,7 +43,7 @@ import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
 import { handleChartTabbing } from './helpers/handleChartTabbing'
-import { getQuartiles } from './helpers/getQuartiles'
+
 import { handleChartAriaLabels } from './helpers/handleChartAriaLabels'
 import { lineOptions } from './helpers/lineOptions'
 import { handleLineType } from './helpers/handleLineType'
@@ -44,36 +53,29 @@ import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
 import Annotation from './components/Annotations'
-
-// Helpers
+// Core Helpers
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
+import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
+import { missingRequiredSections } from '@cdc/core/helpers/missingRequiredSections'
+import { filterVizData } from '@cdc/core/helpers/filterVizData'
+import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
+import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
+import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
-import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+// Local helpers
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
-import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
-
+import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
+import { getComboChartConfig } from './helpers/getComboChartConfig'
+import { getExcludedData } from './helpers/getExcludedData'
+import { getColorScale } from './helpers/getColorScale'
+// styles
 import './scss/main.scss'
-// load both then config below determines which to use
-import DataTable from '@cdc/core/components/DataTable'
-import type { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
-import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
-import Title from '@cdc/core/components/ui/Title'
-import { AllChartsConfig, ChartConfig } from './types/ChartConfig'
-import { Label } from './types/Label'
-import { type ViewportSize } from './types/ChartConfig'
-import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
-import SkipTo from '@cdc/core/components/elements/SkipTo'
-import { filterVizData } from '@cdc/core/helpers/filterVizData'
-import LegendWrapper from './components/LegendWrapper'
-import _ from 'lodash'
-import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
-import { Runtime } from '@cdc/core/types/Runtime'
-import { Pivot } from '@cdc/core/types/Table'
 
 interface CdcChartProps {
   configUrl?: string
@@ -97,7 +99,6 @@ const CdcChart = ({
   isDashboard = false,
   setConfig: setParentConfig,
   setEditing,
-  hostname,
   link,
   setSharedFilter,
   setSharedFilterValue,
@@ -152,8 +153,38 @@ const CdcChart = ({
   const { lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
   const legendId = useId()
 
+  const hasDateAxis = config.xAxis && ['date-time', 'date'].includes(config.xAxis.type)
+  const dataTableDefaultSortBy = hasDateAxis && config.xAxis.dataKey
+
   const checkLineToBarGraph = () => {
     return isConvertLineToBarGraph(config.visualizationType, filteredData, config.allowLineToBarGraph)
+  }
+
+  const loadConfig = async (configObj: ChartConfig, configUrl: string): Promise<ChartConfig> => {
+    const response = _.cloneDeep(configObj) || (await (await fetch(configUrl)).json())
+
+    return response
+  }
+
+  const prepareConfig = (loadedConfig: ChartConfig, data): ChartConfig => {
+    let newConfig = _.defaultsDeep(loadedConfig, defaults)
+    _.defaultsDeep(newConfig, {
+      table: { showVertical: false }
+    })
+
+    _.set(newConfig, 'table.show', _.get(newConfig, 'table.show', !isDashboard))
+
+    _.forEach(newConfig.series, series => {
+      _.defaults(series, {
+        tooltip: true,
+        axis: 'Left'
+      })
+    })
+
+    if (data) {
+      newConfig.data = data
+    }
+    return { ...coveUpdateWorker(newConfig) }
   }
 
   const reloadURLData = async () => {
@@ -224,10 +255,7 @@ const CdcChart = ({
     }
   }
 
-  const loadConfig = async () => {
-    const response = _.cloneDeep(configObj) || (await (await fetch(configUrl)).json())
-
-    // If data is included through a URL, fetch that and store
+  const loadData = async response => {
     let data: any[] = response.data || []
 
     const urlFilters = response.filters
@@ -277,37 +305,7 @@ const CdcChart = ({
     }
 
     data = handleRankByValue(data, response)
-
-    if (data) {
-      setStateData(data)
-      setExcludedData(data)
-    }
-
-    // force showVertical for data tables false if it does not exist
-    if (response !== undefined && response.table !== undefined) {
-      if (!response.table || !response.table.showVertical) {
-        response.table = response.table || {}
-        response.table.showVertical = false
-      }
-    }
-    let newConfig = { ...defaults, ...response }
-
-    if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
-
-    newConfig.series.forEach(series => {
-      if (series.tooltip === undefined || series.tooltip === null) {
-        series.tooltip = true
-      }
-      if (!series.axis) series.axis = 'Left'
-    })
-
-    if (data) {
-      newConfig.data = data
-    }
-
-    const processedConfig = { ...coveUpdateWorker(newConfig) }
-
-    updateConfig(processedConfig, data)
+    return data
   }
 
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
@@ -323,40 +321,7 @@ const CdcChart = ({
       }
     })
 
-    let newExcludedData: any[] = []
-
-    if (newConfig.exclusions && newConfig.exclusions.active) {
-      if (newConfig.xAxis.type === 'categorical' && newConfig.exclusions.keys?.length > 0) {
-        newExcludedData = data.filter(e => !newConfig.exclusions.keys.includes(e[newConfig.xAxis.dataKey]))
-      } else if (
-        isDateScale(newConfig.xAxis) &&
-        (newConfig.exclusions.dateStart || newConfig.exclusions.dateEnd) &&
-        newConfig.xAxis.dateParseFormat
-      ) {
-        // Filter dates
-        const timestamp = e => new Date(e).getTime()
-
-        let startDate = timestamp(newConfig.exclusions.dateStart)
-        let endDate = timestamp(newConfig.exclusions.dateEnd) + 86399999 //Increase by 24h in ms (86400000ms - 1ms) to include selected end date for .getTime() comparative
-
-        let startDateValid = undefined !== typeof startDate && false === isNaN(startDate)
-        let endDateValid = undefined !== typeof endDate && false === isNaN(endDate)
-
-        if (startDateValid && endDateValid) {
-          newExcludedData = data.filter(
-            e => timestamp(e[newConfig.xAxis.dataKey]) >= startDate && timestamp(e[newConfig.xAxis.dataKey]) <= endDate
-          )
-        } else if (startDateValid) {
-          newExcludedData = data.filter(e => timestamp(e[newConfig.xAxis.dataKey]) >= startDate)
-        } else if (endDateValid) {
-          newExcludedData = data.filter(e => timestamp(e[newConfig.xAxis.dataKey]) <= endDate)
-        }
-      } else {
-        newExcludedData = dataOverride || stateData
-      }
-    } else {
-      newExcludedData = dataOverride || stateData
-    }
+    const newExcludedData: any[] = getExcludedData(newConfig, dataOverride || stateData)
 
     setExcludedData(newExcludedData)
 
@@ -435,102 +400,12 @@ const CdcChart = ({
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
-      const combinedData = filteredData || data
-      const groups = _.uniq(_.map(combinedData, newConfig.xAxis.dataKey))
-      const seriesKeys = _.map(newConfig.series, 'dataKey')
-      const plots: any[] = []
-
-      groups.forEach(g => {
-        seriesKeys.forEach(seriesKey => {
-          try {
-            if (!g) throw new Error('No groups resolved in box plots')
-
-            // Start handle operations on combinedData
-            const { count, sortedData } = _.chain(combinedData)
-              // Filter by xAxis data key
-              .filter(item => item[newConfig.xAxis.dataKey] === g)
-              // perform multiple operations on the filtered data
-              .thru(filteredData => ({
-                count: filteredData.length,
-                sortedData: _.map(filteredData, item => Number(item[seriesKey])).sort()
-              }))
-              // get the results from the chain
-              .value()
-
-            // ! - Notice d3.quantile doesn't work here, and we had to take a custom route.
-            const quartiles = getQuartiles(sortedData)
-
-            if (!sortedData) throw new Error('boxplots dont have data yet')
-            if (!plots) throw new Error('boxplots dont have plots yet')
-
-            const q1 = quartiles.q1
-            const q3 = quartiles.q3
-
-            const iqr = q3 - q1
-            const lowerBounds = q1 - 1.5 * iqr
-            const upperBounds = q3 + 1.5 * iqr
-            const filteredData = sortedData.filter(d => d <= upperBounds)
-            const max = d3.max(filteredData)
-            plots.push({
-              columnCategory: g,
-              columnMax: max,
-              columnThirdQuartile: _.round(q3, newConfig.dataFormat.roundTo),
-              columnMedian: Number(d3.median(sortedData)).toFixed(newConfig.dataFormat.roundTo),
-              columnFirstQuartile: _.round(q1, newConfig.dataFormat.roundTo),
-              columnMin: _.min(sortedData),
-              columnCount: count,
-              columnSd: Number(d3.deviation(sortedData)).toFixed(newConfig.dataFormat.roundTo),
-              columnMean: Number(d3.mean(sortedData)).toFixed(newConfig.dataFormat.roundTo),
-              columnIqr: _.round(iqr, newConfig.dataFormat.roundTo),
-              values: sortedData,
-              columnLowerBounds: lowerBounds,
-              columnUpperBounds: upperBounds,
-              columnOutliers: _.filter(sortedData, value => value < lowerBounds || value > upperBounds),
-              columnNonOutliers: _.filter(sortedData, value => value >= lowerBounds && value <= upperBounds)
-            })
-          } catch (e) {
-            console.error('COVE: ', e.message) // eslint-disable-line
-          }
-        })
-      })
-      // Generate a flat list of categories based on seriesKeys and groups
-      const categories =
-        seriesKeys.length > 1
-          ? _.flatMap(groups, value => _.map(seriesKeys, key => `${_.capitalize(key)} - ${_.capitalize(value)}`))
-          : groups
-
+      const [plots, categories] = getBoxPlotConfig(newConfig, stateData)
       newConfig.boxplot['categories'] = categories
       newConfig.boxplot.plots = plots
     }
-
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {
-      newConfig.runtime.barSeriesKeys = []
-      newConfig.runtime.lineSeriesKeys = []
-      newConfig.runtime.areaSeriesKeys = []
-      newConfig.runtime.forecastingSeriesKeys = []
-
-      newConfig.series.forEach(series => {
-        if (series.type === 'Area Chart') {
-          newConfig.runtime.areaSeriesKeys.push(series)
-        }
-        if (series.type === 'Forecasting') {
-          newConfig.runtime.forecastingSeriesKeys.push(series)
-        }
-        if (series.type === 'Bar' || series.type === 'Combo') {
-          newConfig.runtime.barSeriesKeys.push(series.dataKey)
-        }
-        if (
-          series.type === 'Line' ||
-          series.type === 'dashed-sm' ||
-          series.type === 'dashed-md' ||
-          series.type === 'dashed-lg'
-        ) {
-          newConfig.runtime.lineSeriesKeys.push(series.dataKey)
-        }
-        if (series.type === 'Combo') {
-          series.type = 'Bar'
-        }
-      })
+      newConfig.runtime = getComboChartConfig(newConfig)
     }
 
     if (newConfig.visualizationType === 'Forecasting' && newConfig.series) {
@@ -642,14 +517,25 @@ const CdcChart = ({
     setContainer(node)
   }, []) // eslint-disable-line
 
-  const isEmpty = obj => {
-    return Object.keys(obj).length === 0
-  }
-
   // Load data when component first mounts
   useEffect(() => {
-    loadConfig()
-  }, [configObj?.data?.length ? configObj.data : null]) // eslint-disable-line
+    const load = async () => {
+      try {
+        const loadedConfig = await loadConfig(configObj, configUrl)
+        const data = await loadData(loadedConfig)
+        if (data && loadedConfig) {
+          const preparedConfig = await prepareConfig(loadedConfig, data)
+          setStateData(data)
+          setExcludedData(data)
+          updateConfig(preparedConfig, data)
+        }
+      } catch (err) {
+        console.error('Could not Load!')
+      }
+    }
+
+    load()
+  }, [])
 
   useEffect(() => {
     reloadURLData()
@@ -659,7 +545,7 @@ const CdcChart = ({
    * When cove has a config and container ref publish the cove_loaded event.
    */
   useEffect(() => {
-    if (container && !isEmpty(config) && !coveLoadedEventRan) {
+    if (container && !_.isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
       setCoveLoadedEventRan(true)
     }
@@ -729,26 +615,7 @@ const CdcChart = ({
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (stateData && config.xAxis && config.runtime?.seriesKeys) {
-      const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
-        ? config.twoColor.palette
-        : config.palette
-      const allPalettes: Record<string, string[]> = { ...colorPalettes, ...twoColorPalette }
-      let palette = config.customColors || allPalettes[configPalette]
-      let numberOfKeys = config.runtime.seriesKeys.length
-      let newColorScale
-
-      while (numberOfKeys > palette.length) {
-        palette = palette.concat(palette)
-      }
-
-      palette = palette.slice(0, numberOfKeys)
-
-      newColorScale = () =>
-        scaleOrdinal({
-          domain: config.runtime.seriesLabelsAll,
-          range: palette,
-          unknown: null
-        })
+      const newColorScale = getColorScale(config)
 
       setColorScale(newColorScale)
       setLoading(false)
@@ -763,7 +630,7 @@ const CdcChart = ({
   const highlight = (label: Label) => {
     // If we're highlighting all the series, reset them
     if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && config.visualizationType !== 'Forecasting') {
-      highlightReset()
+      handleShowAll()
       return
     }
 
@@ -802,7 +669,7 @@ const CdcChart = ({
   }
 
   // Called on reset button click, unhighlights all data series
-  const highlightReset = () => {
+  const handleShowAll = () => {
     try {
       const legend = legendRef.current
       if (!legend) throw new Error('No legend available to set previous focus on.')
@@ -1023,157 +890,6 @@ const CdcChart = ({
     return String(result)
   }
 
-  const missingRequiredSections = () => {
-    if (config.visualizationType === 'Sankey') return false // skip checks for now
-    if (config.visualizationType === 'Forecasting') return false // skip required checks for now.
-    if (config.visualizationType === 'Forest Plot') return false // skip required checks for now.
-    if (config.visualizationType === 'Pie') {
-      if (undefined === config?.yAxis.dataKey) {
-        return true
-      }
-    } else {
-      if ((undefined === config?.series || false === config?.series.length > 0) && !config?.dynamicSeries) {
-        return true
-      }
-    }
-
-    if (!config.xAxis.dataKey) {
-      return true
-    }
-
-    return false
-  }
-
-  // used for Additional Column
-  const displayDataAsText = (value, columnName) => {
-    if (value === null || value === '' || value === undefined) {
-      return ''
-    }
-
-    if (typeof value === 'string' && value.length > 0 && config.legend.type === 'equalnumber') {
-      return value
-    }
-
-    let formattedValue = value
-
-    let columnObj //= config.columns[columnName]
-    // config.columns not an array but a hash of objects
-    if (Object.keys(config.columns).length > 0) {
-      Object.keys(config.columns).forEach(function (key) {
-        var column = config.columns[key]
-        // add if not the index AND it is enabled to be added to data table
-        if (column.name === columnName) {
-          columnObj = column
-        }
-      })
-    }
-
-    if (columnObj === undefined) {
-      // then use left axis config
-      columnObj = config.type === 'chart' ? config.dataFormat : config.primary
-      // NOTE: Left Value Axis uses different names
-      // so map them below so the code below works
-      // - copy commas to useCommas to work below
-      columnObj['useCommas'] = columnObj.commas
-      // - copy roundTo to roundToPlace to work below
-      columnObj['roundToPlace'] = columnObj.roundTo ? columnObj.roundTo : ''
-    }
-
-    if (columnObj) {
-      // If value is a number, apply specific formattings
-      let hasDecimal = false
-      let decimalPoint = 0
-      if (Number(value)) {
-        if (columnObj.roundToPlace >= 0) {
-          hasDecimal = columnObj.roundToPlace ? columnObj.roundToPlace !== '' || columnObj.roundToPlace !== null : false
-          decimalPoint = columnObj.roundToPlace ? Number(columnObj.roundToPlace) : 0
-
-          // Rounding
-          if (columnObj.hasOwnProperty('roundToPlace') && hasDecimal) {
-            formattedValue = Number(value).toFixed(decimalPoint)
-          }
-        }
-
-        if (columnObj.hasOwnProperty('useCommas') && columnObj.useCommas === true) {
-          // Formats number to string with commas - allows up to 5 decimal places, if rounding is not defined.
-          // Otherwise, uses the rounding value set at 'columnObj.roundToPlace'.
-          formattedValue = Number(value).toLocaleString('en-US', {
-            style: 'decimal',
-            minimumFractionDigits: hasDecimal ? decimalPoint : 0,
-            maximumFractionDigits: hasDecimal ? decimalPoint : 5
-          })
-        }
-      }
-
-      // add prefix and suffix if set
-      formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
-    }
-
-    return formattedValue
-  }
-
-  const Confirm = () => {
-    const confirmDone = e => {
-      if (e) {
-        e.preventDefault()
-      }
-
-      let newConfig = { ...config }
-      delete newConfig.newViz
-
-      updateConfig(newConfig)
-    }
-
-    const styles = {
-      position: 'relative',
-      height: '100vh',
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      gridArea: 'content'
-    }
-
-    return (
-      <section className='waiting' style={styles}>
-        <section className='waiting-container'>
-          <h3>Finish Configuring</h3>
-          <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-          <Button
-            className='btn btn-primary'
-            style={{ margin: '1em auto' }}
-            disabled={missingRequiredSections()}
-            onClick={e => confirmDone(e)}
-          >
-            I'm Done
-          </Button>
-        </section>
-      </section>
-    )
-  }
-
-  const Error = () => {
-    const styles = {
-      position: 'absolute',
-      background: 'white',
-      zIndex: '999',
-      height: '100vh',
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      gridArea: 'content'
-    }
-    return (
-      <section className='waiting' style={styles}>
-        <section className='waiting-container'>
-          <h3>Error With Configuration</h3>
-          <p>{config.runtime.editorErrorMessage}</p>
-        </section>
-      </section>
-    )
-  }
-
   // this is passed DOWN into the various components
   // then they do a lookup based on the bin number as index into here (TT)
   const applyLegendToRow = rowObj => {
@@ -1228,10 +944,10 @@ const CdcChart = ({
   let body = <Loading />
 
   const makeClassName = string => {
-    if (!string || !string.toLowerCase) return
-    return string.toLowerCase().replaceAll(/ /g, '-')
-  }
+    if (!_.isString(string)) return undefined
 
+    return _.kebabCase(string)
+  }
   const getChartWrapperClasses = () => {
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
     const classes = ['chart-container', 'p-relative']
@@ -1252,7 +968,7 @@ const CdcChart = ({
   }
 
   const getChartSubTextClasses = () => {
-    const classes = ['subtext ']
+    const classes = ['subtext mt-4']
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
 
     if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
@@ -1267,13 +983,16 @@ const CdcChart = ({
         {config.dataKey} (Go to Table)
       </a>
     )
+
     body = (
       <>
         {isEditor && <EditorPanel />}
         <Layout.Responsive isEditor={isEditor}>
-          {config.newViz && <Confirm />}
-          {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && <Error />}
-          {!missingRequiredSections() && !config.newViz && (
+          {config.newViz && <Confirm updateConfig={updateConfig} config={config} />}
+          {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && (
+            <Error errorMessage={config.runtime.editorErrorMessage} />
+          )}
+          {!missingRequiredSections(config) && !config.newViz && (
             <div
               className={`cdc-chart-inner-container cove-component__content type-${makeClassName(
                 config.visualizationType
@@ -1286,7 +1005,7 @@ const CdcChart = ({
                 isDashboard={isDashboard}
                 title={title}
                 superTitle={config.superTitle}
-                classes={['chart-title', `${config.theme}`, 'cove-component__header']}
+                classes={['chart-title', `${config.theme}`, 'cove-component__header', 'mb-3']}
                 style={undefined}
               />
 
@@ -1294,7 +1013,7 @@ const CdcChart = ({
               <div className={getChartWrapperClasses().join(' ')}>
                 {/* Intro Text/Message */}
                 {config?.introText && config.visualizationType !== 'Spark Line' && (
-                  <section className={`introText `}>{parse(config.introText)}</section>
+                  <section className={`introText mb-4`}>{parse(config.introText)}</section>
                 )}
 
                 {/* Filters */}
@@ -1375,7 +1094,7 @@ const CdcChart = ({
                           dimensions={dimensions}
                         />
                         {config?.introText && (
-                          <section className='introText' style={{ padding: '0px 0 35px' }}>
+                          <section className='introText mb-4' style={{ padding: '0px 0 35px' }}>
                             {parse(config.introText)}
                           </section>
                         )}
@@ -1452,7 +1171,7 @@ const CdcChart = ({
                     runtimeData={getTableRuntimeData()}
                     expandDataTable={config.table.expanded}
                     columns={config.columns}
-                    displayDataAsText={displayDataAsText}
+                    defaultSortBy={dataTableDefaultSortBy}
                     displayGeoName={name => name}
                     applyLegendToRow={applyLegendToRow}
                     tableTitle={config.table.label}
@@ -1465,8 +1184,8 @@ const CdcChart = ({
                 )}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
+                {config?.footnotes && <section className='footnotes pt-2 mt-4'>{parse(config.footnotes)}</section>}
               </div>
-              {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
             </div>
           )}
         </Layout.Responsive>
@@ -1506,10 +1225,9 @@ const CdcChart = ({
     handleLineType,
     handleChartTabbing,
     highlight,
-    highlightReset,
+    handleShowAll,
     imageId,
     isDashboard,
-    isLegendBottom: legend?.position === 'bottom' || isLegendWrapViewport(currentViewport),
     isDebug,
     isDraggingAnnotation,
     handleDragStateChange,
