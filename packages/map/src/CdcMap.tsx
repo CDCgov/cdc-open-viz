@@ -711,7 +711,7 @@ const CdcMap = ({
 
             if (result['items'][updated]?.min === undefined || result['items'][updated]?.max === undefined) return
 
-            if (number >= result[updated].min && number <= result[updated].max) {
+            if (number >= result['items'][updated].min && number <= result['items'][updated].max) {
               newLegendMemo.set(hashObj(row), updated)
             }
           })
