@@ -173,9 +173,6 @@ const CdcChartComponent: React.FC<CdcChartComponentProps> = ({
       })
     })
 
-    if (data) {
-      newConfig.data = data
-    }
     return { ...coveUpdateWorker(newConfig) }
   }
 
