@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import CdcChartComponent from './CdcChartComponent'
 import { ChartConfig } from './types/ChartConfig'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
@@ -17,47 +17,53 @@ interface CdcChartProps {
 const CdcChart: React.FC<CdcChartProps> = props => {
   const { configUrl, isEditor, isDebug } = props
   const [config, setConfig] = useState({} as ChartConfig)
-  const [isLoading, setIsloading] = useState(false)
-  const loadConfig = async (configUrl: string): Promise<ChartConfig> => {
-    const response = await (await fetch(configUrl)).json()
-    return response
+  const [isConfigLoading, setIsConfigLoading] = useState(false)
+  const [isDataLoading, setIsDataLoading] = useState(false)
+  const prevFiltersRef = useRef(config.filters)
+  const loadConfig = useCallback(async configUrl => {
+    const response = await fetch(configUrl)
+    return response.json()
+  }, [])
+
+  const parseCsv = (responseText, delimiter = '|') => {
+    // Replace commas outside quotes with pipe delimiter and strip double quotes
+    const sanitizedText = responseText.replace(/(".*?")|,/g, (...m) => m[1] || delimiter).replace(/["]+/g, '')
+
+    // Parse CSV
+    return Papa.parse(sanitizedText, {
+      header: true,
+      dynamicTyping: true,
+      skipEmptyLines: true,
+      delimiter
+    }).data
+  }
+
+  const fetchAndParseData = async (url, ext) => {
+    try {
+      const response = await fetch(url)
+      if (ext === 'csv' || isSolrCsv(url)) {
+        const responseText = await response.text()
+        return parseCsv(responseText)
+      } else if (ext === 'json' || isSolrJson(url)) {
+        return await response.json()
+      }
+    } catch (error) {
+      console.error(`Error parsing URL: ${url}`, error)
+      return [] // Return an empty array on failure
+    }
   }
 
   const loadData = async response => {
     let data: any[] = response.data || []
 
     const urlFilters = _.some(_.get(response, 'filters', []), { type: 'url' })
+
     if (response.dataUrl && !urlFilters) {
       try {
         const ext = getFileExtension(response.dataUrl)
-        if ('csv' === ext || isSolrCsv(response.dataUrl)) {
-          data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
-            .then(response => response.text())
-            .then(responseText => {
-              // for every comma NOT inside quotes, replace with a pipe delimiter
-              // - this will let commas inside the quotes not be parsed as a new column
-              // - Limitation: if a delimiter other than comma is used in the csv this will break
-              // Examples of other delimiters that would break: tab
-              responseText = responseText.replace(/(".*?")|,/g, (...m) => m[1] || '|')
-              // now strip the double quotes
-              responseText = responseText.replace(/["]+/g, '')
-              const parsedCsv = Papa.parse(responseText, {
-                //quotes: "true",  // dont need these
-                //quoteChar: "'",  // has no effect that I can tell
-                header: true,
-                dynamicTyping: true,
-                skipEmptyLines: true,
-                delimiter: '|' // we are using pipe symbol as delimiter so setting this explicitly for Papa.parse
-              })
-              return parsedCsv.data
-            })
-        }
-
-        if ('json' === ext || isSolrJson(response.dataUrl)) {
-          data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
-        }
+        data = await fetchAndParseData(`${response.dataUrl}?v=${cacheBustingString()}`, ext)
       } catch {
-        console.error(`COVE: Cannot parse URL: ${response.dataUrl}`) // eslint-disable-line
+        console.error(`COVE: Cannot parse URL: ${response.dataUrl}`)
         data = []
       }
     }
@@ -93,23 +99,8 @@ const CdcChart: React.FC<CdcChartProps> = props => {
       let data: any[] = []
 
       try {
-        const ext = getFileExtension(dataUrl.href)
-        if ('csv' === ext || isSolrCsv(dataUrlFinal)) {
-          data = await fetch(dataUrlFinal)
-            .then(response => response.text())
-            .then(responseText => {
-              const parsedCsv = Papa.parse(responseText, {
-                header: true,
-                dynamicTyping: true,
-                skipEmptyLines: true
-              })
-              return parsedCsv.data
-            })
-        } else if ('json' === ext || isSolrJson(dataUrlFinal)) {
-          data = await fetch(dataUrlFinal).then(response => response.json())
-        } else {
-          data = []
-        }
+        const ext = getFileExtension(dataUrlFinal)
+        data = await fetchAndParseData(dataUrlFinal, ext)
       } catch {
         console.error(`Cannot parse URL: ${dataUrlFinal}`)
         data = []
@@ -121,26 +112,30 @@ const CdcChart: React.FC<CdcChartProps> = props => {
     }
   }
 
-  // Load data when component first mounts
   useEffect(() => {
     const load = async () => {
-      setIsloading(true)
+      setIsConfigLoading(true)
+
       try {
         const loadedConfig = await loadConfig(configUrl)
+        setIsConfigLoading(false)
+        // Start data loading
+        setIsDataLoading(true)
         try {
           const data = await loadData(loadedConfig)
           const newConfig = {
-            data: data,
-            ...loadedConfig
+            ...loadedConfig,
+            data: data
           }
           setConfig(newConfig as ChartConfig)
         } catch (e) {
           console.error('Could not Load data!')
+        } finally {
+          setIsDataLoading(false)
         }
       } catch (err) {
         console.error('Could not Load config!')
-      } finally {
-        setIsloading(false)
+        setIsConfigLoading(false)
       }
     }
 
@@ -148,33 +143,33 @@ const CdcChart: React.FC<CdcChartProps> = props => {
   }, [])
 
   useEffect(() => {
-    const reload = async () => {
-      setIsloading(true)
-      try {
-        const [data, runtimeDataUrl, dataLoadedFromUrl] = await reloadURLData()
-        let newData = data
-        if (config.dataUrl || dataLoadedFromUrl) {
-          newData = Object.assign(data, { urlFiltered: true })
+    if (!_.isEqual(prevFiltersRef.current, config.filters)) {
+      prevFiltersRef.current = config.filters
+      const reload = async () => {
+        setIsDataLoading(true)
+        try {
+          const [data, runtimeDataUrl, dataLoadedFromUrl] = await reloadURLData()
+          setConfig(
+            prev =>
+              ({
+                ...prev,
+                data,
+                dataLoadedFromUrl,
+                runtimeDataUrl,
+                formattedData: { ...data, urlFiltered: true }
+              } as ChartConfig)
+          )
+        } catch (err) {
+          console.error('Could not reload URL Data!', err)
+        } finally {
+          setIsDataLoading(false)
         }
-        const newConfig = {
-          ...config,
-          data: newData,
-          dataLoadedFromUrl,
-          runtimeDataUrl,
-          formattedData: newData
-        }
-        setConfig(newConfig)
-      } catch (err) {
-        console.error('Could not reLoad URL Data!')
-      } finally {
-        setIsloading(false)
       }
+      reload()
     }
+  }, [config?.filters])
 
-    reload()
-  }, [JSON.stringify(config.filters)])
-
-  if (isLoading) {
+  if (isConfigLoading || isDataLoading) {
     return <Loading />
   }
 
