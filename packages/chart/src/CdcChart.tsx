@@ -72,7 +72,6 @@ const CdcChart: React.FC<CdcChartProps> = props => {
   }
 
   const reloadURLData = async () => {
-    let dataLoadedFromUrl = false
     if (config.dataUrl) {
       const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl, window.location.origin)
       let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
@@ -105,10 +104,9 @@ const CdcChart: React.FC<CdcChartProps> = props => {
         console.error(`Cannot parse URL: ${dataUrlFinal}`)
         data = []
       } finally {
-        dataLoadedFromUrl = true
       }
 
-      return [data, dataUrlFinal, dataLoadedFromUrl]
+      return [data, dataUrlFinal]
     }
   }
 
@@ -148,15 +146,15 @@ const CdcChart: React.FC<CdcChartProps> = props => {
       const reload = async () => {
         setIsDataLoading(true)
         try {
-          const [data, runtimeDataUrl, dataLoadedFromUrl] = await reloadURLData()
+          const [data, runtimeDataUrl] = await reloadURLData()
+          const newData = Object.assign(data, { urlFiltered: true })
           setConfig(
             prev =>
               ({
                 ...prev,
-                data,
-                dataLoadedFromUrl,
+                data: newData,
                 runtimeDataUrl,
-                formattedData: { ...data, urlFiltered: true }
+                formattedData: newData
               } as ChartConfig)
           )
         } catch (err) {
