@@ -7,6 +7,7 @@ import Papa from 'papaparse'
 import 'react-tooltip/dist/react-tooltip.css'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import Loading from '@cdc/core/components/Loading'
+import _ from 'lodash'
 
 interface CdcChartProps {
   configUrl?: string
@@ -25,12 +26,7 @@ const CdcChart: React.FC<CdcChartProps> = props => {
   const loadData = async response => {
     let data: any[] = response.data || []
 
-    const urlFilters = response.filters
-      ? response.filters.filter(filter => filter.type === 'url').length > 0
-        ? true
-        : false
-      : false
-
+    const urlFilters = _.some(_.get(response, 'filters', []), { type: 'url' })
     if (response.dataUrl && !urlFilters) {
       try {
         const ext = getFileExtension(response.dataUrl)
