@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client'
 import CdcChart from './CdcChart'
 import './coreStyles_chart.scss'
 
+import '@cdc/core/styles/cove-main.scss'
 import 'react-tooltip/dist/react-tooltip.css'
 
 let isEditor = window.location.href.includes('editor=true')
