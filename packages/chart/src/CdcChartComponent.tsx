@@ -65,7 +65,6 @@ import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
-import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 // Local helpers
@@ -77,7 +76,7 @@ import { getColorScale } from './helpers/getColorScale'
 // styles
 import './scss/main.scss'
 
-interface CdcChartProps {
+interface CdcChartComponentProps {
   configUrl?: string
   config?: ChartConfig
   isEditor?: boolean
@@ -91,8 +90,7 @@ interface CdcChartProps {
   setSharedFilterValue?: (value: any) => void
   dashboardConfig?: DashboardConfig
 }
-const CdcChartComponent = ({
-  configUrl,
+const CdcChartComponent: React.FC<CdcChartComponentProps> = ({
   config: configObj,
   isEditor = false,
   isDebug = false,
@@ -103,7 +101,7 @@ const CdcChartComponent = ({
   setSharedFilter,
   setSharedFilterValue,
   dashboardConfig
-}: CdcChartProps) => {
+}) => {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const svgRef = useRef(null)
@@ -158,12 +156,6 @@ const CdcChartComponent = ({
 
   const checkLineToBarGraph = () => {
     return isConvertLineToBarGraph(config.visualizationType, filteredData, config.allowLineToBarGraph)
-  }
-
-  const loadConfig = async (configObj: ChartConfig, configUrl: string): Promise<ChartConfig> => {
-    const response = _.cloneDeep(configObj) || (await (await fetch(configUrl)).json())
-
-    return response
   }
 
   const prepareConfig = (loadedConfig: ChartConfig, data): ChartConfig => {
@@ -255,59 +247,6 @@ const CdcChartComponent = ({
     }
   }
 
-  const loadData = async response => {
-    let data: any[] = response.data || []
-
-    const urlFilters = response.filters
-      ? response.filters.filter(filter => filter.type === 'url').length > 0
-        ? true
-        : false
-      : false
-
-    if (response.dataUrl && !urlFilters) {
-      try {
-        const ext = getFileExtension(response.dataUrl)
-        if ('csv' === ext || isSolrCsv(response.dataUrl)) {
-          data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
-            .then(response => response.text())
-            .then(responseText => {
-              // for every comma NOT inside quotes, replace with a pipe delimiter
-              // - this will let commas inside the quotes not be parsed as a new column
-              // - Limitation: if a delimiter other than comma is used in the csv this will break
-              // Examples of other delimiters that would break: tab
-              responseText = responseText.replace(/(".*?")|,/g, (...m) => m[1] || '|')
-              // now strip the double quotes
-              responseText = responseText.replace(/["]+/g, '')
-              const parsedCsv = Papa.parse(responseText, {
-                //quotes: "true",  // dont need these
-                //quoteChar: "'",  // has no effect that I can tell
-                header: true,
-                dynamicTyping: true,
-                skipEmptyLines: true,
-                delimiter: '|' // we are using pipe symbol as delimiter so setting this explicitly for Papa.parse
-              })
-              return parsedCsv.data
-            })
-        }
-
-        if ('json' === ext || isSolrJson(response.dataUrl)) {
-          data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
-        }
-      } catch {
-        console.error(`COVE: Cannot parse URL: ${response.dataUrl}`) // eslint-disable-line
-        data = []
-      }
-    }
-
-    if (response.dataDescription) {
-      data = transform.autoStandardize(data)
-      data = transform.developerStandardize(data, response.dataDescription)
-    }
-
-    data = handleRankByValue(data, response)
-    return data
-  }
-
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
     const newConfig = _.cloneDeep(_config)
     let data = dataOverride || stateData
@@ -339,30 +278,10 @@ const CdcChartComponent = ({
 
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {} as Runtime
-    newConfig.runtime.series = newConfig.dynamicSeries ? [] : _.cloneDeep(newConfig.series)
+    newConfig.runtime.series = _.cloneDeep(newConfig.series)
     newConfig.runtime.seriesLabels = {}
     newConfig.runtime.seriesLabelsAll = []
     newConfig.runtime.originalXAxis = newConfig.xAxis
-
-    if (newConfig.dynamicSeries) {
-      let finalData = dataOverride || newConfig.formattedData || newConfig.data
-      if (finalData?.length) {
-        Object.keys(finalData[0]).forEach(seriesKey => {
-          if (
-            seriesKey !== newConfig.xAxis.dataKey &&
-            (!newConfig.filters || newConfig.filters.filter(filter => filter.columnName === seriesKey).length === 0) &&
-            (!newConfig.columns || Object.keys(newConfig.columns).indexOf(seriesKey) === -1)
-          ) {
-            newConfig.runtime.series.push({
-              dataKey: seriesKey,
-              type: newConfig.dynamicSeriesType,
-              lineType: newConfig.dynamicSeriesLineType,
-              tooltip: true
-            })
-          }
-        })
-      }
-    }
 
     if (newConfig.visualizationType === 'Pie') {
       newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey])
@@ -521,10 +440,9 @@ const CdcChartComponent = ({
   useEffect(() => {
     const load = async () => {
       try {
-        const loadedConfig = await loadConfig(configObj, configUrl)
-        const data = await loadData(loadedConfig)
-        if (data && loadedConfig) {
-          const preparedConfig = await prepareConfig(loadedConfig, data)
+        const data = configObj.data
+        if (configObj.data && configObj) {
+          const preparedConfig = await prepareConfig(configObj, data)
           setStateData(data)
           setExcludedData(data)
           updateConfig(preparedConfig, data)

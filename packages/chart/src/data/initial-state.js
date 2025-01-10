@@ -197,6 +197,7 @@ export default {
     bottomPrefix: '',
     bottomAbbreviated: false
   },
+  filters: [],
   confidenceKeys: {},
   visual: {
     border: true,
