@@ -179,74 +179,6 @@ const CdcChartComponent: React.FC<CdcChartComponentProps> = ({
     return { ...coveUpdateWorker(newConfig) }
   }
 
-  const reloadURLData = async () => {
-    if (config.dataUrl) {
-      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl, window.location.origin)
-      let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
-
-      let isUpdateNeeded = false
-      config.filters?.forEach(filter => {
-        if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
-          qsParams[filter.queryParameter] = filter.active
-          isUpdateNeeded = true
-        }
-      })
-
-      if ((!config.formattedData || config.formattedData.urlFiltered) && !isUpdateNeeded) return
-
-      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
-        .map((param, i) => {
-          let qs = i === 0 ? '?' : '&'
-          qs += param + '='
-          qs += qsParams[param]
-          return qs
-        })
-        .join('')}`
-
-      let data: any[] = []
-
-      try {
-        const ext = getFileExtension(dataUrl.href)
-        if ('csv' === ext || isSolrCsv(dataUrlFinal)) {
-          data = await fetch(dataUrlFinal)
-            .then(response => response.text())
-            .then(responseText => {
-              const parsedCsv = Papa.parse(responseText, {
-                header: true,
-                dynamicTyping: true,
-                skipEmptyLines: true
-              })
-              return parsedCsv.data
-            })
-        } else if ('json' === ext || isSolrJson(dataUrlFinal)) {
-          data = await fetch(dataUrlFinal).then(response => response.json())
-        } else {
-          data = []
-        }
-      } catch {
-        console.error(`Cannot parse URL: ${dataUrlFinal}`)
-        data = []
-      }
-
-      if (config.dataDescription) {
-        data = transform.autoStandardize(data)
-        data = transform.developerStandardize(data, config.dataDescription)
-      }
-
-      Object.assign(data, { urlFiltered: true })
-
-      data = handleRankByValue(data, config)
-
-      updateConfig({ ...config, runtimeDataUrl: dataUrlFinal, data, formattedData: data })
-
-      if (data) {
-        setStateData(data)
-        setExcludedData(data)
-        setFilteredData(filterVizData(config.filters, data))
-      }
-    }
-  }
-
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
     const newConfig = _.cloneDeep(_config)
     let data = dataOverride || stateData
@@ -437,15 +369,29 @@ const CdcChartComponent: React.FC<CdcChartComponentProps> = ({
   }, []) // eslint-disable-line
 
   // Load data when component first mounts
+
+  const prepareData = (config, data) => {
+    if (config.dataDescription) {
+      data = transform.autoStandardize(data)
+      data = transform.developerStandardize(data, config.dataDescription)
+    }
+
+    data = handleRankByValue(data, config)
+
+    return data
+  }
   useEffect(() => {
     const load = async () => {
       try {
         const data = configObj.data
         if (configObj.data && configObj) {
           const preparedConfig = await prepareConfig(configObj, data)
-          setStateData(data)
-          setExcludedData(data)
-          updateConfig(preparedConfig, data)
+          const preparedData = prepareData(configObj, data)
+
+          setStateData(preparedData)
+          setExcludedData(preparedData)
+          updateConfig(preparedConfig, preparedData)
+          setFilteredData(filterVizData(config.filters, data))
         }
       } catch (err) {
         console.error('Could not Load!')
@@ -454,10 +400,6 @@ const CdcChartComponent: React.FC<CdcChartComponentProps> = ({
 
     load()
   }, [configObj?.data?.length ? configObj.data : null])
-
-  useEffect(() => {
-    reloadURLData()
-  }, [JSON.stringify(config.filters)])
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.

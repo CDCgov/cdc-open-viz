@@ -69,6 +69,62 @@ const CdcChart: React.FC<CdcChartProps> = props => {
     return data
   }
 
+  const reloadURLData = async () => {
+    let dataLoadedFromUrl = false
+    if (config.dataUrl) {
+      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl, window.location.origin)
+      let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
+
+      let isUpdateNeeded = false
+      config.filters?.forEach(filter => {
+        if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
+          qsParams[filter.queryParameter] = filter.active
+          isUpdateNeeded = true
+        }
+      })
+
+      if ((!config.formattedData || config.formattedData.urlFiltered) && !isUpdateNeeded) return
+
+      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
+        .map((param, i) => {
+          let qs = i === 0 ? '?' : '&'
+          qs += param + '='
+          qs += qsParams[param]
+          return qs
+        })
+        .join('')}`
+
+      let data: any[] = []
+
+      try {
+        const ext = getFileExtension(dataUrl.href)
+        if ('csv' === ext || isSolrCsv(dataUrlFinal)) {
+          data = await fetch(dataUrlFinal)
+            .then(response => response.text())
+            .then(responseText => {
+              const parsedCsv = Papa.parse(responseText, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true
+              })
+              return parsedCsv.data
+            })
+        } else if ('json' === ext || isSolrJson(dataUrlFinal)) {
+          data = await fetch(dataUrlFinal).then(response => response.json())
+        } else {
+          data = []
+        }
+      } catch {
+        console.error(`Cannot parse URL: ${dataUrlFinal}`)
+        data = []
+      } finally {
+        dataLoadedFromUrl = true
+      }
+
+      return [data, dataUrlFinal, dataLoadedFromUrl]
+    }
+  }
+
   // Load data when component first mounts
   useEffect(() => {
     const load = async () => {
@@ -94,6 +150,30 @@ const CdcChart: React.FC<CdcChartProps> = props => {
 
     load()
   }, [])
+
+  useEffect(() => {
+    const reload = async () => {
+      try {
+        const [data, runtimeDataUrl, dataLoadedFromUrl] = await reloadURLData()
+        let newData = data
+        if (config.dataUrl || dataLoadedFromUrl) {
+          newData = Object.assign(data, { urlFiltered: true })
+        }
+        const newConfig = {
+          ...config,
+          data: newData,
+          dataLoadedFromUrl,
+          runtimeDataUrl,
+          formattedData: newData
+        }
+        setConfig(newConfig)
+      } catch (err) {
+        console.error('Could reLoad URL Data!')
+      }
+    }
+
+    reload()
+  }, [JSON.stringify(config.filters)])
 
   if (isLoading) {
     return <Loading />
