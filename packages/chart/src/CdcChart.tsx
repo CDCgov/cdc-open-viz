@@ -166,6 +166,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
       })
     })
 
+    if (newConfig.visualizationType === 'Bump Chart') {
+      newConfig.xAxis.type === 'date-time'
+    }
+
     return { ...coveUpdateWorker(newConfig) }
   }
 
@@ -448,19 +452,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
       setFilteredData(filterVizData(externalFilters, excludedData))
     }
   }, [externalFilters]) // eslint-disable-line
-
-  // This will set the bump chart's default scaling type to date-time
-  useEffect(() => {
-    if (['Bump Chart'].includes(config.visualizationType)) {
-      setConfig({
-        ...config,
-        xAxis: {
-          ...config.xAxis,
-          type: 'date-time'
-        }
-      })
-    }
-  }, [config.visualizationType])
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
