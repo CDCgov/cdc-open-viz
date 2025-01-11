@@ -24,7 +24,6 @@ import { Label } from './types/Label'
 // External Libraries
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse, timeFormat } from 'd3-time-format'
-import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 import _ from 'lodash'
@@ -58,10 +57,8 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import { missingRequiredSections } from '@cdc/core/helpers/missingRequiredSections'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
-import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
-import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
@@ -76,7 +73,7 @@ import { getColorScale } from './helpers/getColorScale'
 // styles
 import './scss/main.scss'
 
-interface CdcChartComponentProps {
+interface CdcChartProps {
   config?: ChartConfig
   isEditor?: boolean
   isDebug?: boolean
@@ -89,7 +86,7 @@ interface CdcChartComponentProps {
   setSharedFilterValue?: (value: any) => void
   dashboardConfig?: DashboardConfig
 }
-const CdcChartComponent: React.FC<CdcChartComponentProps> = ({
+const CdcChart: React.FC<CdcChartProps> = ({
   config: configObj,
   isEditor = false,
   isDebug = false,
@@ -1133,4 +1130,4 @@ const CdcChartComponent: React.FC<CdcChartComponentProps> = ({
   )
 }
 
-export default CdcChartComponent
+export default CdcChart

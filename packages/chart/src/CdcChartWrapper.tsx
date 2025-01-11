@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
-import CdcChartComponent from './CdcChart'
+import CdcChart from './CdcChart'
 import { ChartConfig } from './types/ChartConfig'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
@@ -15,7 +15,7 @@ interface CdcChartProps {
   isDebug?: boolean
 }
 
-const CdcChart: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug }) => {
+const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug }) => {
   const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
   const [isLoading, setIsLoading] = useState(true)
   const prevFiltersRef = useRef(config.filters)
@@ -83,10 +83,10 @@ const CdcChart: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug }) => 
 
   if (isLoading) return <Loading />
 
-  return <CdcChartComponent config={config} isEditor={isEditor} isDebug={isDebug} />
+  return <CdcChart config={config} isEditor={isEditor} isDebug={isDebug} />
 }
 
-export default CdcChart
+export default CdcChartWrapper
 
 const parseCsv = (responseText: string, delimiter = '|') => {
   const sanitizedText = responseText.replace(/(".*?")|,/g, (...m) => m[1] || delimiter).replace(/["]+/g, '')
