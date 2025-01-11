@@ -147,9 +147,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const { lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
   const legendId = useId()
 
-  const hasDateAxis = config.xAxis && ['date-time', 'date'].includes(config.xAxis.type)
-  const dataTableDefaultSortBy = hasDateAxis && config.xAxis.dataKey
-
   const checkLineToBarGraph = () => {
     return isConvertLineToBarGraph(config.visualizationType, filteredData, config.allowLineToBarGraph)
   }
@@ -1024,7 +1021,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     runtimeData={getTableRuntimeData()}
                     expandDataTable={config.table.expanded}
                     columns={config.columns}
-                    defaultSortBy={dataTableDefaultSortBy}
                     displayGeoName={name => name}
                     applyLegendToRow={applyLegendToRow}
                     tableTitle={config.table.label}
