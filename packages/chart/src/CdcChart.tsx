@@ -468,47 +468,16 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }, [config, stateData]) // eslint-disable-line
 
   // Called on legend click, highlights/unhighlights the data series with the given label
-  const highlight = (label: Label) => {
-    // If we're highlighting all the series, reset them
+  const highlight = (label: Label): void => {
     if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && config.visualizationType !== 'Forecasting') {
-      handleShowAll()
-      return
+      return handleShowAll()
     }
 
-    const newSeriesHighlight = [...seriesHighlight]
+    const newHighlight = _.findKey(config.runtime.seriesLabels, v => v === label.datum) || label.datum
 
-    let newHighlight = label.datum
-    if (config.runtime.seriesLabels) {
-      config.runtime.seriesKeys.forEach(key => {
-        if (config.runtime.seriesLabels[key] === label.datum) {
-          newHighlight = key
-        }
-      })
-    }
-
-    if (newSeriesHighlight.indexOf(newHighlight) !== -1) {
-      newSeriesHighlight.splice(newSeriesHighlight.indexOf(newHighlight), 1)
-    } else {
-      newSeriesHighlight.push(newHighlight)
-    }
-
-    /**
-     * pushDataKeyBySeriesName
-     * - pushes series.dataKey into the series highlight based on the found series.name
-     * @param {String} value
-     */
-    // const pushDataKeyBySeriesName = value => {
-    //   let matchingSeries = config.series.filter(series => series.name === value.text)
-    //   if (matchingSeries?.length > 0) {
-    //     newSeriesHighlight.push(matchingSeries[0].dataKey)
-    //   }
-    // }
-
-    // pushDataKeyBySeriesName(label)
-
+    const newSeriesHighlight = _.xor(seriesHighlight, [newHighlight])
     setSeriesHighlight(newSeriesHighlight)
   }
-
   // Called on reset button click, unhighlights all data series
   const handleShowAll = () => {
     try {
