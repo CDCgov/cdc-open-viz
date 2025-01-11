@@ -2,8 +2,8 @@
   "name": "@cdc/chart",
   "version": "4.24.11",
   "description": "React component for visualizing tabular data in various types of charts",
-  "moduleName": "CdcChartComponent",
-  "main": "dist/cdcchartComponent",
+  "moduleName": "CdcChart",
+  "main": "dist/cdcchart",
   "type": "module",
   "scripts": {
     "start": "vite --open",

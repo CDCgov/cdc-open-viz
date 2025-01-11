@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import annotationConfig from './_mock/annotation_category_mock.json'
 import annotationConfigDateLinear from './_mock/annotation_date-linear_mock.json'
 import annotationConfigDateTime from './_mock/annotation_date-time_mock.json'
-import Chart from '../CdcChartComponent'
+import Chart from '../CdcChart'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Annotation',

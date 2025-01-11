@@ -1,7 +1,7 @@
 import DynamicSeriesConfig from './_mock/dynamic_series_config.json'
 import DynamicSeriesBarConfig from './_mock/dynamic_series_bar_config.json'
 import { Meta, StoryObj } from '@storybook/react'
-import Chart from '../CdcChartComponent'
+import Chart from '../CdcChart'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Dynamic Series',
