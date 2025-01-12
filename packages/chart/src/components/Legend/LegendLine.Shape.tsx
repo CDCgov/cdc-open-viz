@@ -1,31 +1,7 @@
 import React from 'react'
 import { handleLineType } from '../../helpers/handleLineType'
-import { GlyphDiamond, GlyphCircle, GlyphSquare, GlyphTriangle } from '@visx/glyph'
 import { Line } from '@visx/shape'
-
-const ShapeComponent = ({ fill, size, left, top, display, index }) => {
-  const glyphs = {
-    0: GlyphCircle,
-    1: GlyphSquare,
-    2: GlyphTriangle,
-    3: GlyphDiamond,
-    4: GlyphTriangle
-  }
-
-  const Shape = glyphs[index]
-  if (!display) {
-    return <></>
-  }
-  // Handle inverted triangle for index 4
-  const isFlipped = index === 4
-  const transform = `translate(${left}, ${top}) ${isFlipped ? 'rotate(180)' : ''}`
-
-  return (
-    <g transform={transform}>
-      <Shape fill={fill} size={size} />
-    </g>
-  )
-}
+import VisxShape from '@cdc/core/components/VisxShape'
 
 const LegendLineShape = props => {
   const { config, label, index } = props
@@ -40,11 +16,13 @@ const LegendLineShape = props => {
         strokeDasharray={handleLineType(config.series[index]?.type ? config.series[index]?.type : '')}
       />
 
-      <ShapeComponent
+      <VisxShape
         index={index}
         display={config.legend.hasShape && index !== 5}
         left={15}
         top={3}
+        key={`legend_shape_${index}`}
+        stroke={label.value}
         fill={label.value}
         size={55}
       />

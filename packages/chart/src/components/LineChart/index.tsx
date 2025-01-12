@@ -8,6 +8,7 @@ import { Text } from '@visx/text'
 
 // CDC core components
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import VisxShape from '@cdc/core/components/VisxShape'
 
 // Local context and hooks
 import ConfigContext from '../../ConfigContext'
@@ -18,11 +19,11 @@ import { filterCircles, createStyles, createDataSegments } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
 import LineChartBumpCircle from './components/LineChart.BumpCircle'
 import isNumber from '@cdc/core/helpers/isNumber'
+import LineChartShape from './components/LineChart.Shape'
 
 // Types
 import { type ChartContext } from '../../types/ChartContext'
 import { type LineChartProps } from './LineChartProps'
-import LineChartShape, { ShapeComponent } from './components/LineChart.Shape'
 
 const LineChart = (props: LineChartProps) => {
   // prettier-ignore
@@ -359,7 +360,7 @@ const LineChart = (props: LineChartProps) => {
               {circleData.map((item, i) => {
                 let isStandardShape = config.visual.lineDatapointSymbol === 'standard'
                 return (
-                  <ShapeComponent
+                  <VisxShape
                     key={i}
                     display={true}
                     left={xPos(item.data)}

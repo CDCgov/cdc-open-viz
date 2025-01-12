@@ -1,7 +1,7 @@
 import React from 'react'
 import chroma from 'chroma-js'
-import { GlyphDiamond, GlyphCircle, GlyphSquare, GlyphTriangle } from '@visx/glyph'
 import { type ChartConfig } from '../../../types/ChartConfig'
+import VisxShape from '@cdc/core/components/VisxShape'
 
 type LineChartShapeProps = {
   config: ChartConfig
@@ -24,30 +24,6 @@ type LineChartShapeProps = {
   yScale: any
   yScaleRight: any
   colorScale: any
-}
-
-export const ShapeComponent = ({ fill, size, left, top, display, index, stroke, key }) => {
-  const glyphs = {
-    0: GlyphCircle,
-    1: GlyphSquare,
-    2: GlyphTriangle,
-    3: GlyphDiamond,
-    4: GlyphTriangle
-  }
-
-  const Shape = glyphs[index]
-  if (!display) {
-    return <></>
-  }
-  // Handle inverted triangle for index 4
-  const isFlipped = index === 4
-  const transform = `translate(${left}, ${top}) ${isFlipped ? 'rotate(180)' : ''}`
-
-  return (
-    <g key={key} transform={transform}>
-      <Shape strokeWidth={0} fill={fill} stroke={stroke} size={size} />
-    </g>
-  )
 }
 
 const LineChartShape = (props: LineChartShapeProps) => {
@@ -122,7 +98,7 @@ const LineChartShape = (props: LineChartShapeProps) => {
       }
 
       return (
-        <ShapeComponent
+        <VisxShape
           display={config.visual.lineDatapointSymbol === 'standard' && dataIndex !== 5}
           left={getXPos(hoveredXValue)}
           top={hoveredSeriesAxis === 'right' ? yScaleRight(hoveredSeriesValue) : yScale(hoveredSeriesValue)}
@@ -138,7 +114,7 @@ const LineChartShape = (props: LineChartShapeProps) => {
 
   if (config.lineDatapointStyle === 'always show') {
     return (
-      <ShapeComponent
+      <VisxShape
         display={config.visual.lineDatapointSymbol === 'standard' && dataIndex !== 5}
         left={cx}
         top={cy}
