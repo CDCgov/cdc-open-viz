@@ -17,8 +17,9 @@
 .cdc-open-viz-module {
   .geo-buttons {
     list-style: none;
-    display: flex;
     color: var(--mediumGray);
+    display: grid;
+    button { width: 100% !important; }
     svg {
       display: block;
       max-width: 80px;
