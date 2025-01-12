@@ -26,7 +26,7 @@ type LineChartShapeProps = {
   colorScale: any
 }
 
-const ShapeComponent = ({ fill, size, left, top, display, index, stroke, key }) => {
+export const ShapeComponent = ({ fill, size, left, top, display, index, stroke, key }) => {
   const glyphs = {
     0: GlyphCircle,
     1: GlyphSquare,
@@ -45,7 +45,7 @@ const ShapeComponent = ({ fill, size, left, top, display, index, stroke, key }) 
 
   return (
     <g key={key} transform={transform}>
-      <Shape fill={fill} stroke={stroke} size={size} />
+      <Shape strokeWidth={0} fill={fill} stroke={stroke} size={size} />
     </g>
   )
 }

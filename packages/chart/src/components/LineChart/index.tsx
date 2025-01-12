@@ -22,7 +22,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 // Types
 import { type ChartContext } from '../../types/ChartContext'
 import { type LineChartProps } from './LineChartProps'
-import LineChartShape from './components/LineChart.Shape'
+import LineChartShape, { ShapeComponent } from './components/LineChart.Shape'
 
 const LineChart = (props: LineChartProps) => {
   // prettier-ignore
@@ -355,26 +355,19 @@ const LineChart = (props: LineChartProps) => {
               )}
 
               {/* circles for preliminaryData data */}
+
               {circleData.map((item, i) => {
+                let isStandardShape = config.visual.lineDatapointSymbol === 'standard'
                 return (
-                  <circle
+                  <ShapeComponent
                     key={i}
-                    cx={xPos(item.data)}
-                    cy={
-                      seriesAxis === 'Right'
-                        ? yScaleRight(getYAxisData(item.data, _seriesKey))
-                        : yScale(Number(getYAxisData(item.data, _seriesKey)))
-                    }
-                    r={item.size}
-                    strokeWidth={seriesData.weight || 2}
-                    stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'}
-                    fill={
-                      item.isFilled
-                        ? colorScale
-                          ? colorScale(config.runtime.seriesLabels[seriesKey])
-                          : '#000'
-                        : '#fff'
-                    }
+                    display={true}
+                    left={xPos(item.data)}
+                    top={yScale(Number(getYAxisData(item.data, seriesKey)))}
+                    size={Number(item.size) * 50}
+                    stroke={colorScale(seriesKey)}
+                    fill={colorScale(seriesKey)}
+                    index={isStandardShape ? index : 0}
                   />
                 )
               })}

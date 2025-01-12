@@ -175,8 +175,8 @@ const PanelVisual: FC<PanelProps> = props => {
                   </Tooltip.Target>
                   <Tooltip.Content>
                     <p>
-                      Shapes will display in order circle, square, triangle, diamond, inverted triangle. Use with no
-                      more than 5 datapoints.
+                      Shapes will appear in the following order: circle, square, triangle, diamond, and inverted
+                      triangle. Use with a maximum of 5 data points.
                     </p>
                   </Tooltip.Content>
                 </Tooltip>
