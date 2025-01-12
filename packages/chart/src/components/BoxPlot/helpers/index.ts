@@ -1,6 +1,7 @@
 import { max, min, median, quantile } from 'd3-array'
 import _ from 'lodash'
-
+import * as d3 from 'd3-array'
+import { getQuartiles } from '../../../helpers/getQuartiles'
 interface Plot {
   columnCategory: string
   columnOutliers: object
@@ -20,9 +21,10 @@ export const handleTooltip = (boxplot, d, key, q1, q3, median, iqr) => {
 export const calculateBoxPlotStats = values => {
   if (!values || !values.length) return {}
   const sortedValues = _.sortBy(values)
+  const quartiles = getQuartiles(sortedValues)
   return {
-    min: min(values),
-    max: max(values),
+    min: d3.min(sortedValues),
+    max: d3.max(sortedValues),
     median: median(values),
     firstQuartile: quantile(sortedValues, 0.25),
     thirdQuartile: quantile(sortedValues, 0.75)
