@@ -8,6 +8,7 @@ import { Text } from '@visx/text'
 
 // CDC core components
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import VisxShape from '@cdc/core/components/VisxShape'
 
 // Local context and hooks
 import ConfigContext from '../../ConfigContext'
@@ -18,6 +19,7 @@ import { filterCircles, createStyles, createDataSegments } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
 import LineChartBumpCircle from './components/LineChart.BumpCircle'
 import isNumber from '@cdc/core/helpers/isNumber'
+import LineChartShape from './components/LineChart.Shape'
 
 // Types
 import { type ChartContext } from '../../types/ChartContext'
@@ -132,7 +134,7 @@ const LineChart = (props: LineChartProps) => {
                         </Text>
                       )}
 
-                      {lineDatapointStyle === 'always show' && (
+                      {lineDatapointStyle === 'always show' && config.visual.lineDatapointSymbol === 'none' && (
                         <LineChartCircle
                           mode='ALWAYS_SHOW_POINTS'
                           dataIndex={dataIndex}
@@ -173,12 +175,32 @@ const LineChart = (props: LineChartProps) => {
                         seriesAxis={seriesAxis}
                         key={`isolated-circle-${dataIndex}`}
                       />
+
+                      {config.visual.lineDatapointSymbol === 'standard' && (
+                        <LineChartShape
+                          tableData={tableData}
+                          dataIndex={index}
+                          d={d}
+                          circleData={circleData}
+                          data={_data}
+                          config={config}
+                          seriesKey={seriesKey}
+                          displayArea={displayArea}
+                          tooltipData={tooltipData}
+                          xScale={xScale}
+                          yScale={yScale}
+                          colorScale={colorScale}
+                          parseDate={parseDate}
+                          yScaleRight={yScaleRight}
+                          seriesAxis={seriesAxis}
+                        />
+                      )}
                     </React.Fragment>
                   )
                 )
               })}
               <>
-                {lineDatapointStyle === 'hover' && (
+                {lineDatapointStyle === 'hover' && config.visual.lineDatapointSymbol === 'none' && (
                   <LineChartCircle
                     tableData={tableData}
                     dataIndex={0}
@@ -198,6 +220,7 @@ const LineChart = (props: LineChartProps) => {
                   />
                 )}
               </>
+
               {/* SPLIT LINE */}
               {isSplitLine ? (
                 <>
@@ -333,26 +356,19 @@ const LineChart = (props: LineChartProps) => {
               )}
 
               {/* circles for preliminaryData data */}
+
               {circleData.map((item, i) => {
+                let isStandardShape = config.visual.lineDatapointSymbol === 'standard'
                 return (
-                  <circle
+                  <VisxShape
                     key={i}
-                    cx={xPos(item.data)}
-                    cy={
-                      seriesAxis === 'Right'
-                        ? yScaleRight(getYAxisData(item.data, _seriesKey))
-                        : yScale(Number(getYAxisData(item.data, _seriesKey)))
-                    }
-                    r={item.size}
-                    strokeWidth={seriesData.weight || 2}
-                    stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'}
-                    fill={
-                      item.isFilled
-                        ? colorScale
-                          ? colorScale(config.runtime.seriesLabels[seriesKey])
-                          : '#000'
-                        : '#fff'
-                    }
+                    display={true}
+                    left={xPos(item.data)}
+                    top={yScale(Number(getYAxisData(item.data, seriesKey)))}
+                    size={Number(item.size) * 50}
+                    stroke={colorScale(seriesKey)}
+                    fill={colorScale(seriesKey)}
+                    index={isStandardShape ? index : 0}
                   />
                 )
               })}
