@@ -358,7 +358,7 @@ const CdcMap = ({
   })
 
   // eslint-disable-next-line
-  const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
+  const generateRuntimeLegend = useCallback((obj, runtimeFilters, hash) => {
     const newLegendMemo = new Map() // Reset memoization
     const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
     let primaryCol = obj.columns.primary.name,
@@ -373,7 +373,7 @@ const CdcMap = ({
       result.fromHash = hash
     }
 
-    result.runtimeDataHash = runtimeData.fromHash
+    result.runtimeDataHash = runtimeFilters?.fromHash
 
     // Unified will based the legend off ALL of the data maps received. Otherwise, it will use
     let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData)
@@ -810,7 +810,7 @@ const CdcMap = ({
     legendMemo.current = newLegendMemo
 
     if (state.general.geoType === 'world') {
-      const runtimeDataKeys = Object.keys(runtimeData)
+      const runtimeDataKeys = Object.keys(runtimeFilters)
       const isCountriesWithNoDataState =
         obj.data === undefined ? false : !countryKeys.every(countryKey => runtimeDataKeys.includes(countryKey))
 
@@ -969,16 +969,22 @@ const CdcMap = ({
         if (filters?.length) {
           for (let i = 0; i < filters.length; i++) {
             const { columnName, active, type } = filters[i]
-            if (type !== 'url' && String(row[columnName]) !== String(active)) return false // Bail out, not part of filter
+            if (type !== 'url' && !String(active).includes(String(row[columnName]))) return false // Bail out, not part of filter
+
+            // Don't add additional rows with same UID
+            if (result[row.uid] === undefined) {
+              if (runtimeFilters[0]?.filterStyle !== 'nested-dropdown') {
+                return (result[row.uid] = row)
+              } else if (
+                state.filters[0].subGrouping &&
+                row[state.filters[0].subGrouping.columnName] == state.filters[0].subGrouping.active
+              ) {
+                return (result[row.uid] = row)
+              }
+            }
           }
         }
-
-        // Don't add additional rows with same UID
-        if (undefined === result[row.uid]) {
-          result[row.uid] = row
-        }
       })
-
       return result
     } catch (e) {
       console.error('COVE: ', e) // eslint-disable-line
@@ -1594,7 +1600,8 @@ const CdcMap = ({
 
     // Data
     if (hashData !== runtimeData.fromHash && state.data?.fromColumn) {
-      const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
+      const filtersForRuntimeData = runtimeFilters.length > 0 ? runtimeFilters : filters
+      const newRuntimeData = generateRuntimeData(state, filtersForRuntimeData, hashData)
 
       setRuntimeData(newRuntimeData)
     } else {
@@ -1810,6 +1817,7 @@ const CdcMap = ({
                 <Filters
                   config={state}
                   setConfig={setState}
+                  excludedData={state.data}
                   filteredData={runtimeFilters}
                   setFilteredData={setRuntimeFilters}
                   dimensions={dimensions}

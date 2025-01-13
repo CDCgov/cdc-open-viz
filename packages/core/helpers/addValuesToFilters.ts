@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { VizFilter } from '../types/VizFilter'
+import { FILTER_STYLE } from '@cdc/dashboard/src/types/FilterStyles'
 
 type Filter = {
   columnName: string
@@ -80,7 +81,7 @@ const handleVizParents = (filter: VizFilter, data: any[] | MapData, filtersLooku
   let filteredData = Array.isArray(data) ? data : Object.values(data).flat(1)
   filter.parents.forEach(parentKey => {
     const parent = filtersLookup[parentKey]
-    if (parent?.filterStyle === 'nested-dropdown') {
+    if (parent?.filterStyle === FILTER_STYLE.nestedDropdown) {
       const { subGrouping } = parent as VizFilter
       if (subGrouping?.active) {
         filteredData = filteredData.filter(d => {
@@ -115,11 +116,11 @@ export const addValuesToFilters = (filters: VizFilter[], data: any[] | MapData):
       filteredData = handleVizParents(filter as VizFilter, data, filtersLookup)
     }
     generateValuesForFilter(filterCopy, filteredData)
-    if (filterCopy.values.length > 0) {
+    if (filterCopy.values?.length > 0) {
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)
       if (queryStringFilterValue) {
         filterCopy.active = queryStringFilterValue
-      } else if (filterCopy.filterStyle === 'multi-select') {
+      } else if (filterCopy.filterStyle === FILTER_STYLE.multiSelect) {
         const defaultValues = filterCopy.values
         const active = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
         filterCopy.active = active.filter(val => includes(defaultValues, val))
@@ -129,19 +130,10 @@ export const addValuesToFilters = (filters: VizFilter[], data: any[] | MapData):
         filterCopy.active = includes(filterCopy.values, active) ? active : defaultValue
       }
     }
-    if (filterCopy.subGrouping) {
-      const groupName = filterCopy.active as string
-      const subGroupingFilter = {
-        ...filterCopy.subGrouping,
-        values: filterCopy.subGrouping.valuesLookup[groupName].values
-      }
-      const queryStringFilterValue = getQueryStringFilterValue(subGroupingFilter)
-      const groupActive = filterCopy.active || filterCopy.values[0]
-      const defaultValue = filterCopy.subGrouping.valuesLookup[groupActive as string].values[0]
-      // if the value doesn't exist in the subGrouping then return the default
-      const filteredLookupValues = Object.values(filterCopy.subGrouping.valuesLookup).flatMap(v => v.values)
-      const activeValue = queryStringFilterValue || filterCopy.subGrouping.active
-      filterCopy.subGrouping.active = filteredLookupValues.includes(activeValue) ? activeValue : defaultValue
+    if (filterCopy.subGrouping && filterCopy.filterStyle === FILTER_STYLE.nestedDropdown) {
+      const subGroupingDefault = filterCopy.subGrouping.valuesLookup[filterCopy.active as string].values[0]
+      const subGroupingActive = filterCopy.subGrouping.active
+      filter.subGrouping.active = subGroupingActive ? subGroupingActive : subGroupingDefault
     }
     return filterCopy
   })
