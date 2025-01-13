@@ -1,76 +1,97 @@
 {
   "annotations": [],
   "general": {
-    "statePicked": {
-      "fipsCode": "32",
-      "stateName": "Nevada"
-    },
-    "geoType": "us",
-    "geoBorderColor": "darkGray",
-    "headerColor": "theme-blue",
-    "showTitle": true,
+    "title": "Example Data Map with Cities",
+    "subtext": "*: Lorem ipsum; NA: Lorem ipsum.",
+    "type": "data",
+    "geoType": "google-map",
+    "headerColor": "theme-cyan",
     "showSidebar": true,
+    "showTitle": true,
     "showDownloadButton": true,
-    "showDownloadMediaButton": false,
-    "displayAsHex": false,
-    "displayStateLabels": false,
+    "expandDataTable": false,
+    "backgroundColor": "#f5f5f5",
+    "geoBorderColor": "darkGray",
     "territoriesLabel": "Territories",
     "language": "en",
     "hasRegions": false,
-    "expandDataTable": false,
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": false,
     "fullBorder": false,
-    "type": "map",
-    "title": "Default US Map",
     "palette": {
       "isReversed": false
     },
     "allowMapZoom": true,
     "hideGeoColumnInTooltip": false,
     "hidePrimaryColumnInTooltip": false,
+    "statePicked": {
+      "fipsCode": "01",
+      "stateName": "Alabama"
+    },
+    "showDownloadImgButton": false,
+    "showDownloadPdfButton": false,
     "territoriesAlwaysShow": false,
     "geoLabelOverride": "",
+    "convertFipsCodes": true,
     "noStateFoundMessage": "Map Unavailable",
-    "annotationDropdownText": "Annotations",
-    "convertFipsCodes": true
+    "annotationDropdownText": "Annotations"
   },
   "type": "map",
-  "color": "pinkpurple",
+  "color": "yelloworangered",
   "columns": {
-    "geo": {
-      "name": "City",
-      "label": "Location",
-      "tooltip": false,
-      "dataTable": true
-    },
-    "primary": {
-      "dataTable": true,
-      "tooltip": true,
-      "prefix": "",
-      "suffix": "",
-      "name": "Value",
-      "label": "",
-      "roundToPlace": 0
-    },
-    "navigate": {
-      "name": "Condition"
-    },
     "latitude": {
       "name": "Latitude"
     },
     "longitude": {
       "name": "Longitude"
+    },
+    "geo": {
+      "dataTable": true,
+      "label": "",
+      "name": "City",
+      "tooltip": false
+    },
+    "primary": {
+      "dataTable": true,
+      "label": "Rate",
+      "name": "Value",
+      "prefix": "",
+      "suffix": "",
+      "tooltip": false,
+      "roundToPlace": 0
+    },
+    "navigate": {
+      "dataTable": false,
+      "name": "",
+      "tooltip": false
+    },
+    "additionalColumn1": {
+      "label": "Latitude",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Latitude",
+      "tooltip": true
+    },
+    "geosInRegion": {
+      "name": "Longitude",
+      "dataTable": true,
+      "label": "Longitude"
     }
   },
   "legend": {
-    "descriptions": {},
+    "numberOfItems": 3,
+    "position": "side",
+    "title": "Legend Title",
+    "description": "Legend Text",
+    "type": "equalnumber",
     "specialClasses": [],
     "unified": false,
     "singleColumn": false,
     "dynamicDescription": false,
-    "type": "equalnumber",
-    "numberOfItems": 3,
-    "position": "side",
-    "title": "Legend",
+    "descriptions": {},
     "singleRow": false,
     "showSpecialClassesLast": false,
     "verticalSorted": false,
@@ -82,18 +103,18 @@
   },
   "filters": [],
   "table": {
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "wrapColumns": false,
     "label": "Data Table",
-    "expanded": false,
+    "expanded": true,
     "limitHeight": false,
     "height": "",
     "caption": "",
-    "showDownloadUrl": false,
-    "showDataTableLink": true,
     "showFullGeoNameInCSV": false,
     "forceDisplay": true,
     "download": true,
     "indexLabel": "",
-    "wrapColumns": false,
     "showDownloadLinkBelow": true
   },
   "tooltips": {
@@ -106,12 +127,12 @@
     "editorErrorMessage": []
   },
   "visual": {
+    "cityStyle": "pin",
     "minBubbleSize": 1,
     "maxBubbleSize": 20,
     "extraBubbleBorder": false,
-    "cityStyle": "circle",
-    "geoCodeCircleSize": "3",
     "showBubbleZeros": false,
+    "geoCodeCircleSize": 2,
     "cityStyleLabel": "",
     "additionalCityStyles": []
   },
@@ -145,18 +166,16 @@
     ]
   },
   "filterBehavior": "Filter Change",
-  "customColors": [
-    "red",
-    "orange",
-    "yellow",
-    "green",
-    "blue",
-    "violet"
-  ],
   "dataTable": {
     "title": "Data Table",
     "forceDisplay": true
   },
+  "sharing": {
+    "enabled": false,
+    "dataHost": "wcms-wp.cdc.gov",
+    "configUrl": "/wcms/4.0/cdc-wp/data-presentation/examples/city-data-map-example.json"
+  },
+  "usingWidgetLoader": true,
   "data": [
     {
       "City": "Albuquerque",
@@ -651,7 +670,7 @@
       "Value": 82
     },
     {
-      "City": "Richmond, Virginia",
+      "City": "Richmond",
       "Longitude": "-77.43605",
       "Latitude": "37.540726",
       "Value": 83
@@ -795,20 +814,6 @@
       "Value": 106
     }
   ],
-  "geoType": "us",
-  "geoBorderColor": "darkGray",
-  "headerColor": "theme-blue",
-  "showTitle": true,
-  "showSidebar": true,
-  "showDownloadButton": true,
-  "showDownloadMediaButton": false,
-  "displayAsHex": false,
-  "displayStateLabels": false,
-  "territoriesLabel": "Territories",
-  "language": "en",
-  "hasRegions": false,
-  "expandDataTable": true,
-  "fullBorder": false,
-  "validated": 4.23,
-  "version": "4.24.11"
+  "filterStyle": "Filter Changes",
+  "version": "4.24.10"
 }
