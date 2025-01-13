@@ -18,7 +18,7 @@ const LegendLineShape = props => {
 
       <VisxShape
         index={index}
-        display={config.legend.hasShape && index !== 5}
+        display={config.legend.hasShape && index < 7}
         left={15}
         top={3}
         key={`legend_shape_${index}`}

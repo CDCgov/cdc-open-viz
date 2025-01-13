@@ -115,7 +115,7 @@ const LineChartShape = (props: LineChartShapeProps) => {
   if (config.lineDatapointStyle === 'always show') {
     return (
       <VisxShape
-        display={config.visual.lineDatapointSymbol === 'standard' && dataIndex !== 5}
+        display={config.visual.lineDatapointSymbol === 'standard' && dataIndex < 7}
         left={cx}
         top={cy}
         size={45}

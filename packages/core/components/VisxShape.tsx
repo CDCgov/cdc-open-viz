@@ -1,18 +1,14 @@
 import React from 'react'
-import { GlyphDiamond, GlyphCircle, GlyphSquare, GlyphTriangle } from '@visx/glyph'
+import { GlyphDiamond, GlyphCircle, GlyphSquare, GlyphTriangle, GlyphCross } from '@visx/glyph'
+import { Text } from '@visx/text'
 
-type GlyphKeys = 0 | 1 | 2 | 3 | 4
-
-type GlyphMap = {
-  [key in GlyphKeys]: React.ComponentType<{ fill?: string; stroke?: string; size?: number; strokeWidth?: number }>
-}
-
-const glyphs: GlyphMap = {
+const glyphs = {
   0: GlyphCircle,
   1: GlyphSquare,
   2: GlyphTriangle,
   3: GlyphDiamond,
-  4: GlyphTriangle
+  4: GlyphTriangle,
+  5: GlyphCross
 }
 
 interface VisxShapeProps {
@@ -21,23 +17,30 @@ interface VisxShapeProps {
   left: number
   top: number
   display: boolean
-  index: GlyphKeys
+  index: number
   stroke: string
   key: string | number
 }
 
 const VisxShape: React.FC<VisxShapeProps> = ({ fill, size, left, top, display, index, stroke, key }) => {
   if (!display) {
-    return null
+    return <g></g>
   }
 
   const Shape = glyphs[index]
   const isFlipped = index === 4
+
   const transform = `translate(${left}, ${top}) ${isFlipped ? 'rotate(180)' : ''}`
 
   return (
     <g key={key} transform={transform}>
-      <Shape strokeWidth={0} fill={fill} stroke={stroke} size={size} />
+      {index === 6 ? (
+        <Text textAnchor='start' fill={fill} dy={3.5} dx={-5} fontSize={size / 4}>
+          &#x2B1F;
+        </Text>
+      ) : (
+        <Shape strokeWidth={0} fill={fill} stroke={stroke} size={size} />
+      )}
     </g>
   )
 }
