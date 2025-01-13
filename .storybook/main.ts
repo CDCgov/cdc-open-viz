@@ -4,8 +4,18 @@ import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr' // Svg Support
 
 const config: StorybookConfig = {
-  stories: ['../_stories/*.mdx', '../packages/**/_stories/*.stories.@(js|jsx|ts|tsx)'],
-  addons: ['@storybook/addon-links', '@storybook/addon-essentials', '@storybook/addon-interactions', 'storybook-addon-fetch-mock', '@storybook/addon-a11y'],
+  stories: [
+    '../_stories/*.mdx',
+    '../packages/**/_stories/*.stories.@(js|jsx|ts|tsx)',
+    '../private/**/*.stories.@(js|jsx|ts|tsx)'
+  ],
+  addons: [
+    '@storybook/addon-links',
+    '@storybook/addon-essentials',
+    '@storybook/addon-interactions',
+    'storybook-addon-fetch-mock',
+    '@storybook/addon-a11y'
+  ],
   staticDirs: ['./assets'],
   framework: {
     name: '@storybook/react-vite',
