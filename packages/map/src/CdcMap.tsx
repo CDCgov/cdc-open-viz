@@ -78,6 +78,7 @@ import useTooltip from './hooks/useTooltip'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import { getGeoFillColor } from './helpers/colors'
+import { SubGrouping } from '@cdc/core/types/VizFilter'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -970,18 +971,16 @@ const CdcMap = ({
           for (let i = 0; i < filters.length; i++) {
             const { columnName, active, type } = filters[i]
             if (type !== 'url' && !String(active).includes(String(row[columnName]))) return false // Bail out, not part of filter
+          }
+        }
 
-            // Don't add additional rows with same UID
-            if (result[row.uid] === undefined) {
-              if (runtimeFilters[0]?.filterStyle !== 'nested-dropdown') {
-                return (result[row.uid] = row)
-              } else if (
-                state.filters[0].subGrouping &&
-                row[state.filters[0].subGrouping.columnName] == state.filters[0].subGrouping.active
-              ) {
-                return (result[row.uid] = row)
-              }
-            }
+        // Don't add additional rows with same UID
+        if (result[row.uid] === undefined) {
+          const isNotNestedDropdown = runtimeFilters[0]?.filterStyle !== 'nested-dropdown'
+          const subGrouping = state.filters[0].subGrouping || ({} as SubGrouping)
+          const rowIsSelected = row[subGrouping.columnName] == subGrouping.active
+          if (isNotNestedDropdown || rowIsSelected) {
+            result[row.uid] = row
           }
         }
       })

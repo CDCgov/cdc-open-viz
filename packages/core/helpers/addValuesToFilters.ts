@@ -130,10 +130,18 @@ export const addValuesToFilters = (filters: VizFilter[], data: any[] | MapData):
         filterCopy.active = includes(filterCopy.values, active) ? active : defaultValue
       }
     }
-    if (filterCopy.subGrouping && filterCopy.filterStyle === FILTER_STYLE.nestedDropdown) {
-      const subGroupingDefault = filterCopy.subGrouping.valuesLookup[filterCopy.active as string].values[0]
-      const subGroupingActive = filterCopy.subGrouping.active
-      filter.subGrouping.active = subGroupingActive ? subGroupingActive : subGroupingDefault
+    if (filterCopy.subGrouping) {
+      const groupName = filterCopy.active as string
+      const subGroupingFilter = {
+        ...filterCopy.subGrouping,
+        values: filterCopy.subGrouping.valuesLookup[groupName].values
+      }
+      const queryStringFilterValue = getQueryStringFilterValue(subGroupingFilter)
+      const groupActive = groupName || filterCopy.values[0]
+      const defaultValue = filterCopy.subGrouping.valuesLookup[groupActive as string].values[0]
+      // if the value doesn't exist in the subGrouping then return the default
+      const activeValue = queryStringFilterValue || filterCopy.subGrouping.active
+      filterCopy.subGrouping.active = activeValue || defaultValue
     }
     return filterCopy
   })
