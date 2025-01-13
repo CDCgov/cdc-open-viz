@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 type DataArray = Record<string, any>[]
 
 export class DataTransform {
@@ -128,7 +130,13 @@ export class DataTransform {
         return standardized
       }
     } else if (description.series === true && description.singleRow === false) {
-      if (description.seriesKey !== undefined && description.xKey !== undefined && (description.valueKey !== undefined || (description.valueKeys !== undefined && description.valueKeys.length > 0) || (description.valueKeysTallSupport !== undefined && description.valueKeysTallSupport.length > 0))) {
+      if (
+        description.seriesKey !== undefined &&
+        description.xKey !== undefined &&
+        (description.valueKey !== undefined ||
+          (description.valueKeys !== undefined && description.valueKeys.length > 0) ||
+          (description.valueKeysTallSupport !== undefined && description.valueKeysTallSupport.length > 0))
+      ) {
         if (description.valueKeysTallSupport !== undefined) {
           let standardizedMapped = {}
           let standardized: string[] = []
@@ -136,7 +144,12 @@ export class DataTransform {
           data.forEach(row => {
             let uniqueKey = row[description.xKey]
             Object.keys(row).forEach(key => {
-              if (key !== description.xKey && key !== description.seriesKey && description.valueKeysTallSupport.indexOf(key) === -1 && (!description.ignoredKeys || description.ignoredKeys.indexOf(key) === -1)) {
+              if (
+                key !== description.xKey &&
+                key !== description.seriesKey &&
+                description.valueKeysTallSupport.indexOf(key) === -1 &&
+                (!description.ignoredKeys || description.ignoredKeys.indexOf(key) === -1)
+              ) {
                 uniqueKey += '|' + row[key]
               }
             })
@@ -145,13 +158,20 @@ export class DataTransform {
               standardizedMapped[uniqueKey] = { [description.xKey]: row[description.xKey] }
             }
             Object.keys(row).forEach(key => {
-              if (key !== description.xKey && key !== description.seriesKey && description.valueKeysTallSupport.indexOf(key) === -1 && (!description.ignoredKeys || description.ignoredKeys.indexOf(key) === -1)) {
+              if (
+                key !== description.xKey &&
+                key !== description.seriesKey &&
+                description.valueKeysTallSupport.indexOf(key) === -1 &&
+                (!description.ignoredKeys || description.ignoredKeys.indexOf(key) === -1)
+              ) {
                 standardizedMapped[uniqueKey][key] = row[key]
               }
             })
             description.valueKeysTallSupport.forEach((valueKey, i) => {
-              if(row[description.seriesKey])
-                standardizedMapped[uniqueKey][i === 0 ? row[description.seriesKey] : (row[description.seriesKey] + '-' + valueKey)] = row[valueKey]
+              if (row[description.seriesKey])
+                standardizedMapped[uniqueKey][
+                  i === 0 ? row[description.seriesKey] : row[description.seriesKey] + '-' + valueKey
+                ] = row[valueKey]
             })
           })
 
@@ -178,7 +198,10 @@ export class DataTransform {
               })
 
               if (!standardizedMapped[uniqueKey]) {
-                standardizedMapped[uniqueKey] = { [description.xKey]: row[description.xKey], '**Numeric Value Property**': valueKey }
+                standardizedMapped[uniqueKey] = {
+                  [description.xKey]: row[description.xKey],
+                  '**Numeric Value Property**': valueKey
+                }
                 extraKeys.forEach(key => {
                   standardizedMapped[uniqueKey][key] = row[key]
                 })
@@ -189,7 +212,10 @@ export class DataTransform {
           })
 
           Object.keys(standardizedMapped).forEach(key => {
-            if (!description.ignoredKeys || description.ignoredKeys.indexOf(standardizedMapped[key]['**Numeric Value Property**']) === -1) {
+            if (
+              !description.ignoredKeys ||
+              description.ignoredKeys.indexOf(standardizedMapped[key]['**Numeric Value Property**']) === -1
+            ) {
               standardized.push(standardizedMapped[key])
             }
           })
@@ -212,7 +238,10 @@ export class DataTransform {
             if (standardizedMapped[uniqueKey]) {
               standardizedMapped[uniqueKey][row[description.seriesKey]] = row[description.valueKey]
             } else {
-              standardizedMapped[uniqueKey] = { [description.xKey]: row[description.xKey], [row[description.seriesKey]]: row[description.valueKey] }
+              standardizedMapped[uniqueKey] = {
+                [description.xKey]: row[description.xKey],
+                [row[description.seriesKey]]: row[description.valueKey]
+              }
               extraKeys.forEach(key => {
                 standardizedMapped[uniqueKey][key] = row[key]
               })
@@ -233,63 +262,26 @@ export class DataTransform {
     return data
   }
 
-  /**
-     * cleanData
-     *
-    // This cleans a data set by:
-    // - removing commas and $ signs from any numbers to try to plot the point
-    // - removing any data points that are NOT composed of of all digits (but allow a decimal point)
-    // Without this the charts "break" and do not render
-    *
-    * Inputs: data as array, excludeKey indicates which key to use to NOT clean
-    *                        Example: "Date" should not be cleaned if part of the data
-    *
-    * Output: returns the cleanedData
-    *
-    * Set testing = true if you need to see before and after data
-    *
-    */
-  cleanData(data: DataArray, excludeKey, testing = false): DataArray {
-    let cleanedupData: DataArray = []
-    if (!Array.isArray(data)) debugger
-    if (testing) console.log('## Data to clean=', data)
-    if (excludeKey === undefined) {
-      console.log('COVE: cleanData excludeKey undefined')
-      return data // because no excludeKey
-    }
-    data.forEach(function (d, i) {
-      if (testing) console.log('clean', i, ' d', d)
-      let cleaned = {}
-      Object.keys(d).forEach(function (key) {
-        const value = d[key]
-        if (key === excludeKey) {
-          // pass thru
-          cleaned[key] = value
-        } else {
-          // remove comma and dollar signs
-          if (testing) console.log('typeof value is ', typeof value)
-          let tmp = ''
-          const removeCommasAndDollars = (num: string) => num.replace(/[,\$]/g, '')
-          if (typeof value === 'string') {
-            tmp = value ? removeCommasAndDollars(value) : ''
-          } else {
-            tmp = value ? value : ''
-          }
-          // UNSAFE_isANumber: matches for any string of digits optionally interrupted by a period.
-          const UNSAFE_isANumber = (num: any) => /\d+\.?\d*/.test(num)
-          if (!isNaN(parseFloat(tmp)) || UNSAFE_isANumber(tmp)) {
-            cleaned[key] = tmp
-          } else {
-            cleaned[key] = ''
-          }
-          // if you get here, then return nothing to skip bad data point
+  cleanData(data: DataArray, excludeKey: string): DataArray {
+    if (!Array.isArray(data) || !excludeKey) return data
+
+    const removeCommasAndDollars = (value: string) => value.replace(/[,\$]/g, '')
+    const isNumber = (value: any) => !isNaN(parseFloat(value)) && isFinite(value)
+
+    return data.map(item =>
+      _.mapValues(item, (value, key) => {
+        if (key === excludeKey) return value
+
+        // Handle string values and sanitize them
+        if (typeof value === 'string') {
+          const sanitized = removeCommasAndDollars(value)
+          return isNumber(sanitized) ? sanitized : ''
         }
+
+        // For non-string values, validate them as numbers
+        return isNumber(value) ? value : ''
       })
-      if (testing) console.log('cleaned=', cleaned)
-      cleanedupData.push(cleaned)
-    })
-    if (testing) console.log('## cleanedData =', cleanedupData)
-    return cleanedupData
+    )
   }
 
   // clean out %, $, commas from numbers when needing to do sorting!
