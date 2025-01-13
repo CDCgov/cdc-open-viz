@@ -136,12 +136,11 @@ export const addValuesToFilters = (filters: VizFilter[], data: any[] | MapData):
         values: filterCopy.subGrouping.valuesLookup[groupName].values
       }
       const queryStringFilterValue = getQueryStringFilterValue(subGroupingFilter)
-      const groupActive = filterCopy.active || filterCopy.values[0]
+      const groupActive = groupName || filterCopy.values[0]
       const defaultValue = filterCopy.subGrouping.valuesLookup[groupActive as string].values[0]
       // if the value doesn't exist in the subGrouping then return the default
-      const filteredLookupValues = Object.values(filterCopy.subGrouping.valuesLookup).flatMap(v => v.values)
       const activeValue = queryStringFilterValue || filterCopy.subGrouping.active
-      filterCopy.subGrouping.active = filteredLookupValues.includes(activeValue) ? activeValue : defaultValue
+      filterCopy.subGrouping.active = activeValue || defaultValue
     }
     return filterCopy
   })
