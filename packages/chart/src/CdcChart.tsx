@@ -24,7 +24,6 @@ import { Label } from './types/Label'
 // External Libraries
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse, timeFormat } from 'd3-time-format'
-import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 import _ from 'lodash'
@@ -58,14 +57,11 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import { missingRequiredSections } from '@cdc/core/helpers/missingRequiredSections'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
-import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
-import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
-import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 // Local helpers
@@ -78,7 +74,6 @@ import { getColorScale } from './helpers/getColorScale'
 import './scss/main.scss'
 
 interface CdcChartProps {
-  configUrl?: string
   config?: ChartConfig
   isEditor?: boolean
   isDebug?: boolean
@@ -91,8 +86,7 @@ interface CdcChartProps {
   setSharedFilterValue?: (value: any) => void
   dashboardConfig?: DashboardConfig
 }
-const CdcChart = ({
-  configUrl,
+const CdcChart: React.FC<CdcChartProps> = ({
   config: configObj,
   isEditor = false,
   isDebug = false,
@@ -103,7 +97,7 @@ const CdcChart = ({
   setSharedFilter,
   setSharedFilterValue,
   dashboardConfig
-}: CdcChartProps) => {
+}) => {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const svgRef = useRef(null)
@@ -153,17 +147,8 @@ const CdcChart = ({
   const { lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
   const legendId = useId()
 
-  const hasDateAxis = config.xAxis && ['date-time', 'date'].includes(config.xAxis.type)
-  const dataTableDefaultSortBy = hasDateAxis && config.xAxis.dataKey
-
   const checkLineToBarGraph = () => {
     return isConvertLineToBarGraph(config.visualizationType, filteredData, config.allowLineToBarGraph)
-  }
-
-  const loadConfig = async (configObj: ChartConfig, configUrl: string): Promise<ChartConfig> => {
-    const response = _.cloneDeep(configObj) || (await (await fetch(configUrl)).json())
-
-    return response
   }
 
   const prepareConfig = (loadedConfig: ChartConfig, data): ChartConfig => {
@@ -181,131 +166,11 @@ const CdcChart = ({
       })
     })
 
-    if (data) {
-      newConfig.data = data
+    if (newConfig.visualizationType === 'Bump Chart') {
+      newConfig.xAxis.type === 'date-time'
     }
+
     return { ...coveUpdateWorker(newConfig) }
-  }
-
-  const reloadURLData = async () => {
-    if (config.dataUrl) {
-      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl, window.location.origin)
-      let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
-
-      let isUpdateNeeded = false
-      config.filters?.forEach(filter => {
-        if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
-          qsParams[filter.queryParameter] = filter.active
-          isUpdateNeeded = true
-        }
-      })
-
-      if ((!config.formattedData || config.formattedData.urlFiltered) && !isUpdateNeeded) return
-
-      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
-        .map((param, i) => {
-          let qs = i === 0 ? '?' : '&'
-          qs += param + '='
-          qs += qsParams[param]
-          return qs
-        })
-        .join('')}`
-
-      let data: any[] = []
-
-      try {
-        const ext = getFileExtension(dataUrl.href)
-        if ('csv' === ext || isSolrCsv(dataUrlFinal)) {
-          data = await fetch(dataUrlFinal)
-            .then(response => response.text())
-            .then(responseText => {
-              const parsedCsv = Papa.parse(responseText, {
-                header: true,
-                dynamicTyping: true,
-                skipEmptyLines: true
-              })
-              return parsedCsv.data
-            })
-        } else if ('json' === ext || isSolrJson(dataUrlFinal)) {
-          data = await fetch(dataUrlFinal).then(response => response.json())
-        } else {
-          data = []
-        }
-      } catch {
-        console.error(`Cannot parse URL: ${dataUrlFinal}`)
-        data = []
-      }
-
-      if (config.dataDescription) {
-        data = transform.autoStandardize(data)
-        data = transform.developerStandardize(data, config.dataDescription)
-      }
-
-      Object.assign(data, { urlFiltered: true })
-
-      data = handleRankByValue(data, config)
-
-      updateConfig({ ...config, runtimeDataUrl: dataUrlFinal, data, formattedData: data })
-
-      if (data) {
-        setStateData(data)
-        setExcludedData(data)
-        setFilteredData(filterVizData(config.filters, data))
-      }
-    }
-  }
-
-  const loadData = async response => {
-    let data: any[] = response.data || []
-
-    const urlFilters = response.filters
-      ? response.filters.filter(filter => filter.type === 'url').length > 0
-        ? true
-        : false
-      : false
-
-    if (response.dataUrl && !urlFilters) {
-      try {
-        const ext = getFileExtension(response.dataUrl)
-        if ('csv' === ext || isSolrCsv(response.dataUrl)) {
-          data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
-            .then(response => response.text())
-            .then(responseText => {
-              // for every comma NOT inside quotes, replace with a pipe delimiter
-              // - this will let commas inside the quotes not be parsed as a new column
-              // - Limitation: if a delimiter other than comma is used in the csv this will break
-              // Examples of other delimiters that would break: tab
-              responseText = responseText.replace(/(".*?")|,/g, (...m) => m[1] || '|')
-              // now strip the double quotes
-              responseText = responseText.replace(/["]+/g, '')
-              const parsedCsv = Papa.parse(responseText, {
-                //quotes: "true",  // dont need these
-                //quoteChar: "'",  // has no effect that I can tell
-                header: true,
-                dynamicTyping: true,
-                skipEmptyLines: true,
-                delimiter: '|' // we are using pipe symbol as delimiter so setting this explicitly for Papa.parse
-              })
-              return parsedCsv.data
-            })
-        }
-
-        if ('json' === ext || isSolrJson(response.dataUrl)) {
-          data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
-        }
-      } catch {
-        console.error(`COVE: Cannot parse URL: ${response.dataUrl}`) // eslint-disable-line
-        data = []
-      }
-    }
-
-    if (response.dataDescription) {
-      data = transform.autoStandardize(data)
-      data = transform.developerStandardize(data, response.dataDescription)
-    }
-
-    data = handleRankByValue(data, response)
-    return data
   }
 
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
@@ -339,30 +204,10 @@ const CdcChart = ({
 
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {} as Runtime
-    newConfig.runtime.series = newConfig.dynamicSeries ? [] : _.cloneDeep(newConfig.series)
+    newConfig.runtime.series = _.cloneDeep(newConfig.series)
     newConfig.runtime.seriesLabels = {}
     newConfig.runtime.seriesLabelsAll = []
     newConfig.runtime.originalXAxis = newConfig.xAxis
-
-    if (newConfig.dynamicSeries) {
-      let finalData = dataOverride || newConfig.formattedData || newConfig.data
-      if (finalData?.length) {
-        Object.keys(finalData[0]).forEach(seriesKey => {
-          if (
-            seriesKey !== newConfig.xAxis.dataKey &&
-            (!newConfig.filters || newConfig.filters.filter(filter => filter.columnName === seriesKey).length === 0) &&
-            (!newConfig.columns || Object.keys(newConfig.columns).indexOf(seriesKey) === -1)
-          ) {
-            newConfig.runtime.series.push({
-              dataKey: seriesKey,
-              type: newConfig.dynamicSeriesType,
-              lineType: newConfig.dynamicSeriesLineType,
-              tooltip: true
-            })
-          }
-        })
-      }
-    }
 
     if (newConfig.visualizationType === 'Pie') {
       newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey])
@@ -518,16 +363,29 @@ const CdcChart = ({
   }, []) // eslint-disable-line
 
   // Load data when component first mounts
+
+  const prepareData = (config, data) => {
+    if (config.dataDescription) {
+      data = transform.autoStandardize(data)
+      data = transform.developerStandardize(data, config.dataDescription)
+    }
+
+    data = handleRankByValue(data, config)
+
+    return data
+  }
   useEffect(() => {
     const load = async () => {
       try {
-        const loadedConfig = await loadConfig(configObj, configUrl)
-        const data = await loadData(loadedConfig)
-        if (data && loadedConfig) {
-          const preparedConfig = await prepareConfig(loadedConfig, data)
-          setStateData(data)
-          setExcludedData(data)
-          updateConfig(preparedConfig, data)
+        const data = configObj.data
+        if (configObj.data && configObj) {
+          const preparedConfig = await prepareConfig(configObj, data)
+          const preparedData = prepareData(configObj, data)
+
+          setStateData(preparedData)
+          setExcludedData(preparedData)
+          updateConfig(preparedConfig, preparedData)
+          setFilteredData(filterVizData(config.filters, data))
         }
       } catch (err) {
         console.error('Could not Load!')
@@ -536,10 +394,6 @@ const CdcChart = ({
 
     load()
   }, [configObj?.data?.length ? configObj.data : null])
-
-  useEffect(() => {
-    reloadURLData()
-  }, [JSON.stringify(config.filters)])
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.
@@ -599,19 +453,6 @@ const CdcChart = ({
     }
   }, [externalFilters]) // eslint-disable-line
 
-  // This will set the bump chart's default scaling type to date-time
-  useEffect(() => {
-    if (['Bump Chart'].includes(config.visualizationType)) {
-      setConfig({
-        ...config,
-        xAxis: {
-          ...config.xAxis,
-          type: 'date-time'
-        }
-      })
-    }
-  }, [config.visualizationType])
-
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (stateData && config.xAxis && config.runtime?.seriesKeys) {
@@ -627,47 +468,16 @@ const CdcChart = ({
   }, [config, stateData]) // eslint-disable-line
 
   // Called on legend click, highlights/unhighlights the data series with the given label
-  const highlight = (label: Label) => {
-    // If we're highlighting all the series, reset them
+  const highlight = (label: Label): void => {
     if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && config.visualizationType !== 'Forecasting') {
-      handleShowAll()
-      return
+      return handleShowAll()
     }
 
-    const newSeriesHighlight = [...seriesHighlight]
+    const newHighlight = _.findKey(config.runtime.seriesLabels, v => v === label.datum) || label.datum
 
-    let newHighlight = label.datum
-    if (config.runtime.seriesLabels) {
-      config.runtime.seriesKeys.forEach(key => {
-        if (config.runtime.seriesLabels[key] === label.datum) {
-          newHighlight = key
-        }
-      })
-    }
-
-    if (newSeriesHighlight.indexOf(newHighlight) !== -1) {
-      newSeriesHighlight.splice(newSeriesHighlight.indexOf(newHighlight), 1)
-    } else {
-      newSeriesHighlight.push(newHighlight)
-    }
-
-    /**
-     * pushDataKeyBySeriesName
-     * - pushes series.dataKey into the series highlight based on the found series.name
-     * @param {String} value
-     */
-    // const pushDataKeyBySeriesName = value => {
-    //   let matchingSeries = config.series.filter(series => series.name === value.text)
-    //   if (matchingSeries?.length > 0) {
-    //     newSeriesHighlight.push(matchingSeries[0].dataKey)
-    //   }
-    // }
-
-    // pushDataKeyBySeriesName(label)
-
+    const newSeriesHighlight = _.xor(seriesHighlight, [newHighlight])
     setSeriesHighlight(newSeriesHighlight)
   }
-
   // Called on reset button click, unhighlights all data series
   const handleShowAll = () => {
     try {
@@ -1171,7 +981,6 @@ const CdcChart = ({
                     runtimeData={getTableRuntimeData()}
                     expandDataTable={config.table.expanded}
                     columns={config.columns}
-                    defaultSortBy={dataTableDefaultSortBy}
                     displayGeoName={name => name}
                     applyLegendToRow={applyLegendToRow}
                     tableTitle={config.table.label}

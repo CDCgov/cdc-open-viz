@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-import CdcChart from './CdcChart'
+import CdcChart from './CdcChartWrapper'
 import './coreStyles_chart.scss'
 
 import '@cdc/core/styles/cove-main.scss'
