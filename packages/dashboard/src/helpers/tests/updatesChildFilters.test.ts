@@ -17,7 +17,7 @@ describe('updateChildFilters', () => {
         active: '',
         key: 'Child Filter',
         parents: 'Parent Filter',
-        values: ['Deer', 'Adams', 'Sally', 'Gorman', 'Roberts']
+        values: ['Deer', 'Roberts']
       }
     ] as SharedFilter[]
     const data = {
