@@ -78,6 +78,7 @@ import useTooltip from './hooks/useTooltip'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import { getGeoFillColor } from './helpers/colors'
+import { SubGrouping } from '@cdc/core/types/VizFilter'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -358,7 +359,7 @@ const CdcMap = ({
   })
 
   // eslint-disable-next-line
-  const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
+  const generateRuntimeLegend = useCallback((obj, runtimeFilters, hash) => {
     const newLegendMemo = new Map() // Reset memoization
     const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
     let primaryCol = obj.columns.primary.name,
@@ -373,7 +374,7 @@ const CdcMap = ({
       result.fromHash = hash
     }
 
-    result.runtimeDataHash = runtimeData.fromHash
+    result.runtimeDataHash = runtimeFilters?.fromHash
 
     // Unified will based the legend off ALL of the data maps received. Otherwise, it will use
     let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData)
@@ -810,7 +811,7 @@ const CdcMap = ({
     legendMemo.current = newLegendMemo
 
     if (state.general.geoType === 'world') {
-      const runtimeDataKeys = Object.keys(runtimeData)
+      const runtimeDataKeys = Object.keys(runtimeFilters)
       const isCountriesWithNoDataState =
         obj.data === undefined ? false : !countryKeys.every(countryKey => runtimeDataKeys.includes(countryKey))
 
@@ -920,6 +921,7 @@ const CdcMap = ({
         newFilter.active = active ?? values[0] // Default to first found value
         newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
         newFilter.showDropdown = showDropdown
+        newFilter.subGrouping = obj.filters[idx].subGrouping || {}
 
         filters.push(newFilter)
       }
@@ -968,17 +970,23 @@ const CdcMap = ({
         // Filters
         if (filters?.length) {
           for (let i = 0; i < filters.length; i++) {
-            const { columnName, active, type } = filters[i]
-            if (type !== 'url' && String(row[columnName]) !== String(active)) return false // Bail out, not part of filter
+            const { columnName, active, type, filterStyle, subGrouping } = filters[i]
+            const isDataFilter = type !== 'url'
+            const matchingValue = String(active) === String(row[columnName]) // Group
+            if (isDataFilter && !matchingValue) return false // Bail out, data doesn't match the filter selection
+            if (filterStyle == 'nested-dropdown') {
+              const matchingSubValue = String(row[subGrouping?.columnName]) === String(subGrouping?.active)
+              if (subGrouping?.active && !matchingSubValue) {
+                return false // Bail out, data doesn't match the subgroup selection
+              }
+            }
           }
         }
-
         // Don't add additional rows with same UID
-        if (undefined === result[row.uid]) {
+        if (result[row.uid] === undefined) {
           result[row.uid] = row
         }
       })
-
       return result
     } catch (e) {
       console.error('COVE: ', e) // eslint-disable-line
@@ -1593,12 +1601,12 @@ const CdcMap = ({
     })
 
     // Data
-    if (hashData !== runtimeData.fromHash && state.data?.fromColumn) {
+    if (hashData !== runtimeData?.fromHash && state.data?.fromColumn) {
       const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
 
       setRuntimeData(newRuntimeData)
     } else {
-      if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
+      if (hashLegend !== runtimeLegend?.fromHash && undefined === runtimeData.init) {
         const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
         setRuntimeLegend(legend)
       }

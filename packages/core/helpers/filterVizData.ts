@@ -36,9 +36,9 @@ export const filterVizData = (filters: Filter[], data) => {
         }
         if (filter.filterStyle === 'nested-dropdown' && filter.subGrouping && add === true) {
           const subGroupActive = filter.subGrouping.active
-          const value = row[filter.subGrouping.columnName]
+          const subGroupValue = row[filter.subGrouping.columnName]
           if (subGroupActive === undefined) return
-          if (value != subGroupActive) {
+          if (subGroupValue != subGroupActive) {
             add = false
           }
         }
