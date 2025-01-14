@@ -1818,7 +1818,6 @@ const CdcMap = ({
                 <Filters
                   config={state}
                   setConfig={setState}
-                  excludedData={state.data}
                   filteredData={runtimeFilters}
                   setFilteredData={setRuntimeFilters}
                   dimensions={dimensions}
