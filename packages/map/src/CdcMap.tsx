@@ -980,10 +980,10 @@ const CdcMap = ({
                 return false // Bail out, data doesn't match the subgroup selection
               }
             }
-            // Don't add additional rows with same UID
-            if (result[row.uid] === undefined) {
-              result[row.uid] = row
-            }
+          }
+          // Don't add additional rows with same UID
+          if (result[row.uid] === undefined) {
+            result[row.uid] = row
           }
         }
       })
