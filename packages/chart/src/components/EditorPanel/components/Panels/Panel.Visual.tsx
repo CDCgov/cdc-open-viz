@@ -138,6 +138,21 @@ const PanelVisual: FC<PanelProps> = props => {
         )}
         {visHasBarBorders() && (
           <Select
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon
+                    display='question'
+                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                  />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>
+                  Recommended set to display for Section 508 compliance.
+                  </p>
+                </Tooltip.Content>
+              </Tooltip>
+            }
             value={config.barHasBorder}
             fieldName='barHasBorder'
             label='Bar Borders'
