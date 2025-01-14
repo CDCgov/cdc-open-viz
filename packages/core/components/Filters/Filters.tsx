@@ -125,11 +125,11 @@ export const useFilters = props => {
         queryParams[newFilter?.subGrouping?.setByQueryParameter] = newFilter.subGrouping.active
         updateQueryString(queryParams)
       }
-      setFilteredData(newFilters[index])
+      setFilteredData(newFilters)
     }
 
     if (!visualizationConfig.dynamicSeries) {
-      newFilters = addValuesToFilters(newFilters, excludedData || data)
+      newFilters = addValuesToFilters(newFilters, excludedData)
       setConfig({
         ...visualizationConfig,
         filters: newFilters
@@ -143,7 +143,7 @@ export const useFilters = props => {
 
     // If we're on a chart and not using the apply button
     if (!standaloneMap && visualizationConfig.filterBehavior === 'Filter Change') {
-      const newFilteredData = filterVizData(newFilters, excludedData || data)
+      const newFilteredData = filterVizData(newFilters, excludedData)
       setFilteredData(newFilteredData)
 
       if (visualizationConfig.dynamicSeries) {
@@ -207,9 +207,9 @@ export const useFilters = props => {
     setConfig({ ...visualizationConfig, filters: newFilters })
 
     if (standaloneMap) {
-      setFilteredData(newFilters, excludedData || data)
+      setFilteredData(newFilters, excludedData)
     } else {
-      setFilteredData(filterVizData(newFilters, excludedData || data))
+      setFilteredData(filterVizData(newFilters, excludedData))
     }
 
     setShowApplyButton(false)
@@ -241,9 +241,9 @@ export const useFilters = props => {
     setConfig({ ...visualizationConfig, filters: newFilters })
 
     if (standaloneMap) {
-      setFilteredData(newFilters, excludedData || data)
+      setFilteredData(newFilters, excludedData)
     } else {
-      setFilteredData(filterVizData(newFilters, excludedData || data))
+      setFilteredData(filterVizData(newFilters, excludedData))
     }
   }
 
@@ -274,8 +274,6 @@ type FilterProps = {
   setFilteredData: Function
   // updating function for setting fitlerBehavior
   setConfig: Function
-  // exclusions
-  exclusions: any[]
   standaloneMap?: boolean
 }
 
@@ -465,8 +463,8 @@ const Filters = (props: FilterProps) => {
             )}
             {filterStyle === 'nested-dropdown' && (
               <NestedDropdown
-                activeGroup={(singleFilter.active as string) || (singleFilter.queuedActive || data)[0]}
-                activeSubGroup={(singleFilter.subGrouping?.active as string) || (singleFilter.queuedActive || data)[1]}
+                activeGroup={(singleFilter.active as string) || (singleFilter.queuedActive || [])[0]}
+                activeSubGroup={(singleFilter.subGrouping?.active as string) || (singleFilter.queuedActive || [])[1]}
                 filterIndex={outerIndex}
                 options={getNestedOptions(singleFilter)}
                 listLabel={label}

@@ -275,7 +275,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 )}
                 {legend.dynamicDescription === true &&
                   runtimeFilters.map((filter, idx) => {
-                    const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
+                    const lookupStr = `${idx},${filter.values?.indexOf(String(filter.active))}`
 
                     // Do we have a custom description for this?
                     const desc = legend.descriptions[lookupStr] || ''

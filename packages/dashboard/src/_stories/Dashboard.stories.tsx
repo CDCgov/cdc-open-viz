@@ -35,7 +35,7 @@ type Story = StoryObj<typeof Dashboard>
 export const Example_1: Story = {
   args: {
     config: ExampleConfig_1,
-    isEditor: true
+    isEditor: false
   }
 }
 

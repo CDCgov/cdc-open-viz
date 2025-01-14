@@ -49,7 +49,6 @@ import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 const EditorPanel = ({ columnsRequiredChecker }) => {
   // prettier-ignore
   const {
-    columnsInData = [],
     changeFilterActive,
     isDashboard,
     isDebug,
