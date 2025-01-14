@@ -921,6 +921,7 @@ const CdcMap = ({
         newFilter.active = active ?? values[0] // Default to first found value
         newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
         newFilter.showDropdown = showDropdown
+        newFilter.subGrouping = obj.filters[idx].subGrouping || {}
 
         filters.push(newFilter)
       }
@@ -969,18 +970,20 @@ const CdcMap = ({
         // Filters
         if (filters?.length) {
           for (let i = 0; i < filters.length; i++) {
-            const { columnName, active, type } = filters[i]
-            if (type !== 'url' && !String(active).includes(String(row[columnName]))) return false // Bail out, not part of filter
-          }
-        }
-
-        // Don't add additional rows with same UID
-        if (result[row.uid] === undefined) {
-          const isNotNestedDropdown = runtimeFilters[0]?.filterStyle !== 'nested-dropdown'
-          const subGrouping = state.filters[0].subGrouping || ({} as SubGrouping)
-          const rowIsSelected = row[subGrouping.columnName] == subGrouping.active
-          if (isNotNestedDropdown || rowIsSelected) {
-            result[row.uid] = row
+            const { columnName, active, type, filterStyle, subGrouping } = filters[i]
+            const isDataFilter = type !== 'url'
+            const matchingValue = String(active) === String(row[columnName]) // Group
+            if (isDataFilter && !matchingValue) return false // Bail out, data doesn't match the filter selection
+            if (filterStyle == 'nested-dropdown') {
+              const matchingSubValue = String(row[subGrouping?.columnName]) === String(subGrouping?.active)
+              if (subGrouping?.active && !matchingSubValue) {
+                return false // Bail out, data doesn't match the subgroup selection
+              }
+            }
+            // Don't add additional rows with same UID
+            if (result[row.uid] === undefined) {
+              result[row.uid] = row
+            }
           }
         }
       })
@@ -1598,13 +1601,12 @@ const CdcMap = ({
     })
 
     // Data
-    if (hashData !== runtimeData.fromHash && state.data?.fromColumn) {
-      const filtersForRuntimeData = runtimeFilters.length > 0 ? runtimeFilters : filters
-      const newRuntimeData = generateRuntimeData(state, filtersForRuntimeData, hashData)
+    if (hashData !== runtimeData?.fromHash && state.data?.fromColumn) {
+      const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
 
       setRuntimeData(newRuntimeData)
     } else {
-      if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
+      if (hashLegend !== runtimeLegend?.fromHash && undefined === runtimeData.init) {
         const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
         setRuntimeLegend(legend)
       }
