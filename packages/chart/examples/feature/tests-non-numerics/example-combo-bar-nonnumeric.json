@@ -124,7 +124,7 @@
     "hideSuppressedLabels": false,
     "hideSuppressionLink": false,
     "seriesHighlight": [],
-    "style": "circles",
+    "style": "lines",
     "subStyle": "linear blocks",
     "shape": "circle",
     "tickRotation": "",
@@ -132,7 +132,8 @@
       "side": false,
       "topBottom": true
     },
-    "position": "right"
+    "position": "right",
+    "hasShape": true
   },
   "exclusions": {
     "active": false,
@@ -272,24 +273,6 @@
   "visualizationType": "Line",
   "series": [
     {
-      "dataKey": "Monthly-Goal",
-      "type": "dashed-sm",
-      "axis": "Left",
-      "tooltip": true
-    },
-    {
-      "dataKey": "Data 1",
-      "type": "Line",
-      "axis": "Left",
-      "tooltip": true
-    },
-    {
-      "dataKey": "Data 2",
-      "type": "Line",
-      "axis": "Left",
-      "tooltip": true
-    },
-    {
       "dataKey": "Data 3",
       "type": "Line",
       "axis": "Left",
@@ -320,7 +303,26 @@
     "showZeroValueData": true,
     "hideNullValue": true
   },
-  "preliminaryData": [],
+  "preliminaryData": [
+    {
+      "type": "effect",
+      "seriesKey": "Data 4",
+      "label": "Suppressed",
+      "column": "Data 3",
+      "value": "120",
+      "style": "Open Circles",
+      "displayTooltip": true,
+      "displayLegend": true,
+      "displayTable": true,
+      "symbol": "",
+      "iconCode": "",
+      "lineCode": "◯",
+      "hideBarSymbol": false,
+      "hideLineStyle": false,
+      "circleSize": "7",
+      "displayGray": true
+    }
+  ],
   "boxplot": {
     "plots": [],
     "borders": "true",

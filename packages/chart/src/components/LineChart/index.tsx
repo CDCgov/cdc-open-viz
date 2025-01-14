@@ -366,8 +366,9 @@ const LineChart = (props: LineChartProps) => {
                     left={xPos(item.data)}
                     top={yScale(Number(getYAxisData(item.data, seriesKey)))}
                     size={Number(item.size) * 50}
+                    strokeWidth={3}
                     stroke={colorScale(seriesKey)}
-                    fill={colorScale(seriesKey)}
+                    fill={item.isFilled ? colorScale(seriesKey) : '#fff'}
                     index={isStandardShape ? index : 0}
                   />
                 )

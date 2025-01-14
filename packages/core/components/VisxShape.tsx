@@ -20,9 +20,20 @@ interface VisxShapeProps {
   index: number
   stroke: string
   key: string | number
+  strokeWidth?: number
 }
 
-const VisxShape: React.FC<VisxShapeProps> = ({ fill, size, left, top, display, index, stroke, key }) => {
+const VisxShape: React.FC<VisxShapeProps> = ({
+  fill,
+  size,
+  left,
+  top,
+  display,
+  index,
+  stroke,
+  key,
+  strokeWidth = 0
+}) => {
   if (!display) {
     return <g></g>
   }
@@ -39,7 +50,7 @@ const VisxShape: React.FC<VisxShapeProps> = ({ fill, size, left, top, display, i
           &#x2B1F;
         </Text>
       ) : (
-        <Shape strokeWidth={0} fill={fill} stroke={stroke} size={size} />
+        <Shape strokeWidth={strokeWidth} fill={fill} stroke={stroke} size={size} />
       )}
     </g>
   )
