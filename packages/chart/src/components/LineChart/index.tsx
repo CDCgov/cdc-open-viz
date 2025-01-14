@@ -5,10 +5,10 @@ import * as allCurves from '@visx/curve'
 import { Group } from '@visx/group'
 import { LinePath, Bar, SplitLinePath, AreaClosed } from '@visx/shape'
 import { Text } from '@visx/text'
+import { GlyphDiamond, GlyphCircle, GlyphSquare, GlyphTriangle, GlyphCross } from '@visx/glyph'
 
 // CDC core components
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import VisxShape from '@cdc/core/components/VisxShape'
 
 // Local context and hooks
 import ConfigContext from '../../ConfigContext'
@@ -53,6 +53,14 @@ const LineChart = (props: LineChartProps) => {
   if (brushConfig.data.length > 0 && config.brush?.active) {
     data = clean(brushConfig.data)
     tableD = clean(brushConfig.data)
+  }
+  const glyphs = {
+    0: GlyphCircle,
+    1: GlyphSquare,
+    2: GlyphTriangle,
+    3: GlyphDiamond,
+    4: GlyphTriangle,
+    5: GlyphCross
   }
 
   const xPos = d => {
@@ -356,21 +364,39 @@ const LineChart = (props: LineChartProps) => {
               )}
 
               {/* circles for preliminaryData data */}
-
               {circleData.map((item, i) => {
-                let isStandardShape = config.visual.lineDatapointSymbol === 'standard'
+                const isStandardShape = config.visual.lineDatapointSymbol === 'standard'
+                const indexOfPentagonShape = 6
+                const Shape = glyphs[isStandardShape ? index : 0] || (() => <></>)
+                const left = xPos(item.data)
+                const top = yScale(Number(getYAxisData(item.data, seriesKey)))
+                const isReversedTriangle = isStandardShape && index === 4 // Flip logic
+                const transform = `translate(${left}, ${top}) ${isReversedTriangle ? 'rotate(180)' : ''}`
+
                 return (
-                  <VisxShape
-                    key={i}
-                    display={true}
-                    left={xPos(item.data)}
-                    top={yScale(Number(getYAxisData(item.data, seriesKey)))}
-                    size={Number(item.size) * 50}
-                    strokeWidth={3}
-                    stroke={colorScale(seriesKey)}
-                    fill={item.isFilled ? colorScale(seriesKey) : '#fff'}
-                    index={isStandardShape ? index : 0}
-                  />
+                  <g key={i} transform={transform}>
+                    {isStandardShape && index === indexOfPentagonShape ? (
+                      <Text
+                        textAnchor='middle'
+                        fill={item.isFilled ? colorScale(seriesKey) : '#fff'}
+                        fontSize={Number(item.size) * 5}
+                        strokeWidth={2}
+                        verticalAnchor='middle'
+                        fontSizeAdjust={3}
+                        stroke={colorScale(seriesKey)}
+                      >
+                        &#x2B1F; {/* Render Filled Pentagon */}
+                      </Text>
+                    ) : (
+                      <Shape
+                        size={Number(item.size) * 50}
+                        strokeWidth={3}
+                        stroke={colorScale(seriesKey)}
+                        fill={item.isFilled ? colorScale(seriesKey) : '#fff'}
+                        index={isStandardShape ? index : 0}
+                      />
+                    )}
+                  </g>
                 )
               })}
 

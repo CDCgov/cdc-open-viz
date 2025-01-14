@@ -1,7 +1,18 @@
 import React from 'react'
 import chroma from 'chroma-js'
 import { type ChartConfig } from '../../../types/ChartConfig'
-import VisxShape from '@cdc/core/components/VisxShape'
+
+import { GlyphDiamond, GlyphCircle, GlyphSquare, GlyphTriangle, GlyphCross } from '@visx/glyph'
+import { Text } from '@visx/text'
+
+const glyphs = {
+  0: GlyphCircle,
+  1: GlyphSquare,
+  2: GlyphTriangle,
+  3: GlyphDiamond,
+  4: GlyphTriangle,
+  5: GlyphCross
+}
 
 type LineChartShapeProps = {
   config: ChartConfig
@@ -45,6 +56,7 @@ const LineChartShape = (props: LineChartShapeProps) => {
 
   // Get the filtered series from config
   const filtered = config?.runtime?.series.find(s => s.dataKey === seriesKey)
+  const Shape = glyphs[dataIndex] || <></>
 
   const getColor = (displayArea: boolean, colorScale: Function, config: ChartConfig, seriesKey: string): string => {
     const seriesLabels = config.runtime.seriesLabels || []
@@ -97,33 +109,51 @@ const LineChartShape = (props: LineChartShapeProps) => {
         return <></>
       }
 
+      const indexOfPentagonShape = 6 // Index for the pentagon shape
+      const maximumShapeAmount = 7 // Maximum number of shapes
+      const isReversedTriangle = dataIndex === 4 // Example condition for flipping
+      const left = getXPos(hoveredXValue)
+      const top = hoveredSeriesAxis === 'right' ? yScaleRight(hoveredSeriesValue) : yScale(hoveredSeriesValue)
+      const transform = `translate(${left}, ${top}) ${isReversedTriangle ? 'rotate(180)' : ''}`
+
       return (
-        <VisxShape
-          display={config.visual.lineDatapointSymbol === 'standard' && dataIndex !== 5}
-          left={getXPos(hoveredXValue)}
-          top={hoveredSeriesAxis === 'right' ? yScaleRight(hoveredSeriesValue) : yScale(hoveredSeriesValue)}
-          size={45}
-          fill={color}
-          stroke={color}
-          index={dataIndex}
-          key={`line-chart-circle--${JSON.stringify(tooltipItem)}--${index}`}
-        />
+        <>
+          {dataIndex < maximumShapeAmount && (
+            <g transform={transform}>
+              {dataIndex === indexOfPentagonShape ? (
+                <Text fill={color} verticalAnchor='middle' textAnchor='middle' fontSize={30 / 4}>
+                  &#x2B1F; {/* Render Filled Pentagon */}
+                </Text>
+              ) : (
+                <Shape strokeWidth={0} top={0} left={0} fill={color} stroke={color} size={30} />
+              )}
+            </g>
+          )}
+        </>
       )
     })
   }
 
   if (config.lineDatapointStyle === 'always show') {
+    const indexOfPentagonShape = 6 // Index for the pentagon shape
+    const maximumShapeAmount = 7 // Maximum number of shapes
+    const isReversedTriangle = dataIndex === 4 // Example condition for flipping
+    const transform = `translate(${cx}, ${cy}) ${isReversedTriangle ? 'rotate(180)' : ''}`
+
     return (
-      <VisxShape
-        display={config.visual.lineDatapointSymbol === 'standard' && dataIndex < 7}
-        left={cx}
-        top={cy}
-        size={45}
-        fill={color}
-        stroke={color}
-        index={dataIndex}
-        key={dataIndex}
-      />
+      <>
+        {dataIndex < maximumShapeAmount && (
+          <g transform={transform}>
+            {dataIndex === indexOfPentagonShape ? (
+              <Text fill={color} verticalAnchor='middle' textAnchor='middle' fontSize={30 / 4}>
+                &#x2B1F; {/* Render Filled Pentagon */}
+              </Text>
+            ) : (
+              <Shape strokeWidth={0} top={0} left={0} fill={color} stroke={color} size={30} />
+            )}
+          </g>
+        )}
+      </>
     )
   }
 }
