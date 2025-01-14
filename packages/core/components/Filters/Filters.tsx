@@ -125,7 +125,7 @@ export const useFilters = props => {
         queryParams[newFilter?.subGrouping?.setByQueryParameter] = newFilter.subGrouping.active
         updateQueryString(queryParams)
       }
-      setFilteredData(newFilters[index])
+      setFilteredData(newFilters)
     }
 
     if (!visualizationConfig.dynamicSeries) {
