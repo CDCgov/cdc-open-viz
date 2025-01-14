@@ -136,7 +136,7 @@ const LineChartShape = (props: LineChartShapeProps) => {
 
   if (config.lineDatapointStyle === 'always show') {
     const indexOfPentagonShape = 6 // Index for the pentagon shape
-    const maximumShapeAmount = 7 // Maximum number of shapes
+    const maximumShapeAmount = config.visual.maximumShapeAmount
     const isReversedTriangle = dataIndex === 4 // Example condition for flipping
     const transform = `translate(${cx}, ${cy}) ${isReversedTriangle ? 'rotate(180)' : ''}`
 

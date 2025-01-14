@@ -188,9 +188,10 @@ const PanelVisual: FC<PanelProps> = props => {
               updateField={updateField}
               options={['none', 'standard']}
             />
-            {config.series.length > 7 && config.visual.lineDatapointSymbol === 'standard' && (
-              <small className='text-danger'>Standard only supports up to 7 data points</small>
-            )}
+            {config.series.length > config.visual.maximumShapeAmount &&
+              config.visual.lineDatapointSymbol === 'standard' && (
+                <small className='text-danger'>Standard only supports up to 7 data points</small>
+              )}
 
             <Select
               value={config.lineDatapointStyle}

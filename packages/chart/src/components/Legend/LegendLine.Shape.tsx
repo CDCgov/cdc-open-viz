@@ -20,7 +20,7 @@ const LegendLineShape = props => {
   const isReversedTriangle = index === 4
   const transform = `translate(${15}, ${3}) ${isReversedTriangle ? 'rotate(180)' : ''}`
   const indexOfPentagonShape = 6
-  const maximumShapeAmount = 7
+  const maximumShapeAmount = config.visual.maximumShapeAmount
 
   return (
     <svg width={30} height={10} style={{ overflow: 'visible' }} className='me-2'>
