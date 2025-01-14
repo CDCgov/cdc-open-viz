@@ -23,7 +23,7 @@ import Territory from './Territory'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { MapContext } from '../../../types/MapContext'
-import { checkColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { checkColorContrast, getContrastColor, getOutlinedContrastColors } from '@cdc/core/helpers/cove/accessibility'
 import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { titleCase } from '../../../helpers/titleCase'
@@ -520,13 +520,11 @@ const UsaMap = () => {
 
     if (undefined === abbr) return null
 
-    let textColor = getContrastColor('#FFF', bgColor)
-
-    // always make HI black since it is off to the side
+    // HI background is always white since it is off to the side
     if (abbr === 'US-HI' && !general.displayAsHex) {
-      textColor = '#000'
+      bgColor = '#FFF'
     }
-    const textStrokeColor = getContrastColor('#000', textColor)
+    let outlinedTextColors = getOutlinedContrastColors(bgColor)
 
     let x = 0,
       y = hexMap.type === 'shapes' && general.displayAsHex ? -10 : 5
@@ -546,8 +544,8 @@ const UsaMap = () => {
             fontSize={14}
             strokeWidth='2'
             paintOrder='stroke'
-            stroke={textStrokeColor}
-            style={{ fill: textColor }}
+            stroke={outlinedTextColors.strokeColor}
+            style={{ fill: outlinedTextColors.textColor }}
             textAnchor='middle'
           >
             {abbr.substring(3)}
@@ -572,9 +570,9 @@ const UsaMap = () => {
           x={4}
           strokeWidth='2'
           paintOrder='stroke'
-          stroke={textStrokeColor}
+          stroke={outlinedTextColors.strokeColor}
           fontSize={13}
-          style={{ fill: textColor }}
+          style={{ fill: outlinedTextColors.textColor }}
           alignmentBaseline='middle'
           transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
         >

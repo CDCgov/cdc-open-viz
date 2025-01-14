@@ -34,3 +34,19 @@ export const getColorContrast = (color1: string, color2: string) => {
   if (!chroma.valid(color1) || !chroma.valid(color2)) return false
   return chroma.contrast(color1, color2)
 }
+
+type OutlinedTextColors = {
+  textColor: string
+  strokeColor: string
+}
+
+export const getOutlinedContrastColors = (bgColor: string): OutlinedTextColors => {
+  let grayColor = '#1c1d1f' // "Gray Cool 90"
+  let whiteColor = '#ffffff'
+
+  if (!bgColor) return { textColor: grayColor, strokeColor: whiteColor }
+  if (chroma.contrast(grayColor, bgColor) < WCAG_TEXT_CONTRAST_RATIO) {
+    return { textColor: whiteColor, strokeColor: grayColor }
+  }
+  return { textColor: grayColor, strokeColor: whiteColor }
+}
