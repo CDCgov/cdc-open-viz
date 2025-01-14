@@ -21,7 +21,7 @@ composer.lock
 *.swo
 
 # Project Specific
-/private
+/_stories/private
 /.storybook_build
 /storybook-static
 /packages/**/examples/private
