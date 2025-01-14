@@ -928,7 +928,7 @@ const CdcMap = ({
 
   // Calculates what's going to be displayed on the map and data table at render.
   // eslint-disable-next-line
-  const generateRuntimeData = (obj, filters, hash, test) => {
+  const generateRuntimeData = useCallback((obj, filters, hash, test) => {
     try {
       const result = {}
 
@@ -987,7 +987,7 @@ const CdcMap = ({
     } catch (e) {
       console.error('COVE: ', e) // eslint-disable-line
     }
-  }
+  })
 
   const outerContainerRef = useCallback(node => {
     if (node !== null) {
