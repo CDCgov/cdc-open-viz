@@ -526,6 +526,7 @@ const UsaMap = () => {
     if (abbr === 'US-HI' && !general.displayAsHex) {
       textColor = '#000'
     }
+    const textStrokeColor = getContrastColor('#000', textColor)
 
     let x = 0,
       y = hexMap.type === 'shapes' && general.displayAsHex ? -10 : 5
@@ -539,7 +540,16 @@ const UsaMap = () => {
     if (undefined === offsets[abbr] || isHex) {
       return (
         <g transform={`translate(${centroid})`} tabIndex={-1}>
-          <text x={x} y={y} fontSize={14} strokeWidth='0' style={{ fill: textColor }} textAnchor='middle'>
+          <text
+            x={x}
+            y={y}
+            fontSize={14}
+            strokeWidth='2'
+            paintOrder='stroke'
+            stroke={textStrokeColor}
+            style={{ fill: textColor }}
+            textAnchor='middle'
+          >
             {abbr.substring(3)}
           </text>
         </g>
@@ -560,9 +570,11 @@ const UsaMap = () => {
         />
         <text
           x={4}
-          strokeWidth='0'
+          strokeWidth='2'
+          paintOrder='stroke'
+          stroke={textStrokeColor}
           fontSize={13}
-          style={{ fill: '#202020' }}
+          style={{ fill: textColor }}
           alignmentBaseline='middle'
           transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
         >
