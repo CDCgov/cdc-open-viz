@@ -119,10 +119,17 @@ const CdcMap = ({
   const [loading, setLoading] = useState(true)
   const [displayPanel, setDisplayPanel] = useState(true)
   const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
-  const [topoData, setTopoData] = useState<Topology | {}>({})
+  const [topoData, setTopoData] = useState<{}>({})
   const [runtimeFilters, setRuntimeFilters] = useState([])
-  const [runtimeLegend, setRuntimeLegend] = useState([])
   const [runtimeData, setRuntimeData] = useState({ init: true })
+  const _setRuntimeData = (data: any) => {
+    if (config) {
+      setRuntimeData(data)
+    } else {
+      setRuntimeFilters(data)
+    }
+  }
+  const [runtimeLegend, setRuntimeLegend] = useState([])
   const [stateToShow, setStateToShow] = useState(null)
   const [modal, setModal] = useState(null)
   const [accessibleStatus, setAccessibleStatus] = useState('')
@@ -876,32 +883,21 @@ const CdcMap = ({
       ) => {
         let newFilter = runtimeFilters[idx]
 
-        const sortAsc = (a, b) => {
-          return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
-        }
-
-        const sortDesc = (a, b) => {
-          return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
+        const sort = (a, b) => {
+          const asc = obj.filters[idx].order !== 'desc'
+          return String(asc ? a : b).localeCompare(String(asc ? b : a), 'en', { numeric: true })
         }
 
         if (type !== 'url') {
           values = getUniqueValues(state.data, columnName)
 
-          if (obj.filters[idx].order === 'asc') {
-            values = values.sort(sortAsc)
-          }
-
-          if (obj.filters[idx].order === 'desc') {
-            values = values.sort(sortDesc)
-          }
-
           if (obj.filters[idx].order === 'cust') {
             if (obj.filters[idx]?.values.length > 0) {
               values = obj.filters[idx].values
             }
+          } else {
+            values = values.sort(sort)
           }
-        } else {
-          values = values
         }
 
         if (undefined === newFilter) {
@@ -1819,7 +1815,7 @@ const CdcMap = ({
                   config={state}
                   setConfig={setState}
                   filteredData={runtimeFilters}
-                  setFilteredData={setRuntimeFilters}
+                  setFilteredData={_setRuntimeData}
                   dimensions={dimensions}
                   standaloneMap={!config}
                 />
