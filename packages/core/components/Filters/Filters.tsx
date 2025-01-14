@@ -274,8 +274,6 @@ type FilterProps = {
   setFilteredData: Function
   // updating function for setting fitlerBehavior
   setConfig: Function
-  // exclusions
-  exclusions: any[]
   standaloneMap?: boolean
 }
 
