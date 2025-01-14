@@ -1,7 +1,7 @@
 /* COPY THIS FILE INTO A FOLDER TO DYNAMICALLY GENERATE STORIES FOR ALL THE CONFIGS */
 /* Creates one story that contains all configs in folder */
 /* RECOMMENDED USE:
-  create a top-level /private with configs or config subfolders and copy this file into it/them
+  create a /_stories/private directory with configs or config subfolders and copy this file into it/them
 */
 
 import React from 'react'
