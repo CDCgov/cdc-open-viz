@@ -7,7 +7,7 @@ interface LegendProps {
   isLegendBottom: boolean
 }
 
-const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom, setHasSuppression }) => {
+const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) => {
   const { preliminaryData, visualizationType, visualizationSubType, legend } = config
 
   const hasOpenCircleEffects = () =>
@@ -104,8 +104,6 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom, setH
     !config.legend.hideSuppressionLink &&
     config.visualizationSubType !== 'stacked' &&
     preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value && (pd?.style || pd.symbol))
-
-  setHasSuppression(shouldShowSuppressedInfo())
 
   return (
     <React.Fragment>

@@ -103,6 +103,7 @@
     "showSuppressedSymbol": true,
     "show": true
   },
+
   "orientation": "vertical",
   "legend": {
     "hide": false,

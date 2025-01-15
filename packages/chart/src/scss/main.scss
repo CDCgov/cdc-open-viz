@@ -50,13 +50,6 @@
   overflow-y: auto;
 }
 
-.d-flex {
-  display: flex;
-}
-.flex-column-reverse {
-  flex-direction: column-reverse;
-}
-
 .cdc-open-viz-module.type-dashboard {
   .cdc-open-viz-module.type-chart.isEditor {
     .cdc-chart-inner-container {
@@ -188,17 +181,6 @@
         grid-template-columns: 1fr 1fr;
       }
 
-      &.vertical-sorted {
-        display: block;
-
-        @include breakpoint(sm) {
-          column-count: 2;
-          column-width: 100%;
-        }
-        column-gap: 1.5em;
-        column-fill: balance;
-      }
-
       &.single-row {
         display: flex;
         flex-direction: row;
@@ -207,6 +189,10 @@
         .legend-item {
           flex-basis: auto;
         }
+      }
+
+      &.double-column.reverse-items div.legend-item:last-child {
+        margin-bottom: 0.2rem !important;
       }
     }
 
@@ -261,10 +247,6 @@
         }
       }
     }
-  }
-
-  .legend-container__inner.flex-column-reverse div.legend-item:last-child {
-    margin-bottom: 0.2rem !important;
   }
 
   .dynamic-legend-list {

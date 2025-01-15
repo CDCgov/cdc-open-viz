@@ -3911,7 +3911,9 @@ const EditorPanel = () => {
                     display={
                       ['bottom', 'top'].includes(config.legend.position) &&
                       !config.legend.hide &&
-                      config.legend.style !== 'gradient'
+                      config.legend.style !== 'gradient' &&
+                      !config.legend.singleRow &&
+                      !config.legend.singleRow
                     }
                     value={config.legend.verticalSorted}
                     section='legend'

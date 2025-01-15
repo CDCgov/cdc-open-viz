@@ -9,7 +9,7 @@ import { getMarginTop, getGradientConfig, getMarginBottom } from './helpers/inde
 import { Label } from '../../types/Label'
 import { ChartConfig, ViewportSize } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
-import { forwardRef, useState } from 'react'
+import { forwardRef } from 'react'
 import LegendSuppression from './Legend.Suppression'
 import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
@@ -50,14 +50,12 @@ const Legend: React.FC<LegendProps> = forwardRef(
     const { innerClasses, containerClasses } = getLegendClasses(config)
     const { runtime, legend } = config
 
-    const [hasSuppression, setHasSuppression] = useState(false)
-
     const isLegendBottom =
       legend?.position === 'bottom' ||
       (isLegendWrapViewport(currentViewport) && !legend.hide && legend?.position !== 'top')
 
     const legendClasses = {
-      marginBottom: getMarginBottom(isLegendBottom, config, hasSuppression),
+      marginBottom: getMarginBottom(isLegendBottom, config),
       marginTop: getMarginTop(isLegendBottom, config)
     }
 
@@ -196,11 +194,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                   })}
                 </div>
 
-                <LegendSuppression
-                  config={config}
-                  isLegendBottom={isLegendBottom}
-                  setHasSuppression={setHasSuppression}
-                />
+                <LegendSuppression config={config} isLegendBottom={isLegendBottom} />
               </>
             )
           }}
