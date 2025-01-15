@@ -41,7 +41,7 @@ const LegendLineShape = props => {
         strokeDasharray={handleLineType(config.series[index]?.type || '')}
       />
 
-      <g transform={transform}>
+      <g display={config.legend.hasShape ? 'block' : 'none'} transform={transform}>
         <Shape fillOpacity={1} fill={label.value} />
       </g>
     </svg>
