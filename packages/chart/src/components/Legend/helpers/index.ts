@@ -20,9 +20,12 @@ export const getMarginTop = (isLegendBottom, config) => {
   }
   return '27px'
 }
-export const getMarginBottom = (isLegendBottom, config, hasSuppression) => {
+export const getMarginBottom = (isLegendBottom, config) => {
   const isLegendTop = config.legend?.position === 'top' && !config.legend.hide
-
+  const hasSuppression =
+    !config.legend.hideSuppressionLink &&
+    config.visualizationSubType !== 'stacked' &&
+    config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value && (pd?.style || pd.symbol))
   let marginBottom = 0
 
   if (isLegendTop) marginBottom = 27

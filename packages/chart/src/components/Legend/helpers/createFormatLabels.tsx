@@ -3,14 +3,25 @@ import { FaStar } from 'react-icons/fa'
 import { Label } from '../../../types/Label'
 import { ColorScale, TransformedData } from '../../../types/ChartContext'
 import { ChartConfig } from '../../../types/ChartConfig'
+import _ from 'lodash'
 
 export const createFormatLabels =
   (config: ChartConfig, tableData: Object[], data: TransformedData[], colorScale: ColorScale) =>
   (defaultLabels: Label[]): Label[] => {
-    const { visualizationType, visualizationSubType, series, runtime } = config
-
-    const reverseLabels = labels =>
-      config.legend.reverseLabelOrder && config.legend?.position === 'bottom' ? labels.reverse() : labels
+    const { visualizationType, visualizationSubType, series, runtime, legend } = config
+    const sortVertical = labels =>
+      legend.verticalSorted
+        ? _.sortBy(_.cloneDeep(labels), label => {
+            const match = label.datum?.match(/-?\d+(\.\d+)?/)
+            return match ? parseFloat(match[0]) : Number.MAX_SAFE_INTEGER
+          })
+        : labels
+    const reverseLabels = labels => {
+      return config.legend.reverseLabelOrder &&
+        (config.legend?.position === 'bottom' || config.legend?.position === 'top')
+        ? sortVertical(labels).reverse()
+        : sortVertical(labels)
+    }
     const colorCode = config.legend?.colorCode
     if (visualizationType === 'Deviation Bar') {
       const [belowColor, aboveColor] = twoColorPalette[config.twoColor.palette]
@@ -98,27 +109,13 @@ export const createFormatLabels =
       return reverseLabels(seriesLabels)
     }
 
-    // DEV-4161: replaceable series name in the legend
-    const hasNewSeriesName = config.series.filter(item => !!item.name).length > 0
-    if (hasNewSeriesName) {
-      //store unique values to Set by colorCode
-      const set = new Set()
-
-      config.series.forEach(d => {
-        set.add(d.name || d.dataKey)
-      })
-
-      // create labels with unique values
-      const uniqueLabels = Array.from(set).map((val, i) => {
-        const newLabel = {
-          datum: val,
-          index: i,
-          text: val,
-          value: colorScale(val)
-        }
-        return newLabel
-      })
-
+    if (config.series.some(item => item.name)) {
+      const uniqueLabels = Array.from(new Set(config.series.map(d => d.name || d.dataKey))).map((val, i) => ({
+        datum: val,
+        index: i,
+        text: val,
+        value: colorScale(val)
+      }))
       return reverseLabels(uniqueLabels)
     }
 

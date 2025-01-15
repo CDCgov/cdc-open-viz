@@ -1,31 +1,49 @@
 import React from 'react'
 import { handleLineType } from '../../helpers/handleLineType'
 import { Line } from '@visx/shape'
-import VisxShape from '@cdc/core/components/VisxShape'
+import { GlyphDiamond, GlyphCircle, GlyphSquare, GlyphTriangle, GlyphCross, Glyph as CustomGlyph } from '@visx/glyph'
+import { Text } from '@visx/text'
+
+// Define glyph shapes
+const Glyphs = [
+  GlyphCircle,
+  GlyphSquare,
+  GlyphTriangle,
+  GlyphDiamond,
+  GlyphTriangle,
+  GlyphCross,
+  ({ fill }: { fill: string }) => (
+    <CustomGlyph>
+      {/* Render Filled Pentagon */}
+      <Text fill={fill} fontSize={14} textAnchor='middle' verticalAnchor='middle'>
+        &#x2B1F;
+      </Text>
+    </CustomGlyph>
+  )
+]
 
 const LegendLineShape = props => {
   const { config, label, index } = props
+  const isReversedTriangle = index === 4
+
+  const Shape =
+    Glyphs[config.visual.lineDatapointSymbol === 'standard' && index < config.visual.maximumShapeAmount ? index : 0]
+  const transform = `translate(${15}, ${3}) ${isReversedTriangle ? 'rotate(180)' : ''}`
 
   return (
     <svg width={30} height={10} style={{ overflow: 'visible' }} className='me-2'>
+      {/* Render line */}
       <Line
         from={{ x: 0, y: 3 }}
         to={{ x: 30, y: 3 }}
         stroke={label.value}
         strokeWidth={2}
-        strokeDasharray={handleLineType(config.series[index]?.type ? config.series[index]?.type : '')}
+        strokeDasharray={handleLineType(config.series[index]?.type || '')}
       />
 
-      <VisxShape
-        index={index}
-        display={config.legend.hasShape && index !== 5}
-        left={15}
-        top={3}
-        key={`legend_shape_${index}`}
-        stroke={label.value}
-        fill={label.value}
-        size={55}
-      />
+      <g display={config.legend.hasShape ? 'block' : 'none'} transform={transform}>
+        <Shape fillOpacity={1} fill={label.value} />
+      </g>
     </svg>
   )
 }
