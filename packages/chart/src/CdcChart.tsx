@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, useRef, useId, useReducer } from 'react'
+import { reducer, initialState } from './store/chart.reducer'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -64,14 +65,14 @@ import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 // Local helpers
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
+import { getChartSubTextClasses, getChartWrapperClasses } from './helpers/getChartClassNames'
 import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
 import { getComboChartConfig } from './helpers/getComboChartConfig'
 import { getExcludedData } from './helpers/getExcludedData'
 import { getColorScale } from './helpers/getColorScale'
+
 // styles
 import './scss/main.scss'
-import { reducer, initialState } from './store/chart.reducer'
-import { getChartSubTextClasses, getChartWrapperClasses } from './helpers/getChartClassNames'
 
 interface CdcChartProps {
   config?: ChartConfig
