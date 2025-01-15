@@ -13,7 +13,7 @@ export default {
   animate: false,
   lineDatapointStyle: 'hover',
   lineDatapointColor: 'Same as Line',
-  barHasBorder: 'false',
+  barHasBorder: 'true',
   isLollipopChart: false,
   lollipopShape: 'circle',
   lollipopColorStyle: 'two-tone',
@@ -188,7 +188,7 @@ export default {
     palette: 'monochrome-1',
     isPaletteReversed: false
   },
-  labels: false,
+  labels: true,
   dataFormat: {
     commas: false,
     prefix: '',
