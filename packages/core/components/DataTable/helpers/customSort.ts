@@ -29,7 +29,7 @@ export const customSort = (a, b, sortBy, config) => {
     const dateA = parseDate(config.xAxis.dateParseFormat, trimmedA)?.getTime()
 
     const dateB = parseDate(config.xAxis.dateParseFormat, trimmedB)?.getTime()
-    console.log(dateA, dateB)
+
     return sortBy.asc ? dateA - dateB : dateB - dateA
   }
   // Check if values are numbers
