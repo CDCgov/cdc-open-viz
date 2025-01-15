@@ -5,7 +5,7 @@ import * as allCurves from '@visx/curve'
 import { Group } from '@visx/group'
 import { LinePath, Bar, SplitLinePath, AreaClosed } from '@visx/shape'
 import { Text } from '@visx/text'
-import { GlyphDiamond, GlyphCircle, GlyphSquare, GlyphTriangle, GlyphCross } from '@visx/glyph'
+import { GlyphDiamond, GlyphCircle, GlyphSquare, GlyphTriangle, GlyphCross, Glyph as CustomGlyph } from '@visx/glyph'
 
 // CDC core components
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -54,14 +54,22 @@ const LineChart = (props: LineChartProps) => {
     data = clean(brushConfig.data)
     tableD = clean(brushConfig.data)
   }
-  const glyphs = {
-    0: GlyphCircle,
-    1: GlyphSquare,
-    2: GlyphTriangle,
-    3: GlyphDiamond,
-    4: GlyphTriangle,
-    5: GlyphCross
-  }
+  const Glyphs = [
+    GlyphCircle,
+    GlyphSquare,
+    GlyphTriangle,
+    GlyphDiamond,
+    GlyphTriangle,
+    GlyphCross,
+    ({ fill }: { fill: string }) => (
+      <CustomGlyph>
+        {/* Render Filled Pentagon */}
+        <Text fill={fill} fontSize={14} textAnchor='middle' verticalAnchor='middle'>
+          &#x2B1F;
+        </Text>
+      </CustomGlyph>
+    )
+  ]
 
   const xPos = d => {
     return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
@@ -142,7 +150,7 @@ const LineChart = (props: LineChartProps) => {
                         </Text>
                       )}
 
-                      {lineDatapointStyle === 'always show' && config.visual.lineDatapointSymbol === 'none' && (
+                      {lineDatapointStyle === 'always show' && (
                         <LineChartCircle
                           mode='ALWAYS_SHOW_POINTS'
                           dataIndex={dataIndex}
@@ -160,12 +168,14 @@ const LineChart = (props: LineChartProps) => {
                           parseDate={parseDate}
                           yScaleRight={yScaleRight}
                           seriesAxis={seriesAxis}
+                          seriesIndex={index}
                           key={`line-circle--${dataIndex}`}
                         />
                       )}
 
                       <LineChartCircle
                         mode='ISOLATED_POINTS'
+                        seriesIndex={index}
                         dataIndex={dataIndex}
                         tableData={tableData}
                         circleData={circleData}
@@ -183,33 +193,14 @@ const LineChart = (props: LineChartProps) => {
                         seriesAxis={seriesAxis}
                         key={`isolated-circle-${dataIndex}`}
                       />
-
-                      {config.visual.lineDatapointSymbol === 'standard' && (
-                        <LineChartShape
-                          tableData={tableData}
-                          dataIndex={index}
-                          d={d}
-                          circleData={circleData}
-                          data={_data}
-                          config={config}
-                          seriesKey={seriesKey}
-                          displayArea={displayArea}
-                          tooltipData={tooltipData}
-                          xScale={xScale}
-                          yScale={yScale}
-                          colorScale={colorScale}
-                          parseDate={parseDate}
-                          yScaleRight={yScaleRight}
-                          seriesAxis={seriesAxis}
-                        />
-                      )}
                     </React.Fragment>
                   )
                 )
               })}
               <>
-                {lineDatapointStyle === 'hover' && config.visual.lineDatapointSymbol === 'none' && (
+                {lineDatapointStyle === 'hover' && (
                   <LineChartCircle
+                    seriesIndex={index}
                     tableData={tableData}
                     dataIndex={0}
                     mode='HOVER_POINTS'
@@ -365,37 +356,22 @@ const LineChart = (props: LineChartProps) => {
 
               {/* circles for preliminaryData data */}
               {circleData.map((item, i) => {
-                const isStandardShape = config.visual.lineDatapointSymbol === 'standard'
-                const indexOfPentagonShape = 6
-                const Shape = glyphs[isStandardShape ? index : 0] || (() => <></>)
-                const left = xPos(item.data)
-                const top = yScale(Number(getYAxisData(item.data, seriesKey)))
-                const isReversedTriangle = isStandardShape && index === 4 // Flip logic
-                const transform = `translate(${left}, ${top}) ${isReversedTriangle ? 'rotate(180)' : ''}`
+                const Shape =
+                  Glyphs[
+                    config.visual.lineDatapointSymbol === 'standard' && index < config.visual.maximumShapeAmount
+                      ? index
+                      : 0
+                  ]
 
+                const isReversedTriangle = index === 4
+                const transformShape = (top, left) =>
+                  `translate(${left}, ${top})${isReversedTriangle ? ' rotate(180)' : ''}`
+                const positionTop = yScale(Number(getXAxisData(item.data, seriesKey)))
+
+                const positionLeft = xPos(item.data)
                 return (
-                  <g key={i} transform={transform}>
-                    {isStandardShape && index === indexOfPentagonShape ? (
-                      <Text
-                        textAnchor='middle'
-                        fill={item.isFilled ? colorScale(seriesKey) : '#fff'}
-                        fontSize={Number(item.size) * 5}
-                        strokeWidth={2}
-                        verticalAnchor='middle'
-                        fontSizeAdjust={3}
-                        stroke={colorScale(seriesKey)}
-                      >
-                        &#x2B1F; {/* Render Filled Pentagon */}
-                      </Text>
-                    ) : (
-                      <Shape
-                        size={Number(item.size) * 50}
-                        strokeWidth={3}
-                        stroke={colorScale(seriesKey)}
-                        fill={item.isFilled ? colorScale(seriesKey) : '#fff'}
-                        index={isStandardShape ? index : 0}
-                      />
-                    )}
+                  <g key={i} transform={transformShape(positionTop, positionLeft)}>
+                    <Shape size={123} opacity={1} fillOpacity={1} fill={'red'} />
                   </g>
                 )
               })}

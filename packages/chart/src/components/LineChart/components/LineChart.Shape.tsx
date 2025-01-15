@@ -51,12 +51,13 @@ const LineChartShape = (props: LineChartShapeProps) => {
     parseDate,
     tooltipData,
     tableData,
-    circleData
+    circleData,
+    data
   } = props
 
   // Get the filtered series from config
   const filtered = config?.runtime?.series.find(s => s.dataKey === seriesKey)
-  const Shape = glyphs[dataIndex] || <></>
+  const Shape = glyphs[config.visual.lineDatapointSymbol === 'standard' ? dataIndex : 0] || <></>
 
   const getColor = (displayArea: boolean, colorScale: Function, config: ChartConfig, seriesKey: string): string => {
     const seriesLabels = config.runtime.seriesLabels || []
@@ -121,7 +122,7 @@ const LineChartShape = (props: LineChartShapeProps) => {
           {dataIndex < maximumShapeAmount && (
             <g transform={transform}>
               {dataIndex === indexOfPentagonShape ? (
-                <Text fill={color} verticalAnchor='middle' textAnchor='middle' fontSize={30 / 4}>
+                <Text fill={color} verticalAnchor='middle' textAnchor='middle' fontSize={6}>
                   &#x2B1F; {/* Render Filled Pentagon */}
                 </Text>
               ) : (
@@ -134,6 +135,61 @@ const LineChartShape = (props: LineChartShapeProps) => {
     })
   }
 
+  const IsolatedPoints = () => {
+    const drawIsolatedPoints = (currentIndex, seriesKey) => {
+      let isMatch = false
+      const currentPoint = data[currentIndex]
+      const previousPoint = currentIndex > 0 ? data[currentIndex - 1] : null
+      const nextPoint = currentIndex < data.length - 1 ? data[currentIndex + 1] : null
+      let res = false
+      // check if isolated points has overlap with circle effect
+      circleData.forEach(item => {
+        if (item?.data[seriesKey] === currentPoint[seriesKey]) {
+          isMatch = true
+        }
+      })
+
+      // Handle the first point in the array
+      if (currentIndex === 0 && nextPoint && !nextPoint[seriesKey]) {
+        res = true
+      }
+      // Handle the last point in the array
+      if (currentIndex === data.length - 1 && previousPoint && !previousPoint[seriesKey]) {
+        res = true
+      }
+      // Handle points in the middle
+      if (currentIndex > 0 && currentIndex < data.length - 1) {
+        if (
+          currentPoint &&
+          currentPoint[seriesKey] &&
+          (!previousPoint || !previousPoint[seriesKey]) &&
+          (!nextPoint || !nextPoint[seriesKey])
+        ) {
+          res = true
+        }
+      }
+      if (isMatch) {
+        res = false
+      }
+
+      return res
+    }
+
+    if (drawIsolatedPoints(dataIndex, seriesKey)) {
+      return (
+        <Shape
+          left={getXPos(d[config.xAxis?.dataKey])}
+          top={filtered?.axis === 'Right' ? yScaleRight(d[filtered?.dataKey]) : yScale(d[filtered?.dataKey])}
+          size={100}
+          strokeWidth={2}
+          stroke={color}
+          fill={color}
+          index={dataIndex}
+        />
+      )
+    }
+  }
+
   if (config.lineDatapointStyle === 'always show') {
     const indexOfPentagonShape = 6 // Index for the pentagon shape
     const maximumShapeAmount = config.visual.maximumShapeAmount
@@ -143,15 +199,18 @@ const LineChartShape = (props: LineChartShapeProps) => {
     return (
       <>
         {dataIndex < maximumShapeAmount && (
-          <g transform={transform}>
-            {dataIndex === indexOfPentagonShape ? (
-              <Text fill={color} verticalAnchor='middle' textAnchor='middle' fontSize={30 / 4}>
-                &#x2B1F; {/* Render Filled Pentagon */}
-              </Text>
-            ) : (
-              <Shape strokeWidth={0} top={0} left={0} fill={color} stroke={color} size={30} />
-            )}
-          </g>
+          <>
+            {/* <IsolatedPoints /> */}
+            <g transform={transform}>
+              {dataIndex === indexOfPentagonShape ? (
+                <Text fill={color} verticalAnchor='middle' textAnchor='middle' fontSize={5}>
+                  &#x2B1F; {/* Render Filled Pentagon */}
+                </Text>
+              ) : (
+                <Shape fill={'yellow'} stroke={color} size={55} />
+              )}
+            </g>
+          </>
         )}
       </>
     )
