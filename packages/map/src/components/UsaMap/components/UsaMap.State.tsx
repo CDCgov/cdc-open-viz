@@ -23,7 +23,7 @@ import Territory from './Territory'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { MapContext } from '../../../types/MapContext'
-import { checkColorContrast, getContrastColor, getOutlinedContrastColors } from '@cdc/core/helpers/cove/accessibility'
+import { checkColorContrast, getContrastColor, outlinedTextColor } from '@cdc/core/helpers/cove/accessibility'
 import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { titleCase } from '../../../helpers/titleCase'
@@ -524,7 +524,7 @@ const UsaMap = () => {
     if (abbr === 'US-HI' && !general.displayAsHex) {
       bgColor = '#FFF'
     }
-    let outlinedTextColors = getOutlinedContrastColors(bgColor)
+    const { textColor, strokeColor } = outlinedTextColor(bgColor)
 
     let x = 0,
       y = hexMap.type === 'shapes' && general.displayAsHex ? -10 : 5
@@ -544,8 +544,8 @@ const UsaMap = () => {
             fontSize={14}
             strokeWidth='2'
             paintOrder='stroke'
-            stroke={outlinedTextColors.strokeColor}
-            style={{ fill: outlinedTextColors.textColor }}
+            stroke={strokeColor}
+            style={{ fill: textColor }}
             textAnchor='middle'
           >
             {abbr.substring(3)}
@@ -570,9 +570,9 @@ const UsaMap = () => {
           x={4}
           strokeWidth='2'
           paintOrder='stroke'
-          stroke={outlinedTextColors.strokeColor}
+          stroke={strokeColor}
           fontSize={13}
-          style={{ fill: outlinedTextColors.textColor }}
+          style={{ fill: textColor }}
           alignmentBaseline='middle'
           transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
         >

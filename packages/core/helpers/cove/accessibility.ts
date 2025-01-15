@@ -40,13 +40,21 @@ type OutlinedTextColors = {
   strokeColor: string
 }
 
-export const getOutlinedContrastColors = (bgColor: string): OutlinedTextColors => {
-  let grayColor = '#1c1d1f' // "Gray Cool 90"
-  let whiteColor = '#ffffff'
+/**
+ * Get the ideal text and text-outline/stroke color for use on a given background color.
+ *
+ * @param {string} bgColor Color of the background
+ * @returns {OutlinedTextColors} Text and outline stroke color ideal for the background in hex (e.g. '#abc123') format
+ */
+export const outlinedTextColor = (bgColor: string): OutlinedTextColors => {
+  const bodyStyles = getComputedStyle(document.body)
+  let coolGray90 = bodyStyles.getPropertyValue('--cool-gray-90')
+  if (!coolGray90 || coolGray90 === '') { coolGray90 = '#1c1d1f' }
+  const white = '#ffffff'
 
-  if (!bgColor) return { textColor: grayColor, strokeColor: whiteColor }
-  if (chroma.contrast(grayColor, bgColor) < WCAG_TEXT_CONTRAST_RATIO) {
-    return { textColor: whiteColor, strokeColor: grayColor }
+  if (!chroma.valid(bgColor) || chroma.contrast(coolGray90, bgColor) >= WCAG_TEXT_CONTRAST_RATIO) {
+    return { textColor: coolGray90, strokeColor: white }
+  } else {
+    return { textColor: white, strokeColor: coolGray90 }
   }
-  return { textColor: grayColor, strokeColor: whiteColor }
 }
