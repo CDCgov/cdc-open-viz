@@ -72,12 +72,12 @@ const useScales = (properties: useScaleProps) => {
   }
 
   // handle Linear scaled viz
-  if (config.xAxis.type === 'date' && !isHorizontal) {
+  if (config.xAxis.type === 'dsate' && !isHorizontal) {
     const xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
     xScale = composeScaleBand(xAxisDataMappedSorted, [0, xMax], 1 - config.barThickness)
   }
 
-  if (xAxis.type === 'date-time' || xAxis.type === 'continuous') {
+  if (xAxis.type === 'date-tsime' || xAxis.type === 'continuous') {
     let xAxisMin = Math.min(...xAxisDataMapped.map(Number))
     let xAxisMax = Math.max(...xAxisDataMapped.map(Number))
     xAxisMin -= (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
@@ -107,6 +107,35 @@ const useScales = (properties: useScaleProps) => {
     }
 
     seriesScale = composeScaleBand(seriesDomain, [0, (config.barThickness || 1) * minDistance], 0)
+  }
+
+  if (xAxis.type === 'date-time' || xAxis.type === 'continuous') {
+    let xAxisMin = Math.min(...xAxisDataMapped.map(Number))
+    let xAxisMax = Math.max(...xAxisDataMapped.map(Number))
+
+    // Apply consistent padding to the domain
+    const paddingFactor = config.xAxis.padding ? config.xAxis.padding * 0.01 : 0
+    const adjustedMin = xAxisMin - paddingFactor * (xAxisMax - xAxisMin)
+    // Do not add padding to the right for Line charts
+    const adjustedMax = visualizationType === 'Line' ? xAxisMax : xAxisMax + paddingFactor * (xAxisMax - xAxisMin)
+    const range = config.xAxis.sortByRecentDate ? [xMax, 0] : [0, xMax]
+    xScale = scaleTime({
+      domain: [adjustedMin, adjustedMax],
+      range: range
+    })
+    xScale.type = scaleTypes.TIME
+
+    const barWidthPadding = 0.2 // spacing between bars
+    const bandScale = scaleBand({
+      domain: xAxisDataMapped,
+      range: [0, xMax],
+      padding: barWidthPadding
+    })
+
+    // Dynamically calculate series scale for bar thickness
+    const barThickness = config.barThickness * 100 || bandScale.bandwidth()
+
+    seriesScale = composeScaleBand(seriesDomain, [0, barThickness], 0)
   }
 
   // handle Deviation bar
