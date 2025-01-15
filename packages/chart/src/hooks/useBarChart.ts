@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react'
-import ConfigContext from '../ConfigContext'
+import ConfigContext, { ChartDispatchContext } from '../ConfigContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
 export const useBarChart = () => {
-  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, setSeriesHighlight, seriesHighlight } =
+  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, seriesHighlight } =
     useContext(ConfigContext)
+  const dispatch = useContext(ChartDispatchContext)
   const { orientation } = config
   const [hoveredBar, setHoveredBar] = useState(null)
 
@@ -223,11 +224,15 @@ export const useBarChart = () => {
   }
 
   const onMouseOverBar = (categoryValue, barKey) => {
-    if (config.legend.highlightOnHover && config.legend.behavior === 'highlight' && barKey) setSeriesHighlight([barKey])
+    if (config.legend.highlightOnHover && config.legend.behavior === 'highlight' && barKey) {
+      dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [barKey] })
+    }
     setHoveredBar(categoryValue)
   }
   const onMouseLeaveBar = () => {
-    if (config.legend.highlightOnHover && config.legend.behavior === 'highlight') setSeriesHighlight([])
+    if (config.legend.highlightOnHover && config.legend.behavior === 'highlight') {
+      dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [] })
+    }
   }
 
   return {

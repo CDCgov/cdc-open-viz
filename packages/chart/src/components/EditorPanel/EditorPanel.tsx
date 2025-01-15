@@ -606,7 +606,6 @@ const EditorPanel = () => {
     setParentConfig,
     missingRequiredSections,
     isDebug,
-    setFilteredData,
     lineOptions,
     rawData,
     highlight,

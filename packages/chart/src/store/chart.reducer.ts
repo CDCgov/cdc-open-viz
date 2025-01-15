@@ -8,6 +8,7 @@ export const initialState = {
   colorScale: null,
   excludedData: [],
   filteredData: undefined,
+  externalFilters: [],
   seriesHighlight: [],
   currentViewport: 'lg' as ViewportSize,
   dimensions: [0, 0],
@@ -39,6 +40,8 @@ export const reducer = (state: State, action: ChartActions) => {
       return { ...state, excludedData: action.payload }
     case 'SET_FILTERED_DATA':
       return { ...state, filteredData: action.payload }
+    case 'SET_EXTERNAL_FILTERS':
+      return { ...state, externalFilters: action.payload }
     case 'SET_SERIES_HIGHLIGHT':
       return { ...state, seriesHighlight: action.payload }
     case 'SET_VIEWPORT':

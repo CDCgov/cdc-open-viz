@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useId } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useId, useReducer } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -13,11 +13,9 @@ import DataTable from '@cdc/core/components/DataTable'
 // Local Components
 import LegendWrapper from './components/LegendWrapper'
 //types
-import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 import type { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import { AllChartsConfig, ChartConfig } from './types/ChartConfig'
-import { type ViewportSize } from './types/ChartConfig'
 import { Pivot } from '@cdc/core/types/Table'
 import { Runtime } from '@cdc/core/types/Runtime'
 import { Label } from './types/Label'
@@ -28,7 +26,7 @@ import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 import _ from 'lodash'
 // Primary Components
-import ConfigContext from './ConfigContext'
+import ConfigContext, { ChartDispatchContext } from './ConfigContext'
 import PieChart from './components/PieChart'
 import SankeyChart from './components/Sankey'
 import LinearChart from './components/LinearChart'
@@ -72,6 +70,7 @@ import { getExcludedData } from './helpers/getExcludedData'
 import { getColorScale } from './helpers/getColorScale'
 // styles
 import './scss/main.scss'
+import { reducer, initialState } from './store/chart.reducer'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -98,38 +97,40 @@ const CdcChart: React.FC<CdcChartProps> = ({
   setSharedFilterValue,
   dashboardConfig
 }) => {
+  const [state, dispatch] = useReducer(reducer, initialState)
+  const {
+    config,
+    stateData,
+    excludedData,
+    filteredData,
+    seriesHighlight,
+    currentViewport,
+    dimensions,
+    externalFilters,
+    container,
+    coveLoadedEventRan,
+    isDraggingAnnotation,
+    imageId,
+    brushConfig
+  } = state
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const svgRef = useRef(null)
   const [colorScale, setColorScale] = useState(null)
-  const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
-  const [stateData, setStateData] = useState(_.cloneDeep(configObj?.data) || [])
-  const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
-  const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
-  const [seriesHighlight, setSeriesHighlight] = useState<string[]>(
-    configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : []
-  )
-  const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
-  const [dimensions, setDimensions] = useState<DimensionsType>([0, 0])
-  const [externalFilters, setExternalFilters] = useState<any[]>()
-  const [container, setContainer] = useState()
-  const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
-  const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
-  const [dynamicLegendItems, setDynamicLegendItems] = useState<any[]>([])
-  const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
-  const [brushConfig, setBrushConfig] = useState({
-    data: [],
-    isActive: false,
-    isBrushing: false
-  })
 
+  const setFiltersConfig = newConfig => {
+    dispatch({ type: 'SET_CONFIG', payload: newConfig })
+  }
+  const setFiltersData = filteredData => {
+    dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
+  }
   const { description, visualizationType } = config
 
   const legendRef = useRef(null)
   const parentRef = useRef(null)
 
   const handleDragStateChange = isDragging => {
-    setIsDraggingAnnotation(isDragging)
+    dispatch({ type: 'SET_DRAG_ANNOTATIONS', payload: isDragging })
   }
 
   if (isDebug) console.log('Chart config, isEditor', config, isEditor)
@@ -187,15 +188,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
     })
 
     const newExcludedData: any[] = getExcludedData(newConfig, dataOverride || stateData)
-
-    setExcludedData(newExcludedData)
+    dispatch({ type: 'SET_EXCLUDED_DATA', payload: newExcludedData })
 
     // After data is grabbed, loop through and generate filter column values if there are any
     let currentData: any[] = []
     if (newConfig.filters) {
       const filtersWithValues = addValuesToFilters(newConfig.filters, newExcludedData)
       currentData = filterVizData(filtersWithValues, newExcludedData)
-      setFilteredData(currentData)
+      dispatch({ type: 'SET_FILTERED_DATA', payload: currentData })
     }
 
     if (newConfig.xAxis.type === 'date-time' && config.orientation === 'horizontal') {
@@ -307,10 +307,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
     newConfig.runtime.editorErrorMessage = ''
 
     if (newConfig.legend.seriesHighlight?.length) {
-      setSeriesHighlight(newConfig.legend?.seriesHighlight)
+      dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: newConfig.legend?.seriesHighligh })
     }
-
-    setConfig(newConfig)
+    dispatch({ type: 'SET_CONFIG', payload: newConfig })
   }
 
   // Sorts data series for horizontal bar charts
@@ -342,7 +341,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
       const newViewport = getViewport(width)
 
-      setCurrentViewport(newViewport)
+      dispatch({ type: 'SET_VIEWPORT', payload: newViewport })
 
       if (entry.target.dataset.lollipop === 'true') {
         width = width - 2.5
@@ -350,7 +349,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
       width = width - svgMarginWidth
 
-      setDimensions([width, height])
+      dispatch({ type: 'SET_DIMENSIONS', payload: [width, height] })
     }
   })
 
@@ -359,7 +358,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       resizeObserver.observe(node)
     }
 
-    setContainer(node)
+    dispatch({ type: 'SET_CONTAINER', payload: node })
   }, []) // eslint-disable-line
 
   // Load data when component first mounts
@@ -381,11 +380,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
         if (configObj.data && configObj) {
           const preparedConfig = await prepareConfig(configObj, data)
           const preparedData = prepareData(configObj, data)
+          dispatch({ type: 'SET_STATE_DATA', payload: preparedData })
 
-          setStateData(preparedData)
-          setExcludedData(preparedData)
+          dispatch({ type: 'SET_EXCLUDED_DATA', payload: preparedData })
           updateConfig(preparedConfig, preparedData)
-          setFilteredData(filterVizData(config.filters, data))
+          dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(config.filters, data) })
         }
       } catch (err) {
         console.error('Could not Load!')
@@ -401,7 +400,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   useEffect(() => {
     if (container && !_.isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
-      setCoveLoadedEventRan(true)
+      dispatch({ type: 'SET_LOADED_EVENT', payload: true })
     }
   }, [container, config]) // eslint-disable-line
 
@@ -414,7 +413,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     const handleFilterData = e => {
       let tmp: any[] = []
       tmp.push(e.detail)
-      setExternalFilters(tmp)
+      dispatch({ type: 'SET_EXTERNAL_FILTERS', payload: tmp })
     }
 
     subscribe('cove_filterData', e => handleFilterData(e))
@@ -436,8 +435,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
       if (!hasActiveProperty) {
         let configCopy = { ...config }
         delete configCopy['filters']
-        setConfig(configCopy)
-        setFilteredData(filterVizData(externalFilters, excludedData))
+        dispatch({ type: 'SET_CONFIG', payload: configCopy })
+        dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(externalFilters, excludedData) })
       }
     }
 
@@ -448,8 +447,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
       externalFilters[0].hasOwnProperty('active')
     ) {
       let newConfigHere = { ...config, filters: externalFilters }
-      setConfig(newConfigHere)
-      setFilteredData(filterVizData(externalFilters, excludedData))
+      dispatch({ type: 'SET_CONFIG', payload: newConfigHere })
+      dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(externalFilters, excludedData) })
     }
   }, [externalFilters]) // eslint-disable-line
 
@@ -476,7 +475,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     const newHighlight = _.findKey(config.runtime.seriesLabels, v => v === label.datum) || label.datum
 
     const newSeriesHighlight = _.xor(seriesHighlight, [newHighlight])
-    setSeriesHighlight(newSeriesHighlight)
+    dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: newSeriesHighlight })
   }
   // Called on reset button click, unhighlights all data series
   const handleShowAll = () => {
@@ -487,7 +486,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     } catch (e) {
       console.error('COVE:', e.message)
     }
-    setSeriesHighlight([])
+    dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [] })
   }
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
@@ -830,8 +829,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
                   <Filters
                     config={config}
-                    setConfig={setConfig}
-                    setFilteredData={setFilteredData}
+                    setConfig={setFiltersConfig}
+                    setFilteredData={setFiltersData}
                     filteredData={filteredData}
                     excludedData={excludedData}
                     filterData={filterVizData}
@@ -896,8 +895,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       <>
                         <Filters
                           config={config}
-                          setConfig={setConfig}
-                          setFilteredData={setFilteredData}
+                          setConfig={setFiltersConfig}
+                          setFilteredData={setFiltersData}
                           filteredData={filteredData}
                           excludedData={excludedData}
                           filterData={filterVizData}
@@ -1023,7 +1022,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     dashboardConfig,
     debugSvg: isDebug,
     dimensions,
-    dynamicLegendItems,
     excludedData,
     formatDate,
     formatNumber,
@@ -1053,13 +1051,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     parseDate,
     rawData: _.cloneDeep(stateData) ?? {},
     seriesHighlight,
-    setBrushConfig,
-    setConfig,
-    setDynamicLegendItems,
     setEditing,
-    setFilteredData,
     setParentConfig,
-    setSeriesHighlight,
     setSharedFilter,
     setSharedFilterValue,
     svgRef,
@@ -1072,16 +1065,18 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   return (
     <ConfigContext.Provider value={contextValues}>
-      <Layout.VisualizationWrapper
-        config={config}
-        isEditor={isEditor}
-        currentViewport={currentViewport}
-        ref={outerContainerRef}
-        imageId={imageId}
-        showEditorPanel={config?.showEditorPanel}
-      >
-        {body}
-      </Layout.VisualizationWrapper>
+      <ChartDispatchContext.Provider value={dispatch}>
+        <Layout.VisualizationWrapper
+          config={config}
+          isEditor={isEditor}
+          currentViewport={currentViewport}
+          ref={outerContainerRef}
+          imageId={imageId}
+          showEditorPanel={config?.showEditorPanel}
+        >
+          {body}
+        </Layout.VisualizationWrapper>
+      </ChartDispatchContext.Provider>
     </ConfigContext.Provider>
   )
 }
