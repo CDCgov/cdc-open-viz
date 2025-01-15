@@ -1,5 +1,4 @@
 import { colorPalettesChart as colorPalettes, sequentialPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
-import { FaStar } from 'react-icons/fa'
 import { Label } from '../../../types/Label'
 import { ColorScale, TransformedData } from '../../../types/ChartContext'
 import { ChartConfig } from '../../../types/ChartConfig'
