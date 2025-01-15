@@ -1770,7 +1770,12 @@ const CdcMap = ({
   )
 
   const sectionClassNames = () => {
-    const classes = ['cove-component__content', 'cdc-map-inner-container', `${currentViewport}`]
+    const classes = [
+      'cove-component__content',
+      'cdc-map-inner-container',
+      `${currentViewport}`,
+      `${state?.general?.headerColor}`
+    ]
     if (config?.runtime?.editorErrorMessage.length > 0) classes.push('type-map--has-error')
     return classes.join(' ')
   }
