@@ -31,7 +31,6 @@ import ConfigContext, { ChartDispatchContext } from './ConfigContext'
 import PieChart from './components/PieChart'
 import SankeyChart from './components/Sankey'
 import LinearChart from './components/LinearChart'
-import { isDateScale } from '@cdc/core/helpers/cove/date'
 
 import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
 
@@ -987,16 +986,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const contextValues = {
-    brushConfig,
+    ...state,
     clean,
     colorPalettes,
-    colorScale,
-    config,
-    currentViewport,
     dashboardConfig,
     debugSvg: isDebug,
-    dimensions,
-    excludedData,
     formatDate,
     formatNumber,
     formatTooltipsDate,
@@ -1005,7 +999,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     handleChartTabbing,
     highlight,
     handleShowAll,
-    imageId,
     isDashboard,
     isDebug,
     isDraggingAnnotation,
@@ -1015,13 +1008,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
     legendId,
     legendRef,
     lineOptions,
-    isLoading,
     missingRequiredSections,
     outerContainerRef,
     parentRef,
     parseDate,
     rawData: _.cloneDeep(stateData) ?? {},
-    seriesHighlight,
     setEditing,
     setParentConfig,
     setSharedFilter,
