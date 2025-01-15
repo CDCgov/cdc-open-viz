@@ -917,7 +917,7 @@ const CdcMap = ({
         newFilter.active = active ?? values[0] // Default to first found value
         newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
         newFilter.showDropdown = showDropdown
-        newFilter.subGrouping = obj.filters[idx].subGrouping || {}
+        newFilter.subGrouping = obj.filters[idx].subGrouping
 
         filters.push(newFilter)
       }
@@ -1568,7 +1568,7 @@ const CdcMap = ({
     const hashFilters = hashObj(state.filters)
     let filters
 
-    if (state.filters && hashFilters !== runtimeFilters.fromHash) {
+    if (state.filters && (config || hashFilters !== runtimeFilters.fromHash)) {
       filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
 
       if (filters) {
