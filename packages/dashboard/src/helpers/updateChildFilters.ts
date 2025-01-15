@@ -2,10 +2,10 @@ import { SharedFilter } from '../types/SharedFilter'
 import _ from 'lodash'
 
 export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Record<string, any>): SharedFilter[] => {
-  const dateSet = Object.values(data).flat()
+  const dataSet = Object.values(data).flat()
 
   // Find indexes of all child filters
-  const childFilterIndexes = newSharedFilters
+  const childFilterIndexes: number[] = newSharedFilters
     .map((filter, index) => (filter.parents ? index : -1))
     .filter(index => index !== -1)
 
@@ -16,17 +16,19 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
 
   // Update each child filter
   childFilterIndexes.forEach(childIndex => {
-    const childFilter = newSharedFilters[childIndex]
-    const parentFilter = newSharedFilters.find(filter => String(childFilter.parents) === String(filter.key))
+    const childFilter: SharedFilter = newSharedFilters[childIndex]
+    const parentFilter: SharedFilter = newSharedFilters.find(
+      filter => String(childFilter.parents) === String(filter.key)
+    )
 
     if (parentFilter) {
       // Filter dataset based on parent's active value
-      const parentActiveValuesArr = dateSet.filter(
+      const parentsActiveValues: string[] = dataSet.filter(
         (d: Record<string, any>) => d[parentFilter.columnName] === parentFilter.active
       )
 
       // Get unique active values for the child filter
-      const uniqChildValues = _.uniq(parentActiveValuesArr.map(d => d[childFilter.columnName]).filter(Boolean))
+      const uniqChildValues = _.uniq(parentsActiveValues.map(d => d[childFilter.columnName]).filter(Boolean))
 
       // Update the child filter if unique values exist
       if (uniqChildValues.length > 0) {
