@@ -986,19 +986,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     )
   }
 
-  const getXAxisData = d =>
-    isDateScale(config.runtime.xAxis)
-      ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime()
-      : d[config.runtime.originalXAxis.dataKey]
-  const getYAxisData = (d, seriesKey) => d[seriesKey]
-
-  const capitalize = str => {
-    return str.charAt(0).toUpperCase() + str.slice(1)
-  }
-
   const contextValues = {
     brushConfig,
-    capitalize,
     clean,
     colorPalettes,
     colorScale,
@@ -1011,8 +1000,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     formatDate,
     formatNumber,
     formatTooltipsDate,
-    getXAxisData,
-    getYAxisData,
     handleChartAriaLabels,
     handleLineType,
     handleChartTabbing,
