@@ -101,6 +101,7 @@ type Visual = {
   verticalHoverLine?: boolean
   horizontalHoverLine?: boolean
   lineDatapointSymbol: 'none' | 'standard'
+  maximumShapeAmount: 7
 }
 
 export type AllChartsConfig = {
