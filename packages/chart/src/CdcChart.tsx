@@ -112,7 +112,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     coveLoadedEventRan,
     isDraggingAnnotation,
     imageId,
-    brushConfig,
     colorScale,
     isLoading
   } = state
@@ -153,13 +152,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     _.set(newConfig, 'table.show', _.get(newConfig, 'table.show', !isDashboard))
 
-    _.forEach(newConfig.series, series => {
-      _.defaults(series, {
-        tooltip: true,
-        axis: 'Left'
-      })
-    })
+    newConfig.series.forEach(series => {
+      const defaultType = newConfig.visualizationType === 'Combo' ? 'Bar' : newConfig.visualizationType || 'Bar'
 
+      series.tooltip = series.tooltip ?? true
+      series.axis = series.axis ?? 'Left'
+      series.type = series.type ?? defaultType
+    })
     if (newConfig.visualizationType === 'Bump Chart') {
       newConfig.xAxis.type === 'date-time'
     }
@@ -170,6 +169,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
     if (newConfig.table && (!newConfig.table?.label || newConfig.table?.label === '')) {
       newConfig.table.label = 'Data Table'
+    }
+
+    if (newConfig.orientation === 'horizontal') {
+      newConfig.lollipopShape = newConfig.lollipopShape
+    }
+    if (newConfig.visualizationType === 'Deviation Bar' || newConfig.visualizationType === 'Paired Bar') {
+      newConfig.orientation = 'horizontal'
+    }
+
+    if (config.visualizationType === 'Scatter Plot') {
+      newConfig.xAxis.type = 'continuous'
     }
 
     return { ...coveUpdateWorker(newConfig) }
