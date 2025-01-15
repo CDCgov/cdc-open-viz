@@ -1,26 +1,34 @@
 import React from 'react'
 import { handleLineType } from '../../helpers/handleLineType'
 import { Line } from '@visx/shape'
-import { GlyphDiamond, GlyphCircle, GlyphSquare, GlyphTriangle, GlyphCross } from '@visx/glyph'
+import { GlyphDiamond, GlyphCircle, GlyphSquare, GlyphTriangle, GlyphCross, Glyph as CustomGlyph } from '@visx/glyph'
 import { Text } from '@visx/text'
 
 // Define glyph shapes
-const glyphs = {
-  0: GlyphCircle,
-  1: GlyphSquare,
-  2: GlyphTriangle,
-  3: GlyphDiamond,
-  4: GlyphTriangle, // Reuse GlyphTriangle
-  5: GlyphCross
-}
+const Glyphs = [
+  GlyphCircle,
+  GlyphSquare,
+  GlyphTriangle,
+  GlyphDiamond,
+  GlyphTriangle,
+  GlyphCross,
+  ({ fill }: { fill: string }) => (
+    <CustomGlyph>
+      {/* Render Filled Pentagon */}
+      <Text fill={fill} fontSize={14} textAnchor='middle' verticalAnchor='middle'>
+        &#x2B1F;
+      </Text>
+    </CustomGlyph>
+  )
+]
 
 const LegendLineShape = props => {
   const { config, label, index } = props
-  const Shape = glyphs[index] || (() => <></>)
   const isReversedTriangle = index === 4
+
+  const Shape =
+    Glyphs[config.visual.lineDatapointSymbol === 'standard' && index < config.visual.maximumShapeAmount ? index : 0]
   const transform = `translate(${15}, ${3}) ${isReversedTriangle ? 'rotate(180)' : ''}`
-  const indexOfPentagonShape = 6
-  const maximumShapeAmount = config.visual.maximumShapeAmount
 
   return (
     <svg width={30} height={10} style={{ overflow: 'visible' }} className='me-2'>
@@ -33,17 +41,9 @@ const LegendLineShape = props => {
         strokeDasharray={handleLineType(config.series[index]?.type || '')}
       />
 
-      {index < maximumShapeAmount && (
-        <g transform={transform}>
-          {index === indexOfPentagonShape ? (
-            <Text textAnchor='middle' verticalAnchor='middle' fill={label.value} fontSize={5}>
-              &#x2B1F; {/* Render Filled Pentagon */}
-            </Text>
-          ) : (
-            <Shape strokeWidth={0} fill={label.value} stroke={label.value} size={55} />
-          )}
-        </g>
-      )}
+      <g transform={transform}>
+        <Shape fillOpacity={1} fill={label.value} />
+      </g>
     </svg>
   )
 }

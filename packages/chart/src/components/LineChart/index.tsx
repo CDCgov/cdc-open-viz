@@ -5,7 +5,6 @@ import * as allCurves from '@visx/curve'
 import { Group } from '@visx/group'
 import { LinePath, Bar, SplitLinePath, AreaClosed } from '@visx/shape'
 import { Text } from '@visx/text'
-import { GlyphDiamond, GlyphCircle, GlyphSquare, GlyphTriangle, GlyphCross, Glyph as CustomGlyph } from '@visx/glyph'
 
 // CDC core components
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -19,7 +18,6 @@ import { filterCircles, createStyles, createDataSegments } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
 import LineChartBumpCircle from './components/LineChart.BumpCircle'
 import isNumber from '@cdc/core/helpers/isNumber'
-import LineChartShape from './components/LineChart.Shape'
 
 // Types
 import { type ChartContext } from '../../types/ChartContext'
@@ -54,22 +52,6 @@ const LineChart = (props: LineChartProps) => {
     data = clean(brushConfig.data)
     tableD = clean(brushConfig.data)
   }
-  const Glyphs = [
-    GlyphCircle,
-    GlyphSquare,
-    GlyphTriangle,
-    GlyphDiamond,
-    GlyphTriangle,
-    GlyphCross,
-    ({ fill }: { fill: string }) => (
-      <CustomGlyph>
-        {/* Render Filled Pentagon */}
-        <Text fill={fill} fontSize={14} textAnchor='middle' verticalAnchor='middle'>
-          &#x2B1F;
-        </Text>
-      </CustomGlyph>
-    )
-  ]
 
   const xPos = d => {
     return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
@@ -356,23 +338,26 @@ const LineChart = (props: LineChartProps) => {
 
               {/* circles for preliminaryData data */}
               {circleData.map((item, i) => {
-                const Shape =
-                  Glyphs[
-                    config.visual.lineDatapointSymbol === 'standard' && index < config.visual.maximumShapeAmount
-                      ? index
-                      : 0
-                  ]
-
-                const isReversedTriangle = index === 4
-                const transformShape = (top, left) =>
-                  `translate(${left}, ${top})${isReversedTriangle ? ' rotate(180)' : ''}`
-                const positionTop = yScale(Number(getXAxisData(item.data, seriesKey)))
-
-                const positionLeft = xPos(item.data)
                 return (
-                  <g key={i} transform={transformShape(positionTop, positionLeft)}>
-                    <Shape size={123} opacity={1} fillOpacity={1} fill={'red'} />
-                  </g>
+                  <circle
+                    key={i}
+                    cx={xPos(item.data)}
+                    cy={
+                      seriesAxis === 'Right'
+                        ? yScaleRight(getYAxisData(item.data, _seriesKey))
+                        : yScale(Number(getYAxisData(item.data, _seriesKey)))
+                    }
+                    r={item.size}
+                    strokeWidth={seriesData.weight || 2}
+                    stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'}
+                    fill={
+                      item.isFilled
+                        ? colorScale
+                          ? colorScale(config.runtime.seriesLabels[seriesKey])
+                          : '#000'
+                        : '#fff'
+                    }
+                  />
                 )
               })}
 
