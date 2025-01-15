@@ -112,10 +112,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
     isDraggingAnnotation,
     imageId,
     brushConfig,
-    colorScale
+    colorScale,
+    isLoading
   } = state
   const transform = new DataTransform()
-  const [loading, setLoading] = useState(true)
+
   const svgRef = useRef(null)
 
   const setFiltersConfig = newConfig => {
@@ -457,7 +458,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       const newColorScale = getColorScale(config)
 
       dispatch({ type: 'SET_COLOR_SCALE', payload: newColorScale })
-      setLoading(false)
+      dispatch({ type: 'SET_LOADING', payload: false })
     }
 
     if (config && stateData && config.sortData) {
@@ -785,7 +786,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return classes
   }
 
-  if (!loading) {
+  if (!isLoading) {
     const tableLink = (
       <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
         {config.dataKey} (Go to Table)
@@ -1043,7 +1044,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     legendId,
     legendRef,
     lineOptions,
-    loading,
+    isLoading,
     missingRequiredSections,
     outerContainerRef,
     parentRef,

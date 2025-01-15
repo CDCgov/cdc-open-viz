@@ -31,7 +31,7 @@ type State = {
   colorScale: object | null
   excludedData: object[]
   filteredData?: object[]
-  externalFilters: object[]
+  externalFilters: any[]
   seriesHighlight: string[]
   currentViewport: ViewportSize
   dimensions: [number, number]

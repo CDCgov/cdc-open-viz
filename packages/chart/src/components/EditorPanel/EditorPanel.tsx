@@ -596,7 +596,7 @@ const EditorPanel = () => {
     updateConfig,
     tableData,
     transformedData: data,
-    loading,
+    isLoading,
     colorScale,
     colorPalettes,
     twoColorPalette,
@@ -812,7 +812,7 @@ const EditorPanel = () => {
   const [displayPanel, setDisplayPanel] = useState(true)
   const [displayViewportOverrides, setDisplayViewportOverrides] = useState(false)
 
-  if (loading) {
+  if (isLoading) {
     return null
   }
 
