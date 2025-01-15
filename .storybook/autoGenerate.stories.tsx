@@ -1,8 +1,13 @@
 /* COPY THIS FILE INTO A FOLDER TO DYNAMICALLY GENERATE STORIES FOR ALL THE CONFIGS */
 /* Creates one story that contains all configs in folder */
 /* RECOMMENDED USE:
-  create a /_stories/private directory with configs or config subfolders and copy this file into it/them
+  1) create a /_stories/private directory with configs or config subfolders and copy this file into it/them
+  2) Change [folder-name] below to a name for the folder
 */
+
+const meta = {
+  title: 'Private/[folder-name]'
+}
 
 import React from 'react'
 
@@ -30,10 +35,6 @@ const allConfigs: Record<
     [key: string]: any
   }
 > = await importAll()
-
-const meta = {
-  title: 'Private/[folder-name]'
-}
 
 export default meta
 
