@@ -285,6 +285,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                         updateFilterProp('parents', filterIndex, value)
                       }}
                       options={getParentFilterOptions(filterIndex)}
+                      selected={config.filters[filterIndex].parents}
                     />
                   </label>
                 </FieldSetWrapper>

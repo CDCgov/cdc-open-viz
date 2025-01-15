@@ -34,12 +34,24 @@ export const setXAxisLabelOffsetToZero = newConfig => {
   newConfig.xAxis.labelOffset = 0
 }
 
+export const defineFilterStyles = newConfig => {
+  if (newConfig.filters) {
+    newConfig.filters = newConfig.filters.map(filter => {
+      if (!filter.filterStyle) {
+        filter.filterStyle = 'dropdown'
+      }
+      return filter
+    })
+  }
+}
+
 const update_4_24_10 = config => {
   const ver = '4.24.10'
   const newConfig = _.cloneDeep(config)
   setXAxisLabelOffsetToZero(newConfig)
   changePivotColumns(newConfig)
   removeMultiSelectPropFromMultiselect(newConfig)
+  defineFilterStyles(newConfig)
   newConfig.version = ver
   return newConfig
 }

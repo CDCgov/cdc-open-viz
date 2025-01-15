@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { VizFilter } from '../../types/VizFilter'
 import { addValuesToFilters } from '../addValuesToFilters'
 import { describe, it, expect, vi } from 'vitest'
+import { FILTER_STYLE } from '@cdc/dashboard/src/types/FilterStyles'
 
 describe('addValuesToFilters', () => {
   const parentFilter = { columnName: 'parentColumn', id: 11, active: 'apple', values: [] } as VizFilter
@@ -36,7 +37,11 @@ describe('addValuesToFilters', () => {
     //expect(newFilters[1].values).toEqual([])
   })
   it('works for nested dropdowns', () => {
-    const nestedParentFilter = { ...parentFilter, subGrouping: { columnName: 'childColumn' } }
+    const nestedParentFilter = {
+      ...parentFilter,
+      filterStyle: FILTER_STYLE.nestedDropdown,
+      subGrouping: { columnName: 'childColumn' }
+    }
     const newFilters = addValuesToFilters([nestedParentFilter], data)
     expect(newFilters[0].values).toEqual(['apple', 'pear'])
     expect(newFilters[0].subGrouping.valuesLookup).toEqual({ apple: { values: ['a', 'b'] }, pear: { values: ['c'] } })
