@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useId, useReducer } from 'react'
+import React, { useEffect, useCallback, useRef, useId, useReducer } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -71,6 +71,7 @@ import { getColorScale } from './helpers/getColorScale'
 // styles
 import './scss/main.scss'
 import { reducer, initialState } from './store/chart.reducer'
+import { getChartSubTextClasses, getChartWrapperClasses } from './helpers/getChartClassNames'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -115,37 +116,28 @@ const CdcChart: React.FC<CdcChartProps> = ({
     colorScale,
     isLoading
   } = state
+
+  /// handle Debug mode
+  if (isDebug) console.log('Chart config, isEditor', config, isEditor)
   const transform = new DataTransform()
 
+  /// Register Refs
   const svgRef = useRef(null)
+  const legendRef = useRef(null)
+  const parentRef = useRef(null)
 
+  // Function dispacthers
   const setFiltersConfig = newConfig => {
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
   }
   const setFiltersData = filteredData => {
     dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
   }
-  const { description, visualizationType } = config
-
-  const legendRef = useRef(null)
-  const parentRef = useRef(null)
 
   const handleDragStateChange = isDragging => {
     dispatch({ type: 'SET_DRAG_ANNOTATIONS', payload: isDragging })
   }
-
-  if (isDebug) console.log('Chart config, isEditor', config, isEditor)
-
-  // Destructure items from config for more readable JSX
-  let { legend, title } = config
-
-  // set defaults on titles if blank AND only in editor
-  if (isEditor) {
-    if (!title || title === '') title = 'Chart Title'
-  }
-
-  if (config.table && (!config.table?.label || config.table?.label === '')) config.table.label = 'Data Table'
-
+  // hooks and states
   const { lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
   const legendId = useId()
 
@@ -170,6 +162,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     if (newConfig.visualizationType === 'Bump Chart') {
       newConfig.xAxis.type === 'date-time'
+    }
+    if (isEditor) {
+      if (!newConfig.title || newConfig.title === '') {
+        newConfig.title = 'Chart Title'
+      }
+    }
+    if (newConfig.table && (!newConfig.table?.label || newConfig.table?.label === '')) {
+      newConfig.table.label = 'Data Table'
     }
 
     return { ...coveUpdateWorker(newConfig) }
@@ -481,8 +481,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const handleShowAll = () => {
     try {
       const legend = legendRef.current
-      if (!legend) throw new Error('No legend available to set previous focus on.')
-      legend.focus()
+      if (!config.legend) throw new Error('No legend available to set previous focus on.')
+      config.legend.focus()
     } catch (e) {
       console.error('COVE:', e.message)
     }
@@ -727,7 +727,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const getTableRuntimeData = () => {
-    if (visualizationType === 'Sankey') return config?.data?.[0]?.tableData
+    if (config.visualizationType === 'Sankey') return config?.data?.[0]?.tableData
     const data = filteredData || excludedData
     const dynamicSeries = config.series.find(series => !!series.dynamicCategory)
     if (!dynamicSeries) return data
@@ -757,40 +757,20 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     return _.kebabCase(string)
   }
-  const getChartWrapperClasses = () => {
-    const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
-    const classes = ['chart-container', 'p-relative']
-    if (legend?.position) {
-      if (isLegendWrapViewport(currentViewport) && legend?.position !== 'top') {
-        classes.push('legend-bottom')
-      } else {
-        classes.push(`legend-${legend.position}`)
-      }
-    }
-    if (legend?.hide) classes.push('legend-hidden')
-    if (lineDatapointClass) classes.push(lineDatapointClass)
-    if (!config.barHasBorder) classes.push('chart-bar--no-border')
-    if (config.brush?.active && dashboardConfig?.type === 'dashboard' && (!isLegendOnBottom || legend.hide))
-      classes.push('dashboard-brush')
-    classes.push(...contentClasses)
-    return classes
-  }
-
-  const getChartSubTextClasses = () => {
-    const classes = ['subtext mt-4']
-    const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
-
-    if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
-    if (config.brush?.active && !isLegendOnBottom) classes.push('subtext--brush-active ')
-    if (config.brush?.active && config.legend.hide) classes.push('subtext--brush-active ')
-    return classes
-  }
 
   if (!isLoading) {
     const tableLink = (
       <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
         {config.dataKey} (Go to Table)
       </a>
+    )
+    const chartWrapperClasses = getChartWrapperClasses(
+      config,
+      currentViewport,
+      isLegendWrapViewport,
+      lineDatapointClass,
+      dashboardConfig,
+      contentClasses
     )
 
     body = (
@@ -812,14 +792,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
               <Title
                 showTitle={config.showTitle}
                 isDashboard={isDashboard}
-                title={title}
+                title={config.title}
                 superTitle={config.superTitle}
                 classes={['chart-title', `${config.theme}`, 'cove-component__header', 'mb-3']}
                 style={undefined}
               />
 
               {/* Visualization Wrapper */}
-              <div className={getChartWrapperClasses().join(' ')}>
+              <div className={chartWrapperClasses.join(' ')}>
                 {/* Intro Text/Message */}
                 {config?.introText && config.visualizationType !== 'Spark Line' && (
                   <section className={`introText mb-4`}>{parse(config.introText)}</section>
@@ -848,9 +828,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 <LegendWrapper>
                   <div
                     className={
-                      legend.hide || isLegendWrapViewport(currentViewport)
+                      config.legend.hide || isLegendWrapViewport(currentViewport)
                         ? 'w-100'
-                        : legend.position === 'bottom' || legend.position === 'top' || visualizationType === 'Sankey'
+                        : config.legend.position === 'bottom' ||
+                          config.legend.position === 'top' ||
+                          config.visualizationType === 'Sankey'
                         ? 'w-100'
                         : 'w-75'
                     }
@@ -910,9 +892,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles }}>
                           <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
                         </div>
-                        {description && (
+                        {config.description && (
                           <div className='subtext' style={{ padding: '35px 0 15px' }}>
-                            {parse(description)}
+                            {parse(config.description)}
                           </div>
                         )}
                       </>
@@ -937,8 +919,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   : link && link}
                 {/* Description */}
 
-                {description && config.visualizationType !== 'Spark Line' && (
-                  <div className={getChartSubTextClasses().join('')}>{parse(description)}</div>
+                {config.description && config.visualizationType !== 'Spark Line' && (
+                  <div className={getChartSubTextClasses(config, currentViewport, isLegendWrapViewport).join('')}>
+                    {parse(config.description)}
+                  </div>
                 )}
 
                 {/* buttons */}
@@ -984,7 +968,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     applyLegendToRow={applyLegendToRow}
                     tableTitle={config.table.label}
                     indexTitle={config.table.indexLabel}
-                    vizTitle={title}
+                    vizTitle={config.title}
                     viewport={currentViewport}
                     tabbingId={handleChartTabbing(config, legendId)}
                     colorScale={colorScale}
@@ -1040,7 +1024,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     handleDragStateChange,
     isEditor,
     isNumber,
-    legend,
     legendId,
     legendRef,
     lineOptions,
