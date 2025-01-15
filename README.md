@@ -57,6 +57,18 @@ Sometimes we need to make fixes or add features to a specific package for our da
 - New packages should have their version start at 1.0.0 through development until they are first published and follow [Semantic Versioning guidelines](https://docs.npmjs.com/about-semantic-versioning) afterwards.
 - Respect the guidelines above and ask someone if you're unsure of something.
 
+## Storybook
+
+COVE makes use of [Storybook](https://storybook.js.org) to preview visualizations. Run it with `yarn storybook`.
+
+In addition to the static stories defined in the `_stories` directory, any COVE config can be viewed locally in Storybook with the following steps:
+
+1. `mkdir -p _stories/private/`
+2. `cp .storybook/autoGenerate.stories.tsx _stories/private/`
+3. Copy configs into `_stories/private/`
+4. `yarn storybook`
+5. You will see those configs under "Private" in Storybook
+
 ---
 
 <details>
