@@ -111,12 +111,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
     coveLoadedEventRan,
     isDraggingAnnotation,
     imageId,
-    brushConfig
+    brushConfig,
+    colorScale
   } = state
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const svgRef = useRef(null)
-  const [colorScale, setColorScale] = useState(null)
 
   const setFiltersConfig = newConfig => {
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
@@ -452,12 +452,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
   }, [externalFilters]) // eslint-disable-line
 
-  // Generates color palette to pass to child chart component
   useEffect(() => {
     if (stateData && config.xAxis && config.runtime?.seriesKeys) {
       const newColorScale = getColorScale(config)
 
-      setColorScale(newColorScale)
+      dispatch({ type: 'SET_COLOR_SCALE', payload: newColorScale })
       setLoading(false)
     }
 
