@@ -206,7 +206,8 @@ export default {
     background: true,
     verticalHoverLine: false,
     horizontalHoverLine: false,
-    lineDatapointSymbol: 'none'
+    lineDatapointSymbol: 'none',
+    maximumShapeAmount: 7
   },
   useLogScale: false,
   filterBehavior: 'Filter Change',
