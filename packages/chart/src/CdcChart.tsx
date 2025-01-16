@@ -144,7 +144,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return isConvertLineToBarGraph(config.visualizationType, filteredData, config.allowLineToBarGraph)
   }
 
-  const prepareConfig = (loadedConfig: ChartConfig, data): ChartConfig => {
+  const prepareConfig = (loadedConfig: ChartConfig): ChartConfig => {
     let newConfig = _.defaultsDeep(loadedConfig, defaults)
     _.defaultsDeep(newConfig, {
       table: { showVertical: false }
@@ -389,7 +389,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       try {
         const data = configObj.data
         if (configObj.data && configObj) {
-          const preparedConfig = await prepareConfig(configObj, data)
+          const preparedConfig = await prepareConfig(configObj)
           const preparedData = prepareData(configObj, data)
           dispatch({ type: 'SET_STATE_DATA', payload: preparedData })
           dispatch({ type: 'SET_EXCLUDED_DATA', payload: preparedData })
