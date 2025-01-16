@@ -3,7 +3,6 @@ import _ from 'lodash'
 
 export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Record<string, any>): SharedFilter[] => {
   const dataSet = Object.values(data).flat()
-
   // Find indexes of all child filters
   const childFilterIndexes: number[] = newSharedFilters
     .map((filter, index) => (filter.parents ? index : -1))
@@ -23,10 +22,9 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
 
     if (parentFilter) {
       // Filter dataset based on parent's active value
-      const parentsActiveValues: string[] = dataSet.filter(
-        (d: Record<string, any>) => d[parentFilter.columnName] === parentFilter.active
+      const parentsActiveValues: string[] = dataSet.filter((d: Record<string, any>) =>
+        parentFilter.active.includes(d[parentFilter.columnName])
       )
-
       // Get unique active values for the child filter
       const uniqChildValues = _.uniq(parentsActiveValues.map(d => d[childFilter.columnName]).filter(Boolean))
 
