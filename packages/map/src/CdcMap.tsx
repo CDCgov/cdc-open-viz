@@ -111,7 +111,6 @@ const CdcMap = ({
   const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [loading, setLoading] = useState(true)
   const [displayPanel, setDisplayPanel] = useState(true)
-  const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
   const [topoData, setTopoData] = useState<{}>({})
   const [runtimeFilters, setRuntimeFilters] = useState([])
   const [runtimeData, setRuntimeData] = useState({ init: true })
