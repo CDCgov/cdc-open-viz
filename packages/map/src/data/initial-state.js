@@ -12,7 +12,7 @@ export default {
     showDownloadButton: false,
     showDownloadMediaButton: false,
     displayAsHex: false,
-    displayStateLabels: false,
+    displayStateLabels: true,
     territoriesAlwaysShow: false,
     language: 'en',
     geoType: 'single-state',
