@@ -2,27 +2,25 @@ import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/
 import { scaleOrdinal } from '@visx/scale'
 import { ChartConfig } from '../types/ChartConfig'
 
-export const getColorScale = (config: ChartConfig): ((value: string) => string) => {
+export const getColorScale = (config: ChartConfig) => {
   const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
     ? config.twoColor.palette
     : config.palette
+
   const allPalettes: Record<string, string[]> = { ...colorPalettes, ...twoColorPalette }
   let palette = config.customColors || allPalettes[configPalette]
-  let numberOfKeys = config.runtime.seriesKeys.length
-  let newColorScale
+  const numberOfKeys = config.runtime.seriesKeys.length
 
-  while (numberOfKeys > palette.length) {
-    palette = palette.concat(palette)
+  // Extend palette to match the number of keys
+  while (palette.length < numberOfKeys) {
+    palette = [...palette, ...palette] // Concatenate to extend
   }
+  palette = palette.slice(0, numberOfKeys) // Ensure exact size
 
-  palette = palette.slice(0, numberOfKeys)
-
-  newColorScale = () =>
-    scaleOrdinal({
-      domain: config.runtime.seriesLabelsAll,
-      range: palette,
-      unknown: null
-    })
-
-  return newColorScale
+  // Return the scaleOrdinal object
+  return scaleOrdinal({
+    domain: config.runtime.seriesLabelsAll,
+    range: palette,
+    unknown: null
+  })
 }
