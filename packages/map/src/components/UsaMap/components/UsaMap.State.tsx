@@ -406,7 +406,7 @@ const UsaMap = () => {
               {map.patterns.map((patternData, patternIndex) => {
                 const { pattern, dataKey, size } = patternData
                 const currentFill = styles.fill
-                const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
+                const hasMatchingValues = patternData.dataValue === geoData?.[patternData.dataKey]
                 const patternColor = patternData.color || getContrastColor('#000', currentFill)
 
                 if (!hasMatchingValues) return
