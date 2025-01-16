@@ -72,7 +72,7 @@ const useScales = (properties: useScaleProps) => {
   }
 
   // handle Linear scaled viz
-  if (config.xAxis.type === 'dsate' && !isHorizontal) {
+  if (config.xAxis.type === 'date' && !isHorizontal) {
     const xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
     xScale = composeScaleBand(xAxisDataMappedSorted, [0, xMax], 1 - config.barThickness)
   }
