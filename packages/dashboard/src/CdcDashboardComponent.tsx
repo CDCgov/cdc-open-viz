@@ -228,7 +228,15 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       )
       dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
       const visualizations = reloadURLHelpers.getVisualizationsWithFormattedData(config.visualizations, newData)
-      dispatch({ type: 'SET_CONFIG', payload: { dashboard: dashboardConfig, datasets: newDatasets, visualizations } })
+      dispatch({
+        type: 'SET_CONFIG',
+        payload: {
+          dashboard: dashboardConfig,
+          datasets: newDatasets,
+          visualizations,
+          activeDashboard: config.activeDashboard
+        }
+      })
       setAPILoading(false)
     }
   }
