@@ -11,7 +11,7 @@ import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
 
 // CDC core components and helpers
-import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { getBarConfig, testZeroValue } from '../helpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
@@ -200,8 +200,12 @@ export const BarChartHorizontal = () => {
                   // update label color
                   if (barColor && labelColor && textFits) {
                     labelColor = getContrastColor('#000', barColor)
+                    let constrast = getColorContrast('#000', barColor)
+                    const contrastLevel = 7
+                    if (constrast < contrastLevel) {
+                      labelColor = '#fff'
+                    }
                   }
-
                   const background = () => {
                     if (isRegularLollipopColor) return barColor
                     if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)

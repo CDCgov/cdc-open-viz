@@ -4,7 +4,7 @@ import { useBarChart } from '../../../hooks/useBarChart'
 import { BarStackHorizontal } from '@visx/shape'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
-import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 // types
@@ -59,7 +59,13 @@ const BarChartStackedHorizontal = () => {
                   seriesHighlight.length === 0 ||
                   seriesHighlight.indexOf(bar.key) !== -1
                 config.barHeight = Number(config.barHeight)
-                const labelColor = getContrastColor('#000', colorScale(config.runtime.seriesLabels[bar.key]))
+                let barColor = colorScale(config.runtime.seriesLabels[bar.key])
+                let labelColor = getContrastColor('#000', barColor)
+                let constrast = getColorContrast('#000', barColor)
+                const contrastLevel = 7
+                if (constrast < contrastLevel) {
+                  labelColor = '#fff'
+                }
                 // tooltips
                 const xAxisValue = formatNumber(data[bar.index][bar.key], 'left')
                 const yAxisValue =
