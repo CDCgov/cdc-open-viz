@@ -45,7 +45,6 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                   seriesHighlight.length === 0 ||
                   seriesHighlight.indexOf(item.dataKey) !== -1
                 const fillOpacity = isTransparent ? 0.3 : 0.5
-
                 return (
                   <Group key={`boxplotplot-${item.dataKey}-${index}`}>
                     {boxplot.plotNonOutlierValues &&
@@ -110,12 +109,14 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                         containerProps={{
                           'data-tooltip-html': handleTooltip(
                             boxplot,
-                            d,
+                            d.columnCategory,
                             item.dataKey,
                             d.q1[item.dataKey],
                             d.q3[item.dataKey],
                             d.median[item.dataKey],
-                            iqr
+                            iqr,
+                            config.xAxis.label,
+                            defaultColor
                           ),
                           'data-tooltip-id': tooltip_id,
                           tabIndex: -1

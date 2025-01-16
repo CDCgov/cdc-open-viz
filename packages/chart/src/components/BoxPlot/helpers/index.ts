@@ -12,15 +12,20 @@ interface Plot {
   q3: any
   median: any
 }
-export const handleTooltip = (boxplot, d, key, q1, q3, median, iqr) => {
+export const handleTooltip = (boxplot, columnCategory, key, q1, q3, median, iqr, label, color) => {
   return `
-      <strong>${d.columnCategory}</strong></br>
-       <strong>Key:${key}</strong></br>
-      ${boxplot.labels.q1}: ${q1}<br/>
-      ${boxplot.labels.q3}: ${q3}<br/>
-      ${boxplot.labels.iqr}: ${iqr}<br/>
-      ${boxplot.labels.median}: ${median}
-    `
+    <div class="p-2  text-red" style="max-width: 300px; word-wrap: break-word; opacity:0.7; background: rgba(255, 255, 255, 0.9)">
+      <div class="fw-bold" style="color: ${color};">
+        ${label ? `${label} : ${columnCategory}` : columnCategory}
+      </div>
+      <div class="" style="background: ${color}; height: 2px;"></div>
+        <strong>Key:</strong> ${key}<br/>
+        <strong>${boxplot.labels.q1}:</strong> ${q1}<br/>
+        <strong>${boxplot.labels.q3}:</strong> ${q3}<br/>
+        <strong>${boxplot.labels.iqr}:</strong> ${iqr}<br/>
+        <strong>${boxplot.labels.median}:</strong> ${median}
+    </div>
+  `
 }
 
 export const calculateBoxPlotStats = (values: number[]) => {
