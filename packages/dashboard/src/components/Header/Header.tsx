@@ -6,7 +6,6 @@ import './index.scss'
 import MultiConfigTabs from '../MultiConfigTabs'
 import { Tab } from '../../types/Tab'
 import _ from 'lodash'
-import { getVizRowColumnLocator } from '../../helpers/getVizRowColumnLocator'
 
 type HeaderProps = {
   back?: any
@@ -29,7 +28,7 @@ const Header = (props: HeaderProps) => {
     // the Widget component will do a data fetch if no data is available for the visualization
     // this is intended to help visualization developers.
     type SampleData = Record<string, { sample: boolean }> & Object[]
-    if (Object.values(data).some((d: SampleData) => d.sample)) {
+    if (Object.values(data).some((d: SampleData) => d?.sample)) {
       const sampleDataRemoved = Object.keys(data).reduce((acc, key) => {
         if ((data[key] as SampleData).sample) {
           acc[key] = []
