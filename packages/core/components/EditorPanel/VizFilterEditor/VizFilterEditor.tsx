@@ -241,6 +241,17 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                           handleFilterOrder={(index1, index2) => handleFilterOrder(index1, index2, filterIndex)}
                         />
                       )}
+                      {filter.order === 'column' && (
+                        <Select
+                          value={filter.orderColumn}
+                          fieldName='orderColumn'
+                          label='Order Column'
+                          updateField={(_section, _subSection, _field, value) =>
+                            updateFilterProp('orderColumn', filterIndex, value)
+                          }
+                          options={dataColumns}
+                        />
+                      )}
                     </>
                   ) : (
                     <NestedDropdownEditor
@@ -274,6 +285,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                         updateFilterProp('parents', filterIndex, value)
                       }}
                       options={getParentFilterOptions(filterIndex)}
+                      selected={config.filters[filterIndex].parents}
                     />
                   </label>
                 </FieldSetWrapper>

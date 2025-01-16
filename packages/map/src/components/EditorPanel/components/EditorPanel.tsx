@@ -26,6 +26,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Icon from '@cdc/core/components/ui/Icon'
 import InputToggle from '@cdc/core/components/inputs/InputToggle'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
+import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 
 // Assets
 import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg'
@@ -37,28 +38,24 @@ import usaDefaultConfig from '../../../../examples/default-usa.json'
 import countyDefaultConfig from '../../../../examples/default-county.json'
 import useMapLayers from '../../../hooks/useMapLayers.tsx'
 
-import { useFilters } from '@cdc/core/components/Filters'
-
 import HexSetting from './HexShapeSettings.jsx'
 import ConfigContext from '../../../context.ts'
 import { MapContext } from '../../../types/MapContext.js'
 import { TextField } from './Inputs'
 import Alert from '@cdc/core/components/Alert'
+import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
 // Todo: move to useReducer, seperate files out.
 const EditorPanel = ({ columnsRequiredChecker }) => {
   // prettier-ignore
   const {
-    changeFilterActive,
     columnsInData = [],
     isDashboard,
     isDebug,
-    isEditor,
     loadConfig,
     runtimeFilters,
     runtimeLegend,
     setParentConfig,
-    setRuntimeFilters,
     setState,
     state,
     tooltipId,
@@ -78,13 +75,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   const [displayPanel, setDisplayPanel] = useState(true)
 
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
-
-  const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({
-    config: state,
-    setConfig: setState,
-    filteredData: runtimeFilters,
-    setFilteredData: setRuntimeFilters
-  })
 
   const headerColors = [
     'theme-blue',
@@ -1073,42 +1063,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     })
   }
 
-  const MapFilters = () => {
-    return (
-      <>
-        <label>
-          Filter Behavior
-          <select
-            value={state.filterBehavior}
-            onChange={e => {
-              setState({
-                ...state,
-                filterBehavior: e.target.value
-              })
-            }}
-          >
-            <option key='Apply Button' value='Apply Button'>
-              Apply Button
-            </option>
-            <option key='Filter Change' value='Filter Change'>
-              Filter Change
-            </option>
-          </select>
-        </label>
-        <label>
-          <TextField
-            type='textarea'
-            value={state.filterIntro}
-            fieldName='filterIntro'
-            label='Filter Intro text'
-            updateField={updateField}
-          />
-        </label>
-        {filtersJSX}
-      </>
-    )
-  }
-
   const removeAdditionalColumn = columnName => {
     const newColumns = state.columns
 
@@ -1271,38 +1225,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     return true
   })
 
-  const updateField = (section, subsection, fieldName, newValue) => {
-    if (!section) {
-      setState({
-        ...state,
-        [fieldName]: newValue
-      })
-      return
-    }
-
-    const isArray = Array.isArray(state[section])
-
-    let sectionValue = isArray ? [...state[section], newValue] : { ...state[section], [fieldName]: newValue }
-
-    if (null !== subsection) {
-      if (isArray) {
-        sectionValue = [...state[section]]
-        sectionValue[subsection] = { ...sectionValue[subsection], [fieldName]: newValue }
-      } else {
-        sectionValue = {
-          ...state[section],
-          [subsection]: { ...state[section][subsection], [fieldName]: newValue }
-        }
-      }
-    }
-
-    let updatedState = {
-      ...state,
-      [section]: sectionValue
-    }
-
-    setState(updatedState)
-  }
+  const updateField = updateFieldFactory(state, setState)
 
   const onBackClick = () => {
     setDisplayPanel(!displayPanel)
@@ -1313,163 +1236,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   }
 
   const usedFilterColumns = {}
-
-  const filtersJSX = state.filters.map((filter, index) => {
-    if (filter.type === 'url') return <></>
-
-    if (filter.columnName) {
-      usedFilterColumns[filter.columnName] = true
-    }
-
-    return (
-      <>
-        <fieldset className='edit-block' key={`filter-${index}`}>
-          <button
-            className='remove-column'
-            onClick={e => {
-              e.preventDefault()
-              changeFilter(index, 'remove')
-            }}
-          >
-            Remove
-          </button>
-          <TextField
-            value={state.filters[index].label}
-            section='filters'
-            subsection={index}
-            fieldName='label'
-            label='Label'
-            updateField={updateField}
-          />
-          <label>
-            <span className='edit-label column-heading'>
-              Filter Column
-              <Tooltip style={{ textTransform: 'none' }}>
-                <Tooltip.Target>
-                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                </Tooltip.Target>
-                <Tooltip.Content>
-                  <p>
-                    Selecting a column will add a dropdown menu below the map legend and allow users to filter based on
-                    the values in this column.
-                  </p>
-                </Tooltip.Content>
-              </Tooltip>
-            </span>
-            <select
-              value={filter.columnName}
-              onChange={event => {
-                changeFilter(index, 'columnName', event.target.value)
-              }}
-            >
-              {columnsOptions.filter(({ key }) => undefined === usedFilterColumns[key] || filter.columnName === key)}
-            </select>
-          </label>
-
-          <label>
-            <span className='edit-showDropdown column-heading'>Show Filter Input</span>
-            <input
-              type='checkbox'
-              checked={filter.showDropdown === undefined ? true : filter.showDropdown}
-              onChange={e => {
-                changeFilter(index, 'showDropdown', e.target.checked)
-              }}
-            />
-          </label>
-
-          <label>
-            <span className='edit-filterOrder column-heading'>Filter Style</span>
-            <select
-              value={filter.filterStyle}
-              onChange={e => {
-                changeFilter(index, 'filterStyle', e.target.value)
-              }}
-            >
-              {filterStyleOptions.map((option, index) => {
-                return (
-                  <option value={option} key={`filter-${option}--${index}`}>
-                    {option}
-                  </option>
-                )
-              })}
-            </select>
-          </label>
-
-          <label>
-            <span className='edit-filterOrder column-heading'>Filter Order</span>
-            <select
-              value={filter.order}
-              onChange={e => {
-                changeFilter(index, 'filterOrder', e.target.value)
-                changeFilterActive(index, filter.values[0])
-              }}
-            >
-              {filterOrderOptions.map((option, index) => {
-                return (
-                  <option value={option.value} key={`filter-${index}`}>
-                    {option.label}
-                  </option>
-                )
-              })}
-            </select>
-          </label>
-
-          <TextField
-            value={state.filters[index].setByQueryParameter}
-            section='filters'
-            subsection={index}
-            fieldName='setByQueryParameter'
-            label='Default Value Set By Query String Parameter'
-            updateField={updateField}
-          />
-
-          {filter.order === 'cust' && (
-            <DragDropContext
-              onDragEnd={({ source, destination }) =>
-                handleFilterOrder(source.index, destination?.index, index, state.filters?.[index])
-              }
-            >
-              <Droppable droppableId='filter_order'>
-                {provided => (
-                  <ul
-                    {...provided.droppableProps}
-                    className='sort-list'
-                    ref={provided.innerRef}
-                    style={{ marginTop: '1em' }}
-                  >
-                    {state.filters[index]?.values.map((value, index) => {
-                      return (
-                        <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
-                          {(provided, snapshot) => (
-                            <li>
-                              <div
-                                className={snapshot.isDragging ? 'currently-dragging' : ''}
-                                style={getItemStyle(
-                                  snapshot.isDragging,
-                                  provided.draggableProps.style,
-                                  sortableItemStyles
-                                )}
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                {value}
-                              </div>
-                            </li>
-                          )}
-                        </Draggable>
-                      )
-                    })}
-                    {provided.placeholder}
-                  </ul>
-                )}
-              </Droppable>
-            </DragDropContext>
-          )}
-        </fieldset>
-      </>
-    )
-  })
 
   const StateOptionList = () => {
     const arrOfArrays = Object.entries(supportedStatesFipsCodes)
@@ -2857,7 +2623,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     </label>
                   </React.Fragment>
                 )}
-                {filtersJSX.length > 0 && (
+                {state.filters.length > 0 && (
                   <label className='checkbox'>
                     <input
                       type='checkbox'
@@ -2885,7 +2651,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     </span>
                   </label>
                 )}
-                {(filtersJSX.length > 0 || state.general.type === 'bubble' || state.general.geoType === 'us') && (
+                {(state.filters.length > 0 || state.general.type === 'bubble' || state.general.geoType === 'us') && (
                   <label className='checkbox'>
                     <input
                       type='checkbox'
@@ -2922,20 +2688,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                 <AccordionItemButton>Filters</AccordionItemButton>
               </AccordionItemHeading>
               <AccordionItemPanel>
-                {filtersJSX.length > 0 ? (
-                  <MapFilters />
-                ) : (
-                  <p style={{ textAlign: 'center' }}>There are currently no filters.</p>
-                )}
-                <button
-                  className={'btn btn-primary full-width'}
-                  onClick={event => {
-                    event.preventDefault()
-                    changeFilter(null, 'addNew')
-                  }}
-                >
-                  Add Filter
-                </button>
+                <VizFilterEditor config={state} updateField={updateField} rawData={state.data} />
               </AccordionItemPanel>
             </AccordionItem>
           )}

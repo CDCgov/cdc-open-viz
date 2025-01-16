@@ -54,7 +54,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
 
         {state.map.patterns.map((patternData, patternIndex) => {
           const patternColor = patternData.color || getContrastColor('#FFF', backgroundColor)
-          const hasMatchingValues = patternData.dataValue === territoryData[patternData.dataKey]
+          const hasMatchingValues = patternData.dataValue === territoryData?.[patternData.dataKey]
 
           if (!hasMatchingValues) return null
           if (!patternData.pattern) return null
@@ -96,8 +96,8 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                 fill={`url(#territory-${territory}-${patternData?.dataKey}--${patternIndex})`}
                 color={patternData ? 'white' : textColor}
                 className={[
-                  `territory-pattern-${patternData.dataKey}`,
-                  `territory-pattern-${patternData.dataKey}--${patternData.dataValue}`
+                  `territory-pattern-${patternData?.dataKey}`,
+                  `territory-pattern-${patternData?.dataKey}--${patternData.dataValue}`
                 ].join(' ')}
               />
               <text
