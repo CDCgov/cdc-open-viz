@@ -26,7 +26,7 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
       const parentsActiveValues: string[] = dataSet.filter((d: Record<string, any>) => {
         if (isParentMultiSelect) {
           // If multi-select, check if the parent active array includes the value
-          return parentFilter.active.includes(d[parentFilter.columnName])
+          return Array.isArray(parentFilter.active) && parentFilter.active.includes(d[parentFilter.columnName])
         } else {
           return parentFilter.active === d[parentFilter.columnName]
         }
