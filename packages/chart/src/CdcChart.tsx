@@ -394,7 +394,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
           dispatch({ type: 'SET_STATE_DATA', payload: preparedData })
           dispatch({ type: 'SET_EXCLUDED_DATA', payload: preparedData })
           updateConfig(preparedConfig, preparedData)
-          dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(config.filters, preparedData) })
+          dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(config.filters, prepareData) })
         }
       } catch (err) {
         console.error('Could not Load!')
@@ -815,7 +815,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 )}
 
                 {/* Filters */}
-                {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
+                {config.filters.some(filter => filter.columnName) && config.visualizationType !== 'Spark Line' && (
                   <Filters
                     config={config}
                     setConfig={setFiltersConfig}
@@ -882,7 +882,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         </div>
                       ))}
                     {/* Sparkline */}
-                    {config.visualizationType === 'Spark Line' && (
+                    {config.filters.some(filter => filter.columnName) && config.visualizationType === 'Spark Line' && (
                       <>
                         <Filters
                           config={config}
