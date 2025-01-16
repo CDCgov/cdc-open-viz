@@ -10,7 +10,7 @@ const cleanDashboardFootnotes = (config: DashboardConfig) => {
   if (config.rows) {
     config.rows.forEach(row => {
       if (row.footnotesId) {
-        const { dataKey, staticFootnotes } = config.visualizations[row.footnotesId] as Footnotes
+        const { dataKey, staticFootnotes } = (config.visualizations[row.footnotesId] || {}) as Footnotes
         if (!dataKey && !staticFootnotes?.length) {
           delete config.visualizations[row.footnotesId]
           delete row.footnotesId

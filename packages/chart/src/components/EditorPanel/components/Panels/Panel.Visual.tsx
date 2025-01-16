@@ -138,6 +138,21 @@ const PanelVisual: FC<PanelProps> = props => {
         )}
         {visHasBarBorders() && (
           <Select
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon
+                    display='question'
+                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                  />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>
+                  Recommended set to display for Section 508 compliance.
+                  </p>
+                </Tooltip.Content>
+              </Tooltip>
+            }
             value={config.barHasBorder}
             fieldName='barHasBorder'
             label='Bar Borders'
@@ -188,9 +203,10 @@ const PanelVisual: FC<PanelProps> = props => {
               updateField={updateField}
               options={['none', 'standard']}
             />
-            {config.series.length > 5 && config.visual.lineDatapointSymbol === 'standard' && (
-              <small className='text-danger'>Standard only supports up to 5 data points</small>
-            )}
+            {config.series.length > config.visual.maximumShapeAmount &&
+              config.visual.lineDatapointSymbol === 'standard' && (
+                <small className='text-danger'>Standard only supports up to 7 data points</small>
+              )}
 
             <Select
               value={config.lineDatapointStyle}

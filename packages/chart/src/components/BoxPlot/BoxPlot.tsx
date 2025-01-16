@@ -4,7 +4,7 @@ import { Group } from '@visx/group'
 import ConfigContext from '../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
-import { handleTooltip, calculateBoxPlotStats, createPlots } from './helpers/index'
+import { handleTooltip, createPlots } from './helpers/index'
 import _ from 'lodash'
 
 const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
@@ -13,13 +13,16 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
 
   const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
   const boxWidth = xScale.bandwidth()
+
+  const bodyStyles = getComputedStyle(document.body)
+  const defaultColor = bodyStyles.getPropertyValue('--cool-gray-90').trim()
   const constrainedWidth = Math.min(40, boxWidth)
   const color_0 = _.get(colorPalettesChart, [config.palette, 0], '#000')
-
+  const plots = createPlots(data, config)
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group left={Number(config.yAxis.size)} className='boxplot' key={`boxplot-group`}>
-        {createPlots(data, config).map((d, i) => {
+        {plots.map((d, i) => {
           const offset = boxWidth - constrainedWidth
           const radius = 4
 
@@ -29,10 +32,6 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
               left={xScale(d.columnCategory) + (xScale.bandwidth() - seriesScale.bandwidth()) / 2}
             >
               {config.series.map((item, index) => {
-                const valuesByKey = d.keyValues[item.dataKey]
-                const { min, max, median, firstQuartile, thirdQuartile } = calculateBoxPlotStats(valuesByKey)
-                let iqr = Number(thirdQuartile - firstQuartile).toFixed(config.dataFormat.roundTo)
-
                 const isTransparent =
                   config.legend.behavior === 'highlight' &&
                   seriesHighlight.length > 0 &&
@@ -42,19 +41,19 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                   seriesHighlight.length === 0 ||
                   seriesHighlight.indexOf(item.dataKey) !== -1
                 const fillOpacity = isTransparent ? 0.3 : 0.5
-
                 return (
                   <Group key={`boxplotplot-${item.dataKey}-${index}`}>
                     {boxplot.plotNonOutlierValues &&
-                      valuesByKey.map((value, index) => {
+                      d.columnNonOutliers[item.dataKey].map((value, index) => {
                         return (
                           <circle
                             display={displayPlot ? 'block' : 'none'}
                             cx={seriesScale(item.dataKey) + seriesScale.bandwidth() / 2}
                             cy={yScale(value)}
                             r={radius}
-                            fill={'#ccc'}
-                            style={{ opacity: fillOpacity, fillOpacity: 1, stroke: 'black' }}
+                            opacity={fillOpacity}
+                            fill={defaultColor}
+                            style={{ stroke: defaultColor }}
                             key={`boxplot-${i}--circle-${index}`}
                           />
                         )
@@ -64,53 +63,56 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                         display={displayPlot ? 'block' : 'none'}
                         data-left={xScale(d.columnCategory) + config.yAxis.size + offset / 2 + 0.5}
                         key={`box-plot-${i}-${item}`}
-                        min={Number(min)}
-                        max={Number(max)}
+                        min={Number(d.min[item.dataKey])}
+                        max={Number(d.max[item.dataKey])}
                         left={seriesScale(item.dataKey)}
-                        firstQuartile={firstQuartile}
-                        thirdQuartile={thirdQuartile}
-                        median={median}
+                        firstQuartile={d.q1[item.dataKey]}
+                        thirdQuartile={d.q3[item.dataKey]}
+                        median={d.median[item.dataKey]}
                         boxWidth={seriesScale.bandwidth()}
                         fill={colorScale(item.dataKey)}
-                        fillOpacity={fillOpacity}
-                        stroke={fillOpacity ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.1)'}
+                        fillOpacity={1}
+                        stroke={defaultColor}
                         valueScale={yScale}
-                        outliers={boxplot.plotOutlierValues ? d.columnOutliers : []}
+                        outliers={boxplot.plotOutlierValues ? _.map(d.columnOutliers[item.dataKey], item => item) : []}
                         outlierProps={{
                           style: {
-                            fill: `${color_0}`,
-                            opacity: fillOpacity
+                            fill: defaultColor,
+                            opacity: fillOpacity,
+                            stroke: defaultColor
                           }
                         }}
                         medianProps={{
                           style: {
-                            stroke: 'black',
-                            opacity: fillOpacity
+                            opacity: fillOpacity,
+                            stroke: defaultColor
                           }
                         }}
                         boxProps={{
                           style: {
-                            stroke: 'black',
-                            strokeWidth: boxplot.borders === 'true' ? 1 : 0,
+                            stroke: defaultColor,
+                            strokeWidth: boxplot.borders === 'true' ? 1.5 : 0,
                             opacity: fillOpacity
                           }
                         }}
                         maxProps={{
                           style: {
-                            stroke: 'black',
-                            opacity: fillOpacity
+                            opacity: fillOpacity,
+                            stroke: defaultColor
                           }
                         }}
                         container
                         containerProps={{
                           'data-tooltip-html': handleTooltip(
                             boxplot,
-                            d,
+                            d.columnCategory,
                             item.dataKey,
-                            firstQuartile,
-                            thirdQuartile,
-                            median,
-                            iqr
+                            _.round(d.q1[item.dataKey], config.dataFormat.roundTo),
+                            _.round(d.q3[item.dataKey], config.dataFormat.roundTo),
+                            _.round(d.median[item.dataKey], config.dataFormat.roundTo),
+                            _.round(d.iqr[item.dataKey], config.dataFormat.roundTo),
+                            config.xAxis.label,
+                            defaultColor
                           ),
                           'data-tooltip-id': tooltip_id,
                           tabIndex: -1

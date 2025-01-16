@@ -8,7 +8,6 @@ import { Text } from '@visx/text'
 
 // CDC core components
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import VisxShape from '@cdc/core/components/VisxShape'
 
 // Local context and hooks
 import ConfigContext from '../../ConfigContext'
@@ -19,17 +18,15 @@ import { filterCircles, createStyles, createDataSegments } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
 import LineChartBumpCircle from './components/LineChart.BumpCircle'
 import isNumber from '@cdc/core/helpers/isNumber'
-import LineChartShape from './components/LineChart.Shape'
 
 // Types
 import { type ChartContext } from '../../types/ChartContext'
 import { type LineChartProps } from './LineChartProps'
+import { getXAxisData, getYAxisData } from '../../helpers/getAxisData'
 
 const LineChart = (props: LineChartProps) => {
   // prettier-ignore
   const {
-    getXAxisData,
-    getYAxisData,
     handleTooltipClick,
     handleTooltipMouseOff,
     handleTooltipMouseOver,
@@ -56,7 +53,7 @@ const LineChart = (props: LineChartProps) => {
   }
 
   const xPos = d => {
-    return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+    return xScale(getXAxisData(d, config, parseDate)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
   }
 
   return (
@@ -134,7 +131,7 @@ const LineChart = (props: LineChartProps) => {
                         </Text>
                       )}
 
-                      {lineDatapointStyle === 'always show' && config.visual.lineDatapointSymbol === 'none' && (
+                      {lineDatapointStyle === 'always show' && (
                         <LineChartCircle
                           mode='ALWAYS_SHOW_POINTS'
                           dataIndex={dataIndex}
@@ -152,12 +149,14 @@ const LineChart = (props: LineChartProps) => {
                           parseDate={parseDate}
                           yScaleRight={yScaleRight}
                           seriesAxis={seriesAxis}
+                          seriesIndex={index}
                           key={`line-circle--${dataIndex}`}
                         />
                       )}
 
                       <LineChartCircle
                         mode='ISOLATED_POINTS'
+                        seriesIndex={index}
                         dataIndex={dataIndex}
                         tableData={tableData}
                         circleData={circleData}
@@ -175,33 +174,14 @@ const LineChart = (props: LineChartProps) => {
                         seriesAxis={seriesAxis}
                         key={`isolated-circle-${dataIndex}`}
                       />
-
-                      {config.visual.lineDatapointSymbol === 'standard' && (
-                        <LineChartShape
-                          tableData={tableData}
-                          dataIndex={index}
-                          d={d}
-                          circleData={circleData}
-                          data={_data}
-                          config={config}
-                          seriesKey={seriesKey}
-                          displayArea={displayArea}
-                          tooltipData={tooltipData}
-                          xScale={xScale}
-                          yScale={yScale}
-                          colorScale={colorScale}
-                          parseDate={parseDate}
-                          yScaleRight={yScaleRight}
-                          seriesAxis={seriesAxis}
-                        />
-                      )}
                     </React.Fragment>
                   )
                 )
               })}
               <>
-                {lineDatapointStyle === 'hover' && config.visual.lineDatapointSymbol === 'none' && (
+                {lineDatapointStyle === 'hover' && (
                   <LineChartCircle
+                    seriesIndex={index}
                     tableData={tableData}
                     dataIndex={0}
                     mode='HOVER_POINTS'
@@ -329,8 +309,8 @@ const LineChart = (props: LineChartProps) => {
                         ? _data
                         : config.xAxis.type === 'date-time' || config.xAxis.type === 'date'
                         ? _data.sort((d1, d2) => {
-                            let x1 = getXAxisData(d1)
-                            let x2 = getXAxisData(d2)
+                            let x1 = getXAxisData(d1, config, parseDate)
+                            let x2 = getXAxisData(d2, config, parseDate)
                             if (x1 < x2) return -1
                             if (x2 < x1) return 1
                             return 0
@@ -356,19 +336,26 @@ const LineChart = (props: LineChartProps) => {
               )}
 
               {/* circles for preliminaryData data */}
-
               {circleData.map((item, i) => {
-                let isStandardShape = config.visual.lineDatapointSymbol === 'standard'
                 return (
-                  <VisxShape
+                  <circle
                     key={i}
-                    display={true}
-                    left={xPos(item.data)}
-                    top={yScale(Number(getYAxisData(item.data, seriesKey)))}
-                    size={Number(item.size) * 50}
-                    stroke={colorScale(seriesKey)}
-                    fill={colorScale(seriesKey)}
-                    index={isStandardShape ? index : 0}
+                    cx={xPos(item.data)}
+                    cy={
+                      seriesAxis === 'Right'
+                        ? yScaleRight(getYAxisData(item.data, _seriesKey))
+                        : yScale(Number(getYAxisData(item.data, _seriesKey)))
+                    }
+                    r={item.size}
+                    strokeWidth={seriesData.weight || 2}
+                    stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'}
+                    fill={
+                      item.isFilled
+                        ? colorScale
+                          ? colorScale(config.runtime.seriesLabels[seriesKey])
+                          : '#000'
+                        : '#fff'
+                    }
                   />
                 )
               })}

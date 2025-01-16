@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import { ChartConfig } from '../types/ChartConfig'
-import { getQuartiles } from './getQuartiles'
 import * as d3 from 'd3-array'
 
 export const getBoxPlotConfig = (newConfig: ChartConfig, data: object[]) => {
@@ -26,27 +25,23 @@ export const getBoxPlotConfig = (newConfig: ChartConfig, data: object[]) => {
           // get the results from the chain
           .value()
 
-        // ! - Notice d3.quantile doesn't work here, and we had to take a custom route.
-        const quartiles = getQuartiles(sortedData)
-
         if (!sortedData) throw new Error('boxplots dont have data yet')
         if (!plots) throw new Error('boxplots dont have plots yet')
 
-        const q1 = quartiles.q1
-        const q3 = quartiles.q3
+        const q1 = d3.quantile(sortedData, 0.25)
+        const q3 = d3.quantile(sortedData, 0.75)
 
         const iqr = q3 - q1
         const lowerBounds = q1 - 1.5 * iqr
         const upperBounds = q3 + 1.5 * iqr
-        const filteredData = sortedData.filter(d => d <= upperBounds)
-        const max = d3.max(filteredData)
+        const nonOutliers = sortedData.filter(value => value >= lowerBounds && value <= upperBounds)
         plots.push({
           columnCategory: g,
-          columnMax: max,
+          columnMax: d3.max(nonOutliers),
           columnThirdQuartile: _.round(q3, newConfig.dataFormat.roundTo),
           columnMedian: Number(d3.median(sortedData)).toFixed(newConfig.dataFormat.roundTo),
           columnFirstQuartile: _.round(q1, newConfig.dataFormat.roundTo),
-          columnMin: _.min(sortedData),
+          columnMin: _.min(nonOutliers),
           columnCount: count,
           columnSd: Number(d3.deviation(sortedData)).toFixed(newConfig.dataFormat.roundTo),
           columnMean: Number(d3.mean(sortedData)).toFixed(newConfig.dataFormat.roundTo),
