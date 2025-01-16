@@ -3,6 +3,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import * as d3 from 'd3'
 import { Text } from '@visx/text'
+import { ChartDispatchContext } from '../ConfigContext'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import _ from 'lodash'
 
@@ -12,7 +13,8 @@ interface BrushChartProps {
 }
 
 const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
-  const { tableData, config, setBrushConfig, dashboardConfig, formatDate, parseDate } = useContext(ConfigContext)
+  const { tableData, config, dashboardConfig, formatDate, parseDate, brushConfig } = useContext(ConfigContext)
+  const dispatch = useContext(ChartDispatchContext)
   const [brushState, setBrushState] = useState({ isBrushing: false, selection: [] })
   const [brushKey, setBrushKey] = useState(0)
   const sharedFilters = dashboardConfig?.dashboard?.sharedFilters ?? []
@@ -113,11 +115,13 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
       const [formattedStartDate, formattedEndDate] = [startDate, endDate].map(date => formatDate(parseDate(date)))
       svg.call(brushHandle, selection, formattedStartDate, formattedEndDate)
 
-      setBrushConfig({
+      const newConfig = {
         active: config.brush.active,
         isBrushing: isUserBrushing,
         data: finalData
-      })
+      }
+      dispatch({ type: 'SET_BRUSH_CONFIG', payload: newConfig })
+
       setBrushState({
         isBrushing: true,
         selection
@@ -150,20 +154,13 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
 
     if ((isFiltersActive || isExclusionsActive || isDashboardFilters) && config.brush?.active) {
       setBrushKey(prevKey => prevKey + 1)
-      setBrushConfig(prev => {
-        return {
-          ...prev,
-          data: tableData
-        }
-      })
+      const newConfig = {
+        ...brushConfig,
+        data: tableData
+      }
+      dispatch({ type: 'SET_BRUSH_CONFIG', payload: newConfig })
     }
-    return () =>
-      setBrushConfig(prev => {
-        return {
-          ...prev,
-          data: []
-        }
-      })
+    return () => dispatch({ type: 'SET_BRUSH_CONFIG', payload: { ...brushConfig, data: [] } })
   }, [config.filters, config.exclusions, config.brush?.active, isDashboardFilters])
   // Initialize brush when component is first rendered
 

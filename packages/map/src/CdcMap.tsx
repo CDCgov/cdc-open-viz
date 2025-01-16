@@ -80,6 +80,8 @@ import GoogleMap from './components/GoogleMap'
 // hooks
 import useTooltip from './hooks/useTooltip'
 import useResizeObserver from './hooks/useResizeObserver'
+import { SubGrouping } from '@cdc/core/types/VizFilter'
+import { ViewPort } from '@cdc/core/types/ViewPort'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -111,8 +113,15 @@ const CdcMap = ({
   const [displayPanel, setDisplayPanel] = useState(true)
   const [topoData, setTopoData] = useState<{}>({})
   const [runtimeFilters, setRuntimeFilters] = useState([])
-  const [runtimeLegend, setRuntimeLegend] = useState([])
   const [runtimeData, setRuntimeData] = useState({ init: true })
+  const _setRuntimeData = (data: any) => {
+    if (config) {
+      setRuntimeData(data)
+    } else {
+      setRuntimeFilters(data)
+    }
+  }
+  const [runtimeLegend, setRuntimeLegend] = useState([])
   const [stateToShow, setStateToShow] = useState(null)
   const [modal, setModal] = useState(null)
   const [accessibleStatus, setAccessibleStatus] = useState('')
@@ -329,7 +338,7 @@ const CdcMap = ({
   })
 
   // eslint-disable-next-line
-  const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
+  const generateRuntimeLegend = useCallback((obj, runtimeFilters, hash) => {
     const newLegendMemo = new Map() // Reset memoization
     const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
     let primaryCol = obj.columns.primary.name,
@@ -344,7 +353,7 @@ const CdcMap = ({
       result.fromHash = hash
     }
 
-    result.runtimeDataHash = runtimeData.fromHash
+    result.runtimeDataHash = runtimeFilters?.fromHash
 
     // Unified will base the legend off ALL of the data maps received. Otherwise, it will use
     let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData)
@@ -758,7 +767,7 @@ const CdcMap = ({
     legendMemo.current = newLegendMemo
 
     if (state.general.geoType === 'world') {
-      const runtimeDataKeys = Object.keys(runtimeData)
+      const runtimeDataKeys = Object.keys(runtimeFilters)
       const isCountriesWithNoDataState =
         obj.data === undefined ? false : !countryKeys.every(countryKey => runtimeDataKeys.includes(countryKey))
 
@@ -823,32 +832,21 @@ const CdcMap = ({
       ) => {
         let newFilter = runtimeFilters[idx]
 
-        const sortAsc = (a, b) => {
-          return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
-        }
-
-        const sortDesc = (a, b) => {
-          return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
+        const sort = (a, b) => {
+          const asc = obj.filters[idx].order !== 'desc'
+          return String(asc ? a : b).localeCompare(String(asc ? b : a), 'en', { numeric: true })
         }
 
         if (type !== 'url') {
           values = getUniqueValues(state.data, columnName)
 
-          if (obj.filters[idx].order === 'asc') {
-            values = values.sort(sortAsc)
-          }
-
-          if (obj.filters[idx].order === 'desc') {
-            values = values.sort(sortDesc)
-          }
-
           if (obj.filters[idx].order === 'cust') {
             if (obj.filters[idx]?.values.length > 0) {
               values = obj.filters[idx].values
             }
+          } else {
+            values = values.sort(sort)
           }
-        } else {
-          values = values
         }
 
         if (undefined === newFilter) {
@@ -868,6 +866,7 @@ const CdcMap = ({
         newFilter.active = active ?? values[0] // Default to first found value
         newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
         newFilter.showDropdown = showDropdown
+        newFilter.subGrouping = obj.filters[idx].subGrouping
 
         filters.push(newFilter)
       }
@@ -916,17 +915,23 @@ const CdcMap = ({
         // Filters
         if (filters?.length) {
           for (let i = 0; i < filters.length; i++) {
-            const { columnName, active, type } = filters[i]
-            if (type !== 'url' && String(row[columnName]) !== String(active)) return false // Bail out, not part of filter
+            const { columnName, active, type, filterStyle, subGrouping } = filters[i]
+            const isDataFilter = type !== 'url'
+            const matchingValue = String(active) === String(row[columnName]) // Group
+            if (isDataFilter && !matchingValue) return false // Bail out, data doesn't match the filter selection
+            if (filterStyle == 'nested-dropdown') {
+              const matchingSubValue = String(row[subGrouping?.columnName]) === String(subGrouping?.active)
+              if (subGrouping?.active && !matchingSubValue) {
+                return false // Bail out, data doesn't match the subgroup selection
+              }
+            }
           }
         }
-
         // Don't add additional rows with same UID
-        if (undefined === result[row.uid]) {
+        if (result[row.uid] === undefined) {
           result[row.uid] = row
         }
       })
-
       return result
     } catch (e) {
       console.error('COVE: ', e) // eslint-disable-line
@@ -1300,7 +1305,7 @@ const CdcMap = ({
     const hashFilters = hashObj(state.filters)
     let filters
 
-    if (state.filters && hashFilters !== runtimeFilters.fromHash) {
+    if (state.filters && (config || hashFilters !== runtimeFilters.fromHash)) {
       filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
 
       if (filters) {
@@ -1329,12 +1334,12 @@ const CdcMap = ({
     })
 
     // Data
-    if (hashData !== runtimeData.fromHash && state.data?.fromColumn) {
+    if (hashData !== runtimeData?.fromHash && state.data?.fromColumn) {
       const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
 
       setRuntimeData(newRuntimeData)
     } else {
-      if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
+      if (hashLegend !== runtimeLegend?.fromHash && undefined === runtimeData.init) {
         const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
         setRuntimeLegend(legend)
       }
@@ -1490,7 +1495,12 @@ const CdcMap = ({
   )
 
   const sectionClassNames = () => {
-    const classes = ['cove-component__content', 'cdc-map-inner-container', `${currentViewport}`]
+    const classes = [
+      'cove-component__content',
+      'cdc-map-inner-container',
+      `${currentViewport}`,
+      `${state?.general?.headerColor}`
+    ]
     if (config?.runtime?.editorErrorMessage.length > 0) classes.push('type-map--has-error')
     return classes.join(' ')
   }
@@ -1531,7 +1541,7 @@ const CdcMap = ({
                   config={state}
                   setConfig={setState}
                   filteredData={runtimeFilters}
-                  setFilteredData={setRuntimeFilters}
+                  setFilteredData={_setRuntimeData}
                   dimensions={dimensions}
                   standaloneMap={!config}
                 />
