@@ -106,7 +106,6 @@ export const createPlots = (data, config) => {
 
         // Calculate box plot statistics
         const { firstQuartile, thirdQuartile, min, max, median } = calculateBoxPlotStats(values)
-        console.log(median, 'median')
         // Calculate outliers and non-outliers
         columnOutliers[key] = calculateOutliers(values, firstQuartile, thirdQuartile).map(Number)
         columnNonOutliers[key] = calculateNonOutliers(values, firstQuartile, thirdQuartile).map(Number)
