@@ -410,6 +410,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   useEffect(() => {
     if (lastMaxValue.current === maxValue) return
     lastMaxValue.current = maxValue
+
     if (!yAxisAutoPadding) return
     setYAxisAutoPadding(0)
   }, [maxValue])
@@ -419,12 +420,20 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const maxValueIsGreaterThanTopGridLine = maxValue > Math.max(...yScale.ticks(handleNumTicks))
 
     if (!maxValueIsGreaterThanTopGridLine || !labelsOverflow) return
-
-    const tickGap = yScale.ticks(handleNumTicks)[1] - yScale.ticks(handleNumTicks)[0]
+    const ticks = yScale.ticks(handleNumTicks)
+    const tickGap = ticks.length === 1 ? ticks[0] : ticks[1] - ticks[0]
     const nextTick = Math.max(...yScale.ticks(handleNumTicks)) + tickGap
-    const newPadding = minValue < 0 ? (nextTick - maxValue) / maxValue / 2 : (nextTick - maxValue) / maxValue
+    const divideBy = minValue < 0 ? maxValue / 2 : maxValue
+    const calculatedPadding = (nextTick - maxValue) / divideBy
 
-    setYAxisAutoPadding(newPadding * 100)
+    // if auto padding is too close to next tick, add one more ticks worth of padding
+    const PADDING_THRESHOLD = 0.025
+    const newPadding =
+      calculatedPadding > PADDING_THRESHOLD ? calculatedPadding : calculatedPadding + tickGap / divideBy
+
+    /* sometimes even though the padding is getting to the next tick exactly,
+    d3 still doesn't show the tick. we add 0.1 to ensure to tip it over the edge */
+    setYAxisAutoPadding(newPadding * 100 + 0.1)
   }, [maxValue, labelsOverflow, yScale, handleNumTicks])
 
   // Render Functions
@@ -433,7 +442,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
     const getTickPositions = (ticks, xScale) => {
       if (!ticks.length) return false
-      // filterout first index
+      // filter out first index
       const filteredTicks = ticks.filter(tick => tick.index !== 0)
       const numberOfTicks = filteredTicks?.length
       const xMaxHalf = xScale.range()[0] || xMax / 2

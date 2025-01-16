@@ -20,7 +20,7 @@ export const coveUpdateWorker = config => {
     ['4.24.5', update_4_24_5],
     ['4.24.7', update_4_24_7, true],
     ['4.24.9', update_4_24_9],
-    ['4.24.10', update_4_24_10]
+    ['4.24.10', update_4_24_10, true]
   ]
 
   versions.forEach(([version, updateFunction, alwaysRun]: [string, UpdateFunction, boolean?]) => {

@@ -6,6 +6,7 @@ import DataTableEditorPanel from './components/DataTableEditorPanel'
 import Filters from '../Filters'
 import { TableConfig } from './types/TableConfig'
 import { filterVizData } from '../../helpers/filterVizData'
+import { addValuesToFilters } from '../../helpers/addValuesToFilters'
 
 type StandAloneProps = {
   visualizationKey: string
@@ -28,9 +29,8 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
 
   useEffect(() => {
     // when using editor changes to filter should update the data
-    setFilteredData(
-      filterVizData(config.filters, config?.formattedData?.length > 0 ? config.formattedData : config.data)
-    )
+    const filters = addValuesToFilters(config.filters, config.data)
+    setFilteredData(filterVizData(filters, config?.formattedData?.length > 0 ? config.formattedData : config.data))
   }, [config.filters])
 
   if (isEditor)
