@@ -4,20 +4,21 @@ import _ from 'lodash'
 export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Record<string, any>): SharedFilter[] => {
   const dataSet = Object.values(data).flat()
   // filter out Data type filters
-  const filters = newSharedFilters.filter(filter => filter.type === 'datafilter')
+  const dataFilters = newSharedFilters.filter(filter => filter.type === 'datafilter')
+  const urlFilters = newSharedFilters.filter(filter => filter.type === 'urlfilter')
   // Find indexes of all child filters
-  const childFilterIndexes: number[] = filters
+  const childFilterIndexes: number[] = dataFilters
     .map((filter, index) => (filter.parents ? index : -1))
     .filter(index => index !== -1)
   if (childFilterIndexes.length === 0) return newSharedFilters
 
   // deep copy of the shared filters
-  const updatedFilters = _.cloneDeep(filters)
+  const updatedFilters = _.cloneDeep(dataFilters)
 
   // Update each child filter
   childFilterIndexes.forEach(childIndex => {
-    const childFilter: SharedFilter = filters[childIndex]
-    const parentFilter: SharedFilter = filters.find(filter => String(childFilter.parents) === String(filter.key))
+    const childFilter: SharedFilter = dataFilters[childIndex]
+    const parentFilter: SharedFilter = dataFilters.find(filter => String(childFilter.parents) === String(filter.key))
     const isParentMultiSelect = parentFilter.filterStyle === 'multi-select'
 
     if (parentFilter) {
@@ -43,5 +44,5 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
     }
   })
 
-  return updatedFilters
+  return [...updatedFilters, ...urlFilters]
 }
