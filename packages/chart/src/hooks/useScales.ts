@@ -80,7 +80,7 @@ const useScales = (properties: useScaleProps) => {
   if (xAxis.type === 'date-time' || xAxis.type === 'continuous') {
     let xAxisMin = Math.min(...xAxisDataMapped.map(Number))
     let xAxisMax = Math.max(...xAxisDataMapped.map(Number))
-    let xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
+    const xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
 
     // Apply consistent padding to the domain
     const paddingFactor = config.xAxis.padding ? config.xAxis.padding * 0.01 : 0
