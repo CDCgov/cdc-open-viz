@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import { ChartConfig } from '../types/ChartConfig'
-import { getQuartiles } from './getQuartiles'
 import * as d3 from 'd3-array'
 
 export const getBoxPlotConfig = (newConfig: ChartConfig, data: object[]) => {
@@ -25,9 +24,6 @@ export const getBoxPlotConfig = (newConfig: ChartConfig, data: object[]) => {
           }))
           // get the results from the chain
           .value()
-
-        // ! - Notice d3.quantile doesn't work here, and we had to take a custom route.
-        const quartiles = getQuartiles(sortedData)
 
         if (!sortedData) throw new Error('boxplots dont have data yet')
         if (!plots) throw new Error('boxplots dont have plots yet')

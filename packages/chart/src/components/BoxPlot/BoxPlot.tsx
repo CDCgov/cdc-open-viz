@@ -4,7 +4,7 @@ import { Group } from '@visx/group'
 import ConfigContext from '../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
-import { handleTooltip, calculateBoxPlotStats, createPlots } from './helpers/index'
+import { handleTooltip, createPlots } from './helpers/index'
 import _ from 'lodash'
 
 const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
@@ -32,10 +32,6 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
               left={xScale(d.columnCategory) + (xScale.bandwidth() - seriesScale.bandwidth()) / 2}
             >
               {config.series.map((item, index) => {
-                const valuesByKey = d.keyValues[item.dataKey]
-                const { min, max, median, firstQuartile, thirdQuartile } = calculateBoxPlotStats(valuesByKey)
-                let iqr = Number(thirdQuartile - firstQuartile).toFixed(config.dataFormat.roundTo)
-
                 const isTransparent =
                   config.legend.behavior === 'highlight' &&
                   seriesHighlight.length > 0 &&
@@ -72,7 +68,7 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                         left={seriesScale(item.dataKey)}
                         firstQuartile={d.q1[item.dataKey]}
                         thirdQuartile={d.q3[item.dataKey]}
-                        median={median}
+                        median={d.median[item.dataKey]}
                         boxWidth={seriesScale.bandwidth()}
                         fill={colorScale(item.dataKey)}
                         fillOpacity={1}
@@ -111,10 +107,10 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                             boxplot,
                             d.columnCategory,
                             item.dataKey,
-                            d.q1[item.dataKey],
-                            d.q3[item.dataKey],
-                            d.median[item.dataKey],
-                            iqr,
+                            _.round(d.q1[item.dataKey], config.dataFormat.roundTo),
+                            _.round(d.q3[item.dataKey], config.dataFormat.roundTo),
+                            _.round(d.median[item.dataKey], config.dataFormat.roundTo),
+                            _.round(d.iqr[item.dataKey], config.dataFormat.roundTo),
                             config.xAxis.label,
                             defaultColor
                           ),
