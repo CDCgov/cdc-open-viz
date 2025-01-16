@@ -103,7 +103,6 @@
     "showSuppressedSymbol": true,
     "show": true
   },
-
   "orientation": "vertical",
   "legend": {
     "hide": false,
@@ -168,10 +167,6 @@
       "Data 2": "110",
       "Data 3": "100",
       "Data 4": "90",
-      "Data 5": "00",
-      "Data 6": "190",
-      "Data 7": "00",
-      "Data 8": "40",
       "Monthly-Goal": "100"
     },
     {
@@ -180,10 +175,6 @@
       "Data 2": "goop",
       "Data 3": "100",
       "Data 4": "100",
-      "Data 5": "10",
-      "Data 6": "590",
-      "Data 7": "44",
-      "Data 8": "10",
       "Monthly-Goal": "100"
     },
     {
@@ -192,10 +183,6 @@
       "Data 2": "90",
       "Data 3": "100.5",
       "Data 4": "120",
-      "Data 5": "50",
-      "Data 6": "66",
-      "Data 7": "12",
-      "Data 8": "123",
       "Monthly-Goal": "110"
     },
     {
@@ -204,10 +191,6 @@
       "Data 2": "2,00",
       "Data 3": "110",
       "Data 4": "120",
-      "Data 5": "50",
-      "Data 6": "190",
-      "Data 7": "99",
-      "Data 8": "33",
       "Monthly-Goal": "110"
     },
     {
@@ -216,10 +199,6 @@
       "Data 2": "90",
       "Data 3": "110",
       "Data 4": "130",
-      "Data 5": "12",
-      "Data 6": "90",
-      "Data 7": "60",
-      "Data 8": "30",
       "Monthly-Goal": "120"
     },
     {
@@ -228,10 +207,6 @@
       "Data 2": "120",
       "Data 3": "120",
       "Data 4": "130",
-      "Data 5": "90",
-      "Data 6": "190",
-      "Data 7": "30",
-      "Data 8": "10",
       "Monthly-Goal": "120"
     },
     {
@@ -240,10 +215,6 @@
       "Data 2": null,
       "Data 3": "120",
       "Data 4": "130",
-      "Data 5": "90",
-      "Data 6": "90",
-      "Data 7": "20",
-      "Data 8": "40",
       "Monthly-Goal": "130"
     },
     {
@@ -252,10 +223,6 @@
       "Data 2": "130",
       "Data 3": "120",
       "Data 4": "140",
-      "Data 5": "80",
-      "Data 6": "10",
-      "Data 7": "11",
-      "Data 8": "4",
       "Monthly-Goal": "130"
     },
     {
@@ -264,23 +231,25 @@
       "Data 2": "130",
       "Data 3": "120",
       "Data 4": "150",
-      "Data 5": "70",
-      "Data 6": "10",
-      "Data 7": "00",
-      "Data 8": "40",
       "Monthly-Goal": "140"
     }
   ],
   "visualizationType": "Line",
   "series": [
     {
-      "dataKey": "Data 3",
+      "dataKey": "Data 2",
       "type": "Line",
       "axis": "Left",
       "tooltip": true
     },
     {
       "dataKey": "Data 4",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Data 3",
       "type": "Line",
       "axis": "Left",
       "tooltip": true
@@ -307,20 +276,20 @@
   "preliminaryData": [
     {
       "type": "effect",
-      "seriesKey": "Data 4",
+      "seriesKey": "Data 3",
       "label": "Suppressed",
-      "column": "Data 3",
-      "value": "120",
-      "style": "Open Circles",
+      "column": "Data 4",
+      "value": "130",
+      "style": "Filled Circles",
       "displayTooltip": true,
       "displayLegend": true,
       "displayTable": true,
       "symbol": "",
       "iconCode": "",
-      "lineCode": "◯",
+      "lineCode": "",
       "hideBarSymbol": false,
       "hideLineStyle": false,
-      "circleSize": "7",
+      "circleSize": "10",
       "displayGray": true
     }
   ],
@@ -363,7 +332,6 @@
     "palette": "monochrome-1",
     "isPaletteReversed": false
   },
-  "filters": [],
   "useLogScale": false,
   "filterBehavior": "Filter Change",
   "highlightedBarValues": [],

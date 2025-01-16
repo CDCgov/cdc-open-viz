@@ -80,10 +80,11 @@ type Exclusions = {
 
 export type Legend = CoreLegend & {
   seriesHighlight: string[]
+
   hideSuppressionLink: boolean
   style: 'circles' | 'boxes' | 'gradient' | 'lines'
   subStyle: 'linear blocks' | 'smooth'
-
+  hasShape: boolean
   tickRotation: string
   hideBorder: {
     side: boolean
@@ -99,6 +100,8 @@ type Visual = {
   hideBackgroundColor?: boolean
   verticalHoverLine?: boolean
   horizontalHoverLine?: boolean
+  lineDatapointSymbol: 'none' | 'standard'
+  maximumShapeAmount: 7
 }
 
 export type AllChartsConfig = {

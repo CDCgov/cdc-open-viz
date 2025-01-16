@@ -15,13 +15,14 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
   const boxWidth = xScale.bandwidth()
 
   const bodyStyles = getComputedStyle(document.body)
-  const defaultColor = bodyStyles.getPropertyValue('--cool-gray-50').trim()
+  const defaultColor = bodyStyles.getPropertyValue('--cool-gray-90').trim()
   const constrainedWidth = Math.min(40, boxWidth)
   const color_0 = _.get(colorPalettesChart, [config.palette, 0], '#000')
+  const plots = createPlots(data, config)
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group left={Number(config.yAxis.size)} className='boxplot' key={`boxplot-group`}>
-        {createPlots(data, config).map((d, i) => {
+        {plots.map((d, i) => {
           const offset = boxWidth - constrainedWidth
           const radius = 4
 
@@ -48,7 +49,7 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                 return (
                   <Group key={`boxplotplot-${item.dataKey}-${index}`}>
                     {boxplot.plotNonOutlierValues &&
-                      valuesByKey.map((value, index) => {
+                      d.columnNonOutliers[item.dataKey].map((value, index) => {
                         return (
                           <circle
                             display={displayPlot ? 'block' : 'none'}
@@ -67,11 +68,11 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                         display={displayPlot ? 'block' : 'none'}
                         data-left={xScale(d.columnCategory) + config.yAxis.size + offset / 2 + 0.5}
                         key={`box-plot-${i}-${item}`}
-                        min={Number(min)}
-                        max={Number(max)}
+                        min={Number(d.min[item.dataKey])}
+                        max={Number(d.max[item.dataKey])}
                         left={seriesScale(item.dataKey)}
-                        firstQuartile={firstQuartile}
-                        thirdQuartile={thirdQuartile}
+                        firstQuartile={d.q1[item.dataKey]}
+                        thirdQuartile={d.q3[item.dataKey]}
                         median={median}
                         boxWidth={seriesScale.bandwidth()}
                         fill={colorScale(item.dataKey)}
@@ -102,7 +103,6 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                         maxProps={{
                           style: {
                             opacity: fillOpacity,
-
                             stroke: defaultColor
                           }
                         }}
@@ -112,9 +112,9 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                             boxplot,
                             d,
                             item.dataKey,
-                            firstQuartile,
-                            thirdQuartile,
-                            median,
+                            d.q1[item.dataKey],
+                            d.q3[item.dataKey],
+                            d.median[item.dataKey],
                             iqr
                           ),
                           'data-tooltip-id': tooltip_id,
