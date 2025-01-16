@@ -392,10 +392,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
           const preparedConfig = await prepareConfig(configObj, data)
           const preparedData = prepareData(configObj, data)
           dispatch({ type: 'SET_STATE_DATA', payload: preparedData })
-
           dispatch({ type: 'SET_EXCLUDED_DATA', payload: preparedData })
           updateConfig(preparedConfig, preparedData)
-          dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(config.filters, data) })
+          dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(config.filters, preparedData) })
         }
       } catch (err) {
         console.error('Could not Load!')
