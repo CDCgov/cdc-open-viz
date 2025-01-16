@@ -71,7 +71,12 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       return { ...initialState, config, filteredData, data }
     }
     case 'SET_CONFIG': {
-      return { ...state, config: { ...state.config, ...action.payload } }
+      if (
+        action.payload.activeDashboard === undefined ||
+        state.config.activeDashboard === action.payload.activeDashboard
+      ) {
+        return { ...state, config: { ...state.config, ...action.payload } }
+      } else return state // ignore SET_CONFIG calls that have the wrong activeDashboard due to async api fetching
     }
     case 'SET_DATA': {
       return { ...state, data: action.payload }

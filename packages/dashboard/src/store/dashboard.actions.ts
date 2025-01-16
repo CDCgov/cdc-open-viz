@@ -14,7 +14,7 @@ type MOVE_VISUALIZATION = Action<
   'MOVE_VISUALIZATION',
   { rowIdx: number; colIdx: number; widget: AnyVisualization & { rowIdx: number; colIdx: number } }
 >
-type SET_CONFIG = Action<'SET_CONFIG', Partial<Config>>
+type SET_CONFIG = Action<'SET_CONFIG', Partial<Config> & { activeDashboard?: number }>
 type UPDATE_CONFIG = Action<'UPDATE_CONFIG', [Config, Object?]>
 type SET_DATA = Action<'SET_DATA', Record<string, any[]>>
 type SET_LOADING = Action<'SET_LOADING', boolean>
