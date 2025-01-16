@@ -5,22 +5,28 @@ interface Plot {
   columnCategory: string
   columnOutliers: Record<string, number[]>
   columnNonOutliers: Record<string, number[]>
-  keyValues: { [key: string]: number[] }
-  min: Record<string, number[]>
-  max: Record<string, number[]>
-  q1: any
-  q3: any
-  median: any
+  keyValues: Record<string, number[]>
+  min: Record<string, number | null>
+  max: Record<string, number | null>
+  q1: Record<string, number>
+  q3: Record<string, number>
+  median: Record<string, number | null>
+  iqr: Record<string, number>
 }
-export const handleTooltip = (boxplot, d, key, q1, q3, median, iqr) => {
+export const handleTooltip = (boxplot, columnCategory, key, q1, q3, median, iqr, label, color) => {
   return `
-      <strong>${d.columnCategory}</strong></br>
-       <strong>Key:${key}</strong></br>
-      ${boxplot.labels.q1}: ${q1}<br/>
-      ${boxplot.labels.q3}: ${q3}<br/>
-      ${boxplot.labels.iqr}: ${iqr}<br/>
-      ${boxplot.labels.median}: ${median}
-    `
+    <div class="p-2  text-red" style="max-width: 300px; word-wrap: break-word; opacity:0.7; background: rgba(255, 255, 255, 0.9)">
+      <div class="fw-bold" style="color: ${color};">
+        ${label ? `${label} : ${columnCategory}` : columnCategory}
+      </div>
+      <div class="" style="background: ${color}; height: 2px;"></div>
+        <strong>Key:</strong> ${key}<br/>
+        <strong>${boxplot.labels.q1}:</strong> ${q1}<br/>
+        <strong>${boxplot.labels.q3}:</strong> ${q3}<br/>
+        <strong>${boxplot.labels.iqr}:</strong> ${iqr}<br/>
+        <strong>${boxplot.labels.median}:</strong> ${median}
+    </div>
+  `
 }
 
 export const calculateBoxPlotStats = (values: number[]) => {
@@ -99,13 +105,14 @@ export const createPlots = (data, config) => {
       const columnMax = {}
       const columnQ1 = {}
       const columnQ3 = {}
+      const columnIqr = {}
 
       // Calculate outliers and non-outliers for each series key
       Object.keys(keyValues).forEach(key => {
         const values = keyValues[key]
 
         // Calculate box plot statistics
-        const { firstQuartile, thirdQuartile, min, max, median } = calculateBoxPlotStats(values)
+        const { firstQuartile, thirdQuartile, min, max, median, iqr } = calculateBoxPlotStats(values)
         // Calculate outliers and non-outliers
         columnOutliers[key] = calculateOutliers(values, firstQuartile, thirdQuartile).map(Number)
         columnNonOutliers[key] = calculateNonOutliers(values, firstQuartile, thirdQuartile).map(Number)
@@ -114,6 +121,7 @@ export const createPlots = (data, config) => {
         columnMax[key] = max
         columnQ1[key] = firstQuartile
         columnQ3[key] = thirdQuartile
+        columnIqr[key] = iqr
       })
 
       // Add the plot object to the plots array
@@ -126,7 +134,8 @@ export const createPlots = (data, config) => {
         max: columnMax,
         q1: columnQ1,
         q3: columnQ3,
-        median: columnMedian
+        median: columnMedian,
+        iqr: columnIqr
       })
     })
   }
