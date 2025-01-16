@@ -1627,7 +1627,19 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                         handleEditorChanges('displayStateLabels', event.target.checked)
                       }}
                     />
-                    <span className='edit-label'>Show state labels</span>
+                    <span className='edit-label'>
+                      Show state labels
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>
+                            Recommended set to display for Section 508 compliance.
+                          </p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                      </span>
                   </label>
                 )}
             </AccordionItemPanel>

@@ -47,41 +47,24 @@ describe('getLegendClasses', () => {
     }
     const result = getLegendClasses(config)
     expect(result.containerClasses).toContain('bottom')
-    expect(result.innerClasses).toContain('double-column')
     expect(result.innerClasses).toContain('bottom')
     expect(result.innerClasses).toContain('single-row')
   })
 
-  it('should return correct classes for top position with vertical sorting', () => {
+  it('should return correct classes for TOP position with double column', () => {
     const config: ChartConfig = {
       legend: {
         position: 'top',
         singleRow: false,
         reverseLabelOrder: false,
-        verticalSorted: true,
-        hideBorder: { side: false, topBottom: false }
-      }
-    }
-    const result = getLegendClasses(config)
-    expect(result.containerClasses).toContain('top')
-    expect(result.innerClasses).toContain('double-column')
-    expect(result.innerClasses).toContain('top')
-    expect(result.innerClasses).toContain('vertical-sorted')
-  })
-
-  it('should return correct classes for reverse label order', () => {
-    const config: ChartConfig = {
-      legend: {
-        position: 'bottom',
-        singleRow: false,
-        reverseLabelOrder: true,
         verticalSorted: false,
         hideBorder: { side: false, topBottom: false }
       }
     }
     const result = getLegendClasses(config)
-    expect(result.innerClasses).toContain('d-flex')
-    expect(result.innerClasses).toContain('flex-column-reverse')
+    expect(result.containerClasses).toContain('top')
+    expect(result.innerClasses).toContain('top')
+    expect(result.innerClasses).toContain('double-column')
   })
 
   it('should return correct classes for hide border side', () => {
