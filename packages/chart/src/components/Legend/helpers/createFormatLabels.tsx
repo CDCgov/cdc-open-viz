@@ -16,10 +16,7 @@ export const createFormatLabels =
           })
         : labels
     const reverseLabels = labels => {
-      return config.legend.reverseLabelOrder &&
-        (config.legend?.position === 'bottom' || config.legend?.position === 'top')
-        ? sortVertical(labels).reverse()
-        : sortVertical(labels)
+      return config.legend.reverseLabelOrder ? sortVertical(labels).reverse() : sortVertical(labels)
     }
     const colorCode = config.legend?.colorCode
     if (visualizationType === 'Deviation Bar') {
