@@ -1351,9 +1351,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               numTicks={useDateSpanMonths ? dateSpanMonths : xTickCount}
               tickStroke='#333'
               tickValues={
-                config.xAxis.manual
+                config.runtime.xAxis.manual
                   ? getTickValues(xAxisDataMapped, xScale, isDateTime ? xTickCount : getManualStep(), config)
-                  : config.xAxis.type === 'date'
+                  : config.runtime.xAxis.type === 'date'
                   ? xAxisDataMapped
                   : undefined
               }
@@ -1361,7 +1361,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               {props => {
                 // For these charts, we generated all ticks in tickValues above, and now need to filter/shift them
                 // so the last tick is always labeled
-                if (config.xAxis.type === 'date' && !config.xAxis.manual) {
+                if (config.runtime.xAxis.type === 'date' && !config.runtime.xAxis.manual) {
                   props.ticks = filterAndShiftLinearDateTicks(config, props, xAxisDataMapped, formatDate)
                 }
 
