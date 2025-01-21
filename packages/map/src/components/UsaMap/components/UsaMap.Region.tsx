@@ -154,8 +154,8 @@ const UsaRegionMap = props => {
         <line
           x1={centroid[0]}
           y1={centroid[1]}
-          x2={centroid[0] + dx}
-          y2={centroid[1] + dy}
+          x2={centroid[0] + x}
+          y2={centroid[1] + y}
           stroke='rgba(0,0,0,.5)'
           strokeWidth={1}
         />
@@ -165,7 +165,7 @@ const UsaRegionMap = props => {
           fontSize={13}
           style={{ fill: '#202020' }}
           alignmentBaseline='middle'
-          transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
+          transform={`translate(${centroid[0] + x}, ${centroid[1] + y})`}
         >
           {abbr.substring(3)}
         </text>
