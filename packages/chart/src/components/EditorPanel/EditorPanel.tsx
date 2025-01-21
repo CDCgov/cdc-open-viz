@@ -693,14 +693,6 @@ const EditorPanel = () => {
       updatedConfig.isLollipopChart = false
     }
 
-    if (updatedConfig.series) {
-      updatedConfig.series = config.series.map(series => ({
-        ...series,
-        type: config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType || 'Bar',
-        axis: 'Left'
-      }))
-    }
-
     if (updatedConfig.visualizationType === 'Deviation Bar' || updatedConfig.visualizationType === 'Paired Bar') {
       updatedConfig.orientation = 'horizontal'
     }
