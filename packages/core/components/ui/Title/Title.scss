@@ -4,7 +4,7 @@
   margin: 0;
   color: var(--white);
 
-  sup {
+  & > sup {
     font-size: var(--superTitle-font-size);
     font-family: var(--app-font-secondary);
     font-weight: 500;
