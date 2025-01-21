@@ -318,7 +318,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     newConfig.runtime.editorErrorMessage = ''
 
     if (newConfig.legend.seriesHighlight?.length) {
-      dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: newConfig.legend?.seriesHighligh })
+      dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: newConfig.legend?.seriesHighlight })
     }
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
   }
