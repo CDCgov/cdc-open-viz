@@ -22,7 +22,7 @@ const Title = (props: HeaderProps) => {
     title &&
     showTitle && (
       <header className={updatedClasses.join(' ')} style={props.style}>
-        {superTitle && <sup>{parse(superTitle)}</sup>}
+        {superTitle && <h3>{parse(superTitle)}</h3>}
         <h2>
           {parse(title)} {isDashboard}
         </h2>

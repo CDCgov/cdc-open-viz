@@ -4,12 +4,13 @@
   margin: 0;
   color: var(--white);
 
-  sup {
+  h3 {
     font-size: var(--superTitle-font-size);
     font-family: var(--app-font-secondary);
     font-weight: 500;
     text-transform: uppercase;
     top: 0;
+    color: var(--white);
   }
 
   h2 {
