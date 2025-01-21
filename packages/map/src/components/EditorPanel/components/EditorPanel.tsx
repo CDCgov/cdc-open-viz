@@ -1448,7 +1448,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     <AlabamaGraphic />
                     <span>U.S. State</span>
                   </button>
-                  <button
+                  {/* <button
                     className={`${state.general.geoType === 'google-map' ? 'active' : ''} full-width`}
                     onClick={e => {
                       e.preventDefault()
@@ -1457,7 +1457,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   >
                     <UsaGraphic />
                     <span>Google Map Api</span>
-                  </button>
+                  </button> */}
                 </ul>
               </label>
               {/* Select > State or County Map */}
