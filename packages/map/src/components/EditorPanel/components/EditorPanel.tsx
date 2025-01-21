@@ -1578,6 +1578,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   <select
                     value={state.general.navigationTarget}
                     onChange={event => {
+                      event.preventDefault()
                       handleEditorChanges('navigationTarget', event.target.value)
                     }}
                   >
@@ -1634,12 +1635,10 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>
-                            Recommended set to display for Section 508 compliance.
-                          </p>
+                          <p>Recommended set to display for Section 508 compliance.</p>
                         </Tooltip.Content>
                       </Tooltip>
-                      </span>
+                    </span>
                   </label>
                 )}
             </AccordionItemPanel>
