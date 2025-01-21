@@ -1578,9 +1578,19 @@ const EditorPanel = () => {
                         value={config.yAxis.label}
                         section='yAxis'
                         fieldName='label'
-                        label='Label '
+                        label='Label'
                         updateField={updateField}
                         maxLength={35}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>35 character limit</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
                       />
                       {config.runtime.seriesKeys &&
                         config.runtime.seriesKeys.length === 1 &&
@@ -2255,6 +2265,16 @@ const EditorPanel = () => {
                     label='Label'
                     updateField={updateField}
                     maxLength={35}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>35 character limit</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
                   />
                   <TextField
                     value={config.yAxis.rightNumTicks}
@@ -2546,6 +2566,16 @@ const EditorPanel = () => {
                         label='Label'
                         updateField={updateField}
                         maxLength={35}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>35 character limit</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
                       />
 
                       {config.xAxis.type === 'continuous' && (
