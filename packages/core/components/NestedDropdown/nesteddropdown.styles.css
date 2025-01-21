@@ -11,22 +11,27 @@
   }
 
   .search-input {
+    font-family: var(--app-font-secondary);
+    font-size: var(--filter-select-font-size);
+    color: var(--cool-gray-90);
+    font-weight: 300;
+
     border: none;
     position: relative;
     display: inline-block;
     width: 100%;
     padding: 0;
     &::placeholder {
-      color: var(--darkGray);
+      color: var(--cool-gray-90);
     }
   }
 
   .main-nested-dropdown-container,
   .nested-dropdown-input-container {
-    border: 1px solid var(--lightGray);
+    border: 1px solid var(--cool-gray-10);
     min-width: 200px;
     cursor: pointer;
-    padding: 0.375rem 0.75rem;
+    padding: 0.33rem 0.75rem;
     font-size: 1em;
   }
 
@@ -53,7 +58,6 @@
     border-radius: 0.25rem;
     position: relative;
     & > span.list-arrow {
-      color: var(--mediumGray);
       position: absolute;
       top: 9px;
       right: 1px;
@@ -63,7 +67,6 @@
     &.disabled {
       background-color: var(--lightestGray);
       & > :is(input) {
-        color: var(--darkGray);
         background-color: var(--lightestGray);
       }
     }
