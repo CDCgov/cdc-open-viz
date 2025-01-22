@@ -704,10 +704,6 @@ const EditorPanel = () => {
     if (updatedConfig.visualizationType === 'Deviation Bar' || updatedConfig.visualizationType === 'Paired Bar') {
       updatedConfig.orientation = 'horizontal'
     }
-
-    if (updatedConfig.visualizationType === 'Bar') {
-      updatedConfig.tooltips = { ...updatedConfig.tooltips, singleSeries: false }
-    }
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
