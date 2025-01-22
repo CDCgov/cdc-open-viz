@@ -501,7 +501,7 @@ const Filters = (props: FilterProps) => {
     const conditionalClass = standaloneMap ? general.headerColor : visualizationType === 'Spark Line' ? null : theme
     const legendClass = legend && !legend.hide && legend.position === 'top' ? 'mb-0' : null
 
-    return [baseClass, conditionalClass, legendClass].filter(Boolean)
+    return [baseClass, conditionalClass, legendClass, 'w-100'].filter(Boolean)
   }
 
   return (
