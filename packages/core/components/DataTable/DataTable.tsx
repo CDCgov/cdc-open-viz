@@ -30,6 +30,7 @@ export type DataTableProps = {
   columns?: Record<string, Column>
   config: TableConfig
   dataConfig?: Object
+  defaultSortBy?: string
   displayGeoName?: Function
   expandDataTable: boolean
   formatLegendLocation?: Function
@@ -58,6 +59,7 @@ const DataTable = (props: DataTableProps) => {
   const {
     config,
     dataConfig,
+    defaultSortBy,
     tableTitle,
     vizTitle,
     rawData,
@@ -87,9 +89,6 @@ const DataTable = (props: DataTableProps) => {
   }, [parentRuntimeData, config.table.pivot?.columnName, config.table.pivot?.valueColumn])
 
   const [expanded, setExpanded] = useState(expandDataTable)
-  const hasDateAxis =
-    _.get(config, 'type') === 'chart' && _.includes(['date-time', 'date'], _.get(config, 'xAxis.type'))
-  const defaultSortBy = hasDateAxis && _.get(config, 'xAxis.dataKey')
   const [sortBy, setSortBy] = useState<any>({
     column: defaultSortBy || '',
     asc: false,
