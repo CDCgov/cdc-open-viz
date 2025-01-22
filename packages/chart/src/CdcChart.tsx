@@ -23,7 +23,7 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, config:
 
   const loadConfig = async () => {
     try {
-      const loadedConfig = editorConfig || ((await await fetch(configUrl)).json() as AllChartsConfig)
+      const loadedConfig = editorConfig || ((await (await fetch(configUrl)).json()) as AllChartsConfig)
       const data = await loadDataFromConfig(loadedConfig)
       const _loadedConfig = { ...initialConfig, ...loadedConfig }
       setConfig({
