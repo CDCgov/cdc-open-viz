@@ -376,17 +376,16 @@ const CdcChart: React.FC<CdcChartProps> = ({
     dispatch({ type: 'SET_CONTAINER', payload: node })
   }, []) // eslint-disable-line
 
-  // Load data when component first mounts
-
   const prepareData = (config, data) => {
+    let newData = []
     if (config.dataDescription) {
-      data = transform.autoStandardize(data)
-      data = transform.developerStandardize(data, config.dataDescription)
+      newData = transform.autoStandardize(data)
+      newData = transform.developerStandardize(data, config.dataDescription)
     }
 
-    data = handleRankByValue(data, config)
+    newData = handleRankByValue(data, config)
 
-    return data
+    return newData
   }
   useEffect(() => {
     const load = async () => {
@@ -398,7 +397,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
           dispatch({ type: 'SET_STATE_DATA', payload: preparedData })
           dispatch({ type: 'SET_EXCLUDED_DATA', payload: preparedData })
           updateConfig(preparedConfig, preparedData)
-          dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(config.filters, prepareData) })
+          // dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(config.filters, prepareData) })
         }
       } catch (err) {
         console.error('Could not Load!')
