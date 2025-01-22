@@ -143,8 +143,8 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
               />
             ) : filter.filterStyle === FILTER_STYLE.nestedDropdown ? (
               <NestedDropdown
-                activeGroup={filter.active as string}
-                activeSubGroup={_key ? filter.subGrouping?.active : activeSubGroupValue}
+                activeGroup={(filter.queuedActive?.[0] || filter.active) as string}
+                activeSubGroup={_key ? filter.queuedActive?.[1] || filter.subGrouping?.active : activeSubGroupValue}
                 filterIndex={filterIndex}
                 options={_key ? getNestedDropdownOptions(apiFilterDropdowns[_key]) : nestedOptions}
                 listLabel={label}
