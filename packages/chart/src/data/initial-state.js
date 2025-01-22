@@ -188,7 +188,7 @@ export default {
     palette: 'monochrome-1',
     isPaletteReversed: false
   },
-  labels: true,
+  labels: false,
   dataFormat: {
     commas: false,
     prefix: '',
