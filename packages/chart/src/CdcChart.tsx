@@ -966,6 +966,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   config.visualizationType !== 'Sankey') ||
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
                   <DataTable
+                    /* changing the "key" will force the table to re-render
+                    when the default sort changes while editing */
+                    key={dataTableDefaultSortBy}
                     config={pivotDynamicSeries(config)}
                     rawData={
                       config.visualizationType === 'Sankey'
