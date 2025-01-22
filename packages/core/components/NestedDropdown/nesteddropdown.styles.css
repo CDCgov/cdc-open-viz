@@ -10,9 +10,12 @@
     list-style: none;
   }
 
+  * {
+    font-family: var(--app-font-secondary) !important;
+    font-size: var(--filter-select-font-size) !important;
+  }
+
   .search-input {
-    font-family: var(--app-font-secondary);
-    font-size: var(--filter-select-font-size);
     color: var(--cool-gray-90);
     font-weight: 300;
 
