@@ -25,6 +25,10 @@ import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse, timeFormat } from 'd3-time-format'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
+import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
+import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
+import Papa from 'papaparse'
+import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import _ from 'lodash'
 // Primary Components
 import ConfigContext, { ChartDispatchContext } from './ConfigContext'
@@ -148,46 +152,200 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return isConvertLineToBarGraph(config.visualizationType, filteredData, config.allowLineToBarGraph)
   }
 
-  const prepareConfig = (loadedConfig: ChartConfig): ChartConfig => {
-    let newConfig = _.defaultsDeep(loadedConfig, defaults)
-    _.defaultsDeep(newConfig, {
-      table: { showVertical: false }
-    })
+  const reloadURLData = async () => {
+    if (config.dataUrl) {
+      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl, window.location.origin)
+      let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
-    _.set(newConfig, 'table.show', _.get(newConfig, 'table.show', !isDashboard))
+      let isUpdateNeeded = false
+      config.filters?.forEach(filter => {
+        if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
+          qsParams[filter.queryParameter] = filter.active
+          isUpdateNeeded = true
+        }
+      })
 
-    newConfig.series.forEach(series => {
-      const defaultType = newConfig.visualizationType === 'Combo' ? 'Bar' : newConfig.visualizationType || 'Bar'
+      if ((!config.formattedData || config.formattedData.urlFiltered) && !isUpdateNeeded) return
 
-      series.tooltip = series.tooltip ?? true
-      series.axis = series.axis ?? 'Left'
-      series.type = series.type ?? defaultType
-    })
-    if (newConfig.visualizationType === 'Bump Chart') {
-      newConfig.xAxis.type === 'date-time'
-    }
-    if (isEditor) {
-      if (!newConfig.title || newConfig.title === '') {
-        newConfig.title = 'Chart Title'
+      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
+        .map((param, i) => {
+          let qs = i === 0 ? '?' : '&'
+          qs += param + '='
+          qs += qsParams[param]
+          return qs
+        })
+        .join('')}`
+
+      let data: any[] = []
+
+      try {
+        const ext = getFileExtension(dataUrl.href)
+        if ('csv' === ext || isSolrCsv(dataUrlFinal)) {
+          data = await fetch(dataUrlFinal)
+            .then(response => response.text())
+            .then(responseText => {
+              const parsedCsv = Papa.parse(responseText, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true
+              })
+              return parsedCsv.data
+            })
+        } else if ('json' === ext || isSolrJson(dataUrlFinal)) {
+          data = await fetch(dataUrlFinal).then(response => response.json())
+        } else {
+          data = []
+        }
+      } catch {
+        console.error(`Cannot parse URL: ${dataUrlFinal}`)
+        data = []
+      }
+
+      if (config.dataDescription) {
+        data = transform.autoStandardize(data)
+        data = transform.developerStandardize(data, config.dataDescription)
+      }
+
+      Object.assign(data, { urlFiltered: true })
+
+      data = handleRankByValue(data, config)
+
+      updateConfig({ ...config, runtimeDataUrl: dataUrlFinal, data, formattedData: data })
+
+      if (data) {
+        dispatch({ type: 'SET_STATE_DATA', payload: data })
+        dispatch({ type: 'SET_EXCLUDED_DATA', payload: data })
+        dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(config.filters, data) })
       }
     }
-    if (newConfig.table && (!newConfig.table?.label || newConfig.table?.label === '')) {
-      newConfig.table.label = 'Data Table'
-    }
-
-    if (newConfig.orientation === 'horizontal') {
-      newConfig.lollipopShape = newConfig.lollipopShape
-    }
-    if (newConfig.visualizationType === 'Deviation Bar' || newConfig.visualizationType === 'Paired Bar') {
-      newConfig.orientation = 'horizontal'
-    }
-
-    if (config.visualizationType === 'Scatter Plot') {
-      newConfig.xAxis.type = 'continuous'
-    }
-
-    return { ...coveUpdateWorker(newConfig) }
   }
+
+  const loadConfig = async () => {
+    const response = _.cloneDeep(configObj)
+
+    // If data is included through a URL, fetch that and store
+    let data: any[] = response.data || []
+
+    const urlFilters = response.filters
+      ? response.filters.filter(filter => filter.type === 'url').length > 0
+        ? true
+        : false
+      : false
+
+    if (response.dataUrl && !urlFilters) {
+      try {
+        const ext = getFileExtension(response.dataUrl)
+        if ('csv' === ext || isSolrCsv(response.dataUrl)) {
+          data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
+            .then(response => response.text())
+            .then(responseText => {
+              // for every comma NOT inside quotes, replace with a pipe delimiter
+              // - this will let commas inside the quotes not be parsed as a new column
+              // - Limitation: if a delimiter other than comma is used in the csv this will break
+              // Examples of other delimiters that would break: tab
+              responseText = responseText.replace(/(".*?")|,/g, (...m) => m[1] || '|')
+              // now strip the double quotes
+              responseText = responseText.replace(/["]+/g, '')
+              const parsedCsv = Papa.parse(responseText, {
+                //quotes: "true",  // dont need these
+                //quoteChar: "'",  // has no effect that I can tell
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true,
+                delimiter: '|' // we are using pipe symbol as delimiter so setting this explicitly for Papa.parse
+              })
+              return parsedCsv.data
+            })
+        }
+
+        if ('json' === ext || isSolrJson(response.dataUrl)) {
+          data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
+        }
+      } catch {
+        console.error(`COVE: Cannot parse URL: ${response.dataUrl}`) // eslint-disable-line
+        data = []
+      }
+    }
+
+    if (response.dataDescription) {
+      data = transform.autoStandardize(data)
+      data = transform.developerStandardize(data, response.dataDescription)
+    }
+
+    data = handleRankByValue(data, response)
+
+    if (data) {
+      dispatch({ type: 'SET_STATE_DATA', payload: data })
+      dispatch({ type: 'SET_EXCLUDED_DATA', payload: data })
+    }
+
+    // force showVertical for data tables false if it does not exist
+    if (response !== undefined && response.table !== undefined) {
+      if (!response.table || !response.table.showVertical) {
+        response.table = response.table || {}
+        response.table.showVertical = false
+      }
+    }
+    let newConfig = { ...defaults, ...response }
+
+    if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
+
+    newConfig.series.forEach(series => {
+      if (series.tooltip === undefined || series.tooltip === null) {
+        series.tooltip = true
+      }
+      if (!series.axis) series.axis = 'Left'
+    })
+
+    if (data) {
+      newConfig.data = data
+    }
+
+    const processedConfig = { ...coveUpdateWorker(newConfig) }
+
+    updateConfig(processedConfig, data)
+  }
+
+  // const prepareConfig = (loadedConfig: ChartConfig): ChartConfig => {
+  //   let newConfig = _.defaultsDeep(loadedConfig, defaults)
+  //   _.defaultsDeep(newConfig, {
+  //     table: { showVertical: false }
+  //   })
+
+  //   _.set(newConfig, 'table.show', _.get(newConfig, 'table.show', !isDashboard))
+
+  //   newConfig.series.forEach(series => {
+  //     const defaultType = newConfig.visualizationType === 'Combo' ? 'Bar' : newConfig.visualizationType || 'Bar'
+
+  //     series.tooltip = series.tooltip ?? true
+  //     series.axis = series.axis ?? 'Left'
+  //     series.type = series.type ?? defaultType
+  //   })
+  //   if (newConfig.visualizationType === 'Bump Chart') {
+  //     newConfig.xAxis.type === 'date-time'
+  //   }
+  //   if (isEditor) {
+  //     if (!newConfig.title || newConfig.title === '') {
+  //       newConfig.title = 'Chart Title'
+  //     }
+  //   }
+  //   if (newConfig.table && (!newConfig.table?.label || newConfig.table?.label === '')) {
+  //     newConfig.table.label = 'Data Table'
+  //   }
+
+  //   if (newConfig.orientation === 'horizontal') {
+  //     newConfig.lollipopShape = newConfig.lollipopShape
+  //   }
+  //   if (newConfig.visualizationType === 'Deviation Bar' || newConfig.visualizationType === 'Paired Bar') {
+  //     newConfig.orientation = 'horizontal'
+  //   }
+
+  //   if (config.visualizationType === 'Scatter Plot') {
+  //     newConfig.xAxis.type = 'continuous'
+  //   }
+
+  //   return { ...coveUpdateWorker(newConfig) }
+  // }
 
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
     const newConfig = _.cloneDeep(_config)
@@ -376,29 +534,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
     dispatch({ type: 'SET_CONTAINER', payload: node })
   }, []) // eslint-disable-line
 
-  const prepareData = (config, data) => {
-    let newData = []
-    if (config.dataDescription) {
-      newData = transform.autoStandardize(data)
-      newData = transform.developerStandardize(data, config.dataDescription)
-    }
-
-    newData = handleRankByValue(data, config)
-
-    return newData
-  }
   useEffect(() => {
     const load = async () => {
       try {
-        const data = configObj.data
-        if (configObj.data && configObj) {
-          const preparedConfig = await prepareConfig(configObj)
-          const preparedData = prepareData(configObj, data)
-          dispatch({ type: 'SET_STATE_DATA', payload: preparedData })
-          dispatch({ type: 'SET_EXCLUDED_DATA', payload: preparedData })
-          updateConfig(preparedConfig, preparedData)
-          // dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(config.filters, prepareData) })
-        }
+        await loadConfig()
+        console.log('Loaded SuccessFully!')
       } catch (err) {
         console.error('Could not Load!')
       }
@@ -406,6 +546,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     load()
   }, [configObj?.data?.length ? configObj.data : null])
+
+  useEffect(() => {
+    reloadURLData()
+  }, [JSON.stringify(config.filters)])
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.
