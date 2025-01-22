@@ -12,7 +12,6 @@ export type TransformedData = {
 
 type SharedChartContext = {
   animatedChart?: boolean
-  brushConfig: { data: []; isBrushing: boolean; isActive: boolean }
   clean: Function
   colorScale?: ColorScale
   config: ChartConfig

@@ -186,10 +186,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   const isNoDataAvailable = config.filters && config.filters.values.length === 0 && data.length === 0
 
-  const xAxisDataMapped =
-    config.brush.active && brushConfig.data?.length
-      ? brushConfig.data.map(d => getXAxisData(d, config, parseDate))
-      : data.map(d => getXAxisData(d, config, parseDate))
+  const xAxisDataMapped = data.map(d => getXAxisData(d, config, parseDate))
   const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
   const properties = {
     data,

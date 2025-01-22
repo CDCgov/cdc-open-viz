@@ -16,12 +16,7 @@ export const initialState = {
   container: null as HTMLElement | null,
   coveLoadedEventRan: false,
   isDraggingAnnotation: false,
-  imageId: `cove-${Math.random().toString(16).slice(-4)}`,
-  brushConfig: {
-    data: [],
-    isActive: false,
-    isBrushing: false
-  }
+  imageId: `cove-${Math.random().toString(16).slice(-4)}`
 }
 
 type State = {
@@ -39,11 +34,6 @@ type State = {
   coveLoadedEventRan: boolean
   isDraggingAnnotation: boolean
   imageId: string
-  brushConfig: {
-    data: object[]
-    isActive: boolean
-    isBrushing: boolean
-  }
 }
 
 export const reducer = (state: State, action: ChartActions): State => {

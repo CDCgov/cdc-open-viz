@@ -13,7 +13,7 @@ interface BrushChartProps {
 }
 
 const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
-  const { tableData, config, dashboardConfig, formatDate, parseDate, brushConfig } = useContext(ConfigContext)
+  const { tableData, config, dashboardConfig, formatDate, parseDate, transformedData } = useContext(ConfigContext)
   const dispatch = useContext(ChartDispatchContext)
   const [brushState, setBrushState] = useState({ isBrushing: false, selection: [] })
   const [brushKey, setBrushKey] = useState(0)
@@ -23,7 +23,7 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
   const svgRef = useRef()
   const brushheight = 25
   const borderRadius = 15
-  const xDomain = d3.extent(tableData, d => new Date(d[config.runtime.originalXAxis.dataKey]))
+  const xDomain = d3.extent(tableData, d => new Date(d[config.xAxis.dataKey]))
 
   const xScale = d3.scaleTime().domain(xDomain).range([0, xMax])
 
@@ -115,12 +115,7 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
       const [formattedStartDate, formattedEndDate] = [startDate, endDate].map(date => formatDate(parseDate(date)))
       svg.call(brushHandle, selection, formattedStartDate, formattedEndDate)
 
-      const newConfig = {
-        active: config.brush.active,
-        isBrushing: isUserBrushing,
-        data: finalData
-      }
-      dispatch({ type: 'SET_BRUSH_CONFIG', payload: newConfig })
+      dispatch({ type: 'SET_FILTERED_DATA', payload: finalData })
 
       setBrushState({
         isBrushing: true,
@@ -154,13 +149,10 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
 
     if ((isFiltersActive || isExclusionsActive || isDashboardFilters) && config.brush?.active) {
       setBrushKey(prevKey => prevKey + 1)
-      const newConfig = {
-        ...brushConfig,
-        data: tableData
-      }
-      dispatch({ type: 'SET_BRUSH_CONFIG', payload: newConfig })
+
+      dispatch({ type: 'SET_FILTERED_DATA', payload: transformedData })
     }
-    return () => dispatch({ type: 'SET_BRUSH_CONFIG', payload: { ...brushConfig, data: [] } })
+    return () => dispatch({ type: 'SET_FILTERED_DATA', payload: transformedData })
   }, [config.filters, config.exclusions, config.brush?.active, isDashboardFilters])
   // Initialize brush when component is first rendered
 
@@ -169,7 +161,7 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
     if (brushKey) {
       initializeBrush()
     }
-  }, [brushKey])
+  }, [brushKey, config])
 
   if (!brushState.isBrushing) {
     initializeBrush()

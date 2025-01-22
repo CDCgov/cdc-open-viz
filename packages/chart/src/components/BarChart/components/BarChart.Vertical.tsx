@@ -45,7 +45,7 @@ export const BarChartVertical = () => {
   } = useBarChart()
 
   // prettier-ignore
-  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig } = useContext<ChartContext>(ConfigContext)
+  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig,clean } = useContext<ChartContext>(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
@@ -59,10 +59,6 @@ export const BarChartVertical = () => {
   // if suppression active use table data (filtere | excluded) but non cleaned
   if (isSuppressionActive) {
     data = tableData
-  }
-  // if brush active use brush data (filtered|excluded) not cleaned
-  if (brushConfig.data.length) {
-    data = brushConfig.data
   }
 
   const hasConfidenceInterval = Object.keys(config.confidenceKeys).length > 0

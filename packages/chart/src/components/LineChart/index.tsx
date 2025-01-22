@@ -38,19 +38,12 @@ const LineChart = (props: LineChartProps) => {
   } = props
 
   // prettier-ignore
-  const { colorScale, config, formatNumber, handleLineType, parseDate, seriesHighlight, tableData, transformedData, updateConfig, brushConfig,clean  } = useContext<ChartContext>(ConfigContext)
-  const { yScaleRight } = useRightAxis({ config, yMax, data: transformedData, updateConfig })
+  const { colorScale, config, formatNumber, handleLineType, parseDate, seriesHighlight, tableData, transformedData:data, updateConfig, brushConfig,clean  } = useContext<ChartContext>(ConfigContext)
+  const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
   if (!handleTooltipMouseOver) return
 
   const DEBUG = false
   const { lineDatapointStyle, showLineSeriesLabels, legend } = config
-  let data = transformedData
-  let tableD = tableData
-  // if brush on use brush data and clean
-  if (brushConfig.data.length > 0 && config.brush?.active) {
-    data = clean(brushConfig.data)
-    tableD = clean(brushConfig.data)
-  }
 
   const xPos = d => {
     return xScale(getXAxisData(d, config, parseDate)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
@@ -81,7 +74,7 @@ const LineChart = (props: LineChartProps) => {
             ? data.filter(d => d[seriesData.dynamicCategory] === seriesKey)
             : data
           const _seriesKey = seriesData.dynamicCategory ? seriesData.originalDataKey : seriesKey
-          const circleData = filterCircles(config?.preliminaryData, tableD, _seriesKey)
+          const circleData = filterCircles(config?.preliminaryData, tableData, _seriesKey)
           return (
             <Group
               key={`series-${seriesKey}-${index}`}
@@ -216,7 +209,7 @@ const LineChart = (props: LineChartProps) => {
                     }
                     styles={createStyles({
                       preliminaryData: config.preliminaryData,
-                      data: tableD,
+                      data: tableData,
                       stroke: colorScale(config.runtime.seriesLabels[seriesKey]),
                       strokeWidth: seriesData.weight || 2,
                       handleLineType,
