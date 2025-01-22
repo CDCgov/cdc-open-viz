@@ -195,13 +195,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     data = handleRankByValue(data, newConfig)
 
-    // Deeper copy
-    Object.keys(defaults).forEach(key => {
-      if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
-        newConfig[key] = { ...defaults[key], ...newConfig[key] }
-      }
-    })
-
     const newExcludedData: any[] = getExcludedData(newConfig, dataOverride || stateData)
     dispatch({ type: 'SET_EXCLUDED_DATA', payload: newExcludedData })
 
@@ -1005,6 +998,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     ...state,
     clean,
     colorPalettes,
+    colorScale,
     dashboardConfig,
     debugSvg: isDebug,
     formatDate,
