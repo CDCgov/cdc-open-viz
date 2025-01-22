@@ -1365,7 +1365,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   useDateSpanMonths &&
                   xScale
                     .ticks(xTickCount)
-                    .map(t => props.ticks.findIndex(tick => tick.value.getTime() === t.getTime()))
+                    .map(t =>
+                      props.ticks.findIndex(
+                        tick => (typeof tick.value === 'number' ? tick.value : tick.value.getTime()) === t.getTime()
+                      )
+                    )
                     .slice(0, 2)
                     .reduce((acc, curr) => curr - acc)
 
