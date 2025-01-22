@@ -306,5 +306,6 @@ export default {
       textAfter: ')'
     },
     data: []
-  }
+  },
+  runtime: { yAxis: {}, seriesKeys: [] }
 }
