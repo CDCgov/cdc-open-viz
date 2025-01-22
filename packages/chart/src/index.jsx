@@ -12,8 +12,11 @@ let isDebug = window.location.href.includes('debug=true')
 
 let domContainer = document.getElementsByClassName('react-container')[0]
 
+let configUrl = domContainer.attributes['data-config'].value
+let config = await (await fetch(configUrl)).json()
+
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
-    <CdcChart configUrl={domContainer.attributes['data-config'].value} isEditor={isEditor} isDebug={isDebug} />
+    <CdcChart config={config} isEditor={isEditor} isDebug={isDebug} />
   </React.StrictMode>
 )
