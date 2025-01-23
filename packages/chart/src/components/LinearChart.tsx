@@ -36,12 +36,13 @@ import useMinMax from '../hooks/useMinMax'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import useScales, { getTickValues, filterAndShiftLinearDateTicks } from '../hooks/useScales'
-import useTopAxis from '../hooks/useTopAxis'
+import getTopAxis from '../helpers/getTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
+import { getXAxisData, getYAxisData } from '../helpers/getAxisData'
 
 type LinearChartProps = {
   parentWidth: number
@@ -103,7 +104,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   // HOOKS  % STATES
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
   const { visSupportsReactTooltip } = useEditorPermissions()
-  const { hasTopAxis } = useTopAxis(config)
+  const { hasTopAxis } = getTopAxis(config)
   const [animatedChart, setAnimatedChart] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
@@ -185,15 +186,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   const isNoDataAvailable = config.filters && config.filters.values.length === 0 && data.length === 0
 
-  const getXAxisData = d =>
-    isDateScale(config.runtime.xAxis)
-      ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime()
-      : d[config.runtime.originalXAxis.dataKey]
-  const getYAxisData = (d, seriesKey) => d[seriesKey]
   const xAxisDataMapped =
     config.brush.active && brushConfig.data?.length
-      ? brushConfig.data.map(d => getXAxisData(d))
-      : data.map(d => getXAxisData(d))
+      ? brushConfig.data.map(d => getXAxisData(d, config, parseDate))
+      : data.map(d => getXAxisData(d, config, parseDate))
   const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
   const properties = {
     data,
@@ -1351,9 +1347,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               numTicks={useDateSpanMonths ? dateSpanMonths : xTickCount}
               tickStroke='#333'
               tickValues={
-                config.xAxis.manual
+                config.runtime.xAxis.manual
                   ? getTickValues(xAxisDataMapped, xScale, isDateTime ? xTickCount : getManualStep(), config)
-                  : config.xAxis.type === 'date'
+                  : config.runtime.xAxis.type === 'date'
                   ? xAxisDataMapped
                   : undefined
               }
@@ -1361,7 +1357,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               {props => {
                 // For these charts, we generated all ticks in tickValues above, and now need to filter/shift them
                 // so the last tick is always labeled
-                if (config.xAxis.type === 'date' && !config.xAxis.manual) {
+                if (config.runtime.xAxis.type === 'date' && !config.runtime.xAxis.manual) {
                   props.ticks = filterAndShiftLinearDateTicks(config, props, xAxisDataMapped, formatDate)
                 }
 
@@ -1369,7 +1365,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   useDateSpanMonths &&
                   xScale
                     .ticks(xTickCount)
-                    .map(t => props.ticks.findIndex(tick => tick.value.getTime() === t.getTime()))
+                    .map(t =>
+                      props.ticks.findIndex(
+                        tick => (typeof tick.value === 'number' ? tick.value : tick.value.getTime()) === t.getTime()
+                      )
+                    )
                     .slice(0, 2)
                     .reduce((acc, curr) => curr - acc)
 

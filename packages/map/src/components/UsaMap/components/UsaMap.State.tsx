@@ -23,10 +23,11 @@ import Territory from './Territory'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { MapContext } from '../../../types/MapContext'
-import { checkColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { checkColorContrast, getContrastColor, outlinedTextColor } from '@cdc/core/helpers/cove/accessibility'
 import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { titleCase } from '../../../helpers/titleCase'
+import TerritoriesSection from './TerritoriesSection'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -405,7 +406,7 @@ const UsaMap = () => {
               {map.patterns.map((patternData, patternIndex) => {
                 const { pattern, dataKey, size } = patternData
                 const currentFill = styles.fill
-                const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
+                const hasMatchingValues = patternData.dataValue === geoData?.[patternData.dataKey]
                 const patternColor = patternData.color || getContrastColor('#000', currentFill)
 
                 if (!hasMatchingValues) return
@@ -519,12 +520,11 @@ const UsaMap = () => {
 
     if (undefined === abbr) return null
 
-    let textColor = getContrastColor('#FFF', bgColor)
-
-    // always make HI black since it is off to the side
+    // HI background is always white since it is off to the side
     if (abbr === 'US-HI' && !general.displayAsHex) {
-      textColor = '#000'
+      bgColor = '#FFF'
     }
+    const { textColor, strokeColor } = outlinedTextColor(bgColor)
 
     let x = 0,
       y = hexMap.type === 'shapes' && general.displayAsHex ? -10 : 5
@@ -538,7 +538,16 @@ const UsaMap = () => {
     if (undefined === offsets[abbr] || isHex) {
       return (
         <g transform={`translate(${centroid})`} tabIndex={-1}>
-          <text x={x} y={y} fontSize={14} strokeWidth='0' style={{ fill: textColor }} textAnchor='middle'>
+          <text
+            x={x}
+            y={y}
+            fontSize={14}
+            strokeWidth='2'
+            paintOrder='stroke'
+            stroke={strokeColor}
+            style={{ fill: textColor }}
+            textAnchor='middle'
+          >
             {abbr.substring(3)}
           </text>
         </g>
@@ -559,9 +568,11 @@ const UsaMap = () => {
         />
         <text
           x={4}
-          strokeWidth='0'
+          strokeWidth='2'
+          paintOrder='stroke'
+          stroke={strokeColor}
           fontSize={13}
-          style={{ fill: '#202020' }}
+          style={{ fill: textColor }}
           alignmentBaseline='middle'
           transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
         >
@@ -586,22 +597,7 @@ const UsaMap = () => {
         {annotations.length > 0 && <Annotation.Draggable onDragStateChange={handleDragStateChange} />}
       </svg>
 
-      {territories.length > 0 && (
-        <>
-          {/* Temporarily make the max width fit the image width */}
-          <div>
-            <div className='d-flex mt-2'>
-              <h5>{general.territoriesLabel}</h5>
-              {'data' === general.type && logo && (
-                <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
-              )}
-            </div>
-            <div>
-              <span className='mt-1 mb-2 d-flex flex-wrap territories'>{territories}</span>
-            </div>
-          </div>
-        </>
-      )}
+      <TerritoriesSection territories={territories} logo={logo} config={state} />
     </ErrorBoundary>
   )
 }

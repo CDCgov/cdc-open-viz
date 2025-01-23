@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef, useCallback, useId } from 'react'
 import * as d3 from 'd3'
 import _ from 'lodash'
 import 'whatwg-fetch'
-import ResizeObserver from 'resize-observer-polyfill'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
@@ -20,8 +19,6 @@ import Waiting from '@cdc/core/components/Waiting'
 
 // types
 import { type Coordinate, type MapConfig } from './types/MapConfig'
-import { type ViewPort } from '@cdc/core/types/ViewPort'
-import { type DimensionsType } from '@cdc/core/types/Dimensions'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
@@ -48,7 +45,6 @@ import './scss/btn.scss'
 // Core Helpers
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import getViewport from '@cdc/core/helpers/getViewport'
 import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
@@ -67,6 +63,7 @@ import { hashObj } from './helpers/hashObj'
 import { navigationHandler } from './helpers/navigationHandler'
 import { validateFipsCodeLength } from './helpers/validateFipsCodeLength'
 import { titleCase } from './helpers/titleCase'
+import { indexOfIgnoreType } from './helpers/indexOfIgnoreType'
 
 // Child Components
 import Annotation from './components/Annotation'
@@ -78,9 +75,13 @@ import Modal from './components/Modal'
 import NavigationMenu from './components/NavigationMenu'
 import UsaMap from './components/UsaMap'
 import WorldMap from './components/WorldMap'
+import GoogleMap from './components/GoogleMap'
 
-// Hooks
+// hooks
 import useTooltip from './hooks/useTooltip'
+import useResizeObserver from './hooks/useResizeObserver'
+import { SubGrouping } from '@cdc/core/types/VizFilter'
+import { ViewPort } from '@cdc/core/types/ViewPort'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -89,15 +90,6 @@ const regionKeys = Object.keys(supportedRegions)
 const countryKeys = Object.keys(supportedCountries)
 const countyKeys = Object.keys(supportedCounties)
 const cityKeys = Object.keys(supportedCities)
-
-const indexOfIgnoreType = (arr, item) => {
-  for (let i = 0; i < arr.length; i++) {
-    if (item === arr[i]) {
-      return i
-    }
-  }
-  return -1
-}
 
 const CdcMap = ({
   config,
@@ -119,22 +111,27 @@ const CdcMap = ({
   const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
   const [loading, setLoading] = useState(true)
   const [displayPanel, setDisplayPanel] = useState(true)
-  const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
   const [topoData, setTopoData] = useState<{}>({})
   const [runtimeFilters, setRuntimeFilters] = useState([])
-  const [runtimeLegend, setRuntimeLegend] = useState([])
   const [runtimeData, setRuntimeData] = useState({ init: true })
+  const _setRuntimeData = (data: any) => {
+    if (config) {
+      setRuntimeData(data)
+    } else {
+      setRuntimeFilters(data)
+    }
+  }
+  const [runtimeLegend, setRuntimeLegend] = useState([])
   const [stateToShow, setStateToShow] = useState(null)
   const [modal, setModal] = useState(null)
   const [accessibleStatus, setAccessibleStatus] = useState('')
   const [filteredCountryCode, setFilteredCountryCode] = useState()
   const [position, setPosition] = useState(state.mapPosition)
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
-  const [container, setContainer] = useState()
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
-  const [dimensions, setDimensions] = useState<DimensionsType>([0, 0])
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
   const [projection, setProjection] = useState(null)
+  const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
 
   const legendRef = useRef(null)
   const tooltipRef = useRef(null)
@@ -226,22 +223,6 @@ const CdcMap = ({
       setPosition(state.mapPosition)
     }
   }, [state.mapPosition, setPosition])
-
-  const resizeObserver = new ResizeObserver(entries => {
-    for (let entry of entries) {
-      let { width, height } = entry.contentRect
-      let newViewport = getViewport(entry.contentRect.width)
-
-      let editorWidth = 350
-
-      setCurrentViewport(newViewport)
-
-      if (isEditor) {
-        width = width - editorWidth
-      }
-      setDimensions([width, height])
-    }
-  })
 
   // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
   // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
@@ -357,7 +338,7 @@ const CdcMap = ({
   })
 
   // eslint-disable-next-line
-  const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
+  const generateRuntimeLegend = useCallback((obj, runtimeFilters, hash) => {
     const newLegendMemo = new Map() // Reset memoization
     const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
     let primaryCol = obj.columns.primary.name,
@@ -372,7 +353,7 @@ const CdcMap = ({
       result.fromHash = hash
     }
 
-    result.runtimeDataHash = runtimeData.fromHash
+    result.runtimeDataHash = runtimeFilters?.fromHash
 
     // Unified will base the legend off ALL of the data maps received. Otherwise, it will use
     let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData)
@@ -786,7 +767,7 @@ const CdcMap = ({
     legendMemo.current = newLegendMemo
 
     if (state.general.geoType === 'world') {
-      const runtimeDataKeys = Object.keys(runtimeData)
+      const runtimeDataKeys = Object.keys(runtimeFilters)
       const isCountriesWithNoDataState =
         obj.data === undefined ? false : !countryKeys.every(countryKey => runtimeDataKeys.includes(countryKey))
 
@@ -851,32 +832,21 @@ const CdcMap = ({
       ) => {
         let newFilter = runtimeFilters[idx]
 
-        const sortAsc = (a, b) => {
-          return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
-        }
-
-        const sortDesc = (a, b) => {
-          return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
+        const sort = (a, b) => {
+          const asc = obj.filters[idx].order !== 'desc'
+          return String(asc ? a : b).localeCompare(String(asc ? b : a), 'en', { numeric: true })
         }
 
         if (type !== 'url') {
           values = getUniqueValues(state.data, columnName)
 
-          if (obj.filters[idx].order === 'asc') {
-            values = values.sort(sortAsc)
-          }
-
-          if (obj.filters[idx].order === 'desc') {
-            values = values.sort(sortDesc)
-          }
-
           if (obj.filters[idx].order === 'cust') {
             if (obj.filters[idx]?.values.length > 0) {
               values = obj.filters[idx].values
             }
+          } else {
+            values = values.sort(sort)
           }
-        } else {
-          values = values
         }
 
         if (undefined === newFilter) {
@@ -896,6 +866,7 @@ const CdcMap = ({
         newFilter.active = active ?? values[0] // Default to first found value
         newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
         newFilter.showDropdown = showDropdown
+        newFilter.subGrouping = obj.filters[idx].subGrouping
 
         filters.push(newFilter)
       }
@@ -944,29 +915,29 @@ const CdcMap = ({
         // Filters
         if (filters?.length) {
           for (let i = 0; i < filters.length; i++) {
-            const { columnName, active, type } = filters[i]
-            if (type !== 'url' && String(row[columnName]) !== String(active)) return false // Bail out, not part of filter
+            const { columnName, active, type, filterStyle, subGrouping } = filters[i]
+            const isDataFilter = type !== 'url'
+            const matchingValue = String(active) === String(row[columnName]) // Group
+            if (isDataFilter && !matchingValue) return false // Bail out, data doesn't match the filter selection
+            if (filterStyle == 'nested-dropdown') {
+              const matchingSubValue = String(row[subGrouping?.columnName]) === String(subGrouping?.active)
+              if (subGrouping?.active && !matchingSubValue) {
+                return false // Bail out, data doesn't match the subgroup selection
+              }
+            }
           }
         }
-
         // Don't add additional rows with same UID
-        if (undefined === result[row.uid]) {
+        if (result[row.uid] === undefined) {
           result[row.uid] = row
         }
       })
-
       return result
     } catch (e) {
       console.error('COVE: ', e) // eslint-disable-line
     }
   })
 
-  const outerContainerRef = useCallback(node => {
-    if (node !== null) {
-      resizeObserver.observe(node)
-    }
-    setContainer(node)
-  }, []) // eslint-disable-line
   const mapSvg = useRef(null)
 
   // this is passed DOWN into the various components
@@ -1324,12 +1295,6 @@ const CdcMap = ({
     }
   }, [state]) // eslint-disable-line
 
-  // When geo label override changes
-  // - redo the tooltips
-  useEffect(() => {
-    applyTooltipsToGeo()
-  }, [state.general.geoLabelOverride]) // eslint-disable-line
-
   useEffect(() => {
     // UID
     if (state.data && state.columns.geo.name && state.columns.geo.name !== state.data.fromColumn) {
@@ -1340,7 +1305,7 @@ const CdcMap = ({
     const hashFilters = hashObj(state.filters)
     let filters
 
-    if (state.filters && hashFilters !== runtimeFilters.fromHash) {
+    if (state.filters && (config || hashFilters !== runtimeFilters.fromHash)) {
       filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
 
       if (filters) {
@@ -1369,12 +1334,12 @@ const CdcMap = ({
     })
 
     // Data
-    if (hashData !== runtimeData.fromHash && state.data?.fromColumn) {
+    if (hashData !== runtimeData?.fromHash && state.data?.fromColumn) {
       const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
 
       setRuntimeData(newRuntimeData)
     } else {
-      if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
+      if (hashLegend !== runtimeLegend?.fromHash && undefined === runtimeData.init) {
         const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
         setRuntimeLegend(legend)
       }
@@ -1452,9 +1417,7 @@ const CdcMap = ({
     applyTooltipsToGeo,
     container,
     content: modal,
-    currentViewport,
     data: runtimeData,
-    dimensions,
     displayGeoName,
     filteredCountryCode,
     generateColorsArray,
@@ -1482,12 +1445,14 @@ const CdcMap = ({
     setSharedFilterValue,
     setState,
     state,
-    viewport: currentViewport,
     tooltipId,
     tooltipRef,
     topoData,
     setTopoData,
-    mapId
+    mapId,
+    outerContainerRef,
+    dimensions,
+    currentViewport
   }
 
   if (!mapProps.data || !state.data) return <></>
@@ -1530,7 +1495,12 @@ const CdcMap = ({
   )
 
   const sectionClassNames = () => {
-    const classes = ['cove-component__content', 'cdc-map-inner-container', `${currentViewport}`]
+    const classes = [
+      'cove-component__content',
+      'cdc-map-inner-container',
+      `${currentViewport}`,
+      `${state?.general?.headerColor}`
+    ]
     if (config?.runtime?.editorErrorMessage.length > 0) classes.push('type-map--has-error')
     return classes.join(' ')
   }
@@ -1564,14 +1534,14 @@ const CdcMap = ({
                 <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
               )}
 
-              {general.introText && <section className='introText mb-4 mt-3'>{parse(general.introText)}</section>}
+              {general.introText && <section className='introText mb-4'>{parse(general.introText)}</section>}
 
               {state?.filters?.length > 0 && (
                 <Filters
                   config={state}
                   setConfig={setState}
                   filteredData={runtimeFilters}
-                  setFilteredData={setRuntimeFilters}
+                  setFilteredData={_setRuntimeData}
                   dimensions={dimensions}
                   standaloneMap={!config}
                 />
@@ -1600,6 +1570,7 @@ const CdcMap = ({
                       {'us-county' === geoType && <UsaMap.County />}
                       {'world' === geoType && <WorldMap />}
                       {/* logo is handled in UsaMap.State when applicable */}
+                      {'google-map' === geoType && <GoogleMap />}
                       {'data' === general.type && logo && ('us' !== geoType || 'us-geocode' === state.general.type) && (
                         <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
                       )}

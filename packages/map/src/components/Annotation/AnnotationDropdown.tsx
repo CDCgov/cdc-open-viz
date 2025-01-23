@@ -6,7 +6,7 @@ import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
 import AnnotationList from './AnnotationList'
 
 const AnnotationDropdown = () => {
-  const { currentViewport: viewport, state: config } = useContext(ConfigContext)
+  const { state: config, isEditor, currentViewport: viewport } = useContext(ConfigContext)
   const [expanded, setExpanded] = useState(false)
 
   const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${appFontSize}px`
@@ -19,7 +19,7 @@ const AnnotationDropdown = () => {
   }
 
   const handleAccordionClassName = () => {
-    const classNames = ['data-table-heading', 'annotation__dropdown-list']
+    const classNames = ['data-table-heading', 'annotation__dropdown-list', 'p-3']
     if (!expanded) {
       classNames.push('collapsed')
     }

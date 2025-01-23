@@ -31,7 +31,6 @@ export type DataTableProps = {
   config: TableConfig
   dataConfig?: Object
   defaultSortBy?: string
-  displayDataAsText?: Function
   displayGeoName?: Function
   expandDataTable: boolean
   formatLegendLocation?: Function
@@ -90,7 +89,6 @@ const DataTable = (props: DataTableProps) => {
   }, [parentRuntimeData, config.table.pivot?.columnName, config.table.pivot?.valueColumn])
 
   const [expanded, setExpanded] = useState(expandDataTable)
-
   const [sortBy, setSortBy] = useState<any>({
     column: defaultSortBy || '',
     asc: false,

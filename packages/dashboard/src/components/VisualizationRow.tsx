@@ -3,7 +3,7 @@ import React, { useContext, useMemo } from 'react'
 import Toggle from './Toggle'
 import _ from 'lodash'
 import { ConfigRow } from '../types/ConfigRow'
-import CdcChart from '@cdc/chart/src/CdcChart'
+import CdcChart from '@cdc/chart/src/CdcChartComponent'
 import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
 import CdcMap from '@cdc/map/src/CdcMap'
 import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
@@ -160,7 +160,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
             <div
               key={`vis__${index}__${colIndex}`}
               className={`col-12 col-md-${col.width}${!shouldShow ? ' d-none' : ''}${
-                hideVisualization ? ' hide-parent-visualization' : ' mt-4'
+                hideVisualization ? ' hide-parent-visualization' : ' mb-4'
               }`}
             >
               {row.toggle && !hideVisualization && (

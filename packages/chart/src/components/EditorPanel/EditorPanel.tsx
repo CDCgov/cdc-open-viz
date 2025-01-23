@@ -596,7 +596,7 @@ const EditorPanel = () => {
     updateConfig,
     tableData,
     transformedData: data,
-    loading,
+    isLoading,
     colorScale,
     colorPalettes,
     twoColorPalette,
@@ -606,7 +606,6 @@ const EditorPanel = () => {
     setParentConfig,
     missingRequiredSections,
     isDebug,
-    setFilteredData,
     lineOptions,
     rawData,
     highlight,
@@ -651,48 +650,6 @@ const EditorPanel = () => {
     visSupportsYPadding
   } = useEditorPermissions()
 
-  // when the visualization type changes we
-  // have to update the individual series type & axis details
-  // dataKey is unchanged here.
-  // ie. { dataKey: 'series_name', type: 'Bar', axis: 'Left'}
-  useEffect(() => {
-    let newSeries = []
-    if (config.series) {
-      newSeries = config.series.map(series => {
-        return {
-          ...series,
-          type:
-            config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar',
-          axis: 'Left'
-        }
-      })
-    }
-
-    updateConfig({
-      ...config,
-      series: newSeries
-    })
-  }, [config.visualizationType]) // eslint-disable-line
-
-  // Scatter Plots default date/category axis is 'continuous'
-  useEffect(() => {
-    if (config.visualizationType === 'Scatter Plot') {
-      updateConfig({
-        ...config,
-        xAxis: {
-          ...config.xAxis,
-          type: 'continuous'
-        }
-      })
-    }
-  }, [])
-
-  useEffect(() => {
-    if (config.visualizationType !== 'Bar') {
-      updateConfig({ ...config, tooltips: { ...config.tooltips, singleSeries: false } })
-    }
-  }, [config.visualizationType])
-
   const { hasRightAxis } = useRightAxis({ config: config, yMax: config.yAxis.size, data: config.data, updateConfig })
 
   const getItemStyle = (isDragging, draggableStyle) => ({
@@ -734,6 +691,22 @@ const EditorPanel = () => {
       updatedConfig.visualizationSubType = 'regular'
       updatedConfig.barStyle = 'flat'
       updatedConfig.isLollipopChart = false
+    }
+
+    if (updatedConfig.series) {
+      updatedConfig.series = config.series.map(series => ({
+        ...series,
+        type: config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType || 'Bar',
+        axis: 'Left'
+      }))
+    }
+
+    if (updatedConfig.visualizationType === 'Deviation Bar' || updatedConfig.visualizationType === 'Paired Bar') {
+      updatedConfig.orientation = 'horizontal'
+    }
+
+    if (updatedConfig.visualizationType === 'Bar') {
+      updatedConfig.tooltips = { ...updatedConfig.tooltips, singleSeries: false }
     }
   }
 
@@ -813,7 +786,7 @@ const EditorPanel = () => {
   const [displayPanel, setDisplayPanel] = useState(true)
   const [displayViewportOverrides, setDisplayViewportOverrides] = useState(false)
 
-  if (loading) {
+  if (isLoading) {
     return null
   }
 
@@ -906,7 +879,7 @@ const EditorPanel = () => {
     return Object.keys(columns)
   }
 
-  const getLegendStyleOptions = (option: 'style' | 'subStyle'): string[] => {
+  const getLegendStyleOptions = (option: 'style' | 'subStyle' | 'shapes'): string[] => {
     const options: string[] = []
 
     switch (option) {
@@ -963,7 +936,7 @@ const EditorPanel = () => {
 
   const convertStateToConfig = () => {
     let strippedState = JSON.parse(JSON.stringify(config))
-    if (false === missingRequiredSections()) {
+    if (false === missingRequiredSections(config)) {
       delete strippedState.newViz
     }
     delete strippedState.runtime
@@ -998,32 +971,6 @@ const EditorPanel = () => {
       }
     })
   }, [config.orientation])
-
-  // Set paired bars to be horizontal, even though that option doesn't display
-  useEffect(() => {
-    if (config.visualizationType === 'Paired Bar') {
-      updateConfig({
-        ...config,
-        orientation: 'horizontal'
-      })
-    }
-  }, []) // eslint-disable-line
-
-  useEffect(() => {
-    if (config.orientation === 'horizontal') {
-      updateConfig({
-        ...config,
-        lollipopShape: config.lollipopShape
-      })
-    }
-  }, [config.isLollipopChart, config.lollipopShape]) // eslint-disable-line
-
-  /// temporary force orientation untill we support Vartical deviaton bar
-  useEffect(() => {
-    if (config.visualizationType === 'Deviation Bar') {
-      updateConfig({ ...config, orientation: 'horizontal' })
-    }
-  }, [config.visualizationType])
 
   const ExclusionsList = useCallback(() => {
     const exclusions = [...config.exclusions.keys]
@@ -1631,9 +1578,19 @@ const EditorPanel = () => {
                         value={config.yAxis.label}
                         section='yAxis'
                         fieldName='label'
-                        label='Label '
+                        label='Label'
                         updateField={updateField}
                         maxLength={35}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>35 character limit</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
                       />
                       {config.runtime.seriesKeys &&
                         config.runtime.seriesKeys.length === 1 &&
@@ -2308,6 +2265,16 @@ const EditorPanel = () => {
                     label='Label'
                     updateField={updateField}
                     maxLength={35}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>35 character limit</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
                   />
                   <TextField
                     value={config.yAxis.rightNumTicks}
@@ -2599,6 +2566,16 @@ const EditorPanel = () => {
                         label='Label'
                         updateField={updateField}
                         maxLength={35}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>35 character limit</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
                       />
 
                       {config.xAxis.type === 'continuous' && (
@@ -3661,6 +3638,27 @@ const EditorPanel = () => {
                     updateField={updateField}
                     options={getLegendStyleOptions('style')}
                   />
+                  <CheckBox
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display='question'
+                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Choose option Shapes in Line Datapoint Symbols to display.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    display={!config.legend.hide && config.legend.style === 'lines'}
+                    value={config.legend.hasShape}
+                    section='legend'
+                    fieldName='hasShape'
+                    label='Shapes'
+                    updateField={updateField}
+                  />
 
                   <Select
                     display={!config.legend.hide && config.legend.style === 'gradient'}
@@ -3890,7 +3888,9 @@ const EditorPanel = () => {
                     display={
                       ['bottom', 'top'].includes(config.legend.position) &&
                       !config.legend.hide &&
-                      config.legend.style !== 'gradient'
+                      config.legend.style !== 'gradient' &&
+                      !config.legend.singleRow &&
+                      !config.legend.singleRow
                     }
                     value={config.legend.verticalSorted}
                     section='legend'

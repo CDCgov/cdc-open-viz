@@ -19,7 +19,7 @@ import Loading from '@cdc/core/components/Loading'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import getViewport from '@cdc/core/helpers/getViewport'
 
-import CdcChart from '@cdc/chart/src/CdcChart'
+import CdcChart from '@cdc/chart/src/CdcChartComponent'
 import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
 import CdcMap from '@cdc/map/src/CdcMap'
 import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
@@ -228,7 +228,15 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       )
       dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
       const visualizations = reloadURLHelpers.getVisualizationsWithFormattedData(config.visualizations, newData)
-      dispatch({ type: 'SET_CONFIG', payload: { dashboard: dashboardConfig, datasets: newDatasets, visualizations } })
+      dispatch({
+        type: 'SET_CONFIG',
+        payload: {
+          dashboard: dashboardConfig,
+          datasets: newDatasets,
+          visualizations,
+          activeDashboard: config.activeDashboard
+        }
+      })
       setAPILoading(false)
     }
   }
@@ -534,7 +542,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
               classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]}
             />
             {/* Description */}
-            {description && <div className='subtext'>{parse(description)}</div>}
+            {description && <div className='subtext mb-3'>{parse(description)}</div>}
             {/* Visualizations */}
             {config.rows &&
               config.rows

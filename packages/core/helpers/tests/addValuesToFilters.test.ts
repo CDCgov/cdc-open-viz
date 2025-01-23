@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { VizFilter } from '../../types/VizFilter'
 import { addValuesToFilters } from '../addValuesToFilters'
 import { describe, it, expect, vi } from 'vitest'
+import { FILTER_STYLE } from '@cdc/dashboard/src/types/FilterStyles'
 
 describe('addValuesToFilters', () => {
   const parentFilter = { columnName: 'parentColumn', id: 11, active: 'apple', values: [] } as VizFilter
@@ -26,6 +27,19 @@ describe('addValuesToFilters', () => {
     expect(newFilters2[2].values).toEqual([3, 1, 4])
     expect(newFilters2[1].values).toEqual([])
   })
+  it('adds filter values based on parent queued active values', () => {
+    const filtersCopy = _.cloneDeep([{ ...parentFilter, queuedActive: 'pear' }, childFilter, parentFilter2])
+    const newFilters2 = addValuesToFilters(filtersCopy, data)
+    expect(newFilters2[0].values).toEqual(['apple', 'pear'])
+    expect(newFilters2[2].values).toEqual([3, 1, 4])
+    expect(newFilters2[1].values).toEqual([])
+
+    filtersCopy[0].queuedActive = 'apple'
+    const newFilters = addValuesToFilters(filtersCopy, data)
+    expect(newFilters[0].values).toEqual(['apple', 'pear'])
+    expect(newFilters[2].values).toEqual([3, 1, 4])
+    expect(newFilters[1].values).toEqual(['b'])
+  })
   it('works when data is an object', () => {
     const filtersCopy = _.cloneDeep(filters)
     const newFilters = addValuesToFilters(filtersCopy, { '0': data })
@@ -36,7 +50,11 @@ describe('addValuesToFilters', () => {
     //expect(newFilters[1].values).toEqual([])
   })
   it('works for nested dropdowns', () => {
-    const nestedParentFilter = { ...parentFilter, subGrouping: { columnName: 'childColumn' } }
+    const nestedParentFilter = {
+      ...parentFilter,
+      filterStyle: FILTER_STYLE.nestedDropdown,
+      subGrouping: { columnName: 'childColumn' }
+    }
     const newFilters = addValuesToFilters([nestedParentFilter], data)
     expect(newFilters[0].values).toEqual(['apple', 'pear'])
     expect(newFilters[0].subGrouping.valuesLookup).toEqual({ apple: { values: ['a', 'b'] }, pear: { values: ['c'] } })
