@@ -1572,7 +1572,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
               </label>
 
               {/* Navigation Behavior */}
-              {state.general.type === 'navigation' && (
+              {(state.general.type === 'navigation' || state.general.type === 'data') && (
                 <label>
                   <span className='edit-label column-heading'>Navigation Behavior</span>
                   <select
