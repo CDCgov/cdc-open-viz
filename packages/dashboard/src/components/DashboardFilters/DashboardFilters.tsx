@@ -8,6 +8,7 @@ import NestedDropdown from '@cdc/core/components/NestedDropdown'
 import { MouseEventHandler } from 'react'
 import Loader from '@cdc/core/components/Loader'
 import _ from 'lodash'
+import { handleSorting } from '@cdc/core/components/Filters'
 
 type DashboardFilterProps = {
   show: number[]
@@ -89,6 +90,8 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           }
         } else {
           // Data Filter
+          handleSorting(filter)
+
           filter.values?.forEach((filterOption, index) => {
             const labeledOpt = filter.labels && filter.labels[filterOption]
             const resetLabelHasMatch = (filterOption || labeledOpt) === filter.resetLabel
@@ -123,7 +126,6 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         }
 
         const formGroupClass = `form-group me-4 mb-1${loading ? ' loading-filter' : ''}`
-
         return (
           <div className={formGroupClass} key={`${label}-filtersection-${filterIndex}`}>
             {label && (

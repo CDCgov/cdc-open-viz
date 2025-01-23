@@ -10,8 +10,8 @@
           "American Samoa",
           "Arizona"
         ],
-        "active": "Alaska",
-        "columnName": "Location"
+        "columnName": "Location",
+        "active": "Arizona"
       },
       {
         "values": [

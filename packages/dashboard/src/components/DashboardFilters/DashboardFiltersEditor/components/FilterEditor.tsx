@@ -14,6 +14,8 @@ import { Visualization } from '@cdc/core/types/Visualization'
 import { hasDashboardApplyBehavior } from '../../../../helpers/hasDashboardApplyBehavior'
 import NestedDropDownDashboard from './NestedDropDownDashboard'
 import { FILTER_STYLE } from '../../../../types/FilterStyles'
+import { filterOrderOptions } from '@cdc/core/components/Filters'
+import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/components/FilterOrder'
 
 type FilterEditorProps = {
   config: DashboardConfig
@@ -118,6 +120,10 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
 
   const handleFilterStyleChange = value => {
     updateFilterProp('filterStyle', value)
+  }
+
+  const handleFilterOrderChange = value => {
+    updateFilterProp('order', value)
   }
 
   const isNestedDropDown = filter.filterStyle === FILTER_STYLE.nestedDropdown
@@ -438,6 +444,31 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
                       ))}
                     </select>
                   </label>
+
+                  <label>
+                    <span className='edit-label column-heading'>Filter Order: </span>
+                    <select value={filter.order || 'column'} onChange={e => handleFilterOrderChange(e.target.value)}>
+                      {filterOrderOptions.map(f => (
+                        <option value={f.value} key={`filter-style-select-item-${f.value}`}>
+                          {f.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  {/* if custom order is set use react-dnd library to sort the values */}
+                  {filter.order === 'cust' && (
+                    <FilterOrder
+                      orderedValues={filter.orderedValues || filter.values}
+                      handleFilterOrder={(index1, index2) => {
+                        const orderedValues = filter.orderedValues ? [...filter.orderedValues] : [...filter.values]
+                        const [removed] = orderedValues.splice(index1, 1)
+                        orderedValues.splice(index2, 0, removed)
+                        updateFilterProp('orderedValues', orderedValues)
+                      }}
+                      filter={filter}
+                      updateFilterProp={updateFilterProp}
+                    />
+                  )}
 
                   <label>
                     <span className='edit-label column-heading'>Show Dropdown</span>
