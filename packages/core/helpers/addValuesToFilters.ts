@@ -8,6 +8,7 @@ type Filter = {
   values: (string | number)[]
   filterStyle?: string
   active?: string | number | (string | number)[]
+  queuedActive?: string | (string | number)[]
   parents?: (string | number)[]
 }
 
@@ -87,21 +88,26 @@ const handleVizParents = (filter: VizFilter, data: any[] | MapData, filtersLooku
   let filteredData = Array.isArray(data) ? data : Object.values(data).flat(1)
   filter.parents.forEach(parentKey => {
     const parent = filtersLookup[parentKey]
+    const [parentQueuedActive, parentQueuedSubActive] = Array.isArray(parent.queuedActive)
+      ? parent.queuedActive
+      : [parent.queuedActive]
+    const parentActive = parentQueuedActive || parent?.active
     if (parent?.filterStyle === FILTER_STYLE.nestedDropdown) {
       const { subGrouping } = parent as VizFilter
-      if (subGrouping?.active) {
+      const parentSubActive = parentQueuedSubActive || subGrouping?.active
+      if (parentSubActive) {
         filteredData = filteredData.filter(d => {
-          const matchingParentGroup = parent.active == d[parent.columnName]
-          const matchingSubGroup = subGrouping.active == d[subGrouping.columnName]
+          const matchingParentGroup = parentActive == d[parent.columnName]
+          const matchingSubGroup = parentSubActive == d[subGrouping.columnName]
           return matchingParentGroup && matchingSubGroup
         })
       }
-    } else if (parent?.active) {
+    } else if (parentActive) {
       filteredData = filteredData.filter(d => {
-        if (Array.isArray(parent.active)) {
-          return parent.active.includes(d[parent.columnName])
+        if (Array.isArray(parentActive)) {
+          return (parentActive as (number | string)[]).includes(d[parent.columnName])
         }
-        return parent.active == d[parent.columnName]
+        return parentActive == d[parent.columnName]
       })
     }
   })

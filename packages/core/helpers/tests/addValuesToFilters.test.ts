@@ -27,6 +27,19 @@ describe('addValuesToFilters', () => {
     expect(newFilters2[2].values).toEqual([3, 1, 4])
     expect(newFilters2[1].values).toEqual([])
   })
+  it('adds filter values based on parent queued active values', () => {
+    const filtersCopy = _.cloneDeep([{ ...parentFilter, queuedActive: 'pear' }, childFilter, parentFilter2])
+    const newFilters2 = addValuesToFilters(filtersCopy, data)
+    expect(newFilters2[0].values).toEqual(['apple', 'pear'])
+    expect(newFilters2[2].values).toEqual([3, 1, 4])
+    expect(newFilters2[1].values).toEqual([])
+
+    filtersCopy[0].queuedActive = 'apple'
+    const newFilters = addValuesToFilters(filtersCopy, data)
+    expect(newFilters[0].values).toEqual(['apple', 'pear'])
+    expect(newFilters[2].values).toEqual([3, 1, 4])
+    expect(newFilters[1].values).toEqual(['b'])
+  })
   it('works when data is an object', () => {
     const filtersCopy = _.cloneDeep(filters)
     const newFilters = addValuesToFilters(filtersCopy, { '0': data })
