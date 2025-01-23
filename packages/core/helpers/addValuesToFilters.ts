@@ -87,7 +87,7 @@ const generateValuesForFilter = (filter: VizFilter, data: any[] | MapData) => {
 const handleVizParents = (filter: VizFilter, data: any[] | MapData, filtersLookup: Record<string, Filter>) => {
   let filteredData = Array.isArray(data) ? data : Object.values(data).flat(1)
   filter.parents.forEach(parentKey => {
-    const parent = filtersLookup[parentKey]
+    const parent = filtersLookup[parentKey] || ({} as Filter)
     const [parentQueuedActive, parentQueuedSubActive] = Array.isArray(parent.queuedActive)
       ? parent.queuedActive
       : [parent.queuedActive]
