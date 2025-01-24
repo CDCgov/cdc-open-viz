@@ -317,23 +317,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (newConfig.legend.seriesHighlight?.length) {
       dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: newConfig.legend?.seriesHighligh })
     }
-
-    let { palette, twoColor } = newConfig
-
-    if (newConfig.isPaletteReversed) {
-      palette = palette.endsWith('reverse') ? palette : palette + 'reverse'
-    } else {
-      palette = palette.endsWith('reverse') ? palette.slice(0, -7) : palette
-    }
-
-    if (twoColor.isPaletteReversed) {
-      twoColor.palette = twoColor.palette.endsWith('reverse') ? twoColor.palette : twoColor.palette + 'reverse'
-    } else {
-      twoColor.palette = twoColor.palette.endsWith('reverse') ? twoColor.palette.slice(0, -7) : twoColor.palette
-    }
-
-    newConfig.palette = palette
-    newConfig.twoColor.palette = twoColor.palette
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
   }
 

@@ -1,6 +1,7 @@
 import { colorPalettesChart, twoColorPalette } from '@cdc/core/data/colorPalettes'
+import { useEffect } from 'react'
 
-export const getColorPalette = config => {
+export const useColorPalette = (config, updateConfig) => {
   let twoColorPalettes = []
   let sequential = []
   let nonSequential = []
@@ -38,6 +39,38 @@ export const getColorPalette = config => {
     sequential = seqPalettes
     nonSequential = nonSeqPalettes
   }
+
+  // Update pairedBar.palette based on isPaletteReversed
+  useEffect(() => {
+    let palette = config.palette
+
+    if (config.twoColor.isPaletteReversed && !config.twoColor.palette.endsWith('reverse')) {
+      palette = config.twoColor.palette + 'reverse'
+    }
+
+    if (!config.twoColor.isPaletteReversed && config.twoColor.palette.endsWith('reverse')) {
+      palette = config.twoColor.palette.slice(0, -7)
+    }
+
+    updateConfig({ ...config, twoColor: { ...config.twoColor, palette: palette } })
+  }, [config.twoColor.isPaletteReversed])
+
+  // Update palette based on isPaletteReversed
+  useEffect(() => {
+    let palette = ''
+
+    if (config.isPaletteReversed && !config.palette.endsWith('reverse')) {
+      palette = config.palette + 'reverse'
+    }
+
+    if (!config.isPaletteReversed && config.palette.endsWith('reverse')) {
+      palette = config.palette.slice(0, -7)
+    }
+
+    updateConfig({ ...config, palette: palette })
+  }, [config.isPaletteReversed])
+
+  // Return all palettes
 
   return { twoColorPalettes, sequential, nonSequential, accessibleColors }
 }
