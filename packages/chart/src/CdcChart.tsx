@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import CdcChart from './CdcChartComponent'
-import { ChartConfig } from './types/ChartConfig'
+import { AllChartsConfig, ChartConfig } from './types/ChartConfig'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import Papa from 'papaparse'
@@ -22,8 +22,7 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug
   const prevFiltersRef = useRef(config.filters)
 
   const loadConfig = useCallback(async () => {
-    const config = { name: 'Jay' }
-    const response = await fetch(configUrl)
+    const response = editorConfig || ((await (await fetch(configUrl)).json()) as AllChartsConfig)
     return response.json()
   }, [])
 
