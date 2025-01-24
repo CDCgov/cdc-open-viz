@@ -3,7 +3,7 @@ import defaults from '../data/initial-state'
 import { type ViewportSize } from '../types/ChartConfig'
 
 export const initialState = {
-  isLoading: false,
+  isLoading: true,
   config: defaults,
   stateData: [],
   colorScale: null,
