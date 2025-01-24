@@ -79,7 +79,8 @@ type Exclusions = {
 }
 
 export type Legend = CoreLegend & {
-  seriesHighlight: string[] | []
+  seriesHighlight: string[]
+
   hideSuppressionLink: boolean
   style: 'circles' | 'boxes' | 'gradient' | 'lines'
   subStyle: 'linear blocks' | 'smooth'
