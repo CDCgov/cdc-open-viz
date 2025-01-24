@@ -23,8 +23,8 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug
 
   const loadConfig = useCallback(async () => {
     const response = editorConfig || ((await (await fetch(configUrl)).json()) as AllChartsConfig)
-    return response.json()
-  }, [])
+    return response
+  }, [editorConfig, configUrl])
 
   const reloadFilteredData = useCallback(async () => {
     if (config.dataUrl) {
@@ -60,7 +60,6 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug
       try {
         const loadedConfig = await loadConfig()
         const data = await loadDataFromConfig(loadedConfig)
-
         setConfig({
           ...loadedConfig,
           data
