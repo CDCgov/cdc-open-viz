@@ -15,7 +15,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import InputToggle from '@cdc/core/components/inputs/InputToggle'
 
 // contexts
-import { useColorPalette } from '../../../../hooks/useColorPalette'
+import { getColorPalette } from '../../../../helpers/getColorPalette'
 import { ChartContext } from './../../../../types/ChartContext.js'
 
 import { useEditorPermissions } from '../../useEditorPermissions.js'
@@ -41,7 +41,7 @@ const PanelVisual: FC<PanelProps> = props => {
     visSupportsReverseColorPalette,
     visHasSingleSeriesTooltip
   } = useEditorPermissions()
-  const { twoColorPalettes, sequential, nonSequential, accessibleColors } = useColorPalette(config, updateConfig)
+  const { twoColorPalettes, sequential, nonSequential, accessibleColors } = getColorPalette(config, updateConfig)
 
   const updateColor = (property, _value) => {
     console.log('value', _value)
@@ -147,9 +147,7 @@ const PanelVisual: FC<PanelProps> = props => {
                   />
                 </Tooltip.Target>
                 <Tooltip.Content>
-                  <p>
-                  Recommended set to display for Section 508 compliance.
-                  </p>
+                  <p>Recommended set to display for Section 508 compliance.</p>
                 </Tooltip.Content>
               </Tooltip>
             }
