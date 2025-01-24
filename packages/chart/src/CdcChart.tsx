@@ -1,47 +1,39 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import CdcChart from './CdcChartComponent'
-import { AllChartsConfig, ChartConfig } from './types/ChartConfig'
+import { ChartConfig } from './types/ChartConfig'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
-import initialConfig from './data/initial-state'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import Papa from 'papaparse'
 import 'react-tooltip/dist/react-tooltip.css'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import Loading from '@cdc/core/components/Loading'
 import _ from 'lodash'
-
+import defaults from './data/initial-state.js'
 interface CdcChartProps {
   configUrl?: string
-  config: ChartConfig
   isEditor?: boolean
   isDebug?: boolean
+  config: ChartConfig
 }
 
-const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, config: editorConfig, isDebug }) => {
-  const [config, setConfig] = useState<ChartConfig>(undefined)
-  const prevFiltersRef = useRef(config?.filters)
+const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug, config: editorConfig }) => {
+  const [config, setConfig] = useState<ChartConfig>(() => editorConfig ?? defaults)
+  const [isLoading, setIsLoading] = useState(false)
+  const prevFiltersRef = useRef(config.filters)
 
-  const loadConfig = async () => {
-    try {
-      const loadedConfig = editorConfig || ((await (await fetch(configUrl)).json()) as AllChartsConfig)
-      const data = await loadDataFromConfig(loadedConfig)
-      const _loadedConfig = { ...initialConfig, ...loadedConfig }
-      setConfig({
-        ..._loadedConfig,
-        data
-      })
-    } catch {
-      console.error('Failed to load configuration or data', error)
-    }
-  }
+  const loadConfig = useCallback(async () => {
+    const config = { name: 'Jay' }
+    const response = await fetch(configUrl)
+    return response.json()
+  }, [])
 
   const reloadFilteredData = useCallback(async () => {
-    if (config?.dataUrl) {
-      const dataUrl = new URL(config?.runtimeDataUrl || config?.dataUrl, window.location.origin)
+    if (config.dataUrl) {
+      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl, window.location.origin)
       const qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
       let isUpdateNeeded = false
 
-      config?.filters?.forEach(filter => {
+      config.filters?.forEach(filter => {
         if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
           qsParams[filter.queryParameter] = filter.active
           isUpdateNeeded = true
@@ -64,17 +56,34 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, config:
   }, [config])
 
   useEffect(() => {
-    loadConfig()
-  }, [])
+    const load = async () => {
+      setIsLoading(true)
+      try {
+        const loadedConfig = await loadConfig()
+        const data = await loadDataFromConfig(loadedConfig)
+
+        setConfig({
+          ...loadedConfig,
+          data
+        })
+      } catch (error) {
+        console.error('Failed to load configuration or data', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    load()
+  }, [configUrl, loadConfig])
 
   useEffect(() => {
-    if (!_.isEqual(prevFiltersRef.current, config?.filters)) {
-      prevFiltersRef.current = config?.filters
+    if (!_.isEqual(prevFiltersRef.current, config.filters)) {
+      prevFiltersRef.current = config.filters
       reloadFilteredData()
     }
-  }, [config?.filters, reloadFilteredData])
+  }, [config.filters, reloadFilteredData])
 
-  if (!config) return <Loading />
+  if (isLoading) return <Loading />
 
   return <CdcChart config={config} isEditor={isEditor} isDebug={isDebug} />
 }
