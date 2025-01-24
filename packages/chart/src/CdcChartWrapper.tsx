@@ -17,7 +17,7 @@ interface CdcChartProps {
 
 const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug }) => {
   const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const prevFiltersRef = useRef(config.filters)
 
   const loadConfig = useCallback(async (url: string) => {
