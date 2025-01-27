@@ -8,7 +8,6 @@ import NestedDropdown from '@cdc/core/components/NestedDropdown'
 import { MouseEventHandler } from 'react'
 import Loader from '@cdc/core/components/Loader'
 import _ from 'lodash'
-import { handleSorting } from '@cdc/core/components/Filters'
 
 type DashboardFilterProps = {
   show: number[]
@@ -90,9 +89,8 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           }
         } else {
           // Data Filter
-          handleSorting(filter)
-
-          filter.values?.forEach((filterOption, index) => {
+          const orderedFilterValues = filter.orderedValues || filter.values
+          orderedFilterValues?.forEach((filterOption, index) => {
             const labeledOpt = filter.labels && filter.labels[filterOption]
             const resetLabelHasMatch = (filterOption || labeledOpt) === filter.resetLabel
 

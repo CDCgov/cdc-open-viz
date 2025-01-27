@@ -28,6 +28,9 @@ import TopSpacing_1 from './_mock/data-bite-dash-test.json'
 import TopSpacing_2 from './_mock/data-bite-dash-test_1.json'
 import TopSpacing_3 from './_mock/data-bite-dash-test_1_1.json'
 import TopSpacing_4 from './_mock/data-bite-dash-test_1_1_1.json'
+import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
+import DashboardFilterDesc from './_mock/dashboard-filter-desc.json'
+import DashboardFilterCust from './_mock/dashboard-filter-cust.json'
 
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Pages/Dashboard',
@@ -35,6 +38,27 @@ const meta: Meta<typeof Dashboard> = {
 }
 
 type Story = StoryObj<typeof Dashboard>
+
+export const Dashboard_Filter_Asc: Story = {
+  args: {
+    config: DashboardFilterAsc,
+    isEditor: false
+  }
+}
+
+export const Dashboard_Filter_Desc: Story = {
+  args: {
+    config: DashboardFilterDesc,
+    isEditor: false
+  }
+}
+
+export const Dashboard_Filter_Cust: Story = {
+  args: {
+    config: DashboardFilterCust,
+    isEditor: false
+  }
+}
 
 export const Example_1: Story = {
   args: {

@@ -460,13 +460,11 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
                     <FilterOrder
                       orderedValues={filter.orderedValues || filter.values}
                       handleFilterOrder={(index1, index2) => {
-                        const orderedValues = filter.orderedValues ? [...filter.orderedValues] : [...filter.values]
-                        const [removed] = orderedValues.splice(index1, 1)
-                        orderedValues.splice(index2, 0, removed)
-                        updateFilterProp('orderedValues', orderedValues)
+                        const values = [...filter.values]
+                        const [removed] = values.splice(index1, 1)
+                        values.splice(index2, 0, removed)
+                        updateFilterProp('orderedValues', values)
                       }}
-                      filter={filter}
-                      updateFilterProp={updateFilterProp}
                     />
                   )}
 

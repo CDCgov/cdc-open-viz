@@ -1,0 +1,551 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "title": "Amount Filtered by Location and Type ",
+    "sharedFilters": [
+      {
+        "values": [
+          "American Samoa",
+          "Alaska",
+          "Alabama",
+          "Arizona",
+          "Arkansas"
+        ],
+        "columnName": "Location",
+        "showDropdown": true,
+        "usedBy": [
+          "data-bite1628875468150",
+          "chart1628875631849",
+          "data-bite1628876561387",
+          "data-bite1628877031319"
+        ],
+        "tier": 1,
+        "type": "datafilter",
+        "order": "cust",
+        "orderedValues": [
+          "American Samoa",
+          "Alaska",
+          "Alabama",
+          "Arizona",
+          "Arkansas"
+        ]
+      },
+      {
+        "values": [
+          "Federal",
+          "Local",
+          "State"
+        ],
+        "columnName": "Type",
+        "showDropdown": true,
+        "usedBy": [
+          "data-bite1628875468150",
+          "chart1628875631849",
+          "data-bite1628876561387",
+          "data-bite1628877031319"
+        ],
+        "tier": 1
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "legacySharedFilters"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 6,
+          "widget": "data-bite1628875468150"
+        },
+        {
+          "width": 6,
+          "widget": "chart1628875631849"
+        },
+        {
+          "width": null
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 6,
+          "widget": "data-bite1628877031319"
+        },
+        {
+          "width": 6,
+          "widget": "data-bite1628876561387"
+        },
+        {
+          "width": null
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "data-bite1628875468150": {
+      "type": "data-bite",
+      "dataBite": "",
+      "dataFunction": "Mean (Average)",
+      "dataColumn": "Amount",
+      "bitePosition": "Left",
+      "biteFontSize": 24,
+      "fontSize": "medium",
+      "biteBody": "<span style=\"font-size: 20px;\">Average Amount 2019-2021</span> <br>Reflects the average of the dashboard level filter selections within the timeframe available in the data.  In this case 2019-2021. \n This number is calculated within the Data Bite module.\n",
+      "imageData": {
+        "display": "none",
+        "url": "",
+        "alt": "",
+        "options": []
+      },
+      "dataFormat": {
+        "roundToPlace": 0,
+        "commas": true,
+        "prefix": "",
+        "suffix": ""
+      },
+      "biteStyle": "graphic",
+      "filters": [],
+      "subtext": "Citation for Source ",
+      "title": "",
+      "theme": "theme-orange",
+      "shadow": true,
+      "visual": {
+        "border": false,
+        "accent": false,
+        "background": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false
+      },
+      "general": {
+        "isCompactStyle": false
+      },
+      "imageUrl": "",
+      "prefix": "",
+      "suffix": "",
+      "uid": "data-bite1628875468150",
+      "visualizationType": "data-bite",
+      "dataKey": "dashboard_aggregate_example_no_add_fullname.csv",
+      "version": "4.25.1",
+      "migrations": {
+        "addColorMigration": true
+      }
+    },
+    "chart1628875631849": {
+      "type": "chart",
+      "title": "",
+      "theme": "theme-blue",
+      "fontSize": "large",
+      "height": "200",
+      "padding": {
+        "left": 5,
+        "right": 5
+      },
+      "yAxis": {
+        "size": "80",
+        "gridLines": false,
+        "label": "Amount",
+        "numTicks": "4"
+      },
+      "barThickness": 0.35,
+      "xAxis": {
+        "size": "0",
+        "tickRotation": 0,
+        "dataKey": "Year",
+        "label": ""
+      },
+      "table": {
+        "label": "Data Table",
+        "expanded": false,
+        "show": false
+      },
+      "legend": {
+        "behavior": "isolate",
+        "position": "right",
+        "hide": true
+      },
+      "palette": "qualitative-bold",
+      "labels": true,
+      "dataFormat": {},
+      "confidenceKeys": {},
+      "uid": "chart1628875631849",
+      "visualizationType": "Bar",
+      "series": [
+        {
+          "dataKey": "Amount",
+          "type": "Bar"
+        }
+      ],
+      "dataKey": "dashboard_aggregate_example_no_add_fullname.csv"
+    },
+    "data-bite1628876561387": {
+      "type": "data-bite",
+      "dataBite": "",
+      "dataFunction": "Max",
+      "dataColumn": "Amount",
+      "bitePosition": "Right",
+      "biteFontSize": "58",
+      "fontSize": "medium",
+      "imageUrl": "",
+      "biteBody": "<span style=\"font-size: 24px;\"> Peak Amount</span> <br>Reflects the maximum point of data within the dashboard level filter selections within the timeframe set in the data.  In this case 2019-2021. \nThis number is calculated within the Data Bite module.\n",
+      "prefix": "",
+      "suffix": "",
+      "dataFormat": {
+        "roundToPlace": 0,
+        "commas": true,
+        "prefix": "",
+        "suffix": ""
+      },
+      "biteStyle": "title",
+      "filters": [],
+      "subtext": "Source",
+      "title": "",
+      "theme": "theme-blue",
+      "shadow": true,
+      "uid": "data-bite1628876561387",
+      "visualizationType": "data-bite",
+      "dataKey": "dashboard_aggregate_example_no_add_fullname.csv"
+    },
+    "data-bite1628877031319": {
+      "type": "data-bite",
+      "dataBite": "",
+      "dataFunction": "Sum",
+      "dataColumn": "Amount",
+      "bitePosition": "Right",
+      "biteFontSize": "58",
+      "fontSize": "medium",
+      "imageUrl": "",
+      "biteBody": "<span style=\"font-size: 24px;\">State Total</span> <br>Reflects the Sum total of the dashboard level filter selections within the timeframe set in the data.  In this case 2019-2021. \n This number is calculated within the Data Bite module.\n",
+      "prefix": "",
+      "suffix": "",
+      "dataFormat": {
+        "roundToPlace": 0,
+        "commas": true,
+        "prefix": "",
+        "suffix": ""
+      },
+      "biteStyle": "title",
+      "filters": [
+        {
+          "id": 1738001923264
+        }
+      ],
+      "subtext": "Source ",
+      "title": "",
+      "theme": "theme-amber",
+      "shadow": true,
+      "uid": "data-bite1628877031319",
+      "visualizationType": "data-bite",
+      "dataKey": "dashboard_aggregate_example_no_add_fullname.csv"
+    },
+    "legacySharedFilters": {
+      "type": "dashboardFilters",
+      "visualizationType": "dashboardFilters",
+      "sharedFilterIndexes": [
+        0,
+        1
+      ],
+      "filterBehavior": "Filter Change",
+      "uid": "legacySharedFilters"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true
+  },
+  "data": [],
+  "dataFileName": "",
+  "dataFileSourceType": "",
+  "type": "dashboard",
+  "uuid": 1628875999137,
+  "runtime": {},
+  "datasets": {
+    "dashboard_aggregate_example_no_add_fullname.csv": {
+      "data": [
+        {
+          "Location": "Alaska",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": "1377"
+        },
+        {
+          "Location": "Alaska",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": "1613"
+        },
+        {
+          "Location": "Alaska",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": "1495"
+        },
+        {
+          "Location": "Alaska",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": "1377"
+        },
+        {
+          "Location": "Alaska",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": "1613"
+        },
+        {
+          "Location": "Alaska",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": "1495"
+        },
+        {
+          "Location": "Alaska",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": "1436"
+        },
+        {
+          "Location": "Alaska",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": "1672"
+        },
+        {
+          "Location": "Alaska",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": "1554"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": "1375"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": "1611"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": "1493"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": "1375"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": "1611"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": "1493"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": "1434"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": "1670"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": "1552"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": "1398"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": "1634"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": "1516"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": "1398"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": "1634"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": "1516"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": "1457"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": "1693"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": "1575"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": "1388"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": "1624"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": "1506"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": "1388"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": "1624"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": "1506"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": "1447"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": "1683"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": "1565"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": "1401"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": "1637"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": "1519"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": "1401"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": "1637"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": "1519"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": "1460"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": "1696"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": "1578"
+        }
+      ]
+    }
+  },
+  "dataUrl": "",
+  "dataDescription": {},
+  "formattedData": [],
+  "version": "4.25.1",
+  "migrations": {
+    "addColorMigration": true
+  }
+}

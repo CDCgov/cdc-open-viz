@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { SharedFilter } from '../types/SharedFilter'
+import { handleSorting } from '@cdc/core/components/Filters'
 
 // Gets filter values from dataset
 const generateValuesForFilter = (columnName: string, data: Record<string, any[]>) => {
@@ -39,7 +40,6 @@ export const addValuesToDashboardFilters = (
     const filterCopy = _.cloneDeep(filter)
     const filterValues = generateValuesForFilter(getSelector(filter), data)
 
-    filterCopy.values = filterValues
     if (filterValues.length > 0) {
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)
       if (queryStringFilterValue) {
@@ -50,10 +50,10 @@ export const addValuesToDashboardFilters = (
         filterCopy.active = active.filter(val => defaultValues.includes(val))
       } else {
         const defaultLabel = filters.find(filter => filter.resetLabel)
-        const defaultValue = defaultLabel ? defaultLabel.resetLabel : filterCopy.orderedValues?.[0] || filterCopy.active
+        const defaultValue = defaultLabel ? defaultLabel.resetLabel : filterCopy.values?.[0] || filterCopy.active
         filterCopy.active = defaultValue
       }
     }
-    return filterCopy
+    return handleSorting(filterCopy)
   })
 }
