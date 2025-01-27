@@ -14,6 +14,7 @@ export const useTooltip = props => {
     tableData: data,
     config,
     formatNumber,
+    capitalize,
     formatDate,
     formatTooltipsDate,
     parseDate,
@@ -521,7 +522,7 @@ export const useTooltip = props => {
     if (visualizationType === 'Forest Plot') {
       if (key === config.xAxis.dataKey)
         return (
-          <li className='tooltip-heading'>{`${_.capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${
+          <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${
             isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value
           }`}</li>
         )
@@ -534,14 +535,14 @@ export const useTooltip = props => {
     // TOOLTIP HEADING
     if (visualizationType === 'Bar' && orientation === 'horizontal' && key === config.xAxis.dataKey)
       return (
-        <li className='tooltip-heading'>{`${_.capitalize(
+        <li className='tooltip-heading'>{`${capitalize(
           config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ` : ''
         )} ${config.xAxis.type === 'date' ? formattedDate : value}`}</li>
       )
 
     if (key === config.xAxis.dataKey)
       return (
-        <li className='tooltip-heading'>{`${_.capitalize(
+        <li className='tooltip-heading'>{`${capitalize(
           config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : ''
         )} ${isDateScale(xAxis) ? formattedDate : value}`}</li>
       )

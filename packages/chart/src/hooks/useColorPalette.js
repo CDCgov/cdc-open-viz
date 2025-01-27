@@ -42,7 +42,7 @@ export const useColorPalette = (config, updateConfig) => {
 
   // Update pairedBar.palette based on isPaletteReversed
   useEffect(() => {
-    let palette = config.palette
+    let palette = ''
 
     if (config.twoColor.isPaletteReversed && !config.twoColor.palette.endsWith('reverse')) {
       palette = config.twoColor.palette + 'reverse'

@@ -22,11 +22,12 @@ import isNumber from '@cdc/core/helpers/isNumber'
 // Types
 import { type ChartContext } from '../../types/ChartContext'
 import { type LineChartProps } from './LineChartProps'
-import { getXAxisData, getYAxisData } from '../../helpers/getAxisData'
 
 const LineChart = (props: LineChartProps) => {
   // prettier-ignore
   const {
+    getXAxisData,
+    getYAxisData,
     handleTooltipClick,
     handleTooltipMouseOff,
     handleTooltipMouseOver,
@@ -53,7 +54,7 @@ const LineChart = (props: LineChartProps) => {
   }
 
   const xPos = d => {
-    return xScale(getXAxisData(d, config, parseDate)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+    return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
   }
 
   return (
@@ -309,8 +310,8 @@ const LineChart = (props: LineChartProps) => {
                         ? _data
                         : config.xAxis.type === 'date-time' || config.xAxis.type === 'date'
                         ? _data.sort((d1, d2) => {
-                            let x1 = getXAxisData(d1, config, parseDate)
-                            let x2 = getXAxisData(d2, config, parseDate)
+                            let x1 = getXAxisData(d1)
+                            let x2 = getXAxisData(d2)
                             if (x1 < x2) return -1
                             if (x2 < x1) return 1
                             return 0
