@@ -596,7 +596,7 @@ const EditorPanel = () => {
     updateConfig,
     tableData,
     transformedData: data,
-    loading,
+    isLoading,
     colorScale,
     colorPalettes,
     twoColorPalette,
@@ -606,7 +606,6 @@ const EditorPanel = () => {
     setParentConfig,
     missingRequiredSections,
     isDebug,
-    setFilteredData,
     lineOptions,
     rawData,
     highlight,
@@ -651,48 +650,6 @@ const EditorPanel = () => {
     visSupportsYPadding
   } = useEditorPermissions()
 
-  // when the visualization type changes we
-  // have to update the individual series type & axis details
-  // dataKey is unchanged here.
-  // ie. { dataKey: 'series_name', type: 'Bar', axis: 'Left'}
-  useEffect(() => {
-    let newSeries = []
-    if (config.series) {
-      newSeries = config.series.map(series => {
-        return {
-          ...series,
-          type:
-            config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar',
-          axis: 'Left'
-        }
-      })
-    }
-
-    updateConfig({
-      ...config,
-      series: newSeries
-    })
-  }, [config.visualizationType]) // eslint-disable-line
-
-  // Scatter Plots default date/category axis is 'continuous'
-  useEffect(() => {
-    if (config.visualizationType === 'Scatter Plot') {
-      updateConfig({
-        ...config,
-        xAxis: {
-          ...config.xAxis,
-          type: 'continuous'
-        }
-      })
-    }
-  }, [])
-
-  useEffect(() => {
-    if (config.visualizationType !== 'Bar') {
-      updateConfig({ ...config, tooltips: { ...config.tooltips, singleSeries: false } })
-    }
-  }, [config.visualizationType])
-
   const { hasRightAxis } = useRightAxis({ config: config, yMax: config.yAxis.size, data: config.data, updateConfig })
 
   const getItemStyle = (isDragging, draggableStyle) => ({
@@ -734,6 +691,22 @@ const EditorPanel = () => {
       updatedConfig.visualizationSubType = 'regular'
       updatedConfig.barStyle = 'flat'
       updatedConfig.isLollipopChart = false
+    }
+
+    if (updatedConfig.series) {
+      updatedConfig.series = config.series.map(series => ({
+        ...series,
+        type: config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType || 'Bar',
+        axis: 'Left'
+      }))
+    }
+
+    if (updatedConfig.visualizationType === 'Deviation Bar' || updatedConfig.visualizationType === 'Paired Bar') {
+      updatedConfig.orientation = 'horizontal'
+    }
+
+    if (updatedConfig.visualizationType === 'Bar') {
+      updatedConfig.tooltips = { ...updatedConfig.tooltips, singleSeries: false }
     }
   }
 
@@ -813,7 +786,7 @@ const EditorPanel = () => {
   const [displayPanel, setDisplayPanel] = useState(true)
   const [displayViewportOverrides, setDisplayViewportOverrides] = useState(false)
 
-  if (loading) {
+  if (isLoading) {
     return null
   }
 
@@ -998,32 +971,6 @@ const EditorPanel = () => {
       }
     })
   }, [config.orientation])
-
-  // Set paired bars to be horizontal, even though that option doesn't display
-  useEffect(() => {
-    if (config.visualizationType === 'Paired Bar') {
-      updateConfig({
-        ...config,
-        orientation: 'horizontal'
-      })
-    }
-  }, []) // eslint-disable-line
-
-  useEffect(() => {
-    if (config.orientation === 'horizontal') {
-      updateConfig({
-        ...config,
-        lollipopShape: config.lollipopShape
-      })
-    }
-  }, [config.isLollipopChart, config.lollipopShape]) // eslint-disable-line
-
-  /// temporary force orientation untill we support Vartical deviaton bar
-  useEffect(() => {
-    if (config.visualizationType === 'Deviation Bar') {
-      updateConfig({ ...config, orientation: 'horizontal' })
-    }
-  }, [config.visualizationType])
 
   const ExclusionsList = useCallback(() => {
     const exclusions = [...config.exclusions.keys]

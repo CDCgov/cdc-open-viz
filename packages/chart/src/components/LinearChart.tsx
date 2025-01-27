@@ -42,6 +42,7 @@ import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
+import { getXAxisData, getYAxisData } from '../helpers/getAxisData'
 
 type LinearChartProps = {
   parentWidth: number
@@ -185,15 +186,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   const isNoDataAvailable = config.filters && config.filters.values.length === 0 && data.length === 0
 
-  const getXAxisData = d =>
-    isDateScale(config.runtime.xAxis)
-      ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime()
-      : d[config.runtime.originalXAxis.dataKey]
-  const getYAxisData = (d, seriesKey) => d[seriesKey]
   const xAxisDataMapped =
     config.brush.active && brushConfig.data?.length
-      ? brushConfig.data.map(d => getXAxisData(d))
-      : data.map(d => getXAxisData(d))
+      ? brushConfig.data.map(d => getXAxisData(d, config, parseDate))
+      : data.map(d => getXAxisData(d, config, parseDate))
   const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
   const properties = {
     data,

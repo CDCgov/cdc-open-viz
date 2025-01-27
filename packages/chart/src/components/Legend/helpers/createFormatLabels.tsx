@@ -1,5 +1,4 @@
 import { colorPalettesChart as colorPalettes, sequentialPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
-import { FaStar } from 'react-icons/fa'
 import { Label } from '../../../types/Label'
 import { ColorScale, TransformedData } from '../../../types/ChartContext'
 import { ChartConfig } from '../../../types/ChartConfig'
@@ -117,29 +116,6 @@ export const createFormatLabels =
         value: colorScale(val)
       }))
       return reverseLabels(uniqueLabels)
-    }
-
-    if (
-      (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') &&
-      config.visualizationSubType === 'regular' &&
-      config.suppressedData
-    ) {
-      const lastIndex = defaultLabels.length - 1
-      let newLabels = []
-
-      config.suppressedData?.forEach(({ label, icon }, index) => {
-        if (label && icon) {
-          const newLabel = {
-            datum: label,
-            index: lastIndex + index,
-            text: label,
-            icon: <FaStar color='#000' size={15} />
-          }
-          newLabels.push(newLabel)
-        }
-      })
-
-      return [...defaultLabels, ...newLabels]
     }
 
     return reverseLabels(defaultLabels)
