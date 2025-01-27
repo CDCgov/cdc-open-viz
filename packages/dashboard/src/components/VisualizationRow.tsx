@@ -160,6 +160,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
 
           const hiddenDashboardFilters =
             visualizationConfig.type === 'dashboardFilters' &&
+            visualizationConfig.sharedFilterIndexes &&
             visualizationConfig.sharedFilterIndexes.filter(
               idx => config.dashboard.sharedFilters[idx].showDropdown === false
             ).length === visualizationConfig.sharedFilterIndexes.length
