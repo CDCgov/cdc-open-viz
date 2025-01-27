@@ -421,22 +421,39 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     if (!yAxisAutoPadding) return
     setYAxisAutoPadding(0)
   }, [maxValue])
+
   useEffect(() => {
     if (orientation === 'horizontal') return
+    if (!labelsOverflow) return
 
-    const maxValueIsGreaterThanTopGridLine = maxValue > Math.max(...yScale.ticks(handleNumTicks))
+    /* We need to add enough padding to render the next tick
+    IF the max value is greater than the top grid line,
+    OR IF the max value is too close to the top grid line */
 
-    if (!maxValueIsGreaterThanTopGridLine || !labelsOverflow) return
+    // minimum percentage of the max value that the distance should be from the top grid line
+    const MINIMUM_DISTANCE_PERCENTAGE = 0.025
+
+    // "max value is greater than the top grid line"
+    const topGridLine = Math.max(...yScale.ticks(handleNumTicks))
+    const maxValueIsGreaterThanTopGridLine = maxValue > topGridLine
+
+    // "max value is too close to the top grid line"
+    const divideBy = minValue < 0 ? maxValue / 2 : maxValue
+    const distanceFromTopGridLine = (topGridLine - maxValue) / divideBy
+    const maxValueTooCloseToTopGridLine =
+      !maxValueIsGreaterThanTopGridLine && distanceFromTopGridLine < MINIMUM_DISTANCE_PERCENTAGE
+
+    const needsAutoPadding = maxValueIsGreaterThanTopGridLine || maxValueTooCloseToTopGridLine
+    if (!needsAutoPadding) return
+
     const ticks = yScale.ticks(handleNumTicks)
     const tickGap = ticks.length === 1 ? ticks[0] : ticks[1] - ticks[0]
     const nextTick = Math.max(...yScale.ticks(handleNumTicks)) + tickGap
-    const divideBy = minValue < 0 ? maxValue / 2 : maxValue
     const calculatedPadding = (nextTick - maxValue) / divideBy
 
     // if auto padding is too close to next tick, add one more ticks worth of padding
-    const PADDING_THRESHOLD = 0.025
     const newPadding =
-      calculatedPadding > PADDING_THRESHOLD ? calculatedPadding : calculatedPadding + tickGap / divideBy
+      calculatedPadding > MINIMUM_DISTANCE_PERCENTAGE ? calculatedPadding : calculatedPadding + tickGap / divideBy
 
     /* sometimes even though the padding is getting to the next tick exactly,
     d3 still doesn't show the tick. we add 0.1 to ensure to tip it over the edge */
