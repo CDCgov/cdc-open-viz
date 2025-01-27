@@ -19,6 +19,7 @@ type BlankMultiConfig = {
 const createBlankDashboard: () => BlankMultiConfig = () => ({
   dashboard: {},
   rows: [{ columns: [{ width: 12 }] }],
+  sharedFilter: [],
   visualizations: {},
   table: {
     label: 'Data Table',
