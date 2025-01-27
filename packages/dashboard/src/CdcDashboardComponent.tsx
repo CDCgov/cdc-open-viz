@@ -276,7 +276,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     const loadAllFilters = shouldLoadAllFilters(config, isEditor && !isPreview)
     const sharedFiltersWithValues = addValuesToDashboardFilters(config.dashboard.sharedFilters, state.data)
 
-    loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns, loadAllFilters).then(newFilters => {
+    loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns, loadAllFilters)?.then(newFilters => {
       const allValuesSelected = newFilters.every(filter => {
         return filter.type === 'datafilter' || filter.active
       })
