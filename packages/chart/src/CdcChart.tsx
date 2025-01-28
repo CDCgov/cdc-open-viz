@@ -369,14 +369,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
   // Load data when component first mounts
 
   const prepareData = (config, data) => {
+    let newData = []
     if (config.dataDescription) {
-      data = transform.autoStandardize(data)
-      data = transform.developerStandardize(data, config.dataDescription)
+      newData = transform.autoStandardize(data)
+      newData = transform.developerStandardize(data, config.dataDescription)
     }
 
-    data = handleRankByValue(data, config)
+    newData = handleRankByValue(data, config)
 
-    return data
+    return newData
   }
   useEffect(() => {
     const load = async () => {
