@@ -230,9 +230,10 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                         value={filter.order || 'asc'}
                         fieldName='order'
                         label='Filter Order'
-                        updateField={(_section, _subSection, _field, value) =>
+                        updateField={(_section, _subSection, _field, value) => {
                           updateFilterProp('order', filterIndex, value)
-                        }
+                          if (filter.orderColumn && value !== 'column') updateFilterProp('orderColumn', filterIndex, '')
+                        }}
                         options={filterOrderOptions}
                       />
                       {filter.order === 'cust' && (

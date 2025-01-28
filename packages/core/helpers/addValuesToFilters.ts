@@ -69,7 +69,14 @@ const generateValuesForFilter = (filter: VizFilter, data: any[] | MapData) => {
     })
   }
   if (orderColumn) {
-    filter.values = valuesWithOrders.sort((a, b) => a[1].localeCompare(b[1])).map(([value]) => value)
+    filter.values = valuesWithOrders
+      .sort((a, b) => {
+        if (typeof a[1] === 'number' && typeof b[1] === 'number') {
+          return a[1] - b[1]
+        }
+        return String(a[1]).localeCompare(String(b[1]))
+      })
+      .map(([value]) => value)
   } else if (filter.order && filter.order !== 'cust') {
     const sort = (a, b) => {
       const asc = filter.order !== 'desc'
