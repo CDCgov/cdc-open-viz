@@ -161,7 +161,9 @@ export const addValuesToFilters = (filters: VizFilter[], data: any[] | MapData):
       // if the value doesn't exist in the subGrouping then return the default
       const activeValue = queryStringFilterValue || filterCopy.subGrouping.active
       filterCopy.subGrouping.active = activeValue || defaultValue
+      filtersLookup[filterCopy.id].subGrouping.active = filterCopy.subGrouping.active
     }
+    filtersLookup[filterCopy.id].active = filterCopy.active
     return filterCopy
   })
 }

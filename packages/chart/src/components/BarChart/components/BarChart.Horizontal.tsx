@@ -218,7 +218,13 @@ export const BarChartHorizontal = () => {
                   const yPos = barHeight * bar.index + barHeight / 2
                   const [upperPos, lowerPos] = ['upper', 'lower'].map(position => {
                     if (!hasConfidenceInterval) return
-                    const d = datum.dynamicData ? datum.CI[bar.key][position] : datum[config.confidenceKeys[position]]
+                    if (datum.dynamicData) {
+                      const ci = datum.CI[bar.key]
+                      if (!ci) return
+                      const d = ci[position]
+                      return xScale(d)
+                    }
+                    const d = datum[config.confidenceKeys[position]]
                     return xScale(d)
                   })
                   // End Confidence Interval Variables
