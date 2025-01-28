@@ -80,31 +80,33 @@ const useScales = (properties: useScaleProps) => {
   if (xAxis.type === 'date-time' || xAxis.type === 'continuous') {
     let xAxisMin = Math.min(...xAxisDataMapped.map(Number))
     let xAxisMax = Math.max(...xAxisDataMapped.map(Number))
-    const xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
-
-    // Apply consistent padding to the domain
-    const paddingFactor = config.xAxis.padding ? config.xAxis.padding * 0.01 : 0
-    const adjustedMin = xAxisMin - paddingFactor * (xAxisMax - xAxisMin)
-    // Do not add padding to the right for Line charts
-    const adjustedMax = visualizationType === 'Line' ? xAxisMax : xAxisMax + paddingFactor * (xAxisMax - xAxisMin)
+    xAxisMin -= (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
+    xAxisMax +=
+      visualizationType === 'Line'
+        ? 0
+        : (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
     const range = config.xAxis.sortByRecentDate ? [xMax, 0] : [0, xMax]
     xScale = scaleTime({
-      domain: [adjustedMin, adjustedMax],
+      domain: [xAxisMin, xAxisMax],
       range: range
     })
+
     xScale.type = scaleTypes.TIME
 
-    const barWidthPadding = 0.2 // spacing between bars
-    const bandScale = scaleBand({
-      domain: xAxisDataMappedSorted,
-      range: [0, xMax],
-      padding: barWidthPadding
-    })
+    let minDistance = Number.MAX_VALUE
+    let xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
 
-    // Dynamically calculate series scale for bar thickness
-    const barThickness = config.barThickness * 100 || bandScale.bandwidth()
+    for (let i = 0; i < xAxisDataMappedSorted.length - 1; i++) {
+      let distance = xScale(xAxisDataMappedSorted[i + 1]) - xScale(xAxisDataMappedSorted[i])
 
-    seriesScale = composeScaleBand(seriesDomain, [0, barThickness], 0)
+      if (distance < minDistance) minDistance = distance
+    }
+
+    if (xAxisDataMapped.length === 1 || minDistance > xMax / 4) {
+      minDistance = xMax / 4
+    }
+
+    seriesScale = composeScaleBand(seriesDomain, [0, (config.barThickness || 1) * minDistance], 0)
   }
 
   // handle Deviation bar
