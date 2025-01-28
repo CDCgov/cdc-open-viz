@@ -426,25 +426,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     if (orientation === 'horizontal') return
     if (!labelsOverflow) return
 
-    /* We need to add enough padding to render the next tick
-    IF the max value is greater than the top grid line,
-    OR IF the max value is too close to the top grid line */
-
     // minimum percentage of the max value that the distance should be from the top grid line
     const MINIMUM_DISTANCE_PERCENTAGE = 0.025
 
-    // "max value is greater than the top grid line"
     const topGridLine = Math.max(...yScale.ticks(handleNumTicks))
-    const maxValueIsGreaterThanTopGridLine = maxValue > topGridLine
+    const needsPaddingThreshold = topGridLine - maxValue * MINIMUM_DISTANCE_PERCENTAGE
+    const maxValueIsGreaterThanThreshold = maxValue > needsPaddingThreshold
 
-    // "max value is too close to the top grid line"
-    const divideBy = minValue < 0 ? maxValue / 2 : maxValue
-    const distanceFromTopGridLine = (topGridLine - maxValue) / divideBy
-    const maxValueTooCloseToTopGridLine =
-      !maxValueIsGreaterThanTopGridLine && distanceFromTopGridLine < MINIMUM_DISTANCE_PERCENTAGE
-
-    const needsAutoPadding = maxValueIsGreaterThanTopGridLine || maxValueTooCloseToTopGridLine
-    if (!needsAutoPadding) return
+    if (!maxValueIsGreaterThanThreshold) return
 
     const ticks = yScale.ticks(handleNumTicks)
     const tickGap = ticks.length === 1 ? ticks[0] : ticks[1] - ticks[0]
