@@ -22,7 +22,7 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug
 
   const loadConfig = useCallback(
     async (url: string) => {
-      const response = editorsConfig
+      const response = editorsConfig || (await (await fetch(url)).json())
       return response
     },
     [editorsConfig]
