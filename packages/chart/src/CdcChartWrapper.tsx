@@ -8,22 +8,25 @@ import 'react-tooltip/dist/react-tooltip.css'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import Loading from '@cdc/core/components/Loading'
 import _ from 'lodash'
-
 interface CdcChartProps {
   configUrl?: string
   isEditor?: boolean
   isDebug?: boolean
+  config?: ChartConfig
 }
 
-const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug }) => {
+const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug, config: editorsConfig }) => {
   const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
   const [isLoading, setIsLoading] = useState(true)
   const prevFiltersRef = useRef(config.filters)
 
-  const loadConfig = useCallback(async (url: string) => {
-    const response = await fetch(url)
-    return response.json()
-  }, [])
+  const loadConfig = useCallback(
+    async (url: string) => {
+      const response = editorsConfig || (await (await fetch(url)).json())
+      return response
+    },
+    [editorsConfig]
+  )
 
   const reloadFilteredData = useCallback(async () => {
     if (config.dataUrl) {
@@ -57,7 +60,7 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug
     const load = async () => {
       setIsLoading(true)
       try {
-        const loadedConfig = await loadConfig(configUrl || '')
+        const loadedConfig = await loadConfig(configUrl)
         const data = await loadDataFromConfig(loadedConfig)
 
         setConfig({
@@ -71,7 +74,7 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug
       }
     }
 
-    if (configUrl) load()
+    load()
   }, [configUrl, loadConfig])
 
   useEffect(() => {
