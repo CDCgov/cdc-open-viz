@@ -5,9 +5,18 @@ import ScreenReaderText from '@cdc/core/components/elements/ScreenReaderText'
 import { SortIcon } from './SortIcon'
 import { getNewSortBy } from '../helpers/getNewSortBy'
 
-type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; hasRowType?; viewport }
+type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; hasRowType?; viewport; rightAlignedCols }
 
-const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType, viewport }: ChartHeaderProps) => {
+const ChartHeader = ({
+  data,
+  isVertical,
+  config,
+  setSortBy,
+  sortBy,
+  hasRowType,
+  viewport,
+  rightAlignedCols
+}: ChartHeaderProps) => {
   const groupBy = config.table?.groupBy
   if (!data) return
   let dataSeriesColumns = getDataSeriesColumns(config, isVertical, data)
@@ -72,7 +81,11 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType, 
 
           return (
             <th
-              style={{ minWidth: (config.table.cellMinWidth || 0) + 'px' }}
+              style={{
+                minWidth: (config.table.cellMinWidth || 0) + 'px',
+                textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
+                paddingRight: sortBy.column === column ? '1.3em' : ''
+              }}
               key={`col-header-${column}__${index}`}
               tabIndex={0}
               role='columnheader'
