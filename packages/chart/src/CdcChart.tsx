@@ -389,7 +389,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
           setStateData(preparedData)
           setExcludedData(preparedData)
           updateConfig(preparedConfig, preparedData)
-          setFilteredData(filterVizData(config.filters, data))
         }
       } catch (err) {
         console.error('Could not Load!')
