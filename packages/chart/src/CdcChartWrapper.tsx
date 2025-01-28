@@ -22,7 +22,7 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug
 
   const loadConfig = useCallback(
     async (url: string) => {
-      const response = editorsConfig || (await (await fetch(url)).json())
+      const response = editorsConfig
       return response
     },
     [editorsConfig]
@@ -60,7 +60,7 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug
     const load = async () => {
       setIsLoading(true)
       try {
-        const loadedConfig = await loadConfig(configUrl || '')
+        const loadedConfig = await loadConfig(configUrl)
         const data = await loadDataFromConfig(loadedConfig)
 
         setConfig({
@@ -74,7 +74,7 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug
       }
     }
 
-    if (configUrl) load()
+    load()
   }, [configUrl, loadConfig])
 
   useEffect(() => {
