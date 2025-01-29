@@ -122,10 +122,6 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
     updateFilterProp('filterStyle', value)
   }
 
-  const handleFilterOrderChange = value => {
-    updateFilterProp('order', value)
-  }
-
   const isNestedDropDown = filter.filterStyle === FILTER_STYLE.nestedDropdown
 
   type APIInputProps = {
@@ -221,7 +217,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
             <span className='edit-label column-heading'>Filter Style: </span>
             <select
               value={filter.filterStyle || FILTER_STYLE.dropdown}
-              onChange={e => handleFilterStyleChange(e.target.value)}
+              onChange={e => updateFilterProp('order', e.target.value)}
             >
               {filterStyles.map(dataKey => (
                 <option value={dataKey} key={`filter-style-select-item-${dataKey}`}>
