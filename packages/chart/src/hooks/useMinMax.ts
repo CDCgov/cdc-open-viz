@@ -240,6 +240,10 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
     min = 0
   }
 
+  if (config.visualizationType === 'Scatter Plot') {
+    max = max * 1.1
+  }
+
   return { min, max, leftMax, rightMax }
 }
 export default useMinMax
