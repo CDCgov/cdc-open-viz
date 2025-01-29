@@ -421,12 +421,20 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     if (!yAxisAutoPadding) return
     setYAxisAutoPadding(0)
   }, [maxValue])
+
   useEffect(() => {
     if (orientation === 'horizontal') return
+    if (!labelsOverflow) return
 
-    const maxValueIsGreaterThanTopGridLine = maxValue > Math.max(...yScale.ticks(handleNumTicks))
+    // minimum percentage of the max value that the distance should be from the top grid line
+    const MINIMUM_DISTANCE_PERCENTAGE = 0.025
 
-    if (!maxValueIsGreaterThanTopGridLine || !labelsOverflow) return
+    const topGridLine = Math.max(...yScale.ticks(handleNumTicks))
+    const needsPaddingThreshold = topGridLine - maxValue * MINIMUM_DISTANCE_PERCENTAGE
+    const maxValueIsGreaterThanThreshold = maxValue > needsPaddingThreshold
+
+    if (!maxValueIsGreaterThanThreshold) return
+
     const ticks = yScale.ticks(handleNumTicks)
     const tickGap = ticks.length === 1 ? ticks[0] : ticks[1] - ticks[0]
     const nextTick = Math.max(...yScale.ticks(handleNumTicks)) + tickGap
@@ -434,9 +442,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const calculatedPadding = (nextTick - maxValue) / divideBy
 
     // if auto padding is too close to next tick, add one more ticks worth of padding
-    const PADDING_THRESHOLD = 0.025
     const newPadding =
-      calculatedPadding > PADDING_THRESHOLD ? calculatedPadding : calculatedPadding + tickGap / divideBy
+      calculatedPadding > MINIMUM_DISTANCE_PERCENTAGE ? calculatedPadding : calculatedPadding + tickGap / divideBy
 
     /* sometimes even though the padding is getting to the next tick exactly,
     d3 still doesn't show the tick. we add 0.1 to ensure to tip it over the edge */
