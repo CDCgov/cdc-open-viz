@@ -28,9 +28,16 @@ import TopSpacing_1 from './_mock/data-bite-dash-test.json'
 import TopSpacing_2 from './_mock/data-bite-dash-test_1.json'
 import TopSpacing_3 from './_mock/data-bite-dash-test_1_1.json'
 import TopSpacing_4 from './_mock/data-bite-dash-test_1_1_1.json'
+
+// Dashboard Filter Updates for Ascending, Descending, and Custom Order
 import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
-import DashboardFilterDesc from './_mock/dashboard-filter-desc.json'
-import DashboardFilterCust from './_mock/dashboard-filter-cust.json'
+const DashboardFilterDesc = _.cloneDeep(DashboardFilterAsc)
+const DashboardFilterCust = _.cloneDeep(DashboardFilterAsc)
+DashboardFilterDesc.dashboard.sharedFilters[0].order = 'desc'
+DashboardFilterCust.dashboard.sharedFilters[0].order = 'cust'
+
+// On DashboardFilterCust change the sharedFilters[0].values and orderedValues to be in a custom order
+const customOrder = ['American Samoa', 'Alaska', 'Alabama', 'Arizona', 'Arkansas']
 
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Pages/Dashboard',
