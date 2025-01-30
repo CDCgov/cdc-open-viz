@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react'
+import React, { useEffect, useState, useCallback, useRef, useContext } from 'react'
 import CdcChart from './CdcChartComponent'
 import { ChartConfig } from './types/ChartConfig'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
@@ -8,6 +8,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import Loading from '@cdc/core/components/Loading'
 import _ from 'lodash'
+import EditorContext from '../../editor/src/ConfigContext'
 interface CdcChartProps {
   configUrl?: string
   isEditor?: boolean
@@ -16,7 +17,14 @@ interface CdcChartProps {
 }
 
 const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug, config: editorsConfig }) => {
-  const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
+  const editorContext = useContext(EditorContext)
+  const [config, _setConfig] = useState<ChartConfig>({} as ChartConfig)
+  const setConfig = newConfig => {
+    _setConfig(newConfig)
+    if (isEditor) {
+      editorContext.setTempConfig(newConfig)
+    }
+  }
   const [isLoading, setIsLoading] = useState(true)
   const prevFiltersRef = useRef(config.filters)
 

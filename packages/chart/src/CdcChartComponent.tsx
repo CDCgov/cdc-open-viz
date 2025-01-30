@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useId } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useId, useContext } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -64,6 +64,7 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import EditorContext from '../../editor/src/ConfigContext'
 // Local helpers
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
 import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
@@ -102,7 +103,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const [loading, setLoading] = useState(true)
   const svgRef = useRef(null)
   const [colorScale, setColorScale] = useState(null)
-  const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
+  const [config, _setConfig] = useState<ChartConfig>({} as ChartConfig)
   const [stateData, setStateData] = useState(_.cloneDeep(configObj?.data) || [])
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
@@ -122,6 +123,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
     isActive: false,
     isBrushing: false
   })
+  const editorContext = useContext(EditorContext)
+  const setConfig = newConfig => {
+    _setConfig(newConfig)
+    if (isEditor && !isDashboard) {
+      editorContext.setTempConfig(newConfig)
+    }
+  }
 
   const { description, visualizationType } = config
 
