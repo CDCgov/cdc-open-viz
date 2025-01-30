@@ -17,7 +17,7 @@ import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAl
 import CollapsibleVisualizationRow from './CollapsibleVisualizationRow'
 import { DashboardFilters } from '../types/DashboardFilters'
 import { hasDashboardApplyBehavior } from '../helpers/hasDashboardApplyBehavior'
-import CdcChart from '@cdc/chart/src/CdcChart'
+import CdcChart from '@cdc/chart/src/CdcChartComponent'
 
 type VisualizationWrapperProps = {
   allExpanded: boolean
