@@ -1,32 +1,24 @@
-import React, { useState, useEffect, useCallback, useRef, useId } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useId, useMemo } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
-// Core components
+import * as d3 from 'd3-array'
 import Layout from '@cdc/core/components/Layout'
-import Confirm from '@cdc/core/components/elements/Confirm'
-import Error from '@cdc/core/components/elements/Error'
-import SkipTo from '@cdc/core/components/elements/SkipTo'
-import Title from '@cdc/core/components/ui/Title'
-import DataTable from '@cdc/core/components/DataTable'
-// Local Components
-import LegendWrapper from './components/LegendWrapper'
+import Button from '@cdc/core/components/elements/Button'
+
 //types
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
-import type { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
-import { AllChartsConfig, ChartConfig } from './types/ChartConfig'
-import { type ViewportSize } from './types/ChartConfig'
-import { Pivot } from '@cdc/core/types/Table'
-import { Runtime } from '@cdc/core/types/Runtime'
-import { Label } from './types/Label'
+
 // External Libraries
+import { scaleOrdinal } from '@visx/scale'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse, timeFormat } from 'd3-time-format'
+import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
-import _ from 'lodash'
+
 // Primary Components
 import ConfigContext from './ConfigContext'
 import PieChart from './components/PieChart'
@@ -42,7 +34,7 @@ import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
 import { handleChartTabbing } from './helpers/handleChartTabbing'
-
+// import { getQuartiles } from './helpers/getQuartiles'
 import { handleChartAriaLabels } from './helpers/handleChartAriaLabels'
 import { lineOptions } from './helpers/lineOptions'
 import { handleLineType } from './helpers/handleLineType'
@@ -52,28 +44,40 @@ import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
 import Annotation from './components/Annotations'
-// Core Helpers
-import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
-import { missingRequiredSections } from '@cdc/core/helpers/missingRequiredSections'
-import { filterVizData } from '@cdc/core/helpers/filterVizData'
-import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
+
+// Helpers
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
+import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-// Local helpers
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
-import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
-import { getComboChartConfig } from './helpers/getComboChartConfig'
-import { getExcludedData } from './helpers/getExcludedData'
-import { getColorScale } from './helpers/getColorScale'
-// styles
+import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
+
 import './scss/main.scss'
+// load both then config below determines which to use
+import DataTable from '@cdc/core/components/DataTable'
+import type { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
+import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
+import Title from '@cdc/core/components/ui/Title'
+import { AllChartsConfig, ChartConfig } from './types/ChartConfig'
+import { Label } from './types/Label'
+import { type ViewportSize } from './types/ChartConfig'
+import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
+import SkipTo from '@cdc/core/components/elements/SkipTo'
+import { filterVizData } from '@cdc/core/helpers/filterVizData'
+import LegendWrapper from './components/LegendWrapper'
+import _ from 'lodash'
+import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
+import { Runtime } from '@cdc/core/types/Runtime'
+import { Pivot } from '@cdc/core/types/Table'
+import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
 
 interface CdcChartProps {
+  configUrl?: string
   config?: ChartConfig
   isEditor?: boolean
   isDebug?: boolean
@@ -86,18 +90,20 @@ interface CdcChartProps {
   setSharedFilterValue?: (value: any) => void
   dashboardConfig?: DashboardConfig
 }
-const CdcChart: React.FC<CdcChartProps> = ({
+const CdcChart = ({
+  configUrl,
   config: configObj,
   isEditor = false,
   isDebug = false,
   isDashboard = false,
   setConfig: setParentConfig,
   setEditing,
+  hostname,
   link,
   setSharedFilter,
   setSharedFilterValue,
   dashboardConfig
-}) => {
+}: CdcChartProps) => {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const svgRef = useRef(null)
@@ -147,34 +153,162 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const { lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
   const legendId = useId()
 
-  const hasDateAxis =
-    (config.xAxis || config.yAxis) && ['date-time', 'date'].includes((config.xAxis || config.yAxis).type)
-  const dataTableDefaultSortBy = hasDateAxis && config.xAxis.dataKey
-
   const checkLineToBarGraph = () => {
     return isConvertLineToBarGraph(config.visualizationType, filteredData, config.allowLineToBarGraph)
   }
 
-  const prepareConfig = (loadedConfig: ChartConfig, data): ChartConfig => {
-    let newConfig = _.defaultsDeep(loadedConfig, defaults)
-    _.defaultsDeep(newConfig, {
-      table: { showVertical: false }
-    })
+  const reloadURLData = async () => {
+    if (config.dataUrl) {
+      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl, window.location.origin)
+      let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
-    _.set(newConfig, 'table.show', _.get(newConfig, 'table.show', !isDashboard))
-
-    _.forEach(newConfig.series, series => {
-      _.defaults(series, {
-        tooltip: true,
-        axis: 'Left'
+      let isUpdateNeeded = false
+      config.filters?.forEach(filter => {
+        if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
+          qsParams[filter.queryParameter] = filter.active
+          isUpdateNeeded = true
+        }
       })
-    })
 
-    if (newConfig.visualizationType === 'Bump Chart') {
-      newConfig.xAxis.type === 'date-time'
+      if ((!config.formattedData || config.formattedData.urlFiltered) && !isUpdateNeeded) return
+
+      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
+        .map((param, i) => {
+          let qs = i === 0 ? '?' : '&'
+          qs += param + '='
+          qs += qsParams[param]
+          return qs
+        })
+        .join('')}`
+
+      let data: any[] = []
+
+      try {
+        const ext = getFileExtension(dataUrl.href)
+        if ('csv' === ext || isSolrCsv(dataUrlFinal)) {
+          data = await fetch(dataUrlFinal)
+            .then(response => response.text())
+            .then(responseText => {
+              const parsedCsv = Papa.parse(responseText, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true
+              })
+              return parsedCsv.data
+            })
+        } else if ('json' === ext || isSolrJson(dataUrlFinal)) {
+          data = await fetch(dataUrlFinal).then(response => response.json())
+        } else {
+          data = []
+        }
+      } catch {
+        console.error(`Cannot parse URL: ${dataUrlFinal}`)
+        data = []
+      }
+
+      if (config.dataDescription) {
+        data = transform.autoStandardize(data)
+        data = transform.developerStandardize(data, config.dataDescription)
+      }
+
+      Object.assign(data, { urlFiltered: true })
+
+      data = handleRankByValue(data, config)
+
+      updateConfig({ ...config, runtimeDataUrl: dataUrlFinal, data, formattedData: data })
+
+      if (data) {
+        setStateData(data)
+        setExcludedData(data)
+        setFilteredData(filterVizData(config.filters, data))
+      }
+    }
+  }
+
+  const loadConfig = async () => {
+    const response = _.cloneDeep(configObj) || (await (await fetch(configUrl)).json())
+
+    // If data is included through a URL, fetch that and store
+    let data: any[] = response.data || []
+
+    const urlFilters = response.filters
+      ? response.filters.filter(filter => filter.type === 'url').length > 0
+        ? true
+        : false
+      : false
+
+    if (response.dataUrl && !urlFilters) {
+      try {
+        const ext = getFileExtension(response.dataUrl)
+        if ('csv' === ext || isSolrCsv(response.dataUrl)) {
+          data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
+            .then(response => response.text())
+            .then(responseText => {
+              // for every comma NOT inside quotes, replace with a pipe delimiter
+              // - this will let commas inside the quotes not be parsed as a new column
+              // - Limitation: if a delimiter other than comma is used in the csv this will break
+              // Examples of other delimiters that would break: tab
+              responseText = responseText.replace(/(".*?")|,/g, (...m) => m[1] || '|')
+              // now strip the double quotes
+              responseText = responseText.replace(/["]+/g, '')
+              const parsedCsv = Papa.parse(responseText, {
+                //quotes: "true",  // dont need these
+                //quoteChar: "'",  // has no effect that I can tell
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true,
+                delimiter: '|' // we are using pipe symbol as delimiter so setting this explicitly for Papa.parse
+              })
+              return parsedCsv.data
+            })
+        }
+
+        if ('json' === ext || isSolrJson(response.dataUrl)) {
+          data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
+        }
+      } catch {
+        console.error(`COVE: Cannot parse URL: ${response.dataUrl}`) // eslint-disable-line
+        data = []
+      }
     }
 
-    return { ...coveUpdateWorker(newConfig) }
+    if (response.dataDescription) {
+      data = transform.autoStandardize(data)
+      data = transform.developerStandardize(data, response.dataDescription)
+    }
+
+    data = handleRankByValue(data, response)
+
+    if (data) {
+      setStateData(data)
+      setExcludedData(data)
+    }
+
+    // force showVertical for data tables false if it does not exist
+    if (response !== undefined && response.table !== undefined) {
+      if (!response.table || !response.table.showVertical) {
+        response.table = response.table || {}
+        response.table.showVertical = false
+      }
+    }
+    let newConfig = { ...defaults, ...response }
+
+    if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
+
+    newConfig.series.forEach(series => {
+      if (series.tooltip === undefined || series.tooltip === null) {
+        series.tooltip = true
+      }
+      if (!series.axis) series.axis = 'Left'
+    })
+
+    if (data) {
+      newConfig.data = data
+    }
+
+    const processedConfig = { ...coveUpdateWorker(newConfig) }
+
+    updateConfig(processedConfig, data)
   }
 
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
@@ -190,7 +324,40 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
     })
 
-    const newExcludedData: any[] = getExcludedData(newConfig, dataOverride || stateData)
+    let newExcludedData: any[] = []
+
+    if (newConfig.exclusions && newConfig.exclusions.active) {
+      if (newConfig.xAxis.type === 'categorical' && newConfig.exclusions.keys?.length > 0) {
+        newExcludedData = data.filter(e => !newConfig.exclusions.keys.includes(e[newConfig.xAxis.dataKey]))
+      } else if (
+        isDateScale(newConfig.xAxis) &&
+        (newConfig.exclusions.dateStart || newConfig.exclusions.dateEnd) &&
+        newConfig.xAxis.dateParseFormat
+      ) {
+        // Filter dates
+        const timestamp = e => new Date(e).getTime()
+
+        let startDate = timestamp(newConfig.exclusions.dateStart)
+        let endDate = timestamp(newConfig.exclusions.dateEnd) + 86399999 //Increase by 24h in ms (86400000ms - 1ms) to include selected end date for .getTime() comparative
+
+        let startDateValid = undefined !== typeof startDate && false === isNaN(startDate)
+        let endDateValid = undefined !== typeof endDate && false === isNaN(endDate)
+
+        if (startDateValid && endDateValid) {
+          newExcludedData = data.filter(
+            e => timestamp(e[newConfig.xAxis.dataKey]) >= startDate && timestamp(e[newConfig.xAxis.dataKey]) <= endDate
+          )
+        } else if (startDateValid) {
+          newExcludedData = data.filter(e => timestamp(e[newConfig.xAxis.dataKey]) >= startDate)
+        } else if (endDateValid) {
+          newExcludedData = data.filter(e => timestamp(e[newConfig.xAxis.dataKey]) <= endDate)
+        }
+      } else {
+        newExcludedData = dataOverride || stateData
+      }
+    } else {
+      newExcludedData = dataOverride || stateData
+    }
 
     setExcludedData(newExcludedData)
 
@@ -208,10 +375,30 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {} as Runtime
-    newConfig.runtime.series = _.cloneDeep(newConfig.series)
+    newConfig.runtime.series = newConfig.dynamicSeries ? [] : _.cloneDeep(newConfig.series)
     newConfig.runtime.seriesLabels = {}
     newConfig.runtime.seriesLabelsAll = []
     newConfig.runtime.originalXAxis = newConfig.xAxis
+
+    if (newConfig.dynamicSeries) {
+      let finalData = dataOverride || newConfig.formattedData || newConfig.data
+      if (finalData?.length) {
+        Object.keys(finalData[0]).forEach(seriesKey => {
+          if (
+            seriesKey !== newConfig.xAxis.dataKey &&
+            (!newConfig.filters || newConfig.filters.filter(filter => filter.columnName === seriesKey).length === 0) &&
+            (!newConfig.columns || Object.keys(newConfig.columns).indexOf(seriesKey) === -1)
+          ) {
+            newConfig.runtime.series.push({
+              dataKey: seriesKey,
+              type: newConfig.dynamicSeriesType,
+              lineType: newConfig.dynamicSeriesLineType,
+              tooltip: true
+            })
+          }
+        })
+      }
+    }
 
     if (newConfig.visualizationType === 'Pie') {
       newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey])
@@ -249,12 +436,40 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
-      const [plots, categories] = getBoxPlotConfig(newConfig, stateData)
+      const [plots, categories] = getBoxPlotConfig(newConfig, data)
+
       newConfig.boxplot['categories'] = categories
       newConfig.boxplot.plots = plots
     }
+
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {
-      newConfig.runtime = getComboChartConfig(newConfig)
+      newConfig.runtime.barSeriesKeys = []
+      newConfig.runtime.lineSeriesKeys = []
+      newConfig.runtime.areaSeriesKeys = []
+      newConfig.runtime.forecastingSeriesKeys = []
+
+      newConfig.series.forEach(series => {
+        if (series.type === 'Area Chart') {
+          newConfig.runtime.areaSeriesKeys.push(series)
+        }
+        if (series.type === 'Forecasting') {
+          newConfig.runtime.forecastingSeriesKeys.push(series)
+        }
+        if (series.type === 'Bar' || series.type === 'Combo') {
+          newConfig.runtime.barSeriesKeys.push(series.dataKey)
+        }
+        if (
+          series.type === 'Line' ||
+          series.type === 'dashed-sm' ||
+          series.type === 'dashed-md' ||
+          series.type === 'dashed-lg'
+        ) {
+          newConfig.runtime.lineSeriesKeys.push(series.dataKey)
+        }
+        if (series.type === 'Combo') {
+          series.type = 'Bar'
+        }
+      })
     }
 
     if (newConfig.visualizationType === 'Forecasting' && newConfig.series) {
@@ -366,42 +581,24 @@ const CdcChart: React.FC<CdcChartProps> = ({
     setContainer(node)
   }, []) // eslint-disable-line
 
-  // Load data when component first mounts
-
-  const prepareData = (config, data) => {
-    if (config.dataDescription) {
-      data = transform.autoStandardize(data)
-      data = transform.developerStandardize(data, config.dataDescription)
-    }
-
-    data = handleRankByValue(data, config)
-
-    return data
+  const isEmpty = obj => {
+    return Object.keys(obj).length === 0
   }
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const data = configObj.data
-        if (configObj.data && configObj) {
-          const preparedConfig = await prepareConfig(configObj, data)
-          const preparedData = prepareData(configObj, data)
-          setStateData(preparedData)
-          setExcludedData(preparedData)
-          updateConfig(preparedConfig, preparedData)
-        }
-      } catch (err) {
-        console.error('Could not Load!')
-      }
-    }
 
-    load()
-  }, [configObj?.data?.length ? configObj.data : null])
+  // Load data when component first mounts
+  useEffect(() => {
+    loadConfig()
+  }, [configObj?.data?.length ? configObj.data : null]) // eslint-disable-line
+
+  useEffect(() => {
+    reloadURLData()
+  }, [JSON.stringify(config.filters)])
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.
    */
   useEffect(() => {
-    if (container && !_.isEmpty(config) && !coveLoadedEventRan) {
+    if (container && !isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
       setCoveLoadedEventRan(true)
     }
@@ -455,10 +652,42 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
   }, [externalFilters]) // eslint-disable-line
 
+  // This will set the bump chart's default scaling type to date-time
+  useEffect(() => {
+    if (['Bump Chart'].includes(config.visualizationType)) {
+      setConfig({
+        ...config,
+        xAxis: {
+          ...config.xAxis,
+          type: 'date-time'
+        }
+      })
+    }
+  }, [config.visualizationType])
+
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (stateData && config.xAxis && config.runtime?.seriesKeys) {
-      const newColorScale = getColorScale(config)
+      const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
+        ? config.twoColor.palette
+        : config.palette
+      const allPalettes: Record<string, string[]> = { ...colorPalettes, ...twoColorPalette }
+      let palette = config.customColors || allPalettes[configPalette]
+      let numberOfKeys = config.runtime.seriesKeys.length
+      let newColorScale
+
+      while (numberOfKeys > palette.length) {
+        palette = palette.concat(palette)
+      }
+
+      palette = palette.slice(0, numberOfKeys)
+
+      newColorScale = () =>
+        scaleOrdinal({
+          domain: config.runtime.seriesLabelsAll,
+          range: palette,
+          unknown: null
+        })
 
       setColorScale(newColorScale)
       setLoading(false)
@@ -470,18 +699,49 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }, [config, stateData]) // eslint-disable-line
 
   // Called on legend click, highlights/unhighlights the data series with the given label
-  const highlight = (label: Label): void => {
+  const highlight = (label: Label) => {
+    // If we're highlighting all the series, reset them
     if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && config.visualizationType !== 'Forecasting') {
-      return handleShowAll()
+      highlightReset()
+      return
     }
 
-    const newHighlight = _.findKey(config.runtime.seriesLabels, v => v === label.datum) || label.datum
+    const newSeriesHighlight = [...seriesHighlight]
 
-    const newSeriesHighlight = _.xor(seriesHighlight, [newHighlight])
+    let newHighlight = label.datum
+    if (config.runtime.seriesLabels) {
+      config.runtime.seriesKeys.forEach(key => {
+        if (config.runtime.seriesLabels[key] === label.datum) {
+          newHighlight = key
+        }
+      })
+    }
+
+    if (newSeriesHighlight.indexOf(newHighlight) !== -1) {
+      newSeriesHighlight.splice(newSeriesHighlight.indexOf(newHighlight), 1)
+    } else {
+      newSeriesHighlight.push(newHighlight)
+    }
+
+    /**
+     * pushDataKeyBySeriesName
+     * - pushes series.dataKey into the series highlight based on the found series.name
+     * @param {String} value
+     */
+    // const pushDataKeyBySeriesName = value => {
+    //   let matchingSeries = config.series.filter(series => series.name === value.text)
+    //   if (matchingSeries?.length > 0) {
+    //     newSeriesHighlight.push(matchingSeries[0].dataKey)
+    //   }
+    // }
+
+    // pushDataKeyBySeriesName(label)
+
     setSeriesHighlight(newSeriesHighlight)
   }
+
   // Called on reset button click, unhighlights all data series
-  const handleShowAll = () => {
+  const highlightReset = () => {
     try {
       const legend = legendRef.current
       if (!legend) throw new Error('No legend available to set previous focus on.')
@@ -702,6 +962,157 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return String(result)
   }
 
+  const missingRequiredSections = () => {
+    if (config.visualizationType === 'Sankey') return false // skip checks for now
+    if (config.visualizationType === 'Forecasting') return false // skip required checks for now.
+    if (config.visualizationType === 'Forest Plot') return false // skip required checks for now.
+    if (config.visualizationType === 'Pie') {
+      if (undefined === config?.yAxis.dataKey) {
+        return true
+      }
+    } else {
+      if ((undefined === config?.series || false === config?.series.length > 0) && !config?.dynamicSeries) {
+        return true
+      }
+    }
+
+    if (!config.xAxis.dataKey) {
+      return true
+    }
+
+    return false
+  }
+
+  // used for Additional Column
+  const displayDataAsText = (value, columnName) => {
+    if (value === null || value === '' || value === undefined) {
+      return ''
+    }
+
+    if (typeof value === 'string' && value.length > 0 && config.legend.type === 'equalnumber') {
+      return value
+    }
+
+    let formattedValue = value
+
+    let columnObj //= config.columns[columnName]
+    // config.columns not an array but a hash of objects
+    if (Object.keys(config.columns).length > 0) {
+      Object.keys(config.columns).forEach(function (key) {
+        var column = config.columns[key]
+        // add if not the index AND it is enabled to be added to data table
+        if (column.name === columnName) {
+          columnObj = column
+        }
+      })
+    }
+
+    if (columnObj === undefined) {
+      // then use left axis config
+      columnObj = config.type === 'chart' ? config.dataFormat : config.primary
+      // NOTE: Left Value Axis uses different names
+      // so map them below so the code below works
+      // - copy commas to useCommas to work below
+      columnObj['useCommas'] = columnObj.commas
+      // - copy roundTo to roundToPlace to work below
+      columnObj['roundToPlace'] = columnObj.roundTo ? columnObj.roundTo : ''
+    }
+
+    if (columnObj) {
+      // If value is a number, apply specific formattings
+      let hasDecimal = false
+      let decimalPoint = 0
+      if (Number(value)) {
+        if (columnObj.roundToPlace >= 0) {
+          hasDecimal = columnObj.roundToPlace ? columnObj.roundToPlace !== '' || columnObj.roundToPlace !== null : false
+          decimalPoint = columnObj.roundToPlace ? Number(columnObj.roundToPlace) : 0
+
+          // Rounding
+          if (columnObj.hasOwnProperty('roundToPlace') && hasDecimal) {
+            formattedValue = Number(value).toFixed(decimalPoint)
+          }
+        }
+
+        if (columnObj.hasOwnProperty('useCommas') && columnObj.useCommas === true) {
+          // Formats number to string with commas - allows up to 5 decimal places, if rounding is not defined.
+          // Otherwise, uses the rounding value set at 'columnObj.roundToPlace'.
+          formattedValue = Number(value).toLocaleString('en-US', {
+            style: 'decimal',
+            minimumFractionDigits: hasDecimal ? decimalPoint : 0,
+            maximumFractionDigits: hasDecimal ? decimalPoint : 5
+          })
+        }
+      }
+
+      // add prefix and suffix if set
+      formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
+    }
+
+    return formattedValue
+  }
+
+  const Confirm = () => {
+    const confirmDone = e => {
+      if (e) {
+        e.preventDefault()
+      }
+
+      let newConfig = { ...config }
+      delete newConfig.newViz
+
+      updateConfig(newConfig)
+    }
+
+    const styles = {
+      position: 'relative',
+      height: '100vh',
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gridArea: 'content'
+    }
+
+    return (
+      <section className='waiting' style={styles}>
+        <section className='waiting-container'>
+          <h3>Finish Configuring</h3>
+          <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
+          <Button
+            className='btn btn-primary'
+            style={{ margin: '1em auto' }}
+            disabled={missingRequiredSections()}
+            onClick={e => confirmDone(e)}
+          >
+            I'm Done
+          </Button>
+        </section>
+      </section>
+    )
+  }
+
+  const Error = () => {
+    const styles = {
+      position: 'absolute',
+      background: 'white',
+      zIndex: '999',
+      height: '100vh',
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gridArea: 'content'
+    }
+    return (
+      <section className='waiting' style={styles}>
+        <section className='waiting-container'>
+          <h3>Error With Configuration</h3>
+          <p>{config.runtime.editorErrorMessage}</p>
+        </section>
+      </section>
+    )
+  }
+
   // this is passed DOWN into the various components
   // then they do a lookup based on the bin number as index into here (TT)
   const applyLegendToRow = rowObj => {
@@ -756,10 +1167,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
   let body = <Loading />
 
   const makeClassName = string => {
-    if (!_.isString(string)) return undefined
-
-    return _.kebabCase(string)
+    if (!string || !string.toLowerCase) return
+    return string.toLowerCase().replaceAll(/ /g, '-')
   }
+
   const getChartWrapperClasses = () => {
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
     const classes = ['chart-container', 'p-relative']
@@ -780,7 +1191,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const getChartSubTextClasses = () => {
-    const classes = ['subtext mt-4']
+    const classes = ['subtext ']
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
 
     if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
@@ -795,16 +1206,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
         {config.dataKey} (Go to Table)
       </a>
     )
-
     body = (
       <>
         {isEditor && <EditorPanel />}
         <Layout.Responsive isEditor={isEditor}>
-          {config.newViz && <Confirm updateConfig={updateConfig} config={config} />}
-          {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && (
-            <Error errorMessage={config.runtime.editorErrorMessage} />
-          )}
-          {!missingRequiredSections(config) && !config.newViz && (
+          {config.newViz && <Confirm />}
+          {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && <Error />}
+          {!missingRequiredSections() && !config.newViz && (
             <div
               className={`cdc-chart-inner-container cove-component__content type-${makeClassName(
                 config.visualizationType
@@ -817,7 +1225,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 isDashboard={isDashboard}
                 title={title}
                 superTitle={config.superTitle}
-                classes={['chart-title', `${config.theme}`, 'cove-component__header', 'mb-3']}
+                classes={['chart-title', `${config.theme}`, 'cove-component__header']}
                 style={undefined}
               />
 
@@ -825,7 +1233,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
               <div className={getChartWrapperClasses().join(' ')}>
                 {/* Intro Text/Message */}
                 {config?.introText && config.visualizationType !== 'Spark Line' && (
-                  <section className={`introText mb-4`}>{parse(config.introText)}</section>
+                  <section className={`introText `}>{parse(config.introText)}</section>
                 )}
 
                 {/* Filters */}
@@ -906,7 +1314,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           dimensions={dimensions}
                         />
                         {config?.introText && (
-                          <section className='introText mb-4' style={{ padding: '0px 0 35px' }}>
+                          <section className='introText' style={{ padding: '0px 0 35px' }}>
                             {parse(config.introText)}
                           </section>
                         )}
@@ -940,10 +1348,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   : link && link}
                 {/* Description */}
 
-                {config.description && config.visualizationType !== 'Spark Line' && (
-                  <div className={getChartSubTextClasses(config, currentViewport, isLegendWrapViewport).join(' ')}>
-                    {parse(config.description)}
-                  </div>
+                {description && config.visualizationType !== 'Spark Line' && (
+                  <div className={getChartSubTextClasses().join('')}>{parse(description)}</div>
                 )}
 
                 {/* buttons */}
@@ -974,9 +1380,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   config.visualizationType !== 'Sankey') ||
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
                   <DataTable
-                    /* changing the "key" will force the table to re-render
-                    when the default sort changes while editing */
-                    key={dataTableDefaultSortBy}
                     config={pivotDynamicSeries(config)}
                     rawData={
                       config.visualizationType === 'Sankey'
@@ -988,7 +1391,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     runtimeData={getTableRuntimeData()}
                     expandDataTable={config.table.expanded}
                     columns={config.columns}
-                    defaultSortBy={dataTableDefaultSortBy}
+                    displayDataAsText={displayDataAsText}
                     displayGeoName={name => name}
                     applyLegendToRow={applyLegendToRow}
                     tableTitle={config.table.label}
@@ -1001,8 +1404,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 )}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
-                {config?.footnotes && <section className='footnotes pt-2 mt-4'>{parse(config.footnotes)}</section>}
               </div>
+              {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
             </div>
           )}
         </Layout.Responsive>
@@ -1042,9 +1445,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
     handleLineType,
     handleChartTabbing,
     highlight,
-    handleShowAll,
+    highlightReset,
     imageId,
     isDashboard,
+    isLegendBottom: legend?.position === 'bottom' || isLegendWrapViewport(currentViewport),
     isDebug,
     isDraggingAnnotation,
     handleDragStateChange,
