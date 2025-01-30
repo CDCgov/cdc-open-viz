@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import Chart from '../CdcChart'
+import Chart from '../CdcChartComponent'
 import config from './_mock/line_chart_symbols.json'
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Symbols',
