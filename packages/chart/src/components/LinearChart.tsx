@@ -42,6 +42,7 @@ import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
+import _ from 'lodash'
 
 type LinearChartProps = {
   parentWidth: number
@@ -1366,9 +1367,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               }
             >
               {props => {
+                const hasDynamicCategory = config.series.some(s => s.dynamicCategory)
                 // For these charts, we generated all ticks in tickValues above, and now need to filter/shift them
                 // so the last tick is always labeled
-                if (config.runtime.xAxis.type === 'date' && !config.runtime.xAxis.manual) {
+                if (config.runtime.xAxis.type === 'date' && !config.runtime.xAxis.manual && !hasDynamicCategory) {
                   props.ticks = filterAndShiftLinearDateTicks(config, props, xAxisDataMapped, formatDate)
                 }
 
