@@ -36,9 +36,6 @@ export const useResizeObserver = (isEditor: boolean) => {
     }
   }, [])
 
-  useEffect(() => {
-    console.log('Final dimensions:', dimensions)
-  }, [dimensions])
   return { resizeObserver, dimensions, currentViewport, outerContainerRef, container }
 }
 
