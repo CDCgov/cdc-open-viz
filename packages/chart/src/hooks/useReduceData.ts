@@ -11,7 +11,7 @@ function useReduceData(config, data) {
   }
   const getMaxValueFromData = () => {
     let max = Math.max(
-      ...data.map(d =>
+      ...data?.map(d =>
         Math.max(
           ...config.runtime.seriesKeys.map(key => {
             const seriesKey = getSeriesKey(key)
