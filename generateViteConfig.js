@@ -6,6 +6,7 @@ import svgr from 'vite-plugin-svgr' // Svg Support
 import dsv from '@rollup/plugin-dsv' // CSV Support
 import dns from 'dns' // nodeJS
 import * as path from 'path'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 // Force load dev server on `localhost` vs 127.0.0.1
 dns.setDefaultResultOrder('verbatim')
@@ -26,12 +27,12 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
         fileName: format => `${componentName.toLowerCase()}.js`
       },
       rollupOptions: {
-        external: ['react', 'reactDOM'],
+        external: ['react', 'react-dom', 'react-dom/server'],
         output: {
           chunkFileNames: `${componentName.toLowerCase()}-[hash].[format].js`,
           globals: {
             react: 'React',
-            reactDOM: 'ReactDOM'
+            'react-dom': 'ReactDOM'
           }
         }
       }
@@ -42,7 +43,8 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
         exportAsDefault: true
       }),
       cssInjectedByJsPlugin(),
-      dsv()
+      dsv(),
+      visualizer()
     ],
     test: {
       globals: true,
