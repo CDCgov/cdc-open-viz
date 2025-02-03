@@ -39,6 +39,7 @@ export const addValuesToDashboardFilters = (
     if (filter.type === 'urlfilter') return filter
     const filterCopy = _.cloneDeep(filter)
     const filterValues = generateValuesForFilter(getSelector(filter), data)
+    filterCopy.values = filterValues
 
     if (filterValues.length > 0) {
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)
