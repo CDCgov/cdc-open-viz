@@ -21,6 +21,7 @@ export const VIZ_FILTER_STYLE = {
   nestedDropdown: 'nested-dropdown',
   pill: 'pill',
   tab: 'tab',
+  tabSimple: 'tab simple',
   tabBar: 'tab bar',
   multiSelect: 'multi-select'
 } as const
@@ -297,11 +298,14 @@ const Filters = (props: FilterProps) => {
 
   useEffect(() => {
     if (!dimensions) return
-    if (Number(dimensions[0]) < 768 && filters?.length > 0) {
-      setMobileFilterStyle(true)
-    } else {
-      setMobileFilterStyle(false)
-    }
+    const [width] = dimensions
+
+    const isMobile = Number(width) < 768
+    const isTabSimple = filters?.some(filter => filter.filterStyle === VIZ_FILTER_STYLE.tabSimple)
+
+    const defaultToMobile = isMobile && filters?.length && !isTabSimple
+
+    setMobileFilterStyle(defaultToMobile)
   }, [dimensions])
 
   useEffect(() => {
@@ -381,8 +385,11 @@ const Filters = (props: FilterProps) => {
 
       handleSorting(singleFilter)
       singleFilter.values?.forEach((filterOption, index) => {
-        const pillClassList = ['pill', active === filterOption ? 'pill--active' : null, theme && theme]
-        const tabClassList = ['tab', active === filterOption && 'tab--active', theme && theme]
+        const isActive = active === filterOption
+        const isTabSimple = singleFilter.filterStyle === 'tab simple'
+
+        const pillClassList = ['pill', isActive ? 'pill--active' : null, theme && theme]
+        const tabClassList = ['tab', isActive && 'tab--active', theme && theme, isTabSimple && 'tab--simple']
 
         Pills.push(
           <div className='pill__wrapper' key={`pill-${index}`}>
@@ -415,7 +422,7 @@ const Filters = (props: FilterProps) => {
         )
 
         Tabs.push(
-          <button
+          <h3
             id={`${filterOption}-${outerIndex}-${index}-${id}`}
             className={tabClassList.join(' ')}
             onClick={e => {
@@ -430,7 +437,7 @@ const Filters = (props: FilterProps) => {
             }}
           >
             {filterOption}
-          </button>
+          </h3>
         )
       })
 
@@ -457,6 +464,7 @@ const Filters = (props: FilterProps) => {
               </label>
             )}
             {filterStyle === 'tab' && !mobileFilterStyle && Tabs}
+            {filterStyle === 'tab simple' && !mobileFilterStyle && Tabs}
             {filterStyle === 'pill' && !mobileFilterStyle && Pills}
             {filterStyle === 'tab bar' && !mobileFilterStyle && <TabBar filter={singleFilter} index={outerIndex} />}
             {filterStyle === 'multi-select' && (

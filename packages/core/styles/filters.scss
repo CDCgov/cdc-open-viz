@@ -53,10 +53,42 @@ div.single-filters {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     margin-top: 5px;
+    font-family: var(--app-font-secondary);
+    font-size: 1rem;
+    text-align: center;
   }
 
   .tab--active {
     border-bottom: none;
+  }
+}
+
+.single-filters--tab .tab.tab--simple {
+  font-family: var(--app-font-secondary);
+  font-size: 1rem;
+  font-weight: 300;
+  border-bottom: 1px solid var(--cool-gray-10);
+  padding: 1rem 0.5rem;
+  width: auto;
+  cursor: pointer;
+  @include breakpoint(xs) {
+    font-size: 0.778em;
+  }
+
+  &:hover {
+    color: var(--colors-blue-vivid-60, #005ea2);
+    background: var(--colors-cyan-cool-10, #eff9fa);
+  }
+
+  &:focus {
+    outline: 2px dashed var(--colors-blue-vivid-60, #005ea2) !important;
+    outline-offset: 3px;
+  }
+
+  &.tab--active {
+    font-weight: 500;
+    border-bottom: 0.3rem solid var(--colors-blue-vivid-60, #005ea2);
+    z-index: 1;
   }
 }
 
