@@ -90,7 +90,6 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         } else {
           // Data Filter
           const orderedFilterValues = filter.orderedValues || filter.values
-          console.log('values empty here', filter)
           orderedFilterValues?.forEach((filterOption, index) => {
             const labeledOpt = filter.labels && filter.labels[filterOption]
             const resetLabelHasMatch = (filterOption || labeledOpt) === filter.resetLabel
