@@ -41,7 +41,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
       Number
     )
     return config.dashboard.sharedFilters
-      .map<[number, string]>(({ key }, i) => [i, key])
+      ?.map<[number, string]>(({ key }, i) => [i, key])
       .filter(([filterIndex]) => !sharedFilterIndexes.includes(filterIndex)) // filter out already added filters
       .map(([filterIndex, filterName]) => (
         <option key={filterIndex} value={filterIndex}>{`${filterIndex} - ${filterName}`}</option>
