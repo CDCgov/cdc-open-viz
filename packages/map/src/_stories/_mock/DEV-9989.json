@@ -1,0 +1,229 @@
+{
+  "annotations": [],
+  "general": {
+    "geoType": "world",
+    "type": "data",
+    "noStateFoundMessage": "Map Unavailable",
+    "annotationDropdownText": "Annotations",
+    "geoBorderColor": "darkGray",
+    "headerColor": "theme-blue",
+    "title": "Outbreaks Map",
+    "showTitle": true,
+    "showSidebar": false,
+    "showDownloadButton": false,
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": false,
+    "territoriesLabel": "Territories",
+    "territoriesAlwaysShow": false,
+    "language": "en",
+    "geoLabelOverride": "Country",
+    "hasRegions": false,
+    "fullBorder": false,
+    "convertFipsCodes": true,
+    "palette": {
+      "isReversed": false
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "statePicked": {
+      "fipsCode": "01",
+      "stateName": "Alabama"
+    }
+  },
+  "type": "map",
+  "color": "colorblindsafe",
+  "columns": {
+    "geo": {
+      "name": "Country",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "dataTable": false,
+      "tooltip": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Country",
+      "label": "",
+      "roundToPlace": 0
+    },
+    "navigate": {
+      "name": ""
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    },
+    "additionalColumn1": {
+      "label": "Disease",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Disease ",
+      "tooltip": true
+    },
+    "additionalColumn2": {
+      "label": "Outbreak",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Outbreak Description",
+      "tooltip": true
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": false,
+    "singleColumn": false,
+    "dynamicDescription": false,
+    "type": "category",
+    "numberOfItems": 3,
+    "position": "bottom",
+    "title": "Legend",
+    "singleRow": false,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false,
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "singleColumnLegend": false,
+    "hideBorder": false
+  },
+  "filters": [],
+  "table": {
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": true,
+    "indexLabel": "",
+    "showDownloadLinkBelow": true
+  },
+  "tooltips": {
+    "appearanceType": "click",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": false,
+    "opacity": 90
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle",
+    "geoCodeCircleSize": 2,
+    "showBubbleZeros": false,
+    "cityStyleLabel": "",
+    "additionalCityStyles": []
+  },
+  "mapPosition": {
+    "coordinates": [
+      0,
+      30
+    ],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
+  "filterIntro": "",
+  "dataTable": {
+    "title": "Country List",
+    "forceDisplay": false
+  },
+  "data": [
+    {
+      "Country": "Democratic Republic of the Congo",
+      "Disease ": "Mpox",
+      "Outbreak Description": "In 2024, the outbreak of clade I mpox across Central and Eastern Africa was declared a Public Health Emergency of International Concern by WHO. CDCs longstanding work in the Democratic Republic of the Congo (DRC)  including building diagnostic capacity and training disease detectives � helped detect clade I soon after it first appeared. CDC is working with other U.S. Government agencies, international, and in-country partners in affected countries to improve surveillance, emergency management, contact investigations, vaccine distribution, case management, laboratory capacity, and infection prevention and control, while sharing guidance and deploying subject matter experts across multiple response pillars. CDC also helped U.S. systems prepare for and rapidly detect imported cases, which happened successfully when a clade I mpox case was reported in November in California.   "
+    },
+    {
+      "Country": "Cambodia",
+      "Disease ": "H5N1 Bird flu",
+      "Outbreak Description": "Repeated outbreaks of H5N1 bird flu in Asia pose a potential risk to the U.S. and the world. CDCs influenza experts have worked globally for 20 plus years, including daily global monitoring of bird flu. When we detect unusual activity, we investigate through global partnerships.?CDC�s work to strengthen surveillance and labs, train responders, and grow strong relationships has been essential to robust responses to recent outbreaks in Cambodia and Vietnam. This work is also essential to getting ahead of threats to the health and safety of Americans. CDC is also the lead for human health in the current U.S. Government response to H5N1 in dairy cows and other animals, and we share what we learn back with our global partners."
+    },
+    {
+      "Country": "Palestine",
+      "Disease ": "Polio",
+      "Outbreak Description": "For the first time in nearly 20 years, polio was detected in Gaza in 2024.?Polio anywhere represents a threat everywhere. When positive samples were identified in July, CDC quickly sprang into action through its partners in the Global Polio Eradication Initiative to plan and implement a response. CDC worked with USG partners to help negotiate a pause in the fighting for a critical vaccination campaign. In September, over 95% of the eligible children in Gaza were vaccinated for polio, despite the ongoing conflict. Quick responses to outbreaks are essential to reaching our goal of a polio-free world."
+    },
+    {
+      "Country": "United States",
+      "Disease ": "Dengue",
+      "Outbreak Description": "In 2024, more than 12 million dengue cases have been reported, making it the highest year on record. This caused a higher number of cases in travelers to those areas, increasing the risk of importation to the United States. Local transmission of dengue has also been reported in 2024 in Florida, California, and Texas. CDC activated its dengue response to support Puerto Rico and prepare for increased transmission in other areas of the United States, working closely with state and local health officials to respond to the current outbreaks while providing technical assistance and support in epidemiology, vector control, clinical management, and diagnostics.�"
+    },
+    {
+      "Country": "United States",
+      "Disease ": "Oropuche",
+      "Outbreak Description": "Oropouche virus is an emerging vector-borne disease with symptoms similar to dengue. In late 2023 and 2024, Oropouche began to spread to areas outside the Amazon basin. Travel-related cases also began appearing in the United States. In some cases, infection during pregnancy was associated with fetal death and possible birth defects. In September, CDC released new clinical tests that can diagnose Oropouche virus infection earlier in the illness and help clinicians provide appropriate care for pregnant patients and their infants. CDC also expanded its ArboNET system to pick up cases in the U.S. and has been working with partner countries to clarify the risks during pregnancy and potential harm to unborn babies.  "
+    },
+    {
+      "Country": "Belize",
+      "Disease ": "New World Screwworm",
+      "Outbreak Description": "In 2024, CDC initiated a human health response to an incursion of New World Screwworm (NWS) flies in Central America. Previously eliminated from North America, this health threat poses a significant economic and veterinary concern, as the fly larvae largely target cows. In partnership with the U.S. Department of Agriculture and Department of State, CDC developed and shared human health information on the prevention, detection, and clinical management of NWS. CDC�s parasitic morphology lab serves as the primary center for species confirmation of the NWS larvae.  "
+    },
+    {
+      "Country": "Brazil",
+      "Disease ": "Measles",
+      "Outbreak Description": " In 2024, WHO reported that global measles cases surged to ~10.3 million in 2023, a 20% increase from the previous year, with 57 countries reporting large outbreaks. Travel-related measles cases continue to impact the United States and create an ongoing risk. But 2024 also brought hopeful news: CDC is part of a longstanding partnership with PAHO that helped Brazil achieve measles elimination. This key milestone restored the Americas as the only WHO region to eliminate measles. "
+    },
+    {
+      "Country": "Rwanda",
+      "Disease ": "Marburg",
+      "Outbreak Description": "In September 2024, Rwanda reported their first recorded outbreak of Marburg virus disease (Marburg), a rare, severe viral hemorrhagic fever that can have up to a 90% fatality rate. CDC has a longstanding presence in Rwanda, with a country office there since 2002. In addition, CDC deployed subject matter experts to support the response to Marburg within 72 hours of being notified of the outbreak by the Government of Rwanda. CDC team members are partnering with Rwandan health authorities and members of interagency Marburg response pillars � infection prevention and control, laboratory, and surveillance (for which CDC is the co-lead) � to contain the outbreak, protect lives and strengthen core public health capabilities.   "
+    }
+  ],
+  "dataFileName": "Outbreaks-Map_Test_12-02-2024_04_minus.csv",
+  "dataFileSourceType": "file",
+  "validated": 4.23,
+  "version": "4.24.10",
+  "id": 21,
+  "category": "Maps",
+  "label": "World",
+  "subType": "world",
+  "icon": {
+    "key": null,
+    "ref": null,
+    "props": {},
+    "_owner": null
+  },
+  "content": "Present a choropleth map of the world.",
+  "datasets": {},
+  "activeVizButtonID": 21
+}

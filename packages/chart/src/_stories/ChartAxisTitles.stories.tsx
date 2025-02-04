@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import Chart from '../CdcChart'
+import Chart from '../CdcChartComponent'
 import longXLabelsConfig from './_mock/large_x_axis_labels.json'
 import pairedBarConfig from './_mock/paired-bar.json'
 import { editConfigKeys } from '../helpers/configHelpers'

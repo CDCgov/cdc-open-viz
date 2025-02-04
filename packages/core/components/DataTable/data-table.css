@@ -15,9 +15,8 @@
 
 .cdc-open-viz-module div.data-table-heading {
   position: relative;
-  background: rgba(0, 0, 0, 0.05);
-  padding: 0.5em 0.7em;
-  border: var(--lightGray) 1px solid;
+  border: var(--cool-gray-10) 1px solid;
+  border-radius: 6px;
 
   svg {
     position: absolute;
@@ -30,9 +29,6 @@
   &:focus {
     z-index: 2;
     position: relative;
-  }
-  @media (max-width: var(--breakpoint-sm)) {
-    font-size: var(--font-small) + 0.2em;
   }
 }
 
@@ -127,7 +123,6 @@ table.data-table {
     &:last-child {
       border-right: 0 !important;
     }
-    font-size: var(--font-size);
   }
 
   td {

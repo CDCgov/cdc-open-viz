@@ -610,7 +610,7 @@ const EditorPanel = () => {
     lineOptions,
     rawData,
     highlight,
-    highlightReset,
+    handleShowAll,
     dimensions
   } = useContext<ChartContext>(ConfigContext)
 
@@ -906,7 +906,7 @@ const EditorPanel = () => {
     return Object.keys(columns)
   }
 
-  const getLegendStyleOptions = (option: 'style' | 'subStyle'): string[] => {
+  const getLegendStyleOptions = (option: 'style' | 'subStyle' | 'shapes'): string[] => {
     const options: string[] = []
 
     switch (option) {
@@ -963,7 +963,7 @@ const EditorPanel = () => {
 
   const convertStateToConfig = () => {
     let strippedState = JSON.parse(JSON.stringify(config))
-    if (false === missingRequiredSections()) {
+    if (false === missingRequiredSections(config)) {
       delete strippedState.newViz
     }
     delete strippedState.runtime
@@ -1631,8 +1631,19 @@ const EditorPanel = () => {
                         value={config.yAxis.label}
                         section='yAxis'
                         fieldName='label'
-                        label='Label '
+                        label='Label'
                         updateField={updateField}
+                        maxLength={35}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>35 character limit</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
                       />
                       {config.runtime.seriesKeys &&
                         config.runtime.seriesKeys.length === 1 &&
@@ -2306,6 +2317,17 @@ const EditorPanel = () => {
                     fieldName='rightLabel'
                     label='Label'
                     updateField={updateField}
+                    maxLength={35}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>35 character limit</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
                   />
                   <TextField
                     value={config.yAxis.rightNumTicks}
@@ -2596,6 +2618,17 @@ const EditorPanel = () => {
                         fieldName='label'
                         label='Label'
                         updateField={updateField}
+                        maxLength={35}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>35 character limit</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
                       />
 
                       {config.xAxis.type === 'continuous' && (
@@ -3658,6 +3691,27 @@ const EditorPanel = () => {
                     updateField={updateField}
                     options={getLegendStyleOptions('style')}
                   />
+                  <CheckBox
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display='question'
+                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Choose option Shapes in Line Datapoint Symbols to display.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    display={!config.legend.hide && config.legend.style === 'lines'}
+                    value={config.legend.hasShape}
+                    section='legend'
+                    fieldName='hasShape'
+                    label='Shapes'
+                    updateField={updateField}
+                  />
 
                   <Select
                     display={!config.legend.hide && config.legend.style === 'gradient'}
@@ -3797,7 +3851,7 @@ const EditorPanel = () => {
                                 updatedSeriesHighlight.splice(i, 1)
                                 updateField('legend', null, 'seriesHighlight', updatedSeriesHighlight)
                                 if (!updatedSeriesHighlight.length) {
-                                  highlightReset()
+                                  handleShowAll()
                                 }
                               }}
                             >
@@ -3887,7 +3941,9 @@ const EditorPanel = () => {
                     display={
                       ['bottom', 'top'].includes(config.legend.position) &&
                       !config.legend.hide &&
-                      config.legend.style !== 'gradient'
+                      config.legend.style !== 'gradient' &&
+                      !config.legend.singleRow &&
+                      !config.legend.singleRow
                     }
                     value={config.legend.verticalSorted}
                     section='legend'

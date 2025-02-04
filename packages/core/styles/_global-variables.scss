@@ -81,18 +81,28 @@ $colors: (
 @include theme();
 
 :root {
+  // Spacing
   --editorContentPadding: 30px;
   --editorWidth: 350px;
+  --space-between-legend-item-rows: 1rem;
+  --space-between-legend-item-columns: 1.5rem;
+  // Breakpoints
   --breakpoint-xs: 480px;
   --breakpoint-sm: 768px;
   --breakpoint-md: 960px;
   --breakpoint-lg: 1170px;
   --breakpoint-xl: 1280px;
-  --font-size: 17px;
-}
-
-@media (max-width: 576px) {
-  :root {
-    --font-size: 13px;
-  }
+  // Font
+  --app-font-main: 'Nunito', sans-serif;
+  --app-font-secondary: 'Poppins', sans-serif;
+  // Font sizes
+  --legend-title-font-size: 1rem;
+  --legend-description-font-size: 1rem;
+  --legend-item-font-size: 0.889rem;
+  --download-link-font-size: 0.772rem;
+  --filter-select-font-size: 0.833rem;
+  --filter-label-font-size: 0.889rem;
+  --filter-buttons-font-size: 0.889rem;
+  --superTitle-font-size: 0.833rem;
+  --title-font-size: 1.222rem;
 }

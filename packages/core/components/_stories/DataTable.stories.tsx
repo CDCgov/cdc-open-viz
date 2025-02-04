@@ -45,8 +45,7 @@ export const CityState: Story = {
     tabbingId: '#asdf',
     columns: CityStateExample.columns,
     applyLegendToRow: () => ['#000'],
-    displayGeoName,
-    displayDataAsText: d => d
+    displayGeoName
   }
 }
 

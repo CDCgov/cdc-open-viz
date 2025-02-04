@@ -68,7 +68,7 @@ const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pag
           <GrFormPrevious />
         </button>
       </li>
-      <li className='mr-2'>
+      <li className='me-2'>
         <button
           onClick={() => nextPage()}
           className='btn btn-next display-flex align-items-center justify-content-center'

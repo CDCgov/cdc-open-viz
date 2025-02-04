@@ -26,7 +26,6 @@
     }
   }
 
-
   .warning-icon {
     position: relative;
     top: 2px;
@@ -49,12 +48,4 @@
     padding: 8px 12px !important;
     opacity: 1;
   }
-
-  &.font-small .bite-content-container {
-    font-size: 0.9em !important;
-  }
-  &.font-large .bite-content-container {
-    font-size: 1.1em !important;
-  }
-  // Medium is just the default
 }

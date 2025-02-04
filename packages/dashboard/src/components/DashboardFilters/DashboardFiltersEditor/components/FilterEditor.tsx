@@ -226,7 +226,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
           </label>
           {filter.filterStyle === FILTER_STYLE.dropdown && (
             <label>
-              <span className='mr-1'>Show Dropdown</span>
+              <span className='me-1'>Show Dropdown</span>
               <input
                 type='checkbox'
                 checked={filter.showDropdown}

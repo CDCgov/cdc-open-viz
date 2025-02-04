@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 
 import CdcEditor from './CdcEditor'
+import '@cdc/core/styles/cove-main.scss'
 import './coreStyles_editor.scss'
 
 // Allow URL query to preselect a tab in standalone mode

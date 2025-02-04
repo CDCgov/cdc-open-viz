@@ -150,12 +150,14 @@ const LineChart = (props: LineChartProps) => {
                           parseDate={parseDate}
                           yScaleRight={yScaleRight}
                           seriesAxis={seriesAxis}
+                          seriesIndex={index}
                           key={`line-circle--${dataIndex}`}
                         />
                       )}
 
                       <LineChartCircle
                         mode='ISOLATED_POINTS'
+                        seriesIndex={index}
                         dataIndex={dataIndex}
                         tableData={tableData}
                         circleData={circleData}
@@ -180,6 +182,7 @@ const LineChart = (props: LineChartProps) => {
               <>
                 {lineDatapointStyle === 'hover' && (
                   <LineChartCircle
+                    seriesIndex={index}
                     tableData={tableData}
                     dataIndex={0}
                     mode='HOVER_POINTS'
@@ -198,6 +201,7 @@ const LineChart = (props: LineChartProps) => {
                   />
                 )}
               </>
+
               {/* SPLIT LINE */}
               {isSplitLine ? (
                 <>

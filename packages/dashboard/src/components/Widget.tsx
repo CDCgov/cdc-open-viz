@@ -33,12 +33,13 @@ const labelHash = {
 
 type WidgetConfig = AnyVisualization & { rowIdx: number; colIdx: number }
 type WidgetProps = {
+  title: string
   widgetConfig?: WidgetConfig
   addVisualization?: Function
   type: string
 }
 
-const Widget = ({ widgetConfig, addVisualization, type }: WidgetProps) => {
+const Widget = ({ title, widgetConfig, addVisualization, type }: WidgetProps) => {
   const { overlay } = useGlobalContext()
   const { config, data } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
@@ -74,9 +75,10 @@ const Widget = ({ widgetConfig, addVisualization, type }: WidgetProps) => {
 
   const deleteWidget = () => {
     if (!widgetConfig) return
+
     dispatch({
       type: 'DELETE_WIDGET',
-      payload: { rowIdx: widgetConfig.rowIdx, colIdx: widgetConfig.colIdx, uid: widgetConfig.uid }
+      payload: { uid: widgetConfig.uid as string }
     })
   }
 
@@ -102,7 +104,10 @@ const Widget = ({ widgetConfig, addVisualization, type }: WidgetProps) => {
 
   const editWidget = () => {
     if (!widgetConfig) return
-    dispatch({ type: 'UPDATE_VISUALIZATION', payload: { vizKey: widgetConfig.uid, configureData: { editing: true } } })
+    dispatch({
+      type: 'UPDATE_VISUALIZATION',
+      payload: { vizKey: widgetConfig.uid as string, configureData: { editing: true } }
+    })
     loadSampleData()
   }
 
@@ -156,6 +161,7 @@ const Widget = ({ widgetConfig, addVisualization, type }: WidgetProps) => {
           )}
           {iconHash[type]}
           <span>{labelHash[type]}</span>
+          <span>{title}</span>
           {widgetConfig?.newViz && type !== 'dashboardFilters' && (
             <span onClick={editWidget} className='config-needed'>
               Configuration needed

@@ -27,7 +27,7 @@ import CategoricalYAxis from './Axis/Categorical.Axis'
 
 // Helpers
 import { isConvertLineToBarGraph } from '../helpers/isConvertLineToBarGraph'
-import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
+import { isLegendWrapViewport, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { calcInitialHeight } from '../helpers/sizeHelpers'
 
@@ -36,13 +36,13 @@ import useMinMax from '../hooks/useMinMax'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import useScales, { getTickValues, filterAndShiftLinearDateTicks } from '../hooks/useScales'
-import useTopAxis from '../hooks/useTopAxis'
+import getTopAxis from '../helpers/getTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
-import { fontSizes } from '@cdc/core/helpers/cove/fontSettings'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
+import _ from 'lodash'
 
 type LinearChartProps = {
   parentWidth: number
@@ -50,9 +50,14 @@ type LinearChartProps = {
 }
 
 const BOTTOM_LABEL_PADDING = 9
-const X_TICK_LABEL_PADDING = 3
+const X_TICK_LABEL_PADDING = 4.5
 const DEFAULT_TICK_LENGTH = 8
 const MONTH_AS_MS = 1000 * 60 * 60 * 24 * 30
+const TICK_LABEL_FONT_SIZE = 16
+const TICK_LABEL_FONT_SIZE_SMALL = 13
+const AXIS_LABEL_FONT_SIZE = 18
+const AXIS_LABEL_FONT_SIZE_SMALL = 14
+const TICK_LABEL_MARGIN_RIGHT = 4.5
 
 const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, parentWidth }, svgRef) => {
   // prettier-ignore
@@ -99,7 +104,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   // HOOKS  % STATES
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
   const { visSupportsReactTooltip } = useEditorPermissions()
-  const { hasTopAxis } = useTopAxis(config)
+  const { hasTopAxis } = getTopAxis(config)
   const [animatedChart, setAnimatedChart] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
@@ -129,6 +134,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const labelsOverflow = onlyShowTopPrefixSuffix && !suffixHasNoSpace
   const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
   const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
+  const tickLabelFontSize = isMobileHeightViewport(currentViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
+  const axisLabelFontSize = isMobileHeightViewport(currentViewport) ? AXIS_LABEL_FONT_SIZE_SMALL : AXIS_LABEL_FONT_SIZE
+  const GET_TEXT_WIDTH_FONT = `normal ${tickLabelFontSize}px Nunito, sans-serif`
 
   // zero if not forest plot
   const forestRowsHeight = isForestPlot ? config.data.length * config.forestPlot.rowHeight : 0
@@ -414,12 +422,20 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     if (!yAxisAutoPadding) return
     setYAxisAutoPadding(0)
   }, [maxValue])
+
   useEffect(() => {
     if (orientation === 'horizontal') return
+    if (!labelsOverflow) return
 
-    const maxValueIsGreaterThanTopGridLine = maxValue > Math.max(...yScale.ticks(handleNumTicks))
+    // minimum percentage of the max value that the distance should be from the top grid line
+    const MINIMUM_DISTANCE_PERCENTAGE = 0.025
 
-    if (!maxValueIsGreaterThanTopGridLine || !labelsOverflow) return
+    const topGridLine = Math.max(...yScale.ticks(handleNumTicks))
+    const needsPaddingThreshold = topGridLine - maxValue * MINIMUM_DISTANCE_PERCENTAGE
+    const maxValueIsGreaterThanThreshold = maxValue > needsPaddingThreshold
+
+    if (!maxValueIsGreaterThanThreshold) return
+
     const ticks = yScale.ticks(handleNumTicks)
     const tickGap = ticks.length === 1 ? ticks[0] : ticks[1] - ticks[0]
     const nextTick = Math.max(...yScale.ticks(handleNumTicks)) + tickGap
@@ -427,9 +443,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const calculatedPadding = (nextTick - maxValue) / divideBy
 
     // if auto padding is too close to next tick, add one more ticks worth of padding
-    const PADDING_THRESHOLD = 0.025
     const newPadding =
-      calculatedPadding > PADDING_THRESHOLD ? calculatedPadding : calculatedPadding + tickGap / divideBy
+      calculatedPadding > MINIMUM_DISTANCE_PERCENTAGE ? calculatedPadding : calculatedPadding + tickGap / divideBy
 
     /* sometimes even though the padding is getting to the next tick exactly,
     d3 still doesn't show the tick. we add 0.1 to ensure to tip it over the edge */
@@ -447,7 +462,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       const numberOfTicks = filteredTicks?.length
       const xMaxHalf = xScale.range()[0] || xMax / 2
       const tickWidthAll = filteredTicks.map(tick =>
-        getTextWidth(formatNumber(tick.value, 'left'), `normal ${fontSizes[config.fontSize]}px sans-serif`)
+        getTextWidth(formatNumber(tick.value, 'left'), GET_TEXT_WIDTH_FONT)
       )
       const accumulator = 100
       const sumOfTickWidth = tickWidthAll.reduce((a, b) => a + b, accumulator)
@@ -484,10 +499,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             return (
               <Group className='bottom-axis'>
                 {props.ticks.map((tick, i) => {
-                  const textWidth = getTextWidth(
-                    formatNumber(tick.value, 'left'),
-                    `normal ${fontSizes[config.fontSize]}px sans-serif`
-                  )
                   const isTicksOverlapping = getTickPositions(props.ticks, g1xScale)
                   const maxTickRotation = Number(config.xAxis.maxTickRotation) || 90
                   const isResponsiveTicks = config.isResponsiveTicks && isTicksOverlapping
@@ -506,6 +517,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                           angle={-angle}
                           verticalAnchor={angle ? 'middle' : 'start'}
                           textAnchor={textAnchor}
+                          fontSize={tickLabelFontSize}
                         >
                           {formatNumber(tick.value, 'left')}
                         </Text>
@@ -536,10 +548,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               <>
                 <Group className='bottom-axis'>
                   {props.ticks.map((tick, i) => {
-                    const textWidth = getTextWidth(
-                      formatNumber(tick.value, 'left'),
-                      `normal ${fontSizes[config.fontSize]}px sans-serif`
-                    )
                     const isTicksOverlapping = getTickPositions(props.ticks, g2xScale)
                     const maxTickRotation = Number(config.xAxis.maxTickRotation) || 90
                     const isResponsiveTicks = config.isResponsiveTicks && isTicksOverlapping
@@ -557,6 +565,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                             angle={-angle}
                             verticalAnchor={angle ? 'middle' : 'start'}
                             textAnchor={textAnchor}
+                            fontSize={tickLabelFontSize}
                           >
                             {formatNumber(tick.value, 'left')}
                           </Text>
@@ -574,6 +583,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                     stroke='#333'
                     textAnchor={'middle'}
                     verticalAnchor='start'
+                    fontSize={axisLabelFontSize}
                   >
                     {runtime.xAxis.label}
                   </Text>
@@ -650,6 +660,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       transform={`translate(${-1 * runtime.yAxis.size + yLabelOffset}, ${axisCenter}) rotate(-90)`}
                       fontWeight='bold'
                       fill={config.yAxis.labelColor}
+                      fontSize={axisLabelFontSize}
                     >
                       {props.label}
                     </Text>
@@ -1043,7 +1054,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       const lastTick = props.ticks.length - 1 === i
                       const hideTopTick = lastTick && onlyShowTopPrefixSuffix && suffix && !suffixHasNoSpace
                       const valueOnLinePadding = hideAxis ? -8 : -12
-                      const labelXPadding = labelsAboveGridlines ? valueOnLinePadding : 2
+                      const labelXPadding = labelsAboveGridlines ? valueOnLinePadding : TICK_LABEL_MARGIN_RIGHT
                       const labelYPadding = labelsAboveGridlines ? 4 : 0
                       const labelX = tick.to.x - labelXPadding
                       const labelY = tick.to.y - labelYPadding
@@ -1060,6 +1071,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                               to={isLogarithmicAxis ? to : tick.to}
                               stroke={config.yAxis.tickColor}
                               display={orientation === 'horizontal' ? 'none' : 'block'}
+                              fontSize={tickLabelFontSize}
                             />
                           )}
 
@@ -1077,6 +1089,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation || 0 : 0})`}
                                 verticalAnchor={'start'}
                                 textAnchor={'end'}
+                                fontSize={tickLabelFontSize}
                               >
                                 {tick.formattedValue}
                               </Text>
@@ -1092,6 +1105,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                 }) rotate(-${runtime.horizontal ? runtime.yAxis.tickRotation : 0})`}
                                 verticalAnchor={'start'}
                                 textAnchor={'end'}
+                                fontSize={tickLabelFontSize}
                               >
                                 {tick.formattedValue}
                               </Text>
@@ -1106,6 +1120,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                 }) rotate(-${runtime.horizontal ? runtime.yAxis.tickRotation : 0})`}
                                 textAnchor={'end'}
                                 verticalAnchor='middle'
+                                fontSize={tickLabelFontSize}
                               >
                                 {tick.formattedValue}
                               </Text>
@@ -1121,6 +1136,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                 }) rotate(-${runtime.horizontal ? runtime.yAxis.tickRotation : 0})`}
                                 textAnchor={'end'}
                                 verticalAnchor='middle'
+                                fontSize={tickLabelFontSize}
                               >
                                 {tick.formattedValue}
                               </Text>
@@ -1139,6 +1155,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                   verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}
                                   textAnchor={config.runtime.horizontal ? 'start' : 'end'}
                                   fill={config.yAxis.tickLabelColor}
+                                  fontSize={tickLabelFontSize}
                                 >
                                   {config.runtime.seriesLabelsAll[tick.formattedValue - 1]}
                                 </Text>
@@ -1181,6 +1198,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                     paintOrder={'stroke'} // keeps stroke under fill
                                     strokeLinejoin='round'
                                     style={{ whiteSpace: 'pre-wrap' }} // prevents leading spaces from being trimmed
+                                    fontSize={tickLabelFontSize}
                                   >
                                     {suffix}
                                   </BlurStrokeText>
@@ -1202,6 +1220,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                   strokeLinejoin='round'
                                   paintOrder={'stroke'} // keeps stroke under fill
                                   style={{ whiteSpace: 'pre-wrap' }} // prevents leading spaces from being trimmed
+                                  fontSize={tickLabelFontSize}
                                 >
                                   {`${tick.formattedValue}${combineDomSuffixWithValue ? suffix : ''}`}
                                 </BlurStrokeText>
@@ -1217,6 +1236,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       transform={`translate(${-1 * runtime.yAxis.size + yLabelOffset}, ${axisCenter}) rotate(-90)`}
                       fontWeight='bold'
                       fill={config.yAxis.labelColor}
+                      fontSize={axisLabelFontSize}
                     >
                       {props.label}
                     </Text>
@@ -1279,6 +1299,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                               verticalAnchor={runtime.horizontal ? 'start' : 'middle'}
                               textAnchor={'start'}
                               fill={config.yAxis.rightAxisTickLabelColor}
+                              fontSize={tickLabelFontSize}
                             >
                               {tick.formattedValue}
                             </Text>
@@ -1298,6 +1319,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       }, ${axisCenter}) rotate(-90)`}
                       fontWeight='bold'
                       fill={config.yAxis.rightAxisLabelColor}
+                      fontSize={axisLabelFontSize}
                     >
                       {props.label}
                     </Text>
@@ -1337,17 +1359,18 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               numTicks={useDateSpanMonths ? dateSpanMonths : xTickCount}
               tickStroke='#333'
               tickValues={
-                config.xAxis.manual
+                config.runtime.xAxis.manual
                   ? getTickValues(xAxisDataMapped, xScale, isDateTime ? xTickCount : getManualStep(), config)
-                  : config.xAxis.type === 'date'
+                  : config.runtime.xAxis.type === 'date'
                   ? xAxisDataMapped
                   : undefined
               }
             >
               {props => {
+                const hasDynamicCategory = config.series.some(s => s.dynamicCategory)
                 // For these charts, we generated all ticks in tickValues above, and now need to filter/shift them
                 // so the last tick is always labeled
-                if (config.xAxis.type === 'date' && !config.xAxis.manual) {
+                if (config.runtime.xAxis.type === 'date' && !config.runtime.xAxis.manual && !hasDynamicCategory) {
                   props.ticks = filterAndShiftLinearDateTicks(config, props, xAxisDataMapped, formatDate)
                 }
 
@@ -1355,7 +1378,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   useDateSpanMonths &&
                   xScale
                     .ticks(xTickCount)
-                    .map(t => props.ticks.findIndex(tick => tick.value.getTime() === t.getTime()))
+                    .map(t =>
+                      props.ticks.findIndex(
+                        tick => (typeof tick.value === 'number' ? tick.value : tick.value.getTime()) === t.getTime()
+                      )
+                    )
                     .slice(0, 2)
                     .reduce((acc, curr) => curr - acc)
 
@@ -1379,16 +1406,12 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
                 // Calculate sumOfTickWidth here, before map function
                 const tickWidthMax = Math.max(
-                  ...filteredTicks.map(tick =>
-                    getTextWidth(tick.formattedValue, `normal ${fontSizes[config.fontSize]}px sans-serif`)
-                  )
+                  ...filteredTicks.map(tick => getTextWidth(tick.formattedValue, GET_TEXT_WIDTH_FONT))
                 )
                 // const marginTop = 20 // moved to top bc need for yMax calcs
                 const accumulator = ismultiLabel ? 180 : 100
 
-                const textWidths = filteredTicks.map(tick =>
-                  getTextWidth(tick.formattedValue, `normal ${fontSizes[config.fontSize]}px sans-serif`)
-                )
+                const textWidths = filteredTicks.map(tick => getTextWidth(tick.formattedValue, GET_TEXT_WIDTH_FONT))
                 const sumOfTickWidth = textWidths.reduce((a, b) => a + b, accumulator)
                 const spaceBetweenEachTick = (xMax - sumOfTickWidth) / (filteredTicks.length - 1)
 
@@ -1480,6 +1503,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                   : undefined
                               }
                               fill={config.xAxis.tickLabelColor}
+                              fontSize={tickLabelFontSize}
                             >
                               {tick.formattedValue}
                             </Text>
@@ -1497,6 +1521,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       verticalAnchor='start'
                       fontWeight='bold'
                       fill={config.xAxis.labelColor}
+                      fontSize={axisLabelFontSize}
                     >
                       {props.label}
                     </Text>

@@ -22,7 +22,6 @@ type TableProps = {
   }
   wrapColumns?: boolean
   hasRowType?: boolean // if it has row type then the first column is the row type which will explain how to render the row
-  fontSize: 'small' | 'medium' | 'large'
   viewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   preliminaryData?: PreliminaryDataItem[]
 }
@@ -39,7 +38,6 @@ const Table = ({
   tableOptions,
   wrapColumns,
   hasRowType,
-  fontSize,
   viewport,
   preliminaryData
 }: TableProps) => {
@@ -71,7 +69,6 @@ const Table = ({
                         childRow={row}
                         wrapColumns={wrapColumns}
                         cellMinWidth={tableOptions.cellMinWidth}
-                        fontSize={fontSize}
                         viewport={viewport}
                       />
                     )
@@ -92,7 +89,6 @@ const Table = ({
                         childRow={childRow}
                         wrapColumns={wrapColumns}
                         cellMinWidth={tableOptions.cellMinWidth}
-                        fontSize={fontSize}
                         viewport={viewport}
                       />
                     )
@@ -110,7 +106,6 @@ const Table = ({
                             isTotal={true}
                             wrapColumns={wrapColumns}
                             cellMinWidth={tableOptions.cellMinWidth}
-                            fontSize={fontSize}
                             viewport={viewport}
                           />
                         )
@@ -125,7 +120,6 @@ const Table = ({
                             childRow={childRowCopy}
                             wrapColumns={wrapColumns}
                             cellMinWidth={tableOptions.cellMinWidth}
-                            fontSize={fontSize}
                             viewport={viewport}
                           />
                         )

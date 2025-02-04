@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import Chart from '../CdcChart'
+import Chart from '../CdcChartComponent'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Tooltip',
@@ -22,7 +22,6 @@ export const Additional_Tooltip: Story = {
       showDownloadMediaButton: false,
       theme: 'theme-orange',
       animate: false,
-      fontSize: 'medium',
       lineDatapointStyle: 'hover',
       barHasBorder: 'false',
       isLollipopChart: false,

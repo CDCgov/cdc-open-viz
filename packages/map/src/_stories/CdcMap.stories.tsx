@@ -149,7 +149,7 @@ export const Standard_Color_Distributions_Without_Special_Classes: Story = {
 
 export const Custom_Color_Distributions_With_Update_Needed: Story = {
   args: {
-    config: editConfigKeys(newConfig, [{ path: ['version'], value: '4.24.11' }])
+    config: editConfigKeys(newConfig, [{ path: ['version'], value: '4.24.10' }])
   }
 }
 

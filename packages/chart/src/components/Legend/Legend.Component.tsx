@@ -1,23 +1,22 @@
 import parse from 'html-react-parser'
+import React from 'react'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendShape from '@cdc/core/components/LegendShape'
 import Button from '@cdc/core/components/elements/Button'
 import { getLegendClasses } from './helpers/getLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
-import { handleLineType } from '../../helpers/handleLineType'
-
 import { getMarginTop, getGradientConfig, getMarginBottom } from './helpers/index'
-import { Line } from '@visx/shape'
 import { Label } from '../../types/Label'
 import { ChartConfig, ViewportSize } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
-import { forwardRef, useState } from 'react'
+import { forwardRef } from 'react'
 import LegendSuppression from './Legend.Suppression'
 import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
+import LegendLineShape from './LegendLine.Shape'
 
-const LEGEND_PADDING = 30
+const LEGEND_PADDING = 36
 
 export interface LegendProps {
   colorScale: ColorScale
@@ -25,7 +24,7 @@ export interface LegendProps {
   currentViewport: ViewportSize
   formatLabels: (labels: Label[]) => Label[]
   highlight: Function
-  highlightReset: Function
+  handleShowAll: Function
   ref: React.Ref<() => void>
   seriesHighlight: string[]
   skipId: string
@@ -40,7 +39,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
       colorScale,
       seriesHighlight,
       highlight,
-      highlightReset,
+      handleShowAll,
       currentViewport,
       formatLabels,
       skipId = 'legend',
@@ -51,14 +50,13 @@ const Legend: React.FC<LegendProps> = forwardRef(
     const { innerClasses, containerClasses } = getLegendClasses(config)
     const { runtime, legend } = config
 
-    const [hasSuppression, setHasSuppression] = useState(false)
-
-    const isBottomOrSmallViewport =
-      legend?.position === 'bottom' || (isLegendWrapViewport(currentViewport) && !legend.hide)
+    const isLegendBottom =
+      legend?.position === 'bottom' ||
+      (isLegendWrapViewport(currentViewport) && !legend.hide && legend?.position !== 'top')
 
     const legendClasses = {
-      marginBottom: getMarginBottom(config, hasSuppression),
-      marginTop: getMarginTop(isBottomOrSmallViewport, config)
+      marginBottom: getMarginBottom(isLegendBottom, config),
+      marginTop: getMarginTop(isLegendBottom, config)
     }
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
@@ -74,8 +72,12 @@ const Legend: React.FC<LegendProps> = forwardRef(
         aria-label='legend'
         tabIndex={0}
       >
-        {legend.label && <h3>{parse(legend.label)}</h3>}
-        {legend.description && <p>{parse(legend.description)}</p>}
+        {(legend.label || legend.description) && (
+          <div className={legend.description ? 'mb-3' : 'mb-2'}>
+            {legend.label && <h3 className='fw-bold'>{parse(legend.label)}</h3>}
+            {legend.description && <p className='mt-2'>{parse(legend.description)}</p>}
+          </div>
+        )}
         <LegendGradient
           config={config}
           {...getGradientConfig(config, formatLabels, colorScale)}
@@ -106,8 +108,10 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       }
                     }
 
-                    if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                      className.push('inactive')
+                    if (seriesHighlight.length) {
+                      if (!seriesHighlight.includes(itemName)) {
+                        className.push('inactive')
+                      } else className.push('highlighted')
                     }
 
                     if (config.legend.style === 'gradient') {
@@ -133,15 +137,9 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       >
                         <>
                           {config.visualizationType === 'Line' && config.legend.style === 'lines' ? (
-                            <svg width={40} height={25}>
-                              <Line
-                                from={{ x: 10, y: 10 }}
-                                to={{ x: 40, y: 10 }}
-                                stroke={label.value}
-                                strokeWidth={2}
-                                strokeDasharray={handleLineType(config.series[i]?.type ? config.series[i]?.type : '')}
-                              />
-                            </svg>
+                            <React.Fragment>
+                              <LegendLineShape index={i} label={label} config={config} />
+                            </React.Fragment>
                           ) : (
                             <>
                               <LegendShape
@@ -151,8 +149,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                             </>
                           )}
                         </>
-
-                        <LegendLabel align='left' margin='0 0 0 4px'>
+                        <LegendLabel align='left' className='m-0'>
                           {label.text}
                         </LegendLabel>
                       </LegendItem>
@@ -191,26 +188,20 @@ const Legend: React.FC<LegendProps> = forwardRef(
                           fill='transparent'
                           borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`}
                         />{' '}
-                        <LegendLabel align='left' margin='0 0 0 4px'>
-                          {bar.legendLabel ? bar.legendLabel : bar.value}
-                        </LegendLabel>
+                        <LegendLabel align='left'>{bar.legendLabel ? bar.legendLabel : bar.value}</LegendLabel>
                       </LegendItem>
                     )
                   })}
                 </div>
 
-                <LegendSuppression
-                  config={config}
-                  isBottomOrSmallViewport={isBottomOrSmallViewport}
-                  setHasSuppression={setHasSuppression}
-                />
+                <LegendSuppression config={config} isLegendBottom={isLegendBottom} />
               </>
             )
           }}
         </LegendOrdinal>
         {seriesHighlight.length > 0 && (
-          <Button onClick={labels => highlightReset(labels)} style={{ marginTop: '1rem' }}>
-            Reset
+          <Button onClick={labels => handleShowAll(labels)} style={{ marginTop: '1rem' }}>
+            Show All
           </Button>
         )}
       </aside>
