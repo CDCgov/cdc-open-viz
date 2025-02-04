@@ -11,7 +11,7 @@ import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
 
 // CDC core components and helpers
-import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { getBarConfig, testZeroValue } from '../helpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
@@ -45,7 +45,6 @@ export const BarChartHorizontal = () => {
     updateBars,
     assignColorsToValues,
     section,
-    fontSize,
     isLabelBelowBar,
     displayNumbersOnBar,
     lollipopBarWidth,
@@ -136,7 +135,7 @@ export const BarChartHorizontal = () => {
                   const barDefaultLabel = !config.yAxis.displayNumbersOnBar ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
-                  const textWidth = getTextWidth(barDefaultLabel, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                  const textWidth = getTextWidth(barDefaultLabel)
                   const textFits = Number(textWidth) < defaultBarWidth - 5
 
                   // control text position
@@ -201,8 +200,12 @@ export const BarChartHorizontal = () => {
                   // update label color
                   if (barColor && labelColor && textFits) {
                     labelColor = getContrastColor('#000', barColor)
+                    let constrast = getColorContrast('#000', barColor)
+                    const contrastLevel = 7
+                    if (constrast < contrastLevel) {
+                      labelColor = '#fff'
+                    }
                   }
-
                   const background = () => {
                     if (isRegularLollipopColor) return barColor
                     if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
@@ -215,7 +218,13 @@ export const BarChartHorizontal = () => {
                   const yPos = barHeight * bar.index + barHeight / 2
                   const [upperPos, lowerPos] = ['upper', 'lower'].map(position => {
                     if (!hasConfidenceInterval) return
-                    const d = datum.dynamicData ? datum.CI[bar.key][position] : datum[config.confidenceKeys[position]]
+                    if (datum.dynamicData) {
+                      const ci = datum.CI[bar.key]
+                      if (!ci) return
+                      const d = ci[position]
+                      return xScale(d)
+                    }
+                    const d = datum[config.confidenceKeys[position]]
                     return xScale(d)
                   })
                   // End Confidence Interval Variables

@@ -15,7 +15,6 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
 
   const borderWidth = config.barHasBorder === 'true' ? 1 : 0
   const halfWidth = width / 2
-  const fontSize = { small: 16, medium: 18, large: 20 }
   const offset = 1.02 // Offset of the left bar from the Axis
 
   const groupOne = {
@@ -109,10 +108,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * data.length
                 config.heights.horizontal = totalheight
                 // check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
-                const textWidth = getTextWidth(
-                  formatNumber(d[groupOne.dataKey], 'left'),
-                  `normal ${fontSize[config.fontSize]}px sans-serif`
-                )
+                const textWidth = getTextWidth(formatNumber(d[groupOne.dataKey], 'left'))
                 const textFits = textWidth < barWidth - 5 // minus padding dx(5)
 
                 return (
@@ -170,10 +166,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * data.length
                 config.heights.horizontal = totalheight
                 // check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
-                const textWidth = getTextWidth(
-                  formatNumber(d[groupTwo.dataKey], 'left'),
-                  `normal ${fontSize[config.fontSize]}px sans-serif`
-                )
+                const textWidth = getTextWidth(formatNumber(d[groupTwo.dataKey], 'left'))
                 const isTextFits = textWidth < barWidth - 5 // minus padding dx(5)
 
                 return (

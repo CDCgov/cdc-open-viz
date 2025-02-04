@@ -75,7 +75,6 @@ $medium: 768px;
   position: relative;
   flex-grow: 1;
   width: 100%;
-  overflow: hidden;
   .geo-point {
     transition: 0.3s all;
     circle {
@@ -102,10 +101,7 @@ $medium: 768px;
 }
 
 .territories-label {
-  color: black;
-  font-size: 1.1em;
-  display: block;
-  margin-top: 15px;
+  font-size: 1em;
 }
 
 // Cities and Territories
@@ -194,7 +190,6 @@ $medium: 768px;
     transform: none;
   }
   .territories {
-    font-size: 1em;
     > span {
       margin-left: 0;
     }
@@ -326,11 +321,4 @@ canvas {
   background-color: white;
   pointer-events: none;
   display: none;
-}
-
-.data-table-container {
-  margin: 20px 0px 0px;
-  &.download-link-above {
-    margin-top: 0;
-  }
 }

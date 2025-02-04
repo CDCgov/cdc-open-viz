@@ -1,3 +1,5 @@
+import { Version } from '@cdc/core/types/Version'
+
 export type Config = {
   type: string
   data: Object[]
@@ -36,4 +38,5 @@ export type Config = {
   general: {
     isCompactStyle: boolean
   }
+  version: Version
 }

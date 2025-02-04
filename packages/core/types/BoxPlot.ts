@@ -15,6 +15,7 @@ export type BoxPlot = {
     upperBounds: string
   }
   plotNonOutlierValues: boolean
+  plotOutlierValues: boolean
   plots: [{ columnOutliers: []; columnLowerBounds: number; columnUpperBounds: number }]
   categories: string[]
   geoType: string

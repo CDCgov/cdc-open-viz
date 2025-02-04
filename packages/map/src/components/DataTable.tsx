@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo } from 'react'
+import React, { useEffect, useState, memo, useContext } from 'react'
 
 import Papa from 'papaparse'
 import ExternalIcon from '../images/external-link.svg' // TODO: Move to Icon component
@@ -10,6 +10,8 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 
 import Loading from '@cdc/core/components/Loading'
+import { navigationHandler } from '../helpers/navigationHandler'
+import ConfigContext from '../context'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
@@ -26,18 +28,15 @@ const DataTable = props => {
     displayDataAsText,
     applyLegendToRow,
     displayGeoName,
-    navigationHandler,
-    viewport,
     formatLegendLocation,
     tabbingId,
     setFilteredCountryCode
   } = props
 
+  const { currentViewport: viewport } = useContext(ConfigContext)
   const [expanded, setExpanded] = useState(expandDataTable)
   const [sortBy, setSortBy] = useState({ column: 'geo', asc: false })
-
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
-
   const fileName = `${mapTitle || 'data-table'}.csv`
 
   // Catch all sorting method used on load by default but also on user click
@@ -118,14 +117,14 @@ const DataTable = props => {
     if (columns.navigate && row[columns.navigate.name]) {
       markup = (
         <span
-          onClick={() => navigationHandler(row[columns.navigate.name])}
+          onClick={() => navigationHandler(state.general.navigationTarget, row[columns.navigate.name])}
           className='table-link'
           title='Click for more information (Opens in a new window)'
           role='link'
           tabIndex='0'
           onKeyDown={e => {
             if (e.keyCode === 13) {
-              navigationHandler(row[columns.navigate.name])
+              navigationHandler(state.general.navigationTarget, row[columns.navigate.name])
             }
           }}
         >
@@ -192,7 +191,7 @@ const DataTable = props => {
 
   const TableMediaControls = ({ belowTable }) => {
     return (
-      <MediaControls.Section classes={['download-links'] + (belowTable ? 'below-table' : '')}>
+      <MediaControls.Section classes={['download-links']}>
         <MediaControls.Link config={state} />
         {state.general.showDownloadButton && <DownloadButton />}
       </MediaControls.Section>
@@ -345,7 +344,7 @@ const DataTable = props => {
                             </>
                           )
                         } else {
-                          cellValue = displayDataAsText(runtimeData[row][state.columns[column].name], column)
+                          cellValue = displayDataAsText(runtimeData[row][state.columns[column].name], column, state)
                         }
 
                         return (
