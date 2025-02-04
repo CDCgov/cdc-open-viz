@@ -134,13 +134,13 @@ $theme: (
 .cdc-open-viz-module {
   @each $theme-name, $theme-colors in $theme {
     &.theme-#{$theme-name} {
-      .single-filters--tab .tab--active {
+      .single-filters--tab .tab--active:not(.tab--simple) {
         border: 1px solid string.unquote(nth($theme-colors, 1));
         border-top: 3px solid string.unquote(nth($theme-colors, 1));
         border-bottom: none;
       }
 
-      .single-filters--tab .tab:not(.tab--active) {
+      .single-filters--tab .tab:not(.tab--active):not(.tab--simple) {
         border-bottom: 1px solid string.unquote(nth($theme-colors, 1));
       }
 

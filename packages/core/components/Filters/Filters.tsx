@@ -425,6 +425,7 @@ const Filters = (props: FilterProps) => {
           <h3
             id={`${filterOption}-${outerIndex}-${index}-${id}`}
             className={tabClassList.join(' ')}
+            tabIndex={0}
             onClick={e => {
               changeFilterActive(outerIndex, filterOption)
               setSelectedFilter(e.target)

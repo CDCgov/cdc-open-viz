@@ -71,6 +71,7 @@ div.single-filters {
   padding: 1rem 0.5rem;
   width: auto;
   cursor: pointer;
+  border-radius: 6px 6px 0 0;
   @include breakpoint(xs) {
     font-size: 0.778em;
   }
