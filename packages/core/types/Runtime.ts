@@ -10,6 +10,7 @@ export type ForecastingSeriesKey = {
 
 export type Runtime = {
   barSeriesKeys?: string[]
+  areaSeriesKeys: object[]
   forecastingSeriesKeys?: ForecastingSeriesKey[]
   originalXAxis: {
     dataKey: string

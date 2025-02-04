@@ -4,18 +4,19 @@ import ConfigContext from '../context'
 import Icon from '@cdc/core/components/ui/Icon'
 
 const Modal = () => {
-  const { applyTooltipsToGeo, capitalize, applyLegendToRow, viewport, type, content } = useContext(ConfigContext)
-
+  const { applyTooltipsToGeo, applyLegendToRow, content, state, currentViewport: viewport } = useContext(ConfigContext)
+  const { capitalizeLabels } = state.tooltips
   const tooltip = applyTooltipsToGeo(content.geoName, content.keyedData, 'jsx')
-
+  const type = state.general.type
   const legendColors = applyLegendToRow(content.keyedData)
 
   return (
     <section
-      className={capitalize ? 'modal-content tooltip capitalize ' + viewport : 'modal-content tooltip ' + viewport}
+      className={
+        capitalizeLabels ? 'modal-content tooltip capitalize ' + viewport : 'modal-content tooltip ' + viewport
+      }
       aria-hidden='true'
     >
-      {type === 'data' && <LegendShape fill={legendColors[0]} />}
       <div className='content'>{tooltip}</div>
       <Icon display='close' alt='Close Modal' size={20} color='#000' className='modal-close' />
     </section>

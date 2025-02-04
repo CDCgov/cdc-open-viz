@@ -13,7 +13,7 @@ const Legend = forwardRef((props, ref) => {
     seriesHighlight,
     highlight,
     tableData,
-    highlightReset,
+    handleShowAll,
     transformedData: data,
     currentViewport,
     dimensions,
@@ -35,7 +35,7 @@ const Legend = forwardRef((props, ref) => {
         colorScale={colorScale}
         seriesHighlight={seriesHighlight}
         highlight={highlight}
-        highlightReset={highlightReset}
+        handleShowAll={handleShowAll}
         currentViewport={currentViewport}
         formatLabels={createLegendLabels}
       />

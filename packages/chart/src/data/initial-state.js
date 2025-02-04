@@ -11,10 +11,9 @@ export default {
   showDownloadMediaButton: false,
   theme: 'theme-blue',
   animate: false,
-  fontSize: 'medium',
   lineDatapointStyle: 'hover',
   lineDatapointColor: 'Same as Line',
-  barHasBorder: 'false',
+  barHasBorder: 'true',
   isLollipopChart: false,
   lollipopShape: 'circle',
   lollipopColorStyle: 'two-tone',
@@ -167,6 +166,7 @@ export default {
     seriesHighlight: [],
     style: 'circles',
     subStyle: 'linear blocks',
+    shape: 'circle',
     tickRotation: '',
     hideBorder: {
       side: false,
@@ -198,13 +198,16 @@ export default {
     bottomPrefix: '',
     bottomAbbreviated: false
   },
+  filters: [],
   confidenceKeys: {},
   visual: {
     border: true,
     accent: true,
     background: true,
     verticalHoverLine: false,
-    horizontalHoverLine: false
+    horizontalHoverLine: false,
+    lineDatapointSymbol: 'none',
+    maximumShapeAmount: 7
   },
   useLogScale: false,
   filterBehavior: 'Filter Change',

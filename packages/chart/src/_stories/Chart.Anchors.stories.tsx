@@ -1,6 +1,6 @@
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import Chart from './../CdcChart'
+import Chart from '../CdcChartComponent'
 import exampleComboBarNonNumeric from './../../examples/feature/tests-date-exclusions/date-exclusions-config.json'
 import { editConfigKeys } from '../helpers/configHelpers'
 

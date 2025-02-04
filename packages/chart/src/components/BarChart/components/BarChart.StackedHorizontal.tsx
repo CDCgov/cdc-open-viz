@@ -4,7 +4,7 @@ import { useBarChart } from '../../../hooks/useBarChart'
 import { BarStackHorizontal } from '@visx/shape'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
-import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 // types
@@ -30,7 +30,7 @@ const BarChartStackedHorizontal = () => {
   } = useContext<ChartContext>(ConfigContext)
 
   // prettier-ignore
-  const { barBorderWidth, displayNumbersOnBar, fontSize, getAdditionalColumn, hoveredBar, isHorizontal, isLabelBelowBar, onMouseLeaveBar, onMouseOverBar, updateBars, barStackedSeriesKeys } = useBarChart()
+  const { barBorderWidth, displayNumbersOnBar, getAdditionalColumn, hoveredBar, isHorizontal, isLabelBelowBar, onMouseLeaveBar, onMouseOverBar, updateBars, barStackedSeriesKeys } = useBarChart()
 
   const { orientation, visualizationSubType } = config
   return (
@@ -59,7 +59,13 @@ const BarChartStackedHorizontal = () => {
                   seriesHighlight.length === 0 ||
                   seriesHighlight.indexOf(bar.key) !== -1
                 config.barHeight = Number(config.barHeight)
-                const labelColor = getContrastColor('#000', colorScale(config.runtime.seriesLabels[bar.key]))
+                let barColor = colorScale(config.runtime.seriesLabels[bar.key])
+                let labelColor = getContrastColor('#000', barColor)
+                let constrast = getColorContrast('#000', barColor)
+                const contrastLevel = 7
+                if (constrast < contrastLevel) {
+                  labelColor = '#fff'
+                }
                 // tooltips
                 const xAxisValue = formatNumber(data[bar.index][bar.key], 'left')
                 const yAxisValue =
@@ -69,7 +75,7 @@ const BarChartStackedHorizontal = () => {
                 const yAxisTooltip = config.runtime.yAxis.label
                   ? `${config.runtime.yAxis.label}: ${yAxisValue}`
                   : yAxisValue
-                const textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                const textWidth = getTextWidth(xAxisValue)
                 const additionalColTooltip = getAdditionalColumn(hoveredBar)
                 const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${xAxisValue}`
                 const tooltip = `<ul>

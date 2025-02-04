@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import chartGradientConfig from './_mock/legend.gradient_mock.json'
 import SimplifiedLineConfig from './_mock/simplified_line.json'
 
-import Chart from '../CdcChart'
+import Chart from '../CdcChartComponent'
 import { editConfigKeys } from '../helpers/configHelpers'
 
 const meta: Meta<typeof Chart> = {
@@ -51,7 +51,7 @@ export const Legend_Gradient_With_box: Story = {
 export const Legend_Gradient_With_Text: Story = {
   args: {
     config: editConfigKeys(chartGradientConfig, [
-      { path: ['legend', 'title'], value: 'Title' },
+      { path: ['legend', 'label'], value: 'Title' },
       { path: ['legend', 'description'], value: 'Description' },
       { path: ['legend', 'hideBorder'], value: false }
     ])

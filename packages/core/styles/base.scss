@@ -65,12 +65,7 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
 
 .cdc-open-viz-module {
   position: relative;
-  color: $baseColor;
-  font-size: 14px !important;
   line-height: 1.4;
-  @include breakpointClass(md) {
-    font-size: 16px !important;
-  }
   @import 'global';
   @import 'button-section';
   @import 'series-list';
@@ -153,4 +148,48 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
       '#ebf7f5'
     )
   );
+
+  // These are required because Chronic has pages that still use TP4 and these Bootstrap5 margin classes aren't defined on those pages
+  .me-0 {
+    margin-right: 0 !important;
+  }
+  .me-1 {
+    margin-right: 0.25rem !important;
+  }
+  .me-2 {
+    margin-right: 0.5rem !important;
+  }
+  .me-3 {
+    margin-right: 1rem !important;
+  }
+  .me-4 {
+    margin-right: 1.5rem !important;
+  }
+  .me-5 {
+    margin-right: 3rem !important;
+  }
+  .me-auto {
+    margin-right: auto !important;
+  }
+  .ms-0 {
+    margin-left: 0 !important;
+  }
+  .ms-1 {
+    margin-left: 0.25rem !important;
+  }
+  .ms-2 {
+    margin-left: 0.5rem !important;
+  }
+  .ms-3 {
+    margin-left: 1rem !important;
+  }
+  .ms-4 {
+    margin-left: 1.5rem !important;
+  }
+  .ms-5 {
+    margin-left: 3rem !important;
+  }
+  .ms-auto {
+    margin-left: auto !important;
+  }
 }

@@ -44,12 +44,12 @@ import { MapContext } from '../../../types/MapContext.js'
 import { TextField } from './Inputs'
 import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
+import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 
 // Todo: move to useReducer, seperate files out.
 const EditorPanel = ({ columnsRequiredChecker }) => {
   // prettier-ignore
   const {
-    columnsInData = [],
     isDashboard,
     isDebug,
     loadConfig,
@@ -67,6 +67,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   } = useContext<MapContext>(ConfigContext)
 
   const { general, columns, legend, table, tooltips } = state
+  const columnsInData = state?.data?.[0] ? Object.keys(state.data[0]) : []
 
   const [configTextboxValue, setConfigTextbox] = useState({}) // eslint-disable-line
 
@@ -231,6 +232,15 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
 
   const handleEditorChanges = async (property, value) => {
     switch (property) {
+      case 'navigationTarget':
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            navigationTarget: value
+          }
+        })
+        break
       // change these to be more generic.
       // updateVisualPropertyValue
       // updateGeneralPropertyValue, etc.
@@ -715,6 +725,14 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
               }
             })
             break
+          case 'google-map':
+            setState({
+              ...state,
+              general: {
+                ...state.general,
+                geoType: 'google-map'
+              }
+            })
           default:
             break
         }
@@ -1369,13 +1387,29 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             </AccordionItemHeading>
             <AccordionItemPanel>
               {/* Geography */}
+              {/*<Select*/}
+              {/*  options={[*/}
+              {/*    { value: 'us', label: 'United States' },*/}
+              {/*    { value: 'us-region', label: 'U.S. Region' },*/}
+              {/*    { value: 'world', label: 'World' },*/}
+              {/*    { value: 'single-state', label: 'U.S. State' },*/}
+              {/*    { value: 'google-map', label: 'Google Map API' }*/}
+              {/*  ]}*/}
+              {/*  section={'general'}*/}
+              {/*  fieldName={'geoType'}*/}
+              {/*  label='Geography'*/}
+              {/*  updateField={updateField}*/}
+              {/*/>*/}
+
               <label>
                 <span className='edit-label column-heading'>
                   <span>Geography</span>
                 </span>
-                <ul className='geo-buttons'>
+                <ul className='geo-buttons d-grid' style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
                   <button
-                    className={state.general.geoType === 'us' || state.general.geoType === 'us-county' ? 'active' : ''}
+                    className={`${
+                      state.general.geoType === 'us' || state.general.geoType === 'us-county' ? 'active' : ''
+                    } full-width`}
                     onClick={e => {
                       e.preventDefault()
                       handleEditorChanges('geoType', 'us')
@@ -1385,7 +1419,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     <span>United States</span>
                   </button>
                   <button
-                    className={state.general.geoType === 'us-region' ? 'active' : ''}
+                    className={`${state.general.geoType === 'us-region' ? 'active' : ''} full-width`}
                     onClick={e => {
                       e.preventDefault()
                       handleEditorChanges('geoType', 'us-region')
@@ -1395,7 +1429,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     <span>U.S. Region</span>
                   </button>
                   <button
-                    className={state.general.geoType === 'world' ? 'active' : ''}
+                    className={`${state.general.geoType === 'world' ? 'active' : ''} full-width`}
                     onClick={e => {
                       e.preventDefault()
                       handleEditorChanges('geoType', 'world')
@@ -1405,7 +1439,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     <span>World</span>
                   </button>
                   <button
-                    className={state.general.geoType === 'single-state' ? 'active' : ''}
+                    className={`${state.general.geoType === 'single-state' ? 'active' : ''} full-width`}
                     onClick={e => {
                       e.preventDefault()
                       handleEditorChanges('geoType', 'single-state')
@@ -1414,6 +1448,16 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     <AlabamaGraphic />
                     <span>U.S. State</span>
                   </button>
+                  {/* <button
+                    className={`${state.general.geoType === 'google-map' ? 'active' : ''} full-width`}
+                    onClick={e => {
+                      e.preventDefault()
+                      handleEditorChanges('geoType', 'google-map')
+                    }}
+                  >
+                    <UsaGraphic />
+                    <span>Google Map Api</span>
+                  </button> */}
                 </ul>
               </label>
               {/* Select > State or County Map */}
@@ -1526,6 +1570,23 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   )}
                 </select>
               </label>
+
+              {/* Navigation Behavior */}
+              {(state.general.type === 'navigation' || state.general.type === 'data') && (
+                <label>
+                  <span className='edit-label column-heading'>Navigation Behavior</span>
+                  <select
+                    value={state.general.navigationTarget}
+                    onChange={event => {
+                      event.preventDefault()
+                      handleEditorChanges('navigationTarget', event.target.value)
+                    }}
+                  >
+                    <option value='_self'>Same Window</option>
+                    <option value='_blank'>New Window</option>
+                  </select>
+                </label>
+              )}
               <label>
                 <span className='edit-label'>Data Classification Type</span>
                 <div>
@@ -1567,7 +1628,17 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                         handleEditorChanges('displayStateLabels', event.target.checked)
                       }}
                     />
-                    <span className='edit-label'>Show state labels</span>
+                    <span className='edit-label'>
+                      Show state labels
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Recommended set to display for Section 508 compliance.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    </span>
                   </label>
                 )}
             </AccordionItemPanel>
@@ -1685,16 +1756,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   </Tooltip>
                 }
               />
-              {'us' === state.general.geoType && (
-                <TextField
-                  value={general.territoriesLabel}
-                  updateField={updateField}
-                  section='general'
-                  fieldName='territoriesLabel'
-                  label='Territories Label'
-                  placeholder='Territories'
-                />
-              )}
               {'us' === state.general.geoType && (
                 <label className='checkbox'>
                   <input
@@ -3316,6 +3377,18 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   updateField={updateField}
                 />
               </label>
+              {/* Leaflet Map Type */}
+              {state.general.geoType === 'leaflet' && (
+                <>
+                  <Select
+                    label='Leaflet Theme'
+                    options={layerOptions}
+                    section={'leaflet'}
+                    fieldName='theme'
+                    updateField={updateField}
+                  />
+                </>
+              )}
             </AccordionItemPanel>
           </AccordionItem>
           <AccordionItem>

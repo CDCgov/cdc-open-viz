@@ -1,12 +1,20 @@
-.cove-component__header {
+.cdc-open-viz-module header.cove-component__header {
   position: relative;
-  padding: 0.6em 0.8em;
+  padding: 1rem;
   margin: 0;
   color: var(--white);
-  font-size: 1.1em;
+
+  & > sup {
+    font-size: var(--superTitle-font-size);
+    font-family: var(--app-font-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    top: 0;
+  }
 
   h2 {
-    font-size: 1.1rem;
+    font-size: var(--title-font-size);
+    font-family: var(--app-font-secondary);
     color: var(--white);
     margin: 0;
   }
@@ -27,7 +35,6 @@
   }
 
   &:not(:empty) {
-    padding: 0.6em 0.8em;
     border-bottom-width: 4px;
     border-bottom-style: solid;
   }

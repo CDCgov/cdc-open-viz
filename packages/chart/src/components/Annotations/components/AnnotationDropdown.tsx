@@ -3,13 +3,13 @@ import ConfigContext from '../../../ConfigContext'
 import './AnnotationDropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
 import Annotation from '..'
-import { fontSizes } from '@cdc/core/helpers/cove/fontSettings'
+import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
 
 const AnnotationDropdown = () => {
   const { currentViewport: viewport, config } = useContext(ConfigContext)
   const [expanded, setExpanded] = useState(false)
 
-  const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${fontSizes[config?.fontSize]}px`
+  const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${appFontSize}px`
 
   const {
     config: { annotations }
@@ -21,7 +21,7 @@ const AnnotationDropdown = () => {
   }
 
   const handleAccordionClassName = () => {
-    const classNames = ['data-table-heading', 'annotation__dropdown-list']
+    const classNames = ['data-table-heading', 'annotation__dropdown-list', 'p-3']
     if (!expanded) {
       classNames.push('collapsed')
     }
