@@ -16,31 +16,23 @@ import {
   handleTextY
 } from './helpers'
 
-import useColorScale from '../../../hooks/useColorScale'
-
 // visx
 import { HtmlLabel, CircleSubject, EditableAnnotation, Connector, Annotation as VisxAnnotation } from '@visx/annotation'
 import { Drag } from '@visx/drag'
 import { MarkerArrow } from '@visx/marker'
 import { LinePath } from '@visx/shape'
-import { fontSizes } from '@cdc/core/helpers/cove/fontSettings'
 
 // styles
 import './AnnotationDraggable.styles.css'
 
 const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragStateChange }) => {
   // prettier-ignore
-  const {
-    config,
-    dimensions,
-    isEditor,
-    updateConfig
-  } = useContext(ConfigContext)
+  const { config, dimensions, isEditor, updateConfig, colorScale } = useContext(ConfigContext)
 
   // destructure config items here...
   const { annotations } = config
   const [height] = dimensions
-  const { colorScale } = useColorScale()
+
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
 
   return (
@@ -134,7 +126,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
                   </p>
                 </>
               )}
-              <div style={{ fontSize: fontSizes[config.fontSize] }} dangerouslySetInnerHTML={sanitizedData()} />
+              <div dangerouslySetInnerHTML={sanitizedData()} />
             </div>
           </HtmlLabel>
           {annotation.connectionType === 'line' && (

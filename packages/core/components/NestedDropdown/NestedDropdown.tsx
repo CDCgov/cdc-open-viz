@@ -124,25 +124,21 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
 }) => {
   const dropdownId = useId()
 
-  const [userSearchTerm, setUserSearchTerm] = useState('')
-  const [inputValue, setInputValue] = useState('')
+  const [userSearchTerm, setUserSearchTerm] = useState(null)
 
-  const initialInputValue = useMemo(() => {
+  const inputValue = useMemo(() => {
     // value from props
     return activeSubGroup ? `${activeGroup} - ${activeSubGroup}` : ''
-  }, [activeSubGroup])
+  }, [activeGroup, activeSubGroup])
   const [inputHasFocus, setInputHasFocus] = useState(false)
   const [isListOpened, setIsListOpened] = useState(false)
-
   const searchInput = useRef(null)
   const searchDropdown = useRef(null)
 
   const chooseSelectedSubGroup = (tierOne: string | number, tierTwo: string | number) => {
     searchInput.current.focus()
-    const selectedItemValue = `${tierOne} - ${tierTwo}`
-    setUserSearchTerm('')
+    setUserSearchTerm(null)
     setIsListOpened(false)
-    setInputValue(selectedItemValue)
     handleSelectedItems([String(tierOne), String(tierTwo)])
   }
 
@@ -220,14 +216,13 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   }
 
   const filterOptions = useMemo(() => {
-    return filterSearchTerm(userSearchTerm, options)
+    return filterSearchTerm(userSearchTerm || '', options)
   }, [userSearchTerm, options])
 
   const handleSearchTermChange = e => {
     const newSearchTerm = e.target.value
     setIsListOpened(true)
     setUserSearchTerm(newSearchTerm)
-    setInputValue(newSearchTerm)
   }
 
   const handleOnBlur = e => {
@@ -265,7 +260,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
             aria-haspopup='true'
             aria-hidden='false'
             tabIndex={0}
-            value={inputValue || initialInputValue}
+            value={userSearchTerm !== null ? userSearchTerm : inputValue}
             onChange={handleSearchTermChange}
             placeholder={loading ? 'Loading...' : '- Select -'}
             disabled={loading || !options.length}
@@ -303,7 +298,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
                       chooseSelectedSubGroup(groupValue, subGroupValue)
                     }}
                     userSelectedLabel={activeGroup + activeSubGroup}
-                    userSearchTerm={userSearchTerm}
+                    userSearchTerm={userSearchTerm || ''}
                   />
                 )
               })

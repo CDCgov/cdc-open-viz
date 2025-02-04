@@ -50,13 +50,6 @@
   overflow-y: auto;
 }
 
-.d-flex {
-  display: flex;
-}
-.flex-column-reverse {
-  flex-direction: column-reverse;
-}
-
 .cdc-open-viz-module.type-dashboard {
   .cdc-open-viz-module.type-chart.isEditor {
     .cdc-chart-inner-container {
@@ -153,11 +146,24 @@
   .legend-container {
     background: #fff;
     width: 100%;
-    padding: 15px;
     vertical-align: top;
     text-align: left;
-    border: 1px solid var(--lightGray);
+    border: 1px solid var(--cool-gray-10);
+    border-radius: 6px;
     position: relative;
+
+    h3 {
+      font-size: var(--legend-title-font-size);
+    }
+
+    p {
+      font-size: var(--legend-description-font-size);
+    }
+
+    tspan,
+    div {
+      font-size: var(--legend-item-font-size);
+    }
 
     &.border-0 {
       border: 1px solid transparent;
@@ -165,22 +171,14 @@
     }
 
     &__inner {
+      display: flex;
+      flex-direction: column;
+      row-gap: var(--space-between-legend-item-rows);
+      column-gap: var(--space-between-legend-item-columns);
       &.double-column,
       &.single-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        grid-column-gap: 1.5em;
-      }
-
-      &.vertical-sorted {
-        display: block;
-
-        @include breakpoint(sm) {
-          column-count: 2;
-          column-width: 100%;
-        }
-        column-gap: 1.5em;
-        column-fill: balance;
       }
 
       &.single-row {
@@ -192,13 +190,16 @@
           flex-basis: auto;
         }
       }
+
+      &.double-column.reverse-items div.legend-item:last-child {
+        margin-bottom: 0.2rem !important;
+      }
     }
 
     .legend-item {
       text-align: left;
       user-select: none;
-      white-space: nowrap;
-
+      line-height: var(--legend-item-font-size);
       .visx-legend-label {
         word-wrap: break-word;
         white-space: pre-wrap;
@@ -212,25 +213,7 @@
 
     .legend-item > .legend-item {
       display: inline-block;
-      margin-right: 0.5rem;
       flex: 0 0 auto;
-    }
-
-    h3 {
-      font-size: 1.3rem;
-    }
-
-    h3,
-    p {
-      margin-bottom: 0.4em;
-    }
-
-    & div.legend-item {
-      margin-bottom: 0.2em !important;
-
-      &:last-child {
-        margin: 0 !important;
-      }
     }
 
     .legend-item {
@@ -240,6 +223,11 @@
       &.inactive {
         opacity: 0.5;
         transition: 0.2s all;
+      }
+      &.highlighted {
+        outline: 1px solid #005ea2;
+        outline-offset: 5px;
+        border-radius: 1px;
       }
     }
 
@@ -259,10 +247,6 @@
         }
       }
     }
-  }
-
-  .legend-container__inner.flex-column-reverse div.legend-item:last-child {
-    margin-bottom: 0.2rem !important;
   }
 
   .dynamic-legend-list {
@@ -297,7 +281,6 @@
     align-items: center;
     font-size: 1em;
     vertical-align: middle;
-    margin-bottom: 0.5em;
 
     & > span {
       display: flex;
@@ -305,7 +288,7 @@
       align-items: center;
       white-space: nowrap;
       font-size: 1em;
-      margin-right: 8px;
+      margin-right: 9px;
       max-height: 1px;
     }
 
@@ -483,32 +466,6 @@
     }
   }
 
-  @include breakpointClass(xs) {
-    &.font-small {
-      font-size: 0.8em;
-
-      .chart-container > svg {
-        font-size: 12px;
-      }
-    }
-
-    &.font-medium {
-      font-size: 0.9em;
-
-      .chart-container > svg {
-        font-size: 14px;
-      }
-    }
-
-    &.font-large {
-      font-size: 1em;
-
-      .chart-container > svg {
-        font-size: 16px;
-      }
-    }
-  }
-
   @include breakpointClass(sm) {
     .chart-container {
       .no-wrap {
@@ -545,48 +502,6 @@
           filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
           transform-origin: 50% 50%;
         }
-      }
-    }
-
-    &.font-small {
-      font-size: 0.9em;
-
-      .chart-container > svg {
-        font-size: 14px;
-      }
-    }
-
-    &.font-large {
-      font-size: 1.1em;
-
-      .chart-container > svg {
-        font-size: 18px;
-      }
-    }
-  }
-
-  @include breakpointClass(lg) {
-    &.font-small {
-      font-size: 1em;
-
-      .chart-container > svg {
-        font-size: 16px;
-      }
-    }
-
-    &.font-medium {
-      font-size: 1.1em;
-
-      .chart-container > svg {
-        font-size: 18px;
-      }
-    }
-
-    &.font-large {
-      font-size: 1.2em;
-
-      .chart-container > svg {
-        font-size: 20px;
       }
     }
   }

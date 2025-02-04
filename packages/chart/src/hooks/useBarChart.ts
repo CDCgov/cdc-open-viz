@@ -1,8 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
+import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
 export const useBarChart = () => {
-  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, setSeriesHighlight, seriesHighlight } = useContext(ConfigContext)
+  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, setSeriesHighlight, seriesHighlight } =
+    useContext(ConfigContext)
   const { orientation } = config
   const [hoveredBar, setHoveredBar] = useState(null)
 
@@ -17,12 +19,22 @@ export const useBarChart = () => {
   const isRounded = config.barStyle === 'rounded'
   const isStacked = config.visualizationSubType === 'stacked'
   const tipRounding = config.tipRounding
-  const radius = config.roundingStyle === 'standard' ? '8px' : config.roundingStyle === 'shallow' ? '5px' : config.roundingStyle === 'finger' ? '15px' : '0px'
+  const radius =
+    config.roundingStyle === 'standard'
+      ? '8px'
+      : config.roundingStyle === 'shallow'
+      ? '5px'
+      : config.roundingStyle === 'finger'
+      ? '15px'
+      : '0px'
   const stackCount = config.runtime.seriesKeys.length
-  const fontSize = { small: 16, medium: 18, large: 20 }
   const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
-  const isBarAndLegendIsolate = config.visualizationType === 'Bar' && config.legend.behavior === 'isolate' && config.legend.axisAlign
-  const barStackedSeriesKeys = isBarAndLegendIsolate && seriesHighlight?.length ? seriesHighlight : config.runtime.barSeriesKeys || config.runtime.seriesKeys
+  const isBarAndLegendIsolate =
+    config.visualizationType === 'Bar' && config.legend.behavior === 'isolate' && config.legend.axisAlign
+  const barStackedSeriesKeys =
+    isBarAndLegendIsolate && seriesHighlight?.length
+      ? seriesHighlight
+      : config.runtime.barSeriesKeys || config.runtime.seriesKeys
 
   useEffect(() => {
     if (orientation === 'horizontal' && !config.yAxis.labelPlacement) {
@@ -68,7 +80,9 @@ export const useBarChart = () => {
       style = isHorizontal ? { borderRadius: `0 ${radius}  ${radius}  0` } : { borderRadius: `${radius} ${radius} 0 0` }
     }
     if (!isStacked && index === -1) {
-      style = isHorizontal ? { borderRadius: `${radius} 0  0 ${radius} ` } : { borderRadius: ` 0  0 ${radius} ${radius}` }
+      style = isHorizontal
+        ? { borderRadius: `${radius} 0  0 ${radius} ` }
+        : { borderRadius: ` 0  0 ${radius} ${radius}` }
     }
     if (tipRounding === 'full' && isStacked && index === 0 && stackCount > 1) {
       style = isHorizontal ? { borderRadius: `${radius} 0 0 ${radius}` } : { borderRadius: `0 0 ${radius} ${radius}` }
@@ -126,7 +140,7 @@ export const useBarChart = () => {
       barHeight = heights.stacked
     }
 
-    const labelHeight = isLabelBelowBar ? fontSize[config.fontSize] * 1.2 : 0
+    const labelHeight = isLabelBelowBar ? appFontSize * 1.2 : 0
     let barSpace = Number(config.barSpace)
 
     // calculate height of container based height, space and fontSize of labels
@@ -191,7 +205,13 @@ export const useBarChart = () => {
         addColCommas: config.columns[colKeys].commas
       }
 
-      const formattedValue = formatColNumber(closestVal[config.columns[colKeys].name], 'left', true, config, formattingParams)
+      const formattedValue = formatColNumber(
+        closestVal[config.columns[colKeys].name],
+        'left',
+        true,
+        config,
+        formattingParams
+      )
       if (config.columns[colKeys].tooltips) {
         columnsWithTooltips.push([config.columns[colKeys].label, formattedValue])
       }
@@ -225,7 +245,6 @@ export const useBarChart = () => {
     radius,
     stackCount,
     barStackedSeriesKeys,
-    fontSize,
     hasMultipleSeries,
     applyRadius,
     updateBars,

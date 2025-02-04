@@ -24,6 +24,10 @@ import { ConfigRow } from '../types/ConfigRow'
 import BumpChartConfig from './_mock/bump-chart.json'
 import MethodologyConfig from './_mock/methodology.json'
 import methodologyAPI from './_mock/methodologyAPI'
+import TopSpacing_1 from './_mock/data-bite-dash-test.json'
+import TopSpacing_2 from './_mock/data-bite-dash-test_1.json'
+import TopSpacing_3 from './_mock/data-bite-dash-test_1_1.json'
+import TopSpacing_4 from './_mock/data-bite-dash-test_1_1_1.json'
 
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Pages/Dashboard',
@@ -400,6 +404,34 @@ export const RegressionMultiVisualization: Story = {
     canvas.getAllByText('Poland')
     canvas.getAllByText('Ethiopia')
     canvas.getAllByText('Curacao')
+  }
+}
+
+export const Top_Spacing_1: Story = {
+  args: {
+    config: TopSpacing_1,
+    isEditor: false
+  }
+}
+
+export const Top_Spacing_2: Story = {
+  args: {
+    config: TopSpacing_2,
+    isEditor: false
+  }
+}
+
+export const Top_Spacing_3: Story = {
+  args: {
+    config: TopSpacing_3,
+    isEditor: false
+  }
+}
+
+export const Top_Spacing_4: Story = {
+  args: {
+    config: TopSpacing_4,
+    isEditor: false
   }
 }
 

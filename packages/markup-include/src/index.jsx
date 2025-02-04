@@ -5,6 +5,7 @@ import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 
 import CdcMarkupInclude from './CdcMarkupInclude'
 
+import '@cdc/core/styles/cove-main.scss'
 import './coreStyles_markupinclude.scss'
 
 let isEditor = window.location.href.includes('editor=true')

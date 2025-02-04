@@ -1,54 +1,36 @@
 import { ChartConfig } from './../../../types/ChartConfig'
 
 export const getLegendClasses = (config: ChartConfig) => {
-  const { position, singleRow, reverseLabelOrder, verticalSorted, hideBorder } = config.legend
-  const containerClasses = ['legend-container']
-  const innerClasses = ['legend-container__inner']
+  const { position, singleRow, verticalSorted, hideBorder } = config.legend
 
-  // Handle legend positioning
-  switch (position) {
-    case 'left':
-      containerClasses.push('left')
-      break
-    case 'right':
-      containerClasses.push('right')
-      break
-    case 'bottom':
-      containerClasses.push('bottom')
-      innerClasses.push('double-column', 'bottom')
-      break
-    case 'top':
-      containerClasses.push('top')
-      innerClasses.push('double-column', 'top')
-      break
+  const containerClassMap = {
+    left: 'left',
+    right: 'right',
+    bottom: 'bottom',
+    top: 'top'
   }
 
-  // Handle single row configuration for 'bottom' and 'top' positions
-  if (['bottom', 'top'].includes(position) && singleRow) {
-    innerClasses.push('single-row')
+  const innerClassMap = {
+    bottom: singleRow ? ['single-row', 'bottom'] : ['double-column', 'bottom'],
+    top: singleRow ? ['single-row', 'top'] : ['double-column', 'top']
   }
 
-  // Reverse label order
-  if (reverseLabelOrder) {
-    innerClasses.push('d-flex', 'flex-column-reverse')
-  }
+  const containerClasses = ['legend-container', containerClassMap[position]].filter(Boolean)
+  const innerClasses = ['legend-container__inner', ...(innerClassMap[position] || [])]
 
-  // Vertical sorting for 'bottom' and 'top' positions
+  // Add vertical sorting class for 'bottom' and 'top' positions
   if (['bottom', 'top'].includes(position) && verticalSorted) {
     innerClasses.push('vertical-sorted')
   }
 
-  // Configure border classes
-  if (hideBorder.side && (['right', 'left'].includes(position) || !position)) {
-    containerClasses.push('border-0')
-  }
+  // Add border and padding classes based on position and hideBorder
+  const shouldHideBorder = (['right', 'left'].includes(position) || !position) && hideBorder.side
+  const shouldHideTopBottomBorder = ['top', 'bottom'].includes(position) && hideBorder.topBottom
 
-  if (hideBorder.topBottom && ['top', 'bottom'].includes(position)) {
-    containerClasses.push('border-0')
-  }
-
-  if (hideBorder.topBottom && ['top'].includes(position)) {
-    containerClasses.push('p-0')
+  if (shouldHideBorder || shouldHideTopBottomBorder) {
+    containerClasses.push('border-0', 'p-0')
+  } else {
+    containerClasses.push('p-3')
   }
 
   return {

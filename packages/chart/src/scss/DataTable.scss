@@ -1,14 +1,9 @@
 .data-table-container {
-  margin: 20px 0 0;
-
   &.brush-active {
     margin: 80px 0 0;
   }
 
   width: 100%;
-  &.download-link-above {
-    margin: 0;
-  }
 }
 
 .data-table-container {

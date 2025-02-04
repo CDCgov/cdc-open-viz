@@ -1,7 +1,8 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../ConfigContext'
+import { ChartConfig } from '../types/ChartConfig'
 
-export const useHighlightedBars = (config, updateConfig) => {
+export const useHighlightedBars = (config: ChartConfig, updateConfig: (config) => void) => {
   const { formatDate, parseDate } = useContext(ConfigContext)
 
   let highlightedSeries = [] // only allow single series for highlights

@@ -9,7 +9,7 @@ const ExpandCollapseButtons: React.FC<ExpandCollapseButtonsProps> = ({ setAllExp
         <button className='btn expand-collapse-buttons' onClick={() => setAllExpanded(false)}>
           - Collapse All
         </button>
-        <button className='btn expand-collapse-buttons mr-2' onClick={() => setAllExpanded(true)}>
+        <button className='btn expand-collapse-buttons me-2' onClick={() => setAllExpanded(true)}>
           + Expand All
         </button>
       </div>

@@ -4,10 +4,10 @@ import Icon from '@cdc/core/components/ui/Icon'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 interface LegendProps {
   config: ChartConfig
-  isBottomOrSmallViewport: boolean
+  isLegendBottom: boolean
 }
 
-const LegendSuppression: React.FC<LegendProps> = ({ config, isBottomOrSmallViewport, setHasSuppression }) => {
+const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) => {
   const { preliminaryData, visualizationType, visualizationSubType, legend } = config
 
   const hasOpenCircleEffects = () =>
@@ -98,14 +98,12 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isBottomOrSmallViewp
   }
 
   const getLegendContainerClass = () =>
-    legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''
+    legend.singleRow && isLegendBottom ? 'legend-container__inner bottom single-row' : ''
 
   const shouldShowSuppressedInfo = () =>
     !config.legend.hideSuppressionLink &&
     config.visualizationSubType !== 'stacked' &&
     preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value && (pd?.style || pd.symbol))
-
-  setHasSuppression(shouldShowSuppressedInfo())
 
   return (
     <React.Fragment>

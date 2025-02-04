@@ -3,7 +3,7 @@ import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react
 import parse from 'html-react-parser'
 
 const LegendItemHex = props => {
-  const { state, viewport } = props
+  const { state, currentViewport: viewport } = props
 
   const getItemShape = shape => {
     switch (shape) {
@@ -27,8 +27,12 @@ const LegendItemHex = props => {
       return (
         <aside id='legend' className={legendClasses.aside.join(' ')} role='region' aria-label='Legend' tabIndex={0}>
           <section className={legendClasses.section.join(' ')} aria-label='Map Legend'>
-            {shapeGroup.legendTitle && <h3 className={legendClasses.title.join(' ')}>{parse(shapeGroup.legendTitle)}</h3>}
-            {shapeGroup.legendDescription && <p className={legendClasses.description.join(' ')}>{parse(shapeGroup.legendDescription)}</p>}
+            {shapeGroup.legendTitle && (
+              <h3 className={legendClasses.title.join(' ')}>{parse(shapeGroup.legendTitle)}</h3>
+            )}
+            {shapeGroup.legendDescription && (
+              <p className={legendClasses.description.join(' ')}>{parse(shapeGroup.legendDescription)}</p>
+            )}
 
             <ul className={legendClasses.ul.join(' ')} aria-label='Legend items' style={{ listStyle: 'none' }}>
               {shapeGroup.items.map((item, itemIndex) => {

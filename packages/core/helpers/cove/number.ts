@@ -198,10 +198,4 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   return String(result)
 }
 
-const getFontSize = (size = 'medium') => {
-  const fontSize = { small: 16, medium: 18, large: 20 }
-
-  return fontSize[size]
-}
-
-export { formatNumber, getFontSize }
+export { formatNumber }
