@@ -376,15 +376,23 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Load data when component first mounts
 
-  const prepareData = (config, data) => {
-    if (config.dataDescription) {
-      data = transform.autoStandardize(data)
-      data = transform.developerStandardize(data, config.dataDescription)
+  const prepareData = async (config: ChartConfig, data: object[]) => {
+    let processedData = []
+
+    try {
+      if (config.dataDescription && data) {
+        processedData = transform.autoStandardize(data)
+
+        processedData = transform.developerStandardize(data, config.dataDescription)
+      }
+
+      processedData = handleRankByValue(data, config)
+    } catch (error) {
+      console.error('Error processing data:', error)
+      throw new Error(`Failed to prepare data due to an error: ${error.message}`)
     }
 
-    data = handleRankByValue(data, config)
-
-    return data
+    return processedData
   }
   useEffect(() => {
     const load = async () => {
@@ -392,7 +400,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         const data = configObj.data
         if (configObj.data && configObj) {
           const preparedConfig = await prepareConfig(configObj, data)
-          const preparedData = prepareData(configObj, data)
+          const preparedData = await prepareData(configObj, data)
           setStateData(preparedData)
           setExcludedData(preparedData)
           updateConfig(preparedConfig, preparedData)
