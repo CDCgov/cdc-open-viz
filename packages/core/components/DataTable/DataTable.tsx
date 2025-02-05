@@ -256,11 +256,15 @@ const DataTable = (props: DataTableProps) => {
         : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
 
     // If every value in a column is a number, record the column index so the header and cells can be right-aligned
-    let rightAlignedCols = Object.fromEntries(
-      Object.keys(childrenMatrix[0])
-        .filter(i => childrenMatrix.filter(row => isRightAlignedTableValue(row[i])).length === childrenMatrix.length)
-        .map(x => [x, true])
-    )
+    const rightAlignedCols = childrenMatrix.length
+      ? Object.fromEntries(
+          Object.keys(childrenMatrix[0])
+            .filter(
+              i => childrenMatrix.filter(row => isRightAlignedTableValue(row[i])).length === childrenMatrix.length
+            )
+            .map(x => [x, true])
+        )
+      : {}
 
     const TableMediaControls = ({ belowTable }) => {
       return (
