@@ -20,10 +20,10 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug
   const editorContext = useContext(EditorContext)
   const [config, _setConfig] = useState<ChartConfig>({} as ChartConfig)
   const setConfig = newConfig => {
+    _setConfig(newConfig)
     if (isEditor) {
       editorContext.setTempConfig(newConfig)
     }
-    _setConfig(newConfig)
   }
   const [isLoading, setIsLoading] = useState(true)
   const prevFiltersRef = useRef(config.filters)
