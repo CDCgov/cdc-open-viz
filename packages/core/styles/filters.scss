@@ -68,7 +68,7 @@ div.single-filters {
   font-size: 1rem;
   font-weight: 300;
   border-bottom: 1px solid var(--cool-gray-10);
-  padding: 1rem 0.5rem;
+  padding: 0.5rem 1rem;
   width: auto;
   cursor: pointer;
   border-radius: 6px 6px 0 0;
@@ -80,8 +80,11 @@ div.single-filters {
     color: var(--colors-blue-vivid-60, #005ea2);
     background: var(--colors-cyan-cool-10, #eff9fa);
   }
-
-  &:focus {
+  // TODO - focus styles have to be heavy handed to override the project's global styles
+  &:focus:not(:focus-visible) {
+    outline: none !important;
+  }
+  &[tabindex]:focus-visible {
     outline: 2px dashed var(--colors-blue-vivid-60, #005ea2) !important;
     outline-offset: 3px;
   }
