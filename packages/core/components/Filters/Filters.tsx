@@ -465,7 +465,9 @@ const Filters = (props: FilterProps) => {
               </label>
             )}
             {filterStyle === 'tab' && !mobileFilterStyle && Tabs}
-            {filterStyle === 'tab simple' && !mobileFilterStyle && Tabs}
+            {filterStyle === 'tab simple' && !mobileFilterStyle && (
+              <div className='tab-simple-container d-flex w-100'>{Tabs}</div>
+            )}
             {filterStyle === 'pill' && !mobileFilterStyle && Pills}
             {filterStyle === 'tab bar' && !mobileFilterStyle && <TabBar filter={singleFilter} index={outerIndex} />}
             {filterStyle === 'multi-select' && (

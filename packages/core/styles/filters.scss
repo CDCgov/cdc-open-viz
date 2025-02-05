@@ -63,36 +63,40 @@ div.single-filters {
   }
 }
 
-.single-filters--tab .tab.tab--simple {
-  font-family: var(--app-font-secondary);
-  font-size: 1rem;
-  font-weight: 300;
+.single-filters--tab .tab-simple-container {
   border-bottom: 1px solid var(--cool-gray-10);
-  padding: 0.5rem 1rem;
-  width: auto;
-  cursor: pointer;
-  border-radius: 6px 6px 0 0;
-  @include breakpoint(xs) {
-    font-size: 0.778em;
-  }
 
-  &:hover {
-    color: var(--colors-blue-vivid-60, #005ea2);
-    background: var(--colors-cyan-cool-10, #eff9fa);
-  }
-  // TODO - focus styles have to be heavy handed to override the project's global styles
-  &:focus:not(:focus-visible) {
-    outline: none !important;
-  }
-  &[tabindex]:focus-visible {
-    outline: 2px dashed var(--colors-blue-vivid-60, #005ea2) !important;
-    outline-offset: 3px;
-  }
+  .tab.tab--simple {
+    font-family: var(--app-font-secondary);
+    font-size: 1rem;
+    font-weight: 300;
+    padding: 0.5rem 1rem;
+    width: auto;
+    cursor: pointer;
+    border-radius: 6px 6px 0 0;
 
-  &.tab--active {
-    font-weight: 500;
-    border-bottom: 0.3rem solid var(--colors-blue-vivid-60, #005ea2);
-    z-index: 1;
+    @include breakpoint(xs) {
+      font-size: 0.778em;
+    }
+
+    &:hover {
+      color: var(--colors-blue-vivid-60, #005ea2);
+      background: var(--colors-cyan-cool-10, #eff9fa);
+    }
+    // TODO - focus styles have to be heavy handed to override the project's global styles
+    &:focus:not(:focus-visible) {
+      outline: none !important;
+    }
+    &[tabindex]:focus-visible {
+      outline: 2px dashed var(--colors-blue-vivid-60, #005ea2) !important;
+      outline-offset: 3px;
+    }
+
+    &.tab--active {
+      font-weight: 500;
+      border-bottom: 0.3rem solid var(--colors-blue-vivid-60, #005ea2);
+      z-index: 1;
+    }
   }
 }
 
