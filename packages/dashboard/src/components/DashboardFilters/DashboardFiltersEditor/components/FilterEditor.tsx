@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { APIFilter } from '../../../../types/APIFilter'
 import { getVizRowColumnLocator } from '../../../../helpers/getVizRowColumnLocator'
-import { TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import { Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { useEffect, useMemo, useState } from 'react'
 import { SharedFilter } from '../../../../types/SharedFilter'
@@ -437,16 +437,13 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
                     </select>
                   </label>
 
-                  <label>
-                    <span className='edit-label column-heading'>Filter Order: </span>
-                    <select value={filter.order || 'column'} onChange={e => updateFilterProp('order', e.target.value)}>
-                      {filterOrderOptions.map(f => (
-                        <option value={f.value} key={`filter-style-select-item-${f.value}`}>
-                          {f.label}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                  <Select
+                    value={filter.order || 'column'}
+                    options={filterOrderOptions}
+                    updateField={(_section, _subSection, _key, value) => updateFilterProp('order', value)}
+                    label={'Filter Order'}
+                  />
+
                   {/* if custom order is set use react-dnd library to sort the values */}
                   {filter.order === 'cust' && (
                     <FilterOrder
