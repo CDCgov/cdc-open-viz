@@ -131,7 +131,7 @@ const loadDataFromConfig = async (response: any) => {
   }
 
   const ext = getFileExtension(response.dataUrl)
-  const urlWithCacheBuster = `${response.dataUrl}?v=${cacheBustingString()}`
+  const urlWithCacheBuster = `${response.dataUrl}`
 
   try {
     return await fetchAndParseData(urlWithCacheBuster, ext)
