@@ -1,17 +1,17 @@
 {
+  "annotations": [],
   "general": {
     "title": "Example Data Map with Cities",
     "subtext": "*: Lorem ipsum; NA: Lorem ipsum.",
-    "type": "data",
+    "type": "navigation",
     "geoType": "us",
     "headerColor": "theme-cyan",
-    "showSidebar": true,
+    "showSidebar": false,
     "showTitle": true,
     "showDownloadButton": true,
     "expandDataTable": false,
     "backgroundColor": "#f5f5f5",
     "geoBorderColor": "darkGray",
-    "territoriesLabel": "Territories",
     "language": "en",
     "hasRegions": false,
     "showDownloadMediaButton": false,
@@ -32,7 +32,10 @@
     "showDownloadPdfButton": false,
     "territoriesAlwaysShow": false,
     "geoLabelOverride": "",
-    "convertFipsCodes": true
+    "convertFipsCodes": true,
+    "navigationTarget": "_self",
+    "noStateFoundMessage": "Map Unavailable",
+    "annotationDropdownText": "Annotations"
   },
   "type": "map",
   "color": "yelloworangered",
@@ -49,11 +52,12 @@
       "name": "Rate",
       "prefix": "",
       "suffix": "",
-      "tooltip": false
+      "tooltip": false,
+      "roundToPlace": 0
     },
     "navigate": {
       "dataTable": false,
-      "name": "",
+      "name": "URL",
       "tooltip": false
     },
     "additionalColumn1": {
@@ -99,7 +103,12 @@
     "descriptions": {},
     "singleRow": false,
     "showSpecialClassesLast": false,
-    "verticalSorted": false
+    "verticalSorted": false,
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "singleColumnLegend": false,
+    "hideBorder": false
   },
   "filters": [],
   "table": {
@@ -114,7 +123,8 @@
     "showFullGeoNameInCSV": false,
     "forceDisplay": true,
     "download": true,
-    "indexLabel": ""
+    "indexLabel": "",
+    "showDownloadLinkBelow": true
   },
   "tooltips": {
     "appearanceType": "hover",
@@ -165,6 +175,7 @@
     ]
   },
   "filterBehavior": "Filter Change",
+  "filterIntro": "",
   "dataTable": {
     "title": "Data Table",
     "forceDisplay": true
@@ -844,5 +855,8 @@
     }
   ],
   "filterStyle": "Filter Changes",
-  "version": "4.24.11"
+  "version": "4.25.1",
+  "migrations": {
+    "addColorMigration": true
+  }
 }

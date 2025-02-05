@@ -1,7 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react'
 import ConfigContext from '../context'
 
-const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoName, mapTabbingID }) => {
+const NavigationMenu = ({
+  data,
+  navigationHandler,
+  options,
+  columns,
+  displayGeoName,
+  mapTabbingID,
+  customNavigationHandler
+}) => {
   const { state } = useContext(ConfigContext)
   const [activeGeo, setActiveGeo] = useState('')
   const [dropdownItems, setDropdownItems] = useState({})
@@ -10,8 +18,7 @@ const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoN
     event.preventDefault()
     if (activeGeo !== '') {
       const urlString = data[dropdownItems[activeGeo]][columns.navigate.name]
-
-      navigationHandler(state.general.navigationTarget, urlString)
+      navigationHandler(urlString)
     }
   }
 
