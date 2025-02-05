@@ -18,10 +18,11 @@ import { FILTER_STYLE } from '../../../../types/FilterStyles'
 type FilterEditorProps = {
   config: DashboardConfig
   filter: SharedFilter
+  filterIndex: number
   updateFilterProp: (name: keyof SharedFilter, value: any) => void
 }
 
-const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilterProp }) => {
+const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config, updateFilterProp }) => {
   const [columns, setColumns] = useState<string[]>([])
   const transform = new DataTransform()
   const filterStyles = Object.values(FILTER_STYLE)
@@ -94,21 +95,6 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
     loadColumnData()
   }, [config.datasets])
 
-  const addFilterUsedBy = (filter, value) => {
-    if (value === '') return
-    if (!filter.usedBy) filter.usedBy = []
-    filter.usedBy.push(value)
-    updateFilterProp('usedBy', filter.usedBy)
-  }
-
-  const removeFilterUsedBy = (filter, value) => {
-    let usedByIndex = filter.usedBy.indexOf(value)
-    if (usedByIndex !== -1) {
-      filter.usedBy.splice(usedByIndex, 1)
-      updateFilterProp('usedBy', filter.usedBy)
-    }
-  }
-
   const updateAPIFilter = (key: keyof APIFilter, value: string | boolean) => {
     const filterClone = _.cloneDeep(filter)
     const _filter = filterClone.apiFilter || { apiEndpoint: '', valueSelector: '', textSelector: '' }
@@ -118,6 +104,14 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
 
   const handleFilterStyleChange = value => {
     updateFilterProp('filterStyle', value)
+  }
+
+  const updateLabel = (value: string) => {
+    const duplicateLabels = config.dashboard.sharedFilters.filter(
+      (filter, i) => filter.key === value && filterIndex !== i
+    )
+    // If there are duplicate labels, append the number of duplicates to the label similar functionality to duplicate file names
+    updateFilterProp('key', duplicateLabels.length ? value + ` (${duplicateLabels.length})` : value)
   }
 
   const isNestedDropDown = filter.filterStyle === FILTER_STYLE.nestedDropdown
@@ -240,7 +234,9 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
           <TextField
             label='Label'
             value={filter.key}
-            updateField={(_section, _subSection, _key, value) => updateFilterProp('key', value)}
+            updateField={(_section, _subSection, _key, value) => {
+              updateLabel(value)
+            }}
           />
           {filter.filterStyle === FILTER_STYLE.multiSelect && (
             <TextField
