@@ -4,20 +4,20 @@ import { MultiDashboardConfig } from '../types/MultiDashboard'
 import DashboardActions from './dashboard.actions'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 import { Tab } from '../types/Tab'
-import { DashboardConfig } from '../types/DashboardConfig'
+import { Dashboard } from '../types/Dashboard'
 import { ConfigRow } from '../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { initialState } from '../DashboardContext'
 
 type BlankMultiConfig = {
-  dashboard: Partial<DashboardConfig>
+  dashboard: Partial<Dashboard>
   rows: Partial<ConfigRow>[]
   visualizations: Record<string, Object>
   table: Object
 }
 
 const createBlankDashboard: () => BlankMultiConfig = () => ({
-  dashboard: {},
+  dashboard: { sharedFilters: [] },
   rows: [{ columns: [{ width: 12 }] }],
   visualizations: {},
   table: {
