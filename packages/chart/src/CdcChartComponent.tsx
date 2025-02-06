@@ -383,10 +383,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
       if (config.dataDescription && data) {
         processedData = transform.autoStandardize(data)
 
-        processedData = transform.developerStandardize(data, config.dataDescription)
+        processedData = transform.developerStandardize(processedData, config.dataDescription)
       }
 
-      processedData = handleRankByValue(data, config)
+      processedData = handleRankByValue(processedData, config)
     } catch (error) {
       console.error('Error processing data:', error)
       throw new Error(`Failed to prepare data due to an error: ${error.message}`)
