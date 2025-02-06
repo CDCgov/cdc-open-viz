@@ -6,11 +6,18 @@ import { getFormattedData } from './getFormattedData'
 import { getVizKeys } from './getVizKeys'
 
 export const getApplicableFilters = (dashboard: Dashboard, key: string | number): false | SharedFilter[] => {
-  const c = dashboard.sharedFilters?.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(`${key}`) !== -1)
+  const c = dashboard.sharedFilters?.filter(
+    sharedFilter =>
+      (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(`${key}`) !== -1) || sharedFilter.usedBy.indexOf(key) !== -1
+  )
   return c?.length > 0 ? c : false
 }
 
-export const getFilteredData = (state: DashboardState, initialFilteredData?: Record<string, any>, dataOverride?: Object) => {
+export const getFilteredData = (
+  state: DashboardState,
+  initialFilteredData?: Record<string, any>,
+  dataOverride?: Object
+) => {
   const newFilteredData = initialFilteredData || {}
   const { config } = state
   getVizKeys(config).forEach(key => {
@@ -18,7 +25,8 @@ export const getFilteredData = (state: DashboardState, initialFilteredData?: Rec
     if (applicableFilters) {
       const { dataKey, data, dataDescription } = config.visualizations[key]
       const _data = (dataOverride || state.data)[dataKey] || data
-      const formattedData = dataOverride?.[dataKey] || (dataDescription ? getFormattedData(_data, dataDescription) : _data)
+      const formattedData =
+        dataOverride?.[dataKey] || (dataDescription ? getFormattedData(_data, dataDescription) : _data)
 
       newFilteredData[key] = filterData(applicableFilters, formattedData)
     }
@@ -29,7 +37,8 @@ export const getFilteredData = (state: DashboardState, initialFilteredData?: Rec
       const { dataKey, data, dataDescription } = row
       const _data = (dataOverride || state.data)[dataKey] || data
       if (applicableFilters) {
-        const formattedData = dataOverride?.[dataKey] ?? dataDescription ? getFormattedData(_data, dataDescription) : _data
+        const formattedData =
+          dataOverride?.[dataKey] ?? dataDescription ? getFormattedData(_data, dataDescription) : _data
 
         newFilteredData[index] = filterData(applicableFilters, formattedData)
       } else {
