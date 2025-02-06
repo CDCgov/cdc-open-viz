@@ -83,20 +83,21 @@ const LineChart = (props: LineChartProps) => {
             : data
           const _seriesKey = seriesData.dynamicCategory ? seriesData.originalDataKey : seriesKey
           const circleData = filterCircles(config?.preliminaryData, tableD, _seriesKey)
+
           return (
             <Group
               key={`series-${seriesKey}-${index}`}
               opacity={
                 legend.behavior === 'highlight' &&
                 seriesHighlight.length > 0 &&
-                seriesHighlight.indexOf(_seriesKey) === -1
+                seriesHighlight.indexOf(seriesKey) === -1
                   ? 0.5
                   : 1
               }
               display={
                 legend.behavior === 'highlight' ||
                 (seriesHighlight.length === 0 && !legend.dynamicLegend) ||
-                seriesHighlight.indexOf(_seriesKey) !== -1
+                seriesHighlight.indexOf(seriesKey) !== -1
                   ? 'block'
                   : 'none'
               }

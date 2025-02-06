@@ -63,7 +63,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     seriesIndex
   } = props
   const { lineDatapointStyle, visual } = config
-  const filtered = config?.runtime?.series.filter(s => s.dataKey === seriesKey)?.[0]
+  const filtered = config?.series.filter(s => s.dataKey === seriesKey)?.[0]
   const Shape =
     Glyphs[
       config.visual.lineDatapointSymbol === 'standard' && seriesIndex < visual.maximumShapeAmount ? seriesIndex : 0
@@ -80,11 +80,12 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     seriesKey: string
   ) => {
     const seriesLabels = config.runtime.seriesLabels || []
-    let color = displayArea ? colorScale(seriesLabels[hoveredKey] || seriesKey) : ' transparent'
-
+    const seriesLabelsAll = config.runtime.seriesLabelsAll || []
+    let color = displayArea ? colorScale(seriesLabels[hoveredKey] || seriesLabelsAll[seriesIndex]) : ' transparent'
     if (config.lineDatapointColor === 'Lighter than Line' && color !== 'transparent' && color) {
       color = chroma(color).brighten(1)
     }
+    console.log(seriesLabels, 'seriesKey', seriesLabelsAll)
     return color
   }
   const getXPos = hoveredXValue => {
@@ -113,7 +114,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
           <Shape
             opacity={d[seriesKey] ? 1 : 0}
             fillOpacity={1}
-            fill={getColor(displayArea, colorScale, config, seriesKey, seriesKey)}
+            fill={getColor(displayArea, colorScale, config, null, seriesKey)}
             style={{ filter: 'unset', opacity: 1 }}
           />
         </g>
@@ -130,43 +131,45 @@ const LineChartCircle = (props: LineChartCircleProps) => {
       if (!hoveredXValue) return
 
       let hoveredSeriesValue
-      let hoveredSeriesIndex
       let hoveredSeriesData = tooltipData.data.filter(d => d[0] === seriesKey)
       let hoveredSeriesKey = hoveredSeriesData?.[0]?.[0]
       let hoveredSeriesAxis = hoveredSeriesData?.[0]?.[2]
+      const originalDataKey = config.runtime.series[0]['originalDataKey'] ?? ''
+
       if (!hoveredSeriesKey) return
-      hoveredSeriesIndex = tooltipData?.data.indexOf(hoveredSeriesKey)
       hoveredSeriesValue = tableData?.find(d => {
         return d[config?.xAxis.dataKey] === hoveredXValue
-      })?.[seriesKey]
+      })[originalDataKey]
 
       //    hoveredSeriesValue = extractNumber(hoveredSeriesValue)
-      return tooltipData?.data.map((tooltipItem, index) => {
-        if (isNaN(hoveredSeriesValue)) return <></>
-        const isMatch = circleData?.some(cd => cd[config.xAxis.dataKey] === hoveredXValue)
+      if (isNaN(hoveredSeriesValue)) return <></>
+      const isMatch = circleData?.some(cd => cd[config.xAxis.dataKey] === hoveredXValue)
+      if (
+        isMatch ||
+        !hoveredSeriesValue ||
+        (visual.maximumShapeAmount === seriesIndex && visual.lineDatapointSymbol === 'standard')
+      ) {
+        return <></>
+      }
 
-        if (
-          isMatch ||
-          !hoveredSeriesValue ||
-          (visual.maximumShapeAmount === seriesIndex && visual.lineDatapointSymbol === 'standard')
-        ) {
-          return <></>
-        }
+      const positionTop = hoveredSeriesAxis === 'right' ? yScaleRight(hoveredSeriesValue) : yScale(hoveredSeriesValue)
+      const positionLeft = getXPos(hoveredXValue)
 
-        const positionTop = hoveredSeriesAxis === 'right' ? yScaleRight(hoveredSeriesValue) : yScale(hoveredSeriesValue)
-        const positionLeft = getXPos(hoveredXValue)
-        return (
-          <g transform={transformShape(positionTop, positionLeft)}>
-            <Shape
-              size={55}
-              opacity={1}
-              fillOpacity={1}
-              fill={getColor(displayArea, colorScale, config, hoveredSeriesKey, seriesKey)}
-              style={{ filter: 'unset', opacity: 1 }}
-            />
-          </g>
-        )
-      })
+      //  const positionTop =
+      //    filtered?.axis === 'Right' ? yScaleRight(d[filtered?.dataKey]) : yScale(d[filtered?.dataKey])
+      //  const positionLeft = getXPos(d[config.xAxis?.dataKey])
+      //  const color = colorScale(config.runtime.seriesLabelsAll[seriesIndex])
+      return (
+        <g transform={transformShape(positionTop, positionLeft)}>
+          <Shape
+            size={55}
+            opacity={1}
+            fillOpacity={1}
+            fill={getColor(displayArea, colorScale, config, hoveredSeriesKey, seriesKey)}
+            style={{ filter: 'unset', opacity: 1 }}
+          />
+        </g>
+      )
     }
   }
   if (mode === 'ISOLATED_POINTS') {
@@ -190,10 +193,10 @@ const LineChartCircle = (props: LineChartCircleProps) => {
       return isFirstPoint || isLastPoint || isMiddlePoint
     }
 
-    if (drawIsolatedPoints(dataIndex, seriesKey) && !config.series.some(s => s.dynamicCategory)) {
+    if (drawIsolatedPoints(dataIndex, seriesKey)) {
       const positionTop = filtered?.axis === 'Right' ? yScaleRight(d[filtered?.dataKey]) : yScale(d[filtered?.dataKey])
       const positionLeft = getXPos(d[config.xAxis?.dataKey])
-      const color = colorScale(config.runtime.seriesLabels[seriesKey])
+      const color = colorScale(config.runtime.seriesLabelsAll[seriesIndex])
 
       return (
         <g transform={transformShape(positionTop, positionLeft)}>

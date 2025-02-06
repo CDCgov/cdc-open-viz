@@ -1,10 +1,18 @@
 {
+  "annotations": [],
   "type": "chart",
-  "title": "Combo Bar-Line Chart",
-  "theme": "theme-indigo",
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "title": "",
+  "showTitle": true,
+  "showDownloadMediaButton": false,
+  "theme": "theme-blue",
   "animate": false,
   "fontSize": "medium",
-  "lineDatapointStyle": "always show",
+  "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
   "barHasBorder": "false",
   "isLollipopChart": false,
   "lollipopShape": "circle",
@@ -13,25 +21,35 @@
   "barStyle": "flat",
   "roundingStyle": "standard",
   "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "annotationDropdownText": "Annotations",
+    "showDownloadButton": false,
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true
+  },
   "padding": {
     "left": 5,
     "right": 5
   },
+  "preliminaryData": [],
   "yAxis": {
     "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "68",
-    "gridLines": true,
+    "size": 50,
+    "gridLines": false,
     "enablePadding": false,
     "min": "",
     "max": "",
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
-    "rightHideAxis": true,
-    "rightAxisSize": 50,
+    "rightHideAxis": false,
+    "rightAxisSize": 0,
     "rightLabel": "",
     "rightLabelOffsetSize": 0,
     "rightAxisLabelColor": "#333",
@@ -44,286 +62,8 @@
     "anchors": [],
     "shoMissingDataLabel": true,
     "showMissingDataLine": true,
-    "categories": [],
-    "isLegendValue": false,
-    "label": "Y-Axis Label Example"
+    "categories": []
   },
-  "topAxis": {
-    "hasLine": false
-  },
-  "barThickness": "0.5",
-  "barHeight": 25,
-  "height": "332",
-  "xAxis": {
-    "sortDates": false,
-    "anchors": [],
-    "type": "date",
-    "showTargetLabel": true,
-    "targetLabel": "Target",
-    "hideAxis": false,
-    "hideLabel": false,
-    "hideTicks": false,
-    "size": "78",
-    "tickRotation": "25",
-    "min": "",
-    "max": "",
-    "labelColor": "#333",
-    "tickLabelColor": "#333",
-    "tickColor": "#333",
-    "numTicks": "",
-    "labelOffset": 0,
-    "axisPadding": 200,
-    "target": 0,
-    "maxTickRotation": 0,
-    "padding": 5,
-    "showYearsOnce": false,
-    "sortByRecentDate": false,
-    "isLegendValue": false,
-    "dataKey": "Date",
-    "label": "X-Axis Example Label",
-    "dateParseFormat": "%d/%m/%Y",
-    "dateDisplayFormat": "%d/%m/%Y",
-    "axisBBox": 96.9543685913086,
-    "tickWidthMax": 86
-  },
-  "table": {
-    "label": "Data Table",
-    "expanded": true,
-    "limitHeight": false,
-    "height": "",
-    "caption": "",
-    "showDownloadUrl": false,
-    "showDataTableLink": true,
-    "showDownloadLinkBelow": true,
-    "indexLabel": "",
-    "download": true,
-    "showVertical": true,
-    "dateDisplayFormat": "",
-    "showMissingDataLabel": true,
-    "showSuppressedSymbol": true,
-    "show": true
-  },
-
-  "orientation": "vertical",
-  "legend": {
-    "hide": false,
-    "behavior": "highlight",
-    "axisAlign": true,
-    "singleRow": false,
-    "colorCode": "",
-    "reverseLabelOrder": false,
-    "description": "",
-    "dynamicLegend": false,
-    "dynamicLegendDefaultText": "Show All",
-    "dynamicLegendItemLimit": 5,
-    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
-    "dynamicLegendChartMessage": "Select Options from the Legend",
-    "label": "Data Type",
-    "lineMode": false,
-    "verticalSorted": false,
-    "highlightOnHover": false,
-    "hideSuppressedLabels": false,
-    "hideSuppressionLink": false,
-    "seriesHighlight": [],
-    "style": "lines",
-    "subStyle": "linear blocks",
-    "shape": "circle",
-    "tickRotation": "",
-    "hideBorder": {
-      "side": false,
-      "topBottom": true
-    },
-    "position": "right",
-    "hasShape": true
-  },
-  "exclusions": {
-    "active": false,
-    "keys": []
-  },
-  "palette": "qualitative4",
-  "isPaletteReversed": false,
-  "labels": false,
-  "dataFormat": {
-    "commas": false,
-    "prefix": "",
-    "suffix": "",
-    "abbreviated": false,
-    "bottomSuffix": "",
-    "bottomPrefix": "",
-    "bottomAbbreviated": false
-  },
-  "confidenceKeys": {},
-  "visual": {
-    "border": true,
-    "accent": true,
-    "background": true,
-    "verticalHoverLine": false,
-    "horizontalHoverLine": false,
-    "lineDatapointSymbol": "standard"
-  },
-  "data": [
-    {
-      "Date": "1/15/2016",
-      "Data 1": "N/A",
-      "Data 2": "110",
-      "Data 3": "100",
-      "Data 4": "90",
-      "Data 5": "00",
-      "Data 6": "190",
-      "Data 7": "00",
-      "Data 8": "40",
-      "Monthly-Goal": "100"
-    },
-    {
-      "Date": "2/15/2016",
-      "Data 1": "100",
-      "Data 2": "goop",
-      "Data 3": "100",
-      "Data 4": "100",
-      "Data 5": "10",
-      "Data 6": "590",
-      "Data 7": "44",
-      "Data 8": "10",
-      "Monthly-Goal": "100"
-    },
-    {
-      "Date": "3/15/2016",
-      "Data 1": "",
-      "Data 2": "90",
-      "Data 3": "100.5",
-      "Data 4": "120",
-      "Data 5": "50",
-      "Data 6": "66",
-      "Data 7": "12",
-      "Data 8": "123",
-      "Monthly-Goal": "110"
-    },
-    {
-      "Date": "4/15/2016",
-      "Data 1": "80",
-      "Data 2": "2,00",
-      "Data 3": "110",
-      "Data 4": "120",
-      "Data 5": "50",
-      "Data 6": "190",
-      "Data 7": "99",
-      "Data 8": "33",
-      "Monthly-Goal": "110"
-    },
-    {
-      "Date": "5/15/2016",
-      "Data 1": "70",
-      "Data 2": "90",
-      "Data 3": "110",
-      "Data 4": "130",
-      "Data 5": "12",
-      "Data 6": "90",
-      "Data 7": "60",
-      "Data 8": "30",
-      "Monthly-Goal": "120"
-    },
-    {
-      "Date": "6/15/2016",
-      "Data 1": "100",
-      "Data 2": "120",
-      "Data 3": "120",
-      "Data 4": "130",
-      "Data 5": "90",
-      "Data 6": "190",
-      "Data 7": "30",
-      "Data 8": "10",
-      "Monthly-Goal": "120"
-    },
-    {
-      "Date": "7/15/2016",
-      "Data 1": "zip",
-      "Data 2": null,
-      "Data 3": "120",
-      "Data 4": "130",
-      "Data 5": "90",
-      "Data 6": "90",
-      "Data 7": "20",
-      "Data 8": "40",
-      "Monthly-Goal": "130"
-    },
-    {
-      "Date": "8/15/2016",
-      "Data 1": "110",
-      "Data 2": "130",
-      "Data 3": "120",
-      "Data 4": "140",
-      "Data 5": "80",
-      "Data 6": "10",
-      "Data 7": "11",
-      "Data 8": "4",
-      "Monthly-Goal": "130"
-    },
-    {
-      "Date": "9/15/2016",
-      "Data 1": "120",
-      "Data 2": "130",
-      "Data 3": "120",
-      "Data 4": "150",
-      "Data 5": "70",
-      "Data 6": "10",
-      "Data 7": "00",
-      "Data 8": "40",
-      "Monthly-Goal": "140"
-    }
-  ],
-  "visualizationType": "Line",
-  "series": [
-    {
-      "dataKey": "Data 3",
-      "type": "Line",
-      "axis": "Left",
-      "tooltip": true
-    },
-    {
-      "dataKey": "Data 4",
-      "type": "Line",
-      "axis": "Left",
-      "tooltip": true
-    }
-  ],
-  "description": "Note: There is an option to make the line dotted as demonstrated above",
-  "annotations": [],
-  "debugSvg": false,
-  "chartMessage": {
-    "noData": "No Data Available"
-  },
-  "showTitle": true,
-  "showDownloadMediaButton": false,
-  "lineDatapointColor": "Same as Line",
-  "isResponsiveTicks": false,
-  "general": {
-    "annotationDropdownText": "Annotations",
-    "showDownloadButton": false,
-    "showMissingDataLabel": true,
-    "showSuppressedSymbol": true,
-    "showZeroValueData": true,
-    "hideNullValue": true
-  },
-  "preliminaryData": [
-    {
-      "type": "effect",
-      "seriesKey": "Data 4",
-      "label": "Suppressed",
-      "column": "Data 3",
-      "value": "120",
-      "style": "Open Circles",
-      "displayTooltip": true,
-      "displayLegend": true,
-      "displayTable": true,
-      "symbol": "",
-      "iconCode": "",
-      "lineCode": "◯",
-      "hideBarSymbol": false,
-      "hideLineStyle": false,
-      "circleSize": "7",
-      "displayGray": true
-    }
-  ],
   "boxplot": {
     "plots": [],
     "borders": "true",
@@ -347,26 +87,137 @@
       "upperBounds": "Upper Bounds"
     }
   },
+  "topAxis": {
+    "hasLine": false
+  },
   "isLegendValue": false,
+  "barThickness": 0.35,
+  "barHeight": 25,
   "barSpace": 15,
   "heights": {
     "vertical": 300,
     "horizontal": 750
   },
+  "xAxis": {
+    "sortDates": false,
+    "anchors": [],
+    "type": "categorical",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 75,
+    "tickRotation": 0,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "labelOffset": 0,
+    "axisPadding": 200,
+    "target": 0,
+    "maxTickRotation": 0,
+    "padding": 5,
+    "showYearsOnce": false,
+    "sortByRecentDate": false,
+    "dataKey": "Date",
+    "tickWidthMax": 81
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "indexLabel": "",
+    "download": true,
+    "showVertical": true,
+    "dateDisplayFormat": "",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "show": true
+  },
+  "orientation": "vertical",
   "color": "pinkpurple",
   "columns": {},
+  "legend": {
+    "hide": false,
+    "behavior": "isolate",
+    "axisAlign": true,
+    "singleRow": true,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "hideSuppressedLabels": false,
+    "hideSuppressionLink": false,
+    "seriesHighlight": [],
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    },
+    "position": "right"
+  },
   "brush": {
     "height": 45,
     "active": false
   },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "qualitative-bold",
+  "isPaletteReversed": false,
   "twoColor": {
     "palette": "monochrome-1",
     "isPaletteReversed": false
   },
-  "filters": [],
+  "labels": false,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false
+  },
   "useLogScale": false,
   "filterBehavior": "Filter Change",
   "highlightedBarValues": [],
+  "series": [
+    {
+      "dataKey": "Percent Vaccinated",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true,
+      "dynamicCategory": "Public Health Jurisdiction"
+    }
+  ],
   "tooltips": {
     "opacity": 90,
     "singleSeries": false,
@@ -461,9 +312,4371 @@
     },
     "data": []
   },
-  "version": "4.25.1",
-  "migrations": {
-    "addColorMigration": true
+  "visualizationType": "Line",
+  "data": [
+    {
+      "FIPS Codes": "02013",
+      "Date": "1/1/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02016",
+      "Date": "1/2/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "89.74",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02020",
+      "Date": "1/3/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "NA",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "02050",
+      "Date": "1/4/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "85.38",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02060",
+      "Date": "1/5/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02068",
+      "Date": "1/6/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "50.41",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "02070",
+      "Date": "1/7/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "65.34",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "02090",
+      "Date": "1/8/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "53.3",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "02100",
+      "Date": "1/9/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "47.03",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "02105",
+      "Date": "1/10/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "88.32",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02110",
+      "Date": "1/11/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "NA",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02122",
+      "Date": "1/12/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "31.23",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "02130",
+      "Date": "1/13/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "63.86",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "02150",
+      "Date": "1/14/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "69.59",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "02158",
+      "Date": "1/15/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "98.33",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02164",
+      "Date": "1/16/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "65.73",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "02170",
+      "Date": "1/17/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "32.13",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "02180",
+      "Date": "1/18/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "88.57",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02185",
+      "Date": "1/19/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "NA",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "02188",
+      "Date": "1/20/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "75.06",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02195",
+      "Date": "1/21/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "74.48",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02198",
+      "Date": "1/22/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "57.75",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "02220",
+      "Date": "1/23/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "75.12",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02230",
+      "Date": "1/24/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02240",
+      "Date": "1/25/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "23.94",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "02261",
+      "Date": "1/26/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "40.92",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "02275",
+      "Date": "1/27/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "NA",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "02282",
+      "Date": "1/28/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "96.67",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02290",
+      "Date": "1/29/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "86.47",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "01001",
+      "Date": "1/1/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "34.13",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01003",
+      "Date": "1/2/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "37.55",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01005",
+      "Date": "1/3/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "32.78",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01007",
+      "Date": "1/4/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "24.83",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01009",
+      "Date": "1/5/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "*",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "01011",
+      "Date": "1/6/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "50.59",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "01013",
+      "Date": "1/7/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "28.25",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01015",
+      "Date": "1/8/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "33.01",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01017",
+      "Date": "1/9/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "20.28",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01019",
+      "Date": "1/10/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "14.04",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "01021",
+      "Date": "1/11/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "25.24",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01023",
+      "Date": "1/12/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "39.57",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01025",
+      "Date": "1/13/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "*",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01027",
+      "Date": "1/14/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "23.85",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01029",
+      "Date": "1/15/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "14.83",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "01031",
+      "Date": "1/16/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "26.38",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01033",
+      "Date": "1/17/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "37.04",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01035",
+      "Date": "1/18/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "31.94",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01037",
+      "Date": "1/19/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "23.87",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01039",
+      "Date": "1/20/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "21.4",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01041",
+      "Date": "1/21/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "19.49",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "01043",
+      "Date": "1/22/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "20.77",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01045",
+      "Date": "1/23/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "*",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01047",
+      "Date": "1/24/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "35.95",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01049",
+      "Date": "1/25/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "20.97",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01051",
+      "Date": "1/26/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "31.41",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01053",
+      "Date": "1/27/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "20.24",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01055",
+      "Date": "1/28/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "27.95",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01057",
+      "Date": "1/29/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "20.02",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01059",
+      "Date": "1/30/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "28.59",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01061",
+      "Date": "1/31/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "14.87",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "01063",
+      "Date": "2/1/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "44.05",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "01065",
+      "Date": "2/2/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "58.53",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "01067",
+      "Date": "2/3/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "22.4",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01069",
+      "Date": "2/4/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "27.27",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01071",
+      "Date": "2/5/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "27.12",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01073",
+      "Date": "2/6/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "55.79",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "01075",
+      "Date": "2/7/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "16.74",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "01077",
+      "Date": "2/8/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "30.71",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01079",
+      "Date": "2/9/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "23.08",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01081",
+      "Date": "2/10/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "32.87",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01083",
+      "Date": "2/11/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "21.03",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01085",
+      "Date": "2/12/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "48.36",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "01087",
+      "Date": "2/13/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "50.19",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "01089",
+      "Date": "2/14/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "57.67",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "01091",
+      "Date": "2/15/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "47.2",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "01093",
+      "Date": "2/16/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "17.5",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "01095",
+      "Date": "2/17/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "31.06",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01097",
+      "Date": "2/18/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "39.18",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01099",
+      "Date": "2/19/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "31.45",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01101",
+      "Date": "2/20/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "50.54",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "01103",
+      "Date": "2/21/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "26.11",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01105",
+      "Date": "2/22/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "43.88",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "01107",
+      "Date": "2/23/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "36.8",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01109",
+      "Date": "2/24/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "39.77",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01111",
+      "Date": "2/25/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "12.65",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "01113",
+      "Date": "2/26/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "36.78",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01117",
+      "Date": "2/27/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "34.86",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01115",
+      "Date": "2/28/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "25.68",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01119",
+      "Date": "3/1/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "58.55",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "01121",
+      "Date": "3/2/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "24.3",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01123",
+      "Date": "3/3/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "23.69",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01125",
+      "Date": "3/4/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "39.99",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01127",
+      "Date": "3/5/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "28.51",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01129",
+      "Date": "3/6/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "24.47",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01131",
+      "Date": "3/7/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "51.67",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "01133",
+      "Date": "3/8/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "8.29",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "05001",
+      "Date": "1/1/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "55.55",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05003",
+      "Date": "1/2/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "40.57",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05005",
+      "Date": "1/3/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "32.08",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05007",
+      "Date": "1/4/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "57.67",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05009",
+      "Date": "1/5/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "28.04",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05011",
+      "Date": "1/6/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "54.5",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05013",
+      "Date": "1/7/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "30.18",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05015",
+      "Date": "1/8/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "36.62",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05017",
+      "Date": "1/9/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "51.86",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05019",
+      "Date": "1/10/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "57.84",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05021",
+      "Date": "1/11/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "35.06",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05023",
+      "Date": "1/12/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "28.57",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05025",
+      "Date": "1/13/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "44.1",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05027",
+      "Date": "1/14/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "51.25",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05029",
+      "Date": "1/15/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "51.04",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05031",
+      "Date": "1/16/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "44.69",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05033",
+      "Date": "1/17/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "39.84",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05035",
+      "Date": "1/18/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "42.57",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05037",
+      "Date": "1/19/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "44.26",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05039",
+      "Date": "1/20/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "62.9",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "05041",
+      "Date": "1/21/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "53.16",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05043",
+      "Date": "1/22/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "49.58",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05045",
+      "Date": "1/23/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "50.18",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05047",
+      "Date": "1/24/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "40.72",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05049",
+      "Date": "1/25/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "26.74",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05051",
+      "Date": "1/26/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "45.09",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05053",
+      "Date": "1/27/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "36.88",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05055",
+      "Date": "1/28/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "37.32",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05057",
+      "Date": "1/29/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "29.71",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05059",
+      "Date": "1/30/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "39.6",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05061",
+      "Date": "1/31/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "37.23",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05063",
+      "Date": "2/1/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "37.18",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05065",
+      "Date": "2/2/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "37.32",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05067",
+      "Date": "2/3/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "33.98",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05069",
+      "Date": "2/4/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "50.85",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05071",
+      "Date": "2/5/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "45.67",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05073",
+      "Date": "2/6/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "25.39",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05075",
+      "Date": "2/7/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "38",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05077",
+      "Date": "2/8/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "25.23",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05079",
+      "Date": "2/9/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "38.65",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05081",
+      "Date": "2/10/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "23.08",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05083",
+      "Date": "2/11/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "38.48",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05085",
+      "Date": "2/12/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "46.96",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05087",
+      "Date": "2/13/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "34.63",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05089",
+      "Date": "2/14/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "17.97",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "05091",
+      "Date": "2/15/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "21.71",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05093",
+      "Date": "2/16/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "32.99",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05095",
+      "Date": "2/17/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "63.26",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "05097",
+      "Date": "2/18/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "21.62",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05099",
+      "Date": "2/19/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "39.97",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05101",
+      "Date": "2/20/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "18.95",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "05103",
+      "Date": "2/21/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "48.36",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05105",
+      "Date": "2/22/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "47.07",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05107",
+      "Date": "2/23/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "44.03",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05109",
+      "Date": "2/24/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "29.4",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05111",
+      "Date": "2/25/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "41.64",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05113",
+      "Date": "2/26/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "23.59",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05115",
+      "Date": "2/27/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "47.51",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05117",
+      "Date": "2/28/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "37.43",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05119",
+      "Date": "3/1/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "64.24",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "05121",
+      "Date": "3/2/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "30.79",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05125",
+      "Date": "3/3/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "58.77",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05127",
+      "Date": "3/4/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "34.7",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05129",
+      "Date": "3/5/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "23.49",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05131",
+      "Date": "3/6/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "51.32",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05133",
+      "Date": "3/7/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "36.78",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05135",
+      "Date": "3/8/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "32.8",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05123",
+      "Date": "3/9/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "31.13",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05137",
+      "Date": "3/10/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "26.39",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05139",
+      "Date": "3/11/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "46.07",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05141",
+      "Date": "3/12/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "24.51",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05143",
+      "Date": "3/13/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "68.75",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "05145",
+      "Date": "3/14/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "38.29",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05147",
+      "Date": "3/15/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "47.16",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05149",
+      "Date": "3/16/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "48.3",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "04001",
+      "Date": "1/1/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "04003",
+      "Date": "1/2/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "74.89",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "04005",
+      "Date": "1/3/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "04007",
+      "Date": "1/4/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "50",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "04009",
+      "Date": "1/5/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "56.24",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "04011",
+      "Date": "1/6/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "29.7",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "04012",
+      "Date": "1/7/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "62.19",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "04013",
+      "Date": "1/8/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "53.84",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "04015",
+      "Date": "1/9/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "21.79",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "04017",
+      "Date": "1/10/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "04019",
+      "Date": "1/11/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "71.56",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "04021",
+      "Date": "1/12/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "46.57",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "04023",
+      "Date": "1/13/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "04025",
+      "Date": "1/14/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "27.9",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "04027",
+      "Date": "1/15/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "84.7",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06001",
+      "Date": "1/1/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "96.69",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06003",
+      "Date": "1/2/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "0",
+      "Vaccination Coverage Group": "No Data"
+    },
+    {
+      "FIPS Codes": "06005",
+      "Date": "1/3/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "52.34",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06007",
+      "Date": "1/4/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "43.08",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "06009",
+      "Date": "1/5/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "46.21",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "06011",
+      "Date": "1/6/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "48.69",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "06013",
+      "Date": "1/7/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "88.29",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06015",
+      "Date": "1/8/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "35.33",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "06017",
+      "Date": "1/9/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "55",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06019",
+      "Date": "1/10/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "59.34",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06021",
+      "Date": "1/11/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "46.92",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "06023",
+      "Date": "1/12/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "67.9",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "06025",
+      "Date": "1/13/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06027",
+      "Date": "1/14/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "0",
+      "Vaccination Coverage Group": "No Data"
+    },
+    {
+      "FIPS Codes": "06029",
+      "Date": "1/15/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "53.02",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06031",
+      "Date": "1/16/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "48.71",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "06033",
+      "Date": "1/17/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "44.78",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "06035",
+      "Date": "1/18/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "21.66",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "06037",
+      "Date": "1/19/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "84.51",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06039",
+      "Date": "1/20/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "54.47",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06041",
+      "Date": "1/21/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06043",
+      "Date": "1/22/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "0",
+      "Vaccination Coverage Group": "No Data"
+    },
+    {
+      "FIPS Codes": "06045",
+      "Date": "1/23/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "60.57",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "06047",
+      "Date": "1/24/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "55.46",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06049",
+      "Date": "1/25/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "0",
+      "Vaccination Coverage Group": "No Data"
+    },
+    {
+      "FIPS Codes": "06051",
+      "Date": "1/26/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "0",
+      "Vaccination Coverage Group": "No Data"
+    },
+    {
+      "FIPS Codes": "06053",
+      "Date": "1/27/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "78.63",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06055",
+      "Date": "1/28/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "85.2",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06057",
+      "Date": "1/29/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "59.26",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06059",
+      "Date": "1/30/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "75.05",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06061",
+      "Date": "1/31/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "60.42",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "06063",
+      "Date": "2/1/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "0",
+      "Vaccination Coverage Group": "No Data"
+    },
+    {
+      "FIPS Codes": "06065",
+      "Date": "2/2/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "56.33",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06067",
+      "Date": "2/3/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "67.5",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "06069",
+      "Date": "2/4/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "69.89",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "06071",
+      "Date": "2/5/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "53.59",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06073",
+      "Date": "2/6/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06075",
+      "Date": "2/7/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06077",
+      "Date": "2/8/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "63.97",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "06079",
+      "Date": "2/9/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "64.59",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "06081",
+      "Date": "2/10/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "96.53",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06083",
+      "Date": "2/11/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "73.94",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06085",
+      "Date": "2/12/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "93.97",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06087",
+      "Date": "2/13/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "94.82",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06089",
+      "Date": "2/14/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "32.94",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "06091",
+      "Date": "2/15/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "0",
+      "Vaccination Coverage Group": "No Data"
+    },
+    {
+      "FIPS Codes": "06093",
+      "Date": "2/16/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "31.4",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "06095",
+      "Date": "2/17/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "72.68",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06097",
+      "Date": "2/18/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "82.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06099",
+      "Date": "2/19/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "61.79",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "06101",
+      "Date": "2/20/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "52.75",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06103",
+      "Date": "2/21/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "28.55",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "06105",
+      "Date": "2/22/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "0",
+      "Vaccination Coverage Group": "No Data"
+    },
+    {
+      "FIPS Codes": "06107",
+      "Date": "2/23/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "48.81",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "06109",
+      "Date": "2/24/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "41.79",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "06111",
+      "Date": "2/25/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "72.48",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06113",
+      "Date": "2/26/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "76.78",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06115",
+      "Date": "2/27/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "43.73",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "08001",
+      "Date": "1/1/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "65.08",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "08003",
+      "Date": "1/2/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "54.84",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "08005",
+      "Date": "1/3/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "67.65",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "08007",
+      "Date": "1/4/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "37.97",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "08009",
+      "Date": "1/5/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "15.77",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08011",
+      "Date": "1/6/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "29.08",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08013",
+      "Date": "1/7/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "80.5",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08014",
+      "Date": "1/8/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "81.91",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08015",
+      "Date": "1/9/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "51.64",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "08019",
+      "Date": "1/10/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "49.8",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "08021",
+      "Date": "1/11/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "43.62",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "08025",
+      "Date": "1/12/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "21.4",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08027",
+      "Date": "1/13/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "19.48",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08029",
+      "Date": "1/14/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "25.45",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08031",
+      "Date": "1/15/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "79.16",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08033",
+      "Date": "1/16/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "15.54",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08035",
+      "Date": "1/17/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "69.32",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "08037",
+      "Date": "1/18/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "86.79",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08041",
+      "Date": "1/19/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "54.31",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "08039",
+      "Date": "1/20/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "24.91",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08043",
+      "Date": "1/21/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "20.99",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08045",
+      "Date": "1/22/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "62.95",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "08047",
+      "Date": "1/23/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "50",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "08049",
+      "Date": "1/24/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "46.08",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "08051",
+      "Date": "1/25/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "68.72",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "08055",
+      "Date": "1/26/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "26.53",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08059",
+      "Date": "1/27/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "75.43",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08061",
+      "Date": "1/28/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "18.18",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08063",
+      "Date": "1/29/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "19.16",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08067",
+      "Date": "1/30/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "71.46",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08065",
+      "Date": "1/31/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "63.07",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "08069",
+      "Date": "2/1/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "63.98",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "08071",
+      "Date": "2/2/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "46.26",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "08075",
+      "Date": "2/3/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "24.32",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08077",
+      "Date": "2/4/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "35.08",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "08079",
+      "Date": "2/5/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "38.24",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "08081",
+      "Date": "2/6/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "26.68",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08083",
+      "Date": "2/7/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "53.79",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "08085",
+      "Date": "2/8/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "32.45",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "08087",
+      "Date": "2/9/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "33.22",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "08089",
+      "Date": "2/10/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "27.61",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08091",
+      "Date": "2/11/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "58.09",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "08093",
+      "Date": "2/12/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "37.02",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "08095",
+      "Date": "2/13/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "19.06",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08097",
+      "Date": "2/14/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "92.73",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08099",
+      "Date": "2/15/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "28.92",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08101",
+      "Date": "2/16/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "46.51",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "08103",
+      "Date": "2/17/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "25.05",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08105",
+      "Date": "2/18/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "55.15",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "08107",
+      "Date": "2/19/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "82.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08109",
+      "Date": "2/20/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "19.93",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08111",
+      "Date": "2/21/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08113",
+      "Date": "2/22/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08115",
+      "Date": "2/23/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "19.88",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08117",
+      "Date": "2/24/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "92.09",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08119",
+      "Date": "2/25/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "37.95",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "08121",
+      "Date": "2/26/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "11.08",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08123",
+      "Date": "2/27/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "53.76",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "08125",
+      "Date": "2/28/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "22.82",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "09001",
+      "Date": "1/1/2023",
+      "Public Health Jurisdiction": "CT",
+      "Percent Vaccinated": "91.95",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "09003",
+      "Date": "1/2/2023",
+      "Public Health Jurisdiction": "CT",
+      "Percent Vaccinated": "74.68",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "09005",
+      "Date": "1/3/2023",
+      "Public Health Jurisdiction": "CT",
+      "Percent Vaccinated": "73.14",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "09007",
+      "Date": "1/4/2023",
+      "Public Health Jurisdiction": "CT",
+      "Percent Vaccinated": "81.54",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "09009",
+      "Date": "1/5/2023",
+      "Public Health Jurisdiction": "CT",
+      "Percent Vaccinated": "80.16",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "09011",
+      "Date": "1/6/2023",
+      "Public Health Jurisdiction": "CT",
+      "Percent Vaccinated": "75.04",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "09013",
+      "Date": "1/7/2023",
+      "Public Health Jurisdiction": "CT",
+      "Percent Vaccinated": "67.94",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "09015",
+      "Date": "1/8/2023",
+      "Public Health Jurisdiction": "CT",
+      "Percent Vaccinated": "61.02",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    }
+  ],
+  "dataFileName": "blank leader.csv",
+  "dataFileSourceType": "file",
+  "formattedData": [
+    {
+      "FIPS Codes": "02013",
+      "Date": "1/1/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02016",
+      "Date": "1/2/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "89.74",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02020",
+      "Date": "1/3/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "NA",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "02050",
+      "Date": "1/4/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "85.38",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02060",
+      "Date": "1/5/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02068",
+      "Date": "1/6/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "50.41",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "02070",
+      "Date": "1/7/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "65.34",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "02090",
+      "Date": "1/8/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "53.3",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "02100",
+      "Date": "1/9/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "47.03",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "02105",
+      "Date": "1/10/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "88.32",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02110",
+      "Date": "1/11/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "NA",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02122",
+      "Date": "1/12/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "31.23",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "02130",
+      "Date": "1/13/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "63.86",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "02150",
+      "Date": "1/14/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "69.59",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "02158",
+      "Date": "1/15/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "98.33",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02164",
+      "Date": "1/16/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "65.73",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "02170",
+      "Date": "1/17/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "32.13",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "02180",
+      "Date": "1/18/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "88.57",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02185",
+      "Date": "1/19/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "NA",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "02188",
+      "Date": "1/20/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "75.06",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02195",
+      "Date": "1/21/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "74.48",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02198",
+      "Date": "1/22/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "57.75",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "02220",
+      "Date": "1/23/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "75.12",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02230",
+      "Date": "1/24/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02240",
+      "Date": "1/25/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "23.94",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "02261",
+      "Date": "1/26/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "40.92",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "02275",
+      "Date": "1/27/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "NA",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "02282",
+      "Date": "1/28/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "96.67",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "02290",
+      "Date": "1/29/2023",
+      "Public Health Jurisdiction": "AK",
+      "Percent Vaccinated": "86.47",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "01001",
+      "Date": "1/1/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "34.13",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01003",
+      "Date": "1/2/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "37.55",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01005",
+      "Date": "1/3/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "32.78",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01007",
+      "Date": "1/4/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "24.83",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01009",
+      "Date": "1/5/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "*",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "01011",
+      "Date": "1/6/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "50.59",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "01013",
+      "Date": "1/7/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "28.25",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01015",
+      "Date": "1/8/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "33.01",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01017",
+      "Date": "1/9/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "20.28",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01019",
+      "Date": "1/10/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "14.04",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "01021",
+      "Date": "1/11/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "25.24",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01023",
+      "Date": "1/12/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "39.57",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01025",
+      "Date": "1/13/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "*",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01027",
+      "Date": "1/14/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "23.85",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01029",
+      "Date": "1/15/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "14.83",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "01031",
+      "Date": "1/16/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "26.38",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01033",
+      "Date": "1/17/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "37.04",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01035",
+      "Date": "1/18/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "31.94",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01037",
+      "Date": "1/19/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "23.87",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01039",
+      "Date": "1/20/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "21.4",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01041",
+      "Date": "1/21/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "19.49",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "01043",
+      "Date": "1/22/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "20.77",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01045",
+      "Date": "1/23/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "*",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01047",
+      "Date": "1/24/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "35.95",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01049",
+      "Date": "1/25/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "20.97",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01051",
+      "Date": "1/26/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "31.41",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01053",
+      "Date": "1/27/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "20.24",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01055",
+      "Date": "1/28/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "27.95",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01057",
+      "Date": "1/29/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "20.02",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01059",
+      "Date": "1/30/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "28.59",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01061",
+      "Date": "1/31/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "14.87",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "01063",
+      "Date": "2/1/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "44.05",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "01065",
+      "Date": "2/2/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "58.53",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "01067",
+      "Date": "2/3/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "22.4",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01069",
+      "Date": "2/4/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "27.27",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01071",
+      "Date": "2/5/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "27.12",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01073",
+      "Date": "2/6/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "55.79",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "01075",
+      "Date": "2/7/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "16.74",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "01077",
+      "Date": "2/8/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "30.71",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01079",
+      "Date": "2/9/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "23.08",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01081",
+      "Date": "2/10/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "32.87",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01083",
+      "Date": "2/11/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "21.03",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01085",
+      "Date": "2/12/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "48.36",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "01087",
+      "Date": "2/13/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "50.19",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "01089",
+      "Date": "2/14/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "57.67",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "01091",
+      "Date": "2/15/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "47.2",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "01093",
+      "Date": "2/16/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "17.5",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "01095",
+      "Date": "2/17/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "31.06",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01097",
+      "Date": "2/18/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "39.18",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01099",
+      "Date": "2/19/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "31.45",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01101",
+      "Date": "2/20/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "50.54",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "01103",
+      "Date": "2/21/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "26.11",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01105",
+      "Date": "2/22/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "43.88",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "01107",
+      "Date": "2/23/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "36.8",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01109",
+      "Date": "2/24/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "39.77",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01111",
+      "Date": "2/25/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "12.65",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "01113",
+      "Date": "2/26/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "36.78",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01117",
+      "Date": "2/27/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "34.86",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01115",
+      "Date": "2/28/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "25.68",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01119",
+      "Date": "3/1/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "58.55",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "01121",
+      "Date": "3/2/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "24.3",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01123",
+      "Date": "3/3/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "23.69",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01125",
+      "Date": "3/4/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "39.99",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "01127",
+      "Date": "3/5/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "28.51",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01129",
+      "Date": "3/6/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "24.47",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "01131",
+      "Date": "3/7/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "51.67",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "01133",
+      "Date": "3/8/2023",
+      "Public Health Jurisdiction": "AL",
+      "Percent Vaccinated": "8.29",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "05001",
+      "Date": "1/1/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "55.55",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05003",
+      "Date": "1/2/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "40.57",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05005",
+      "Date": "1/3/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "32.08",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05007",
+      "Date": "1/4/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "57.67",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05009",
+      "Date": "1/5/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "28.04",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05011",
+      "Date": "1/6/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "54.5",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05013",
+      "Date": "1/7/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "30.18",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05015",
+      "Date": "1/8/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "36.62",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05017",
+      "Date": "1/9/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "51.86",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05019",
+      "Date": "1/10/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "57.84",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05021",
+      "Date": "1/11/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "35.06",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05023",
+      "Date": "1/12/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "28.57",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05025",
+      "Date": "1/13/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "44.1",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05027",
+      "Date": "1/14/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "51.25",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05029",
+      "Date": "1/15/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "51.04",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05031",
+      "Date": "1/16/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "44.69",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05033",
+      "Date": "1/17/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "39.84",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05035",
+      "Date": "1/18/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "42.57",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05037",
+      "Date": "1/19/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "44.26",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05039",
+      "Date": "1/20/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "62.9",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "05041",
+      "Date": "1/21/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "53.16",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05043",
+      "Date": "1/22/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "49.58",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05045",
+      "Date": "1/23/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "50.18",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05047",
+      "Date": "1/24/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "40.72",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05049",
+      "Date": "1/25/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "26.74",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05051",
+      "Date": "1/26/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "45.09",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05053",
+      "Date": "1/27/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "36.88",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05055",
+      "Date": "1/28/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "37.32",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05057",
+      "Date": "1/29/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "29.71",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05059",
+      "Date": "1/30/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "39.6",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05061",
+      "Date": "1/31/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "37.23",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05063",
+      "Date": "2/1/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "37.18",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05065",
+      "Date": "2/2/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "37.32",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05067",
+      "Date": "2/3/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "33.98",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05069",
+      "Date": "2/4/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "50.85",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05071",
+      "Date": "2/5/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "45.67",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05073",
+      "Date": "2/6/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "25.39",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05075",
+      "Date": "2/7/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "38",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05077",
+      "Date": "2/8/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "25.23",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05079",
+      "Date": "2/9/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "38.65",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05081",
+      "Date": "2/10/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "23.08",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05083",
+      "Date": "2/11/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "38.48",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05085",
+      "Date": "2/12/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "46.96",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05087",
+      "Date": "2/13/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "34.63",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05089",
+      "Date": "2/14/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "17.97",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "05091",
+      "Date": "2/15/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "21.71",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05093",
+      "Date": "2/16/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "32.99",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05095",
+      "Date": "2/17/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "63.26",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "05097",
+      "Date": "2/18/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "21.62",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05099",
+      "Date": "2/19/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "39.97",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05101",
+      "Date": "2/20/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "18.95",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "05103",
+      "Date": "2/21/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "48.36",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05105",
+      "Date": "2/22/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "47.07",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05107",
+      "Date": "2/23/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "44.03",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05109",
+      "Date": "2/24/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "29.4",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05111",
+      "Date": "2/25/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "41.64",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05113",
+      "Date": "2/26/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "23.59",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05115",
+      "Date": "2/27/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "47.51",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05117",
+      "Date": "2/28/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "37.43",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05119",
+      "Date": "3/1/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "64.24",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "05121",
+      "Date": "3/2/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "30.79",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05125",
+      "Date": "3/3/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "58.77",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05127",
+      "Date": "3/4/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "34.7",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05129",
+      "Date": "3/5/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "23.49",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05131",
+      "Date": "3/6/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "51.32",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "05133",
+      "Date": "3/7/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "36.78",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05135",
+      "Date": "3/8/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "32.8",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05123",
+      "Date": "3/9/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "31.13",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05137",
+      "Date": "3/10/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "26.39",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05139",
+      "Date": "3/11/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "46.07",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05141",
+      "Date": "3/12/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "24.51",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "05143",
+      "Date": "3/13/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "68.75",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "05145",
+      "Date": "3/14/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "38.29",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "05147",
+      "Date": "3/15/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "47.16",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "05149",
+      "Date": "3/16/2023",
+      "Public Health Jurisdiction": "AR",
+      "Percent Vaccinated": "48.3",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "04001",
+      "Date": "1/1/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "04003",
+      "Date": "1/2/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "74.89",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "04005",
+      "Date": "1/3/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "04007",
+      "Date": "1/4/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "50",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "04009",
+      "Date": "1/5/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "56.24",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "04011",
+      "Date": "1/6/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "29.7",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "04012",
+      "Date": "1/7/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "62.19",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "04013",
+      "Date": "1/8/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "53.84",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "04015",
+      "Date": "1/9/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "21.79",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "04017",
+      "Date": "1/10/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "04019",
+      "Date": "1/11/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "71.56",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "04021",
+      "Date": "1/12/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "46.57",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "04023",
+      "Date": "1/13/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "04025",
+      "Date": "1/14/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "27.9",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "04027",
+      "Date": "1/15/2023",
+      "Public Health Jurisdiction": "AZ",
+      "Percent Vaccinated": "84.7",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06001",
+      "Date": "1/1/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "96.69",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06003",
+      "Date": "1/2/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "0",
+      "Vaccination Coverage Group": "No Data"
+    },
+    {
+      "FIPS Codes": "06005",
+      "Date": "1/3/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "52.34",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06007",
+      "Date": "1/4/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "43.08",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "06009",
+      "Date": "1/5/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "46.21",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "06011",
+      "Date": "1/6/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "48.69",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "06013",
+      "Date": "1/7/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "88.29",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06015",
+      "Date": "1/8/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "35.33",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "06017",
+      "Date": "1/9/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "55",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06019",
+      "Date": "1/10/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "59.34",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06021",
+      "Date": "1/11/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "46.92",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "06023",
+      "Date": "1/12/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "67.9",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "06025",
+      "Date": "1/13/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06027",
+      "Date": "1/14/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "0",
+      "Vaccination Coverage Group": "No Data"
+    },
+    {
+      "FIPS Codes": "06029",
+      "Date": "1/15/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "53.02",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06031",
+      "Date": "1/16/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "48.71",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "06033",
+      "Date": "1/17/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "44.78",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "06035",
+      "Date": "1/18/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "21.66",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "06037",
+      "Date": "1/19/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "84.51",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06039",
+      "Date": "1/20/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "54.47",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06041",
+      "Date": "1/21/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06043",
+      "Date": "1/22/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "0",
+      "Vaccination Coverage Group": "No Data"
+    },
+    {
+      "FIPS Codes": "06045",
+      "Date": "1/23/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "60.57",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "06047",
+      "Date": "1/24/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "55.46",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06049",
+      "Date": "1/25/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "0",
+      "Vaccination Coverage Group": "No Data"
+    },
+    {
+      "FIPS Codes": "06051",
+      "Date": "1/26/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "0",
+      "Vaccination Coverage Group": "No Data"
+    },
+    {
+      "FIPS Codes": "06053",
+      "Date": "1/27/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "78.63",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06055",
+      "Date": "1/28/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "85.2",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06057",
+      "Date": "1/29/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "59.26",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06059",
+      "Date": "1/30/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "75.05",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06061",
+      "Date": "1/31/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "60.42",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "06063",
+      "Date": "2/1/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "0",
+      "Vaccination Coverage Group": "No Data"
+    },
+    {
+      "FIPS Codes": "06065",
+      "Date": "2/2/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "56.33",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06067",
+      "Date": "2/3/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "67.5",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "06069",
+      "Date": "2/4/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "69.89",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "06071",
+      "Date": "2/5/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "53.59",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06073",
+      "Date": "2/6/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06075",
+      "Date": "2/7/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06077",
+      "Date": "2/8/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "63.97",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "06079",
+      "Date": "2/9/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "64.59",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "06081",
+      "Date": "2/10/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "96.53",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06083",
+      "Date": "2/11/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "73.94",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06085",
+      "Date": "2/12/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "93.97",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06087",
+      "Date": "2/13/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "94.82",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06089",
+      "Date": "2/14/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "32.94",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "06091",
+      "Date": "2/15/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "0",
+      "Vaccination Coverage Group": "No Data"
+    },
+    {
+      "FIPS Codes": "06093",
+      "Date": "2/16/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "31.4",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "06095",
+      "Date": "2/17/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "72.68",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06097",
+      "Date": "2/18/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "82.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06099",
+      "Date": "2/19/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "61.79",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "06101",
+      "Date": "2/20/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "52.75",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "06103",
+      "Date": "2/21/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "28.55",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "06105",
+      "Date": "2/22/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "0",
+      "Vaccination Coverage Group": "No Data"
+    },
+    {
+      "FIPS Codes": "06107",
+      "Date": "2/23/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "48.81",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "06109",
+      "Date": "2/24/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "41.79",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "06111",
+      "Date": "2/25/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "72.48",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06113",
+      "Date": "2/26/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "76.78",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "06115",
+      "Date": "2/27/2023",
+      "Public Health Jurisdiction": "CA",
+      "Percent Vaccinated": "43.73",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "08001",
+      "Date": "1/1/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "65.08",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "08003",
+      "Date": "1/2/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "54.84",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "08005",
+      "Date": "1/3/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "67.65",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "08007",
+      "Date": "1/4/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "37.97",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "08009",
+      "Date": "1/5/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "15.77",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08011",
+      "Date": "1/6/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "29.08",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08013",
+      "Date": "1/7/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "80.5",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08014",
+      "Date": "1/8/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "81.91",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08015",
+      "Date": "1/9/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "51.64",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "08019",
+      "Date": "1/10/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "49.8",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "08021",
+      "Date": "1/11/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "43.62",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "08025",
+      "Date": "1/12/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "21.4",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08027",
+      "Date": "1/13/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "19.48",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08029",
+      "Date": "1/14/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "25.45",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08031",
+      "Date": "1/15/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "79.16",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08033",
+      "Date": "1/16/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "15.54",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08035",
+      "Date": "1/17/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "69.32",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "08037",
+      "Date": "1/18/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "86.79",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08041",
+      "Date": "1/19/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "54.31",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "08039",
+      "Date": "1/20/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "24.91",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08043",
+      "Date": "1/21/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "20.99",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08045",
+      "Date": "1/22/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "62.95",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "08047",
+      "Date": "1/23/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "50",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "08049",
+      "Date": "1/24/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "46.08",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "08051",
+      "Date": "1/25/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "68.72",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "08055",
+      "Date": "1/26/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "26.53",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08059",
+      "Date": "1/27/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "75.43",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08061",
+      "Date": "1/28/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "18.18",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08063",
+      "Date": "1/29/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "19.16",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08067",
+      "Date": "1/30/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "71.46",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08065",
+      "Date": "1/31/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "63.07",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "08069",
+      "Date": "2/1/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "63.98",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "08071",
+      "Date": "2/2/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "46.26",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "08075",
+      "Date": "2/3/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "24.32",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08077",
+      "Date": "2/4/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "35.08",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "08079",
+      "Date": "2/5/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "38.24",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "08081",
+      "Date": "2/6/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "26.68",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08083",
+      "Date": "2/7/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "53.79",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "08085",
+      "Date": "2/8/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "32.45",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "08087",
+      "Date": "2/9/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "33.22",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "08089",
+      "Date": "2/10/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "27.61",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08091",
+      "Date": "2/11/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "58.09",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "08093",
+      "Date": "2/12/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "37.02",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "08095",
+      "Date": "2/13/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "19.06",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08097",
+      "Date": "2/14/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "92.73",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08099",
+      "Date": "2/15/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "28.92",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08101",
+      "Date": "2/16/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "46.51",
+      "Vaccination Coverage Group": "40% - 49.9%"
+    },
+    {
+      "FIPS Codes": "08103",
+      "Date": "2/17/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "25.05",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "08105",
+      "Date": "2/18/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "55.15",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "08107",
+      "Date": "2/19/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "82.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08109",
+      "Date": "2/20/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "19.93",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08111",
+      "Date": "2/21/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08113",
+      "Date": "2/22/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "99.99",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08115",
+      "Date": "2/23/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "19.88",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08117",
+      "Date": "2/24/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "92.09",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "08119",
+      "Date": "2/25/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "37.95",
+      "Vaccination Coverage Group": "30% - 39.9%"
+    },
+    {
+      "FIPS Codes": "08121",
+      "Date": "2/26/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "11.08",
+      "Vaccination Coverage Group": "0% - 19.9%"
+    },
+    {
+      "FIPS Codes": "08123",
+      "Date": "2/27/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "53.76",
+      "Vaccination Coverage Group": "50% - 59.9%"
+    },
+    {
+      "FIPS Codes": "08125",
+      "Date": "2/28/2023",
+      "Public Health Jurisdiction": "CO",
+      "Percent Vaccinated": "22.82",
+      "Vaccination Coverage Group": "20% - 29.9%"
+    },
+    {
+      "FIPS Codes": "09001",
+      "Date": "1/1/2023",
+      "Public Health Jurisdiction": "CT",
+      "Percent Vaccinated": "91.95",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "09003",
+      "Date": "1/2/2023",
+      "Public Health Jurisdiction": "CT",
+      "Percent Vaccinated": "74.68",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "09005",
+      "Date": "1/3/2023",
+      "Public Health Jurisdiction": "CT",
+      "Percent Vaccinated": "73.14",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "09007",
+      "Date": "1/4/2023",
+      "Public Health Jurisdiction": "CT",
+      "Percent Vaccinated": "81.54",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "09009",
+      "Date": "1/5/2023",
+      "Public Health Jurisdiction": "CT",
+      "Percent Vaccinated": "80.16",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "09011",
+      "Date": "1/6/2023",
+      "Public Health Jurisdiction": "CT",
+      "Percent Vaccinated": "75.04",
+      "Vaccination Coverage Group": "70% or More"
+    },
+    {
+      "FIPS Codes": "09013",
+      "Date": "1/7/2023",
+      "Public Health Jurisdiction": "CT",
+      "Percent Vaccinated": "67.94",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    },
+    {
+      "FIPS Codes": "09015",
+      "Date": "1/8/2023",
+      "Public Health Jurisdiction": "CT",
+      "Percent Vaccinated": "61.02",
+      "Vaccination Coverage Group": "60% - 69.9%"
+    }
+  ],
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
   },
+  "version": "4.24.10",
   "dynamicMarginTop": 0
 }
