@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { APIFilter } from '../../../../types/APIFilter'
 import { getVizRowColumnLocator } from '../../../../helpers/getVizRowColumnLocator'
 import { TextField } from '@cdc/core/components/EditorPanel/Inputs'
@@ -110,7 +110,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
   }
 
   const updateAPIFilter = (key: keyof APIFilter, value: string | boolean) => {
-    const filterClone = _.cloneDeep(filter)
+    const filterClone = cloneDeep(filter)
     const _filter = filterClone.apiFilter || { apiEndpoint: '', valueSelector: '', textSelector: '' }
     const newAPIFilter: APIFilter = { ..._filter, [key]: value }
     updateFilterProp('apiFilter', newAPIFilter)

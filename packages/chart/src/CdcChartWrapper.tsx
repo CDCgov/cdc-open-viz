@@ -7,7 +7,7 @@ import Papa from 'papaparse'
 import 'react-tooltip/dist/react-tooltip.css'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import Loading from '@cdc/core/components/Loading'
-import _ from 'lodash'
+import { get, isEqual, some } from 'lodash-es'
 interface CdcChartProps {
   configUrl?: string
   isEditor?: boolean
@@ -78,7 +78,7 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug
   }, [configUrl, loadConfig])
 
   useEffect(() => {
-    if (!_.isEqual(prevFiltersRef.current, config.filters)) {
+    if (!isEqual(prevFiltersRef.current, config.filters)) {
       prevFiltersRef.current = config.filters
       reloadFilteredData()
     }
@@ -118,7 +118,7 @@ const fetchAndParseData = async (url: string, ext: string) => {
 }
 
 const loadDataFromConfig = async (response: any) => {
-  if (!response.dataUrl || _.some(_.get(response, 'filters', []), { type: 'url' })) {
+  if (!response.dataUrl || some(get(response, 'filters', []), { type: 'url' })) {
     return response.data || []
   }
 

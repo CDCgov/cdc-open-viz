@@ -7,7 +7,7 @@ import {
   setActiveNestedDropdown,
   setActiveMultiDropdown
 } from '../apiFilterHelpers'
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import type { APIFilterDropdowns } from '../../components/DashboardFilters'
 import { SharedFilter } from '../../types/SharedFilter'
 import { FILTER_STYLE } from '../../types/FilterStyles'
@@ -398,21 +398,21 @@ describe('setAutoLoadDefaultValue', () => {
   })
 
   it('should assign the default value from dropdownOptions when no active value is set', () => {
-    const sharedFiltersCopy = _.cloneDeep(sharedFilters)
+    const sharedFiltersCopy = cloneDeep(sharedFilters)
     sharedFiltersCopy[0].active = null
     const result = setAutoLoadDefaultValue(0, dropdownOptions, sharedFiltersCopy, [0])
     expect(result.active).toEqual('option1')
   })
 
   it('should retain the current active value if it exists in dropdownOptions', () => {
-    const sharedFiltersCopy = _.cloneDeep(sharedFilters)
+    const sharedFiltersCopy = cloneDeep(sharedFilters)
     sharedFiltersCopy[0].active = 'option1'
     const result = setAutoLoadDefaultValue(0, dropdownOptions, sharedFiltersCopy, [0])
     expect(result.active).toEqual('option1')
   })
 
   it('should assign the default value if the current active value does not exist in dropdownOptions', () => {
-    const sharedFiltersCopy = _.cloneDeep(sharedFilters)
+    const sharedFiltersCopy = cloneDeep(sharedFilters)
     sharedFiltersCopy[0].active = 'nonexistent'
     const result = setAutoLoadDefaultValue(0, dropdownOptions, sharedFiltersCopy, [0])
     expect(result.active).toEqual('option1')

@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { Condition } from '../types/Condition'
 import Icon from '@cdc/core/components/ui/Icon'
 
@@ -37,7 +37,7 @@ const Conditions: React.FC<CondtionsProps> = ({
   const { columnName, isOrIsNotEqualTo, value } = conditionSettings
 
   const handleConditionChange = (selectionValue: string | number, conditionSetting: string) => {
-    const conditionSettingUpdate = _.cloneDeep(conditionSettings)
+    const conditionSettingUpdate = cloneDeep(conditionSettings)
     if (conditionSetting === 'columnName') {
       conditionSettingUpdate['value'] = ''
     }

@@ -1,4 +1,4 @@
-import { update } from 'lodash'
+import { update } from 'lodash-es'
 import { updatePaletteNames } from '../helpers/updatePaletteNames'
 
 const colorPalettesMap = {

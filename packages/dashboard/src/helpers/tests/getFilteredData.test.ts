@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { SharedFilter } from '../../types/SharedFilter'
 import { getFilteredData } from '../getFilteredData'
 
@@ -65,7 +65,11 @@ describe('getFilteredData', () => {
       }
     ]
     const config = { ...state.config, dashboard: { sharedFilters } }
-    expect(getFilteredData({ ...state, config }, initialFilteredData)).toEqual({ newData: [data.data1[1]], '0': [data.data1[0]], vizA: [data.data1[0]] })
+    expect(getFilteredData({ ...state, config }, initialFilteredData)).toEqual({
+      newData: [data.data1[1]],
+      '0': [data.data1[0]],
+      vizA: [data.data1[0]]
+    })
   })
 
   it('should filter visualizations and rows', () => {
@@ -77,7 +81,7 @@ describe('getFilteredData', () => {
         ...sharedFilterDefaults
       }
     ]
-    const dataOverride = _.cloneDeep(data)
+    const dataOverride = cloneDeep(data)
     dataOverride.data1[0] = { id: 1, name: 'Alice', age: 30 }
     const config = { ...state.config, dashboard: { sharedFilters } }
     const filteredData = getFilteredData({ ...state, config }, undefined, dataOverride)

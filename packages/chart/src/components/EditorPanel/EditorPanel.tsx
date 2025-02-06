@@ -41,7 +41,7 @@ import { type ChartConfig } from '../../types/ChartConfig'
 import './editor-panel.scss'
 import { Anchor } from '@cdc/core/types/Axis'
 import EditorPanelContext from './EditorPanelContext'
-import _ from 'lodash'
+import { cloneDeep, uniq, flatMap } from 'lodash-es'
 import { adjustedSymbols as symbolCodes } from '@cdc/core/helpers/footnoteSymbols'
 import { updateFieldRankByValue } from './helpers/updateFieldRankByValue'
 
@@ -59,7 +59,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   const hasComboBarSeries = isCombo && barSeriesExists
 
   const getColumnOptions = () => {
-    return _.uniq(_.flatMap(data, _.keys))
+    return uniq(flatMap(data, keys))
   }
 
   const getTypeOptions = () => {
@@ -1252,7 +1252,7 @@ const EditorPanel = () => {
   }
 
   const removeAdditionalColumn = columnName => {
-    const newColumns = _.cloneDeep(config.columns)
+    const newColumns = cloneDeep(config.columns)
 
     delete newColumns[columnName]
 

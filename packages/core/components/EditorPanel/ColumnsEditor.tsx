@@ -4,7 +4,7 @@ import { Select, TextField } from './Inputs'
 import { Visualization } from '../../types/Visualization'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import { Column } from '../../types/Column'
-import _ from 'lodash'
+import { cloneDeep, uniq } from 'lodash-es'
 import React, { useState } from 'react'
 import FieldSetWrapper from './FieldSetWrapper'
 
@@ -27,7 +27,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
 
   const editColumn = (key, value) => {
     if (key === 'dataTable' && value === true) {
-      const newColumns = _.cloneDeep(config.columns) // must pass new columns object to trigger re-render of DataTableEditor
+      const newColumns = cloneDeep(config.columns) // must pass new columns object to trigger re-render of DataTableEditor
       newColumns[colKey] = { ...newColumns[colKey], dataTable: value }
       updateField(null, null, 'columns', newColumns)
     } else {
@@ -36,7 +36,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
   }
 
   const changeName = value => {
-    const newColumns = _.cloneDeep(config.columns)
+    const newColumns = cloneDeep(config.columns)
     const currentCol = config.columns[colKey]
     const newColumn = { ...currentCol, name: value, label: value }
     if (newColumn.dataTable === undefined) {
@@ -45,7 +45,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
     if (value !== colKey) {
       newColumns[value] = newColumn
       delete newColumns[colKey]
-      const newControls = { ..._.cloneDeep(openControls), [value]: true }
+      const newControls = { ...cloneDeep(openControls), [value]: true }
       delete newControls[colKey]
       setOpenControls(newControls)
     }
@@ -57,7 +57,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
       return Object.keys(row).map(columnName => columnName)
     })
     const configuredColumns = Object.values(config.columns).map(col => col.name)
-    const cols = _.uniq(columns).filter(key => {
+    const cols = uniq(columns).filter(key => {
       if (config.table.groupBy === key) return false
       if (configuredColumns.includes(key)) return false
       return true

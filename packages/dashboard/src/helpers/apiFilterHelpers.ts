@@ -2,7 +2,7 @@ import { gatherQueryParams } from '@cdc/core/helpers/gatherQueryParams'
 import { APIFilterDropdowns, DropdownOptions } from '../components/DashboardFilters'
 import { APIFilter } from '../types/APIFilter'
 import { SharedFilter } from '../types/SharedFilter'
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
 import { FILTER_STYLE } from '../types/FilterStyles'
 
@@ -132,8 +132,8 @@ export const setAutoLoadDefaultValue = (
   sharedFilters: SharedFilter[],
   autoLoadFilterIndexes: number[]
 ): SharedFilter => {
-  const sharedFiltersCopy = _.cloneDeep(sharedFilters)
-  const sharedFilter = _.cloneDeep(sharedFiltersCopy[sharedFilterIndex])
+  const sharedFiltersCopy = cloneDeep(sharedFilters)
+  const sharedFilter = cloneDeep(sharedFiltersCopy[sharedFilterIndex])
   if (!autoLoadFilterIndexes.length || !dropdownOptions?.length) return sharedFilter // no autoLoading happening
   const hasQueryParameter = sharedFilter.setByQueryParameter
     ? Boolean(getQueryParam(sharedFilter.setByQueryParameter))

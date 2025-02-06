@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import EditorActions from './editor.actions'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'

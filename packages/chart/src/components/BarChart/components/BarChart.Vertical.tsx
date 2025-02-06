@@ -21,7 +21,6 @@ import createBarElement from '@cdc/core/components/createBarElement'
 import chroma from 'chroma-js'
 // Types
 import { type ChartContext } from '../../../types/ChartContext'
-import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
 
 export const BarChartVertical = () => {

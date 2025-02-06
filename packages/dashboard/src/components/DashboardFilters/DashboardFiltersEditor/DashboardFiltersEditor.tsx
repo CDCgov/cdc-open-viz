@@ -13,7 +13,7 @@ import FieldSetWrapper from '@cdc/core/components/EditorPanel/FieldSetWrapper'
 import FilterEditor from './components/FilterEditor'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { DashboardContext, DashboardDispatchContext } from '../../../DashboardContext'
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { DashboardFilters } from '../../../types/DashboardFilters'
 import { SharedFilter } from '../../../types/SharedFilter'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
@@ -51,7 +51,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
   const [canAddExisting, setCanAddExisting] = useState(false)
 
   const updateFilterProp = (prop: string, index: number, value) => {
-    const newSharedFilters = _.cloneDeep(sharedFilters)
+    const newSharedFilters = cloneDeep(sharedFilters)
     const {
       apiEndpoint: oldEndpoint,
       valueSelector: oldValueSelector,
@@ -103,7 +103,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
   }
 
   const removeFilter = index => {
-    const newSharedFilters = _.cloneDeep(sharedFilters)
+    const newSharedFilters = cloneDeep(sharedFilters)
 
     newSharedFilters.splice(index, 1)
     const shiftDownIndexes = Object.keys(sharedFilters).slice(index + 1)
@@ -127,7 +127,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
   }
 
   const addNewFilter = () => {
-    const _sharedFilters = _.cloneDeep(sharedFilters) || []
+    const _sharedFilters = cloneDeep(sharedFilters) || []
     const columnName = 'New Dashboard Filter ' + (_sharedFilters.length + 1)
     const newFilter = { key: columnName, showDropdown: true, values: [] } as SharedFilter
     dispatch({ type: 'SET_SHARED_FILTERS', payload: [..._sharedFilters, newFilter] })

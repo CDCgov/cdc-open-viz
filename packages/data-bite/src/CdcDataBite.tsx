@@ -14,7 +14,6 @@ import GradientBite from './components/GradientBite'
 import Layout from '@cdc/core/components/Layout'
 
 // external
-import ResizeObserver from 'resize-observer-polyfill'
 import parse from 'html-react-parser'
 
 // helpers

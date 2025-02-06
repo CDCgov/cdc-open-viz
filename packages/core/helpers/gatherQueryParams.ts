@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 const strip = (paramVal: string) => {
   return paramVal.replace(/"/g, '')
 }

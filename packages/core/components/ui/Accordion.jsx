@@ -1,6 +1,11 @@
 import React, { Children } from 'react'
-import { Accordion as AccordionComponent, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
-import PropTypes from 'prop-types'
+import {
+  Accordion as AccordionComponent,
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemPanel,
+  AccordionItemButton
+} from 'react-accessible-accordion'
 
 import Icon from './Icon'
 import Tooltip from './Tooltip'
@@ -42,14 +47,5 @@ const Accordion = ({ children }) => {
 
 //Create subcomponents as "slots" within component namespace
 Accordion.Section = AccordionSection
-
-Accordion.Section.propTypes = {
-  /* Icon for the accordion label */
-  icon: PropTypes.node,
-  /* Title for the accordion label*/
-  title: PropTypes.string,
-  /* Tooltip for the accordion label*/
-  tooltipText: PropTypes.object
-}
 
 export default Accordion

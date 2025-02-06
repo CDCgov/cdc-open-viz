@@ -7,7 +7,6 @@ import { scaleLinear } from '@visx/scale'
 
 // external
 import parse from 'html-react-parser'
-import ResizeObserver from 'resize-observer-polyfill'
 
 // cdc
 import { Config } from './types/Config'

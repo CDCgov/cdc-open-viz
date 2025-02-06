@@ -1,6 +1,6 @@
 import { DashboardConfig } from '../../../../types/DashboardConfig'
 import { SharedFilter } from '../../../../types/SharedFilter'
-import _ from 'lodash'
+import { uniq } from 'lodash-es'
 import { SubGrouping } from '@cdc/core/types/VizFilter'
 import { TextField } from '@cdc/core/components/EditorPanel/Inputs'
 
@@ -56,7 +56,7 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
     const newColumnName = selectedOption.value
 
     const valuesLookup = filter.values.reduce((acc, groupName) => {
-      const values: string[] = _.uniq(
+      const values: string[] = uniq(
         config.datasets[selectedOptionDatasetName].data
           .map(d => {
             return d[filter.columnName] === groupName ? d[newColumnName] : ''

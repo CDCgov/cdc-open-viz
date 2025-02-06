@@ -1,6 +1,5 @@
 import React from 'react'
 // import html2pdf from 'html2pdf.js'
-import html2canvas from 'html2canvas'
 
 const buttonText = {
   pdf: 'Download PDF',
@@ -76,12 +75,20 @@ const generateMedia = (state, type, elementToCapture) => {
 
   switch (type) {
     case 'image':
-      html2canvas(baseSvg, {
-        ignoreElements: el =>
-          el.className?.indexOf && el.className.search(/download-buttons|download-links|data-table-container/) !== -1
-      }).then(canvas => {
-        saveImageAs(canvas.toDataURL(), filename + '.png')
-      })
+      const downloadImage = async () => {
+        import(/* webpackChunkName: "html2canvas" */ 'html2canvas').then(mod => {
+          mod
+            .default(baseSvg, {
+              ignoreElements: el =>
+                el.className?.indexOf &&
+                el.className.search(/download-buttons|download-links|data-table-container/) !== -1
+            })
+            .then(canvas => {
+              saveImageAs(canvas.toDataURL(), filename + '.png')
+            })
+        })
+      }
+      downloadImage()
       return
     case 'pdf':
       // let opt = {

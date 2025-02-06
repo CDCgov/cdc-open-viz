@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, useId } from 'react'
 
 // IE11
-import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
 // Core components
 import Layout from '@cdc/core/components/Layout'
@@ -26,7 +25,22 @@ import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse, timeFormat } from 'd3-time-format'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
-import _ from 'lodash'
+import {
+  cloneDeep,
+  defaultsDeep,
+  get,
+  set,
+  forEach,
+  defaults as _defaults,
+  remove,
+  isEmpty,
+  uniq,
+  findKey,
+  xor,
+  pick,
+  isString,
+  kebabCase
+} from 'lodash-es'
 // Primary Components
 import ConfigContext from './ConfigContext'
 import PieChart from './components/PieChart'
@@ -103,7 +117,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const svgRef = useRef(null)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
-  const [stateData, setStateData] = useState(_.cloneDeep(configObj?.data) || [])
+  const [stateData, setStateData] = useState(cloneDeep(configObj?.data) || [])
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
   const [seriesHighlight, setSeriesHighlight] = useState<string[]>(
@@ -156,15 +170,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const prepareConfig = (loadedConfig: ChartConfig, data): ChartConfig => {
-    let newConfig = _.defaultsDeep(loadedConfig, defaults)
-    _.defaultsDeep(newConfig, {
+    let newConfig = defaultsDeep(loadedConfig, defaults)
+    defaultsDeep(newConfig, {
       table: { showVertical: false }
     })
 
-    _.set(newConfig, 'table.show', _.get(newConfig, 'table.show', !isDashboard))
+    set(newConfig, 'table.show', get(newConfig, 'table.show', !isDashboard))
 
-    _.forEach(newConfig.series, series => {
-      _.defaults(series, {
+    forEach(newConfig.series, series => {
+      _defaults(series, {
         tooltip: true,
         axis: 'Left'
       })
@@ -178,7 +192,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
-    const newConfig = _.cloneDeep(_config)
+    const newConfig = cloneDeep(_config)
     let data = dataOverride || stateData
 
     data = handleRankByValue(data, newConfig)
@@ -208,7 +222,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {} as Runtime
-    newConfig.runtime.series = _.cloneDeep(newConfig.series)
+    newConfig.runtime.series = cloneDeep(newConfig.series)
     newConfig.runtime.seriesLabels = {}
     newConfig.runtime.seriesLabelsAll = []
     newConfig.runtime.originalXAxis = newConfig.xAxis
@@ -220,10 +234,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
       const finalData = dataOverride || newConfig.formattedData || newConfig.data
       newConfig.runtime.seriesKeys = (newConfig.runtime.series || []).flatMap(series => {
         if (series.dynamicCategory) {
-          _.remove(newConfig.runtime.seriesLabelsAll, label => label === series.dataKey)
-          _.remove(newConfig.runtime.series, s => s.dataKey === series.dataKey)
+          remove(newConfig.runtime.seriesLabelsAll, label => label === series.dataKey)
+          remove(newConfig.runtime.series, s => s.dataKey === series.dataKey)
           // grab the dynamic series keys from the data
-          const seriesKeys: string[] = _.uniq(finalData.map(d => d[series.dynamicCategory]))
+          const seriesKeys: string[] = uniq(finalData.map(d => d[series.dynamicCategory]))
           // for each of those keys perform side effects
           seriesKeys.forEach(dataKey => {
             newConfig.runtime.seriesLabels[dataKey] = dataKey
@@ -401,7 +415,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
    * When cove has a config and container ref publish the cove_loaded event.
    */
   useEffect(() => {
-    if (container && !_.isEmpty(config) && !coveLoadedEventRan) {
+    if (container && !isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
       setCoveLoadedEventRan(true)
     }
@@ -475,9 +489,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
       return handleShowAll()
     }
 
-    const newHighlight = _.findKey(config.runtime.seriesLabels, v => v === label.datum) || label.datum
+    const newHighlight = findKey(config.runtime.seriesLabels, v => v === label.datum) || label.datum
 
-    const newSeriesHighlight = _.xor(seriesHighlight, [newHighlight])
+    const newSeriesHighlight = xor(seriesHighlight, [newHighlight])
     setSeriesHighlight(newSeriesHighlight)
   }
   // Called on reset button click, unhighlights all data series
@@ -739,11 +753,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
       .map(col => col.name)
       .concat([dynamicSeries.dynamicCategory, dynamicSeries.dataKey])
     if (config.xAxis?.dataKey) usedColumns.push(config.xAxis.dataKey)
-    return data.map(d => _.pick(d, usedColumns))
+    return data.map(d => pick(d, usedColumns))
   }
 
   const pivotDynamicSeries = (config: ChartConfig): TableConfig => {
-    const tableConfig: TableConfig = _.cloneDeep(config)
+    const tableConfig: TableConfig = cloneDeep(config)
     const dynamicSeries = tableConfig.series.find(series => !!series.dynamicCategory)
     if (dynamicSeries) {
       const pivot: Pivot = { columnName: dynamicSeries.dynamicCategory, valueColumns: [dynamicSeries.dataKey] }
@@ -756,9 +770,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
   let body = <Loading />
 
   const makeClassName = string => {
-    if (!_.isString(string)) return undefined
+    if (!isString(string)) return undefined
 
-    return _.kebabCase(string)
+    return kebabCase(string)
   }
   const getChartWrapperClasses = () => {
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
@@ -1059,7 +1073,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     outerContainerRef,
     parentRef,
     parseDate,
-    rawData: _.cloneDeep(stateData) ?? {},
+    rawData: cloneDeep(stateData) ?? {},
     seriesHighlight,
     setBrushConfig,
     setConfig,
@@ -1074,7 +1088,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     tableData: filteredData || excludedData, // do not clean table data
     transformedData: clean(filteredData || excludedData), // do this right before passing to components
     twoColorPalette,
-    unfilteredData: _.cloneDeep(stateData),
+    unfilteredData: cloneDeep(stateData),
     updateConfig
   }
 

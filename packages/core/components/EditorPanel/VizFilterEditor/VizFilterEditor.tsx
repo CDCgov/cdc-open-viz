@@ -3,7 +3,7 @@ import Tooltip from '../../ui/Tooltip'
 import Icon from '../../ui/Icon'
 import { Visualization } from '../../../types/Visualization'
 import { UpdateFieldFunc } from '../../../types/UpdateFieldFunc'
-import _ from 'lodash'
+import { cloneDeep, flatten, uniq } from 'lodash-es'
 import { MultiSelectFilter, VizFilter, VizFilterStyle } from '../../../types/VizFilter'
 import { filterStyleOptions, handleSorting, filterOrderOptions } from '../../Filters'
 import FieldSetWrapper from '../FieldSetWrapper'
@@ -22,11 +22,11 @@ type VizFilterProps = {
 const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawData }) => {
   const openControls = useState({})
   const dataColumns = useMemo(() => {
-    return _.uniq(_.flatten(rawData?.map(row => Object.keys(row))))
+    return uniq(flatten(rawData?.map(row => Object.keys(row))))
   }, [rawData])
 
   const removeFilter = index => {
-    let filters = _.cloneDeep(config.filters)
+    let filters = cloneDeep(config.filters)
 
     filters.splice(index, 1)
 
@@ -38,7 +38,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
   }
 
   const updateFilterStyle = (index, style: VizFilterStyle) => {
-    const filters = _.cloneDeep(config.filters)
+    const filters = cloneDeep(config.filters)
     const currentFilter = { ...filters[index], orderedValues: filters[index].values }
     currentFilter.filterStyle = style
     if (style === 'multi-select') {
@@ -54,8 +54,8 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
   }
 
   const handleNameChange = (filterIndex, columnName) => {
-    const values = _.uniq(rawData.map(row => row[columnName]))
-    const copiedFilter = { ..._.cloneDeep(config.filters[filterIndex]), columnName, values }
+    const values = uniq(rawData.map(row => row[columnName]))
+    const copiedFilter = { ...cloneDeep(config.filters[filterIndex]), columnName, values }
     handleSorting(copiedFilter) // sorts dropdown values in place
     copiedFilter.active = copiedFilter.values[0]
     const newFilters = config.filters.map((filter, index) => {
@@ -85,7 +85,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
     const [movedItem] = updatedValues.splice(idx1, 1)
     updatedValues.splice(idx2, 0, movedItem)
 
-    const filtersCopy = _.cloneDeep(config.filters)
+    const filtersCopy = cloneDeep(config.filters)
     const filterItem = { ...filtersCopy[filterIndex] }
 
     // Overwrite filterItem.values since thats what we map through in the editor panel

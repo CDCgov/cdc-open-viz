@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo, useContext, useRef, useMemo, useReducer } from 'react'
 
 // Third Party
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 
 // Context
 import { Variable } from '../types/Variable'
@@ -87,7 +87,7 @@ const EditorPanel: React.FC = () => {
   const [controls, setControls] = openVariableControls
 
   const handleCreateNewVariableButtonClick = () => {
-    const newVariableArray = [..._.cloneDeep(variableArray)]
+    const newVariableArray = [...cloneDeep(variableArray)]
     const newVariable = {
       columnName: '',
       conditions: [],
@@ -103,7 +103,7 @@ const EditorPanel: React.FC = () => {
   }
 
   const updateVariableArray = (newVariable: Variable, variableIndex: number) => {
-    const newVariableArray = _.cloneDeep(variableArray)
+    const newVariableArray = cloneDeep(variableArray)
     newVariableArray[variableIndex] = newVariable
     setVariableArray(newVariableArray)
     updateField('contentEditor', null, 'markupVariables', newVariableArray)
@@ -111,12 +111,12 @@ const EditorPanel: React.FC = () => {
   }
 
   const deleteVariable = (variableIndex: number) => {
-    const newVariableArray = _.cloneDeep(variableArray)
+    const newVariableArray = cloneDeep(variableArray)
     newVariableArray.splice(variableIndex, 1)
     setVariableArray(newVariableArray)
     updateField('contentEditor', null, 'markupVariables', newVariableArray)
 
-    const newControls = _.cloneDeep(controls)
+    const newControls = cloneDeep(controls)
     delete newControls[variableIndex]
     setControls(newControls)
   }

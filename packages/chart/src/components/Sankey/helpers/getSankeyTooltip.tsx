@@ -1,4 +1,4 @@
-import ReactDOMServer from 'react-dom/server'
+//import ReactDOMServer from 'react-dom/server'
 import ColumnList from '../components/ColumnList'
 
 export const getSankeyTooltip = (data: Object, tooltipID: string) => {
@@ -9,8 +9,8 @@ export const getSankeyTooltip = (data: Object, tooltipID: string) => {
   const tooltipColumn1 = (data?.tooltips?.find(item => item.node === tooltipID) || {}).column1
   const tooltipColumn2 = (data?.tooltips?.find(item => item.node === tooltipID) || {}).column2
 
-  const tooltipColumn1Data = ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn1} />)
-  const tooltipColumn2Data = ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn2} />)
+  const tooltipColumn1Data = '' // ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn1} />)
+  const tooltipColumn2Data = '' // ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn2} />)
 
   return `<div class="sankey-chart__tooltip">
     <span class="sankey-chart__tooltip--tooltip-header">${tooltipID}</span>

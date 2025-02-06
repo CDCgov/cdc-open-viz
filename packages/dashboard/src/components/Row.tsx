@@ -16,7 +16,7 @@ import { ConfigRow } from '../types/ConfigRow'
 import { DataDesignerModal } from './DataDesignerModal'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import { iconHash } from '../helpers/iconHash'
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { Visualization } from '@cdc/core/types/Visualization'
 
 type RowMenuProps = {
@@ -26,7 +26,7 @@ type RowMenuProps = {
 const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
   const { config } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
-  const rows = _.cloneDeep(config.rows)
+  const rows = cloneDeep(config.rows)
   const row = config.rows[rowIdx]
 
   const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
@@ -41,7 +41,7 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
   }, [row])
 
   const setRowLayout = (layout: number[], toggle = undefined) => {
-    const newRows = _.cloneDeep(rows)
+    const newRows = cloneDeep(rows)
     newRows[rowIdx].toggle = toggle
     const rowColumns = newRows[rowIdx].columns
     const columnsWithWidgets = rowColumns.filter(c => c.widget)

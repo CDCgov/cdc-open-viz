@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { ChartConfig } from '../types/ChartConfig'
 
 /* editConfigKeys

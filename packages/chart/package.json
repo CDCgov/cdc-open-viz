@@ -41,7 +41,7 @@
     "@visx/stats": "^3.0.0",
     "@visx/text": "^3.0.0",
     "@visx/tooltip": "^3.0.0",
-    "chroma-js": "^2.1.2",
+    "chroma-js": "^3.1.0",
     "d3-array": "^2.8.0",
     "d3-format": "^3.1.0",
     "d3-sankey": "^0.12.3",
@@ -63,7 +63,6 @@
   },
   "gitHead": "c4b0402afe6ed209a85b7078711549b9fd7dae7d",
   "devDependencies": {
-    "@types/d3-sankey": "^0.12.4",
-    "resize-observer-polyfill": "^1.5.1"
+    "@types/d3-sankey": "^0.12.4"
   }
 }

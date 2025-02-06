@@ -3,7 +3,6 @@ import React, { useState, useEffect, useCallback, useMemo, useReducer, useContex
 // IE11
 // import 'core-js/stable'
 import 'whatwg-fetch'
-import ResizeObserver from 'resize-observer-polyfill'
 
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -46,7 +45,7 @@ import { type SharedFilter } from './types/SharedFilter'
 import { type WCMSProps } from '@cdc/core/types/WCMSProps'
 import { type InitialState } from './types/InitialState'
 import MultiTabs from './components/MultiConfigTabs'
-import _ from 'lodash'
+import { cloneDeep, pick, omit, pickBy } from 'lodash-es'
 import EditorContext from '../../editor/src/ConfigContext'
 import { APIFilterDropdowns } from './components/DashboardFilters'
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
@@ -107,13 +106,13 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   )
 
   const reloadURLData = async (newFilters?: SharedFilter[]) => {
-    const config = _.cloneDeep(state.config)
+    const config = cloneDeep(state.config)
     if (!config.datasets) return
     const filters = newFilters || config.dashboard.sharedFilters
     const datasetKeys = reloadURLHelpers.getDatasetKeys(config)
 
-    const newData = _.cloneDeep(state.data)
-    const newDatasets = _.cloneDeep(config.datasets)
+    const newData = cloneDeep(state.data)
+    const newDatasets = cloneDeep(config.datasets)
     let dataWasFetched = false
     let newFileName = ''
 
@@ -201,7 +200,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       }
     }
 
-    const datasetsWithFiles = _.pickBy(newDatasets, dataset => !dataset.dataUrl)
+    const datasetsWithFiles = pickBy(newDatasets, dataset => !dataset.dataUrl)
 
     if (dataWasFetched || Object.keys(datasetsWithFiles).length) {
       const dataFiles = Object.keys(datasetsWithFiles).reduce((acc, key) => {
@@ -252,7 +251,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   }
 
   const setSharedFilter = (key, datum) => {
-    const { config: newConfig, filteredData } = _.cloneDeep(state)
+    const { config: newConfig, filteredData } = cloneDeep(state)
 
     for (let i = 0; i < newConfig.dashboard.sharedFilters.length; i++) {
       const filter = newConfig.dashboard.sharedFilters[i]
@@ -285,15 +284,15 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   }, [isEditor, isPreview, state.config?.activeDashboard])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
-    const config = _.cloneDeep(state.config)
-    const updatedConfig = _.pick(config, ['visualizations', 'multiDashboards'])
+    const config = cloneDeep(state.config)
+    const updatedConfig = pick(config, ['visualizations', 'multiDashboards'])
     updatedConfig.visualizations[visualizationKey] = newConfig
     updatedConfig.visualizations[visualizationKey].formattedData = config.visualizations[visualizationKey].formattedData
     if (config.multiDashboards) {
       const activeDashboard = config.activeDashboard
       const multiDashboards = [...config.multiDashboards]
       const label = multiDashboards[activeDashboard].label
-      const toSave = { label, visualizations: updatedConfig.visualizations, ..._.pick(config, ['dashboard', 'rows']) }
+      const toSave = { label, visualizations: updatedConfig.visualizations, ...pick(config, ['dashboard', 'rows']) }
       multiDashboards[activeDashboard] = toSave
       updatedConfig.multiDashboards = multiDashboards
     }
@@ -491,7 +490,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                   visualizationKey={visualizationKey}
                   config={{ ...visualizationConfig, datasets: state.config.datasets }}
                   isEditor={true}
-                  updateConfig={conf => _updateConfig(_.omit(conf, 'datasets'))}
+                  updateConfig={conf => _updateConfig(omit(conf, 'datasets'))}
                 />
               </>
             )
@@ -549,7 +548,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                 .filter(row => row.columns.filter(col => col.widget).length !== 0)
                 .map((row, index) => {
                   if (row.multiVizColumn && (isPreview || !isEditor)) {
-                    const filteredData = getFilteredData(state, _.cloneDeep(state.data))
+                    const filteredData = getFilteredData(state, cloneDeep(state.data))
                     const data = filteredData[index] ?? row.formattedData
                     const dataGroups = {}
                     data.forEach(d => {

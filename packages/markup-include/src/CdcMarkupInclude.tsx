@@ -1,8 +1,7 @@
 import { useEffect, useCallback, useRef, useReducer, useMemo } from 'react'
-import _ from 'lodash'
+import { isEmpty, uniq } from 'lodash-es'
 // external
 import { Markup } from 'interweave'
-import axios from 'axios'
 
 // cdc
 import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
@@ -127,11 +126,11 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         dispatch({ type: 'SET_URL_MARKUP', payload })
       } else {
         try {
-          await axios.get(srcUrl).then(res => {
-            if (res.data) {
-              dispatch({ type: 'SET_URL_MARKUP', payload: res.data })
-            }
-          })
+          await fetch(srcUrl)
+            .then(res => res.text())
+            .then(data => {
+              dispatch({ type: 'SET_URL_MARKUP', payload: data })
+            })
         } catch (err) {
           if (err.response) {
             // Response with error
@@ -164,7 +163,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const emptyVariableChecker = []
 
   const convertVariablesInMarkup = inlineMarkup => {
-    if (_.isEmpty(markupVariables)) return inlineMarkup
+    if (isEmpty(markupVariables)) return inlineMarkup
     const variableRegexPattern = /{{(.*?)}}/g
     const convertedInlineMarkup = inlineMarkup.replace(variableRegexPattern, variableTag => {
       if (emptyVariableChecker.length > 0) return
@@ -175,7 +174,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
           ? data
           : filterOutConditions(data, [...workingVariable.conditions])
 
-      const variableValues: string[] = _.uniq(
+      const variableValues: string[] = uniq(
         (workingData || []).map(dataObject => {
           const dataObjectValue = dataObject[workingVariable.columnName]
           return workingVariable.addCommas && !isNaN(parseFloat(dataObjectValue))

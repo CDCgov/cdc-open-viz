@@ -4,7 +4,7 @@ import * as d3 from 'd3-geo'
 import { geoCentroid, geoPath, geoContains } from 'd3-geo'
 import { feature } from 'topojson-client'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
-import debounce from 'lodash.debounce'
+import { debounce } from 'lodash-es'
 
 import Loading from '@cdc/core/components/Loading'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -38,7 +38,7 @@ const getTopoData = year => {
   return new Promise((resolve, reject) => {
     const resolveWithTopo = async response => {
       if (response.status !== 200) {
-        response = await import('./../data/cb_2019_us_county_20m.json')
+        response = await import(/* webpackChunkName: "cb_2019_us_county_20m" */ './../data/cb_2019_us_county_20m.json')
       } else {
         response = await response.json()
       }

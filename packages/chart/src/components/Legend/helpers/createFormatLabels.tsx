@@ -3,7 +3,7 @@ import { FaStar } from 'react-icons/fa'
 import { Label } from '../../../types/Label'
 import { ColorScale, TransformedData } from '../../../types/ChartContext'
 import { ChartConfig } from '../../../types/ChartConfig'
-import _ from 'lodash'
+import { cloneDeep, sortBy } from 'lodash-es'
 
 export const createFormatLabels =
   (config: ChartConfig, tableData: Object[], data: TransformedData[], colorScale: ColorScale) =>
@@ -11,7 +11,7 @@ export const createFormatLabels =
     const { visualizationType, visualizationSubType, series, runtime, legend } = config
     const sortVertical = labels =>
       legend.verticalSorted
-        ? _.sortBy(_.cloneDeep(labels), label => {
+        ? sortBy(cloneDeep(labels), label => {
             const match = label.datum?.match(/-?\d+(\.\d+)?/)
             return match ? parseFloat(match[0]) : Number.MAX_SAFE_INTEGER
           })

@@ -1,5 +1,4 @@
 import { isDateScale } from '@cdc/core/helpers/cove/date'
-import _ from 'lodash'
 import { ChartConfig } from '../types/ChartConfig'
 export const getExcludedData = (newConfig: ChartConfig, data: object[]) => {
   let newExcludedData = data

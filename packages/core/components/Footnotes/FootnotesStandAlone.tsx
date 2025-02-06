@@ -3,7 +3,7 @@ import Footnotes from './Footnotes'
 import FootnotesEditor from '../EditorPanel/FootnotesEditor'
 import { ViewPort } from '../../types/ViewPort'
 import FootnotesConfig, { Footnote } from '../../types/Footnotes'
-import _ from 'lodash'
+import { pick } from 'lodash-es'
 import { useMemo } from 'react'
 import { updateFieldFactory } from '../../helpers/updateFieldFactory'
 
@@ -42,7 +42,7 @@ const FootnotesStandAlone: React.FC<StandAloneProps> = ({
     const configData = config.formattedData || config.data
     if (configData && config.dataKey && config.dynamicFootnotes) {
       const { symbolColumn, textColumn, orderColumn } = config.dynamicFootnotes
-      const _data = configData.map(row => _.pick(row, [symbolColumn, textColumn, orderColumn]))
+      const _data = configData.map(row => pick(row, [symbolColumn, textColumn, orderColumn]))
       _data.sort((a, b) => a[orderColumn] - b[orderColumn])
       return _data.map(row => ({ symbol: row[symbolColumn], text: row[textColumn] }))
     }

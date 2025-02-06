@@ -1,11 +1,11 @@
-import _ from 'lodash'
+import { chain, uniq, round, flatMap, capitalize, map, min, filter } from 'lodash-es'
 import { ChartConfig } from '../types/ChartConfig'
 import * as d3 from 'd3-array'
 
 export const getBoxPlotConfig = (newConfig: ChartConfig, data: object[]) => {
   const combinedData = data
-  const groups = _.uniq(_.map(combinedData, newConfig.xAxis.dataKey))
-  const seriesKeys = _.map(newConfig.series, 'dataKey')
+  const groups = uniq(map(combinedData, newConfig.xAxis.dataKey))
+  const seriesKeys = map(newConfig.series, 'dataKey')
   const plots: any[] = []
 
   groups.forEach(g => {
@@ -14,13 +14,13 @@ export const getBoxPlotConfig = (newConfig: ChartConfig, data: object[]) => {
         if (!g) throw new Error('No groups resolved in box plots')
 
         // Start handle operations on combinedData
-        const { count, sortedData } = _.chain(combinedData)
+        const { count, sortedData } = chain(combinedData)
           // Filter by xAxis data key
           .filter(item => item[newConfig.xAxis.dataKey] === g)
           // perform multiple operations on the filtered data
           .thru(filteredData => ({
             count: filteredData.length,
-            sortedData: _.map(filteredData, item => Number(item[seriesKey])).sort()
+            sortedData: map(filteredData, item => Number(item[seriesKey])).sort()
           }))
           // get the results from the chain
           .value()
@@ -38,19 +38,19 @@ export const getBoxPlotConfig = (newConfig: ChartConfig, data: object[]) => {
         plots.push({
           columnCategory: g,
           columnMax: d3.max(nonOutliers),
-          columnThirdQuartile: _.round(q3, newConfig.dataFormat.roundTo),
+          columnThirdQuartile: round(q3, newConfig.dataFormat.roundTo),
           columnMedian: Number(d3.median(sortedData)).toFixed(newConfig.dataFormat.roundTo),
-          columnFirstQuartile: _.round(q1, newConfig.dataFormat.roundTo),
-          columnMin: _.min(nonOutliers),
+          columnFirstQuartile: round(q1, newConfig.dataFormat.roundTo),
+          columnMin: min(nonOutliers),
           columnCount: count,
           columnSd: Number(d3.deviation(sortedData)).toFixed(newConfig.dataFormat.roundTo),
           columnMean: Number(d3.mean(sortedData)).toFixed(newConfig.dataFormat.roundTo),
-          columnIqr: _.round(iqr, newConfig.dataFormat.roundTo),
+          columnIqr: round(iqr, newConfig.dataFormat.roundTo),
           values: sortedData,
           columnLowerBounds: lowerBounds,
           columnUpperBounds: upperBounds,
-          columnOutliers: _.filter(sortedData, value => value < lowerBounds || value > upperBounds),
-          columnNonOutliers: _.filter(sortedData, value => value >= lowerBounds && value <= upperBounds)
+          columnOutliers: filter(sortedData, value => value < lowerBounds || value > upperBounds),
+          columnNonOutliers: filter(sortedData, value => value >= lowerBounds && value <= upperBounds)
         })
       } catch (e) {
         console.error('COVE: ', e.message) // eslint-disable-line
@@ -61,7 +61,7 @@ export const getBoxPlotConfig = (newConfig: ChartConfig, data: object[]) => {
   // Generate a flat list of categories based on seriesKeys and groups
   const categories =
     seriesKeys.length > 1
-      ? _.flatMap(groups, value => _.map(seriesKeys, key => `${_.capitalize(key)} - ${_.capitalize(value)}`))
+      ? flatMap(groups, value => map(seriesKeys, key => `${capitalize(key)} - ${capitalize(value)}`))
       : groups
 
   return [plots, categories]

@@ -5,7 +5,6 @@ import MarkupIncludeIcon from '../../assets/icon-code.svg'
 import { FilterFunction, JsonEditor, UpdateFunction } from 'json-edit-react'
 import { formatConfigBeforeSave as stripConfig } from '../../helpers/formatConfigBeforeSave'
 import './advanced-editor-styles.css'
-import _ from 'lodash'
 import Tooltip from '../ui/Tooltip'
 
 export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExpandCollapse = () => {} }) => {

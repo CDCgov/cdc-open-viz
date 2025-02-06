@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import Conditions from './Conditions'
 import { Variable } from '../types/Variable'
 import { Condition } from '../types/Condition'
-import _ from 'lodash'
+import { uniq, cloneDeep } from 'lodash-es'
 import Icon from '@cdc/core/components/ui/Icon'
 import { CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
@@ -42,7 +42,7 @@ const VariableSection: React.FC<VariableSectionProps> = ({
 
   const conditionLookup: Record<string, string[] | number[]> = useMemo(() => {
     return columnNames.reduce((acc, column) => {
-      acc[column] = _.uniq(data.map(row => row[column]))
+      acc[column] = uniq(data.map(row => row[column]))
       return acc
     }, {})
   }, [columnNames])
@@ -58,7 +58,7 @@ const VariableSection: React.FC<VariableSectionProps> = ({
 
   const updateConditionsList = (conditionSettings: Condition, conditionIndex: number) => {
     const { columnName, isOrIsNotEqualTo, value } = conditionSettings
-    const newConditionsList = _.cloneDeep(conditionsList)
+    const newConditionsList = cloneDeep(conditionsList)
     newConditionsList[conditionIndex] = {
       columnName: columnName,
       isOrIsNotEqualTo: isOrIsNotEqualTo,
@@ -68,7 +68,7 @@ const VariableSection: React.FC<VariableSectionProps> = ({
   }
 
   const removeCondition = (conditionIndex: number) => {
-    const updatedConditionsList = _.cloneDeep(conditionsList)
+    const updatedConditionsList = cloneDeep(conditionsList)
     updatedConditionsList.splice(conditionIndex, 1)
     setConditionsList(updatedConditionsList)
   }

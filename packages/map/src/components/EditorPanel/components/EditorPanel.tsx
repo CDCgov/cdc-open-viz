@@ -10,7 +10,6 @@ import {
 } from 'react-accessible-accordion'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { useDebounce } from 'use-debounce'
-import _ from 'lodash'
 // import ReactTags from 'react-tag-autocomplete'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import Panels from './Panels'
@@ -379,7 +378,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           legend: {
             ...state.legend,
             position: value,
-            hideBorder: _.includes(['top', 'bottom'], value)
+            hideBorder: includes(['top', 'bottom'], value)
           }
         })
         break

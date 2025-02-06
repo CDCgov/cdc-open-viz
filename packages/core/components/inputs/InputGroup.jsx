@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
-import PropTypes from 'prop-types'
 
 const InputGroup = ({ label, flow, children, clear, className, style, ...attributes }) => {
   const [styles, setStyles] = useState({})
@@ -29,7 +28,11 @@ const InputGroup = ({ label, flow, children, clear, className, style, ...attribu
   }, [clear, flow, labelWidth])
 
   return (
-    <div className={`cove-input-group${clear ? ' clear' : ''}${className ? ' ' + className : ''}`} flow={flow} {...attributes}>
+    <div
+      className={`cove-input-group${clear ? ' clear' : ''}${className ? ' ' + className : ''}`}
+      flow={flow}
+      {...attributes}
+    >
       {label && flow ? (
         <>
           {'left' === flow && (
@@ -60,12 +63,6 @@ const InputGroup = ({ label, flow, children, clear, className, style, ...attribu
       )}
     </div>
   )
-}
-
-InputGroup.propTypes = {
-  /* Text to display for the input group */
-  label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  flow: PropTypes.oneOf(['left', 'center', 'right'])
 }
 
 export default InputGroup

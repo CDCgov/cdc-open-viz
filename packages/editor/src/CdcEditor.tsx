@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useReducer, useMemo } from 're
 
 // IE11
 // import 'core-js/stable' // temp remove, appears to be used with html2pdf.js which we're temp removing
-import ResizeObserver from 'resize-observer-polyfill'
 
 import getViewport from '@cdc/core/helpers/getViewport'
 
@@ -22,7 +21,7 @@ import { legacyConfigSupport } from './helpers/legacyConfigSupport'
 
 import './scss/main.scss'
 import editorReducer, { EditorState } from './store/editor.reducer'
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { WCMSProps } from '@cdc/core/types/WCMSProps'
 import { devToolsStore } from '@cdc/core/helpers/withDevTools'
 
@@ -48,7 +47,7 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
   const [state, dispatch] = useReducer(editorReducer, initialState)
 
   const setTempConfigAndUpdate = config => {
-    updateVizConfig(_.cloneDeep(config))
+    updateVizConfig(cloneDeep(config))
     dispatch({ type: 'EDITOR_TEMP_SAVE', payload: config })
   }
 

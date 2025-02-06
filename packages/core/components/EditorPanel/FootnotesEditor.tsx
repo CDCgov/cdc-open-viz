@@ -1,5 +1,5 @@
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import Footnotes, { Footnote } from '../../types/Footnotes'
 import { footnotesSymbols } from '../../helpers/footnoteSymbols'
 import InputSelect from '../inputs/InputSelect'
@@ -16,13 +16,13 @@ const FootnotesEditor: React.FC<FootnotesEditorProps> = ({ config, updateField }
   }
 
   const updateStaticFootnote = (footnoteIndex, footnoteUpdate: Footnote) => {
-    const footnoteCopy = _.cloneDeep(config.staticFootnotes)
+    const footnoteCopy = cloneDeep(config.staticFootnotes)
     footnoteCopy[footnoteIndex] = footnoteUpdate
     updateField(null, null, 'staticFootnotes', footnoteCopy)
   }
 
   const deleteStaticFootnote = footnoteIndex => {
-    const footnoteCopy = _.cloneDeep(config.staticFootnotes)
+    const footnoteCopy = cloneDeep(config.staticFootnotes)
     footnoteCopy.splice(footnoteIndex, 1)
     updateField(null, null, 'staticFootnotes', footnoteCopy)
   }

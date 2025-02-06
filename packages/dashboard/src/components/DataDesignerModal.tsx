@@ -5,7 +5,6 @@ import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 import Modal from '@cdc/core/components/ui/Modal'
 import { CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
-import _ from 'lodash'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { ConfigureData } from '@cdc/core/types/ConfigureData'
@@ -58,7 +57,11 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
 
     const dataDescription = { ...configureData.dataDescription, [key]: value }
 
-    const newConfigureData = { data: newData, dataDescription, formattedData: transform.developerStandardize(newData, dataDescription) }
+    const newConfigureData = {
+      data: newData,
+      dataDescription,
+      formattedData: transform.developerStandardize(newData, dataDescription)
+    }
 
     updateConfigureData(newConfigureData)
     setCanContinue(true)
@@ -83,7 +86,8 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
           Select a dataset:&nbsp;
           <select className='dataset-selector' value={configureData.dataKey || ''} onChange={changeDataset}>
             <option value=''>Select a dataset</option>
-            {config.datasets && Object.keys(config.datasets).map(datasetKey => <option key={datasetKey}>{datasetKey}</option>)}
+            {config.datasets &&
+              Object.keys(config.datasets).map(datasetKey => <option key={datasetKey}>{datasetKey}</option>)}
           </select>
           {vizKey && (
             <CheckBox
@@ -116,7 +120,10 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p>You can select a column where for each unique value in the column the configuration for the row will be repeated in to the data preview.</p>
+                    <p>
+                      You can select a column where for each unique value in the column the configuration for the row
+                      will be repeated in to the data preview.
+                    </p>
                   </Tooltip.Content>
                 </Tooltip>
               }
@@ -127,15 +134,31 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
             />
           ) : (
             <>
-              <InputSelect options={Object.keys(config.datasets[configureData.dataKey]?.data[0] || {})} value={config.rows[rowIndex].multiVizColumn} label='Multi-Visualization Column' initial='--Select--' updateField={(section, subsection, fieldName, value) => setMultiVizColumn(value)} required />
-              <CheckBox value={config.rows[rowIndex].expandCollapseAllButtons} label=' Add Expand/Collapse All buttons' fieldName='' updateField={(section, subsection, fieldName, value) => setExpandCollapseAllButtons(value)} />
+              <InputSelect
+                options={Object.keys(config.datasets[configureData.dataKey]?.data[0] || {})}
+                value={config.rows[rowIndex].multiVizColumn}
+                label='Multi-Visualization Column'
+                initial='--Select--'
+                updateField={(section, subsection, fieldName, value) => setMultiVizColumn(value)}
+                required
+              />
+              <CheckBox
+                value={config.rows[rowIndex].expandCollapseAllButtons}
+                label=' Add Expand/Collapse All buttons'
+                fieldName=''
+                updateField={(section, subsection, fieldName, value) => setExpandCollapseAllButtons(value)}
+              />
             </>
           )
         ) : (
           <></>
         )}
         {canContinue && (
-          <button style={{ margin: '1em', display: 'block' }} className='cove-button' onClick={() => overlay?.actions.toggleOverlay()}>
+          <button
+            style={{ margin: '1em', display: 'block' }}
+            className='cove-button'
+            onClick={() => overlay?.actions.toggleOverlay()}
+          >
             Continue
           </button>
         )}

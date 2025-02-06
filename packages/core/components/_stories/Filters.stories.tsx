@@ -3,7 +3,7 @@ import { Meta, StoryObj } from '@storybook/react'
 import Filters from '../Filters'
 import { VizFilter } from '../../types/VizFilter'
 import { faker } from '@faker-js/faker'
-import _ from 'lodash'
+import { times } from 'lodash-es'
 import { Visualization } from '../../types/Visualization'
 
 const meta: Meta<typeof Filters> = {
@@ -15,7 +15,7 @@ type Story = StoryObj<typeof Filters>
 
 faker.seed(123)
 
-const animalData = _.times(7, () => ({ bear: faker.animal.bear(), cat: faker.animal.cat(), cow: faker.animal.cow() }))
+const animalData = times(7, () => ({ bear: faker.animal.bear(), cat: faker.animal.cat(), cow: faker.animal.cow() }))
 const generateFilters = filterStyle => {
   return ['bear', 'cat', 'cow'].map(columnName => {
     return {

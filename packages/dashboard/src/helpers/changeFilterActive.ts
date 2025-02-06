@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { FilterBehavior } from '../helpers/FilterBehavior'
 import { getQueryParams, updateQueryString } from '@cdc/core/helpers/queryStringUtils'
 import { SharedFilter } from '../types/SharedFilter'
@@ -27,7 +27,7 @@ export const changeFilterActive = (
   sharedFilters: SharedFilter[],
   vizConfig: DashboardFilters
 ): [SharedFilter[], number[]] => {
-  const sharedFiltersCopy = _.cloneDeep(sharedFilters)
+  const sharedFiltersCopy = cloneDeep(sharedFilters)
   const currentFilter = sharedFiltersCopy[filterIndex]
   if (vizConfig.filterBehavior !== FilterBehavior.Apply || vizConfig.autoLoad) {
     if (currentFilter?.filterStyle === FILTER_STYLE.nestedDropdown) {

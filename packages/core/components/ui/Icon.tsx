@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types'
-
 import iconCaretUp from '../../assets/icon-caret-up.svg'
 import iconCaretDown from '../../assets/icon-caret-down.svg'
 import iconCaretFilledUp from '../../assets/icon-caret-filled-up.svg'

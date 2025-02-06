@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 export default function methodologyAPI(select: string, where?: [string, string | number]): Object[] {
   const data = [
     {
@@ -86,5 +84,5 @@ export default function methodologyAPI(select: string, where?: [string, string |
     })
     .map(row => (selectCol === '*' ? row : { [selectCol]: row[selectCol] }))
 
-  return distinct ? _.uniqBy(rows, selectCol) : rows
+  return distinct ? uniqBy(rows, selectCol) : rows
 }

@@ -1,7 +1,7 @@
 import Footnotes from '@cdc/core/types/Footnotes'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
-import _ from 'lodash'
+import { cloneDeep, omit } from 'lodash-es'
 
 const cleanDashboardFootnotes = (config: DashboardConfig) => {
   // strip any blank footnote visualizations
@@ -43,7 +43,7 @@ const cleanDashboardData = (config: DashboardConfig) => {
   }
   if (config.visualizations) {
     Object.keys(config.visualizations).forEach(vizKey => {
-      config.visualizations[vizKey] = _.omit(config.visualizations[vizKey], [
+      config.visualizations[vizKey] = omit(config.visualizations[vizKey], [
         'runtime',
         'formattedData',
         'data',
@@ -55,7 +55,7 @@ const cleanDashboardData = (config: DashboardConfig) => {
   if (config.rows) {
     config.rows.forEach((row, i) => {
       if (row.dataKey) {
-        config.rows[i] = _.omit(row, ['data', 'formattedData'])
+        config.rows[i] = omit(row, ['data', 'formattedData'])
       }
     })
   }
@@ -94,7 +94,7 @@ const removeRuntimeDataURLs = (config: DashboardConfig) => {
 }
 
 export const formatConfigBeforeSave = configToStrip => {
-  const strippedConfig = _.cloneDeep(configToStrip)
+  const strippedConfig = cloneDeep(configToStrip)
   if (strippedConfig.type === 'dashboard') {
     if (strippedConfig.multiDashboards) {
       strippedConfig.multiDashboards.forEach((multiDashboard, i) => {

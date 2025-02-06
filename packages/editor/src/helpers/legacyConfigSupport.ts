@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { pick } from 'lodash-es'
 
 // Legacy support - dashboards using a single dataset
 export const legacyConfigSupport = config => {
@@ -13,16 +13,23 @@ export const legacyConfigSupport = config => {
 
       newConfig.datasets = {}
       newConfig.datasets[dataKey] = {
-        ..._.pick(config, ['data', 'dataUrl', 'dataFileSourceType']),
+        ...pick(config, ['data', 'dataUrl', 'dataFileSourceType']),
         dataFileName: dataKey
       }
 
       Object.keys(newConfig.visualizations).forEach(vizKey => {
-        const newData = { dataKey, ..._.pick(newConfig, 'dataDescription', 'formattedData') }
+        const newData = { dataKey, ...pick(newConfig, 'dataDescription', 'formattedData') }
         newConfig.visualizations[vizKey] = { ...newConfig.visualizations[vizKey], ...newData }
       })
 
-      const blankFields = { data: [], dataUrl: '', dataFileName: '', dataFileSourceType: '', dataDescription: [], formattedData: [] }
+      const blankFields = {
+        data: [],
+        dataUrl: '',
+        dataFileName: '',
+        dataFileSourceType: '',
+        dataDescription: [],
+        formattedData: []
+      }
       newConfig = { ...newConfig, ...blankFields }
     }
 

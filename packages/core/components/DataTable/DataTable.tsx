@@ -22,7 +22,7 @@ import { Column } from '../../types/Column'
 import { pivotData } from '../../helpers/pivotData'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import './data-table.css'
-import _ from 'lodash'
+import { omit } from 'lodash-es'
 
 export type DataTableProps = {
   applyLegendToRow?: Function
@@ -81,7 +81,7 @@ const DataTable = (props: DataTableProps) => {
       const { columnName, valueColumns } = config.table.pivot
       if (columnName && valueColumns) {
         // remove excluded columns so that they aren't included in the pivot calculation
-        const _data = data.map(row => _.omit(row, excludeColumns))
+        const _data = data.map(row => omit(row, excludeColumns))
         return pivotData(_data, columnName, valueColumns)
       }
     }

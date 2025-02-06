@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { SharedFilter } from '../types/SharedFilter'
 
@@ -36,7 +36,7 @@ export const addValuesToDashboardFilters = (
   return filters?.map((filter, index) => {
     if (filtersToSkip.includes(index)) return filter
     if (filter.type === 'urlfilter') return filter
-    const filterCopy = _.cloneDeep(filter)
+    const filterCopy = cloneDeep(filter)
     const filterValues = generateValuesForFilter(getSelector(filter), data)
 
     filterCopy.values = filterValues

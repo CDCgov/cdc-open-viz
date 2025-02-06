@@ -1,10 +1,10 @@
 import { TableConfig } from '../types/TableConfig'
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { Column } from '../../../types/Column'
 
 export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, runtimeData: Object[]): string[] => {
   if (config.visualizationType === 'Sankey') return Object.keys(config?.data?.[0]?.tableData[0])
-  const configColumns = _.cloneDeep(config.columns) || ({} as Record<string, Column>)
+  const configColumns = cloneDeep(config.columns) || ({} as Record<string, Column>)
   const excludeColumns = Object.values(configColumns)
     .filter(column => column.dataTable === false)
     .map(column => column.name)

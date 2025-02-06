@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 
 const addFiltersToTables = config => {
   if (config.type === 'dashboard') {
@@ -17,7 +17,7 @@ const addFiltersToTables = config => {
 const update_4_24_4 = config => {
   const ver = '4.24.4'
 
-  const newConfig = _.cloneDeep(config)
+  const newConfig = cloneDeep(config)
   addFiltersToTables(newConfig)
 
   newConfig.version = ver

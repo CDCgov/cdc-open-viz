@@ -4,7 +4,7 @@ import ConfigContext from '../../../../ConfigContext.js'
 // CDC Core
 import Accordion from '@cdc/core/components/ui/Accordion'
 import Button from '@cdc/core/components/elements/Button'
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 
 // types
 import { type PanelProps } from './../PanelProps'
@@ -153,7 +153,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     <input
                       type='range'
                       onChange={e => {
-                        const updatedAnnotations = _.cloneDeep(config?.annotations)
+                        const updatedAnnotations = cloneDeep(config?.annotations)
                         updatedAnnotations[index].opacity = e.target.value
                         updateConfig({
                           ...config,
@@ -170,7 +170,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                       type='checkbox'
                       checked={config?.annotations[index]?.edit?.subject || false}
                       onChange={e => {
-                        const updatedAnnotations = _.cloneDeep(config?.annotations)
+                        const updatedAnnotations = cloneDeep(config?.annotations)
                         updatedAnnotations[index].edit.subject = e.target.checked
                         updateConfig({
                           ...config,
@@ -185,7 +185,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                       type='checkbox'
                       checked={config?.annotations[index]?.edit?.label || false}
                       onChange={e => {
-                        const updatedAnnotations = _.cloneDeep(config?.annotations)
+                        const updatedAnnotations = cloneDeep(config?.annotations)
                         updatedAnnotations[index].edit.label = e.target.checked
                         updateConfig({
                           ...config,
@@ -200,7 +200,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     <select
                       key='annotation-connection-type'
                       onChange={e => {
-                        const updatedAnnotations = _.cloneDeep(config?.annotations)
+                        const updatedAnnotations = cloneDeep(config?.annotations)
                         updatedAnnotations[index].connectionType = e.target.value
                         updateConfig({
                           ...config,
@@ -231,7 +231,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                           max='20'
                           value={config?.annotations[index]?.bezier || 0}
                           onChange={e => {
-                            const updatedAnnotations = _.cloneDeep(config?.annotations)
+                            const updatedAnnotations = cloneDeep(config?.annotations)
                             updatedAnnotations[index].bezier = e.target.value
                             updateConfig({
                               ...config,
@@ -247,7 +247,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     Connection Location:
                     <select
                       onChange={e => {
-                        const updatedAnnotations = _.cloneDeep(config?.annotations)
+                        const updatedAnnotations = cloneDeep(config?.annotations)
                         updatedAnnotations[index].connectionLocation = e.target.value
                         updateConfig({
                           ...config,
@@ -269,7 +269,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                       key='annotation-marker'
                       value={annotation.marker}
                       onChange={e => {
-                        const updatedAnnotations = _.cloneDeep(config?.annotations)
+                        const updatedAnnotations = cloneDeep(config?.annotations)
                         updatedAnnotations[index].marker = e.target.value
                         updateConfig({
                           ...config,

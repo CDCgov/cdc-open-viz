@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { csvParse } from 'd3'
-import axios from 'axios'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
@@ -112,13 +111,10 @@ export default function DataImport() {
     const fileExtension = getFileExtension(dataURL)
     try {
       // eslint-disable-next-line no-unused-vars
-      await axios
-        .get(dataURL.toString(), {
-          responseType: 'blob'
-        })
-        .then(response => {
-          responseBlob = response.data
-
+      await fetch(dataURL.toString())
+        .then(response => response.blob())
+        .then(responseB => {
+          responseBlob = responseB
           // Sometimes the files are coming in as plain text types... Maybe when saved from Macs
           const csvTypes = ['text/csv', 'text/plain']
           if ((fileExtension === '.csv' && csvTypes.includes(responseBlob.type)) || isSolrCsv(externalURL)) {

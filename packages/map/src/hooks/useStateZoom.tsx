@@ -3,7 +3,6 @@ import ConfigContext from '../context'
 import { geoAlbersUsaTerritories, GeoProjection } from 'd3-composite-projections'
 import { MapContext } from '../types/MapContext'
 import { geoPath, GeoPath } from 'd3-geo'
-import _ from 'lodash'
 import { getFilterControllingStatePicked } from '../components/UsaMap/helpers/map'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
 
@@ -22,7 +21,8 @@ interface Position {
 }
 
 const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
-  const { setTranslate, setScale, setStateToShow, setPosition, state, setState, runtimeData } = useContext<MapContext>(ConfigContext)
+  const { setTranslate, setScale, setStateToShow, setPosition, state, setState, runtimeData } =
+    useContext<MapContext>(ConfigContext)
   const statePicked = getFilterControllingStatePicked(state, runtimeData)
   const defaultStateToShow = 'Alabama'
   useEffect(() => {

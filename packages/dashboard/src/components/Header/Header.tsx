@@ -5,7 +5,7 @@ import { DashboardContext, DashboardDispatchContext } from '../../DashboardConte
 import './index.scss'
 import MultiConfigTabs from '../MultiConfigTabs'
 import { Tab } from '../../types/Tab'
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 
 type HeaderProps = {
   back?: any
@@ -21,7 +21,7 @@ const Header = (props: HeaderProps) => {
   const dispatch = useContext(DashboardDispatchContext)
   const back = () => {
     if (!visualizationKey) return
-    const newConfig = _.cloneDeep(config)
+    const newConfig = cloneDeep(config)
     newConfig.visualizations[visualizationKey].editing = false
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
 

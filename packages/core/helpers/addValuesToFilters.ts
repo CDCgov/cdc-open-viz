@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { cloneDeep, keyBy } from 'lodash-es'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { VizFilter } from '../types/VizFilter'
 import { FILTER_STYLE } from '@cdc/dashboard/src/types/FilterStyles'
@@ -126,9 +126,9 @@ const includes = (arr: any[], val: any): boolean => {
 }
 
 export const addValuesToFilters = (filters: VizFilter[], data: any[] | MapData): Array<VizFilter> => {
-  const filtersLookup = _.keyBy(filters, 'id')
+  const filtersLookup = keyBy(filters, 'id')
   return filters?.map(filter => {
-    const filterCopy = _.cloneDeep(filter)
+    const filterCopy = cloneDeep(filter)
     let filteredData = data
     const isMapData = !Array.isArray(data)
     if (filter.parents?.length && !isMapData) {

@@ -4,7 +4,6 @@ import GroupRow from './components/GroupRow'
 import { CellMatrix, GroupCellMatrix } from './types/CellMatrix'
 import { RowType } from './types/RowType'
 import { PreliminaryDataItem } from '@cdc/chart/src/types/ChartConfig'
-import _ from 'lodash'
 
 type TableProps = {
   childrenMatrix: CellMatrix | GroupCellMatrix

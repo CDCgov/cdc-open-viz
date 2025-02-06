@@ -2,7 +2,7 @@ import { useContext, useState } from 'react'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 import Filters from './DashboardFilters'
 import { changeFilterActive } from '../../helpers/changeFilterActive'
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { FilterBehavior } from '../../helpers/FilterBehavior'
 import { getFilteredData } from '../../helpers/getFilteredData'
 import { DashboardFilters } from '../../types/DashboardFilters'
@@ -47,7 +47,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
 
   const applyFilters = e => {
     e.preventDefault() // prevent form submission
-    const dashboardConfig = _.cloneDeep(state.config.dashboard)
+    const dashboardConfig = cloneDeep(state.config.dashboard)
     const nonAutoLoadFilterIndexes = Object.values(state.config.visualizations)
       .filter(v => v.type === 'dashboardFilters')
       .reduce((acc, viz: DashboardFilters) => (!viz.autoLoad ? [...acc, viz.sharedFilterIndexes] : acc), [])
@@ -84,7 +84,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       }
       setAPILoading(true)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: dashboardConfig.sharedFilters })
-      dispatch({ type: 'SET_FILTERED_DATA', payload: getFilteredData(_.cloneDeep(state)) })
+      dispatch({ type: 'SET_FILTERED_DATA', payload: getFilteredData(cloneDeep(state)) })
       loadAPIFilters(dashboardConfig.sharedFilters, apiFilterDropdowns)
         .then(newFilters => {
           reloadURLData(newFilters)
@@ -98,7 +98,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   }
 
   const handleOnChange = (index: number, value: string | string[]) => {
-    const newConfig = _.cloneDeep(dashboardConfig)
+    const newConfig = cloneDeep(dashboardConfig)
     let [newSharedFilters, changedFilterIndexes] = changeFilterActive(
       index,
       value,
@@ -137,7 +137,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       if (newSharedFilters[index].type === 'urlfilter' && newSharedFilters[index].apiFilter) {
         reloadURLData(newSharedFilters)
       } else {
-        const clonedState = _.cloneDeep(state)
+        const clonedState = cloneDeep(state)
         clonedState.config.dashboard.sharedFilters = newSharedFilters
         const newFilteredData = getFilteredData(clonedState)
         dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })

@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { SharedFilter } from '../types/SharedFilter'
 import { FILTER_STYLE } from '../types/FilterStyles'
 
@@ -24,7 +23,7 @@ function getMaxTierAndSetFilterTiers(filters: SharedFilter[]): number {
 }
 
 function filter(data = [], filters: SharedFilter[], condition) {
-  const activeFilters = _.filter(filters, f => (f.resetLabel === f.active ? f.values?.includes(f.resetLabel) : true))
+  const activeFilters = filter(filters, f => (f.resetLabel === f.active ? f.values?.includes(f.resetLabel) : true))
   return data.filter(row => {
     const foundMatchingFilter = activeFilters.find(filter => {
       const currentValue = row[filter.columnName]

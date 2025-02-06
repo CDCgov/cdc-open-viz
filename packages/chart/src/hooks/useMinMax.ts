@@ -1,5 +1,5 @@
 import { ChartConfig } from '../types/ChartConfig'
-import _ from 'lodash'
+import { pick } from 'lodash-es'
 import { isConvertLineToBarGraph } from '../helpers/isConvertLineToBarGraph'
 
 type UseMinMaxProps = {
@@ -177,8 +177,8 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
         if (pd.type !== 'suppression' || !pd.style) return false
 
         // Filter data item based on current series keys and check if pd.value is present
-        const relevantData = _.pick(dataItem, config.runtime?.seriesKeys)
-        const isValuePresent = _.values(relevantData).includes(pd.value)
+        const relevantData = pick(dataItem, config.runtime?.seriesKeys)
+        const isValuePresent = values(relevantData).includes(pd.value)
 
         // Check for value match condition
         const valueMatch = pd.column ? dataItem[pd.column] === pd.value : isValuePresent

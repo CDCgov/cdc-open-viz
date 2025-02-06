@@ -1,5 +1,4 @@
 import React, { Children } from 'react'
-import PropTypes from 'prop-types'
 
 import { useGlobalContext } from '../GlobalContext'
 import Icon from './Icon'
@@ -8,10 +7,18 @@ import '../../styles/v2/components/modal.scss'
 
 //Define the "slots" to be populated by subcomponents
 const ModalHeader = () => null
-const ModalContent = (children) => children
+const ModalContent = children => children
 const ModalFooter = () => null
 
-const Modal = ({ fontTheme = 'dark', headerBgColor = '#fff', showDividerTop = true, showDividerBottom = true, showClose = true, children, override = null }) => {
+const Modal = ({
+  fontTheme = 'dark',
+  headerBgColor = '#fff',
+  showDividerTop = true,
+  showDividerBottom = true,
+  showClose = true,
+  children,
+  override = null
+}) => {
   //Access global overlay state
   let { overlay } = useGlobalContext()
 
@@ -76,13 +83,5 @@ const Modal = ({ fontTheme = 'dark', headerBgColor = '#fff', showDividerTop = tr
 Modal.Header = ModalHeader
 Modal.Content = ModalContent
 Modal.Footer = ModalFooter
-
-Modal.propTypes = {
-  fontTheme: PropTypes.oneOf(['dark', 'light']),
-  headerBgColor: PropTypes.string,
-  showDividerTop: PropTypes.bool,
-  showDividerBottom: PropTypes.bool,
-  showClose: PropTypes.bool
-}
 
 export default Modal

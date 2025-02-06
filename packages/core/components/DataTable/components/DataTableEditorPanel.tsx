@@ -1,11 +1,17 @@
-import { Accordion, AccordionItem, AccordionItemButton, AccordionItemHeading, AccordionItemPanel } from 'react-accessible-accordion'
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemButton,
+  AccordionItemHeading,
+  AccordionItemPanel
+} from 'react-accessible-accordion'
 import DataTableEditor from '../../EditorPanel/DataTableEditor'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { useMemo } from 'react'
 import ColumnsEditor from '../../EditorPanel/ColumnsEditor'
 import VizFilterEditor from '../../EditorPanel/VizFilterEditor'
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 
 type DataTableEditorProps = {
   config: Visualization
@@ -15,7 +21,7 @@ type DataTableEditorProps = {
 const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateConfig }) => {
   const updateField = useMemo(() => updateFieldFactory(config, updateConfig), [JSON.stringify(config)])
   const deleteColumn = columnName => {
-    const newColumns = _.cloneDeep(config.columns)
+    const newColumns = cloneDeep(config.columns)
 
     delete newColumns[columnName]
 

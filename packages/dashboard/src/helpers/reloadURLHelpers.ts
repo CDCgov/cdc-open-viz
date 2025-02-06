@@ -2,7 +2,7 @@ import { gatherQueryParams } from '@cdc/core/helpers/gatherQueryParams'
 import { SharedFilter } from '../types/SharedFilter'
 import { capitalizeSplitAndJoin } from '@cdc/core/helpers/cove/string'
 import { AnyVisualization, Visualization } from '@cdc/core/types/Visualization'
-import _ from 'lodash'
+import { cloneDeep, uniq } from 'lodash-es'
 import { DashboardConfig } from '../types/DashboardConfig'
 import { ConfigRow } from '../types/ConfigRow'
 
@@ -31,7 +31,7 @@ export const getDatasetKeys = ({ visualizations, datasets, rows }: GetDatasetKey
   const vizDataKeys = Object.values(visualizations).map(viz => viz.dataKey)
   const rowDataKeys = rows.map(row => row.dataKey)
   // ensure to only load datasets for the specific dashboard tab.
-  const datasetsUsedByDashboard = _.uniq([...vizDataKeys, ...rowDataKeys])
+  const datasetsUsedByDashboard = uniq([...vizDataKeys, ...rowDataKeys])
   return Object.keys(datasets).filter(datasetKey => datasetsUsedByDashboard.includes(datasetKey))
 }
 
@@ -99,7 +99,7 @@ export const getVisualizationsWithFormattedData = (visualizations: Record<string
       acc[vizKey].formattedData = newData[dataKey]
     }
     return acc
-  }, _.cloneDeep(visualizations))
+  }, cloneDeep(visualizations))
 }
 
 export const filterUsedByDataUrl = (

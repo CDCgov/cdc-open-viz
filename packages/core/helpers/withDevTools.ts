@@ -38,7 +38,7 @@ type DevTools = {
 
 // constants
 const withDevTools = typeof window !== 'undefined' && (window as any).__REDUX_DEVTOOLS_EXTENSION__
-const devTools: DevTools = !withDevTools ? null : (window as any).__REDUX_DEVTOOLS_EXTENSION__.connect()
+const devTools: DevTools = !withDevTools ? null : (window as any).__REDUX_DEVTOOLS_EXTENSION__connect()
 export const devToolsStore = !withDevTools ? null : devTools
 
 export const devToolsWrapper =

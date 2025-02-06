@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { uniq, sortBy } from 'lodash-es'
 import * as d3 from 'd3-array'
 
 interface Plot {
@@ -33,7 +33,7 @@ export const calculateBoxPlotStats = (values: number[]) => {
   if (!values || values.length === 0) return {}
 
   // Sort the values
-  const sortedValues = _.sortBy(values)
+  const sortedValues = sortBy(values)
 
   // Quartiles
   const firstQuartile = d3.quantile(sortedValues, 0.25) ?? 0
@@ -93,7 +93,7 @@ export const calculateNonOutliers = (values: number[], firstQuartile: number, th
 export const createPlots = (data, config) => {
   const dataKeys = data.map(d => d[config.xAxis.dataKey])
   const plots: Plot[] = []
-  const groups: string[] = _.uniq(dataKeys)
+  const groups: string[] = uniq(dataKeys)
 
   if (groups && groups.length > 0) {
     groups.forEach(group => {

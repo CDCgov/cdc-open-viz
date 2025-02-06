@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { mapValues } from 'lodash-es'
 
 type DataArray = Record<string, any>[]
 
@@ -269,7 +269,7 @@ export class DataTransform {
     const isNumber = (value: any) => !isNaN(parseFloat(value)) && isFinite(value)
 
     return data.map(item =>
-      _.mapValues(item, (value, key) => {
+      mapValues(item, (value, key) => {
         if (key === excludeKey) return value
 
         // Handle string values and sanitize them

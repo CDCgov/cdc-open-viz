@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 import { loadAPIFiltersFactory } from '../loadAPIFilters'
 import { faker } from '@faker-js/faker'
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { SharedFilter } from '../../types/SharedFilter'
 
 faker.seed(123)
@@ -175,7 +175,7 @@ describe('loadAPIFiltersFactory', () => {
     expect(newSharedFilters[2].active).toEqual([2020])
   })
   it('returns new active values for multiselect', async () => {
-    const _sharedFilters = _.cloneDeep(sharedFilters)
+    const _sharedFilters = cloneDeep(sharedFilters)
     _sharedFilters[1].active = 'Q1'
     _sharedFilters[2].active = ['2020', '2021']
     const apiDropdownsLoaded = {
@@ -219,7 +219,7 @@ describe('loadAPIFiltersFactory', () => {
     expect(newSharedFilters[2].active).toEqual(['2020', '2021'])
   })
   it('loads All filters if loadAll is true', async () => {
-    const _sharedFilters = _.cloneDeep(sharedFilters)
+    const _sharedFilters = cloneDeep(sharedFilters)
     const newSharedFilters = await loadAPIFilters(_sharedFilters, {}, true)
     expect(newSharedFilters[2].active).toEqual([2020])
   })

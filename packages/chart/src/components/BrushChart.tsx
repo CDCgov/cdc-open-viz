@@ -4,7 +4,7 @@ import ConfigContext from '../ConfigContext'
 import * as d3 from 'd3'
 import { Text } from '@visx/text'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
-import _ from 'lodash'
+import { get, sortBy } from 'lodash-es'
 
 interface BrushChartProps {
   xMax: number
@@ -92,21 +92,21 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
 
       const [x0, x1] = selection.map(value => xScale.invert(value))
 
-      const newFilteredData = _.filter(tableData, d => {
+      const newFilteredData = filter(tableData, d => {
         const parsedDate = new Date(d[config.xAxis.dataKey])
         return parsedDate && !isNaN(parsedDate.getTime()) && parsedDate >= x0 && parsedDate <= x1
       })
 
       const sortByRecentDate = config.xAxis.sortByRecentDate
 
-      const sortedData = _.sortBy(newFilteredData, item => new Date(item[config.xAxis.dataKey]))
+      const sortedData = sortBy(newFilteredData, item => new Date(item[config.xAxis.dataKey]))
 
       // If ascending is false, reverse the sorted array
       const finalData = !sortByRecentDate ? sortedData : sortedData.reverse()
 
       // Retrieve the start and end dates based on the sorted data array
-      const startDate = _.get(_.first(finalData), config.xAxis.dataKey, '')
-      const endDate = _.get(_.last(finalData), config.xAxis.dataKey, '')
+      const startDate = get(first(finalData), config.xAxis.dataKey, '')
+      const endDate = get(last(finalData), config.xAxis.dataKey, '')
       // add custom blue colored handlers to each corners of brush
       svg.selectAll('.handle--custom').remove()
       // append handler

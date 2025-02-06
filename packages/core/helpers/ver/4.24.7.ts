@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
 import { MultiDashboardConfig } from '@cdc/dashboard/src/types/MultiDashboard'
 import { AnyVisualization } from '../../types/Visualization'
@@ -52,7 +52,10 @@ export const dashboardFiltersMigrate = config => {
     newVisualizations[vizKey] = viz
   })
 
-  if (config.dashboard.sharedFilters.length && !Object.values(newVisualizations).find((v: AnyVisualization) => v.type === 'dashboardFilters')) {
+  if (
+    config.dashboard.sharedFilters.length &&
+    !Object.values(newVisualizations).find((v: AnyVisualization) => v.type === 'dashboardFilters')
+  ) {
     const newViz = {
       type: 'dashboardFilters',
       visualizationType: 'dashboardFilters',
@@ -112,7 +115,7 @@ const updateLogarithmicConfig = newConfig => {
 const update_4_24_7 = config => {
   const ver = '4.24.7'
 
-  const newConfig = _.cloneDeep(config)
+  const newConfig = cloneDeep(config)
 
   mapUpdates(newConfig)
   dashboardFiltersMigrate(newConfig)

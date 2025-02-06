@@ -22,7 +22,6 @@ import chroma from 'chroma-js'
 // Local context and types
 import BarChartContext, { BarChartContextValues } from './context'
 import { ChartContext } from '../../../types/ChartContext'
-import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
 
 export const BarChartHorizontal = () => {

@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { TransformedData } from '../../../types/ChartContext'
 import { ChartConfig } from '../../../types/ChartConfig'
 
@@ -7,7 +6,7 @@ export const getBarData = (config: ChartConfig, data: TransformedData[], hasConf
   if (!dynamicSeries) return data
   const { dynamicCategory, dataKey } = dynamicSeries
   const xAxisKey = config.runtime.originalXAxis.dataKey
-  const xAxisGroupDataLookup = _.groupBy(data, xAxisKey)
+  const xAxisGroupDataLookup = groupBy(data, xAxisKey)
   return Object.values(xAxisGroupDataLookup).map(group => {
     return group.reduce((acc, datum) => {
       const dataValue = datum[dataKey]

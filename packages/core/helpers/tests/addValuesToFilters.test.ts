@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { VizFilter } from '../../types/VizFilter'
 import { addValuesToFilters } from '../addValuesToFilters'
 import { describe, it, expect, vi } from 'vitest'
@@ -15,7 +15,7 @@ describe('addValuesToFilters', () => {
   ]
   const filters: VizFilter[] = [parentFilter, childFilter, parentFilter2]
   it('adds filter values based on parent active values', () => {
-    const filtersCopy = _.cloneDeep(filters)
+    const filtersCopy = cloneDeep(filters)
     const newFilters = addValuesToFilters(filtersCopy, data)
     expect(newFilters[0].values).toEqual(['apple', 'pear'])
     expect(newFilters[2].values).toEqual([3, 1, 4])
@@ -28,7 +28,7 @@ describe('addValuesToFilters', () => {
     expect(newFilters2[1].values).toEqual([])
   })
   it('adds filter values based on parent queued active values', () => {
-    const filtersCopy = _.cloneDeep([{ ...parentFilter, queuedActive: 'pear' }, childFilter, parentFilter2])
+    const filtersCopy = cloneDeep([{ ...parentFilter, queuedActive: 'pear' }, childFilter, parentFilter2])
     const newFilters2 = addValuesToFilters(filtersCopy, data)
     expect(newFilters2[0].values).toEqual(['apple', 'pear'])
     expect(newFilters2[2].values).toEqual([3, 1, 4])
@@ -41,7 +41,7 @@ describe('addValuesToFilters', () => {
     expect(newFilters[1].values).toEqual(['b'])
   })
   it('works when data is an object', () => {
-    const filtersCopy = _.cloneDeep(filters)
+    const filtersCopy = cloneDeep(filters)
     const newFilters = addValuesToFilters(filtersCopy, { '0': data })
     expect(newFilters[0].values).toEqual(['apple', 'pear'])
     expect(newFilters[2].values).toEqual([3, 1, 4])

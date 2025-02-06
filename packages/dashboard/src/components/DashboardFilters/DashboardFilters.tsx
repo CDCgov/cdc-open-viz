@@ -7,7 +7,7 @@ import { NestedOptions, ValueTextPair } from '@cdc/core/components/NestedDropdow
 import NestedDropdown from '@cdc/core/components/NestedDropdown'
 import { MouseEventHandler } from 'react'
 import Loader from '@cdc/core/components/Loader'
-import _ from 'lodash'
+import { get } from 'lodash-es'
 
 type DashboardFilterProps = {
   show: number[]
@@ -70,7 +70,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           ]
         )
 
-        const activeSubGroupValue = _.get(
+        const activeSubGroupValue = get(
           filter?.subGrouping?.valuesLookup,
           [filter?.active as string, 'values', 0],
           null // Default to null if the path is invalid

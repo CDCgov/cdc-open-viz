@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
 import { handleSorting } from '../handleSorting'
-import _ from 'lodash'
 
 describe('handleSorting', () => {
   it('should use orderedValues when order is "cust" and filterStyle is not "nested-dropdown"', () => {

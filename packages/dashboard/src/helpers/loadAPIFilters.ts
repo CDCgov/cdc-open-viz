@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { APIFilterDropdowns } from '../components/DashboardFilters'
 import { SharedFilter } from '../types/SharedFilter'
 import * as apiFilterHelpers from './apiFilterHelpers'
@@ -38,7 +38,7 @@ export const loadAPIFiltersFactory = (
     setAPIFilterDropdowns(currentState => {
       return { ...currentState, ...loadingDropdowns }
     })
-    const newDropdowns = _.cloneDeep(dropdowns)
+    const newDropdowns = cloneDeep(dropdowns)
     return Promise.all(
       Object.keys(toFetch).map(
         endpoint =>

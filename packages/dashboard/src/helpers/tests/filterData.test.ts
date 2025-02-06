@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { SharedFilter } from '../../types/SharedFilter'
 import { filterData } from '../filterData'
 

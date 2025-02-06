@@ -16,6 +16,7 @@ dns.setDefaultResultOrder('verbatim')
 const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}) => {
   let configOptionsDefault = {
     server: { port: 8080 },
+    //define: { 'process.env.NODE_ENV': '"production"' },
     build: {
       commonjsOptions: {
         include: [/@cdc\/core/, /node_modules/]
@@ -27,14 +28,19 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
         fileName: format => `${componentName.toLowerCase()}.js`
       },
       rollupOptions: {
-        external: ['react', 'react-dom', 'react-dom/server'],
+        external: ['react', 'react-dom'],
         output: {
           chunkFileNames: `${componentName.toLowerCase()}-[hash].[format].js`,
           globals: {
             react: 'React',
-            'react-dom': 'ReactDOM'
+            reactDOM: 'ReactDOM'
           }
         }
+      }
+    },
+    resolve: {
+      alias: {
+        lodash: 'lodash-es'
       }
     },
     plugins: [

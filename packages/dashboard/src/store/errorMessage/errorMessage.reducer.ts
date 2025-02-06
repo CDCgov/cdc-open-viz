@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { remove } from 'lodash-es'
 import errorMessagesActions from './errorMessage.actions'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 
@@ -13,7 +13,7 @@ const reducer = (state: errorMessagesState, action: errorMessagesActions): error
 
     case 'DISMISS_ERROR_MESSAGE': {
       const messages = [...state]
-      _.remove(messages, (_, index) => {
+      remove(messages, (_, index) => {
         return index === action.payload
       })
       return messages

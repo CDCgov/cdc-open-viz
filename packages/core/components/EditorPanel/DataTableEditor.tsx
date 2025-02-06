@@ -5,7 +5,7 @@ import { CheckBox, TextField, Select } from './Inputs'
 import MultiSelect from '../MultiSelect'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import { Visualization } from '../../types/Visualization'
-import _ from 'lodash'
+import { cloneDeep, uniq } from 'lodash-es'
 import { Column } from '../../types/Column'
 
 interface DataTableProps {
@@ -28,7 +28,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
 
   const groupPivotColumns = useMemo(() => {
     const columns: string[] = config.data.flatMap(Object.keys)
-    const cols = _.uniq(columns).filter(key => {
+    const cols = uniq(columns).filter(key => {
       return true
     })
     return cols
@@ -40,7 +40,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
   }
 
   const excludeColumns = (section, subSection, fieldName, excludedColNames: string[]) => {
-    const newColumns = _.cloneDeep(config.columns)
+    const newColumns = cloneDeep(config.columns)
 
     const colNames: string[] = []
     for (let colKey in newColumns) {

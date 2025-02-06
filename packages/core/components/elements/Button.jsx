@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react'
-import PropTypes from 'prop-types'
 
 import LoadSpin from '../ui/LoadSpin'
 
@@ -119,23 +118,6 @@ const Button = ({
       )}
     </button>
   )
-}
-
-Button.propTypes = {
-  /** Specify special role type for button */
-  role: PropTypes.oneOf(['loader']),
-  /** Provide object with styles that overwrite base styles when hovered */
-  hoverStyle: PropTypes.object,
-  /** Enables button to stretch to the full width of the content */
-  fluid: PropTypes.bool,
-  /** Displays loading spinner on button while condition is true **/
-  loading: PropTypes.bool,
-  /** Set text to appear during loading animation **/
-  loadingText: PropTypes.string,
-  /** Displays button as flex and centers all direct children nodes. Useful for aligning icons and text **/
-  flexCenter: PropTypes.bool,
-  /** When value condition is true, retains any custom, inline `style={}` defined **/
-  active: PropTypes.bool
 }
 
 export default Button

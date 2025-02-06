@@ -2,7 +2,7 @@ import { ConfigRow } from '../../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { getIcon } from '../../helpers/iconHash'
 import './toggle-style.css'
-import _ from 'lodash'
+import { capitalize } from 'lodash-es'
 
 type ToggleProps = {
   active: number
@@ -22,8 +22,17 @@ const Toggle: React.FC<ToggleProps> = ({ active, row, visualizations, setToggled
         const type = visualizations[col.widget].type
         const selected = colIndex === active
         return (
-          <div role='radio' className={selected ? 'selected' : ''} key={colIndex} onClick={() => selectItem(colIndex)} onKeyUp={e => selectItem(colIndex, e)} aria-checked={selected} tabIndex={0} aria-label={`Toggle ${type}`}>
-            {getIcon(visualizations[col.widget])} <span>{_.capitalize(type)}</span>
+          <div
+            role='radio'
+            className={selected ? 'selected' : ''}
+            key={colIndex}
+            onClick={() => selectItem(colIndex)}
+            onKeyUp={e => selectItem(colIndex, e)}
+            aria-checked={selected}
+            tabIndex={0}
+            aria-label={`Toggle ${type}`}
+          >
+            {getIcon(visualizations[col.widget])} <span>{capitalize(type)}</span>
           </div>
         )
       })}

@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 export type ValueTextPair = [string | number, string | number | undefined] | [string | number] // [value, text]
 
 export type NestedOptions = Array<[ValueTextPair, ValueTextPair[]]>

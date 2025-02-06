@@ -12,7 +12,7 @@ import { useContext } from 'react'
 import ConfigContext from '../ConfigContext'
 import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
-import _ from 'lodash'
+import { uniq, map } from 'lodash-es'
 
 const scaleTypes = {
   TIME: 'time',
@@ -164,9 +164,9 @@ const useScales = (properties: useScaleProps) => {
 
     // Set Scales
 
-    const categories = _.uniq(data.map(d => d[config.xAxis.dataKey]))
+    const categories = uniq(data.map(d => d[config.xAxis.dataKey]))
     const range = [0, config.barThickness * 100 || 1]
-    const domain = _.map(config.series, 'dataKey')
+    const domain = map(config.series, 'dataKey')
     yScale = scaleLinear({
       range: [yMax, 0],
       round: true,

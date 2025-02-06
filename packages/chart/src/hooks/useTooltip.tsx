@@ -7,7 +7,7 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 // Third-party library imports
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
-import _ from 'lodash'
+import { uniq, pick } from 'lodash-es'
 
 export const useTooltip = props => {
   const {
@@ -375,7 +375,7 @@ export const useTooltip = props => {
     const includedSeries = runtimeSeries.map(item => item.dataKey)
     includedSeries.push(config.xAxis.dataKey)
     // get dynamic category series
-    const dynamicDataCategories = _.uniq(
+    const dynamicDataCategories = uniq(
       config.runtime.series.flatMap(series => {
         if (series.dynamicCategory) {
           return [series.dynamicCategory, series.originalDataKey]
@@ -407,7 +407,7 @@ export const useTooltip = props => {
       }
 
       const yScaleValues = dataToSearch.map(object => {
-        return _.pick(object, includedSeries)
+        return pick(object, includedSeries)
       })
       return yScaleValues
     } catch (error) {
