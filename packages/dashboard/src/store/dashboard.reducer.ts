@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { getUpdateConfig } from '../helpers/getUpdateConfig'
-import { MultiDashboardConfig } from '../types/MultiDashboard'
+import { MultiDashboard, MultiDashboardConfig } from '../types/MultiDashboard'
 import DashboardActions from './dashboard.actions'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 import { Tab } from '../types/Tab'
@@ -44,7 +44,10 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const newRows = state.config.rows.map((row, i) => (i === rowIndex ? { ...row, footnotesId: id } : row))
       return {
         ...state,
-        config: { ...state.config, rows: newRows, visualizations: { ...state.config.visualizations, [id]: config } }
+        config: saveMultiChanges(
+          { ...state.config, rows: newRows, visualizations: { ...state.config.visualizations, [id]: config } },
+          state.config.activeDashboard
+        )
       }
     }
     case 'ADD_NEW_DASHBOARD': {
@@ -55,7 +58,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     }
     case 'UPDATE_CONFIG': {
       const [config, filteredData] = getUpdateConfig(state)(...action.payload)
-      return { ...state, config, filteredData }
+      return { ...state, config: saveMultiChanges(config, state.config.activeDashboard), filteredData }
     }
     case 'APPLY_CONFIG': {
       // using advanced editor. Wipe all existing data and apply new config
@@ -68,14 +71,17 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
           if (data) acc[key] = data
           return acc
         }, {})
-      return { ...initialState, config, filteredData, data }
+      return { ...initialState, config: saveMultiChanges(config, state.config.activeDashboard), filteredData, data }
     }
     case 'SET_CONFIG': {
       if (
         action.payload.activeDashboard === undefined ||
         state.config.activeDashboard === action.payload.activeDashboard
       ) {
-        return { ...state, config: { ...state.config, ...action.payload } }
+        return {
+          ...state,
+          config: saveMultiChanges({ ...state.config, ...action.payload }, action.payload.activeDashboard)
+        }
       } else return state // ignore SET_CONFIG calls that have the wrong activeDashboard due to async api fetching
     }
     case 'SET_DATA': {
@@ -93,14 +99,10 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     case 'SET_SHARED_FILTERS': {
       const newSharedFilters = action.payload
       const newDashboardConfig = { ...state.config.dashboard, sharedFilters: newSharedFilters }
-      if (state.config.multiDashboards) {
-        const saveSlot = state.config.activeDashboard
-        const newMultiDashboards = _.cloneDeep(state.config.multiDashboards)
-        newMultiDashboards[saveSlot].dashboard = newDashboardConfig
-        const newState = applyMultiDashboards(state, newMultiDashboards)
-        return { ...newState, config: { ...newState.config, dashboard: newDashboardConfig } }
+      return {
+        ...state,
+        config: saveMultiChanges({ ...state.config, dashboard: newDashboardConfig }, state.config.activeDashboard)
       }
-      return { ...state, config: { ...state.config, dashboard: newDashboardConfig } }
     }
     case 'SET_TAB_SELECTED': {
       return { ...state, tabSelected: action.payload }
@@ -143,7 +145,8 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const label = newMultiDashboards[saveSlot].label
       const toSave = _.pick(state.config, ['dashboard', 'visualizations', 'rows'])
       newMultiDashboards[saveSlot] = { ...toSave, label }
-      return applyMultiDashboards(state, newMultiDashboards)
+      const newConfig = saveMultiChanges(state.config, saveSlot)
+      return { ...state, config: newConfig }
     }
     case 'INITIALIZE_MULTIDASHBOARDS': {
       const label = 'New Dashboard 1'
@@ -176,7 +179,10 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       newRows[rowIdx].columns[colIdx].widget = vizKey
       return {
         ...state,
-        config: { ...state.config, visualizations: { ...state.config.visualizations, [vizKey]: newViz }, rows: newRows }
+        config: saveMultiChanges(
+          { ...state.config, visualizations: { ...state.config.visualizations, [vizKey]: newViz }, rows: newRows },
+          state.config.activeDashboard
+        )
       }
     }
     case 'MOVE_VISUALIZATION': {
@@ -186,7 +192,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       newRows[rowIdx].columns[colIdx].widget = widget.uid
       return {
         ...state,
-        config: { ...state.config, rows: newRows }
+        config: saveMultiChanges({ ...state.config, rows: newRows }, state.config.activeDashboard)
       }
     }
     case 'UPDATE_VISUALIZATION': {
@@ -194,7 +200,10 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const updatedViz = { ...state.config.visualizations[vizKey], ...configureData } as AnyVisualization
       return {
         ...state,
-        config: { ...state.config, visualizations: { ...state.config.visualizations, [vizKey]: updatedViz } }
+        config: saveMultiChanges(
+          { ...state.config, visualizations: { ...state.config.visualizations, [vizKey]: updatedViz } },
+          state.config.activeDashboard
+        )
       }
     }
     case 'UPDATE_ROW': {
@@ -205,7 +214,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         }
         return row
       })
-      return { ...state, config: { ...state.config, rows: newRows } }
+      return { ...state, config: saveMultiChanges({ ...state.config, rows: newRows }, state.config.activeDashboard) }
     }
     case 'DELETE_WIDGET': {
       const { uid } = action.payload
@@ -227,12 +236,15 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
 
       return {
         ...state,
-        config: {
-          ...state.config,
-          dashboard: { ...state.config.dashboard, sharedFilters: newSharedFilters },
-          visualizations: newVisualizations,
-          rows: filteredRows
-        }
+        config: saveMultiChanges(
+          {
+            ...state.config,
+            dashboard: { ...state.config.dashboard, sharedFilters: newSharedFilters },
+            visualizations: newVisualizations,
+            rows: filteredRows
+          },
+          state.config.activeDashboard
+        )
       }
     }
     default:
@@ -240,7 +252,16 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
   }
 }
 
-const applyMultiDashboards = (state, newMultiDashboards) => ({
+const saveMultiChanges = (config: MultiDashboardConfig, saveSlot?: number): MultiDashboardConfig => {
+  if (saveSlot === undefined) return config
+  const newMultiDashboards = [...config.multiDashboards]
+  const label = newMultiDashboards[saveSlot].label
+  const toSave = _.pick(config, ['dashboard', 'visualizations', 'rows'])
+  newMultiDashboards[saveSlot] = { ...toSave, label }
+  return { ...config, multiDashboards: newMultiDashboards }
+}
+
+const applyMultiDashboards = (state: DashboardState, newMultiDashboards: MultiDashboard[]): DashboardState => ({
   ...state,
   config: { ...state.config, multiDashboards: newMultiDashboards }
 })
