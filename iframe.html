@@ -19,7 +19,7 @@
     window.FRAMEWORK_OPTIONS = {};
     window.CHANNEL_OPTIONS = {};
     window.FEATURES = {"warnOnLegacyHierarchySeparator":true,"buildStoriesJson":false,"storyStoreV7":true,"argTypeTargetsV7":true,"legacyDecoratorFileOrder":false,"disallowImplicitActionsInRenderV8":false};
-    window.STORIES = [{"titlePrefix":"","directory":"./_stories","files":"*.mdx","importPathMatcher":"^\\.[\\\\/](?:_stories[\\\\/](?!\\.)(?=.)[^\\\\/]*?\\.mdx)$"},{"titlePrefix":"","directory":"./packages","files":"**/_stories/*.stories.@(js|jsx|ts|tsx)","importPathMatcher":"^\\.[\\\\/](?:packages(?:[\\\\/](?!\\.)(?:(?:(?!(?:^|[\\\\/])\\.).)*?)[\\\\/]|[\\\\/]|$)_stories[\\\\/](?!\\.)(?=.)[^\\\\/]*?\\.stories\\.(js|jsx|ts|tsx))$"}];
+    window.STORIES = [{"titlePrefix":"","directory":"./_stories","files":"*.mdx","importPathMatcher":"^\\.[\\\\/](?:_stories[\\\\/](?!\\.)(?=.)[^\\\\/]*?\\.mdx)$"},{"titlePrefix":"","directory":"./packages","files":"**/_stories/*.stories.@(js|jsx|ts|tsx)","importPathMatcher":"^\\.[\\\\/](?:packages(?:[\\\\/](?!\\.)(?:(?:(?!(?:^|[\\\\/])\\.).)*?)[\\\\/]|[\\\\/]|$)_stories[\\\\/](?!\\.)(?=.)[^\\\\/]*?\\.stories\\.(js|jsx|ts|tsx))$"},{"titlePrefix":"","directory":"./_stories/private","files":"**/*.stories.@(js|jsx|ts|tsx)","importPathMatcher":"^\\.[\\\\/](?:_stories[\\\\/]private(?:[\\\\/](?!\\.)(?:(?:(?!(?:^|[\\\\/])\\.).)*?)[\\\\/]|[\\\\/]|$)(?!\\.)(?=.)[^\\\\/]*?\\.stories\\.(js|jsx|ts|tsx))$"}];
     window.DOCS_OPTIONS = {"defaultName":"Docs","autodocs":"tag"};
 
     
@@ -359,31 +359,28 @@
   }
 </script>
 <script>
-  window.global = window;
-  window.process = { // vite does not polyfill process https://github.com/storybookjs/storybook/issues/18920
-    "env": {
-      "NODE_ENV": "production"
+  window.global = window
+  window.process = {
+    // vite does not polyfill process https://github.com/storybookjs/storybook/issues/18920
+    env: {
+      NODE_ENV: 'production'
     }
   }
 </script>
 <style>
-.search-result-item--label {
-  color: #a3a3a3 !important;
-}
+  .search-result-item--label {
+    color: #a3a3a3 !important;
+  }
 
-.search-result-item--label .sto-1xkb16p {
-  color: #005eaa !important;
-}
+  .search-result-item--label .sto-1xkb16p {
+    color: #005eaa !important;
+  }
 
-.sbdocs-h3 {
-  color: #3a569b !important;
-}
+  .sbdocs-h3 {
+    color: #3a569b !important;
+  }
 </style>
-<link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/contrib/libs/bootstrap/latest/css/bootstrap.min.css?_=39423">
-<link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/4.0/assets/css/app.min.css?_=39423">
-
-<!-- to toggle on tp5 -->
-<!-- <link rel="stylesheet prefetch" href="https://wcms-wp-test.cdc.gov/TemplatePackage/5.0/css/app.css?_=81698"> -->
+<link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
 
   <script type="module" crossorigin src="./storybook.js"></script>
   <link rel="stylesheet" href="./style.css">
