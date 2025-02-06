@@ -2,7 +2,7 @@ import { r as v, R as r } from "./storybook-index-45401197.es.js";
 import { c as Qa, A as Za, V as Ka, F as Xa, a as Ya } from "./storybook-InputToggle-1e77d9ab.es.js";
 import { i as Ja, g as er } from "./storybook-getViewport-513ec896.es.js";
 import { T as ea, H as ta } from "./storybook-index-3b47b3f7.es.js";
-import { f as Re } from "./storybook-fetchRemoteData-1d0a5295.es.js";
+import { f as xe } from "./storybook-fetchRemoteData-1d0a5295.es.js";
 import { E as na, L as Ot } from "./storybook-viewports-5c5d7af1.es.js";
 import { D as Se, A as tr, a as Zt, b as Kt, c as Xt, d as Yt } from "./storybook-DataTransform-6163e156.es.js";
 import { b as nr, D as ar, f as rr, C as aa, a as ra } from "./storybook-CdcChartComponent-f9821d3b.es.js";
@@ -10,21 +10,21 @@ import { C as oa } from "./storybook-CdcDataBite-7aaaabf2.es.js";
 import { e as or, C as ia, A as ir } from "./storybook-CdcMap-7a44998e.es.js";
 import { C as sa } from "./storybook-CdcWaffleChart-89d05418.es.js";
 import { C as la } from "./storybook-CdcMarkupInclude-6be71bc2.es.js";
-import { A as xe, a as sr, b as nt, c as at, d as rt, e as ot } from "./storybook-Accordion-2501c7d9.es.js";
-import { I as lr, a as _e } from "./storybook-editor-57986c01.es.js";
+import { A as Me, a as sr, b as nt, c as at, d as rt, e as ot } from "./storybook-Accordion-2501c7d9.es.js";
+import { I as lr, a as Ne } from "./storybook-editor-57986c01.es.js";
 import { B as cr } from "./storybook-Button-63da743c.es.js";
-import { a as R } from "./storybook-Icon-4f5978ba.es.js";
-import { T as P } from "./storybook-Tooltip-4102bd69.es.js";
+import { a as P } from "./storybook-Icon-4f5978ba.es.js";
+import { T as L } from "./storybook-Tooltip-4102bd69.es.js";
 import { I as ge } from "./storybook-InputSelect-20478396.es.js";
 import { L as ye, u as ur, c as ca } from "./storybook-coveUpdateWorker-4c7dbbf1.es.js";
 import { u as It } from "./storybook-updateFieldFactory-c006040a.es.js";
 import { D as dr } from "./storybook-DataDesigner-1d516d20.es.js";
-import { P as ke } from "./storybook-index-43433e35.es.js";
-import { C as Ve, T as Y, S as fr } from "./storybook-Inputs-b80d0cf3.es.js";
-import { _ as A } from "./storybook-lodash-a4231e1c.es.js";
-import { u as mr, g as ua, f as Jt, a as pr, F as gr, b as _t, c as da, d as Pe, e as hr } from "./storybook-Filters-ce4a04a7.es.js";
+import { P as Fe } from "./storybook-index-43433e35.es.js";
+import { C as Ue, T as J, S as fr } from "./storybook-Inputs-b80d0cf3.es.js";
+import { _ as N } from "./storybook-lodash-a4231e1c.es.js";
+import { u as mr, g as ua, f as Jt, a as pr, F as gr, b as _t, c as da, d as Oe, e as hr } from "./storybook-Filters-ce4a04a7.es.js";
 import { D as gt, M as en } from "./storybook-DataTable-897188ef.es.js";
-import { F as re } from "./storybook-FilterStyles-fd509eb9.es.js";
+import { F as oe } from "./storybook-FilterStyles-fd509eb9.es.js";
 import { D as vr } from "./storybook-DashboardFilters-3d2191b7.es.js";
 import { M as it } from "./storybook-MultiSelect-d587cce3.es.js";
 import { F as yr } from "./storybook-Footnotes-108c3a2d.es.js";
@@ -32,11 +32,11 @@ import { L as br } from "./storybook-Loader-f4ec7b29.es.js";
 import { j as Er } from "./storybook-jsx-runtime-36872362.es.js";
 var fa = v.createContext({
   dragDropManager: void 0
-}), oe;
+}), ie;
 (function(e) {
   e.SOURCE = "SOURCE", e.TARGET = "TARGET";
-})(oe || (oe = {}));
-function L(e, t) {
+})(ie || (ie = {}));
+function F(e, t) {
   for (var n = arguments.length, a = new Array(n > 2 ? n - 2 : 0), o = 2; o < n; o++)
     a[o - 2] = arguments[o];
   if (process.env.NODE_ENV !== "production" && t === void 0)
@@ -54,7 +54,7 @@ function L(e, t) {
     throw i.framesToPop = 1, i;
   }
 }
-var kt = "dnd-core/INIT_COORDS", Ke = "dnd-core/BEGIN_DRAG", Nt = "dnd-core/PUBLISH_DRAG_SOURCE", Xe = "dnd-core/HOVER", Ye = "dnd-core/DROP", Je = "dnd-core/END_DRAG";
+var kt = "dnd-core/INIT_COORDS", Xe = "dnd-core/BEGIN_DRAG", Nt = "dnd-core/PUBLISH_DRAG_SOURCE", Ye = "dnd-core/HOVER", Je = "dnd-core/DROP", et = "dnd-core/END_DRAG";
 function tn(e, t) {
   return {
     type: kt,
@@ -64,13 +64,13 @@ function tn(e, t) {
     }
   };
 }
-function Ue(e) {
+function ze(e) {
   "@babel/helpers - typeof";
-  return typeof Symbol == "function" && typeof Symbol.iterator == "symbol" ? Ue = function(n) {
+  return typeof Symbol == "function" && typeof Symbol.iterator == "symbol" ? ze = function(n) {
     return typeof n;
-  } : Ue = function(n) {
+  } : ze = function(n) {
     return n && typeof Symbol == "function" && n.constructor === Symbol && n !== Symbol.prototype ? "symbol" : typeof n;
-  }, Ue(e);
+  }, ze(e);
 }
 function Dr(e, t, n) {
   return t.split(".").reduce(function(a, o) {
@@ -83,7 +83,7 @@ function Sr(e, t) {
   });
 }
 function ma(e) {
-  return Ue(e) === "object";
+  return ze(e) === "object";
 }
 function wr(e, t) {
   var n = /* @__PURE__ */ new Map(), a = function(s) {
@@ -113,30 +113,30 @@ function Or(e) {
       publishSource: !0
     }, o = a.publishSource, i = o === void 0 ? !0 : o, s = a.clientOffset, l = a.getSourceClientOffset, c = e.getMonitor(), m = e.getRegistry();
     e.dispatch(tn(s)), Ir(n, c, m);
-    var f = Nr(n, c);
-    if (f === null) {
+    var p = Nr(n, c);
+    if (p === null) {
       e.dispatch(Cr);
       return;
     }
-    var d = null;
+    var u = null;
     if (s) {
       if (!l)
         throw new Error("getSourceClientOffset must be defined");
-      _r(l), d = l(f);
+      _r(l), u = l(p);
     }
-    e.dispatch(tn(s, d));
-    var y = m.getSource(f), h = y.beginDrag(c, f);
+    e.dispatch(tn(s, u));
+    var E = m.getSource(p), h = E.beginDrag(c, p);
     if (h != null) {
-      kr(h), m.pinSource(f);
-      var I = m.getSourceType(f);
+      kr(h), m.pinSource(p);
+      var O = m.getSourceType(p);
       return {
-        type: Ke,
+        type: Xe,
         payload: {
-          itemType: I,
+          itemType: O,
           item: h,
-          sourceId: f,
+          sourceId: p,
           clientOffset: s || null,
-          sourceClientOffset: d || null,
+          sourceClientOffset: u || null,
           isSourcePublic: !!i
         }
       };
@@ -144,15 +144,15 @@ function Or(e) {
   };
 }
 function Ir(e, t, n) {
-  L(!t.isDragging(), "Cannot call beginDrag while dragging."), e.forEach(function(a) {
-    L(n.getSource(a), "Expected sourceIds to be registered.");
+  F(!t.isDragging(), "Cannot call beginDrag while dragging."), e.forEach(function(a) {
+    F(n.getSource(a), "Expected sourceIds to be registered.");
   });
 }
 function _r(e) {
-  L(typeof e == "function", "When clientOffset is provided, getSourceClientOffset must be a function.");
+  F(typeof e == "function", "When clientOffset is provided, getSourceClientOffset must be a function.");
 }
 function kr(e) {
-  L(ma(e), "Item must be an object.");
+  F(ma(e), "Item must be an object.");
 }
 function Nr(e, t) {
   for (var n = null, a = e.length - 1; a >= 0; a--)
@@ -184,7 +184,7 @@ function Ar(e) {
     Pr(i, s, l);
     var c = s.getItemType();
     return Rr(i, l, c), xr(i, s, l), {
-      type: Xe,
+      type: Ye,
       payload: {
         targetIds: i,
         clientOffset: o || null
@@ -193,15 +193,15 @@ function Ar(e) {
   };
 }
 function Lr(e) {
-  L(Array.isArray(e), "Expected targetIds to be an array.");
+  F(Array.isArray(e), "Expected targetIds to be an array.");
 }
 function Pr(e, t, n) {
-  L(t.isDragging(), "Cannot call hover while not dragging."), L(!t.didDrop(), "Cannot call hover after drop.");
+  F(t.isDragging(), "Cannot call hover while not dragging."), F(!t.didDrop(), "Cannot call hover after drop.");
   for (var a = 0; a < e.length; a++) {
     var o = e[a];
-    L(e.lastIndexOf(o) === a, "Expected targetIds to be unique in the passed array.");
+    F(e.lastIndexOf(o) === a, "Expected targetIds to be unique in the passed array.");
     var i = n.getTarget(o);
-    L(i, "Expected targetIds to be registered.");
+    F(i, "Expected targetIds to be registered.");
   }
 }
 function Rr(e, t, n) {
@@ -247,7 +247,7 @@ function $r(e) {
     var i = zr(a);
     i.forEach(function(s, l) {
       var c = Vr(s, l, o, a), m = {
-        type: Ye,
+        type: Je,
         payload: {
           dropResult: an(an({}, n), c)
         }
@@ -257,14 +257,14 @@ function $r(e) {
   };
 }
 function Br(e) {
-  L(e.isDragging(), "Cannot call drop while not dragging."), L(!e.didDrop(), "Cannot call drop twice during one drag operation.");
+  F(e.isDragging(), "Cannot call drop while not dragging."), F(!e.didDrop(), "Cannot call drop twice during one drag operation.");
 }
 function Vr(e, t, n, a) {
   var o = n.getTarget(e), i = o ? o.drop(a, e) : void 0;
   return Ur(i), typeof i > "u" && (i = t === 0 ? {} : a.getDropResult()), i;
 }
 function Ur(e) {
-  L(typeof e > "u" || ma(e), "Drop result must either be an object or undefined.");
+  F(typeof e > "u" || ma(e), "Drop result must either be an object or undefined.");
 }
 function zr(e) {
   var t = e.getTargetIds().filter(e.canDropOnTarget, e);
@@ -280,14 +280,14 @@ function Hr(e) {
       i.endDrag(n, o), a.unpinSource();
     }
     return {
-      type: Je
+      type: et
     };
   };
 }
 function jr(e) {
-  L(e.isDragging(), "Cannot call endDrag while not dragging.");
+  F(e.isDragging(), "Cannot call endDrag while not dragging.");
 }
-function qr(e) {
+function Gr(e) {
   return {
     beginDrag: Or(e),
     publishDragSource: Fr(e),
@@ -296,7 +296,7 @@ function qr(e) {
     endDrag: Hr(e)
   };
 }
-function Gr(e, t) {
+function qr(e, t) {
   if (!(e instanceof t))
     throw new TypeError("Cannot call a class as a function");
 }
@@ -309,13 +309,13 @@ function rn(e, t) {
 function Wr(e, t, n) {
   return t && rn(e.prototype, t), n && rn(e, n), e;
 }
-function Ne(e, t, n) {
+function Ae(e, t, n) {
   return t in e ? Object.defineProperty(e, t, { value: n, enumerable: !0, configurable: !0, writable: !0 }) : e[t] = n, e;
 }
 var Qr = /* @__PURE__ */ function() {
   function e(t, n) {
     var a = this;
-    Gr(this, e), Ne(this, "store", void 0), Ne(this, "monitor", void 0), Ne(this, "backend", void 0), Ne(this, "isSetUp", !1), Ne(this, "handleRefCountChange", function() {
+    qr(this, e), Ae(this, "store", void 0), Ae(this, "monitor", void 0), Ae(this, "backend", void 0), Ae(this, "isSetUp", !1), Ae(this, "handleRefCountChange", function() {
       var o = a.store.getState().refCount > 0;
       a.backend && (o && !a.isSetUp ? (a.backend.setup(), a.isSetUp = !0) : !o && a.isSetUp && (a.backend.teardown(), a.isSetUp = !1));
     }), this.store = t, this.monitor = n, t.subscribe(this.handleRefCountChange);
@@ -348,11 +348,11 @@ var Qr = /* @__PURE__ */ function() {
         return function() {
           for (var l = arguments.length, c = new Array(l), m = 0; m < l; m++)
             c[m] = arguments[m];
-          var f = s.apply(n, c);
-          typeof f < "u" && a(f);
+          var p = s.apply(n, c);
+          typeof p < "u" && a(p);
         };
       }
-      var i = qr(this);
+      var i = Gr(this);
       return Object.keys(i).reduce(function(s, l) {
         var c = i[l];
         return s[l] = o(c), s;
@@ -412,24 +412,24 @@ function Jr() {
   var e = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : ln, t = arguments.length > 1 ? arguments[1] : void 0, n = t.payload;
   switch (t.type) {
     case kt:
-    case Ke:
+    case Xe:
       return {
         initialSourceClientOffset: n.sourceClientOffset,
         initialClientOffset: n.clientOffset,
         clientOffset: n.clientOffset
       };
-    case Xe:
+    case Ye:
       return Kr(e.clientOffset, n.clientOffset) ? e : sn(sn({}, e), {}, {
         clientOffset: n.clientOffset
       });
+    case et:
     case Je:
-    case Ye:
       return ln;
     default:
       return e;
   }
 }
-var Ft = "dnd-core/ADD_SOURCE", At = "dnd-core/ADD_TARGET", Lt = "dnd-core/REMOVE_SOURCE", et = "dnd-core/REMOVE_TARGET";
+var Ft = "dnd-core/ADD_SOURCE", At = "dnd-core/ADD_TARGET", Lt = "dnd-core/REMOVE_SOURCE", tt = "dnd-core/REMOVE_TARGET";
 function eo(e) {
   return {
     type: Ft,
@@ -456,7 +456,7 @@ function no(e) {
 }
 function ao(e) {
   return {
-    type: et,
+    type: tt,
     payload: {
       targetId: e
     }
@@ -472,7 +472,7 @@ function cn(e, t) {
   }
   return n;
 }
-function ae(e) {
+function re(e) {
   for (var t = 1; t < arguments.length; t++) {
     var n = arguments[t] != null ? arguments[t] : {};
     t % 2 ? cn(Object(n), !0).forEach(function(a) {
@@ -498,8 +498,8 @@ var oo = {
 function io() {
   var e = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : oo, t = arguments.length > 1 ? arguments[1] : void 0, n = t.payload;
   switch (t.type) {
-    case Ke:
-      return ae(ae({}, e), {}, {
+    case Xe:
+      return re(re({}, e), {}, {
         itemType: n.itemType,
         item: n.item,
         sourceId: n.sourceId,
@@ -508,25 +508,25 @@ function io() {
         didDrop: !1
       });
     case Nt:
-      return ae(ae({}, e), {}, {
+      return re(re({}, e), {}, {
         isSourcePublic: !0
       });
-    case Xe:
-      return ae(ae({}, e), {}, {
+    case Ye:
+      return re(re({}, e), {}, {
         targetIds: n.targetIds
       });
-    case et:
-      return e.targetIds.indexOf(n.targetId) === -1 ? e : ae(ae({}, e), {}, {
+    case tt:
+      return e.targetIds.indexOf(n.targetId) === -1 ? e : re(re({}, e), {}, {
         targetIds: Sr(e.targetIds, n.targetId)
       });
-    case Ye:
-      return ae(ae({}, e), {}, {
+    case Je:
+      return re(re({}, e), {}, {
         dropResult: n.dropResult,
         didDrop: !0,
         targetIds: []
       });
-    case Je:
-      return ae(ae({}, e), {}, {
+    case et:
+      return re(re({}, e), {}, {
         itemType: null,
         item: null,
         sourceId: null,
@@ -546,17 +546,17 @@ function so() {
     case At:
       return e + 1;
     case Lt:
-    case et:
+    case tt:
       return e - 1;
     default:
       return e;
   }
 }
-var Ge = [], Pt = [];
-Ge.__IS_NONE__ = !0;
+var We = [], Pt = [];
+We.__IS_NONE__ = !0;
 Pt.__IS_ALL__ = !0;
 function lo(e, t) {
-  if (e === Ge)
+  if (e === We)
     return !1;
   if (e === Pt || typeof t > "u")
     return !0;
@@ -566,23 +566,23 @@ function lo(e, t) {
 function co() {
   var e = arguments.length > 1 ? arguments[1] : void 0;
   switch (e.type) {
-    case Xe:
+    case Ye:
       break;
     case Ft:
     case At:
-    case et:
+    case tt:
     case Lt:
-      return Ge;
-    case Ke:
+      return We;
+    case Xe:
     case Nt:
+    case et:
     case Je:
-    case Ye:
     default:
       return Pt;
   }
   var t = e.payload, n = t.targetIds, a = n === void 0 ? [] : n, o = t.prevTargetIds, i = o === void 0 ? [] : o, s = wr(a, i), l = s.length > 0 || !Xr(a, i);
   if (!l)
-    return Ge;
+    return We;
   var c = i[i.length - 1], m = a[a.length - 1];
   return c !== m && (c && s.push(c), m && s.push(m)), s;
 }
@@ -675,14 +675,14 @@ var bo = /* @__PURE__ */ function() {
       var a = this, o = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {
         handlerIds: void 0
       }, i = o.handlerIds;
-      L(typeof n == "function", "listener must be a function."), L(typeof i > "u" || Array.isArray(i), "handlerIds, when specified, must be an array of strings.");
+      F(typeof n == "function", "listener must be a function."), F(typeof i > "u" || Array.isArray(i), "handlerIds, when specified, must be an array of strings.");
       var s = this.store.getState().stateId, l = function() {
-        var m = a.store.getState(), f = m.stateId;
+        var m = a.store.getState(), p = m.stateId;
         try {
-          var d = f === s || f === s + 1 && !lo(m.dirtyHandlerIds, i);
-          d || n();
+          var u = p === s || p === s + 1 && !lo(m.dirtyHandlerIds, i);
+          u || n();
         } finally {
-          s = f;
+          s = p;
         }
       };
       return this.store.subscribe(l);
@@ -691,7 +691,7 @@ var bo = /* @__PURE__ */ function() {
     key: "subscribeToOffsetChange",
     value: function(n) {
       var a = this;
-      L(typeof n == "function", "listener must be a function.");
+      F(typeof n == "function", "listener must be a function.");
       var o = this.store.getState().dragOffset, i = function() {
         var l = a.store.getState().dragOffset;
         l !== o && (o = l, n());
@@ -704,7 +704,7 @@ var bo = /* @__PURE__ */ function() {
       if (!n)
         return !1;
       var a = this.registry.getSource(n);
-      return L(a, "Expected to find a valid source. sourceId=".concat(n)), this.isDragging() ? !1 : a.canDrag(this, n);
+      return F(a, "Expected to find a valid source. sourceId=".concat(n)), this.isDragging() ? !1 : a.canDrag(this, n);
     }
   }, {
     key: "canDropOnTarget",
@@ -712,7 +712,7 @@ var bo = /* @__PURE__ */ function() {
       if (!n)
         return !1;
       var a = this.registry.getTarget(n);
-      if (L(a, "Expected to find a valid target. targetId=".concat(n)), !this.isDragging() || this.didDrop())
+      if (F(a, "Expected to find a valid target. targetId=".concat(n)), !this.isDragging() || this.didDrop())
         return !1;
       var o = this.registry.getTargetType(n), i = this.getItemType();
       return ht(o, i) && a.canDrop(this, n);
@@ -728,7 +728,7 @@ var bo = /* @__PURE__ */ function() {
       if (!n)
         return !1;
       var a = this.registry.getSource(n, !0);
-      if (L(a, "Expected to find a valid source. sourceId=".concat(n)), !this.isDragging() || !this.isSourcePublic())
+      if (F(a, "Expected to find a valid source. sourceId=".concat(n)), !this.isDragging() || !this.isSourcePublic())
         return !1;
       var o = this.registry.getSourceType(n), i = this.getItemType();
       return o !== i ? !1 : a.isDragging(this, n);
@@ -818,19 +818,19 @@ var bo = /* @__PURE__ */ function() {
 function Do() {
   return Eo++;
 }
-function ze(e) {
+function He(e) {
   "@babel/helpers - typeof";
-  return typeof Symbol == "function" && typeof Symbol.iterator == "symbol" ? ze = function(n) {
+  return typeof Symbol == "function" && typeof Symbol.iterator == "symbol" ? He = function(n) {
     return typeof n;
-  } : ze = function(n) {
+  } : He = function(n) {
     return n && typeof Symbol == "function" && n.constructor === Symbol && n !== Symbol.prototype ? "symbol" : typeof n;
-  }, ze(e);
+  }, He(e);
 }
 function So(e) {
-  L(typeof e.canDrag == "function", "Expected canDrag to be a function."), L(typeof e.beginDrag == "function", "Expected beginDrag to be a function."), L(typeof e.endDrag == "function", "Expected endDrag to be a function.");
+  F(typeof e.canDrag == "function", "Expected canDrag to be a function."), F(typeof e.beginDrag == "function", "Expected beginDrag to be a function."), F(typeof e.endDrag == "function", "Expected endDrag to be a function.");
 }
 function wo(e) {
-  L(typeof e.canDrop == "function", "Expected canDrop to be a function."), L(typeof e.hover == "function", "Expected hover to be a function."), L(typeof e.drop == "function", "Expected beginDrag to be a function.");
+  F(typeof e.canDrop == "function", "Expected canDrop to be a function."), F(typeof e.hover == "function", "Expected hover to be a function."), F(typeof e.drop == "function", "Expected beginDrag to be a function.");
 }
 function vt(e, t) {
   if (t && Array.isArray(e)) {
@@ -839,7 +839,7 @@ function vt(e, t) {
     });
     return;
   }
-  L(typeof e == "string" || ze(e) === "symbol", t ? "Type can only be a string, a symbol, or an array of either." : "Type can only be a string or a symbol.");
+  F(typeof e == "string" || He(e) === "symbol", t ? "Type can only be a string, a symbol, or an array of either." : "Type can only be a string or a symbol.");
 }
 const pn = typeof global < "u" ? global : self, ga = pn.MutationObserver || pn.WebKitMutationObserver;
 function ha(e) {
@@ -1030,9 +1030,9 @@ function Mo(e) {
 function $o(e) {
   var t = Do().toString();
   switch (e) {
-    case oe.SOURCE:
+    case ie.SOURCE:
       return "S".concat(t);
-    case oe.TARGET:
+    case ie.TARGET:
       return "T".concat(t);
     default:
       throw new Error("Unknown Handler Role: ".concat(e));
@@ -1041,11 +1041,11 @@ function $o(e) {
 function vn(e) {
   switch (e[0]) {
     case "S":
-      return oe.SOURCE;
+      return ie.SOURCE;
     case "T":
-      return oe.TARGET;
+      return ie.TARGET;
     default:
-      L(!1, "Cannot parse handler ID: ".concat(e));
+      F(!1, "Cannot parse handler ID: ".concat(e));
   }
 }
 function yn(e, t) {
@@ -1066,14 +1066,14 @@ var Bo = /* @__PURE__ */ function() {
     key: "addSource",
     value: function(n, a) {
       vt(n), So(a);
-      var o = this.addHandler(oe.SOURCE, n, a);
+      var o = this.addHandler(ie.SOURCE, n, a);
       return this.store.dispatch(eo(o)), o;
     }
   }, {
     key: "addTarget",
     value: function(n, a) {
       vt(n, !0), wo(a);
-      var o = this.addHandler(oe.TARGET, n, a);
+      var o = this.addHandler(ie.TARGET, n, a);
       return this.store.dispatch(to(o)), o;
     }
   }, {
@@ -1085,66 +1085,66 @@ var Bo = /* @__PURE__ */ function() {
     key: "getSource",
     value: function(n) {
       var a = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : !1;
-      L(this.isSourceId(n), "Expected a valid source ID.");
+      F(this.isSourceId(n), "Expected a valid source ID.");
       var o = a && n === this.pinnedSourceId, i = o ? this.pinnedSource : this.dragSources.get(n);
       return i;
     }
   }, {
     key: "getTarget",
     value: function(n) {
-      return L(this.isTargetId(n), "Expected a valid target ID."), this.dropTargets.get(n);
+      return F(this.isTargetId(n), "Expected a valid target ID."), this.dropTargets.get(n);
     }
   }, {
     key: "getSourceType",
     value: function(n) {
-      return L(this.isSourceId(n), "Expected a valid source ID."), this.types.get(n);
+      return F(this.isSourceId(n), "Expected a valid source ID."), this.types.get(n);
     }
   }, {
     key: "getTargetType",
     value: function(n) {
-      return L(this.isTargetId(n), "Expected a valid target ID."), this.types.get(n);
+      return F(this.isTargetId(n), "Expected a valid target ID."), this.types.get(n);
     }
   }, {
     key: "isSourceId",
     value: function(n) {
       var a = vn(n);
-      return a === oe.SOURCE;
+      return a === ie.SOURCE;
     }
   }, {
     key: "isTargetId",
     value: function(n) {
       var a = vn(n);
-      return a === oe.TARGET;
+      return a === ie.TARGET;
     }
   }, {
     key: "removeSource",
     value: function(n) {
       var a = this;
-      L(this.getSource(n), "Expected an existing source."), this.store.dispatch(no(n)), No(function() {
+      F(this.getSource(n), "Expected an existing source."), this.store.dispatch(no(n)), No(function() {
         a.dragSources.delete(n), a.types.delete(n);
       });
     }
   }, {
     key: "removeTarget",
     value: function(n) {
-      L(this.getTarget(n), "Expected an existing target."), this.store.dispatch(ao(n)), this.dropTargets.delete(n), this.types.delete(n);
+      F(this.getTarget(n), "Expected an existing target."), this.store.dispatch(ao(n)), this.dropTargets.delete(n), this.types.delete(n);
     }
   }, {
     key: "pinSource",
     value: function(n) {
       var a = this.getSource(n);
-      L(a, "Expected an existing source."), this.pinnedSourceId = n, this.pinnedSource = a;
+      F(a, "Expected an existing source."), this.pinnedSourceId = n, this.pinnedSource = a;
     }
   }, {
     key: "unpinSource",
     value: function() {
-      L(this.pinnedSource, "No source is pinned at the time."), this.pinnedSourceId = null, this.pinnedSource = null;
+      F(this.pinnedSource, "No source is pinned at the time."), this.pinnedSourceId = null, this.pinnedSource = null;
     }
   }, {
     key: "addHandler",
     value: function(n, a, o) {
       var i = $o(n);
-      return this.types.set(i, a), n === oe.SOURCE ? this.dragSources.set(i, o) : n === oe.TARGET && this.dropTargets.set(i, o), i;
+      return this.types.set(i, a), n === ie.SOURCE ? this.dragSources.set(i, o) : n === ie.TARGET && this.dropTargets.set(i, o), i;
     }
   }]), e;
 }();
@@ -1161,13 +1161,13 @@ function Uo(e) {
 }
 var zo = ["children"];
 function Ho(e, t) {
-  return Wo(e) || Go(e, t) || qo(e, t) || jo();
+  return Wo(e) || qo(e, t) || Go(e, t) || jo();
 }
 function jo() {
   throw new TypeError(`Invalid attempt to destructure non-iterable instance.
 In order to be iterable, non-array objects must have a [Symbol.iterator]() method.`);
 }
-function qo(e, t) {
+function Go(e, t) {
   if (e) {
     if (typeof e == "string")
       return bn(e, t);
@@ -1184,7 +1184,7 @@ function bn(e, t) {
     a[n] = e[n];
   return a;
 }
-function Go(e, t) {
+function qo(e, t) {
   var n = e == null ? null : typeof Symbol < "u" && e[Symbol.iterator] || e["@@iterator"];
   if (n != null) {
     var a = [], o = !0, i = !1, s, l;
@@ -1227,13 +1227,13 @@ function Zo(e, t) {
     o = a[i], !(t.indexOf(o) >= 0) && (n[o] = e[o]);
   return n;
 }
-var En = 0, He = Symbol.for("__REACT_DND_CONTEXT_INSTANCE__"), Ko = v.memo(function(t) {
+var En = 0, je = Symbol.for("__REACT_DND_CONTEXT_INSTANCE__"), Ko = v.memo(function(t) {
   var n = t.children, a = Qo(t, zo), o = Xo(a), i = Ho(o, 2), s = i[0], l = i[1];
   return v.useEffect(function() {
     if (l) {
       var c = ya();
       return ++En, function() {
-        --En === 0 && (c[He] = null);
+        --En === 0 && (c[je] = null);
       };
     }
   }, []), Er(fa.Provider, Object.assign({
@@ -1254,9 +1254,9 @@ function Xo(e) {
 }
 function Yo(e) {
   var t = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : ya(), n = arguments.length > 2 ? arguments[2] : void 0, a = arguments.length > 3 ? arguments[3] : void 0, o = t;
-  return o[He] || (o[He] = {
+  return o[je] || (o[je] = {
     dragDropManager: Vo(e, t, n, a)
-  }), o[He];
+  }), o[je];
 }
 function ya() {
   return typeof global < "u" ? global : window;
@@ -1294,7 +1294,7 @@ var st = !1, lt = !1, ti = /* @__PURE__ */ function() {
   }, {
     key: "canDrag",
     value: function() {
-      L(!st, "You may not call monitor.canDrag() inside your canDrag() implementation. Read more: http://react-dnd.github.io/react-dnd/docs/api/drag-source-monitor");
+      F(!st, "You may not call monitor.canDrag() inside your canDrag() implementation. Read more: http://react-dnd.github.io/react-dnd/docs/api/drag-source-monitor");
       try {
         return st = !0, this.internalMonitor.canDragSource(this.sourceId);
       } finally {
@@ -1306,7 +1306,7 @@ var st = !1, lt = !1, ti = /* @__PURE__ */ function() {
     value: function() {
       if (!this.sourceId)
         return !1;
-      L(!lt, "You may not call monitor.isDragging() inside your isDragging() implementation. Read more: http://react-dnd.github.io/react-dnd/docs/api/drag-source-monitor");
+      F(!lt, "You may not call monitor.isDragging() inside your isDragging() implementation. Read more: http://react-dnd.github.io/react-dnd/docs/api/drag-source-monitor");
       try {
         return lt = !0, this.internalMonitor.isDraggingSource(this.sourceId);
       } finally {
@@ -1445,7 +1445,7 @@ var ct = !1, ri = /* @__PURE__ */ function() {
     value: function() {
       if (!this.targetId)
         return !1;
-      L(!ct, "You may not call monitor.canDrop() inside your canDrop() implementation. Read more: http://react-dnd.github.io/react-dnd/docs/api/drop-target-monitor");
+      F(!ct, "You may not call monitor.canDrop() inside your canDrop() implementation. Read more: http://react-dnd.github.io/react-dnd/docs/api/drop-target-monitor");
       try {
         return ct = !0, this.internalMonitor.canDropOnTarget(this.targetId);
       } finally {
@@ -1544,7 +1544,7 @@ function Cn(e, t) {
 }
 function si(e, t) {
   var n = e.ref;
-  return L(typeof n != "string", "Cannot connect React DnD to an element with an existing string ref. Please convert it to use a callback ref instead, or wrap it into a <span> or <div>. Read more: https://reactjs.org/docs/refs-and-the-dom.html#callback-refs"), n ? v.cloneElement(e, {
+  return F(typeof n != "string", "Cannot connect React DnD to an element with an existing string ref. Please convert it to use a callback ref instead, or wrap it into a <span> or <div>. Read more: https://reactjs.org/docs/refs-and-the-dom.html#callback-refs"), n ? v.cloneElement(e, {
     ref: function(o) {
       Cn(n, o), Cn(t, o);
     }
@@ -1552,18 +1552,18 @@ function si(e, t) {
     ref: t
   });
 }
-function je(e) {
+function Ge(e) {
   "@babel/helpers - typeof";
-  return typeof Symbol == "function" && typeof Symbol.iterator == "symbol" ? je = function(n) {
+  return typeof Symbol == "function" && typeof Symbol.iterator == "symbol" ? Ge = function(n) {
     return typeof n;
-  } : je = function(n) {
+  } : Ge = function(n) {
     return n && typeof Symbol == "function" && n.constructor === Symbol && n !== Symbol.prototype ? "symbol" : typeof n;
-  }, je(e);
+  }, Ge(e);
 }
 function yt(e) {
   return (
     // eslint-disable-next-line no-prototype-builtins
-    e !== null && je(e) === "object" && Object.prototype.hasOwnProperty.call(e, "current")
+    e !== null && Ge(e) === "object" && Object.prototype.hasOwnProperty.call(e, "current")
   );
 }
 function bt(e, t, n, a) {
@@ -1581,8 +1581,8 @@ function bt(e, t, n, a) {
     var m = i[c];
     if (!l(m))
       return !1;
-    var f = e[m], d = t[m];
-    if (o = n ? n.call(a, f, d, m) : void 0, o === !1 || o === void 0 && f !== d)
+    var p = e[m], u = t[m];
+    if (o = n ? n.call(a, p, u, m) : void 0, o === !1 || o === void 0 && p !== u)
       return !1;
   }
   return !0;
@@ -1600,20 +1600,20 @@ function On(e, t) {
 function ci(e, t, n) {
   return t && On(e.prototype, t), n && On(e, n), e;
 }
-function Z(e, t, n) {
+function K(e, t, n) {
   return t in e ? Object.defineProperty(e, t, { value: n, enumerable: !0, configurable: !0, writable: !0 }) : e[t] = n, e;
 }
 var ui = /* @__PURE__ */ function() {
   function e(t) {
     var n = this;
-    li(this, e), Z(this, "hooks", ba({
+    li(this, e), K(this, "hooks", ba({
       dragSource: function(o, i) {
         n.clearDragSource(), n.dragSourceOptions = i || null, yt(o) ? n.dragSourceRef = o : n.dragSourceNode = o, n.reconnectDragSource();
       },
       dragPreview: function(o, i) {
         n.clearDragPreview(), n.dragPreviewOptions = i || null, yt(o) ? n.dragPreviewRef = o : n.dragPreviewNode = o, n.reconnectDragPreview();
       }
-    })), Z(this, "handlerId", null), Z(this, "dragSourceRef", null), Z(this, "dragSourceNode", void 0), Z(this, "dragSourceOptionsInternal", null), Z(this, "dragSourceUnsubscribe", void 0), Z(this, "dragPreviewRef", null), Z(this, "dragPreviewNode", void 0), Z(this, "dragPreviewOptionsInternal", null), Z(this, "dragPreviewUnsubscribe", void 0), Z(this, "lastConnectedHandlerId", null), Z(this, "lastConnectedDragSource", null), Z(this, "lastConnectedDragSourceOptions", null), Z(this, "lastConnectedDragPreview", null), Z(this, "lastConnectedDragPreviewOptions", null), Z(this, "backend", void 0), this.backend = t;
+    })), K(this, "handlerId", null), K(this, "dragSourceRef", null), K(this, "dragSourceNode", void 0), K(this, "dragSourceOptionsInternal", null), K(this, "dragSourceUnsubscribe", void 0), K(this, "dragPreviewRef", null), K(this, "dragPreviewNode", void 0), K(this, "dragPreviewOptionsInternal", null), K(this, "dragPreviewUnsubscribe", void 0), K(this, "lastConnectedHandlerId", null), K(this, "lastConnectedDragSource", null), K(this, "lastConnectedDragSourceOptions", null), K(this, "lastConnectedDragPreview", null), K(this, "lastConnectedDragPreviewOptions", null), K(this, "backend", void 0), this.backend = t;
   }
   return ci(e, [{
     key: "receiveHandlerId",
@@ -1740,17 +1740,17 @@ function In(e, t) {
 function fi(e, t, n) {
   return t && In(e.prototype, t), n && In(e, n), e;
 }
-function de(e, t, n) {
+function fe(e, t, n) {
   return t in e ? Object.defineProperty(e, t, { value: n, enumerable: !0, configurable: !0, writable: !0 }) : e[t] = n, e;
 }
 var mi = /* @__PURE__ */ function() {
   function e(t) {
     var n = this;
-    di(this, e), de(this, "hooks", ba({
+    di(this, e), fe(this, "hooks", ba({
       dropTarget: function(o, i) {
         n.clearDropTarget(), n.dropTargetOptions = i, yt(o) ? n.dropTargetRef = o : n.dropTargetNode = o, n.reconnect();
       }
-    })), de(this, "handlerId", null), de(this, "dropTargetRef", null), de(this, "dropTargetNode", void 0), de(this, "dropTargetOptionsInternal", null), de(this, "unsubscribeDropTarget", void 0), de(this, "lastConnectedHandlerId", null), de(this, "lastConnectedDropTarget", null), de(this, "lastConnectedDropTargetOptions", null), de(this, "backend", void 0), this.backend = t;
+    })), fe(this, "handlerId", null), fe(this, "dropTargetRef", null), fe(this, "dropTargetNode", void 0), fe(this, "dropTargetOptionsInternal", null), fe(this, "unsubscribeDropTarget", void 0), fe(this, "lastConnectedHandlerId", null), fe(this, "lastConnectedDropTarget", null), fe(this, "lastConnectedDropTargetOptions", null), fe(this, "backend", void 0), this.backend = t;
   }
   return fi(e, [{
     key: "connectTarget",
@@ -1891,14 +1891,14 @@ function bi(e, t, n) {
     a.spec = e;
   }, [e]), a;
 }
-function Ie() {
+function _e() {
   var e = v.useContext(fa), t = e.dragDropManager;
-  return L(t != null, "Expected drag drop context"), t;
+  return F(t != null, "Expected drag drop context"), t;
 }
 function Ei(e) {
   return v.useMemo(function() {
     var t = e.type;
-    return L(t != null, "spec.type must be defined"), t;
+    return F(t != null, "spec.type must be defined"), t;
   }, [e]);
 }
 function Di(e, t) {
@@ -1950,11 +1950,11 @@ function Ci(e) {
     return e;
 }
 function Oi(e, t, n) {
-  var a = Ie(), o = bi(e, t, n), i = Ei(e);
+  var a = _e(), o = bi(e, t, n), i = Ei(e);
   Ee(function() {
     if (i != null) {
-      var l = gi(i, o, a), c = Di(l, 2), m = c[0], f = c[1];
-      return t.receiveHandlerId(m), n.receiveHandlerId(m), f;
+      var l = gi(i, o, a), c = Di(l, 2), m = c[0], p = c[1];
+      return t.receiveHandlerId(m), n.receiveHandlerId(m), p;
     }
   }, [a, t, n, o, i]);
 }
@@ -1997,13 +1997,13 @@ function Ea(e, t) {
   }, n);
 }
 function Ai() {
-  var e = Ie();
+  var e = _e();
   return v.useMemo(function() {
     return new ti(e);
   }, [e]);
 }
 function Li(e, t) {
-  var n = Ie(), a = v.useMemo(function() {
+  var n = _e(), a = v.useMemo(function() {
     return new ui(n.getBackend());
   }, [n]);
   return Ee(function() {
@@ -2121,7 +2121,7 @@ function ji(e) {
   if (Array.isArray(e))
     return e;
 }
-function qi(e, t, n) {
+function Gi(e, t, n) {
   var a = Bi(e, t, n), o = Vi(a, 2), i = o[0], s = o[1];
   return Ee(function() {
     var c = e.getHandlerId();
@@ -2132,13 +2132,13 @@ function qi(e, t, n) {
   }, [e, s]), i;
 }
 function Da(e, t, n) {
-  return qi(t, e || function() {
+  return Gi(t, e || function() {
     return {};
   }, function() {
     return n.reconnect();
   });
 }
-function Gi(e) {
+function qi(e) {
   return v.useMemo(function() {
     return e.hooks.dragSource();
   }, [e]);
@@ -2150,14 +2150,14 @@ function Wi(e) {
 }
 function Qi(e, t) {
   var n = Ea(e, t);
-  L(!n.begin, "useDrag::spec.begin was deprecated in v14. Replace spec.begin() with spec.item(). (see more here - https://react-dnd.github.io/react-dnd/docs/api/use-drag)");
+  F(!n.begin, "useDrag::spec.begin was deprecated in v14. Replace spec.begin() with spec.item(). (see more here - https://react-dnd.github.io/react-dnd/docs/api/use-drag)");
   var a = Ai(), o = Li(n.options, n.previewOptions);
-  return Oi(n, a, o), [Da(n.collect, a, o), Gi(o), Wi(o)];
+  return Oi(n, a, o), [Da(n.collect, a, o), qi(o), Wi(o)];
 }
 function Zi(e) {
   var t = e.accept;
   return v.useMemo(function() {
-    return L(e.accept != null, "accept must be defined"), Array.isArray(t) ? t : [t];
+    return F(e.accept != null, "accept must be defined"), Array.isArray(t) ? t : [t];
   }, [t]);
 }
 function Ki(e, t) {
@@ -2258,22 +2258,22 @@ function rs(e) {
     return e;
 }
 function os(e, t, n) {
-  var a = Ie(), o = Ji(e, t), i = Zi(e);
+  var a = _e(), o = Ji(e, t), i = Zi(e);
   Ee(function() {
-    var l = pi(i, o, a), c = es(l, 2), m = c[0], f = c[1];
-    return t.receiveHandlerId(m), n.receiveHandlerId(m), f;
+    var l = pi(i, o, a), c = es(l, 2), m = c[0], p = c[1];
+    return t.receiveHandlerId(m), n.receiveHandlerId(m), p;
   }, [a, t, o, n, i.map(function(s) {
     return s.toString();
   }).join("|")]);
 }
 function is() {
-  var e = Ie();
+  var e = _e();
   return v.useMemo(function() {
     return new ri(e);
   }, [e]);
 }
 function ss(e) {
-  var t = Ie(), n = v.useMemo(function() {
+  var t = _e(), n = v.useMemo(function() {
     return new mi(t.getBackend());
   }, [t]);
   return Ee(function() {
@@ -2370,36 +2370,36 @@ function Mn(e, t) {
 function vs(e, t, n) {
   return t && Mn(e.prototype, t), n && Mn(e, n), e;
 }
-function Fe(e, t, n) {
+function Le(e, t, n) {
   return t in e ? Object.defineProperty(e, t, { value: n, enumerable: !0, configurable: !0, writable: !0 }) : e[t] = n, e;
 }
 var $n = /* @__PURE__ */ function() {
   function e(t, n) {
-    hs(this, e), Fe(this, "xs", void 0), Fe(this, "ys", void 0), Fe(this, "c1s", void 0), Fe(this, "c2s", void 0), Fe(this, "c3s", void 0);
+    hs(this, e), Le(this, "xs", void 0), Le(this, "ys", void 0), Le(this, "c1s", void 0), Le(this, "c2s", void 0), Le(this, "c3s", void 0);
     for (var a = t.length, o = [], i = 0; i < a; i++)
       o.push(i);
-    o.sort(function(S, C) {
-      return t[S] < t[C] ? -1 : 1;
+    o.sort(function(S, T) {
+      return t[S] < t[T] ? -1 : 1;
     });
-    for (var s = [], l = [], c, m, f = 0; f < a - 1; f++)
-      c = t[f + 1] - t[f], m = n[f + 1] - n[f], s.push(c), l.push(m / c);
-    for (var d = [l[0]], y = 0; y < s.length - 1; y++) {
-      var h = l[y], I = l[y + 1];
-      if (h * I <= 0)
-        d.push(0);
+    for (var s = [], l = [], c, m, p = 0; p < a - 1; p++)
+      c = t[p + 1] - t[p], m = n[p + 1] - n[p], s.push(c), l.push(m / c);
+    for (var u = [l[0]], E = 0; E < s.length - 1; E++) {
+      var h = l[E], O = l[E + 1];
+      if (h * O <= 0)
+        u.push(0);
       else {
-        c = s[y];
-        var O = s[y + 1], p = c + O;
-        d.push(3 * p / ((p + O) / h + (p + c) / I));
+        c = s[E];
+        var I = s[E + 1], g = c + I;
+        u.push(3 * g / ((g + I) / h + (g + c) / O));
       }
     }
-    d.push(l[l.length - 1]);
-    for (var D = [], u = [], g, b = 0; b < d.length - 1; b++) {
-      g = l[b];
-      var w = d[b], E = 1 / s[b], T = w + d[b + 1] - g - g;
-      D.push((g - w - T) * E), u.push(T * E * E);
+    u.push(l[l.length - 1]);
+    for (var D = [], d = [], f, w = 0; w < u.length - 1; w++) {
+      f = l[w];
+      var y = u[w], b = 1 / s[w], C = y + u[w + 1] - f - f;
+      D.push((f - y - C) * b), d.push(C * b * b);
     }
-    this.xs = t, this.ys = n, this.c1s = d, this.c2s = D, this.c3s = u;
+    this.xs = t, this.ys = n, this.c1s = u, this.c2s = D, this.c3s = d;
   }
   return vs(e, [{
     key: "interpolate",
@@ -2407,19 +2407,19 @@ var $n = /* @__PURE__ */ function() {
       var a = this.xs, o = this.ys, i = this.c1s, s = this.c2s, l = this.c3s, c = a.length - 1;
       if (n === a[c])
         return o[c];
-      for (var m = 0, f = l.length - 1, d; m <= f; ) {
-        d = Math.floor(0.5 * (m + f));
-        var y = a[d];
-        if (y < n)
-          m = d + 1;
-        else if (y > n)
-          f = d - 1;
+      for (var m = 0, p = l.length - 1, u; m <= p; ) {
+        u = Math.floor(0.5 * (m + p));
+        var E = a[u];
+        if (E < n)
+          m = u + 1;
+        else if (E > n)
+          p = u - 1;
         else
-          return o[d];
+          return o[u];
       }
-      c = Math.max(0, f);
-      var h = n - a[c], I = h * h;
-      return o[c] + i[c] * h + s[c] * I + l[c] * h * I;
+      c = Math.max(0, p);
+      var h = n - a[c], O = h * h;
+      return o[c] + i[c] * h + s[c] * O + l[c] * h * O;
     }
   }]), e;
 }(), ys = 1;
@@ -2433,7 +2433,7 @@ function Ta(e) {
     y: a
   };
 }
-function Me(e) {
+function $e(e) {
   return {
     x: e.clientX,
     y: e.clientY
@@ -2454,30 +2454,30 @@ function Ds(e, t, n, a, o) {
   var i = bs(t), s = i ? e : t, l = Ta(s), c = {
     x: n.x - l.x,
     y: n.y - l.y
-  }, m = e.offsetWidth, f = e.offsetHeight, d = a.anchorX, y = a.anchorY, h = Es(i, t, m, f), I = h.dragPreviewWidth, O = h.dragPreviewHeight, p = function() {
-    var T = new $n([0, 0.5, 1], [
+  }, m = e.offsetWidth, p = e.offsetHeight, u = a.anchorX, E = a.anchorY, h = Es(i, t, m, p), O = h.dragPreviewWidth, I = h.dragPreviewHeight, g = function() {
+    var C = new $n([0, 0.5, 1], [
       // Dock to the top
       c.y,
       // Align at the center
-      c.y / f * O,
+      c.y / p * I,
       // Dock to the bottom
-      c.y + O - f
-    ]), S = T.interpolate(y);
-    return wa() && i && (S += (window.devicePixelRatio - 1) * O), S;
+      c.y + I - p
+    ]), S = C.interpolate(E);
+    return wa() && i && (S += (window.devicePixelRatio - 1) * I), S;
   }, D = function() {
-    var T = new $n([0, 0.5, 1], [
+    var C = new $n([0, 0.5, 1], [
       // Dock to the left
       c.x,
       // Align at the center
-      c.x / m * I,
+      c.x / m * O,
       // Dock to the right
-      c.x + I - m
+      c.x + O - m
     ]);
-    return T.interpolate(d);
-  }, u = o.offsetX, g = o.offsetY, b = u === 0 || u, w = g === 0 || g;
+    return C.interpolate(u);
+  }, d = o.offsetX, f = o.offsetY, w = d === 0 || d, y = f === 0 || f;
   return {
-    x: b ? u : D(),
-    y: w ? g : p()
+    x: w ? d : D(),
+    y: y ? f : g()
   };
 }
 var Ca = "__NATIVE_FILE__", Oa = "__NATIVE_URL__", Ia = "__NATIVE_TEXT__", _a = "__NATIVE_HTML__";
@@ -2495,10 +2495,10 @@ function dt(e, t, n) {
   return a ?? n;
 }
 var Ce;
-function $e(e, t, n) {
+function Be(e, t, n) {
   return t in e ? Object.defineProperty(e, t, { value: n, enumerable: !0, configurable: !0, writable: !0 }) : e[t] = n, e;
 }
-var Dt = (Ce = {}, $e(Ce, Ca, {
+var Dt = (Ce = {}, Be(Ce, Ca, {
   exposeProperties: {
     files: function(t) {
       return Array.prototype.slice.call(t.files);
@@ -2511,7 +2511,7 @@ var Dt = (Ce = {}, $e(Ce, Ca, {
     }
   },
   matchesTypes: ["Files"]
-}), $e(Ce, _a, {
+}), Be(Ce, _a, {
   exposeProperties: {
     html: function(t, n) {
       return dt(t, n, "");
@@ -2521,7 +2521,7 @@ var Dt = (Ce = {}, $e(Ce, Ca, {
     }
   },
   matchesTypes: ["Html", "text/html"]
-}), $e(Ce, Oa, {
+}), Be(Ce, Oa, {
   exposeProperties: {
     urls: function(t, n) {
       return dt(t, n, "").split(`
@@ -2532,7 +2532,7 @@ var Dt = (Ce = {}, $e(Ce, Ca, {
     }
   },
   matchesTypes: ["Url", "text/uri-list"]
-}), $e(Ce, Ia, {
+}), Be(Ce, Ia, {
   exposeProperties: {
     text: function(t, n) {
       return dt(t, n, "");
@@ -2695,14 +2695,14 @@ function ks(e, t) {
   if (!(e instanceof t))
     throw new TypeError("Cannot call a class as a function");
 }
-function qn(e, t) {
+function Gn(e, t) {
   for (var n = 0; n < t.length; n++) {
     var a = t[n];
     a.enumerable = a.enumerable || !1, a.configurable = !0, "value" in a && (a.writable = !0), Object.defineProperty(e, a.key, a);
   }
 }
 function Ns(e, t, n) {
-  return t && qn(e.prototype, t), n && qn(e, n), e;
+  return t && Gn(e.prototype, t), n && Gn(e, n), e;
 }
 function x(e, t, n) {
   return t in e ? Object.defineProperty(e, t, { value: n, enumerable: !0, configurable: !0, writable: !0 }) : e[t] = n, e;
@@ -2726,7 +2726,7 @@ var Fs = /* @__PURE__ */ function() {
       if (!i.defaultPrevented) {
         var s = o.dragStartSourceIds;
         o.dragStartSourceIds = null;
-        var l = Me(i);
+        var l = $e(i);
         o.monitor.isDragging() && o.actions.endDrag(), o.actions.beginDrag(s || [], {
           publishSource: !1,
           getSourceClientOffset: o.getSourceClientOffset,
@@ -2735,16 +2735,16 @@ var Fs = /* @__PURE__ */ function() {
         var c = i.dataTransfer, m = ft(c);
         if (o.monitor.isDragging()) {
           if (c && typeof c.setDragImage == "function") {
-            var f = o.monitor.getSourceId(), d = o.sourceNodes.get(f), y = o.sourcePreviewNodes.get(f) || d;
-            if (y) {
-              var h = o.getCurrentSourcePreviewNodeOptions(), I = h.anchorX, O = h.anchorY, p = h.offsetX, D = h.offsetY, u = {
-                anchorX: I,
-                anchorY: O
-              }, g = {
-                offsetX: p,
+            var p = o.monitor.getSourceId(), u = o.sourceNodes.get(p), E = o.sourcePreviewNodes.get(p) || u;
+            if (E) {
+              var h = o.getCurrentSourcePreviewNodeOptions(), O = h.anchorX, I = h.anchorY, g = h.offsetX, D = h.offsetY, d = {
+                anchorX: O,
+                anchorY: I
+              }, f = {
+                offsetX: g,
                 offsetY: D
-              }, b = Ds(d, y, l, u, g);
-              c.setDragImage(y, b.x, b.y);
+              }, w = Ds(u, E, l, d, f);
+              c.setDragImage(E, w.x, w.y);
             }
           }
           try {
@@ -2752,8 +2752,8 @@ var Fs = /* @__PURE__ */ function() {
           } catch {
           }
           o.setCurrentDragSourceNode(i.target);
-          var w = o.getCurrentSourcePreviewNodeOptions(), E = w.captureDraggingState;
-          E ? o.actions.publishDragSource() : setTimeout(function() {
+          var y = o.getCurrentSourcePreviewNodeOptions(), b = y.captureDraggingState;
+          b ? o.actions.publishDragSource() : setTimeout(function() {
             return o.actions.publishDragSource();
           }, 0);
         } else if (m)
@@ -2777,7 +2777,7 @@ var Fs = /* @__PURE__ */ function() {
       var s = o.dragEnterTargetIds;
       if (o.dragEnterTargetIds = [], !!o.monitor.isDragging()) {
         o.altKeyPressed = i.altKey, s.length > 0 && o.actions.hover(s, {
-          clientOffset: Me(i)
+          clientOffset: $e(i)
         });
         var l = s.some(function(c) {
           return o.monitor.canDropOnTarget(c);
@@ -2792,7 +2792,7 @@ var Fs = /* @__PURE__ */ function() {
         i.preventDefault(), i.dataTransfer && (i.dataTransfer.dropEffect = "none");
         return;
       }
-      o.altKeyPressed = i.altKey, o.lastClientOffset = Me(i), o.hoverRafId === null && typeof requestAnimationFrame < "u" && (o.hoverRafId = requestAnimationFrame(function() {
+      o.altKeyPressed = i.altKey, o.lastClientOffset = $e(i), o.hoverRafId === null && typeof requestAnimationFrame < "u" && (o.hoverRafId = requestAnimationFrame(function() {
         o.monitor.isDragging() && o.actions.hover(s || [], {
           clientOffset: o.lastClientOffset
         }), o.hoverRafId = null;
@@ -2817,7 +2817,7 @@ var Fs = /* @__PURE__ */ function() {
     }), x(this, "handleTopDrop", function(i) {
       var s = o.dropTargetIds;
       o.dropTargetIds = [], o.actions.hover(s, {
-        clientOffset: Me(i)
+        clientOffset: $e(i)
       }), o.actions.drop({
         dropEffect: o.getCurrentDropEffect()
       }), o.isDraggingNativeItem() ? o.endDragNativeItem() : o.monitor.isDragging() && o.actions.endDrag();
@@ -3010,14 +3010,14 @@ var Fs = /* @__PURE__ */ function() {
 };
 const ka = v.createContext({}), pe = () => v.useContext(ka), Ls = ({ children: e }) => {
   var s, l, c;
-  const [t, n] = v.useState({}), a = (m, f = !1) => {
-    let d = { object: m, show: !0, disableBgClose: f };
-    n((y) => ({ ...y, overlay: { ...d } }));
+  const [t, n] = v.useState({}), a = (m, p = !1) => {
+    let u = { object: m, show: !0, disableBgClose: p };
+    n((E) => ({ ...E, overlay: { ...u } }));
   }, o = (m = !1) => {
-    n((f) => ({
-      ...f,
+    n((p) => ({
+      ...p,
       overlay: {
-        ...f.overlay,
+        ...p.overlay,
         show: m
       }
     }));
@@ -3033,7 +3033,7 @@ const ka = v.createContext({}), pe = () => v.useContext(ka), Ls = ({ children: e
     }
   };
   return /* @__PURE__ */ r.createElement(ka.Provider, { value: i }, e);
-}, Ps = "Dashboard Description", We = {
+}, Ps = "Dashboard Description", Qe = {
   data: {},
   loading: !1,
   filteredData: {},
@@ -3053,40 +3053,40 @@ const ka = v.createContext({}), pe = () => v.useContext(ka), Ls = ({ children: e
   loadAPIFilters: () => Promise.resolve([]),
   isDebug: !1,
   config: {},
-  ...We
-}, J = v.createContext(Rs), te = v.createContext(() => {
+  ...Qe
+}, ee = v.createContext(Rs), ne = v.createContext(() => {
 });
 const xs = ({ disableBgClose: e, children: t, override: n = null }) => {
   let { overlay: a } = pe();
-  const [o, i] = v.useState(!1), [s, l] = v.useState(null), [c, m] = v.useState(!1), f = n ? n == null ? void 0 : n.show : a == null ? void 0 : a.show;
+  const [o, i] = v.useState(!1), [s, l] = v.useState(null), [c, m] = v.useState(!1), p = n ? n == null ? void 0 : n.show : a == null ? void 0 : a.show;
   return v.useEffect(() => {
-    if (f === void 0 || f === !1)
+    if (p === void 0 || p === !1)
       return;
     document.body.style.overflow = "hidden", i(!0), l("animate-in");
-    const d = setTimeout(() => {
+    const u = setTimeout(() => {
       l("show");
     }, 750);
-    return () => clearTimeout(d);
-  }, [f]), v.useEffect(() => {
-    if (f === void 0 || f === !0)
+    return () => clearTimeout(u);
+  }, [p]), v.useEffect(() => {
+    if (p === void 0 || p === !0)
       return;
     l("animate-out");
-    const d = setTimeout(() => {
+    const u = setTimeout(() => {
       l(null), i(!1), document.body.style.overflow = null;
     }, 400);
-    return () => clearTimeout(d);
-  }, [f]), v.useEffect(() => {
+    return () => clearTimeout(u);
+  }, [p]), v.useEffect(() => {
     if (c === !1)
       return;
-    const d = setTimeout(() => {
+    const u = setTimeout(() => {
       m(!1);
     }, 400);
-    return () => clearTimeout(d);
-  }, [c]), /* @__PURE__ */ r.createElement(r.Fragment, null, o && /* @__PURE__ */ r.createElement("div", { className: `cove-overlay${s ? " " + s : ""}${c ? " overlay-error" : ""}` }, /* @__PURE__ */ r.createElement("div", { className: "cove-overlay__bg", style: { cursor: e ? "default" : null }, onClick: (d) => e ? m(!0) : a ? a.actions.toggleOverlay(!1) : n ? n.actions.toggleOverlay(!1) : d.preventDefault(), role: "alert" }), /* @__PURE__ */ r.createElement("div", { className: "cove-overlay__wrapper" }, /* @__PURE__ */ r.createElement("div", { className: "cove-overlay__container" }, t))));
+    return () => clearTimeout(u);
+  }, [c]), /* @__PURE__ */ r.createElement(r.Fragment, null, o && /* @__PURE__ */ r.createElement("div", { className: `cove-overlay${s ? " " + s : ""}${c ? " overlay-error" : ""}` }, /* @__PURE__ */ r.createElement("div", { className: "cove-overlay__bg", style: { cursor: e ? "default" : null }, onClick: (u) => e ? m(!0) : a ? a.actions.toggleOverlay(!1) : n ? n.actions.toggleOverlay(!1) : u.preventDefault(), role: "alert" }), /* @__PURE__ */ r.createElement("div", { className: "cove-overlay__wrapper" }, /* @__PURE__ */ r.createElement("div", { className: "cove-overlay__container" }, t))));
 }, Ms = () => {
   const { overlay: e } = pe();
   return /* @__PURE__ */ r.createElement(xs, { disableBgClose: e.disableBgClose }, e.object);
-}, Na = v.createContext({}), Be = {
+}, Na = v.createContext({}), Ve = {
   title: "Filtered Text",
   type: "filtered-text",
   theme: "theme-blue",
@@ -3114,34 +3114,34 @@ const xs = ({ disableBgClose: e, children: t, override: n = null }) => {
   "theme-green",
   "theme-amber"
 ], Bs = v.memo((e) => {
-  const { config: t, updateConfig: n, loading: a, stateData: o, setParentConfig: i, isDashboard: s } = v.useContext(Na), [l, c] = v.useState(!0), [m, f] = v.useState(!1), d = It(t, n, !0), y = (E) => {
-    let T = [...t.filters];
-    T.splice(E, 1), n({ ...t, filters: T });
-  }, h = (E, T, S) => {
+  const { config: t, updateConfig: n, loading: a, stateData: o, setParentConfig: i, isDashboard: s } = v.useContext(Na), [l, c] = v.useState(!0), [m, p] = v.useState(!1), u = It(t, n, !0), E = (b) => {
     let C = [...t.filters];
-    C[T][E] = S, n({ ...t, filters: C });
-  }, I = () => {
-    let E = t.filters ? [...t.filters] : [];
-    E.push({ values: [] }), n({ ...t, filters: E });
-  }, O = (E = !0) => {
-    let T = {};
-    return o.length && o.map((S) => Object.keys(S).forEach((C) => T[C] = !0)), Object.keys(T);
-  }, p = (E) => {
-    let T = [];
-    const S = t.filters[E].columnName;
-    return o && S && (o.forEach(function(C) {
-      C[S] !== void 0 && T.indexOf(C[S]) === -1 && T.push(C[S]);
-    }), T.sort()), T;
+    C.splice(b, 1), n({ ...t, filters: C });
+  }, h = (b, C, S) => {
+    let T = [...t.filters];
+    T[C][b] = S, n({ ...t, filters: T });
+  }, O = () => {
+    let b = t.filters ? [...t.filters] : [];
+    b.push({ values: [] }), n({ ...t, filters: b });
+  }, I = (b = !0) => {
+    let C = {};
+    return o.length && o.map((S) => Object.keys(S).forEach((T) => C[T] = !0)), Object.keys(C);
+  }, g = (b) => {
+    let C = [];
+    const S = t.filters[b].columnName;
+    return o && S && (o.forEach(function(T) {
+      T[S] !== void 0 && C.indexOf(T[S]) === -1 && C.push(T[S]);
+    }), C.sort()), C;
   };
   v.useEffect(() => {
     if (i) {
-      const E = b();
-      i(E);
+      const b = w();
+      i(b);
     }
   }, [t]), v.useEffect(() => {
     if (!m) {
-      let E = { ...t };
-      delete E.newViz, n(E);
+      let b = { ...t };
+      delete b.newViz, n(b);
     }
   }, []);
   const D = () => {
@@ -3149,86 +3149,86 @@ const xs = ({ disableBgClose: e, children: t, override: n = null }) => {
       ...t,
       showEditorPanel: !l
     });
-  }, u = () => /* @__PURE__ */ r.createElement("section", { className: "waiting" }, /* @__PURE__ */ r.createElement("section", { className: "waiting-container" }, /* @__PURE__ */ r.createElement("h3", null, "Error With Configuration"), /* @__PURE__ */ r.createElement("p", null, t.runtime.editorErrorMessage))), g = () => {
-    const E = (T) => {
-      T.preventDefault();
+  }, d = () => /* @__PURE__ */ r.createElement("section", { className: "waiting" }, /* @__PURE__ */ r.createElement("section", { className: "waiting-container" }, /* @__PURE__ */ r.createElement("h3", null, "Error With Configuration"), /* @__PURE__ */ r.createElement("p", null, t.runtime.editorErrorMessage))), f = () => {
+    const b = (C) => {
+      C.preventDefault();
       let S = { ...t };
       delete S.newViz, n(S);
     };
-    return /* @__PURE__ */ r.createElement("section", { className: "waiting" }, /* @__PURE__ */ r.createElement("section", { className: "waiting-container" }, /* @__PURE__ */ r.createElement("h3", null, "Finish Configuring"), /* @__PURE__ */ r.createElement("p", null, "Set all required options to the left and confirm below to display a preview of the markup."), /* @__PURE__ */ r.createElement("button", { className: "btn btn-primary", style: { margin: "1em auto" }, onClick: E }, "I'm Done")));
-  }, b = () => {
-    let E = JSON.parse(JSON.stringify(t));
-    return delete E.newViz, delete E.runtime, E;
-  }, w = /* @__PURE__ */ r.createElement(xe, null, /* @__PURE__ */ r.createElement(xe.Section, { title: "General" }, /* @__PURE__ */ r.createElement(
+    return /* @__PURE__ */ r.createElement("section", { className: "waiting" }, /* @__PURE__ */ r.createElement("section", { className: "waiting-container" }, /* @__PURE__ */ r.createElement("h3", null, "Finish Configuring"), /* @__PURE__ */ r.createElement("p", null, "Set all required options to the left and confirm below to display a preview of the markup."), /* @__PURE__ */ r.createElement("button", { className: "btn btn-primary", style: { margin: "1em auto" }, onClick: b }, "I'm Done")));
+  }, w = () => {
+    let b = JSON.parse(JSON.stringify(t));
+    return delete b.newViz, delete b.runtime, b;
+  }, y = /* @__PURE__ */ r.createElement(Me, null, /* @__PURE__ */ r.createElement(Me.Section, { title: "General" }, /* @__PURE__ */ r.createElement(
     lr,
     {
       value: t.title,
       fieldName: "title",
       label: "Title",
       placeholder: "Filterable Text Title",
-      updateField: d
+      updateField: u
     }
-  )), /* @__PURE__ */ r.createElement(xe.Section, { title: "Data" }, /* @__PURE__ */ r.createElement("div", { className: "cove-accordion__panel-section" }, /* @__PURE__ */ r.createElement("div", { className: "cove-input-group" }, /* @__PURE__ */ r.createElement(
+  )), /* @__PURE__ */ r.createElement(Me.Section, { title: "Data" }, /* @__PURE__ */ r.createElement("div", { className: "cove-accordion__panel-section" }, /* @__PURE__ */ r.createElement("div", { className: "cove-input-group" }, /* @__PURE__ */ r.createElement(
     ge,
     {
       value: t.textColumn || "",
       fieldName: "textColumn",
       label: "Text Column",
-      updateField: d,
+      updateField: u,
       initial: "Select",
-      options: O()
+      options: I()
     }
-  ))), /* @__PURE__ */ r.createElement("hr", { className: "cove-accordion__divider" }), /* @__PURE__ */ r.createElement("label", { style: { marginBottom: "1rem" } }, /* @__PURE__ */ r.createElement("span", { className: "edit-label" }, "Data Point Filters"), /* @__PURE__ */ r.createElement(P, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(P.Target, null, /* @__PURE__ */ r.createElement(R, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(P.Content, null, /* @__PURE__ */ r.createElement("p", null, 'To refine the highlighted data point, specify one or more filters (e.g., "Male" and "Female" for a column called "Sex").')))), t.filters && /* @__PURE__ */ r.createElement("ul", { className: "filters-list", style: { paddingLeft: 0, marginBottom: "1rem" } }, t.filters.map((E, T) => /* @__PURE__ */ r.createElement("fieldset", { className: "edit-block", key: T }, /* @__PURE__ */ r.createElement(
+  ))), /* @__PURE__ */ r.createElement("hr", { className: "cove-accordion__divider" }), /* @__PURE__ */ r.createElement("label", { style: { marginBottom: "1rem" } }, /* @__PURE__ */ r.createElement("span", { className: "edit-label" }, "Data Point Filters"), /* @__PURE__ */ r.createElement(L, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(L.Target, null, /* @__PURE__ */ r.createElement(P, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(L.Content, null, /* @__PURE__ */ r.createElement("p", null, 'To refine the highlighted data point, specify one or more filters (e.g., "Male" and "Female" for a column called "Sex").')))), t.filters && /* @__PURE__ */ r.createElement("ul", { className: "filters-list", style: { paddingLeft: 0, marginBottom: "1rem" } }, t.filters.map((b, C) => /* @__PURE__ */ r.createElement("fieldset", { className: "edit-block", key: C }, /* @__PURE__ */ r.createElement(
     "button",
     {
       type: "button",
       className: "remove-column",
       onClick: () => {
-        y(T);
+        E(C);
       }
     },
     "Remove"
   ), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading" }, "Column"), /* @__PURE__ */ r.createElement(
     "select",
     {
-      value: E.columnName,
+      value: b.columnName,
       onChange: (S) => {
-        h("columnName", T, S.target.value);
+        h("columnName", C, S.target.value);
       }
     },
     /* @__PURE__ */ r.createElement("option", { value: "" }, "- Select Option -"),
-    O().map((S, C) => /* @__PURE__ */ r.createElement("option", { value: S, key: C }, S))
+    I().map((S, T) => /* @__PURE__ */ r.createElement("option", { value: S, key: T }, S))
   )), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading" }, "Column Value"), /* @__PURE__ */ r.createElement(
     "select",
     {
-      value: E.columnValue,
+      value: b.columnValue,
       onChange: (S) => {
-        h("columnValue", T, S.target.value);
+        h("columnValue", C, S.target.value);
       }
     },
     /* @__PURE__ */ r.createElement("option", { value: "" }, "- Select Option -"),
-    p(T).map((S, C) => /* @__PURE__ */ r.createElement("option", { value: S, key: C }, S))
-  ))))), /* @__PURE__ */ r.createElement(cr, { onClick: I, fluid: !0 }, "Add Filter")), /* @__PURE__ */ r.createElement(xe.Section, { title: "Visual" }, /* @__PURE__ */ r.createElement(
+    g(C).map((S, T) => /* @__PURE__ */ r.createElement("option", { value: S, key: T }, S))
+  ))))), /* @__PURE__ */ r.createElement(cr, { onClick: O, fluid: !0 }, "Add Filter")), /* @__PURE__ */ r.createElement(Me.Section, { title: "Visual" }, /* @__PURE__ */ r.createElement(
     ge,
     {
       value: t.fontSize,
       fieldName: "fontSize",
       label: "Font Size",
-      updateField: d,
+      updateField: u,
       options: ["small", "medium", "large"]
     }
-  ), /* @__PURE__ */ r.createElement("br", null), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label" }, "Theme"), /* @__PURE__ */ r.createElement("ul", { className: "color-palette" }, $s.map((E) => /* @__PURE__ */ r.createElement(
+  ), /* @__PURE__ */ r.createElement("br", null), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label" }, "Theme"), /* @__PURE__ */ r.createElement("ul", { className: "color-palette" }, $s.map((b) => /* @__PURE__ */ r.createElement(
     "li",
     {
-      title: E,
-      key: E,
+      title: b,
+      key: b,
       onClick: () => {
-        n({ ...t, theme: E });
+        n({ ...t, theme: b });
       },
-      className: t.theme === E ? "selected " + E : E
+      className: t.theme === b ? "selected " + b : b
     }
   )))), /* @__PURE__ */ r.createElement("div", { className: "cove-accordion__panel-section checkbox-group" }, /* @__PURE__ */ r.createElement(
-    _e,
+    Ne,
     {
       inline: !0,
       size: "small",
@@ -3236,10 +3236,10 @@ const xs = ({ disableBgClose: e, children: t, override: n = null }) => {
       section: "visual",
       fieldName: "border",
       label: "Display Border",
-      updateField: d
+      updateField: u
     }
   ), /* @__PURE__ */ r.createElement(
-    _e,
+    Ne,
     {
       inline: !0,
       size: "small",
@@ -3247,37 +3247,37 @@ const xs = ({ disableBgClose: e, children: t, override: n = null }) => {
       section: "visual",
       fieldName: "borderColorTheme",
       label: "Use theme border color",
-      updateField: d
+      updateField: u
     }
   ), /* @__PURE__ */ r.createElement(
-    _e,
+    Ne,
     {
       size: "small",
       value: t.visual.accent,
       section: "visual",
       fieldName: "accent",
       label: "Use Accent Style",
-      updateField: d
+      updateField: u
     }
   ), /* @__PURE__ */ r.createElement(
-    _e,
+    Ne,
     {
       size: "small",
       value: t.visual.background,
       section: "visual",
       fieldName: "background",
       label: "Use Theme Background Color",
-      updateField: d
+      updateField: u
     }
   ), /* @__PURE__ */ r.createElement(
-    _e,
+    Ne,
     {
       size: "small",
       value: t.visual.hideBackgroundColor,
       section: "visual",
       fieldName: "hideBackgroundColor",
       label: "Hide Background Color",
-      updateField: d
+      updateField: u
     }
   ))));
   return a ? null : /* @__PURE__ */ r.createElement(na, { component: "EditorPanel" }, /* @__PURE__ */ r.createElement(
@@ -3288,88 +3288,88 @@ const xs = ({ disableBgClose: e, children: t, override: n = null }) => {
       title: "Configure Filtered Text",
       onBackClick: D
     },
-    !t.newViz && t.runtime && t.runtime.editorErrorMessage && /* @__PURE__ */ r.createElement(u, null),
-    t.newViz && m && /* @__PURE__ */ r.createElement(g, null),
-    w
+    !t.newViz && t.runtime && t.runtime.editorErrorMessage && /* @__PURE__ */ r.createElement(d, null),
+    t.newViz && m && /* @__PURE__ */ r.createElement(f, null),
+    y
   ));
 });
 const Fa = ({ config: e, configUrl: t, isDashboard: n = !1, isEditor: a = !1, setConfig: o }) => {
-  const i = new Se(), [s, l] = v.useState(Be), [c, m] = v.useState(!0), [f, d] = v.useState(s.data || []), [y, h] = v.useState();
-  let { title: I, filters: O } = s;
-  const p = s.fontSize === "small" ? "16px" : s.fontSize === "medium" ? "22px" : "27px", { contentClasses: D, innerContainerClasses: u } = ur(s), g = async () => {
-    let S = e || await (await fetch(t)).json(), C = S.formattedData || S.data || {};
-    S.dataUrl && (C = await (await fetch(S.dataUrl)).json(), S.dataDescription && (C = i.autoStandardize(C), C = i.developerStandardize(C, S.dataDescription))), C && (d(C), h(C));
-    let k = { ...s, ...S };
-    const V = { ...ca(k) };
-    b(V), m(!1);
-  }, b = (S) => {
-    Object.keys(Be).forEach((C) => {
-      S[C] && typeof S[C] == "object" && !Array.isArray(S[C]) && (S[C] = { ...Be[C], ...S[C] });
+  const i = new Se(), [s, l] = v.useState(Ve), [c, m] = v.useState(!0), [p, u] = v.useState(s.data || []), [E, h] = v.useState();
+  let { title: O, filters: I } = s;
+  const g = s.fontSize === "small" ? "16px" : s.fontSize === "medium" ? "22px" : "27px", { contentClasses: D, innerContainerClasses: d } = ur(s), f = async () => {
+    let S = e || await (await fetch(t)).json(), T = S.formattedData || S.data || {};
+    S.dataUrl && (T = await (await fetch(S.dataUrl)).json(), S.dataDescription && (T = i.autoStandardize(T), T = i.developerStandardize(T, S.dataDescription))), T && (u(T), h(T));
+    let R = { ...s, ...S };
+    const V = { ...ca(R) };
+    w(V), m(!1);
+  }, w = (S) => {
+    Object.keys(Ve).forEach((T) => {
+      S[T] && typeof S[T] == "object" && !Array.isArray(S[T]) && (S[T] = { ...Ve[T], ...S[T] });
     }), S.runtime = {}, S.runtime.uniqueId = Date.now(), S.runtime.editorErrorMessage = "", l(S);
-  }, w = () => {
+  }, y = () => {
     let S = [];
-    if (O.length)
-      O.map((C) => C.columnName && C.columnValue ? S = f.filter(function(k) {
-        return k[C.columnName] === C.columnValue;
+    if (I.length)
+      I.map((T) => T.columnName && T.columnValue ? S = p.filter(function(R) {
+        return R[T.columnName] === T.columnValue;
       }) : null);
     else
-      return S = f.filter((C, k) => C[s.textColumn] && k === 0);
+      return S = p.filter((T, R) => T[s.textColumn] && R === 0);
     return S;
   };
   v.useEffect(() => {
-    g().catch((S) => console.log(S));
+    f().catch((S) => console.log(S));
   }, []), v.useEffect(() => {
-    e && !e.dataUrl && (b({ ...Be, ...e }), d(e.data), h(e.data));
+    e && !e.dataUrl && (w({ ...Ve, ...e }), u(e.data), h(e.data));
   }, [e == null ? void 0 : e.data]);
-  let E = /* @__PURE__ */ r.createElement(Ot, null);
+  let b = /* @__PURE__ */ r.createElement(Ot, null);
   if (c === !1) {
-    let S = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(ye.Responsive, { isEditor: a }, /* @__PURE__ */ r.createElement("div", { className: "cove-component__content no-borders" }, /* @__PURE__ */ r.createElement(ea, { classes: [`${s.theme}`], title: I, style: { fontSize: p } }), /* @__PURE__ */ r.createElement("div", { className: `${D.join(" ")} body` }, w().slice(0, 1).map((C, k) => /* @__PURE__ */ r.createElement("p", { style: { fontSize: p }, key: k }, " ", ta(C[s.textColumn] || ""), " "))))));
-    E = /* @__PURE__ */ r.createElement(r.Fragment, null, a && /* @__PURE__ */ r.createElement(Bs, null), S);
+    let S = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(ye.Responsive, { isEditor: a }, /* @__PURE__ */ r.createElement("div", { className: "cove-component__content no-borders" }, /* @__PURE__ */ r.createElement(ea, { classes: [`${s.theme}`], title: O, style: { fontSize: g } }), /* @__PURE__ */ r.createElement("div", { className: `${D.join(" ")} body` }, y().slice(0, 1).map((T, R) => /* @__PURE__ */ r.createElement("p", { style: { fontSize: g }, key: R }, " ", ta(T[s.textColumn] || ""), " "))))));
+    b = /* @__PURE__ */ r.createElement(r.Fragment, null, a && /* @__PURE__ */ r.createElement(Bs, null), S);
   }
-  const T = {
+  const C = {
     config: s,
-    updateConfig: b,
+    updateConfig: w,
     loading: c,
     setParentConfig: o,
     isDashboard: n,
-    stateData: f,
-    unfilteredData: f
+    stateData: p,
+    unfilteredData: p
   };
-  return /* @__PURE__ */ r.createElement(na, { component: "CdcFilteredText" }, /* @__PURE__ */ r.createElement(Na.Provider, { value: T }, /* @__PURE__ */ r.createElement(ye.VisualizationWrapper, { config: s, isEditor: a, showEditorPanel: s == null ? void 0 : s.showEditorPanel }, E)));
+  return /* @__PURE__ */ r.createElement(na, { component: "CdcFilteredText" }, /* @__PURE__ */ r.createElement(Na.Provider, { value: C }, /* @__PURE__ */ r.createElement(ye.VisualizationWrapper, { config: s, isEditor: a, showEditorPanel: s == null ? void 0 : s.showEditorPanel }, b)));
 }, he = {
-  "data-bite": /* @__PURE__ */ r.createElement(R, { display: "databite", base: !0 }),
-  Bar: /* @__PURE__ */ r.createElement(R, { display: "chartBar", base: !0 }),
-  "Spark Line": /* @__PURE__ */ r.createElement(R, { display: "chartLine" }),
-  "Bump Chart": /* @__PURE__ */ r.createElement(R, { display: "chartLine" }),
-  "waffle-chart": /* @__PURE__ */ r.createElement(R, { display: "grid", base: !0 }),
-  "markup-include": /* @__PURE__ */ r.createElement(R, { display: "code", base: !0 }),
-  Line: /* @__PURE__ */ r.createElement(R, { display: "chartLine", base: !0 }),
-  Pie: /* @__PURE__ */ r.createElement(R, { display: "chartPie", base: !0 }),
-  us: /* @__PURE__ */ r.createElement(R, { display: "mapUsa", base: !0 }),
-  "us-county": /* @__PURE__ */ r.createElement(R, { display: "mapUsa", base: !0 }),
-  world: /* @__PURE__ */ r.createElement(R, { display: "mapWorld", base: !0 }),
-  "single-state": /* @__PURE__ */ r.createElement(R, { display: "mapAl", base: !0 }),
-  gear: /* @__PURE__ */ r.createElement(R, { display: "gear", base: !0 }),
-  gearMulti: /* @__PURE__ */ r.createElement(R, { display: "gearMulti", base: !0 }),
-  tools: /* @__PURE__ */ r.createElement(R, { display: "tools", base: !0 }),
-  "filtered-text": /* @__PURE__ */ r.createElement(R, { display: "filtered-text", base: !0 }),
-  dashboardFilters: /* @__PURE__ */ r.createElement(R, { display: "dashboardFilters", base: !0 }),
-  table: /* @__PURE__ */ r.createElement(R, { display: "table", base: !0 }),
-  Sankey: /* @__PURE__ */ r.createElement(R, { display: "sankey", base: !0 })
+  "data-bite": /* @__PURE__ */ r.createElement(P, { display: "databite", base: !0 }),
+  Bar: /* @__PURE__ */ r.createElement(P, { display: "chartBar", base: !0 }),
+  "Spark Line": /* @__PURE__ */ r.createElement(P, { display: "chartLine" }),
+  "Bump Chart": /* @__PURE__ */ r.createElement(P, { display: "chartLine" }),
+  "waffle-chart": /* @__PURE__ */ r.createElement(P, { display: "grid", base: !0 }),
+  "markup-include": /* @__PURE__ */ r.createElement(P, { display: "code", base: !0 }),
+  Line: /* @__PURE__ */ r.createElement(P, { display: "chartLine", base: !0 }),
+  Pie: /* @__PURE__ */ r.createElement(P, { display: "chartPie", base: !0 }),
+  us: /* @__PURE__ */ r.createElement(P, { display: "mapUsa", base: !0 }),
+  "us-county": /* @__PURE__ */ r.createElement(P, { display: "mapUsa", base: !0 }),
+  world: /* @__PURE__ */ r.createElement(P, { display: "mapWorld", base: !0 }),
+  "single-state": /* @__PURE__ */ r.createElement(P, { display: "mapAl", base: !0 }),
+  gear: /* @__PURE__ */ r.createElement(P, { display: "gear", base: !0 }),
+  gearMulti: /* @__PURE__ */ r.createElement(P, { display: "gearMulti", base: !0 }),
+  tools: /* @__PURE__ */ r.createElement(P, { display: "tools", base: !0 }),
+  "filtered-text": /* @__PURE__ */ r.createElement(P, { display: "filtered-text", base: !0 }),
+  dashboardFilters: /* @__PURE__ */ r.createElement(P, { display: "dashboardFilters", base: !0 }),
+  table: /* @__PURE__ */ r.createElement(P, { display: "table", base: !0 }),
+  Sankey: /* @__PURE__ */ r.createElement(P, { display: "sankey", base: !0 })
 }, Vs = (e) => {
   const { type: t, visualizationType: n, general: a } = e;
   return n ? he[n] : a != null && a.geoType ? a.geoType === "single-state" ? he.us : he[a.geoType] : he[t];
 };
-const Aa = () => null, La = (e) => e, Pa = () => null, fe = ({ fontTheme: e = "dark", headerBgColor: t = "#fff", showDividerTop: n = !0, showDividerBottom: a = !0, showClose: o = !0, children: i, override: s = null }) => {
+const Aa = () => null, La = (e) => e, Pa = () => null, me = ({ fontTheme: e = "dark", headerBgColor: t = "#fff", showDividerTop: n = !0, showDividerBottom: a = !0, showClose: o = !0, children: i, override: s = null }) => {
   let { overlay: l } = pe();
-  const c = v.Children.toArray(i), m = c.find((h) => (h == null ? void 0 : h.type) === Aa), f = c.find((h) => (h == null ? void 0 : h.type) === La), d = c.find((h) => (h == null ? void 0 : h.type) === Pa), y = (h) => h ? null : "none";
+  const c = v.Children.toArray(i), m = c.find((h) => (h == null ? void 0 : h.type) === Aa), p = c.find((h) => (h == null ? void 0 : h.type) === La), u = c.find((h) => (h == null ? void 0 : h.type) === Pa), E = (h) => h ? null : "none";
   return /* @__PURE__ */ r.createElement("div", { className: `cove-modal cove-modal__theme--${e}` }, (o || m) && /* @__PURE__ */ r.createElement(
     "div",
     {
       className: "cove-modal__header",
       style: {
         backgroundColor: t,
-        boxShadow: y(m && n),
+        boxShadow: E(m && n),
         padding: m ? null : "0",
         minHeight: m ? null : "unset"
       }
@@ -3387,71 +3387,71 @@ const Aa = () => null, La = (e) => e, Pa = () => null, fe = ({ fontTheme: e = "d
           h.preventDefault();
         }
       },
-      /* @__PURE__ */ r.createElement(R, { display: "close" })
+      /* @__PURE__ */ r.createElement(P, { display: "close" })
     )
-  ), /* @__PURE__ */ r.createElement("div", { className: "cove-modal__content" }, f && f.props.children), d && /* @__PURE__ */ r.createElement(
+  ), /* @__PURE__ */ r.createElement("div", { className: "cove-modal__content" }, p && p.props.children), u && /* @__PURE__ */ r.createElement(
     "div",
     {
       className: "cove-modal__footer",
       style: {
-        boxShadow: y(a),
+        boxShadow: E(a),
         paddingTop: a ? "1rem" : null
       }
     },
-    d.props.children
+    u.props.children
   ));
 };
-fe.Header = Aa;
-fe.Content = La;
-fe.Footer = Pa;
-fe.propTypes = {
-  fontTheme: ke.oneOf(["dark", "light"]),
-  headerBgColor: ke.string,
-  showDividerTop: ke.bool,
-  showDividerBottom: ke.bool,
-  showClose: ke.bool
+me.Header = Aa;
+me.Content = La;
+me.Footer = Pa;
+me.propTypes = {
+  fontTheme: Fe.oneOf(["dark", "light"]),
+  headerBgColor: Fe.string,
+  showDividerTop: Fe.bool,
+  showDividerBottom: Fe.bool,
+  showClose: Fe.bool
 };
 const Ra = ({ vizKey: e, rowIndex: t }) => {
-  var u;
-  const { config: n } = v.useContext(J), { overlay: a } = pe(), o = new Se(), i = v.useContext(te), [s, l] = v.useState(!1), [c, m] = v.useState(!e), [f, d] = v.useState(!!n.rows[t].multiVizColumn), y = v.useMemo(() => e && !c ? n.visualizations[e] : n.rows[t], [n.visualizations, n.rows, e, t, c]), h = (g) => {
-    i(e && !c ? { type: "UPDATE_VISUALIZATION", payload: { vizKey: e, configureData: g } } : { type: "UPDATE_ROW", payload: { rowIndex: t, rowData: g } });
-  }, I = ({ target: { value: g } }) => {
-    h({ dataDescription: {}, formattedData: void 0, dataKey: g });
-  }, O = async (g, b) => {
-    const w = y.dataKey, { data: E, dataUrl: T } = n.datasets[w];
-    let S = E;
-    !E && T && (S = await Re(T), S = o.autoStandardize(S));
-    const C = { ...y.dataDescription, [g]: b }, k = { data: S, dataDescription: C, formattedData: o.developerStandardize(S, C) };
-    h(k), l(!0);
-  }, p = (g) => {
-    g !== "" && (i({ type: "UPDATE_ROW", payload: { rowIndex: t, rowData: { multiVizColumn: g } } }), l(!0));
-  }, D = (g) => {
-    i({ type: "UPDATE_ROW", payload: { rowIndex: t, rowData: { expandCollapseAllButtons: g } } }), l(!0);
+  var d;
+  const { config: n } = v.useContext(ee), { overlay: a } = pe(), o = new Se(), i = v.useContext(ne), [s, l] = v.useState(!1), [c, m] = v.useState(!e), [p, u] = v.useState(!!n.rows[t].multiVizColumn), E = v.useMemo(() => e && !c ? n.visualizations[e] : n.rows[t], [n.visualizations, n.rows, e, t, c]), h = (f) => {
+    i(e && !c ? { type: "UPDATE_VISUALIZATION", payload: { vizKey: e, configureData: f } } : { type: "UPDATE_ROW", payload: { rowIndex: t, rowData: f } });
+  }, O = ({ target: { value: f } }) => {
+    h({ dataDescription: {}, formattedData: void 0, dataKey: f });
+  }, I = async (f, w) => {
+    const y = E.dataKey, { data: b, dataUrl: C } = n.datasets[y];
+    let S = b;
+    !b && C && (S = await xe(C), S = o.autoStandardize(S));
+    const T = { ...E.dataDescription, [f]: w }, R = { data: S, dataDescription: T, formattedData: o.developerStandardize(S, T) };
+    h(R), l(!0);
+  }, g = (f) => {
+    f !== "" && (i({ type: "UPDATE_ROW", payload: { rowIndex: t, rowData: { multiVizColumn: f } } }), l(!0));
+  }, D = (f) => {
+    i({ type: "UPDATE_ROW", payload: { rowIndex: t, rowData: { expandCollapseAllButtons: f } } }), l(!0);
   };
-  return /* @__PURE__ */ r.createElement(fe, null, /* @__PURE__ */ r.createElement(fe.Content, null, /* @__PURE__ */ r.createElement("div", { className: "dataset-selector-container" }, "Select a dataset: ", /* @__PURE__ */ r.createElement("select", { className: "dataset-selector", value: y.dataKey || "", onChange: I }, /* @__PURE__ */ r.createElement("option", { value: "" }, "Select a dataset"), n.datasets && Object.keys(n.datasets).map((g) => /* @__PURE__ */ r.createElement("option", { key: g }, g))), e && /* @__PURE__ */ r.createElement(
-    Ve,
+  return /* @__PURE__ */ r.createElement(me, null, /* @__PURE__ */ r.createElement(me.Content, null, /* @__PURE__ */ r.createElement("div", { className: "dataset-selector-container" }, "Select a dataset: ", /* @__PURE__ */ r.createElement("select", { className: "dataset-selector", value: E.dataKey || "", onChange: O }, /* @__PURE__ */ r.createElement("option", { value: "" }, "Select a dataset"), n.datasets && Object.keys(n.datasets).map((f) => /* @__PURE__ */ r.createElement("option", { key: f }, f))), e && /* @__PURE__ */ r.createElement(
+    Ue,
     {
       label: "Apply To Row",
       value: c,
-      updateField: (g, b, w, E) => {
-        m(E), I({ target: { value: "" } });
+      updateField: (f, w, y, b) => {
+        m(b), O({ target: { value: "" } });
       }
     }
-  )), y.dataKey && /* @__PURE__ */ r.createElement(
+  )), E.dataKey && /* @__PURE__ */ r.createElement(
     dr,
     {
-      configureData: y,
+      configureData: E,
       visualizationKey: e,
-      updateDescriptionProp: O
+      updateDescriptionProp: I
     }
-  ), c && y.dataKey ? f ? /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(ge, { options: Object.keys(((u = n.datasets[y.dataKey]) == null ? void 0 : u.data[0]) || {}), value: n.rows[t].multiVizColumn, label: "Multi-Visualization Column", initial: "--Select--", updateField: (g, b, w, E) => p(E), required: !0 }), /* @__PURE__ */ r.createElement(Ve, { value: n.rows[t].expandCollapseAllButtons, label: " Add Expand/Collapse All buttons", fieldName: "", updateField: (g, b, w, E) => D(E) })) : /* @__PURE__ */ r.createElement(
-    Ve,
+  ), c && E.dataKey ? p ? /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(ge, { options: Object.keys(((d = n.datasets[E.dataKey]) == null ? void 0 : d.data[0]) || {}), value: n.rows[t].multiVizColumn, label: "Multi-Visualization Column", initial: "--Select--", updateField: (f, w, y, b) => g(b), required: !0 }), /* @__PURE__ */ r.createElement(Ue, { value: n.rows[t].expandCollapseAllButtons, label: " Add Expand/Collapse All buttons", fieldName: "", updateField: (f, w, y, b) => D(b) })) : /* @__PURE__ */ r.createElement(
+    Ue,
     {
       label: "Configure Multiple Visualizations",
-      value: f,
-      tooltip: /* @__PURE__ */ r.createElement(P, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(P.Target, null, /* @__PURE__ */ r.createElement(R, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(P.Content, null, /* @__PURE__ */ r.createElement("p", null, "You can select a column where for each unique value in the column the configuration for the row will be repeated in to the data preview."))),
-      updateField: (g, b, w, E) => {
-        s && E === !0 && l(!1), d(E);
+      value: p,
+      tooltip: /* @__PURE__ */ r.createElement(L, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(L.Target, null, /* @__PURE__ */ r.createElement(P, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(L.Content, null, /* @__PURE__ */ r.createElement("p", null, "You can select a column where for each unique value in the column the configuration for the row will be repeated in to the data preview."))),
+      updateField: (f, w, y, b) => {
+        s && b === !0 && l(!1), u(b);
       }
     }
   ) : /* @__PURE__ */ r.createElement(r.Fragment, null), s && /* @__PURE__ */ r.createElement("button", { style: { margin: "1em", display: "block" }, className: "cove-button", onClick: () => a == null ? void 0 : a.actions.toggleOverlay() }, "Continue")));
@@ -3472,25 +3472,25 @@ const Ra = ({ vizKey: e, rowIndex: t }) => {
   dashboardFilters: "Filter Dropdowns",
   Sankey: "Sankey Chart",
   table: "Table"
-}, X = ({ title: e, widgetConfig: t, addVisualization: n, type: a }) => {
-  var b;
-  const { overlay: o } = pe(), { config: i, data: s } = v.useContext(J), l = v.useContext(te), c = new Se(), m = (w, E) => {
-    let T = E.getDropResult();
-    if (!T)
+}, Y = ({ title: e, widgetConfig: t, addVisualization: n, type: a }) => {
+  var w;
+  const { overlay: o } = pe(), { config: i, data: s } = v.useContext(ee), l = v.useContext(ne), c = new Se(), m = (y, b) => {
+    let C = b.getDropResult();
+    if (!C)
       return null;
-    const { rowIdx: S, colIdx: C } = T;
+    const { rowIdx: S, colIdx: T } = C;
     if ((t == null ? void 0 : t.rowIdx) !== void 0)
-      l({ type: "MOVE_VISUALIZATION", payload: { rowIdx: S, colIdx: C, widget: t } });
+      l({ type: "MOVE_VISUALIZATION", payload: { rowIdx: S, colIdx: T, widget: t } });
     else if (n) {
-      const k = n();
-      l({ type: "ADD_VISUALIZATION", payload: { newViz: k, rowIdx: S, colIdx: C } });
+      const R = n();
+      l({ type: "ADD_VISUALIZATION", payload: { newViz: R, rowIdx: S, colIdx: T } });
     }
-  }, [{ isDragging: f, ...d }, y] = Qi(
+  }, [{ isDragging: p, ...u }, E] = Qi(
     {
       type: "vis-widget",
       end: m,
-      collect: (w) => ({
-        isDragging: w.isDragging()
+      collect: (y) => ({
+        isDragging: y.isDragging()
       })
     },
     [i.activeDashboard, i.rows, i.dashboard.sharedFilters]
@@ -3499,36 +3499,36 @@ const Ra = ({ vizKey: e, rowIndex: t }) => {
       type: "DELETE_WIDGET",
       payload: { uid: t.uid }
     });
-  }, I = (w, E) => {
-    const T = new URL(w);
-    return T.searchParams.set("$limit", E), T.href.replace(/%24/g, "$");
-  }, O = () => {
+  }, O = (y, b) => {
+    const C = new URL(y);
+    return C.searchParams.set("$limit", b), C.href.replace(/%24/g, "$");
+  }, I = () => {
     var S;
-    const w = ((S = i.rows[t.rowIdx]) == null ? void 0 : S.dataKey) || (t == null ? void 0 : t.dataKey), E = i.datasets[w], T = s[E == null ? void 0 : E.dataUrl];
-    if (T && !T.length) {
-      const C = I(E.dataUrl, 100);
-      Re(C).then((k) => {
-        k.sample = !0, l({ type: "SET_DATA", payload: { ...s, [w]: k } });
+    const y = ((S = i.rows[t.rowIdx]) == null ? void 0 : S.dataKey) || (t == null ? void 0 : t.dataKey), b = i.datasets[y], C = s[b == null ? void 0 : b.dataUrl];
+    if (C && !C.length) {
+      const T = O(b.dataUrl, 100);
+      xe(T).then((R) => {
+        R.sample = !0, l({ type: "SET_DATA", payload: { ...s, [y]: R } });
       });
     }
-  }, p = () => {
+  }, g = () => {
     t && (l({
       type: "UPDATE_VISUALIZATION",
       payload: { vizKey: t.uid, configureData: { editing: !0 } }
-    }), O());
+    }), I());
   };
   let D = !1;
-  const u = !!((b = i.rows[t == null ? void 0 : t.rowIdx]) != null && b.dataKey);
-  if (u || ["dashboardFilters", "markup-include"].includes(a))
+  const d = !!((w = i.rows[t == null ? void 0 : t.rowIdx]) != null && w.dataKey);
+  if (d || ["dashboardFilters", "markup-include"].includes(a))
     D = !0;
   else if (t != null && t.formattedData)
     D = !0;
   else if (t != null && t.dataKey && (t != null && t.dataDescription) && i.datasets[t.dataKey]) {
-    const w = c.autoStandardize(i.datasets[t.dataKey].data);
-    !!c.developerStandardize(w, t.dataDescription) && (D = !0);
+    const y = c.autoStandardize(i.datasets[t.dataKey].data);
+    !!c.developerStandardize(y, t.dataDescription) && (D = !0);
   }
-  const g = !u && (t == null ? void 0 : t.type) !== "dashboardFilters";
-  return /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement("div", { className: "widget", ref: y, style: { opacity: f ? 0.5 : 1 }, ...d }, /* @__PURE__ */ r.createElement(R, { display: "move", className: "drag-icon" }), /* @__PURE__ */ r.createElement("div", { className: "widget__content" }, (t == null ? void 0 : t.rowIdx) !== void 0 && /* @__PURE__ */ r.createElement("div", { className: "widget-menu" }, D && /* @__PURE__ */ r.createElement("button", { title: "Configure Visualization", className: "btn btn-configure", onClick: p }, he.tools), g && /* @__PURE__ */ r.createElement(
+  const f = !d && (t == null ? void 0 : t.type) !== "dashboardFilters";
+  return /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement("div", { className: "widget", ref: E, style: { opacity: p ? 0.5 : 1 }, ...u }, /* @__PURE__ */ r.createElement(P, { display: "move", className: "drag-icon" }), /* @__PURE__ */ r.createElement("div", { className: "widget__content" }, (t == null ? void 0 : t.rowIdx) !== void 0 && /* @__PURE__ */ r.createElement("div", { className: "widget-menu" }, D && /* @__PURE__ */ r.createElement("button", { title: "Configure Visualization", className: "btn btn-configure", onClick: g }, he.tools), f && /* @__PURE__ */ r.createElement(
     "button",
     {
       title: "Configure Data",
@@ -3540,10 +3540,10 @@ const Ra = ({ vizKey: e, rowIndex: t }) => {
       }
     },
     he.gear
-  ), /* @__PURE__ */ r.createElement("div", { className: "widget-menu-item", onClick: h }, /* @__PURE__ */ r.createElement(R, { display: "close", base: !0 }))), he[a], /* @__PURE__ */ r.createElement("span", null, Us[a]), /* @__PURE__ */ r.createElement("span", null, e), (t == null ? void 0 : t.newViz) && a !== "dashboardFilters" && /* @__PURE__ */ r.createElement("span", { onClick: p, className: "config-needed" }, "Configuration needed"))));
+  ), /* @__PURE__ */ r.createElement("div", { className: "widget-menu-item", onClick: h }, /* @__PURE__ */ r.createElement(P, { display: "close", base: !0 }))), he[a], /* @__PURE__ */ r.createElement("span", null, Us[a]), /* @__PURE__ */ r.createElement("span", null, e), (t == null ? void 0 : t.newViz) && a !== "dashboardFilters" && /* @__PURE__ */ r.createElement("span", { onClick: g, className: "config-needed" }, "Configuration needed"))));
 }, zs = ({ data: e, rowIdx: t, colIdx: n }) => {
-  var f;
-  const { config: a } = v.useContext(J), [{ isOver: o, canDrop: i }, s] = cs(
+  var p;
+  const { config: a } = v.useContext(ee), [{ isOver: o, canDrop: i }, s] = cs(
     () => ({
       accept: "vis-widget",
       drop: () => ({
@@ -3552,9 +3552,9 @@ const Ra = ({ vizKey: e, rowIndex: t }) => {
         canDrop: i
       }),
       canDrop: () => !e.widget,
-      collect: (d) => ({
-        isOver: d.isOver(),
-        canDrop: !!d.canDrop()
+      collect: (u) => ({
+        isOver: u.isOver(),
+        canDrop: !!u.canDrop()
       })
     }),
     [a.activeDashboard]
@@ -3562,52 +3562,52 @@ const Ra = ({ vizKey: e, rowIndex: t }) => {
   l && !l.uid && (l.uid = e.widget);
   let c = ["builder-column", "column-size--" + e.width];
   o && i && c.push("column--drop"), l && c.push("column--populated");
-  const m = (d) => {
-    var y;
-    if (d)
-      return d.type === "map" ? d.general.title : d.type === "markup-include" ? (y = d.contentEditor) == null ? void 0 : y.title : d.title;
+  const m = (u) => {
+    var E;
+    if (u)
+      return u.type === "map" ? u.general.title : u.type === "markup-include" ? (E = u.contentEditor) == null ? void 0 : E.title : u.title;
   };
   return /* @__PURE__ */ r.createElement("div", { className: c.join(" "), ref: s }, l ? /* @__PURE__ */ r.createElement(
-    X,
+    Y,
     {
       title: m(l),
       widgetConfig: { rowIdx: t, colIdx: n, ...l },
-      type: l.visualizationType ?? ((f = l.general) == null ? void 0 : f.geoType)
+      type: l.visualizationType ?? ((p = l.general) == null ? void 0 : p.geoType)
     }
   ) : /* @__PURE__ */ r.createElement("p", { className: "builder-column__text" }, "Drag and drop ", /* @__PURE__ */ r.createElement("br", null), " visualization"));
-}, Hs = (e) => /* @__PURE__ */ v.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", ...e }, /* @__PURE__ */ v.createElement("path", { d: "M2,16 L22,16 L22,14 L2,14 L2,16 Z M2,11 L22,11 L22,9 L2,9 L2,11 Z M2,4 L2,6 L22,6 L22,4 L2,4 Z" })), js = (e) => /* @__PURE__ */ v.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", ...e }, /* @__PURE__ */ v.createElement("path", { d: "M22 14L22 16 13 16 13 14 22 14zM11 16L2 16 2 14 11 14 11 16zM22 4L22 6 13 6 13 4 22 4zM11 6L2 6 2 4 11 4 11 6zM22 9L22 11 13 11 13 9 22 9zM11 11L2 11 2 9 11 9 11 11z" })), qs = (e) => /* @__PURE__ */ v.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", ...e }, /* @__PURE__ */ v.createElement("path", { d: "M22,14 L22,16 L17,16 L17,14 L22,14 Z M7,14 L7,16 L2,16 L2,14 L7,14 Z M15,14 L15,16 L9,16 L9,14 L15,14 Z M22,9 L22,11 L17,11 L17,9 L22,9 Z M7,9 L7,11 L2,11 L2,9 L7,9 Z M15,9 L15,11 L9,11 L9,9 L15,9 Z M22,4 L22,6 L17,6 L17,4 L22,4 Z M7,4 L7,6 L2,6 L2,4 L7,4 Z M15,4 L15,6 L9,6 L9,4 L15,4 Z" })), Gs = (e) => /* @__PURE__ */ v.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", ...e }, /* @__PURE__ */ v.createElement("path", { d: "M22,14 L22,16 L10,16 L10,14 L22,14 Z M8,14 L8,16 L2,16 L2,14 L8,14 Z M22,9 L22,11 L10,11 L10,9 L22,9 Z M8,9 L8,11 L2,11 L2,9 L8,9 Z M22,4 L22,6 L10,6 L10,4 L22,4 Z M8,4 L8,6 L2,6 L2,4 L8,4 Z" })), Ws = (e) => /* @__PURE__ */ v.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", ...e }, /* @__PURE__ */ v.createElement("path", { d: "M22,14 L22,16 L16,16 L16,14 L22,14 Z M14,14 L14,16 L2,16 L2,14 L14,14 Z M22,9 L22,11 L16,11 L16,9 L22,9 Z M14,9 L14,11 L2,11 L2,9 L14,9 Z M22,4 L22,6 L16,6 L16,4 L22,4 Z M14,4 L14,6 L2,6 L2,4 L14,4 Z" })), Qs = (e) => /* @__PURE__ */ v.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", height: 24, width: 24, viewBox: "0 0 576 512", ...e }, /* @__PURE__ */ v.createElement("path", { d: "M192 64C86 64 0 150 0 256S86 448 192 448H384c106 0 192-86 192-192s-86-192-192-192H192zm192 96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z" })), Zs = ({ rowIdx: e }) => {
-  const { config: t } = v.useContext(J), n = v.useContext(te), a = A.cloneDeep(t.rows), o = t.rows[e], i = (d) => n({ type: "UPDATE_CONFIG", payload: [d] }), s = v.useMemo(() => o.toggle ? "toggle" : o.columns.reduce((d, y) => (y.width && (d += y.width), d), ""), [o]), l = (d, y = void 0) => {
-    const h = A.cloneDeep(a);
-    h[e].toggle = y;
-    const I = h[e].columns, O = I.filter((D) => D.widget);
-    if (!(O.length > d.length)) {
+}, Hs = (e) => /* @__PURE__ */ v.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", ...e }, /* @__PURE__ */ v.createElement("path", { d: "M2,16 L22,16 L22,14 L2,14 L2,16 Z M2,11 L22,11 L22,9 L2,9 L2,11 Z M2,4 L2,6 L22,6 L22,4 L2,4 Z" })), js = (e) => /* @__PURE__ */ v.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", ...e }, /* @__PURE__ */ v.createElement("path", { d: "M22 14L22 16 13 16 13 14 22 14zM11 16L2 16 2 14 11 14 11 16zM22 4L22 6 13 6 13 4 22 4zM11 6L2 6 2 4 11 4 11 6zM22 9L22 11 13 11 13 9 22 9zM11 11L2 11 2 9 11 9 11 11z" })), Gs = (e) => /* @__PURE__ */ v.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", ...e }, /* @__PURE__ */ v.createElement("path", { d: "M22,14 L22,16 L17,16 L17,14 L22,14 Z M7,14 L7,16 L2,16 L2,14 L7,14 Z M15,14 L15,16 L9,16 L9,14 L15,14 Z M22,9 L22,11 L17,11 L17,9 L22,9 Z M7,9 L7,11 L2,11 L2,9 L7,9 Z M15,9 L15,11 L9,11 L9,9 L15,9 Z M22,4 L22,6 L17,6 L17,4 L22,4 Z M7,4 L7,6 L2,6 L2,4 L7,4 Z M15,4 L15,6 L9,6 L9,4 L15,4 Z" })), qs = (e) => /* @__PURE__ */ v.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", ...e }, /* @__PURE__ */ v.createElement("path", { d: "M22,14 L22,16 L10,16 L10,14 L22,14 Z M8,14 L8,16 L2,16 L2,14 L8,14 Z M22,9 L22,11 L10,11 L10,9 L22,9 Z M8,9 L8,11 L2,11 L2,9 L8,9 Z M22,4 L22,6 L10,6 L10,4 L22,4 Z M8,4 L8,6 L2,6 L2,4 L8,4 Z" })), Ws = (e) => /* @__PURE__ */ v.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", ...e }, /* @__PURE__ */ v.createElement("path", { d: "M22,14 L22,16 L16,16 L16,14 L22,14 Z M14,14 L14,16 L2,16 L2,14 L14,14 Z M22,9 L22,11 L16,11 L16,9 L22,9 Z M14,9 L14,11 L2,11 L2,9 L14,9 Z M22,4 L22,6 L16,6 L16,4 L22,4 Z M14,4 L14,6 L2,6 L2,4 L14,4 Z" })), Qs = (e) => /* @__PURE__ */ v.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", height: 24, width: 24, viewBox: "0 0 576 512", ...e }, /* @__PURE__ */ v.createElement("path", { d: "M192 64C86 64 0 150 0 256S86 448 192 448H384c106 0 192-86 192-192s-86-192-192-192H192zm192 96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z" })), Zs = ({ rowIdx: e }) => {
+  const { config: t } = v.useContext(ee), n = v.useContext(ne), a = N.cloneDeep(t.rows), o = t.rows[e], i = (u) => n({ type: "UPDATE_CONFIG", payload: [u] }), s = v.useMemo(() => o.toggle ? "toggle" : o.columns.reduce((u, E) => (E.width && (u += E.width), u), ""), [o]), l = (u, E = void 0) => {
+    const h = N.cloneDeep(a);
+    h[e].toggle = E;
+    const O = h[e].columns, I = O.filter((D) => D.widget);
+    if (!(I.length > u.length)) {
       {
-        const D = I.length > d.length ? O : I;
-        h[e].columns = d.map((u, g) => {
-          const b = D[g];
-          return b ? { ...b, width: u } : { width: u };
+        const D = O.length > u.length ? I : O;
+        h[e].columns = u.map((d, f) => {
+          const w = D[f];
+          return w ? { ...w, width: d } : { width: d };
         });
       }
       i({ ...t, rows: h });
     }
-  }, c = (d = "down") => {
-    if (e === a.length - 1 && d === "down")
+  }, c = (u = "down") => {
+    if (e === a.length - 1 && u === "down")
       return;
-    let y = d === "down" ? e + 1 : e - 1;
-    const h = a[y];
-    a[y] = o, a[e] = h, a[y].uuid = Date.now(), a[e].uuid = Date.now(), i({ ...t, rows: a });
-    let I = d === "down" ? 202 : -202, O = d === "down" ? -202 : 202, p = document.querySelector("[data-row-id='" + e + "']"), D = document.querySelector("[data-row-id='" + y + "']");
-    p.style.pointerEvents = "none", D.style.pointerEvents = "none", p.style.top = I + "px", D.style.top = O + "px", setTimeout(() => {
-      p.style.transition = "top 500ms cubic-bezier(0.16, 1, 0.3, 1)", D.style.transition = "top 500ms cubic-bezier(0.16, 1, 0.3, 1)", p.style.top = "0", D.style.top = "0";
+    let E = u === "down" ? e + 1 : e - 1;
+    const h = a[E];
+    a[E] = o, a[e] = h, a[E].uuid = Date.now(), a[e].uuid = Date.now(), i({ ...t, rows: a });
+    let O = u === "down" ? 202 : -202, I = u === "down" ? -202 : 202, g = document.querySelector("[data-row-id='" + e + "']"), D = document.querySelector("[data-row-id='" + E + "']");
+    g.style.pointerEvents = "none", D.style.pointerEvents = "none", g.style.top = O + "px", D.style.top = I + "px", setTimeout(() => {
+      g.style.transition = "top 500ms cubic-bezier(0.16, 1, 0.3, 1)", D.style.transition = "top 500ms cubic-bezier(0.16, 1, 0.3, 1)", g.style.top = "0", D.style.top = "0";
     }, 0), setTimeout(() => {
-      p.setAttribute("style", ""), D.setAttribute("style", "");
+      g.setAttribute("style", ""), D.setAttribute("style", "");
     }, 500);
   }, m = () => {
-    let d = { ...t.visualizations };
-    a[e] && a[e].columns && a[e].columns.length && t.visualizations && a[e].columns.forEach((y) => {
-      y.widget && delete d[y.widget];
-    }), a.splice(e, 1), i({ ...t, rows: a, visualizations: d });
-  }, f = [
+    let u = { ...t.visualizations };
+    a[e] && a[e].columns && a[e].columns.length && t.visualizations && a[e].columns.forEach((E) => {
+      E.widget && delete u[E.widget];
+    }), a.splice(e, 1), i({ ...t, rows: a, visualizations: u });
+  }, p = [
     /* @__PURE__ */ r.createElement(
       "li",
       {
@@ -3636,7 +3636,7 @@ const Ra = ({ vizKey: e, rowIndex: t }) => {
         key: "444",
         title: "3 Columns"
       },
-      /* @__PURE__ */ r.createElement(qs, null)
+      /* @__PURE__ */ r.createElement(Gs, null)
     ),
     /* @__PURE__ */ r.createElement(
       "li",
@@ -3646,7 +3646,7 @@ const Ra = ({ vizKey: e, rowIndex: t }) => {
         key: "48",
         title: "2 Columns"
       },
-      /* @__PURE__ */ r.createElement(Gs, null)
+      /* @__PURE__ */ r.createElement(qs, null)
     ),
     /* @__PURE__ */ r.createElement(
       "li",
@@ -3669,7 +3669,7 @@ const Ra = ({ vizKey: e, rowIndex: t }) => {
       /* @__PURE__ */ r.createElement(Qs, null)
     )
   ];
-  return /* @__PURE__ */ r.createElement("nav", { className: "row-menu" }, /* @__PURE__ */ r.createElement("ul", { className: "row-menu__flyout" }, f), /* @__PURE__ */ r.createElement("div", { className: "spacer" }), /* @__PURE__ */ r.createElement(
+  return /* @__PURE__ */ r.createElement("nav", { className: "row-menu" }, /* @__PURE__ */ r.createElement("ul", { className: "row-menu__flyout" }, p), /* @__PURE__ */ r.createElement("div", { className: "spacer" }), /* @__PURE__ */ r.createElement(
     "button",
     {
       className: "btn btn-primary row-menu__btn border-0",
@@ -3677,7 +3677,7 @@ const Ra = ({ vizKey: e, rowIndex: t }) => {
       onClick: () => c("up"),
       disabled: e === 0
     },
-    /* @__PURE__ */ r.createElement(R, { display: "caretUp", color: "#fff", size: 25 })
+    /* @__PURE__ */ r.createElement(P, { display: "caretUp", color: "#fff", size: 25 })
   ), /* @__PURE__ */ r.createElement(
     "button",
     {
@@ -3686,7 +3686,7 @@ const Ra = ({ vizKey: e, rowIndex: t }) => {
       onClick: () => c("down"),
       disabled: e + 1 === a.length
     },
-    /* @__PURE__ */ r.createElement(R, { display: "caretDown", color: "#fff", size: 25 })
+    /* @__PURE__ */ r.createElement(P, { display: "caretDown", color: "#fff", size: 25 })
   ), /* @__PURE__ */ r.createElement(
     "button",
     {
@@ -3695,10 +3695,10 @@ const Ra = ({ vizKey: e, rowIndex: t }) => {
       onClick: m,
       disabled: e === 0 && a.length === 1
     },
-    /* @__PURE__ */ r.createElement(R, { display: "close", color: "#fff", size: 25 })
+    /* @__PURE__ */ r.createElement(P, { display: "close", color: "#fff", size: 25 })
   ));
 }, Ks = ({ row: e, idx: t, uuid: n }) => {
-  const { overlay: a } = pe(), o = v.useContext(te), i = () => {
+  const { overlay: a } = pe(), o = v.useContext(ne), i = () => {
     if (e.footnotesId)
       o({ type: "UPDATE_VISUALIZATION", payload: { vizKey: e.footnotesId, configureData: { editing: !0 } } });
     else {
@@ -3726,10 +3726,10 @@ const Ra = ({ vizKey: e, rowIndex: t }) => {
     he.gearMulti
   ), /* @__PURE__ */ r.createElement("div", { className: "column-container" }, e.columns.filter((s) => s.width).map((s, l) => /* @__PURE__ */ r.createElement(zs, { data: s, key: `row-${n}-col-${l}`, rowIdx: t, colIdx: l }))), /* @__PURE__ */ r.createElement("button", { className: "btn btn-primary footnotes", onClick: i }, e.footnotesId ? "Edit" : "Add", " Footnotes")));
 }, Xs = () => {
-  const { config: e } = v.useContext(J);
+  const { config: e } = v.useContext(ee);
   if (!e)
     return null;
-  const t = e.rows, n = v.useContext(te), a = (i) => n({ type: "UPDATE_CONFIG", payload: [i] }), o = () => {
+  const t = e.rows, n = v.useContext(ne), a = (i) => n({ type: "UPDATE_CONFIG", payload: [i] }), o = () => {
     const i = { columns: [{ width: 12 }] };
     a({
       ...e,
@@ -3739,33 +3739,33 @@ const Ra = ({ vizKey: e, rowIndex: t }) => {
   };
   return /* @__PURE__ */ r.createElement("div", { className: "builder-grid" }, (t || []).map((i, s) => /* @__PURE__ */ r.createElement(Ks, { row: i, idx: s, uuid: i.uuid, key: s })), /* @__PURE__ */ r.createElement("button", { className: "btn btn-primary col", onClick: o }, "Add Row"));
 };
-const Ys = (e) => /* @__PURE__ */ r.createElement(fe, null, /* @__PURE__ */ r.createElement(fe.Content, null, /* @__PURE__ */ r.createElement("p", null, "Are you sure you want to delete this dashboard? "), /* @__PURE__ */ r.createElement("button", { className: "btn btn-danger", onClick: e }, "DELETE"))), Js = ({ name: e, handleClick: t, tabs: n, index: a, active: o }) => {
-  const [i, s] = v.useState(!1), l = v.useContext(te), { overlay: c } = pe(), m = v.createRef(), f = (p) => {
-    p.stopPropagation();
-    const D = m.current.value, u = D === e, g = !D, b = n.includes(D);
-    !u && !g && !b && l({ type: "RENAME_DASHBOARD_TAB", payload: { current: e, new: D } }), s(!1);
-  }, d = (p) => {
-    p.target.className !== "remove" && (o ? s(!0) : t());
-  }, y = () => {
-    const p = () => {
+const Ys = (e) => /* @__PURE__ */ r.createElement(me, null, /* @__PURE__ */ r.createElement(me.Content, null, /* @__PURE__ */ r.createElement("p", null, "Are you sure you want to delete this dashboard? "), /* @__PURE__ */ r.createElement("button", { className: "btn btn-danger", onClick: e }, "DELETE"))), Js = ({ name: e, handleClick: t, tabs: n, index: a, active: o }) => {
+  const [i, s] = v.useState(!1), l = v.useContext(ne), { overlay: c } = pe(), m = v.createRef(), p = (g) => {
+    g.stopPropagation();
+    const D = m.current.value, d = D === e, f = !D, w = n.includes(D);
+    !d && !f && !w && l({ type: "RENAME_DASHBOARD_TAB", payload: { current: e, new: D } }), s(!1);
+  }, u = (g) => {
+    g.target.className !== "remove" && (o ? s(!0) : t());
+  }, E = () => {
+    const g = () => {
       l({ type: "REMOVE_MULTIDASHBOARD_AT_INDEX", payload: a }), c == null || c.actions.toggleOverlay(!1);
     };
-    c == null || c.actions.openOverlay(Ys(p));
-  }, h = (p, D) => {
-    const u = p + D;
-    u > -1 && u <= n.length - 1 && l({ type: "REORDER_MULTIDASHBOARDS", payload: { currentIndex: p, newIndex: p + D } });
-  }, I = a !== 0, O = a <= n.length - 2;
-  return /* @__PURE__ */ r.createElement("li", { className: "nav-item d-flex mt-0" }, I && i && /* @__PURE__ */ r.createElement("button", { className: "border-0", onClick: () => h(a, -1) }, "<"), /* @__PURE__ */ r.createElement(
+    c == null || c.actions.openOverlay(Ys(g));
+  }, h = (g, D) => {
+    const d = g + D;
+    d > -1 && d <= n.length - 1 && l({ type: "REORDER_MULTIDASHBOARDS", payload: { currentIndex: g, newIndex: g + D } });
+  }, O = a !== 0, I = a <= n.length - 2;
+  return /* @__PURE__ */ r.createElement("li", { className: "nav-item d-flex mt-0" }, O && i && /* @__PURE__ */ r.createElement("button", { className: "border-0", onClick: () => h(a, -1) }, "<"), /* @__PURE__ */ r.createElement(
     "div",
     {
       className: `edit nav-link${o ? " active" : ""}`,
       "aria-current": o ? "page" : null,
-      onClick: d
+      onClick: u
     },
-    i ? /* @__PURE__ */ r.createElement("div", { className: "d-flex" }, /* @__PURE__ */ r.createElement("input", { type: "text", defaultValue: e, onBlur: f, ref: m }), /* @__PURE__ */ r.createElement("button", { className: "btn btn-link save", onClick: f }, "save")) : /* @__PURE__ */ r.createElement(r.Fragment, null, e, /* @__PURE__ */ r.createElement("button", { className: "btn btn-danger border-0 ms-1", onClick: y }, "X"))
-  ), O && i && /* @__PURE__ */ r.createElement("button", { className: "border-0", onClick: () => h(a, 1) }, ">"));
+    i ? /* @__PURE__ */ r.createElement("div", { className: "d-flex" }, /* @__PURE__ */ r.createElement("input", { type: "text", defaultValue: e, onBlur: p, ref: m }), /* @__PURE__ */ r.createElement("button", { className: "btn btn-link save", onClick: p }, "save")) : /* @__PURE__ */ r.createElement(r.Fragment, null, e, /* @__PURE__ */ r.createElement("button", { className: "btn btn-danger border-0 ms-1", onClick: E }, "X"))
+  ), I && i && /* @__PURE__ */ r.createElement("button", { className: "border-0", onClick: () => h(a, 1) }, ">"));
 }, el = () => {
-  const { config: e } = v.useContext(J), t = v.useContext(te), n = v.useMemo(
+  const { config: e } = v.useContext(ee), t = v.useContext(ne), n = v.useMemo(
     () => (e.multiDashboards || []).map(({ label: i }) => i),
     [e.multiDashboards]
   ), a = v.useMemo(() => e.activeDashboard, [e.activeDashboard]), o = (i) => {
@@ -3783,7 +3783,7 @@ const Ys = (e) => /* @__PURE__ */ r.createElement(fe, null, /* @__PURE__ */ r.cr
     }
   )), /* @__PURE__ */ r.createElement("li", { className: "nav-item" }, /* @__PURE__ */ r.createElement("button", { className: "nav-link add", onClick: () => t({ type: "ADD_NEW_DASHBOARD" }) }, "+"))) : null;
 }, tl = () => {
-  const { config: e } = v.useContext(J), t = v.useContext(te), n = v.useMemo(
+  const { config: e } = v.useContext(ee), t = v.useContext(ne), n = v.useMemo(
     () => (e.multiDashboards || []).map(({ label: i }) => i),
     [e.multiDashboards]
   ), a = v.useMemo(() => e.activeDashboard, [e.activeDashboard]), o = (i, s) => {
@@ -3799,84 +3799,84 @@ const Ys = (e) => /* @__PURE__ */ r.createElement(fe, null, /* @__PURE__ */ r.cr
     },
     i
   )))) : null;
-}, xa = ({ isEditor: e = !1 }) => e ? /* @__PURE__ */ r.createElement(el, null) : /* @__PURE__ */ r.createElement(tl, null), ie = (e) => {
-  var I, O;
-  const t = ["Dashboard Description", "Data Table Settings", "Dashboard Preview"], { visualizationKey: n, subEditor: a } = e, { config: o, setParentConfig: i, tabSelected: s, data: l } = v.useContext(J);
+}, xa = ({ isEditor: e = !1 }) => e ? /* @__PURE__ */ r.createElement(el, null) : /* @__PURE__ */ r.createElement(tl, null), se = (e) => {
+  var O, I;
+  const t = ["Dashboard Description", "Data Table Settings", "Dashboard Preview"], { visualizationKey: n, subEditor: a } = e, { config: o, setParentConfig: i, tabSelected: s, data: l } = v.useContext(ee);
   if (!o)
     return null;
-  const c = v.useContext(te), m = () => {
+  const c = v.useContext(ne), m = () => {
     if (!n)
       return;
-    const p = A.cloneDeep(o);
-    if (p.visualizations[n].editing = !1, c({ type: "SET_CONFIG", payload: p }), Object.values(l).some((D) => D == null ? void 0 : D.sample)) {
-      const D = Object.keys(l).reduce((u, g) => (l[g].sample ? u[g] = [] : u[g] = l[g], u), {});
+    const g = N.cloneDeep(o);
+    if (g.visualizations[n].editing = !1, c({ type: "SET_CONFIG", payload: g }), Object.values(l).some((D) => D == null ? void 0 : D.sample)) {
+      const D = Object.keys(l).reduce((d, f) => (l[f].sample ? d[f] = [] : d[f] = l[f], d), {});
       c({ type: "SET_DATA", payload: D });
     }
-  }, f = (p, D, u) => {
-    let g = { ...o };
-    g[p] || (g[p] = {}), g[p][D] = u, c({ type: "UPDATE_CONFIG", payload: [g] });
-  }, d = (p = "JSON") => {
+  }, p = (g, D, d) => {
+    let f = { ...o };
+    f[g] || (f[g] = {}), f[g][D] = d, c({ type: "UPDATE_CONFIG", payload: [f] });
+  }, u = (g = "JSON") => {
     let D = JSON.parse(JSON.stringify(o));
-    return delete D.newViz, delete D.runtime, p === "JSON" ? JSON.stringify(D) : D;
+    return delete D.newViz, delete D.runtime, g === "JSON" ? JSON.stringify(D) : D;
   };
   v.useEffect(() => {
-    const p = d(), D = new CustomEvent("updateVizConfig", { detail: p });
+    const g = u(), D = new CustomEvent("updateVizConfig", { detail: g });
     if (window.dispatchEvent(D), i) {
-      const u = d("object");
-      i(u);
+      const d = u("object");
+      i(d);
     }
   }, [o]);
-  const y = (p) => {
-    const { checked: D } = p.currentTarget;
+  const E = (g) => {
+    const { checked: D } = g.currentTarget;
     D && c({ type: "INITIALIZE_MULTIDASHBOARDS" });
   }, h = !!o.multiDashboards;
-  return /* @__PURE__ */ r.createElement("div", { "aria-level": 2, role: "heading", className: `editor-heading${a ? " sub-dashboard-viz" : ""}` }, a ? /* @__PURE__ */ r.createElement("div", { className: "heading-1 back-to", onClick: m, style: { cursor: "pointer" } }, /* @__PURE__ */ r.createElement("span", null, "←"), " Back to Dashboard") : /* @__PURE__ */ r.createElement("div", { className: "heading-1" }, "Dashboard Editor", " ", /* @__PURE__ */ r.createElement("span", { className: "small" }, /* @__PURE__ */ r.createElement("input", { type: "checkbox", onChange: y, checked: h, disabled: h }), " make multidashboard"), /* @__PURE__ */ r.createElement("br", null), /* @__PURE__ */ r.createElement(
+  return /* @__PURE__ */ r.createElement("div", { "aria-level": 2, role: "heading", className: `editor-heading${a ? " sub-dashboard-viz" : ""}` }, a ? /* @__PURE__ */ r.createElement("div", { className: "heading-1 back-to", onClick: m, style: { cursor: "pointer" } }, /* @__PURE__ */ r.createElement("span", null, "←"), " Back to Dashboard") : /* @__PURE__ */ r.createElement("div", { className: "heading-1" }, "Dashboard Editor", " ", /* @__PURE__ */ r.createElement("span", { className: "small" }, /* @__PURE__ */ r.createElement("input", { type: "checkbox", onChange: E, checked: h, disabled: h }), " make multidashboard"), /* @__PURE__ */ r.createElement("br", null), /* @__PURE__ */ r.createElement(
     "input",
     {
       type: "text",
       placeholder: "Enter Dashboard Name Here",
-      defaultValue: (I = o.dashboard) == null ? void 0 : I.title,
-      onChange: (p) => f("dashboard", "title", p.target.value)
+      defaultValue: (O = o.dashboard) == null ? void 0 : O.title,
+      onChange: (g) => p("dashboard", "title", g.target.value)
     }
-  )), !a && /* @__PURE__ */ r.createElement("div", { className: "toggle-bar__wrapper" }, /* @__PURE__ */ r.createElement(xa, { isEditor: !0 }), /* @__PURE__ */ r.createElement("ul", { className: "toggle-bar" }, t.map((p) => /* @__PURE__ */ r.createElement(
+  )), !a && /* @__PURE__ */ r.createElement("div", { className: "toggle-bar__wrapper" }, /* @__PURE__ */ r.createElement(xa, { isEditor: !0 }), /* @__PURE__ */ r.createElement("ul", { className: "toggle-bar" }, t.map((g) => /* @__PURE__ */ r.createElement(
     "li",
     {
-      key: p,
-      className: s === p ? "active" : "inactive",
+      key: g,
+      className: s === g ? "active" : "inactive",
       onClick: () => {
-        c({ type: "SET_TAB_SELECTED", payload: p });
+        c({ type: "SET_TAB_SELECTED", payload: g });
       }
     },
-    p
+    g
   ))), /* @__PURE__ */ r.createElement("div", { className: "heading-body" }, s === "Dashboard Description" && /* @__PURE__ */ r.createElement(
     "input",
     {
       type: "text",
       className: "description-input",
       placeholder: "Type a dashboard description here.",
-      defaultValue: (O = o.dashboard) == null ? void 0 : O.description,
-      onChange: (p) => f("dashboard", "description", p.target.value)
+      defaultValue: (I = o.dashboard) == null ? void 0 : I.description,
+      onChange: (g) => p("dashboard", "description", g.target.value)
     }
   ), s === "Data Table Settings" && /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement("div", { className: "wrap" }, /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement(
     "input",
     {
       type: "checkbox",
       defaultChecked: o.table.show,
-      onChange: (p) => f("table", "show", p.target.checked)
+      onChange: (g) => p("table", "show", g.target.checked)
     }
   ), "Show Data Table(s)"), /* @__PURE__ */ r.createElement("br", null), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement(
     "input",
     {
       type: "checkbox",
       defaultChecked: o.table.expanded,
-      onChange: (p) => f("table", "expanded", p.target.checked)
+      onChange: (g) => p("table", "expanded", g.target.checked)
     }
   ), "Expanded by Default"), /* @__PURE__ */ r.createElement("br", null)), /* @__PURE__ */ r.createElement("div", { className: "wrap" }, /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement(
     "input",
     {
       type: "checkbox",
       defaultChecked: o.table.limitHeight,
-      onChange: (p) => f("table", "limitHeight", p.target.checked)
+      onChange: (g) => p("table", "limitHeight", g.target.checked)
     }
   ), "Limit Table Height"), o.table.limitHeight && /* @__PURE__ */ r.createElement(
     "input",
@@ -3885,29 +3885,29 @@ const Ys = (e) => /* @__PURE__ */ r.createElement(fe, null, /* @__PURE__ */ r.cr
       type: "text",
       placeholder: "Height (px)",
       defaultValue: o.table.height,
-      onChange: (p) => f("table", "height", p.target.value)
+      onChange: (g) => p("table", "height", g.target.value)
     }
   )), /* @__PURE__ */ r.createElement("div", { className: "wrap" }, /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement(
     "input",
     {
       type: "checkbox",
       defaultChecked: o.table.download,
-      onChange: (p) => f("table", "download", p.target.checked)
+      onChange: (g) => p("table", "download", g.target.checked)
     }
   ), "Show Download CSV Link"), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement(
     "input",
     {
       type: "checkbox",
       defaultChecked: o.table.showDownloadUrl,
-      onChange: (p) => f("table", "showDownloadUrl", p.target.checked)
+      onChange: (g) => p("table", "showDownloadUrl", g.target.checked)
     }
   ), "Show URL to Automatically Updated Data"))))));
 };
-const Gn = new Se(), De = (e, t) => {
+const qn = new Se(), De = (e, t) => {
   if (e && t)
     try {
-      let n = Gn.autoStandardize(e);
-      return n = Gn.developerStandardize(e, t), n;
+      let n = qn.autoStandardize(e);
+      return n = qn.developerStandardize(e, t), n;
     } catch {
       return e;
     }
@@ -3928,7 +3928,7 @@ const Gn = new Se(), De = (e, t) => {
     }
   });
 }, rl = (e) => (nl(e), al(e), e);
-const ee = (e, t) => {
+const te = (e, t) => {
   const a = {
     filters: [],
     filterBehavior: "Filter Change",
@@ -3984,7 +3984,7 @@ const ee = (e, t) => {
   }
   return a;
 }, ol = () => {
-  const [e, t] = v.useState(!1), { config: n } = v.useContext(J), a = v.useContext(te), o = (i) => {
+  const [e, t] = v.useState(!1), { config: n } = v.useContext(ee), a = v.useContext(ne), o = (i) => {
     const s = i.multiDashboards ? {
       ...n,
       ...i,
@@ -3993,7 +3993,7 @@ const ee = (e, t) => {
     } : i;
     a({ type: "APPLY_CONFIG", payload: [rl(s)] });
   };
-  return /* @__PURE__ */ r.createElement("div", { className: `visualizations-panel${e ? " advanced-editor" : ""}` }, /* @__PURE__ */ r.createElement("p", { style: { fontSize: "14px" } }, "Click and drag an item onto the grid to add it to your dashboard."), /* @__PURE__ */ r.createElement("span", { className: "subheading-3" }, "Chart"), /* @__PURE__ */ r.createElement("div", { className: "drag-grid" }, /* @__PURE__ */ r.createElement(X, { addVisualization: () => ee("chart", "Bar"), type: "Bar" }), /* @__PURE__ */ r.createElement(X, { addVisualization: () => ee("chart", "Line"), type: "Line" }), /* @__PURE__ */ r.createElement(X, { addVisualization: () => ee("chart", "Pie"), type: "Pie" }), /* @__PURE__ */ r.createElement(X, { addVisualization: () => ee("chart", "Sankey"), type: "Sankey" })), /* @__PURE__ */ r.createElement("span", { className: "subheading-3" }, "Map"), /* @__PURE__ */ r.createElement("div", { className: "drag-grid" }, /* @__PURE__ */ r.createElement(X, { addVisualization: () => ee("map", "us"), type: "us" }), /* @__PURE__ */ r.createElement(X, { addVisualization: () => ee("map", "world"), type: "world" }), /* @__PURE__ */ r.createElement(X, { addVisualization: () => ee("map", "single-state"), type: "single-state" })), /* @__PURE__ */ r.createElement("span", { className: "subheading-3" }, "Misc."), /* @__PURE__ */ r.createElement("div", { className: "drag-grid" }, /* @__PURE__ */ r.createElement(X, { addVisualization: () => ee("data-bite", ""), type: "data-bite" }), /* @__PURE__ */ r.createElement(X, { addVisualization: () => ee("waffle-chart", ""), type: "waffle-chart" }), /* @__PURE__ */ r.createElement(X, { addVisualization: () => ee("markup-include", ""), type: "markup-include" }), /* @__PURE__ */ r.createElement(X, { addVisualization: () => ee("filtered-text", ""), type: "filtered-text" }), /* @__PURE__ */ r.createElement(X, { addVisualization: () => ee("dashboardFilters", ""), type: "dashboardFilters" }), /* @__PURE__ */ r.createElement(X, { addVisualization: () => ee("table", ""), type: "table" })), /* @__PURE__ */ r.createElement(
+  return /* @__PURE__ */ r.createElement("div", { className: `visualizations-panel${e ? " advanced-editor" : ""}` }, /* @__PURE__ */ r.createElement("p", { style: { fontSize: "14px" } }, "Click and drag an item onto the grid to add it to your dashboard."), /* @__PURE__ */ r.createElement("span", { className: "subheading-3" }, "Chart"), /* @__PURE__ */ r.createElement("div", { className: "drag-grid" }, /* @__PURE__ */ r.createElement(Y, { addVisualization: () => te("chart", "Bar"), type: "Bar" }), /* @__PURE__ */ r.createElement(Y, { addVisualization: () => te("chart", "Line"), type: "Line" }), /* @__PURE__ */ r.createElement(Y, { addVisualization: () => te("chart", "Pie"), type: "Pie" }), /* @__PURE__ */ r.createElement(Y, { addVisualization: () => te("chart", "Sankey"), type: "Sankey" })), /* @__PURE__ */ r.createElement("span", { className: "subheading-3" }, "Map"), /* @__PURE__ */ r.createElement("div", { className: "drag-grid" }, /* @__PURE__ */ r.createElement(Y, { addVisualization: () => te("map", "us"), type: "us" }), /* @__PURE__ */ r.createElement(Y, { addVisualization: () => te("map", "world"), type: "world" }), /* @__PURE__ */ r.createElement(Y, { addVisualization: () => te("map", "single-state"), type: "single-state" })), /* @__PURE__ */ r.createElement("span", { className: "subheading-3" }, "Misc."), /* @__PURE__ */ r.createElement("div", { className: "drag-grid" }, /* @__PURE__ */ r.createElement(Y, { addVisualization: () => te("data-bite", ""), type: "data-bite" }), /* @__PURE__ */ r.createElement(Y, { addVisualization: () => te("waffle-chart", ""), type: "waffle-chart" }), /* @__PURE__ */ r.createElement(Y, { addVisualization: () => te("markup-include", ""), type: "markup-include" }), /* @__PURE__ */ r.createElement(Y, { addVisualization: () => te("filtered-text", ""), type: "filtered-text" }), /* @__PURE__ */ r.createElement(Y, { addVisualization: () => te("dashboardFilters", ""), type: "dashboardFilters" }), /* @__PURE__ */ r.createElement(Y, { addVisualization: () => te("table", ""), type: "table" })), /* @__PURE__ */ r.createElement(
     Za,
     {
       loadConfig: o,
@@ -4020,24 +4020,24 @@ function il(e) {
   }), t;
 }
 function Wn(e = [], t, n) {
-  const a = A.filter(t, (o) => {
+  const a = N.filter(t, (o) => {
     var i;
     return o.resetLabel === o.active ? (i = o.values) == null ? void 0 : i.includes(o.resetLabel) : !0;
   });
   return e.filter((o) => !a.find((s) => {
-    var d;
-    const l = o[s.columnName], c = s.queuedActive || s.filterStyle === re.nestedDropdown ? [s.active, (d = s.subGrouping) == null ? void 0 : d.active] : s.active;
+    var u;
+    const l = o[s.columnName], c = s.queuedActive || s.filterStyle === oe.nestedDropdown ? [s.active, (u = s.subGrouping) == null ? void 0 : u.active] : s.active;
     let m = !0;
     if (Array.isArray(c) ? m = !c.includes(l) : m = c && l != c, s.filterStyle === "nested-dropdown" && s.subGrouping && s.active === l && m === !1) {
-      const y = s.subGrouping.active, h = o[s.subGrouping.columnName];
-      m = y && h !== y;
+      const E = s.subGrouping.active, h = o[s.subGrouping.columnName];
+      m = E && h !== E;
     }
-    const f = s.tier === n;
-    if (s.type !== "urlfilter" && f && m)
+    const p = s.tier === n;
+    if (s.type !== "urlfilter" && p && m)
       return !0;
   }));
 }
-const Oe = (e, t) => {
+const Ie = (e, t) => {
   const n = il(e);
   for (let a = 0; a < n; a++) {
     const o = a === n - 1, i = Wn(t, e, a + 1);
@@ -4062,28 +4062,28 @@ const Oe = (e, t) => {
   let a = {}, o = be(t);
   const i = Rt(t.rows);
   return t.dashboard.sharedFilters && (t.dashboard.sharedFilters.forEach((s, l) => {
-    const c = !!o.find((y) => y === s.setBy), m = t.dashboard.sharedFilters[l], f = (y) => {
-      if (m.values = y, y.length > 0) {
-        const h = m.pivot ? m.values : m.values[0], I = ua(m);
-        I ? m.active = I : m.active = m.active || h;
+    const c = !!o.find((E) => E === s.setBy), m = t.dashboard.sharedFilters[l], p = (E) => {
+      if (m.values = E, E.length > 0) {
+        const h = m.pivot ? m.values : m.values[0], O = ua(m);
+        O ? m.active = O : m.active = m.active || h;
       }
-    }, d = sl(s.columnName, n || e.data);
-    c ? (m.order === "asc" && d.sort(), m.order === "desc" && d.sort().reverse(), f(d)) : (!s.values || s.values.length === 0) && s.showDropdown && f(d);
+    }, u = sl(s.columnName, n || e.data);
+    c ? (m.order === "asc" && u.sort(), m.order === "desc" && u.sort().reverse(), p(u)) : (!s.values || s.values.length === 0) && s.showDropdown && p(u);
   }), o.forEach((s) => {
     var m;
     const l = i[s];
     if ((m = t.rows[l]) != null && m.datakey)
       return;
-    const c = t.dashboard.sharedFilters.filter((f) => f.usedBy && f.usedBy.indexOf(s) !== -1);
+    const c = t.dashboard.sharedFilters.filter((p) => p.usedBy && p.usedBy.indexOf(s) !== -1);
     if (c.length > 0) {
-      const f = t.visualizations[s], d = t.datasets[f.dataKey], h = De((d == null ? void 0 : d.data) || f.data, f.dataDescription) || (n || e.data)[f.dataKey];
-      a[s] = Oe(c, h);
+      const p = t.visualizations[s], u = t.datasets[p.dataKey], h = De((u == null ? void 0 : u.data) || p.data, p.dataDescription) || (n || e.data)[p.dataKey];
+      a[s] = Ie(c, h);
     }
   }), t.rows.forEach((s, l) => {
     const c = t.dashboard.sharedFilters.filter((m) => m.usedBy && m.usedBy.indexOf(l) !== -1);
     if (c.length > 0) {
-      const f = De(s.data, s.dataDescription) || (n || e.data)[l];
-      a[l] = Oe(c, f);
+      const p = De(s.data, s.dataDescription) || (n || e.data)[l];
+      a[l] = Ie(c, p);
     }
   })), t.runtime = {}, [t, a];
 }, $a = typeof window < "u" && window.__REDUX_DEVTOOLS_EXTENSION__, ll = $a ? window.__REDUX_DEVTOOLS_EXTENSION__.connect() : null, pt = $a ? ll : null, Ba = (e) => (t, n) => {
@@ -4105,7 +4105,7 @@ const Oe = (e, t) => {
       const { id: n, rowIndex: a, config: o } = t.payload, i = e.config.rows.map((s, l) => l === a ? { ...s, footnotesId: n } : s);
       return {
         ...e,
-        config: se(
+        config: le(
           { ...e.config, rows: i, visualizations: { ...e.config.visualizations, [n]: o } },
           e.config.activeDashboard
         )
@@ -4113,11 +4113,11 @@ const Oe = (e, t) => {
     }
     case "ADD_NEW_DASHBOARD": {
       const n = e.config.multiDashboards, a = "New Dashboard " + (n.length + 1), o = [...n, { ...cl(), label: a }];
-      return Ae(e, o);
+      return Pe(e, o);
     }
     case "UPDATE_CONFIG": {
       const [n, a] = St(e)(...t.payload);
-      return { ...e, config: se(n, e.config.activeDashboard), filteredData: a };
+      return { ...e, config: le(n, e.config.activeDashboard), filteredData: a };
     }
     case "APPLY_CONFIG": {
       const [n, a] = St(e)(...t.payload), o = [...Object.values(n.visualizations), ...n.rows].map((i) => i.dataKey).reduce((i, s) => {
@@ -4125,12 +4125,12 @@ const Oe = (e, t) => {
         const l = e.data[s] || ((c = e.config.datasets[s]) == null ? void 0 : c.data);
         return l && (i[s] = l), i;
       }, {});
-      return { ...We, config: se(n, e.config.activeDashboard), filteredData: a, data: o };
+      return { ...Qe, config: le(n, e.config.activeDashboard), filteredData: a, data: o };
     }
     case "SET_CONFIG":
       return t.payload.activeDashboard === void 0 || e.config.activeDashboard === t.payload.activeDashboard ? {
         ...e,
-        config: se({ ...e.config, ...t.payload }, t.payload.activeDashboard)
+        config: le({ ...e.config, ...t.payload }, t.payload.activeDashboard)
       } : e;
     case "SET_DATA":
       return { ...e, data: t.payload };
@@ -4144,44 +4144,44 @@ const Oe = (e, t) => {
       const n = t.payload, a = { ...e.config.dashboard, sharedFilters: n };
       return {
         ...e,
-        config: se({ ...e.config, dashboard: a }, e.config.activeDashboard)
+        config: le({ ...e.config, dashboard: a }, e.config.activeDashboard)
       };
     }
     case "SET_TAB_SELECTED":
       return { ...e, tabSelected: t.payload };
     case "REMOVE_MULTIDASHBOARD_AT_INDEX": {
       const n = [...e.config.multiDashboards];
-      A.remove(n, (o, i) => i === t.payload);
+      N.remove(n, (o, i) => i === t.payload);
       const a = {
         ...e.config,
         multiDashboards: n,
         ...n[0],
         activeDashboard: 0
       };
-      return n.length === 0 ? { ...e, config: A.omit(e.config, "multiDashboards") } : Ae({ ...e, config: a }, n);
+      return n.length === 0 ? { ...e, config: N.omit(e.config, "multiDashboards") } : Pe({ ...e, config: a }, n);
     }
     case "RENAME_DASHBOARD_TAB": {
       const n = e.config.multiDashboards.map((o) => (o.label === t.payload.current && (o.label = t.payload.new), o)), a = { ...e.config, label: t.payload.new };
-      return Ae({ ...e, newConfig: a }, n);
+      return Pe({ ...e, newConfig: a }, n);
     }
     case "REORDER_MULTIDASHBOARDS": {
       const { newIndex: n, currentIndex: a } = t.payload, o = [...e.config.multiDashboards];
       o.splice(n, 0, o.splice(a, 1)[0]);
       const i = { ...e.config, activeDashboard: n };
-      return Ae({ ...e, config: i }, o);
+      return Pe({ ...e, config: i }, o);
     }
     case "SAVE_CURRENT_CHANGES": {
-      const n = e.config.activeDashboard, a = [...e.config.multiDashboards], o = a[n].label, i = A.pick(e.config, ["dashboard", "visualizations", "rows"]);
+      const n = e.config.activeDashboard, a = [...e.config.multiDashboards], o = a[n].label, i = N.pick(e.config, ["dashboard", "visualizations", "rows"]);
       a[n] = { ...i, label: o };
-      const s = se(e.config, n);
+      const s = le(e.config, n);
       return { ...e, config: s };
     }
     case "INITIALIZE_MULTIDASHBOARDS": {
-      const n = "New Dashboard 1", o = [{ ...A.pick(e.config, ["dashboard", "visualizations", "rows"]), label: n }], i = { ...e.config, activeDashboard: 0 };
-      return Ae({ ...e, config: i }, o);
+      const n = "New Dashboard 1", o = [{ ...N.pick(e.config, ["dashboard", "visualizations", "rows"]), label: n }], i = { ...e.config, activeDashboard: 0 };
+      return Pe({ ...e, config: i }, o);
     }
     case "SWITCH_CONFIG": {
-      const n = t.payload, a = e.config.multiDashboards[n], o = A.cloneDeep(e.data);
+      const n = t.payload, a = e.config.multiDashboards[n], o = N.cloneDeep(e.data);
       return { ...e, data: o, config: { ...e.config, ...a, activeDashboard: n } };
     }
     case "TOGGLE_ROW": {
@@ -4195,27 +4195,27 @@ const Oe = (e, t) => {
       return { ...e, config: { ...e.config, rows: o } };
     }
     case "ADD_VISUALIZATION": {
-      const { newViz: n, rowIdx: a, colIdx: o } = t.payload, i = n.uid, s = A.cloneDeep(e.config.rows);
+      const { newViz: n, rowIdx: a, colIdx: o } = t.payload, i = n.uid, s = N.cloneDeep(e.config.rows);
       return s[a].columns[o].widget = i, {
         ...e,
-        config: se(
+        config: le(
           { ...e.config, visualizations: { ...e.config.visualizations, [i]: n }, rows: s },
           e.config.activeDashboard
         )
       };
     }
     case "MOVE_VISUALIZATION": {
-      const { rowIdx: n, colIdx: a, widget: o } = t.payload, i = A.cloneDeep(e.config.rows);
+      const { rowIdx: n, colIdx: a, widget: o } = t.payload, i = N.cloneDeep(e.config.rows);
       return i[o.rowIdx].columns[o.colIdx].widget = null, i[n].columns[a].widget = o.uid, {
         ...e,
-        config: se({ ...e.config, rows: i }, e.config.activeDashboard)
+        config: le({ ...e.config, rows: i }, e.config.activeDashboard)
       };
     }
     case "UPDATE_VISUALIZATION": {
       const { vizKey: n, configureData: a } = t.payload, o = { ...e.config.visualizations[n], ...a };
       return {
         ...e,
-        config: se(
+        config: le(
           { ...e.config, visualizations: { ...e.config.visualizations, [n]: o } },
           e.config.activeDashboard
         )
@@ -4223,22 +4223,22 @@ const Oe = (e, t) => {
     }
     case "UPDATE_ROW": {
       const { rowIndex: n, rowData: a } = t.payload, o = e.config.rows.map((i, s) => s === n ? { ...i, ...a } : i);
-      return { ...e, config: se({ ...e.config, rows: o }, e.config.activeDashboard) };
+      return { ...e, config: le({ ...e.config, rows: o }, e.config.activeDashboard) };
     }
     case "DELETE_WIDGET": {
-      const { uid: n } = t.payload, a = A.cloneDeep(e.config.rows), o = A.cloneDeep(e.config.visualizations);
+      const { uid: n } = t.payload, a = N.cloneDeep(e.config.rows), o = N.cloneDeep(e.config.visualizations);
       delete o[n];
-      const i = A.cloneDeep(e.config.dashboard.sharedFilters);
+      const i = N.cloneDeep(e.config.dashboard.sharedFilters);
       i && i.length > 0 && i.forEach((l) => {
         l.usedBy && l.usedBy.indexOf(n) !== -1 && l.usedBy.splice(l.usedBy.indexOf(n), 1);
       });
-      const s = A.map(a, (l) => ({
+      const s = N.map(a, (l) => ({
         ...l,
-        columns: A.filter(l.columns, (c) => c.widget !== n)
+        columns: N.filter(l.columns, (c) => c.widget !== n)
       }));
       return {
         ...e,
-        config: se(
+        config: le(
           {
             ...e.config,
             dashboard: { ...e.config.dashboard, sharedFilters: i },
@@ -4252,12 +4252,12 @@ const Oe = (e, t) => {
     default:
       return e;
   }
-}, se = (e, t) => {
+}, le = (e, t) => {
   if (t === void 0)
     return e;
-  const n = [...e.multiDashboards], a = n[t].label, o = A.pick(e, ["dashboard", "visualizations", "rows"]);
+  const n = [...e.multiDashboards], a = n[t].label, o = N.pick(e, ["dashboard", "visualizations", "rows"]);
   return n[t] = { ...o, label: a }, { ...e, multiDashboards: n };
-}, Ae = (e, t) => ({
+}, Pe = (e, t) => ({
   ...e,
   config: { ...e.config, multiDashboards: t }
 }), dl = Ba(ul), fl = (e, t) => {
@@ -4268,7 +4268,7 @@ const Oe = (e, t) => {
     }
     case "DISMISS_ERROR_MESSAGE": {
       const n = [...e];
-      return A.remove(n, (a, o) => o === t.payload), n;
+      return N.remove(n, (a, o) => o === t.payload), n;
     }
   }
 }, ml = Ba(fl);
@@ -4278,7 +4278,7 @@ const Va = ({ children: e, visualizationKey: t, visualizationConfig: n, type: a,
 }, pl = ({ config: e, updateConfig: t }) => {
   var i;
   const n = v.useMemo(() => It(e, t), [JSON.stringify(e)]), a = (s) => {
-    const l = A.cloneDeep(e.columns);
+    const l = N.cloneDeep(e.columns);
     delete l[s], t({
       ...e,
       columns: l
@@ -4340,7 +4340,7 @@ const gl = ({ active: e, row: t, visualizations: n, setToggled: a }) => {
     if (!i.widget)
       return null;
     const l = n[i.widget].type, c = s === e;
-    return /* @__PURE__ */ r.createElement("div", { role: "radio", className: c ? "selected" : "", key: s, onClick: () => o(s), onKeyUp: (m) => o(s, m), "aria-checked": c, tabIndex: 0, "aria-label": `Toggle ${l}` }, Vs(n[i.widget]), " ", /* @__PURE__ */ r.createElement("span", null, A.capitalize(l)));
+    return /* @__PURE__ */ r.createElement("div", { role: "radio", className: c ? "selected" : "", key: s, onClick: () => o(s), onKeyUp: (m) => o(s, m), "aria-checked": c, tabIndex: 0, "aria-label": `Toggle ${l}` }, Vs(n[i.widget]), " ", /* @__PURE__ */ r.createElement("span", null, N.capitalize(l)));
   }));
 }, Ua = {
   Apply: "Apply Button",
@@ -4354,9 +4354,9 @@ const gl = ({ active: e, row: t, visualizations: n, setToggled: a }) => {
     e[o].active = "", e[o].subGrouping && (e[o].subGrouping.active = "");
   }), a;
 }, hl = (e, t, n, a) => {
-  const o = A.cloneDeep(n), i = o[e];
+  const o = N.cloneDeep(n), i = o[e];
   if (a.filterBehavior !== Ua.Apply || a.autoLoad)
-    if ((i == null ? void 0 : i.filterStyle) === re.nestedDropdown)
+    if ((i == null ? void 0 : i.filterStyle) === oe.nestedDropdown)
       o[e].active = t[0], o[e].subGrouping.active = t[1];
     else {
       o[e].active = t, Qn(o, e);
@@ -4370,176 +4370,176 @@ const gl = ({ active: e, row: t, visualizations: n, setToggled: a }) => {
   var a;
   const n = (a = e.sharedFilters) == null ? void 0 : a.filter((o) => o.usedBy && o.usedBy.indexOf(`${t}`) !== -1);
   return (n == null ? void 0 : n.length) > 0 ? n : !1;
-}, Le = (e, t, n) => {
+}, Re = (e, t, n) => {
   const a = t || {}, { config: o } = e;
   return be(o).forEach((i) => {
     const s = wt(o.dashboard, i);
     if (s) {
-      const { dataKey: l, data: c, dataDescription: m } = o.visualizations[i], f = (n || e.data)[l] || c, d = (n == null ? void 0 : n[l]) || (m ? De(f, m) : f);
-      a[i] = Oe(s, d);
+      const { dataKey: l, data: c, dataDescription: m } = o.visualizations[i], p = (n || e.data)[l] || c, u = (n == null ? void 0 : n[l]) || (m ? De(p, m) : p);
+      a[i] = Ie(s, u);
     }
   }), o.rows.forEach((i, s) => {
     if (i.dataKey) {
-      const l = wt(o.dashboard, s), { dataKey: c, data: m, dataDescription: f } = i, d = (n || e.data)[c] || m;
+      const l = wt(o.dashboard, s), { dataKey: c, data: m, dataDescription: p } = i, u = (n || e.data)[c] || m;
       if (l) {
-        const y = (n == null ? void 0 : n[c]) ?? f ? De(d, f) : d;
-        a[s] = Oe(l, y);
+        const E = (n == null ? void 0 : n[c]) ?? p ? De(u, p) : u;
+        a[s] = Ie(l, E);
       } else
-        a[s] = d || [];
+        a[s] = u || [];
     }
   }), a;
-}, Qe = (e) => Object.values(e).some((t) => t.filterBehavior === "Apply Button" && t.type === "dashboardFilters"), vl = ({
+}, Ze = (e) => Object.values(e).some((t) => t.filterBehavior === "Apply Button" && t.type === "dashboardFilters"), vl = ({
   filter: e,
   config: t,
   isDashboard: n = !1,
   updateFilterProp: a
 }) => {
   const o = e == null ? void 0 : e.subGrouping, i = Object.keys(t.datasets), s = [];
-  i.map((d) => {
-    Object.keys(t.datasets[d].data[0]).forEach(
+  i.map((u) => {
+    Object.keys(t.datasets[u].data[0]).forEach(
       (h) => s.push({
-        datasetKey: d,
+        datasetKey: u,
         columnName: h
       })
     );
   });
-  const l = [], c = (d, y) => {
+  const l = [], c = (u, E) => {
     s.forEach((h) => {
-      h.datasetKey === d && h.columnName !== y && l.push(h.columnName);
+      h.datasetKey === u && h.columnName !== E && l.push(h.columnName);
     });
-  }, m = (d) => {
-    const y = d.selectedOptions[0].dataset.set, h = d.value;
-    a("columnName", h), c(y, h);
-  }, f = (d) => {
-    const y = d.selectedOptions[0].dataset.set, h = d.value, I = e.values.reduce((p, D) => {
-      const u = A.uniq(
-        t.datasets[y].data.map((g) => g[e.columnName] === D ? g[h] : "").filter((g) => g !== "")
+  }, m = (u) => {
+    const E = u.selectedOptions[0].dataset.set, h = u.value;
+    a("columnName", h), c(E, h);
+  }, p = (u) => {
+    const E = u.selectedOptions[0].dataset.set, h = u.value, O = e.values.reduce((g, D) => {
+      const d = N.uniq(
+        t.datasets[E].data.map((f) => f[e.columnName] === D ? f[h] : "").filter((f) => f !== "")
       ).sort();
-      return p[D] = {
-        values: u,
-        orderedValues: u
-      }, p;
-    }, {}), O = {
+      return g[D] = {
+        values: d,
+        orderedValues: d
+      }, g;
+    }, {}), I = {
       ...o,
       columnName: h,
-      valuesLookup: I
+      valuesLookup: O
     };
-    a("subGrouping", O);
+    a("subGrouping", I);
   };
   return /* @__PURE__ */ r.createElement("div", { className: "nesteddropdown-editor" }, !n && /* @__PURE__ */ r.createElement(
-    Y,
+    J,
     {
       label: "Label",
       value: e.key,
-      updateField: (d, y, h, I) => a("key", I)
+      updateField: (u, E, h, O) => a("key", O)
     }
-  ), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("div", { className: "edit-label column-heading mt-2" }, "Filter Grouping", /* @__PURE__ */ r.createElement("span", null)), /* @__PURE__ */ r.createElement("select", { value: e.columnName, onChange: (d) => m(d.target) }, /* @__PURE__ */ r.createElement("option", { value: "" }, "- Select Option -"), s == null ? void 0 : s.map((d) => /* @__PURE__ */ r.createElement(
+  ), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("div", { className: "edit-label column-heading mt-2" }, "Filter Grouping", /* @__PURE__ */ r.createElement("span", null)), /* @__PURE__ */ r.createElement("select", { value: e.columnName, onChange: (u) => m(u.target) }, /* @__PURE__ */ r.createElement("option", { value: "" }, "- Select Option -"), s == null ? void 0 : s.map((u) => /* @__PURE__ */ r.createElement(
     "option",
     {
-      value: d.columnName,
-      "data-set": d.datasetKey,
-      key: `filter_${d.datasetKey}_${d.columnName} `
+      value: u.columnName,
+      "data-set": u.datasetKey,
+      key: `filter_${u.datasetKey}_${u.columnName} `
     },
-    d.columnName
+    u.columnName
   )))), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("div", { className: "edit-label column-heading mt-2" }, "Filter SubGrouping", /* @__PURE__ */ r.createElement("span", null)), /* @__PURE__ */ r.createElement(
     "select",
     {
       value: (o == null ? void 0 : o.columnName) ?? "",
-      onChange: (d) => {
-        f(d.target);
+      onChange: (u) => {
+        p(u.target);
       }
     },
     /* @__PURE__ */ r.createElement("option", { value: "" }, "- Select Option -"),
-    s.map((d) => {
-      if (d.columnName !== e.columnName)
+    s.map((u) => {
+      if (u.columnName !== e.columnName)
         return /* @__PURE__ */ r.createElement(
           "option",
           {
-            value: d.columnName,
-            "data-set": d.datasetKey,
-            key: `subFilter_${d.datasetKey}_${d.columnName} `
+            value: u.columnName,
+            "data-set": u.datasetKey,
+            key: `subFilter_${u.datasetKey}_${u.columnName} `
           },
-          d.columnName
+          u.columnName
         );
     })
   )));
 }, yl = ({ filter: e, filterIndex: t, config: n, updateFilterProp: a }) => {
-  const [o, i] = v.useState([]), s = new Se(), l = Object.values(re), c = (n.dashboard.sharedFilters || []).filter(({ key: u, type: g }) => u !== e.key && g !== "datafilter").map(({ key: u }) => u), m = Rt(n.rows), [f, d] = v.useMemo(() => {
-    const u = {}, g = Object.keys(n.visualizations).filter((E) => {
-      var me;
-      const T = m[E];
-      if (!T)
+  const [o, i] = v.useState([]), s = new Se(), l = Object.values(oe), c = (n.dashboard.sharedFilters || []).filter(({ key: d, type: f }) => d !== e.key && f !== "datafilter").map(({ key: d }) => d), m = Rt(n.rows), [p, u] = v.useMemo(() => {
+    const d = {}, f = Object.keys(n.visualizations).filter((b) => {
+      var B;
+      const C = m[b];
+      if (!C)
         return !1;
-      const S = n.visualizations[E];
+      const S = n.visualizations[b];
       if (S.type === "dashboardFilters")
         return !1;
-      const C = ((me = S.general) == null ? void 0 : me.title) || S.title || E;
-      u[E] = C;
-      const k = S.usesSharedFilter, V = T.row, j = n.rows[V].dataKey;
-      return e.setBy !== E && !k && !j;
-    }), b = [];
-    n.rows.forEach((E, T) => {
-      E.dataKey && (u[T] = `Row ${T + 1}`, b.push(T));
+      const T = ((B = S.general) == null ? void 0 : B.title) || S.title || b;
+      d[b] = T;
+      const R = S.usesSharedFilter, V = C.row, G = n.rows[V].dataKey;
+      return e.setBy !== b && !R && !G;
+    }), w = [];
+    n.rows.forEach((b, C) => {
+      b.dataKey && (d[C] = `Row ${C + 1}`, w.push(C));
     });
-    const w = b.filter((E) => !e.usedBy || e.usedBy.indexOf(E.toString()) === -1);
-    return [u, [...g, ...w]];
-  }, [n.visualizations, e.usedBy, e.setBy, m]), y = async () => {
-    const u = {}, g = Object.keys(n.datasets);
-    for (let b = 0; b < g.length; b++) {
-      const w = g[b];
-      let E = n.datasets[w];
-      if (!E.data && E.dataUrl && (E = await Re(E.dataUrl), E.dataDescription))
+    const y = w.filter((b) => !e.usedBy || e.usedBy.indexOf(b.toString()) === -1);
+    return [d, [...f, ...y]];
+  }, [n.visualizations, e.usedBy, e.setBy, m]), E = async () => {
+    const d = {}, f = Object.keys(n.datasets);
+    for (let w = 0; w < f.length; w++) {
+      const y = f[w];
+      let b = n.datasets[y];
+      if (!b.data && b.dataUrl && (b = await xe(b.dataUrl), b.dataDescription))
         try {
-          E = s.autoStandardize(E.data), E = s.developerStandardize(E.data, E.dataDescription);
+          b = s.autoStandardize(b.data), b = s.developerStandardize(b.data, b.dataDescription);
         } catch {
         }
-      E.data && E.data.forEach((T) => {
-        Object.keys(T).forEach((S) => {
-          u[S] = !0;
+      b.data && b.data.forEach((C) => {
+        Object.keys(C).forEach((S) => {
+          d[S] = !0;
         });
       });
     }
-    i(Object.keys(u));
+    i(Object.keys(d));
   };
   v.useEffect(() => {
-    y();
+    E();
   }, [n.datasets]);
-  const h = (u, g) => {
-    const E = { ...A.cloneDeep(e).apiFilter || { apiEndpoint: "", valueSelector: "", textSelector: "" }, [u]: g };
-    a("apiFilter", E);
-  }, I = (u) => {
-    a("filterStyle", u);
-  }, O = (u) => {
-    const g = n.dashboard.sharedFilters.filter(
-      (b, w) => b.key === u && t !== w
+  const h = (d, f) => {
+    const b = { ...N.cloneDeep(e).apiFilter || { apiEndpoint: "", valueSelector: "", textSelector: "" }, [d]: f };
+    a("apiFilter", b);
+  }, O = (d) => {
+    a("filterStyle", d);
+  }, I = (d) => {
+    const f = n.dashboard.sharedFilters.filter(
+      (w, y) => w.key === d && t !== y
     );
-    a("key", g.length ? u + ` (${g.length})` : u);
-  }, p = e.filterStyle === re.nestedDropdown, D = ({ isSubgroup: u = !1 }) => {
-    var w, E, T;
-    const g = u ? "subgroupTextSelector" : "textSelector", b = u ? "subgroupValueSelector" : "valueSelector";
-    return /* @__PURE__ */ r.createElement(r.Fragment, null, !u && /* @__PURE__ */ r.createElement(
-      Y,
+    a("key", f.length ? d + ` (${f.length})` : d);
+  }, g = e.filterStyle === oe.nestedDropdown, D = ({ isSubgroup: d = !1 }) => {
+    var y, b, C;
+    const f = d ? "subgroupTextSelector" : "textSelector", w = d ? "subgroupValueSelector" : "valueSelector";
+    return /* @__PURE__ */ r.createElement(r.Fragment, null, !d && /* @__PURE__ */ r.createElement(
+      J,
       {
         label: "API Endpoint: ",
-        value: (w = e.apiFilter) == null ? void 0 : w.apiEndpoint,
-        updateField: (S, C, k, V) => h("apiEndpoint", V),
-        tooltip: /* @__PURE__ */ r.createElement(r.Fragment, null, p && /* @__PURE__ */ r.createElement(P, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(P.Target, null, /* @__PURE__ */ r.createElement(R, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(P.Content, null, /* @__PURE__ */ r.createElement("p", null, "Your API Endpoint should return both value selector values."))))
+        value: (y = e.apiFilter) == null ? void 0 : y.apiEndpoint,
+        updateField: (S, T, R, V) => h("apiEndpoint", V),
+        tooltip: /* @__PURE__ */ r.createElement(r.Fragment, null, g && /* @__PURE__ */ r.createElement(L, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(L.Target, null, /* @__PURE__ */ r.createElement(P, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(L.Content, null, /* @__PURE__ */ r.createElement("p", null, "Your API Endpoint should return both value selector values."))))
       }
-    ), /* @__PURE__ */ r.createElement("div", { className: p ? "border border-dark p-1 my-1" : "" }, /* @__PURE__ */ r.createElement(
-      Y,
+    ), /* @__PURE__ */ r.createElement("div", { className: g ? "border border-dark p-1 my-1" : "" }, /* @__PURE__ */ r.createElement(
+      J,
       {
-        label: `${u ? "Subgroup " : ""}Value Selector:`,
-        value: ((E = e == null ? void 0 : e.apiFilter) == null ? void 0 : E[b]) || "",
-        updateField: (S, C, k, V) => h(b, V),
-        tooltip: /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(P, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(P.Target, null, /* @__PURE__ */ r.createElement(R, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(P.Content, null, /* @__PURE__ */ r.createElement("p", null, "Value to use in the html option element"))), " * Required")
+        label: `${d ? "Subgroup " : ""}Value Selector:`,
+        value: ((b = e == null ? void 0 : e.apiFilter) == null ? void 0 : b[w]) || "",
+        updateField: (S, T, R, V) => h(w, V),
+        tooltip: /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(L, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(L.Target, null, /* @__PURE__ */ r.createElement(P, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(L.Content, null, /* @__PURE__ */ r.createElement("p", null, "Value to use in the html option element"))), " * Required")
       }
     ), /* @__PURE__ */ r.createElement(
-      Y,
+      J,
       {
-        label: `${u ? "Subgroup " : ""}Display Text Selector:`,
-        value: ((T = e == null ? void 0 : e.apiFilter) == null ? void 0 : T[g]) || "",
-        updateField: (S, C, k, V) => h(g, V),
-        tooltip: /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(P, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(P.Target, null, /* @__PURE__ */ r.createElement(R, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(P.Content, null, /* @__PURE__ */ r.createElement("p", null, "Text to use in the html option element. If none is applied value selector will be used."))), " * Optional")
+        label: `${d ? "Subgroup " : ""}Display Text Selector:`,
+        value: ((C = e == null ? void 0 : e.apiFilter) == null ? void 0 : C[f]) || "",
+        updateField: (S, T, R, V) => h(f, V),
+        tooltip: /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(L, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(L.Target, null, /* @__PURE__ */ r.createElement(P, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(L.Content, null, /* @__PURE__ */ r.createElement("p", null, "Text to use in the html option element. If none is applied value selector will be used."))), " * Optional")
       }
     )));
   };
@@ -4547,7 +4547,7 @@ const gl = ({ active: e, row: t, visualizations: n, setToggled: a }) => {
     "select",
     {
       defaultValue: e.type || "",
-      onChange: (u) => a("type", u.target.value),
+      onChange: (d) => a("type", d.target.value),
       disabled: !!e.type
     },
     /* @__PURE__ */ r.createElement("option", { value: "" }, "- Select Option -"),
@@ -4556,132 +4556,132 @@ const gl = ({ active: e, row: t, visualizations: n, setToggled: a }) => {
   )), e.type !== void 0 && /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading" }, "Filter Style: "), /* @__PURE__ */ r.createElement(
     "select",
     {
-      value: e.filterStyle || re.dropdown,
-      onChange: (u) => I(u.target.value)
+      value: e.filterStyle || oe.dropdown,
+      onChange: (d) => O(d.target.value)
     },
-    l.map((u) => /* @__PURE__ */ r.createElement("option", { value: u, key: `filter-style-select-item-${u}` }, u))
-  )), e.filterStyle === re.dropdown && /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "me-1" }, "Show Dropdown"), /* @__PURE__ */ r.createElement(
+    l.map((d) => /* @__PURE__ */ r.createElement("option", { value: d, key: `filter-style-select-item-${d}` }, d))
+  )), e.filterStyle === oe.dropdown && /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "me-1" }, "Show Dropdown"), /* @__PURE__ */ r.createElement(
     "input",
     {
       type: "checkbox",
       checked: e.showDropdown,
-      onChange: (u) => {
+      onChange: (d) => {
         a("showDropdown", !e.showDropdown);
       }
     }
   )), /* @__PURE__ */ r.createElement(
-    Y,
+    J,
     {
       label: "Label",
       value: e.key,
-      updateField: (u, g, b, w) => {
-        O(w);
+      updateField: (d, f, w, y) => {
+        I(y);
       }
     }
-  ), e.filterStyle === re.multiSelect && /* @__PURE__ */ r.createElement(
-    Y,
+  ), e.filterStyle === oe.multiSelect && /* @__PURE__ */ r.createElement(
+    J,
     {
       label: "Select Limit",
       value: e.selectLimit,
-      updateField: (u, g, b, w) => a("selectLimit", w),
+      updateField: (d, f, w, y) => a("selectLimit", y),
       type: "number",
-      tooltip: /* @__PURE__ */ r.createElement(P, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(P.Target, null, /* @__PURE__ */ r.createElement(R, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(P.Content, null, /* @__PURE__ */ r.createElement("p", null, "The maximum number of items that can be selected.")))
+      tooltip: /* @__PURE__ */ r.createElement(L, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(L.Target, null, /* @__PURE__ */ r.createElement(P, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(L.Content, null, /* @__PURE__ */ r.createElement("p", null, "The maximum number of items that can be selected.")))
     }
-  ), e.type === "urlfilter" && /* @__PURE__ */ r.createElement(r.Fragment, null, !Qe(n.visualizations) && /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading" }, "URL to Filter: "), /* @__PURE__ */ r.createElement(
+  ), e.type === "urlfilter" && /* @__PURE__ */ r.createElement(r.Fragment, null, !Ze(n.visualizations) && /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading" }, "URL to Filter: "), /* @__PURE__ */ r.createElement(
     "select",
     {
       defaultValue: e.datasetKey || "",
-      onChange: (u) => a("datasetKey", u.target.value)
+      onChange: (d) => a("datasetKey", d.target.value)
     },
     /* @__PURE__ */ r.createElement("option", { value: "" }, "- Select Option -"),
-    Object.keys(n.datasets).map((u) => n.datasets[u].dataUrl ? /* @__PURE__ */ r.createElement("option", { key: u, value: u }, n.datasets[u].dataUrl) : null)
+    Object.keys(n.datasets).map((d) => n.datasets[d].dataUrl ? /* @__PURE__ */ r.createElement("option", { key: d, value: d }, n.datasets[d].dataUrl) : null)
   )), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading" }, "Filter By: "), /* @__PURE__ */ r.createElement(
     "select",
     {
       defaultValue: e.filterBy || "",
-      onChange: (u) => a("filterBy", u.target.value)
+      onChange: (d) => a("filterBy", d.target.value)
     },
     /* @__PURE__ */ r.createElement("option", { value: "" }, "- Select Option -"),
     /* @__PURE__ */ r.createElement("option", { key: "query-string", value: "Query String" }, "Query String"),
     /* @__PURE__ */ r.createElement("option", { key: "file-name", value: "File Name" }, "File Name")
   )), e.filterBy === "File Name" && /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(
-    Y,
+    J,
     {
       label: "File Name: ",
       value: e.fileName || "",
-      updateField: (u, g, b, w) => a("fileName", w),
-      tooltip: /* @__PURE__ */ r.createElement(P, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(P.Target, null, /* @__PURE__ */ r.createElement(R, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(P.Content, null, /* @__PURE__ */ r.createElement("p", null, "Add ${query} to replace the filename with the active dropdown value.")))
+      updateField: (d, f, w, y) => a("fileName", y),
+      tooltip: /* @__PURE__ */ r.createElement(L, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(L.Target, null, /* @__PURE__ */ r.createElement(P, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(L.Content, null, /* @__PURE__ */ r.createElement("p", null, "Add ${query} to replace the filename with the active dropdown value.")))
     }
-  ), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading" }, "White Space Replacments", /* @__PURE__ */ r.createElement(P, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(P.Target, null, /* @__PURE__ */ r.createElement(R, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(P.Content, null, /* @__PURE__ */ r.createElement("p", null, "Set how whitespace characters will be handled in the file request")))), /* @__PURE__ */ r.createElement(
+  ), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading" }, "White Space Replacments", /* @__PURE__ */ r.createElement(L, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(L.Target, null, /* @__PURE__ */ r.createElement(P, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(L.Content, null, /* @__PURE__ */ r.createElement("p", null, "Set how whitespace characters will be handled in the file request")))), /* @__PURE__ */ r.createElement(
     "select",
     {
       defaultValue: e.whitespaceReplacement || "Keep Spaces",
-      onChange: (u) => a("whitespaceReplacement", u.target.value)
+      onChange: (d) => a("whitespaceReplacement", d.target.value)
     },
     /* @__PURE__ */ r.createElement("option", { key: "remove-spaces", value: "Remove Spaces" }, "Remove Spaces"),
     /* @__PURE__ */ r.createElement("option", { key: "replace-with-underscore", value: "Replace With Underscore" }, "Replace With Underscore"),
     /* @__PURE__ */ r.createElement("option", { key: "keep-spaces", value: "Keep Spaces" }, "Keep Spaces")
   )))), e.filterBy === "Query String" && /* @__PURE__ */ r.createElement(
-    Y,
+    J,
     {
       label: "Query string parameter",
       value: e.queryParameter,
-      updateField: (u, g, b, w) => a("queryParameter", w)
+      updateField: (d, f, w, y) => a("queryParameter", y)
     }
-  ), /* @__PURE__ */ r.createElement(D, null), p && /* @__PURE__ */ r.createElement(D, { isSubgroup: !0 }), !!c.length && /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading mt-1" }, "Parent Filter(s): "), /* @__PURE__ */ r.createElement(
+  ), /* @__PURE__ */ r.createElement(D, null), g && /* @__PURE__ */ r.createElement(D, { isSubgroup: !0 }), !!c.length && /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading mt-1" }, "Parent Filter(s): "), /* @__PURE__ */ r.createElement(
     it,
     {
       label: "Parent Filter(s): ",
-      options: c.map((u) => ({ value: u, label: u })),
+      options: c.map((d) => ({ value: d, label: d })),
       fieldName: "parents",
       selected: e.parents,
-      updateField: (u, g, b, w) => {
-        a("parents", w);
+      updateField: (d, f, w, y) => {
+        a("parents", y);
       }
     }
-  )), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading mt-1" }, "Used By: (optional)", /* @__PURE__ */ r.createElement(P, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(P.Target, null, /* @__PURE__ */ r.createElement(R, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(P.Content, null, /* @__PURE__ */ r.createElement("p", null, "Select if you would like specific visualizations or rows to use this filter. Otherwise the filter will be added to all api requests.")))), /* @__PURE__ */ r.createElement(
+  )), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading mt-1" }, "Used By: (optional)", /* @__PURE__ */ r.createElement(L, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(L.Target, null, /* @__PURE__ */ r.createElement(P, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(L.Content, null, /* @__PURE__ */ r.createElement("p", null, "Select if you would like specific visualizations or rows to use this filter. Otherwise the filter will be added to all api requests.")))), /* @__PURE__ */ r.createElement(
     it,
     {
-      options: d.map((u) => ({
-        value: u,
-        label: f[u]
+      options: u.map((d) => ({
+        value: d,
+        label: p[d]
       })),
       fieldName: "usedBy",
       selected: e.usedBy,
-      updateField: (u, g, b, w) => {
-        a("usedBy", w);
+      updateField: (d, f, w, y) => {
+        a("usedBy", y);
       }
     }
   )), /* @__PURE__ */ r.createElement(
-    Y,
+    J,
     {
       label: "Reset Label: ",
       value: e.resetLabel || "",
-      updateField: (u, g, b, w) => a("resetLabel", w)
+      updateField: (d, f, w, y) => a("resetLabel", y)
     }
   ), /* @__PURE__ */ r.createElement(
-    Y,
+    J,
     {
       label: "Default Value Set By Query String Parameter: ",
       value: e.setByQueryParameter || "",
-      updateField: (u, g, b, w) => a("setByQueryParameter", w)
+      updateField: (d, f, w, y) => a("setByQueryParameter", y)
     }
-  )), e.type === "datafilter" && /* @__PURE__ */ r.createElement(r.Fragment, null, e.filterStyle !== re.nestedDropdown ? /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading" }, "Filter: "), /* @__PURE__ */ r.createElement(
+  )), e.type === "datafilter" && /* @__PURE__ */ r.createElement(r.Fragment, null, e.filterStyle !== oe.nestedDropdown ? /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading" }, "Filter: "), /* @__PURE__ */ r.createElement(
     "select",
     {
       value: e.columnName,
-      onChange: (u) => {
-        a("columnName", u.target.value);
+      onChange: (d) => {
+        a("columnName", d.target.value);
       }
     },
     /* @__PURE__ */ r.createElement("option", { value: "" }, "- Select Option -"),
-    o.map((u) => /* @__PURE__ */ r.createElement("option", { value: u, key: `filter-column-select-item-${u}` }, u))
+    o.map((d) => /* @__PURE__ */ r.createElement("option", { value: d, key: `filter-column-select-item-${d}` }, d))
   )), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading" }, "Show Dropdown"), /* @__PURE__ */ r.createElement(
     "input",
     {
       type: "checkbox",
       defaultChecked: e.showDropdown === !0,
-      onChange: (u) => {
+      onChange: (d) => {
         a("showDropdown", !e.showDropdown);
       }
     }
@@ -4689,55 +4689,55 @@ const gl = ({ active: e, row: t, visualizations: n, setToggled: a }) => {
     vl,
     {
       filter: e,
-      updateFilterProp: (u, g) => {
-        a(u, g);
+      updateFilterProp: (d, f) => {
+        a(d, f);
       },
       isDashboard: !0,
       config: n
     }
-  ), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading" }, "Set By: "), /* @__PURE__ */ r.createElement("select", { value: e.setBy, onChange: (u) => a("setBy", u.target.value) }, /* @__PURE__ */ r.createElement("option", { value: "" }, "- Select Option -"), Object.keys(n.visualizations).filter((u) => n.visualizations[u].type !== "dashboardFilters").map((u) => {
-    var b;
-    const g = n.visualizations[u];
-    return /* @__PURE__ */ r.createElement("option", { value: u, key: `set-by-select-item-${u}` }, ((b = g.general) == null ? void 0 : b.title) || g.title || u);
-  }))), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading mt-1" }, "Used By: (optional)", /* @__PURE__ */ r.createElement(P, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(P.Target, null, /* @__PURE__ */ r.createElement(R, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(P.Content, null, /* @__PURE__ */ r.createElement("p", null, "Select if you would like specific visualizations or rows to use this filter. Otherwise the filter will be added to all api requests.")))), /* @__PURE__ */ r.createElement(
+  ), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading" }, "Set By: "), /* @__PURE__ */ r.createElement("select", { value: e.setBy, onChange: (d) => a("setBy", d.target.value) }, /* @__PURE__ */ r.createElement("option", { value: "" }, "- Select Option -"), Object.keys(n.visualizations).filter((d) => n.visualizations[d].type !== "dashboardFilters").map((d) => {
+    var w;
+    const f = n.visualizations[d];
+    return /* @__PURE__ */ r.createElement("option", { value: d, key: `set-by-select-item-${d}` }, ((w = f.general) == null ? void 0 : w.title) || f.title || d);
+  }))), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading mt-1" }, "Used By: (optional)", /* @__PURE__ */ r.createElement(L, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(L.Target, null, /* @__PURE__ */ r.createElement(P, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(L.Content, null, /* @__PURE__ */ r.createElement("p", null, "Select if you would like specific visualizations or rows to use this filter. Otherwise the filter will be added to all api requests.")))), /* @__PURE__ */ r.createElement(
     it,
     {
-      options: d.map((u) => ({
-        value: u,
-        label: f[u]
+      options: u.map((d) => ({
+        value: d,
+        label: p[d]
       })),
       fieldName: "usedBy",
       selected: e.usedBy,
-      updateField: (u, g, b, w) => {
-        a("usedBy", w);
+      updateField: (d, f, w, y) => {
+        a("usedBy", y);
       }
     }
   )), /* @__PURE__ */ r.createElement(
-    Y,
+    J,
     {
       label: "Reset Label: ",
       value: e.resetLabel || "",
-      updateField: (u, g, b, w) => a("resetLabel", w)
+      updateField: (d, f, w, y) => a("resetLabel", y)
     }
   ), /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading" }, "Parent Filter: "), /* @__PURE__ */ r.createElement(
     "select",
     {
       value: e.parents || [],
-      onChange: (u) => {
-        a("parents", u.target.value);
+      onChange: (d) => {
+        a("parents", d.target.value);
       }
     },
     /* @__PURE__ */ r.createElement("option", { value: "" }, "Select a filter"),
-    n.dashboard.sharedFilters && n.dashboard.sharedFilters.map((u) => {
-      if (u.key !== e.key)
-        return /* @__PURE__ */ r.createElement("option", { key: u.key }, u.key);
+    n.dashboard.sharedFilters && n.dashboard.sharedFilters.map((d) => {
+      if (d.key !== e.key)
+        return /* @__PURE__ */ r.createElement("option", { key: d.key }, d.key);
     })
   )), /* @__PURE__ */ r.createElement(
-    Y,
+    J,
     {
       label: "Default Value Set By Query String Parameter: ",
       value: e.setByQueryParameter || "",
-      updateField: (u, g, b, w) => a("setByQueryParameter", w)
+      updateField: (d, f, w, y) => a("setByQueryParameter", y)
     }
   ))));
 }, bl = ({
@@ -4745,11 +4745,11 @@ const gl = ({ active: e, row: t, visualizations: n, setToggled: a }) => {
   removeFilterFromViz: t,
   filterIndex: n
 }) => {
-  const { overlay: a } = pe(), { config: o } = v.useContext(J), i = Object.values(o.visualizations).filter((l) => {
+  const { overlay: a } = pe(), { config: o } = v.useContext(ee), i = Object.values(o.visualizations).filter((l) => {
     var c;
     return (c = l.sharedFilterIndexes) == null ? void 0 : c.map(Number).includes(Number(n));
   }).length > 1, s = i ? "This filter is used by multiple visualizations. You can either delete the filter from this visualization only or you can delete the filter completely, which will also remove it from other visualizations." : "Are you sure you want to delete this filter?";
-  return /* @__PURE__ */ r.createElement(fe, { showClose: !0 }, /* @__PURE__ */ r.createElement(fe.Content, null, /* @__PURE__ */ r.createElement("p", null, s), i && /* @__PURE__ */ r.createElement(
+  return /* @__PURE__ */ r.createElement(me, { showClose: !0 }, /* @__PURE__ */ r.createElement(me.Content, null, /* @__PURE__ */ r.createElement("p", null, s), i && /* @__PURE__ */ r.createElement(
     "button",
     {
       className: "btn btn-warning",
@@ -4786,45 +4786,45 @@ const gl = ({ active: e, row: t, visualizations: n, setToggled: a }) => {
 }, Tt = (e, t, n = []) => e == null ? void 0 : e.map((a, o) => {
   if (n.includes(o) || a.type === "urlfilter")
     return a;
-  const i = A.cloneDeep(a), s = El(Dl(a), t);
+  const i = N.cloneDeep(a), s = El(Dl(a), t);
   if (i.values = s, s.length > 0) {
     const l = ua(i);
     if (l)
       i.active = l;
     else if (a.multiSelect) {
       const c = i.values, m = Array.isArray(i.active) ? i.active : [i.active];
-      i.active = m.filter((f) => c.includes(f));
+      i.active = m.filter((p) => c.includes(p));
     } else {
-      const c = e.find((f) => f.resetLabel), m = c ? c.resetLabel : i.values[0] || i.active;
+      const c = e.find((p) => p.resetLabel), m = c ? c.resetLabel : i.values[0] || i.active;
       i.active = m;
     }
   }
   return i;
 }), Sl = ({ vizConfig: e, updateConfig: t }) => {
-  const { config: n, loadAPIFilters: a, data: o } = v.useContext(J), { overlay: i } = pe(), {
+  const { config: n, loadAPIFilters: a, data: o } = v.useContext(ee), { overlay: i } = pe(), {
     dashboard: { sharedFilters: s },
     visualizations: l
-  } = n, c = v.useContext(te), m = v.useMemo(() => {
+  } = n, c = v.useContext(ne), m = v.useMemo(() => {
     var D;
-    const p = n.visualizations[e.uid].sharedFilterIndexes.map(
+    const g = n.visualizations[e.uid].sharedFilterIndexes.map(
       Number
     );
-    return (D = n.dashboard.sharedFilters) == null ? void 0 : D.map(({ key: u }, g) => [g, u]).filter(([u]) => !p.includes(u)).map(([u, g]) => /* @__PURE__ */ r.createElement("option", { key: u, value: u }, `${u} - ${g}`));
-  }, [n.visualizations, e.uid]), f = v.useState({}), [d, y] = v.useState(!1), h = (p, D, u) => {
-    const g = A.cloneDeep(s), {
-      apiEndpoint: b,
-      valueSelector: w,
-      textSelector: E,
-      subgroupValueSelector: T,
+    return (D = n.dashboard.sharedFilters) == null ? void 0 : D.map(({ key: d }, f) => [f, d]).filter(([d]) => !g.includes(d)).map(([d, f]) => /* @__PURE__ */ r.createElement("option", { key: d, value: d }, `${d} - ${f}`));
+  }, [n.visualizations, e.uid]), p = v.useState({}), [u, E] = v.useState(!1), h = (g, D, d) => {
+    const f = N.cloneDeep(s), {
+      apiEndpoint: w,
+      valueSelector: y,
+      textSelector: b,
+      subgroupValueSelector: C,
       subgroupTextSelector: S
-    } = s[D].apiFilter || {}, C = (u == null ? void 0 : u.apiEndpoint) !== b || (u == null ? void 0 : u.valueSelector) !== w || (u == null ? void 0 : u.textSelector) !== E || (u == null ? void 0 : u.subgroupValueSelector) !== T || (u == null ? void 0 : u.subgroupTextSelector) !== S;
-    if (g[D][p] = u, p === "columnName") {
-      g[D].subGrouping && delete g[D].subGrouping;
-      const k = Tt(g, o);
-      c({ type: "SET_SHARED_FILTERS", payload: k });
+    } = s[D].apiFilter || {}, T = (d == null ? void 0 : d.apiEndpoint) !== w || (d == null ? void 0 : d.valueSelector) !== y || (d == null ? void 0 : d.textSelector) !== b || (d == null ? void 0 : d.subgroupValueSelector) !== C || (d == null ? void 0 : d.subgroupTextSelector) !== S;
+    if (f[D][g] = d, g === "columnName") {
+      f[D].subGrouping && delete f[D].subGrouping;
+      const R = Tt(f, o);
+      c({ type: "SET_SHARED_FILTERS", payload: R });
     } else
-      p === "filterStyle" ? (g[D] = {
-        ...g[D],
+      g === "filterStyle" ? (f[D] = {
+        ...f[D],
         active: "",
         apiFilter: {
           apiEndpoint: "",
@@ -4832,82 +4832,82 @@ const gl = ({ active: e, row: t, visualizations: n, setToggled: a }) => {
           textSelector: "",
           valueSelector: ""
         },
-        filterStyle: u
-      }, c({ type: "SET_SHARED_FILTERS", payload: g })) : p === "apiFilter" && u.apiEndpoint && u.valueSelector && C ? (s[D].filterStyle === re.nestedDropdown && u.subgroupValueSelector && (g[D].subGrouping = {
+        filterStyle: d
+      }, c({ type: "SET_SHARED_FILTERS", payload: f })) : g === "apiFilter" && d.apiEndpoint && d.valueSelector && T ? (s[D].filterStyle === oe.nestedDropdown && d.subgroupValueSelector && (f[D].subGrouping = {
         active: "",
         columnName: "",
         setByQueryParameter: "",
         valuesLookup: {}
-      }), a(g, {})) : c({ type: "SET_SHARED_FILTERS", payload: g });
-  }, I = (p) => {
-    const D = A.cloneDeep(s);
-    D.splice(p, 1);
-    const u = Object.keys(s).slice(p + 1), g = l;
-    Object.keys(g).forEach((b) => {
-      const w = g[b];
-      if (w.type === "dashboardFilters") {
-        const E = w.sharedFilterIndexes.filter((T) => T != p).map((T) => u.includes(T.toString()) ? T - 1 : T);
-        c({ type: "UPDATE_VISUALIZATION", payload: { vizKey: b, configureData: { sharedFilterIndexes: E } } });
+      }), a(f, {})) : c({ type: "SET_SHARED_FILTERS", payload: f });
+  }, O = (g) => {
+    const D = N.cloneDeep(s);
+    D.splice(g, 1);
+    const d = Object.keys(s).slice(g + 1), f = l;
+    Object.keys(f).forEach((w) => {
+      const y = f[w];
+      if (y.type === "dashboardFilters") {
+        const b = y.sharedFilterIndexes.filter((C) => C != g).map((C) => d.includes(C.toString()) ? C - 1 : C);
+        c({ type: "UPDATE_VISUALIZATION", payload: { vizKey: w, configureData: { sharedFilterIndexes: b } } });
       }
     }), c({ type: "SET_SHARED_FILTERS", payload: D });
-  }, O = () => {
-    const p = A.cloneDeep(s) || [], u = { key: "New Dashboard Filter " + (p.length + 1), showDropdown: !0, values: [] };
-    c({ type: "SET_SHARED_FILTERS", payload: [...p, u] }), t({ ...e, sharedFilterIndexes: [...e.sharedFilterIndexes, p.length] });
+  }, I = () => {
+    const g = N.cloneDeep(s) || [], d = { key: "New Dashboard Filter " + (g.length + 1), showDropdown: !0, values: [] };
+    c({ type: "SET_SHARED_FILTERS", payload: [...g, d] }), t({ ...e, sharedFilterIndexes: [...e.sharedFilterIndexes, g.length] });
   };
   return /* @__PURE__ */ r.createElement(tr, { allowZeroExpanded: !0 }, /* @__PURE__ */ r.createElement(Zt, null, /* @__PURE__ */ r.createElement(Kt, null, /* @__PURE__ */ r.createElement(Xt, null, "General")), /* @__PURE__ */ r.createElement(Yt, null, /* @__PURE__ */ r.createElement(
     fr,
     {
       value: e.filterBehavior,
       label: "Filter Behavior",
-      updateField: (p, D, u, g) => {
-        t({ ...e, filterBehavior: g });
+      updateField: (g, D, d, f) => {
+        t({ ...e, filterBehavior: f });
       },
       options: ["Apply Button", "Filter Change"],
-      tooltip: /* @__PURE__ */ r.createElement(P, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(P.Target, null, /* @__PURE__ */ r.createElement(R, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(P.Content, null, /* @__PURE__ */ r.createElement("p", null, 'The Apply Button option changes the visualization when the user clicks "apply". The Filter Change option immediately changes the visualization when the selection is changed.')))
+      tooltip: /* @__PURE__ */ r.createElement(L, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(L.Target, null, /* @__PURE__ */ r.createElement(P, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(L.Content, null, /* @__PURE__ */ r.createElement("p", null, 'The Apply Button option changes the visualization when the user clicks "apply". The Filter Change option immediately changes the visualization when the selection is changed.')))
     }
   ), e.filterBehavior === "Apply Button" && /* @__PURE__ */ r.createElement(
-    Y,
+    J,
     {
       label: "Apply Filter Button Text",
       maxLength: 20,
       value: e.applyFiltersButtonText,
-      updateField: (p, D, u, g) => {
-        t({ ...e, applyFiltersButtonText: g });
+      updateField: (g, D, d, f) => {
+        t({ ...e, applyFiltersButtonText: f });
       }
     }
   ), e.filterBehavior === "Filter Change" && /* @__PURE__ */ r.createElement(
-    Ve,
+    Ue,
     {
       label: "Auto Load",
       value: e.autoLoad,
-      updateField: (p, D, u, g) => {
-        t({ ...e, autoLoad: g });
+      updateField: (g, D, d, f) => {
+        t({ ...e, autoLoad: f });
       },
-      tooltip: /* @__PURE__ */ r.createElement(P, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(P.Target, null, /* @__PURE__ */ r.createElement(R, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(P.Content, null, /* @__PURE__ */ r.createElement("p", null, "Check if you would like for all URL filters to automatically select a value when a parent filter is changed.")))
+      tooltip: /* @__PURE__ */ r.createElement(L, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(L.Target, null, /* @__PURE__ */ r.createElement(P, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(L.Content, null, /* @__PURE__ */ r.createElement("p", null, "Check if you would like for all URL filters to automatically select a value when a parent filter is changed.")))
     }
-  ))), /* @__PURE__ */ r.createElement(Zt, null, /* @__PURE__ */ r.createElement(Kt, null, /* @__PURE__ */ r.createElement(Xt, null, "Filters")), /* @__PURE__ */ r.createElement(Yt, null, e.sharedFilterIndexes.map((p) => {
-    const D = s[p];
+  ))), /* @__PURE__ */ r.createElement(Zt, null, /* @__PURE__ */ r.createElement(Kt, null, /* @__PURE__ */ r.createElement(Xt, null, "Filters")), /* @__PURE__ */ r.createElement(Yt, null, e.sharedFilterIndexes.map((g) => {
+    const D = s[g];
     return /* @__PURE__ */ r.createElement(
       Xa,
       {
-        key: D.key + p,
+        key: D.key + g,
         fieldName: D.key,
-        fieldKey: p,
+        fieldKey: g,
         fieldType: "Dashboard Filter",
-        controls: f,
+        controls: p,
         deleteField: () => {
           i == null || i.actions.openOverlay(
             /* @__PURE__ */ r.createElement(
               bl,
               {
-                removeFilterCompletely: I,
-                removeFilterFromViz: (u) => {
+                removeFilterCompletely: O,
+                removeFilterFromViz: (d) => {
                   t({
                     ...e,
-                    sharedFilterIndexes: e.sharedFilterIndexes.filter((g) => g !== u)
+                    sharedFilterIndexes: e.sharedFilterIndexes.filter((f) => f !== d)
                   });
                 },
-                filterIndex: p
+                filterIndex: g
               }
             )
           );
@@ -4917,30 +4917,30 @@ const gl = ({ active: e, row: t, visualizations: n, setToggled: a }) => {
         yl,
         {
           filter: D,
-          filterIndex: p,
-          updateFilterProp: (u, g) => {
-            h(u, p, g);
+          filterIndex: g,
+          updateFilterProp: (d, f) => {
+            h(d, g, f);
           },
           config: n
         }
       )
     );
-  }), /* @__PURE__ */ r.createElement("button", { onClick: O, className: "btn btn-primary full-width" }, "Add Filter"), d ? /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading" }, "Select Existing Dashboard Filter", /* @__PURE__ */ r.createElement(P, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(P.Target, null, /* @__PURE__ */ r.createElement(R, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(P.Content, null, /* @__PURE__ */ r.createElement("p", null, "This feature is indentended to support legacy functionality. Be advised that any change to the filter in this editor will reflect on the whole dashboard.", " ")))), /* @__PURE__ */ r.createElement(
+  }), /* @__PURE__ */ r.createElement("button", { onClick: I, className: "btn btn-primary full-width" }, "Add Filter"), u ? /* @__PURE__ */ r.createElement("label", null, /* @__PURE__ */ r.createElement("span", { className: "edit-label column-heading" }, "Select Existing Dashboard Filter", /* @__PURE__ */ r.createElement(L, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(L.Target, null, /* @__PURE__ */ r.createElement(P, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(L.Content, null, /* @__PURE__ */ r.createElement("p", null, "This feature is indentended to support legacy functionality. Be advised that any change to the filter in this editor will reflect on the whole dashboard.", " ")))), /* @__PURE__ */ r.createElement(
     "select",
     {
       value: "",
-      onChange: (p) => {
+      onChange: (g) => {
         t({
           ...e,
-          sharedFilterIndexes: [...e.sharedFilterIndexes, p.target.value]
-        }), y(!1);
+          sharedFilterIndexes: [...e.sharedFilterIndexes, g.target.value]
+        }), E(!1);
       }
     },
     [
       /* @__PURE__ */ r.createElement("option", { key: "select", value: "" }, "Select"),
       ...m
     ]
-  )) : /* @__PURE__ */ r.createElement("button", { onClick: () => y(!0), className: "btn btn-primary full-width mt-2" }, "Add Existing Dashboard Filter"))));
+  )) : /* @__PURE__ */ r.createElement("button", { onClick: () => E(!0), className: "btn btn-primary full-width mt-2" }, "Add Existing Dashboard Filter"))));
 }, wl = (e) => e.replace(/"/g, ""), Tl = (e) => String(e).match(/^[-]?[0-9\.]+$/), Ct = (e, t) => {
   const n = e.includes("?");
   return t.filter(({ value: a }) => a !== "").map(({ key: a, value: o }, i) => {
@@ -4957,7 +4957,7 @@ const gl = ({ active: e, row: t, visualizations: n, setToggled: a }) => {
   });
   return (n || []).length ? n.flatMap((a) => {
     var o;
-    if (a.filterStyle === re.nestedDropdown) {
+    if (a.filterStyle === oe.nestedDropdown) {
       const i = a.apiFilter.valueSelector || "", s = a.apiFilter.subgroupValueSelector || "", l = a.queuedActive ? a.queuedActive[0] : a.active || "", c = a.queuedActive ? a.queuedActive[1] : ((o = a.subGrouping) == null ? void 0 : o.active) || "";
       return [
         { key: i, value: l },
@@ -4995,46 +4995,47 @@ const gl = ({ active: e, row: t, visualizations: n, setToggled: a }) => {
   }), n;
 }, _l = (e, t) => {
   var s, l;
-  const n = Pe(t == null ? void 0 : t.setByQueryParameter), a = (s = e[0]) == null ? void 0 : s.value, o = (l = e[0]) == null ? void 0 : l.subOptions[0].value, i = Pe(t == null ? void 0 : t.subGrouping.setByQueryParameter);
+  const n = Oe(t == null ? void 0 : t.setByQueryParameter), a = (s = e[0]) == null ? void 0 : s.value, o = (l = e[0]) == null ? void 0 : l.subOptions[0].value, i = Oe(t == null ? void 0 : t.subGrouping.setByQueryParameter);
   if (!t.active)
     t.active = n || a, t.subGrouping.active = i || o;
   else {
     const c = e.find((m) => m.value === t.active);
     if (t.active = c ? c.value : a, c) {
-      const m = c.subOptions.find((f) => f.value === t.subGrouping.active);
+      const m = c.subOptions.find((p) => p.value === t.subGrouping.active);
       t.subGrouping.active = (m == null ? void 0 : m.value) || o;
     } else
       t.subGrouping.active = o;
   }
 }, kl = (e, t) => {
   var s;
-  const n = Pe(t == null ? void 0 : t.setByQueryParameter), a = Array.isArray(n) ? n : n == null ? void 0 : n.split(","), o = n ? a : [(s = e[0]) == null ? void 0 : s.value], i = (t.active || []).filter(
+  const n = Oe(t == null ? void 0 : t.setByQueryParameter), a = Array.isArray(n) ? n : n == null ? void 0 : n.split(","), o = n ? a : [(s = e[0]) == null ? void 0 : s.value], i = (t.active || []).filter(
     (l) => e.find((c) => c.value === l)
   );
   t.active = i.length ? i : o;
 }, Zn = (e, t, n, a) => {
-  var c;
-  const o = A.cloneDeep(n), i = A.cloneDeep(o[e]), s = Pe(i == null ? void 0 : i.setByQueryParameter), l = i.setByQueryParameter ? s !== void 0 : !1;
+  var l;
+  const o = N.cloneDeep(n), i = N.cloneDeep(o[e]);
   if (!a.length || !(t != null && t.length))
-    return l && i.apiFilter && (i.queuedActive = s), i;
-  if (a.includes(e) || l) {
-    const m = o.filter((d) => {
-      var y;
-      return (y = i.parents) == null ? void 0 : y.includes(d.key);
-    }), f = m.some((d) => !(d.active || d.queuedActive));
-    if (m && f)
+    return i;
+  const s = i.setByQueryParameter ? !!Oe(i.setByQueryParameter) : !1;
+  if (a.includes(e) || s) {
+    const c = o.filter((p) => {
+      var u;
+      return (u = i.parents) == null ? void 0 : u.includes(p.key);
+    }), m = c.some((p) => !(p.active || p.queuedActive));
+    if (c && m)
       return i;
-    if (i.filterStyle === re.multiSelect)
+    if (i.filterStyle === oe.multiSelect)
       kl(t, i);
-    else if (i.filterStyle === re.nestedDropdown)
+    else if (i.filterStyle === oe.nestedDropdown)
       _l(t, i);
     else {
-      const d = (c = t[0]) == null ? void 0 : c.value;
+      const p = (l = t[0]) == null ? void 0 : l.value, u = Oe(i == null ? void 0 : i.setByQueryParameter);
       if (!i.active)
-        i.active = s || d;
+        i.active = u || p;
       else {
-        const y = t.find((h) => h.value == i.active);
-        i.active = y ? y.value : d;
+        const E = t.find((h) => h.value == i.active);
+        i.active = E ? E.value : p;
       }
     }
   }
@@ -5047,65 +5048,65 @@ const ja = ({
   currentViewport: a,
   isEditor: o = !1
 }) => {
-  var g, b;
-  const i = v.useContext(J), { config: s, reloadURLData: l, loadAPIFilters: c, setAPIFilterDropdowns: m, setAPILoading: f } = i, d = v.useContext(te), y = (w) => {
-    w.preventDefault();
-    const E = A.cloneDeep(i.config.dashboard), T = Object.values(i.config.visualizations).filter((C) => C.type === "dashboardFilters").reduce((C, k) => k.autoLoad ? C : [...C, k.sharedFilterIndexes], []);
-    if (!E.sharedFilters.some((C, k) => T.includes(k) ? !C.active && !C.queuedActive : !1)) {
-      if (Qe(i.config.visualizations)) {
-        const C = _t();
-        let k = !1;
-        E.sharedFilters.forEach((V) => {
-          V.queuedActive && (hr(V), V.setByQueryParameter && C[V.setByQueryParameter] !== V.active && (C[V.setByQueryParameter] = Array.isArray(V.active) ? V.active.join(",") : V.active, k = !0));
-        }), k && da(C);
+  var f, w;
+  const i = v.useContext(ee), { config: s, reloadURLData: l, loadAPIFilters: c, setAPIFilterDropdowns: m, setAPILoading: p } = i, u = v.useContext(ne), E = (y) => {
+    y.preventDefault();
+    const b = N.cloneDeep(i.config.dashboard), C = Object.values(i.config.visualizations).filter((T) => T.type === "dashboardFilters").reduce((T, R) => R.autoLoad ? T : [...T, R.sharedFilterIndexes], []);
+    if (!b.sharedFilters.some((T, R) => C.includes(R) ? !T.active && !T.queuedActive : !1)) {
+      if (Ze(i.config.visualizations)) {
+        const T = _t();
+        let R = !1;
+        b.sharedFilters.forEach((V) => {
+          V.queuedActive && (hr(V), V.setByQueryParameter && T[V.setByQueryParameter] !== V.active && (T[V.setByQueryParameter] = Array.isArray(V.active) ? V.active.join(",") : V.active, R = !0));
+        }), R && da(T);
       }
-      f(!0), d({ type: "SET_SHARED_FILTERS", payload: E.sharedFilters }), d({ type: "SET_FILTERED_DATA", payload: Le(A.cloneDeep(i)) }), c(E.sharedFilters, e).then((C) => {
-        l(C);
-      }).catch((C) => {
-        console.error(C);
+      p(!0), u({ type: "SET_SHARED_FILTERS", payload: b.sharedFilters }), u({ type: "SET_FILTERED_DATA", payload: Re(N.cloneDeep(i)) }), c(b.sharedFilters, e).then((T) => {
+        l(T);
+      }).catch((T) => {
+        console.error(T);
       });
     }
-  }, h = (w, E) => {
-    const T = A.cloneDeep(s);
-    let [S, C] = hl(
-      w,
-      E,
-      T.dashboard.sharedFilters,
+  }, h = (y, b) => {
+    const C = N.cloneDeep(s);
+    let [S, T] = hl(
+      y,
+      b,
+      C.dashboard.sharedFilters,
       t
     );
-    if (d({ type: "SET_SHARED_FILTERS", payload: S }), Qe(s.visualizations)) {
-      const k = t.autoLoad, V = T.dashboard.sharedFilters.some((le) => !le.active), j = S.filter((le) => le.apiFilter).map((le) => le.apiFilter.apiEndpoint), me = Cl(
-        j,
+    if (u({ type: "SET_SHARED_FILTERS", payload: S }), Ze(s.visualizations)) {
+      const R = t.autoLoad, V = C.dashboard.sharedFilters.some((ce) => !ce.active), G = S.filter((ce) => ce.apiFilter).map((ce) => ce.apiFilter.apiEndpoint), B = Cl(
+        G,
         e,
-        C
+        T
       );
-      k && !V ? (m(me), c(S, me).then((le) => {
-        l(le);
-      })) : (S[w].queuedActive = E, d({ type: "SET_DATA", payload: {} }), d({ type: "SET_FILTERED_DATA", payload: {} }), m(me), c(S, me));
-    } else if (S[w].type === "urlfilter" && S[w].apiFilter)
+      R && !V ? (m(B), c(S, B).then((ce) => {
+        l(ce);
+      })) : (S[y].queuedActive = b, u({ type: "SET_DATA", payload: {} }), u({ type: "SET_FILTERED_DATA", payload: {} }), m(B), c(S, B));
+    } else if (S[y].type === "urlfilter" && S[y].apiFilter)
       l(S);
     else {
-      const k = A.cloneDeep(i);
-      k.config.dashboard.sharedFilters = S;
-      const V = Le(k);
-      d({ type: "SET_FILTERED_DATA", payload: V }), d({ type: "SET_SHARED_FILTERS", payload: S });
+      const R = N.cloneDeep(i);
+      R.config.dashboard.sharedFilters = S;
+      const V = Re(R);
+      u({ type: "SET_FILTERED_DATA", payload: V }), u({ type: "SET_SHARED_FILTERS", payload: S });
     }
-  }, [I, O] = v.useState(!0), p = () => {
-    O(!I), n({
+  }, [O, I] = v.useState(!0), g = () => {
+    I(!O), n({
       ...t,
-      showEditorPanel: !I
+      showEditorPanel: !O
     });
-  }, D = (g = t == null ? void 0 : t.sharedFilterIndexes) == null ? void 0 : g.map(Number).map((w) => s.dashboard.sharedFilters[w]), u = D.length ? D.every((w) => w.showDropdown === !1) : !1;
-  return u && !o ? /* @__PURE__ */ r.createElement(r.Fragment, null) : /* @__PURE__ */ r.createElement(ye.VisualizationWrapper, { config: t, isEditor: o, currentViewport: a }, o && /* @__PURE__ */ r.createElement(
+  }, D = (f = t == null ? void 0 : t.sharedFilterIndexes) == null ? void 0 : f.map(Number).map((y) => s.dashboard.sharedFilters[y]), d = D.length ? D.every((y) => y.showDropdown === !1) : !1;
+  return d && !o ? /* @__PURE__ */ r.createElement(r.Fragment, null) : /* @__PURE__ */ r.createElement(ye.VisualizationWrapper, { config: t, isEditor: o, currentViewport: a }, o && /* @__PURE__ */ r.createElement(
     ye.Sidebar,
     {
-      displayPanel: I,
+      displayPanel: O,
       isDashboard: !0,
       title: "Configure Dashboard Filters",
-      onBackClick: p
+      onBackClick: g
     },
     /* @__PURE__ */ r.createElement(Sl, { updateConfig: n, vizConfig: t })
-  ), !u && /* @__PURE__ */ r.createElement(ye.Responsive, { isEditor: o }, /* @__PURE__ */ r.createElement(
+  ), !d && /* @__PURE__ */ r.createElement(ye.Responsive, { isEditor: o }, /* @__PURE__ */ r.createElement(
     "div",
     {
       className: `${o ? " is-editor" : ""} cove-component__content col-12 cove-dashboard-filters-container`
@@ -5113,27 +5114,27 @@ const ja = ({
     /* @__PURE__ */ r.createElement(
       vr,
       {
-        show: (b = t == null ? void 0 : t.sharedFilterIndexes) == null ? void 0 : b.map(Number),
+        show: (w = t == null ? void 0 : t.sharedFilterIndexes) == null ? void 0 : w.map(Number),
         filters: s.dashboard.sharedFilters || [],
         apiFilterDropdowns: e,
         handleOnChange: h,
         showSubmit: t.filterBehavior === Ua.Apply && !t.autoLoad,
-        applyFilters: y,
+        applyFilters: E,
         applyFiltersButtonText: t.applyFiltersButtonText
       }
     )
   )));
-}, Nl = new Se(), qa = (e, t, n) => {
+}, Nl = new Se(), Ga = (e, t, n) => {
   var l;
-  const a = A.cloneDeep(n.visualizations[e]), o = (l = n.datasets[a.dataKey]) == null ? void 0 : l.data, i = o != null && o.length ? Object.keys(o[0]) : [], s = (wt(n.dashboard, t) || []).filter((c) => i.includes(c.columnName));
-  return s.length && (a.formattedData = Oe(s, o)), a.data = o, a;
-}, Ga = (e, t, n, a, o) => {
+  const a = N.cloneDeep(n.visualizations[e]), o = (l = n.datasets[a.dataKey]) == null ? void 0 : l.data, i = o != null && o.length ? Object.keys(o[0]) : [], s = (wt(n.dashboard, t) || []).filter((c) => i.includes(c.columnName));
+  return s.length && (a.formattedData = Ie(s, o)), a.data = o, a;
+}, qa = (e, t, n, a, o) => {
   if (t === void 0)
     return {};
-  const i = A.cloneDeep(n.visualizations[e]), s = n.rows[t];
+  const i = N.cloneDeep(n.visualizations[e]), s = n.rows[t];
   if (s.footnotesId && s.footnotesId === e)
-    return qa(e, t, n);
-  s != null && s.dataKey && Object.assign(i, A.pick(s, ["dataKey", "dataDescription", "formattedData", "data"])), i.formattedData && (i.originalFormattedData = i.formattedData);
+    return Ga(e, t, n);
+  s != null && s.dataKey && Object.assign(i, N.pick(s, ["dataKey", "dataDescription", "formattedData", "data"])), i.formattedData && (i.originalFormattedData = i.formattedData);
   const l = (o == null ? void 0 : o[t]) ?? (o == null ? void 0 : o[e]);
   if (l)
     i.data = l || [], i.formattedData && (i.formattedData = i.data);
@@ -5143,17 +5144,17 @@ const ja = ({
   }
   return i;
 }, Fl = ({ config: e, updateField: t }) => {
-  var m, f, d, y, h, I;
+  var m, p, u, E, h, O;
   const n = () => {
-    const O = [...e.staticFootnotes || [], { text: "Add Footnote Text" }];
-    t(null, null, "staticFootnotes", O);
-  }, a = (O, p) => {
-    const D = A.cloneDeep(e.staticFootnotes);
-    D[O] = p, t(null, null, "staticFootnotes", D);
-  }, o = (O) => {
-    const p = A.cloneDeep(e.staticFootnotes);
-    p.splice(O, 1), t(null, null, "staticFootnotes", p);
-  }, i = (O) => [["", "--Select--"]].concat(O.map((p) => [p, p])), s = e.datasets || {}, l = e.dataKey ? i(Object.keys(((f = (m = s[e.dataKey]) == null ? void 0 : m.data) == null ? void 0 : f[0]) || {})) : [], c = i(Object.keys(s));
+    const I = [...e.staticFootnotes || [], { text: "Add Footnote Text" }];
+    t(null, null, "staticFootnotes", I);
+  }, a = (I, g) => {
+    const D = N.cloneDeep(e.staticFootnotes);
+    D[I] = g, t(null, null, "staticFootnotes", D);
+  }, o = (I) => {
+    const g = N.cloneDeep(e.staticFootnotes);
+    g.splice(I, 1), t(null, null, "staticFootnotes", g);
+  }, i = (I) => [["", "--Select--"]].concat(I.map((g) => [g, g])), s = e.datasets || {}, l = e.dataKey ? i(Object.keys(((p = (m = s[e.dataKey]) == null ? void 0 : m.data) == null ? void 0 : p[0]) || {})) : [], c = i(Object.keys(s));
   return /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement("em", null, "Dynamic Footnotes"), /* @__PURE__ */ r.createElement("div", { className: "row border p-2" }, /* @__PURE__ */ r.createElement(
     ge,
     {
@@ -5167,7 +5168,7 @@ const ja = ({
     ge,
     {
       label: "Footnote Symbol Column",
-      value: (d = e.dynamicFootnotes) == null ? void 0 : d.symbolColumn,
+      value: (u = e.dynamicFootnotes) == null ? void 0 : u.symbolColumn,
       options: l,
       section: "dynamicFootnotes",
       fieldName: "symbolColumn",
@@ -5177,7 +5178,7 @@ const ja = ({
     ge,
     {
       label: "Footnote Text Column",
-      value: (y = e.dynamicFootnotes) == null ? void 0 : y.textColumn,
+      value: (E = e.dynamicFootnotes) == null ? void 0 : E.textColumn,
       options: l,
       section: "dynamicFootnotes",
       fieldName: "textColumn",
@@ -5193,25 +5194,25 @@ const ja = ({
       fieldName: "orderColumn",
       updateField: t
     }
-  ))), /* @__PURE__ */ r.createElement("hr", null), /* @__PURE__ */ r.createElement("em", null, "Static Footnotes"), (I = e.staticFootnotes) == null ? void 0 : I.map((O, p) => /* @__PURE__ */ r.createElement("div", { key: p, className: "row border p-2" }, /* @__PURE__ */ r.createElement("div", { className: "col-8" }, /* @__PURE__ */ r.createElement(
+  ))), /* @__PURE__ */ r.createElement("hr", null), /* @__PURE__ */ r.createElement("em", null, "Static Footnotes"), (O = e.staticFootnotes) == null ? void 0 : O.map((I, g) => /* @__PURE__ */ r.createElement("div", { key: g, className: "row border p-2" }, /* @__PURE__ */ r.createElement("div", { className: "col-8" }, /* @__PURE__ */ r.createElement(
     ge,
     {
       label: "Symbol",
-      value: O.symbol,
+      value: I.symbol,
       options: [["", "--Select--"], ...rr],
       fieldName: "symbol",
-      updateField: (D, u, g, b) => a(p, { ...O, symbol: b })
+      updateField: (D, d, f, w) => a(g, { ...I, symbol: w })
     }
   ), " ", /* @__PURE__ */ r.createElement(
-    Y,
+    J,
     {
       label: "Text",
-      value: O.text,
+      value: I.text,
       fieldName: "text",
-      updateField: (D, u, g, b) => a(p, { ...O, text: b })
+      updateField: (D, d, f, w) => a(g, { ...I, text: w })
     }
-  )), /* @__PURE__ */ r.createElement("div", { className: "col-2 ms-4" }, /* @__PURE__ */ r.createElement("button", { className: "btn btn-danger p-1", onClick: () => o(p) }, "Delete")))), /* @__PURE__ */ r.createElement("button", { className: "btn btn-primary", onClick: n }, "Add Static Footnote"));
-}, Ze = ({
+  )), /* @__PURE__ */ r.createElement("div", { className: "col-2 ms-4" }, /* @__PURE__ */ r.createElement("button", { className: "btn btn-danger p-1", onClick: () => o(g) }, "Delete")))), /* @__PURE__ */ r.createElement("button", { className: "btn btn-primary", onClick: n }, "Add Static Footnote"));
+}, Ke = ({
   visualizationKey: e,
   config: t,
   viewport: n,
@@ -5223,7 +5224,7 @@ const ja = ({
     return /* @__PURE__ */ r.createElement(
       Va,
       {
-        component: Ze,
+        component: Ke,
         visualizationKey: e,
         visualizationConfig: t,
         updateConfig: o,
@@ -5235,8 +5236,8 @@ const ja = ({
   const s = v.useMemo(() => {
     const c = t.formattedData || t.data;
     if (c && t.dataKey && t.dynamicFootnotes) {
-      const { symbolColumn: m, textColumn: f, orderColumn: d } = t.dynamicFootnotes, y = c.map((h) => A.pick(h, [m, f, d]));
-      return y.sort((h, I) => h[d] - I[d]), y.map((h) => ({ symbol: h[m], text: h[f] }));
+      const { symbolColumn: m, textColumn: p, orderColumn: u } = t.dynamicFootnotes, E = c.map((h) => N.pick(h, [m, p, u]));
+      return E.sort((h, O) => h[u] - O[u]), E.map((h) => ({ symbol: h[m], text: h[p] }));
     }
     return [];
   }, [t.dynamicFootnotes, t.formattedData, t.data]), l = t.staticFootnotes || [];
@@ -5265,7 +5266,7 @@ const ja = ({
         c.keyCode === 13 && s(!i);
       }
     },
-    /* @__PURE__ */ r.createElement(R, { display: i ? "minus" : "plus", base: !0 }),
+    /* @__PURE__ */ r.createElement(P, { display: i ? "minus" : "plus", base: !0 }),
     n
   ), i && o);
 }, Ll = ({
@@ -5294,50 +5295,53 @@ const ja = ({
   setSharedFilter: s,
   updateChildConfig: l,
   apiFilterDropdowns: c,
-  currentViewport: m
+  currentViewport: m,
+  isLastRow: p
 }) => {
-  const { config: f, filteredData: d, data: y } = v.useContext(J), [h, I] = r.useState(a.columns.map((u, g) => g === 0)), O = (u) => {
-    I(h.map((g, b) => b === u));
-  }, p = v.useMemo(() => {
+  const { config: u, filteredData: E, data: h } = v.useContext(ee), [O, I] = r.useState(a.columns.map((f, w) => w === 0)), g = (f) => {
+    I(O.map((w, y) => y === f));
+  }, D = v.useMemo(() => {
     if (a.footnotesId) {
-      const u = qa(a.footnotesId, o, f);
+      const f = Ga(a.footnotesId, o, u);
       if (a.multiVizColumn && t) {
-        const g = t[0][a.multiVizColumn], b = u.formattedData.filter((w) => w[a.multiVizColumn] === g);
-        u.formattedData = b;
+        const w = t[0][a.multiVizColumn], y = f.formattedData.filter((b) => b[a.multiVizColumn] === w);
+        f.formattedData = y;
       } else
-        u.formattedData = d[a.footnotesId];
-      return u;
+        f.formattedData = E[a.footnotesId];
+      return f;
     }
     return null;
-  }, [f, a, y, d]), D = (u) => {
-    const b = Object.values(f.visualizations).filter(
-      (w) => w.type === "dashboardFilters"
-    ).filter((w) => !w.autoLoad).flatMap((w) => w.sharedFilterIndexes);
-    return Qe(f.visualizations) && u.autoLoad ? b.some((w) => {
-      const { queuedActive: E, active: T, subGrouping: S } = f.dashboard.sharedFilters[w];
-      return !T && !E ? !0 : E ? S ? E[0] !== T || E[1] !== S.active : E !== T : !1;
+  }, [u, a, h, E]), d = (f) => {
+    const y = Object.values(u.visualizations).filter(
+      (b) => b.type === "dashboardFilters"
+    ).filter((b) => !b.autoLoad).flatMap((b) => b.sharedFilterIndexes);
+    return Ze(u.visualizations) && f.autoLoad ? y.some((b) => {
+      const { queuedActive: C, active: S, subGrouping: T } = u.dashboard.sharedFilters[b];
+      return !S && !C ? !0 : C ? T ? C[0] !== S || C[1] !== T.active : C !== S : !1;
     }) : !1;
   };
-  return /* @__PURE__ */ r.createElement("div", { className: `row${a.equalHeight ? " equal-height" : ""}${a.toggle ? " toggle" : ""}`, key: `row__${o}` }, a.columns.map((u, g) => {
-    if (u.width) {
-      if (!u.widget)
-        return /* @__PURE__ */ r.createElement("div", { key: `row__${o}__col__${g}`, className: `col col-${u.width}` });
-      const b = Ga(u.widget, o, f, y, d);
-      t && (b.data = t, b.formattedData && (b.formattedData = t));
-      const w = f.dashboard.sharedFilters && f.dashboard.sharedFilters.filter((k) => k.setBy === u.widget).length > 0, E = w ? f.dashboard.sharedFilters.filter((k) => k.setBy === u.widget)[0].active : void 0, T = /* @__PURE__ */ r.createElement("a", { href: `#data-table-${b.dataKey}`, className: "margin-left-href" }, b.dataKey, " (Go to Table)"), S = i && b.filterBehavior !== "Apply Button" && (b.type !== "dashboardFilters" || D(b)), C = a.toggle === void 0 || a.toggle && h[g];
+  return /* @__PURE__ */ r.createElement("div", { className: `row${a.equalHeight ? " equal-height" : ""}${a.toggle ? " toggle" : ""}`, key: `row__${o}` }, a.columns.map((f, w) => {
+    if (f.width) {
+      if (!f.widget)
+        return /* @__PURE__ */ r.createElement("div", { key: `row__${o}__col__${w}`, className: `col col-${f.width}` });
+      const y = qa(f.widget, o, u, h, E);
+      t && (y.data = t, y.formattedData && (y.formattedData = t));
+      const b = u.dashboard.sharedFilters && u.dashboard.sharedFilters.filter((B) => B.setBy === f.widget).length > 0, C = b ? u.dashboard.sharedFilters.filter((B) => B.setBy === f.widget)[0].active : void 0, S = /* @__PURE__ */ r.createElement("a", { href: `#data-table-${y.dataKey}`, className: "margin-left-href" }, y.dataKey, " (Go to Table)"), T = i && y.filterBehavior !== "Apply Button" && (y.type !== "dashboardFilters" || d(y)), R = a.toggle === void 0 || a.toggle && O[w], V = y.type === "dashboardFilters" && y.sharedFilterIndexes && y.sharedFilterIndexes.filter(
+        (B) => u.dashboard.sharedFilters[B].showDropdown === !1
+      ).length === y.sharedFilterIndexes.length, G = !p && !V;
       return /* @__PURE__ */ r.createElement(
         "div",
         {
-          key: `vis__${o}__${g}`,
-          className: `col-12 col-md-${u.width}${C ? "" : " d-none"}${S ? " hide-parent-visualization" : " mb-4"}`
+          key: `vis__${o}__${w}`,
+          className: `col-12 col-md-${f.width}${R ? "" : " d-none"}${T ? " hide-parent-visualization" : G ? " mb-4" : ""}`
         },
-        a.toggle && !S && /* @__PURE__ */ r.createElement(
+        a.toggle && !T && /* @__PURE__ */ r.createElement(
           gl,
           {
             row: a,
-            visualizations: f.visualizations,
-            active: h.indexOf(!0),
-            setToggled: O
+            visualizations: u.visualizations,
+            active: O.indexOf(!0),
+            setToggled: g
           }
         ),
         /* @__PURE__ */ r.createElement(
@@ -5346,138 +5350,138 @@ const ja = ({
             allExpanded: e,
             currentViewport: m,
             groupName: n,
-            hideVisualization: S,
+            hideVisualization: T,
             row: a
           },
-          b.type === "chart" && /* @__PURE__ */ r.createElement(
+          y.type === "chart" && /* @__PURE__ */ r.createElement(
             aa,
             {
-              key: u.widget,
-              config: b,
-              dashboardConfig: f,
+              key: f.widget,
+              config: y,
+              dashboardConfig: u,
               isEditor: !1,
-              setConfig: (k) => {
-                l(u.widget, k);
+              setConfig: (B) => {
+                l(f.widget, B);
               },
-              setSharedFilter: w ? s : void 0,
+              setSharedFilter: b ? s : void 0,
               isDashboard: !0,
-              link: f.table && f.table.show && f.datasets && b.table && b.table.showDataTableLink ? T : void 0,
+              link: u.table && u.table.show && u.datasets && y.table && y.table.showDataTableLink ? S : void 0,
               configUrl: void 0,
               setEditing: void 0,
               hostname: void 0,
               setSharedFilterValue: void 0
             }
           ),
-          b.type === "map" && /* @__PURE__ */ r.createElement(
+          y.type === "map" && /* @__PURE__ */ r.createElement(
             ia,
             {
-              key: u.widget,
-              config: b,
+              key: f.widget,
+              config: y,
               isEditor: !1,
-              setConfig: (k) => {
-                l(u.widget, k);
+              setConfig: (B) => {
+                l(f.widget, B);
               },
               showLoader: !1,
-              setSharedFilter: w ? s : void 0,
-              setSharedFilterValue: E,
+              setSharedFilter: b ? s : void 0,
+              setSharedFilterValue: C,
               isDashboard: !0,
-              link: f.table && f.table.show && f.datasets && b.table && b.table.showDataTableLink ? T : void 0
+              link: u.table && u.table.show && u.datasets && y.table && y.table.showDataTableLink ? S : void 0
             }
           ),
-          b.type === "data-bite" && /* @__PURE__ */ r.createElement(
+          y.type === "data-bite" && /* @__PURE__ */ r.createElement(
             oa,
             {
-              key: u.widget,
-              config: b,
+              key: f.widget,
+              config: y,
               isEditor: !1,
-              setConfig: (k) => {
-                l(u.widget, k);
+              setConfig: (B) => {
+                l(f.widget, B);
               },
               isDashboard: !0
             }
           ),
-          b.type === "waffle-chart" && /* @__PURE__ */ r.createElement(
+          y.type === "waffle-chart" && /* @__PURE__ */ r.createElement(
             sa,
             {
-              key: u.widget,
-              config: b,
+              key: f.widget,
+              config: y,
               isEditor: !1,
-              setConfig: (k) => {
-                l(u.widget, k);
+              setConfig: (B) => {
+                l(f.widget, B);
               },
               isDashboard: !0,
-              configUrl: f.table && f.table.show && f.datasets && b.table && b.table.showDataTableLink ? T : void 0
+              configUrl: u.table && u.table.show && u.datasets && y.table && y.table.showDataTableLink ? S : void 0
             }
           ),
-          b.type === "markup-include" && /* @__PURE__ */ r.createElement(
+          y.type === "markup-include" && /* @__PURE__ */ r.createElement(
             la,
             {
-              key: u.widget,
-              config: b,
+              key: f.widget,
+              config: y,
               configUrl: void 0,
               isDashboard: !0,
               isEditor: !1,
-              setConfig: (k) => {
-                l(u.widget, k);
+              setConfig: (B) => {
+                l(f.widget, B);
               }
             }
           ),
-          b.type === "filtered-text" && /* @__PURE__ */ r.createElement(
+          y.type === "filtered-text" && /* @__PURE__ */ r.createElement(
             Fa,
             {
-              key: u.widget,
-              config: b,
+              key: f.widget,
+              config: y,
               isEditor: !1,
-              setConfig: (k) => {
-                l(u.widget, k);
+              setConfig: (B) => {
+                l(f.widget, B);
               },
               isDashboard: !0,
               configUrl: void 0
             }
           ),
-          b.type === "dashboardFilters" && /* @__PURE__ */ r.createElement(
+          y.type === "dashboardFilters" && /* @__PURE__ */ r.createElement(
             ja,
             {
-              setConfig: (k) => {
-                l(u.widget, k);
+              setConfig: (B) => {
+                l(f.widget, B);
               },
-              key: u.widget,
-              visualizationConfig: b,
+              key: f.widget,
+              visualizationConfig: y,
               apiFilterDropdowns: c,
               currentViewport: m
             }
           ),
-          b.type === "table" && /* @__PURE__ */ r.createElement(
+          y.type === "table" && /* @__PURE__ */ r.createElement(
             xt,
             {
-              key: u.widget,
-              updateConfig: (k) => {
-                l(u.widget, k);
+              key: f.widget,
+              updateConfig: (B) => {
+                l(f.widget, B);
               },
-              visualizationKey: u.widget,
-              config: b,
+              visualizationKey: f.widget,
+              config: y,
               viewport: m
             }
           ),
-          b.type === "footnotes" && /* @__PURE__ */ r.createElement(
-            Ze,
+          y.type === "footnotes" && /* @__PURE__ */ r.createElement(
+            Ke,
             {
-              key: u.widget,
-              visualizationKey: u.widget,
-              config: b,
+              key: f.widget,
+              visualizationKey: f.widget,
+              config: y,
               viewport: m
             }
           )
         )
       );
     }
-    return /* @__PURE__ */ r.createElement(r.Fragment, { key: `vis__${o}__${g}` });
+    return /* @__PURE__ */ r.createElement(r.Fragment, { key: `vis__${o}__${w}` });
   }), a.footnotesId && !i ? /* @__PURE__ */ r.createElement(
-    Ze,
+    Ke,
     {
       isEditor: !1,
       visualizationKey: a.footnotesId,
-      config: p,
+      config: D,
       viewport: m
     }
   ) : null);
@@ -5492,7 +5496,7 @@ const ja = ({
     decodeURIComponent(n[o]) !== t[o] && (a = !0);
   }), a;
 }, Yn = ({ visualizations: e, datasets: t, rows: n }) => {
-  const a = Object.values(e).map((s) => s.dataKey), o = n.map((s) => s.dataKey), i = A.uniq([...a, ...o]);
+  const a = Object.values(e).map((s) => s.dataKey), o = n.map((s) => s.dataKey), i = N.uniq([...a, ...o]);
   return Object.keys(t).filter((s) => i.includes(s));
 }, Rl = (e, t, n) => {
   const a = Object.keys(e).flatMap((s) => {
@@ -5530,7 +5534,7 @@ const ja = ({
 }, Ml = (e, t) => Object.keys(e).reduce((n, a) => {
   const o = e[a].dataKey;
   return t[o] && (n[a].formattedData = t[o]), n;
-}, A.cloneDeep(e)), $l = (e, t, n, a) => {
+}, N.cloneDeep(e)), $l = (e, t, n, a) => {
   var i, s;
   if (!e.usedBy || !e.usedBy.length)
     return !0;
@@ -5543,54 +5547,57 @@ const ja = ({
   const o = (i, s, l, c = 50) => {
     if (!i)
       return;
-    const m = i.map((p, D) => D), f = l ? m : a;
+    const m = i.map((g, D) => D), p = l ? m : a;
     i = i.map(
-      (p, D) => {
-        var u;
+      (g, D) => {
+        var d;
         return Zn(
           D,
-          s[(u = p.apiFilter) == null ? void 0 : u.apiEndpoint],
+          s[(d = g.apiFilter) == null ? void 0 : d.apiEndpoint],
           i,
-          f
+          p
         );
       }
     );
-    const d = i.filter((p) => p.apiFilter), y = new Map(d.map((p) => [p.apiFilter.apiEndpoint, p.apiFilter])), h = Il(i, s), I = Object.values(h).reduce(
-      (p, [D]) => ({ ...p, [D]: null }),
+    const u = i.filter((g) => g.apiFilter), E = new Map(u.map((g) => [g.apiFilter.apiEndpoint, g.apiFilter])), h = Il(i, s), O = Object.values(h).reduce(
+      (g, [D]) => ({ ...g, [D]: null }),
       {}
     );
-    n((p) => ({ ...p, ...I }));
-    const O = A.cloneDeep(s);
+    n((g) => ({ ...g, ...O }));
+    const I = N.cloneDeep(s);
     return Promise.all(
       Object.keys(h).map(
-        (p) => new Promise((D) => {
-          fetch(p).then((u) => u.json()).then((u) => {
-            Array.isArray(u) || console.error("COVE only supports response data in the shape Array<Object>");
-            const [g, b] = h[p], w = y.get(g), E = Ol(u, w);
-            O[g] = E;
-            const T = Zn(
+        (g) => new Promise((D) => {
+          fetch(g).then((d) => d.json()).then((d) => {
+            Array.isArray(d) || console.error("COVE only supports response data in the shape Array<Object>");
+            const [f, w] = h[g], y = E.get(f), b = Ol(d, y);
+            I[f] = b;
+            const C = Zn(
+              w,
               b,
-              E,
               i,
-              f
+              p
             );
-            i[b] = T;
+            i[w] = C;
           }).catch(() => {
             t({
               type: "ADD_ERROR_MESSAGE",
               payload: "There was a problem returning data. Please try again."
-            });
+            }), D({ error: !0 });
           }).finally(() => {
-            D();
+            D({ error: !1 });
           });
         })
       )
-    ).then(() => !i.reduce((D, u, g) => f.includes(g) && !u.active ? Ha(za(u, i)) ? D : [...D, g] : D, []).length || c === 0 ? (n(O), e({ type: "SET_SHARED_FILTERS", payload: i }), i) : o(i, O, l, c - 1));
+    ).then((g) => {
+      const D = g.some(({ error: f }) => f), d = i.reduce((f, w, y) => p.includes(y) && !w.active ? Ha(za(w, i)) ? f : [...f, y] : f, []);
+      return D || !d.length || c === 0 ? (n(I), e({ type: "SET_SHARED_FILTERS", payload: i }), i) : o(i, I, l, c - 1);
+    });
   };
   return o;
 }, Ul = (e, t) => {
   var s;
-  const n = !!Pe("cove-auto-load"), a = e.multiDashboards ? e.multiDashboards[e.activeDashboard] : e, o = (s = a.dashboard.sharedFilters) == null ? void 0 : s.some(
+  const n = !!Oe("cove-auto-load"), a = e.multiDashboards ? e.multiDashboards[e.activeDashboard] : e, o = (s = a.dashboard.sharedFilters) == null ? void 0 : s.some(
     (l) => l.filterBy === "File Name"
   ), i = Object.values(a.visualizations).reduce((l, c) => {
     if (l === !1)
@@ -5604,159 +5611,159 @@ const ja = ({
     return l;
   }, void 0);
   if (n || i || o || t) {
-    const l = a.rows.map((f) => f.dataKey).filter(Boolean);
-    return !!Object.values(a.visualizations).map((f) => f.dataKey).filter(Boolean).concat(l).find((f) => {
-      var d;
-      return !((d = e.datasets[f].data) != null && d.length);
+    const l = a.rows.map((p) => p.dataKey).filter(Boolean);
+    return !!Object.values(a.visualizations).map((p) => p.dataKey).filter(Boolean).concat(l).find((p) => {
+      var u;
+      return !((u = e.datasets[p].data) != null && u.length);
     });
   }
   return !1;
 };
 function zl({ initialState: e, isEditor: t = !1, isDebug: n = !1 }) {
-  var le, Mt, $t, Bt, Vt, Ut, zt, Ht, jt, qt, Gt, Wt, Qt;
-  const [a, o] = v.useReducer(dl, e), [i, s] = v.useReducer(ml, []), l = v.useContext(ra), [c, m] = v.useState({}), [f, d] = v.useState("lg"), [y] = v.useState(`cove-${Math.random().toString(16).slice(-4)}`), [h, I] = v.useState(!0), [O, p] = v.useState(!1), D = a.tabSelected === "Dashboard Preview", u = v.useMemo(() => {
-    const _ = Yn(a.config).map((F) => a.data[F]);
-    return _.length ? _.some((F) => F === void 0) : !0;
-  }, [a.data]), g = Rt(a.config.rows), b = new Se(), w = v.useMemo(() => Object.values(a.config.visualizations).filter((_) => _.type === "dashboardFilters").reduce((_, F) => F.autoLoad ? [..._, ...F.sharedFilterIndexes] : _, []), [a.config.visualizations]), E = Vl(
+  var ce, Mt, $t, Bt, Vt, Ut, zt, Ht, jt, Gt, qt, Wt, Qt;
+  const [a, o] = v.useReducer(dl, e), [i, s] = v.useReducer(ml, []), l = v.useContext(ra), [c, m] = v.useState({}), [p, u] = v.useState("lg"), [E] = v.useState(`cove-${Math.random().toString(16).slice(-4)}`), [h, O] = v.useState(!0), [I, g] = v.useState(!1), D = a.tabSelected === "Dashboard Preview", d = v.useMemo(() => {
+    const _ = Yn(a.config).map((k) => a.data[k]);
+    return _.length ? _.some((k) => k === void 0) : !0;
+  }, [a.data]), f = Rt(a.config.rows), w = new Se(), y = v.useMemo(() => Object.values(a.config.visualizations).filter((_) => _.type === "dashboardFilters").reduce((_, k) => k.autoLoad ? [..._, ...k.sharedFilterIndexes] : _, []), [a.config.visualizations]), b = Vl(
     o,
     s,
     m,
-    w
-  ), T = async (_) => {
-    const F = A.cloneDeep(a.config);
-    if (!F.datasets)
+    y
+  ), C = async (_) => {
+    const k = N.cloneDeep(a.config);
+    if (!k.datasets)
       return;
-    const U = _ || F.dashboard.sharedFilters, N = Yn(F), $ = A.cloneDeep(a.data), z = A.cloneDeep(F.datasets);
-    let q = !1, B = "";
-    for (let W = 0; W < N.length; W++) {
-      const Q = N[W], ce = F.datasets[Q];
-      if (ce.dataUrl && U) {
-        const ue = new URL(ce.runtimeDataUrl || ce.dataUrl, window.location.origin), ve = Object.fromEntries(new URLSearchParams(ue.search)), K = {};
-        U.forEach((M) => {
-          var H;
-          if (M.type === "urlfilter" && $l(M, Q, F.visualizations, F.rows)) {
-            if (M.filterBy === "File Name" && (B = xl(B, M, Q)), M.queryParameter && (K[M.queryParameter] ? K[M.queryParameter] = K[M.queryParameter] + M.active : K[M.queryParameter] = M.active), M.setByQueryParameter) {
-              const we = Object.fromEntries(new URLSearchParams(window.location.search))[M.setByQueryParameter], Wa = ((H = M.apiFilter) == null ? void 0 : H.valueSelector) || M.setByQueryParameter;
-              we && (K[Wa] = we);
+    const z = _ || k.dashboard.sharedFilters, M = Yn(k), A = N.cloneDeep(a.data), $ = N.cloneDeep(k.datasets);
+    let q = !1, H = "";
+    for (let W = 0; W < M.length; W++) {
+      const j = M[W], ue = k.datasets[j];
+      if (ue.dataUrl && z) {
+        const ve = new URL(ue.runtimeDataUrl || ue.dataUrl, window.location.origin), de = Object.fromEntries(new URLSearchParams(ve.search)), X = {};
+        z.forEach((U) => {
+          var Q;
+          if (U.type === "urlfilter" && $l(U, j, k.visualizations, k.rows)) {
+            if (U.filterBy === "File Name" && (H = xl(H, U, j)), U.queryParameter && (X[U.queryParameter] ? X[U.queryParameter] = X[U.queryParameter] + U.active : X[U.queryParameter] = U.active), U.setByQueryParameter) {
+              const we = Object.fromEntries(new URLSearchParams(window.location.search))[U.setByQueryParameter], Wa = ((Q = U.apiFilter) == null ? void 0 : Q.valueSelector) || U.setByQueryParameter;
+              we && (X[Wa] = we);
             }
-            M.apiFilter && M.active && (K[M.apiFilter.valueSelector] = M.active, M.apiFilter.subgroupValueSelector && M.subGrouping.active && (K[M.apiFilter.subgroupValueSelector] = M.subGrouping.active));
+            U.apiFilter && U.active && (X[U.apiFilter.valueSelector] = U.active, U.apiFilter.subgroupValueSelector && U.subGrouping.active && (X[U.apiFilter.subgroupValueSelector] = U.subGrouping.active));
           }
         });
-        const tt = Pl(U, ve, K);
-        if (_ || tt) {
+        const ke = Pl(z, de, X);
+        if (_ || ke) {
           q = !0;
-          const M = Rl(
-            { ...ve, ...K },
-            ue,
-            B
+          const U = Rl(
+            { ...de, ...X },
+            ve,
+            H
           );
-          p(!0), await Re(M).then((H) => {
-            let ne = H;
-            if (H && ce.dataDescription)
+          g(!0), await xe(U).then((Q) => {
+            let ae = Q;
+            if (Q && ue.dataDescription)
               try {
-                ne = b.autoStandardize(ne), ne = b.developerStandardize(ne, ce.dataDescription);
+                ae = w.autoStandardize(ae), ae = w.developerStandardize(ae, ue.dataDescription);
               } catch (we) {
                 console.error("Error standardizing data:", we);
               }
-            z[Q].data = ne, z[Q].runtimeDataUrl = M, $[Q] = ne;
-          }).catch((H) => {
-            console.error(H), s({
+            $[j].data = ae, $[j].runtimeDataUrl = U, A[j] = ae;
+          }).catch((Q) => {
+            console.error(Q), s({
               type: "ADD_ERROR_MESSAGE",
               payload: "There was a problem returning data. Please try again."
-            }), z[Q].data = [], z[Q].runtimeDataUrl = M, $[Q] = [];
+            }), $[j].data = [], $[j].runtimeDataUrl = U, A[j] = [];
           });
         }
       }
     }
-    const G = A.pickBy(z, (W) => !W.dataUrl);
-    if (q || Object.keys(G).length) {
-      const W = Object.keys(G).reduce((H, ne) => (H[ne] = G[ne].data, H), {}), Q = { ...$, ...W };
-      o({ type: "SET_DATA", payload: Q });
-      const ce = F.dashboard.sharedFilters.reduce((H, ne, we) => (ne.type === "datafilter" && H.push(we), H), []), ue = Object.values(F.visualizations).filter((H) => H.type === "dashboardFilters").flatMap((H) => H.sharedFilterIndexes).filter((H) => !ce.includes(H)), ve = Tt(U, Q, ue), K = { ...F.dashboard, sharedFilters: ve }, tt = Le(
-        { ...a, config: { ...a.config, dashboard: K } },
+    const Z = N.pickBy($, (W) => !W.dataUrl);
+    if (q || Object.keys(Z).length) {
+      const W = Object.keys(Z).reduce((Q, ae) => (Q[ae] = Z[ae].data, Q), {}), j = { ...A, ...W };
+      o({ type: "SET_DATA", payload: j });
+      const ue = k.dashboard.sharedFilters.reduce((Q, ae, we) => (ae.type === "datafilter" && Q.push(we), Q), []), ve = Object.values(k.visualizations).filter((Q) => Q.type === "dashboardFilters").flatMap((Q) => Q.sharedFilterIndexes).filter((Q) => !ue.includes(Q)), de = Tt(z, j, ve), X = { ...k.dashboard, sharedFilters: de }, ke = Re(
+        { ...a, config: { ...a.config, dashboard: X } },
         {},
-        Q
+        j
       );
-      o({ type: "SET_FILTERED_DATA", payload: tt });
-      const M = Ml(F.visualizations, $);
+      o({ type: "SET_FILTERED_DATA", payload: ke });
+      const U = Ml(k.visualizations, A);
       o({
         type: "SET_CONFIG",
         payload: {
-          dashboard: K,
-          datasets: z,
-          visualizations: M,
-          activeDashboard: F.activeDashboard
+          dashboard: X,
+          datasets: $,
+          visualizations: U,
+          activeDashboard: k.activeDashboard
         }
-      }), p(!1);
+      }), g(!1);
     }
-  }, S = (_, F) => {
-    const { config: U, filteredData: N } = A.cloneDeep(a);
-    for (let z = 0; z < U.dashboard.sharedFilters.length; z++) {
-      const q = U.dashboard.sharedFilters[z];
+  }, S = (_, k) => {
+    const { config: z, filteredData: M } = N.cloneDeep(a);
+    for (let $ = 0; $ < z.dashboard.sharedFilters.length; $++) {
+      const q = z.dashboard.sharedFilters[$];
       if (q.setBy === _) {
-        q.columnName && (q.active = F[q.columnName]);
+        q.columnName && (q.active = k[q.columnName]);
         break;
       }
     }
-    const $ = Le({ ...a, config: U }, N);
-    o({ type: "SET_FILTERED_DATA", payload: $ }), o({ type: "SET_CONFIG", payload: U }), o({ type: "SET_SHARED_FILTERS", payload: U.dashboard.sharedFilters });
+    const A = Re({ ...a, config: z }, M);
+    o({ type: "SET_FILTERED_DATA", payload: A }), o({ type: "SET_CONFIG", payload: z }), o({ type: "SET_SHARED_FILTERS", payload: z.dashboard.sharedFilters });
   };
   v.useEffect(() => {
-    var N;
-    const { config: _ } = a, F = Ul(_, t && !D), U = Tt(_.dashboard.sharedFilters, a.data);
-    (N = E(U, c, F)) == null || N.then(($) => {
-      $.every((q) => q.type === "datafilter" || q.active) && T($);
+    var M;
+    const { config: _ } = a, k = Ul(_, t && !D), z = Tt(_.dashboard.sharedFilters, a.data);
+    (M = b(z, c, k)) == null || M.then((A) => {
+      A.every((q) => q.type === "datafilter" || q.active) && C(A);
     });
-  }, [t, D, (le = a.config) == null ? void 0 : le.activeDashboard]);
-  const C = (_, F) => {
-    const U = A.cloneDeep(a.config), N = A.pick(U, ["visualizations", "multiDashboards"]);
-    if (N.visualizations[_] = F, N.visualizations[_].formattedData = U.visualizations[_].formattedData, U.multiDashboards) {
-      const $ = U.activeDashboard, z = [...U.multiDashboards], B = { label: z[$].label, visualizations: N.visualizations, ...A.pick(U, ["dashboard", "rows"]) };
-      z[$] = B, N.multiDashboards = z;
+  }, [t, D, (ce = a.config) == null ? void 0 : ce.activeDashboard]);
+  const T = (_, k) => {
+    const z = N.cloneDeep(a.config), M = N.pick(z, ["visualizations", "multiDashboards"]);
+    if (M.visualizations[_] = k, M.visualizations[_].formattedData = z.visualizations[_].formattedData, z.multiDashboards) {
+      const A = z.activeDashboard, $ = [...z.multiDashboards], H = { label: $[A].label, visualizations: M.visualizations, ...N.pick(z, ["dashboard", "rows"]) };
+      $[A] = H, M.multiDashboards = $;
     }
-    o({ type: "SET_CONFIG", payload: N }), t && l.setTempConfig(N);
-  }, k = new Ja((_) => {
-    for (let F of _) {
-      let U = er(F.contentRect.width);
-      d(U);
+    o({ type: "SET_CONFIG", payload: M }), t && l.setTempConfig(M);
+  }, R = new Ja((_) => {
+    for (let k of _) {
+      let z = er(k.contentRect.width);
+      u(z);
     }
   }), V = v.useCallback((_) => {
-    _ !== null && k.observe(_);
+    _ !== null && R.observe(_);
   }, []);
   if (a.loading)
     return /* @__PURE__ */ r.createElement(Ot, null);
-  let j = null;
+  let G = null;
   if (t && !D) {
     let _ = !1;
-    be(a.config).forEach((F) => {
+    be(a.config).forEach((k) => {
       var q;
-      const U = (q = g[F]) == null ? void 0 : q.row, N = Ga(
-        F,
-        U,
+      const z = (q = f[k]) == null ? void 0 : q.row, M = qa(
+        k,
+        z,
         a.config,
         a.data,
         a.filteredData
       );
-      N.uid = F, N.type === "footnotes" && (N.formattedData = void 0);
-      const $ = a.config.dashboard.sharedFilters && a.config.dashboard.sharedFilters.filter((B) => B.setBy === F).length > 0, z = $ ? a.config.dashboard.sharedFilters.filter((B) => B.setBy === F)[0].active : void 0;
-      if (N.editing) {
+      M.uid = k, M.type === "footnotes" && (M.formattedData = void 0);
+      const A = a.config.dashboard.sharedFilters && a.config.dashboard.sharedFilters.filter((H) => H.setBy === k).length > 0, $ = A ? a.config.dashboard.sharedFilters.filter((H) => H.setBy === k)[0].active : void 0;
+      if (M.editing) {
         _ = !0;
-        const B = (G) => {
-          let W = N.originalFormattedData ? { ...G, formattedData: N.originalFormattedData } : G;
-          C(F, W);
+        const H = (Z) => {
+          let W = M.originalFormattedData ? { ...Z, formattedData: M.originalFormattedData } : Z;
+          T(k, W);
         };
-        switch (N.type) {
+        switch (M.type) {
           case "chart":
-            j = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(ie, { visualizationKey: F, subEditor: "Chart" }), /* @__PURE__ */ r.createElement(
+            G = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(se, { visualizationKey: k, subEditor: "Chart" }), /* @__PURE__ */ r.createElement(
               aa,
               {
-                key: F,
-                config: N,
+                key: k,
+                config: M,
                 isEditor: !0,
                 isDebug: n,
-                setConfig: B,
-                setSharedFilter: $ ? S : void 0,
-                setSharedFilterValue: z,
+                setConfig: H,
+                setSharedFilter: A ? S : void 0,
+                setSharedFilterValue: $,
                 dashboardConfig: a.config,
                 isDashboard: !0,
                 configUrl: void 0,
@@ -5767,16 +5774,16 @@ function zl({ initialState: e, isEditor: t = !1, isDebug: n = !1 }) {
             ));
             break;
           case "map":
-            j = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(ie, { visualizationKey: F, subEditor: "Map" }), /* @__PURE__ */ r.createElement(
+            G = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(se, { visualizationKey: k, subEditor: "Map" }), /* @__PURE__ */ r.createElement(
               ia,
               {
-                key: F,
-                config: N,
+                key: k,
+                config: M,
                 isEditor: !0,
                 isDebug: n,
-                setConfig: B,
-                setSharedFilter: $ ? S : void 0,
-                setSharedFilterValue: z,
+                setConfig: H,
+                setSharedFilter: A ? S : void 0,
+                setSharedFilterValue: $,
                 isDashboard: !0,
                 showLoader: !1,
                 dashboardConfig: a.config
@@ -5784,134 +5791,135 @@ function zl({ initialState: e, isEditor: t = !1, isDebug: n = !1 }) {
             ));
             break;
           case "data-bite":
-            j = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(ie, { visualizationKey: F, subEditor: "Data Bite" }), /* @__PURE__ */ r.createElement(
+            G = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(se, { visualizationKey: k, subEditor: "Data Bite" }), /* @__PURE__ */ r.createElement(
               oa,
               {
-                key: F,
-                config: { ...N, newViz: !0 },
+                key: k,
+                config: { ...M, newViz: !0 },
                 isEditor: !0,
-                setConfig: B,
+                setConfig: H,
                 isDashboard: !0
               }
             ));
             break;
           case "waffle-chart":
-            j = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(ie, { visualizationKey: F, subEditor: "Waffle Chart" }), /* @__PURE__ */ r.createElement(
+            G = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(se, { visualizationKey: k, subEditor: "Waffle Chart" }), /* @__PURE__ */ r.createElement(
               sa,
               {
-                key: F,
-                config: N,
+                key: k,
+                config: M,
                 isEditor: !0,
-                setConfig: B,
+                setConfig: H,
                 isDashboard: !0,
                 configUrl: void 0
               }
             ));
             break;
           case "markup-include":
-            j = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(ie, { visualizationKey: F, subEditor: "Markup Include" }), /* @__PURE__ */ r.createElement(
+            G = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(se, { visualizationKey: k, subEditor: "Markup Include" }), /* @__PURE__ */ r.createElement(
               la,
               {
-                key: F,
-                config: N,
+                key: k,
+                config: M,
                 isEditor: !0,
-                setConfig: B,
+                setConfig: H,
                 isDashboard: !0,
                 configUrl: void 0
               }
             ));
             break;
           case "filtered-text":
-            j = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(ie, { visualizationKey: F, subEditor: "Filtered Text" }), /* @__PURE__ */ r.createElement(
+            G = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(se, { visualizationKey: k, subEditor: "Filtered Text" }), /* @__PURE__ */ r.createElement(
               Fa,
               {
-                key: F,
-                config: N,
+                key: k,
+                config: M,
                 isEditor: !0,
-                setConfig: B,
+                setConfig: H,
                 isDashboard: !0,
                 configUrl: void 0
               }
             ));
             break;
           case "dashboardFilters":
-            j = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(ie, { visualizationKey: F, subEditor: "Filter Dropdowns" }), /* @__PURE__ */ r.createElement(
+            G = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(se, { visualizationKey: k, subEditor: "Filter Dropdowns" }), /* @__PURE__ */ r.createElement(
               ja,
               {
                 isEditor: !0,
-                visualizationConfig: N,
+                visualizationConfig: M,
                 apiFilterDropdowns: c,
-                setConfig: B
+                setConfig: H
               }
             ));
             break;
           case "table":
-            j = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(ie, { visualizationKey: F, subEditor: "Table" }), /* @__PURE__ */ r.createElement(
+            G = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(se, { visualizationKey: k, subEditor: "Table" }), /* @__PURE__ */ r.createElement(
               xt,
               {
-                visualizationKey: F,
-                config: N,
+                visualizationKey: k,
+                config: M,
                 isEditor: !0,
-                updateConfig: B
+                updateConfig: H
               }
             ));
             break;
           case "footnotes":
-            j = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(ie, { visualizationKey: F, subEditor: "Footnotes" }), /* @__PURE__ */ r.createElement(
-              Ze,
+            G = /* @__PURE__ */ r.createElement(r.Fragment, null, /* @__PURE__ */ r.createElement(se, { visualizationKey: k, subEditor: "Footnotes" }), /* @__PURE__ */ r.createElement(
+              Ke,
               {
-                visualizationKey: F,
-                config: { ...N, datasets: a.config.datasets },
+                visualizationKey: k,
+                config: { ...M, datasets: a.config.datasets },
                 isEditor: !0,
-                updateConfig: (G) => B(A.omit(G, "datasets"))
+                updateConfig: (Z) => H(N.omit(Z, "datasets"))
               }
             ));
             break;
           default:
-            j = /* @__PURE__ */ r.createElement(r.Fragment, null);
+            G = /* @__PURE__ */ r.createElement(r.Fragment, null);
             break;
         }
       }
-    }), _ || (j = /* @__PURE__ */ r.createElement(Ko, { backend: As }, /* @__PURE__ */ r.createElement("div", { className: "header-container" }, /* @__PURE__ */ r.createElement(ie, null), /* @__PURE__ */ r.createElement(ol, null)), /* @__PURE__ */ r.createElement("div", { className: "layout-container" }, /* @__PURE__ */ r.createElement(Xs, null))));
+    }), _ || (G = /* @__PURE__ */ r.createElement(Ko, { backend: As }, /* @__PURE__ */ r.createElement("div", { className: "header-container" }, /* @__PURE__ */ r.createElement(se, null), /* @__PURE__ */ r.createElement(ol, null)), /* @__PURE__ */ r.createElement("div", { className: "layout-container" }, /* @__PURE__ */ r.createElement(Xs, null))));
   } else {
-    const { config: _ } = a, { title: F, description: U } = _.dashboard || {};
-    j = /* @__PURE__ */ r.createElement(r.Fragment, null, t && /* @__PURE__ */ r.createElement(ie, null), O && /* @__PURE__ */ r.createElement(br, { fullScreen: !0 }), /* @__PURE__ */ r.createElement(xa, { isEditor: t && !D }), i.map((N, $) => /* @__PURE__ */ r.createElement(
+    const { config: _ } = a, { title: k, description: z } = _.dashboard || {}, M = _.rows && _.rows.filter((A) => A.columns.filter(($) => $.widget).length !== 0);
+    G = /* @__PURE__ */ r.createElement(r.Fragment, null, t && /* @__PURE__ */ r.createElement(se, null), I && /* @__PURE__ */ r.createElement(br, { fullScreen: !0 }), /* @__PURE__ */ r.createElement(xa, { isEditor: t && !D }), i.map((A, $) => /* @__PURE__ */ r.createElement(
       ir,
       {
         type: "danger",
         onDismiss: () => s({ type: "DISMISS_ERROR_MESSAGE", payload: $ }),
-        message: N,
+        message: A,
         autoDismiss: !0
       }
     )), /* @__PURE__ */ r.createElement(ye.Responsive, { isEditor: t }, /* @__PURE__ */ r.createElement("div", { className: `cdc-dashboard-inner-container${t ? " is-editor" : ""}` }, /* @__PURE__ */ r.createElement(
       ea,
       {
-        title: F,
+        title: k,
         isDashboard: !0,
         classes: ["dashboard-title", `${_.dashboard.theme ?? "theme-blue"}`]
       }
-    ), U && /* @__PURE__ */ r.createElement("div", { className: "subtext mb-3" }, ta(U)), _.rows && _.rows.filter((N) => N.columns.filter(($) => $.widget).length !== 0).map((N, $) => {
-      if (N.multiVizColumn && (D || !t)) {
-        const q = Le(a, A.cloneDeep(a.data))[$] ?? N.formattedData, B = {};
-        return q.forEach((G) => {
-          const W = G[N.multiVizColumn];
-          B[W] || (B[W] = []), B[W].push(G);
-        }), /* @__PURE__ */ r.createElement(r.Fragment, null, !u && N.expandCollapseAllButtons === !0 && /* @__PURE__ */ r.createElement(Bl, { setAllExpanded: I }), Object.keys(B).map((G) => {
-          const W = B[G];
+    ), z && /* @__PURE__ */ r.createElement("div", { className: "subtext mb-3" }, ta(z)), M && M.map((A, $) => {
+      if (A.multiVizColumn && (D || !t)) {
+        const H = Re(a, N.cloneDeep(a.data))[$] ?? A.formattedData, Z = {};
+        return H.forEach((W) => {
+          const j = W[A.multiVizColumn];
+          Z[j] || (Z[j] = []), Z[j].push(W);
+        }), /* @__PURE__ */ r.createElement(r.Fragment, null, !d && A.expandCollapseAllButtons === !0 && /* @__PURE__ */ r.createElement(Bl, { setAllExpanded: O }), Object.keys(Z).map((W) => {
+          const j = Z[W];
           return /* @__PURE__ */ r.createElement(
             Kn,
             {
-              key: `row__${$}__${G}`,
+              key: `row__${$}__${W}`,
               allExpanded: h,
-              filteredDataOverride: W,
-              groupName: G,
-              row: N,
+              filteredDataOverride: j,
+              groupName: W,
+              row: A,
               rowIndex: $,
               setSharedFilter: S,
-              updateChildConfig: C,
+              updateChildConfig: T,
               apiFilterDropdowns: c,
-              currentViewport: f,
-              inNoDataState: u
+              currentViewport: p,
+              inNoDataState: d,
+              isLastRow: $ === M.length - 1
             }
           );
         }));
@@ -5922,23 +5930,24 @@ function zl({ initialState: e, isEditor: t = !1, isDebug: n = !1 }) {
             key: `row__${$}`,
             allExpanded: !1,
             groupName: "",
-            row: N,
+            row: A,
             rowIndex: $,
             setSharedFilter: S,
-            updateChildConfig: C,
+            updateChildConfig: T,
             apiFilterDropdowns: c,
-            currentViewport: f,
-            inNoDataState: u
+            currentViewport: p,
+            inNoDataState: d,
+            isLastRow: $ === M.length - 1
           }
         );
-    }), u ? /* @__PURE__ */ r.createElement("div", { className: "mt-5" }, "Please complete your selection to continue.") : /* @__PURE__ */ r.createElement(r.Fragment, null), /* @__PURE__ */ r.createElement("section", { className: "download-buttons" }, ((Mt = _.table) == null ? void 0 : Mt.downloadImageButton) && /* @__PURE__ */ r.createElement(
+    }), d ? /* @__PURE__ */ r.createElement("div", { className: "mt-5" }, "Please complete your selection to continue.") : /* @__PURE__ */ r.createElement(r.Fragment, null), /* @__PURE__ */ r.createElement("section", { className: "download-buttons" }, ((Mt = _.table) == null ? void 0 : Mt.downloadImageButton) && /* @__PURE__ */ r.createElement(
       en.Button,
       {
         title: "Download Dashboard as Image",
         type: "image",
         state: _,
         text: "Download Dashboard Image",
-        elementToCapture: y
+        elementToCapture: E
       }
     ), (($t = _.table) == null ? void 0 : $t.downloadPdfButton) && /* @__PURE__ */ r.createElement(
       en.Button,
@@ -5947,74 +5956,74 @@ function zl({ initialState: e, isEditor: t = !1, isDebug: n = !1 }) {
         type: "pdf",
         state: _,
         text: "Download Dashboard PDF",
-        elementToCapture: y
+        elementToCapture: E
       }
     )), ((Bt = _.table) == null ? void 0 : Bt.show) && _.data && /* @__PURE__ */ r.createElement(
       gt,
       {
         config: _,
         rawData: (Ut = (Vt = _.data) == null ? void 0 : Vt[0]) != null && Ut.tableData ? (Ht = (zt = _.data) == null ? void 0 : zt[0]) == null ? void 0 : Ht.tableData : _.data,
-        runtimeData: (qt = (jt = _.data) == null ? void 0 : jt[0]) != null && qt.tableData ? (Wt = (Gt = _.data) == null ? void 0 : Gt[0]) == null ? void 0 : Wt.tableData : _.data || [],
+        runtimeData: (Gt = (jt = _.data) == null ? void 0 : jt[0]) != null && Gt.tableData ? (Wt = (qt = _.data) == null ? void 0 : qt[0]) == null ? void 0 : Wt.tableData : _.data || [],
         expandDataTable: _.table.expanded,
         showDownloadButton: _.table.download,
         tableTitle: _.dashboard.title || "",
-        viewport: f,
+        viewport: p,
         tabbingId: _.dashboard.title || "",
         outerContainerRef: V,
-        imageRef: y,
+        imageRef: E,
         isDebug: n,
         isEditor: t
       }
-    ), ((Qt = _.table) == null ? void 0 : Qt.show) && _.datasets && Object.keys(_.datasets).map((N) => {
-      var B, G, W, Q, ce;
-      const $ = be(_).filter((ue) => _.visualizations[ue].dataKey === N);
-      let z = [];
-      (B = _.dashboard.sharedFilters) == null || B.forEach((ue) => {
-        let ve = !0;
-        $.forEach((K) => {
-          ue.usedBy && ue.usedBy.indexOf(K) === -1 && (ve = !1);
-        }), ve && z.push(ue);
+    ), ((Qt = _.table) == null ? void 0 : Qt.show) && _.datasets && Object.keys(_.datasets).map((A) => {
+      var Z, W, j, ue, ve;
+      const $ = be(_).filter((de) => _.visualizations[de].dataKey === A);
+      let q = [];
+      (Z = _.dashboard.sharedFilters) == null || Z.forEach((de) => {
+        let X = !0;
+        $.forEach((ke) => {
+          de.usedBy && de.usedBy.indexOf(ke) === -1 && (X = !1);
+        }), X && q.push(de);
       });
-      const q = z.length > 0 ? Oe(z, _.datasets[N].data) : void 0;
+      const H = q.length > 0 ? Ie(q, _.datasets[A].data) : void 0;
       return /* @__PURE__ */ r.createElement(
         "div",
         {
           className: "multi-table-container",
-          id: `data-table-${N}`,
-          key: `data-table-${N}`
+          id: `data-table-${A}`,
+          key: `data-table-${A}`
         },
         /* @__PURE__ */ r.createElement(
           gt,
           {
             config: _,
-            dataConfig: _.datasets[N],
-            rawData: ((W = (G = _.datasets[N].data) == null ? void 0 : G[0]) == null ? void 0 : W.tableData) || _.datasets[N].data,
-            runtimeData: ((ce = (Q = _.datasets[N].data) == null ? void 0 : Q[0]) == null ? void 0 : ce.tableData) || q || _.datasets[N].data || [],
+            dataConfig: _.datasets[A],
+            rawData: ((j = (W = _.datasets[A].data) == null ? void 0 : W[0]) == null ? void 0 : j.tableData) || _.datasets[A].data,
+            runtimeData: ((ve = (ue = _.datasets[A].data) == null ? void 0 : ue[0]) == null ? void 0 : ve.tableData) || H || _.datasets[A].data || [],
             expandDataTable: _.table.expanded,
-            tableTitle: N,
-            viewport: f,
-            tabbingId: N
+            tableTitle: A,
+            viewport: p,
+            tabbingId: A
           }
         )
       );
     }))));
   }
-  const me = ["cdc-open-viz-module", "type-dashboard", `${f}`];
+  const B = ["cdc-open-viz-module", "type-dashboard", `${p}`];
   return /* @__PURE__ */ r.createElement(Ls, null, /* @__PURE__ */ r.createElement(
-    J.Provider,
+    ee.Provider,
     {
       value: {
         ...a,
         setParentConfig: l.setTempConfig,
         outerContainerRef: V,
         isDebug: n,
-        loadAPIFilters: E,
+        loadAPIFilters: b,
         setAPIFilterDropdowns: m,
-        reloadURLData: T,
-        setAPILoading: p
+        reloadURLData: C,
+        setAPILoading: g
       }
     },
-    /* @__PURE__ */ r.createElement(te.Provider, { value: o }, /* @__PURE__ */ r.createElement("div", { className: me.join(" "), ref: V, "data-download-id": y }, j), /* @__PURE__ */ r.createElement(Ms, null))
+    /* @__PURE__ */ r.createElement(ne.Provider, { value: o }, /* @__PURE__ */ r.createElement("div", { className: B.join(" "), ref: V, "data-download-id": E }, G), /* @__PURE__ */ r.createElement(Ms, null))
   ));
 }
 const Jn = {
@@ -6033,47 +6042,47 @@ const Jn = {
   }
 }, Hl = async (e) => {
   let t = e.formattedData || e.data;
-  return e.dataUrl && (t = await Re(`${e.dataUrl}`), t = De(t, e.dataDescription)), t;
+  return e.dataUrl && (t = await xe(`${e.dataUrl}`), t = De(t, e.dataDescription)), t;
 }, Sc = ({ configUrl: e, isEditor: t, isDebug: n }) => {
-  const [a, o] = v.useState(void 0), i = v.useContext(ra), s = (y) => {
-    if (!y.multiDashboards)
+  const [a, o] = v.useState(void 0), i = v.useContext(ra), s = (E) => {
+    if (!E.multiDashboards)
       return null;
     const h = _t()["cove-tab"];
-    return h !== void 0 && Number(h) < y.multiDashboards.length ? Number(h) : 0;
-  }, l = (y, h) => {
-    const [I, O] = St(We)(y, h), p = ca(I);
-    return { ...We, config: p, filteredData: O, data: h };
+    return h !== void 0 && Number(h) < E.multiDashboards.length ? Number(h) : 0;
+  }, l = (E, h) => {
+    const [O, I] = St(Qe)(E, h), g = ca(O);
+    return { ...Qe, config: g, filteredData: I, data: h };
   }, c = async () => {
-    const y = i.config || await (await fetch(e)).json(), h = s(y), { newConfig: I, datasets: O } = h !== null ? await d(y, h) : await f(y);
-    o(l(I, O));
+    const E = i.config || await (await fetch(e)).json(), h = s(E), { newConfig: O, datasets: I } = h !== null ? await u(E, h) : await p(E);
+    o(l(O, I));
   };
   v.useEffect(() => {
     c();
   }, []);
-  const m = (y) => {
-    let h = { ...y };
-    const I = Object.keys(y.datasets).reduce((O, p) => {
-      const D = y.datasets[p];
-      return O[p] = D.formattedData || D.data, O;
+  const m = (E) => {
+    let h = { ...E };
+    const O = Object.keys(E.datasets).reduce((I, g) => {
+      const D = E.datasets[g];
+      return I[g] = D.formattedData || D.data, I;
     }, {});
-    return be(h).forEach((O) => {
-      const p = I[h.visualizations[O].dataKey];
-      p && (h.visualizations[O].formattedData = p);
-    }), Object.keys(I).forEach((O) => {
-      h.datasets[O].data = I[O];
-    }), { newConfig: h, datasets: I };
-  }, f = async (y) => {
-    let h = { ...Jn, ...y };
-    if (y.datasets)
+    return be(h).forEach((I) => {
+      const g = O[h.visualizations[I].dataKey];
+      g && (h.visualizations[I].formattedData = g);
+    }), Object.keys(O).forEach((I) => {
+      h.datasets[I].data = O[I];
+    }), { newConfig: h, datasets: O };
+  }, p = async (E) => {
+    let h = { ...Jn, ...E };
+    if (E.datasets)
       return m(h);
     {
-      const I = h.dataFileName || "backwards-compatibility", O = await Hl(y), p = {};
-      if (p[I] = {
-        data: O,
+      const O = h.dataFileName || "backwards-compatibility", I = await Hl(E), g = {};
+      if (g[O] = {
+        data: I,
         dataDescription: h.dataDescription
-      }, h.datasets = p, be(h).forEach((g) => {
-        const b = { dataKey: I, ...A.pick(h, "dataDescription", "formattedData") };
-        h.visualizations[g] = { ...h.visualizations[g], ...b };
+      }, h.datasets = g, be(h).forEach((f) => {
+        const w = { dataKey: O, ...N.pick(h, "dataDescription", "formattedData") };
+        h.visualizations[f] = { ...h.visualizations[f], ...w };
       }), h = { ...h, ...{
         data: [],
         dataUrl: "",
@@ -6082,23 +6091,23 @@ const Jn = {
         dataDescription: {},
         formattedData: []
       } }, h.dashboard.filters) {
-        const g = { ...h.dashboard };
-        g.sharedFilters || (g.sharedFilters = []);
-        const b = g.filters.map((w) => ({ ...w, key: w.label, showDropdown: !0, usedBy: be(h) }));
-        g.sharedFilters = [...g.sharedFilters, ...b], h.dashboard = { ...g, filters: void 0 };
+        const f = { ...h.dashboard };
+        f.sharedFilters || (f.sharedFilters = []);
+        const w = f.filters.map((y) => ({ ...y, key: y.label, showDropdown: !0, usedBy: be(h) }));
+        f.sharedFilters = [...f.sharedFilters, ...w], h.dashboard = { ...f, filters: void 0 };
       }
-      const u = { [I]: O };
-      return { newConfig: h, datasets: u };
+      const d = { [O]: I };
+      return { newConfig: h, datasets: d };
     }
-  }, d = async (y, h) => {
-    const I = y.multiDashboards[h], O = {
+  }, u = async (E, h) => {
+    const O = E.multiDashboards[h], I = {
       ...Jn,
-      ...y,
-      ...I,
-      multiDashboards: y.multiDashboards,
+      ...E,
+      ...O,
+      multiDashboards: E.multiDashboards,
       activeDashboard: h
     };
-    return m(O);
+    return m(I);
   };
   return a ? /* @__PURE__ */ r.createElement(zl, { isEditor: t, isDebug: n, initialState: a }) : /* @__PURE__ */ r.createElement(Ot, null);
 };
