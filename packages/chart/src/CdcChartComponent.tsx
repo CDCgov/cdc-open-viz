@@ -949,9 +949,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 {/* Description */}
 
                 {config.description && config.visualizationType !== 'Spark Line' && (
-                  <div className={getChartSubTextClasses(config, currentViewport, isLegendWrapViewport).join(' ')}>
-                    {parse(config.description)}
-                  </div>
+                  <div className={getChartSubTextClasses().join(' ')}>{parse(config.description)}</div>
                 )}
 
                 {/* buttons */}

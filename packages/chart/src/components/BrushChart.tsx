@@ -54,6 +54,9 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
 
   const brushHandle = (g, selection, firstDate, lastDate) => {
     const textWidth = getTextWidth(firstDate, `normal ${16 / 1.1}px sans-serif`)
+    const textPositionLeft = selection[0] < textWidth ? 0 : -textWidth
+    const textPositionRight = xMax - selection[1] < textWidth ? -textWidth : 0
+
     return g
       .selectAll('.handle--custom')
       .data([{ side: 'left' }, { side: 'right' }])
@@ -61,7 +64,7 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
         const handleGroup = enter.append('g').attr('class', 'handle--custom')
         handleGroup
           .append('text')
-          .attr('x', d => (d.side === 'left' ? 0 : -textWidth))
+          .attr('x', d => (d.side === 'left' ? textPositionLeft : textPositionRight))
           .attr('y', 30)
           .text(d => (d.side === 'left' ? firstDate : lastDate))
           .attr('font-size', '13px')
@@ -165,7 +168,19 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
         }
       })
   }, [config.filters, config.exclusions, config.brush?.active, isDashboardFilters])
-  // Initialize brush when component is first rendered
+
+  useEffect(() => {
+    const checkAndInitializeBrush = () => {
+      if (xMax > 0) {
+        initializeBrush()
+      } else {
+        //set a timeout to retry or handle the negative xMax scenario
+        setTimeout(checkAndInitializeBrush, 500)
+      }
+    }
+
+    checkAndInitializeBrush()
+  }, [xMax])
 
   // reset brush on keychange
   useEffect(() => {
