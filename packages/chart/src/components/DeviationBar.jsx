@@ -64,7 +64,7 @@ export default function DeviationBar({ height, xScale }) {
       const firstBarValue = data[0][seriesKey]
       const barPosition = firstBarValue < target ? 'left' : 'right'
       const label = `${config.xAxis.targetLabel} ${formatNumber(config.xAxis.target || 0, 'left')}`
-      const labelWidth = getTextWidth(label)
+      const labelWidth = getTextWidth(label, 'bold')
       let labelY = config.isLollipopChart ? lollipopBarHeight / 2 : Number(config.barHeight) / 2
       let paddingX = 0
       let labelX = 0
