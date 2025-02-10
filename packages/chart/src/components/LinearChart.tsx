@@ -1551,7 +1551,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               >
                 <ul>
                   {typeof tooltipData === 'object' &&
-                    Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}
+                    Object.entries(tooltipData.data)
+                      .filter(([_, values]) => Array.isArray(values) && !values.includes(undefined))
+                      .map((item, index) => <TooltipListItem item={item} key={index} />)}
                 </ul>
               </TooltipWithBounds>
             </>
