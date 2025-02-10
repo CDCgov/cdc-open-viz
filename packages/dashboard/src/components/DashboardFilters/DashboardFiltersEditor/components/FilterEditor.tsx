@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { APIFilter } from '../../../../types/APIFilter'
 import { getVizRowColumnLocator } from '../../../../helpers/getVizRowColumnLocator'
-import { TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import { Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { useEffect, useMemo, useState } from 'react'
 import { SharedFilter } from '../../../../types/SharedFilter'
@@ -14,14 +14,17 @@ import { Visualization } from '@cdc/core/types/Visualization'
 import { hasDashboardApplyBehavior } from '../../../../helpers/hasDashboardApplyBehavior'
 import NestedDropDownDashboard from './NestedDropDownDashboard'
 import { FILTER_STYLE } from '../../../../types/FilterStyles'
+import { filterOrderOptions } from '@cdc/core/components/Filters'
+import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/components/FilterOrder'
 
 type FilterEditorProps = {
   config: DashboardConfig
   filter: SharedFilter
+  filterIndex: number
   updateFilterProp: (name: keyof SharedFilter, value: any) => void
 }
 
-const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilterProp }) => {
+const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config, updateFilterProp }) => {
   const [columns, setColumns] = useState<string[]>([])
   const transform = new DataTransform()
   const filterStyles = Object.values(FILTER_STYLE)
@@ -94,21 +97,6 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
     loadColumnData()
   }, [config.datasets])
 
-  const addFilterUsedBy = (filter, value) => {
-    if (value === '') return
-    if (!filter.usedBy) filter.usedBy = []
-    filter.usedBy.push(value)
-    updateFilterProp('usedBy', filter.usedBy)
-  }
-
-  const removeFilterUsedBy = (filter, value) => {
-    let usedByIndex = filter.usedBy.indexOf(value)
-    if (usedByIndex !== -1) {
-      filter.usedBy.splice(usedByIndex, 1)
-      updateFilterProp('usedBy', filter.usedBy)
-    }
-  }
-
   const updateAPIFilter = (key: keyof APIFilter, value: string | boolean) => {
     const filterClone = _.cloneDeep(filter)
     const _filter = filterClone.apiFilter || { apiEndpoint: '', valueSelector: '', textSelector: '' }
@@ -116,8 +104,12 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
     updateFilterProp('apiFilter', newAPIFilter)
   }
 
-  const handleFilterStyleChange = value => {
-    updateFilterProp('filterStyle', value)
+  const updateLabel = (value: string) => {
+    const duplicateLabels = config.dashboard.sharedFilters.filter(
+      (filter, i) => filter.key === value && filterIndex !== i
+    )
+    // If there are duplicate labels, append the number of duplicates to the label similar functionality to duplicate file names
+    updateFilterProp('key', duplicateLabels.length ? value + ` (${duplicateLabels.length})` : value)
   }
 
   const isNestedDropDown = filter.filterStyle === FILTER_STYLE.nestedDropdown
@@ -215,7 +207,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
             <span className='edit-label column-heading'>Filter Style: </span>
             <select
               value={filter.filterStyle || FILTER_STYLE.dropdown}
-              onChange={e => handleFilterStyleChange(e.target.value)}
+              onChange={e => updateFilterProp('filterStyle', e.target.value)}
             >
               {filterStyles.map(dataKey => (
                 <option value={dataKey} key={`filter-style-select-item-${dataKey}`}>
@@ -240,7 +232,9 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
           <TextField
             label='Label'
             value={filter.key}
-            updateField={(_section, _subSection, _key, value) => updateFilterProp('key', value)}
+            updateField={(_section, _subSection, _key, value) => {
+              updateLabel(value)
+            }}
           />
           {filter.filterStyle === FILTER_STYLE.multiSelect && (
             <TextField
@@ -438,6 +432,26 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, config, updateFilte
                       ))}
                     </select>
                   </label>
+
+                  <Select
+                    value={filter.order || 'column'}
+                    options={filterOrderOptions}
+                    updateField={(_section, _subSection, _key, value) => updateFilterProp('order', value)}
+                    label={'Filter Order'}
+                  />
+
+                  {/* if custom order is set use react-dnd library to sort the values */}
+                  {filter.order === 'cust' && (
+                    <FilterOrder
+                      orderedValues={filter.orderedValues || filter.values}
+                      handleFilterOrder={(index1, index2) => {
+                        const values = [...filter.values]
+                        const [removed] = values.splice(index1, 1)
+                        values.splice(index2, 0, removed)
+                        updateFilterProp('orderedValues', values)
+                      }}
+                    />
+                  )}
 
                   <label>
                     <span className='edit-label column-heading'>Show Dropdown</span>

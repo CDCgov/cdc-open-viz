@@ -20,6 +20,7 @@ import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import DeleteFilterModal from './components/DeleteFilterModal'
 import { addValuesToDashboardFilters } from '../../../helpers/addValuesToDashboardFilters'
 import { FILTER_STYLE } from '../../../types/FilterStyles'
+import { handleSorting } from '@cdc/core/components/Filters'
 
 type DashboardFitlersEditorProps = {
   vizConfig: DashboardFilters
@@ -60,11 +61,11 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
       subgroupTextSelector: oldSubgroupTextSelector
     } = sharedFilters[index].apiFilter || {}
     const apiFilterChanged =
-      value.apiEndpoint !== oldEndpoint ||
-      value.valueSelector !== oldValueSelector ||
-      value.textSelector !== oldTextSelector ||
-      value.subgroupValueSelector !== oldSubgroupValueSelector ||
-      value.subgroupTextSelector !== oldSubgroupTextSelector
+      value?.apiEndpoint !== oldEndpoint ||
+      value?.valueSelector !== oldValueSelector ||
+      value?.textSelector !== oldTextSelector ||
+      value?.subgroupValueSelector !== oldSubgroupValueSelector ||
+      value?.subgroupTextSelector !== oldSubgroupTextSelector
 
     newSharedFilters[index][prop] = value
     if (prop === 'columnName') {
@@ -98,6 +99,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
       // automatically dispatches SET_SHARED_FILTERS
       loadAPIFilters(newSharedFilters, {})
     } else {
+      handleSorting(newSharedFilters[index])
       dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
     }
   }
@@ -228,6 +230,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
               >
                 <FilterEditor
                   filter={filter}
+                  filterIndex={index}
                   updateFilterProp={(name, value) => {
                     updateFilterProp(name, index, value)
                   }}

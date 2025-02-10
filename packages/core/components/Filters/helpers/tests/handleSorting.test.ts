@@ -16,6 +16,32 @@ describe('handleSorting', () => {
     expect(result.values).toEqual(['value1', 'value2', 'value3'])
   })
 
+  it('should sort orderedValues in asc order if order is asc"', () => {
+    const singleFilter = {
+      values: ['value3', 'value1', 'value2'],
+      orderedValues: ['value2', 'value1', 'value3'],
+      order: 'asc',
+      filterStyle: 'nested-dropdown'
+    }
+
+    const result = handleSorting(singleFilter)
+
+    expect(result.orderedValues).toEqual(['value1', 'value2', 'value3'])
+  })
+
+  it('should sort orderedValues in desc order if order is desc"', () => {
+    const singleFilter = {
+      values: ['value3', 'value1', 'value2'],
+      orderedValues: ['value1', 'value2', 'value1'],
+      order: 'desc',
+      filterStyle: 'nested-dropdown'
+    }
+
+    const result = handleSorting(singleFilter)
+
+    expect(result.orderedValues).toEqual(['value3', 'value2', 'value1'])
+  })
+
   it('should sort values in ascending order by default', () => {
     const singleFilter = {
       values: ['value3', 'value1', 'value2'],
