@@ -1,7 +1,7 @@
 import { b as pa, h as ua } from "./storybook-horizontal_bar-4e46191a.es.js";
 import { a as e } from "./storybook-annotation_category_mock-49899352.es.js";
 import { s as fa } from "./storybook-scatterplot_mock-4c967616.es.js";
-import { C as ma } from "./storybook-CdcChartComponent-f9821d3b.es.js";
+import { C as ma } from "./storybook-CdcChartComponent-b5228c9e.es.js";
 import { e as a } from "./storybook-configHelpers-a0be6ce6.es.js";
 import "./storybook-index-45401197.es.js";
 import "./storybook-_commonjsHelpers-c5d32002.es.js";

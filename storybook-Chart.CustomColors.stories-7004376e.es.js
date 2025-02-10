@@ -1,6 +1,5 @@
-import { S as p } from "./storybook-simplified_line-7cc5c98a.es.js";
-import { C as m } from "./storybook-CdcChartComponent-f9821d3b.es.js";
-import { e } from "./storybook-configHelpers-a0be6ce6.es.js";
+import { C as i } from "./storybook-CdcChartComponent-b5228c9e.es.js";
+import { s as p } from "./storybook-scatterplot_mock-4c967616.es.js";
 import "./storybook-index-45401197.es.js";
 import "./storybook-_commonjsHelpers-c5d32002.es.js";
 import "./storybook-getViewport-513ec896.es.js";
@@ -39,44 +38,34 @@ import "./storybook-linear-bc5fb9aa.es.js";
 import "./storybook-BlurStrokeText-adc27352.es.js";
 import "./storybook-InputSelect-20478396.es.js";
 import "./storybook-Accordion-2501c7d9.es.js";
-const U = {
-  title: "Components/Templates/Chart/Axis Labels",
-  component: m
-}, t = {
+const R = {
+  title: "Components/Templates/Chart/Custom Colors",
+  component: i
+}, o = {
   args: {
-    config: e(p, [{
-      path: ["xAxis", "showYearsOnce"],
-      value: !0
-    }, {
-      path: ["tooltips", "dateDisplayFormat"],
-      value: "%b. %d %Y"
-    }])
+    config: p,
+    isEditor: !1
   }
 };
-var o, r, i;
-t.parameters = {
-  ...t.parameters,
+var t, r, m;
+o.parameters = {
+  ...o.parameters,
   docs: {
-    ...(o = t.parameters) == null ? void 0 : o.docs,
+    ...(t = o.parameters) == null ? void 0 : t.docs,
     source: {
       originalSource: `{
   args: {
-    config: editConfigKeys(SimplifiedLineConfig, [{
-      path: ['xAxis', 'showYearsOnce'],
-      value: true
-    }, {
-      path: ['tooltips', 'dateDisplayFormat'],
-      value: '%b. %d %Y'
-    }])
+    config: scatterPlotCustomColorConfig,
+    isEditor: false
   }
 }`,
-      ...(i = (r = t.parameters) == null ? void 0 : r.docs) == null ? void 0 : i.source
+      ...(m = (r = o.parameters) == null ? void 0 : r.docs) == null ? void 0 : m.source
     }
   }
 };
-const V = ["Abbreviated_Dates"];
+const U = ["ScatterPlot"];
 export {
-  t as Abbreviated_Dates,
-  V as __namedExportsOrder,
-  U as default
+  o as ScatterPlot,
+  U as __namedExportsOrder,
+  R as default
 };

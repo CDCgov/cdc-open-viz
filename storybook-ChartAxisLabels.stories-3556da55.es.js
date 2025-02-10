@@ -1,5 +1,6 @@
-import { C as i } from "./storybook-CdcChartComponent-f9821d3b.es.js";
-import { s as p } from "./storybook-scatterplot_mock-4c967616.es.js";
+import { S as p } from "./storybook-simplified_line-7cc5c98a.es.js";
+import { C as m } from "./storybook-CdcChartComponent-b5228c9e.es.js";
+import { e } from "./storybook-configHelpers-a0be6ce6.es.js";
 import "./storybook-index-45401197.es.js";
 import "./storybook-_commonjsHelpers-c5d32002.es.js";
 import "./storybook-getViewport-513ec896.es.js";
@@ -38,34 +39,44 @@ import "./storybook-linear-bc5fb9aa.es.js";
 import "./storybook-BlurStrokeText-adc27352.es.js";
 import "./storybook-InputSelect-20478396.es.js";
 import "./storybook-Accordion-2501c7d9.es.js";
-const R = {
-  title: "Components/Templates/Chart/Custom Colors",
-  component: i
-}, o = {
+const U = {
+  title: "Components/Templates/Chart/Axis Labels",
+  component: m
+}, t = {
   args: {
-    config: p,
-    isEditor: !1
+    config: e(p, [{
+      path: ["xAxis", "showYearsOnce"],
+      value: !0
+    }, {
+      path: ["tooltips", "dateDisplayFormat"],
+      value: "%b. %d %Y"
+    }])
   }
 };
-var t, r, m;
-o.parameters = {
-  ...o.parameters,
+var o, r, i;
+t.parameters = {
+  ...t.parameters,
   docs: {
-    ...(t = o.parameters) == null ? void 0 : t.docs,
+    ...(o = t.parameters) == null ? void 0 : o.docs,
     source: {
       originalSource: `{
   args: {
-    config: scatterPlotCustomColorConfig,
-    isEditor: false
+    config: editConfigKeys(SimplifiedLineConfig, [{
+      path: ['xAxis', 'showYearsOnce'],
+      value: true
+    }, {
+      path: ['tooltips', 'dateDisplayFormat'],
+      value: '%b. %d %Y'
+    }])
   }
 }`,
-      ...(m = (r = o.parameters) == null ? void 0 : r.docs) == null ? void 0 : m.source
+      ...(i = (r = t.parameters) == null ? void 0 : r.docs) == null ? void 0 : i.source
     }
   }
 };
-const U = ["ScatterPlot"];
+const V = ["Abbreviated_Dates"];
 export {
-  o as ScatterPlot,
-  U as __namedExportsOrder,
-  R as default
+  t as Abbreviated_Dates,
+  V as __namedExportsOrder,
+  U as default
 };

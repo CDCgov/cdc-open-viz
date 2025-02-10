@@ -5,7 +5,7 @@ import { T as ea, H as ta } from "./storybook-index-3b47b3f7.es.js";
 import { f as xe } from "./storybook-fetchRemoteData-1d0a5295.es.js";
 import { E as na, L as Ot } from "./storybook-viewports-5c5d7af1.es.js";
 import { D as Se, A as tr, a as Zt, b as Kt, c as Xt, d as Yt } from "./storybook-DataTransform-6163e156.es.js";
-import { b as nr, D as ar, f as rr, C as aa, a as ra } from "./storybook-CdcChartComponent-f9821d3b.es.js";
+import { b as nr, D as ar, f as rr, C as aa, a as ra } from "./storybook-CdcChartComponent-b5228c9e.es.js";
 import { C as oa } from "./storybook-CdcDataBite-7aaaabf2.es.js";
 import { e as or, C as ia, A as ir } from "./storybook-CdcMap-7a44998e.es.js";
 import { C as sa } from "./storybook-CdcWaffleChart-89d05418.es.js";
@@ -4521,6 +4521,7 @@ const gl = ({ active: e, row: t, visualizations: n, setToggled: a }) => {
       J,
       {
         label: "API Endpoint: ",
+        type: "textarea",
         value: (y = e.apiFilter) == null ? void 0 : y.apiEndpoint,
         updateField: (S, T, R, V) => h("apiEndpoint", V),
         tooltip: /* @__PURE__ */ r.createElement(r.Fragment, null, g && /* @__PURE__ */ r.createElement(L, { style: { textTransform: "none" } }, /* @__PURE__ */ r.createElement(L.Target, null, /* @__PURE__ */ r.createElement(P, { display: "question", style: { marginLeft: "0.5rem" } })), /* @__PURE__ */ r.createElement(L.Content, null, /* @__PURE__ */ r.createElement("p", null, "Your API Endpoint should return both value selector values."))))

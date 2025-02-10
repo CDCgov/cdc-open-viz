@@ -1,5 +1,5 @@
 import { R as b } from "./storybook-index-45401197.es.js";
-import { C as m } from "./storybook-CdcChartComponent-f9821d3b.es.js";
+import { C as m } from "./storybook-CdcChartComponent-b5228c9e.es.js";
 import { p as x } from "./storybook-paired-bar-9dcfe98c.es.js";
 import { e as g } from "./storybook-configHelpers-a0be6ce6.es.js";
 import "./storybook-_commonjsHelpers-c5d32002.es.js";

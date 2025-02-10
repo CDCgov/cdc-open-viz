@@ -1,8 +1,8 @@
-import { f as N } from "./storybook-index-4ddb77d9.es.js";
-import { M as Qe } from "./storybook-CdcDashboard-7e4a8d73.es.js";
-import { w as H, u as M } from "./storybook-index-73510294.es.js";
+import { f as P } from "./storybook-index-4ddb77d9.es.js";
+import { M as je } from "./storybook-CdcDashboard-e5a54a72.es.js";
+import { w as N, u as D } from "./storybook-index-b7ec4af1.es.js";
 import { _ as V } from "./storybook-lodash-a4231e1c.es.js";
-import { f as Ze } from "./storybook-CdcChartComponent-f9821d3b.es.js";
+import { f as Ze } from "./storybook-CdcChartComponent-b5228c9e.es.js";
 import "./storybook-index-45401197.es.js";
 import "./storybook-_commonjsHelpers-c5d32002.es.js";
 import "./storybook-InputToggle-1e77d9ab.es.js";
@@ -253,7 +253,7 @@ const Xe = {
   data3: {
     dataUrl: "http://test.gov/api/POC/TableData?DataValueTypeId=CRDMEDN"
   }
-}, na = "Apply Button", ia = {}, ra = 1684783370106, ca = {
+}, na = "Apply Button", ia = {}, ra = 1684783370106, sa = {
   dashboard: Xe,
   rows: ea,
   visualizations: aa,
@@ -262,7 +262,7 @@ const Xe = {
   filterBehavior: na,
   runtime: ia,
   uuid: ra
-}, sa = {
+}, la = {
   theme: "theme-green",
   sharedFilters: [
     {
@@ -351,7 +351,7 @@ const Xe = {
       ]
     }
   ]
-}, la = [
+}, ca = [
   [
     {
       width: 12,
@@ -376,7 +376,7 @@ const Xe = {
       widget: "chart1"
     }
   ]
-], ma = {
+], da = {
   filters: {
     type: "filter-dropdowns",
     visualizationType: "filter-dropdowns",
@@ -603,20 +603,20 @@ const Xe = {
       {}
     ]
   }
-}, da = "dashboard", pa = {
+}, pa = "dashboard", ma = {
   data3: {
     dataUrl: "http://test.gov/api/POC/TableData"
   }
-}, ua = "Apply Button", La = {}, Ta = 1684783370106, ya = {
-  dashboard: sa,
-  rows: la,
-  visualizations: ma,
-  type: da,
-  datasets: pa,
+}, ua = "Apply Button", La = {}, Ta = 1684783370106, ha = {
+  dashboard: la,
+  rows: ca,
+  visualizations: da,
+  type: pa,
+  datasets: ma,
   filterBehavior: ua,
   runtime: La,
   uuid: Ta
-}, ha = {
+}, ya = {
   theme: "theme-blue",
   sharedFilters: [
     {
@@ -642,7 +642,7 @@ const Xe = {
       {}
     ]
   }
-], Ra = {
+], ga = {
   dashboardFilters1730831317688: {
     filters: [],
     filterBehavior: "Filter Change",
@@ -661,7 +661,7 @@ const Xe = {
   showDownloadUrl: !1,
   showDownloadLinkBelow: !0,
   showVertical: !0
-}, Sa = !0, ga = {
+}, Ra = !0, fa = {
   "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=brfss_prevalence_cove_explore_by_topic": {
     dataFileSize: 35061,
     dataFileName: "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=brfss_prevalence_cove_explore_by_topic",
@@ -670,581 +670,2671 @@ const Xe = {
     preview: !0,
     dataUrl: "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=brfss_prevalence_cove_explore_by_topic"
   }
-}, Ya = !1, fa = "dashboard", va = "0.37", ka = {
+}, Sa = !1, Ya = "dashboard", va = "0.37", ba = {
   type: "categorical",
   size: 75,
   maxTickRotation: 45,
   labelOffset: 0
-}, Fa = {}, ba = "4.24.10", Ca = {
-  dashboard: ha,
+}, ka = {}, Fa = "4.24.10", Ca = {
+  dashboard: ya,
   rows: Aa,
-  visualizations: Ra,
+  visualizations: ga,
   table: wa,
-  newViz: Sa,
-  datasets: ga,
-  isResponsiveTicks: Ya,
-  type: fa,
+  newViz: Ra,
+  datasets: fa,
+  isResponsiveTicks: Sa,
+  type: Ya,
   barThickness: va,
-  xAxis: ka,
-  runtime: Fa,
-  version: ba
-}, Na = {
-  theme: "theme-blue",
-  filters: [
-    {
-      values: [
-        "Alaska",
-        "Alabama",
-        "Arkansas",
-        "American Samoa",
-        "Arizona"
-      ],
-      active: "Alaska",
-      columnName: "Location"
-    },
-    {
-      values: [
-        "Federal",
-        "Local",
-        "State"
-      ],
-      active: "Federal",
-      columnName: "Type"
-    }
-  ],
-  title: "Amount Filtered by Location and Type "
-}, Ha = [
-  [
-    {
-      width: 6,
-      widget: "data-bite1628875468150"
-    },
-    {
-      width: 6,
-      widget: "chart1628875631849"
-    },
-    {
-      width: null
-    }
-  ],
-  [
-    {
-      width: 6,
-      widget: "data-bite1628877031319"
-    },
-    {
-      width: 6,
-      widget: "data-bite1628876561387"
-    },
-    {
-      width: null
-    }
-  ]
-], Ma = {
-  "data-bite1628875468150": {
-    type: "data-bite",
-    data: [
-      {
-        Location: "Alaska",
-        Year: "2019",
-        Type: "Federal",
-        Amount: "1377"
-      },
-      {
-        Location: "Alaska",
-        Year: "2020",
-        Type: "Federal",
-        Amount: "1377"
-      },
-      {
-        Location: "Alaska",
-        Year: "2021",
-        Type: "Federal",
-        Amount: "1436"
-      }
-    ],
-    dataBite: "",
-    dataFunction: "Mean (Average)",
-    dataColumn: "Amount",
-    bitePosition: "Left",
-    biteFontSize: 24,
-    fontSize: "medium",
-    imageUrl: "",
-    biteBody: `<span style="font-size: 20px;">Average Amount 2019-2021</span> <br>Reflects the average of the dashboard level filter selections within the timeframe available in the data.  In this case 2019-2021. 
- This number is calculated within the Data Bite module.
-`,
-    prefix: "",
-    suffix: "",
-    dataFormat: {
-      roundToPlace: 0,
-      commas: !0,
-      prefix: "",
-      suffix: ""
-    },
-    biteStyle: "graphic",
-    filters: [],
-    subtext: "Citation for Source ",
-    title: "",
-    theme: "theme-orange",
-    shadow: !0,
-    uid: "data-bite1628875468150",
-    visualizationType: "data-bite",
-    editing: !0
-  },
-  chart1628875631849: {
-    type: "chart",
-    title: "",
-    theme: "theme-blue",
-    fontSize: "large",
-    height: "200",
-    padding: {
-      left: 5,
-      right: 5
-    },
-    yAxis: {
-      size: "80",
-      gridLines: !1,
-      label: "Amount",
-      numTicks: "4"
-    },
-    barThickness: 0.35,
-    xAxis: {
-      size: "0",
-      tickRotation: 0,
-      dataKey: "Year",
-      label: ""
-    },
-    table: {
-      label: "Data Table",
-      expanded: !1,
-      show: !1
-    },
-    legend: {
-      behavior: "isolate",
-      position: "right",
-      hide: !0
-    },
-    palette: "qualitative-bold",
-    labels: !0,
-    dataFormat: {},
-    confidenceKeys: {},
-    uid: "chart1628875631849",
-    visualizationType: "Bar",
-    data: [
-      {
-        Location: "Alaska",
-        Year: "2019",
-        Type: "Federal",
-        Amount: "1377"
-      },
-      {
-        Location: "Alaska",
-        Year: "2020",
-        Type: "Federal",
-        Amount: "1377"
-      },
-      {
-        Location: "Alaska",
-        Year: "2021",
-        Type: "Federal",
-        Amount: "1436"
-      }
-    ],
-    series: [
-      {
-        dataKey: "Amount",
-        type: "Bar"
-      }
-    ]
-  },
-  "data-bite1628876561387": {
-    type: "data-bite",
-    data: [
-      {
-        Location: "Alaska",
-        Year: "2019",
-        Type: "Federal",
-        Amount: "1377"
-      },
-      {
-        Location: "Alaska",
-        Year: "2020",
-        Type: "Federal",
-        Amount: "1377"
-      },
-      {
-        Location: "Alaska",
-        Year: "2021",
-        Type: "Federal",
-        Amount: "1436"
-      }
-    ],
-    dataBite: "",
-    dataFunction: "Max",
-    dataColumn: "Amount",
-    bitePosition: "Right",
-    biteFontSize: "58",
-    fontSize: "medium",
-    imageUrl: "",
-    biteBody: `<span style="font-size: 24px;"> Peak Amount</span> <br>Reflects the maximum point of data within the dashboard level filter selections within the timeframe set in the data.  In this case 2019-2021. 
-This number is calculated within the Data Bite module.
-`,
-    prefix: "",
-    suffix: "",
-    dataFormat: {
-      roundToPlace: 0,
-      commas: !0,
-      prefix: "",
-      suffix: ""
-    },
-    biteStyle: "title",
-    filters: [],
-    subtext: "Source",
-    title: "",
-    theme: "theme-blue",
-    shadow: !0,
-    uid: "data-bite1628876561387",
-    visualizationType: "data-bite"
-  },
-  "data-bite1628877031319": {
-    type: "data-bite",
-    data: [
-      {
-        Location: "Alaska",
-        Year: "2019",
-        Type: "Federal",
-        Amount: "1377"
-      },
-      {
-        Location: "Alaska",
-        Year: "2020",
-        Type: "Federal",
-        Amount: "1377"
-      },
-      {
-        Location: "Alaska",
-        Year: "2021",
-        Type: "Federal",
-        Amount: "1436"
-      }
-    ],
-    dataBite: "",
-    dataFunction: "Sum",
-    dataColumn: "Amount",
-    bitePosition: "Right",
-    biteFontSize: "58",
-    fontSize: "medium",
-    imageUrl: "",
-    biteBody: `<span style="font-size: 24px;">State Total</span> <br>Reflects the Sum total of the dashboard level filter selections within the timeframe set in the data.  In this case 2019-2021. 
- This number is calculated within the Data Bite module.
-`,
-    prefix: "",
-    suffix: "",
-    dataFormat: {
-      roundToPlace: 0,
-      commas: !0,
-      prefix: "",
-      suffix: ""
-    },
-    biteStyle: "title",
-    filters: [
-      {
-        values: []
-      }
-    ],
-    subtext: "Source ",
-    title: "",
-    theme: "theme-amber",
-    shadow: !0,
-    uid: "data-bite1628877031319",
-    visualizationType: "data-bite"
-  }
-}, Va = {
+  xAxis: ba,
+  runtime: ka,
+  version: Fa
+}, Pa = {
   label: "Data Table",
-  show: !0
-}, Ua = [
-  {
-    Location: "Alaska",
-    Year: "2019",
-    Type: "Federal",
-    Amount: "1377"
+  show: !1,
+  showDownloadUrl: !1,
+  showVertical: !0
+}, Na = [], Da = "lg", Va = 15, Ha = "General", Ma = "dashboard", xa = null, Ia = null, Ua = {
+  key: null,
+  ref: null,
+  props: {},
+  _owner: null
+}, Ea = "Present multiple data visualizations with shared filter controls.", Wa = {
+  "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2000": {
+    dataFileSize: 3651652,
+    dataFileName: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2000",
+    dataFileSourceType: "url",
+    dataFileFormat: "JSON",
+    preview: !1,
+    dataUrl: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2000"
   },
-  {
-    Location: "Alaska",
-    Year: "2019",
-    Type: "Local",
-    Amount: "1613"
+  "Over Time Filter": {
+    dataFileSize: 5031552,
+    dataFileName: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2001",
+    dataFileSourceType: "url",
+    dataFileFormat: "JSON",
+    preview: !1,
+    dataUrl: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2001"
   },
-  {
-    Location: "Alaska",
-    Year: "2019",
-    Type: "State",
-    Amount: "1495"
+  "Specific Year Filter": {
+    dataFileSize: 5033955,
+    dataFileName: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2002",
+    dataFileSourceType: "url",
+    dataFileFormat: "JSON",
+    preview: !1,
+    dataUrl: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2002"
   },
-  {
-    Location: "Alaska",
-    Year: "2020",
-    Type: "Federal",
-    Amount: "1377"
+  "Explore by Topic": {
+    dataFileSize: 5029507,
+    dataFileName: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2003",
+    dataFileSourceType: "url",
+    dataFileFormat: "JSON",
+    preview: !1,
+    dataUrl: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2003"
   },
-  {
-    Location: "Alaska",
-    Year: "2020",
-    Type: "Local",
-    Amount: "1613"
+  "Explore by Topic Visualization Row": {
+    dataFileSize: 5029507,
+    dataFileName: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2004",
+    dataFileSourceType: "url",
+    dataFileFormat: "JSON",
+    preview: !1,
+    dataUrl: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2004"
   },
-  {
-    Location: "Alaska",
-    Year: "2020",
-    Type: "State",
-    Amount: "1495"
+  "Over Time Filter 2": {
+    dataFileSize: 4957054,
+    dataFileName: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2001&$where=LEN(Year_Filter) < 5",
+    dataFileSourceType: "url",
+    dataFileFormat: "JSON",
+    preview: !1,
+    dataUrl: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2001&$where=LEN(Year_Filter) < 5"
   },
-  {
-    Location: "Alaska",
-    Year: "2021",
-    Type: "Federal",
-    Amount: "1436"
-  },
-  {
-    Location: "Alaska",
-    Year: "2021",
-    Type: "Local",
-    Amount: "1672"
-  },
-  {
-    Location: "Alaska",
-    Year: "2021",
-    Type: "State",
-    Amount: "1554"
-  },
-  {
-    Location: "Alabama",
-    Year: "2019",
-    Type: "Federal",
-    Amount: "1375"
-  },
-  {
-    Location: "Alabama",
-    Year: "2019",
-    Type: "Local",
-    Amount: "1611"
-  },
-  {
-    Location: "Alabama",
-    Year: "2019",
-    Type: "State",
-    Amount: "1493"
-  },
-  {
-    Location: "Alabama",
-    Year: "2020",
-    Type: "Federal",
-    Amount: "1375"
-  },
-  {
-    Location: "Alabama",
-    Year: "2020",
-    Type: "Local",
-    Amount: "1611"
-  },
-  {
-    Location: "Alabama",
-    Year: "2020",
-    Type: "State",
-    Amount: "1493"
-  },
-  {
-    Location: "Alabama",
-    Year: "2021",
-    Type: "Federal",
-    Amount: "1434"
-  },
-  {
-    Location: "Alabama",
-    Year: "2021",
-    Type: "Local",
-    Amount: "1670"
-  },
-  {
-    Location: "Alabama",
-    Year: "2021",
-    Type: "State",
-    Amount: "1552"
-  },
-  {
-    Location: "Arkansas",
-    Year: "2019",
-    Type: "Federal",
-    Amount: "1398"
-  },
-  {
-    Location: "Arkansas",
-    Year: "2019",
-    Type: "Local",
-    Amount: "1634"
-  },
-  {
-    Location: "Arkansas",
-    Year: "2019",
-    Type: "State",
-    Amount: "1516"
-  },
-  {
-    Location: "Arkansas",
-    Year: "2020",
-    Type: "Federal",
-    Amount: "1398"
-  },
-  {
-    Location: "Arkansas",
-    Year: "2020",
-    Type: "Local",
-    Amount: "1634"
-  },
-  {
-    Location: "Arkansas",
-    Year: "2020",
-    Type: "State",
-    Amount: "1516"
-  },
-  {
-    Location: "Arkansas",
-    Year: "2021",
-    Type: "Federal",
-    Amount: "1457"
-  },
-  {
-    Location: "Arkansas",
-    Year: "2021",
-    Type: "Local",
-    Amount: "1693"
-  },
-  {
-    Location: "Arkansas",
-    Year: "2021",
-    Type: "State",
-    Amount: "1575"
-  },
-  {
-    Location: "American Samoa",
-    Year: "2019",
-    Type: "Federal",
-    Amount: "1388"
-  },
-  {
-    Location: "American Samoa",
-    Year: "2019",
-    Type: "Local",
-    Amount: "1624"
-  },
-  {
-    Location: "American Samoa",
-    Year: "2019",
-    Type: "State",
-    Amount: "1506"
-  },
-  {
-    Location: "American Samoa",
-    Year: "2020",
-    Type: "Federal",
-    Amount: "1388"
-  },
-  {
-    Location: "American Samoa",
-    Year: "2020",
-    Type: "Local",
-    Amount: "1624"
-  },
-  {
-    Location: "American Samoa",
-    Year: "2020",
-    Type: "State",
-    Amount: "1506"
-  },
-  {
-    Location: "American Samoa",
-    Year: "2021",
-    Type: "Federal",
-    Amount: "1447"
-  },
-  {
-    Location: "American Samoa",
-    Year: "2021",
-    Type: "Local",
-    Amount: "1683"
-  },
-  {
-    Location: "American Samoa",
-    Year: "2021",
-    Type: "State",
-    Amount: "1565"
-  },
-  {
-    Location: "Arizona",
-    Year: "2019",
-    Type: "Federal",
-    Amount: "1401"
-  },
-  {
-    Location: "Arizona",
-    Year: "2019",
-    Type: "Local",
-    Amount: "1637"
-  },
-  {
-    Location: "Arizona",
-    Year: "2019",
-    Type: "State",
-    Amount: "1519"
-  },
-  {
-    Location: "Arizona",
-    Year: "2020",
-    Type: "Federal",
-    Amount: "1401"
-  },
-  {
-    Location: "Arizona",
-    Year: "2020",
-    Type: "Local",
-    Amount: "1637"
-  },
-  {
-    Location: "Arizona",
-    Year: "2020",
-    Type: "State",
-    Amount: "1519"
-  },
-  {
-    Location: "Arizona",
-    Year: "2021",
-    Type: "Federal",
-    Amount: "1460"
-  },
-  {
-    Location: "Arizona",
-    Year: "2021",
-    Type: "Local",
-    Amount: "1696"
-  },
-  {
-    Location: "Arizona",
-    Year: "2021",
-    Type: "State",
-    Amount: "1578"
+  "Bar Chart": {
+    dataFileSize: 5049792,
+    dataFileName: "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=adhap_cove_location_topic_bar_chart_all&$limit=2000",
+    dataFileSourceType: "url",
+    dataFileFormat: "JSON",
+    preview: !0,
+    dataUrl: "https://nccd-cove-public-api.apps.ecpaas-dev.cdc.gov/od-public?$datakey=adhap_cove_location_topic_bar_chart_all&$limit=2000"
   }
-], Da = "dashboard_aggregate_example_no_add_fullname.csv", Ea = "file", Ia = "dashboard", xa = 1628875999137, Pa = {}, Wa = {
-  dashboard: Na,
-  rows: Ha,
-  visualizations: Ma,
-  table: Va,
-  data: Ua,
-  dataFileName: Da,
-  dataFileSourceType: Ea,
-  type: Ia,
-  uuid: xa,
-  runtime: Pa
-}, Oa = {
+}, Oa = null, Ba = 15, za = "4.25.1", _a = 1737570501379, qa = [
+  {
+    dashboard: {
+      theme: "theme-blue",
+      sharedFilters: [
+        {
+          key: "Location",
+          showDropdown: !0,
+          type: "urlfilter",
+          filterStyle: "nested-dropdown",
+          apiFilter: {
+            apiEndpoint: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2000&$select=DISTINCT%20Location,%20LocationDesc,%20LocationAbbr&$order=Location",
+            subgroupValueSelector: "LocationAbbr",
+            textSelector: "",
+            valueSelector: "Location",
+            subgroupTextSelector: "LocationDesc"
+          },
+          subGrouping: {
+            columnName: "",
+            setByQueryParameter: "",
+            valuesLookup: {}
+          },
+          tier: 1
+        },
+        {
+          key: "Category",
+          showDropdown: !0,
+          type: "urlfilter",
+          apiFilter: {
+            apiEndpoint: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2000&$select=DISTINCT%20Category&$order=Category",
+            valueSelector: "Category",
+            textSelector: ""
+          },
+          parents: [
+            "Location"
+          ],
+          tier: 2
+        },
+        {
+          key: "Indicator",
+          showDropdown: !0,
+          type: "urlfilter",
+          apiFilter: {
+            apiEndpoint: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2000&$select=DISTINCT%20Indicator&$order=Indicator",
+            valueSelector: "Indicator",
+            textSelector: ""
+          },
+          parents: [
+            "Location",
+            "Category"
+          ],
+          tier: 2
+        },
+        {
+          key: "Age Group",
+          showDropdown: !0,
+          type: "urlfilter",
+          apiFilter: {
+            apiEndpoint: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2001&$select=DISTINCT%20Subcategory_Agegroup_Filter&$order=Subcategory_Agegroup_Filter",
+            valueSelector: "Subcategory_Agegroup_Filter",
+            textSelector: ""
+          },
+          usedBy: [
+            "chart1736198567054",
+            "table1736446212687"
+          ],
+          tier: 1,
+          parents: [
+            "Location",
+            "Category",
+            "Indicator"
+          ]
+        },
+        {
+          key: "Demographic",
+          showDropdown: !0,
+          type: "urlfilter",
+          filterStyle: "nested-dropdown",
+          apiFilter: {
+            apiEndpoint: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2001&$select=DISTINCT%20Demographic,%20SubCategory_Demographic_Filter&$order=Demographic,SubCategory_Demographic_Filter",
+            subgroupValueSelector: "SubCategory_Demographic_Filter",
+            textSelector: "",
+            valueSelector: "Demographic"
+          },
+          subGrouping: {
+            columnName: "",
+            setByQueryParameter: "",
+            valuesLookup: {}
+          },
+          parents: [
+            "Age Group"
+          ],
+          usedBy: [
+            "chart1736198567054",
+            "table1736446212687"
+          ],
+          tier: 2
+        },
+        {
+          key: "Year",
+          showDropdown: !0,
+          type: "urlfilter",
+          apiFilter: {
+            apiEndpoint: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic_bar_chart_all&$limit=2002&$select=DISTINCT%20Year_Filter&$order=Year_Filter",
+            valueSelector: "Year_Filter",
+            textSelector: ""
+          },
+          usedBy: [
+            "chart1736451559821"
+          ],
+          tier: 1,
+          parents: [
+            "Location",
+            "Category",
+            "Indicator"
+          ]
+        },
+        {
+          key: "Age Group ",
+          showDropdown: !0,
+          type: "urlfilter",
+          apiFilter: {
+            apiEndpoint: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic_bar_chart_all&$limit=2002&$select=DISTINCT%20Subcategory_Agegroup_Filter&$order=Subcategory_Agegroup_Filter",
+            valueSelector: "Subcategory_Agegroup_Filter",
+            textSelector: ""
+          },
+          parents: [
+            "Year"
+          ],
+          usedBy: [
+            "chart1736451559821"
+          ],
+          tier: 2
+        },
+        {
+          key: "Demographic ",
+          showDropdown: !0,
+          type: "urlfilter",
+          filterStyle: "nested-dropdown",
+          apiFilter: {
+            apiEndpoint: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic_bar_chart_all&$limit=2002&$select=DISTINCT%20Demographic,%20SubCategory_Demographic_Filter&$order=Demographic,SubCategory_Demographic_Filter",
+            subgroupValueSelector: "SubCategory_Demographic_Filter",
+            textSelector: "",
+            valueSelector: "Demographic"
+          },
+          subGrouping: {
+            columnName: "",
+            setByQueryParameter: "",
+            valuesLookup: {}
+          },
+          parents: [
+            "Year",
+            "Age Group "
+          ],
+          usedBy: [
+            "chart1736451559821"
+          ],
+          tier: 2
+        }
+      ]
+    },
+    visualizations: {
+      dashboardFilters1736197709119: {
+        filters: [],
+        filterBehavior: "Apply Button",
+        newViz: !0,
+        openModal: !0,
+        uid: "dashboardFilters1736197709119",
+        type: "dashboardFilters",
+        sharedFilterIndexes: [
+          0,
+          1,
+          2
+        ],
+        visualizationType: "dashboardFilters",
+        applyFiltersButtonText: "View Results"
+      },
+      chart1736198567054: {
+        annotations: [],
+        type: "chart",
+        debugSvg: !1,
+        chartMessage: {
+          noData: "No Data Available"
+        },
+        title: "Line Chart 1",
+        showTitle: !1,
+        showDownloadMediaButton: !1,
+        theme: "theme-blue",
+        animate: !1,
+        fontSize: "medium",
+        lineDatapointStyle: "hover",
+        lineDatapointColor: "Same as Line",
+        barHasBorder: "false",
+        isLollipopChart: !1,
+        lollipopShape: "circle",
+        lollipopColorStyle: "two-tone",
+        visualizationSubType: "regular",
+        barStyle: "flat",
+        roundingStyle: "standard",
+        tipRounding: "top",
+        isResponsiveTicks: !1,
+        general: {
+          annotationDropdownText: "Annotations",
+          showDownloadButton: !1,
+          showMissingDataLabel: !0,
+          showSuppressedSymbol: !0,
+          showZeroValueData: !0,
+          hideNullValue: !0
+        },
+        padding: {
+          left: 5,
+          right: 5
+        },
+        preliminaryData: [],
+        yAxis: {
+          hideAxis: !1,
+          displayNumbersOnBar: !1,
+          hideLabel: !1,
+          hideTicks: !1,
+          size: "70",
+          gridLines: !1,
+          enablePadding: !0,
+          min: "",
+          max: "",
+          labelColor: "#333",
+          tickLabelColor: "#333",
+          tickColor: "#333",
+          rightHideAxis: !1,
+          rightAxisSize: 0,
+          rightLabel: "",
+          rightLabelOffsetSize: 0,
+          rightAxisLabelColor: "#333",
+          rightAxisTickLabelColor: "#333",
+          rightAxisTickColor: "#333",
+          numTicks: "",
+          axisPadding: 0,
+          scalePadding: "",
+          tickRotation: 0,
+          anchors: [],
+          shoMissingDataLabel: !0,
+          showMissingDataLine: !0,
+          categories: [],
+          label: "Percentage (%)"
+        },
+        boxplot: {
+          plots: [],
+          borders: "true",
+          plotOutlierValues: !1,
+          plotNonOutlierValues: !0,
+          labels: {
+            q1: "Lower Quartile",
+            q2: "q2",
+            q3: "Upper Quartile",
+            q4: "q4",
+            minimum: "Minimum",
+            maximum: "Maximum",
+            mean: "Mean",
+            median: "Median",
+            sd: "Standard Deviation",
+            iqr: "Interquartile Range",
+            count: "Count",
+            outliers: "Outliers",
+            values: "Values",
+            lowerBounds: "Lower Bounds",
+            upperBounds: "Upper Bounds"
+          }
+        },
+        topAxis: {
+          hasLine: !1
+        },
+        isLegendValue: !1,
+        barThickness: 0.35,
+        barHeight: 25,
+        barSpace: 15,
+        heights: {
+          vertical: 300,
+          horizontal: 750
+        },
+        xAxis: {
+          sortDates: !1,
+          anchors: [],
+          type: "date",
+          showTargetLabel: !0,
+          targetLabel: "Target",
+          hideAxis: !1,
+          hideLabel: !1,
+          hideTicks: !1,
+          size: 75,
+          tickRotation: 0,
+          min: "",
+          max: "",
+          labelColor: "#333",
+          tickLabelColor: "#333",
+          tickColor: "#333",
+          numTicks: "",
+          labelOffset: 0,
+          axisPadding: 200,
+          target: 0,
+          maxTickRotation: 0,
+          padding: 5,
+          showYearsOnce: !1,
+          sortByRecentDate: !1,
+          dataKey: "Year",
+          label: "Year",
+          dateParseFormat: "%Y",
+          dateDisplayFormat: "%Y",
+          axisBBox: 29.860000610351562,
+          tickWidthMax: 39
+        },
+        table: {
+          label: "Data Table",
+          expanded: !0,
+          limitHeight: !1,
+          height: "",
+          caption: "",
+          showDownloadUrl: !1,
+          showDataTableLink: !1,
+          showDownloadLinkBelow: !0,
+          indexLabel: "",
+          download: !0,
+          showVertical: !0,
+          dateDisplayFormat: "%Y",
+          showMissingDataLabel: !0,
+          showSuppressedSymbol: !0,
+          show: !1,
+          showDownloadImgButton: !0
+        },
+        orientation: "vertical",
+        color: "pinkpurple",
+        columns: {},
+        legend: {
+          hide: !1,
+          behavior: "isolate",
+          axisAlign: !0,
+          singleRow: !0,
+          colorCode: "",
+          reverseLabelOrder: !1,
+          description: "",
+          dynamicLegend: !1,
+          dynamicLegendDefaultText: "Show All",
+          dynamicLegendItemLimit: 5,
+          dynamicLegendItemLimitMessage: "Dynamic Legend Item Limit Hit.",
+          dynamicLegendChartMessage: "Select Options from the Legend",
+          label: "",
+          lineMode: !1,
+          verticalSorted: !1,
+          highlightOnHover: !1,
+          hideSuppressedLabels: !1,
+          hideSuppressionLink: !1,
+          seriesHighlight: [],
+          style: "circles",
+          subStyle: "linear blocks",
+          shape: "circle",
+          tickRotation: "",
+          hideBorder: {
+            side: !1,
+            topBottom: !0
+          },
+          position: "right"
+        },
+        brush: {
+          height: 45,
+          active: !1
+        },
+        exclusions: {
+          active: !1,
+          keys: []
+        },
+        palette: "qualitative-bold",
+        isPaletteReversed: !1,
+        twoColor: {
+          palette: "monochrome-1",
+          isPaletteReversed: !1
+        },
+        labels: !1,
+        dataFormat: {
+          commas: !1,
+          prefix: "",
+          suffix: "",
+          abbreviated: !1,
+          bottomSuffix: "",
+          bottomPrefix: "",
+          bottomAbbreviated: !1,
+          roundTo: "1"
+        },
+        confidenceKeys: {},
+        visual: {
+          border: !0,
+          accent: !0,
+          background: !0,
+          verticalHoverLine: !0,
+          horizontalHoverLine: !1,
+          lineDatapointSymbol: "none",
+          maximumShapeAmount: 7
+        },
+        useLogScale: !1,
+        filterBehavior: "Filter Change",
+        highlightedBarValues: [],
+        series: [
+          {
+            dataKey: "Data_Value",
+            type: "Line",
+            axis: "Left",
+            tooltip: !0,
+            dynamicCategory: "Series"
+          }
+        ],
+        tooltips: {
+          opacity: 90,
+          singleSeries: !1,
+          dateDisplayFormat: "%Y"
+        },
+        forestPlot: {
+          startAt: 0,
+          colors: {
+            line: "",
+            shape: ""
+          },
+          lineOfNoEffect: {
+            show: !0
+          },
+          type: "",
+          pooledResult: {
+            diamondHeight: 5,
+            column: ""
+          },
+          estimateField: "",
+          estimateRadius: "",
+          shape: "square",
+          rowHeight: 20,
+          description: {
+            show: !0,
+            text: "description",
+            location: 0
+          },
+          result: {
+            show: !0,
+            text: "result",
+            location: 100
+          },
+          radius: {
+            min: 2,
+            max: 10,
+            scalingColumn: ""
+          },
+          regression: {
+            lower: 0,
+            upper: 0,
+            estimateField: 0
+          },
+          leftWidthOffset: 0,
+          rightWidthOffset: 0,
+          showZeroLine: !1,
+          leftLabel: "",
+          rightLabel: ""
+        },
+        area: {
+          isStacked: !1
+        },
+        sankey: {
+          title: {
+            defaultColor: "black"
+          },
+          iterations: 1,
+          rxValue: 0.9,
+          overallSize: {
+            width: 900,
+            height: 700
+          },
+          margin: {
+            margin_y: 25,
+            margin_x: 0
+          },
+          nodeSize: {
+            nodeWidth: 26,
+            nodeHeight: 40
+          },
+          nodePadding: 55,
+          nodeFontColor: "black",
+          nodeColor: {
+            default: "#ff8500",
+            inactive: "#808080"
+          },
+          linkColor: {
+            default: "#ffc900",
+            inactive: "#D3D3D3"
+          },
+          opacity: {
+            nodeOpacityDefault: 1,
+            nodeOpacityInactive: 0.1,
+            LinkOpacityDefault: 1,
+            LinkOpacityInactive: 0.1
+          },
+          storyNodeFontColor: "#006778",
+          storyNodeText: [],
+          nodeValueStyle: {
+            textBefore: "(",
+            textAfter: ")"
+          },
+          data: []
+        },
+        filters: [],
+        openModal: !0,
+        uid: "chart1736198567054",
+        visualizationType: "Line",
+        dataDescription: {
+          horizontal: !1,
+          series: !1
+        },
+        dataKey: "Over Time Filter 2",
+        version: "4.25.1",
+        dynamicMarginTop: 0,
+        migrations: {
+          addColorMigration: !0
+        },
+        allowLineToBarGraph: !0
+      },
+      "markup-include1736445974811": {
+        filters: [],
+        filterBehavior: "Filter Change",
+        openModal: !1,
+        uid: "markup-include1736445974811",
+        type: "markup-include",
+        contentEditor: {
+          inlineHTML: "",
+          markupVariables: [],
+          showHeader: !0,
+          srcUrl: "#example",
+          title: "Trends over Time",
+          useInlineHTML: !0
+        },
+        theme: "theme-blue",
+        visual: {
+          border: !1,
+          accent: !1,
+          background: !1,
+          hideBackgroundColor: !1,
+          borderColorTheme: !1
+        },
+        showEditorPanel: !0,
+        visualizationType: "markup-include",
+        dataDescription: {
+          horizontal: !1,
+          series: !1
+        },
+        dataKey: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2000",
+        version: "4.24.10"
+      },
+      "markup-include1736446038125": {
+        filters: [],
+        filterBehavior: "Filter Change",
+        openModal: !1,
+        uid: "markup-include1736446038125",
+        type: "markup-include",
+        contentEditor: {
+          inlineHTML: "<h2>{{Indicator}}</h2><h3><em>Category: {{Category}}</em></h3><h4>Location: {{LocationDesc}}</h4>",
+          markupVariables: [
+            {
+              columnName: "Indicator",
+              conditions: [],
+              name: "Indicator",
+              tag: "{{Indicator}}"
+            },
+            {
+              columnName: "Category",
+              conditions: [],
+              name: "Category",
+              tag: "{{Category}}"
+            },
+            {
+              columnName: "LocationDesc",
+              conditions: [],
+              name: "LocationDesc",
+              tag: "{{LocationDesc}}"
+            }
+          ],
+          showHeader: !0,
+          srcUrl: "#example",
+          title: "",
+          useInlineHTML: !0,
+          allowHideSection: !0
+        },
+        theme: "theme-blue",
+        visual: {
+          border: !1,
+          accent: !1,
+          background: !1,
+          hideBackgroundColor: !1,
+          borderColorTheme: !1
+        },
+        showEditorPanel: !0,
+        visualizationType: "markup-include",
+        dataDescription: {
+          horizontal: !1,
+          series: !1
+        },
+        dataKey: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2000",
+        version: "4.25.1",
+        migrations: {
+          addColorMigration: !0
+        }
+      },
+      "markup-include1736446128952": {
+        filters: [],
+        filterBehavior: "Filter Change",
+        openModal: !1,
+        uid: "markup-include1736446128952",
+        type: "markup-include",
+        contentEditor: {
+          inlineHTML: '<a class="" href="/wcms/nccdphp/adhap/indicator-definitions.html">View Indicator Definition</a>',
+          markupVariables: [],
+          showHeader: !0,
+          srcUrl: "#example",
+          title: "",
+          useInlineHTML: !0
+        },
+        theme: "theme-blue",
+        visual: {
+          border: !1,
+          accent: !1,
+          background: !1,
+          hideBackgroundColor: !1,
+          borderColorTheme: !1
+        },
+        showEditorPanel: !0,
+        visualizationType: "markup-include",
+        dataDescription: {
+          horizontal: !1,
+          series: !1
+        },
+        dataKey: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2000",
+        version: "4.25.1",
+        migrations: {
+          addColorMigration: !0
+        }
+      },
+      table1736446212687: {
+        filters: [],
+        filterBehavior: "Filter Change",
+        newViz: !1,
+        openModal: !0,
+        uid: "table1736446212687",
+        type: "table",
+        table: {
+          label: "Data Table 1",
+          show: !0,
+          showDownloadUrl: !1,
+          showVertical: !0,
+          expanded: !0,
+          collapsible: !0,
+          groupBy: "Year_Filter",
+          pivot: {
+            columnName: "AgeGroup",
+            valueColumns: [
+              "Subcategory_Agegroup"
+            ]
+          }
+        },
+        columns: {
+          AgeGroup: {
+            label: "AgeGroup",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "AgeGroup",
+            order: 1
+          },
+          Category: {
+            label: "Category",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Category"
+          },
+          Data_Value: {
+            label: "Percentage (%)",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: "1",
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Data_Value",
+            order: 3
+          },
+          Footnotes: {
+            label: "Footnotes",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Footnotes"
+          },
+          High_CI: {
+            label: "High_CI",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "High_CI"
+          },
+          Indicator: {
+            label: "Indicator",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Indicator"
+          },
+          Location: {
+            label: "Location",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Location"
+          },
+          LocationAbbr: {
+            label: "LocationAbbr",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "LocationAbbr"
+          },
+          Low_CI: {
+            label: "Low_CI",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Low_CI"
+          },
+          DataSource: {
+            label: "DataSource",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "DataSource"
+          },
+          Data_Value_Type: {
+            label: "Data_Value_Type",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Data_Value_Type"
+          },
+          Demographic: {
+            label: "Demographic",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Demographic",
+            order: null
+          },
+          Question: {
+            label: "Question",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Question"
+          },
+          Response: {
+            label: "Response",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Response"
+          },
+          createdon: {
+            label: "createdon",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "createdon"
+          },
+          LocationDesc: {
+            label: "LocationDesc",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "LocationDesc"
+          },
+          SubCategory_Demographic_Filter: {
+            label: "SubCategory_Demographic_Filter",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "SubCategory_Demographic_Filter",
+            order: null
+          },
+          Subcategory_Agegroup_Filter: {
+            label: "Subcategory_Agegroup_Filter",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Subcategory_Agegroup_Filter"
+          },
+          Indicator_Description: {
+            label: "Indicator_Description",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Indicator_Description"
+          },
+          Indicator_Long_Name: {
+            label: "Indicator_Long_Name",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Indicator_Long_Name"
+          },
+          QuestionDisplayOrder: {
+            label: "QuestionDisplayOrder",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "QuestionDisplayOrder"
+          },
+          Category_DisplayOrder: {
+            label: "Category_DisplayOrder",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Category_DisplayOrder"
+          },
+          "95%_CI": {
+            label: "95% CI",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "95%_CI",
+            order: 4
+          },
+          Subcategory_Demographic: {
+            label: "Demographic",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Subcategory_Demographic",
+            order: 2
+          },
+          Createdon: {
+            label: "Createdon",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Createdon"
+          },
+          additionalColumn26: {
+            label: "New Column",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0
+          },
+          Indicator_DisplayOrder: {
+            name: "Indicator_DisplayOrder",
+            dataTable: !1
+          },
+          Location_DisplayOrder: {
+            name: "Location_DisplayOrder",
+            dataTable: !1
+          },
+          Question_DisplayOrder: {
+            name: "Question_DisplayOrder",
+            dataTable: !1
+          },
+          Response_DisplayOrder: {
+            name: "Response_DisplayOrder",
+            dataTable: !1
+          },
+          ShowChart: {
+            name: "ShowChart",
+            dataTable: !1
+          },
+          Subcategory_Agegroup: {
+            name: "Subcategory_Agegroup",
+            dataTable: !0
+          },
+          Subcategory_Agegroup_DisplayOrder: {
+            name: "Subcategory_Agegroup_DisplayOrder",
+            dataTable: !1
+          },
+          Subcategory_Demographic_DisplayOrder: {
+            name: "Subcategory_Demographic_DisplayOrder",
+            dataTable: !1
+          },
+          Subcategory_Demographic_Filter: {
+            name: "Subcategory_Demographic_Filter",
+            dataTable: !1
+          },
+          Year: {
+            name: "Year",
+            dataTable: !1
+          },
+          Series: {
+            label: "Demographic",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Series",
+            order: null
+          }
+        },
+        dataFormat: {},
+        visualizationType: "table",
+        dataDescription: {
+          horizontal: !1,
+          series: !1
+        },
+        dataKey: "Over Time Filter",
+        general: {
+          showDownloadButton: !0
+        }
+      },
+      "markup-include1736451291324": {
+        filters: [],
+        filterBehavior: "Filter Change",
+        openModal: !1,
+        uid: "markup-include1736451291324",
+        type: "markup-include",
+        contentEditor: {
+          inlineHTML: '<h2>{{Indicator}}</h2><h3><em>Category: {{Category}}</em></h3><h4>Location: {{LocationDesc}}</h4><br/><a class="" href="/wcms/nccdphp/adhap/indicator-definitions.html">View Indicator Definition</a>',
+          markupVariables: [
+            {
+              columnName: "Indicator",
+              conditions: [],
+              name: "Indicator",
+              tag: "{{Indicator}}"
+            },
+            {
+              columnName: "Category",
+              conditions: [],
+              name: "Category",
+              tag: "{{Category}}"
+            },
+            {
+              columnName: "LocationDesc",
+              conditions: [],
+              name: "LocationDesc",
+              tag: "{{LocationDesc}}"
+            }
+          ],
+          showHeader: !0,
+          srcUrl: "#example",
+          title: "Details for a Specific Year",
+          useInlineHTML: !0
+        },
+        theme: "theme-blue",
+        visual: {
+          border: !1,
+          accent: !1,
+          background: !1,
+          hideBackgroundColor: !1,
+          borderColorTheme: !1
+        },
+        showEditorPanel: !0,
+        visualizationType: "markup-include",
+        dataDescription: {
+          horizontal: !1,
+          series: !1
+        },
+        dataKey: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2000",
+        version: "4.25.1",
+        migrations: {
+          addColorMigration: !0
+        }
+      },
+      chart1736451559821: {
+        annotations: [],
+        type: "chart",
+        debugSvg: !1,
+        chartMessage: {
+          noData: "No Data Available"
+        },
+        title: "Bar Chart 1",
+        showTitle: !0,
+        showDownloadMediaButton: !1,
+        theme: "theme-blue",
+        animate: !1,
+        fontSize: "medium",
+        lineDatapointStyle: "hover",
+        lineDatapointColor: "Same as Line",
+        barHasBorder: "false",
+        isLollipopChart: !1,
+        lollipopShape: "circle",
+        lollipopColorStyle: "two-tone",
+        visualizationSubType: "regular",
+        barStyle: "flat",
+        roundingStyle: "standard",
+        tipRounding: "top",
+        isResponsiveTicks: !1,
+        general: {
+          annotationDropdownText: "Annotations",
+          showDownloadButton: !1,
+          showMissingDataLabel: !0,
+          showSuppressedSymbol: !0,
+          showZeroValueData: !0,
+          hideNullValue: !0
+        },
+        padding: {
+          left: 5,
+          right: 5
+        },
+        preliminaryData: [],
+        yAxis: {
+          hideAxis: !1,
+          displayNumbersOnBar: !1,
+          hideLabel: !1,
+          hideTicks: !1,
+          size: "70",
+          gridLines: !1,
+          enablePadding: !1,
+          min: "",
+          max: "",
+          labelColor: "#333",
+          tickLabelColor: "#333",
+          tickColor: "#333",
+          rightHideAxis: !1,
+          rightAxisSize: 0,
+          rightLabel: "",
+          rightLabelOffsetSize: 0,
+          rightAxisLabelColor: "#333",
+          rightAxisTickLabelColor: "#333",
+          rightAxisTickColor: "#333",
+          numTicks: "",
+          axisPadding: 0,
+          scalePadding: 10,
+          tickRotation: 0,
+          anchors: [],
+          shoMissingDataLabel: !0,
+          showMissingDataLine: !0,
+          categories: [],
+          label: "Percentage (%)"
+        },
+        boxplot: {
+          plots: [],
+          borders: "true",
+          plotOutlierValues: !1,
+          plotNonOutlierValues: !0,
+          labels: {
+            q1: "Lower Quartile",
+            q2: "q2",
+            q3: "Upper Quartile",
+            q4: "q4",
+            minimum: "Minimum",
+            maximum: "Maximum",
+            mean: "Mean",
+            median: "Median",
+            sd: "Standard Deviation",
+            iqr: "Interquartile Range",
+            count: "Count",
+            outliers: "Outliers",
+            values: "Values",
+            lowerBounds: "Lower Bounds",
+            upperBounds: "Upper Bounds"
+          }
+        },
+        topAxis: {
+          hasLine: !1
+        },
+        isLegendValue: !1,
+        barThickness: 0.35,
+        barHeight: 25,
+        barSpace: 15,
+        heights: {
+          vertical: 300,
+          horizontal: 750
+        },
+        xAxis: {
+          sortDates: !1,
+          anchors: [],
+          type: "categorical",
+          showTargetLabel: !0,
+          targetLabel: "Target",
+          hideAxis: !1,
+          hideLabel: !1,
+          hideTicks: !1,
+          size: 75,
+          tickRotation: 0,
+          min: "",
+          max: "",
+          labelColor: "#333",
+          tickLabelColor: "#333",
+          tickColor: "#333",
+          numTicks: "",
+          labelOffset: 0,
+          axisPadding: 200,
+          target: 0,
+          maxTickRotation: 0,
+          padding: 5,
+          showYearsOnce: !1,
+          sortByRecentDate: !1,
+          dataKey: "Subcategory_Agegroup",
+          tickWidthMax: 88,
+          axisBBox: 27.19333267211914
+        },
+        table: {
+          label: "Data Table",
+          expanded: !0,
+          limitHeight: !1,
+          height: "",
+          caption: "",
+          showDownloadUrl: !1,
+          showDataTableLink: !1,
+          showDownloadLinkBelow: !1,
+          indexLabel: "",
+          download: !0,
+          showVertical: !0,
+          dateDisplayFormat: "",
+          showMissingDataLabel: !0,
+          showSuppressedSymbol: !0,
+          show: !0,
+          showDownloadImgButton: !0
+        },
+        orientation: "vertical",
+        color: "pinkpurple",
+        columns: {},
+        legend: {
+          hide: !1,
+          behavior: "isolate",
+          axisAlign: !0,
+          singleRow: !0,
+          colorCode: "",
+          reverseLabelOrder: !1,
+          description: "",
+          dynamicLegend: !1,
+          dynamicLegendDefaultText: "Show All",
+          dynamicLegendItemLimit: 5,
+          dynamicLegendItemLimitMessage: "Dynamic Legend Item Limit Hit.",
+          dynamicLegendChartMessage: "Select Options from the Legend",
+          label: "Demographic",
+          lineMode: !1,
+          verticalSorted: !1,
+          highlightOnHover: !1,
+          hideSuppressedLabels: !1,
+          hideSuppressionLink: !1,
+          seriesHighlight: [],
+          style: "circles",
+          subStyle: "linear blocks",
+          shape: "circle",
+          tickRotation: "",
+          hideBorder: {
+            side: !1,
+            topBottom: !0
+          },
+          position: "right"
+        },
+        brush: {
+          height: 45,
+          active: !1
+        },
+        exclusions: {
+          active: !1,
+          keys: []
+        },
+        palette: "qualitative-bold",
+        isPaletteReversed: !1,
+        twoColor: {
+          palette: "monochrome-1",
+          isPaletteReversed: !1
+        },
+        labels: !1,
+        dataFormat: {
+          commas: !1,
+          prefix: "",
+          suffix: "",
+          abbreviated: !1,
+          bottomSuffix: "",
+          bottomPrefix: "",
+          bottomAbbreviated: !1,
+          roundTo: "1"
+        },
+        confidenceKeys: {},
+        visual: {
+          border: !0,
+          accent: !0,
+          background: !0,
+          verticalHoverLine: !1,
+          horizontalHoverLine: !1,
+          lineDatapointSymbol: "none",
+          maximumShapeAmount: 7
+        },
+        useLogScale: !1,
+        filterBehavior: "Filter Change",
+        highlightedBarValues: [],
+        series: [
+          {
+            dataKey: "Data_Value",
+            type: "Bar",
+            axis: "Left",
+            tooltip: !0,
+            dynamicCategory: "Series"
+          }
+        ],
+        tooltips: {
+          opacity: 90,
+          singleSeries: !1,
+          dateDisplayFormat: ""
+        },
+        forestPlot: {
+          startAt: 0,
+          colors: {
+            line: "",
+            shape: ""
+          },
+          lineOfNoEffect: {
+            show: !0
+          },
+          type: "",
+          pooledResult: {
+            diamondHeight: 5,
+            column: ""
+          },
+          estimateField: "",
+          estimateRadius: "",
+          shape: "square",
+          rowHeight: 20,
+          description: {
+            show: !0,
+            text: "description",
+            location: 0
+          },
+          result: {
+            show: !0,
+            text: "result",
+            location: 100
+          },
+          radius: {
+            min: 2,
+            max: 10,
+            scalingColumn: ""
+          },
+          regression: {
+            lower: 0,
+            upper: 0,
+            estimateField: 0
+          },
+          leftWidthOffset: 0,
+          rightWidthOffset: 0,
+          showZeroLine: !1,
+          leftLabel: "",
+          rightLabel: ""
+        },
+        area: {
+          isStacked: !1
+        },
+        sankey: {
+          title: {
+            defaultColor: "black"
+          },
+          iterations: 1,
+          rxValue: 0.9,
+          overallSize: {
+            width: 900,
+            height: 700
+          },
+          margin: {
+            margin_y: 25,
+            margin_x: 0
+          },
+          nodeSize: {
+            nodeWidth: 26,
+            nodeHeight: 40
+          },
+          nodePadding: 55,
+          nodeFontColor: "black",
+          nodeColor: {
+            default: "#ff8500",
+            inactive: "#808080"
+          },
+          linkColor: {
+            default: "#ffc900",
+            inactive: "#D3D3D3"
+          },
+          opacity: {
+            nodeOpacityDefault: 1,
+            nodeOpacityInactive: 0.1,
+            LinkOpacityDefault: 1,
+            LinkOpacityInactive: 0.1
+          },
+          storyNodeFontColor: "#006778",
+          storyNodeText: [],
+          nodeValueStyle: {
+            textBefore: "(",
+            textAfter: ")"
+          },
+          data: []
+        },
+        filters: [],
+        openModal: !0,
+        uid: "chart1736451559821",
+        visualizationType: "Line",
+        dataDescription: {
+          horizontal: !1,
+          series: !1
+        },
+        dataKey: "Bar Chart",
+        version: "4.25.1",
+        dynamicMarginTop: 0,
+        migrations: {
+          addColorMigration: !0
+        }
+      },
+      table1736957971832: {
+        filters: [],
+        filterBehavior: "Filter Change",
+        newViz: !1,
+        openModal: !0,
+        uid: "table1736957971832",
+        type: "table",
+        table: {
+          label: "Data Table",
+          show: !0,
+          showDownloadUrl: !1,
+          showVertical: !0,
+          expanded: !0,
+          collapsible: !0,
+          groupBy: "Subcategory_Agegroup",
+          pivot: {
+            columnName: "Subcategory_Demographic",
+            valueColumns: []
+          }
+        },
+        columns: {
+          AgeGroup: {
+            label: "AgeGroup",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "AgeGroup",
+            order: null
+          },
+          "95%_CI": {
+            label: "95% CI",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "95%_CI",
+            order: 4
+          },
+          Category: {
+            label: "Category",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Category"
+          },
+          CategoryDisplayOrder: {
+            label: "CategoryDisplayOrder",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "CategoryDisplayOrder"
+          },
+          DataSource: {
+            label: "DataSource",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "DataSource"
+          },
+          Data_Value: {
+            label: "Percentage (%)",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: "1",
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Data_Value",
+            order: 3
+          },
+          Data_Value_Type: {
+            label: "Data_Value_Type",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Data_Value_Type"
+          },
+          Demographic: {
+            label: "Demographic",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Demographic",
+            order: 2
+          },
+          Footnotes: {
+            label: "Footnotes",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Footnotes"
+          },
+          High_CI: {
+            label: "High_CI",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "High_CI"
+          },
+          Indicator: {
+            label: "Indicator",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Indicator"
+          },
+          Indicator_Description: {
+            label: "Indicator_Description",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Indicator_Description"
+          },
+          Indicator_Long_Name: {
+            label: "Indicator_Long_Name",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Indicator_Long_Name"
+          },
+          Location: {
+            label: "Location",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Location"
+          },
+          LocationAbbr: {
+            label: "LocationAbbr",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "LocationAbbr"
+          },
+          LocationDesc: {
+            label: "LocationDesc",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "LocationDesc"
+          },
+          LocationDisplayOrder: {
+            label: "LocationDisplayOrder",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "LocationDisplayOrder"
+          },
+          Low_CI: {
+            label: "Low_CI",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Low_CI"
+          },
+          QuestionDisplayOrder: {
+            label: "QuestionDisplayOrder",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "QuestionDisplayOrder"
+          },
+          Response: {
+            label: "Response",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Response"
+          },
+          SubCategory_Demographic: {
+            label: "SubCategory_Demographic",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "SubCategory_Demographic"
+          },
+          SubCategory_Demographic_Filter: {
+            label: "SubCategory_Demographic_Filter",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "SubCategory_Demographic_Filter"
+          },
+          SubcategoryDisplayOrder: {
+            label: "SubcategoryDisplayOrder",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "SubcategoryDisplayOrder"
+          },
+          Subcategory_Agegroup: {
+            label: "Subcategory_Agegroup",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Subcategory_Agegroup"
+          },
+          Subcategory_Agegroup_Filter: {
+            label: "Subcategory_Agegroup_Filter",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Subcategory_Agegroup_Filter"
+          },
+          Year: {
+            label: "Year",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Year"
+          },
+          createdon: {
+            label: "createdon",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "createdon"
+          },
+          Category_DisplayOrder: {
+            label: "Category_DisplayOrder",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Category_DisplayOrder"
+          },
+          Createdon: {
+            label: "Createdon",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Createdon"
+          },
+          Indicator_DisplayOrder: {
+            label: "Indicator_DisplayOrder",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Indicator_DisplayOrder"
+          },
+          Location_DisplayOrder: {
+            label: "Location_DisplayOrder",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Location_DisplayOrder"
+          },
+          Question: {
+            label: "Question",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Question"
+          },
+          Question_DisplayOrder: {
+            label: "Question_DisplayOrder",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Question_DisplayOrder"
+          },
+          ShowChart: {
+            label: "ShowChart",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "ShowChart"
+          },
+          Response_DisplayOrder: {
+            label: "Response_DisplayOrder",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Response_DisplayOrder"
+          },
+          Subcategory_Agegroup_DisplayOrder: {
+            label: "Subcategory_Agegroup_DisplayOrder",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Subcategory_Agegroup_DisplayOrder"
+          },
+          Subcategory_Demographic: {
+            label: "Subcategory_Demographic",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Subcategory_Demographic"
+          },
+          Subcategory_Demographic_DisplayOrder: {
+            label: "Subcategory_Demographic_DisplayOrder",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Subcategory_Demographic_DisplayOrder"
+          },
+          Subcategory_Demographic_Filter: {
+            label: "Subcategory_Demographic_Filter",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Subcategory_Demographic_Filter"
+          },
+          Year_Filter: {
+            label: "Year_Filter",
+            dataTable: !0,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Year_Filter"
+          },
+          Series: {
+            label: "Series",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            forestPlot: !1,
+            startingPoint: "0",
+            forestPlotAlignRight: !1,
+            roundToPlace: 0,
+            commas: !1,
+            showInViz: !1,
+            forestPlotStartingPoint: 0,
+            name: "Series"
+          }
+        },
+        dataFormat: {},
+        visualizationType: "table",
+        dataDescription: {
+          horizontal: !1,
+          series: !1
+        },
+        dataKey: "Specific Year Filter",
+        general: {
+          showDownloadButton: !0
+        }
+      },
+      dashboardFilters1736967744405: {
+        filters: [],
+        filterBehavior: "Filter Change",
+        newViz: !0,
+        openModal: !0,
+        uid: "dashboardFilters1736967744405",
+        type: "dashboardFilters",
+        sharedFilterIndexes: [
+          3,
+          4
+        ],
+        visualizationType: "dashboardFilters",
+        autoLoad: !0
+      },
+      dashboardFilters1737488646480: {
+        filters: [],
+        filterBehavior: "Filter Change",
+        newViz: !0,
+        openModal: !0,
+        uid: "dashboardFilters1737488646480",
+        type: "dashboardFilters",
+        sharedFilterIndexes: [
+          5,
+          6,
+          7
+        ],
+        visualizationType: "dashboardFilters",
+        autoLoad: !0
+      }
+    },
+    rows: [
+      {
+        columns: [
+          {
+            width: 12,
+            widget: "dashboardFilters1736197709119"
+          },
+          {},
+          {}
+        ]
+      },
+      {
+        columns: [
+          {
+            width: 12,
+            widget: "dashboardFilters1737488646480"
+          }
+        ],
+        uuid: 1737488639584
+      },
+      {
+        columns: [
+          {
+            width: 12,
+            widget: "chart1736451559821"
+          },
+          {
+            width: 12,
+            widget: "table1736957971832"
+          },
+          {
+            width: 12
+          }
+        ],
+        toggle: !0,
+        uuid: 1737488639584,
+        dataDescription: {},
+        dataKey: ""
+      }
+    ],
+    label: "View by Location"
+  },
+  {
+    label: "View by Topic",
+    visualizations: {
+      dashboardFilters1737569479559: {
+        filters: [],
+        filterBehavior: "Apply Button",
+        newViz: !0,
+        openModal: !0,
+        uid: "dashboardFilters1737569479559",
+        type: "dashboardFilters",
+        sharedFilterIndexes: [
+          0,
+          1
+        ],
+        visualizationType: "dashboardFilters",
+        applyFiltersButtonText: "View Results"
+      },
+      dashboardFilters1737570017053: {
+        filters: [],
+        filterBehavior: "Filter Change",
+        newViz: !0,
+        openModal: !0,
+        uid: "dashboardFilters1737570017053",
+        type: "dashboardFilters",
+        sharedFilterIndexes: [
+          2,
+          3,
+          4
+        ],
+        visualizationType: "dashboardFilters",
+        autoLoad: !0
+      },
+      map1737570504911: {
+        annotations: [],
+        general: {
+          geoType: "us",
+          navigationTarget: "_self",
+          noStateFoundMessage: "Map Unavailable",
+          annotationDropdownText: "Annotations",
+          geoBorderColor: "darkGray",
+          headerColor: "theme-blue",
+          title: "Map",
+          showTitle: !1,
+          showSidebar: !0,
+          showDownloadButton: !0,
+          showDownloadMediaButton: !1,
+          displayAsHex: !1,
+          displayStateLabels: !0,
+          territoriesAlwaysShow: !1,
+          language: "en",
+          geoLabelOverride: "",
+          hasRegions: !1,
+          fullBorder: !1,
+          type: "data",
+          convertFipsCodes: !0,
+          palette: {
+            isReversed: !1
+          },
+          allowMapZoom: !0,
+          hideGeoColumnInTooltip: !1,
+          hidePrimaryColumnInTooltip: !1,
+          statePicked: {
+            fipsCode: "01",
+            stateName: "Alabama"
+          },
+          expandDataTable: !1,
+          showDownloadImgButton: !0
+        },
+        type: "map",
+        color: "pinkpurple",
+        columns: {
+          geo: {
+            name: "LocationAbbr",
+            label: "Location",
+            tooltip: !1,
+            dataTable: !0
+          },
+          primary: {
+            dataTable: !0,
+            tooltip: !0,
+            prefix: "",
+            suffix: "",
+            name: "Data_Value",
+            label: "",
+            roundToPlace: 0
+          },
+          navigate: {
+            name: ""
+          },
+          latitude: {
+            name: ""
+          },
+          longitude: {
+            name: ""
+          },
+          additionalColumn1: {
+            label: "New Column",
+            dataTable: !1,
+            tooltips: !1,
+            prefix: "",
+            suffix: "",
+            name: "Subcategory_Demographic",
+            tooltip: !0
+          }
+        },
+        legend: {
+          descriptions: {},
+          specialClasses: [],
+          unified: !1,
+          singleColumn: !1,
+          singleRow: !1,
+          verticalSorted: !1,
+          showSpecialClassesLast: !1,
+          dynamicDescription: !1,
+          type: "equalnumber",
+          numberOfItems: 3,
+          position: "side",
+          title: "Percentage (%)",
+          style: "circles",
+          subStyle: "linear blocks",
+          tickRotation: "",
+          singleColumnLegend: !1,
+          hideBorder: !1
+        },
+        filters: [],
+        table: {
+          wrapColumns: !1,
+          label: "Data Table",
+          expanded: !0,
+          limitHeight: !1,
+          height: "",
+          caption: "",
+          showDownloadUrl: !1,
+          showDataTableLink: !1,
+          showDownloadLinkBelow: !0,
+          showFullGeoNameInCSV: !1,
+          forceDisplay: !0,
+          download: !0,
+          indexLabel: ""
+        },
+        tooltips: {
+          appearanceType: "hover",
+          linkLabel: "Learn More",
+          capitalizeLabels: !0,
+          opacity: 90
+        },
+        visual: {
+          minBubbleSize: 1,
+          maxBubbleSize: 20,
+          extraBubbleBorder: !1,
+          cityStyle: "circle",
+          cityStyleLabel: "",
+          showBubbleZeros: !1,
+          additionalCityStyles: [],
+          geoCodeCircleSize: 8
+        },
+        mapPosition: {
+          coordinates: [
+            0,
+            30
+          ],
+          zoom: 1
+        },
+        map: {
+          layers: [],
+          patterns: []
+        },
+        hexMap: {
+          type: "",
+          shapeGroups: [
+            {
+              legendTitle: "",
+              legendDescription: "",
+              items: [
+                {
+                  key: "",
+                  shape: "Arrow Up",
+                  column: "",
+                  operator: "=",
+                  value: ""
+                }
+              ]
+            }
+          ]
+        },
+        filterBehavior: "Filter Change",
+        filterIntro: "",
+        openModal: !0,
+        uid: "map1737570504911",
+        dataDescription: {
+          series: !1,
+          horizontal: !1
+        },
+        dataKey: "Explore by Topic Visualization Row",
+        version: "4.25.1",
+        migrations: {
+          addColorMigration: !0
+        }
+      }
+    },
+    dashboard: {
+      sharedFilters: [
+        {
+          key: "Category",
+          showDropdown: !0,
+          type: "urlfilter",
+          apiFilter: {
+            apiEndpoint: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2003&$select=DISTINCT%20Category&$order=Category",
+            valueSelector: "Category",
+            textSelector: ""
+          },
+          usedBy: [
+            2
+          ],
+          tier: 1
+        },
+        {
+          key: "Indicator",
+          showDropdown: !0,
+          type: "urlfilter",
+          apiFilter: {
+            apiEndpoint: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2003&$select=DISTINCT%20Indicator&$order=Indicator",
+            valueSelector: "Indicator",
+            textSelector: ""
+          },
+          parents: [
+            "Category"
+          ],
+          usedBy: [
+            2
+          ],
+          tier: 2
+        },
+        {
+          key: "Year",
+          showDropdown: !0,
+          type: "urlfilter",
+          apiFilter: {
+            apiEndpoint: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2004&$select=DISTINCT%20Year_Filter&$order=Year_Filter",
+            valueSelector: "Year_Filter",
+            textSelector: ""
+          },
+          usedBy: [
+            "map1737570504911"
+          ],
+          tier: 1
+        },
+        {
+          key: "Age Group",
+          showDropdown: !0,
+          type: "urlfilter",
+          apiFilter: {
+            apiEndpoint: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2004&$select=DISTINCT%20Subcategory_Agegroup&$order=Subcategory_Agegroup",
+            valueSelector: "Subcategory_Agegroup",
+            textSelector: ""
+          },
+          parents: [
+            "Year"
+          ],
+          usedBy: [
+            "map1737570504911"
+          ],
+          tier: 2
+        },
+        {
+          key: "Demographic",
+          showDropdown: !0,
+          type: "urlfilter",
+          filterStyle: "nested-dropdown",
+          apiFilter: {
+            apiEndpoint: "https://nccd-proxy-dev.cdc.gov/NCCD_COVE_API?$datakey=adhap_cove_location_topic&$limit=2004&$select=DISTINCT%20Demographic,%20SubCategory_Demographic&$order=Demographic,SubCategory_Demographic",
+            subgroupValueSelector: "SubCategory_Demographic",
+            textSelector: "",
+            valueSelector: "Demographic"
+          },
+          subGrouping: {
+            columnName: "",
+            setByQueryParameter: "",
+            valuesLookup: {}
+          },
+          usedBy: [
+            "map1737570504911"
+          ],
+          parents: [
+            "Year ",
+            "Age Group  "
+          ],
+          tier: 1
+        }
+      ]
+    },
+    rows: [
+      {
+        columns: [
+          {
+            width: 12,
+            widget: "dashboardFilters1737569479559"
+          }
+        ]
+      },
+      {
+        columns: [
+          {
+            width: 12,
+            widget: "dashboardFilters1737570017053"
+          }
+        ]
+      },
+      {
+        columns: [
+          {
+            width: 12,
+            widget: "map1737570504911"
+          }
+        ]
+      }
+    ],
+    type: "dashboard",
+    version: "4.25.1",
+    migrations: {
+      addColorMigration: !0
+    }
+  }
+], Ga = {
+  addColorMigration: !0
+}, $a = {}, Ka = {
+  table: Pa,
+  errors: Na,
+  currentViewport: Da,
+  id: Va,
+  category: Ha,
+  type: Ma,
+  subType: xa,
+  orientation: Ia,
+  icon: Ua,
+  content: Ea,
+  datasets: Wa,
+  visualizationType: Oa,
+  activeVizButtonID: Ba,
+  version: za,
+  uuid: _a,
+  multiDashboards: qa,
+  migrations: Ga,
+  runtime: $a
+}, Qa = {
   theme: "theme-blue",
   filters: [
     {
@@ -1270,7 +3360,7 @@ This number is calculated within the Data Bite module.
   ],
   title: "Amount for Location by Year",
   description: ""
-}, Ba = [
+}, Ja = [
   [
     {
       width: 6,
@@ -1298,7 +3388,7 @@ This number is calculated within the Data Bite module.
       widget: "data-bite1628879641924"
     }
   ]
-], za = {
+], ja = {
   chart1628879269005: {
     type: "chart",
     title: "",
@@ -1574,10 +3664,10 @@ This number is calculated within the Data Bite module.
       }
     ]
   }
-}, qa = {
+}, Za = {
   label: "Data Table",
   show: !0
-}, Ga = [
+}, Xa = [
   {
     Location: "Alaska",
     Year: "2019",
@@ -1848,20 +3938,20 @@ This number is calculated within the Data Bite module.
     Type: "State",
     Amount: "1578"
   }
-], Ka = "dashboard_aggregate_example_no_add_fullname.csv", $a = "file", _a = "dashboard", ja = 1628879384203, Ja = {
-  dashboard: Oa,
-  rows: Ba,
-  visualizations: za,
-  table: qa,
-  data: Ga,
-  dataFileName: Ka,
-  dataFileSourceType: $a,
-  type: _a,
-  uuid: ja
-}, Qa = {
+], et = "dashboard_aggregate_example_no_add_fullname.csv", at = "file", tt = "dashboard", ot = 1628879384203, nt = {
+  dashboard: Qa,
+  rows: Ja,
+  visualizations: ja,
+  table: Za,
+  data: Xa,
+  dataFileName: et,
+  dataFileSourceType: at,
+  type: tt,
+  uuid: ot
+}, it = {
   theme: "theme-blue",
   title: "Dashboard with No Filters"
-}, Za = [
+}, rt = [
   [
     {
       width: 12,
@@ -1883,7 +3973,7 @@ This number is calculated within the Data Bite module.
       width: null
     }
   ]
-], Xa = {
+], st = {
   map1629143821077: {
     general: {
       geoType: "us",
@@ -3703,10 +5793,10 @@ This number is calculated within the Data Bite module.
       series: !1
     }
   }
-}, et = {
+}, lt = {
   label: "Data Table",
   show: !0
-}, at = "dashboard", tt = 1629144022257, ot = {
+}, ct = "dashboard", dt = 1629144022257, pt = {
   "dashboard_example_map.csv": {
     data: [
       {
@@ -3948,15 +6038,15 @@ This number is calculated within the Data Bite module.
     dataFileFormat: "CSV",
     preview: !0
   }
-}, nt = {
-  dashboard: Qa,
-  rows: Za,
-  visualizations: Xa,
-  table: et,
-  type: at,
-  uuid: tt,
-  datasets: ot
-}, it = {
+}, mt = {
+  dashboard: it,
+  rows: rt,
+  visualizations: st,
+  table: lt,
+  type: ct,
+  uuid: dt,
+  datasets: pt
+}, ut = {
   theme: "theme-blue",
   sharedFilters: [
     {
@@ -3974,7 +6064,7 @@ This number is calculated within the Data Bite module.
       ]
     }
   ]
-}, rt = [
+}, Lt = [
   {
     columns: [
       {
@@ -3995,7 +6085,7 @@ This number is calculated within the Data Bite module.
       {}
     ]
   }
-], ct = {
+], Tt = {
   map1721943918271: {
     annotations: [],
     general: {
@@ -4239,12 +6329,12 @@ This number is calculated within the Data Bite module.
     visualizationType: "dashboardFilters",
     editing: !1
   }
-}, st = {
+}, ht = {
   label: "Data Table",
   show: !0,
   showDownloadUrl: !1,
   showVertical: !0
-}, lt = !0, mt = {
+}, yt = !0, At = {
   "test-single-county-file.json": {
     data: [
       {
@@ -4334,18 +6424,18 @@ This number is calculated within the Data Bite module.
     dataFileFormat: "JSON",
     preview: !0
   }
-}, dt = "dashboard", pt = {}, ut = "4.24.9", Lt = 1721943961122, Tt = {
-  dashboard: it,
-  rows: rt,
-  visualizations: ct,
-  table: st,
-  newViz: lt,
-  datasets: mt,
-  type: dt,
-  runtime: pt,
-  version: ut,
-  uuid: Lt
-}, yt = {
+}, gt = "dashboard", wt = {}, Rt = "4.24.9", ft = 1721943961122, St = {
+  dashboard: ut,
+  rows: Lt,
+  visualizations: Tt,
+  table: ht,
+  newViz: yt,
+  datasets: At,
+  type: gt,
+  runtime: wt,
+  version: Rt,
+  uuid: ft
+}, Yt = {
   theme: "theme-blue",
   sharedFilters: [
     {
@@ -4367,7 +6457,7 @@ This number is calculated within the Data Bite module.
       tier: 1
     }
   ]
-}, ht = [
+}, vt = [
   [
     {
       width: 12,
@@ -4387,7 +6477,7 @@ This number is calculated within the Data Bite module.
     {},
     {}
   ]
-], At = {
+], bt = {
   chart1699383531543: {
     type: "chart",
     debugSvg: !1,
@@ -14269,12 +16359,12 @@ This number is calculated within the Data Bite module.
       "No data"
     ]
   }
-}, Rt = {
+}, kt = {
   label: "Data Table",
   show: !0,
   showDownloadUrl: !1,
   showVertical: !0
-}, wt = {
+}, Ft = {
   "dashboard_aggregate_example_state_type (1).csv": {
     data: [
       {
@@ -17416,16 +19506,16 @@ This number is calculated within the Data Bite module.
     dataFileFormat: "CSV",
     preview: !0
   }
-}, St = "dashboard", gt = 1699383537668, Yt = "Filter Change", ft = {
-  dashboard: yt,
-  rows: ht,
-  visualizations: At,
-  table: Rt,
-  datasets: wt,
-  type: St,
-  uuid: gt,
-  filterBehavior: Yt
-}, vt = {
+}, Ct = "dashboard", Pt = 1699383537668, Nt = "Filter Change", Dt = {
+  dashboard: Yt,
+  rows: vt,
+  visualizations: bt,
+  table: kt,
+  datasets: Ft,
+  type: Ct,
+  uuid: Pt,
+  filterBehavior: Nt
+}, Vt = {
   theme: "theme-blue",
   sharedFilters: [
     {
@@ -17439,7 +19529,7 @@ This number is calculated within the Data Bite module.
       tier: 1
     }
   ]
-}, kt = [
+}, Ht = [
   {
     toggle: !0,
     columns: [
@@ -17462,7 +19552,7 @@ This number is calculated within the Data Bite module.
     dataKey: "valid-world-data.json",
     multiVizColumn: "Country"
   }
-], Ft = {
+], Mt = {
   chart1711646813542: {
     type: "chart",
     debugSvg: !1,
@@ -17787,21 +19877,21 @@ This number is calculated within the Data Bite module.
     visualizationType: "table",
     editing: !1
   }
-}, bt = {
+}, xt = {
   label: "Data Table",
   show: !1,
   showDownloadUrl: !1,
   showVertical: !0
-}, Ct = {}, Nt = "dashboard", Ht = {}, Mt = "4.23", U = {
-  dashboard: vt,
-  rows: kt,
-  visualizations: Ft,
-  table: bt,
-  datasets: Ct,
-  type: Nt,
-  runtime: Ht,
-  version: Mt
-}, Vt = 0, Ut = [
+}, It = {}, Ut = "dashboard", Et = {}, Wt = "4.23", H = {
+  dashboard: Vt,
+  rows: Ht,
+  visualizations: Mt,
+  table: xt,
+  datasets: It,
+  type: Ut,
+  runtime: Et,
+  version: Wt
+}, Ot = 0, Bt = [
   {
     dashboard: {
       theme: "theme-blue"
@@ -18321,7 +20411,7 @@ This number is calculated within the Data Bite module.
       show: !1
     }
   }
-], Dt = {
+], zt = {
   "valid-data-chart.csv": {
     data: [
       {
@@ -18714,13 +20804,13 @@ This number is calculated within the Data Bite module.
     dataFileFormat: "CSV",
     preview: !0
   }
-}, Et = {
-  activeDashboard: Vt,
-  multiDashboards: Ut,
-  datasets: Dt
-}, It = {
+}, _t = {
+  activeDashboard: Ot,
+  multiDashboards: Bt,
+  datasets: zt
+}, qt = {
   theme: "theme-blue"
-}, xt = [
+}, Gt = [
   [
     {
       width: 12,
@@ -18729,7 +20819,7 @@ This number is calculated within the Data Bite module.
     {},
     {}
   ]
-], Pt = {
+], $t = {
   table1707840146431: {
     newViz: !0,
     openModal: !1,
@@ -18797,12 +20887,12 @@ This number is calculated within the Data Bite module.
       }
     ]
   }
-}, Wt = {
+}, Kt = {
   label: "Data Table",
   show: !1,
   showDownloadUrl: !1,
   showVertical: !0
-}, Ot = !0, Bt = {
+}, Qt = !0, Jt = {
   "valid-data-chart.csv": {
     data: [
       {
@@ -18832,19 +20922,19 @@ This number is calculated within the Data Bite module.
     dataFileFormat: "CSV",
     preview: !0
   }
-}, zt = "dashboard", qt = {}, Gt = {
-  dashboard: It,
-  rows: xt,
-  visualizations: Pt,
-  table: Wt,
-  newViz: Ot,
-  datasets: Bt,
-  type: zt,
-  runtime: qt
-}, Kt = {
+}, jt = "dashboard", Zt = {}, Xt = {
+  dashboard: qt,
+  rows: Gt,
+  visualizations: $t,
+  table: Kt,
+  newViz: Qt,
+  datasets: Jt,
+  type: jt,
+  runtime: Zt
+}, eo = {
   theme: "theme-blue",
   sharedFilters: []
-}, $t = [
+}, ao = [
   [
     {
       width: 12,
@@ -18853,7 +20943,7 @@ This number is calculated within the Data Bite module.
     {},
     {}
   ]
-], _t = {
+], to = {
   table1707935263149: {
     openModal: !1,
     uid: "table1707935263149",
@@ -18900,12 +20990,12 @@ This number is calculated within the Data Bite module.
     filterBehavior: "Filter Change",
     dataKey: "valid-data-chart.csv"
   }
-}, jt = {
+}, oo = {
   label: "Data Table",
   show: !1,
   showDownloadUrl: !1,
   showVertical: !0
-}, Jt = {
+}, no = {
   "valid-data-chart.csv": {
     data: [
       {
@@ -18943,23 +21033,23 @@ This number is calculated within the Data Bite module.
     dataFileFormat: "CSV",
     preview: !0
   }
-}, Qt = "dashboard", Zt = {}, Xt = [
+}, io = "dashboard", ro = {}, so = [
   1,
   2,
   3
-], eo = {
-  dashboard: Kt,
-  rows: $t,
-  visualizations: _t,
-  table: jt,
-  datasets: Jt,
-  type: Qt,
-  runtime: Zt,
-  data: Xt
-}, ao = {
+], lo = {
+  dashboard: eo,
+  rows: ao,
+  visualizations: to,
+  table: oo,
+  datasets: no,
+  type: io,
+  runtime: ro,
+  data: so
+}, co = {
   theme: "theme-blue",
   sharedFilters: []
-}, to = [
+}, po = [
   [
     {
       width: 12,
@@ -18968,7 +21058,7 @@ This number is calculated within the Data Bite module.
     {},
     {}
   ]
-], oo = {
+], mo = {
   table1707935263149: {
     openModal: !1,
     uid: "table1707935263149",
@@ -19068,12 +21158,12 @@ This number is calculated within the Data Bite module.
       }
     ]
   }
-}, no = {
+}, uo = {
   label: "Data Table",
   show: !1,
   showDownloadUrl: !1,
   showVertical: !0
-}, io = {
+}, Lo = {
   "valid-data-chart.csv": {
     data: [
       {
@@ -19113,22 +21203,22 @@ This number is calculated within the Data Bite module.
     dataFileFormat: "CSV",
     preview: !0
   }
-}, ro = "dashboard", co = {}, so = [
+}, To = "dashboard", ho = {}, yo = [
   1,
   2,
   3
-], lo = {
-  dashboard: ao,
-  rows: to,
-  visualizations: oo,
-  table: no,
-  datasets: io,
-  type: ro,
-  runtime: co,
-  data: so
-}, mo = {
+], Ao = {
+  dashboard: co,
+  rows: po,
+  visualizations: mo,
+  table: uo,
+  datasets: Lo,
+  type: To,
+  runtime: ho,
+  data: yo
+}, go = {
   theme: "theme-blue"
-}, po = [
+}, wo = [
   [
     {
       width: 12,
@@ -19146,7 +21236,7 @@ This number is calculated within the Data Bite module.
       widget: "table1708703256246"
     }
   ]
-], uo = {
+], Ro = {
   map1708703168295: {
     general: {
       geoType: "us",
@@ -22780,12 +24870,12 @@ This number is calculated within the Data Bite module.
     validated: 4.23,
     dynamicMarginTop: 0
   }
-}, Lo = {
+}, fo = {
   label: "Data Table",
   show: !1,
   showDownloadUrl: !1,
   showVertical: !0
-}, To = {
+}, So = {
   "valid-data-map.csv": {
     data: [
       {
@@ -23149,25 +25239,25 @@ This number is calculated within the Data Bite module.
     dataFileFormat: "CSV",
     preview: !0
   }
-}, yo = [], ho = "dashboard", Ao = "", Ro = "", wo = "", So = [], go = [], Yo = {}, fo = {
-  dashboard: mo,
-  rows: po,
-  visualizations: uo,
-  table: Lo,
-  datasets: To,
-  data: yo,
-  type: ho,
-  dataUrl: Ao,
-  dataFileName: Ro,
-  dataFileSourceType: wo,
-  dataDescription: So,
-  formattedData: go,
-  runtime: Yo
-}, vo = {
+}, Yo = [], vo = "dashboard", bo = "", ko = "", Fo = "", Co = [], Po = [], No = {}, Do = {
+  dashboard: go,
+  rows: wo,
+  visualizations: Ro,
+  table: fo,
+  datasets: So,
+  data: Yo,
+  type: vo,
+  dataUrl: bo,
+  dataFileName: ko,
+  dataFileSourceType: Fo,
+  dataDescription: Co,
+  formattedData: Po,
+  runtime: No
+}, Vo = {
   theme: "theme-blue",
   description: "",
   title: "Bump Chart"
-}, ko = [
+}, Ho = [
   {
     columns: [
       {
@@ -23192,7 +25282,7 @@ This number is calculated within the Data Bite module.
     ],
     uuid: 1719606685381
   }
-], Fo = {
+], Mo = {
   chart1719598308434: {
     type: "chart",
     debugSvg: !1,
@@ -25997,12 +28087,12 @@ This number is calculated within the Data Bite module.
     data: {},
     version: "4.24.4"
   }
-}, bo = {
+}, xo = {
   label: "Data Table",
   show: !1,
   showDownloadUrl: !1,
   showVertical: !0
-}, Co = {
+}, Io = {
   "_NOTUSED-bump-chart-data.json": {
     data: [
       {
@@ -26712,17 +28802,17 @@ This number is calculated within the Data Bite module.
     dataFileFormat: "JSON",
     preview: !0
   }
-}, No = "dashboard", Ho = "4.24.4", Mo = {}, Vo = 1719606681758, Uo = {
-  dashboard: vo,
-  rows: ko,
-  visualizations: Fo,
-  table: bo,
-  datasets: Co,
-  type: No,
-  version: Ho,
-  runtime: Mo,
-  uuid: Vo
-}, Do = {
+}, Uo = "dashboard", Eo = "4.24.4", Wo = {}, Oo = 1719606681758, Bo = {
+  dashboard: Vo,
+  rows: Ho,
+  visualizations: Mo,
+  table: xo,
+  datasets: Io,
+  type: Uo,
+  version: Eo,
+  runtime: Wo,
+  uuid: Oo
+}, zo = {
   theme: "theme-blue",
   sharedFilters: [
     {
@@ -26755,7 +28845,7 @@ This number is calculated within the Data Bite module.
       tier: 2
     }
   ]
-}, Eo = [
+}, _o = [
   {
     columns: [
       {
@@ -26784,7 +28874,7 @@ This number is calculated within the Data Bite module.
       }
     ]
   }
-], Io = {
+], qo = {
   dashboardFilters1723488344936: {
     filters: [],
     filterBehavior: "Apply Button",
@@ -27124,27 +29214,27 @@ This number is calculated within the Data Bite module.
     version: "4.24.9",
     dynamicMarginTop: 0
   }
-}, xo = {
+}, Go = {
   label: "Data Table",
   show: !0,
   showDownloadUrl: !1,
   showVertical: !0
-}, Po = {
+}, $o = {
   "hidden-methodology": {
     dataUrl: "http://test.gov/methodology"
   }
-}, Wo = "dashboard", Oo = {}, Bo = "4.24.9", zo = 1723488346870, qo = {
-  dashboard: Do,
-  rows: Eo,
-  visualizations: Io,
-  table: xo,
-  datasets: Po,
-  type: Wo,
-  runtime: Oo,
-  version: Bo,
-  uuid: zo
+}, Ko = "dashboard", Qo = {}, Jo = "4.24.9", jo = 1723488346870, Zo = {
+  dashboard: zo,
+  rows: _o,
+  visualizations: qo,
+  table: Go,
+  datasets: $o,
+  type: Ko,
+  runtime: Qo,
+  version: Jo,
+  uuid: jo
 };
-function D(a, e) {
+function M(a, e) {
   const t = [
     {
       year: 1999,
@@ -27218,20 +29308,20 @@ function D(a, e) {
       state: "new mexico",
       value: "8"
     }
-  ], o = a.split(" "), s = o[0] === "distinct", n = o.length === 2 ? o[1] : o[0], r = t.filter((c) => {
+  ], o = a.split(" "), l = o[0] === "distinct", n = o.length === 2 ? o[1] : o[0], r = t.filter((s) => {
     if (!e)
       return !0;
-    const [je, Je] = e;
-    return c[je] === Je;
-  }).map((c) => n === "*" ? c : { [n]: c[n] });
-  return s ? V.uniqBy(r, n) : r;
+    const [Qe, Je] = e;
+    return s[Qe] === Je;
+  }).map((s) => n === "*" ? s : { [n]: s[n] });
+  return l ? V.uniqBy(r, n) : r;
 }
-const Go = {
+const Xo = {
   theme: "theme-blue",
   sharedFilters: [],
   description: "Dash Description",
   title: "Dashboard Name"
-}, Ko = [
+}, en = [
   {
     columns: [
       {
@@ -27250,7 +29340,7 @@ const Go = {
     },
     dataKey: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv"
   }
-], $o = {
+], an = {
   "data-bite1722537849962": {
     type: "data-bite",
     dataBite: "",
@@ -27349,12 +29439,12 @@ const Go = {
     version: "4.24.10",
     dataKey: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv"
   }
-}, _o = {
+}, tn = {
   label: "Data Table",
   show: !1,
   showDownloadUrl: !1,
   showVertical: !0
-}, jo = {
+}, on = {
   "/bird-flu/modules/situation-summary/national-flu-surveillance.csv": {
     dataFileSize: 39,
     dataFileName: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv",
@@ -27363,166 +29453,20 @@ const Go = {
     preview: !0,
     dataUrl: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv"
   }
-}, Jo = "dashboard", Qo = "4.24.10", Zo = 1722537847428, Xo = {
-  dashboard: Go,
-  rows: Ko,
-  visualizations: $o,
-  table: _o,
-  datasets: jo,
-  type: Jo,
-  version: Qo,
-  uuid: Zo
-}, en = {
+}, nn = "dashboard", rn = "4.24.10", sn = 1722537847428, ln = {
+  dashboard: Xo,
+  rows: en,
+  visualizations: an,
+  table: tn,
+  datasets: on,
+  type: nn,
+  version: rn,
+  uuid: sn
+}, cn = {
   theme: "theme-blue",
   sharedFilters: [],
   description: "Dash Description",
   title: ""
-}, an = [
-  {
-    columns: [
-      {
-        width: 6,
-        widget: "data-bite1722537849962"
-      },
-      {
-        width: 6,
-        widget: "data-bite1728059122204"
-      }
-    ],
-    dataDescription: {
-      horizontal: !1,
-      series: !0,
-      singleRow: !0
-    },
-    dataKey: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv"
-  }
-], tn = {
-  "data-bite1722537849962": {
-    type: "data-bite",
-    dataBite: "",
-    dataFunction: "Sum",
-    dataColumn: "specimens tested",
-    bitePosition: "Left",
-    biteFontSize: 24,
-    fontSize: "medium",
-    biteBody: "specimens tested that would have detected influenza A(H5) or other novel influenza viruses",
-    imageData: {
-      display: "none",
-      url: "",
-      alt: "",
-      options: []
-    },
-    dataFormat: {
-      roundToPlace: 0,
-      commas: !0,
-      prefix: "",
-      suffix: "+"
-    },
-    biteStyle: "title",
-    filters: [],
-    subtext: "",
-    title: "Specimens tested",
-    theme: "theme-blue",
-    shadow: !1,
-    visual: {
-      border: !1,
-      accent: !1,
-      background: !1,
-      hideBackgroundColor: !1,
-      borderColorTheme: !1
-    },
-    general: {
-      isCompactStyle: !1
-    },
-    filterBehavior: "Filter Change",
-    openModal: !0,
-    uid: "data-bite1722537849962",
-    visualizationType: "data-bite",
-    dataDescription: {
-      horizontal: !1,
-      series: !0,
-      singleRow: !0
-    },
-    version: "4.24.10",
-    dataKey: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv"
-  },
-  "data-bite1728059122204": {
-    type: "data-bite",
-    dataBite: "",
-    dataFunction: "Sum",
-    dataColumn: "Human cases",
-    bitePosition: "Left",
-    biteFontSize: 24,
-    fontSize: "medium",
-    biteBody: "case detected through national flu surveillance",
-    imageData: {
-      display: "none",
-      url: "",
-      alt: "",
-      options: []
-    },
-    dataFormat: {
-      roundToPlace: 0,
-      commas: !0,
-      prefix: "",
-      suffix: ""
-    },
-    biteStyle: "title",
-    filters: [],
-    subtext: "",
-    title: "Human cases",
-    theme: "theme-blue",
-    shadow: !1,
-    visual: {
-      border: !1,
-      accent: !1,
-      background: !1,
-      hideBackgroundColor: !1,
-      borderColorTheme: !1
-    },
-    general: {
-      isCompactStyle: !1
-    },
-    filterBehavior: "Filter Change",
-    openModal: !0,
-    uid: "data-bite1728059122204",
-    visualizationType: "data-bite",
-    dataDescription: {
-      horizontal: !1,
-      series: !0,
-      singleRow: !0
-    },
-    version: "4.24.10",
-    dataKey: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv"
-  }
-}, on = {
-  label: "Data Table",
-  show: !1,
-  showDownloadUrl: !1,
-  showVertical: !0
-}, nn = {
-  "/bird-flu/modules/situation-summary/national-flu-surveillance.csv": {
-    dataFileSize: 39,
-    dataFileName: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv",
-    dataFileSourceType: "url",
-    dataFileFormat: "OCTET-STREAM",
-    preview: !0,
-    dataUrl: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv"
-  }
-}, rn = "dashboard", cn = "4.24.10", sn = 1722537847428, ln = {
-  dashboard: en,
-  rows: an,
-  visualizations: tn,
-  table: on,
-  datasets: nn,
-  type: rn,
-  version: cn,
-  uuid: sn
-}, mn = {
-  theme: "theme-blue",
-  sharedFilters: [],
-  description: "",
-  title: "Title no description"
 }, dn = [
   {
     columns: [
@@ -27641,12 +29585,12 @@ const Go = {
     version: "4.24.10",
     dataKey: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv"
   }
-}, un = {
+}, mn = {
   label: "Data Table",
   show: !1,
   showDownloadUrl: !1,
   showVertical: !0
-}, Ln = {
+}, un = {
   "/bird-flu/modules/situation-summary/national-flu-surveillance.csv": {
     dataFileSize: 39,
     dataFileName: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv",
@@ -27655,21 +29599,21 @@ const Go = {
     preview: !0,
     dataUrl: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv"
   }
-}, Tn = "dashboard", yn = "4.24.10", hn = 1722537847428, An = {
-  dashboard: mn,
+}, Ln = "dashboard", Tn = "4.24.10", hn = 1722537847428, yn = {
+  dashboard: cn,
   rows: dn,
   visualizations: pn,
-  table: un,
-  datasets: Ln,
-  type: Tn,
-  version: yn,
+  table: mn,
+  datasets: un,
+  type: Ln,
+  version: Tn,
   uuid: hn
-}, Rn = {
+}, An = {
   theme: "theme-blue",
   sharedFilters: [],
   description: "",
-  title: ""
-}, wn = [
+  title: "Title no description"
+}, gn = [
   {
     columns: [
       {
@@ -27688,7 +29632,7 @@ const Go = {
     },
     dataKey: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv"
   }
-], Sn = {
+], wn = {
   "data-bite1722537849962": {
     type: "data-bite",
     dataBite: "",
@@ -27787,12 +29731,12 @@ const Go = {
     version: "4.24.10",
     dataKey: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv"
   }
-}, gn = {
+}, Rn = {
   label: "Data Table",
   show: !1,
   showDownloadUrl: !1,
   showVertical: !0
-}, Yn = {
+}, fn = {
   "/bird-flu/modules/situation-summary/national-flu-surveillance.csv": {
     dataFileSize: 39,
     dataFileName: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv",
@@ -27801,41 +29745,187 @@ const Go = {
     preview: !0,
     dataUrl: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv"
   }
-}, fn = "dashboard", vn = "4.24.10", kn = 1722537847428, Fn = {
-  dashboard: Rn,
-  rows: wn,
-  visualizations: Sn,
-  table: gn,
-  datasets: Yn,
-  type: fn,
-  version: vn,
-  uuid: kn
-}, Di = {
-  title: "Components/Pages/Dashboard",
-  component: Qe
-}, l = {
-  args: {
-    config: Wa,
-    isEditor: !1
+}, Sn = "dashboard", Yn = "4.24.10", vn = 1722537847428, bn = {
+  dashboard: An,
+  rows: gn,
+  visualizations: wn,
+  table: Rn,
+  datasets: fn,
+  type: Sn,
+  version: Yn,
+  uuid: vn
+}, kn = {
+  theme: "theme-blue",
+  sharedFilters: [],
+  description: "",
+  title: ""
+}, Fn = [
+  {
+    columns: [
+      {
+        width: 6,
+        widget: "data-bite1722537849962"
+      },
+      {
+        width: 6,
+        widget: "data-bite1728059122204"
+      }
+    ],
+    dataDescription: {
+      horizontal: !1,
+      series: !0,
+      singleRow: !0
+    },
+    dataKey: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv"
   }
-}, m = {
+], Cn = {
+  "data-bite1722537849962": {
+    type: "data-bite",
+    dataBite: "",
+    dataFunction: "Sum",
+    dataColumn: "specimens tested",
+    bitePosition: "Left",
+    biteFontSize: 24,
+    fontSize: "medium",
+    biteBody: "specimens tested that would have detected influenza A(H5) or other novel influenza viruses",
+    imageData: {
+      display: "none",
+      url: "",
+      alt: "",
+      options: []
+    },
+    dataFormat: {
+      roundToPlace: 0,
+      commas: !0,
+      prefix: "",
+      suffix: "+"
+    },
+    biteStyle: "title",
+    filters: [],
+    subtext: "",
+    title: "Specimens tested",
+    theme: "theme-blue",
+    shadow: !1,
+    visual: {
+      border: !1,
+      accent: !1,
+      background: !1,
+      hideBackgroundColor: !1,
+      borderColorTheme: !1
+    },
+    general: {
+      isCompactStyle: !1
+    },
+    filterBehavior: "Filter Change",
+    openModal: !0,
+    uid: "data-bite1722537849962",
+    visualizationType: "data-bite",
+    dataDescription: {
+      horizontal: !1,
+      series: !0,
+      singleRow: !0
+    },
+    version: "4.24.10",
+    dataKey: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv"
+  },
+  "data-bite1728059122204": {
+    type: "data-bite",
+    dataBite: "",
+    dataFunction: "Sum",
+    dataColumn: "Human cases",
+    bitePosition: "Left",
+    biteFontSize: 24,
+    fontSize: "medium",
+    biteBody: "case detected through national flu surveillance",
+    imageData: {
+      display: "none",
+      url: "",
+      alt: "",
+      options: []
+    },
+    dataFormat: {
+      roundToPlace: 0,
+      commas: !0,
+      prefix: "",
+      suffix: ""
+    },
+    biteStyle: "title",
+    filters: [],
+    subtext: "",
+    title: "Human cases",
+    theme: "theme-blue",
+    shadow: !1,
+    visual: {
+      border: !1,
+      accent: !1,
+      background: !1,
+      hideBackgroundColor: !1,
+      borderColorTheme: !1
+    },
+    general: {
+      isCompactStyle: !1
+    },
+    filterBehavior: "Filter Change",
+    openModal: !0,
+    uid: "data-bite1728059122204",
+    visualizationType: "data-bite",
+    dataDescription: {
+      horizontal: !1,
+      series: !0,
+      singleRow: !0
+    },
+    version: "4.24.10",
+    dataKey: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv"
+  }
+}, Pn = {
+  label: "Data Table",
+  show: !1,
+  showDownloadUrl: !1,
+  showVertical: !0
+}, Nn = {
+  "/bird-flu/modules/situation-summary/national-flu-surveillance.csv": {
+    dataFileSize: 39,
+    dataFileName: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv",
+    dataFileSourceType: "url",
+    dataFileFormat: "OCTET-STREAM",
+    preview: !0,
+    dataUrl: "/bird-flu/modules/situation-summary/national-flu-surveillance.csv"
+  }
+}, Dn = "dashboard", Vn = "4.24.10", Hn = 1722537847428, Mn = {
+  dashboard: kn,
+  rows: Fn,
+  visualizations: Cn,
+  table: Pn,
+  datasets: Nn,
+  type: Dn,
+  version: Vn,
+  uuid: Hn
+}, zi = {
+  title: "Components/Pages/Dashboard",
+  component: je
+}, c = {
   args: {
-    config: Ja,
+    config: Ka,
     isEditor: !1
   }
 }, d = {
   args: {
     config: nt,
-    isEditor: !1
+    isEditor: !0
   }
 }, p = {
   args: {
-    config: Uo,
+    config: mt,
+    isEditor: !1
+  }
+}, m = {
+  args: {
+    config: Bo,
     isEditor: !1
   }
 }, u = {
   args: {
-    config: ft,
+    config: Dt,
     isEditor: !1
   }
 }, L = {
@@ -27845,64 +29935,64 @@ const Go = {
   }
 }, T = {
   args: {
-    config: Gt,
-    isEditor: !1
-  }
-}, y = {
-  args: {
-    config: fo,
+    config: Xt,
     isEditor: !1
   }
 }, h = {
   args: {
-    config: lo,
+    config: Do,
+    isEditor: !1
+  }
+}, y = {
+  args: {
+    config: Ao,
     isEditor: !1
   }
 }, A = {
   args: {
-    config: eo,
+    config: lo,
     isEditor: !1
   }
-}, R = {
+}, g = {
   args: {
-    config: Tt,
+    config: St,
     isEditor: !1
   }
 };
-N.seed(123);
-const Ke = V.times(5, N.location.country), bn = V.times(3, (a) => `category-${a + 1}`), $e = [];
-Ke.forEach((a, e) => {
-  bn.forEach((t, o) => {
+P.seed(123);
+const Ge = V.times(5, P.location.country), xn = V.times(3, (a) => `category-${a + 1}`), $e = [];
+Ge.forEach((a, e) => {
+  xn.forEach((t, o) => {
     (e + o) % 3 !== 0 && $e.push({
       Country: a,
       "Sample Categories": t,
-      Data: N.number.int({
+      Data: P.number.int({
         min: 5,
         max: 50
       })
     });
   });
 });
-const Cn = Ke.map((a, e) => ({
+const In = Ge.map((a, e) => ({
   Country: a,
   symbol: Ze[e][0],
-  text: N.lorem.sentence()
-})), _e = {
+  text: P.lorem.sentence()
+})), Ke = {
   "valid-world-data.json": {
     data: $e
   },
   "footnote-data.json": {
-    data: Cn
+    data: In
   }
 }, w = {
   args: {
-    config: Et,
+    config: _t,
     isEditor: !1
   }
-}, Nn = [{
-  ...U.rows[0],
+}, Un = [{
+  ...H.rows[0],
   footnotesId: "footnote123"
-}], Hn = {
+}], En = {
   dataKey: "footnote-data.json",
   dynamicFootnotes: {
     symbolColumn: "symbol",
@@ -27912,20 +30002,20 @@ const Cn = Ke.map((a, e) => ({
     symbol: "**",
     text: "This is a static Footnote"
   }]
-}, Mn = {
-  ...U.visualizations,
-  footnote123: Hn
-}, S = {
+}, Wn = {
+  ...H.visualizations,
+  footnote123: En
+}, R = {
   args: {
     config: {
-      ...U,
-      datasets: _e,
-      rows: Nn,
-      visualizations: Mn
+      ...H,
+      datasets: Ke,
+      rows: Un,
+      visualizations: Wn
     },
     isEditor: !1
   }
-}, i = (a) => new Promise((e) => setTimeout(e, a)), E = {
+}, i = (a) => new Promise((e) => setTimeout(e, a)), x = {
   debug: !0,
   mocks: [{
     matcher: {
@@ -28012,7 +30102,7 @@ const Cn = Ke.map((a, e) => ({
     },
     response: {
       status: 200,
-      body: D("distinct year")
+      body: M("distinct year")
     }
   }, ...["a", "b"].map((a) => ({
     matcher: {
@@ -28024,7 +30114,7 @@ const Cn = Ke.map((a, e) => ({
     },
     response: {
       status: 200,
-      body: D("*", ["methodology", a])
+      body: M("*", ["methodology", a])
     }
   })), ...[1999, 2e3, 2012, 2013].map((a) => ({
     matcher: {
@@ -28037,30 +30127,30 @@ const Cn = Ke.map((a, e) => ({
     },
     response: {
       status: 200,
-      body: D("distinct methodology", ["year", a])
+      body: M("distinct methodology", ["year", a])
     }
   }))]
-}, g = {
+}, f = {
   args: {
-    config: ca,
+    config: sa,
     isEditor: !1
   },
   parameters: {
-    fetchMock: E
+    fetchMock: x
   },
   play: async ({
     canvasElement: a
   }) => {
-    const e = H(a), t = M.setup();
+    const e = N(a), t = D.setup();
     await i(1e3);
     const o = e.getByLabelText("Category", {
       selector: "select"
     });
     await t.selectOptions(o, ["topicId"]);
-    const s = e.getByLabelText("Indicator", {
+    const l = e.getByLabelText("Indicator", {
       selector: "select"
     });
-    await t.selectOptions(s, ["indicatorID"]);
+    await t.selectOptions(l, ["indicatorID"]);
     const n = e.getByLabelText("Year", {
       selector: "select"
     });
@@ -28069,32 +30159,32 @@ const Cn = Ke.map((a, e) => ({
       selector: "select"
     });
     await t.selectOptions(r, ["Some StratificationCategory 0"]);
-    const c = e.getByLabelText("Stratification", {
+    const s = e.getByLabelText("Stratification", {
       selector: "select"
     });
-    await t.selectOptions(c, ["Some Stratification 0"]), await t.click(e.getByText("GO!"));
+    await t.selectOptions(s, ["Some Stratification 0"]), await t.click(e.getByText("GO!"));
   }
-}, Y = {
+}, S = {
   args: {
-    config: ya,
+    config: ha,
     isEditor: !1
   },
   parameters: {
-    fetchMock: E
+    fetchMock: x
   },
   play: async ({
     canvasElement: a
   }) => {
-    const e = H(a), t = M.setup();
+    const e = N(a), t = D.setup();
     await i(1e3);
     const o = e.getByLabelText("Location", {
       selector: "select"
     });
     await t.selectOptions(o, ["MS"]);
-    const s = e.getByLabelText("Category", {
+    const l = e.getByLabelText("Category", {
       selector: "select"
     });
-    await t.selectOptions(s, ["topicId"]);
+    await t.selectOptions(l, ["topicId"]);
     const n = e.getByLabelText("Indicator", {
       selector: "select"
     });
@@ -28104,18 +30194,18 @@ const Cn = Ke.map((a, e) => ({
     });
     await t.selectOptions(r, ["Some Year 1"]);
   }
-}, f = {
+}, Y = {
   args: {
-    config: qo,
+    config: Zo,
     isEditor: !1
   },
   parameters: {
-    fetchMock: E
+    fetchMock: x
   },
   play: async ({
     canvasElement: a
   }) => {
-    const e = H(a), t = M.setup();
+    const e = N(a), t = D.setup();
     await i(1e3);
     const o = e.getByLabelText("Year", {
       selector: "select"
@@ -28125,47 +30215,47 @@ const Cn = Ke.map((a, e) => ({
 }, v = {
   args: {
     config: {
-      ...U,
-      datasets: _e
+      ...H,
+      datasets: Ke
     },
     isEditor: !1
   },
   play: async ({
     canvasElement: a
   }) => {
-    const e = H(a), t = M.setup();
+    const e = N(a), t = D.setup();
     await i(1e3);
     const o = e.getByLabelText("Category", {
       selector: "select"
     });
     e.getAllByText("Paraguay"), e.getAllByText("Poland"), e.getAllByText("Iraq"), await t.selectOptions(o, ["category-3"]), e.getAllByText("Paraguay"), e.getAllByText("Ethiopia"), e.getAllByText("Iraq"), await t.selectOptions(o, ["category-1"]), e.getAllByText("Poland"), e.getAllByText("Ethiopia"), e.getAllByText("Curacao");
   }
-}, k = {
-  args: {
-    config: Xo,
-    isEditor: !1
-  }
-}, F = {
+}, b = {
   args: {
     config: ln,
     isEditor: !1
   }
-}, b = {
+}, k = {
   args: {
-    config: An,
+    config: yn,
+    isEditor: !1
+  }
+}, F = {
+  args: {
+    config: bn,
     isEditor: !1
   }
 }, C = {
   args: {
-    config: Fn,
+    config: Mn,
     isEditor: !1
   }
 };
-var I, x, P;
-l.parameters = {
-  ...l.parameters,
+var I, U, E;
+c.parameters = {
+  ...c.parameters,
   docs: {
-    ...(I = l.parameters) == null ? void 0 : I.docs,
+    ...(I = c.parameters) == null ? void 0 : I.docs,
     source: {
       originalSource: `{
   args: {
@@ -28173,31 +30263,31 @@ l.parameters = {
     isEditor: false
   }
 }`,
-      ...(P = (x = l.parameters) == null ? void 0 : x.docs) == null ? void 0 : P.source
+      ...(E = (U = c.parameters) == null ? void 0 : U.docs) == null ? void 0 : E.source
     }
   }
 };
 var W, O, B;
-m.parameters = {
-  ...m.parameters,
+d.parameters = {
+  ...d.parameters,
   docs: {
-    ...(W = m.parameters) == null ? void 0 : W.docs,
+    ...(W = d.parameters) == null ? void 0 : W.docs,
     source: {
       originalSource: `{
   args: {
     config: ExampleConfig_2,
-    isEditor: false
+    isEditor: true
   }
 }`,
-      ...(B = (O = m.parameters) == null ? void 0 : O.docs) == null ? void 0 : B.source
+      ...(B = (O = d.parameters) == null ? void 0 : O.docs) == null ? void 0 : B.source
     }
   }
 };
-var z, q, G;
-d.parameters = {
-  ...d.parameters,
+var z, _, q;
+p.parameters = {
+  ...p.parameters,
   docs: {
-    ...(z = d.parameters) == null ? void 0 : z.docs,
+    ...(z = p.parameters) == null ? void 0 : z.docs,
     source: {
       originalSource: `{
   args: {
@@ -28205,15 +30295,15 @@ d.parameters = {
     isEditor: false
   }
 }`,
-      ...(G = (q = d.parameters) == null ? void 0 : q.docs) == null ? void 0 : G.source
+      ...(q = (_ = p.parameters) == null ? void 0 : _.docs) == null ? void 0 : q.source
     }
   }
 };
-var K, $, _;
-p.parameters = {
-  ...p.parameters,
+var G, $, K;
+m.parameters = {
+  ...m.parameters,
   docs: {
-    ...(K = p.parameters) == null ? void 0 : K.docs,
+    ...(G = m.parameters) == null ? void 0 : G.docs,
     source: {
       originalSource: `{
   args: {
@@ -28221,15 +30311,15 @@ p.parameters = {
     isEditor: false
   }
 }`,
-      ...(_ = ($ = p.parameters) == null ? void 0 : $.docs) == null ? void 0 : _.source
+      ...(K = ($ = m.parameters) == null ? void 0 : $.docs) == null ? void 0 : K.source
     }
   }
 };
-var j, J, Q;
+var Q, J, j;
 u.parameters = {
   ...u.parameters,
   docs: {
-    ...(j = u.parameters) == null ? void 0 : j.docs,
+    ...(Q = u.parameters) == null ? void 0 : Q.docs,
     source: {
       originalSource: `{
   args: {
@@ -28237,7 +30327,7 @@ u.parameters = {
     isEditor: false
   }
 }`,
-      ...(Q = (J = u.parameters) == null ? void 0 : J.docs) == null ? void 0 : Q.source
+      ...(j = (J = u.parameters) == null ? void 0 : J.docs) == null ? void 0 : j.source
     }
   }
 };
@@ -28274,10 +30364,10 @@ T.parameters = {
   }
 };
 var ne, ie, re;
-y.parameters = {
-  ...y.parameters,
+h.parameters = {
+  ...h.parameters,
   docs: {
-    ...(ne = y.parameters) == null ? void 0 : ne.docs,
+    ...(ne = h.parameters) == null ? void 0 : ne.docs,
     source: {
       originalSource: `{
   args: {
@@ -28285,15 +30375,15 @@ y.parameters = {
     isEditor: false
   }
 }`,
-      ...(re = (ie = y.parameters) == null ? void 0 : ie.docs) == null ? void 0 : re.source
+      ...(re = (ie = h.parameters) == null ? void 0 : ie.docs) == null ? void 0 : re.source
     }
   }
 };
-var ce, se, le;
-h.parameters = {
-  ...h.parameters,
+var se, le, ce;
+y.parameters = {
+  ...y.parameters,
   docs: {
-    ...(ce = h.parameters) == null ? void 0 : ce.docs,
+    ...(se = y.parameters) == null ? void 0 : se.docs,
     source: {
       originalSource: `{
   args: {
@@ -28301,15 +30391,15 @@ h.parameters = {
     isEditor: false
   }
 }`,
-      ...(le = (se = h.parameters) == null ? void 0 : se.docs) == null ? void 0 : le.source
+      ...(ce = (le = y.parameters) == null ? void 0 : le.docs) == null ? void 0 : ce.source
     }
   }
 };
-var me, de, pe;
+var de, pe, me;
 A.parameters = {
   ...A.parameters,
   docs: {
-    ...(me = A.parameters) == null ? void 0 : me.docs,
+    ...(de = A.parameters) == null ? void 0 : de.docs,
     source: {
       originalSource: `{
   args: {
@@ -28317,15 +30407,15 @@ A.parameters = {
     isEditor: false
   }
 }`,
-      ...(pe = (de = A.parameters) == null ? void 0 : de.docs) == null ? void 0 : pe.source
+      ...(me = (pe = A.parameters) == null ? void 0 : pe.docs) == null ? void 0 : me.source
     }
   }
 };
 var ue, Le, Te;
-R.parameters = {
-  ...R.parameters,
+g.parameters = {
+  ...g.parameters,
   docs: {
-    ...(ue = R.parameters) == null ? void 0 : ue.docs,
+    ...(ue = g.parameters) == null ? void 0 : ue.docs,
     source: {
       originalSource: `{
   args: {
@@ -28333,15 +30423,15 @@ R.parameters = {
     isEditor: false
   }
 }`,
-      ...(Te = (Le = R.parameters) == null ? void 0 : Le.docs) == null ? void 0 : Te.source
+      ...(Te = (Le = g.parameters) == null ? void 0 : Le.docs) == null ? void 0 : Te.source
     }
   }
 };
-var ye, he, Ae;
+var he, ye, Ae;
 w.parameters = {
   ...w.parameters,
   docs: {
-    ...(ye = w.parameters) == null ? void 0 : ye.docs,
+    ...(he = w.parameters) == null ? void 0 : he.docs,
     source: {
       originalSource: `{
   args: {
@@ -28349,15 +30439,15 @@ w.parameters = {
     isEditor: false
   }
 }`,
-      ...(Ae = (he = w.parameters) == null ? void 0 : he.docs) == null ? void 0 : Ae.source
+      ...(Ae = (ye = w.parameters) == null ? void 0 : ye.docs) == null ? void 0 : Ae.source
     }
   }
 };
-var Re, we, Se;
-S.parameters = {
-  ...S.parameters,
+var ge, we, Re;
+R.parameters = {
+  ...R.parameters,
   docs: {
-    ...(Re = S.parameters) == null ? void 0 : Re.docs,
+    ...(ge = R.parameters) == null ? void 0 : ge.docs,
     source: {
       originalSource: `{
   args: {
@@ -28370,15 +30460,15 @@ S.parameters = {
     isEditor: false
   }
 }`,
-      ...(Se = (we = S.parameters) == null ? void 0 : we.docs) == null ? void 0 : Se.source
+      ...(Re = (we = R.parameters) == null ? void 0 : we.docs) == null ? void 0 : Re.source
     }
   }
 };
-var ge, Ye, fe;
-g.parameters = {
-  ...g.parameters,
+var fe, Se, Ye;
+f.parameters = {
+  ...f.parameters,
   docs: {
-    ...(ge = g.parameters) == null ? void 0 : ge.docs,
+    ...(fe = f.parameters) == null ? void 0 : fe.docs,
     source: {
       originalSource: `{
   args: {
@@ -28420,15 +30510,15 @@ g.parameters = {
     await user.click(canvas.getByText('GO!'));
   }
 }`,
-      ...(fe = (Ye = g.parameters) == null ? void 0 : Ye.docs) == null ? void 0 : fe.source
+      ...(Ye = (Se = f.parameters) == null ? void 0 : Se.docs) == null ? void 0 : Ye.source
     }
   }
 };
-var ve, ke, Fe;
-Y.parameters = {
-  ...Y.parameters,
+var ve, be, ke;
+S.parameters = {
+  ...S.parameters,
   docs: {
-    ...(ve = Y.parameters) == null ? void 0 : ve.docs,
+    ...(ve = S.parameters) == null ? void 0 : ve.docs,
     source: {
       originalSource: `{
   args: {
@@ -28467,15 +30557,15 @@ Y.parameters = {
     await user.selectOptions(yearFilter, ['Some Year 1']);
   }
 }`,
-      ...(Fe = (ke = Y.parameters) == null ? void 0 : ke.docs) == null ? void 0 : Fe.source
+      ...(ke = (be = S.parameters) == null ? void 0 : be.docs) == null ? void 0 : ke.source
     }
   }
 };
-var be, Ce, Ne;
-f.parameters = {
-  ...f.parameters,
+var Fe, Ce, Pe;
+Y.parameters = {
+  ...Y.parameters,
   docs: {
-    ...(be = f.parameters) == null ? void 0 : be.docs,
+    ...(Fe = Y.parameters) == null ? void 0 : Fe.docs,
     source: {
       originalSource: `{
   args: {
@@ -28511,15 +30601,15 @@ f.parameters = {
     canvas.getAllByText('new mexico');
   }
 }`,
-      ...(Ne = (Ce = f.parameters) == null ? void 0 : Ce.docs) == null ? void 0 : Ne.source
+      ...(Pe = (Ce = Y.parameters) == null ? void 0 : Ce.docs) == null ? void 0 : Pe.source
     }
   }
 };
-var He, Me, Ve;
+var Ne, De, Ve;
 v.parameters = {
   ...v.parameters,
   docs: {
-    ...(He = v.parameters) == null ? void 0 : He.docs,
+    ...(Ne = v.parameters) == null ? void 0 : Ne.docs,
     source: {
       originalSource: `{
   args: {
@@ -28554,15 +30644,15 @@ v.parameters = {
     canvas.getAllByText('Curacao');
   }
 }`,
-      ...(Ve = (Me = v.parameters) == null ? void 0 : Me.docs) == null ? void 0 : Ve.source
+      ...(Ve = (De = v.parameters) == null ? void 0 : De.docs) == null ? void 0 : Ve.source
     }
   }
 };
-var Ue, De, Ee;
-k.parameters = {
-  ...k.parameters,
+var He, Me, xe;
+b.parameters = {
+  ...b.parameters,
   docs: {
-    ...(Ue = k.parameters) == null ? void 0 : Ue.docs,
+    ...(He = b.parameters) == null ? void 0 : He.docs,
     source: {
       originalSource: `{
   args: {
@@ -28570,15 +30660,15 @@ k.parameters = {
     isEditor: false
   }
 }`,
-      ...(Ee = (De = k.parameters) == null ? void 0 : De.docs) == null ? void 0 : Ee.source
+      ...(xe = (Me = b.parameters) == null ? void 0 : Me.docs) == null ? void 0 : xe.source
     }
   }
 };
-var Ie, xe, Pe;
-F.parameters = {
-  ...F.parameters,
+var Ie, Ue, Ee;
+k.parameters = {
+  ...k.parameters,
   docs: {
-    ...(Ie = F.parameters) == null ? void 0 : Ie.docs,
+    ...(Ie = k.parameters) == null ? void 0 : Ie.docs,
     source: {
       originalSource: `{
   args: {
@@ -28586,15 +30676,15 @@ F.parameters = {
     isEditor: false
   }
 }`,
-      ...(Pe = (xe = F.parameters) == null ? void 0 : xe.docs) == null ? void 0 : Pe.source
+      ...(Ee = (Ue = k.parameters) == null ? void 0 : Ue.docs) == null ? void 0 : Ee.source
     }
   }
 };
 var We, Oe, Be;
-b.parameters = {
-  ...b.parameters,
+F.parameters = {
+  ...F.parameters,
   docs: {
-    ...(We = b.parameters) == null ? void 0 : We.docs,
+    ...(We = F.parameters) == null ? void 0 : We.docs,
     source: {
       originalSource: `{
   args: {
@@ -28602,11 +30692,11 @@ b.parameters = {
     isEditor: false
   }
 }`,
-      ...(Be = (Oe = b.parameters) == null ? void 0 : Oe.docs) == null ? void 0 : Be.source
+      ...(Be = (Oe = F.parameters) == null ? void 0 : Oe.docs) == null ? void 0 : Be.source
     }
   }
 };
-var ze, qe, Ge;
+var ze, _e, qe;
 C.parameters = {
   ...C.parameters,
   docs: {
@@ -28618,33 +30708,33 @@ C.parameters = {
     isEditor: false
   }
 }`,
-      ...(Ge = (qe = C.parameters) == null ? void 0 : qe.docs) == null ? void 0 : Ge.source
+      ...(qe = (_e = C.parameters) == null ? void 0 : _e.docs) == null ? void 0 : qe.source
     }
   }
 };
-const Ei = ["Example_1", "Example_2", "Example_3", "Bump_Chart_Dashboard", "Dashboard_Filters", "API_Filter_Error", "StandAloneTable", "ToggleExample", "PivotFilter", "GroupPivotFilter", "SingleStateDashboardWithFilters", "MultiDashboard", "Footnotes", "RegressionAPIFiltersMap", "RegressionAPIFiltersChart", "RegressionHiddenFilter", "RegressionMultiVisualization", "Top_Spacing_1", "Top_Spacing_2", "Top_Spacing_3", "Top_Spacing_4"];
+const _i = ["Example_1", "Example_2", "Example_3", "Bump_Chart_Dashboard", "Dashboard_Filters", "API_Filter_Error", "StandAloneTable", "ToggleExample", "PivotFilter", "GroupPivotFilter", "SingleStateDashboardWithFilters", "MultiDashboard", "Footnotes", "RegressionAPIFiltersMap", "RegressionAPIFiltersChart", "RegressionHiddenFilter", "RegressionMultiVisualization", "Top_Spacing_1", "Top_Spacing_2", "Top_Spacing_3", "Top_Spacing_4"];
 export {
   L as API_Filter_Error,
-  p as Bump_Chart_Dashboard,
+  m as Bump_Chart_Dashboard,
   u as Dashboard_Filters,
-  l as Example_1,
-  m as Example_2,
-  d as Example_3,
-  S as Footnotes,
+  c as Example_1,
+  d as Example_2,
+  p as Example_3,
+  R as Footnotes,
   A as GroupPivotFilter,
   w as MultiDashboard,
-  h as PivotFilter,
-  Y as RegressionAPIFiltersChart,
-  g as RegressionAPIFiltersMap,
-  f as RegressionHiddenFilter,
+  y as PivotFilter,
+  S as RegressionAPIFiltersChart,
+  f as RegressionAPIFiltersMap,
+  Y as RegressionHiddenFilter,
   v as RegressionMultiVisualization,
-  R as SingleStateDashboardWithFilters,
+  g as SingleStateDashboardWithFilters,
   T as StandAloneTable,
-  y as ToggleExample,
-  k as Top_Spacing_1,
-  F as Top_Spacing_2,
-  b as Top_Spacing_3,
+  h as ToggleExample,
+  b as Top_Spacing_1,
+  k as Top_Spacing_2,
+  F as Top_Spacing_3,
   C as Top_Spacing_4,
-  Ei as __namedExportsOrder,
-  Di as default
+  _i as __namedExportsOrder,
+  zi as default
 };
