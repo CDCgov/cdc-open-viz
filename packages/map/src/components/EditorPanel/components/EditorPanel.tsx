@@ -1448,7 +1448,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     <AlabamaGraphic />
                     <span>U.S. State</span>
                   </button>
-                  <button
+                  {/* <button
                     className={`${state.general.geoType === 'google-map' ? 'active' : ''} full-width`}
                     onClick={e => {
                       e.preventDefault()
@@ -1457,7 +1457,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   >
                     <UsaGraphic />
                     <span>Google Map Api</span>
-                  </button>
+                  </button> */}
                 </ul>
               </label>
               {/* Select > State or County Map */}
@@ -1572,12 +1572,13 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
               </label>
 
               {/* Navigation Behavior */}
-              {state.general.type === 'navigation' && (
+              {(state.general.type === 'navigation' || state.general.type === 'data') && (
                 <label>
                   <span className='edit-label column-heading'>Navigation Behavior</span>
                   <select
                     value={state.general.navigationTarget}
                     onChange={event => {
+                      event.preventDefault()
                       handleEditorChanges('navigationTarget', event.target.value)
                     }}
                   >
@@ -1634,12 +1635,10 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>
-                            Recommended set to display for Section 508 compliance.
-                          </p>
+                          <p>Recommended set to display for Section 508 compliance.</p>
                         </Tooltip.Content>
                       </Tooltip>
-                      </span>
+                    </span>
                   </label>
                 )}
             </AccordionItemPanel>

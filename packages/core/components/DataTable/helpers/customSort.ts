@@ -25,7 +25,7 @@ export const customSort = (a, b, sortBy, config) => {
   const trimmedA = String(valueA).trim()
   const trimmedB = String(valueB).trim()
 
-  if (config.xAxis?.dataKey === sortBy.column && config.xAxis.type === 'date') {
+  if (config.xAxis?.dataKey === sortBy.column && ['date', 'date-time'].includes(config.xAxis.type)) {
     const dateA = parseDate(config.xAxis.dateParseFormat, trimmedA)?.getTime()
 
     const dateB = parseDate(config.xAxis.dateParseFormat, trimmedB)?.getTime()

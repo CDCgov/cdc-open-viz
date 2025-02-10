@@ -42,7 +42,7 @@ import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
-import { getXAxisData, getYAxisData } from '../helpers/getAxisData'
+import _ from 'lodash'
 
 type LinearChartProps = {
   parentWidth: number
@@ -186,10 +186,15 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   const isNoDataAvailable = config.filters && config.filters.values.length === 0 && data.length === 0
 
+  const getXAxisData = d =>
+    isDateScale(config.runtime.xAxis)
+      ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime()
+      : d[config.runtime.originalXAxis.dataKey]
+  const getYAxisData = (d, seriesKey) => d[seriesKey]
   const xAxisDataMapped =
     config.brush.active && brushConfig.data?.length
-      ? brushConfig.data.map(d => getXAxisData(d, config, parseDate))
-      : data.map(d => getXAxisData(d, config, parseDate))
+      ? brushConfig.data.map(d => getXAxisData(d))
+      : data.map(d => getXAxisData(d))
   const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
   const properties = {
     data,
@@ -417,12 +422,20 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     if (!yAxisAutoPadding) return
     setYAxisAutoPadding(0)
   }, [maxValue])
+
   useEffect(() => {
     if (orientation === 'horizontal') return
+    if (!labelsOverflow) return
 
-    const maxValueIsGreaterThanTopGridLine = maxValue > Math.max(...yScale.ticks(handleNumTicks))
+    // minimum percentage of the max value that the distance should be from the top grid line
+    const MINIMUM_DISTANCE_PERCENTAGE = 0.025
 
-    if (!maxValueIsGreaterThanTopGridLine || !labelsOverflow) return
+    const topGridLine = Math.max(...yScale.ticks(handleNumTicks))
+    const needsPaddingThreshold = topGridLine - maxValue * MINIMUM_DISTANCE_PERCENTAGE
+    const maxValueIsGreaterThanThreshold = maxValue > needsPaddingThreshold
+
+    if (!maxValueIsGreaterThanThreshold) return
+
     const ticks = yScale.ticks(handleNumTicks)
     const tickGap = ticks.length === 1 ? ticks[0] : ticks[1] - ticks[0]
     const nextTick = Math.max(...yScale.ticks(handleNumTicks)) + tickGap
@@ -430,9 +443,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const calculatedPadding = (nextTick - maxValue) / divideBy
 
     // if auto padding is too close to next tick, add one more ticks worth of padding
-    const PADDING_THRESHOLD = 0.025
     const newPadding =
-      calculatedPadding > PADDING_THRESHOLD ? calculatedPadding : calculatedPadding + tickGap / divideBy
+      calculatedPadding > MINIMUM_DISTANCE_PERCENTAGE ? calculatedPadding : calculatedPadding + tickGap / divideBy
 
     /* sometimes even though the padding is getting to the next tick exactly,
     d3 still doesn't show the tick. we add 0.1 to ensure to tip it over the edge */
@@ -1347,17 +1359,18 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               numTicks={useDateSpanMonths ? dateSpanMonths : xTickCount}
               tickStroke='#333'
               tickValues={
-                config.xAxis.manual
+                config.runtime.xAxis.manual
                   ? getTickValues(xAxisDataMapped, xScale, isDateTime ? xTickCount : getManualStep(), config)
-                  : config.xAxis.type === 'date'
+                  : config.runtime.xAxis.type === 'date'
                   ? xAxisDataMapped
                   : undefined
               }
             >
               {props => {
+                const hasDynamicCategory = config.series.some(s => s.dynamicCategory)
                 // For these charts, we generated all ticks in tickValues above, and now need to filter/shift them
                 // so the last tick is always labeled
-                if (config.xAxis.type === 'date' && !config.xAxis.manual) {
+                if (config.runtime.xAxis.type === 'date' && !config.runtime.xAxis.manual && !hasDynamicCategory) {
                   props.ticks = filterAndShiftLinearDateTicks(config, props, xAxisDataMapped, formatDate)
                 }
 
@@ -1365,7 +1378,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   useDateSpanMonths &&
                   xScale
                     .ticks(xTickCount)
-                    .map(t => props.ticks.findIndex(tick => tick.value.getTime() === t.getTime()))
+                    .map(t =>
+                      props.ticks.findIndex(
+                        tick => (typeof tick.value === 'number' ? tick.value : tick.value.getTime()) === t.getTime()
+                      )
+                    )
                     .slice(0, 2)
                     .reduce((acc, curr) => curr - acc)
 
@@ -1534,7 +1551,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               >
                 <ul>
                   {typeof tooltipData === 'object' &&
-                    Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}
+                    Object.entries(tooltipData.data)
+                      .filter(([_, values]) => Array.isArray(values) && !values.includes(undefined))
+                      .map((item, index) => <TooltipListItem item={item} key={index} />)}
                 </ul>
               </TooltipWithBounds>
             </>

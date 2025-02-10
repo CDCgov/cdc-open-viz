@@ -41,13 +41,13 @@ export default function ConfigureTab({ containerEl }) {
     case 'chart':
       return (
         <ErrorBoundary component='CdcChart'>
-          <CdcChart isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
+          <CdcChart isEditor={true} isDebug={isDebug} config={config} />
         </ErrorBoundary>
       )
     case 'dashboard':
       return (
         <ErrorBoundary component='CdcDashboard'>
-          <MultiDashboardWrapper isEditor={true} isDebug={isDebug} config={config} />
+          <MultiDashboardWrapper isEditor={true} isDebug={isDebug} />
         </ErrorBoundary>
       )
     case 'data-bite':

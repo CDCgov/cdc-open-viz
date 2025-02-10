@@ -40,7 +40,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
       Number
     )
     return config.dashboard.sharedFilters
-      .map<[number, string]>(({ key }, i) => [i, key])
+      ?.map<[number, string]>(({ key }, i) => [i, key])
       .filter(([filterIndex]) => !sharedFilterIndexes.includes(filterIndex)) // filter out already added filters
       .map(([filterIndex, filterName]) => (
         <option key={filterIndex} value={filterIndex}>{`${filterIndex} - ${filterName}`}</option>
@@ -60,11 +60,11 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
       subgroupTextSelector: oldSubgroupTextSelector
     } = sharedFilters[index].apiFilter || {}
     const apiFilterChanged =
-      value.apiEndpoint !== oldEndpoint ||
-      value.valueSelector !== oldValueSelector ||
-      value.textSelector !== oldTextSelector ||
-      value.subgroupValueSelector !== oldSubgroupValueSelector ||
-      value.subgroupTextSelector !== oldSubgroupTextSelector
+      value?.apiEndpoint !== oldEndpoint ||
+      value?.valueSelector !== oldValueSelector ||
+      value?.textSelector !== oldTextSelector ||
+      value?.subgroupValueSelector !== oldSubgroupValueSelector ||
+      value?.subgroupTextSelector !== oldSubgroupTextSelector
 
     newSharedFilters[index][prop] = value
     if (prop === 'columnName') {
@@ -228,6 +228,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
               >
                 <FilterEditor
                   filter={filter}
+                  filterIndex={index}
                   updateFilterProp={(name, value) => {
                     updateFilterProp(name, index, value)
                   }}
@@ -274,9 +275,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
               </select>
             </label>
           ) : (
-
             <button onClick={() => setCanAddExisting(true)} className='btn btn-primary full-width mt-2'>
-
               Add Existing Dashboard Filter
             </button>
           )}

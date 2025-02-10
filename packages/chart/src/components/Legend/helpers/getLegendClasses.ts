@@ -18,6 +18,11 @@ export const getLegendClasses = (config: ChartConfig) => {
   const containerClasses = ['legend-container', containerClassMap[position]].filter(Boolean)
   const innerClasses = ['legend-container__inner', ...(innerClassMap[position] || [])]
 
+  // Add vertical sorting class for 'bottom' and 'top' positions
+  if (['bottom', 'top'].includes(position) && verticalSorted) {
+    innerClasses.push('vertical-sorted')
+  }
+
   // Add border and padding classes based on position and hideBorder
   const shouldHideBorder = (['right', 'left'].includes(position) || !position) && hideBorder.side
   const shouldHideTopBottomBorder = ['top', 'bottom'].includes(position) && hideBorder.topBottom

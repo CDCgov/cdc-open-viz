@@ -101,11 +101,11 @@ export const useFilters = props => {
   const changeFilterActive = (index, value) => {
     let newFilters = standaloneMap ? [...filteredData] : [...visualizationConfig.filters]
 
+    const newFilter = newFilters[index]
     if (visualizationConfig.filterBehavior === 'Apply Button') {
-      newFilters[index].queuedActive = value
+      newFilter.queuedActive = value
       setShowApplyButton(true)
     } else {
-      const newFilter = newFilters[index]
       if (newFilter.filterStyle !== 'nested-dropdown') {
         newFilter.active = value
       } else {
@@ -441,6 +441,13 @@ const Filters = (props: FilterProps) => {
       ]
       const mobileExempt = ['nested-dropdown', 'multi-select'].includes(filterStyle)
       const showDefaultDropdown = (filterStyle === 'dropdown' || mobileFilterStyle) && !mobileExempt
+      const [nestedActiveGroup, nestedActiveSubGroup] = useMemo<string[]>(() => {
+        if (filterStyle !== 'nested-dropdown') return []
+        return (singleFilter.queuedActive || [singleFilter.active, singleFilter.subGrouping?.active]) as [
+          string,
+          string
+        ]
+      }, [singleFilter])
       return (
         <div className={classList.join(' ')} key={outerIndex}>
           <>
@@ -463,8 +470,8 @@ const Filters = (props: FilterProps) => {
             )}
             {filterStyle === 'nested-dropdown' && (
               <NestedDropdown
-                activeGroup={(singleFilter.active as string) || (singleFilter.queuedActive || [])[0]}
-                activeSubGroup={(singleFilter.subGrouping?.active as string) || (singleFilter.queuedActive || [])[1]}
+                activeGroup={nestedActiveGroup}
+                activeSubGroup={nestedActiveSubGroup}
                 filterIndex={outerIndex}
                 options={getNestedOptions(singleFilter)}
                 listLabel={label}
@@ -494,7 +501,7 @@ const Filters = (props: FilterProps) => {
     const conditionalClass = standaloneMap ? general.headerColor : visualizationType === 'Spark Line' ? null : theme
     const legendClass = legend && !legend.hide && legend.position === 'top' ? 'mb-0' : null
 
-    return [baseClass, conditionalClass, legendClass].filter(Boolean)
+    return [baseClass, conditionalClass, legendClass, 'w-100'].filter(Boolean)
   }
 
   return (

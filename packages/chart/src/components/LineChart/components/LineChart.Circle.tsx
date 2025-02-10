@@ -190,7 +190,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
       return isFirstPoint || isLastPoint || isMiddlePoint
     }
 
-    if (drawIsolatedPoints(dataIndex, seriesKey)) {
+    if (drawIsolatedPoints(dataIndex, seriesKey) && !config.series.some(s => s.dynamicCategory)) {
       const positionTop = filtered?.axis === 'Right' ? yScaleRight(d[filtered?.dataKey]) : yScale(d[filtered?.dataKey])
       const positionLeft = getXPos(d[config.xAxis?.dataKey])
       const color = colorScale(config.runtime.seriesLabels[seriesKey])

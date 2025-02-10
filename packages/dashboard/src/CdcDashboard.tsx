@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import CdcDashboard from './CdcDashboardComponent'
 import { MultiDashboardConfig } from './types/MultiDashboard'
 import Loading from '@cdc/core/components/Loading'
@@ -13,19 +13,16 @@ import { DashboardConfig } from './types/DashboardConfig'
 import { coveUpdateWorker } from '@cdc/core/helpers/coveUpdateWorker'
 import _ from 'lodash'
 import { getQueryParams } from '@cdc/core/helpers/queryStringUtils'
+import EditorContext from '../../editor/src/ConfigContext'
 
 type MultiDashboardProps = Omit<WCMSProps, 'configUrl'> & {
   configUrl?: string
   config?: MultiDashboardConfig
 }
 
-const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
-  configUrl,
-  config: editorConfig,
-  isEditor,
-  isDebug
-}) => {
+const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, isEditor, isDebug, config }) => {
   const [initial, setInitial] = useState<InitialState>(undefined)
+  const editorContext = useContext(EditorContext)
 
   const getSelectedConfig = (config: MultiDashboardConfig): number | null => {
     if (!config.multiDashboards) return null
@@ -48,7 +45,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
   }
 
   const loadConfig = async () => {
-    const _config: MultiDashboardConfig = editorConfig || (await (await fetch(configUrl)).json())
+    const _config: MultiDashboardConfig = config || editorContext.config || (await (await fetch(configUrl)).json())
     const selected = getSelectedConfig(_config)
 
     const { newConfig, datasets } =
