@@ -159,9 +159,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
     (config.xAxis || config.yAxis) && ['date-time', 'date'].includes((config.xAxis || config.yAxis).type)
   const dataTableDefaultSortBy = hasDateAxis && config.xAxis.dataKey
 
-  const checkLineToBarGraph = () => {
-    return isConvertLineToBarGraph(config.visualizationType, filteredData, config.allowLineToBarGraph)
-  }
+  const convertLineToBarGraph = (() => {
+    const isDynamicSeries = configObj.series.some(series => series.dynamicCategory)
+    const isDynamicWithLessThanThreePoints =
+      isDynamicSeries && _.uniq(configObj.formattedData?.map(data => data[configObj.xAxis.dataKey])).length <= 2
+    return isConvertLineToBarGraph(
+      config.visualizationType,
+      filteredData,
+      config.allowLineToBarGraph,
+      isDynamicWithLessThanThreePoints
+    )
+  })()
 
   const prepareConfig = (loadedConfig: ChartConfig, data): ChartConfig => {
     let newConfig = _.defaultsDeep(loadedConfig, defaults)
@@ -297,7 +305,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       newConfig.yAxis.type = newConfig.yAxis.type === 'categorical' ? 'linear' : newConfig.yAxis.type
     } else if (
       ['Box Plot', 'Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType) &&
-      !checkLineToBarGraph()
+      !convertLineToBarGraph
     ) {
       newConfig.runtime.xAxis = newConfig.xAxis
       newConfig.runtime.yAxis = newConfig.yAxis
@@ -884,7 +892,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     )}
                     {/* Line Chart */}
                     {config.visualizationType === 'Line' &&
-                      (checkLineToBarGraph() ? (
+                      (convertLineToBarGraph ? (
                         <div ref={parentRef} style={{ width: `100%` }}>
                           <ParentSize>
                             {parent => (
@@ -1031,6 +1039,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const contextValues = {
     brushConfig,
     capitalize,
+    convertLineToBarGraph,
     clean,
     colorPalettes,
     colorScale,

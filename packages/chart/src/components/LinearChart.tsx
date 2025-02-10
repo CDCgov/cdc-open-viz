@@ -26,7 +26,6 @@ import Regions from './Regions'
 import CategoricalYAxis from './Axis/Categorical.Axis'
 
 // Helpers
-import { isConvertLineToBarGraph } from '../helpers/isConvertLineToBarGraph'
 import { isLegendWrapViewport, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { calcInitialHeight } from '../helpers/sizeHelpers'
@@ -65,6 +64,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     brushConfig,
     colorScale,
     config,
+    convertLineToBarGraph,
     currentViewport,
     dimensions,
     formatDate,
@@ -257,10 +257,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const useDateSpanMonths = isDateTime && dateSpanMonths > xTickCount
 
   // GETTERS & FUNCTIONS
-  const checkLineToBarGraph = () => {
-    return isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph)
-  }
-
   const handleLeftTickFormatting = (tick, index, ticks) => {
     if (isLogarithmicAxis && tick === 0.1) {
       //when logarithmic scale applied change value of first tick
@@ -732,7 +728,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               showTooltip={showTooltip}
             />
           )}
-          {(visualizationType === 'Bar' || visualizationType === 'Combo' || checkLineToBarGraph()) && (
+          {(visualizationType === 'Bar' || visualizationType === 'Combo' || convertLineToBarGraph) && (
             <BarChart
               xScale={xScale}
               yScale={yScale}
@@ -751,7 +747,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               chartRef={svgRef}
             />
           )}
-          {((visualizationType === 'Line' && !checkLineToBarGraph()) ||
+          {((visualizationType === 'Line' && !convertLineToBarGraph) ||
             visualizationType === 'Combo' ||
             visualizationType === 'Bump Chart') && (
             <LineChart
@@ -815,7 +811,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(
             visualizationType
           ) &&
-            !checkLineToBarGraph() && (
+            !convertLineToBarGraph && (
               <>
                 <LineChart
                   xScale={xScale}
@@ -948,7 +944,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               {config.chartMessage.noData}
             </Text>
           )}
-          {(config.visualizationType === 'Bar' || checkLineToBarGraph()) &&
+          {(config.visualizationType === 'Bar' || convertLineToBarGraph) &&
             config.tooltips.singleSeries &&
             config.visual.horizontalHoverLine && (
               <Group
@@ -967,7 +963,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 />
               </Group>
             )}
-          {(config.visualizationType === 'Bar' || checkLineToBarGraph()) &&
+          {(config.visualizationType === 'Bar' || convertLineToBarGraph) &&
             config.tooltips.singleSeries &&
             config.visual.verticalHoverLine && (
               <Group key='tooltipLine-vertical' className='vertical-tooltip-line'>
