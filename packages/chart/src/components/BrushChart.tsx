@@ -169,17 +169,28 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
       })
   }, [config.filters, config.exclusions, config.brush?.active, isDashboardFilters])
 
+  // this effect handles where brush chart is missing on production. it helpes re render
   useEffect(() => {
+    let timeoutId = null
+
     const checkAndInitializeBrush = () => {
       if (xMax > 0) {
         initializeBrush()
       } else {
-        //set a timeout to retry or handle the negative xMax scenario
-        setTimeout(checkAndInitializeBrush, 500)
+        // Clear the existing timeout and set a new one
+        clearTimeout(timeoutId)
+        timeoutId = setTimeout(checkAndInitializeBrush, 500)
       }
     }
 
     checkAndInitializeBrush()
+
+    // Cleanup function to clear timeout
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+    }
   }, [xMax])
 
   // reset brush on keychange

@@ -11,6 +11,7 @@ export const getGradientConfig = (config, formatLabels, colorScale) => {
 }
 
 export const getMarginTop = (isLegendBottom, config) => {
+  // margin between charts xAxis legend not to overlap axis labels,ticks.
   const DEFAULT_MARGIN_TOP = 27
   if (isLegendBottom && config.legend.hide) {
     return '0px'
@@ -19,8 +20,8 @@ export const getMarginTop = (isLegendBottom, config) => {
     return '0px'
   }
   if (isLegendBottom && config.brush.active && !config.legend.hide) {
-    const additialMargin = 25
-    return `${DEFAULT_MARGIN_TOP + config.brush.height + additialMargin}px`
+    const additiolMargin = 25
+    return `${DEFAULT_MARGIN_TOP + config.brush.height + additiolMargin}px`
   } else {
     return `${DEFAULT_MARGIN_TOP}px`
   }
