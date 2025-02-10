@@ -46,6 +46,5 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
       }
     }
   })
-  console.log(updatedFilters, 'updatedFilters')
   return updatedFilters
 }
