@@ -11,7 +11,7 @@ const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoN
     if (activeGeo !== '') {
       const urlString = data[dropdownItems[activeGeo]][columns.navigate.name]
 
-      navigationHandler(state.general.navigationTarget, urlString)
+      navigationHandler(urlString)
     }
   }
 
