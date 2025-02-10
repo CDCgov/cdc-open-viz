@@ -107,8 +107,8 @@ export const formatConfigBeforeSave = configToStrip => {
       delete strippedConfig.rows
       delete strippedConfig.visualizations
       delete strippedConfig.label
-      delete strippedConfig.activeDashboard
     }
+    delete strippedConfig.activeDashboard
     cleanDashboardData(strippedConfig)
     cleanSharedFilters(strippedConfig)
     cleanDashboardFootnotes(strippedConfig)
