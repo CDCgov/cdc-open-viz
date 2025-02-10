@@ -47,7 +47,7 @@ export default function ConfigureTab({ containerEl }) {
     case 'dashboard':
       return (
         <ErrorBoundary component='CdcDashboard'>
-          <MultiDashboardWrapper isEditor={true} isDebug={isDebug} config={config} />
+          <MultiDashboardWrapper isEditor={true} isDebug={isDebug} />
         </ErrorBoundary>
       )
     case 'data-bite':

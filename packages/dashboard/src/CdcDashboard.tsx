@@ -20,7 +20,7 @@ type MultiDashboardProps = Omit<WCMSProps, 'configUrl'> & {
   config?: MultiDashboardConfig
 }
 
-const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, isEditor, isDebug }) => {
+const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, isEditor, isDebug, config }) => {
   const [initial, setInitial] = useState<InitialState>(undefined)
   const editorContext = useContext(EditorContext)
 
@@ -45,7 +45,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, isEdi
   }
 
   const loadConfig = async () => {
-    const _config: MultiDashboardConfig = editorContext.config || (await (await fetch(configUrl)).json())
+    const _config: MultiDashboardConfig = config || editorContext.config || (await (await fetch(configUrl)).json())
     const selected = getSelectedConfig(_config)
 
     const { newConfig, datasets } =
