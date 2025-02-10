@@ -1,10 +1,18 @@
 {
+  "annotations": [],
   "type": "chart",
-  "title": "Combo Bar-Line Chart",
-  "theme": "theme-indigo",
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "title": "",
+  "showTitle": false,
+  "showDownloadMediaButton": false,
+  "theme": "theme-blue",
   "animate": false,
   "fontSize": "medium",
-  "lineDatapointStyle": "always show",
+  "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
   "barHasBorder": "false",
   "isLollipopChart": false,
   "lollipopShape": "circle",
@@ -13,31 +21,41 @@
   "barStyle": "flat",
   "roundingStyle": "standard",
   "tipRounding": "top",
+  "isResponsiveTicks": true,
+  "general": {
+    "annotationDropdownText": "Annotations",
+    "showDownloadButton": false,
+    "showMissingDataLabel": false,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": false,
+    "hideNullValue": true
+  },
   "padding": {
     "left": 5,
     "right": 5
   },
+  "preliminaryData": [],
   "yAxis": {
     "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "68",
-    "gridLines": true,
+    "size": "75",
+    "gridLines": false,
     "enablePadding": false,
-    "min": "",
-    "max": "",
+    "min": "0.1",
+    "max": "3",
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
     "rightHideAxis": true,
-    "rightAxisSize": 50,
+    "rightAxisSize": 0,
     "rightLabel": "",
     "rightLabelOffsetSize": 0,
     "rightAxisLabelColor": "#333",
     "rightAxisTickLabelColor": "#333",
     "rightAxisTickColor": "#333",
-    "numTicks": "",
+    "numTicks": "6",
     "axisPadding": 0,
     "scalePadding": 10,
     "tickRotation": 0,
@@ -45,285 +63,9 @@
     "shoMissingDataLabel": true,
     "showMissingDataLine": true,
     "categories": [],
-    "isLegendValue": false,
-    "label": "Y-Axis Label Example"
+    "label": "Reported cases per 100,000 Population",
+    "type": "linear"
   },
-  "topAxis": {
-    "hasLine": false
-  },
-  "barThickness": "0.5",
-  "barHeight": 25,
-  "height": "332",
-  "xAxis": {
-    "sortDates": false,
-    "anchors": [],
-    "type": "date",
-    "showTargetLabel": true,
-    "targetLabel": "Target",
-    "hideAxis": false,
-    "hideLabel": false,
-    "hideTicks": false,
-    "size": "78",
-    "tickRotation": "25",
-    "min": "",
-    "max": "",
-    "labelColor": "#333",
-    "tickLabelColor": "#333",
-    "tickColor": "#333",
-    "numTicks": "",
-    "labelOffset": 0,
-    "axisPadding": 200,
-    "target": 0,
-    "maxTickRotation": 0,
-    "padding": 5,
-    "showYearsOnce": false,
-    "sortByRecentDate": false,
-    "isLegendValue": false,
-    "dataKey": "Date",
-    "label": "X-Axis Example Label",
-    "dateParseFormat": "%d/%m/%Y",
-    "dateDisplayFormat": "%d/%m/%Y",
-    "axisBBox": 96.9543685913086,
-    "tickWidthMax": 86
-  },
-  "table": {
-    "label": "Data Table",
-    "expanded": true,
-    "limitHeight": false,
-    "height": "",
-    "caption": "",
-    "showDownloadUrl": false,
-    "showDataTableLink": true,
-    "showDownloadLinkBelow": true,
-    "indexLabel": "",
-    "download": true,
-    "showVertical": true,
-    "dateDisplayFormat": "",
-    "showMissingDataLabel": true,
-    "showSuppressedSymbol": true,
-    "show": true
-  },
-
-  "orientation": "vertical",
-  "legend": {
-    "hide": false,
-    "behavior": "highlight",
-    "axisAlign": true,
-    "singleRow": false,
-    "colorCode": "",
-    "reverseLabelOrder": false,
-    "description": "",
-    "dynamicLegend": false,
-    "dynamicLegendDefaultText": "Show All",
-    "dynamicLegendItemLimit": 5,
-    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
-    "dynamicLegendChartMessage": "Select Options from the Legend",
-    "label": "Data Type",
-    "lineMode": false,
-    "verticalSorted": false,
-    "highlightOnHover": false,
-    "hideSuppressedLabels": false,
-    "hideSuppressionLink": false,
-    "seriesHighlight": [],
-    "style": "lines",
-    "subStyle": "linear blocks",
-    "shape": "circle",
-    "tickRotation": "",
-    "hideBorder": {
-      "side": false,
-      "topBottom": true
-    },
-    "position": "right",
-    "hasShape": true
-  },
-  "exclusions": {
-    "active": false,
-    "keys": []
-  },
-  "palette": "qualitative4",
-  "isPaletteReversed": false,
-  "labels": false,
-  "dataFormat": {
-    "commas": false,
-    "prefix": "",
-    "suffix": "",
-    "abbreviated": false,
-    "bottomSuffix": "",
-    "bottomPrefix": "",
-    "bottomAbbreviated": false
-  },
-  "confidenceKeys": {},
-  "visual": {
-    "border": true,
-    "accent": true,
-    "background": true,
-    "verticalHoverLine": false,
-    "horizontalHoverLine": false,
-    "lineDatapointSymbol": "standard"
-  },
-  "data": [
-    {
-      "Date": "1/15/2016",
-      "Data 1": "N/A",
-      "Data 2": "110",
-      "Data 3": "100",
-      "Data 4": "90",
-      "Data 5": "00",
-      "Data 6": "190",
-      "Data 7": "00",
-      "Data 8": "40",
-      "Monthly-Goal": "100"
-    },
-    {
-      "Date": "2/15/2016",
-      "Data 1": "100",
-      "Data 2": "goop",
-      "Data 3": "100",
-      "Data 4": "100",
-      "Data 5": "10",
-      "Data 6": "590",
-      "Data 7": "44",
-      "Data 8": "10",
-      "Monthly-Goal": "100"
-    },
-    {
-      "Date": "3/15/2016",
-      "Data 1": "",
-      "Data 2": "90",
-      "Data 3": "100.5",
-      "Data 4": "120",
-      "Data 5": "50",
-      "Data 6": "66",
-      "Data 7": "12",
-      "Data 8": "123",
-      "Monthly-Goal": "110"
-    },
-    {
-      "Date": "4/15/2016",
-      "Data 1": "80",
-      "Data 2": "2,00",
-      "Data 3": "110",
-      "Data 4": "120",
-      "Data 5": "50",
-      "Data 6": "190",
-      "Data 7": "99",
-      "Data 8": "33",
-      "Monthly-Goal": "110"
-    },
-    {
-      "Date": "5/15/2016",
-      "Data 1": "70",
-      "Data 2": "90",
-      "Data 3": "110",
-      "Data 4": "130",
-      "Data 5": "12",
-      "Data 6": "90",
-      "Data 7": "60",
-      "Data 8": "30",
-      "Monthly-Goal": "120"
-    },
-    {
-      "Date": "6/15/2016",
-      "Data 1": "100",
-      "Data 2": "120",
-      "Data 3": "120",
-      "Data 4": "130",
-      "Data 5": "90",
-      "Data 6": "190",
-      "Data 7": "30",
-      "Data 8": "10",
-      "Monthly-Goal": "120"
-    },
-    {
-      "Date": "7/15/2016",
-      "Data 1": "zip",
-      "Data 2": null,
-      "Data 3": "120",
-      "Data 4": "130",
-      "Data 5": "90",
-      "Data 6": "90",
-      "Data 7": "20",
-      "Data 8": "40",
-      "Monthly-Goal": "130"
-    },
-    {
-      "Date": "8/15/2016",
-      "Data 1": "110",
-      "Data 2": "130",
-      "Data 3": "120",
-      "Data 4": "140",
-      "Data 5": "80",
-      "Data 6": "10",
-      "Data 7": "11",
-      "Data 8": "4",
-      "Monthly-Goal": "130"
-    },
-    {
-      "Date": "9/15/2016",
-      "Data 1": "120",
-      "Data 2": "130",
-      "Data 3": "120",
-      "Data 4": "150",
-      "Data 5": "70",
-      "Data 6": "10",
-      "Data 7": "00",
-      "Data 8": "40",
-      "Monthly-Goal": "140"
-    }
-  ],
-  "visualizationType": "Line",
-  "series": [
-    {
-      "dataKey": "Data 3",
-      "type": "Line",
-      "axis": "Left",
-      "tooltip": true
-    },
-    {
-      "dataKey": "Data 4",
-      "type": "Line",
-      "axis": "Left",
-      "tooltip": true
-    }
-  ],
-  "description": "Note: There is an option to make the line dotted as demonstrated above",
-  "annotations": [],
-  "debugSvg": false,
-  "chartMessage": {
-    "noData": "No Data Available"
-  },
-  "showTitle": true,
-  "showDownloadMediaButton": false,
-  "lineDatapointColor": "Same as Line",
-  "isResponsiveTicks": false,
-  "general": {
-    "annotationDropdownText": "Annotations",
-    "showDownloadButton": false,
-    "showMissingDataLabel": true,
-    "showSuppressedSymbol": true,
-    "showZeroValueData": true,
-    "hideNullValue": true
-  },
-  "preliminaryData": [
-    {
-      "type": "effect",
-      "seriesKey": "Data 4",
-      "label": "Suppressed",
-      "column": "Data 3",
-      "value": "120",
-      "style": "Open Circles",
-      "displayTooltip": true,
-      "displayLegend": true,
-      "displayTable": true,
-      "symbol": "",
-      "iconCode": "",
-      "lineCode": "◯",
-      "hideBarSymbol": false,
-      "hideLineStyle": false,
-      "circleSize": "7",
-      "displayGray": true
-    }
-  ],
   "boxplot": {
     "plots": [],
     "borders": "true",
@@ -347,26 +89,167 @@
       "upperBounds": "Upper Bounds"
     }
   },
+  "topAxis": {
+    "hasLine": false
+  },
   "isLegendValue": false,
+  "barThickness": 0.35,
+  "barHeight": 25,
   "barSpace": 15,
   "heights": {
     "vertical": 300,
     "horizontal": 750
   },
+  "xAxis": {
+    "sortDates": false,
+    "anchors": [],
+    "type": "categorical",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 75,
+    "tickRotation": 0,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "labelOffset": 0,
+    "axisPadding": 200,
+    "target": 0,
+    "maxTickRotation": 0,
+    "padding": 5,
+    "showYearsOnce": false,
+    "sortByRecentDate": false,
+    "dataKey": "Year",
+    "label": "Year",
+    "manual": true,
+    "axisBBox": 50.90235137939453,
+    "tickWidthMax": 39
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "indexLabel": "",
+    "download": true,
+    "showVertical": false,
+    "dateDisplayFormat": "",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "show": true
+  },
+  "orientation": "vertical",
   "color": "pinkpurple",
   "columns": {},
+  "legend": {
+    "hide": false,
+    "behavior": "isolate",
+    "axisAlign": true,
+    "singleRow": true,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "hideSuppressedLabels": false,
+    "hideSuppressionLink": false,
+    "seriesHighlight": [],
+    "style": "boxes",
+    "subStyle": "linear blocks",
+    "shape": "circle",
+    "tickRotation": "",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    },
+    "position": "top"
+  },
   "brush": {
-    "height": 45,
+    "height": 25,
     "active": false
   },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "qualitative-bold",
+  "isPaletteReversed": false,
   "twoColor": {
     "palette": "monochrome-1",
     "isPaletteReversed": false
   },
-  "filters": [],
+  "labels": false,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false,
+    "roundTo": "1"
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false,
+    "lineDatapointSymbol": "none",
+    "maximumShapeAmount": 7
+  },
   "useLogScale": false,
   "filterBehavior": "Filter Change",
   "highlightedBarValues": [],
+  "series": [
+    {
+      "dataKey": "American Indian/Alaska Native",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Asian/Pacific Islander",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Black, non-Hispanic",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "White, non-Hispanic",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Hispanic",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
   "tooltips": {
     "opacity": 90,
     "singleSeries": false,
@@ -461,9 +344,292 @@
     },
     "data": []
   },
+  "errors": [],
+  "currentViewport": "lg",
+  "id": 4,
+  "category": "Charts",
+  "label": "Line",
+  "subType": "Line",
+  "icon": {
+    "key": null,
+    "ref": null,
+    "props": {},
+    "_owner": null
+  },
+  "content": "Present one or more data trends over time.",
+  "visualizationType": "Line",
+  "datasets": {},
+  "activeVizButtonID": 4,
+  "data": [
+    {
+      "Year": "2007",
+      "American Indian/Alaska Native": "1.4",
+      "Asian/Pacific Islander": "0.9",
+      "Black, non-Hispanic": "2.3",
+      "White, non-Hispanic": "1",
+      "Hispanic": "1"
+    },
+    {
+      "Year": "2008",
+      "American Indian/Alaska Native": "1.8",
+      "Asian/Pacific Islander": "0.8",
+      "Black, non-Hispanic": "2.2",
+      "White, non-Hispanic": "0.9",
+      "Hispanic": "0.8"
+    },
+    {
+      "Year": "2009",
+      "American Indian/Alaska Native": "1",
+      "Asian/Pacific Islander": "0.7",
+      "Black, non-Hispanic": "1.7",
+      "White, non-Hispanic": "0.8",
+      "Hispanic": "0.7"
+    },
+    {
+      "Year": "2010",
+      "American Indian/Alaska Native": "1.1",
+      "Asian/Pacific Islander": "0.6",
+      "Black, non-Hispanic": "1.7",
+      "White, non-Hispanic": "0.8",
+      "Hispanic": "0.6"
+    },
+    {
+      "Year": "2011",
+      "American Indian/Alaska Native": "0.5",
+      "Asian/Pacific Islander": "0.4",
+      "Black, non-Hispanic": "1.4",
+      "White, non-Hispanic": "0.8",
+      "Hispanic": "0.4"
+    },
+    {
+      "Year": "2012",
+      "American Indian/Alaska Native": "0.7",
+      "Asian/Pacific Islander": "0.4",
+      "Black, non-Hispanic": "1.1",
+      "White, non-Hispanic": "0.8",
+      "Hispanic": "0.4"
+    },
+    {
+      "Year": "2013",
+      "American Indian/Alaska Native": "0.7",
+      "Asian/Pacific Islander": "0.3",
+      "Black, non-Hispanic": "0.9",
+      "White, non-Hispanic": "0.9",
+      "Hispanic": "0.4"
+    },
+    {
+      "Year": "2014",
+      "American Indian/Alaska Native": "0.8",
+      "Asian/Pacific Islander": "0.3",
+      "Black, non-Hispanic": "0.8",
+      "White, non-Hispanic": "0.9",
+      "Hispanic": "0.3"
+    },
+    {
+      "Year": "2015",
+      "American Indian/Alaska Native": "0.7",
+      "Asian/Pacific Islander": "0.4",
+      "Black, non-Hispanic": "1",
+      "White, non-Hispanic": "1.1",
+      "Hispanic": "0.3"
+    },
+    {
+      "Year": "2016",
+      "American Indian/Alaska Native": "0.5",
+      "Asian/Pacific Islander": "0.3",
+      "Black, non-Hispanic": "0.9",
+      "White, non-Hispanic": "1",
+      "Hispanic": "0.3"
+    },
+    {
+      "Year": "2017",
+      "American Indian/Alaska Native": "0.7",
+      "Asian/Pacific Islander": "0.3",
+      "Black, non-Hispanic": "1",
+      "White, non-Hispanic": "1.1",
+      "Hispanic": "0.3"
+    },
+    {
+      "Year": "2018",
+      "American Indian/Alaska Native": "0.9",
+      "Asian/Pacific Islander": "0.3",
+      "Black, non-Hispanic": "1",
+      "White, non-Hispanic": "1",
+      "Hispanic": "0.4"
+    },
+    {
+      "Year": "2019",
+      "American Indian/Alaska Native": "0.6",
+      "Asian/Pacific Islander": "0.3",
+      "Black, non-Hispanic": "0.9",
+      "White, non-Hispanic": "1",
+      "Hispanic": "0.4"
+    },
+    {
+      "Year": "2020",
+      "American Indian/Alaska Native": "0.4",
+      "Asian/Pacific Islander": "0.2",
+      "Black, non-Hispanic": "0.7",
+      "White, non-Hispanic": "0.7",
+      "Hispanic": "0.3"
+    },
+    {
+      "Year": "2021",
+      "American Indian/Alaska Native": "0.4",
+      "Asian/Pacific Islander": "0.2",
+      "Black, non-Hispanic": "0.9",
+      "White, non-Hispanic": "0.6",
+      "Hispanic": "0.4"
+    },
+    {
+      "Year": "2022",
+      "American Indian/Alaska Native": "0.4",
+      "Asian/Pacific Islander": "0.3",
+      "Black, non-Hispanic": "1",
+      "White, non-Hispanic": "0.6",
+      "Hispanic": "0.4"
+    }
+  ],
+  "dataFileName": "chart_data 2-6.csv",
+  "dataFileSourceType": "file",
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
   "version": "4.25.1",
+  "dynamicMarginTop": 0,
+  "formattedData": [
+    {
+      "Year": "2007",
+      "American Indian/Alaska Native": "1.4",
+      "Asian/Pacific Islander": "0.9",
+      "Black, non-Hispanic": "2.3",
+      "White, non-Hispanic": "1",
+      "Hispanic": "1"
+    },
+    {
+      "Year": "2008",
+      "American Indian/Alaska Native": "1.8",
+      "Asian/Pacific Islander": "0.8",
+      "Black, non-Hispanic": "2.2",
+      "White, non-Hispanic": "0.9",
+      "Hispanic": "0.8"
+    },
+    {
+      "Year": "2009",
+      "American Indian/Alaska Native": "1",
+      "Asian/Pacific Islander": "0.7",
+      "Black, non-Hispanic": "1.7",
+      "White, non-Hispanic": "0.8",
+      "Hispanic": "0.7"
+    },
+    {
+      "Year": "2010",
+      "American Indian/Alaska Native": "1.1",
+      "Asian/Pacific Islander": "0.6",
+      "Black, non-Hispanic": "1.7",
+      "White, non-Hispanic": "0.8",
+      "Hispanic": "0.6"
+    },
+    {
+      "Year": "2011",
+      "American Indian/Alaska Native": "0.5",
+      "Asian/Pacific Islander": "0.4",
+      "Black, non-Hispanic": "1.4",
+      "White, non-Hispanic": "0.8",
+      "Hispanic": "0.4"
+    },
+    {
+      "Year": "2012",
+      "American Indian/Alaska Native": "0.7",
+      "Asian/Pacific Islander": "0.4",
+      "Black, non-Hispanic": "1.1",
+      "White, non-Hispanic": "0.8",
+      "Hispanic": "0.4"
+    },
+    {
+      "Year": "2013",
+      "American Indian/Alaska Native": "0.7",
+      "Asian/Pacific Islander": "0.3",
+      "Black, non-Hispanic": "0.9",
+      "White, non-Hispanic": "0.9",
+      "Hispanic": "0.4"
+    },
+    {
+      "Year": "2014",
+      "American Indian/Alaska Native": "0.8",
+      "Asian/Pacific Islander": "0.3",
+      "Black, non-Hispanic": "0.8",
+      "White, non-Hispanic": "0.9",
+      "Hispanic": "0.3"
+    },
+    {
+      "Year": "2015",
+      "American Indian/Alaska Native": "0.7",
+      "Asian/Pacific Islander": "0.4",
+      "Black, non-Hispanic": "1",
+      "White, non-Hispanic": "1.1",
+      "Hispanic": "0.3"
+    },
+    {
+      "Year": "2016",
+      "American Indian/Alaska Native": "0.5",
+      "Asian/Pacific Islander": "0.3",
+      "Black, non-Hispanic": "0.9",
+      "White, non-Hispanic": "1",
+      "Hispanic": "0.3"
+    },
+    {
+      "Year": "2017",
+      "American Indian/Alaska Native": "0.7",
+      "Asian/Pacific Islander": "0.3",
+      "Black, non-Hispanic": "1",
+      "White, non-Hispanic": "1.1",
+      "Hispanic": "0.3"
+    },
+    {
+      "Year": "2018",
+      "American Indian/Alaska Native": "0.9",
+      "Asian/Pacific Islander": "0.3",
+      "Black, non-Hispanic": "1",
+      "White, non-Hispanic": "1",
+      "Hispanic": "0.4"
+    },
+    {
+      "Year": "2019",
+      "American Indian/Alaska Native": "0.6",
+      "Asian/Pacific Islander": "0.3",
+      "Black, non-Hispanic": "0.9",
+      "White, non-Hispanic": "1",
+      "Hispanic": "0.4"
+    },
+    {
+      "Year": "2020",
+      "American Indian/Alaska Native": "0.4",
+      "Asian/Pacific Islander": "0.2",
+      "Black, non-Hispanic": "0.7",
+      "White, non-Hispanic": "0.7",
+      "Hispanic": "0.3"
+    },
+    {
+      "Year": "2021",
+      "American Indian/Alaska Native": "0.4",
+      "Asian/Pacific Islander": "0.2",
+      "Black, non-Hispanic": "0.9",
+      "White, non-Hispanic": "0.6",
+      "Hispanic": "0.4"
+    },
+    {
+      "Year": "2022",
+      "American Indian/Alaska Native": "0.4",
+      "Asian/Pacific Islander": "0.3",
+      "Black, non-Hispanic": "1",
+      "White, non-Hispanic": "0.6",
+      "Hispanic": "0.4"
+    }
+  ],
+  "filters": [],
   "migrations": {
     "addColorMigration": true
-  },
-  "dynamicMarginTop": 0
+  }
 }
