@@ -220,6 +220,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const { uid } = action.payload
       const newRows = _.cloneDeep(state.config.rows)
       const newVisualizations = _.cloneDeep(state.config.visualizations)
+      delete newVisualizations[uid]
       const newSharedFilters = _.cloneDeep(state.config.dashboard.sharedFilters)
       if (newSharedFilters && newSharedFilters.length > 0) {
         newSharedFilters.forEach(sharedFilter => {

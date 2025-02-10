@@ -31,7 +31,7 @@ export const getUpdateConfig =
             const defaultValues = _filter.pivot ? _filter.values : _filter.values[0]
 
             const queryStringFilterValue = getQueryStringFilterValue(_filter)
-            if(queryStringFilterValue){
+            if (queryStringFilterValue) {
               _filter.active = queryStringFilterValue
             } else {
               _filter.active = _filter.active || defaultValues
@@ -57,19 +57,26 @@ export const getUpdateConfig =
       visualizationKeys.forEach(visualizationKey => {
         const row = vizRowColumnLocator[visualizationKey]
         if (newConfig.rows[row]?.datakey) return // data configured on the row level
-        const applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1)
+        const applicableFilters = newConfig.dashboard.sharedFilters.filter(
+          sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1
+        )
 
         if (applicableFilters.length > 0) {
           const visualization = newConfig.visualizations[visualizationKey]
           const _newConfigDataSet = newConfig.datasets[visualization.dataKey]
-          const formattedData = getFormattedData(_newConfigDataSet?.data || visualization.data, visualization.dataDescription)
+          const formattedData = getFormattedData(
+            _newConfigDataSet?.data || visualization.data,
+            visualization.dataDescription
+          )
           const _data = formattedData || (dataOverride || state.data)[visualization.dataKey]
           newFilteredData[visualizationKey] = filterData(applicableFilters, _data)
         }
       })
 
       newConfig.rows.forEach((row, rowIndex) => {
-        const applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(rowIndex) !== -1)
+        const applicableFilters = newConfig.dashboard.sharedFilters.filter(
+          sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(rowIndex) !== -1
+        )
 
         if (applicableFilters.length > 0) {
           const formattedData = getFormattedData(row.data, row.dataDescription)

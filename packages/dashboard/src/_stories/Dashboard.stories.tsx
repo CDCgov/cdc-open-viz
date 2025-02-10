@@ -29,12 +29,43 @@ import TopSpacing_2 from './_mock/data-bite-dash-test_1.json'
 import TopSpacing_3 from './_mock/data-bite-dash-test_1_1.json'
 import TopSpacing_4 from './_mock/data-bite-dash-test_1_1_1.json'
 
+// Dashboard Filter Updates for Ascending, Descending, and Custom Order
+import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
+const DashboardFilterDesc = _.cloneDeep(DashboardFilterAsc)
+const DashboardFilterCust = _.cloneDeep(DashboardFilterAsc)
+DashboardFilterDesc.dashboard.sharedFilters[0].order = 'desc'
+DashboardFilterCust.dashboard.sharedFilters[0].order = 'cust'
+
+// On DashboardFilterCust change the sharedFilters[0].values and orderedValues to be in a custom order
+const customOrder = ['American Samoa', 'Alaska', 'Alabama', 'Arizona', 'Arkansas']
+
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Pages/Dashboard',
   component: Dashboard
 }
 
 type Story = StoryObj<typeof Dashboard>
+
+export const Dashboard_Filter_Asc: Story = {
+  args: {
+    config: DashboardFilterAsc,
+    isEditor: false
+  }
+}
+
+export const Dashboard_Filter_Desc: Story = {
+  args: {
+    config: DashboardFilterDesc,
+    isEditor: false
+  }
+}
+
+export const Dashboard_Filter_Cust: Story = {
+  args: {
+    config: DashboardFilterCust,
+    isEditor: false
+  }
+}
 
 export const Example_1: Story = {
   args: {

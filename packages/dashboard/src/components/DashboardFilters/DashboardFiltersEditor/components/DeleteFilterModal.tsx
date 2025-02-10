@@ -10,12 +10,22 @@ type DeleteFilterProps = {
   filterIndex: number
 }
 
-const DeleteFilterModal: React.FC<DeleteFilterProps> = ({ removeFilterCompletely, removeFilterFromViz, filterIndex }) => {
+const DeleteFilterModal: React.FC<DeleteFilterProps> = ({
+  removeFilterCompletely,
+  removeFilterFromViz,
+  filterIndex
+}) => {
   const { overlay } = useGlobalContext()
   const { config } = useContext(DashboardContext)
-  const filterUsedByMany = Object.values(config.visualizations).filter(viz => (viz as DashboardFilters).sharedFilterIndexes?.map(Number).includes(Number(filterIndex))).length > 1
 
-  const message = filterUsedByMany ? 'This filter is used by multiple visualizations. You can either delete the filter from this visualization only or you can delete the filter completely, which will also remove it from other visualizations.' : 'Are you sure you want to delete this filter?'
+  const filterUsedByMany =
+    Object.values(config.visualizations).filter(viz => {
+      return (viz as DashboardFilters).sharedFilterIndexes?.map(Number).includes(Number(filterIndex))
+    }).length > 1
+
+  const message = filterUsedByMany
+    ? 'This filter is used by multiple visualizations. You can either delete the filter from this visualization only or you can delete the filter completely, which will also remove it from other visualizations.'
+    : 'Are you sure you want to delete this filter?'
   return (
     <Modal showClose={true}>
       <Modal.Content>
