@@ -1596,9 +1596,7 @@ const CdcMap = ({
                   data={runtimeData}
                   options={general}
                   columns={state.columns}
-                  navigationHandler={val =>
-                    navigationHandler(state.general.navigationBehavior, val, customNavigationHandler)
-                  }
+                  navigationHandler={val => navigationHandler('_blank', val, customNavigationHandler)}
                 />
               )}
 

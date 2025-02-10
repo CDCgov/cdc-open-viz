@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef, useId, useContext } fr
 import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
 // Core components
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import Layout from '@cdc/core/components/Layout'
 import Confirm from '@cdc/core/components/elements/Confirm'
 import Error from '@cdc/core/components/elements/Error'
@@ -163,7 +164,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return isConvertLineToBarGraph(config.visualizationType, filteredData, config.allowLineToBarGraph)
   }
 
-  const prepareConfig = (loadedConfig: ChartConfig, data): ChartConfig => {
+  const prepareConfig = async (loadedConfig: ChartConfig) => {
     let newConfig = _.defaultsDeep(loadedConfig, defaults)
     _.defaultsDeep(newConfig, {
       table: { showVertical: false }
@@ -374,28 +375,49 @@ const CdcChart: React.FC<CdcChartProps> = ({
     setContainer(node)
   }, []) // eslint-disable-line
 
-  // Load data when component first mounts
+  const prepareData = async newConfig => {
+    try {
+      const urlFilters = newConfig.filters
+        ? newConfig.filters.filter(filter => filter.type === 'url').length > 0
+          ? true
+          : false
+        : false
 
-  const prepareData = (config, data) => {
-    if (config.dataDescription) {
-      data = transform.autoStandardize(data)
-      data = transform.developerStandardize(data, config.dataDescription)
+      if (newConfig.dataUrl && !urlFilters) {
+        // handle urls with spaces in the name.
+        if (newConfig.dataUrl) newConfig.dataUrl = `${newConfig.dataUrl}`
+        let newData = await fetchRemoteData(newConfig.dataUrl, 'Chart')
+
+        if (newData && newConfig.dataDescription) {
+          newData = transform.autoStandardize(newData)
+          newData = transform.developerStandardize(newData, newConfig.dataDescription)
+        }
+
+        if (newData) {
+          newConfig.data = newData
+        }
+      } else if (newConfig.formattedData) {
+        newConfig.data = newConfig.formattedData
+      } else if (newConfig.dataDescription) {
+        newConfig.data = transform.autoStandardize(newConfig.data)
+        newConfig.data = transform.developerStandardize(newConfig.data, newConfig.dataDescription)
+      }
+    } catch (err) {
+      console.log('errir on prepareData function ', err)
     }
-
-    data = handleRankByValue(data, config)
-
-    return data
+    return newConfig
   }
+
   useEffect(() => {
+    console.log('use Effect-3')
     const load = async () => {
       try {
-        const data = configObj.data
-        if (configObj.data && configObj) {
-          const preparedConfig = await prepareConfig(configObj, data)
-          const preparedData = prepareData(configObj, data)
-          setStateData(preparedData)
-          setExcludedData(preparedData)
-          updateConfig(preparedConfig, preparedData)
+        if (configObj) {
+          const preparedConfig = await prepareConfig(configObj)
+          let preppedData = await prepareData(preparedConfig)
+          setStateData(preppedData.data)
+          setExcludedData(preppedData.data)
+          updateConfig(preparedConfig, preppedData.data)
         }
       } catch (err) {
         console.error('Could not Load!')
