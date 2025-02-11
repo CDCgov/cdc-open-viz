@@ -159,17 +159,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     (config.xAxis || config.yAxis) && ['date-time', 'date'].includes((config.xAxis || config.yAxis).type)
   const dataTableDefaultSortBy = hasDateAxis && config.xAxis.dataKey
 
-  const convertLineToBarGraph = (() => {
-    const isDynamicSeries = configObj.series.some(series => series.dynamicCategory)
-    const isDynamicWithLessThanThreePoints =
-      isDynamicSeries && _.uniq(configObj.formattedData?.map(data => data[configObj.xAxis.dataKey])).length <= 2
-    return isConvertLineToBarGraph(
-      config.visualizationType,
-      filteredData,
-      config.allowLineToBarGraph,
-      isDynamicWithLessThanThreePoints
-    )
-  })()
+  const convertLineToBarGraph = isConvertLineToBarGraph(config, filteredData)
 
   const prepareConfig = (loadedConfig: ChartConfig, data): ChartConfig => {
     let newConfig = _.defaultsDeep(loadedConfig, defaults)
