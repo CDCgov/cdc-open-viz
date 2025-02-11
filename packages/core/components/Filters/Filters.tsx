@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react'
-import { useId } from 'react'
+import { useState, useEffect, useMemo, useRef, useId } from 'react'
+import _ from 'lodash'
 
 // CDC
 import Button from '../elements/Button'
@@ -11,10 +11,10 @@ import { filterVizData } from '../../helpers/filterVizData'
 import { addValuesToFilters } from '../../helpers/addValuesToFilters'
 import { DimensionsType } from '../../types/Dimensions'
 import NestedDropdown from '../NestedDropdown'
-import _ from 'lodash'
 import { getNestedOptions } from './helpers/getNestedOptions'
 import { applyQueuedActive } from './helpers/applyQueuedActive'
 import { handleSorting } from './helpers/handleSorting'
+import { getWrappingStatuses } from './helpers/filterWrapping'
 
 export const VIZ_FILTER_STYLE = {
   dropdown: 'dropdown',
@@ -283,7 +283,16 @@ const Filters = (props: FilterProps) => {
   const { filters, general, theme, filterBehavior } = visualizationConfig
   const [mobileFilterStyle, setMobileFilterStyle] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState<EventTarget>(null)
+  const [wrappingFilters, setWrappingFilters] = useState({})
   const id = useId()
+
+  const wrappingFilterRefs = useRef({})
+  const filterWrappingStatusesToUpdate = getWrappingStatuses(wrappingFilterRefs, wrappingFilters, filters)
+
+  if (filterWrappingStatusesToUpdate.length) {
+    const validStatuses = filterWrappingStatusesToUpdate.filter(Boolean) as [string, any][]
+    setWrappingFilters({ ...wrappingFilters, ...Object.fromEntries(validStatuses) })
+  }
 
   // useFilters hook provides data and logic for handling various filter functions
   // prettier-ignore
@@ -381,7 +390,8 @@ const Filters = (props: FilterProps) => {
       const Pills = []
       const Tabs = []
 
-      const { active, queuedActive, label, filterStyle } = singleFilter as VizFilter
+      const { active, queuedActive, label, filterStyle, columnName } = singleFilter as VizFilter
+      const { isDropdown } = wrappingFilters[columnName] || {}
 
       handleSorting(singleFilter)
       singleFilter.values?.forEach((filterOption, index) => {
@@ -447,8 +457,8 @@ const Filters = (props: FilterProps) => {
         'form-group',
         mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`
       ]
-      const mobileExempt = ['nested-dropdown', 'multi-select'].includes(filterStyle)
-      const showDefaultDropdown = (filterStyle === 'dropdown' || mobileFilterStyle) && !mobileExempt
+      const mobileExempt = ['nested-dropdown', 'multi-select', VIZ_FILTER_STYLE.tabSimple].includes(filterStyle)
+      const showDefaultDropdown = ((filterStyle === 'dropdown' || mobileFilterStyle) && !mobileExempt) || isDropdown
       const [nestedActiveGroup, nestedActiveSubGroup] = useMemo<string[]>(() => {
         if (filterStyle !== 'nested-dropdown') return []
         return (singleFilter.queuedActive || [singleFilter.active, singleFilter.subGrouping?.active]) as [
@@ -457,7 +467,7 @@ const Filters = (props: FilterProps) => {
         ]
       }, [singleFilter])
       return (
-        <div className={classList.join(' ')} key={outerIndex}>
+        <div className={classList.join(' ')} key={outerIndex} ref={el => (wrappingFilterRefs.current[columnName] = el)}>
           <>
             {label && (
               <label className='font-weight-bold mb-2' htmlFor={`filter-${outerIndex}`}>
@@ -465,7 +475,7 @@ const Filters = (props: FilterProps) => {
               </label>
             )}
             {filterStyle === 'tab' && !mobileFilterStyle && Tabs}
-            {filterStyle === 'tab simple' && !mobileFilterStyle && (
+            {filterStyle === 'tab simple' && !showDefaultDropdown && (
               <div className='tab-simple-container d-flex w-100'>{Tabs}</div>
             )}
             {filterStyle === 'pill' && !mobileFilterStyle && Pills}

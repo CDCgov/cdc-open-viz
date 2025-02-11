@@ -65,6 +65,7 @@ div.single-filters {
 
 .single-filters--tab .tab-simple-container {
   border-bottom: 1px solid var(--cool-gray-10);
+  flex-wrap: wrap;
 
   .tab.tab--simple {
     font-family: var(--app-font-secondary);
@@ -75,8 +76,9 @@ div.single-filters {
     cursor: pointer;
     border-radius: 6px 6px 0 0;
 
-    @include breakpoint(xs) {
+    @include breakpointClass(xs) {
       font-size: 0.778em;
+      padding: 0.5rem 0.778em;
     }
 
     &:hover {
@@ -96,6 +98,14 @@ div.single-filters {
       font-weight: 500;
       border-bottom: 0.3rem solid var(--colors-blue-vivid-60, #005ea2);
       z-index: 1;
+    }
+  }
+}
+.cdc-open-viz-module {
+  @include breakpointClass(xs) {
+    .single-filters--tab .tab-simple-container .tab.tab--simple {
+      font-size: 0.778em;
+      padding: 0.5rem 0.778em;
     }
   }
 }
