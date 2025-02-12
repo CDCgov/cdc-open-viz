@@ -24,12 +24,7 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
     if (parentFilter) {
       // Filter dataset based on parent's active value
       const parentsActiveValues: string[] = dataSet.filter((d: Record<string, any>) => {
-        if (isParentMultiSelect) {
-          // If multi-select, check if the parent active array includes the value
-          return Array.isArray(parentFilter.active) && parentFilter.active.includes(d[parentFilter.columnName])
-        } else {
-          return parentFilter.active === d[parentFilter.columnName]
-        }
+        return parentFilter.active?.includes(d[parentFilter.columnName])
       })
       // Get unique active values for the child filter
       const childFilterValues = _.uniq(parentsActiveValues.map(d => d[childFilter.columnName]).filter(Boolean))
