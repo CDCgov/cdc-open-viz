@@ -112,8 +112,10 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
       const endDate = _.get(_.last(finalData), config.xAxis.dataKey, '')
       // add custom blue colored handlers to each corners of brush
       svg.selectAll('.handle--custom').remove()
-      // append handler
-      const [formattedStartDate, formattedEndDate] = [startDate, endDate].map(date => formatDate(parseDate(date)))
+      // Parse and format the dates, setting them to an empty string if undefined
+      const parseAndFormatDate = date => (date ? formatDate(parseDate(date)) : '')
+      const formattedStartDate = parseAndFormatDate(startDate)
+      const formattedEndDate = parseAndFormatDate(endDate)
       svg.call(brushHandle, selection, formattedStartDate, formattedEndDate)
 
       setBrushConfig({
