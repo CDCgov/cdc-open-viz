@@ -757,7 +757,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (config.visualizationType === 'Forecasting') return data
     //  specify keys that needs  to be cleaned to render chart and skip rest
     const includedKeys = config.series.map(s => s.dataKey)
-    return config?.xAxis?.dataKey ? transform.cleanData(data, config.xAxis.dataKey, includedKeys) : data
+    // key that does not need to be cleaned
+    const excludedKey = config.xAxis.dataKey
+    return config?.xAxis?.dataKey ? transform.cleanData(data, excludedKey, includedKeys) : data
   }
 
   const getTableRuntimeData = () => {
