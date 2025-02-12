@@ -19,7 +19,6 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
     const parentFilter: SharedFilter = newSharedFilters.find(
       filter => String(childFilter.parents) === String(filter.key)
     )
-    const isParentMultiSelect = parentFilter.filterStyle === 'multi-select'
 
     if (parentFilter) {
       // Filter dataset based on parent's active value
