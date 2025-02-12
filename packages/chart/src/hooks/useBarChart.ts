@@ -192,9 +192,11 @@ export const useBarChart = () => {
     const columns = config.columns
     const columnsWithTooltips = []
     let additionalTooltipItems = ''
+    const dynamicCategorySeries = config.runtime?.series?.find(series => series?.dynamicCategory)
     const closestVal =
       tableData.find(d => {
-        return d[config.xAxis.dataKey] === xAxisDataValue
+        const dynamicCategoryMatch = dynamicCategorySeries ? d[dynamicCategorySeries.dynamicCategory] === series : true
+        return d[config.xAxis.dataKey] === xAxisDataValue && dynamicCategoryMatch
       }) || {}
     Object.keys(columns).forEach(colKeys => {
       if (series && config.columns[colKeys].series && config.columns[colKeys].series !== series) return
