@@ -12,7 +12,7 @@ type Story = StoryObj<typeof Chart>
 
 export const Tab_Simple: Story = {
   args: {
-    config: editConfigKeys(scatterPlotDownloadImage, [{ path: ['filters', '0', 'filterStyle'], value: 'tab simple' }])
+    config: editConfigKeys(scatterPlotDownloadImage, [{ path: ['filters', '0', 'filterStyle'], value: 'tab-simple' }])
   }
 }
 

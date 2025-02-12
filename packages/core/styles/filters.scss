@@ -26,6 +26,7 @@
 }
 
 div.single-filters {
+  width: 100%;
   label {
     width: 100%;
     font-weight: 700;
@@ -36,6 +37,9 @@ div.single-filters {
       border-top-left-radius: 15px;
       border-bottom-left-radius: 15px;
     }
+  }
+  & > select.cove-form-select {
+    width: auto;
   }
 }
 
@@ -63,11 +67,13 @@ div.single-filters {
   }
 }
 
-.single-filters--tab .tab-simple-container {
+.tab-simple-container {
   border-bottom: 1px solid var(--cool-gray-10);
   flex-wrap: wrap;
 
   .tab.tab--simple {
+    background: none;
+    border: none;
     font-family: var(--app-font-secondary);
     font-size: 1rem;
     font-weight: 300;
@@ -89,7 +95,7 @@ div.single-filters {
     &:focus:not(:focus-visible) {
       outline: none !important;
     }
-    &[tabindex]:focus-visible {
+    &:focus-visible {
       outline: 2px dashed var(--colors-blue-vivid-60, #005ea2) !important;
       outline-offset: 3px;
     }
@@ -103,7 +109,7 @@ div.single-filters {
 }
 .cdc-open-viz-module {
   @include breakpointClass(xs) {
-    .single-filters--tab .tab-simple-container .tab.tab--simple {
+    .single-filters--tab-simple .tab-simple-container .tab.tab--simple {
       font-size: 0.778em;
       padding: 0.5rem 0.778em;
     }

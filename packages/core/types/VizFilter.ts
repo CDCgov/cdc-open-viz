@@ -11,7 +11,7 @@ export type FilterBase = {
 
 export type VizFilterStyle =
   | 'tab'
-  | 'tab simple'
+  | 'tab-simple'
   | 'pill'
   | 'tab bar'
   | 'dropdown'

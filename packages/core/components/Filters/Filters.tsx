@@ -21,7 +21,7 @@ export const VIZ_FILTER_STYLE = {
   nestedDropdown: 'nested-dropdown',
   pill: 'pill',
   tab: 'tab',
-  tabSimple: 'tab simple',
+  tabSimple: 'tab-simple',
   tabBar: 'tab bar',
   multiSelect: 'multi-select'
 } as const
@@ -318,6 +318,22 @@ const Filters = (props: FilterProps) => {
   }, [dimensions])
 
   useEffect(() => {
+    const noLongerTabSimple = Object.keys(wrappingFilters).filter(columnName => {
+      const filter = filters.find(filter => filter.columnName === columnName)
+      if (!filter) return false
+      return filter.filterStyle !== VIZ_FILTER_STYLE.tabSimple
+    })
+
+    if (!noLongerTabSimple.length) return
+
+    setWrappingFilters(
+      Object.fromEntries(
+        Object.entries(wrappingFilters).filter(([columnName]) => !noLongerTabSimple.includes(columnName))
+      )
+    )
+  }, [filters])
+
+  useEffect(() => {
     if (selectedFilter) {
       const el = document.getElementById(selectedFilter.id)
       if (el) el.focus()
@@ -389,6 +405,7 @@ const Filters = (props: FilterProps) => {
       const DropdownOptions = []
       const Pills = []
       const Tabs = []
+      const isTabSimple = singleFilter.filterStyle === 'tab-simple'
 
       const { active, queuedActive, label, filterStyle, columnName } = singleFilter as VizFilter
       const { isDropdown } = wrappingFilters[columnName] || {}
@@ -396,7 +413,6 @@ const Filters = (props: FilterProps) => {
       handleSorting(singleFilter)
       singleFilter.values?.forEach((filterOption, index) => {
         const isActive = active === filterOption
-        const isTabSimple = singleFilter.filterStyle === 'tab simple'
 
         const pillClassList = ['pill', isActive ? 'pill--active' : null, theme && theme]
         const tabClassList = ['tab', isActive && 'tab--active', theme && theme, isTabSimple && 'tab--simple']
@@ -432,10 +448,9 @@ const Filters = (props: FilterProps) => {
         )
 
         Tabs.push(
-          <h3
+          <button
             id={`${filterOption}-${outerIndex}-${index}-${id}`}
             className={tabClassList.join(' ')}
-            tabIndex={0}
             onClick={e => {
               changeFilterActive(outerIndex, filterOption)
               setSelectedFilter(e.target)
@@ -448,7 +463,7 @@ const Filters = (props: FilterProps) => {
             }}
           >
             {filterOption}
-          </h3>
+          </button>
         )
       })
 
@@ -470,12 +485,12 @@ const Filters = (props: FilterProps) => {
         <div className={classList.join(' ')} key={outerIndex} ref={el => (wrappingFilterRefs.current[columnName] = el)}>
           <>
             {label && (
-              <label className='font-weight-bold mb-2' htmlFor={`filter-${outerIndex}`}>
+              <label className={`font-weight-bold mb-${isTabSimple ? '0' : '2'}`} htmlFor={`filter-${outerIndex}`}>
                 {label}
               </label>
             )}
             {filterStyle === 'tab' && !mobileFilterStyle && Tabs}
-            {filterStyle === 'tab simple' && !showDefaultDropdown && (
+            {filterStyle === 'tab-simple' && !showDefaultDropdown && (
               <div className='tab-simple-container d-flex w-100'>{Tabs}</div>
             )}
             {filterStyle === 'pill' && !mobileFilterStyle && Pills}

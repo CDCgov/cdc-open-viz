@@ -119,7 +119,7 @@
       "columnName": "pathogen",
       "values": ["COVID-19", "Influenza A", "RSV"],
       "active": "COVID-19",
-      "filterStyle": "tab simple"
+      "filterStyle": "tab-simple"
     }
   ],
   "table": {
