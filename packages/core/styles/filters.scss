@@ -26,6 +26,7 @@
 }
 
 div.single-filters {
+  width: 100%;
   label {
     width: 100%;
     font-weight: 700;
@@ -36,6 +37,10 @@ div.single-filters {
       border-top-left-radius: 15px;
       border-bottom-left-radius: 15px;
     }
+  }
+  & > select.cove-form-select,
+  & > div.nested-dropdown {
+    width: fit-content;
   }
 }
 
@@ -53,10 +58,62 @@ div.single-filters {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     margin-top: 5px;
+    font-family: var(--app-font-secondary);
+    font-size: 1rem;
+    text-align: center;
   }
 
   .tab--active {
     border-bottom: none;
+  }
+}
+
+.tab-simple-container {
+  border-bottom: 1px solid var(--cool-gray-10);
+  flex-wrap: wrap;
+
+  .tab.tab--simple {
+    background: none;
+    border: none;
+    font-family: var(--app-font-secondary);
+    font-size: 1rem;
+    font-weight: 300;
+    padding: 0.5rem 1rem;
+    width: auto;
+    cursor: pointer;
+    border-radius: 6px 6px 0 0;
+
+    @include breakpointClass(xs) {
+      font-size: 0.778em;
+      padding: 0.5rem 0.778em;
+    }
+
+    &:hover {
+      color: var(--colors-blue-vivid-60, #005ea2);
+      background: var(--colors-cyan-cool-10, #eff9fa);
+    }
+    // TODO - focus styles have to be heavy handed to override the project's global styles
+    &:focus:not(:focus-visible) {
+      outline: none !important;
+    }
+    &:focus-visible {
+      outline: 2px dashed var(--colors-blue-vivid-60, #005ea2) !important;
+      outline-offset: 3px;
+    }
+
+    &.tab--active {
+      font-weight: 500;
+      border-bottom: 0.3rem solid var(--colors-blue-vivid-60, #005ea2);
+      z-index: 1;
+    }
+  }
+}
+.cdc-open-viz-module {
+  @include breakpointClass(xs) {
+    .single-filters--tab-simple .tab-simple-container .tab.tab--simple {
+      font-size: 0.778em;
+      padding: 0.5rem 0.778em;
+    }
   }
 }
 

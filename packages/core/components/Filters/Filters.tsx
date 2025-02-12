@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react'
-import { useId } from 'react'
+import { useState, useEffect, useMemo, useRef, useId } from 'react'
+import _ from 'lodash'
 
 // CDC
 import Button from '../elements/Button'
@@ -11,16 +11,17 @@ import { filterVizData } from '../../helpers/filterVizData'
 import { addValuesToFilters } from '../../helpers/addValuesToFilters'
 import { DimensionsType } from '../../types/Dimensions'
 import NestedDropdown from '../NestedDropdown'
-import _ from 'lodash'
 import { getNestedOptions } from './helpers/getNestedOptions'
 import { applyQueuedActive } from './helpers/applyQueuedActive'
 import { handleSorting } from './helpers/handleSorting'
+import { getWrappingStatuses } from './helpers/filterWrapping'
 
 export const VIZ_FILTER_STYLE = {
   dropdown: 'dropdown',
   nestedDropdown: 'nested-dropdown',
   pill: 'pill',
   tab: 'tab',
+  tabSimple: 'tab-simple',
   tabBar: 'tab bar',
   multiSelect: 'multi-select'
 } as const
@@ -282,7 +283,16 @@ const Filters = (props: FilterProps) => {
   const { filters, general, theme, filterBehavior } = visualizationConfig
   const [mobileFilterStyle, setMobileFilterStyle] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState<EventTarget>(null)
+  const [wrappingFilters, setWrappingFilters] = useState({})
   const id = useId()
+
+  const wrappingFilterRefs = useRef({})
+  const filterWrappingStatusesToUpdate = getWrappingStatuses(wrappingFilterRefs, wrappingFilters, filters)
+
+  if (filterWrappingStatusesToUpdate.length) {
+    const validStatuses = filterWrappingStatusesToUpdate.filter(Boolean) as [string, any][]
+    setWrappingFilters({ ...wrappingFilters, ...Object.fromEntries(validStatuses) })
+  }
 
   // useFilters hook provides data and logic for handling various filter functions
   // prettier-ignore
@@ -297,12 +307,31 @@ const Filters = (props: FilterProps) => {
 
   useEffect(() => {
     if (!dimensions) return
-    if (Number(dimensions[0]) < 768 && filters?.length > 0) {
-      setMobileFilterStyle(true)
-    } else {
-      setMobileFilterStyle(false)
-    }
+    const [width] = dimensions
+
+    const isMobile = Number(width) < 768
+    const isTabSimple = filters?.some(filter => filter.filterStyle === VIZ_FILTER_STYLE.tabSimple)
+
+    const defaultToMobile = isMobile && filters?.length && !isTabSimple
+
+    setMobileFilterStyle(defaultToMobile)
   }, [dimensions])
+
+  useEffect(() => {
+    const noLongerTabSimple = Object.keys(wrappingFilters).filter(columnName => {
+      const filter = filters.find(filter => filter.columnName === columnName)
+      if (!filter) return false
+      return filter.filterStyle !== VIZ_FILTER_STYLE.tabSimple
+    })
+
+    if (!noLongerTabSimple.length) return
+
+    setWrappingFilters(
+      Object.fromEntries(
+        Object.entries(wrappingFilters).filter(([columnName]) => !noLongerTabSimple.includes(columnName))
+      )
+    )
+  }, [filters])
 
   useEffect(() => {
     if (selectedFilter) {
@@ -376,13 +405,17 @@ const Filters = (props: FilterProps) => {
       const DropdownOptions = []
       const Pills = []
       const Tabs = []
+      const isTabSimple = singleFilter.filterStyle === 'tab-simple'
 
-      const { active, queuedActive, label, filterStyle } = singleFilter as VizFilter
+      const { active, queuedActive, label, filterStyle, columnName } = singleFilter as VizFilter
+      const { isDropdown } = wrappingFilters[columnName] || {}
 
       handleSorting(singleFilter)
       singleFilter.values?.forEach((filterOption, index) => {
-        const pillClassList = ['pill', active === filterOption ? 'pill--active' : null, theme && theme]
-        const tabClassList = ['tab', active === filterOption && 'tab--active', theme && theme]
+        const isActive = active === filterOption
+
+        const pillClassList = ['pill', isActive ? 'pill--active' : null, theme && theme]
+        const tabClassList = ['tab', isActive && 'tab--active', theme && theme, isTabSimple && 'tab--simple']
 
         Pills.push(
           <div className='pill__wrapper' key={`pill-${index}`}>
@@ -439,8 +472,8 @@ const Filters = (props: FilterProps) => {
         'form-group',
         mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`
       ]
-      const mobileExempt = ['nested-dropdown', 'multi-select'].includes(filterStyle)
-      const showDefaultDropdown = (filterStyle === 'dropdown' || mobileFilterStyle) && !mobileExempt
+      const mobileExempt = ['nested-dropdown', 'multi-select', VIZ_FILTER_STYLE.tabSimple].includes(filterStyle)
+      const showDefaultDropdown = ((filterStyle === 'dropdown' || mobileFilterStyle) && !mobileExempt) || isDropdown
       const [nestedActiveGroup, nestedActiveSubGroup] = useMemo<string[]>(() => {
         if (filterStyle !== 'nested-dropdown') return []
         return (singleFilter.queuedActive || [singleFilter.active, singleFilter.subGrouping?.active]) as [
@@ -448,15 +481,19 @@ const Filters = (props: FilterProps) => {
           string
         ]
       }, [singleFilter])
+      const hideLabelMargin = isTabSimple && !showDefaultDropdown
       return (
-        <div className={classList.join(' ')} key={outerIndex}>
+        <div className={classList.join(' ')} key={outerIndex} ref={el => (wrappingFilterRefs.current[columnName] = el)}>
           <>
             {label && (
-              <label className='font-weight-bold mb-2' htmlFor={`filter-${outerIndex}`}>
+              <label className={`font-weight-bold mb-${hideLabelMargin ? '0' : '2'}`} htmlFor={`filter-${outerIndex}`}>
                 {label}
               </label>
             )}
             {filterStyle === 'tab' && !mobileFilterStyle && Tabs}
+            {filterStyle === 'tab-simple' && !showDefaultDropdown && (
+              <div className='tab-simple-container d-flex w-100'>{Tabs}</div>
+            )}
             {filterStyle === 'pill' && !mobileFilterStyle && Pills}
             {filterStyle === 'tab bar' && !mobileFilterStyle && <TabBar filter={singleFilter} index={outerIndex} />}
             {filterStyle === 'multi-select' && (
