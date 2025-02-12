@@ -85,7 +85,7 @@ export const useFilters = props => {
     // Overwrite filterItem.values since thats what we map through in the editor panel
     filterItem.values = updatedValues
     filterItem.orderedValues = updatedValues
-    filterItem.active = filterItem.active || updatedValues[0]
+    if (!filterItem.active) filterItem.active = updatedValues[0]
     filterItem.order = 'cust'
 
     // Update the filters
