@@ -254,7 +254,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
 }
 
 const saveMultiChanges = (config: MultiDashboardConfig, saveSlot?: number): MultiDashboardConfig => {
-  if (saveSlot === undefined) return config
+  if (saveSlot === undefined || !config.multiDashboards) return config
   const newMultiDashboards = [...config.multiDashboards]
   const label = newMultiDashboards[saveSlot].label
   const toSave = _.pick(config, ['dashboard', 'visualizations', 'rows'])

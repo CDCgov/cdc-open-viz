@@ -63,7 +63,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     seriesIndex
   } = props
   const { lineDatapointStyle, visual } = config
-  const filtered = config?.runtime?.series.filter(s => s.dataKey === seriesKey)?.[0]
+  const filtered = config?.series.filter(s => s.dataKey === seriesKey)?.[0]
   const Shape =
     Glyphs[
       config.visual.lineDatapointSymbol === 'standard' && seriesIndex < visual.maximumShapeAmount ? seriesIndex : 0
@@ -80,8 +80,8 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     seriesKey: string
   ) => {
     const seriesLabels = config.runtime.seriesLabels || []
-    let color = displayArea ? colorScale(seriesLabels[hoveredKey] || seriesKey) : ' transparent'
-
+    const seriesLabelsAll = config.runtime.seriesLabelsAll || []
+    let color = displayArea ? colorScale(seriesLabels[hoveredKey] || seriesLabelsAll[seriesIndex]) : ' transparent'
     if (config.lineDatapointColor === 'Lighter than Line' && color !== 'transparent' && color) {
       color = chroma(color).brighten(1)
     }
@@ -130,15 +130,23 @@ const LineChartCircle = (props: LineChartCircleProps) => {
       if (!hoveredXValue) return
 
       let hoveredSeriesValue
-      let hoveredSeriesIndex
       let hoveredSeriesData = tooltipData.data.filter(d => d[0] === seriesKey)
       let hoveredSeriesKey = hoveredSeriesData?.[0]?.[0]
       let hoveredSeriesAxis = hoveredSeriesData?.[0]?.[2]
+      const dynamicSeriesConfig = config.runtime.series.find(s => s.dynamicCategory)
+      const originalDataKey = dynamicSeriesConfig?.originalDataKey ?? seriesKey
+
       if (!hoveredSeriesKey) return
-      hoveredSeriesIndex = tooltipData?.data.indexOf(hoveredSeriesKey)
       hoveredSeriesValue = tableData?.find(d => {
-        return d[config?.xAxis.dataKey] === hoveredXValue
-      })?.[seriesKey]
+        const dynamicCategory = dynamicSeriesConfig?.dynamicCategory
+        const matchingXValue = d[config.xAxis.dataKey] === hoveredXValue
+        if (!matchingXValue) return false
+        if (dynamicCategory) {
+          const match = d[dynamicCategory] === hoveredSeriesKey
+          return match
+        }
+        return true
+      })?.[originalDataKey]
 
       //    hoveredSeriesValue = extractNumber(hoveredSeriesValue)
       return tooltipData?.data.map((tooltipItem, index) => {
@@ -190,10 +198,10 @@ const LineChartCircle = (props: LineChartCircleProps) => {
       return isFirstPoint || isLastPoint || isMiddlePoint
     }
 
-    if (drawIsolatedPoints(dataIndex, seriesKey) && !config.series.some(s => s.dynamicCategory)) {
+    if (drawIsolatedPoints(dataIndex, seriesKey)) {
       const positionTop = filtered?.axis === 'Right' ? yScaleRight(d[filtered?.dataKey]) : yScale(d[filtered?.dataKey])
       const positionLeft = getXPos(d[config.xAxis?.dataKey])
-      const color = colorScale(config.runtime.seriesLabels[seriesKey])
+      const color = colorScale(config.runtime.seriesLabelsAll[seriesIndex])
 
       return (
         <g transform={transformShape(positionTop, positionLeft)}>

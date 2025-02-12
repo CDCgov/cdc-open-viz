@@ -210,7 +210,7 @@ const BrushHandle = props => {
   const transform = isLeft ? 'scale(-1, 1)' : 'translate(0,0)'
   const textAnchor = isLeft ? 'end' : 'start'
   const tooltipText = isLeft ? ` Drag edges to focus on a specific segment ` : ''
-  const textWidth = getTextWidth(tooltipText, `normal ${appFontSize / 1.1}px sans-serif`)
+  const textWidth = getTextWidth(tooltipText, `${appFontSize / 1.1}px`)
 
   return (
     <>
