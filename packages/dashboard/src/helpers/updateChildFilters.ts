@@ -32,15 +32,15 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
         }
       })
       // Get unique active values for the child filter
-      const uniqChildValues = _.uniq(parentsActiveValues.map(d => d[childFilter.columnName]).filter(Boolean))
+      const childFilterValues = _.uniq(parentsActiveValues.map(d => d[childFilter.columnName]).filter(Boolean))
 
       // Update the child filter if unique values exist
-      if (uniqChildValues.length > 0) {
+      if (childFilterValues.length > 0) {
         const isChildMultiSelect = childFilter.filterStyle === 'multi-select'
-        const activeValue = isChildMultiSelect ? uniqChildValues : uniqChildValues[0]
+        const activeValue = isChildMultiSelect ? childFilterValues : childFilterValues[0]
         updatedFilters[childIndex] = {
           ...childFilter,
-          values: uniqChildValues,
+          values: childFilterValues,
           active: activeValue
         }
       }
