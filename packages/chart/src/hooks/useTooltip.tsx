@@ -175,11 +175,16 @@ export const useTooltip = props => {
             ?.flatMap(seriesKey => {
               const value = resolvedScaleValues[0]?.[seriesKey]
               const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
+              const seriesObjWithName = config.runtime.series.find(
+                series => series.dataKey === seriesKey && series.name !== undefined
+              )
               if (
                 (value === null || value === undefined || value === '' || formattedValue === 'N/A') &&
                 config.general.hideNullValue
               ) {
                 return []
+              } else if (seriesObjWithName && seriesObjWithName.name === '') {
+                return [['', formattedValue, getAxisPosition(seriesKey)]]
               } else {
                 return [[seriesKey, formattedValue, getAxisPosition(seriesKey)]]
               }
@@ -567,8 +572,14 @@ export const useTooltip = props => {
     if (index == 1 && config.dataFormat.onlyShowTopPrefixSuffix) {
       newValue = `${config.dataFormat.prefix}${newValue}${config.dataFormat.suffix}`
     }
+    const activeLabel = getSeriesNameFromLabel(key)
+    const displayText = activeLabel ? `${activeLabel}: ${newValue}` : newValue
 
-    return <li style={style} className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${newValue}`}</li>
+    return (
+      <li style={style} className='tooltip-body'>
+        {displayText}
+      </li>
+    )
   }
 
   return {
