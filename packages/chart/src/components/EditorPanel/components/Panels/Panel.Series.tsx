@@ -500,6 +500,8 @@ const SeriesInputName = props => {
 
     updateConfig(newConfig)
   }
+  // if series name is emty show default data value.
+  const value = series.name !== undefined && series.name !== series.dataKey ? series.name : series.dataKey
 
   return (
     <>
@@ -507,7 +509,7 @@ const SeriesInputName = props => {
       <input
         type='text'
         key={`series-name-${i}`}
-        value={series.name ? series.name : ''}
+        value={value}
         onChange={event => {
           changeSeriesName(i, event.target.value)
         }}
