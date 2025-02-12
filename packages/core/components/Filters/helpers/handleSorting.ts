@@ -18,6 +18,7 @@ export const handleSorting = singleFilter => {
   }
 
   singleFilter.values = singleFilterValues.sort(sort)
+  singleFilter.orderedValues = singleFilterValues.sort(sort)
 
   return singleFilter
 }

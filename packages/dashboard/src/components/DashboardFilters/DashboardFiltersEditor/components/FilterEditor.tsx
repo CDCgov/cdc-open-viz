@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { APIFilter } from '../../../../types/APIFilter'
 import { getVizRowColumnLocator } from '../../../../helpers/getVizRowColumnLocator'
-import { TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import { Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { useEffect, useMemo, useState } from 'react'
 import { SharedFilter } from '../../../../types/SharedFilter'
@@ -14,6 +14,8 @@ import { Visualization } from '@cdc/core/types/Visualization'
 import { hasDashboardApplyBehavior } from '../../../../helpers/hasDashboardApplyBehavior'
 import NestedDropDownDashboard from './NestedDropDownDashboard'
 import { FILTER_STYLE } from '../../../../types/FilterStyles'
+import { filterOrderOptions } from '@cdc/core/components/Filters'
+import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/components/FilterOrder'
 
 type FilterEditorProps = {
   config: DashboardConfig
@@ -102,8 +104,12 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
     updateFilterProp('apiFilter', newAPIFilter)
   }
 
-  const handleFilterStyleChange = value => {
-    updateFilterProp('filterStyle', value)
+  const updateLabel = (value: string) => {
+    const duplicateLabels = config.dashboard.sharedFilters.filter(
+      (filter, i) => filter.key === value && filterIndex !== i
+    )
+    // If there are duplicate labels, append the number of duplicates to the label similar functionality to duplicate file names
+    updateFilterProp('key', duplicateLabels.length ? value + ` (${duplicateLabels.length})` : value)
   }
 
   const updateLabel = (value: string) => {
@@ -209,7 +215,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
             <span className='edit-label column-heading'>Filter Style: </span>
             <select
               value={filter.filterStyle || FILTER_STYLE.dropdown}
-              onChange={e => handleFilterStyleChange(e.target.value)}
+              onChange={e => updateFilterProp('filterStyle', e.target.value)}
             >
               {filterStyles.map(dataKey => (
                 <option value={dataKey} key={`filter-style-select-item-${dataKey}`}>
@@ -434,6 +440,26 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
                       ))}
                     </select>
                   </label>
+
+                  <Select
+                    value={filter.order || 'column'}
+                    options={filterOrderOptions}
+                    updateField={(_section, _subSection, _key, value) => updateFilterProp('order', value)}
+                    label={'Filter Order'}
+                  />
+
+                  {/* if custom order is set use react-dnd library to sort the values */}
+                  {filter.order === 'cust' && (
+                    <FilterOrder
+                      orderedValues={filter.orderedValues || filter.values}
+                      handleFilterOrder={(index1, index2) => {
+                        const values = [...filter.values]
+                        const [removed] = values.splice(index1, 1)
+                        values.splice(index2, 0, removed)
+                        updateFilterProp('orderedValues', values)
+                      }}
+                    />
+                  )}
 
                   <label>
                     <span className='edit-label column-heading'>Show Dropdown</span>
