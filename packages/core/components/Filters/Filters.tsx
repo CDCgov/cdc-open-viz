@@ -481,11 +481,12 @@ const Filters = (props: FilterProps) => {
           string
         ]
       }, [singleFilter])
+      const hideLabelMargin = isTabSimple && !showDefaultDropdown
       return (
         <div className={classList.join(' ')} key={outerIndex} ref={el => (wrappingFilterRefs.current[columnName] = el)}>
           <>
             {label && (
-              <label className={`font-weight-bold mb-${isTabSimple ? '0' : '2'}`} htmlFor={`filter-${outerIndex}`}>
+              <label className={`font-weight-bold mb-${hideLabelMargin ? '0' : '2'}`} htmlFor={`filter-${outerIndex}`}>
                 {label}
               </label>
             )}
