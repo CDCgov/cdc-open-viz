@@ -12,6 +12,15 @@ export const getWrappingStatuses = (wrappingFilterRefs, wrappingFilters, allFilt
 
       if (!filterStyle || filterStyle !== VIZ_FILTER_STYLE.tabSimple) return false
 
+      const filterStyleClass = (ref as HTMLElement).className
+        .split(' ')
+        .find(className => className.includes(filterStyle))
+        ?.split('single-filters--')[1]
+
+      const classMatchesStyle = filterStyleClass && filterStyleClass === filterStyle
+
+      if (!classMatchesStyle) return false
+
       const wrappingState = wrappingFilters[columnValue]
       const { height, width } = (ref as HTMLElement).getBoundingClientRect()
       const wrappingThreshold = label ? WRAPPING_HEIGHT_THRESHOLD_WITH_LABEL : WRAPPING_HEIGHT_THRESHOLD_NO_LABEL

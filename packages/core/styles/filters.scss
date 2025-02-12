@@ -38,8 +38,9 @@ div.single-filters {
       border-bottom-left-radius: 15px;
     }
   }
-  & > select.cove-form-select {
-    width: auto;
+  & > select.cove-form-select,
+  & > div.nested-dropdown {
+    width: fit-content;
   }
 }
 
