@@ -94,7 +94,8 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           }
         } else {
           // Data Filter
-          filter.values?.forEach((filterOption, index) => {
+          const orderedFilterValues = filter.orderedValues || filter.values
+          orderedFilterValues?.forEach((filterOption, index) => {
             const labeledOpt = filter.labels && filter.labels[filterOption]
             const resetLabelHasMatch = (filterOption || labeledOpt) === filter.resetLabel
 
@@ -128,7 +129,6 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         }
 
         const formGroupClass = `form-group me-4 mb-1${loading ? ' loading-filter' : ''}`
-
         return (
           <div className={formGroupClass} key={`${filter.key}-filtersection-${filterIndex}`}>
             {label && (
