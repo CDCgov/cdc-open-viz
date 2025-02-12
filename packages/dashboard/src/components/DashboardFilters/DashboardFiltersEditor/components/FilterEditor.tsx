@@ -434,6 +434,13 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
                   </label>
 
                   <Select
+                    value={filter.active || '-Select-'}
+                    options={config.dashboard.sharedFilters[filterIndex].values}
+                    updateField={(_section, _subSection, _key, value) => updateFilterProp('active', value)}
+                    label={'Filter Default Value'}
+                  />
+
+                  <Select
                     value={filter.order || 'column'}
                     options={filterOrderOptions}
                     updateField={(_section, _subSection, _key, value) => updateFilterProp('order', value)}
