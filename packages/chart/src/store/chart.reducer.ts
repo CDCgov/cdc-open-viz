@@ -14,9 +14,9 @@ export const getInitialState = (configObj: ChartConfig) => {
     filteredData: undefined,
     seriesHighlight:
       configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : [],
-    currentViewport: 'lg' as ViewportSize,
-    dimensions: [0, 0] as DimensionsType,
-    container: null as HTMLElement | null,
+    currentViewport: 'lg',
+    dimensions: [0, 0],
+    container: null,
     coveLoadedEventRan: false,
     isDraggingAnnotation: false,
     imageId: `cove-${Math.random().toString(16).slice(-4)}`,
@@ -42,7 +42,11 @@ type State = {
   coveLoadedEventRan: boolean
   isDraggingAnnotation: boolean
   imageId: string
-  brushConfig: object
+  brushConfig: {
+    data: object[]
+    isActive: boolean
+    isBrushing: boolean
+  }
 }
 
 export const reducer = (state: State, action: ChartActions) => {
