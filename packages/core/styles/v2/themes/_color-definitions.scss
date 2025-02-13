@@ -149,7 +149,9 @@ $theme: (
         color: #fff;
       }
       .filters-section button.cove-button:not([disabled]) {
-        background-color: string.unquote(nth($theme-colors, 1)) !important;
+        // css var added for secondary button https://uxpreview.cdc.gov/3GE5EW/?id=6cg4ol&p=fonts__spacing__and_elements_in_charts__ux-1249_ removing !importants so filter styles apply
+        --theme: #{string.unquote(nth($theme-colors, 1))};
+        background-color: string.unquote(nth($theme-colors, 1));
       }
     }
 
@@ -173,7 +175,8 @@ $theme: (
         outline: 2px solid string.unquote(nth($theme-colors, 1));
       }
       .apply:not([disabled]) {
-        background-color: string.unquote(nth($theme-colors, 1)) !important;
+        --theme: #{string.unquote(nth($theme-colors, 1))};
+        background-color: string.unquote(nth($theme-colors, 1));
       }
     }
   }

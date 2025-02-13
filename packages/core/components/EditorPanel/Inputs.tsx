@@ -189,17 +189,19 @@ const Select = memo((props: SelectProps) => {
         {label}
         {tooltip}
       </span>
-      <select
-        className={`cove-form-select ${required && !value ? 'warning' : ''}`}
-        name={fieldName}
-        value={value}
-        onChange={event => {
-          updateField(section, subsection, fieldName, event.target.value)
-        }}
-        {...attributes}
-      >
-        {optionsJsx}
-      </select>
+      <div className='cove-form-select-wrapper'>
+        <select
+          className={`cove-form-select ${required && !value ? 'warning' : ''}`}
+          name={fieldName}
+          value={value}
+          onChange={event => {
+            updateField(section, subsection, fieldName, event.target.value)
+          }}
+          {...attributes}
+        >
+          {optionsJsx}
+        </select>
+      </div>
     </label>
   )
 })

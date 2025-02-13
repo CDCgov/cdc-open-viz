@@ -158,24 +158,26 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
               />
             ) : (
               <>
-                <select
-                  id={`filter-${filterIndex}`}
-                  className='cove-form-select'
-                  data-index='0'
-                  value={loading ? 'Loading...' : filter.queuedActive || filter.active}
-                  onChange={val => {
-                    handleOnChange(filterIndex, val.target.value)
-                  }}
-                  disabled={loading || isDisabled}
-                >
-                  {loading && <option value='Loading...'>Loading...</option>}
-                  {nullVal(filter) && (
-                    <option key={`select`} value=''>
-                      {filter.resetLabel || '- Select -'}
-                    </option>
-                  )}
-                  {values}
-                </select>
+                <div className='cove-form-select-wrapper'>
+                  <select
+                    id={`filter-${filterIndex}`}
+                    className='cove-form-select'
+                    data-index='0'
+                    value={loading ? 'Loading...' : filter.queuedActive || filter.active}
+                    onChange={val => {
+                      handleOnChange(filterIndex, val.target.value)
+                    }}
+                    disabled={loading || isDisabled}
+                  >
+                    {loading && <option value='Loading...'>Loading...</option>}
+                    {nullVal(filter) && (
+                      <option key={`select`} value=''>
+                        {filter.resetLabel || '- Select -'}
+                      </option>
+                    )}
+                    {values}
+                  </select>
+                </div>
                 {loading && <Loader spinnerType={'text-secondary'} />}
               </>
             )}
