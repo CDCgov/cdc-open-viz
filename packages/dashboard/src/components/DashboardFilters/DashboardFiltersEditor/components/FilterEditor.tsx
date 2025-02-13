@@ -112,14 +112,6 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
     updateFilterProp('key', duplicateLabels.length ? value + ` (${duplicateLabels.length})` : value)
   }
 
-  const updateLabel = (value: string) => {
-    const duplicateLabels = config.dashboard.sharedFilters.filter(
-      (filter, i) => filter.key === value && filterIndex !== i
-    )
-    // If there are duplicate labels, append the number of duplicates to the label similar functionality to duplicate file names
-    updateFilterProp('key', duplicateLabels.length ? value + ` (${duplicateLabels.length})` : value)
-  }
-
   const isNestedDropDown = filter.filterStyle === FILTER_STYLE.nestedDropdown
 
   type APIInputProps = {
