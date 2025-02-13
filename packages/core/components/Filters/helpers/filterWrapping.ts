@@ -8,7 +8,7 @@ export const getWrappingStatuses = (wrappingFilterRefs, wrappingFilters, allFilt
       if (!ref) return false
 
       const filter = allFilters.find(filter => filter.columnName === columnValue)
-      const { filterStyle, label } = filter
+      const { filterStyle, label } = filter || {}
 
       if (!filterStyle || filterStyle !== VIZ_FILTER_STYLE.tabSimple) return false
 
