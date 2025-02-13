@@ -171,7 +171,7 @@ const DataTable = (props: DataTableProps) => {
     if (config.type === 'map') {
       return config.table.caption
         ? config.table.caption
-        : `Data table showing data for the ${mapLookup[config.general.geoType]} figure.`
+        : `Data table showing data for the ${mapLookup[config.general?.geoType]} figure.`
     } else {
       return config.table.caption ? config.table.caption : `Data table showing data for the ${config.type} figure.`
     }
@@ -211,7 +211,7 @@ const DataTable = (props: DataTableProps) => {
   const getClassNames = (): string => {
     const classes = ['data-table-container']
 
-    if (config.table.showDownloadLinkBelow) {
+    if (config.general?.showDownloadButton && !config.table.showDownloadLinkBelow) {
       classes.push('mt-4')
     }
 
@@ -266,7 +266,7 @@ const DataTable = (props: DataTableProps) => {
 
     return (
       <ErrorBoundary component='DataTable'>
-        {!config.table.showDownloadLinkBelow && <TableMediaControls />}
+        {config.general?.showDownloadButton && !config.table.showDownloadLinkBelow && <TableMediaControls />}
         <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           {config.table.collapsible !== false && (
@@ -336,7 +336,9 @@ const DataTable = (props: DataTableProps) => {
               )}
           </div>
         </section>
-        {config.table.showDownloadLinkBelow && <TableMediaControls belowTable={true} />}
+        {config.general?.showDownloadButton && config.table.showDownloadLinkBelow && (
+          <TableMediaControls belowTable={true} />
+        )}
         <div id={skipId} className='cdcdataviz-sr-only'>
           Skipped data table.
         </div>
