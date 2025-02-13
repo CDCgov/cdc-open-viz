@@ -1,4 +1,5 @@
 import { DimensionsType } from '@cdc/core/types/Dimensions'
+import { ChartConfig } from '../types/ChartConfig'
 
 type Action<T, P = undefined, R = undefined> = {
   type: T
@@ -6,9 +7,9 @@ type Action<T, P = undefined, R = undefined> = {
 }
 
 // Action Types
-type SET_CONFIG = Action<'SET_CONFIG', object>
+type SET_CONFIG = Action<'SET_CONFIG', ChartConfig>
 type SET_LOADING = Action<'SET_LOADING', boolean>
-type UPDATE_CONFIG = Action<'UPDATE_CONFIG', object>
+type UPDATE_CONFIG = Action<'UPDATE_CONFIG', ChartConfig>
 type SET_COLOR_SCALE = Action<'SET_COLOR_SCALE', Function>
 type SET_STATE_DATA = Action<'SET_STATE_DATA', object[]>
 type SET_EXCLUDED_DATA = Action<'SET_EXCLUDED_DATA', object[]>

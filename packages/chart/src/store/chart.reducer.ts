@@ -1,6 +1,8 @@
 import ChartActions from './chart.actions'
 import defaults from '../data/initial-state.js'
-import { type ViewportSize } from '../types/ChartConfig'
+import { ChartConfig, type ViewportSize } from '../types/ChartConfig'
+import { DimensionsType } from '@cdc/core/types/Dimensions'
+import _ from 'lodash'
 export const initialState = {
   isLoading: true,
   config: defaults,
@@ -21,7 +23,46 @@ export const initialState = {
     isBrushing: false
   }
 }
-type State = typeof initialState
+
+export const getInitialState = (configObj: ChartConfig) => {
+  return {
+    isLoading: true,
+    config: defaults,
+    stateData: _.cloneDeep(configObj?.data) || [],
+    colorScale: null,
+    excludedData: undefined,
+    filteredData: undefined,
+    seriesHighlight:
+      configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : [],
+    currentViewport: 'lg' as ViewportSize,
+    dimensions: [0, 0] as DimensionsType,
+    container: null as HTMLElement | null,
+    coveLoadedEventRan: false,
+    isDraggingAnnotation: false,
+    imageId: `cove-${Math.random().toString(16).slice(-4)}`,
+    brushConfig: {
+      data: [],
+      isActive: false,
+      isBrushing: false
+    }
+  }
+}
+
+type State = {
+  isLoading: boolean
+  config: ChartConfig
+  stateData: object[]
+  colorScale: Function
+  excludedData: object[]
+  filteredData: object[]
+  seriesHighlight: string[]
+  currentViewport: ViewportSize
+  dimensions: DimensionsType
+  container: HTMLElement | null
+  coveLoadedEventRan: boolean
+  isDraggingAnnotation: boolean
+  imageId: string
+}
 
 export const reducer = (state: State, action: ChartActions) => {
   switch (action.type) {

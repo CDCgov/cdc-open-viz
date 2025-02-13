@@ -74,7 +74,7 @@ import { getExcludedData } from './helpers/getExcludedData'
 import { getColorScale } from './helpers/getColorScale'
 // styles
 import './scss/main.scss'
-import { reducer } from './store/chart.reducer'
+import { getInitialState, reducer } from './store/chart.reducer'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -101,28 +101,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   setSharedFilterValue,
   dashboardConfig
 }) => {
-  const initialState = {
-    isLoading: true,
-    config: defaults,
-    stateData: _.cloneDeep(configObj?.data) || [],
-    colorScale: null,
-    excludedData: undefined,
-    filteredData: undefined,
-    seriesHighlight:
-      configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : [],
-    currentViewport: 'lg' as ViewportSize,
-    dimensions: [0, 0] as DimensionsType,
-    container: null as HTMLElement | null,
-    coveLoadedEventRan: false,
-    isDraggingAnnotation: false,
-    imageId: `cove-${Math.random().toString(16).slice(-4)}`,
-    brushConfig: {
-      data: [],
-      isActive: false,
-      isBrushing: false
-    }
-  }
   const transform = new DataTransform()
+  const initialState = getInitialState(configObj)
   const [state, dispatch] = useReducer(reducer, initialState)
   const {
     config,
