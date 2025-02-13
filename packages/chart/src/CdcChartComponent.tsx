@@ -14,11 +14,9 @@ import DataTable from '@cdc/core/components/DataTable'
 // Local Components
 import LegendWrapper from './components/LegendWrapper'
 //types
-import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 import type { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import { AllChartsConfig, ChartConfig } from './types/ChartConfig'
-import { type ViewportSize } from './types/ChartConfig'
 import { Pivot } from '@cdc/core/types/Table'
 import { Runtime } from '@cdc/core/types/Runtime'
 import { Label } from './types/Label'
@@ -119,26 +117,26 @@ const CdcChart: React.FC<CdcChartProps> = ({
     isDraggingAnnotation,
     colorScale
   } = state
+  const { description, visualizationType } = config
   const svgRef = useRef(null)
+  const editorContext = useContext(EditorContext)
   const [externalFilters, setExternalFilters] = useState<any[]>()
   const [brushConfig, setBrushConfig] = useState({
     data: [],
     isActive: false,
     isBrushing: false
   })
-  const editorContext = useContext(EditorContext)
-  const setConfig = newConfig => {
+
+  const setConfig = (newConfig: ChartConfig): void => {
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
     if (isEditor && !isDashboard) {
       editorContext.setTempConfig(newConfig)
     }
   }
 
-  const setFiltersData = filteredData => {
+  const setFiltersData = (filteredData: object[]): void => {
     dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
   }
-
-  const { description, visualizationType } = config
 
   const legendRef = useRef(null)
   const parentRef = useRef(null)
@@ -404,13 +402,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
         newConfig.data = transform.developerStandardize(newConfig.data, newConfig.dataDescription)
       }
     } catch (err) {
-      console.log('errir on prepareData function ', err)
+      console.log('Error on prepareData function ', err)
     }
     return newConfig
   }
 
   useEffect(() => {
-    console.log('use Effect-3')
     const load = async () => {
       try {
         if (configObj) {
@@ -1050,18 +1047,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const contextValues = {
+    ...state,
     brushConfig,
     capitalize,
     convertLineToBarGraph,
     clean,
     colorPalettes,
-    colorScale,
-    config,
-    currentViewport,
     dashboardConfig,
     debugSvg: isDebug,
-    dimensions,
-    excludedData,
     formatDate,
     formatNumber,
     formatTooltipsDate,
@@ -1072,10 +1065,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     handleChartTabbing,
     highlight,
     handleShowAll,
-    imageId,
     isDashboard,
     isDebug,
-    isDraggingAnnotation,
     handleDragStateChange,
     isEditor,
     isNumber,
@@ -1083,13 +1074,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
     legendId,
     legendRef,
     lineOptions,
-    isLoading,
     missingRequiredSections,
     outerContainerRef,
     parentRef,
     parseDate,
     rawData: _.cloneDeep(stateData) ?? {},
-    seriesHighlight,
     setBrushConfig,
     setConfig,
     setEditing,
@@ -1097,8 +1086,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     setSharedFilter,
     setSharedFilterValue,
     svgRef,
-    tableData: filteredData || excludedData, // do not clean table data
-    transformedData: clean(filteredData || excludedData), // do this right before passing to components
+    tableData: filteredData || excludedData,
+    transformedData: clean(filteredData || excludedData),
     twoColorPalette,
     unfilteredData: _.cloneDeep(stateData),
     updateConfig
