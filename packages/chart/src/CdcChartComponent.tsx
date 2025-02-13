@@ -27,7 +27,7 @@ import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 import _ from 'lodash'
 // Primary Components
-import ConfigContext from './ConfigContext'
+import ConfigContext, { ChartDispatchContext } from './ConfigContext'
 import PieChart from './components/PieChart'
 import SankeyChart from './components/Sankey'
 import LinearChart from './components/LinearChart'
@@ -114,18 +114,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
     coveLoadedEventRan,
     imageId,
     seriesHighlight,
-    isDraggingAnnotation,
-    colorScale
+    colorScale,
+    brushConfig
   } = state
   const { description, visualizationType } = config
   const svgRef = useRef(null)
   const editorContext = useContext(EditorContext)
   const [externalFilters, setExternalFilters] = useState<any[]>()
-  const [brushConfig, setBrushConfig] = useState({
-    data: [],
-    isActive: false,
-    isBrushing: false
-  })
 
   const setConfig = (newConfig: ChartConfig): void => {
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
@@ -1079,7 +1074,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     parentRef,
     parseDate,
     rawData: _.cloneDeep(stateData) ?? {},
-    setBrushConfig,
     setConfig,
     setEditing,
     setParentConfig,
@@ -1095,16 +1089,18 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   return (
     <ConfigContext.Provider value={contextValues}>
-      <Layout.VisualizationWrapper
-        config={config}
-        isEditor={isEditor}
-        currentViewport={currentViewport}
-        ref={outerContainerRef}
-        imageId={imageId}
-        showEditorPanel={config?.showEditorPanel}
-      >
-        {body}
-      </Layout.VisualizationWrapper>
+      <ChartDispatchContext.Provider value={dispatch}>
+        <Layout.VisualizationWrapper
+          config={config}
+          isEditor={isEditor}
+          currentViewport={currentViewport}
+          ref={outerContainerRef}
+          imageId={imageId}
+          showEditorPanel={config?.showEditorPanel}
+        >
+          {body}
+        </Layout.VisualizationWrapper>
+      </ChartDispatchContext.Provider>
     </ConfigContext.Provider>
   )
 }

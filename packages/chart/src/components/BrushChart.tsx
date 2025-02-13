@@ -1,6 +1,6 @@
 import { Group } from '@visx/group'
 import { useContext, useEffect, useRef, useState } from 'react'
-import ConfigContext from '../ConfigContext'
+import ConfigContext, { ChartDispatchContext } from '../ConfigContext'
 import * as d3 from 'd3'
 import { Text } from '@visx/text'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
@@ -13,6 +13,7 @@ interface BrushChartProps {
 
 const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
   const { tableData, config, setBrushConfig, dashboardConfig, formatDate, parseDate } = useContext(ConfigContext)
+  const dispatch = useContext(ChartDispatchContext)
   const [brushState, setBrushState] = useState({ isBrushing: false, selection: [] })
   const [brushKey, setBrushKey] = useState(0)
   const sharedFilters = dashboardConfig?.dashboard?.sharedFilters ?? []
@@ -105,11 +106,11 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
       const sortedData = _.sortBy(newFilteredData, item => new Date(item[config.xAxis.dataKey]))
 
       // If ascending is false, reverse the sorted array
-      const finalData = !sortByRecentDate ? sortedData : sortedData.reverse()
+      const finalData: object[] = !sortByRecentDate ? sortedData : sortedData.reverse()
 
       // Retrieve the start and end dates based on the sorted data array
-      const startDate = _.get(_.first(finalData), config.xAxis.dataKey, '')
-      const endDate = _.get(_.last(finalData), config.xAxis.dataKey, '')
+      const startDate: string = _.get(_.first(finalData), config.xAxis.dataKey, '')
+      const endDate: string = _.get(_.last(finalData), config.xAxis.dataKey, '')
       // add custom blue colored handlers to each corners of brush
       svg.selectAll('.handle--custom').remove()
       // Parse and format the dates, setting them to an empty string if undefined
@@ -118,11 +119,12 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
       const formattedEndDate = parseAndFormatDate(endDate)
       svg.call(brushHandle, selection, formattedStartDate, formattedEndDate)
 
-      setBrushConfig({
+      const payload = {
         active: config.brush.active,
         isBrushing: isUserBrushing,
         data: finalData
-      })
+      }
+      dispatch({ type: 'SET_BRUSH_CONFIG', payload: payload })
       setBrushState({
         isBrushing: true,
         selection
@@ -155,20 +157,10 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
 
     if ((isFiltersActive || isExclusionsActive || isDashboardFilters) && config.brush?.active) {
       setBrushKey(prevKey => prevKey + 1)
-      setBrushConfig(prev => {
-        return {
-          ...prev,
-          data: tableData
-        }
-      })
     }
-    return () =>
-      setBrushConfig(prev => {
-        return {
-          ...prev,
-          data: []
-        }
-      })
+    dispatch({ type: 'SET_BRUSH_CONFIG', payload: { ...config.brush, data: tableData } })
+
+    return () => dispatch({ type: 'SET_BRUSH_CONFIG', payload: { ...config.brush, data: [] } })
   }, [config.filters, config.exclusions, config.brush?.active, isDashboardFilters])
 
   // this effect handles where brush chart is missing on production. it helpes re render

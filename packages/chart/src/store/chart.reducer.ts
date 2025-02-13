@@ -42,6 +42,7 @@ type State = {
   coveLoadedEventRan: boolean
   isDraggingAnnotation: boolean
   imageId: string
+  brushConfig: object
 }
 
 export const reducer = (state: State, action: ChartActions) => {
