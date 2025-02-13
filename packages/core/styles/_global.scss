@@ -178,14 +178,53 @@ section.footnotes {
 
 // after migration to TP5 this declaration should be removed and all references
 // to it should be replaced with .form-select
-.cove-form-select {
+.cove-form-select-wrapper {
+  display: grid;
+  grid-template-areas: 'select';
+  align-items: center;
+  inline-size: max-content;
+  min-inline-size: 15ch;
+  max-inline-size: 100%;
+  min-block-size: 40px;
+  font-size: var(--filter-select-font-size);
   font-family: var(--app-font-secondary);
   font-weight: 300;
-  font-size: var(--filter-select-font-size);
-  display: block;
-  width: 100%;
-  padding: 0.375rem 0.75rem;
-  border-radius: 0.25rem;
-  border: 1px solid var(--cool-gray-10);
+  line-height: 1;
   color: var(--cool-gray-90);
+  background-color: var(--white);
+  cursor: pointer;
+
+  .cove-form-select {
+    appearance: none;
+    border: 1px solid var(--cool-gray-10);
+    border-radius: var(--borders-radius);
+    padding: 0.5rem;
+    background-color: transparent;
+    margin: 0;
+    inline-size: 100%;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    cursor: inherit;
+    line-height: inherit;
+    grid-area: select;
+  }
+
+  &::after {
+    font-family: var(--icons-cdc-fa);
+    font-size: 0.778rem;
+    content: '\f17b';
+    color: var(--cool-gray-90);
+    grid-area: select;
+    justify-self: end;
+    transform: translateX(-0.5rem);
+    pointer-events: none;
+    transition: transform 200ms ease;
+  }
+
+  &:focus-within {
+    &::after {
+      transform: rotate(180deg) translateX(0.5rem);
+    }
+  }
 }

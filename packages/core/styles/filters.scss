@@ -19,8 +19,54 @@
   &__buttons {
     width: 100%;
     font-size: var(--filter-buttons-font-size);
-    .apply {
-      margin-right: 10px;
+    // TODO: Eventually lift up to base button component styles?
+    .cove-button {
+      min-block-size: 40px;
+      line-height: 1;
+      padding: 0.5rem 1rem;
+      border: 1px solid transparent;
+      border-radius: var(--borders-radius);
+
+      &.apply {
+        margin-right: 0.5rem;
+
+        &:hover {
+          // using brightness filter here to get close to spec which is only considering blue and not other possible themes https://uxpreview.cdc.gov/3GE5EW/?id=6cg4ol&p=fonts__spacing__and_elements_in_charts__ux-1249_
+          filter: brightness(0.9);
+        }
+
+        &:disabled {
+          // !important to override base button disabled style in /core/styles/v2/components/button.scss
+          color: var(--cool-gray-90);
+          background: var(--cool-gray-10) !important;
+
+          &:hover {
+            filter: initial;
+          }
+        }
+      }
+
+      // requires !important to override styles in /core/styles/v2/themes/_color-definitions.scss
+      &.reset {
+        background: var(--white) !important;
+        color: var(--theme);
+        border-color: var(--theme);
+
+        &:hover {
+          background: var(--theme) !important;
+          color: var(--white);
+        }
+
+        &:disabled {
+          color: var(--cool-gray-90);
+          background: var(--gray-2) !important;
+          border-color: var(--cool-gray-10);
+          &:hover {
+            background: var(--gray-2) !important;
+            color: var(--cool-gray-90);
+          }
+        }
+      }
     }
   }
 }

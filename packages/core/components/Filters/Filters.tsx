@@ -218,7 +218,6 @@ export const useFilters = props => {
 
   const handleReset = e => {
     let newFilters = [...visualizationConfig.filters]
-    e.preventDefault()
 
     // reset to first item in values array.
     let needsQueryUpdate = false
@@ -249,8 +248,8 @@ export const useFilters = props => {
   }
 
   const filterConstants = {
-    buttonText: 'Apply Filters',
-    resetText: 'Reset All'
+    buttonText: 'Apply',
+    resetText: 'Clear Filters'
   }
 
   // prettier-ignore
@@ -373,19 +372,21 @@ const Filters = (props: FilterProps) => {
   const Dropdown = props => {
     const { index: outerIndex, label, active, filters } = props
     return (
-      <select
-        id={`filter-${outerIndex}`}
-        name={label}
-        aria-label={`Filter by ${label}`}
-        className='cove-form-select'
-        data-index='0'
-        value={active}
-        onChange={e => {
-          changeFilterActive(outerIndex, e.target.value)
-        }}
-      >
-        {filters}
-      </select>
+      <div className='cove-form-select-wrapper'>
+        <select
+          id={`filter-${outerIndex}`}
+          name={label}
+          aria-label={`Filter by ${label}`}
+          className='cove-form-select'
+          data-index='0'
+          value={active}
+          onChange={e => {
+            changeFilterActive(outerIndex, e.target.value)
+          }}
+        >
+          {filters}
+        </select>
+      </div>
     )
   }
 
@@ -561,9 +562,14 @@ const Filters = (props: FilterProps) => {
               >
                 {filterConstants.buttonText}
               </Button>
-              <a href='#!' role='button' onClick={handleReset}>
+              <Button
+                onClick={handleReset}
+                type='button'
+                disabled={showApplyButton}
+                className={[general?.headerColor ? general.headerColor : theme, 'reset'].join(' ')}
+              >
                 {filterConstants.resetText}
-              </a>
+              </Button>
             </div>
           ) : (
             <></>
