@@ -14,6 +14,7 @@ import { hasDashboardApplyBehavior } from '../../helpers/hasDashboardApplyBehavi
 import * as apiFilterHelpers from '../../helpers/apiFilterHelpers'
 import { applyQueuedActive } from '@cdc/core/components/Filters/helpers/applyQueuedActive'
 import './dashboardfilter.styles.css'
+import { updateChildFilters } from '../../helpers/updateChildFilters'
 
 type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
 
@@ -183,7 +184,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
           >
             <Filters
               show={visualizationConfig?.sharedFilterIndexes?.map(Number)}
-              filters={dashboardConfig.dashboard.sharedFilters || []}
+              filters={updateChildFilters(dashboardConfig.dashboard.sharedFilters, state.data) || []}
               apiFilterDropdowns={apiFilterDropdowns}
               handleOnChange={handleOnChange}
               showSubmit={visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad}
