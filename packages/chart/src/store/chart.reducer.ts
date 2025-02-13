@@ -3,26 +3,6 @@ import defaults from '../data/initial-state.js'
 import { ChartConfig, type ViewportSize } from '../types/ChartConfig'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import _ from 'lodash'
-export const initialState = {
-  isLoading: true,
-  config: defaults,
-  stateData: [],
-  colorScale: null,
-  excludedData: [],
-  filteredData: undefined,
-  seriesHighlight: [],
-  currentViewport: 'lg' as ViewportSize,
-  dimensions: [0, 0],
-  container: null as HTMLElement | null,
-  coveLoadedEventRan: false,
-  isDraggingAnnotation: false,
-  imageId: `cove-${Math.random().toString(16).slice(-4)}`,
-  brushConfig: {
-    data: [],
-    isActive: false,
-    isBrushing: false
-  }
-}
 
 export const getInitialState = (configObj: ChartConfig) => {
   return {
