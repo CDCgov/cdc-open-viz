@@ -262,24 +262,26 @@ export class DataTransform {
     return data
   }
 
-  cleanData(data: DataArray, excludeKey: string): DataArray {
+  cleanData(data: DataArray, excludeKey: string, includedKeys: string[]): DataArray {
     if (!Array.isArray(data) || !excludeKey) return data
 
     const removeCommasAndDollars = (value: string) => value.replace(/[,\$]/g, '')
     const isNumber = (value: any) => !isNaN(parseFloat(value)) && isFinite(value)
-
     return data.map(item =>
       _.mapValues(item, (value, key) => {
         if (key === excludeKey) return value
 
-        // Handle string values and sanitize them
-        if (typeof value === 'string') {
-          const sanitized = removeCommasAndDollars(value)
-          return isNumber(sanitized) ? sanitized : ''
-        }
+        if (includedKeys.includes(key)) {
+          if (typeof value === 'string') {
+            // Handle string values and sanitize them
+            const sanitized = removeCommasAndDollars(value)
+            return isNumber(sanitized) ? sanitized : ''
+          }
+          return isNumber(value) ? value : ''
 
-        // For non-string values, validate them as numbers
-        return isNumber(value) ? value : ''
+          // For non-string values, validate them as numbers
+        }
+        return value
       })
     )
   }
