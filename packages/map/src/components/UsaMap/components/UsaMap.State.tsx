@@ -597,7 +597,7 @@ const UsaMap = () => {
         {annotations.length > 0 && <Annotation.Draggable onDragStateChange={handleDragStateChange} />}
       </svg>
 
-      <TerritoriesSection territories={territories} logo={logo} config={state} />
+      <TerritoriesSection territories={territories} logo={logo} config={state} territoriesData={territoriesData} />
     </ErrorBoundary>
   )
 }
