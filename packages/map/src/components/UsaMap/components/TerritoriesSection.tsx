@@ -2,29 +2,39 @@ import React from 'react'
 
 type TerritoriesSectionProps = {
   territories: JSX.Element[]
+  // Keys of the territories to display
+  territoresData: string[]
   logo: string
   config: any
 }
 
-const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, logo, config }) => {
+const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, logo, config, territoriesData }) => {
+  // filter territioriesData into the two groups below
+  const freelyAssociatedKeys = territoriesData.filter(territory => {
+    return ['US-FM', 'US-MH', 'US-PW'].includes(territory)
+  })
+  const usTerritoriesKeys = territoriesData.filter(territory => {
+    return ['US-AS', 'US-GU', 'US-MP', 'US-PR', 'US-VI'].includes(territory)
+  })
+
   const usTerritories = territories
     .filter(territory => {
-      return ['US-AS', 'US-GU', 'US-MP', 'US-PR', 'US-VI'].includes(territory?.props?.territory)
+      return usTerritoriesKeys.includes(`US-${territory?.props?.label}`)
     })
     .sort((a, b) => {
-      return a.props.territory.localeCompare(b.props.territory)
+      return a.props.label.localeCompare(b.props.label)
     })
 
   const freelyAssociatedStates = territories
     .filter(territory => {
-      return ['US-FM', 'US-MH', 'US-PW'].includes(territory?.props?.territory)
+      return freelyAssociatedKeys.includes(`US-${territory?.props?.label}`)
     })
     .sort((a, b) => {
-      return a.props.territory.localeCompare(b.props.territory)
+      return a.props.label.localeCompare(b.props.label)
     })
 
   return (
-    territories.length > 0 && (
+    territoriesData.length > 0 && (
       <>
         {/* Temporarily make the max width fit the image width */}
         <div>
@@ -34,13 +44,13 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
             )}
           </div>
           <div>
-            {usTerritories.length > 0 && (
+            {(usTerritories.length > 0 || config.general.territoriesAlwaysShow) && (
               <>
                 <h5 className='territories-label'>U.S. Territories</h5>
                 <span className='mt-1 mb-2 d-flex flex-wrap territories'>{usTerritories}</span>
               </>
             )}
-            {freelyAssociatedStates.length > 0 && (
+            {(freelyAssociatedStates.length > 0 || config.general.territoriesAlwaysShow) && (
               <>
                 <h5 className='territories-label'>Freely Associated States</h5>
                 <span className='mt-1 mb-2 d-flex flex-wrap territories'>{freelyAssociatedStates}</span>
