@@ -1,13 +1,13 @@
 import { ReactNode } from 'react'
 import Row from './components/Row'
 import GroupRow from './components/GroupRow'
-import { CellMatrix, GroupCellMatrix } from './types/CellMatrix'
+import { CellMatrix } from './types/CellMatrix'
 import { RowType } from './types/RowType'
 import { PreliminaryDataItem } from '@cdc/chart/src/types/ChartConfig'
 import _ from 'lodash'
 
 type TableProps = {
-  childrenMatrix: CellMatrix | GroupCellMatrix
+  childrenMatrix: CellMatrix | Map<string, CellMatrix>
   noData?: boolean
   tableName: string
   caption: string
@@ -56,9 +56,9 @@ const Table = ({
           <thead style={headStyle}>{headContent}</thead>
           <tbody>
             {isGroupedMatrix
-              ? Object.keys(childrenMatrix).flatMap(groupName => {
+              ? Array.from(childrenMatrix.keys()).flatMap(groupName => {
                   let colSpan = 0
-                  const rows = childrenMatrix[groupName].map((row, i) => {
+                  const rows = childrenMatrix.get(groupName).map((row, i) => {
                     colSpan = row.length
                     const key = `${tableName}-${groupName}-row-${i}`
                     return (
