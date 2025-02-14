@@ -51,7 +51,7 @@ export const addValuesToDashboardFilters = (
         filterCopy.active = active.filter(val => defaultValues.includes(val))
       } else {
         const defaultLabel = filters.find(filter => filter.resetLabel)
-        const defaultValue = defaultLabel ? defaultLabel.resetLabel : filterCopy.values?.[0] || filterCopy.active
+        const defaultValue = defaultLabel ? defaultLabel.resetLabel : filterCopy.active || filterCopy.values[0]
         filterCopy.active = defaultValue
       }
     }
