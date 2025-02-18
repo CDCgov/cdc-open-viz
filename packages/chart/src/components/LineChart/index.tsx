@@ -89,14 +89,14 @@ const LineChart = (props: LineChartProps) => {
               opacity={
                 legend.behavior === 'highlight' &&
                 seriesHighlight.length > 0 &&
-                seriesHighlight.indexOf(_seriesKey) === -1
+                seriesHighlight.indexOf(seriesKey) === -1
                   ? 0.5
                   : 1
               }
               display={
                 legend.behavior === 'highlight' ||
                 (seriesHighlight.length === 0 && !legend.dynamicLegend) ||
-                seriesHighlight.indexOf(_seriesKey) !== -1
+                seriesHighlight.indexOf(seriesKey) !== -1
                   ? 'block'
                   : 'none'
               }

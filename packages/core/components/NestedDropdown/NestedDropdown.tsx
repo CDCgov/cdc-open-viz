@@ -6,12 +6,13 @@ import Loader from '../Loader'
 
 const Options: React.FC<{
   subOptions: ValueTextPair[]
+  handleBlur: React.FocusEventHandler<HTMLLIElement>
   filterIndex: number
   label: string
   handleSubGroupSelect: Function
   userSelectedLabel: string
   userSearchTerm: string
-}> = ({ subOptions, filterIndex, label, handleSubGroupSelect, userSelectedLabel, userSearchTerm }) => {
+}> = ({ subOptions, handleBlur, filterIndex, label, handleSubGroupSelect, userSelectedLabel, userSearchTerm }) => {
   const [isTierOneExpanded, setIsTierOneExpanded] = useState(true)
   const checkMark = <>&#10004;</>
 
@@ -45,6 +46,7 @@ const Options: React.FC<{
         tabIndex={0}
         aria-label={label}
         onClick={handleGroupClick}
+        onBlur={handleBlur}
         onKeyUp={handleKeyUp}
         className={`nested-dropdown-group-${filterIndex}`}
       >
@@ -132,6 +134,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   }, [activeGroup, activeSubGroup])
   const [inputHasFocus, setInputHasFocus] = useState(false)
   const [isListOpened, setIsListOpened] = useState(false)
+  const nestedDropdownRef = useRef(null)
   const searchInput = useRef(null)
   const searchDropdown = useRef(null)
 
@@ -225,24 +228,34 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
     setUserSearchTerm(newSearchTerm)
   }
 
-  const handleOnBlur = e => {
+  const handleOnBlur = (e: React.FocusEvent<HTMLLIElement, Element>): void => {
     if (
       e.relatedTarget === null ||
       ![
         `nested-dropdown-${filterIndex}`,
         `nested-dropdown-group-${filterIndex}`,
-        `selectable-item-${filterIndex}`
+        `selectable-item-${filterIndex}`,
+        `main-nested-dropdown-container-${filterIndex}`
       ].includes(e.relatedTarget.className)
     ) {
       setInputHasFocus(false)
       setIsListOpened(false)
+    } else {
+      ;(e.relatedTarget as HTMLElement).focus()
     }
   }
+
+  function handleBlur(nestedDropdown, handleOnBlur) {
+    nestedDropdown?.addEventListener('blur', handleOnBlur)
+  }
+  handleBlur(searchInput.current, e => handleOnBlur(e))
+  handleBlur(searchDropdown.current, e => handleOnBlur(e))
 
   return (
     <>
       <div
         id={dropdownId}
+        ref={nestedDropdownRef}
         className={`nested-dropdown nested-dropdown-${filterIndex} ${isListOpened ? 'open-filter' : ''}`}
         onKeyUp={handleKeyUp}
       >
@@ -268,7 +281,6 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
               if (inputHasFocus) setIsListOpened(!isListOpened)
             }}
             onFocus={() => setInputHasFocus(true)}
-            onBlur={e => handleOnBlur(e)}
           />
           <span className='list-arrow' aria-hidden={true}>
             <Icon display='caretDown' />
@@ -282,7 +294,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
           aria-labelledby='main-nested-dropdown'
           aria-expanded={isListOpened}
           ref={searchDropdown}
-          className={`main-nested-dropdown-container ${isListOpened ? '' : 'hide'}`}
+          className={`main-nested-dropdown-container-${filterIndex}${isListOpened ? '' : ' hide'}`}
         >
           {filterOptions.length
             ? filterOptions.map(([group, subgroup], index) => {
@@ -291,6 +303,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
                 return (
                   <Options
                     key={groupTextValue + '_' + index}
+                    handleBlur={handleOnBlur}
                     subOptions={subgroup}
                     filterIndex={filterIndex}
                     label={groupTextValue}

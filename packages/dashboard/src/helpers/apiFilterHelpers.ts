@@ -134,10 +134,14 @@ export const setAutoLoadDefaultValue = (
 ): SharedFilter => {
   const sharedFiltersCopy = _.cloneDeep(sharedFilters)
   const sharedFilter = _.cloneDeep(sharedFiltersCopy[sharedFilterIndex])
-  if (!autoLoadFilterIndexes.length || !dropdownOptions?.length) return sharedFilter // no autoLoading happening
-  const hasQueryParameter = sharedFilter.setByQueryParameter
-    ? Boolean(getQueryParam(sharedFilter.setByQueryParameter))
-    : false
+  const defaultQueryParamValue = getQueryParam(sharedFilter?.setByQueryParameter)
+  const hasQueryParameter = sharedFilter.setByQueryParameter ? defaultQueryParamValue !== undefined : false
+  if (!autoLoadFilterIndexes.length || !dropdownOptions?.length) {
+    if (hasQueryParameter && sharedFilter.apiFilter) {
+      sharedFilter.queuedActive = defaultQueryParamValue
+    }
+    return sharedFilter // no autoLoading happening
+  }
   if (autoLoadFilterIndexes.includes(sharedFilterIndex) || hasQueryParameter) {
     const filterParents = sharedFiltersCopy.filter(f => sharedFilter.parents?.includes(f.key))
     const notAllParentFiltersSelected = filterParents.some(p => !(p.active || p.queuedActive))
@@ -148,7 +152,6 @@ export const setAutoLoadDefaultValue = (
       setActiveNestedDropdown(dropdownOptions, sharedFilter)
     } else {
       const defaultValue = dropdownOptions[0]?.value
-      const defaultQueryParamValue = getQueryParam(sharedFilter?.setByQueryParameter)
       if (!sharedFilter.active) {
         sharedFilter.active = defaultQueryParamValue || defaultValue
       } else {

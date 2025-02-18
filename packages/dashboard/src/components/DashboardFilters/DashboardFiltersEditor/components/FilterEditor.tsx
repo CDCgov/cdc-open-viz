@@ -442,7 +442,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
                   />
 
                   <Select
-                    value={filter.order || 'column'}
+                    value={filter.order || 'asc'}
                     options={filterOrderOptions}
                     updateField={(_section, _subSection, _key, value) => updateFilterProp('order', value)}
                     label={'Filter Order'}

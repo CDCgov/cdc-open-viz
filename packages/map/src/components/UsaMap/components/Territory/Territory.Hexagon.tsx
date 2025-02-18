@@ -52,7 +52,7 @@ const TerritoryHexagon = ({
   const hexagonLabel = (geo, bgColor = '#FFFFFF', projection) => {
     let centroid = projection ? projection(geoCentroid(geo)) : [22, 17.5]
 
-    let abbr = geo?.properties?.iso ? geo.properties.iso : geo.uid
+    let abbr = geo?.properties?.iso ? geo.properties.iso : geo?.uid ? geo.uid : `US-${label}`
 
     const getArrowDirection = (geoData, geo, isTerritory = false) => {
       if (!isTerritory) {
@@ -63,19 +63,20 @@ const TerritoryHexagon = ({
         <>
           {state.hexMap.shapeGroups.map((group, groupIndex) => {
             return group.items.map((item, itemIndex) => {
+              if (!geoData) return
               switch (item.operator) {
                 case '=':
-                  if (geoData[item.key] === item.value || Number(geoData[item.key]) === Number(item.value)) {
+                  if (geoData?.[item.key] === item.value || Number(geoData[item.key]) === Number(item.value)) {
                     return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
                   }
                   break
                 case '≠':
-                  if (geoData[item.key] !== item.value && Number(geoData[item.key]) !== Number(item.value)) {
+                  if (geoData?.[item.key] !== item.value && Number(geoData[item.key]) !== Number(item.value)) {
                     return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
                   }
                   break
                 case '<':
-                  if (Number(geoData[item.key]) < Number(item.value)) {
+                  if (Number(geoData?.[item.key]) < Number(item.value)) {
                     return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
                   }
                   break
@@ -175,18 +176,16 @@ const TerritoryHexagon = ({
   }
 
   return (
-    territoryData && (
-      <svg viewBox='-1 -1 46 53' className='territory-wrapper--hex'>
-        <g {...props} data-tooltip-html={dataTooltipHtml} data-tooltip-id={dataTooltipId} onClick={handleShapeClick}>
-          <polygon
-            stroke={stroke}
-            strokeWidth={strokeWidth}
-            points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702'
-          />
-          {state.general.displayAsHex && hexagonLabel(territoryData, stroke, false)}
-        </g>
-      </svg>
-    )
+    <svg viewBox='-1 -1 46 53' className='territory-wrapper--hex'>
+      <g {...props} data-tooltip-html={dataTooltipHtml} data-tooltip-id={dataTooltipId} onClick={handleShapeClick}>
+        <polygon
+          stroke={stroke}
+          strokeWidth={strokeWidth}
+          points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702'
+        />
+        {state.general.displayAsHex && hexagonLabel(territoryData, stroke, false)}
+      </g>
+    </svg>
   )
 }
 
