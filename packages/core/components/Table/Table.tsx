@@ -24,6 +24,7 @@ type TableProps = {
   hasRowType?: boolean // if it has row type then the first column is the row type which will explain how to render the row
   viewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   preliminaryData?: PreliminaryDataItem[]
+  rightAlignedCols: object
 }
 
 type Position = 'sticky'
@@ -39,7 +40,8 @@ const Table = ({
   wrapColumns,
   hasRowType,
   viewport,
-  preliminaryData
+  preliminaryData,
+  rightAlignedCols
 }: TableProps) => {
   const headStyle = stickyHeader ? { position: 'sticky' as Position, top: 0, zIndex: 2 } : {}
   const isGroupedMatrix = !Array.isArray(childrenMatrix)
@@ -70,6 +72,7 @@ const Table = ({
                         wrapColumns={wrapColumns}
                         cellMinWidth={tableOptions.cellMinWidth}
                         viewport={viewport}
+                        rightAlignedCols={rightAlignedCols}
                       />
                     )
                   })
@@ -90,6 +93,7 @@ const Table = ({
                         wrapColumns={wrapColumns}
                         cellMinWidth={tableOptions.cellMinWidth}
                         viewport={viewport}
+                        rightAlignedCols={rightAlignedCols}
                       />
                     )
                   } else {
@@ -107,6 +111,7 @@ const Table = ({
                             wrapColumns={wrapColumns}
                             cellMinWidth={tableOptions.cellMinWidth}
                             viewport={viewport}
+                            rightAlignedCols={rightAlignedCols}
                           />
                         )
                       case RowType.row_group_total:
@@ -121,6 +126,7 @@ const Table = ({
                             wrapColumns={wrapColumns}
                             cellMinWidth={tableOptions.cellMinWidth}
                             viewport={viewport}
+                            rightAlignedCols={rightAlignedCols}
                           />
                         )
                     }

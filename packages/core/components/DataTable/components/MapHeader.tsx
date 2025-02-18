@@ -16,7 +16,7 @@ const ColumnHeadingText = ({ text, config }) => {
   return text
 }
 
-const MapHeader = ({ columns, config, indexTitle, sortBy, setSortBy }: MapHeaderProps) => {
+const MapHeader = ({ columns, config, indexTitle, sortBy, setSortBy, rightAlignedCols }: MapHeaderProps) => {
   return (
     <tr>
       {Object.keys(columns)
@@ -35,6 +35,10 @@ const MapHeader = ({ columns, config, indexTitle, sortBy, setSortBy }: MapHeader
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
           return (
             <th
+              style={{
+                textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
+                paddingRight: '1.3em'
+              }}
               key={`col-header-${column}__${index}`}
               id={column}
               tabIndex={0}
