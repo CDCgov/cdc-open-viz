@@ -21,6 +21,7 @@ import { TableConfig } from './types/TableConfig'
 import { Column } from '../../types/Column'
 import { pivotData } from '../../helpers/pivotData'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
+import isRightAlignedTableValue from '@cdc/core/helpers/isRightAlignedTableValue'
 import './data-table.css'
 import _ from 'lodash'
 
@@ -249,6 +250,22 @@ const DataTable = (props: DataTableProps) => {
       return classes
     }
 
+    const childrenMatrix =
+      config.type === 'map'
+        ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData, viewport })
+        : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
+
+    // If every value in a column is a number, record the column index so the header and cells can be right-aligned
+    const rightAlignedCols = childrenMatrix.length
+      ? Object.fromEntries(
+          Object.keys(childrenMatrix[0])
+            .filter(
+              i => childrenMatrix.filter(row => isRightAlignedTableValue(row[i])).length === childrenMatrix.length
+            )
+            .map(x => [x, true])
+        )
+      : {}
+
     const TableMediaControls = ({ belowTable }) => {
       return (
         <MediaControls.Section classes={getMediaControlsClasses(belowTable)}>
@@ -278,18 +295,20 @@ const DataTable = (props: DataTableProps) => {
               viewport={viewport}
               wrapColumns={wrapColumns}
               noData={hasNoData}
-              childrenMatrix={
-                config.type === 'map'
-                  ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData, viewport })
-                  : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
-              }
+              childrenMatrix={childrenMatrix}
               tableName={config.type}
               caption={caption}
               stickyHeader
               hasRowType={hasRowType}
               headContent={
                 config.type === 'map' ? (
-                  <MapHeader columns={columns} {...props} sortBy={sortBy} setSortBy={setSortBy} />
+                  <MapHeader
+                    columns={columns}
+                    {...props}
+                    sortBy={sortBy}
+                    setSortBy={setSortBy}
+                    rightAlignedCols={rightAlignedCols}
+                  />
                 ) : (
                   <ChartHeader
                     data={runtimeData}
@@ -299,6 +318,7 @@ const DataTable = (props: DataTableProps) => {
                     sortBy={sortBy}
                     setSortBy={setSortBy}
                     viewport={viewport}
+                    rightAlignedCols={rightAlignedCols}
                   />
                 )
               }
@@ -310,6 +330,7 @@ const DataTable = (props: DataTableProps) => {
                 'aria-rowcount': config?.data?.length ? config.data.length : -1,
                 hidden: !expanded
               }}
+              rightAlignedCols={rightAlignedCols}
             />
 
             {/* REGION Data Table */}

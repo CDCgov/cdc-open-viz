@@ -83,7 +83,7 @@ table.data-table {
     }
     th,
     td {
-      padding: 0.5em 1.3em 0.5em 0.7em;
+      padding: 0.5em 0.7em;
       line-height: normal;
       position: relative;
       text-align: left;
