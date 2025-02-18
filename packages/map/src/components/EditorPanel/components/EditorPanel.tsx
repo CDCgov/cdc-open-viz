@@ -1641,6 +1641,19 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     </span>
                   </label>
                 )}
+
+              {'us' === state.general.geoType && (
+                <label className='checkbox'>
+                  <input
+                    type='checkbox'
+                    checked={general.territoriesAlwaysShow || false}
+                    onChange={event => {
+                      handleEditorChanges('territoriesAlwaysShow', event.target.checked)
+                    }}
+                  />
+                  <span className='edit-label'>Show All Territories</span>
+                </label>
+              )}
             </AccordionItemPanel>
           </AccordionItem>
           <AccordionItem>
@@ -1756,18 +1769,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   </Tooltip>
                 }
               />
-              {'us' === state.general.geoType && (
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={general.territoriesAlwaysShow || false}
-                    onChange={event => {
-                      handleEditorChanges('territoriesAlwaysShow', event.target.checked)
-                    }}
-                  />
-                  <span className='edit-label'>Show All Territories</span>
-                </label>
-              )}
+
               {/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>

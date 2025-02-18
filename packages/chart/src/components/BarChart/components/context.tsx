@@ -8,6 +8,7 @@ export type BarChartContextValues = {
   xScale: Function
   yScale: Function
   seriesScale: Function
+  convertLineToBarGraph: boolean
 }
 
 export default BarChartContext

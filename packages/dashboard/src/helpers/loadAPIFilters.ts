@@ -42,7 +42,7 @@ export const loadAPIFiltersFactory = (
     return Promise.all(
       Object.keys(toFetch).map(
         endpoint =>
-          new Promise<void>(resolve => {
+          new Promise<{ error: boolean }>(resolve => {
             fetch(endpoint)
               .then(resp => resp.json())
               .then(data => {
@@ -67,13 +67,15 @@ export const loadAPIFiltersFactory = (
                   type: 'ADD_ERROR_MESSAGE',
                   payload: 'There was a problem returning data. Please try again.'
                 })
+                resolve({ error: true })
               })
               .finally(() => {
-                resolve()
+                resolve({ error: false })
               })
           })
       )
-    ).then(() => {
+    ).then(responses => {
+      const hasError = responses.some(({ error }) => error)
       const toLoad = sharedFilters.reduce((acc, curr, index) => {
         // the filter is autoloading and it hasn't finished yet
         if (_autoLoadFilterIndexes.includes(index) && !curr.active) {
@@ -84,7 +86,7 @@ export const loadAPIFiltersFactory = (
         }
         return acc
       }, [])
-      if (!toLoad.length || recursiveLimit === 0) {
+      if (hasError || !toLoad.length || recursiveLimit === 0) {
         setAPIFilterDropdowns(newDropdowns)
         dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFilters })
         return sharedFilters

@@ -1,7 +1,5 @@
 .cove-dashboard-filters-container {
   :is(label) {
-    margin-bottom: 0;
-    margin-top: 0.5rem;
     font-size: var(--filter-label-font-size);
     font-weight: 700;
   }

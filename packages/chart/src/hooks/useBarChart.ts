@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react'
-import ConfigContext from '../ConfigContext'
+import ConfigContext, { ChartDispatchContext } from '../ConfigContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
 export const useBarChart = () => {
   const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, setSeriesHighlight, seriesHighlight } =
     useContext(ConfigContext)
+  const dispatch = useContext(ChartDispatchContext)
   const { orientation } = config
   const [hoveredBar, setHoveredBar] = useState(null)
 
@@ -192,9 +193,11 @@ export const useBarChart = () => {
     const columns = config.columns
     const columnsWithTooltips = []
     let additionalTooltipItems = ''
+    const dynamicCategorySeries = config.runtime?.series?.find(series => series?.dynamicCategory)
     const closestVal =
       tableData.find(d => {
-        return d[config.xAxis.dataKey] === xAxisDataValue
+        const dynamicCategoryMatch = dynamicCategorySeries ? d[dynamicCategorySeries.dynamicCategory] === series : true
+        return d[config.xAxis.dataKey] === xAxisDataValue && dynamicCategoryMatch
       }) || {}
     Object.keys(columns).forEach(colKeys => {
       if (series && config.columns[colKeys].series && config.columns[colKeys].series !== series) return
@@ -223,11 +226,16 @@ export const useBarChart = () => {
   }
 
   const onMouseOverBar = (categoryValue, barKey) => {
-    if (config.legend.highlightOnHover && config.legend.behavior === 'highlight' && barKey) setSeriesHighlight([barKey])
+    if (config.legend.highlightOnHover && config.legend.behavior === 'highlight' && barKey) {
+      dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [barKey] })
+    }
+
     setHoveredBar(categoryValue)
   }
   const onMouseLeaveBar = () => {
-    if (config.legend.highlightOnHover && config.legend.behavior === 'highlight') setSeriesHighlight([])
+    if (config.legend.highlightOnHover && config.legend.behavior === 'highlight') {
+      dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [] })
+    }
   }
 
   return {

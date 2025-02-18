@@ -68,6 +68,7 @@ type VizRowProps = {
   updateChildConfig: Function
   apiFilterDropdowns: APIFilterDropdowns
   currentViewport: ViewPort
+  isLastRow: boolean
 }
 
 const VisualizationRow: React.FC<VizRowProps> = ({
@@ -80,7 +81,8 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   setSharedFilter,
   updateChildConfig,
   apiFilterDropdowns,
-  currentViewport
+  currentViewport,
+  isLastRow
 }) => {
   const { config, filteredData: dashboardFilteredData, data: rawData } = useContext(DashboardContext)
   const [show, setShow] = React.useState(row.columns.map((col, i) => i === 0))
@@ -156,11 +158,19 @@ const VisualizationRow: React.FC<VizRowProps> = ({
 
           const shouldShow = row.toggle === undefined || (row.toggle && show[colIndex])
 
+          const hiddenDashboardFilters =
+            visualizationConfig.type === 'dashboardFilters' &&
+            visualizationConfig.sharedFilterIndexes &&
+            visualizationConfig.sharedFilterIndexes.filter(
+              idx => config.dashboard.sharedFilters[idx].showDropdown === false
+            ).length === visualizationConfig.sharedFilterIndexes.length
+          const hasMarginBottom = !isLastRow && !hiddenDashboardFilters
+
           return (
             <div
               key={`vis__${index}__${colIndex}`}
               className={`col-12 col-md-${col.width}${!shouldShow ? ' d-none' : ''}${
-                hideVisualization ? ' hide-parent-visualization' : ' mb-4'
+                hideVisualization ? ' hide-parent-visualization' : hasMarginBottom ? ' mb-4' : ''
               }`}
             >
               {row.toggle && !hideVisualization && (
