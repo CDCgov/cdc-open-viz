@@ -41,10 +41,9 @@ import useMapLayers from '../../../hooks/useMapLayers.tsx'
 import HexSetting from './HexShapeSettings.jsx'
 import ConfigContext from '../../../context.ts'
 import { MapContext } from '../../../types/MapContext.js'
-import { TextField } from './Inputs'
 import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
-import { Select } from '@cdc/core/components/EditorPanel/Inputs'
+import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 
 // Todo: move to useReducer, seperate files out.
 const EditorPanel = ({ columnsRequiredChecker }) => {
@@ -1348,27 +1347,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
 
   const isLoadedFromUrl = state?.dataKey?.includes('http://') || state?.dataKey?.includes('https://')
 
-  // if isDebug = true, then try to set the Geography Col and Data col to reduce clicking
-  const setGeoColumn = () => {
-    // only for debug mode
-    let geoColFound = columnsInData.includes(state.columns.geo.name)
-    if (undefined !== isDebug && isDebug && !geoColFound) {
-      // then try to set the x axis to appropriate value so we dont have to manually do it
-      let mapcols = columnsInData[0]
-      if (mapcols !== '') editColumn('geo', 'name', mapcols)
-
-      if (
-        !state.columns.hasOwnProperty('primary') ||
-        undefined === state.columns.primary.name ||
-        '' === state.columns.primary.name ||
-        !state.columns.primary.name
-      ) {
-        editColumn('primary', 'name', columnsInData[1]) // blindly picks first value col
-      }
-    }
-  }
-  if (isDebug) setGeoColumn()
-
   return (
     <ErrorBoundary component='EditorPanel'>
       <Layout.Sidebar
@@ -1386,21 +1364,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
               <AccordionItemButton>Type</AccordionItemButton>
             </AccordionItemHeading>
             <AccordionItemPanel>
-              {/* Geography */}
-              {/*<Select*/}
-              {/*  options={[*/}
-              {/*    { value: 'us', label: 'United States' },*/}
-              {/*    { value: 'us-region', label: 'U.S. Region' },*/}
-              {/*    { value: 'world', label: 'World' },*/}
-              {/*    { value: 'single-state', label: 'U.S. State' },*/}
-              {/*    { value: 'google-map', label: 'Google Map API' }*/}
-              {/*  ]}*/}
-              {/*  section={'general'}*/}
-              {/*  fieldName={'geoType'}*/}
-              {/*  label='Geography'*/}
-              {/*  updateField={updateField}*/}
-              {/*/>*/}
-
               <label>
                 <span className='edit-label column-heading'>
                   <span>Geography</span>
@@ -1448,51 +1411,39 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     <AlabamaGraphic />
                     <span>U.S. State</span>
                   </button>
-                  {/* <button
-                    className={`${state.general.geoType === 'google-map' ? 'active' : ''} full-width`}
-                    onClick={e => {
-                      e.preventDefault()
-                      handleEditorChanges('geoType', 'google-map')
-                    }}
-                  >
-                    <UsaGraphic />
-                    <span>Google Map Api</span>
-                  </button> */}
                 </ul>
               </label>
               {/* Select > State or County Map */}
               {(state.general.geoType === 'us' || state.general.geoType === 'us-county') && (
-                <label>
-                  <span className='edit-label column-heading'>Geography Subtype</span>
-                  <select
-                    value={state.general.geoType}
-                    onChange={event => {
-                      handleEditorChanges('geoType', event.target.value)
-                    }}
-                  >
-                    <option value='us'>US State-Level</option>
-                    <option value='us-county'>US County-Level</option>
-                  </select>
-                </label>
+                <Select
+                  label='Geography Subtype'
+                  value={state.general.geoType}
+                  options={[
+                    { value: 'us', label: 'US State-Level' },
+                    { value: 'us-county', label: 'US County-Level' }
+                  ]}
+                  onChange={event => {
+                    handleEditorChanges('geoType', event.target.value)
+                  }}
+                />
               )}
               {(state.general.geoType === 'us-county' || state.general.geoType === 'single-state') && (
-                <label>
-                  <span className='edit-label column-heading'>County Census Year</span>
-                  <select
-                    value={state.general.countyCensusYear || '2019'}
-                    onChange={event => {
-                      handleEditorChanges('countyCensusYear', event.target.value)
-                    }}
-                  >
-                    <option value='2022'>2022</option>
-                    <option value='2021'>2021</option>
-                    <option value='2020'>2020</option>
-                    <option value='2019'>2019</option>
-                    <option value='2015'>2015</option>
-                    <option value='2014'>2014</option>
-                    <option value='2013'>2013</option>
-                  </select>
-                </label>
+                <Select
+                  label='County Census Year'
+                  value={state.general.countyCensusYear || '2019'}
+                  options={[
+                    { value: '2022', label: '2022' },
+                    { value: '2021', label: '2021' },
+                    { value: '2020', label: '2020' },
+                    { value: '2019', label: '2019' },
+                    { value: '2015', label: '2015' },
+                    { value: '2014', label: '2014' },
+                    { value: '2013', label: '2013' }
+                  ]}
+                  onChange={event => {
+                    handleEditorChanges('countyCensusYear', event.target.value)
+                  }}
+                />
               )}
               {(state.general.geoType === 'us-county' || state.general.geoType === 'single-state') && (
                 <label>
@@ -1540,52 +1491,51 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                 </label>
               )}
               {/* Type */}
-              <label>
-                <span className='edit-label column-heading'>
-                  Map Type
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>
-                        Select "Data" to create a color-coded data map. To create a navigation-only map, select
-                        "Navigation."
-                      </p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                </span>
-                <select
-                  value={state.general.type}
-                  onChange={event => {
-                    handleEditorChanges('editorMapType', event.target.value)
-                  }}
-                >
-                  <option value='data'>Data</option>
-                  {state.general.geoType === 'us-county' && <option value='us-geocode'>Geocode</option>}
-                  {state.general.geoType === 'world' && <option value='world-geocode'>Geocode</option>}
-                  {state.general.geoType !== 'us-county' && <option value='navigation'>Navigation</option>}
-                  {(state.general.geoType === 'world' || state.general.geoType === 'us') && (
-                    <option value='bubble'>Bubble</option>
-                  )}
-                </select>
-              </label>
+              <Select
+                label={
+                  <>
+                    Map Type
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                      </Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>
+                          Select "Data" to create a color-coded data map. To create a navigation-only map, select
+                          "Navigation."
+                        </p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  </>
+                }
+                value={state.general.type}
+                options={[
+                  { value: 'data', label: 'Data' },
+                  ...(state.general.geoType === 'us-county' ? [{ value: 'us-geocode', label: 'Geocode' }] : []),
+                  ...(state.general.geoType === 'world' ? [{ value: 'world-geocode', label: 'Geocode' }] : []),
+                  ...(state.general.geoType !== 'us-county' ? [{ value: 'navigation', label: 'Navigation' }] : []),
+                  ...(state.general.geoType === 'world' || state.general.geoType === 'us'
+                    ? [{ value: 'bubble', label: 'Bubble' }]
+                    : [])
+                ]}
+                onChange={event => {
+                  handleEditorChanges('editorMapType', event.target.value)
+                }}
+              />
 
               {/* Navigation Behavior */}
               {(state.general.type === 'navigation' || state.general.type === 'data') && (
-                <label>
-                  <span className='edit-label column-heading'>Navigation Behavior</span>
-                  <select
-                    value={state.general.navigationTarget}
-                    onChange={event => {
-                      event.preventDefault()
-                      handleEditorChanges('navigationTarget', event.target.value)
-                    }}
-                  >
-                    <option value='_self'>Same Window</option>
-                    <option value='_blank'>New Window</option>
-                  </select>
-                </label>
+                <Select
+                  label='Navigation Behavior'
+                  value={state.general.navigationTarget}
+                  options={[
+                    { value: '_self', label: 'Same Window' },
+                    { value: '_blank', label: 'New Window' }
+                  ]}
+                  onChange={event => {
+                    handleEditorChanges('navigationTarget', event.target.value)
+                  }}
+                />
               )}
               <label>
                 <span className='edit-label'>Data Classification Type</span>
@@ -1620,16 +1570,13 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
               {'us' === state.general.geoType &&
                 'bubble' !== state.general.type &&
                 false === state.general.displayAsHex && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={state.general.displayStateLabels}
-                      onChange={event => {
-                        handleEditorChanges('displayStateLabels', event.target.checked)
-                      }}
-                    />
-                    <span className='edit-label'>
-                      Show state labels
+                  <CheckBox
+                    label='Show state labels'
+                    checked={state.general.displayStateLabels}
+                    onChange={event => {
+                      handleEditorChanges('displayStateLabels', event.target.checked)
+                    }}
+                    tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -1638,8 +1585,8 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                           <p>Recommended set to display for Section 508 compliance.</p>
                         </Tooltip.Content>
                       </Tooltip>
-                    </span>
-                  </label>
+                    }
+                  />
                 )}
 
               {'us' === state.general.geoType && (
@@ -1799,14 +1746,13 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       </Tooltip.Content>
                     </Tooltip>
                   </span>
-                  <select
+                  <Select
                     value={state.columns.geo ? state.columns.geo.name : columnsOptions[0]}
+                    options={columnsOptions.map(c => c.key)}
                     onChange={event => {
                       editColumn('geo', 'name', event.target.value)
                     }}
-                  >
-                    {columnsOptions}
-                  </select>
+                  />
                 </label>
                 {state.general.type === 'us-geocode' && (
                   <label className='checkbox'>
@@ -1858,9 +1804,17 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
               </fieldset>
               {'navigation' !== state.general.type && (
                 <fieldset className='primary-fieldset edit-block'>
-                  <label>
-                    <span className='edit-label column-heading'>
-                      Data Column
+                  <Select
+                    label='Data Column'
+                    value={columns.primary.name}
+                    options={columnsOptions.map(c => c.key)}
+                    onChange={event => {
+                      const _state = _.cloneDeep(state)
+                      _state.columns.primary.name = event.target.value
+                      _state.columns.primary.label = event.target.value
+                      setState(_state)
+                    }}
+                    tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -1869,16 +1823,8 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                           <p>Select the source column containing the categorical or numeric values to be mapped.</p>
                         </Tooltip.Content>
                       </Tooltip>
-                    </span>
-                    <select
-                      value={state.columns.primary ? state.columns.primary.name : columnsOptions[0]}
-                      onChange={event => {
-                        editColumn('primary', 'name', event.target.value)
-                      }}
-                    >
-                      {columnsOptions}
-                    </select>
-                  </label>
+                    }
+                  />
                   <label className='checkbox'>
                     <input
                       type='checkbox'
@@ -2003,24 +1949,22 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
               )}
               {
                 <>
-                  <label>Latitude Column</label>
-                  <select
-                    value={state.columns.latitude.name ? state.columns.latitude.name : ''}
+                  <Select
+                    label='Latitude Column'
+                    value={state.columns.latitude.name}
+                    options={columnsOptions.map(c => c.key)}
                     onChange={e => {
                       editColumn('latitude', 'name', e.target.value)
                     }}
-                  >
-                    {columnsOptions}
-                  </select>
-                  <label>Longitude Column</label>
-                  <select
-                    value={state.columns.longitude.name ? state.columns.longitude.name : ''}
+                  />
+                  <Select
+                    label='Longitude Column'
+                    value={state.columns.longitude.name}
+                    options={columnsOptions.map(c => c.key)}
                     onChange={e => {
                       editColumn('longitude', 'name', e.target.value)
                     }}
-                  >
-                    {columnsOptions}
-                  </select>
+                  />
                 </>
               }
 
@@ -2138,14 +2082,13 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     </Tooltip.Content>
                   </Tooltip>
                 </span>
-                <select
-                  value={state.columns.navigate ? state.columns.navigate.name : columnsOptions[0]}
+                <Select
+                  value={state.columns.navigate ? state.columns.navigate.name : ''}
+                  options={columnsOptions.map(c => c.key)}
                   onChange={event => {
                     editColumn('navigate', 'name', event.target.value)
                   }}
-                >
-                  {columnsOptions}
-                </select>
+                />
               </label>
               {'navigation' !== state.general.type && (
                 <fieldset className='primary-fieldset edit-block'>
@@ -2343,18 +2286,17 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
               </AccordionItemHeading>
               <AccordionItemPanel>
                 {(state.legend.type === 'equalnumber' || state.legend.type === 'equalinterval') && (
-                  <label>
-                    <span className='edit-label'>Legend Type</span>
-                    <select
-                      value={legend.type}
-                      onChange={event => {
-                        handleEditorChanges('legendType', event.target.value)
-                      }}
-                    >
-                      <option value='equalnumber'>Equal Number (Quantiles)</option>
-                      <option value='equalinterval'>Equal Interval</option>
-                    </select>
-                  </label>
+                  <Select
+                    label='Legend Type'
+                    value={legend.type}
+                    options={[
+                      { value: 'equalnumber', label: 'Equal Number (Quantiles)' },
+                      { value: 'equalinterval', label: 'Equal Interval' }
+                    ]}
+                    onChange={event => {
+                      handleEditorChanges('legendType', event.target.value)
+                    }}
+                  />
                 )}
                 {'navigation' !== state.general.type && (
                   <label className='checkbox'>
@@ -2370,19 +2312,18 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                 )}
                 {'navigation' !== state.general.type && (
                   <>
-                    <label>
-                      <span className='edit-label'>Legend Position</span>
-                      <select
-                        value={legend.position || false}
-                        onChange={event => {
-                          handleEditorChanges('sidebarPosition', event.target.value)
-                        }}
-                      >
-                        <option value='side'>Side</option>
-                        <option value='bottom'>Bottom</option>
-                        <option value='top'>Top</option>
-                      </select>
-                    </label>
+                    <Select
+                      label='Legend Position'
+                      value={legend.position || ''}
+                      options={[
+                        { value: 'side', label: 'Side' },
+                        { value: 'bottom', label: 'Bottom' },
+                        { value: 'top', label: 'Top' }
+                      ]}
+                      onChange={event => {
+                        handleEditorChanges('sidebarPosition', event.target.value)
+                      }}
+                    />
                     {(state.legend.position === 'side' || !state.legend.position) &&
                       state.legend.style === 'gradient' && (
                         <span style={{ color: 'red', fontSize: '14px' }}>
@@ -2392,36 +2333,36 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   </>
                 )}
                 {'navigation' !== state.general.type && (
-                  <label>
-                    <span className='edit-label column-heading'>
-                      Legend Style
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>
-                            If using gradient style, limit the legend to five items for better mobile visibility, and
-                            position the legend at the top or bottom.
-                          </p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    </span>
-
-                    <select
-                      value={legend.style || ''}
-                      onChange={event => {
-                        handleEditorChanges('legendStyle', event.target.value)
-                      }}
-                    >
-                      <option value='circles'>circles</option>
-                      <option value='boxes'>boxes</option>
-                      {legend.position !== 'side' && <option value='gradient'>gradient</option>}
-                    </select>
-                  </label>
+                  <Select
+                    label={
+                      <>
+                        Legend Style
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon
+                              display='question'
+                              style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                            />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>
+                              If using gradient style, limit the legend to five items for better mobile visibility, and
+                              position the legend at the top or bottom.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </>
+                    }
+                    value={legend.style || ''}
+                    options={[
+                      { value: 'circles', label: 'circles' },
+                      { value: 'boxes', label: 'boxes' },
+                      ...(legend.position !== 'side' ? [{ value: 'gradient', label: 'gradient' }] : [])
+                    ]}
+                    onChange={event => {
+                      handleEditorChanges('legendStyle', event.target.value)
+                    }}
+                  />
                 )}
                 {'navigation' !== state.general.type && state.legend.style === 'gradient' && (
                   <label>
@@ -2571,36 +2512,32 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   </label>
                 )}
                 {'category' !== legend.type && (
-                  <label>
-                    <span className='edit-label'>
-                      Number of Items
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>
-                            For numeric maps, select the number of data classes. Do not include designated special
-                            classes.
-                          </p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    </span>
-                    <select
-                      value={legend.numberOfItems}
-                      onChange={event => {
-                        handleEditorChanges('legendNumber', event.target.value)
-                      }}
-                    >
-                      {[...Array(numberOfItemsLimit).keys()].map(num => {
-                        return (
-                          <option value={num + 1} key={num + 1}>
-                            {num + 1}
-                          </option>
-                        )
-                      })}
-                    </select>
-                  </label>
+                  <Select
+                    label={
+                      <>
+                        Number of Items
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>
+                              For numeric maps, select the number of data classes. Do not include designated special
+                              classes.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </>
+                    }
+                    value={legend.numberOfItems}
+                    options={[...Array(numberOfItemsLimit).keys()].map(num => ({
+                      value: num + 1,
+                      label: num + 1
+                    }))}
+                    onChange={event => {
+                      handleEditorChanges('legendNumber', event.target.value)
+                    }}
+                  />
                 )}
                 {'category' === legend.type && (
                   <React.Fragment>
