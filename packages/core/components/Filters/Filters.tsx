@@ -546,7 +546,7 @@ const Filters = (props: FilterProps) => {
       {visualizationConfig.filterIntro && (
         <p className='filters-section__intro-text mb-3'>{visualizationConfig.filterIntro}</p>
       )}
-      <div className='d-flex flex-wrap w-100 mb-4 pb-2 filters-section__wrapper'>
+      <div className='d-flex flex-wrap w-100 mb-4 pb-2 filters-section__wrapper align-items-end'>
         {' '}
         <>
           <Style />
