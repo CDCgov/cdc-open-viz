@@ -26,7 +26,6 @@
 }
 
 div.single-filters {
-  width: 100%;
   label {
     width: 100%;
     font-weight: 700;
@@ -66,6 +65,10 @@ div.single-filters {
   .tab--active {
     border-bottom: none;
   }
+}
+
+.single-filters--tab-simple {
+  flex-basis: 100%;
 }
 
 .tab-simple-container {
