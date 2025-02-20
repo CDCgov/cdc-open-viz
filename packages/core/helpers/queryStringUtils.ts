@@ -42,3 +42,9 @@ export function updateQueryParam(key: string, value: number | string) {
   queryParams[key] = value
   updateQueryString(queryParams)
 }
+
+export function removeQueryParam(key: string) {
+  const queryParams = getQueryParams()
+  delete queryParams[key]
+  updateQueryString(queryParams)
+}
