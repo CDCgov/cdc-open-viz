@@ -1,35 +1,16 @@
-import { useContext } from 'react'
+import React, { useContext } from 'react'
 import { useDrag } from 'react-dnd'
-
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
-import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
-
+import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import Icon from '@cdc/core/components/ui/Icon'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
-import { iconHash } from '../helpers/iconHash'
+import { iconHash } from '../../helpers/iconHash'
 import _ from 'lodash'
-import { DataDesignerModal } from './DataDesignerModal'
-
-const labelHash = {
-  'data-bite': 'Data Bite',
-  'waffle-chart': 'Waffle Chart',
-  'markup-include': 'Markup Include',
-  Bar: 'Bar',
-  Line: 'Line',
-  'Spark Line': 'Spark Line',
-  'Bump Chart': 'Bump Chart',
-  Pie: 'Pie',
-  us: 'United States (State- or County-Level)',
-  'us-county': 'United States (State- or County-Level)',
-  world: 'World',
-  'single-state': 'U.S. State',
-  'filtered-text': 'Filtered Text',
-  dashboardFilters: 'Filter Dropdowns',
-  Sankey: 'Sankey Chart',
-  table: 'Table'
-}
+import { DataDesignerModal } from '../DataDesignerModal'
+import { labelHash } from '@cdc/core/helpers/labelHash'
+import './widget.styles.css'
 
 type WidgetConfig = AnyVisualization & { rowIdx: number; colIdx: number }
 type WidgetProps = {
@@ -37,9 +18,19 @@ type WidgetProps = {
   widgetConfig?: WidgetConfig
   addVisualization?: Function
   type: string
+  widgetInRow?: boolean
+  toggleRow?: boolean
 }
 
-const Widget = ({ title, widgetConfig, addVisualization, type }: WidgetProps) => {
+const Widget = ({
+  title,
+  columnData,
+  widgetConfig,
+  addVisualization,
+  type,
+  widgetInRow = false,
+  toggleRow = false
+}: WidgetProps) => {
   const { overlay } = useGlobalContext()
   const { config, data } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
@@ -129,46 +120,88 @@ const Widget = ({ title, widgetConfig, addVisualization, type }: WidgetProps) =>
 
   const needsDataConfiguration = !dataConfiguredForRow && widgetConfig?.type !== 'dashboardFilters'
 
+  const widgetContent = (
+    <div
+      className={`widget ${toggleRow ? 'd-block widget--toggle' : ''} ${isDragging && 'dragging'}`}
+      style={{ maxHeight: widgetInRow && toggleRow ? '160px' : '180px' }}
+    >
+      <Icon display='move' className='drag-icon' />
+      <div className='widget__content'>
+        {widgetConfig?.rowIdx !== undefined && (
+          <div className='widget-menu'>
+            {isConfigurationReady && (
+              <button title='Configure Visualization' className='btn btn-configure' onClick={editWidget}>
+                {iconHash['tools']}
+              </button>
+            )}
+            {needsDataConfiguration && (
+              <button
+                title='Configure Data'
+                className='btn btn-configure'
+                onClick={() => {
+                  overlay?.actions.openOverlay(
+                    <DataDesignerModal rowIndex={widgetConfig.rowIdx} vizKey={widgetConfig.uid} />
+                  )
+                }}
+              >
+                {iconHash['gear']}
+              </button>
+            )}
+            <div className='widget-menu-item' onClick={deleteWidget}>
+              <Icon display='close' base />
+            </div>
+          </div>
+        )}
+        {iconHash[type]}
+        <span>{labelHash[type]}</span>
+        <span>{title}</span>
+        {widgetConfig?.newViz && type !== 'dashboardFilters' && (
+          <span onClick={editWidget} className='config-needed'>
+            Configuration needed
+          </span>
+        )}
+      </div>
+    </div>
+  )
+
   return (
     <>
-      <div className='widget' ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }} {...collected}>
-        <Icon display='move' className='drag-icon' />
-        <div className='widget__content'>
-          {widgetConfig?.rowIdx !== undefined && (
-            <div className='widget-menu'>
-              {isConfigurationReady && (
-                <button title='Configure Visualization' className='btn btn-configure' onClick={editWidget}>
-                  {iconHash['tools']}
-                </button>
-              )}
-              {needsDataConfiguration && (
-                <button
-                  title='Configure Data'
-                  className='btn btn-configure'
-                  onClick={() => {
-                    overlay?.actions.openOverlay(
-                      <DataDesignerModal rowIndex={widgetConfig.rowIdx} vizKey={widgetConfig.uid} />
-                    )
-                  }}
-                >
-                  {iconHash['gear']}
-                </button>
-              )}
-              <div className='widget-menu-item' onClick={deleteWidget}>
-                <Icon display='close' base />
-              </div>
-            </div>
-          )}
-          {iconHash[type]}
-          <span>{labelHash[type]}</span>
-          <span>{title}</span>
-          {widgetConfig?.newViz && type !== 'dashboardFilters' && (
-            <span onClick={editWidget} className='config-needed'>
-              Configuration needed
-            </span>
-          )}
+      {widgetInRow && toggleRow ? (
+        <div
+          ref={drag}
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            opacity: isDragging ? 0.5 : 1,
+            width: '100%'
+          }}
+          {...collected}
+        >
+          <div className='widget__toggle-title p-1'>
+            <input
+              type='text'
+              value={columnData.toggleName}
+              style={{ fontSize: '12px' }}
+              onChange={e => {
+                dispatch({
+                  type: 'UPDATE_TOGGLE_NAME',
+                  payload: {
+                    rowIndex: widgetConfig.rowIdx,
+                    columnIndex: widgetConfig.colIdx,
+                    toggleName: e.target.value
+                  }
+                })
+              }}
+            />
+          </div>
+          <br />
+          <div className='w-100'>{widgetContent}</div>
         </div>
-      </div>
+      ) : (
+        <div ref={drag} style={{ opacity: isDragging ? 0.5 : 1, width: widgetInRow ? '100%' : 'auto' }} {...collected}>
+          {widgetContent}
+        </div>
+      )}
     </>
   )
 }
