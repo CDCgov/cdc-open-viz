@@ -104,6 +104,13 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
     }
   }
 
+  const updateQueryParameters = (index, value) => {
+    const newSharedFilters = _.cloneDeep(sharedFilters)
+    newSharedFilters[index].setByQueryParameter = value[0]
+    newSharedFilters[index].subGrouping.setByQueryParameter = value[1]
+    dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+  }
+
   const removeFilter = index => {
     const newSharedFilters = _.cloneDeep(sharedFilters)
 
@@ -233,6 +240,9 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                   filterIndex={index}
                   updateFilterProp={(name, value) => {
                     updateFilterProp(name, index, value)
+                  }}
+                  updateQueryParameters={value => {
+                    updateQueryParameters(index, value)
                   }}
                   config={config}
                 />

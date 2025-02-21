@@ -22,9 +22,16 @@ type FilterEditorProps = {
   filter: SharedFilter
   filterIndex: number
   updateFilterProp: (name: keyof SharedFilter, value: any) => void
+  updateQueryParameters: (value: any) => void
 }
 
-const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config, updateFilterProp }) => {
+const FilterEditor: React.FC<FilterEditorProps> = ({
+  filter,
+  filterIndex,
+  config,
+  updateFilterProp,
+  updateQueryParameters
+}) => {
   const [columns, setColumns] = useState<string[]>([])
   const transform = new DataTransform()
   const filterStyles = Object.values(FILTER_STYLE)
@@ -61,6 +68,22 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
     const rowsNotSelected = rowOptions.filter(row => !filter.usedBy || filter.usedBy.indexOf(row.toString()) === -1)
     return [nameLookup, [...vizOptions, ...rowsNotSelected]]
   }, [config.visualizations, filter.usedBy, filter.setBy, vizRowColumnLocator])
+
+  const subGrouping = filter.subGrouping
+
+  const useParameters = useMemo(() => {
+    return !!(filter.setByQueryParameter && subGrouping?.setByQueryParameter)
+  }, [config, filterIndex])
+
+  const isUrlFilter = filter.type === 'urlfilter'
+
+  const handleParametersCheckboxClick = e => {
+    const { checked } = e.target
+    const groupColumnName = isUrlFilter ? filter.apiFilter.valueSelector : filter.columnName
+    const subGroupColumnName = isUrlFilter ? filter.apiFilter.subgroupValueSelector : subGrouping.columnName
+    const parameterSettings = checked ? [groupColumnName, subGroupColumnName] : []
+    updateQueryParameters(parameterSettings)
+  }
 
   const loadColumnData = async () => {
     const columns = {}
@@ -255,7 +278,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
             />
           )}
 
-          {filter.type === 'urlfilter' && (
+          {isUrlFilter && (
             <>
               {!hasDashboardApplyBehavior(config.visualizations) && (
                 <>
@@ -355,6 +378,17 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
 
               {isNestedDropDown && <APIInputs isSubgroup={true} />}
 
+              <label>
+                <input
+                  type='checkbox'
+                  checked={useParameters}
+                  aria-label='Create query parameters'
+                  disabled={!filter.apiFilter?.valueSelector && !filter.apiFilter?.subgroupValueSelector}
+                  onChange={e => handleParametersCheckboxClick(e)}
+                />
+                <span> Create query parameters</span>
+              </label>
+
               {!!parentFilters.length && (
                 <label>
                   <span className='edit-label column-heading mt-1'>Parent Filter(s): </span>
@@ -402,12 +436,6 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
                 label='Reset Label: '
                 value={filter.resetLabel || ''}
                 updateField={(_section, _subSection, _key, value) => updateFilterProp('resetLabel', value)}
-              />
-
-              <TextField
-                label='Default Value Set By Query String Parameter: '
-                value={filter.setByQueryParameter || ''}
-                updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)}
               />
             </>
           )}
@@ -473,14 +501,26 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
                   </label>
                 </>
               ) : (
-                <NestedDropDownDashboard
-                  filter={filter}
-                  updateFilterProp={(name, value) => {
-                    updateFilterProp(name, value)
-                  }}
-                  isDashboard={true}
-                  config={config}
-                />
+                <>
+                  <NestedDropDownDashboard
+                    filter={filter}
+                    updateFilterProp={(name, value) => {
+                      updateFilterProp(name, value)
+                    }}
+                    isDashboard={true}
+                    config={config}
+                  />
+                  <label>
+                    <input
+                      type='checkbox'
+                      checked={useParameters}
+                      aria-label='Create query parameters'
+                      disabled={!filter.columnName || !subGrouping?.columnName}
+                      onChange={e => handleParametersCheckboxClick(e)}
+                    />
+                    <span> Create query parameters</span>
+                  </label>
+                </>
               )}
               <label>
                 <span className='edit-label column-heading'>Set By: </span>
@@ -549,11 +589,13 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
                 </select>
               </label>
 
-              <TextField
-                label='Default Value Set By Query String Parameter: '
-                value={filter.setByQueryParameter || ''}
-                updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)}
-              />
+              {!isNestedDropDown && (
+                <TextField
+                  label='Default Value Set By Query String Parameter: '
+                  value={filter.setByQueryParameter || ''}
+                  updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)}
+                />
+              )}
             </>
           )}
         </>

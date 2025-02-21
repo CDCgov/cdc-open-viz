@@ -138,6 +138,13 @@ export const setAutoLoadDefaultValue = (
   const hasQueryParameter = sharedFilter.setByQueryParameter ? defaultQueryParamValue !== undefined : false
   if (!autoLoadFilterIndexes.length || !dropdownOptions?.length) {
     if (hasQueryParameter && sharedFilter.apiFilter) {
+      if (sharedFilter.subGrouping) {
+        const subQueryValue = getQueryParam(sharedFilter?.subGrouping.setByQueryParameter)
+        if (subQueryValue !== undefined) {
+          sharedFilter.queuedActive = [defaultQueryParamValue, subQueryValue]
+        }
+      }
+    } else {
       sharedFilter.queuedActive = defaultQueryParamValue
     }
     return sharedFilter // no autoLoading happening
