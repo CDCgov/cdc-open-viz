@@ -104,6 +104,17 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
     }
   }
 
+  const toggleNestedQueryParameters = (index, checked: boolean) => {
+    const newSharedFilters = _.cloneDeep(sharedFilters)
+    const filter = newSharedFilters[index]
+    const isUrlFilter = filter.type === 'urlfilter'
+    const groupColumnName = isUrlFilter ? filter.apiFilter.valueSelector : filter.columnName
+    const subGroupColumnName = isUrlFilter ? filter.apiFilter.subgroupValueSelector : filter.subGrouping.columnName
+    filter.setByQueryParameter = checked ? groupColumnName : undefined
+    filter.subGrouping.setByQueryParameter = checked ? subGroupColumnName : undefined
+    dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+  }
+
   const removeFilter = index => {
     const newSharedFilters = _.cloneDeep(sharedFilters)
 
@@ -233,6 +244,9 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                   filterIndex={index}
                   updateFilterProp={(name, value) => {
                     updateFilterProp(name, index, value)
+                  }}
+                  toggleNestedQueryParameters={checked => {
+                    toggleNestedQueryParameters(index, checked)
                   }}
                   config={config}
                 />

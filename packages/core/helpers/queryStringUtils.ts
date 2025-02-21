@@ -38,6 +38,7 @@ export function updateQueryString(queryParams) {
 }
 
 export function updateQueryParam(key: string, value: number | string) {
+  if (!key) return
   const queryParams = getQueryParams()
   queryParams[key] = value
   updateQueryString(queryParams)
