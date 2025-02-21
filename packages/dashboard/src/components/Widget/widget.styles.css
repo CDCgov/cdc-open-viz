@@ -7,4 +7,51 @@
   height: 25%;
   background-color: #005eaa;
   color: white;
+  padding: 5px;
+}
+
+.widget__edit-title-icon {
+  cursor: pointer !important;
+}
+
+.widget--toggle .widget__content {
+  height: 100%;
+}
+
+.widget--toggle .widget__content .widget-menu + svg {
+  height: 35px !important;
+  width: 35px !important;
+  flex-grow: unset;
+}
+
+.widget-menu {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+
+.widget-menu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.btn-configure {
+  background: none;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: 0 5px;
+}
+
+.widget-menu-item {
+  display: block;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.widget-menu-item svg {
+  fill: var(--mediumGray);
 }

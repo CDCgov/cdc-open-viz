@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { useDrag } from 'react-dnd'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
@@ -34,6 +34,11 @@ const Widget = ({
   const { overlay } = useGlobalContext()
   const { config, data } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
+
+  const [isEditing, setIsEditing] = useState(false)
+  const [toggleName, setToggleName] = useState(
+    columnData?.toggleName || labelHash[config?.visualizations[columnData?.widget]?.type] || ''
+  )
 
   const transform = new DataTransform()
 
@@ -123,7 +128,7 @@ const Widget = ({
   const widgetContent = (
     <div
       className={`widget ${toggleRow ? 'd-block widget--toggle' : ''} ${isDragging && 'dragging'}`}
-      style={{ maxHeight: widgetInRow && toggleRow ? '160px' : '180px' }}
+      style={{ maxHeight: widgetInRow && toggleRow ? '180px' : '180px', minHeight: '100%' }}
     >
       <Icon display='move' className='drag-icon' />
       <div className='widget__content'>
@@ -173,32 +178,52 @@ const Widget = ({
             display: 'flex',
             flexWrap: 'wrap',
             opacity: isDragging ? 0.5 : 1,
-            width: '100%'
+            width: '100%',
+            height: '100%'
           }}
           {...collected}
         >
-          <div className='widget__toggle-title p-1'>
-            <input
-              type='text'
-              value={columnData.toggleName}
-              style={{ fontSize: '12px' }}
-              onChange={e => {
-                dispatch({
-                  type: 'UPDATE_TOGGLE_NAME',
-                  payload: {
-                    rowIndex: widgetConfig.rowIdx,
-                    columnIndex: widgetConfig.colIdx,
-                    toggleName: e.target.value
-                  }
-                })
-              }}
-            />
+          <div className='widget__toggle-title'>
+            <div className='flex'>
+              {isEditing ? (
+                <Icon display='check' className='widget__edit-title-icon me-1' onClick={() => setIsEditing(false)} />
+              ) : (
+                <Icon display='edit' className='widget__edit-title-icon me-1' onClick={() => setIsEditing(true)} />
+              )}{' '}
+              {isEditing ? (
+                <input
+                  type='text'
+                  value={toggleName}
+                  style={{ fontSize: '12px' }}
+                  onChange={e => setToggleName(e.target.value)}
+                  onBlur={() => {
+                    setIsEditing(false)
+                    dispatch({
+                      type: 'UPDATE_TOGGLE_NAME',
+                      payload: {
+                        rowIndex: widgetConfig.rowIdx,
+                        columnIndex: widgetConfig.colIdx,
+                        toggleName: toggleName
+                      }
+                    })
+                  }}
+                />
+              ) : (
+                <span>{toggleName}</span>
+              )}
+            </div>
           </div>
           <br />
-          <div className='w-100'>{widgetContent}</div>
+          <div className='w-100' style={{ minHeight: widgetInRow && toggleRow ? '135px' : '180px' }}>
+            {widgetContent}
+          </div>
         </div>
       ) : (
-        <div ref={drag} style={{ opacity: isDragging ? 0.5 : 1, width: widgetInRow ? '100%' : 'auto' }} {...collected}>
+        <div
+          ref={drag}
+          style={{ opacity: isDragging ? 0.5 : 1, width: widgetInRow ? '100%' : 'auto', height: '100%' }}
+          {...collected}
+        >
           {widgetContent}
         </div>
       )}
