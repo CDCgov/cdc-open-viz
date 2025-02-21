@@ -22,9 +22,16 @@ type FilterEditorProps = {
   filter: SharedFilter
   filterIndex: number
   updateFilterProp: (name: keyof SharedFilter, value: any) => void
+  toggleNestedQueryParameters: (checked: boolean) => void
 }
 
-const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config, updateFilterProp }) => {
+const FilterEditor: React.FC<FilterEditorProps> = ({
+  filter,
+  filterIndex,
+  config,
+  updateFilterProp,
+  toggleNestedQueryParameters
+}) => {
   const [columns, setColumns] = useState<string[]>([])
   const transform = new DataTransform()
   const filterStyles = Object.values(FILTER_STYLE)
@@ -61,6 +68,11 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
     const rowsNotSelected = rowOptions.filter(row => !filter.usedBy || filter.usedBy.indexOf(row.toString()) === -1)
     return [nameLookup, [...vizOptions, ...rowsNotSelected]]
   }, [config.visualizations, filter.usedBy, filter.setBy, vizRowColumnLocator])
+
+  const useParameters = useMemo(() => {
+    if (filter.subGrouping) return !!(filter.setByQueryParameter && filter.subGrouping?.setByQueryParameter)
+    return !!filter.setByQueryParameter
+  }, [config, filterIndex])
 
   const loadColumnData = async () => {
     const columns = {}
@@ -355,6 +367,30 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
 
               {isNestedDropDown && <APIInputs isSubgroup={true} />}
 
+              <label>
+                <input
+                  type='checkbox'
+                  checked={useParameters}
+                  aria-label='Create query parameters'
+                  disabled={!filter.apiFilter?.valueSelector && !filter.apiFilter?.subgroupValueSelector}
+                  onChange={e => toggleNestedQueryParameters(e.target.checked)}
+                />
+                <span>
+                  {' '}
+                  Create query parameters{' '}
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p>
+                        Query parameters will be added to the URL which correspond to the respective value selector.
+                      </p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                </span>
+              </label>
+
               {!!parentFilters.length && (
                 <label>
                   <span className='edit-label column-heading mt-1'>Parent Filter(s): </span>
@@ -402,12 +438,6 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
                 label='Reset Label: '
                 value={filter.resetLabel || ''}
                 updateField={(_section, _subSection, _key, value) => updateFilterProp('resetLabel', value)}
-              />
-
-              <TextField
-                label='Default Value Set By Query String Parameter: '
-                value={filter.setByQueryParameter || ''}
-                updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)}
               />
             </>
           )}
@@ -473,14 +503,39 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
                   </label>
                 </>
               ) : (
-                <NestedDropDownDashboard
-                  filter={filter}
-                  updateFilterProp={(name, value) => {
-                    updateFilterProp(name, value)
-                  }}
-                  isDashboard={true}
-                  config={config}
-                />
+                <>
+                  <NestedDropDownDashboard
+                    filter={filter}
+                    updateFilterProp={(name, value) => {
+                      updateFilterProp(name, value)
+                    }}
+                    isDashboard={true}
+                    config={config}
+                  />
+                  <label>
+                    <input
+                      type='checkbox'
+                      checked={useParameters}
+                      aria-label='Create query parameters'
+                      disabled={!filter.columnName || !filter.subGrouping?.columnName}
+                      onChange={e => toggleNestedQueryParameters(e.target.checked)}
+                    />
+                    <span>
+                      {' '}
+                      Create query parameters{' '}
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>
+                            Query parameters will be added to the URL which correspond to the respective column name.
+                          </p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    </span>
+                  </label>
+                </>
               )}
               <label>
                 <span className='edit-label column-heading'>Set By: </span>
@@ -549,11 +604,13 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
                 </select>
               </label>
 
-              <TextField
-                label='Default Value Set By Query String Parameter: '
-                value={filter.setByQueryParameter || ''}
-                updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)}
-              />
+              {!isNestedDropDown && (
+                <TextField
+                  label='Default Value Set By Query String Parameter: '
+                  value={filter.setByQueryParameter || ''}
+                  updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)}
+                />
+              )}
             </>
           )}
         </>

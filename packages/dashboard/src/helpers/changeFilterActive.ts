@@ -52,6 +52,10 @@ export const changeFilterActive = (
         updateQueryString(queryParams)
       }
     }
+  } else if (currentFilter.subGrouping) {
+    updateQueryParam(currentFilter.setByQueryParameter, value[0])
+    updateQueryParam(currentFilter.subGrouping.setByQueryParameter, value[1])
+    sharedFiltersCopy[filterIndex].queuedActive = value
   } else {
     const paramVal = Array.isArray(value) ? value.join(',') : value
     if (currentFilter.setByQueryParameter) updateQueryParam(currentFilter.setByQueryParameter, paramVal)
