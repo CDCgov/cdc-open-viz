@@ -1,5 +1,6 @@
 {
   "name": "@cdc/root",
+  "homepage": "https://cdcgov.github.io/cdc-open-viz",
   "version": "0.0.0",
   "private": true,
   "workspaces": [
