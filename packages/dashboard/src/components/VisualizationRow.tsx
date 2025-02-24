@@ -162,7 +162,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
             visualizationConfig.type === 'dashboardFilters' &&
             visualizationConfig.sharedFilterIndexes &&
             visualizationConfig.sharedFilterIndexes.filter(
-              idx => config.dashboard.sharedFilters[idx].showDropdown === false
+              idx => config.dashboard.sharedFilters?.[idx]?.showDropdown === false
             ).length === visualizationConfig.sharedFilterIndexes.length
           const hasMarginBottom = !isLastRow && !hiddenDashboardFilters
 
