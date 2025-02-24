@@ -482,22 +482,18 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
                   config={config}
                 />
               )}
-              <label>
-                <span className='edit-label column-heading'>Set By: </span>
-                <select value={filter.setBy} onChange={e => updateFilterProp('setBy', e.target.value)}>
-                  <option value=''>- Select Option -</option>
-                  {Object.keys(config.visualizations)
-                    .filter(vizKey => config.visualizations[vizKey].type !== 'dashboardFilters')
-                    .map(vizKey => {
-                      const viz = config.visualizations[vizKey] as Visualization
-                      return (
-                        <option value={vizKey} key={`set-by-select-item-${vizKey}`}>
-                          {viz.general?.title || viz.title || vizKey}
-                        </option>
-                      )
-                    })}
-                </select>
-              </label>
+              <Select
+                label='Set By:'
+                value={filter.setBy}
+                options={Object.keys(config.visualizations)
+                  .filter(vizKey => config.visualizations[vizKey].type !== 'dashboardFilters')
+                  .map(vizKey => ({
+                    value: vizKey,
+                    label: config.visualizations[vizKey].general?.title || config.visualizations[vizKey].title || vizKey
+                  }))}
+                updateField={(_section, _subSection, _key, value) => updateFilterProp('setBy', value)}
+                initial='- Select Option -'
+              />
               <label>
                 <span className='edit-label column-heading mt-1'>
                   Used By: (optional)
