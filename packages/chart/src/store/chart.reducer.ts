@@ -68,7 +68,7 @@ export const reducer = (state: State, action: ChartActions) => {
     case 'SET_SERIES_HIGHLIGHT':
       return { ...state, seriesHighlight: action.payload }
     case 'SET_VIEWPORT':
-      return { ...state, currentViewpsort: action.payload }
+      return { ...state, currentViewport: action.payload }
     case 'SET_DIMENSIONS':
       return { ...state, dimensions: action.payload }
     case 'SET_CONTAINER':
