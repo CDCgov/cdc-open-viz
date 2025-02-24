@@ -68,6 +68,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
       value?.subgroupTextSelector !== oldSubgroupTextSelector
 
     newSharedFilters[index][prop] = value
+
     if (prop === 'columnName') {
       if (newSharedFilters[index].subGrouping) delete newSharedFilters[index].subGrouping
       // changing a data column and want to load the data into the preview options
@@ -98,6 +99,9 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
       // changing a api filter and want to load the api data into the preview.
       // automatically dispatches SET_SHARED_FILTERS
       loadAPIFilters(newSharedFilters, {})
+    } else if (prop === 'type' && value === 'mapfilter') {
+      newSharedFilters[index].values = ['State', 'County']
+      dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
     } else {
       handleSorting(newSharedFilters[index])
       dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })

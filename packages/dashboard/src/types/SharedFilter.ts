@@ -2,7 +2,7 @@ import { FilterBase, SubGrouping } from '@cdc/core/types/VizFilter'
 import { APIFilter } from './APIFilter'
 import { FilterStyle } from './FilterStyles'
 export type SharedFilter = FilterBase & {
-  type?: 'urlfilter' | 'datafilter' | ''
+  type?: 'urlfilter' | 'datafilter' | 'mapfilter' | ''
   fileName?: string
   filterBy?: 'Query String' | 'File Name'
   filterStyle: FilterStyle
