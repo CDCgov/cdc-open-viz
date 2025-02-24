@@ -1027,7 +1027,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
         break
       case 'showDropdown':
         newFilters[idx] = { ...newFilters[idx] }
-        newFilters[idx].showDropdown = value
+        newFilters[idx]?.showDropdown = value
         break
       case 'columnName':
         newFilters[idx] = { ...newFilters[idx] }
