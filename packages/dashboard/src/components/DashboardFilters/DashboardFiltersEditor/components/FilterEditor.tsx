@@ -199,6 +199,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
           <option value=''>- Select Option -</option>
           <option value='urlfilter'>URL</option>
           <option value='datafilter'>Data</option>
+          <option value='mapfilter'>Map Control</option>
         </select>
       </label>
       {filter.type !== undefined && (
