@@ -9,6 +9,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import MultiSelect from '@cdc/core/components/MultiSelect'
+import Loading from '@cdc/core/components/Loading'
 import { DashboardConfig } from '../../../../types/DashboardConfig'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { hasDashboardApplyBehavior } from '../../../../helpers/hasDashboardApplyBehavior'
@@ -26,6 +27,7 @@ type FilterEditorProps = {
 
 const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config, updateFilterProp }) => {
   const [columns, setColumns] = useState<string[]>([])
+  const [dataFiltersLoading, setDataFiltersLoading] = useState(false)
   const transform = new DataTransform()
   const filterStyles = Object.values(FILTER_STYLE)
 
@@ -63,20 +65,25 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
   }, [config.visualizations, filter.usedBy, filter.setBy, vizRowColumnLocator])
 
   const loadColumnData = async () => {
+    // column data only needed for data filters
+    if (!config.dashboard.sharedFilters.some(f => f.type === 'datafilter')) return
     const columns = {}
     const dataKeys = Object.keys(config.datasets)
-
     for (let i = 0; i < dataKeys.length; i++) {
       const dataKey = dataKeys[i]
       let _dataSet = config.datasets[dataKey]
       if (!_dataSet.data && _dataSet.dataUrl) {
-        _dataSet = await fetchRemoteData(_dataSet.dataUrl)
+        setDataFiltersLoading(true)
+        let data = await fetchRemoteData(_dataSet.dataUrl)
         if (_dataSet.dataDescription) {
           try {
-            _dataSet = transform.autoStandardize(_dataSet.data)
-            _dataSet = transform.developerStandardize(_dataSet.data, _dataSet.dataDescription)
+            data = transform.autoStandardize(data)
+            data = transform.developerStandardize(data, _dataSet.dataDescription)
           } catch (e) {
+            console.error(e)
             //Data not able to be standardized, leave as is
+          } finally {
+            _dataSet.data = data
           }
         }
       }
@@ -89,13 +96,13 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
         })
       }
     }
-
+    setDataFiltersLoading(false)
     setColumns(Object.keys(columns))
   }
 
   useEffect(() => {
     loadColumnData()
-  }, [config.datasets])
+  }, [config.datasets, config.dashboard.sharedFilters])
 
   const updateAPIFilter = (key: keyof APIFilter, value: string | boolean) => {
     const filterClone = _.cloneDeep(filter)
@@ -187,13 +194,21 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
     )
   }
 
+  const selectFilterType = (type: string) => {
+    updateFilterProp('type', type)
+    if (type === 'datafilter') {
+      loadColumnData()
+    }
+  }
+
   return (
     <>
+      {dataFiltersLoading && <Loading />}
       <label>
         <span className='edit-label column-heading'>Filter Type: </span>
         <select
           defaultValue={filter.type || ''}
-          onChange={e => updateFilterProp('type', e.target.value)}
+          onChange={e => selectFilterType(e.target.value)}
           disabled={!!filter.type}
         >
           <option value=''>- Select Option -</option>

@@ -1117,7 +1117,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   }
 
   const convertStateToConfig = () => {
-    let strippedState = JSON.parse(JSON.stringify(state)) // Deep copy
+    let strippedState = _.cloneDeep(state) // Deep copy
 
     // Strip ref
     delete strippedState['']
@@ -1125,7 +1125,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     delete strippedState.newViz
 
     // Remove the legend
-    let strippedLegend = JSON.parse(JSON.stringify(state.legend))
+    let strippedLegend = _.cloneDeep(state.legend)
 
     delete strippedLegend.disabledAmt
 
@@ -1135,7 +1135,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     delete strippedState.defaultData
 
     // Remove tooltips if they're active in the editor
-    let strippedGeneral = JSON.parse(JSON.stringify(state.general))
+    let strippedGeneral = _.cloneDeep(state.general)
 
     strippedState.general = strippedGeneral
 

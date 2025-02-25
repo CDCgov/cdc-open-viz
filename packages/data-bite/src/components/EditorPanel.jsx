@@ -1,5 +1,5 @@
 import React, { memo, useContext, useEffect, useState } from 'react'
-
+import _ from 'lodash'
 import {
   Accordion,
   AccordionItem,
@@ -212,7 +212,7 @@ const EditorPanel = memo(() => {
   }
 
   const convertStateToConfig = () => {
-    let strippedState = JSON.parse(JSON.stringify(config))
+    let strippedState = _.cloneDeep(config)
     //if(false === missingRequiredSections()) {
     //strippedState.newViz
     //}
