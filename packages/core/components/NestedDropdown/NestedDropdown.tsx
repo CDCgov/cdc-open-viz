@@ -283,7 +283,11 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
             onFocus={() => setInputHasFocus(true)}
           />
           <span className='list-arrow' aria-hidden={true}>
-            <Icon display='caretDown' />
+            {isListOpened ? (
+              <Icon display='caretUp' alt='arrow pointing up' />
+            ) : (
+              <Icon display='caretDown' alt='arrow pointing down' />
+            )}
           </span>
         </div>
         {loading && <Loader spinnerType={'text-secondary'} />}
