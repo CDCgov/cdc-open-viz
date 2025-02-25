@@ -5,6 +5,12 @@ import { Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { useEffect, useMemo, useState } from 'react'
 import { SharedFilter } from '../../../../types/SharedFilter'
+
+// Add defaultValue to SharedFilter type
+interface SharedFilter {
+  defaultValue?: string
+  resetLabel?: string
+}
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -464,9 +470,13 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                   </label>
 
                   <Select
-                    value={filter.active}
-                    options={config.dashboard.sharedFilters[filterIndex].values}
-                    updateField={(_section, _subSection, _key, value) => updateFilterProp('active', value)}
+                    value={filter.defaultValue}
+                    options={
+                      filter.resetLabel
+                        ? [filter.resetLabel, ...config.dashboard.sharedFilters[filterIndex].values]
+                        : config.dashboard.sharedFilters[filterIndex].values
+                    }
+                    updateField={(_section, _subSection, _key, value) => updateFilterProp('defaultValue', value)}
                     label={'Filter Default Value'}
                     initial={'Select'}
                   />
