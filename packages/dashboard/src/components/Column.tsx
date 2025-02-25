@@ -2,9 +2,20 @@ import React, { useContext } from 'react'
 import { useDrop } from 'react-dnd'
 
 import { DashboardContext } from '../DashboardContext'
-import Widget from './Widget'
+import Widget from './Widget/Widget'
 
-const Column = ({ data, rowIdx, colIdx }) => {
+type ColumnProps = {
+  // column data passed from parent
+  data: any
+  // row index
+  rowIdx: number
+  // column index
+  colIdx: number
+  // toggle row
+  toggleRow: boolean
+}
+
+const Column: React.FC<ColumnProps> = ({ data, rowIdx, colIdx, toggleRow }) => {
   const { config } = useContext(DashboardContext)
 
   const [{ isOver, canDrop }, drop] = useDrop(
@@ -48,9 +59,12 @@ const Column = ({ data, rowIdx, colIdx }) => {
     <div className={classNames.join(' ')} ref={drop}>
       {widget ? (
         <Widget
+          columnData={data}
           title={handleTitle(widget)}
           widgetConfig={{ rowIdx, colIdx, ...widget }}
           type={widget.visualizationType ?? widget.general?.geoType}
+          toggleRow={toggleRow}
+          widgetInRow
         />
       ) : (
         <p className='builder-column__text'>
