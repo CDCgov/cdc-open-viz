@@ -16,7 +16,15 @@ type ChartRowsProps = DataTableProps & {
   hasRowType?: boolean
 }
 
-const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorScale, hasRowType }: ChartRowsProps): CellMatrix | GroupCellMatrix => {
+const chartCellArray = ({
+  rows,
+  runtimeData,
+  config,
+  isVertical,
+  sortBy,
+  colorScale,
+  hasRowType
+}: ChartRowsProps): CellMatrix | GroupCellMatrix => {
   const groupBy = config.table?.groupBy
   const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
 
@@ -38,7 +46,7 @@ const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorSc
 
   if (isVertical) {
     if (groupBy) {
-      const cellMatrix: GroupCellMatrix = {}
+      const cellMatrix = new Map()
       rows.forEach(row => {
         let groupKey: string
         let groupValues = []
@@ -49,10 +57,11 @@ const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorSc
             groupValues.push(getChartCellValue(row, column, config, runtimeData))
           }
         })
-        if (!cellMatrix[groupKey]) {
-          cellMatrix[groupKey] = [groupValues]
+        if (!cellMatrix.has(groupKey)) {
+          cellMatrix.set(groupKey, [groupValues])
         } else {
-          cellMatrix[groupKey].push(groupValues)
+          const currentGroupValues = cellMatrix.get(groupKey)
+          cellMatrix.set(groupKey, [...currentGroupValues, groupValues])
         }
       })
       return cellMatrix

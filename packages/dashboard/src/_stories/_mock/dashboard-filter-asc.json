@@ -5,11 +5,11 @@
     "sharedFilters": [
       {
         "values": [
-          "Alabama",
           "Alaska",
+          "Alabama",
+          "Arkansas",
           "American Samoa",
-          "Arizona",
-          "Arkansas"
+          "Arizona"
         ],
         "columnName": "Location",
         "showDropdown": true,
@@ -21,11 +21,11 @@
         ],
         "tier": 1,
         "type": "datafilter",
-        "order": "cust",
+        "order": "asc",
         "orderedValues": [
-          "Alabama",
-          "Alaska",
           "American Samoa",
+          "Alaska",
+          "Alabama",
           "Arizona",
           "Arkansas"
         ]

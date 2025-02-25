@@ -11,10 +11,20 @@ type RowProps = {
   viewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   style?: object
   preliminaryData?: PreliminaryDataItem[]
+  rightAlignedCols: object
 }
 
 const Row: FC<RowProps> = props => {
-  const { childRow, rowKey, wrapColumns, cellMinWidth = 0, isTotal, viewport, preliminaryData } = props
+  const {
+    childRow,
+    rowKey,
+    wrapColumns,
+    cellMinWidth = 0,
+    isTotal,
+    viewport,
+    preliminaryData,
+    rightAlignedCols
+  } = props
   const whiteSpace = wrapColumns ? 'unset' : 'nowrap'
   const minWidth = cellMinWidth + 'px'
 
@@ -27,11 +37,13 @@ const Row: FC<RowProps> = props => {
           ) && { color: '#777772' }) ||
           {}
 
+        const textAlign = rightAlignedCols && rightAlignedCols[i] ? 'right' : ''
+
         return (
           <Cell
             ariaLabel={style?.color ? 'suppressed data' : ''}
             key={rowKey + '__' + i}
-            style={{ whiteSpace, minWidth, ...style }}
+            style={{ whiteSpace, minWidth, textAlign, ...style }}
             isBold={isTotal}
           >
             {child}

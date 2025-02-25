@@ -149,13 +149,7 @@ const CityList = ({
 
     const styles = {
       fill: legendColors[0],
-      opacity:
-        setSharedFilterValue &&
-        isFilterValueSupported &&
-        data[city] &&
-        data[city][state.columns.geo.name] !== setSharedFilterValue
-          ? 0.5
-          : 1,
+      opacity: !isFilterValueSupported || (isFilterValueSupported && city === setSharedFilterValue) ? 1 : 0.5,
       stroke:
         setSharedFilterValue &&
         isFilterValueSupported &&

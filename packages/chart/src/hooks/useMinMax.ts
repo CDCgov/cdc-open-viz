@@ -1,6 +1,7 @@
 import { ChartConfig } from '../types/ChartConfig'
 import _ from 'lodash'
-import { isConvertLineToBarGraph } from '../helpers/isConvertLineToBarGraph'
+import ConfigContext from '../ConfigContext'
+import { useContext } from 'react'
 
 type UseMinMaxProps = {
   /** config - standard chart config */
@@ -27,12 +28,10 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   let leftMax = 0
   let rightMax = 0
 
+  const { convertLineToBarGraph } = useContext(ConfigContext)
+
   if (!data) {
     return { min, max }
-  }
-
-  const checkLineToBarGraph = () => {
-    return isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph)
   }
 
   const { visualizationType, series } = config
@@ -136,14 +135,14 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
 
   // this should not apply to bar charts if there is negative CI data
   if (
-    (visualizationType === 'Bar' || checkLineToBarGraph() || (visualizationType === 'Combo' && !isAllLine)) &&
+    (visualizationType === 'Bar' || convertLineToBarGraph || (visualizationType === 'Combo' && !isAllLine)) &&
     min > 0
   ) {
     min = 0
   }
   if (
     (config.visualizationType === 'Bar' ||
-      checkLineToBarGraph() ||
+      convertLineToBarGraph ||
       (config.visualizationType === 'Combo' && !isAllLine)) &&
     min < 0
   ) {
@@ -167,7 +166,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
     min = Number(enteredMinValue) && isMinValid ? Number(enteredMinValue) : 0
   }
 
-  if (config.visualizationType === 'Line' && !checkLineToBarGraph()) {
+  if (config.visualizationType === 'Line' && !convertLineToBarGraph) {
     const isMinValid = isLogarithmicAxis
       ? Number(enteredMinValue) >= 0 && Number(enteredMinValue) < minValue
       : Number(enteredMinValue) < minValue

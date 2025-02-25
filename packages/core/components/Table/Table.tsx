@@ -1,13 +1,13 @@
 import { ReactNode } from 'react'
 import Row from './components/Row'
 import GroupRow from './components/GroupRow'
-import { CellMatrix, GroupCellMatrix } from './types/CellMatrix'
+import { CellMatrix } from './types/CellMatrix'
 import { RowType } from './types/RowType'
 import { PreliminaryDataItem } from '@cdc/chart/src/types/ChartConfig'
 import _ from 'lodash'
 
 type TableProps = {
-  childrenMatrix: CellMatrix | GroupCellMatrix
+  childrenMatrix: CellMatrix | Map<string, CellMatrix>
   noData?: boolean
   tableName: string
   caption: string
@@ -24,6 +24,7 @@ type TableProps = {
   hasRowType?: boolean // if it has row type then the first column is the row type which will explain how to render the row
   viewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   preliminaryData?: PreliminaryDataItem[]
+  rightAlignedCols: object
 }
 
 type Position = 'sticky'
@@ -39,7 +40,8 @@ const Table = ({
   wrapColumns,
   hasRowType,
   viewport,
-  preliminaryData
+  preliminaryData,
+  rightAlignedCols
 }: TableProps) => {
   const headStyle = stickyHeader ? { position: 'sticky' as Position, top: 0, zIndex: 2 } : {}
   const isGroupedMatrix = !Array.isArray(childrenMatrix)
@@ -56,9 +58,9 @@ const Table = ({
           <thead style={headStyle}>{headContent}</thead>
           <tbody>
             {isGroupedMatrix
-              ? Object.keys(childrenMatrix).flatMap(groupName => {
+              ? Array.from(childrenMatrix.keys()).flatMap(groupName => {
                   let colSpan = 0
-                  const rows = childrenMatrix[groupName].map((row, i) => {
+                  const rows = childrenMatrix.get(groupName).map((row, i) => {
                     colSpan = row.length
                     const key = `${tableName}-${groupName}-row-${i}`
                     return (
@@ -70,6 +72,7 @@ const Table = ({
                         wrapColumns={wrapColumns}
                         cellMinWidth={tableOptions.cellMinWidth}
                         viewport={viewport}
+                        rightAlignedCols={rightAlignedCols}
                       />
                     )
                   })
@@ -90,6 +93,7 @@ const Table = ({
                         wrapColumns={wrapColumns}
                         cellMinWidth={tableOptions.cellMinWidth}
                         viewport={viewport}
+                        rightAlignedCols={rightAlignedCols}
                       />
                     )
                   } else {
@@ -107,6 +111,7 @@ const Table = ({
                             wrapColumns={wrapColumns}
                             cellMinWidth={tableOptions.cellMinWidth}
                             viewport={viewport}
+                            rightAlignedCols={rightAlignedCols}
                           />
                         )
                       case RowType.row_group_total:
@@ -121,6 +126,7 @@ const Table = ({
                             wrapColumns={wrapColumns}
                             cellMinWidth={tableOptions.cellMinWidth}
                             viewport={viewport}
+                            rightAlignedCols={rightAlignedCols}
                           />
                         )
                     }

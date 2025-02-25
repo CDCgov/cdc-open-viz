@@ -6,7 +6,6 @@ import BarChartContext, { type BarChartContextValues } from './context'
 import { useBarChart } from '../../../hooks/useBarChart'
 import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
 import { getBarConfig, testZeroValue } from '../helpers'
-import { isConvertLineToBarGraph } from '../../../helpers/isConvertLineToBarGraph'
 // VisX library imports
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
@@ -25,7 +24,8 @@ import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
 
 export const BarChartVertical = () => {
-  const { xScale, yScale, xMax, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
+  const { xScale, yScale, xMax, yMax, seriesScale, convertLineToBarGraph } =
+    useContext<BarChartContextValues>(BarChartContext)
 
   const [barWidth, setBarWidth] = useState(0)
   const [totalBarsInGroup, setTotalBarsInGroup] = useState(0)
@@ -70,9 +70,7 @@ export const BarChartVertical = () => {
   const _data = getBarData(config, data, hasConfidenceInterval)
   return (
     config.visualizationSubType !== 'stacked' &&
-    (config.visualizationType === 'Bar' ||
-      config.visualizationType === 'Combo' ||
-      isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph)) &&
+    (config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || convertLineToBarGraph) &&
     config.orientation === 'vertical' && (
       <Group>
         <BarGroup

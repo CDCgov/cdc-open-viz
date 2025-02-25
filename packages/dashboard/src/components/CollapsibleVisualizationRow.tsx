@@ -28,7 +28,7 @@ const CollapsibleVisualizationRow: React.FC<CollapsableVizRow> = ({
       <div
         style={{ fontSize: titleFontSize }}
         role='button'
-        className={`multi-visualiation-heading${isExpanded ? '' : ' collapsed'} h4`}
+        className={`multi-visualiation-heading${isExpanded ? '' : ' collapsed'} h4 my-0`}
         onClick={() => {
           setIsExpanded(!isExpanded)
         }}

@@ -55,6 +55,10 @@ const TextField = memo((props: TextFieldProps) => {
     }
   }, [debouncedValue])
 
+  useEffect(() => {
+    setValue(stateValue) // Update local state when props change
+  }, [stateValue])
+
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
 
   const onChange = e => {

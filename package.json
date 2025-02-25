@@ -1,5 +1,6 @@
 {
   "name": "@cdc/root",
+  "homepage": "https://cdcgov.github.io/cdc-open-viz",
   "version": "0.0.0",
   "private": true,
   "workspaces": [
@@ -35,7 +36,7 @@
     "@visx/group": "^3.0.0",
     "@visx/heatmap": "^3.0.0",
     "@visx/scale": "^3.0.0",
-    "@vitejs/plugin-react": "^3.1.0",
+    "@vitejs/plugin-react": "^4.3.4",
     "@vitest/coverage-c8": "^0.29.2",
     "@vitest/ui": "^0.29.2",
     "babel-eslint": "^10.1.0",
