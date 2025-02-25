@@ -31,7 +31,13 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
       // Update the child filter if unique values exist
       if (childFilterValues.length > 0) {
         const isChildMultiSelect = childFilter.filterStyle === 'multi-select'
-        const activeValue = isChildMultiSelect ? childFilterValues : childFilterValues[0]
+        const activeValue = isChildMultiSelect
+          ? childFilterValues
+          : childFilter.active
+          ? childFilter.active
+          : childFilter.defaultValue
+          ? childFilter.defaultValue
+          : childFilterValues[0]
         updatedFilters[childIndex] = {
           ...childFilter,
           values: childFilterValues,
