@@ -424,11 +424,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
    * When cove has a config and container ref publish the cove_loaded event.
    */
   useEffect(() => {
-    if (container && !_.isEmpty(config) && !coveLoadedEventRan) {
+    if (container && !isLoading && !_.isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_LOADED_EVENT', payload: true })
     }
-  }, [container, config]) // eslint-disable-line
+  }, [container, config, isLoading]) // eslint-disable-line
 
   /**
    * Handles filter change events outside of COVE
