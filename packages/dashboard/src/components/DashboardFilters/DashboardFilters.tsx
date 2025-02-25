@@ -37,6 +37,11 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
     handleOnChange(fieldName, value) // fieldName is the sharedFilterIndex
   }
 
+  const stripDuplicateLabelIncrement = (label: string): string => {
+    // converts 'Label (1)' to 'Label'
+    return label.replace(/\s\(\d+\)$/, '')
+  }
+
   const getNestedDropdownOptions = (options?: DropdownOptions): NestedOptions => {
     if (!options) return []
     const getValueTextTuple = (value: string, text?: string): ValueTextPair => (text ? [value, text] : [value])
@@ -50,13 +55,13 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
     <form className='d-flex flex-wrap'>
       {sharedFilters.map((filter, filterIndex) => {
         const urlFilterType = filter.type === 'urlfilter'
-        const label = filter.key
+        const label = stripDuplicateLabelIncrement(filter.key || '')
 
         if (
           (!urlFilterType && !filter.showDropdown && filter.filterStyle !== FILTER_STYLE.nestedDropdown) ||
           (show && !show.includes(filterIndex))
         )
-          return <React.Fragment key={`${label}-filtersection-${filterIndex}-option`} />
+          return <React.Fragment key={`${filter.key}-filtersection-${filterIndex}-option`} />
         const values: JSX.Element[] = []
 
         const _key = filter.apiFilter?.apiEndpoint
@@ -89,7 +94,8 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           }
         } else {
           // Data Filter
-          filter.values?.forEach((filterOption, index) => {
+          const orderedFilterValues = filter.orderedValues || filter.values
+          orderedFilterValues?.forEach((filterOption, index) => {
             const labeledOpt = filter.labels && filter.labels[filterOption]
             const resetLabelHasMatch = (filterOption || labeledOpt) === filter.resetLabel
 
@@ -123,9 +129,8 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         }
 
         const formGroupClass = `form-group me-4 mb-1${loading ? ' loading-filter' : ''}`
-
         return (
-          <div className={formGroupClass} key={`${label}-filtersection-${filterIndex}`}>
+          <div className={formGroupClass} key={`${filter.key}-filtersection-${filterIndex}`}>
             {label && (
               <label className='font-weight-bold mb-2' htmlFor={`filter-${filterIndex}`}>
                 {label}

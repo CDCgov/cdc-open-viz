@@ -62,7 +62,8 @@ const config: StorybookConfig = {
         }
       },
       plugins: [
-        react({ jsxRuntime: 'classic' }), //https://github.com/babel/babel/discussions/13013
+        // changed from classic to automatic 02/21 for import React error.
+        react({ jsxRuntime: 'automatic' }), //https://github.com/babel/babel/discussions/13013
         svgr({
           exportAsDefault: true
         })

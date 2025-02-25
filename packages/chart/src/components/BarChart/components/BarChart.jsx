@@ -10,15 +10,25 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../../../ConfigContext'
 import BarChartContext from './context'
 
-const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, handleTooltipMouseOver, handleTooltipMouseOff, handleTooltipClick }) => {
-  const { transformedData: data, config } = useContext(ConfigContext)
+const BarChart = ({
+  xScale,
+  yScale,
+  seriesScale,
+  xMax,
+  yMax,
+  handleTooltipMouseOver,
+  handleTooltipMouseOff,
+  handleTooltipClick
+}) => {
+  const { transformedData: data, config, convertLineToBarGraph } = useContext(ConfigContext)
 
   const contextValues = {
     xScale,
     yScale,
     xMax,
     yMax,
-    seriesScale
+    seriesScale,
+    convertLineToBarGraph
   }
 
   return (
@@ -29,7 +39,17 @@ const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, handleTooltipMouseO
           <BarChartType.StackedHorizontal />
           <BarChartType.Vertical />
           <BarChartType.Horizontal />
-          <Bar key={'bars'} display={config.tooltips.singleSeries ? 'none' : 'block'} width={Number(xMax)} height={Number(yMax)} fill={'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} onClick={e => handleTooltipClick(e, data)} />
+          <Bar
+            key={'bars'}
+            display={config.tooltips.singleSeries ? 'none' : 'block'}
+            width={Number(xMax)}
+            height={Number(yMax)}
+            fill={'transparent'}
+            fillOpacity={0.05}
+            onMouseMove={e => handleTooltipMouseOver(e, data)}
+            onMouseOut={handleTooltipMouseOff}
+            onClick={e => handleTooltipClick(e, data)}
+          />
         </Group>
       </BarChartContext.Provider>
     </ErrorBoundary>

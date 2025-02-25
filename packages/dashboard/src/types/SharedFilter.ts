@@ -11,7 +11,7 @@ export type SharedFilter = FilterBase & {
   active?: string | string[]
   queuedActive?: string | string[]
   usedBy?: (string | number)[] // if number used by whole row, else used by specific viz
-  order: 'cust' | 'desc' | 'asc'
+  order: 'cust' | 'desc' | 'asc' | 'column'
   parents?: string[]
   setBy?: string
   selectLimit?: number

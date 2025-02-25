@@ -4,6 +4,21 @@ import { MultiDashboardConfig } from '@cdc/dashboard/src/types/MultiDashboard'
 import { AnyVisualization } from '../../types/Visualization'
 import versionNeedsUpdate from './versionNeedsUpdate'
 
+/**
+ * Migrates the dashboard configuration to the new format.
+ *
+ * This function performs the following transformations:
+ * - Removes `autoLoad` and `defaultValue` from `apiFilter` in shared filters.
+ * - Updates visualizations to remove `hide` and set `sharedFilterIndexes`.
+ * - Renames visualization type `filter-dropdowns` to `dashboardFilters`.
+ * - Ensures `sharedFilterIndexes` and `filterBehavior` are set for `dashboardFilters`.
+ * - Adds a new `dashboardFilters` visualization if there are shared filters but no `dashboardFilters` visualization.
+ * - Updates rows to include the new `dashboardFilters` visualization.
+ * - Removes deprecated `filterBehavior` from the configuration.
+ *
+ * @param {object} config - The dashboard configuration object to migrate.
+ * @returns {object} The migrated dashboard configuration object.
+ */
 export const dashboardFiltersMigrate = config => {
   if (!config.dashboard) return config
   const dashboardConfig = config as MultiDashboardConfig
@@ -52,7 +67,10 @@ export const dashboardFiltersMigrate = config => {
     newVisualizations[vizKey] = viz
   })
 
-  if (config.dashboard.sharedFilters.length && !Object.values(newVisualizations).find((v: AnyVisualization) => v.type === 'dashboardFilters')) {
+  if (
+    config.dashboard.sharedFilters.length &&
+    !Object.values(newVisualizations).find((v: AnyVisualization) => v.type === 'dashboardFilters')
+  ) {
     const newViz = {
       type: 'dashboardFilters',
       visualizationType: 'dashboardFilters',
