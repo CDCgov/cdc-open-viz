@@ -35,20 +35,22 @@ export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExp
   }, [config])
 
   const typeLookup = {
-    chart: ['Charts', 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/bar-chart.html', <ChartIcon />],
-    dashboard: ['Dashboard', 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/bar-chart.html', <ChartIcon />],
-    map: ['Maps', 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html', <MapIcon />],
-    'markup-include': [
-      'Markup Include',
-      'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/Markup-Include.html',
-      <MarkupIncludeIcon />
-    ]
+    chart: ['Charts', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
+    dashboard: ['Dashboard', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
+    map: ['Maps', 'https://www.cdc.gov/cove/index.html', <MapIcon />],
+    'markup-include': ['Markup Include', 'https://www.cdc.gov/cove/index.html', <MarkupIncludeIcon />]
   }
 
   if (!config.type) return <></>
   return (
     <>
-      <a href={typeLookup[config.type][1]} target='_blank' rel='noopener noreferrer' className='guidance-link'>
+      <a
+        href={typeLookup[config.type][1]}
+        target='_blank'
+        rel='noopener noreferrer'
+        className='guidance-link'
+        style={{ cursor: 'pointer !important' }}
+      >
         {typeLookup[config.type][2]}
         <div>
           <span className='heading-3'>Get Help with {typeLookup[config.type][0]}</span>
