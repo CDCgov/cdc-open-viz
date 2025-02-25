@@ -8,7 +8,7 @@ export default function isRightAlignedTableValue(value = '') {
     return !Number.isNaN(value)
   }
   if (typeof value === 'string') {
-    return numericStrings.includes(value) || /^[\$\d\.\%\,\-]*$/.test(value)
+    return numericStrings.includes(value) || /^[\$\d\.\%\,\-\s\(\)CI]*$/.test(value)
   }
   return false
 }
