@@ -228,7 +228,6 @@ export const useFilters = props => {
         filter.values = getUniqueValues(data, filter.columnName)
       }
 
-      // todo: reset to default label.
       newFilters[i].active = handleSorting(filter).values[0]
 
       if (filter.setByQueryParameter && queryParams[filter.setByQueryParameter] !== filter.active) {
