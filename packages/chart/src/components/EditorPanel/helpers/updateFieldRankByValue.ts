@@ -30,7 +30,12 @@ export const updateFieldRankByValue = (
   newConfig.rankByValue = newValue
 
   if (config.rankByValue && !newValue) {
-    const cleanData = config?.xAxis?.dataKey ? transform.cleanData(config.data, config.xAxis.dataKey) : config.data
+    const CIkeys: string[] = Object.values(config.confidenceKeys) as string[]
+    const seriesKeys: string[] = config.series.map(s => s.dataKey)
+    const keysToClean: string[] = seriesKeys.concat(CIkeys)
+    const cleanData = config?.xAxis?.dataKey
+      ? transform.cleanData(config.data, config.xAxis.dataKey, keysToClean)
+      : config.data
     const newData = preTransformedData.sort((a, b) => {
       const aIndex = indexOfObj(cleanData, a)
       const bIndex = indexOfObj(cleanData, b)
