@@ -465,7 +465,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
 
                   <Select
                     value={filter.defaultValue}
-                    options={config.dashboard.sharedFilters[filterIndex].values}
+                    options={[filter.resetLabel, ...config.dashboard.sharedFilters[filterIndex].values]}
                     updateField={(_section, _subSection, _key, value) => updateFilterProp('defaultValue', value)}
                     label={'Filter Default Value'}
                     initial={'Select'}
