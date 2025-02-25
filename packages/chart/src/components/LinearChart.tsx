@@ -1533,6 +1533,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           Object.entries(tooltipData.data).length > 0 &&
           tooltipOpen &&
           showTooltip &&
+          !tooltipData?.data?.some(subArray => subArray.some(item => item === undefined)) &&
           tooltipData.dataYPosition &&
           tooltipData.dataXPosition && (
             <>
