@@ -83,7 +83,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           </Tooltip>
         }
       />
-      {config.type !== 'table' ? (
+      {config.type !== 'table' && (
         <CheckBox
           value={config.table.show}
           fieldName='show'
@@ -108,16 +108,16 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
             </Tooltip>
           }
         />
-      ) : (
-        <CheckBox
-          value={config.general?.showDownloadButton}
-          fieldName='showDownloadButton'
-          label='Show Download CSV link'
-          section='general'
-          updateField={updateField}
-          className='column-heading'
-        />
       )}
+
+      <CheckBox
+        value={config.general?.showDownloadButton}
+        fieldName='showDownloadButton'
+        label='Show Download CSV link'
+        section='general'
+        updateField={updateField}
+        className='column-heading'
+      />
 
       {config.visualizationType !== 'Box Plot' && config.type !== 'table' && (
         <CheckBox
