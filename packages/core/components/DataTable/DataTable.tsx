@@ -283,7 +283,7 @@ const DataTable = (props: DataTableProps) => {
 
     return (
       <ErrorBoundary component='DataTable'>
-        {config.general?.showDownloadButton && !config.table.showDownloadLinkBelow && <TableMediaControls />}
+        {!config.table.showDownloadLinkBelow && <TableMediaControls />}
         <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           {config.table.collapsible !== false && (
@@ -357,9 +357,7 @@ const DataTable = (props: DataTableProps) => {
               )}
           </div>
         </section>
-        {config.general?.showDownloadButton && config.table.showDownloadLinkBelow && (
-          <TableMediaControls belowTable={true} />
-        )}
+        {config.table.showDownloadLinkBelow && <TableMediaControls belowTable={true} />}
         <div id={skipId} className='cdcdataviz-sr-only'>
           Skipped data table.
         </div>
