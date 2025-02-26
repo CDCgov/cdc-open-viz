@@ -31,7 +31,8 @@ export default {
     accent: false,
     background: false,
     hideBackgroundColor: false,
-    borderColorTheme: false
+    borderColorTheme: false,
+    hideTitle: false
   },
   general: {
     isCompactStyle: false
