@@ -212,7 +212,7 @@ const DataTable = (props: DataTableProps) => {
   const getClassNames = (): string => {
     const classes = ['data-table-container']
 
-    if (config.table.showDownloadLinkBelow) {
+    if ((config.table.download || config.general?.showDownloadButton) && config.table.showDownloadLinkBelow) {
       classes.push('mt-4')
     }
 
