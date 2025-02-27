@@ -749,9 +749,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (!Array.isArray(data)) return []
     if (config.visualizationType === 'Forecasting') return data
     //  specify keys that needs  to be cleaned to render chart and skip rest
-    const CIkeys: string[] = Object.values(config?.confidenceKeys ?? {}) as string[]
-    const seriesKeys: string[] = config?.series?.map(s => s.dataKey)
-    const keysToClean: string[] = seriesKeys.concat(CIkeys)
+    const CIkeys: string[] = Object.values(_.get(config, 'confidenceKeys', {})) as string[]
+    const seriesKeys: string[] = _.get(config, 'series', []).map((s: any) => s.dataKey)
+    const keysToClean: string[] = [...(seriesKeys ?? []), ...(CIkeys ?? [])]
+
     // key that does not need to be cleaned
     const excludedKey = config.xAxis.dataKey
     return config?.xAxis?.dataKey ? transform.cleanData(data, excludedKey, keysToClean) : data
