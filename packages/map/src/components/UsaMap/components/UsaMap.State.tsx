@@ -28,6 +28,7 @@ import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { titleCase } from '../../../helpers/titleCase'
 import TerritoriesSection from './TerritoriesSection'
+import { displayGeoName } from '../../../helpers/displayGeoName'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -61,7 +62,6 @@ const UsaMap = () => {
       applyLegendToRow,
       applyTooltipsToGeo,
       data,
-      displayGeoName,
       geoClickHandler,
       setSharedFilterValue,
       state,
