@@ -416,11 +416,7 @@ const LineChart = (props: LineChartProps) => {
                       x={xPos(lastDatum) + 5}
                       y={yScale(getYAxisData(lastDatum, seriesKey))}
                       alignmentBaseline='middle'
-                      fill={
-                        config.colorMatchLineSeriesLabels && colorScale
-                          ? colorScale(config.runtime.seriesLabels[seriesKey] || seriesKey)
-                          : 'black'
-                      }
+                      fill={colorScale(config.runtime.seriesLabels[seriesKey] || seriesKey)}
                     >
                       {labelText}
                     </Text>

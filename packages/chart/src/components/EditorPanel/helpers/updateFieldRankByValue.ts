@@ -31,7 +31,7 @@ export const updateFieldRankByValue = (
 
   if (config.rankByValue && !newValue) {
     const CIkeys: string[] = Object.values(config?.confidenceKeys ?? {}) as string[]
-    const seriesKeys: string[] = config.series.map(s => s.dataKey)
+    const seriesKeys: string[] = config?.series?.map(s => s.dataKey)
     const keysToClean: string[] = seriesKeys.concat(CIkeys)
     const cleanData = config?.xAxis?.dataKey
       ? transform.cleanData(config.data, config.xAxis.dataKey, keysToClean)
