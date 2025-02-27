@@ -393,11 +393,26 @@ const LineChart = (props: LineChartProps) => {
                       break
                     }
                   }
-                  if (!lastDatum) {
+                  if (!lastDatum || legend.position === 'right') {
                     return <></>
                   }
+
+                  let labelText = config.runtime.seriesLabels[seriesKey] || seriesKey
+                  // truncate labels longer that 10 chars
+                  const ellipsis = '...'
+                  if (labelText.length > 10) {
+                    labelText = labelText.substring(0, 10) + ellipsis
+                  }
+
                   return (
                     <Text
+                      display={
+                        legend.behavior === 'highlight' ||
+                        (seriesHighlight.length === 0 && !legend.dynamicLegend) ||
+                        seriesHighlight.indexOf(seriesKey) !== -1
+                          ? 'block'
+                          : 'none'
+                      }
                       x={xPos(lastDatum) + 5}
                       y={yScale(getYAxisData(lastDatum, seriesKey))}
                       alignmentBaseline='middle'
@@ -407,7 +422,7 @@ const LineChart = (props: LineChartProps) => {
                           : 'black'
                       }
                     >
-                      {config.runtime.seriesLabels[seriesKey] || seriesKey}
+                      {labelText}
                     </Text>
                   )
                 })}

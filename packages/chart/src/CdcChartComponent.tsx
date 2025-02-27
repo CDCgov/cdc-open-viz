@@ -913,11 +913,23 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           </ParentSize>
                         </div>
                       ) : (
-                        <div ref={parentRef} style={{ width: `100%` }}>
+                        <div ref={parentRef} style={{ width: '100%' }}>
                           <ParentSize>
-                            {parent => (
-                              <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
-                            )}
+                            {parent => {
+                              const labelMargin = 120
+                              const widthReduction =
+                                config.showLineSeriesLabels &&
+                                (config.legend.position !== 'right' || config.legend.hide)
+                                  ? labelMargin
+                                  : 0
+                              return (
+                                <LinearChart
+                                  ref={svgRef}
+                                  parentWidth={parent.width - widthReduction}
+                                  parentHeight={parent.height}
+                                />
+                              )
+                            }}
                           </ParentSize>
                         </div>
                       ))}
