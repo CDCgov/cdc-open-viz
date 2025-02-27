@@ -200,7 +200,8 @@ export const useBarChart = () => {
         return d[config.xAxis.dataKey] === xAxisDataValue && dynamicCategoryMatch
       }) || {}
     Object.keys(columns).forEach(colKeys => {
-      if (series && config.columns[colKeys].series && config.columns[colKeys].series !== series) return
+      const colConfig = config.columns[colKeys]
+      if (series && colConfig.series && colConfig.series !== series && !colConfig.tooltips) return
       const formattingParams = {
         addColPrefix: config.columns[colKeys].prefix,
         addColSuffix: config.columns[colKeys].suffix,

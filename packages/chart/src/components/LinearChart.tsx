@@ -224,7 +224,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     leftMax,
     rightMax,
     dimensions,
-    xMax: parentWidth - Number(config.orientation === 'horizontal' ? config.xAxis.size : config.yAxis.size)
+    xMax:
+      parentWidth -
+      Number(config.orientation === 'horizontal' ? config.xAxis.size : config.yAxis.size) -
+      (hasRightAxis ? config.yAxis.rightAxisSize : 0)
   })
 
   const [yTickCount, xTickCount] = ['yAxis', 'xAxis'].map(axis =>
@@ -592,7 +595,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       </>
     )
   }
-
   return isNaN(width) ? (
     <React.Fragment></React.Fragment>
   ) : (
@@ -605,7 +607,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
         <svg
           ref={svgRef}
           onMouseMove={onMouseMove}
-          width={parentWidth}
+          width={parentWidth + config.yAxis.rightAxisSize}
           height={isNoDataAvailable ? 1 : parentHeight}
           className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${
             debugSvg && 'debug'
@@ -699,35 +701,37 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           )}
           {((visualizationType === 'Area Chart' && config.visualizationSubType === 'regular') ||
             visualizationType === 'Combo') && (
-            <AreaChart
-              xScale={xScale}
-              yScale={yScale}
-              yMax={yMax}
-              xMax={xMax}
-              chartRef={svgRef}
-              width={xMax}
-              height={yMax}
-              handleTooltipMouseOver={handleTooltipMouseOver}
-              handleTooltipMouseOff={handleTooltipMouseOff}
-              tooltipData={tooltipData}
-              showTooltip={showTooltip}
-            />
+            <></>
+            // <AreaChart
+            //   xScale={xScale}
+            //   yScale={yScale}
+            //   yMax={yMax}
+            //   xMax={xMax}
+            //   chartRef={svgRef}
+            //   width={xMax}
+            //   height={yMax}
+            //   handleTooltipMouseOver={handleTooltipMouseOver}
+            //   handleTooltipMouseOff={handleTooltipMouseOff}
+            //   tooltipData={tooltipData}
+            //   showTooltip={showTooltip}
+            // />
           )}
           {((visualizationType === 'Area Chart' && config.visualizationSubType === 'stacked') ||
             visualizationType === 'Combo') && (
-            <AreaChartStacked
-              xScale={xScale}
-              yScale={yScale}
-              yMax={yMax}
-              xMax={xMax}
-              chartRef={svgRef}
-              width={xMax}
-              height={yMax}
-              handleTooltipMouseOver={handleTooltipMouseOver}
-              handleTooltipMouseOff={handleTooltipMouseOff}
-              tooltipData={tooltipData}
-              showTooltip={showTooltip}
-            />
+            <></>
+            // <AreaChartStacked
+            //   xScale={xScale}
+            //   yScale={yScale}
+            //   yMax={yMax}
+            //   xMax={xMax}
+            //   chartRef={svgRef}
+            //   width={xMax}
+            //   height={yMax}
+            //   handleTooltipMouseOver={handleTooltipMouseOver}
+            //   handleTooltipMouseOff={handleTooltipMouseOff}
+            //   tooltipData={tooltipData}
+            //   showTooltip={showTooltip}
+            // />
           )}
           {(visualizationType === 'Bar' || visualizationType === 'Combo' || convertLineToBarGraph) && (
             <BarChart
@@ -764,7 +768,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               handleTooltipClick={handleTooltipClick}
               tooltipData={tooltipData}
               showTooltip={showTooltip}
-              chartRef={svgRef}
+              //chartRef={svgRef}
             />
           )}
           {(visualizationType === 'Forecasting' || visualizationType === 'Combo') && (
@@ -1555,7 +1559,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               </TooltipWithBounds>
             </>
           )}
-
         {config.visualizationType === 'Bump Chart' && (
           <ReactTooltip
             id={`bump-chart`}

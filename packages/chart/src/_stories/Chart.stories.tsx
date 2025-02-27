@@ -13,6 +13,7 @@ import areaChartStacked from './_mock/area_chart_stacked.json'
 import multipleLines from './_mock/short_dates.json'
 import lineChartDynamicCI from './_mock/line_chart_dynamic_ci.json'
 import lineChartNonDynamicCI from './_mock/line_chart_non_dynamic_ci.json'
+import COMBO from './_mock/combo-chart.json'
 import { editConfigKeys } from '../helpers/configHelpers'
 
 const meta: Meta<typeof Chart> = {
@@ -21,6 +22,13 @@ const meta: Meta<typeof Chart> = {
 }
 
 type Story = StoryObj<typeof Chart>
+
+export const TESTEST: Story = {
+  args: {
+    config: COMBO,
+    isEditor: false
+  }
+}
 
 export const line_Chart_Dynamic_Confidence_Intervals: Story = {
   args: {
