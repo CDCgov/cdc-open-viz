@@ -76,7 +76,7 @@ const BarChartStackedHorizontal = () => {
                   ? `${config.runtime.yAxis.label}: ${yAxisValue}`
                   : yAxisValue
                 const textWidth = getTextWidth(xAxisValue)
-                const additionalColTooltip = getAdditionalColumn(hoveredBar)
+                const additionalColTooltip = getAdditionalColumn(bar.key, hoveredBar)
                 const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${xAxisValue}`
                 const tooltip = `<ul>
                   <li class="tooltip-heading"">${yAxisTooltip}</li>
