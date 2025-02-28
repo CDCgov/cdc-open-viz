@@ -172,7 +172,7 @@ const CountyMap = props => {
       getTopoData(currentYear).then(response => {
         if (canvasRef.current) {
           const context = canvasRef.current.getContext('2d')
-          context.clearRect(canvasRef.current.width, canvasRef.current.height)
+          context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
         }
         setTopoData(response)
       })

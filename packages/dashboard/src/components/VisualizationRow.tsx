@@ -1,5 +1,5 @@
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
-import React, { useContext, useMemo } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import Toggle from './Toggle'
 import _ from 'lodash'
 import { ConfigRow } from '../types/ConfigRow'
@@ -85,10 +85,19 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   isLastRow
 }) => {
   const { config, filteredData: dashboardFilteredData, data: rawData } = useContext(DashboardContext)
-  const [show, setShow] = React.useState(row.columns.map((col, i) => i === 0))
-  const setToggled = (colIndex: number) => {
-    setShow(show.map((_, i) => i === colIndex))
-  }
+  const [toggledRow, setToggled] = React.useState<number>(0)
+
+  useEffect(() => {
+    if (row.toggle) setToggled(0)
+  }, [config.activeDashboard, index])
+
+  const show = useMemo(() => {
+    if (row.toggle) {
+      return row.columns.map((col, i) => i === toggledRow)
+    } else {
+      return row.columns.map((col, i) => true)
+    }
+  }, [config.activeDashboard, toggledRow])
 
   const footnotesConfig = useMemo(() => {
     if (row.footnotesId) {
@@ -127,6 +136,9 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   }
   return (
     <div className={`row${row.equalHeight ? ' equal-height' : ''}${row.toggle ? ' toggle' : ''}`} key={`row__${index}`}>
+      {row.toggle && !inNoDataState && (
+        <Toggle row={row} visualizations={config.visualizations} active={toggledRow} setToggled={setToggled} />
+      )}
       {row.columns.map((col, colIndex) => {
         if (col.width) {
           if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`col col-${col.width}`}></div>
@@ -173,14 +185,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                 hideVisualization ? ' hide-parent-visualization' : hasMarginBottom ? ' mb-4' : ''
               }`}
             >
-              {row.toggle && !hideVisualization && (
-                <Toggle
-                  row={row}
-                  visualizations={config.visualizations}
-                  active={show.indexOf(true)}
-                  setToggled={setToggled}
-                />
-              )}
               <VisualizationWrapper
                 allExpanded={allExpanded}
                 currentViewport={currentViewport}

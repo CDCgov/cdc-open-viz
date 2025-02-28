@@ -1371,7 +1371,7 @@ const CdcMap = ({
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       loadConfig(config)
-    }, [config.data]) // eslint-disable-line
+    }, [config.data, config.general.geoType, config.general.stateToShow]) // eslint-disable-line
   }
 
   // Destructuring for more readable JSX
