@@ -109,7 +109,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
 
       const lookup = {
         State: 'us',
-        County: 'single-state'
+        County: 'us-county'
       }
 
       if (visualizationsToCheck) {
@@ -119,6 +119,8 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
             // get fips code by state name
             const f = getFipsCode(value)
             viz.general.statePicked = { fipsCode: f, stateName: value }
+            viz.general.stateToShow = value
+            viz.general.geoType = 'single-state'
           }
           if (dashboardConfig.dashboard.sharedFilters[index].propertyToUpdate === 'geoType') {
             viz.general.geoType = lookup[value]
