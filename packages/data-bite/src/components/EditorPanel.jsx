@@ -617,6 +617,13 @@ const EditorPanel = memo(() => {
                       label='Hide Background Color'
                       updateField={updateField}
                     />
+                    <CheckBox
+                      value={config.visual?.hideTitle}
+                      section='visual'
+                      fieldName='hideTitle'
+                      label='Hide Title'
+                      updateField={updateField}
+                    />
                   </div>
                   <label>
                     <span className='edit-label'>Theme</span>
