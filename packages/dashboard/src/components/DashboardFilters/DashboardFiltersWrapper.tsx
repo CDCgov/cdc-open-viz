@@ -15,6 +15,7 @@ import * as apiFilterHelpers from '../../helpers/apiFilterHelpers'
 import { applyQueuedActive } from '@cdc/core/components/Filters/helpers/applyQueuedActive'
 import './dashboardfilter.styles.css'
 import { updateChildFilters } from '../../helpers/updateChildFilters'
+import { getFipsCode } from '@cdc/map/src/data/supported-geos'
 
 type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
 
@@ -99,6 +100,37 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   }
 
   const handleOnChange = (index: number, value: string | string[]) => {
+    // check if the filter type is a configFilter
+    if (dashboardConfig.dashboard.sharedFilters[index].type === 'configFilter') {
+      // and then update the shared filters
+      const newConfig = _.cloneDeep(dashboardConfig)
+
+      // check the sharedFilters usedBy property to see if the filter is used by any visualizations
+      // if it is, then update the data for the visualization
+      const visualizationsToCheck = dashboardConfig.dashboard.sharedFilters[index].usedBy
+
+      const lookup = {
+        State: 'us',
+        County: 'single-state'
+      }
+
+      if (visualizationsToCheck) {
+        visualizationsToCheck.forEach(vizIndex => {
+          const viz = newConfig.visualizations[vizIndex]
+          if (dashboardConfig.dashboard.sharedFilters[index].propertyToUpdate === 'focusedState') {
+            // get fips code by state name
+            const f = getFipsCode(value)
+            viz.general.statePicked = { fipsCode: f, stateName: value }
+          }
+          if (dashboardConfig.dashboard.sharedFilters[index].propertyToUpdate === 'geoType') {
+            viz.general.geoType = lookup[value]
+          }
+        })
+      }
+      // set config
+      dispatch({ type: 'SET_CONFIG', payload: newConfig })
+    }
+
     const newConfig = _.cloneDeep(dashboardConfig)
     let [newSharedFilters, changedFilterIndexes] = changeFilterActive(
       index,

@@ -189,34 +189,30 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
 
   return (
     <>
-      <label>
-        <span className='edit-label column-heading'>Filter Type: </span>
-        <select
-          defaultValue={filter.type || ''}
-          onChange={e => updateFilterProp('type', e.target.value)}
-          disabled={!!filter.type}
-        >
-          <option value=''>- Select Option -</option>
-          <option value='urlfilter'>URL</option>
-          <option value='datafilter'>Data</option>
-          <option value='mapfilter'>Map Control</option>
-        </select>
-      </label>
+      <Select
+        label='Filter Type:'
+        value={filter.type || ''}
+        options={[
+          { value: '', label: '- Select Option -' },
+          { value: 'urlfilter', label: 'URL' },
+          { value: 'datafilter', label: 'Data' },
+          { value: 'configFilter', label: 'Config Control' }
+        ]}
+        updateField={(_section, _subSection, _key, value) => updateFilterProp('type', value)}
+        disabled={!!filter.type}
+      />
+
       {filter.type !== undefined && (
         <>
-          <label>
-            <span className='edit-label column-heading'>Filter Style: </span>
-            <select
-              value={filter.filterStyle || FILTER_STYLE.dropdown}
-              onChange={e => updateFilterProp('filterStyle', e.target.value)}
-            >
-              {filterStyles.map(dataKey => (
-                <option value={dataKey} key={`filter-style-select-item-${dataKey}`}>
-                  {dataKey}
-                </option>
-              ))}
-            </select>
-          </label>
+          <Select
+            label='Filter Style:'
+            value={filter.filterStyle || FILTER_STYLE.dropdown}
+            options={filterStyles.map(dataKey => ({
+              value: dataKey,
+              label: dataKey
+            }))}
+            updateField={(_section, _subSection, _key, value) => updateFilterProp('filterStyle', value)}
+          />
           {filter.filterStyle === FILTER_STYLE.dropdown && (
             <label>
               <span className='me-1'>Show Dropdown</span>
@@ -555,6 +551,65 @@ const FilterEditor: React.FC<FilterEditorProps> = ({ filter, filterIndex, config
                 value={filter.setByQueryParameter || ''}
                 updateField={(_section, _subSection, _key, value) => updateFilterProp('setByQueryParameter', value)}
               />
+            </>
+          )}
+
+          {filter.type === 'configFilter' && (
+            <>
+              {/* add select component for visualizationType */}
+              <Select
+                label='Visualization Type:'
+                value={filter.visualizationType || ''}
+                options={[
+                  { value: '', label: '- Select Option -' },
+                  { value: 'table', label: 'Table' },
+                  { value: 'chart', label: 'Chart' },
+                  { value: 'map', label: 'Map' },
+                  { value: 'dashboard', label: 'Dashboard' }
+                ]}
+                updateField={(_section, _subSection, _key, value) => updateFilterProp('visualizationType', value)}
+              />
+
+              {filter.visualizationType === 'map' && (
+                <Select
+                  label='Property To Update:'
+                  value={filter.propertyToUpdate || ''}
+                  // add properies for focused state and geoType
+                  options={[
+                    { value: '', label: '- Select Option -' },
+                    { value: 'focusedState', label: 'Focused State' },
+                    { value: 'geoType', label: 'Geo Type' }
+                  ]}
+                  updateField={(_section, _subSection, _key, value) => updateFilterProp('propertyToUpdate', value)}
+                />
+              )}
+              <label>
+                <span className='edit-label column-heading mt-1'>
+                  Used By: (optional)
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p>
+                        Select if you would like specific visualizations or rows to use this filter. Otherwise the
+                        filter will be added to all api requests.
+                      </p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                </span>
+                <MultiSelect
+                  options={usedByOptions.map(opt => ({
+                    value: opt,
+                    label: usedByNameLookup[opt]
+                  }))}
+                  fieldName='usedBy'
+                  selected={filter.usedBy}
+                  updateField={(_section, _subsection, _fieldname, newItems) => {
+                    updateFilterProp('usedBy', newItems)
+                  }}
+                />
+              </label>
             </>
           )}
         </>

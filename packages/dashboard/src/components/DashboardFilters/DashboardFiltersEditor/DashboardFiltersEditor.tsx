@@ -21,6 +21,8 @@ import DeleteFilterModal from './components/DeleteFilterModal'
 import { addValuesToDashboardFilters } from '../../../helpers/addValuesToDashboardFilters'
 import { FILTER_STYLE } from '../../../types/FilterStyles'
 import { handleSorting } from '@cdc/core/components/Filters'
+import { mapFilterValues } from '../../../helpers/getFilteredData'
+import { stateToIso } from '@cdc/map/src/data/supported-geos.js'
 
 type DashboardFitlersEditorProps = {
   vizConfig: DashboardFilters
@@ -99,9 +101,24 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
       // changing a api filter and want to load the api data into the preview.
       // automatically dispatches SET_SHARED_FILTERS
       loadAPIFilters(newSharedFilters, {})
-    } else if (prop === 'type' && value === 'mapfilter') {
-      newSharedFilters[index].values = ['State', 'County']
-      dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+    } else if (prop === 'propertyToUpdate' && value === 'geoType') {
+      if (
+        newSharedFilters[index].visualizationType === 'map' &&
+        newSharedFilters[index].propertyToUpdate === 'geoType'
+      ) {
+        newSharedFilters[index].values = mapFilterValues
+        dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+      }
+    } else if (prop === 'propertyToUpdate' && value === 'focusedState') {
+      if (
+        newSharedFilters[index].visualizationType === 'map' &&
+        newSharedFilters[index].propertyToUpdate === 'focusedState'
+      ) {
+        // get all state names
+        debugger
+        newSharedFilters[index].values = Object.keys(stateToIso)
+        dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+      }
     } else {
       handleSorting(newSharedFilters[index])
       dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
