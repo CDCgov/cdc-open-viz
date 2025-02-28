@@ -65,9 +65,9 @@ export const addValuesToDashboardFilters = (
         const active: string[] = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
         filterCopy.active = active.filter(val => defaultValues.includes(val))
       } else {
-        const defaultLabel = filters.find(filter => filter.resetLabel)
-        const defaultValue = defaultLabel ? defaultLabel.resetLabel : filterCopy.active || filterCopy.values[0]
-        filterCopy.active = defaultValue
+        const hasResetLabel = filters.find(filter => filter.resetLabel)
+        const defaultValue = hasResetLabel ? hasResetLabel.resetLabel : filterCopy.active || filterCopy.values[0]
+        filterCopy.active = filterCopy.defaultValue || defaultValue
       }
     }
     return handleSorting(filterCopy)

@@ -86,7 +86,7 @@ export const useFilters = props => {
     // Overwrite filterItem.values since thats what we map through in the editor panel
     filterItem.values = updatedValues
     filterItem.orderedValues = updatedValues
-    if (!filterItem.active) filterItem.active = updatedValues[0]
+    if (!filterItem.active) filterItem.active = filterItem.defaultValue ? filterItem.defaultValue : updatedValues[0]
     filterItem.order = 'cust'
 
     // Update the filters
@@ -227,6 +227,7 @@ export const useFilters = props => {
       if (!filter.values || filter.values.length === 0) {
         filter.values = getUniqueValues(data, filter.columnName)
       }
+
       newFilters[i].active = handleSorting(filter).values[0]
 
       if (filter.setByQueryParameter && queryParams[filter.setByQueryParameter] !== filter.active) {
@@ -547,7 +548,7 @@ const Filters = (props: FilterProps) => {
       {visualizationConfig.filterIntro && (
         <p className='filters-section__intro-text mb-3'>{visualizationConfig.filterIntro}</p>
       )}
-      <div className='d-flex flex-wrap w-100 mb-4 pb-2 filters-section__wrapper'>
+      <div className='d-flex flex-wrap w-100 mb-4 pb-2 filters-section__wrapper align-items-end'>
         {' '}
         <>
           <Style />

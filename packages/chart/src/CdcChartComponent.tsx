@@ -424,11 +424,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
    * When cove has a config and container ref publish the cove_loaded event.
    */
   useEffect(() => {
-    if (container && !_.isEmpty(config) && !coveLoadedEventRan) {
+    if (container && !isLoading && !_.isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_LOADED_EVENT', payload: true })
     }
-  }, [container, config]) // eslint-disable-line
+  }, [container, config, isLoading]) // eslint-disable-line
 
   /**
    * Handles filter change events outside of COVE
@@ -749,10 +749,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (!Array.isArray(data)) return []
     if (config.visualizationType === 'Forecasting') return data
     //  specify keys that needs  to be cleaned to render chart and skip rest
-    const includedKeys = config.series.map(s => s.dataKey)
+    const CIkeys: string[] = Object.values(config.confidenceKeys) as string[]
+    const seriesKeys: string[] = config.series.map(s => s.dataKey)
+    const keysToClean: string[] = seriesKeys.concat(CIkeys)
     // key that does not need to be cleaned
     const excludedKey = config.xAxis.dataKey
-    return config?.xAxis?.dataKey ? transform.cleanData(data, excludedKey, includedKeys) : data
+    return config?.xAxis?.dataKey ? transform.cleanData(data, excludedKey, keysToClean) : data
   }
 
   const getTableRuntimeData = () => {
