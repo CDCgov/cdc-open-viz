@@ -137,7 +137,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   return (
     <div className={`row${row.equalHeight ? ' equal-height' : ''}${row.toggle ? ' toggle' : ''}`} key={`row__${index}`}>
       {row.toggle && !inNoDataState && (
-        <Toggle row={row} visualizations={config.visualizations} active={show.indexOf(true)} setToggled={setToggled} />
+        <Toggle row={row} visualizations={config.visualizations} active={toggledRow} setToggled={setToggled} />
       )}
       {row.columns.map((col, colIndex) => {
         if (col.width) {
