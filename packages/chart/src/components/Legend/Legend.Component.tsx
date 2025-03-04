@@ -150,7 +150,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                           )}
                         </>
                         <LegendLabel align='left' className='m-0'>
-                          {label.text}
+                          {parse(label.text)}
                         </LegendLabel>
                       </LegendItem>
                     )
