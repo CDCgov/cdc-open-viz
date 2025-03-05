@@ -16,6 +16,7 @@ const Button = ({
   active = false,
   onClick,
   children,
+  secondary,
   ...attributes
 }) => {
   const buttonRef = useRef(null)
@@ -33,7 +34,8 @@ const Button = ({
       (flexCenter || 'loader' === role ? ' cove-button--flex-center' : '') +
       (fluid ? ' fluid' : '') +
       (loading ? ' loading' : '') +
-      (attributes.className ? ' ' + attributes.className : ''),
+      (attributes.className ? ' ' + attributes.className : '') +
+      (secondary ? ' secondary' : ''),
     onMouseOver: () => setButtonState('in'),
     onMouseOut: () => setButtonState('out'),
     onFocus: () => setButtonState('in'),
