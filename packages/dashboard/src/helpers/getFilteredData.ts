@@ -5,10 +5,14 @@ import { filterData } from './filterData'
 import { getFormattedData } from './getFormattedData'
 import { getVizKeys } from './getVizKeys'
 
+export const mapFilterValues = ['State', 'County']
+
 export const getApplicableFilters = (dashboard: Dashboard, key: string | number): false | SharedFilter[] => {
   const c = dashboard.sharedFilters?.filter(
     sharedFilter =>
-      (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(`${key}`) !== -1) || sharedFilter.usedBy?.indexOf(key) !== -1
+      sharedFilter.type !== 'configFilter' &&
+      ((sharedFilter.usedBy && sharedFilter.usedBy.indexOf(`${key}`) !== -1) ||
+        sharedFilter.usedBy?.indexOf(key) !== -1)
   )
   return c?.length > 0 ? c : false
 }

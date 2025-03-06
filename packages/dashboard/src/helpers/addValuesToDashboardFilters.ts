@@ -2,6 +2,8 @@ import _ from 'lodash'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { SharedFilter } from '../types/SharedFilter'
 import { handleSorting } from '@cdc/core/components/Filters'
+import { mapFilterValues } from './getFilteredData'
+import { stateToIso } from '@cdc/map/src/data/supported-geos.js'
 
 // Gets filter values from dataset
 const generateValuesForFilter = (columnName: string, data: Record<string, any[]>) => {
@@ -39,7 +41,20 @@ export const addValuesToDashboardFilters = (
     if (filter.type === 'urlfilter') return filter
     const filterCopy = _.cloneDeep(filter)
     const filterValues = generateValuesForFilter(getSelector(filter), data)
+
     filterCopy.values = filterValues
+
+    if (filter.type === 'configFilter' && filter.visualizationType === 'map' && filter.propertyToUpdate === 'geoType') {
+      filterCopy.values = mapFilterValues
+    }
+
+    if (
+      filter.type === 'configFilter' &&
+      filter.visualizationType === 'map' &&
+      filter.propertyToUpdate === 'focusedState'
+    ) {
+      filterCopy.values = Object.keys(stateToIso)
+    }
 
     if (filterValues.length > 0) {
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)

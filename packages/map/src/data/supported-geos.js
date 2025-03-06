@@ -181,6 +181,13 @@ export const stateFipsToTwoDigit = {
   78: 'VI'
 }
 
+export const getFipsCode = stateName => {
+  const entry = Object.entries(supportedStatesFipsCodes).find(
+    ([, name]) => name.toLowerCase() === stateName.toLowerCase()
+  )
+  return entry ? entry[0] : null // Return FIPS code if found, otherwise null
+}
+
 export const supportedStatesFipsCodes = {
   '01': 'Alabama',
   '02': 'Alaska',
