@@ -344,7 +344,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
-      const svgMarginWidth = 15
       const editorWidth = 350
 
       width = isEditor ? width - editorWidth : width
@@ -357,7 +356,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         width = width - 2.5
       }
 
-      width = width - svgMarginWidth
+      width = width
       dispatch({ type: 'SET_DIMENSIONS', payload: [width, height] })
     }
   })

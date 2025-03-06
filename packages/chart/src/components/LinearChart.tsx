@@ -329,6 +329,15 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   }
 
   // EFFECTS
+  // Adjust padding on the right side of the chart to accommodate for overflow
+  useEffect(() => {
+    if (!parentRef.current) return
+    const lastTickRect = xAxisLabelRefs.current?.[xAxisLabelRefs.current.length - 1]?.getBoundingClientRect()
+    const lastBottomTickEnd = lastTickRect ? lastTickRect.x + lastTickRect.width : 0
+    const paddingToAdd = lastBottomTickEnd > parentWidth ? lastBottomTickEnd - parentWidth : 0
+    const BUFFER = 5
+    parentRef.current.style.paddingRight = `${paddingToAdd + BUFFER}px`
+  }, [parentWidth, parentHeight])
 
   // Make sure the chart is visible if in the editor
   /* eslint-disable react-hooks/exhaustive-deps */
@@ -1399,14 +1408,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 const axisMaxHeight = bottomLabelStart + BOTTOM_LABEL_PADDING
 
                 const containsMultipleWords = inputString => /\s/.test(inputString)
-                const ismultiLabel = filteredTicks.some(tick => containsMultipleWords(tick.value))
+                const isMultiLabel = filteredTicks.some(tick => containsMultipleWords(tick.value))
 
                 // Calculate sumOfTickWidth here, before map function
                 const tickWidthMax = Math.max(
                   ...filteredTicks.map(tick => getTextWidth(tick.formattedValue, GET_TEXT_WIDTH_FONT))
                 )
                 // const marginTop = 20 // moved to top bc need for yMax calcs
-                const accumulator = ismultiLabel ? 180 : 100
+                const accumulator = isMultiLabel ? 180 : 100
 
                 const textWidths = filteredTicks.map(tick => getTextWidth(tick.formattedValue, GET_TEXT_WIDTH_FONT))
                 const sumOfTickWidth = textWidths.reduce((a, b) => a + b, accumulator)
