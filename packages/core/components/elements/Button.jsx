@@ -91,7 +91,7 @@ const Button = ({
       {...attributesObj}
       onClick={e => {
         e.preventDefault()
-        return loading || onClick()
+        return loading || onClick(e)
       }}
       disabled={loading || attributesObj.disabled}
       ref={buttonRef}

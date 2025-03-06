@@ -51,7 +51,7 @@ export const filterOrderOptions: { label: string; value: OrderBy }[] = [
 export const useFilters = props => {
   const [showApplyButton, setShowApplyButton] = useState(false)
 
-  // Desconstructing: notice, adding more descriptive visualizationConfig name over config
+  // Deconstructing: notice, adding more descriptive visualizationConfig name over config
   // visualizationConfig feels more robust for all vis types so that its not confused with config/state/etc.
   const {
     config: visualizationConfig,
@@ -252,7 +252,7 @@ export const useFilters = props => {
   }
 
   const filterConstants = {
-    buttonText: 'Apply Filters',
+    buttonText: 'Apply',
     resetText: 'Clear Filters'
   }
 
@@ -287,6 +287,16 @@ const Filters = (props: FilterProps) => {
   const [mobileFilterStyle, setMobileFilterStyle] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState<EventTarget>(null)
   const [wrappingFilters, setWrappingFilters] = useState({})
+  const [initialActiveFilters, setInitialActiveFilters] = useState([])
+
+  useEffect(() => {
+    if (!filteredData) return
+
+    setInitialActiveFilters(filters.map(filter => filter.active))
+  }, [])
+
+  const activeFilters = filters.map(filter => filter.active)
+  const initialFiltersActive = initialActiveFilters.every((filter, i) => activeFilters.includes(filter))
   const id = useId()
 
   const wrappingFilterRefs = useRef({})
@@ -564,7 +574,7 @@ const Filters = (props: FilterProps) => {
               >
                 {filterConstants.buttonText}
               </Button>
-              <Button secondary disabled={!showApplyButton} onClick={handleReset}>
+              <Button secondary disabled={initialFiltersActive} onClick={handleReset}>
                 {filterConstants.resetText}
               </Button>
             </div>
