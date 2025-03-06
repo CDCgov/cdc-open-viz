@@ -542,9 +542,9 @@ const UsaMap = () => {
             x={x}
             y={y}
             fontSize={14}
-            strokeWidth='2'
-            paintOrder='stroke'
-            stroke={strokeColor}
+            strokeWidth='0'
+            // paintOrder='stroke' // PENDING DEV-9278: Adds a stroke around the text potentially for 508 compliance
+            // stroke={strokeColor}
             style={{ fill: textColor }}
             textAnchor='middle'
           >
@@ -568,9 +568,9 @@ const UsaMap = () => {
         />
         <text
           x={4}
-          strokeWidth='2'
-          paintOrder='stroke'
-          stroke={strokeColor}
+          strokeWidth='0'
+          // paintOrder='stroke' // PENDING DEV-9278: Adds a stroke around the text potentially for 508 compliance
+          // stroke={strokeColor}
           fontSize={13}
           style={{ fill: textColor }}
           alignmentBaseline='middle'
@@ -597,7 +597,7 @@ const UsaMap = () => {
         {annotations.length > 0 && <Annotation.Draggable onDragStateChange={handleDragStateChange} />}
       </svg>
 
-      <TerritoriesSection territories={territories} logo={logo} config={state} />
+      <TerritoriesSection territories={territories} logo={logo} config={state} territoriesData={territoriesData} />
     </ErrorBoundary>
   )
 }

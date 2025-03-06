@@ -5,9 +5,18 @@ import ScreenReaderText from '@cdc/core/components/elements/ScreenReaderText'
 import { SortIcon } from './SortIcon'
 import { getNewSortBy } from '../helpers/getNewSortBy'
 
-type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; hasRowType?; viewport }
+type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; hasRowType?; viewport; rightAlignedCols }
 
-const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType, viewport }: ChartHeaderProps) => {
+const ChartHeader = ({
+  data,
+  isVertical,
+  config,
+  setSortBy,
+  sortBy,
+  hasRowType,
+  viewport,
+  rightAlignedCols
+}: ChartHeaderProps) => {
   const groupBy = config.table?.groupBy
   if (!data) return
   let dataSeriesColumns = getDataSeriesColumns(config, isVertical, data)
@@ -69,10 +78,15 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType, 
           const text = getSeriesName(column, config)
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
+          const isSortedCol = column === sortBy.column && !hasRowType
 
           return (
             <th
-              style={{ minWidth: (config.table.cellMinWidth || 0) + 'px' }}
+              style={{
+                minWidth: (config.table.cellMinWidth || 0) + 'px',
+                textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
+                paddingRight: isSortedCol ? '1.3em' : ''
+              }}
               key={`col-header-${column}__${index}`}
               tabIndex={0}
               role='columnheader'
@@ -94,7 +108,7 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType, 
                 : null)}
             >
               <ColumnHeadingText text={text} column={column} config={config} />
-              {column === sortBy.column && !hasRowType && <SortIcon ascending={sortByAsc} />}
+              {isSortedCol && <SortIcon ascending={sortByAsc} />}
               <ScreenReaderSortByText sortBy={sortBy} config={config} text={text} />
             </th>
           )
@@ -110,9 +124,14 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType, 
           let text = row !== '__series__' ? getChartCellValue(row, column, config, data) : '__series__'
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.colIndex === index ? sortBy.asc : undefined
+          const isSortedCol = index === sortBy.colIndex && !hasRowType
           return (
             <th
-              style={{ minWidth: (config.table.cellMinWidth || 0) + 'px' }}
+              style={{
+                minWidth: (config.table.cellMinWidth || 0) + 'px',
+                textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
+                paddingRight: isSortedCol ? '1.3em' : ''
+              }}
               key={`col-header-${text}__${index}`}
               tabIndex={0}
               role='columnheader'
@@ -132,7 +151,7 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType, 
                 : null)}
             >
               <ColumnHeadingText text={text} column={column} config={config} />
-              {index === sortBy.colIndex && !hasRowType && <SortIcon ascending={sortByAsc} />}
+              {isSortedCol && <SortIcon ascending={sortByAsc} />}
 
               <ScreenReaderSortByText text={text} config={config} sortBy={sortBy} />
             </th>

@@ -19,7 +19,7 @@ import Loading from '@cdc/core/components/Loading'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import getViewport from '@cdc/core/helpers/getViewport'
 
-import CdcChart from '@cdc/chart/src/CdcChart'
+import CdcChart from '@cdc/chart/src/CdcChartComponent'
 import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
 import CdcMap from '@cdc/map/src/CdcMap'
 import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
@@ -521,6 +521,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     const { config } = state
     const { title, description } = config.dashboard || {}
 
+    const filteredRows = config.rows && config.rows.filter(row => row.columns.filter(col => col.widget).length !== 0)
+
     body = (
       <>
         {isEditor && <Header />}
@@ -544,62 +546,62 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             {/* Description */}
             {description && <div className='subtext mb-3'>{parse(description)}</div>}
             {/* Visualizations */}
-            {config.rows &&
-              config.rows
-                .filter(row => row.columns.filter(col => col.widget).length !== 0)
-                .map((row, index) => {
-                  if (row.multiVizColumn && (isPreview || !isEditor)) {
-                    const filteredData = getFilteredData(state, _.cloneDeep(state.data))
-                    const data = filteredData[index] ?? row.formattedData
-                    const dataGroups = {}
-                    data.forEach(d => {
-                      const groupKey = d[row.multiVizColumn]
-                      if (!dataGroups[groupKey]) dataGroups[groupKey] = []
-                      dataGroups[groupKey].push(d)
-                    })
-                    return (
-                      <>
-                        {/* Expand/Collapse All */}
-                        {!inNoDataState && row.expandCollapseAllButtons === true && (
-                          <ExpandCollapseButtons setAllExpanded={setAllExpanded} />
-                        )}
-                        {Object.keys(dataGroups).map(groupName => {
-                          const dataValue = dataGroups[groupName]
-                          return (
-                            <VisualizationRow
-                              key={`row__${index}__${groupName}`}
-                              allExpanded={allExpanded}
-                              filteredDataOverride={dataValue}
-                              groupName={groupName}
-                              row={row}
-                              rowIndex={index}
-                              setSharedFilter={setSharedFilter}
-                              updateChildConfig={updateChildConfig}
-                              apiFilterDropdowns={apiFilterDropdowns}
-                              currentViewport={currentViewport}
-                              inNoDataState={inNoDataState}
-                            />
-                          )
-                        })}
-                      </>
-                    )
-                  } else {
-                    return (
-                      <VisualizationRow
-                        key={`row__${index}`}
-                        allExpanded={false}
-                        groupName={''}
-                        row={row}
-                        rowIndex={index}
-                        setSharedFilter={setSharedFilter}
-                        updateChildConfig={updateChildConfig}
-                        apiFilterDropdowns={apiFilterDropdowns}
-                        currentViewport={currentViewport}
-                        inNoDataState={inNoDataState}
-                      />
-                    )
-                  }
-                })}
+            {filteredRows &&
+              filteredRows.map((row, index) => {
+                if (row.multiVizColumn && (isPreview || !isEditor)) {
+                  const filteredData = getFilteredData(state, _.cloneDeep(state.data))
+                  const data = filteredData[index] ?? row.formattedData
+                  const dataGroups = {}
+                  data.forEach(d => {
+                    const groupKey = d[row.multiVizColumn]
+                    if (!dataGroups[groupKey]) dataGroups[groupKey] = []
+                    dataGroups[groupKey].push(d)
+                  })
+                  return (
+                    <>
+                      {/* Expand/Collapse All */}
+                      {!inNoDataState && row.expandCollapseAllButtons === true && (
+                        <ExpandCollapseButtons setAllExpanded={setAllExpanded} />
+                      )}
+                      {Object.keys(dataGroups).map(groupName => {
+                        const dataValue = dataGroups[groupName]
+                        return (
+                          <VisualizationRow
+                            key={`row__${index}__${groupName}`}
+                            allExpanded={allExpanded}
+                            filteredDataOverride={dataValue}
+                            groupName={groupName}
+                            row={row}
+                            rowIndex={index}
+                            setSharedFilter={setSharedFilter}
+                            updateChildConfig={updateChildConfig}
+                            apiFilterDropdowns={apiFilterDropdowns}
+                            currentViewport={currentViewport}
+                            inNoDataState={inNoDataState}
+                            isLastRow={index === filteredRows.length - 1}
+                          />
+                        )
+                      })}
+                    </>
+                  )
+                } else {
+                  return (
+                    <VisualizationRow
+                      key={`row__${index}`}
+                      allExpanded={false}
+                      groupName={''}
+                      row={row}
+                      rowIndex={index}
+                      setSharedFilter={setSharedFilter}
+                      updateChildConfig={updateChildConfig}
+                      apiFilterDropdowns={apiFilterDropdowns}
+                      currentViewport={currentViewport}
+                      inNoDataState={inNoDataState}
+                      isLastRow={index === filteredRows.length - 1}
+                    />
+                  )
+                }
+              })}
 
             {inNoDataState ? <div className='mt-5'>Please complete your selection to continue.</div> : <></>}
 

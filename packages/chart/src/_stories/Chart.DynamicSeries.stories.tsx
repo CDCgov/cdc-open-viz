@@ -1,7 +1,7 @@
 import DynamicSeriesConfig from './_mock/dynamic_series_config.json'
 import DynamicSeriesBarConfig from './_mock/dynamic_series_bar_config.json'
 import { Meta, StoryObj } from '@storybook/react'
-import Chart from '../CdcChart'
+import Chart from '../CdcChartComponent'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Dynamic Series',
@@ -10,7 +10,22 @@ const meta: Meta<typeof Chart> = {
 
 type Story = StoryObj<typeof Chart>
 
-export const Line: Story = {
+// data with a line break
+const data = DynamicSeriesConfig.data.map((d, i) => (i === 4 ? { ...d, Data_Value: null } : d))
+export const LineShowPoints: Story = {
+  args: {
+    config: {
+      ...DynamicSeriesConfig,
+      data,
+      originalFormattedData: data,
+      formattedData: data,
+      lineDatapointStyle: 'always show'
+    },
+    isEditor: false
+  }
+}
+
+export const LineHoverPoints: Story = {
   args: {
     config: DynamicSeriesConfig,
     isEditor: false

@@ -9,7 +9,6 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
   const allPalettes: Record<string, string[]> = { ...colorPalettes, ...twoColorPalette }
   let palette = config.customColors || allPalettes[configPalette]
   let numberOfKeys = config.runtime.seriesKeys.length
-  let newColorScale
 
   while (numberOfKeys > palette.length) {
     palette = palette.concat(palette)
@@ -17,12 +16,9 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
 
   palette = palette.slice(0, numberOfKeys)
 
-  newColorScale = () =>
-    scaleOrdinal({
-      domain: config.runtime.seriesLabelsAll,
-      range: palette,
-      unknown: null
-    })
-
-  return newColorScale
+  return scaleOrdinal({
+    domain: config.runtime.seriesLabelsAll,
+    range: palette,
+    unknown: null
+  })
 }

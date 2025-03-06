@@ -1282,11 +1282,11 @@ const CdcMap = ({
   }, []) // eslint-disable-line
 
   useEffect(() => {
-    if (state && !coveLoadedHasRan && container) {
+    if (state && !runtimeData.init && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: state })
       setCoveLoadedHasRan(true)
     }
-  }, [state, container]) // eslint-disable-line
+  }, [state, container, runtimeData.init]) // eslint-disable-line
 
   useEffect(() => {
     // When geotype changes - add UID
@@ -1596,9 +1596,7 @@ const CdcMap = ({
                   data={runtimeData}
                   options={general}
                   columns={state.columns}
-                  navigationHandler={val =>
-                    navigationHandler(state.general.navigationBehavior, val, customNavigationHandler)
-                  }
+                  navigationHandler={val => navigationHandler('_blank', val, customNavigationHandler)}
                 />
               )}
 

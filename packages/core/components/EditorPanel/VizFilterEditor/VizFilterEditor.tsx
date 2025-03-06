@@ -91,7 +91,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
     // Overwrite filterItem.values since thats what we map through in the editor panel
     filterItem.values = updatedValues
     filterItem.orderedValues = updatedValues
-    filterItem.active = updatedValues[0]
+    filterItem.active = filterItem.defaultValue ? filterItem.defaultValue : updatedValues[0]
 
     filterItem.order = 'cust'
 

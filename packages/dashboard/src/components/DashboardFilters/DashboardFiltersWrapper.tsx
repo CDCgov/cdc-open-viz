@@ -14,6 +14,7 @@ import { hasDashboardApplyBehavior } from '../../helpers/hasDashboardApplyBehavi
 import * as apiFilterHelpers from '../../helpers/apiFilterHelpers'
 import { applyQueuedActive } from '@cdc/core/components/Filters/helpers/applyQueuedActive'
 import './dashboardfilter.styles.css'
+import { updateChildFilters } from '../../helpers/updateChildFilters'
 
 type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
 
@@ -64,17 +65,15 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         const queryParams = getQueryParams()
         let needsQueryUpdate = false
         dashboardConfig.sharedFilters.forEach(sharedFilter => {
-          if (sharedFilter.queuedActive) {
-            applyQueuedActive(sharedFilter)
-            if (
-              sharedFilter.setByQueryParameter &&
-              queryParams[sharedFilter.setByQueryParameter] !== sharedFilter.active
-            ) {
-              queryParams[sharedFilter.setByQueryParameter] = Array.isArray(sharedFilter.active)
-                ? sharedFilter.active.join(',')
-                : sharedFilter.active
-              needsQueryUpdate = true
-            }
+          if (sharedFilter.queuedActive) applyQueuedActive(sharedFilter)
+          if (
+            sharedFilter.setByQueryParameter &&
+            queryParams[sharedFilter.setByQueryParameter] !== sharedFilter.active
+          ) {
+            queryParams[sharedFilter.setByQueryParameter] = Array.isArray(sharedFilter.active)
+              ? sharedFilter.active.join(',')
+              : sharedFilter.active
+            needsQueryUpdate = true
           }
         })
 
@@ -183,7 +182,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
           >
             <Filters
               show={visualizationConfig?.sharedFilterIndexes?.map(Number)}
-              filters={dashboardConfig.dashboard.sharedFilters || []}
+              filters={updateChildFilters(dashboardConfig.dashboard.sharedFilters, state.data) || []}
               apiFilterDropdowns={apiFilterDropdowns}
               handleOnChange={handleOnChange}
               showSubmit={visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad}

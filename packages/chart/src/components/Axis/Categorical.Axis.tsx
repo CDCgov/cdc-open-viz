@@ -96,7 +96,7 @@ const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
               const isLastIndex = config.yAxis.categories.length - 1 === barStack.index
               const textSize = appFontSize / 1.3
               const textColor = chroma(bar.color).luminance() < 0.4 ? '#fff' : '#000'
-              const textWidth = getTextWidth(bar.key)
+              const textWidth = getTextWidth(bar.key, `${textSize}px`)
               const displayText = Number(textWidth) < bar.width && bar.height > textSize
               const tooltip = `<ul>
               <li class="tooltip-heading""> Label : ${bar.key}  </li>

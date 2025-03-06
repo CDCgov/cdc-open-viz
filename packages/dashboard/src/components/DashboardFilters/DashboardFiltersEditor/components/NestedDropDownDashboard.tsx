@@ -22,13 +22,16 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
   const datasets = Object.keys(config.datasets)
   const columnNameOptionsInDataset = []
   datasets.map(datasetKey => {
-    const columnNamesInDataset = Object.keys(config.datasets[datasetKey].data[0])
-    columnNamesInDataset.forEach(columnName =>
-      columnNameOptionsInDataset.push({
-        datasetKey,
-        columnName
-      })
-    )
+    const data = config.datasets[datasetKey].data
+    if (data) {
+      const columnNamesInDataset = Object.keys(data[0])
+      columnNamesInDataset.forEach(columnName =>
+        columnNameOptionsInDataset.push({
+          datasetKey,
+          columnName
+        })
+      )
+    }
   })
 
   const subGroupingColumnNameOptions = []
