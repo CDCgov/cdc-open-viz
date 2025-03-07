@@ -41,7 +41,7 @@ import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
-import _ from 'lodash'
+import _, { clamp } from 'lodash'
 
 type LinearChartProps = {
   parentWidth: number
@@ -119,6 +119,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
   const lastMaxValue = useRef(maxValue)
+  const gridLineRefs = useRef([])
 
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
@@ -331,12 +332,16 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   // EFFECTS
   // Adjust padding on the right side of the chart to accommodate for overflow
   useEffect(() => {
-    if (!parentRef.current) return
+    if (!parentRef.current || !parentWidth || !gridLineRefs.current.length) return
     const lastTickRect = xAxisLabelRefs.current?.[xAxisLabelRefs.current.length - 1]?.getBoundingClientRect()
     const lastBottomTickEnd = lastTickRect ? lastTickRect.x + lastTickRect.width : 0
-    const paddingToAdd = lastBottomTickEnd > parentWidth ? lastBottomTickEnd - parentWidth : 0
-    const BUFFER = 5
-    parentRef.current.style.paddingRight = `${paddingToAdd + BUFFER}px`
+    const paddingToAdd = clamp(lastBottomTickEnd - parentWidth, 0, 15)
+    parentRef.current.style.paddingRight = `${paddingToAdd}px`
+    // subtract padding from grid line's x1 value
+    gridLineRefs.current.forEach(gridLine => {
+      if (!gridLine) return
+      gridLine.setAttribute('x1', xMax - paddingToAdd)
+    })
   }, [parentWidth, parentHeight])
 
   // Make sure the chart is visible if in the editor
@@ -647,6 +652,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                           {runtime.yAxis.gridLines && !hideFirstGridLine ? (
                             <Line
+                              innerRef={el => (gridLineRefs.current[i] = el)}
                               key={`${tick.value}--hide-hideGridLines`}
                               display={(isLogarithmicAxis && showTicks).toString()}
                               from={{ x: tick.from.x + xMax, y: tick.from.y }}

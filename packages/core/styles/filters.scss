@@ -76,7 +76,7 @@ div.single-filters {
   .tab.tab--simple {
     background: none;
     border: none;
-    border-bottom: 0.3rem solid var(--colors-blue-vivid-60, transparent);
+    border-bottom: 0.3rem solid transparent;
     font-family: var(--app-font-secondary);
     font-size: 1rem;
     font-weight: 300;
@@ -108,7 +108,7 @@ div.single-filters {
 .cdc-open-viz-module {
   @include breakpointClass(xs) {
     .single-filters--tab-simple .tab-simple-container .tab.tab--simple {
-      font-size: 0.73em;
+      font-size: 0.778em;
       padding: 0.5rem 0.73em;
     }
   }
