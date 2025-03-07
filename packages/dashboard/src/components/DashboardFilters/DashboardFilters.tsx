@@ -8,6 +8,7 @@ import NestedDropdown from '@cdc/core/components/NestedDropdown'
 import { MouseEventHandler } from 'react'
 import Loader from '@cdc/core/components/Loader'
 import _ from 'lodash'
+import { DROPDOWN_STYLES } from '@cdc/core/components/Filters/Filters'
 
 type DashboardFilterProps = {
   show: number[]
@@ -160,7 +161,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
               <>
                 <select
                   id={`filter-${filterIndex}`}
-                  className='cove-form-select'
+                  className={`cove-form-select ${DROPDOWN_STYLES}`}
                   data-index='0'
                   value={loading ? 'Loading...' : filter.queuedActive || filter.active}
                   onChange={val => {

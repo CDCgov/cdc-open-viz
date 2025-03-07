@@ -2,7 +2,8 @@
   &__wrapper {
     flex-wrap: wrap;
     display: flex;
-    gap: 18px 27px;
+    gap: 1rem 1.5rem;
+    margin-bottom: 2rem;
     label {
       display: inherit;
       margin-bottom: 5px;
@@ -19,9 +20,6 @@
   &__buttons {
     width: 100%;
     font-size: var(--filter-buttons-font-size);
-    .apply {
-      margin-right: 10px;
-    }
   }
 }
 
