@@ -55,7 +55,11 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
       if (!vizLookup) return false
       const viz = config.visualizations[vizKey] as Visualization
       if (viz.type === 'dashboardFilters') return false
-      const vizName = viz.general?.title || viz.title || vizKey
+      let vizName = viz.general?.title || viz.title || vizKey
+      if (viz.visualizationType === 'markup-include') {
+        vizName = viz.contentEditor.title || vizKey
+      }
+
       nameLookup[vizKey] = vizName
       const usesSharedFilter = viz.usesSharedFilter
       const rowIndex = vizLookup.row
@@ -74,6 +78,14 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
     const rowsNotSelected = rowOptions.filter(row => !filter.usedBy || filter.usedBy.indexOf(row.toString()) === -1)
     return [nameLookup, [...vizOptions, ...rowsNotSelected]]
   }, [config.visualizations, filter.usedBy, filter.setBy, vizRowColumnLocator])
+
+  const getUsedByOptions = (viz, vizKey) => {
+    let vizName = viz.general?.title || viz.title || vizKey
+    if (viz.visualizationType === 'markup-include') {
+      vizName = viz.contentEditor.title || vizKey
+    }
+    return vizName
+  }
 
   const useParameters = useMemo(() => {
     if (filter.subGrouping) return !!(filter.setByQueryParameter && filter.subGrouping?.setByQueryParameter)
@@ -204,7 +216,6 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
       </>
     )
   }
-
   return (
     <>
       <label>
@@ -557,7 +568,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                       const viz = config.visualizations[vizKey] as Visualization
                       return (
                         <option value={vizKey} key={`set-by-select-item-${vizKey}`}>
-                          {viz.general?.title || viz.title || vizKey}
+                          {getUsedByOptions(viz, vizKey)}
                         </option>
                       )
                     })}

@@ -49,6 +49,9 @@ type DeprecatedVisualizationType = {
     | 'table'
     | 'navigation'
   usesSharedFilter?: any
+  contentEditor: {
+    title: string
+  }
   visualizationSubType: string
   visualizationType: string
   xAxis: Axis
