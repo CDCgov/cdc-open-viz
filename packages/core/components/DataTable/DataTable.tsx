@@ -212,7 +212,12 @@ const DataTable = (props: DataTableProps) => {
   const getClassNames = (): string => {
     const classes = ['data-table-container']
 
-    if (config.general?.showDownloadButton && !config.table.showDownloadLinkBelow) {
+    const hasDownloadLinkAbove =
+      (config.table.download || config.general?.showDownloadButton) && !config.table.showDownloadLinkBelow
+
+    const isStandaloneTable = config.type === 'table'
+
+    if (!hasDownloadLinkAbove && !isStandaloneTable) {
       classes.push('mt-4')
     }
 
@@ -237,15 +242,19 @@ const DataTable = (props: DataTableProps) => {
       }
     }
 
-    const getMediaControlsClasses = belowTable => {
+    const getMediaControlsClasses = (belowTable, hasDownloadLink) => {
       const classes = ['download-links']
       if (!belowTable) {
-        classes.push('mt-4', 'mb-2')
+        if (hasDownloadLink) {
+          classes.push('mt-4', 'mb-2')
+        }
         const isLegendOnBottom = config?.legend?.position === 'bottom' || isLegendWrapViewport(viewport)
         if (config.brush?.active && !isLegendOnBottom) classes.push('brush-active')
         if (config.brush?.active && config.legend.hide) classes.push('brush-active')
       } else {
-        classes.push('mt-2')
+        if (hasDownloadLink) {
+          classes.push('mt-2')
+        }
       }
       return classes
     }
@@ -267,10 +276,11 @@ const DataTable = (props: DataTableProps) => {
       : {}
 
     const TableMediaControls = ({ belowTable }) => {
+      const hasDownloadLink = config.table.download || config.general?.showDownloadButton
       return (
-        <MediaControls.Section classes={getMediaControlsClasses(belowTable)}>
+        <MediaControls.Section classes={getMediaControlsClasses(belowTable, hasDownloadLink)}>
           <MediaControls.Link config={config} dashboardDataConfig={dataConfig} />
-          {(config.table.download || config.general?.showDownloadButton) && (
+          {hasDownloadLink && (
             <DownloadButton
               rawData={getDownloadData()}
               fileName={`${vizTitle || 'data-table'}.csv`}
@@ -283,7 +293,7 @@ const DataTable = (props: DataTableProps) => {
 
     return (
       <ErrorBoundary component='DataTable'>
-        {config.general?.showDownloadButton && !config.table.showDownloadLinkBelow && <TableMediaControls />}
+        {!config.table.showDownloadLinkBelow && <TableMediaControls />}
         <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           {config.table.collapsible !== false && (
@@ -357,9 +367,7 @@ const DataTable = (props: DataTableProps) => {
               )}
           </div>
         </section>
-        {config.general?.showDownloadButton && config.table.showDownloadLinkBelow && (
-          <TableMediaControls belowTable={true} />
-        )}
+        {config.table.showDownloadLinkBelow && <TableMediaControls belowTable={true} />}
         <div id={skipId} className='cdcdataviz-sr-only'>
           Skipped data table.
         </div>

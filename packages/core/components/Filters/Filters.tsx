@@ -26,6 +26,8 @@ export const VIZ_FILTER_STYLE = {
   multiSelect: 'multi-select'
 } as const
 
+export const DROPDOWN_STYLES = 'py-2 ps-2 w-100 d-block'
+
 export type VizFilterStyle = (typeof VIZ_FILTER_STYLE)[keyof typeof VIZ_FILTER_STYLE]
 
 export const filterStyleOptions = Object.values(VIZ_FILTER_STYLE)
@@ -49,7 +51,7 @@ export const filterOrderOptions: { label: string; value: OrderBy }[] = [
 export const useFilters = props => {
   const [showApplyButton, setShowApplyButton] = useState(false)
 
-  // Desconstructing: notice, adding more descriptive visualizationConfig name over config
+  // Deconstructing: notice, adding more descriptive visualizationConfig name over config
   // visualizationConfig feels more robust for all vis types so that its not confused with config/state/etc.
   const {
     config: visualizationConfig,
@@ -86,7 +88,7 @@ export const useFilters = props => {
     // Overwrite filterItem.values since thats what we map through in the editor panel
     filterItem.values = updatedValues
     filterItem.orderedValues = updatedValues
-    if (!filterItem.active) filterItem.active = updatedValues[0]
+    if (!filterItem.active) filterItem.active = filterItem.defaultValue ? filterItem.defaultValue : updatedValues[0]
     filterItem.order = 'cust'
 
     // Update the filters
@@ -227,6 +229,7 @@ export const useFilters = props => {
       if (!filter.values || filter.values.length === 0) {
         filter.values = getUniqueValues(data, filter.columnName)
       }
+
       newFilters[i].active = handleSorting(filter).values[0]
 
       if (filter.setByQueryParameter && queryParams[filter.setByQueryParameter] !== filter.active) {
@@ -249,8 +252,8 @@ export const useFilters = props => {
   }
 
   const filterConstants = {
-    buttonText: 'Apply Filters',
-    resetText: 'Reset All'
+    buttonText: 'Apply',
+    resetText: 'Clear Filters'
   }
 
   // prettier-ignore
@@ -284,6 +287,16 @@ const Filters = (props: FilterProps) => {
   const [mobileFilterStyle, setMobileFilterStyle] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState<EventTarget>(null)
   const [wrappingFilters, setWrappingFilters] = useState({})
+  const [initialActiveFilters, setInitialActiveFilters] = useState([])
+
+  useEffect(() => {
+    if (!filteredData) return
+
+    setInitialActiveFilters(filters.map(filter => filter.active))
+  }, [])
+
+  const activeFilters = filters.map(filter => filter.active)
+  const initialFiltersActive = initialActiveFilters.every((filter, i) => activeFilters.includes(filter))
   const id = useId()
 
   const wrappingFilterRefs = useRef({})
@@ -377,7 +390,7 @@ const Filters = (props: FilterProps) => {
         id={`filter-${outerIndex}`}
         name={label}
         aria-label={`Filter by ${label}`}
-        className='cove-form-select'
+        className={`cove-form-select ${DROPDOWN_STYLES}`}
         data-index='0'
         value={active}
         onChange={e => {
@@ -546,7 +559,7 @@ const Filters = (props: FilterProps) => {
       {visualizationConfig.filterIntro && (
         <p className='filters-section__intro-text mb-3'>{visualizationConfig.filterIntro}</p>
       )}
-      <div className='d-flex flex-wrap w-100 mb-4 pb-2 filters-section__wrapper'>
+      <div className='d-flex flex-wrap w-100 filters-section__wrapper align-items-end'>
         {' '}
         <>
           <Style />
@@ -557,13 +570,13 @@ const Filters = (props: FilterProps) => {
                   handleApplyButton(filters)
                 }}
                 disabled={!showApplyButton}
-                className={[general?.headerColor ? general.headerColor : theme, 'apply'].join(' ')}
+                className={[general?.headerColor ? general.headerColor : theme, 'apply', 'me-2'].join(' ')}
               >
                 {filterConstants.buttonText}
               </Button>
-              <a href='#!' role='button' onClick={handleReset}>
+              <Button secondary disabled={initialFiltersActive} onClick={handleReset}>
                 {filterConstants.resetText}
-              </a>
+              </Button>
             </div>
           ) : (
             <></>

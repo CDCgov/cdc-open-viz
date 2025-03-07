@@ -1,6 +1,23 @@
 @import '../utils/variables';
 @import '../themes/index';
 
+:root {
+  --cove-button-primary: var(--colors-blue-vivid-60);
+  --cove-button-primary-font-color: #fff;
+  --cove-button-primary-hover: #0b4778;
+  --cove-button-primary-disabled: var(--cool-gray-10);
+  --cove-button-primary-disabled-font-color: var(--cool-gray-90);
+
+  --cove-button-secondary: #fff;
+  --cove-button-secondary-font-color: var(--colors-blue-vivid-60);
+  --cove-button-secondary-border-color: var(--colors-blue-vivid-60);
+  --cove-button-secondary-hover: #0b4778;
+  --cove-button-secondary-hover-font-color: #fff;
+  --cove-button-secondary-disabled: #f5f6f7;
+  --cove-button-secondary-disabled-font-color: var(--cool-gray-90);
+  --cove-button-secondary-disabled-border-color: var(--cool-gray-10);
+}
+
 .sbdocs .cove-button {
   margin-right: 1rem;
   margin-bottom: 1rem;
@@ -11,7 +28,7 @@
   }
 }
 
-.cove-button {
+.cdc-open-viz-module button.cove-button {
   display: inline-block;
   position: relative;
   min-height: 2.125rem;
@@ -19,12 +36,30 @@
   text-align: center;
   text-decoration: none;
   vertical-align: middle;
-  color: #fff;
-  background-color: $primary;
-  border-radius: 0.1875rem;
+  color: var(--cove-button-primary-font-color);
+  background-color: var(--cove-button-primary);
+  border-radius: 6px;
   border: 0;
   outline: none;
-  transition: all 500ms $transition-expo-out;
+  transition: background-color 500ms $transition-expo-out, color 500ms $transition-expo-out,
+    border-color 500ms $transition-expo-out;
+
+  &.secondary {
+    background-color: var(--cove-button-secondary);
+    color: var(--cove-button-secondary-font-color);
+    border: 1px solid var(--cove-button-secondary-border-color);
+
+    &:hover {
+      background-color: var(--cove-button-secondary-hover);
+      color: var(--cove-button-secondary-hover-font-color);
+    }
+
+    &:disabled {
+      background-color: var(--cove-button-secondary-disabled);
+      color: var(--cove-button-secondary-disabled-font-color);
+      border: 1px solid var(--cove-button-secondary-disabled-border-color);
+    }
+  }
 
   * {
     pointer-events: none;
@@ -32,7 +67,8 @@
   }
 
   &:disabled {
-    background-color: #959595 !important;
+    background-color: var(--cove-button-primary-disabled);
+    color: var(--cove-button-primary-disabled-font-color);
     cursor: not-allowed;
   }
 
@@ -40,11 +76,12 @@
     cursor: pointer;
   }
 
-  &:hover,
-  &:active,
-  &:focus,
-  &.active {
-    background-color: lighten($primary, 5%);
+  &:hover:not(:disabled) {
+    background-color: var(--cove-button-primary-hover);
+  }
+  &:focus {
+    outline: 2px dashed var(--colors-blue-vivid-60) !important;
+    outline-offset: 5px;
   }
 
   &:not(.loading) {
@@ -54,7 +91,6 @@
         content: '';
         position: absolute;
         inset: 0;
-        outline: 2px solid rgba(161, 161, 161, 0.6);
         border-radius: 0.3125em;
         margin: -2px;
         pointer-events: none;

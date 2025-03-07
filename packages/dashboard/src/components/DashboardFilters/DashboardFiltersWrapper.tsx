@@ -65,17 +65,15 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         const queryParams = getQueryParams()
         let needsQueryUpdate = false
         dashboardConfig.sharedFilters.forEach(sharedFilter => {
-          if (sharedFilter.queuedActive) {
-            applyQueuedActive(sharedFilter)
-            if (
-              sharedFilter.setByQueryParameter &&
-              queryParams[sharedFilter.setByQueryParameter] !== sharedFilter.active
-            ) {
-              queryParams[sharedFilter.setByQueryParameter] = Array.isArray(sharedFilter.active)
-                ? sharedFilter.active.join(',')
-                : sharedFilter.active
-              needsQueryUpdate = true
-            }
+          if (sharedFilter.queuedActive) applyQueuedActive(sharedFilter)
+          if (
+            sharedFilter.setByQueryParameter &&
+            queryParams[sharedFilter.setByQueryParameter] !== sharedFilter.active
+          ) {
+            queryParams[sharedFilter.setByQueryParameter] = Array.isArray(sharedFilter.active)
+              ? sharedFilter.active.join(',')
+              : sharedFilter.active
+            needsQueryUpdate = true
           }
         })
 
