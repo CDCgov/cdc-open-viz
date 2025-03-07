@@ -42,6 +42,7 @@ import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
 import _, { clamp } from 'lodash'
+import { EDITOR_WIDTH } from '../CdcChartComponent'
 
 type LinearChartProps = {
   parentWidth: number
@@ -333,16 +334,20 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   // Adjust padding on the right side of the chart to accommodate for overflow
   useEffect(() => {
     if (!parentRef.current || !parentWidth || !gridLineRefs.current.length) return
+    const editorIsOpen = !!document.querySelector('.editor-panel:not(.hidden)')
     const lastTickRect = xAxisLabelRefs.current?.[xAxisLabelRefs.current.length - 1]?.getBoundingClientRect()
     const lastBottomTickEnd = lastTickRect ? lastTickRect.x + lastTickRect.width : 0
-    const paddingToAdd = clamp(lastBottomTickEnd - parentWidth, 0, 15)
+    const editorWidth = editorIsOpen ? EDITOR_WIDTH : 0
+    const calculatedOverhang = lastBottomTickEnd - editorWidth - parentWidth
+    const paddingToAdd = clamp(calculatedOverhang, 0, 20)
+
     parentRef.current.style.paddingRight = `${paddingToAdd}px`
     // subtract padding from grid line's x1 value
     gridLineRefs.current.forEach(gridLine => {
       if (!gridLine) return
       gridLine.setAttribute('x1', xMax - paddingToAdd)
     })
-  }, [parentWidth, parentHeight])
+  }, [parentWidth, parentHeight, data])
 
   // Make sure the chart is visible if in the editor
   /* eslint-disable react-hooks/exhaustive-deps */

@@ -74,6 +74,8 @@ import { getColorScale } from './helpers/getColorScale'
 import './scss/main.scss'
 import { getInitialState, reducer } from './store/chart.reducer'
 
+export const EDITOR_WIDTH = 350
+
 interface CdcChartProps {
   config?: ChartConfig
   isEditor?: boolean
@@ -344,9 +346,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
-      const editorWidth = 350
 
-      width = isEditor ? width - editorWidth : width
+      width = isEditor ? width - EDITOR_WIDTH : width
 
       const newViewport = getViewport(width)
 
