@@ -69,12 +69,7 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug
       setIsLoading(true)
       try {
         const loadedConfig = await loadConfig(configUrl)
-        const data = await loadDataFromConfig(loadedConfig)
-
-        setConfig({
-          ...loadedConfig,
-          data
-        })
+        setConfig(loadedConfig)
       } catch (error) {
         console.error('Failed to load configuration or data', error)
       } finally {
@@ -121,22 +116,6 @@ const fetchAndParseData = async (url: string, ext: string) => {
     }
   } catch (error) {
     console.error(`Error parsing URL: ${url}`, error)
-    return []
-  }
-}
-
-const loadDataFromConfig = async (response: any) => {
-  if (!response.dataUrl || _.some(_.get(response, 'filters', []), { type: 'url' })) {
-    return response.data || []
-  }
-
-  const ext = getFileExtension(response.dataUrl)
-  const urlWithCacheBuster = `${response.dataUrl}`
-
-  try {
-    return await fetchAndParseData(urlWithCacheBuster, ext)
-  } catch {
-    console.error(`Cannot parse URL: ${response.dataUrl}`)
     return []
   }
 }
