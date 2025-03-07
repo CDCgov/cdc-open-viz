@@ -148,9 +148,6 @@ $theme: (
         background-color: string.unquote(nth($theme-colors, 1));
         color: #fff;
       }
-      .filters-section button.cove-button:not([disabled]) {
-        background-color: string.unquote(nth($theme-colors, 1)) !important;
-      }
     }
 
     .theme-#{$theme-name} {
@@ -173,7 +170,7 @@ $theme: (
         outline: 2px solid string.unquote(nth($theme-colors, 1));
       }
       .apply:not([disabled]) {
-        background-color: string.unquote(nth($theme-colors, 1)) !important;
+        background-color: string.unquote(nth($theme-colors, 1));
       }
     }
   }
