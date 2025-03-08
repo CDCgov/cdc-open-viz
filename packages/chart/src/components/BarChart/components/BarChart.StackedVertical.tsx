@@ -69,7 +69,7 @@ const BarChartStackedVertical = () => {
                 const xAxisTooltip = config.runtime.xAxis.label
                   ? `${config.runtime.xAxis.label}: ${xAxisValue}`
                   : xAxisValue
-                const additionalColTooltip = getAdditionalColumn(hoveredBar)
+                const additionalColTooltip = getAdditionalColumn(bar.key, hoveredBar)
                 const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
                 const tooltip = `<ul>
                   <li class="tooltip-heading"">${xAxisTooltip}</li>
