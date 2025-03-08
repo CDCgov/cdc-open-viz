@@ -19,6 +19,51 @@ const reducer = (state: EditorState, action: EditorActions): EditorState => {
     case 'EDITOR_SET_CONFIG': {
       return { ...state, config: action.payload }
     }
+    case 'SET_DASHBOARD_DATASET': {
+      const { dataset, datasetKey, oldDatasetKey } = action.payload
+      const oldDataset = oldDatasetKey ? state.config?.datasets[oldDatasetKey] : {}
+      const config = _.cloneDeep(state.config)
+      if (oldDatasetKey) {
+        const changeDatasets = _config => {
+          _config.rows?.forEach(row => {
+            if (row.dataKey === oldDatasetKey) {
+              row.dataKey = datasetKey
+            }
+          })
+          Object.values(_config.visualizations || {}).forEach(viz => {
+            if (viz.dataKey === oldDatasetKey) {
+              viz.dataKey = datasetKey
+            }
+          })
+        }
+        applyMultiDashboards(config, changeDatasets)
+        delete config.datasets[oldDatasetKey]
+      }
+      Object.values(config.datasets).forEach(dataset => {
+        dataset.preview = false
+      })
+      config.datasets[datasetKey] = { ...oldDataset, ...dataset }
+      return { ...state, config }
+    }
+    case 'DELETE_DASHBOARD_DATASET': {
+      const { datasetKey } = action.payload
+      const deleteDatasetKeys = _config => {
+        _config.rows?.forEach(row => {
+          if (row.dataKey === datasetKey) {
+            delete row.dataKey
+          }
+        })
+        Object.values(_config.visualizations || {}).forEach(viz => {
+          if (viz.dataKey === datasetKey) {
+            delete viz.dataKey
+          }
+        })
+      }
+      const config = _.cloneDeep(state.config)
+      applyMultiDashboards(config, deleteDatasetKeys)
+      delete config.datasets[datasetKey]
+      return { ...state, config }
+    }
     case 'EDITOR_TEMP_SAVE': {
       return { ...state, tempConfig: action.payload }
     }
@@ -34,6 +79,15 @@ const reducer = (state: EditorState, action: EditorActions): EditorState => {
     default:
       return state
   }
+}
+
+const applyMultiDashboards = (config: Record<string, any>, mutationFunc: Function) => {
+  if (config.multiDashboards) {
+    config.multiDashboards.forEach(dashboard => {
+      mutationFunc(dashboard)
+    })
+  }
+  mutationFunc(config)
 }
 
 export default devToolsWrapper<EditorState, EditorActions>(reducer)

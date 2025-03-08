@@ -17,7 +17,6 @@
 }
 
 .editor-panel {
-
   .two-col-inputs {
     display: flex;
     margin-top: 1em;
@@ -261,9 +260,6 @@
   textarea {
     min-width: 100%;
     max-width: 100%; // Doing this prevents width of textarea from being changed
-  }
-  textarea {
-    min-height: 140px;
   }
   .header .color-palette li {
     width: 21px;

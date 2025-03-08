@@ -15,8 +15,8 @@ export class DataTransform {
   }
 
   //Performs standardizations that can be completed automatically without use input
-  autoStandardize(data) {
-    const errorsFound: any[] = []
+  autoStandardize(data): Object[] | undefined {
+    const errorsFound: string[] = []
 
     // Empty data
     if (!data || 0 === data.length) {
