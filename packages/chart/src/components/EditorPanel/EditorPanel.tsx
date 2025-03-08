@@ -2698,7 +2698,7 @@ const EditorPanel = () => {
                         </>
                       )}
 
-                      {isDateScale(config.xAxis) && (
+                      {(isDateScale(config.xAxis) || config?.visualizationType === 'Bump Chart') && (
                         <>
                           <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
                             Format how charts should parse and display your dates using{' '}
