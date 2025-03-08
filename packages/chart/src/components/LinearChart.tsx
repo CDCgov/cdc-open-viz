@@ -41,7 +41,8 @@ import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
-import _ from 'lodash'
+import _, { clamp } from 'lodash'
+import { EDITOR_WIDTH } from '../CdcChartComponent'
 
 type LinearChartProps = {
   parentWidth: number
@@ -119,6 +120,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
   const lastMaxValue = useRef(maxValue)
+  const gridLineRefs = useRef([])
 
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
@@ -329,6 +331,23 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   }
 
   // EFFECTS
+  // Adjust padding on the right side of the chart to accommodate for overflow
+  useEffect(() => {
+    if (!parentRef.current || !parentWidth || !gridLineRefs.current.length) return
+    const editorIsOpen = !!document.querySelector('.editor-panel:not(.hidden)')
+    const lastTickRect = xAxisLabelRefs.current?.[xAxisLabelRefs.current.length - 1]?.getBoundingClientRect()
+    const lastBottomTickEnd = lastTickRect ? lastTickRect.x + lastTickRect.width : 0
+    const editorWidth = editorIsOpen ? EDITOR_WIDTH : 0
+    const calculatedOverhang = lastBottomTickEnd - editorWidth - parentWidth
+    const paddingToAdd = clamp(calculatedOverhang, 0, 20)
+
+    parentRef.current.style.paddingRight = `${paddingToAdd}px`
+    // subtract padding from grid line's x1 value
+    gridLineRefs.current.forEach(gridLine => {
+      if (!gridLine) return
+      gridLine.setAttribute('x1', xMax - paddingToAdd)
+    })
+  }, [parentWidth, parentHeight, data])
 
   // Make sure the chart is visible if in the editor
   /* eslint-disable react-hooks/exhaustive-deps */
@@ -638,6 +657,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                           {runtime.yAxis.gridLines && !hideFirstGridLine ? (
                             <Line
+                              innerRef={el => (gridLineRefs.current[i] = el)}
                               key={`${tick.value}--hide-hideGridLines`}
                               display={(isLogarithmicAxis && showTicks).toString()}
                               from={{ x: tick.from.x + xMax, y: tick.from.y }}
@@ -1399,14 +1419,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 const axisMaxHeight = bottomLabelStart + BOTTOM_LABEL_PADDING
 
                 const containsMultipleWords = inputString => /\s/.test(inputString)
-                const ismultiLabel = filteredTicks.some(tick => containsMultipleWords(tick.value))
+                const isMultiLabel = filteredTicks.some(tick => containsMultipleWords(tick.value))
 
                 // Calculate sumOfTickWidth here, before map function
                 const longestTickLength = Math.max(
                   ...filteredTicks.map(tick => getTextWidth(tick.formattedValue, GET_TEXT_WIDTH_FONT))
                 )
                 // const marginTop = 20 // moved to top bc need for yMax calcs
-                const accumulator = ismultiLabel ? 180 : 100
+                const accumulator = isMultiLabel ? 180 : 100
 
                 const textWidths = filteredTicks.map(tick => getTextWidth(tick.formattedValue, GET_TEXT_WIDTH_FONT))
                 const sumOfTickWidth = textWidths.reduce((a, b) => a + b, accumulator)

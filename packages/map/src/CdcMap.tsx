@@ -1511,6 +1511,7 @@ const CdcMap = ({
         config={state}
         isEditor={isEditor}
         ref={outerContainerRef}
+        currentViewport={currentViewport}
         imageId={imageId}
         showEditorPanel={state.showEditorPanel}
       >
