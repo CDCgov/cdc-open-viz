@@ -51,15 +51,13 @@ $red: #f74242;
   margin-top: 2em;
 }
 
-
-
 .row-menu__flyout {
   background-color: var(--blue);
   $blue: #005eaa;
   background-color: #c2c2c2;
   border-radius: 0.2em 0.2em 0 0;
   outline: none;
-  
+
   padding: 0.2em 0.3em;
   fill: #fff;
   list-style: none;
@@ -94,7 +92,7 @@ $red: #f74242;
     li {
       display: flex;
     }
-  
+
     li + li {
       margin-left: 0.3em;
     }
@@ -208,12 +206,6 @@ $red: #f74242;
     }
   }
 
-  .btn-configure {
-    background: none;
-    width: 3em;
-    margin-left: 0.5em;
-  }
-
   .drag-icon,
   .drag-icon svg {
     fill: var(--lightGray);
@@ -282,27 +274,6 @@ $red: #f74242;
   }
 }
 
-.widget-menu {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  display: flex;
-}
-
-.widget-menu-item {
-  display: block;
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  user-select: none;
-  margin-left: 0.7em;
-  margin-top: 5px;
-
-  svg {
-    fill: var(--mediumGray);
-  }
-}
-
 .btn--fluid {
   @extend .btn;
   width: 100%;
@@ -332,7 +303,7 @@ $red: #f74242;
       background-color: var(--blue);
     }
   }
-  
+
   padding: 2em 1em 1em;
   border: 1px solid #c2c2c2;
   transition: border 300ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -363,7 +334,6 @@ $red: #f74242;
 
   &:hover {
     .row-menu .row-menu__btn {
-
       &.row-menu__btn--edit {
         background-color: transparent;
       }
