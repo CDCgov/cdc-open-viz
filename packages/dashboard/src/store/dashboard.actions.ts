@@ -32,6 +32,7 @@ type SWITCH_CONFIG = Action<'SWITCH_CONFIG', number>
 type TOGGLE_ROW = Action<'TOGGLE_ROW', { rowIndex: number; colIndex: number }>
 type UPDATE_VISUALIZATION = Action<'UPDATE_VISUALIZATION', { vizKey: string; configureData: Partial<AnyVisualization> }>
 type UPDATE_ROW = Action<'UPDATE_ROW', { rowIndex: number; rowData: Partial<ConfigRow> }>
+type UPDATE_TOGGLE_NAME = Action<'UPDATE_TOGGLE_NAME', { rowIndex: number; columnIndex: number; toggleName: string }>
 
 type DashboardActions =
   | ADD_FOOTNOTE
@@ -57,4 +58,5 @@ type DashboardActions =
   | TOGGLE_ROW
   | UPDATE_VISUALIZATION
   | UPDATE_ROW
+  | UPDATE_TOGGLE_NAME
 export default DashboardActions

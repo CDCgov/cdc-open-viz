@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react'
 import type { AnyVisualization } from '@cdc/core/types/Visualization'
-import Widget from '../Widget'
+import Widget from '../Widget/Widget'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import { Table } from '@cdc/core/types/Table'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
