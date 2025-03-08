@@ -1,7 +1,8 @@
 import { displayDataAsText } from '../../../core/helpers/displayDataAsText'
+import { displayGeoName } from '../helpers/displayGeoName'
 
 const useTooltip = props => {
-  const { state, displayGeoName, supportedStatesFipsCodes } = props
+  const { state, supportedStatesFipsCodes } = props
 
   const config = state
 
