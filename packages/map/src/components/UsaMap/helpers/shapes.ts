@@ -1,7 +1,10 @@
 export const drawCircle = (circle, context, state) => {
   const percentOfOriginalSize = 0.75
+  const scaleVal = 3
   const adjustedGeoRadius =
-    state.mapPosition.zoom > 1 ? Number(circle.geoRadius) * percentOfOriginalSize : circle.geoRadius
+    state.mapPosition.zoom > 1
+      ? Number(circle.geoRadius * scaleVal) * percentOfOriginalSize
+      : circle.geoRadius * scaleVal
   context.lineWidth = 1
   context.fillStyle = circle.color
   context.beginPath()
@@ -11,7 +14,8 @@ export const drawCircle = (circle, context, state) => {
 }
 export const drawSquare = (square, context, state) => {
   const percentOfOriginalSize = 0.75
-  const sideLength = square.size
+  const scaleVal = 5
+  const sideLength = square.size * scaleVal
 
   const adjustedSize = state.mapPosition.zoom > 1 ? sideLength * percentOfOriginalSize : sideLength
 
@@ -30,7 +34,8 @@ export const drawSquare = (square, context, state) => {
 
 export const drawDiamond = (diamond, context, state) => {
   const percentOfOriginalSize = 0.75
-  const fullSize = diamond.size
+  const scaleVal = 7
+  const fullSize = diamond.size * scaleVal
 
   const adjustedSize = state.mapPosition.zoom > 1 ? fullSize * percentOfOriginalSize : fullSize
 
@@ -66,7 +71,8 @@ export const drawDiamond = (diamond, context, state) => {
 }
 export const drawTriangle = (triangle, context, state) => {
   const percentOfOriginalSize = 0.75
-  const baseLength = triangle.size
+  const scaleVal = 6
+  const baseLength = triangle.size * scaleVal
 
   // Adjust the size
   const adjustedSize = state.mapPosition.zoom > 1 ? baseLength * percentOfOriginalSize : baseLength
@@ -98,9 +104,10 @@ export const drawTriangle = (triangle, context, state) => {
 }
 export const drawStar = (star, context, state) => {
   const percentOfOriginalSize = 0.75
+  const scaleVal = 5.5
   const spikes = star.spikes
-  const outerRadius = star.outerRadius
-  const innerRadius = star.innerRadius
+  const outerRadius = star.outerRadius * scaleVal
+  const innerRadius = star.innerRadius * scaleVal
 
   const adjustedOuterRadius = state.mapPosition.zoom > 1 ? outerRadius * percentOfOriginalSize : outerRadius
   const adjustedInnerRadius = state.mapPosition.zoom > 1 ? innerRadius * percentOfOriginalSize : innerRadius
@@ -135,22 +142,32 @@ export const drawStar = (star, context, state) => {
   context.stroke()
 }
 
-export const drawPin = (pin, ctx) => {
+export const drawPin = (pin, ctx, state) => {
+  const scaleVal = 25
+  const percentOfOriginalSize = 0.75
+  const baseSize = pin.size * scaleVal
+  const size = state.mapPosition.zoom > 1 ? baseSize * percentOfOriginalSize : baseSize
+
   ctx.save()
   ctx.translate(pin.x, pin.y)
+  ctx.scale(size / baseSize, size / baseSize)
+
   ctx.beginPath()
   ctx.moveTo(0, 0)
-  ctx.bezierCurveTo(2, -10, -20, -25, 0, -30)
-  ctx.bezierCurveTo(20, -25, -2, -10, 0, 0)
+  ctx.bezierCurveTo((2 * size) / 100, (-10 * size) / 100, (-20 * size) / 100, (-25 * size) / 100, 0, (-30 * size) / 100)
+  ctx.bezierCurveTo((20 * size) / 100, (-25 * size) / 100, (-2 * size) / 100, (-10 * size) / 100, 0, 0)
   ctx.fillStyle = pin.color
   ctx.fill()
   ctx.strokeStyle = 'black'
   ctx.lineWidth = 1
   ctx.stroke()
+
+  // Draw the circle on top of the pin
   ctx.beginPath()
-  ctx.arc(0, -21, 3, 0, Math.PI * 2)
+  ctx.arc(0, (-21 * size) / 100, (3 * size) / 100, 0, Math.PI * 2)
   ctx.closePath()
   ctx.fill()
+
   ctx.restore()
 }
 

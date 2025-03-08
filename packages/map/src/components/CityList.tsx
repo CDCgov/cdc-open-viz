@@ -90,7 +90,7 @@ const CityList = ({
         onClick={() => geoClickHandler(cityDisplayName, geoData)}
         data-tooltip-id={`tooltip__${tooltipId}`}
         data-tooltip-html={toolTip}
-        transform={`scale(${radius / 9})`}
+        transform={`scale(${radius / 7.5})`}
         stroke={geoStrokeColor}
         strokeWidth={'2px'}
         tabIndex='-1'
