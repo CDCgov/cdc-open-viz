@@ -6,7 +6,7 @@ import Widget from './Widget/Widget'
 
 type ColumnProps = {
   // column data passed from parent
-  data: any
+  data: Object[]
   // row index
   rowIdx: number
   // column index
