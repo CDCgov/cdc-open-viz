@@ -1402,7 +1402,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 const ismultiLabel = filteredTicks.some(tick => containsMultipleWords(tick.value))
 
                 // Calculate sumOfTickWidth here, before map function
-                const tickWidthMax = Math.max(
+                const longestTickLength = Math.max(
                   ...filteredTicks.map(tick => getTextWidth(tick.formattedValue, GET_TEXT_WIDTH_FONT))
                 )
                 // const marginTop = 20 // moved to top bc need for yMax calcs
@@ -1411,8 +1411,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 const textWidths = filteredTicks.map(tick => getTextWidth(tick.formattedValue, GET_TEXT_WIDTH_FONT))
                 const sumOfTickWidth = textWidths.reduce((a, b) => a + b, accumulator)
                 const spaceBetweenEachTick = (xMax - sumOfTickWidth) / (filteredTicks.length - 1)
+                const bufferBetweenTicks = 40
+                const maxLengthOfTick = width / filteredTicks.length - X_TICK_LABEL_PADDING * 2 - bufferBetweenTicks
 
-                // Check if ticks are overlapping
                 // Determine the position of each tick
                 let positions = [0] // The first tick is at position 0
                 for (let i = 1; i < textWidths.length; i++) {
@@ -1424,35 +1425,22 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 const axisBBox = axisBottomRef?.current?.getBBox().height
                 config.xAxis.axisBBox = axisBBox
 
-                // Check if ticks are overlapping
-                let areTicksTouching = false
-                textWidths.forEach((_, i) => {
-                  if (positions[i] + textWidths[i] > positions[i + 1]) {
-                    areTicksTouching = true
-                    return
-                  }
-                })
-
-                // Force wrap when showing years once so it's easier to read
-                if (config.xAxis.showYearsOnce) {
-                  areTicksTouching = true
-                }
-
                 // force wrap it last tick is close to the end of the axis
                 const lastTickWidth = textWidths[textWidths.length - 1]
                 const lastTickPosition = positions[positions.length - 1] + lastTickWidth
                 const lastTickEnd = lastTickPosition + lastTickWidth / 2
                 const lastTickEndThreshold = xMax - lastTickWidth
 
-                if (lastTickEnd > lastTickEndThreshold) {
-                  areTicksTouching = true
-                }
+                const areTicksTouching =
+                  textWidths.some(textWidth => textWidth > maxLengthOfTick) || // Force wrap if any tick is too long
+                  config.xAxis.showYearsOnce || // Force wrap when showing years once so it's easier to read
+                  lastTickEnd > lastTickEndThreshold // Force wrap it last tick is close to the end of the axis
 
                 const dynamicMarginTop =
-                  areTicksTouching && config.isResponsiveTicks ? tickWidthMax + DEFAULT_TICK_LENGTH + 20 : 0
+                  areTicksTouching && config.isResponsiveTicks ? longestTickLength + DEFAULT_TICK_LENGTH + 20 : 0
 
                 config.dynamicMarginTop = dynamicMarginTop
-                config.xAxis.tickWidthMax = tickWidthMax
+                config.xAxis.tickWidthMax = longestTickLength
 
                 return (
                   <Group className='bottom-axis' width={dimensions[0]}>
