@@ -2909,27 +2909,26 @@ const EditorPanel = () => {
                             </>
                           )}
 
-                          {config.xAxis.type === 'date' ||
-                            (config.xAxis.type === 'date-time' && (
-                              <>
-                                <TextField
-                                  type='date'
-                                  section='exclusions'
-                                  fieldName='dateStart'
-                                  label='Start Date'
-                                  updateField={updateField}
-                                  value={config.exclusions.dateStart || ''}
-                                />
-                                <TextField
-                                  type='date'
-                                  section='exclusions'
-                                  fieldName='dateEnd'
-                                  label='End Date'
-                                  updateField={updateField}
-                                  value={config.exclusions.dateEnd || ''}
-                                />
-                              </>
-                            ))}
+                          {(config.xAxis.type === 'date' || config.xAxis.type === 'date-time') && (
+                            <>
+                              <TextField
+                                type='date'
+                                section='exclusions'
+                                fieldName='dateStart'
+                                label='Start Date'
+                                updateField={updateField}
+                                value={config.exclusions.dateStart || ''}
+                              />
+                              <TextField
+                                type='date'
+                                section='exclusions'
+                                fieldName='dateEnd'
+                                label='End Date'
+                                updateField={updateField}
+                                value={config.exclusions.dateEnd || ''}
+                              />
+                            </>
+                          )}
                         </>
                       )}
 
