@@ -27,7 +27,7 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
         fileName: format => `${componentName.toLowerCase()}.js`
       },
       rollupOptions: {
-        external: ['react', 'react-dom', 'react-dom/server'],
+        external: ['react', 'react-dom'],
         output: {
           chunkFileNames: `${componentName.toLowerCase()}-[hash].[format].js`,
           globals: {
