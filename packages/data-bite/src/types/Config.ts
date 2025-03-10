@@ -34,6 +34,7 @@ export type Config = {
     background: boolean
     hideBackgroundColor: boolean
     borderColorTheme: boolean
+    hideTitle: boolean
   }
   general: {
     isCompactStyle: boolean
