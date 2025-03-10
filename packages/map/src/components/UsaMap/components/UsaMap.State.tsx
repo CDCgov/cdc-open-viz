@@ -3,12 +3,11 @@ import React, { useState, useEffect, memo, useContext } from 'react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 // United States Topojson resources
-import topoJSON from '../data/us-topo.json'
 import hexTopoJSON from '../data/us-hex-topo.json'
 import { supportedTerritories } from '../../../data/supported-geos'
 
 import { geoCentroid, geoPath } from 'd3-geo'
-import { feature } from 'topojson-client'
+import { feature as topoFeature } from 'topojson-client'
 import { AlbersUsa, Mercator } from '@visx/geo'
 import CityList from '../../CityList'
 import BubbleList from '../../BubbleList'
@@ -29,8 +28,7 @@ import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { titleCase } from '../../../helpers/titleCase'
 import TerritoriesSection from './TerritoriesSection'
 
-const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
-const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
+const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
   'US-VT': [50, -8],
@@ -95,8 +93,17 @@ const UsaMap = () => {
 
   // "Choose State" options
   const [extent, setExtent] = useState(null)
-  const [focusedStates, setFocusedStates] = useState(unitedStates)
+  const [focusedStates, setFocusedStates] = useState(null)
   const [translate, setTranslate] = useState([455, 200])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      import(/* webpackChunkName: "us-topo" */ '../data/us-topo.json').then(topoJSON => {
+        setFocusedStates(topoFeature(topoJSON, topoJSON.objects.states).features)
+      })
+    }
+    fetchData()
+  }, [])
 
   // When returning from another map we want to reset the state
   useEffect(() => {
@@ -209,6 +216,10 @@ const UsaMap = () => {
 
   // Note: Layers are different than patterns
   const { pathArray } = useMapLayers(state, '', pathGenerator, tooltipId)
+
+  if (!focusedStates) {
+    return <></>
+  }
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
