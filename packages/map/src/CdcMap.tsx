@@ -864,7 +864,8 @@ const CdcMap = ({
         newFilter.values = values
         newFilter.setByQueryParameter = setByQueryParameter
         handleSorting(newFilter)
-        newFilter.active = active ?? values[0] // Default to first found value
+        newFilter.active = active || obj.filters[idx].defaultValue || values[0] // Default to first found value
+        newFilter.defaultValue = obj.filters[idx].defaultValue || ''
         newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
         newFilter.showDropdown = showDropdown
         newFilter.subGrouping = obj.filters[idx].subGrouping
