@@ -179,8 +179,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (newConfig.visualizationType === 'Bump Chart') {
       newConfig.xAxis.type === 'date-time'
     }
-
-    return { ...coveUpdateWorker(newConfig) }
+    if (!isDashboard) coveUpdateWorker(newConfig)
+    return newConfig
   }
 
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
@@ -749,9 +749,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (!Array.isArray(data)) return []
     if (config.visualizationType === 'Forecasting') return data
     //  specify keys that needs  to be cleaned to render chart and skip rest
-    const CIkeys: string[] = Object.values(config.confidenceKeys) as string[]
-    const seriesKeys: string[] = config.series.map(s => s.dataKey)
-    const keysToClean: string[] = seriesKeys.concat(CIkeys)
+    const CIkeys: string[] = Object.values(_.get(config, 'confidenceKeys', {})) as string[]
+    const seriesKeys: string[] = _.get(config, 'series', []).map((s: any) => s.dataKey)
+    const keysToClean: string[] = [...(seriesKeys ?? []), ...(CIkeys ?? [])]
+
     // key that does not need to be cleaned
     const excludedKey = config.xAxis.dataKey
     return config?.xAxis?.dataKey ? transform.cleanData(data, excludedKey, keysToClean) : data
@@ -913,11 +914,23 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           </ParentSize>
                         </div>
                       ) : (
-                        <div ref={parentRef} style={{ width: `100%` }}>
+                        <div ref={parentRef} style={{ width: '100%' }}>
                           <ParentSize>
-                            {parent => (
-                              <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
-                            )}
+                            {parent => {
+                              const labelMargin = 120
+                              const widthReduction =
+                                config.showLineSeriesLabels &&
+                                (config.legend.position !== 'right' || config.legend.hide)
+                                  ? labelMargin
+                                  : 0
+                              return (
+                                <LinearChart
+                                  ref={svgRef}
+                                  parentWidth={parent.width - widthReduction}
+                                  parentHeight={parent.height}
+                                />
+                              )
+                            }}
                           </ParentSize>
                         </div>
                       ))}

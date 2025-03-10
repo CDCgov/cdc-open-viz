@@ -30,7 +30,7 @@ const Header = (props: HeaderProps) => {
     type SampleData = Record<string, { sample: boolean }> & Object[]
     if (Object.values(data).some((d: SampleData) => d?.sample)) {
       const sampleDataRemoved = Object.keys(data).reduce((acc, key) => {
-        if ((data[key] as SampleData).sample) {
+        if ((data[key] as SampleData)?.sample) {
           acc[key] = []
         } else {
           acc[key] = data[key]
@@ -49,14 +49,10 @@ const Header = (props: HeaderProps) => {
     dispatch({ type: 'UPDATE_CONFIG', payload: [newConfig] })
   }
 
-  const convertStateToConfig = (type = 'JSON') => {
-    let strippedState = JSON.parse(JSON.stringify(config))
+  const convertStateToConfig = () => {
+    const strippedState = _.cloneDeep(config)
     delete strippedState.newViz
     delete strippedState.runtime
-
-    if (type === 'JSON') {
-      return JSON.stringify(strippedState)
-    }
 
     return strippedState
   }
@@ -65,14 +61,13 @@ const Header = (props: HeaderProps) => {
     const parsedData = convertStateToConfig()
 
     // Emit the data in a regular JS event so it can be consumed by anything.
-    const event = new CustomEvent('updateVizConfig', { detail: parsedData })
+    const event = new CustomEvent('updateVizConfig', { detail: JSON.stringify(parsedData) })
 
     window.dispatchEvent(event)
 
     // Pass up to Editor if needed
     if (setParentConfig) {
-      const newConfig = convertStateToConfig('object')
-      setParentConfig(newConfig)
+      setParentConfig(parsedData)
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

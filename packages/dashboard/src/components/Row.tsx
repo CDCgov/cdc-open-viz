@@ -18,6 +18,7 @@ import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import { iconHash } from '../helpers/iconHash'
 import _ from 'lodash'
 import { Visualization } from '@cdc/core/types/Visualization'
+import { labelHash } from '@cdc/core/helpers/labelHash'
 
 type RowMenuProps = {
   rowIdx: number
@@ -54,6 +55,12 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
       // a 3 column becoming a 2 column with only a VizConfig in the second column will maintain order
       // a 2 column becoming a 1 column with only a VizConfig in the second column will move the VizConfig to the first column
       const mapRow = rowColumns.length > layout.length ? columnsWithWidgets : rowColumns
+
+      // Adds placeholder column name that defaults to the visualization type.
+      newRows[rowIdx].columns.forEach((col, idx) => {
+        col.toggleName = col.toggleName || labelHash[config.visualizations[col.widget]?.type] || undefined
+      })
+
       newRows[rowIdx].columns = layout.map((width, colIndex) => {
         const col = mapRow[colIndex]
         return col ? { ...col, width } : { width }
@@ -245,7 +252,13 @@ const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
           {row.columns
             .filter(column => column.width)
             .map((column, colIdx) => (
-              <Column data={column} key={`row-${uuid}-col-${colIdx}`} rowIdx={rowIdx} colIdx={colIdx} />
+              <Column
+                data={column}
+                key={`row-${uuid}-col-${colIdx}`}
+                rowIdx={rowIdx}
+                colIdx={colIdx}
+                toggleRow={row.toggle}
+              />
             ))}
         </div>
         <button className='btn btn-primary footnotes' onClick={configureFootnotes}>

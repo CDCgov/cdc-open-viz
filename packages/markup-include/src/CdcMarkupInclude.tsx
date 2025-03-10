@@ -75,7 +75,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
   }
 
-  const loadConfig = useCallback(async () => {
+  const loadConfig = async () => {
     let response = configObj || (await (await fetch(configUrl)).json())
     let responseData = response.data ?? {}
 
@@ -89,7 +89,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
     updateConfig({ ...configObj, ...processedConfig })
     dispatch({ type: 'SET_LOADING', payload: false })
-  }, [])
+  }
 
   // Custom Functions
   useEffect(() => {
@@ -116,7 +116,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     }
   }, [markupError])
 
-  const loadConfigMarkupData = useCallback(async () => {
+  const loadConfigMarkupData = async () => {
     dispatch({ type: 'SET_MARKUP_ERROR', payload: null })
 
     if (srcUrl) {
@@ -147,7 +147,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     } else {
       dispatch({ type: 'SET_URL_MARKUP', payload: '' })
     }
-  }, [srcUrl])
+  }
 
   const filterOutConditions = (workingData, conditionList) => {
     const { columnName, isOrIsNotEqualTo, value } = conditionList[0]
@@ -212,11 +212,12 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     let parse
     let hasBody = false
     if (markup && markup !== '' && markup !== null) {
-      if (markup.toString().match(/<body[^>]*>/i) && markup.toString().match(/<\/body\s*>/i)) {
+      const markupString = markup.toString()
+      if (markupString.match(/<body[^>]*>/i) && markupString.match(/<\/body\s*>/i)) {
         hasBody = true
-        parse = markup.toString().match(/<body[^>]*>([^<]*(?:(?!<\/?body)<[^<]*)*)<\/body\s*>/i)
+        parse = markupString.match(/<body[^>]*>([^<]*(?:(?!<\/?body)<[^<]*)*)<\/body\s*>/i)
       } else {
-        parse = markup.toString()
+        parse = markupString
       }
     }
 
@@ -239,7 +240,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   //Reload any functions when config is updated
   useEffect(() => {
     loadConfigMarkupData().catch(err => console.log(err))
-  }, [loadConfigMarkupData])
+  }, [config])
 
   let content = <Loading />
 
