@@ -1593,7 +1593,6 @@ const CdcMap = ({
                     expandDataTable={table.expanded}
                     headerColor={general.headerColor}
                     columns={state.columns}
-                    showDownloadButton={general.showDownloadButton}
                     showFullGeoNameInCSV={table.showFullGeoNameInCSV}
                     runtimeLegend={runtimeLegend}
                     runtimeData={runtimeData}

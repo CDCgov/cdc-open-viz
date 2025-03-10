@@ -46,7 +46,6 @@ export type DataTableProps = {
   rawData: Object[]
   runtimeData: Object[] & Record<string, Object>
   setFilteredCountryCode?: Function // used for Maps only
-  showDownloadButton?: boolean
   tabbingId: string
   tableTitle: string
   viewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
@@ -208,13 +207,10 @@ const DataTable = (props: DataTableProps) => {
     [config.runtime?.seriesKeys]) // eslint-disable-line
 
   const hasNoData = runtimeData.length === 0
-
   const getClassNames = (): string => {
     const classes = ['data-table-container']
 
-    const hasDownloadLinkAbove =
-      (config.table.download || config.general?.showDownloadButton) && !config.table.showDownloadLinkBelow
-
+    const hasDownloadLinkAbove = config.table.download && !config.table.showDownloadLinkBelow
     const isStandaloneTable = config.type === 'table'
 
     if (!hasDownloadLinkAbove && !isStandaloneTable) {
@@ -276,7 +272,7 @@ const DataTable = (props: DataTableProps) => {
       : {}
 
     const TableMediaControls = ({ belowTable }) => {
-      const hasDownloadLink = config.table.download || config.general?.showDownloadButton
+      const hasDownloadLink = config.table.download
       return (
         <MediaControls.Section classes={getMediaControlsClasses(belowTable, hasDownloadLink)}>
           <MediaControls.Link config={config} dashboardDataConfig={dataConfig} />

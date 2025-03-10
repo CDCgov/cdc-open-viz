@@ -2834,6 +2834,26 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   />
                   <span className='edit-label'>Map loads with data table expanded</span>
                 </label>
+                <CheckBox
+                  value={state.table.download}
+                  fieldName='download'
+                  label='Show Download CSV Link'
+                  section='table'
+                  updateField={updateField}
+                />
+                {state.table.download && (
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      className='ml-2'
+                      checked={state.table.showDownloadLinkBelow}
+                      onChange={event => {
+                        handleEditorChanges('toggleDownloadLinkBelow', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label'>Show Link Below Table</span>
+                  </label>
+                )}
                 {isDashboard && (
                   <label className='checkbox'>
                     <input
@@ -2878,16 +2898,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   />
                   <span className='edit-label'>Enable Image Download</span>
                 </label>
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={state.table.showDownloadLinkBelow}
-                    onChange={event => {
-                      handleEditorChanges('toggleDownloadLinkBelow', event.target.checked)
-                    }}
-                  />
-                  <span className='edit-label'>Show Download Link Below Table</span>
-                </label>
+
                 {/* <label className='checkbox'>
                       <input
                         type='checkbox'

@@ -640,7 +640,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                 rawData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data}
                 runtimeData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data || []}
                 expandDataTable={config.table.expanded}
-                showDownloadButton={config.table.download}
                 tableTitle={config.dashboard.title || ''}
                 viewport={currentViewport}
                 tabbingId={config.dashboard.title || ''}
