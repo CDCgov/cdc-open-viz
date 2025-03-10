@@ -1,6 +1,7 @@
 import Footnotes from '@cdc/core/types/Footnotes'
-import { Visualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization, Visualization } from '@cdc/core/types/Visualization'
 import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
+import { removeDashboardFilter } from '@cdc/dashboard/src/helpers/removeDashboardFilter'
 import _ from 'lodash'
 
 const cleanDashboardFootnotes = (config: DashboardConfig) => {
@@ -61,15 +62,36 @@ const cleanDashboardData = (config: DashboardConfig) => {
   }
 }
 
-const cleanSharedFilters = (config: DashboardConfig) => {
+export const cleanSharedFilters = (config: DashboardConfig) => {
   if (config.dashboard?.sharedFilters) {
-    config.dashboard.sharedFilters.forEach((filter, index) => {
-      delete config.dashboard.sharedFilters[index].active
-      if (filter.subGrouping) delete config.dashboard.sharedFilters[index].subGrouping.active
-      if (filter.type === 'urlfilter') {
-        delete config.dashboard.sharedFilters[index].values
+
+    const recursiveRemoveFilters = (sharedFilters, visualizations: Record<string, AnyVisualization>) => {
+      const usedFilters = _.uniq(Object.values(visualizations).reduce((acc, viz) => {
+        if(viz.type === 'dashboardFilters') {
+          acc = acc.concat(viz.sharedFilterIndexes)
+        }
+        return acc
+      }, []))
+      for(let index = 0; index < sharedFilters.length; index++) {
+        const filter = sharedFilters[index]
+        if(!usedFilters.includes(index)) {
+
+          const [newSharedFilters, newVisualizations] = removeDashboardFilter(index, config.dashboard.sharedFilters, config.visualizations)
+          config.dashboard.sharedFilters = newSharedFilters
+          config.visualizations = newVisualizations
+          recursiveRemoveFilters(newSharedFilters, newVisualizations)
+          break;
+        } else {
+          delete config.dashboard.sharedFilters[index].active
+          if (filter.subGrouping) delete config.dashboard.sharedFilters[index].subGrouping.active
+          if (filter.type === 'urlfilter') {
+            delete config.dashboard.sharedFilters[index].values
+          }
+        }
       }
-    })
+    }
+
+    recursiveRemoveFilters(config.dashboard.sharedFilters, config.visualizations)
   }
 }
 
