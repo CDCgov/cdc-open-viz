@@ -644,7 +644,6 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                 ]}
                 updateField={(_section, _subSection, _key, value) => updateFilterProp('visualizationType', value)}
               />
-
               {filter.visualizationType === 'map' && (
                 <Select
                   label='Property To Update:'
@@ -685,6 +684,17 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                   }}
                 />
               </label>
+              <Select
+                value={filter.defaultValue}
+                options={
+                  filter.resetLabel
+                    ? [filter.resetLabel, ...config.dashboard.sharedFilters[filterIndex].values]
+                    : config.dashboard.sharedFilters[filterIndex].values
+                }
+                updateField={(_section, _subSection, _key, value) => updateFilterProp('defaultValue', value)}
+                label={'Filter Default Value'}
+                initial={'Select'}
+              />
             </>
           )}
         </>

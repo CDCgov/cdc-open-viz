@@ -56,6 +56,10 @@ export const addValuesToDashboardFilters = (
       filterCopy.values = Object.keys(stateToIso)
     }
 
+    if (filter.type === 'configFilter') {
+      filterCopy.active = filterCopy.defaultValue || filterCopy.values[0]
+    }
+
     if (filterValues.length > 0) {
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)
       if (queryStringFilterValue) {

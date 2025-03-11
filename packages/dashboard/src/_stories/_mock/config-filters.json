@@ -1,0 +1,845 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": [
+      {
+        "key": "Map Detail",
+        "showDropdown": true,
+        "values": [
+          "County",
+          "State"
+        ],
+        "type": "configFilter",
+        "orderedValues": [
+          "County",
+          "State"
+        ],
+        "visualizationType": "map",
+        "propertyToUpdate": "geoType",
+        "usedBy": [
+          "map1740773670361"
+        ],
+        "tier": 1
+      },
+      {
+        "key": "State",
+        "showDropdown": true,
+        "values": [
+          "Alabama",
+          "Alaska",
+          "Arizona",
+          "Arkansas",
+          "California",
+          "Colorado",
+          "Connecticut",
+          "Delaware",
+          "Florida",
+          "Georgia",
+          "Hawaii",
+          "Idaho",
+          "Illinois",
+          "Indiana",
+          "Iowa",
+          "Kansas",
+          "Kentucky",
+          "Louisiana",
+          "Maine",
+          "Maryland",
+          "Massachusetts",
+          "Michigan",
+          "Minnesota",
+          "Mississippi",
+          "Missouri",
+          "Montana",
+          "Nebraska",
+          "Nevada",
+          "New Hampshire",
+          "New Jersey",
+          "New Mexico",
+          "New York",
+          "North Carolina",
+          "North Dakota",
+          "Ohio",
+          "Oklahoma",
+          "Oregon",
+          "Pennsylvania",
+          "Rhode Island",
+          "South Carolina",
+          "South Dakota",
+          "Tennessee",
+          "Texas",
+          "Utah",
+          "Vermont",
+          "Virginia",
+          "Washington",
+          "West Virginia",
+          "Wisconsin",
+          "Wyoming"
+        ],
+        "type": "configFilter",
+        "orderedValues": [
+          "Alabama",
+          "Alaska",
+          "Arizona",
+          "Arkansas",
+          "California",
+          "Colorado",
+          "Connecticut",
+          "Delaware",
+          "Florida",
+          "Georgia",
+          "Hawaii",
+          "Idaho",
+          "Illinois",
+          "Indiana",
+          "Iowa",
+          "Kansas",
+          "Kentucky",
+          "Louisiana",
+          "Maine",
+          "Maryland",
+          "Massachusetts",
+          "Michigan",
+          "Minnesota",
+          "Mississippi",
+          "Missouri",
+          "Montana",
+          "Nebraska",
+          "Nevada",
+          "New Hampshire",
+          "New Jersey",
+          "New Mexico",
+          "New York",
+          "North Carolina",
+          "North Dakota",
+          "Ohio",
+          "Oklahoma",
+          "Oregon",
+          "Pennsylvania",
+          "Rhode Island",
+          "South Carolina",
+          "South Dakota",
+          "Tennessee",
+          "Texas",
+          "Utah",
+          "Vermont",
+          "Virginia",
+          "Washington",
+          "West Virginia",
+          "Wisconsin",
+          "Wyoming"
+        ],
+        "visualizationType": "map",
+        "propertyToUpdate": "focusedState",
+        "usedBy": [
+          "map1740773670361"
+        ],
+        "tier": 1
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboardFilters1740773693132"
+        },
+        {},
+        {}
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "map1740773670361"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "map1740773670361": {
+      "annotations": [],
+      "general": {
+        "geoType": "single-state",
+        "navigationTarget": "_self",
+        "noStateFoundMessage": "Map Unavailable",
+        "annotationDropdownText": "Annotations",
+        "geoBorderColor": "darkGray",
+        "headerColor": "theme-blue",
+        "title": "",
+        "showTitle": true,
+        "showSidebar": true,
+        "showDownloadButton": true,
+        "showDownloadMediaButton": false,
+        "displayAsHex": false,
+        "displayStateLabels": true,
+        "territoriesAlwaysShow": false,
+        "language": "en",
+        "geoLabelOverride": "",
+        "hasRegions": false,
+        "fullBorder": false,
+        "type": "data",
+        "convertFipsCodes": true,
+        "palette": {
+          "isReversed": false
+        },
+        "allowMapZoom": true,
+        "hideGeoColumnInTooltip": false,
+        "hidePrimaryColumnInTooltip": false,
+        "statePicked": {
+          "fipsCode": "12",
+          "stateName": "Florida"
+        },
+        "expandDataTable": false,
+        "stateToShow": "Florida"
+      },
+      "type": "map",
+      "color": "pinkpurple",
+      "columns": {
+        "geo": {
+          "name": "FIPS Codes",
+          "label": "Location",
+          "tooltip": false,
+          "dataTable": true
+        },
+        "primary": {
+          "dataTable": true,
+          "tooltip": true,
+          "prefix": "",
+          "suffix": "",
+          "name": "Percent Vaccinated",
+          "label": "Percent Vaccinated",
+          "roundToPlace": 0
+        },
+        "navigate": {
+          "name": ""
+        },
+        "latitude": {
+          "name": ""
+        },
+        "longitude": {
+          "name": ""
+        }
+      },
+      "legend": {
+        "descriptions": {},
+        "specialClasses": [],
+        "unified": false,
+        "singleColumn": false,
+        "singleRow": false,
+        "verticalSorted": false,
+        "showSpecialClassesLast": false,
+        "dynamicDescription": false,
+        "type": "equalnumber",
+        "numberOfItems": 3,
+        "position": "side",
+        "title": "",
+        "style": "circles",
+        "subStyle": "linear blocks",
+        "tickRotation": "",
+        "singleColumnLegend": false,
+        "hideBorder": false
+      },
+      "filters": [],
+      "table": {
+        "wrapColumns": false,
+        "label": "Data Table",
+        "expanded": false,
+        "limitHeight": false,
+        "height": "",
+        "caption": "",
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "showDownloadLinkBelow": true,
+        "showFullGeoNameInCSV": false,
+        "forceDisplay": true,
+        "download": true,
+        "indexLabel": ""
+      },
+      "tooltips": {
+        "appearanceType": "hover",
+        "linkLabel": "Learn More",
+        "capitalizeLabels": true,
+        "opacity": 90
+      },
+      "visual": {
+        "minBubbleSize": 1,
+        "maxBubbleSize": 20,
+        "extraBubbleBorder": false,
+        "cityStyle": "circle",
+        "cityStyleLabel": "",
+        "showBubbleZeros": false,
+        "additionalCityStyles": [],
+        "geoCodeCircleSize": 8
+      },
+      "mapPosition": {
+        "coordinates": [
+          0,
+          30
+        ],
+        "zoom": 1
+      },
+      "map": {
+        "layers": [],
+        "patterns": []
+      },
+      "hexMap": {
+        "type": "",
+        "shapeGroups": [
+          {
+            "legendTitle": "",
+            "legendDescription": "",
+            "items": [
+              {
+                "key": "",
+                "shape": "Arrow Up",
+                "column": "",
+                "operator": "=",
+                "value": ""
+              }
+            ]
+          }
+        ]
+      },
+      "filterBehavior": "Filter Change",
+      "filterIntro": "",
+      "openModal": true,
+      "uid": "map1740773670361",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "dataKey": "valid-county-data.csv",
+      "version": "4.25.1",
+      "migrations": {
+        "addColorMigration": true
+      }
+    },
+    "dashboardFilters1740773693132": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "newViz": true,
+      "openModal": true,
+      "uid": "dashboardFilters1740773693132",
+      "type": "dashboardFilters",
+      "sharedFilterIndexes": [
+        0,
+        1
+      ],
+      "visualizationType": "dashboardFilters"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showDownloadLinkBelow": true,
+    "showVertical": true
+  },
+  "newViz": true,
+  "errors": [],
+  "currentViewport": "lg",
+  "id": 15,
+  "category": "General",
+  "label": "Dashboard",
+  "type": "dashboard",
+  "subType": null,
+  "orientation": null,
+  "icon": {
+    "key": null,
+    "ref": null,
+    "props": {},
+    "_owner": null,
+    "_store": {}
+  },
+  "content": "Present multiple data visualizations with shared filter controls.",
+  "datasets": {
+    "valid-county-data.csv": {
+      "data": [
+        {
+          "FIPS Codes": "02013",
+          "County": "Aleutians East Borough",
+          "State": "AK",
+          "State Name": "Alaska",
+          "Public Health Jurisdiction": "AK",
+          "Percent Vaccinated": "99.99",
+          "Vaccination Coverage Group": "70% or More"
+        },
+        {
+          "FIPS Codes": "01001",
+          "County": "Autauga County",
+          "State": "AL",
+          "State Name": "Alabama",
+          "Public Health Jurisdiction": "AL",
+          "Percent Vaccinated": "34.13",
+          "Vaccination Coverage Group": "30% - 39.9%"
+        },
+        {
+          "FIPS Codes": "05001",
+          "County": "Arkansas County",
+          "State": "AR",
+          "State Name": "Arkansas",
+          "Public Health Jurisdiction": "AR",
+          "Percent Vaccinated": "55.55",
+          "Vaccination Coverage Group": "50% - 59.9%"
+        },
+        {
+          "FIPS Codes": "04001",
+          "County": "Apache County",
+          "State": "AZ",
+          "State Name": "Arizona",
+          "Public Health Jurisdiction": "AZ",
+          "Percent Vaccinated": "99.99",
+          "Vaccination Coverage Group": "70% or More"
+        },
+        {
+          "FIPS Codes": "06001",
+          "County": "Alameda County",
+          "State": "CA",
+          "State Name": "California",
+          "Public Health Jurisdiction": "CA",
+          "Percent Vaccinated": "96.69",
+          "Vaccination Coverage Group": "70% or More"
+        },
+        {
+          "FIPS Codes": "08001",
+          "County": "Adams County",
+          "State": "CO",
+          "State Name": "Colorado",
+          "Public Health Jurisdiction": "CO",
+          "Percent Vaccinated": "65.08",
+          "Vaccination Coverage Group": "60% - 69.9%"
+        },
+        {
+          "FIPS Codes": "09001",
+          "County": "Fairfield County",
+          "State": "CT",
+          "State Name": "Connecticut",
+          "Public Health Jurisdiction": "CT",
+          "Percent Vaccinated": "91.95",
+          "Vaccination Coverage Group": "70% or More"
+        },
+        {
+          "FIPS Codes": "11001",
+          "County": "District of Columbia",
+          "State": "DC",
+          "State Name": "District of Columbia",
+          "Public Health Jurisdiction": "DC",
+          "Percent Vaccinated": "84.06",
+          "Vaccination Coverage Group": "70% or More"
+        },
+        {
+          "FIPS Codes": "10001",
+          "County": "Kent County",
+          "State": "DE",
+          "State Name": "Delaware",
+          "Public Health Jurisdiction": "DE",
+          "Percent Vaccinated": "48.47",
+          "Vaccination Coverage Group": "40% - 49.9%"
+        },
+        {
+          "FIPS Codes": "12001",
+          "County": "Alachua County",
+          "State": "FL",
+          "State Name": "Florida",
+          "Public Health Jurisdiction": "FL",
+          "Percent Vaccinated": "69.86",
+          "Vaccination Coverage Group": "60% - 69.9%"
+        },
+        {
+          "FIPS Codes": "13001",
+          "County": "Appling County",
+          "State": "GA",
+          "State Name": "Georgia",
+          "Public Health Jurisdiction": "GA",
+          "Percent Vaccinated": "14.04",
+          "Vaccination Coverage Group": "0% - 19.9%"
+        },
+        {
+          "FIPS Codes": "15001",
+          "County": "Hawaii County",
+          "State": "HI",
+          "State Name": "Hawaii",
+          "Public Health Jurisdiction": "HI",
+          "Percent Vaccinated": "81.14",
+          "Vaccination Coverage Group": "70% or More"
+        },
+        {
+          "FIPS Codes": "19001",
+          "County": "Adair County",
+          "State": "IA",
+          "State Name": "Iowa",
+          "Public Health Jurisdiction": "IA",
+          "Percent Vaccinated": "33.78",
+          "Vaccination Coverage Group": "30% - 39.9%"
+        },
+        {
+          "FIPS Codes": "16001",
+          "County": "Ada County",
+          "State": "ID",
+          "State Name": "Idaho",
+          "Public Health Jurisdiction": "ID",
+          "Percent Vaccinated": "0",
+          "Vaccination Coverage Group": "No Data"
+        },
+        {
+          "FIPS Codes": "17001",
+          "County": "Adams County",
+          "State": "IL",
+          "State Name": "Illinois",
+          "Public Health Jurisdiction": "IL",
+          "Percent Vaccinated": "30.99",
+          "Vaccination Coverage Group": "30% - 39.9%"
+        },
+        {
+          "FIPS Codes": "18001",
+          "County": "Adams County",
+          "State": "IN",
+          "State Name": "Indiana",
+          "Public Health Jurisdiction": "IN",
+          "Percent Vaccinated": "13.41",
+          "Vaccination Coverage Group": "0% - 19.9%"
+        },
+        {
+          "FIPS Codes": "20001",
+          "County": "Allen County",
+          "State": "KS",
+          "State Name": "Kansas",
+          "Public Health Jurisdiction": "KS",
+          "Percent Vaccinated": "28.08",
+          "Vaccination Coverage Group": "20% - 29.9%"
+        },
+        {
+          "FIPS Codes": "21001",
+          "County": "Adair County",
+          "State": "KY",
+          "State Name": "Kentucky",
+          "Public Health Jurisdiction": "KY",
+          "Percent Vaccinated": "23.78",
+          "Vaccination Coverage Group": "20% - 29.9%"
+        },
+        {
+          "FIPS Codes": "22001",
+          "County": "Acadia Parish",
+          "State": "LA",
+          "State Name": "Louisiana",
+          "Public Health Jurisdiction": "LA",
+          "Percent Vaccinated": "29.95",
+          "Vaccination Coverage Group": "20% - 29.9%"
+        },
+        {
+          "FIPS Codes": "25001",
+          "County": "Barnstable County",
+          "State": "MA",
+          "State Name": "Massachusetts",
+          "Public Health Jurisdiction": "MA",
+          "Percent Vaccinated": "1.26",
+          "Vaccination Coverage Group": "0% - 19.9%"
+        },
+        {
+          "FIPS Codes": "24001",
+          "County": "Allegany County",
+          "State": "MD",
+          "State Name": "Maryland",
+          "Public Health Jurisdiction": "MD",
+          "Percent Vaccinated": "39.9",
+          "Vaccination Coverage Group": "30% - 39.9%"
+        },
+        {
+          "FIPS Codes": "23001",
+          "County": "Androscoggin County",
+          "State": "ME",
+          "State Name": "Maine",
+          "Public Health Jurisdiction": "ME",
+          "Percent Vaccinated": "62.47",
+          "Vaccination Coverage Group": "60% - 69.9%"
+        },
+        {
+          "FIPS Codes": "26001",
+          "County": "Alcona County",
+          "State": "MI",
+          "State Name": "Michigan",
+          "Public Health Jurisdiction": "MI",
+          "Percent Vaccinated": "16.24",
+          "Vaccination Coverage Group": "0% - 19.9%"
+        },
+        {
+          "FIPS Codes": "27001",
+          "County": "Aitkin County",
+          "State": "MN",
+          "State Name": "Minnesota",
+          "Public Health Jurisdiction": "MN",
+          "Percent Vaccinated": "40.28",
+          "Vaccination Coverage Group": "40% - 49.9%"
+        },
+        {
+          "FIPS Codes": "28001",
+          "County": "Adams County",
+          "State": "MS",
+          "State Name": "Mississippi",
+          "Public Health Jurisdiction": "MS",
+          "Percent Vaccinated": "44.87",
+          "Vaccination Coverage Group": "40% - 49.9%"
+        },
+        {
+          "FIPS Codes": "29001",
+          "County": "Adair County",
+          "State": "MO",
+          "State Name": "Missouri",
+          "Public Health Jurisdiction": "MO",
+          "Percent Vaccinated": "33.61",
+          "Vaccination Coverage Group": "30% - 39.9%"
+        },
+        {
+          "FIPS Codes": "30001",
+          "County": "Beaverhead County",
+          "State": "MT",
+          "State Name": "Montana",
+          "Public Health Jurisdiction": "MT",
+          "Percent Vaccinated": "43.67",
+          "Vaccination Coverage Group": "40% - 49.9%"
+        },
+        {
+          "FIPS Codes": "37001",
+          "County": "Alamance County",
+          "State": "NC",
+          "State Name": "North Carolina",
+          "Public Health Jurisdiction": "NC",
+          "Percent Vaccinated": "53.24",
+          "Vaccination Coverage Group": "50% - 59.9%"
+        },
+        {
+          "FIPS Codes": "38001",
+          "County": "Adams County",
+          "State": "ND",
+          "State Name": "North Dakota",
+          "Public Health Jurisdiction": "ND",
+          "Percent Vaccinated": "23.45",
+          "Vaccination Coverage Group": "20% - 29.9%"
+        },
+        {
+          "FIPS Codes": "31025",
+          "County": "Cass County",
+          "State": "NE",
+          "State Name": "Nebraska",
+          "Public Health Jurisdiction": "NE",
+          "Percent Vaccinated": "51.79",
+          "Vaccination Coverage Group": "50% - 59.9%"
+        },
+        {
+          "FIPS Codes": "33001",
+          "County": "Belknap County",
+          "State": "NH",
+          "State Name": "New Hampshire",
+          "Public Health Jurisdiction": "NH",
+          "Percent Vaccinated": "51.35",
+          "Vaccination Coverage Group": "50% - 59.9%"
+        },
+        {
+          "FIPS Codes": "34001",
+          "County": "Atlantic County",
+          "State": "NJ",
+          "State Name": "New Jersey",
+          "Public Health Jurisdiction": "NJ",
+          "Percent Vaccinated": "54.02",
+          "Vaccination Coverage Group": "50% - 59.9%"
+        },
+        {
+          "FIPS Codes": "35001",
+          "County": "Bernalillo County",
+          "State": "NM",
+          "State Name": "New Mexico",
+          "Public Health Jurisdiction": "NM",
+          "Percent Vaccinated": "73.22",
+          "Vaccination Coverage Group": "70% or More"
+        },
+        {
+          "FIPS Codes": "32510",
+          "County": "Carson City",
+          "State": "NV",
+          "State Name": "Nevada",
+          "Public Health Jurisdiction": "NV",
+          "Percent Vaccinated": "54.87",
+          "Vaccination Coverage Group": "50% - 59.9%"
+        },
+        {
+          "FIPS Codes": "36001",
+          "County": "Albany County",
+          "State": "NY",
+          "State Name": "New York",
+          "Public Health Jurisdiction": "NY",
+          "Percent Vaccinated": "78.84",
+          "Vaccination Coverage Group": "70% or More"
+        },
+        {
+          "FIPS Codes": "39001",
+          "County": "Adams County",
+          "State": "OH",
+          "State Name": "Ohio",
+          "Public Health Jurisdiction": "OH",
+          "Percent Vaccinated": "20.47",
+          "Vaccination Coverage Group": "20% - 29.9%"
+        },
+        {
+          "FIPS Codes": "40001",
+          "County": "Adair County",
+          "State": "OK",
+          "State Name": "Oklahoma",
+          "Public Health Jurisdiction": "OK",
+          "Percent Vaccinated": "31.71",
+          "Vaccination Coverage Group": "30% - 39.9%"
+        },
+        {
+          "FIPS Codes": "41001",
+          "County": "Baker County",
+          "State": "OR",
+          "State Name": "Oregon",
+          "Public Health Jurisdiction": "OR",
+          "Percent Vaccinated": "36.09",
+          "Vaccination Coverage Group": "30% - 39.9%"
+        },
+        {
+          "FIPS Codes": "42001",
+          "County": "Adams County",
+          "State": "PA",
+          "State Name": "Pennsylvania",
+          "Public Health Jurisdiction": "PA",
+          "Percent Vaccinated": "39.79",
+          "Vaccination Coverage Group": "30% - 39.9%"
+        },
+        {
+          "FIPS Codes": "72001",
+          "County": "Adjuntas Municipio",
+          "State": "PR",
+          "State Name": "Puerto Rico",
+          "Public Health Jurisdiction": "PR",
+          "Percent Vaccinated": "91.99",
+          "Vaccination Coverage Group": "70% or More"
+        },
+        {
+          "FIPS Codes": "44001",
+          "County": "Bristol County",
+          "State": "RI",
+          "State Name": "Rhode Island",
+          "Public Health Jurisdiction": "RI",
+          "Percent Vaccinated": "84.65",
+          "Vaccination Coverage Group": "70% or More"
+        },
+        {
+          "FIPS Codes": "45001",
+          "County": "Abbeville County",
+          "State": "SC",
+          "State Name": "South Carolina",
+          "Public Health Jurisdiction": "SC",
+          "Percent Vaccinated": "22.3",
+          "Vaccination Coverage Group": "20% - 29.9%"
+        },
+        {
+          "FIPS Codes": "46003",
+          "County": "Aurora County",
+          "State": "SD",
+          "State Name": "South Dakota",
+          "Public Health Jurisdiction": "SD",
+          "Percent Vaccinated": "35.48",
+          "Vaccination Coverage Group": "30% - 39.9%"
+        },
+        {
+          "FIPS Codes": "47001",
+          "County": "Anderson County",
+          "State": "TN",
+          "State Name": "Tennessee",
+          "Public Health Jurisdiction": "TN",
+          "Percent Vaccinated": "40.37",
+          "Vaccination Coverage Group": "40% - 49.9%"
+        },
+        {
+          "FIPS Codes": "48001",
+          "County": "Anderson County",
+          "State": "TX",
+          "State Name": "Texas",
+          "Public Health Jurisdiction": "TX",
+          "Percent Vaccinated": "0",
+          "Vaccination Coverage Group": "No Data"
+        },
+        {
+          "FIPS Codes": "49001",
+          "County": "Beaver County",
+          "State": "UT",
+          "State Name": "Utah",
+          "Public Health Jurisdiction": "UT",
+          "Percent Vaccinated": "33.6",
+          "Vaccination Coverage Group": "30% - 39.9%"
+        },
+        {
+          "FIPS Codes": "51001",
+          "County": "Accomack County",
+          "State": "VA",
+          "State Name": "Virginia",
+          "Public Health Jurisdiction": "VA",
+          "Percent Vaccinated": "55.87",
+          "Vaccination Coverage Group": "50% - 59.9%"
+        },
+        {
+          "FIPS Codes": "50001",
+          "County": "Addison County",
+          "State": "VT",
+          "State Name": "Vermont",
+          "Public Health Jurisdiction": "VT",
+          "Percent Vaccinated": "78.86",
+          "Vaccination Coverage Group": "70% or More"
+        },
+        {
+          "FIPS Codes": "53001",
+          "County": "Adams County",
+          "State": "WA",
+          "State Name": "Washington",
+          "Public Health Jurisdiction": "WA",
+          "Percent Vaccinated": "44.02",
+          "Vaccination Coverage Group": "40% - 49.9%"
+        },
+        {
+          "FIPS Codes": "55001",
+          "County": "Adams County",
+          "State": "WI",
+          "State Name": "Wisconsin",
+          "Public Health Jurisdiction": "WI",
+          "Percent Vaccinated": "32.12",
+          "Vaccination Coverage Group": "30% - 39.9%"
+        },
+        {
+          "FIPS Codes": "54001",
+          "County": "Barbour County",
+          "State": "WV",
+          "State Name": "West Virginia",
+          "Public Health Jurisdiction": "WV",
+          "Percent Vaccinated": "35.8",
+          "Vaccination Coverage Group": "30% - 39.9%"
+        },
+        {
+          "FIPS Codes": "56001",
+          "County": "Albany County",
+          "State": "WY",
+          "State Name": "Wyoming",
+          "Public Health Jurisdiction": "WY",
+          "Percent Vaccinated": "61.75",
+          "Vaccination Coverage Group": "60% - 69.9%"
+        }
+      ],
+      "dataFileSize": 2919,
+      "dataFileName": "valid-county-data.csv",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "CSV",
+      "preview": true
+    }
+  },
+  "visualizationType": null,
+  "activeVizButtonID": 15,
+  "runtime": {},
+  "version": "4.25.1",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "uuid": 1740773669107
+}
