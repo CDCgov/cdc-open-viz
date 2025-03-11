@@ -906,7 +906,7 @@ const EditorPanel = () => {
     return Object.keys(columns)
   }
 
-  const getLegendStyleOptions = (option: 'style' | 'subStyle' | 'shapes'): string[] => {
+  const getLegendStyleOptions = (option: 'style' | 'subStyle' | 'shapes' | 'subGroup'): string[] => {
     const options: string[] = []
 
     switch (option) {
@@ -930,6 +930,8 @@ const EditorPanel = () => {
         }
 
         break
+      case 'subGroup':
+        options.push(...getColumns())
     }
     return options
   }
@@ -3690,6 +3692,16 @@ const EditorPanel = () => {
                     label='Legend Style'
                     updateField={updateField}
                     options={getLegendStyleOptions('style')}
+                  />
+
+                  <Select
+                    value={config.legend.subGroup}
+                    section='legend'
+                    fieldName='subGroup'
+                    initial='Select'
+                    label='Legend SubGroup'
+                    updateField={updateField}
+                    options={getLegendStyleOptions('subGroup')}
                   />
                   <CheckBox
                     tooltip={

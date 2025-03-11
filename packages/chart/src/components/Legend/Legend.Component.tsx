@@ -15,6 +15,7 @@ import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import LegendLineShape from './LegendLine.Shape'
+import LegendSubgroup from './Legend.Subgroup'
 
 const LEGEND_PADDING = 36
 
@@ -29,6 +30,7 @@ export interface LegendProps {
   seriesHighlight: string[]
   skipId: string
   dimensions: DimensionsType // for responsive width legend
+  transformedData: any
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
@@ -43,7 +45,8 @@ const Legend: React.FC<LegendProps> = forwardRef(
       currentViewport,
       formatLabels,
       skipId = 'legend',
-      dimensions
+      dimensions,
+      transformedData: data
     },
     ref
   ) => {
@@ -85,6 +88,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
           parentPaddingToSubtract={legend.hideBorder ? 0 : LEGEND_PADDING}
         />
 
+        <LegendSubgroup data={data} config={config} colorScale={colorScale} formatLabels={formatLabels} />
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
           {labels => {
             return (
@@ -114,7 +118,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       } else className.push('highlighted')
                     }
 
-                    if (config.legend.style === 'gradient') {
+                    if (config.legend.style === 'gradient' || config.legend.subGroup) {
                       return <></>
                     }
 
