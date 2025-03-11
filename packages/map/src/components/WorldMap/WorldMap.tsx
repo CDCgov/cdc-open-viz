@@ -1,10 +1,9 @@
-import { memo, useContext } from 'react'
+import { memo, useContext, useState, useEffect } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { geoMercator } from 'd3-geo'
 import { Mercator } from '@visx/geo'
 import { feature } from 'topojson-client'
-import topoJSON from './data/world-topo.json'
 import ZoomableGroup from '../ZoomableGroup'
 import Geo from '../Geo'
 import CityList from '../CityList'
@@ -15,8 +14,6 @@ import { getGeoFillColor, getGeoStrokeColor } from '../../helpers/colors'
 import { supportedCountries } from '../../data/supported-geos'
 import { handleMapAriaLabels } from '../../helpers/handleMapAriaLabels'
 import { titleCase } from '../../helpers/titleCase'
-
-const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 
 let projection = geoMercator()
 
@@ -38,6 +35,21 @@ const WorldMap = () => {
     state,
     tooltipId,
   } = useContext(ConfigContext)
+
+  const [world, setWorld] = useState(null)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      import(/* webpackChunkName: "world-topo" */ './data/world-topo.json').then(topoJSON => {
+        setWorld(feature(topoJSON, topoJSON.objects.countries).features)
+      })
+    }
+    fetchData()
+  }, [])
+
+  if (!world) {
+    return <></>
+  }
 
   // TODO Refactor - state should be set together here to avoid rerenders
   // Resets to original data & zooms out

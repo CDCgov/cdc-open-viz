@@ -23,6 +23,7 @@ import { FILTER_STYLE } from '../../../types/FilterStyles'
 import { handleSorting } from '@cdc/core/components/Filters'
 import { mapFilterValues } from '../../../helpers/getFilteredData'
 import { stateToIso } from '@cdc/map/src/data/supported-geos.js'
+import { removeDashboardFilter } from '../../../helpers/removeDashboardFilter'
 
 type DashboardFitlersEditorProps = {
   vizConfig: DashboardFilters
@@ -137,27 +138,9 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
   }
 
   const removeFilter = index => {
-    const newSharedFilters = _.cloneDeep(sharedFilters)
-
-    newSharedFilters.splice(index, 1)
-    const shiftDownIndexes = Object.keys(sharedFilters).slice(index + 1)
-    const anyViz: Record<string, AnyVisualization> = visualizations
-    Object.keys(anyViz).forEach(vizKey => {
-      const viz = anyViz[vizKey]
-      if (viz.type === 'dashboardFilters') {
-        // shift the indexes down
-        const sharedFilterIndexes = viz.sharedFilterIndexes
-          .filter(filterIndex => filterIndex != index)
-          .map(filterIndex => {
-            if (shiftDownIndexes.includes(filterIndex.toString())) {
-              return filterIndex - 1
-            }
-            return filterIndex
-          })
-        dispatch({ type: 'UPDATE_VISUALIZATION', payload: { vizKey, configureData: { sharedFilterIndexes } } })
-      }
-    })
-    dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+    const [newSharedFilters, newVisualizations] = removeDashboardFilter(index, sharedFilters, visualizations)
+    const dashboard = { ...config.dashboard, sharedFilters: newSharedFilters }
+    dispatch({ type: 'SET_CONFIG', payload: { dashboard, visualizations: newVisualizations } })
   }
 
   const addNewFilter = () => {

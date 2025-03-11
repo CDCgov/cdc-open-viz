@@ -248,6 +248,20 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         )
       }
     }
+    case 'UPDATE_TOGGLE_NAME': {
+      const { rowIndex, columnIndex, toggleName } = action.payload
+      const newRows = state.config.rows.map((row, index) => {
+        if (index === rowIndex) {
+          const newColumns = row.columns.map((col, i) => ({
+            ...col,
+            toggleName: i === columnIndex ? toggleName : col.toggleName
+          }))
+          return { ...row, columns: newColumns }
+        }
+        return row
+      })
+      return { ...state, config: { ...state.config, rows: newRows } }
+    }
     default:
       return state
   }

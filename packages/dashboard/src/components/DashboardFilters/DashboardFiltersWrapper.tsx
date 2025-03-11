@@ -33,7 +33,6 @@ type DashboardFiltersProps = {
   isEditor?: boolean
   setConfig: (config: DashboardFilters) => void
   currentViewport?: ViewPort
-  setAPILoading: (loading: boolean) => void
 }
 
 const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({

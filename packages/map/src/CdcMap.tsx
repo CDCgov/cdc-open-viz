@@ -19,6 +19,7 @@ import Waiting from '@cdc/core/components/Waiting'
 
 // types
 import { type Coordinate, type MapConfig } from './types/MapConfig'
+import { displayGeoName } from './helpers/displayGeoName'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
@@ -863,7 +864,8 @@ const CdcMap = ({
         newFilter.values = values
         newFilter.setByQueryParameter = setByQueryParameter
         handleSorting(newFilter)
-        newFilter.active = active ?? values[0] // Default to first found value
+        newFilter.active = active || obj.filters[idx].defaultValue || values[0] // Default to first found value
+        newFilter.defaultValue = obj.filters[idx].defaultValue || ''
         newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
         newFilter.showDropdown = showDropdown
         newFilter.subGrouping = obj.filters[idx].subGrouping
@@ -1007,53 +1009,6 @@ const CdcMap = ({
     }
 
     return formattedName
-  }
-
-  // Attempts to find the corresponding value
-  const displayGeoName = key => {
-    if (!state.general.convertFipsCodes) return key
-
-    // World Map
-    // If we're returning a city name instead of a country ISO code, capitalize it for the data table.
-    if (state.type === 'map' && state.general.geoType === 'world') {
-      if (String(key).length > 3) return titleCase(key)
-    }
-    let value = key
-    // Map to first item in values array which is the preferred label
-    if (stateKeys.includes(value)) {
-      value = titleCase(supportedStates[key][0])
-    }
-
-    if (territoryKeys.includes(value)) {
-      value = titleCase(supportedTerritories[key][0])
-    }
-
-    if (countryKeys.includes(value)) {
-      value = supportedCountries[key][0]
-    }
-
-    if (countyKeys.includes(value)) {
-      value = titleCase(supportedCounties[key])
-    }
-
-    const dict = {
-      'Washington D.C.': 'District of Columbia',
-      'WASHINGTON DC': 'District of Columbia',
-      DC: 'District of Columbia',
-      'WASHINGTON DC.': 'District of Columbia',
-      Congo: 'Republic of the Congo'
-    }
-
-    if (true === Object.keys(dict).includes(value)) {
-      value = dict[value]
-    }
-
-    // if you get here and it's 2 letters then dont titleCase state abbreviations like "AL"
-    if (value.length === 2) {
-      return value
-    } else {
-      return titleCase(value)
-    }
   }
 
   // todo: convert to store or context eventually.
@@ -1511,6 +1466,7 @@ const CdcMap = ({
         config={state}
         isEditor={isEditor}
         ref={outerContainerRef}
+        currentViewport={currentViewport}
         imageId={imageId}
         showEditorPanel={state.showEditorPanel}
       >
