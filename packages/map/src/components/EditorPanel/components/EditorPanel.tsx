@@ -2842,17 +2842,19 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   updateField={updateField}
                 />
                 {state.table.download && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      className='ml-2'
-                      checked={state.table.showDownloadLinkBelow}
-                      onChange={event => {
-                        handleEditorChanges('toggleDownloadLinkBelow', event.target.checked)
-                      }}
-                    />
-                    <span className='edit-label'>Show Link Below Table</span>
-                  </label>
+                  <>
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        className='ms-4'
+                        checked={state.table.showDownloadLinkBelow}
+                        onChange={event => {
+                          handleEditorChanges('toggleDownloadLinkBelow', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Show Link Below Table</span>
+                    </label>
+                  </>
                 )}
                 {isDashboard && (
                   <label className='checkbox'>

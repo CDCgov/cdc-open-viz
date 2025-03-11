@@ -12,7 +12,9 @@ export const getFootnotesVizConfig = (vizKey: string, rowNumber: number, config:
 
   const data = config.datasets[visualizationConfig.dataKey]?.data
   const dataColumns = data?.length ? Object.keys(data[0]) : []
-  const filters = (getApplicableFilters(config.dashboard, rowNumber) || []).filter(filter => dataColumns.includes(filter.columnName))
+  const filters = (getApplicableFilters(config.dashboard, rowNumber) || []).filter(filter =>
+    dataColumns.includes(filter.columnName)
+  )
   if (filters.length) {
     visualizationConfig.formattedData = filterData(filters, data)
   }
@@ -20,7 +22,13 @@ export const getFootnotesVizConfig = (vizKey: string, rowNumber: number, config:
   return visualizationConfig as Footnotes
 }
 
-export const getVizConfig = (visualizationKey: string, rowNumber: number, config: MultiDashboardConfig, data: Object, filteredData?: Object) => {
+export const getVizConfig = (
+  visualizationKey: string,
+  rowNumber: number,
+  config: MultiDashboardConfig,
+  data: Object,
+  filteredData?: Object
+) => {
   if (rowNumber === undefined) return {}
   const visualizationConfig = _.cloneDeep(config.visualizations[visualizationKey])
   const rowData = config.rows[rowNumber]
@@ -31,6 +39,22 @@ export const getVizConfig = (visualizationKey: string, rowNumber: number, config
   if (rowData?.dataKey) {
     // data configured on the row
     Object.assign(visualizationConfig, _.pick(rowData, ['dataKey', 'dataDescription', 'formattedData', 'data']))
+  }
+
+  if (visualizationConfig.table && config.dashboard.sharedFilters.length) {
+    // Download CSV button needs to know to include shared filter columns
+    const sharedFilterColumns = config.dashboard.sharedFilters.reduce((acc, filter) => {
+      if (!filter.usedBy?.length || filter.usedBy?.includes(visualizationKey)) {
+        const colName = filter.apiFilter ? filter.apiFilter.valueSelector : filter.columnName
+        acc.push(colName)
+        const subGrouping = filter.subGrouping?.columnName || filter.apiFilter?.subgroupValueSelector
+        if (subGrouping) {
+          acc.push(subGrouping)
+        }
+      }
+      return acc
+    }, [])
+    visualizationConfig.table.sharedFilterColumns = sharedFilterColumns
   }
 
   if (visualizationConfig.formattedData) visualizationConfig.originalFormattedData = visualizationConfig.formattedData
@@ -45,7 +69,9 @@ export const getVizConfig = (visualizationKey: string, rowNumber: number, config
     const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
     visualizationConfig.data = data[dataKey] || []
     if (visualizationConfig.formattedData) {
-      visualizationConfig.formattedData = transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) || visualizationConfig.data
+      visualizationConfig.formattedData =
+        transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) ||
+        visualizationConfig.data
     }
   }
   return visualizationConfig

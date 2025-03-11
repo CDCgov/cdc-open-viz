@@ -24,6 +24,7 @@ import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import isRightAlignedTableValue from '@cdc/core/helpers/isRightAlignedTableValue'
 import './data-table.css'
 import _ from 'lodash'
+import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
 
 export type DataTableProps = {
   applyLegendToRow?: Function
@@ -229,12 +230,21 @@ const DataTable = (props: DataTableProps) => {
 
   if (config.visualizationType !== 'Box Plot') {
     const getDownloadData = () => {
+      const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
+      const sharedFilterColumns = config.table?.sharedFilterColumns || []
+      const csvData =
+        config.table?.downloadVisibleDataOnly && config.type !== 'map'
+          ? rawData.map(d => {
+              return _.pick(d, [...sharedFilterColumns, ...dataSeriesColumns])
+            })
+          : rawData
+
       // only use fullGeoName on County maps and no other
       if (config.general?.geoType === 'us-county') {
         // Add column for full Geo name along with State
-        return rawData.map(row => ({ FullGeoName: formatLegendLocation(row[config.columns.geo.name]), ...row }))
+        return csvData.map(row => ({ FullGeoName: formatLegendLocation(row[config.columns.geo.name]), ...row }))
       } else {
-        return rawData
+        return csvData
       }
     }
 

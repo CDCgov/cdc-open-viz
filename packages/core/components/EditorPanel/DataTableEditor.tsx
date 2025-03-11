@@ -233,14 +233,24 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
         updateField={updateField}
       />
       {config.table.download && (
-        <CheckBox
-          value={config.table.showDownloadLinkBelow}
-          fieldName='showDownloadLinkBelow'
-          className='ml-2'
-          label='Show Link Below Table'
-          section='table'
-          updateField={updateField}
-        />
+        <>
+          <CheckBox
+            value={config.table.showDownloadLinkBelow}
+            fieldName='showDownloadLinkBelow'
+            className='ms-4'
+            label='Show Link Below Table'
+            section='table'
+            updateField={updateField}
+          />
+          <CheckBox
+            value={config.table.downloadVisibleDataOnly}
+            fieldName='downloadVisibleDataOnly'
+            className='ms-4'
+            label='Download only visible data'
+            section='table'
+            updateField={updateField}
+          />
+        </>
       )}
       {isDashboard && config.type !== 'table' && (
         <CheckBox
