@@ -962,7 +962,7 @@ const EditorPanel = () => {
   }
 
   const convertStateToConfig = () => {
-    let strippedState = JSON.parse(JSON.stringify(config))
+    let strippedState = _.cloneDeep(config)
     if (false === missingRequiredSections(config)) {
       delete strippedState.newViz
     }
@@ -2698,7 +2698,7 @@ const EditorPanel = () => {
                         </>
                       )}
 
-                      {isDateScale(config.xAxis) && (
+                      {(isDateScale(config.xAxis) || config?.visualizationType === 'Bump Chart') && (
                         <>
                           <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
                             Format how charts should parse and display your dates using{' '}
@@ -2909,27 +2909,26 @@ const EditorPanel = () => {
                             </>
                           )}
 
-                          {config.xAxis.type === 'date' ||
-                            (config.xAxis.type === 'date-time' && (
-                              <>
-                                <TextField
-                                  type='date'
-                                  section='exclusions'
-                                  fieldName='dateStart'
-                                  label='Start Date'
-                                  updateField={updateField}
-                                  value={config.exclusions.dateStart || ''}
-                                />
-                                <TextField
-                                  type='date'
-                                  section='exclusions'
-                                  fieldName='dateEnd'
-                                  label='End Date'
-                                  updateField={updateField}
-                                  value={config.exclusions.dateEnd || ''}
-                                />
-                              </>
-                            ))}
+                          {(config.xAxis.type === 'date' || config.xAxis.type === 'date-time') && (
+                            <>
+                              <TextField
+                                type='date'
+                                section='exclusions'
+                                fieldName='dateStart'
+                                label='Start Date'
+                                updateField={updateField}
+                                value={config.exclusions.dateStart || ''}
+                              />
+                              <TextField
+                                type='date'
+                                section='exclusions'
+                                fieldName='dateEnd'
+                                label='End Date'
+                                updateField={updateField}
+                                value={config.exclusions.dateEnd || ''}
+                              />
+                            </>
+                          )}
                         </>
                       )}
 

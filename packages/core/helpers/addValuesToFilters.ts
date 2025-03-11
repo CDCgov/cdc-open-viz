@@ -144,7 +144,7 @@ export const addValuesToFilters = (filters: VizFilter[], data: any[] | MapData):
         const active = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
         filterCopy.active = active.filter(val => includes(defaultValues, val))
       } else {
-        const defaultValue = filterCopy.values[0]
+        const defaultValue = filterCopy.defaultValue || filterCopy.values[0]
         const active = Array.isArray(filterCopy.active) ? filterCopy.active[0] : filterCopy.active
         filterCopy.active = includes(filterCopy.values, active) ? active : defaultValue
       }

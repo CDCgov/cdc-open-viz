@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import {
   Accordion,
   AccordionItem,
@@ -33,6 +33,21 @@ const PatternSettings = ({ name }: PanelProps) => {
     data
   } = state
 
+  const [unitedStates, setUnitedStates] = useState(null)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      import(/* webpackChunkName: "us-topo" */ '../../../UsaMap/data/us-topo.json').then(topoJSON => {
+        setUnitedStates(feature(topoJSON, topoJSON.objects.states).features)
+      })
+    }
+    fetchData()
+  }, [])
+
+  if (!unitedStates) {
+    return <></>
+  }
+
   /** Updates the map config with a new pattern item */
   const handleAddGeoPattern = () => {
     let patterns = [...state.map.patterns]
@@ -52,7 +67,6 @@ const PatternSettings = ({ name }: PanelProps) => {
     index: number,
     keyToUpdate: 'dataKey' | 'pattern' | 'dataValue' | 'size' | 'label' | 'color'
   ) => {
-    const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
     const updatedPatterns = [...state.map.patterns]
 
     // Update the specific pattern with the new value
