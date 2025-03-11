@@ -640,10 +640,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                 value={filter.visualizationType || ''}
                 options={[
                   { value: '', label: '- Select Option -' },
-                  { value: 'table', label: 'Table' },
-                  { value: 'chart', label: 'Chart' },
-                  { value: 'map', label: 'Map' },
-                  { value: 'dashboard', label: 'Dashboard' }
+                  { value: 'map', label: 'Map' }
                 ]}
                 updateField={(_section, _subSection, _key, value) => updateFilterProp('visualizationType', value)}
               />
