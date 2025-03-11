@@ -718,7 +718,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             />
           )}
           {((visualizationType === 'Area Chart' && config.visualizationSubType === 'regular') ||
-            visualizationType === 'Combo') && (
+            (visualizationType === 'Combo' && config.visualizationSubType === 'regular')) && (
             <AreaChart
               xScale={xScale}
               yScale={yScale}
@@ -734,7 +734,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             />
           )}
           {((visualizationType === 'Area Chart' && config.visualizationSubType === 'stacked') ||
-            visualizationType === 'Combo') && (
+            (visualizationType === 'Combo' && config.visualizationSubType === 'stacked')) && (
             <AreaChartStacked
               xScale={xScale}
               yScale={yScale}
