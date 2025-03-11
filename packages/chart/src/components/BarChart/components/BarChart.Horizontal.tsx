@@ -192,7 +192,7 @@ export const BarChartHorizontal = () => {
                     ? highlightedBar.borderWidth
                     : config.isLollipopChart
                     ? 0
-                    : config.barHasBorder === 'true'
+                    : config.barHasBorder === 'true' && !absentDataLabel && !isSuppressed
                     ? barBorderWidth
                     : 0
                   const displaylollipopShape = testZeroValue(bar.value) ? 'none' : 'block'
