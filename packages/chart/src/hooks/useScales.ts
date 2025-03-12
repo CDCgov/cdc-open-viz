@@ -137,14 +137,8 @@ const useScales = (properties: useScaleProps) => {
       xScale.type = scaleTypes.LINEAR
     }
     if (xAxis.type === 'categorical') {
-      // Map items to rounded numbers if numeric, skip formatting  non-numeric strings.
-      const xAxisDataMappedRoundedItems = xAxisDataMapped.map(item => {
-        const strItem = String(item)
-        const parsed = parseFloat(strItem)
-        return !isNaN(parsed) ? Math.round(parsed).toString() : strItem
-      })
-
-      xScale = composeScaleBand(xAxisDataMappedRoundedItems, [0, xMax], 1 - config.barThickness)
+      xScale = composeScaleBand(xAxisDataMapped, [0, xMax], 1)
+      xScale.type = scaleTypes.BAND
     }
   }
 
