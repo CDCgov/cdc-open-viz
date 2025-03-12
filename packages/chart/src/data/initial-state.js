@@ -24,7 +24,6 @@ export default {
   isResponsiveTicks: false,
   general: {
     annotationDropdownText: 'Annotations',
-    showDownloadButton: false,
     showMissingDataLabel: true,
     showSuppressedSymbol: true,
     showZeroValueData: true,

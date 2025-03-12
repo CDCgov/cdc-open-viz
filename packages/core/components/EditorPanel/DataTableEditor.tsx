@@ -83,7 +83,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           </Tooltip>
         }
       />
-      {config.type !== 'table' ? (
+      {config.type !== 'table' && (
         <CheckBox
           value={config.table.show}
           fieldName='show'
@@ -107,15 +107,6 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
               </Tooltip.Content>
             </Tooltip>
           }
-        />
-      ) : (
-        <CheckBox
-          value={config.general?.showDownloadButton}
-          fieldName='showDownloadButton'
-          label='Show Download CSV link'
-          section='general'
-          updateField={updateField}
-          className='column-heading'
         />
       )}
 
@@ -234,6 +225,33 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           updateField={updateField}
         />
       )}
+      <CheckBox
+        value={config.table.download}
+        fieldName='download'
+        label='Show Download CSV Link'
+        section='table'
+        updateField={updateField}
+      />
+      {config.table.download && (
+        <>
+          <CheckBox
+            value={config.table.showDownloadLinkBelow}
+            fieldName='showDownloadLinkBelow'
+            className='ms-4'
+            label='Show Link Below Table'
+            section='table'
+            updateField={updateField}
+          />
+          <CheckBox
+            value={config.table.downloadVisibleDataOnly}
+            fieldName='downloadVisibleDataOnly'
+            className='ms-4'
+            label='Download only visible data'
+            section='table'
+            updateField={updateField}
+          />
+        </>
+      )}
       {isDashboard && config.type !== 'table' && (
         <CheckBox
           value={config.table.showDataTableLink}
@@ -261,14 +279,6 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           updateField={updateField}
         />
       )}
-
-      <CheckBox
-        value={config.table.showDownloadLinkBelow}
-        fieldName='showDownloadLinkBelow'
-        label='Show Download Link Below Table'
-        section='table'
-        updateField={updateField}
-      />
       <label>
         <span className='edit-label column-heading'>Table Cell Min Width</span>
         <input
