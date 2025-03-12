@@ -357,6 +357,14 @@ const EditorPanel = memo(() => {
                     placeholder='Data Bite Title'
                     updateField={updateField}
                   />
+                  <CheckBox
+                    value={config.visual?.showTitle}
+                    section='visual'
+                    checked={config.visual?.showTitle}
+                    fieldName='showTitle'
+                    label='Show Title'
+                    updateField={updateField}
+                  />
 
                   <TextField
                     type='textarea'
@@ -615,13 +623,6 @@ const EditorPanel = memo(() => {
                       section='visual'
                       fieldName='hideBackgroundColor'
                       label='Hide Background Color'
-                      updateField={updateField}
-                    />
-                    <CheckBox
-                      value={config.visual?.hideTitle}
-                      section='visual'
-                      fieldName='hideTitle'
-                      label='Hide Title'
                       updateField={updateField}
                     />
                   </div>
