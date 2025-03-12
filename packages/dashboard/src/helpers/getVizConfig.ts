@@ -45,9 +45,11 @@ export const getVizConfig = (
     // Download CSV button needs to know to include shared filter columns
     const sharedFilterColumns = config.dashboard.sharedFilters.reduce((acc, filter) => {
       if (!filter.usedBy?.length || filter.usedBy?.includes(visualizationKey)) {
-        const colName = filter.apiFilter ? filter.apiFilter.valueSelector : filter.columnName
+        const apiFilter = filter.apiFilter
+        const colName = apiFilter?.textSelector || apiFilter?.valueSelector || filter.columnName
         acc.push(colName)
-        const subGrouping = filter.subGrouping?.columnName || filter.apiFilter?.subgroupValueSelector
+        const subGrouping =
+          apiFilter?.subgroupTextSelector || apiFilter?.subgroupValueSelector || filter.subGrouping?.columnName
         if (subGrouping) {
           acc.push(subGrouping)
         }

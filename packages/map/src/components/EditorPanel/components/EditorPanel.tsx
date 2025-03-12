@@ -2854,6 +2854,14 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       />
                       <span className='edit-label'>Show Link Below Table</span>
                     </label>
+                    <CheckBox
+                      value={state.table.downloadVisibleDataOnly}
+                      fieldName='downloadVisibleDataOnly'
+                      className='ms-4'
+                      label='Download only visible data'
+                      section='table'
+                      updateField={updateField}
+                    />
                   </>
                 )}
                 {isDashboard && (

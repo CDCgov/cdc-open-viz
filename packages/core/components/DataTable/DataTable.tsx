@@ -11,7 +11,7 @@ import BoxplotHeader from './components/BoxplotHeader'
 import MapHeader from './components/MapHeader'
 import SkipTo from '../elements/SkipTo'
 import ExpandCollapse from './components/ExpandCollapse'
-import mapCellMatrix from './helpers/mapCellMatrix'
+import mapCellMatrix, { getMapRowData } from './helpers/mapCellMatrix'
 import Table from '../Table'
 import chartCellMatrix from './helpers/chartCellMatrix'
 import regionCellMatrix from './helpers/regionCellMatrix'
@@ -33,9 +33,9 @@ export type DataTableProps = {
   config: TableConfig
   dataConfig?: Object
   defaultSortBy?: string
-  displayGeoName?: Function
+  displayGeoName?: (row: string) => string
   expandDataTable: boolean
-  formatLegendLocation?: Function
+  formatLegendLocation?: (row: string) => string
   groupBy?: string
   headerColor?: string
   imageRef?: string
@@ -46,7 +46,7 @@ export type DataTableProps = {
   outerContainerRef?: Function
   rawData: Object[]
   runtimeData: Object[] & Record<string, Object>
-  setFilteredCountryCode?: Function // used for Maps only
+  setFilteredCountryCode?: string // used for Maps only
   tabbingId: string
   tableTitle: string
   viewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
@@ -61,6 +61,7 @@ const DataTable = (props: DataTableProps) => {
     config,
     dataConfig,
     defaultSortBy,
+    displayGeoName,
     tableTitle,
     vizTitle,
     rawData,
@@ -232,12 +233,21 @@ const DataTable = (props: DataTableProps) => {
     const getDownloadData = () => {
       const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
       const sharedFilterColumns = config.table?.sharedFilterColumns || []
-      const csvData =
-        config.table?.downloadVisibleDataOnly && config.type !== 'map'
-          ? rawData.map(d => {
+      const visibleData =
+        config.type === 'map'
+          ? getMapRowData(
+              rows,
+              columns,
+              config,
+              formatLegendLocation,
+              runtimeData as Record<string, Object>,
+              displayGeoName,
+              sharedFilterColumns
+            )
+          : rawData.map(d => {
               return _.pick(d, [...sharedFilterColumns, ...dataSeriesColumns])
             })
-          : rawData
+      const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
 
       // only use fullGeoName on County maps and no other
       if (config.general?.geoType === 'us-county') {
