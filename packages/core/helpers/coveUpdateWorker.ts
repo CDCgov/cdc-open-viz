@@ -13,8 +13,10 @@ import update_4_24_10 from './ver/4.24.10'
 import update_4_24_11 from './ver/4.24.11'
 import update_4_25_1 from './ver/4.25.1'
 
-export const coveUpdateWorker = config => {
+export const coveUpdateWorker = (config, multiDashboardVersion?) => {
   let genConfig = config
+
+  if (multiDashboardVersion) genConfig.version = multiDashboardVersion
 
   const versions = [
     ['4.24.3', update_4_24_3],
@@ -30,15 +32,18 @@ export const coveUpdateWorker = config => {
   versions.forEach(([version, updateFunction, alwaysRun]: [string, UpdateFunction, boolean?]) => {
     if (versionNeedsUpdate(genConfig.version, version) || alwaysRun) {
       genConfig = updateFunction(genConfig)
-    }
-    if (genConfig.multiDashboards) {
-      genConfig.multiDashboards.forEach((dashboard, index) => {
-        dashboard.type = 'dashboard'
-        genConfig.multiDashboards[index] = coveUpdateWorker(dashboard)
-      })
+
+      if (genConfig.multiDashboards) {
+        genConfig.multiDashboards.forEach((dashboard, index) => {
+          dashboard.type = 'dashboard'
+          genConfig.multiDashboards[index] = coveUpdateWorker(dashboard, genConfig.version)
+        })
+      }
     }
   })
 
+  // config version is stored at the root level of the config.
+  if (multiDashboardVersion) delete genConfig.version
   return genConfig
 }
 

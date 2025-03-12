@@ -11,7 +11,7 @@ import BoxplotHeader from './components/BoxplotHeader'
 import MapHeader from './components/MapHeader'
 import SkipTo from '../elements/SkipTo'
 import ExpandCollapse from './components/ExpandCollapse'
-import mapCellMatrix from './helpers/mapCellMatrix'
+import mapCellMatrix, { getMapRowData } from './helpers/mapCellMatrix'
 import Table from '../Table'
 import chartCellMatrix from './helpers/chartCellMatrix'
 import regionCellMatrix from './helpers/regionCellMatrix'
@@ -24,6 +24,7 @@ import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import isRightAlignedTableValue from '@cdc/core/helpers/isRightAlignedTableValue'
 import './data-table.css'
 import _ from 'lodash'
+import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
 
 export type DataTableProps = {
   applyLegendToRow?: Function
@@ -32,9 +33,9 @@ export type DataTableProps = {
   config: TableConfig
   dataConfig?: Object
   defaultSortBy?: string
-  displayGeoName?: Function
+  displayGeoName?: (row: string) => string
   expandDataTable: boolean
-  formatLegendLocation?: Function
+  formatLegendLocation?: (row: string) => string
   groupBy?: string
   headerColor?: string
   imageRef?: string
@@ -45,8 +46,7 @@ export type DataTableProps = {
   outerContainerRef?: Function
   rawData: Object[]
   runtimeData: Object[] & Record<string, Object>
-  setFilteredCountryCode?: Function // used for Maps only
-  showDownloadButton?: boolean
+  setFilteredCountryCode?: string // used for Maps only
   tabbingId: string
   tableTitle: string
   viewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
@@ -61,6 +61,7 @@ const DataTable = (props: DataTableProps) => {
     config,
     dataConfig,
     defaultSortBy,
+    displayGeoName,
     tableTitle,
     vizTitle,
     rawData,
@@ -208,13 +209,10 @@ const DataTable = (props: DataTableProps) => {
     [config.runtime?.seriesKeys]) // eslint-disable-line
 
   const hasNoData = runtimeData.length === 0
-
   const getClassNames = (): string => {
     const classes = ['data-table-container']
 
-    const hasDownloadLinkAbove =
-      (config.table.download || config.general?.showDownloadButton) && !config.table.showDownloadLinkBelow
-
+    const hasDownloadLinkAbove = config.table.download && !config.table.showDownloadLinkBelow
     const isStandaloneTable = config.type === 'table'
 
     if (!hasDownloadLinkAbove && !isStandaloneTable) {
@@ -233,12 +231,30 @@ const DataTable = (props: DataTableProps) => {
 
   if (config.visualizationType !== 'Box Plot') {
     const getDownloadData = () => {
+      const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
+      const sharedFilterColumns = config.table?.sharedFilterColumns || []
+      const visibleData =
+        config.type === 'map'
+          ? getMapRowData(
+              rows,
+              columns,
+              config,
+              formatLegendLocation,
+              runtimeData as Record<string, Object>,
+              displayGeoName,
+              sharedFilterColumns
+            )
+          : rawData.map(d => {
+              return _.pick(d, [...sharedFilterColumns, ...dataSeriesColumns])
+            })
+      const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
+
       // only use fullGeoName on County maps and no other
       if (config.general?.geoType === 'us-county') {
         // Add column for full Geo name along with State
-        return rawData.map(row => ({ FullGeoName: formatLegendLocation(row[config.columns.geo.name]), ...row }))
+        return csvData.map(row => ({ FullGeoName: formatLegendLocation(row[config.columns.geo.name]), ...row }))
       } else {
-        return rawData
+        return csvData
       }
     }
 
@@ -276,7 +292,7 @@ const DataTable = (props: DataTableProps) => {
       : {}
 
     const TableMediaControls = ({ belowTable }) => {
-      const hasDownloadLink = config.table.download || config.general?.showDownloadButton
+      const hasDownloadLink = config.table.download
       return (
         <MediaControls.Section classes={getMediaControlsClasses(belowTable, hasDownloadLink)}>
           <MediaControls.Link config={config} dashboardDataConfig={dataConfig} />

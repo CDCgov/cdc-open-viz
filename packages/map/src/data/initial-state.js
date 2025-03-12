@@ -9,7 +9,6 @@ export default {
     title: '',
     showTitle: true,
     showSidebar: true,
-    showDownloadButton: false,
     showDownloadMediaButton: false,
     displayAsHex: false,
     displayStateLabels: true,

@@ -9,6 +9,7 @@ export type Table = {
   collapsible?: boolean
   dateDisplayFormat?: string
   download?: boolean
+  downloadVisibleDataOnly?: boolean
   downloadImageButton?: boolean
   downloadPdfButton?: boolean
   excludeColumns?: string[]
@@ -20,6 +21,7 @@ export type Table = {
   limitHeight?: boolean
   pivot?: Pivot
   show?: boolean
+  sharedFilterColumns?: string[] // added at runtime by Dashboard
   showDataTableLink?: boolean
   showDownloadImgButton?: boolean
   showDownloadLinkBelow?: boolean
