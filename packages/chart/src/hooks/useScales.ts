@@ -127,24 +127,9 @@ const useScales = (properties: useScaleProps) => {
 
   // handle Scatter plot
   if (config.visualizationType === 'Scatter Plot') {
-    if (xAxis.type === 'continuous') {
-      let min = xAxis.min ? xAxis.min : Math.min.apply(null, xScale.domain())
-      let max = xAxis.max ? xAxis.max : Math.max.apply(null, xScale.domain())
-      xScale = scaleLinear({
-        domain: [min, max],
-        range: [0, xMax]
-      })
-      xScale.type = scaleTypes.LINEAR
-    }
-    if (xAxis.type === 'categorical') {
-      // Map items to rounded numbers if numeric, skip formatting  non-numeric strings.
-      const xAxisDataMappedRoundedItems = xAxisDataMapped.map(item => {
-        const strItem = String(item)
-        const parsed = parseFloat(strItem)
-        return !isNaN(parsed) ? Math.round(parsed).toString() : strItem
-      })
-
-      xScale = composeScaleBand(xAxisDataMappedRoundedItems, [0, xMax], 1 - config.barThickness)
+    if (xAxis.type === 'categorical' || xAxis.type === 'continuous') {
+      xScale = composeScaleBand(xAxisDataMapped, [0, xMax], 1)
+      xScale.type = scaleTypes.BAND
     }
   }
 
