@@ -27,7 +27,7 @@ export const getMimeType = ({ fileBlob, externalURL, fileName, fileSourceType, f
 
   if (fileSourceType === 'url') {
     // if no fileData.type check the externalURL for csv or json extension
-    if (!fileData.type) {
+    if (!fileData.type || fileData.type === 'application/octet-stream') {
       const pathMatch = externalURL.match(/(?:\.([^.]+))?$/g)
       const ext = pathMatch.length === 0 ? '.csv' : pathMatch[0]
       return supportedDataTypes[ext]
