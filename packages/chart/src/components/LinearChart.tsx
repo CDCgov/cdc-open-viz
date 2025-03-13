@@ -440,8 +440,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   }, [maxValue])
 
   useEffect(() => {
-    if (orientation === 'horizontal') return
-    if (!labelsOverflow) return
+    if (orientation === 'horizontal' || !labelsOverflow || config.yAxis?.max) {
+      setYAxisAutoPadding(0)
+      return
+    }
 
     // minimum percentage of the max value that the distance should be from the top grid line
     const MINIMUM_DISTANCE_PERCENTAGE = 0.025
