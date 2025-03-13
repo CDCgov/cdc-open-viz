@@ -138,6 +138,7 @@ export default function DataImport() {
           }
         })
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err)
 
       const error = err.toString()
@@ -476,12 +477,13 @@ export default function DataImport() {
   }
 
   let configureData,
-    readyToConfigure = false
+    readyToConfigure: boolean | Object[] = false
 
   if (config.type === 'dashboard') {
     readyToConfigure = Object.keys(config.datasets).length > 0
   } else {
     configureData = config
+
     readyToConfigure =
       !!config.formattedData || (config.data && config.dataDescription && transform.autoStandardize(config.data))
   }
