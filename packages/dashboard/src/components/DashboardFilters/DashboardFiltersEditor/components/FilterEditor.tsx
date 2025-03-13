@@ -50,6 +50,14 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
 
   const vizRowColumnLocator = getVizRowColumnLocator(config.rows)
 
+  const getVizTitle = (viz, vizKey) => {
+    let vizName = viz.general?.title || viz.title || vizKey
+    if (viz.visualizationType === 'markup-include') {
+      vizName = viz.contentEditor.title || vizKey
+    }
+    return vizName
+  }
+
   const [usedByNameLookup, usedByOptions] = useMemo(() => {
     const nameLookup = {}
     const vizOptions = Object.keys(config.visualizations).filter(vizKey => {
@@ -57,7 +65,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
       if (!vizLookup) return false
       const viz = config.visualizations[vizKey] as Visualization
       if (viz.type === 'dashboardFilters') return false
-      const vizName = viz.general?.title || viz.title || vizKey
+      const vizName = getVizTitle(viz, vizKey)
+
       nameLookup[vizKey] = vizName
       const usesSharedFilter = viz.usesSharedFilter
       const rowIndex = vizLookup.row
@@ -565,11 +574,11 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
               <Select
                 label='Set By:'
                 value={filter.setBy}
-                options={Object.keys(config.visualizations)
-                  .filter(vizKey => config.visualizations[vizKey].type !== 'dashboardFilters')
-                  .map(vizKey => ({
-                    value: vizKey,
-                    label: config.visualizations[vizKey].general?.title || config.visualizations[vizKey].title || vizKey
+                options={Object.values(config.visualizations)
+                  .filter(viz => viz.type !== 'dashboardFilters')
+                  .map(viz => ({
+                    value: viz.uid,
+                    label: getVizTitle(viz, viz.type)
                   }))}
                 updateField={(_section, _subSection, _key, value) => updateFilterProp('setBy', value)}
                 initial='- Select Option -'
