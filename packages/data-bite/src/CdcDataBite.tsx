@@ -546,7 +546,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
             {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
             {(!config.dataColumn || !config.dataFunction) && <Confirm />}
             <Title
-              showTitle={!config.visual?.hideTitle}
+              showTitle={config.visual?.showTitle}
               config={config}
               title={title}
               isDashboard={isDashboard}
