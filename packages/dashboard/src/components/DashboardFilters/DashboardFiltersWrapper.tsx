@@ -16,6 +16,7 @@ import { applyQueuedActive } from '@cdc/core/components/Filters/helpers/applyQue
 import './dashboardfilter.styles.css'
 import { updateChildFilters } from '../../helpers/updateChildFilters'
 import { getFipsCode } from '@cdc/map/src/data/supported-geos'
+import { CONSTANTS } from '../../helpers/configFilterFunctions'
 
 type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
 
@@ -98,7 +99,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
 
   const handleOnChange = (index: number, value: string | string[]) => {
     // check if the filter type is a configFilter
-    if (dashboardConfig.dashboard.sharedFilters[index].type === 'configFilter') {
+    if (dashboardConfig.dashboard.sharedFilters?.[index].type === 'configFilter') {
       // and then update the shared filters
       const newConfig = _.cloneDeep(dashboardConfig)
 
@@ -114,15 +115,44 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       if (visualizationsToCheck) {
         visualizationsToCheck.forEach(vizIndex => {
           const viz = newConfig.visualizations[vizIndex]
+          const focusedStateFilters = newConfig.dashboard.sharedFilters.filter(
+            (f, i) => newConfig.dashboard.sharedFilters[i].propertyToUpdate === 'focusedState'
+          )
+          const geoTypeFilters = newConfig.dashboard.sharedFilters.filter(
+            (f, i) => newConfig.dashboard.sharedFilters[i].propertyToUpdate === 'geoType'
+          )
           if (dashboardConfig.dashboard.sharedFilters[index].propertyToUpdate === 'focusedState') {
             // get fips code by state name
             const f = getFipsCode(value)
             viz.general.statePicked = { fipsCode: f, stateName: value }
             viz.general.stateToShow = value
-            viz.general.geoType = 'single-state'
+
+            if (value === '- Select -') {
+              // check all config.dashboard.sharedFilers for the geoType filter
+              const lookup = {
+                State: 'us',
+                County: 'us-county'
+              }
+              if (geoTypeFilters) {
+                viz.general.geoType = lookup[geoTypeFilters?.[0].active]
+              } else {
+                viz.general.geoType = 'us'
+              }
+            } else {
+              viz.general.geoType = 'single-state'
+            }
           }
           if (dashboardConfig.dashboard.sharedFilters[index].propertyToUpdate === 'geoType') {
             viz.general.geoType = lookup[value]
+
+            // reset any focusedState filters onto newConfig
+            dashboardConfig.dashboard.sharedFilters.forEach((f, i) => {
+              // if the filter is a focusedState filter
+              if (f.propertyToUpdate === 'focusedState') {
+                // set the active value to '- Select -'
+                dashboardConfig.dashboard.sharedFilters[i].active = '- Select -'
+              }
+            })
           }
         })
       }

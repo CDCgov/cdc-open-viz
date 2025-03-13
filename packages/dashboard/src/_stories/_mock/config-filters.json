@@ -25,6 +25,7 @@
         "key": "State",
         "showDropdown": true,
         "values": [
+          "- Select -",
           "Alabama",
           "Alaska",
           "Arizona",
@@ -78,6 +79,7 @@
         ],
         "type": "configFilter",
         "orderedValues": [
+          "- Select -",
           "Alabama",
           "Alaska",
           "Arizona",
@@ -162,7 +164,7 @@
     "map1740773670361": {
       "annotations": [],
       "general": {
-        "geoType": "single-state",
+        "geoType": "us",
         "navigationTarget": "_self",
         "noStateFoundMessage": "Map Unavailable",
         "annotationDropdownText": "Annotations",
@@ -189,11 +191,11 @@
         "hideGeoColumnInTooltip": false,
         "hidePrimaryColumnInTooltip": false,
         "statePicked": {
-          "fipsCode": "12",
-          "stateName": "Florida"
+          "fipsCode": "06",
+          "stateName": "California"
         },
         "expandDataTable": false,
-        "stateToShow": "Florida"
+        "stateToShow": "California"
       },
       "type": "map",
       "color": "pinkpurple",
