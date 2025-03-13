@@ -565,6 +565,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     addColRoundTo,
     { index, length } = { index: null, length: null }
   ) => {
+    if (num === '') return 'N/A'
     // if num is NaN return num
     if (isNaN(num) || !num) return num
     // Check if the input number is negative
