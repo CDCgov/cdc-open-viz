@@ -1,36 +1,42 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { csvParse } from 'd3'
 import axios from 'axios'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
-import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
+import ConfigContext, { EditorDispatchContext } from '../../../ConfigContext'
 
-import TabPane from './TabPane'
-import Tabs from './Tabs'
-import PreviewDataTable from './PreviewDataTable'
-import LinkIcon from '../assets/icons/link.svg'
-import SampleDataContext from './../samples/SampleDataContext'
+import TabPane from '../../TabPane'
+import Tabs from '../../Tabs'
+import PreviewDataTable from '../../PreviewDataTable'
+import LinkIcon from '../../../assets/icons/link.svg'
+import SampleDataContext from './samples/SampleDataContext'
 import SampleData from './SampleData'
 
-import FileUploadIcon from '../assets/icons/file-upload-solid.svg'
+import FileUploadIcon from '../../../assets/icons/file-upload-solid.svg'
 import CloseIcon from '@cdc/core/assets/icon-close.svg'
 
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
-
-import '../scss/data-import.scss'
-
-import '@cdc/core/styles/v2/components/data-designer.scss'
-import { errorMessages, maxFileSize } from '../helpers/errorMessages'
-import { Visualization } from '@cdc/core/types/Visualization'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
-import { DataSet } from '@cdc/dashboard/src/types/DataSet'
+import { type Visualization } from '@cdc/core/types/Visualization'
+import { type DataSet } from '@cdc/dashboard/src/types/DataSet'
 
-export default function DataImport() {
+import './data-import.scss'
+import '@cdc/core/styles/v2/components/data-designer.scss'
+
+import { errorMessages, maxFileSize } from '../../../helpers/errorMessages'
+import { displaySize } from '../helpers/displaySize'
+import { supportedDataTypes } from '../helpers/supportedDataTypes'
+import { getFileExtension } from '../helpers/getFileExtension'
+import { parseTextByMimeType } from '../helpers/parseTextByMimeType'
+import { getMimeType } from '../helpers/getMimeType'
+
+const DataImport = () => {
   const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)
+  const dispatch = useContext(EditorDispatchContext)
+  const transform = new DataTransform()
 
   const setConfig = (conf: Visualization) => {
     dispatch({ type: 'EDITOR_SET_CONFIG', payload: conf })
@@ -38,43 +44,18 @@ export default function DataImport() {
   const setErrors = (err: string[]) => {
     dispatch({ type: 'EDITOR_SET_ERRORS', payload: err })
   }
-  const transform = new DataTransform()
 
   const [externalURL, setExternalURL] = useState(
     config.dataFileSourceType === 'url' ? config.dataFileName : config.dataUrl || ''
   )
 
   const [keepURL, setKeepURL] = useState(!!config.dataUrl)
-
   const [addingDataset, setAddingDataset] = useState(config.type === 'dashboard' || !config.data)
-
   const [editingDataset, _setEditingDataset] = useState<string>(undefined)
-
   const [newDatasetName, setNewDatasetName] = useState<string>(undefined)
   const setEditingDataset = (datasetKey: string) => {
     _setEditingDataset(datasetKey)
     setNewDatasetName(datasetKey)
-  }
-
-  const dispatch = useContext(EditorDispatchContext)
-
-  const supportedDataTypes = {
-    '.csv': 'text/csv',
-    '.json': 'application/json'
-  }
-
-  const displaySize = size => {
-    if (size === undefined) return ''
-
-    if (size > Math.pow(1024, 3)) {
-      return Math.round((size / Math.pow(1024, 3)) * 100) / 100 + 'GB'
-    } else if (size > Math.pow(1024, 2)) {
-      return Math.round((size / Math.pow(1024, 2)) * 100) / 100 + 'MB'
-    } else if (size > 1024) {
-      return Math.round((size / 1024) * 100) / 100 + 'KB'
-    } else {
-      return size + 'B'
-    }
   }
 
   /**
@@ -83,8 +64,6 @@ export default function DataImport() {
   const dataExists = (newData, oldSeries, oldAxisX) => {
     // Loop through old series to make sure each exists in the new data
 
-    // TODO: move to forEach?
-    // eslint-disable-next-line array-callback-return
     oldSeries.map(function (currentValue, index, newData) {
       if (!newData.find(element => element.dataKey === currentValue.dataKey)) return false
     })
@@ -95,15 +74,8 @@ export default function DataImport() {
     return true
   }
 
-  const getFileExtension = (url: URL) => {
-    return isSolrCsv(externalURL)
-      ? '.csv'
-      : isSolrJson(externalURL)
-      ? '.json'
-      : Object.keys(supportedDataTypes).find(extension => url.pathname.endsWith(extension))
-  }
-
   const loadExternal = async () => {
+    let responseBlob: Blob = null
     let dataURL: URL
     // Is URL valid?
 
@@ -113,9 +85,9 @@ export default function DataImport() {
     } catch {
       throw errorMessages.urlInvalid
     }
-    let responseBlob: Blob = null
-
+    debugger
     const fileExtension = getFileExtension(dataURL)
+
     try {
       // eslint-disable-next-line no-unused-vars
       await axios
@@ -139,7 +111,7 @@ export default function DataImport() {
         })
     } catch (err) {
       // eslint-disable-next-line no-console
-      console.error(err)
+      console.error('Error in loadExternal', err)
 
       const error = err.toString()
 
@@ -186,42 +158,13 @@ export default function DataImport() {
       return
     }
 
-    // checking the file source type allows us to handle real urls better
-    // For example, query parameters in API's and cache busting strings
-    // file matching can handle .csv and .json, but doesn't handle
-    // .csv?version=1 or .json?version=1
-    const getMimeType = () => {
-      const path = fileBlob?.name || externalURL || fileName
-      if (fileSourceType === 'file') {
-        const pathMatch = path.match(/(?:\.([^.]+))?$/g)
-        const ext = pathMatch.length === 0 ? '.csv' : pathMatch[0]
-        return supportedDataTypes[ext]
-      }
-
-      if (fileSourceType === 'url') {
-        return fileData.type
-      }
-    }
-
-    const mimeType = getMimeType()
-
-    const getText = resultText => {
-      switch (mimeType) {
-        case 'text/csv':
-          return csvParse(resultText)
-        case 'text/plain':
-        case 'application/json':
-          try {
-            return isSolrJson(externalURL) ? JSON.parse(resultText).response.docs : JSON.parse(resultText)
-          } catch (errors) {
-            setErrors([errorMessages.formatting])
-            return
-          }
-        default:
-          setErrors([errorMessages.fileType])
-          return
-      }
-    }
+    const mimeType = getMimeType({
+      fileBlob,
+      externalURL,
+      fileName,
+      fileSourceType,
+      fileData
+    })
 
     // Convert from blob into raw text
     // Have to use FileReader instead of just .text because IE11 and the polyfills for this are bugged
@@ -272,7 +215,7 @@ export default function DataImport() {
 
       // Validate parsed data and set if no issues.
       try {
-        const result = getText(this.result.toString())
+        const result = parseTextByMimeType(this.result.toString(), mimeType, externalURL, setErrors)
         const text = transform.autoStandardize(result)
         if (config.data && config.series) {
           if (dataExists(text, config.series, config?.xAxis.dataKey)) {
@@ -855,3 +798,5 @@ export default function DataImport() {
     </>
   )
 }
+
+export default DataImport
