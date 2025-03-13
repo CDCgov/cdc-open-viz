@@ -31,7 +31,8 @@ export const pivotData = (data: Record<string, any>[], columnName: string, pivot
         aggregateRows[key][pivotColumn] = {
           ...aggregateRows[key][pivotColumn],
           ...toAdd,
-          [row[columnName]]: row[pivotColumn]
+          [row[columnName]]: row[pivotColumn],
+          _pivotedFrom: pivotColumn
         }
       })
     } else {
@@ -40,7 +41,8 @@ export const pivotData = (data: Record<string, any>[], columnName: string, pivot
       aggregateRows[key] = {
         ...aggregateRows[key],
         ...toAdd,
-        [row[columnName]]: row[_pivot]
+        [row[columnName]]: row[_pivot],
+        _pivotedFrom: _pivot
       }
     }
 
