@@ -52,7 +52,7 @@ export const pivotData = (data: Record<string, any>[], columnName: string, pivot
   if (pivot.length > 1) {
     return Object.keys(aggregateRows).flatMap(aggregateKey => {
       return Object.keys(aggregateRows[aggregateKey]).map(pivotColumn => ({
-        pivotColumn,
+        _pivotedFrom: pivotColumn,
         ...aggregateRows[aggregateKey][pivotColumn]
       }))
     })
