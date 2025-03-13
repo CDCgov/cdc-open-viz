@@ -85,7 +85,6 @@ const DataImport = () => {
     } catch {
       throw errorMessages.urlInvalid
     }
-    debugger
     const fileExtension = getFileExtension(dataURL)
 
     try {
