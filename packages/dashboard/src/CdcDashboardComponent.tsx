@@ -282,6 +282,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       })
       if (allValuesSelected) {
         reloadURLData(newFilters)
+        setAPILoading(false)
       } else {
         setAPILoading(false)
       }
