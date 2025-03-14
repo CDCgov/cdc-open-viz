@@ -52,7 +52,8 @@ const Legend: React.FC<LegendProps> = forwardRef(
     ref
   ) => {
     const { innerClasses, containerClasses } = getLegendClasses(config)
-    const { runtime, legend } = config
+    const { runtime, legend, series } = config
+
     const seriesWithData = getSeriesWithData(config)
 
     const isLegendBottom =
@@ -97,7 +98,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
               <>
                 <div className={innerClasses.join(' ')}>
                   {formatLabels(labels as Label[])
-                    .filter(label => seriesWithData.includes(label.datum))
+                    .filter(label => !series.length || seriesWithData.includes(label.datum))
                     .map((label, i) => {
                       let className = ['legend-item', `legend-text--${label.text.replace(' ', '').toLowerCase()}`]
                       let itemName = label.datum
