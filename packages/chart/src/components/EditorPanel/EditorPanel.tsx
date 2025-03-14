@@ -906,7 +906,7 @@ const EditorPanel = () => {
     return Object.keys(columns)
   }
 
-  const getLegendStyleOptions = (option: 'style' | 'subStyle' | 'shapes' | 'subGroup'): string[] => {
+  const getLegendStyleOptions = (option: 'style' | 'subStyle' | 'shapes' | 'groupBy'): string[] => {
     const options: string[] = []
 
     switch (option) {
@@ -930,8 +930,9 @@ const EditorPanel = () => {
         }
 
         break
-      case 'subGroup':
+      case 'groupBy':
         options.push(...getColumns())
+        break
     }
     return options
   }
@@ -3695,14 +3696,15 @@ const EditorPanel = () => {
                   />
 
                   <Select
-                    value={config.legend.subGroup}
+                    value={config.legend.groupBy}
                     section='legend'
-                    fieldName='subGroup'
+                    fieldName='groupBy'
                     initial='Select'
-                    label='Legend SubGroup'
+                    label='Legend Group By:'
                     updateField={updateField}
-                    options={getLegendStyleOptions('subGroup')}
+                    options={getLegendStyleOptions('groupBy')}
                   />
+
                   <CheckBox
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>

@@ -166,6 +166,7 @@ export default {
     seriesHighlight: [],
     style: 'circles',
     subStyle: 'linear blocks',
+    groupBy: '',
     shape: 'circle',
     tickRotation: '',
     hideBorder: {

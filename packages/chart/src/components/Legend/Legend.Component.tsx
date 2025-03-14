@@ -118,7 +118,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       } else className.push('highlighted')
                     }
 
-                    if (config.legend.style === 'gradient' || config.legend.subGroup) {
+                    if (config.legend.style === 'gradient' || config.legend.groupBy) {
                       return <></>
                     }
 
