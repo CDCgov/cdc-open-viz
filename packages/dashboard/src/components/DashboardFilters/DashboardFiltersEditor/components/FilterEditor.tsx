@@ -15,6 +15,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import MultiSelect from '@cdc/core/components/MultiSelect'
+import Loading from '@cdc/core/components/Loading'
 import { DashboardConfig } from '../../../../types/DashboardConfig'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { hasDashboardApplyBehavior } from '../../../../helpers/hasDashboardApplyBehavior'
@@ -39,6 +40,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
   toggleNestedQueryParameters
 }) => {
   const [columns, setColumns] = useState<string[]>([])
+  const [dataFiltersLoading, setDataFiltersLoading] = useState(false)
   const transform = new DataTransform()
   const filterStyles = Object.values(FILTER_STYLE)
 
@@ -48,6 +50,14 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
 
   const vizRowColumnLocator = getVizRowColumnLocator(config.rows)
 
+  const getVizTitle = (viz, vizKey) => {
+    let vizName = viz.general?.title || viz.title || vizKey
+    if (viz.visualizationType === 'markup-include') {
+      vizName = viz.contentEditor.title || vizKey
+    }
+    return vizName
+  }
+
   const [usedByNameLookup, usedByOptions] = useMemo(() => {
     const nameLookup = {}
     const vizOptions = Object.keys(config.visualizations).filter(vizKey => {
@@ -55,7 +65,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
       if (!vizLookup) return false
       const viz = config.visualizations[vizKey] as Visualization
       if (viz.type === 'dashboardFilters') return false
-      const vizName = viz.general?.title || viz.title || vizKey
+      const vizName = getVizTitle(viz, vizKey)
+
       nameLookup[vizKey] = vizName
       const usesSharedFilter = viz.usesSharedFilter
       const rowIndex = vizLookup.row
@@ -81,20 +92,25 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
   }, [config, filterIndex])
 
   const loadColumnData = async () => {
+    // column data only needed for data filters
+    if (!config.dashboard.sharedFilters.some(f => f.type === 'datafilter')) return
     const columns = {}
     const dataKeys = Object.keys(config.datasets)
-
     for (let i = 0; i < dataKeys.length; i++) {
       const dataKey = dataKeys[i]
       let _dataSet = config.datasets[dataKey]
       if (!_dataSet.data && _dataSet.dataUrl) {
-        _dataSet = await fetchRemoteData(_dataSet.dataUrl)
+        setDataFiltersLoading(true)
+        let data = await fetchRemoteData(_dataSet.dataUrl)
         if (_dataSet.dataDescription) {
           try {
-            _dataSet = transform.autoStandardize(_dataSet.data)
-            _dataSet = transform.developerStandardize(_dataSet.data, _dataSet.dataDescription)
+            data = transform.autoStandardize(data)
+            data = transform.developerStandardize(data, _dataSet.dataDescription)
           } catch (e) {
+            console.error(e)
             //Data not able to be standardized, leave as is
+          } finally {
+            _dataSet.data = data
           }
         }
       }
@@ -107,13 +123,13 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
         })
       }
     }
-
+    setDataFiltersLoading(false)
     setColumns(Object.keys(columns))
   }
 
   useEffect(() => {
     loadColumnData()
-  }, [config.datasets])
+  }, [config.datasets, config.dashboard.sharedFilters])
 
   const updateAPIFilter = (key: keyof APIFilter, value: string | boolean) => {
     const filterClone = _.cloneDeep(filter)
@@ -205,13 +221,21 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
     )
   }
 
+  const selectFilterType = (type: string) => {
+    updateFilterProp('type', type)
+    if (type === 'datafilter') {
+      loadColumnData()
+    }
+  }
+
   return (
     <>
+      {dataFiltersLoading && <Loading />}
       <label>
         <span className='edit-label column-heading'>Filter Type: </span>
         <select
           defaultValue={filter.type || ''}
-          onChange={e => updateFilterProp('type', e.target.value)}
+          onChange={e => selectFilterType(e.target.value)}
           disabled={!!filter.type}
         >
           <option value=''>- Select Option -</option>
@@ -547,22 +571,18 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                   </label>
                 </>
               )}
-              <label>
-                <span className='edit-label column-heading'>Set By: </span>
-                <select value={filter.setBy} onChange={e => updateFilterProp('setBy', e.target.value)}>
-                  <option value=''>- Select Option -</option>
-                  {Object.keys(config.visualizations)
-                    .filter(vizKey => config.visualizations[vizKey].type !== 'dashboardFilters')
-                    .map(vizKey => {
-                      const viz = config.visualizations[vizKey] as Visualization
-                      return (
-                        <option value={vizKey} key={`set-by-select-item-${vizKey}`}>
-                          {viz.general?.title || viz.title || vizKey}
-                        </option>
-                      )
-                    })}
-                </select>
-              </label>
+              <Select
+                label='Set By:'
+                value={filter.setBy}
+                options={Object.values(config.visualizations)
+                  .filter(viz => viz.type !== 'dashboardFilters')
+                  .map(viz => ({
+                    value: viz.uid,
+                    label: getVizTitle(viz, viz.type)
+                  }))}
+                updateField={(_section, _subSection, _key, value) => updateFilterProp('setBy', value)}
+                initial='- Select Option -'
+              />
               <label>
                 <span className='edit-label column-heading mt-1'>
                   Used By: (optional)

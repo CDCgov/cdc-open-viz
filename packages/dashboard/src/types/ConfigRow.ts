@@ -5,6 +5,7 @@ type Col = {
   width: number | null
   hide?: boolean
   widget?: string
+  toggleName?: string
   uuid?: string | number
 }
 

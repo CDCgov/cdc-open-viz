@@ -19,11 +19,11 @@ import Waiting from '@cdc/core/components/Waiting'
 
 // types
 import { type Coordinate, type MapConfig } from './types/MapConfig'
+import { displayGeoName } from './helpers/displayGeoName'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
 import {
-  stateFipsToTwoDigit,
   supportedCities,
   supportedCounties,
   supportedCountries,
@@ -62,7 +62,6 @@ import { getUniqueValues } from './helpers/getUniqueValues'
 import { hashObj } from './helpers/hashObj'
 import { navigationHandler } from './helpers/navigationHandler'
 import { validateFipsCodeLength } from './helpers/validateFipsCodeLength'
-import { titleCase } from './helpers/titleCase'
 import { indexOfIgnoreType } from './helpers/indexOfIgnoreType'
 
 // Child Components
@@ -80,8 +79,7 @@ import GoogleMap from './components/GoogleMap'
 // hooks
 import useTooltip from './hooks/useTooltip'
 import useResizeObserver from './hooks/useResizeObserver'
-import { SubGrouping } from '@cdc/core/types/VizFilter'
-import { ViewPort } from '@cdc/core/types/ViewPort'
+import { formatLegendLocation } from './helpers/formatLegendLocation'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -227,19 +225,19 @@ const CdcMap = ({
   // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
   // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
   // eslint-disable-next-line
-  const addUIDs = useCallback((obj, fromColumn) => {
-    obj.data.forEach(row => {
+  const addUIDs = useCallback((configObj, fromColumn) => {
+    configObj.data.forEach(row => {
       let uid = null
 
       if (row.uid) row.uid = null // Wipe existing UIDs
 
       // United States check
-      if ('us' === obj.general.geoType && obj.columns.geo.name) {
-        // const geoName = row[obj.columns.geo.name] && typeof row[obj.columns.geo.name] === "string" ? row[obj.columns.geo.name].toUpperCase() : '';
+      if ('us' === configObj.general.geoType && configObj.columns.geo.name) {
+        // const geoName = row[configObj.columns.geo.name] && typeof row[configObj.columns.geo.name] === "string" ? row[configObj.columns.geo.name].toUpperCase() : '';
         let geoName = ''
 
-        if (row[obj.columns.geo.name] !== undefined && row[obj.columns.geo.name] !== null) {
-          geoName = String(row[obj.columns.geo.name])
+        if (row[configObj.columns.geo.name] !== undefined && row[configObj.columns.geo.name] !== null) {
+          geoName = String(row[configObj.columns.geo.name])
           geoName = geoName.toUpperCase()
         }
 
@@ -273,12 +271,12 @@ const CdcMap = ({
         }
       }
 
-      if ('us-region' === obj.general.geoType && obj.columns.geo.name) {
-        // const geoName = row[obj.columns.geo.name] && typeof row[obj.columns.geo.name] === "string" ? row[obj.columns.geo.name].toUpperCase() : '';
+      if ('us-region' === configObj.general.geoType && configObj.columns.geo.name) {
+        // const geoName = row[configObj.columns.geo.name] && typeof row[configObj.columns.geo.name] === "string" ? row[configObj.columns.geo.name].toUpperCase() : '';
         let geoName = ''
 
-        if (row[obj.columns.geo.name] !== undefined && row[obj.columns.geo.name] !== null) {
-          geoName = String(row[obj.columns.geo.name])
+        if (row[configObj.columns.geo.name] !== undefined && row[configObj.columns.geo.name] !== null) {
+          geoName = String(row[configObj.columns.geo.name])
           geoName = geoName.toUpperCase()
         }
 
@@ -287,8 +285,8 @@ const CdcMap = ({
       }
 
       // World Check
-      if ('world' === obj.general.geoType) {
-        const geoName = row[obj.columns.geo.name]
+      if ('world' === configObj.general.geoType) {
+        const geoName = row[configObj.columns.geo.name]
 
         uid = countryKeys.find(key => supportedCountries[key].includes(geoName))
 
@@ -305,10 +303,10 @@ const CdcMap = ({
 
       // County Check
       if (
-        ('us-county' === obj.general.geoType || 'single-state' === obj.general.geoType) &&
-        'us-geocode' !== obj.general.type
+        ('us-county' === configObj.general.geoType || 'single-state' === configObj.general.geoType) &&
+        'us-geocode' !== configObj.general.type
       ) {
-        const fips = row[obj.columns.geo.name]
+        const fips = row[configObj.columns.geo.name]
         uid = countyKeys.find(key => key === fips)
       }
 
@@ -334,18 +332,18 @@ const CdcMap = ({
       }
     })
 
-    obj.data.fromColumn = fromColumn
+    configObj.data.fromColumn = fromColumn
   })
 
   // eslint-disable-next-line
-  const generateRuntimeLegend = useCallback((obj, runtimeFilters, hash) => {
+  const generateRuntimeLegend = useCallback((configObj, runtimeFilters, hash) => {
     const newLegendMemo = new Map() // Reset memoization
     const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
-    let primaryCol = obj.columns.primary.name,
-      isBubble = obj.general.type === 'bubble',
-      categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
-      type = obj.legend.type,
-      number = obj.legend.numberOfItems,
+    let primaryCol = configObj.columns.primary.name,
+      isBubble = configObj.general.type === 'bubble',
+      categoricalCol = configObj.columns.categorical ? configObj.columns.categorical.name : undefined,
+      type = configObj.legend.type,
+      number = configObj.legend.numberOfItems,
       result = []
 
     // Add a hash for what we're working from if passed
@@ -356,14 +354,14 @@ const CdcMap = ({
     result.runtimeDataHash = runtimeFilters?.fromHash
 
     // Unified will base the legend off ALL of the data maps received. Otherwise, it will use
-    let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData)
+    let dataSet = configObj.legend.unified ? configObj.data : Object.values(runtimeData)
     let specialClasses = 0
     let specialClassesHash = {}
 
     // Special classes
-    if (obj.legend.specialClasses.length) {
-      if (typeof obj.legend.specialClasses[0] === 'object') {
-        obj.legend.specialClasses.forEach(specialClass => {
+    if (configObj.legend.specialClasses.length) {
+      if (typeof configObj.legend.specialClasses[0] === 'object') {
+        configObj.legend.specialClasses.forEach(specialClass => {
           dataSet = dataSet.filter(row => {
             const val = String(row[specialClass.key])
 
@@ -399,7 +397,7 @@ const CdcMap = ({
         dataSet = dataSet.filter(row => {
           const val = row[primaryCol]
 
-          if (obj.legend.specialClasses.includes(val)) {
+          if (configObj.legend.specialClasses.includes(val)) {
             // apply the special color to the legend
             if (undefined === specialClassesHash[val]) {
               specialClassesHash[val] = true
@@ -451,8 +449,8 @@ const CdcMap = ({
 
       let sorted = [...uniqueValues.keys()]
 
-      if (obj.legend.additionalCategories) {
-        obj.legend.additionalCategories.forEach(additionalCategory => {
+      if (configObj.legend.additionalCategories) {
+        configObj.legend.additionalCategories.forEach(additionalCategory => {
           if (additionalCategory && indexOfIgnoreType(sorted, additionalCategory) === -1) {
             sorted.push(additionalCategory)
           }
@@ -460,7 +458,7 @@ const CdcMap = ({
       }
 
       // Apply custom sorting or regular sorting
-      let configuredOrder = obj.legend.categoryValuesOrder ?? []
+      let configuredOrder = configObj.legend.categoryValuesOrder ?? []
 
       if (configuredOrder.length) {
         sorted.sort((a, b) => {
@@ -529,7 +527,7 @@ const CdcMap = ({
     let legendNumber = Math.min(number, Object.keys(uniqueValues).length)
 
     // Separate zero
-    if (true === obj.legend.separateZero && !state.general.equalNumberOptIn) {
+    if (true === configObj.legend.separateZero && !state.general.equalNumberOptIn) {
       let addLegendItem = false
 
       for (let i = 0; i < dataSet.length; i++) {
@@ -769,7 +767,7 @@ const CdcMap = ({
     if (state.general.geoType === 'world') {
       const runtimeDataKeys = Object.keys(runtimeFilters)
       const isCountriesWithNoDataState =
-        obj.data === undefined ? false : !countryKeys.every(countryKey => runtimeDataKeys.includes(countryKey))
+        configObj.data === undefined ? false : !countryKeys.every(countryKey => runtimeDataKeys.includes(countryKey))
 
       if (result.length > 0 && isCountriesWithNoDataState) {
         result.push({
@@ -807,14 +805,14 @@ const CdcMap = ({
   })
 
   // eslint-disable-next-line
-  const generateRuntimeFilters = useCallback((obj, hash, runtimeFilters) => {
-    if (typeof obj === 'undefined' || undefined === obj.filters || obj.filters.length === 0) return []
+  const generateRuntimeFilters = useCallback((configObj, hash, runtimeFilters) => {
+    if (typeof configObj === 'undefined' || undefined === configObj.filters || configObj.filters.length === 0) return []
 
     let filters = []
 
     if (hash) filters.fromHash = hash
 
-    obj?.filters.forEach(
+    configObj?.filters.forEach(
       (
         {
           columnName,
@@ -833,16 +831,16 @@ const CdcMap = ({
         let newFilter = runtimeFilters[idx]
 
         const sort = (a, b) => {
-          const asc = obj.filters[idx].order !== 'desc'
+          const asc = configObj.filters[idx].order !== 'desc'
           return String(asc ? a : b).localeCompare(String(asc ? b : a), 'en', { numeric: true })
         }
 
         if (type !== 'url') {
           values = getUniqueValues(state.data, columnName)
 
-          if (obj.filters[idx].order === 'cust') {
-            if (obj.filters[idx]?.values.length > 0) {
-              values = obj.filters[idx].values
+          if (configObj.filters[idx].order === 'cust') {
+            if (configObj.filters[idx]?.values.length > 0) {
+              values = configObj.filters[idx].values
             }
           } else {
             values = values.sort(sort)
@@ -853,7 +851,7 @@ const CdcMap = ({
           newFilter = {}
         }
 
-        newFilter.order = obj.filters[idx].order ? obj.filters[idx].order : 'asc'
+        newFilter.order = configObj.filters[idx].order ? configObj.filters[idx].order : 'asc'
         newFilter.type = type
         newFilter.label = label ?? ''
         newFilter.columnName = columnName
@@ -863,10 +861,11 @@ const CdcMap = ({
         newFilter.values = values
         newFilter.setByQueryParameter = setByQueryParameter
         handleSorting(newFilter)
-        newFilter.active = active ?? values[0] // Default to first found value
-        newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
+        newFilter.active = active || configObj.filters[idx].defaultValue || values[0] // Default to first found value
+        newFilter.defaultValue = configObj.filters[idx].defaultValue || ''
+        newFilter.filterStyle = configObj.filters[idx].filterStyle ? configObj.filters[idx].filterStyle : 'dropdown'
         newFilter.showDropdown = showDropdown
-        newFilter.subGrouping = obj.filters[idx].subGrouping
+        newFilter.subGrouping = configObj.filters[idx].subGrouping
 
         filters.push(newFilter)
       }
@@ -877,7 +876,7 @@ const CdcMap = ({
 
   // Calculates what's going to be displayed on the map and data table at render.
   // eslint-disable-next-line
-  const generateRuntimeData = useCallback((obj, filters, hash, test) => {
+  const generateRuntimeData = useCallback((configObj, filters, hash, test) => {
     try {
       const result = {}
 
@@ -886,22 +885,23 @@ const CdcMap = ({
         value: hash
       })
 
-      addUIDs(obj, obj.columns.geo.name)
-      obj.data.forEach(row => {
+      addUIDs(configObj, configObj.columns.geo.name)
+      configObj.data.forEach(row => {
         if (test) {
-          console.log('object', obj) // eslint-disable-line
+          console.log('object', configObj) // eslint-disable-line
           console.log('row', row) // eslint-disable-line
         }
 
         if (undefined === row.uid) return false // No UID for this row, we can't use for mapping
-
-        if (row[obj.columns.primary.name]) {
-          row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name], state)
+        const configPrimaryName = configObj.columns.primary.name
+        if (row[configPrimaryName]) {
+          row[configPrimaryName] = numberFromString(row[configPrimaryName], state)
         }
 
         // If this is a navigation only map, skip if it doesn't have a URL
-        if ('navigation' === obj.general.type) {
-          let navigateUrl = row[obj.columns.navigate.name] || ''
+
+        if ('navigation' === configObj.general.type) {
+          let navigateUrl = row[configObj.columns.navigate.name] || ''
 
           if (undefined !== navigateUrl && typeof navigateUrl === 'string') {
             // Strip hidden characters before we check length
@@ -987,73 +987,6 @@ const CdcMap = ({
     newLegend.runtimeDataHash = runtimeLegend.runtimeDataHash
 
     setRuntimeLegend(newLegend)
-  }
-
-  const formatLegendLocation = key => {
-    let value = key
-    let formattedName = ''
-    let stateName = stateFipsToTwoDigit[key?.substring(0, 2)]
-      ? stateFipsToTwoDigit[key?.substring(0, 2)]
-      : key
-      ? runtimeData?.[key]?.[state.columns.geo.name]
-      : ''
-
-    if (stateName) {
-      formattedName += stateName
-    }
-
-    if (countyKeys.includes(value)) {
-      formattedName += ', ' + titleCase(supportedCounties[key])
-    }
-
-    return formattedName
-  }
-
-  // Attempts to find the corresponding value
-  const displayGeoName = key => {
-    if (!state.general.convertFipsCodes) return key
-
-    // World Map
-    // If we're returning a city name instead of a country ISO code, capitalize it for the data table.
-    if (state.type === 'map' && state.general.geoType === 'world') {
-      if (String(key).length > 3) return titleCase(key)
-    }
-    let value = key
-    // Map to first item in values array which is the preferred label
-    if (stateKeys.includes(value)) {
-      value = titleCase(supportedStates[key][0])
-    }
-
-    if (territoryKeys.includes(value)) {
-      value = titleCase(supportedTerritories[key][0])
-    }
-
-    if (countryKeys.includes(value)) {
-      value = supportedCountries[key][0]
-    }
-
-    if (countyKeys.includes(value)) {
-      value = titleCase(supportedCounties[key])
-    }
-
-    const dict = {
-      'Washington D.C.': 'District of Columbia',
-      'WASHINGTON DC': 'District of Columbia',
-      DC: 'District of Columbia',
-      'WASHINGTON DC.': 'District of Columbia',
-      Congo: 'Republic of the Congo'
-    }
-
-    if (true === Object.keys(dict).includes(value)) {
-      value = dict[value]
-    }
-
-    // if you get here and it's 2 letters then dont titleCase state abbreviations like "AL"
-    if (value.length === 2) {
-      return value
-    } else {
-      return titleCase(value)
-    }
   }
 
   // todo: convert to store or context eventually.
@@ -1511,6 +1444,7 @@ const CdcMap = ({
         config={state}
         isEditor={isEditor}
         ref={outerContainerRef}
+        currentViewport={currentViewport}
         imageId={imageId}
         showEditorPanel={state.showEditorPanel}
       >
@@ -1637,7 +1571,6 @@ const CdcMap = ({
                     expandDataTable={table.expanded}
                     headerColor={general.headerColor}
                     columns={state.columns}
-                    showDownloadButton={general.showDownloadButton}
                     showFullGeoNameInCSV={table.showFullGeoNameInCSV}
                     runtimeLegend={runtimeLegend}
                     runtimeData={runtimeData}
@@ -1647,7 +1580,9 @@ const CdcMap = ({
                     indexTitle={table.indexLabel}
                     vizTitle={general.title}
                     viewport={currentViewport}
-                    formatLegendLocation={formatLegendLocation}
+                    formatLegendLocation={key =>
+                      formatLegendLocation(key, runtimeData?.[key]?.[state.columns.geo.name])
+                    }
                     setFilteredCountryCode={setFilteredCountryCode}
                     tabbingId={tabId}
                     showDownloadImgButton={state.general.showDownloadImgButton}
