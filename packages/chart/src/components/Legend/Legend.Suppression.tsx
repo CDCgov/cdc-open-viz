@@ -121,14 +121,19 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) =>
         </React.Fragment>
       )}
       {shouldShowSuppressedInfo() && (
-        <div className='legend-container__outer definition-link'>
+        <div className='legend-container__outer link-container'>
           <Icon alt='info-icon' display='info' />
           <p>
             This chart contains
-            <a // prettier-ignore
+            <a
+              className='legend-container__outer link'
               onClick={handleLinkClick}
-              data-tooltip-content='Data is suppressed to maintain statistical reliability. This occurs when the number of respondents or reported values does not meet the minimum reporting threshold.'
-              data-tooltip-id='my-tooltip'
+              data-tooltip-content='Data is
+               suppressed to maintain statistical reliability.
+                This occurs when the number of respondents or 
+                reported values does not meet the minimum
+                 reporting threshold.'
+              data-tooltip-id='supression-tooltip'
               href='no-router-link'
             >
               suppressed data
@@ -137,10 +142,19 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) =>
         </div>
       )}
 
-      <ReactTooltip // prettier-ignore
-        id='my-tooltip'
+      <ReactTooltip
+        id='supression-tooltip'
+        place='top'
+        effect='solid'
         variant='light'
-        style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black', maxWidth: '100%' }}
+        style={{
+          background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`,
+          color: 'black',
+          padding: '9px 18px',
+          boxShadow: '0px 2px 2px rgba(28, 29, 31, 0.45)',
+          maxWidth: '239px',
+          borderRadius: '4px'
+        }}
       />
     </React.Fragment>
   )

@@ -144,6 +144,17 @@
   }
 
   .legend-container {
+    #supression-tooltip {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.8337rem;
+      font-weight: 400;
+      max-width: 16.7rem;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      box-shadow: 0px 2px 2px rgba(28, 29, 31, 0.45);
+      white-space: normal;
+      line-height: 1.4;
+    }
     background: #fff;
     width: 100%;
     vertical-align: top;
@@ -232,12 +243,24 @@
     }
 
     &__outer {
-      &.definition-link {
+      &.link-container {
         display: flex;
         flex-direction: row;
         position: absolute;
         left: 0%;
         top: 108%;
+
+        .link {
+          text-decoration: underline;
+          text-decoration-color: #005ea2;
+          text-decoration-style: dotted;
+          text-decoration-thickness: 2px;
+          text-underline-offset: 0.25rem;
+          position: relative;
+          cursor: pointer;
+          color: #005ea2;
+        }
+
         & > * {
           margin: 0;
         }
