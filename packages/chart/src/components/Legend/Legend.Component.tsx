@@ -88,7 +88,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
           parentPaddingToSubtract={legend.hideBorder ? 0 : LEGEND_PADDING}
         />
 
-        <LegendSubgroup data={data} config={config} colorScale={colorScale} formatLabels={formatLabels} />
+        <LegendSubgroup formatLabels={formatLabels} />
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
           {labels => {
             return (

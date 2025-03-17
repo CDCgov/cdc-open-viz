@@ -247,6 +247,24 @@
         }
       }
     }
+    .legend-group {
+      * > {
+        font-family: 'Nunito', sans-serif !important;
+      }
+      .group-label {
+        font-size: 1rem;
+        font-weight: 500;
+        line-height: 18px;
+        margin-bottom: 0.5rem;
+      }
+
+      .group-item > * {
+        font-size: 0.889;
+        font-weight: 90;
+        line-height: 18px;
+        margin-bottom: 0.5rem;
+      }
+    }
 
     .legend-group.top,
     .legend-group.bottom {
@@ -523,6 +541,7 @@
   @include breakpointClass(xs) {
     .chart-container {
       .legend-group {
+        margin-bottom: 1rem;
         grid-template-columns: repeat(1, 1fr);
 
         &.group-item {
@@ -546,8 +565,9 @@
       }
       .legend-group {
         grid-template-columns: repeat(4, 1fr);
+
         &.group-item {
-          margin-right: 0.5rem;
+          margin-right: 2rem;
         }
       }
     }

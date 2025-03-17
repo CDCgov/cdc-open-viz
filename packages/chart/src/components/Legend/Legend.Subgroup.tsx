@@ -1,14 +1,12 @@
 import React, { useContext } from 'react'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendShape from '@cdc/core/components/LegendShape'
-import getLegendClasses from './helpers/getLegendClasses'
-import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
+import ConfigContext from '../../ConfigContext'
 import _ from 'lodash'
 
-function LegendSubgroup({ data, config, colorScale, formatLabels }) {
-  const dispatch = useContext(ChartDispatchContext)
-  const { highlight, seriesHighlight } = useContext(ConfigContext)
-  const { innerClasses, containerClasses } = getLegendClasses(config)
+function LegendSubgroup({ formatLabels }) {
+  const { highlight, seriesHighlight, colorScale, transformedData: data, config } = useContext(ConfigContext)
+
   function getSubGroups(data, key: string | undefined) {
     const uniqueGroups = new Set()
     data.forEach(d => {
@@ -34,8 +32,8 @@ function LegendSubgroup({ data, config, colorScale, formatLabels }) {
       {groups.map(group => {
         return (
           <div style={{ cursor: 'pointer' }} className={classNameItem.join(' ')} key={group}>
-            <div className='text-left'>
-              <p>{group}</p>
+            <div>
+              <p className='legend-group group-label'>{group}</p>
             </div>
             <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
               {labels =>
@@ -46,7 +44,7 @@ function LegendSubgroup({ data, config, colorScale, formatLabels }) {
                   })
 
                   .map((label, i) => {
-                    let className = []
+                    let className = ['legend-group', 'group-item']
                     if (seriesHighlight.length) {
                       if (!seriesHighlight.includes(label.datum)) {
                         className.push('inactive')
@@ -57,6 +55,7 @@ function LegendSubgroup({ data, config, colorScale, formatLabels }) {
 
                     return (
                       <LegendItem
+                        alignItems='start'
                         className={className.join(' ')}
                         onClick={e => {
                           e.preventDefault()
