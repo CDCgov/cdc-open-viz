@@ -144,12 +144,13 @@ export const BarChartVertical = () => {
                   <li class="tooltip-body ">${tooltipBody}</li>
                   ${additionalColTooltip ? '<li class="tooltip-body ">' + additionalColTooltip + '</li>' : ''}
                     </li></ul>`
-                  const { barHeight, isSuppressed, getBarY, getAbsentDataLabel } = getBarConfig({
+                  const { barHeight, isSuppressed, getBarY, absentDataLabel } = getBarConfig({
                     bar,
                     defaultBarHeight,
                     config,
                     barWidth,
-                    isVertical: true
+                    isVertical: true,
+                    yAxisValue
                   })
                   // configure colors
                   let labelColor = '#000000'
@@ -159,7 +160,7 @@ export const BarChartVertical = () => {
                   const isHighlightedBar = highlightedBarValues?.includes(xAxisValue)
                   const highlightedBarColor = getHighlightedBarColorByValue(xAxisValue)
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
-                  const absentDataLabel = getAbsentDataLabel(yAxisValue)
+
                   const borderColor = isHighlightedBar
                     ? highlightedBarColor
                     : config.barHasBorder === 'true'
