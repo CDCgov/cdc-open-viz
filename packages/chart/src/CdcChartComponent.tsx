@@ -181,7 +181,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (newConfig.visualizationType === 'Bump Chart') {
       newConfig.xAxis.type === 'date-time'
     }
-    if (!isDashboard) coveUpdateWorker(newConfig)
+    if (!isDashboard) return coveUpdateWorker(newConfig)
     return newConfig
   }
 
