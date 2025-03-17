@@ -108,7 +108,6 @@ export type MapConfig = Visualization & {
     palette: {
       isReversed: boolean
     }
-    showDownloadButton: boolean
     showDownloadMediaButton: boolean
     showSidebar: boolean
     showTitle: boolean

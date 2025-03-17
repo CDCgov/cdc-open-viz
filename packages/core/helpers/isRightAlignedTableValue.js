@@ -8,6 +8,10 @@ export default function isRightAlignedTableValue(value = '') {
     return !Number.isNaN(value)
   }
   if (typeof value === 'string') {
+    // Dates like 2024-09-12 are not considered numbers
+    if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(value)) {
+      return false
+    }
     return numericStrings.includes(value) || /^[\$\d\.\%\,\-\s\(\)CI]*$/.test(value)
   }
   return false
