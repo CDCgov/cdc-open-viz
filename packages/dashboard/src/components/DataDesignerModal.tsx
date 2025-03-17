@@ -65,9 +65,25 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
     return newData
   }
 
+  const removeDataset = (widgetKey = vizKey) => {
+    const newConfigureData = widgetKey ? config.visualizations[widgetKey] : config.rows[rowIndex]
+    delete newConfigureData.data
+    delete newConfigureData.dataKey
+    delete newConfigureData.dataDescription
+    delete newConfigureData.formattedData
+
+    return (newConfigureData as ConfigureData) || {}
+  }
+
   const changeDataset = async ({ target: { value } }) => {
-    const newData = await fetchData(value)
-    const newConfigureData = { dataDescription: {}, formattedData: undefined, dataKey: value, data: newData }
+    const newData = value === '' ? {} : await fetchData(value)
+    const newConfigureData =
+      value === '' ? removeDataset() : { dataDescription: {}, formattedData: undefined, dataKey: value, data: newData }
+
+    const columnWidgets = config.rows[rowIndex].columns.filter(column => column.widget).map(column => column.widget)
+    if (!vizKey) {
+      columnWidgets.forEach(currentWidgetKey => removeDataset(currentWidgetKey))
+    }
 
     updateConfigureData(newConfigureData)
   }
