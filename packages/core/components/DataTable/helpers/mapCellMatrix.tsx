@@ -103,7 +103,8 @@ const mapCellArray = ({
             </div>
           )
         } else {
-          const dataValue = getDataValue(config, runtimeData, row, column)
+          const rowData = runtimeData[row]
+          const dataValue = getDataValue(config, rowData, column)
           return displayDataAsText(dataValue, column, config)
         }
       })
