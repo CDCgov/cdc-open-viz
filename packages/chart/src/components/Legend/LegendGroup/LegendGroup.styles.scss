@@ -3,22 +3,24 @@
 .legend-container {
   .legend-group {
     font-size: 1rem;
-    font-weight: 500;
+
     line-height: 18px;
     margin-bottom: 0.5rem;
 
-    .group-item > * {
+    .group-item .visx-legend-label {
+      font-weight: 400;
       font-size: 0.889rem;
-      font-weight: 90;
-      line-height: 18px;
       margin-bottom: 0.5rem;
+    }
+    .group-label {
+      font-weight: 500;
+      font-family: Nunito, sans-serif;
+      font-size: 1rem;
     }
   }
 
   .legend-group.top,
   .legend-group.bottom {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
     grid-gap: 10px;
 
     &.group-item {

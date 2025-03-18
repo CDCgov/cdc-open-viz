@@ -3,7 +3,7 @@ import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendShape from '@cdc/core/components/LegendShape'
 import ConfigContext from '../../../ConfigContext'
 import _ from 'lodash'
-// import './LegendGroup.styles.scss'
+import './LegendGroup.styles.scss'
 
 interface LegendGroup {
   formatLabels: Function
