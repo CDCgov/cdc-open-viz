@@ -15,7 +15,7 @@ import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import LegendLineShape from './LegendLine.Shape'
-import LegendSubgroup from './Legend.Subgroup'
+import LegendGroup from './LegendGroup'
 
 const LEGEND_PADDING = 36
 
@@ -87,8 +87,8 @@ const Legend: React.FC<LegendProps> = forwardRef(
           dimensions={dimensions}
           parentPaddingToSubtract={legend.hideBorder ? 0 : LEGEND_PADDING}
         />
+        <LegendGroup formatLabels={formatLabels} />
 
-        <LegendSubgroup formatLabels={formatLabels} />
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
           {labels => {
             return (

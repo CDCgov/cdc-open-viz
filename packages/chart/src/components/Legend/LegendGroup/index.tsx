@@ -1,13 +1,23 @@
 import React, { useContext } from 'react'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendShape from '@cdc/core/components/LegendShape'
-import ConfigContext from '../../ConfigContext'
+import ConfigContext from '../../../ConfigContext'
 import _ from 'lodash'
 
-function LegendGroup({ formatLabels }) {
-  const { highlight, seriesHighlight, colorScale, transformedData: data, config } = useContext(ConfigContext)
+interface LegendGroup {
+  formatLabels: Function
+}
+const LegendGroup = ({ formatLabels }) => {
+  const {
+    highlight,
+    seriesHighlight,
+    colorScale,
+    transformedData: data,
+    config,
+    currentViewport
+  } = useContext(ConfigContext)
 
-  function getSubGroups(data, key: string | undefined) {
+  const getSubGroups = (data, key: string | undefined) => {
     const uniqueGroups = new Set()
     data.forEach(d => {
       config.series.forEach(series => {
@@ -21,17 +31,15 @@ function LegendGroup({ formatLabels }) {
 
   const groups: string[] = getSubGroups(data, config.legend.groupBy)
 
-  const classNames = ['legend-group', `${config.legend.position}`]
-  // if (config.legend.position === 'bottom' || config.legend.position === 'top') {
-  //   classNames.push('d-flex')
-  // }
+  const classNames = ['legend-group', config.legend.position, currentViewport]
+
   let classNameItem = ['legend-group group-item']
 
   return (
     <div className={classNames.join(' ')}>
       {groups.map(group => {
         return (
-          <div style={{ cursor: 'pointer' }} className={classNameItem.join(' ')} key={group}>
+          <div className={classNameItem.join(' ')} key={group}>
             <div>
               <p className='legend-group group-label'>{group}</p>
             </div>

@@ -1,0 +1,112 @@
+@mixin breakpoint($class) {
+  @if $class == xs {
+    @media (max-width: 767px) {
+      @content;
+    }
+  } @else if $class == sm {
+    @media (min-width: 768px) {
+      @content;
+    }
+  } @else if $class == md {
+    @media (min-width: 960px) {
+      @content;
+    }
+  } @else if $class == lg {
+    @media (min-width: 1300px) {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint mixin supports: xs, sm, md, lg";
+  }
+}
+
+@mixin breakpointClass($class) {
+  @if $class == xs {
+    &.xs,
+    &.xxs {
+      @content;
+    }
+  } @else if $class == sm {
+    &.sm,
+    &.md,
+    &.lg {
+      @content;
+    }
+  } @else if $class == md {
+    &.md,
+    &.lg {
+      @content;
+    }
+  } @else if $class == lg {
+    &.lg {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint Class mixin supports: xs, sm, md, lg";
+  }
+}
+
+.legend-container {
+  .legend-group {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 18px;
+    margin-bottom: 0.5rem;
+
+    .group-item > * {
+      font-size: 0.889rem;
+      font-weight: 90;
+      line-height: 18px;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  .legend-group.top,
+  .legend-group.bottom {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 10px;
+
+    &.group-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    & .inactive {
+      opacity: 0.5;
+      transition: 0.2s all;
+    }
+    & .highlighted {
+      outline: 1px solid #005ea2;
+      outline-offset: 5px;
+      border-radius: 1px;
+    }
+  }
+
+  @include breakpointClass(sm) {
+    .legend-group {
+      grid-template-columns: repeat(2, 1fr);
+      .group-item {
+        margin-bottom: 1rem;
+      }
+    }
+  }
+  @include breakpointClass(md) {
+    .legend-group {
+      grid-template-columns: repeat(4, 1fr);
+      .group-item {
+        margin-right: 2rem;
+      }
+    }
+  }
+  @include breakpointClass(xs) {
+    .legend-group {
+      margin-bottom: 1rem;
+      grid-template-columns: repeat(1, 1fr);
+      .group-item {
+        margin-bottom: 1rem;
+      }
+    }
+  }
+}
