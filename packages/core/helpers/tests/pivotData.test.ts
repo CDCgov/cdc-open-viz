@@ -12,8 +12,8 @@ describe('pivotData', () => {
   it('should pivot data correctly', () => {
     const result = pivotData(data, 'name', ['age'])
     expect(result).toEqual([
-      { city: 'New York', John: 25, Jane: 27 },
-      { city: 'San Francisco', Jane: 30, John: 31 }
+      { city: 'New York', John: 25, Jane: 27, _pivotedFrom: 'age' },
+      { city: 'San Francisco', Jane: 30, John: 31, _pivotedFrom: 'age' }
     ])
   })
   it('should fill in columns with no data with empty strings', () => {
@@ -21,15 +21,15 @@ describe('pivotData', () => {
     const result = pivotData(data2, 'name', ['age'])
 
     expect(result).toEqual([
-      { city: 'New York', John: 25, Jane: '' },
-      { city: 'San Francisco', Jane: 30, John: '' }
+      { city: 'New York', John: 25, Jane: '', _pivotedFrom: 'age' },
+      { city: 'San Francisco', Jane: 30, John: '', _pivotedFrom: 'age' }
     ])
 
     const data3 = [data[0], data[1], data[2]]
     const result2 = pivotData(data3, 'name', ['age'])
     expect(result2).toEqual([
-      { city: 'New York', John: 25, Jane: 27 },
-      { city: 'San Francisco', Jane: 30, John: '' }
+      { city: 'New York', John: 25, Jane: 27, _pivotedFrom: 'age' },
+      { city: 'San Francisco', Jane: 30, John: '', _pivotedFrom: 'age' }
     ])
   })
   it('should be able to pivot more than one column', () => {
@@ -41,10 +41,10 @@ describe('pivotData', () => {
     ]
     const result = pivotData(data, 'name', ['age', 'color'])
     expect(result).toEqual([
-      { city: 'New York', John: 25, Jane: 27, pivotColumn: 'age' },
-      { city: 'New York', John: 'blue', Jane: 'red', pivotColumn: 'color' },
-      { city: 'San Francisco', Jane: 30, John: 31, pivotColumn: 'age' },
-      { city: 'San Francisco', Jane: 'yellow', John: 'green', pivotColumn: 'color' }
+      { city: 'New York', John: 25, Jane: 27, _pivotedFrom: 'age' },
+      { city: 'New York', John: 'blue', Jane: 'red', _pivotedFrom: 'color' },
+      { city: 'San Francisco', Jane: 30, John: 31, _pivotedFrom: 'age' },
+      { city: 'San Francisco', Jane: 'yellow', John: 'green', _pivotedFrom: 'color' }
     ])
   })
 })
