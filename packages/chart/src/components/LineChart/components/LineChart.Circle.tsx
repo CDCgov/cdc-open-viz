@@ -179,32 +179,30 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     }
   }
   if (mode === 'ISOLATED_POINTS') {
-    const findDataIndex = () => {
-      const indexNumber = data.findIndex(item => item[config.xAxis.dataKey] === pointData[config.xAxis.dataKey])
-      return indexNumber
-    }
     const drawIsolatedPoints = (currentIndex, seriesKey) => {
-      const workingIndex = pointData ? findDataIndex() : currentIndex
-      const currentPoint = data[workingIndex]
-      const previousPoint = data[workingIndex - 1] || {}
-      const nextPoint = data[workingIndex + 1] || {}
+      const currentPoint = data[currentIndex]
+      const previousPoint = data[currentIndex - 1] || {}
+      const nextPoint = data[currentIndex + 1] || {}
 
       const isMatch = circleData.some(item => item?.data[seriesKey] === currentPoint[seriesKey])
       if (isMatch) return false
 
-      const isFirstPoint = workingIndex === 0 && !nextPoint[seriesKey]
-      const isLastPoint = workingIndex === data.length - 1 && !previousPoint[seriesKey]
+      const isFirstPoint = currentIndex === 0 && !nextPoint[seriesKey]
+      const isLastPoint = currentIndex === data.length - 1 && !previousPoint[seriesKey]
       const isMiddlePoint =
-        workingIndex > 0 &&
-        workingIndex < data.length - 1 &&
+        currentIndex > 0 &&
+        currentIndex < data.length - 1 &&
         currentPoint[seriesKey] &&
         !previousPoint[seriesKey] &&
         !nextPoint[seriesKey]
 
       return isFirstPoint || isLastPoint || isMiddlePoint
     }
+    const _dataIndex = pointData
+      ? data.findIndex(item => item[config.xAxis.dataKey] === pointData[config.xAxis.dataKey])
+      : dataIndex
 
-    if (drawIsolatedPoints(dataIndex, seriesKey)) {
+    if (drawIsolatedPoints(_dataIndex, seriesKey)) {
       const positionTop =
         filtered?.axis === 'Right' ? yScaleRight(pointData[filtered?.dataKey]) : yScale(pointData[filtered?.dataKey])
       const positionLeft = getXPos(pointData[config.xAxis?.dataKey])
