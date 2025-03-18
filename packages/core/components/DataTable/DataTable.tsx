@@ -88,7 +88,7 @@ const DataTable = (props: DataTableProps) => {
       }
     }
     return data
-  }, [parentRuntimeData, config.table.pivot?.columnName, config.table.pivot?.valueColumn])
+  }, [parentRuntimeData, config.table.pivot?.columnName, config.table.pivot?.valueColumns])
 
   const [expanded, setExpanded] = useState(expandDataTable)
   const [sortBy, setSortBy] = useState<any>({

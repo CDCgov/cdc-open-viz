@@ -2,16 +2,22 @@ import { parseDate, formatDate } from '@cdc/core/helpers/cove/date'
 import { formatNumber } from '../../../helpers/cove/number'
 import { TableConfig } from '../types/TableConfig'
 
+const isPivotColumn = (columnName, config) => {
+  const tableHasPivotColumnConfigured = config.table.pivot?.valueColumns?.length
+  const originalColumnNames = Object.keys(config.data[0] || {})
+  const columnIsPivot = originalColumnNames.length && !originalColumnNames.includes(columnName)
+  return tableHasPivotColumnConfigured && columnIsPivot
+}
+
 // if its additional column, return formatting params
-const isAdditionalColumn = (column, config) => {
-  let inthere = false
+const isAdditionalColumn = (column: string, config, rowData) => {
+  const columnName = isPivotColumn(column, config) ? rowData._pivotedFrom : column
   let formattingParams = {}
   const { columns } = config
   if (columns) {
     Object.keys(columns).forEach(keycol => {
       const col = columns[keycol]
-      if (col.name === column) {
-        inthere = true
+      if (col.name === columnName) {
         formattingParams = {
           addColPrefix: col.prefix,
           addColSuffix: col.suffix,
@@ -54,7 +60,7 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
       if (rightSeriesItem.dataKey === column) resolvedAxis = 'right'
     })
 
-    let addColParams = isAdditionalColumn(column, config)
+    let addColParams = isAdditionalColumn(column, config, rowObj)
     if (addColParams) {
       cellValue = config.dataFormat
         ? formatNumber(runtimeData[row][column], resolvedAxis, false, config, addColParams)
