@@ -76,16 +76,12 @@ const DataTable = (props: DataTableProps) => {
   } = props
   const runtimeData = useMemo(() => {
     const data = removeNullColumns(parentRuntimeData)
-    if (config.table.pivot) {
+    const { columnName, valueColumns } = config.table.pivot || {}
+    if (columnName && valueColumns) {
       const excludeColumns = Object.values(config.columns || {})
         .filter(column => column.dataTable === false)
         .map(col => col.name)
-      const { columnName, valueColumns } = config.table.pivot
-      if (columnName && valueColumns) {
-        // remove excluded columns so that they aren't included in the pivot calculation
-        const _data = data.map(row => _.omit(row, excludeColumns))
-        return pivotData(_data, columnName, valueColumns)
-      }
+      return pivotData(data, columnName, valueColumns, excludeColumns)
     }
     return data
   }, [parentRuntimeData, config.table.pivot?.columnName, config.table.pivot?.valueColumns])
@@ -244,7 +240,7 @@ const DataTable = (props: DataTableProps) => {
               displayGeoName,
               sharedFilterColumns
             )
-          : rawData.map(d => {
+          : runtimeData.map(d => {
               return _.pick(d, [...sharedFilterColumns, ...dataSeriesColumns])
             })
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
