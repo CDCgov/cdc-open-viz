@@ -3,7 +3,7 @@ import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendShape from '@cdc/core/components/LegendShape'
 import ConfigContext from '../../../ConfigContext'
 import _ from 'lodash'
-import './LegendGroup.styles.scss'
+// import './LegendGroup.styles.scss'
 
 interface LegendGroup {
   formatLabels: Function
@@ -32,9 +32,20 @@ const LegendGroup = ({ formatLabels }) => {
 
   const groups: string[] = getSubGroups(data, config.legend.groupBy)
 
-  const classNames = ['legend-group', config.legend.position, currentViewport]
+  const classNames = ['legend-group', 'container', config.legend.position, currentViewport, 'row']
 
-  let classNameItem = ['legend-group group-item']
+  const gridCol =
+    currentViewport === 'xs'
+      ? 'col-12'
+      : currentViewport === 'sm'
+      ? 'col-6'
+      : currentViewport === 'md'
+      ? 'col-4'
+      : 'col-3'
+
+  const isSigleCol = config.legend.position === 'bottom' || config.legend.position === 'top' ? gridCol : 'col-12'
+
+  let classNameItem = ['legend-group group-item', isSigleCol]
 
   return (
     <div className={classNames.join(' ')}>
@@ -53,6 +64,7 @@ const LegendGroup = ({ formatLabels }) => {
                   })
 
                   .map((label, i) => {
+                    console.log(label, 'label')
                     let className = ['legend-group', 'group-item']
                     if (seriesHighlight.length) {
                       if (!seriesHighlight.includes(label.datum)) {
