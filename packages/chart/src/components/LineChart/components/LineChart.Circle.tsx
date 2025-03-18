@@ -46,7 +46,7 @@ const Glyphs = [
 const LineChartCircle = (props: LineChartCircleProps) => {
   const {
     config,
-    d,
+    d: pointData,
     tableData,
     displayArea,
     seriesKey,
@@ -96,7 +96,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
   if (mode === 'ALWAYS_SHOW_POINTS' && lineDatapointStyle !== 'hidden') {
     if (lineDatapointStyle === 'always show') {
       const isMatch = circleData?.some(
-        cd => cd[config.xAxis.dataKey] === d[config.xAxis.dataKey] && cd[seriesKey] === d[seriesKey]
+        cd => cd[config.xAxis.dataKey] === pointData[config.xAxis.dataKey] && cd[seriesKey] === pointData[seriesKey]
       )
 
       if (
@@ -105,13 +105,14 @@ const LineChartCircle = (props: LineChartCircleProps) => {
         (visual.maximumShapeAmount === seriesIndex && visual.lineDatapointSymbol === 'standard')
       )
         return <></>
-      const positionLeft = getXPos(d[config.xAxis.dataKey])
-      const positionTop = filtered.axis === 'Right' ? yScaleRight(d[filtered.dataKey]) : yScale(d[filtered.dataKey])
+      const positionLeft = getXPos(pointData[config.xAxis.dataKey])
+      const positionTop =
+        filtered.axis === 'Right' ? yScaleRight(pointData[filtered.dataKey]) : yScale(pointData[filtered.dataKey])
 
       return (
         <g transform={transformShape(positionTop, positionLeft)}>
           <Shape
-            opacity={d[seriesKey] ? 1 : 0}
+            opacity={pointData[seriesKey] ? 1 : 0}
             fillOpacity={1}
             fill={getColor(displayArea, colorScale, config, seriesKey, seriesKey)}
             style={{ filter: 'unset', opacity: 1 }}
@@ -178,19 +179,24 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     }
   }
   if (mode === 'ISOLATED_POINTS') {
+    const findDataIndex = () => {
+      const indexNumber = data.findIndex(item => item[config.xAxis.dataKey] === pointData[config.xAxis.dataKey])
+      return indexNumber
+    }
     const drawIsolatedPoints = (currentIndex, seriesKey) => {
-      const currentPoint = data[currentIndex]
-      const previousPoint = data[currentIndex - 1] || {}
-      const nextPoint = data[currentIndex + 1] || {}
+      const workingIndex = pointData ? findDataIndex() : currentIndex
+      const currentPoint = data[workingIndex]
+      const previousPoint = data[workingIndex - 1] || {}
+      const nextPoint = data[workingIndex + 1] || {}
 
       const isMatch = circleData.some(item => item?.data[seriesKey] === currentPoint[seriesKey])
       if (isMatch) return false
 
-      const isFirstPoint = currentIndex === 0 && !nextPoint[seriesKey]
-      const isLastPoint = currentIndex === data.length - 1 && !previousPoint[seriesKey]
+      const isFirstPoint = workingIndex === 0 && !nextPoint[seriesKey]
+      const isLastPoint = workingIndex === data.length - 1 && !previousPoint[seriesKey]
       const isMiddlePoint =
-        currentIndex > 0 &&
-        currentIndex < data.length - 1 &&
+        workingIndex > 0 &&
+        workingIndex < data.length - 1 &&
         currentPoint[seriesKey] &&
         !previousPoint[seriesKey] &&
         !nextPoint[seriesKey]
@@ -199,8 +205,9 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     }
 
     if (drawIsolatedPoints(dataIndex, seriesKey)) {
-      const positionTop = filtered?.axis === 'Right' ? yScaleRight(d[filtered?.dataKey]) : yScale(d[filtered?.dataKey])
-      const positionLeft = getXPos(d[config.xAxis?.dataKey])
+      const positionTop =
+        filtered?.axis === 'Right' ? yScaleRight(pointData[filtered?.dataKey]) : yScale(pointData[filtered?.dataKey])
+      const positionLeft = getXPos(pointData[config.xAxis?.dataKey])
       const color = colorScale(config.runtime.seriesLabelsAll[seriesIndex])
 
       return (
