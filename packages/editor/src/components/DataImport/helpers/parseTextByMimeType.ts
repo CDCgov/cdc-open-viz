@@ -16,7 +16,6 @@ export const parseTextByMimeType = (
   externalURL,
   errorHandler: (err: string[]) => void
 ) => {
-  console.log('res', resultText)
   switch (mimeType) {
     case 'text/csv':
       return csvParse(resultText)
