@@ -52,16 +52,13 @@ import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { publish } from '@cdc/core/helpers/events'
 
 // Map Helpers
-import { applyColorToLegend } from './helpers/applyColorToLegend'
 import { closeModal } from './helpers/closeModal'
 import { generateColorsArray } from './helpers/generateColorsArray'
 import { generateRuntimeLegendHash } from './helpers/generateRuntimeLegendHash'
-import { getGeoFillColor } from './helpers/colors'
 import { getUniqueValues } from './helpers/getUniqueValues'
 import { hashObj } from './helpers/hashObj'
 import { navigationHandler } from './helpers/navigationHandler'
 import { validateFipsCodeLength } from './helpers/validateFipsCodeLength'
-import { indexOfIgnoreType } from './helpers/indexOfIgnoreType'
 
 // Child Components
 import Annotation from './components/Annotation'
