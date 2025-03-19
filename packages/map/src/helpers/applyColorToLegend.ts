@@ -3,6 +3,10 @@ import chroma from 'chroma-js'
 import { type MapConfig } from '@cdc/map/src/types/MapConfig'
 import { colorDistributions } from './colorDistributions'
 
+type LegendItem = {
+  special: boolean
+}
+
 /**
  * applyColorToLegend
  * @param legendIdx legend item index
@@ -10,11 +14,11 @@ import { colorDistributions } from './colorDistributions'
  * @param result hash of legend items
  * @returns string - the corresponding color for the legend item
  */
-export const applyColorToLegend = (legendIdx: number, config: MapConfig, result = []): string => {
+export const applyColorToLegend = (legendIdx: number, config: MapConfig, result: LegendItem[] = []): string => {
   if (!config) throw new Error('Config is required')
 
-  const { legend, customColors, general = {}, color } = config
-  const { geoType, palette = {} } = general
+  const { legend, customColors, general, color } = config
+  const { geoType, palette } = general
   const specialClasses = legend?.specialClasses ?? []
   const mapColorPalette = customColors ?? colorPalettes[color] ?? colorPalettes['bluegreen']
 
