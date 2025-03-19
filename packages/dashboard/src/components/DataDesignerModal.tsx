@@ -46,6 +46,7 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
 
   const fetchData = async datasetKey => {
     const { data, dataUrl } = config.datasets[datasetKey]
+    if (!dataUrl) return data
     let newData = data
     const noCachedData = dataUrl && !data
     const dataSetChanged = datasetKey !== configureData.dataKey
