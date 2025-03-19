@@ -143,8 +143,6 @@ const CdcMap = ({
   let legendSpecialClassLastMemo = useRef(new Map())
   let innerContainerRef = useRef()
 
-  if (isDebug) console.log('CdcMap state=', state) // <eslint-disable-line></eslint-disable-line>
-
   const handleDragStateChange = isDragging => {
     setIsDraggingAnnotation(isDragging)
   }
