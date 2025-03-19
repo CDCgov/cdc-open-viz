@@ -227,7 +227,6 @@ const CityList = ({
       if (geoData?.[state.columns.longitude.name] && geoData?.[state.columns.latitude.name]) {
         const coords = [Number(geoData?.[state.columns.longitude.name]), Number(geoData?.[state.columns.latitude.name])]
         let translate = `translate(${projection(coords)})`
-        console.log(translate, 'translate')
         return (
           <g key={i} transform={translate} style={styles} className='geo-point' tabIndex={-1}>
             {cityStyleShapes[cityStyle.shape.toLowerCase()]}
