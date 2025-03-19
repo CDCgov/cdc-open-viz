@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef, useContext } from 'react'
-import * as d3 from 'd3-geo'
 
 import { geoCentroid, geoPath, geoContains } from 'd3-geo'
 import { feature } from 'topojson-client'
@@ -11,18 +10,9 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
-import {
-  drawCircle,
-  drawDiamond,
-  drawSquare,
-  drawTriangle,
-  drawPin,
-  drawStar,
-  drawShape,
-  createShapeProperties
-} from '../helpers/shapes'
-import { getGeoStrokeColor } from '../../../helpers/colors'
-import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
+import { drawShape, createShapeProperties } from '../helpers/shapes'
+
+import { getGeoStrokeColor, handleMapAriaLabels } from '../../../helpers'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`

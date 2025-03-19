@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../../../context'
 import { MapContext } from '../../../../types/MapContext'
-import { getGeoFillColor } from '../../../../helpers/colors'
+import { getGeoFillColor } from '../../../../helpers'
 
 interface CountyOutputProps {
   counties: any[]

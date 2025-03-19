@@ -1,14 +1,13 @@
 import { useState, useEffect, useContext } from 'react'
-
-import { jsx } from '@emotion/react'
-import { supportedCities } from '../data/supported-geos'
 import { scaleLinear } from 'd3-scale'
+
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
-import { getFilterControllingStatePicked } from './UsaMap/helpers/map'
-import { titleCase } from '../helpers/titleCase'
 
 import ConfigContext from '../context'
-import { getGeoStrokeColor } from '../helpers/colors'
+import { supportedCities } from '../data/supported-geos'
+import { getFilterControllingStatePicked } from './UsaMap/helpers/map'
+
+import { getGeoStrokeColor, titleCase } from '../helpers'
 
 const CityList = ({
   data,

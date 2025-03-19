@@ -17,7 +17,6 @@ import Waiting from '@cdc/core/components/Waiting'
 
 // types
 import { type Coordinate, type MapConfig } from './types/MapConfig'
-import { displayGeoName } from './helpers/displayGeoName'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
@@ -42,7 +41,6 @@ import './scss/btn.scss'
 
 // Core Helpers
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import { generateRuntimeLegend } from './helpers/generateRuntimeLegend'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import numberFromString from '@cdc/core/helpers/numberFromString'
@@ -52,13 +50,18 @@ import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { publish } from '@cdc/core/helpers/events'
 
 // Map Helpers
-import { closeModal } from './helpers/closeModal'
-import { generateColorsArray } from './helpers/generateColorsArray'
-import { generateRuntimeLegendHash } from './helpers/generateRuntimeLegendHash'
-import { getUniqueValues } from './helpers/getUniqueValues'
-import { hashObj } from './helpers/hashObj'
-import { navigationHandler } from './helpers/navigationHandler'
-import { validateFipsCodeLength } from './helpers/validateFipsCodeLength'
+import {
+  closeModal,
+  displayGeoName,
+  formatLegendLocation,
+  generateColorsArray,
+  generateRuntimeLegend,
+  generateRuntimeLegendHash,
+  getUniqueValues,
+  hashObj,
+  navigationHandler,
+  validateFipsCodeLength
+} from './helpers'
 
 // Child Components
 import Annotation from './components/Annotation'
@@ -75,7 +78,6 @@ import GoogleMap from './components/GoogleMap'
 // hooks
 import useTooltip from './hooks/useTooltip'
 import useResizeObserver from './hooks/useResizeObserver'
-import { formatLegendLocation } from './helpers/formatLegendLocation'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)

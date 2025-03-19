@@ -10,7 +10,7 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 
 import Loading from '@cdc/core/components/Loading'
-import { navigationHandler } from '../helpers/navigationHandler'
+import { navigationHandler } from '../helpers'
 import ConfigContext from '../context'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */

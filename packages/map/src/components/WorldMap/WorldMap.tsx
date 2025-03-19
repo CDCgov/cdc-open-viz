@@ -10,10 +10,8 @@ import CityList from '../CityList'
 import BubbleList from '../BubbleList'
 import ConfigContext from '../../context'
 import ZoomControls from '../ZoomControls'
-import { getGeoFillColor, getGeoStrokeColor } from '../../helpers/colors'
 import { supportedCountries } from '../../data/supported-geos'
-import { handleMapAriaLabels } from '../../helpers/handleMapAriaLabels'
-import { titleCase } from '../../helpers/titleCase'
+import { getGeoFillColor, getGeoStrokeColor, handleMapAriaLabels, titleCase } from '../../helpers'
 
 let projection = geoMercator()
 
