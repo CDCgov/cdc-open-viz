@@ -28,6 +28,7 @@ import TopSpacing_1 from './_mock/data-bite-dash-test.json'
 import TopSpacing_2 from './_mock/data-bite-dash-test_1.json'
 import TopSpacing_3 from './_mock/data-bite-dash-test_1_1.json'
 import TopSpacing_4 from './_mock/data-bite-dash-test_1_1_1.json'
+import ConfigFilters from './_mock/config-filters.json'
 
 // Dashboard Filter Updates for Ascending, Descending, and Custom Order
 import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
@@ -466,5 +467,13 @@ export const Top_Spacing_4: Story = {
     isEditor: false
   }
 }
+
+export const Config_Filters: Story = {
+  args: {
+    config: ConfigFilters,
+    isEditor: false
+  }
+}
+
 
 export default meta

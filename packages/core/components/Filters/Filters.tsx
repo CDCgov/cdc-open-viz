@@ -385,6 +385,7 @@ const Filters = (props: FilterProps) => {
 
   const Dropdown = props => {
     const { index: outerIndex, label, active, filters } = props
+
     return (
       <select
         id={`filter-${outerIndex}`}
