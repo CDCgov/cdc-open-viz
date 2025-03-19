@@ -906,7 +906,7 @@ const EditorPanel = () => {
     return Object.keys(columns)
   }
 
-  const getLegendStyleOptions = (option: 'style' | 'subStyle' | 'shapes'): string[] => {
+  const getLegendStyleOptions = (option: 'style' | 'subStyle' | 'shapes' | 'groupBy'): string[] => {
     const options: string[] = []
 
     switch (option) {
@@ -929,6 +929,9 @@ const EditorPanel = () => {
           options.push('linear blocks', 'smooth')
         }
 
+        break
+      case 'groupBy':
+        options.push(...getColumns())
         break
     }
     return options
@@ -3690,6 +3693,17 @@ const EditorPanel = () => {
                     updateField={updateField}
                     options={getLegendStyleOptions('style')}
                   />
+
+                  <Select
+                    value={config.legend.groupBy}
+                    section='legend'
+                    fieldName='groupBy'
+                    initial='Select'
+                    label='Legend Group By:'
+                    updateField={updateField}
+                    options={getLegendStyleOptions('groupBy')}
+                  />
+
                   <CheckBox
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
