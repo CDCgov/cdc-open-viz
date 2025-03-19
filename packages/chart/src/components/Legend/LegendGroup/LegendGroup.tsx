@@ -3,7 +3,7 @@ import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendShape from '@cdc/core/components/LegendShape'
 import ConfigContext from '../../../ConfigContext'
 import _ from 'lodash'
-import './LegendGroup.styles.scss'
+import './LegendGroup.styles.css'
 
 interface LegendGroup {
   formatLabels: Function
@@ -64,7 +64,6 @@ const LegendGroup = ({ formatLabels }) => {
                   })
 
                   .map((label, i) => {
-                    console.log(label, 'label')
                     let className = ['legend-group', 'group-item']
                     if (seriesHighlight.length) {
                       if (!seriesHighlight.includes(label.datum)) {
