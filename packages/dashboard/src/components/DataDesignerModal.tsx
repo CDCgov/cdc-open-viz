@@ -47,10 +47,10 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
   const fetchData = async datasetKey => {
     const { data, dataUrl } = config.datasets[datasetKey]
     let newData = data
-    const noCachedData = !data && dataUrl
-    const needsDataRefresh = configureData.dataKey !== datasetKey && noCachedData
+    const noCachedData = dataUrl && !data
+    const dataSetChanged = datasetKey !== configureData.dataKey
     setErrorMessage('')
-    if (needsDataRefresh) {
+    if (dataSetChanged || noCachedData) {
       setLoadingAPIData(true)
       try {
         newData = await fetchRemoteData(dataUrl)
@@ -73,8 +73,7 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
 
   const updateDescriptionProp = async (key, value) => {
     const datasetKey = configureData.dataKey
-
-    const newData = await fetchData(datasetKey)
+    const newData = configureData.data || (await fetchData(datasetKey))
 
     const dataDescription = { ...configureData.dataDescription, [key]: value }
 
