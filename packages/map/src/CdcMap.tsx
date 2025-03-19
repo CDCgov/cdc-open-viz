@@ -51,6 +51,7 @@ import { publish } from '@cdc/core/helpers/events'
 
 // Map Helpers
 import {
+  addUIDs,
   closeModal,
   displayGeoName,
   formatLegendLocation,
@@ -78,14 +79,6 @@ import GoogleMap from './components/GoogleMap'
 // hooks
 import useTooltip from './hooks/useTooltip'
 import useResizeObserver from './hooks/useResizeObserver'
-
-// Data props
-const stateKeys = Object.keys(supportedStates)
-const territoryKeys = Object.keys(supportedTerritories)
-const regionKeys = Object.keys(supportedRegions)
-const countryKeys = Object.keys(supportedCountries)
-const countyKeys = Object.keys(supportedCounties)
-const cityKeys = Object.keys(supportedCities)
 
 const CdcMap = ({
   config,
@@ -218,119 +211,6 @@ const CdcMap = ({
     }
   }, [state.mapPosition, setPosition])
 
-  // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
-  // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
-  // eslint-disable-next-line
-  const addUIDs = useCallback((configObj, fromColumn) => {
-    configObj.data.forEach(row => {
-      let uid = null
-
-      if (row.uid) row.uid = null // Wipe existing UIDs
-
-      // United States check
-      if ('us' === configObj.general.geoType && configObj.columns.geo.name) {
-        // const geoName = row[configObj.columns.geo.name] && typeof row[configObj.columns.geo.name] === "string" ? row[configObj.columns.geo.name].toUpperCase() : '';
-        let geoName = ''
-
-        if (row[configObj.columns.geo.name] !== undefined && row[configObj.columns.geo.name] !== null) {
-          geoName = String(row[configObj.columns.geo.name])
-          geoName = geoName.toUpperCase()
-        }
-
-        // States
-        uid = stateKeys.find(key => supportedStates[key].includes(geoName))
-
-        // Territories
-        if (!uid) {
-          uid = territoryKeys.find(key => supportedTerritories[key].includes(geoName))
-        }
-
-        // Cities
-        if (!uid && geoName) {
-          uid = cityKeys.find(key => key === geoName.toUpperCase())
-        }
-
-        if (state.general.displayAsHex) {
-          const upperCaseKey = geoName.toUpperCase()
-          const supportedDc = [
-            'WASHINGTON D.C.',
-            'DISTRICT OF COLUMBIA',
-            'WASHINGTON DC',
-            'DC',
-            'WASHINGTON DC.',
-            'D.C.',
-            'D.C'
-          ]
-          if (supportedDc.includes(upperCaseKey)) {
-            uid = 'US-DC'
-          }
-        }
-      }
-
-      if ('us-region' === configObj.general.geoType && configObj.columns.geo.name) {
-        // const geoName = row[configObj.columns.geo.name] && typeof row[configObj.columns.geo.name] === "string" ? row[configObj.columns.geo.name].toUpperCase() : '';
-        let geoName = ''
-
-        if (row[configObj.columns.geo.name] !== undefined && row[configObj.columns.geo.name] !== null) {
-          geoName = String(row[configObj.columns.geo.name])
-          geoName = geoName.toUpperCase()
-        }
-
-        // Regions
-        uid = regionKeys.find(key => supportedRegions[key].includes(geoName))
-      }
-
-      // World Check
-      if ('world' === configObj.general.geoType) {
-        const geoName = row[configObj.columns.geo.name]
-
-        uid = countryKeys.find(key => supportedCountries[key].includes(geoName))
-
-        // Cities
-        if (!uid && 'world-geocode' === state.general.type) {
-          uid = cityKeys.find(key => key === geoName?.toUpperCase())
-        }
-
-        // Cities
-        if (!uid && geoName) {
-          uid = cityKeys.find(key => key === geoName.toUpperCase())
-        }
-      }
-
-      // County Check
-      if (
-        ('us-county' === configObj.general.geoType || 'single-state' === configObj.general.geoType) &&
-        'us-geocode' !== configObj.general.type
-      ) {
-        const fips = row[configObj.columns.geo.name]
-        uid = countyKeys.find(key => key === fips)
-      }
-
-      if ('us-geocode' === state.general.type) {
-        uid = row[state.columns.geo.name]
-      }
-
-      if (
-        !uid &&
-        state.columns.latitude?.name &&
-        state.columns.longitude?.name &&
-        row[state.columns.latitude?.name] &&
-        row[state.columns.longitude?.name]
-      ) {
-        uid = `${row[state.columns.geo.name]}`
-      }
-
-      if (uid) {
-        Object.defineProperty(row, 'uid', {
-          value: uid,
-          writable: true
-        })
-      }
-    })
-
-    configObj.data.fromColumn = fromColumn
-  })
-
   // eslint-disable-next-line
   const generateRuntimeFilters = useCallback((configObj, hash, runtimeFilters) => {
     if (typeof configObj === 'undefined' || undefined === configObj.filters || configObj.filters.length === 0) return []
@@ -413,6 +293,7 @@ const CdcMap = ({
       })
 
       addUIDs(configObj, configObj.columns.geo.name)
+
       configObj.data.forEach(row => {
         if (test) {
           console.log('object', configObj) // eslint-disable-line
