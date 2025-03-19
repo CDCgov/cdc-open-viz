@@ -69,6 +69,7 @@ export type HexMapSettings = {
 export type Coordinate = [number, number]
 
 export type MapConfig = Visualization & {
+  type: 'map'
   color: string // map color palette
   customColors: string[] // custom color palette
   columns: {
@@ -80,6 +81,8 @@ export type MapConfig = Visualization & {
     categorical: { name: string }
   }
   dataUrl: string
+  // whether to use the old custom quantile scaling method or new custom quantile scaling method
+  equalNumberOptIn: boolean
   runtimeDataUrl: string
   filters: VizFilter[]
   general: {

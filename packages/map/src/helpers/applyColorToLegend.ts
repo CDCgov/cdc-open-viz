@@ -43,23 +43,12 @@ export const applyColorToLegend = (legendIdx: number, config: ChartConfig, resul
 
     let colorIdx = legendIdx - specialClasses.length
 
-    // Special Classes (No Data)
     if (result[legendIdx].special) {
-      if (!config?.migrations?.addColorMigration) {
-        const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
-        return specialClassColors[legendIdx]
-      } else {
-        const specialClassColors = ['#A9AEB1', '#71767A']
-        return specialClassColors[legendIdx]
-      }
+      const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
+      return specialClassColors[legendIdx]
     }
 
     if (config.color.includes('qualitative')) return mapColorPalette[colorIdx]
-
-    // If the current version is newer than 4.24.10, use the color palette
-    if (!config?.migrations?.addColorMigration) {
-      if (config.customColors) return mapColorPalette[legendIdx - specialClasses.length]
-    }
 
     let amt = Math.max(result.length - specialClasses.length, 1)
     let distributionArray = colorDistributions[amt]

@@ -75,43 +75,49 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     )
   }
   const getFormattedLegendItems = () => {
-    return runtimeLegend.map((entry, idx) => {
-      const entryMax = displayDataAsText(entry.max, 'primary', state)
+    try {
+      if (!runtimeLegend) Error('No runtime legend data')
+      return runtimeLegend.items.map((entry, idx) => {
+        const entryMax = displayDataAsText(entry.max, 'primary', state)
 
-      const entryMin = displayDataAsText(entry.min, 'primary', state)
-      let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
+        const entryMin = displayDataAsText(entry.min, 'primary', state)
+        let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
 
-      // If interval, add some formatting
-      if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
-        formattedText = `${entryMin} - < ${entryMax}`
-      }
+        // If interval, add some formatting
+        if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
+          formattedText = `${entryMin} - < ${entryMax}`
+        }
 
-      if (legend.type === 'category') {
-        formattedText = displayDataAsText(entry.value, 'primary', state)
-      }
+        if (legend.type === 'category') {
+          formattedText = displayDataAsText(entry.value, 'primary', state)
+        }
 
-      if (entry.max === 0 && entry.min === 0) {
-        formattedText = '0'
-      }
+        if (entry.max === 0 && entry.min === 0) {
+          formattedText = '0'
+        }
 
-      if (entry.max === null && entry.min === null) {
-        formattedText = 'No data'
-      }
+        if (entry.max === null && entry.min === null) {
+          formattedText = 'No data'
+        }
 
-      let legendLabel = formattedText
+        let legendLabel = formattedText
 
-      if (entry.hasOwnProperty('special')) {
-        legendLabel = entry.label || entry.value
-      }
+        if (entry.hasOwnProperty('special')) {
+          legendLabel = entry.label || entry.value
+        }
 
-      return {
-        color: entry.color,
-        label: parse(legendLabel),
-        disabled: entry.disabled,
-        special: entry.hasOwnProperty('special'),
-        value: [entry.min, entry.max]
-      }
-    })
+        return {
+          color: entry.color,
+          label: parse(legendLabel),
+          disabled: entry.disabled,
+          special: entry.hasOwnProperty('special'),
+          value: [entry.min, entry.max]
+        }
+      })
+    } catch (e) {
+      console.error('Error in getFormattedLegendItems', e)
+      return []
+    }
   }
 
   const legendList = (patternsOnly = false) => {
@@ -296,8 +302,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             )}
 
             <LegendGradient
-              labels={getFormattedLegendItems().map(item => item?.label) ?? []}
-              colors={getFormattedLegendItems().map(item => item?.color) ?? []}
+              labels={getFormattedLegendItems()?.map(item => item?.label) ?? []}
+              colors={getFormattedLegendItems()?.map(item => item?.color) ?? []}
               dimensions={dimensions}
               parentPaddingToSubtract={
                 containerWidthPadding + (legend.hideBorder || boxDynamicallyHidden ? 0 : LEGEND_PADDING)

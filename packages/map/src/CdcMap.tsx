@@ -1,7 +1,5 @@
 // Vendor
 import React, { useState, useEffect, useRef, useCallback, useId } from 'react'
-import * as d3 from 'd3'
-import _ from 'lodash'
 import 'whatwg-fetch'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import Papa from 'papaparse'
@@ -44,6 +42,7 @@ import './scss/btn.scss'
 
 // Core Helpers
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import { generateRuntimeLegend } from './helpers/generateRuntimeLegend'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import numberFromString from '@cdc/core/helpers/numberFromString'
@@ -334,475 +333,6 @@ const CdcMap = ({
   })
 
   // eslint-disable-next-line
-  const generateRuntimeLegend = useCallback((configObj, runtimeFilters, hash) => {
-    const newLegendMemo = new Map() // Reset memoization
-    const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
-    let primaryCol = configObj.columns.primary.name,
-      isBubble = configObj.general.type === 'bubble',
-      categoricalCol = configObj.columns.categorical ? configObj.columns.categorical.name : undefined,
-      type = configObj.legend.type,
-      number = configObj.legend.numberOfItems,
-      result = []
-
-    // Add a hash for what we're working from if passed
-    if (hash) {
-      result.fromHash = hash
-    }
-
-    result.runtimeDataHash = runtimeFilters?.fromHash
-
-    // Unified will base the legend off ALL of the data maps received. Otherwise, it will use
-    let dataSet = configObj.legend.unified ? configObj.data : Object.values(runtimeData)
-    let specialClasses = 0
-    let specialClassesHash = {}
-
-    // Special classes
-    if (configObj.legend.specialClasses.length) {
-      if (typeof configObj.legend.specialClasses[0] === 'object') {
-        configObj.legend.specialClasses.forEach(specialClass => {
-          dataSet = dataSet.filter(row => {
-            const val = String(row[specialClass.key])
-
-            if (specialClass.value === val) {
-              if (undefined === specialClassesHash[val]) {
-                specialClassesHash[val] = true
-
-                result.push({
-                  special: true,
-                  value: val,
-                  label: specialClass.label
-                })
-
-                result[result.length - 1].color = applyColorToLegend(result.length - 1, state, result)
-
-                specialClasses += 1
-              }
-
-              let specialColor: number
-
-              // color the state if val is in row
-              specialColor = result.findIndex(p => p.value === val)
-
-              newLegendMemo.set(hashObj(row), specialColor)
-
-              return false
-            }
-
-            return true
-          })
-        })
-      } else {
-        dataSet = dataSet.filter(row => {
-          const val = row[primaryCol]
-
-          if (configObj.legend.specialClasses.includes(val)) {
-            // apply the special color to the legend
-            if (undefined === specialClassesHash[val]) {
-              specialClassesHash[val] = true
-
-              result.push({
-                special: true,
-                value: val
-              })
-
-              result[result.length - 1].color = applyColorToLegend(result.length - 1, state, result)
-
-              specialClasses += 1
-            }
-
-            let specialColor = ''
-
-            // color the state if val is in row
-            if (Object.values(row).includes(val)) {
-              specialColor = result.findIndex(p => p.value === val)
-            }
-
-            newLegendMemo.set(hashObj(row), specialColor)
-
-            return false
-          }
-
-          return true
-        })
-      }
-    }
-
-    // Category
-    if ('category' === type) {
-      let uniqueValues = new Map()
-      let count = 0
-
-      for (let i = 0; i < dataSet.length; i++) {
-        let row = dataSet[i]
-        let value = isBubble && categoricalCol && row[categoricalCol] ? row[categoricalCol] : row[primaryCol]
-        if (undefined === value) continue
-
-        if (false === uniqueValues.has(value)) {
-          uniqueValues.set(value, [hashObj(row)])
-          count++
-        } else {
-          uniqueValues.get(value).push(hashObj(row))
-        }
-      }
-
-      let sorted = [...uniqueValues.keys()]
-
-      if (configObj.legend.additionalCategories) {
-        configObj.legend.additionalCategories.forEach(additionalCategory => {
-          if (additionalCategory && indexOfIgnoreType(sorted, additionalCategory) === -1) {
-            sorted.push(additionalCategory)
-          }
-        })
-      }
-
-      // Apply custom sorting or regular sorting
-      let configuredOrder = configObj.legend.categoryValuesOrder ?? []
-
-      if (configuredOrder.length) {
-        sorted.sort((a, b) => {
-          let aVal = configuredOrder.indexOf(a)
-          let bVal = configuredOrder.indexOf(b)
-          if (aVal === bVal) return 0
-          if (aVal === -1) return 1
-          if (bVal === -1) return -1
-          return aVal - bVal
-        })
-      } else {
-        sorted.sort((a, b) => a - b)
-      }
-
-      // Add legend item for each
-      sorted.forEach(val => {
-        result.push({
-          value: val
-        })
-
-        let lastIdx = result.length - 1
-        let arr = uniqueValues.get(val)
-
-        if (arr) {
-          arr.forEach(hashedRow => newLegendMemo.set(hashedRow, lastIdx))
-        }
-      })
-
-      // Add color to new legend item
-      for (let i = 0; i < result.length; i++) {
-        result[i].color = applyColorToLegend(i, state, result)
-      }
-
-      legendMemo.current = newLegendMemo
-
-      // before returning the legend result
-      // add property for bin number and set to index location
-      result.forEach((row, i) => {
-        row.bin = i // set bin number to index
-      })
-
-      // Move all special legend items from "Special Classes"  to the end of the legend
-      if (state.legend.showSpecialClassesLast) {
-        let specialRows = result.filter(d => d.special === true)
-        let otherRows = result.filter(d => !d.special)
-        result = [...otherRows, ...specialRows]
-      }
-
-      const assignSpecialClassLastIndex = (value, key) => {
-        const newIndex = result.findIndex(d => d.bin === value)
-        newLegendSpecialClassLastMemo.set(key, newIndex)
-      }
-      newLegendMemo.forEach(assignSpecialClassLastIndex)
-      legendSpecialClassLastMemo.current = newLegendSpecialClassLastMemo
-
-      // filter special classes from results
-      const specialValues = result.filter(d => d.special).map(d => d.value)
-      return result.filter(d => d.special || !specialValues.includes(d.value))
-    }
-
-    let uniqueValues = {}
-    dataSet.forEach(datum => {
-      uniqueValues[datum[primaryCol]] = true
-    })
-
-    let legendNumber = Math.min(number, Object.keys(uniqueValues).length)
-
-    // Separate zero
-    if (true === configObj.legend.separateZero && !state.general.equalNumberOptIn) {
-      let addLegendItem = false
-
-      for (let i = 0; i < dataSet.length; i++) {
-        if (dataSet[i][primaryCol] === 0) {
-          addLegendItem = true
-
-          let row = dataSet.splice(i, 1)[0]
-
-          newLegendMemo.set(hashObj(row), result.length)
-          i--
-        }
-      }
-
-      if (addLegendItem) {
-        legendNumber -= 1 // This zero takes up one legend item
-
-        // Add new legend item
-        result.push({
-          min: 0,
-          max: 0
-        })
-
-        let lastIdx = result.length - 1
-
-        // Add color to new legend item
-        result[lastIdx].color = applyColorToLegend(lastIdx, state, result)
-      }
-    }
-
-    // Sort data for use in equalnumber or equalinterval
-    if (state.general.type !== 'us-geocode') {
-      dataSet = dataSet
-        .filter(row => typeof row[primaryCol] === 'number')
-        .sort((a, b) => {
-          let aNum = a[primaryCol]
-          let bNum = b[primaryCol]
-
-          return aNum - bNum
-        })
-    }
-
-    // Equal Number
-    if (type === 'equalnumber') {
-      // start work on changing legend functionality
-      // FALSE === ignore old version for now.
-      if (!state.general.equalNumberOptIn) {
-        let numberOfRows = dataSet.length
-
-        let remainder
-        let changingNumber = legendNumber
-
-        let chunkAmt
-
-        // Loop through the array until it has been split into equal subarrays
-        while (numberOfRows > 0) {
-          remainder = numberOfRows % changingNumber
-          chunkAmt = Math.floor(numberOfRows / changingNumber)
-
-          if (remainder > 0) {
-            chunkAmt += 1
-          }
-
-          let removedRows = dataSet.splice(0, chunkAmt)
-
-          let min = removedRows[0][primaryCol],
-            max = removedRows[removedRows.length - 1][primaryCol]
-
-          // eslint-disable-next-line
-          removedRows.forEach(row => {
-            newLegendMemo.set(hashObj(row), result.length)
-          })
-
-          result.push({
-            min,
-            max
-          })
-
-          result[result.length - 1].color = applyColorToLegend(result.length - 1, state, result)
-
-          changingNumber -= 1
-          numberOfRows -= chunkAmt
-        }
-      } else {
-        // get nums
-        let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
-
-        domainNums = d3.extent(domainNums)
-
-        let colors = colorPalettes[state.color]
-        let colorRange = colors.slice(0, state.legend.numberOfItems)
-
-        const getDomain = () => {
-          // backwards compatibility
-          if (state?.columns?.primary?.roundToPlace !== undefined && state?.general?.equalNumberOptIn) {
-            return _.uniq(
-              dataSet.map(item =>
-                Number(item[state.columns.primary.name]).toFixed(Number(state?.columns?.primary?.roundToPlace))
-              )
-            )
-          }
-          return _.uniq(dataSet.map(item => Math.round(Number(item[state.columns.primary.name]))))
-        }
-
-        const getBreaks = scale => {
-          // backwards compatibility
-          if (state?.columns?.primary?.roundToPlace !== undefined && state?.general?.equalNumberOptIn) {
-            return scale.quantiles().map(b => Number(b)?.toFixed(Number(state?.columns?.primary?.roundToPlace)))
-          }
-          return scale.quantiles().map(item => Number(Math.round(item)))
-        }
-
-        let scale = d3
-          .scaleQuantile()
-          .domain(getDomain()) // min/max values
-          .range(colorRange) // set range to our colors array
-
-        const breaks = getBreaks(scale)
-
-        // if separating zero force it into breaks
-        if (breaks[0] !== 0) {
-          breaks.unshift(0)
-        }
-
-        // eslint-disable-next-line array-callback-return
-        breaks.map((item, index) => {
-          const setMin = index => {
-            let min = breaks[index]
-
-            // if first break is a seperated zero, min is zero
-            if (index === 0 && state.legend.separateZero) {
-              min = 0
-            }
-
-            // if we're on the second break, and separating out zero, increment min to 1.
-            if (index === 1 && state.legend.separateZero) {
-              min = 1
-            }
-
-            // // in starting position and zero in the data
-            // if((index === state.legend.specialClasses?.length ) && (state.legend.specialClasses.length !== 0)) {
-            //     min = breaks[index]
-            // }
-            return min
-          }
-
-          const getDecimalPlace = n => {
-            return Math.pow(10, -n)
-          }
-
-          const setMax = index => {
-            let max = Number(breaks[index + 1]) - getDecimalPlace(Number(state?.columns?.primary?.roundToPlace))
-
-            if (index === 0 && state.legend.separateZero) {
-              max = 0
-            }
-
-            if (index + 1 === breaks.length) {
-              max = domainNums[1]
-            }
-
-            return max
-          }
-
-          let min = setMin(index)
-          let max = setMax(index, min)
-
-          result.push({
-            min,
-            max,
-            color: scale(item)
-          })
-
-          dataSet.forEach(row => {
-            let number = row[state.columns.primary.name]
-            let updated = result.length - 1
-
-            if (result[updated]?.min === (null || undefined) || result[updated]?.max === (null || undefined)) return
-
-            if (number >= result[updated].min && number <= result[updated].max) {
-              newLegendMemo.set(hashObj(row), updated)
-            }
-          })
-        })
-      }
-    }
-
-    // Equal Interval
-    if (type === 'equalinterval' && dataSet?.length !== 0) {
-      if (!dataSet || dataSet.length === 0) {
-        setState({
-          ...state,
-          runtime: {
-            ...state.runtime,
-            editorErrorMessage: 'Error setting equal interval legend type'
-          }
-        })
-        return
-      }
-      dataSet = dataSet.filter(row => row[primaryCol] !== undefined)
-      let dataMin = dataSet[0][primaryCol]
-      let dataMax = dataSet[dataSet.length - 1][primaryCol]
-
-      let pointer = 0 // Start at beginning of dataSet
-
-      for (let i = 0; i < legendNumber; i++) {
-        let interval = Math.abs(dataMax - dataMin) / legendNumber
-
-        let min = dataMin + interval * i
-        let max = min + interval
-
-        // If this is the last loop, assign actual max of data as the end point
-        if (i === legendNumber - 1) max = dataMax
-
-        // Add rows in dataSet that belong to this new legend item since we've got the data sorted
-        while (pointer < dataSet.length && dataSet[pointer][primaryCol] <= max) {
-          newLegendMemo.set(hashObj(dataSet[pointer]), result.length)
-          pointer += 1
-        }
-
-        let range = {
-          min: Math.round(min * 100) / 100,
-          max: Math.round(max * 100) / 100
-        }
-
-        result.push(range)
-
-        result[result.length - 1].color = applyColorToLegend(result.length - 1, state, result)
-      }
-    }
-
-    result.forEach((legendItem, idx) => {
-      legendItem.color = applyColorToLegend(idx, state, result)
-    })
-
-    legendMemo.current = newLegendMemo
-
-    if (state.general.geoType === 'world') {
-      const runtimeDataKeys = Object.keys(runtimeFilters)
-      const isCountriesWithNoDataState =
-        configObj.data === undefined ? false : !countryKeys.every(countryKey => runtimeDataKeys.includes(countryKey))
-
-      if (result.length > 0 && isCountriesWithNoDataState) {
-        result.push({
-          min: null,
-          max: null,
-          color: getGeoFillColor(state)
-        })
-      }
-    }
-
-    //----------
-    // DEV-784
-    // before returning the legend result
-    // add property for bin number and set to index location
-    result.forEach((row, i) => {
-      row.bin = i // set bin number to index
-    })
-
-    // Move all special legend items from "Special Classes"  to the end of the legend
-    if (state.legend.showSpecialClassesLast) {
-      let specialRows = result.filter(d => d.special === true)
-      let otherRows = result.filter(d => !d.special)
-      result = [...otherRows, ...specialRows]
-    }
-    //-----------
-
-    const assignSpecialClassLastIndex = (value, key) => {
-      const newIndex = result.findIndex(d => d.bin === value)
-      newLegendSpecialClassLastMemo.set(key, newIndex)
-    }
-    newLegendMemo.forEach(assignSpecialClassLastIndex)
-    legendSpecialClassLastMemo.current = newLegendSpecialClassLastMemo
-
-    return result
-  })
-
-  // eslint-disable-next-line
   const generateRuntimeFilters = useCallback((configObj, hash, runtimeFilters) => {
     if (typeof configObj === 'undefined' || undefined === configObj.filters || configObj.filters.length === 0) return []
 
@@ -963,7 +493,7 @@ const CdcMap = ({
 
         // changed to use bin prop to get color instead of idx
         // bc we re-order legend when showSpecialClassesLast is checked
-        let legendBinColor = runtimeLegend.find(o => o.bin === idx)?.color
+        let legendBinColor = runtimeLegend.items.find(o => o.bin === idx)?.color
         return generateColorsArray(legendBinColor, runtimeLegend[idx]?.special)
       }
 
@@ -1271,7 +801,15 @@ const CdcMap = ({
       setRuntimeData(newRuntimeData)
     } else {
       if (hashLegend !== runtimeLegend?.fromHash && undefined === runtimeData.init) {
-        const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
+        const legend = generateRuntimeLegend(
+          legendMemo,
+          legendSpecialClassLastMemo,
+          state,
+          runtimeData,
+          hashLegend,
+          runtimeFilters,
+          setState
+        )
         setRuntimeLegend(legend)
       }
     }
@@ -1281,7 +819,15 @@ const CdcMap = ({
     const hashLegend = generateRuntimeLegendHash(state, runtimeFilters)
 
     // Legend - Update when runtimeData does
-    const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
+    const legend = generateRuntimeLegend(
+      legendMemo,
+      legendSpecialClassLastMemo,
+      state,
+      runtimeData,
+      hashLegend,
+      runtimeFilters,
+      setState
+    )
     setRuntimeLegend(legend)
   }, [
     runtimeData,
