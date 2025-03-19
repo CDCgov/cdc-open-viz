@@ -3999,6 +3999,13 @@ const EditorPanel = () => {
                     fieldName='description'
                     label='Legend Description'
                   />
+                  <CheckBox
+                    value={config.legend.unified}
+                    section='legend'
+                    fieldName='unified'
+                    label='Unified Legend'
+                    updateField={updateField}
+                  />
                 </AccordionItemPanel>
               </AccordionItem>
             )}

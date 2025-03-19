@@ -55,6 +55,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
     const { runtime, legend, series } = config
 
     const seriesWithData = getSeriesWithData(config)
+    const dontFilterLegendItems = !series.length || legend.unified
 
     const isLegendBottom =
       legend?.position === 'bottom' ||
@@ -98,7 +99,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
               <>
                 <div className={innerClasses.join(' ')}>
                   {formatLabels(labels as Label[])
-                    .filter(label => !series.length || seriesWithData.includes(label.datum))
+                    .filter(label => dontFilterLegendItems || seriesWithData.includes(label.datum))
                     .map((label, i) => {
                       let className = ['legend-item', `legend-text--${label.text.replace(' ', '').toLowerCase()}`]
                       let itemName = label.datum
