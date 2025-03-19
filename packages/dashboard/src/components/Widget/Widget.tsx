@@ -88,10 +88,13 @@ const Widget = ({
   const loadSampleData = () => {
     const dataKey = config.rows[widgetConfig.rowIdx]?.dataKey || widgetConfig?.dataKey
     const dataset = config.datasets[dataKey]
-    const _data = data[dataset?.dataUrl]
-    if (_data && !_data.length) {
+    const _data = data[dataKey]
+    if (dataKey && !_data?.length) {
       const url = changeDataLimit(dataset.dataUrl, 100)
       fetchRemoteData(url).then(responseData => {
+        // this sample data is temporary.
+        // the HEADER component removes the data when you toggle to the main viz panel.
+        // data will be cached only when it's loaded via dashboard preview.
         responseData.sample = true
         dispatch({ type: 'SET_DATA', payload: { ...data, [dataKey]: responseData } })
       })
