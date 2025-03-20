@@ -20,6 +20,7 @@ import './index.scss'
 import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { isBelowBreakpoint, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
+import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
 
 const LEGEND_PADDING = 30
 
@@ -54,26 +55,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const legendOnBottom = legend.position === 'bottom' || legendWrapping
   const needsTopMargin = legend.hideBorder && legendOnBottom
 
-  // Toggles if a legend is active and being applied to the map and data table.
-  const toggleLegendActive = (i, legendLabel) => {
-    const newValue = !runtimeLegend[i].disabled
-
-    runtimeLegend[i].disabled = newValue // Toggle!
-
-    let newLegend = [...runtimeLegend]
-
-    newLegend[i].disabled = newValue
-
-    const disabledAmt = runtimeLegend.disabledAmt ?? 0
-
-    newLegend['disabledAmt'] = newValue ? disabledAmt + 1 : disabledAmt - 1
-
-    setRuntimeLegend(newLegend)
-
-    setAccessibleStatus(
-      `Disabled legend item ${legendLabel ?? ''}. Please reference the data table to see updated values.`
-    )
-  }
   const getFormattedLegendItems = () => {
     try {
       if (!runtimeLegend) Error('No runtime legend data')
@@ -141,11 +122,11 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           className={handleListItemClass()}
           key={idx}
           title={`Legend item ${item.label} - Click to disable`}
-          onClick={() => toggleLegendActive(idx, item.label)}
+          onClick={() => toggleLegendActive(idx, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)}
           onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault()
-              toggleLegendActive(idx, item.label)
+              toggleLegendActive(idx, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)
             }
           }}
           tabIndex={0}
