@@ -21,6 +21,7 @@ import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { isBelowBreakpoint, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
+import { resetLegendToggles } from '../../../helpers'
 
 const LEGEND_PADDING = 30
 
@@ -36,8 +37,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const { isEditor, dimensions, currentViewport } = useContext(ConfigContext)
 
   const {
-    // prettier-ignore
-    resetLegendToggles,
     runtimeFilters,
     runtimeLegend,
     setAccessibleStatus,
@@ -216,7 +215,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     if (e) {
       e.preventDefault()
     }
-    resetLegendToggles()
+    resetLegendToggles(runtimeLegend, setRuntimeLegend)
     setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.')
     if (legend) {
       legend.focus()

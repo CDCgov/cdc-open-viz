@@ -377,19 +377,6 @@ const CdcMap = ({
     }
   }
 
-  // This resets all active legend toggles.
-  const resetLegendToggles = async () => {
-    let newLegend = [...runtimeLegend]
-
-    newLegend.forEach(legendItem => {
-      delete legendItem.disabled
-    })
-
-    newLegend.runtimeDataHash = runtimeLegend.runtimeDataHash
-
-    setRuntimeLegend(newLegend)
-  }
-
   // todo: convert to store or context eventually.
   const { buildTooltip } = useTooltip({ state, displayGeoName, supportedStatesFipsCodes })
 
@@ -783,7 +770,6 @@ const CdcMap = ({
     loadConfig,
     logo,
     position,
-    resetLegendToggles,
     runtimeFilters,
     runtimeLegend,
     runtimeData,

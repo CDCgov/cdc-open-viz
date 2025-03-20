@@ -8,13 +8,14 @@ export const toggleLegendActive = (
   setAccessibleStatus
 ) => {
   const runtimeLegendCopy = _.cloneDeep(runtimeLegend)
-  const newValue = !runtimeLegendCopy.items?.[i].disabled
 
-  runtimeLegendCopy.items[i].disabled = newValue // Toggle!
+  // Create and toggle the new value
+  const newValue = !runtimeLegendCopy.items?.[i].disabled
+  runtimeLegendCopy.items[i].disabled = newValue
 
   const disabledAmt = runtimeLegend.disabledAmt ?? 0
 
-  runtimeLegendCopy.items[i]['disabledAmt'] = newValue ? disabledAmt + 1 : disabledAmt - 1
+  runtimeLegendCopy['disabledAmt'] = newValue ? disabledAmt + 1 : disabledAmt - 1
 
   setRuntimeLegend(runtimeLegendCopy)
 
