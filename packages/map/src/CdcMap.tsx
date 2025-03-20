@@ -20,15 +20,7 @@ import { type Coordinate, type MapConfig } from './types/MapConfig'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
-import {
-  supportedCities,
-  supportedCounties,
-  supportedCountries,
-  supportedRegions,
-  supportedStates,
-  supportedStatesFipsCodes,
-  supportedTerritories
-} from './data/supported-geos'
+import { supportedStatesFipsCodes } from './data/supported-geos'
 import colorPalettes from '@cdc/core/data/colorPalettes'
 import initialState from './data/initial-state'
 
@@ -59,6 +51,7 @@ import {
   generateRuntimeLegend,
   generateRuntimeLegendHash,
   getUniqueValues,
+  handleMapTabbing,
   hashObj,
   navigationHandler,
   validateFipsCodeLength
@@ -124,10 +117,11 @@ const CdcMap = ({
 
   const legendRef = useRef(null)
   const tooltipRef = useRef(null)
-  const legendId = useId()
+
   // create random tooltipId
   const tooltipId = `${Math.random().toString(16).slice(-4)}`
   const mapId = useId()
+  const legendId = useId()
 
   const { handleSorting } = useFilters({ config: state, setConfig: setState })
   let legendMemo = useRef(new Map())
@@ -282,7 +276,6 @@ const CdcMap = ({
   })
 
   // Calculates what's going to be displayed on the map and data table at render.
-  // eslint-disable-next-line
   const generateRuntimeData = useCallback((configObj, filters, hash, test) => {
     try {
       const result = {}
@@ -731,14 +724,16 @@ const CdcMap = ({
     }, [config.data]) // eslint-disable-line
   }
 
-  // Destructuring for more readable JSX
-  const { general, tooltips, table } = state
-  let { title, subtext = '', geoType } = general
+  const { general, tooltips, table, columns } = state
+  const { subtext = '', geoType } = general
+  const { showDownloadImgButton, showDownloadPdfButton, headerColor, introText } = general
+  let title = state.general.title
 
   // if no title AND in editor then set a default
   if (isEditor) {
     if (!title || title === '') title = 'Map Title'
   }
+
   if (!table.label || table.label === '') table.label = 'Data Table'
 
   // Map container classes
@@ -814,35 +809,7 @@ const CdcMap = ({
 
   if (!mapProps.data || !state.data) return <></>
 
-  const hasDataTable =
-    state.runtime.editorErrorMessage.length === 0 &&
-    true === table.forceDisplay &&
-    general.type !== 'navigation' &&
-    false === loading
-
-  const handleMapTabbing = () => {
-    let tabbingID
-
-    // 1) skip to legend
-    if (general.showSidebar) {
-      tabbingID = legendId
-    }
-
-    // 2) skip to data table if it exists and not a navigation map
-    if (hasDataTable && !general.showSidebar) {
-      tabbingID = `dataTableSection__${Date.now()}`
-    }
-
-    // 3) if it's a navigation map skip to the dropdown.
-    if (state.general.type === 'navigation') {
-      tabbingID = `dropdown-${Date.now()}`
-    }
-
-    // 4) handle other options
-    return tabbingID || '!'
-  }
-
-  const tabId = handleMapTabbing()
+  const tabId = handleMapTabbing(state, loading, legendId)
 
   // this only shows in Dashboard config mode and only if Show Table is also set
   const tableLink = (
@@ -852,12 +819,7 @@ const CdcMap = ({
   )
 
   const sectionClassNames = () => {
-    const classes = [
-      'cove-component__content',
-      'cdc-map-inner-container',
-      `${currentViewport}`,
-      `${state?.general?.headerColor}`
-    ]
+    const classes = ['cove-component__content', 'cdc-map-inner-container', `${currentViewport}`, `${headerColor}`]
     if (config?.runtime?.editorErrorMessage.length > 0) classes.push('type-map--has-error')
     return classes.join(' ')
   }
@@ -885,14 +847,14 @@ const CdcMap = ({
                 title={title}
                 superTitle={general.superTitle}
                 config={config}
-                classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
+                classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${headerColor}`]}
               />
               <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
               {state?.annotations?.length > 0 && (
                 <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
               )}
 
-              {general.introText && <section className='introText mb-4'>{parse(general.introText)}</section>}
+              {introText && <section className='introText mb-4'>{parse(introText)}</section>}
 
               {state?.filters?.length > 0 && (
                 <Filters
@@ -964,7 +926,7 @@ const CdcMap = ({
               {subtext.length > 0 && <p className='subtext mt-4'>{parse(subtext)}</p>}
 
               <MediaControls.Section classes={['download-buttons']}>
-                {state.general.showDownloadImgButton && (
+                {showDownloadImgButton && (
                   <MediaControls.Button
                     text='Download Image'
                     title='Download Chart as Image'
@@ -973,7 +935,7 @@ const CdcMap = ({
                     elementToCapture={imageId}
                   />
                 )}
-                {state.general.showDownloadPdfButton && (
+                {showDownloadPdfButton && (
                   <MediaControls.Button
                     text='Download PDF'
                     title='Download Chart as PDF'
@@ -994,7 +956,7 @@ const CdcMap = ({
                     navigationHandler={navigationHandler}
                     expandDataTable={table.expanded}
                     headerColor={general.headerColor}
-                    columns={state.columns}
+                    columns={columns}
                     showFullGeoNameInCSV={table.showFullGeoNameInCSV}
                     runtimeLegend={runtimeLegend}
                     runtimeData={runtimeData}
@@ -1009,8 +971,8 @@ const CdcMap = ({
                     }
                     setFilteredCountryCode={setFilteredCountryCode}
                     tabbingId={tabId}
-                    showDownloadImgButton={state.general.showDownloadImgButton}
-                    showDownloadPdfButton={state.general.showDownloadPdfButton}
+                    showDownloadImgButton={showDownloadImgButton}
+                    showDownloadPdfButton={showDownloadPdfButton}
                     innerContainerRef={innerContainerRef}
                     outerContainerRef={outerContainerRef}
                     imageRef={imageId}
