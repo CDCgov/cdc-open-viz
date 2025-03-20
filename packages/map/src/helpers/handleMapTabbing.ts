@@ -9,7 +9,7 @@ export const handleMapTabbing = (state: MapConfig, loading: boolean, legendId: s
     general.type !== 'navigation' &&
     false === loading
 
-  let tabbingID
+  let tabbingID: string
 
   // 1) skip to legend
   if (general.showSidebar) {
