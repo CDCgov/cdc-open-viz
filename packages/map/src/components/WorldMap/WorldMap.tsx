@@ -185,7 +185,6 @@ const WorldMap = () => {
         applyLegendToRow={applyLegendToRow}
         applyTooltipsToGeo={applyTooltipsToGeo}
         data={data}
-        displayGeoName={displayGeoName}
         geoClickHandler={geoClickHandler}
         key='cities'
         projection={projection}

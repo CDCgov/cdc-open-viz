@@ -117,7 +117,6 @@ const SingleStateMap = props => {
         state={state}
         geoClickHandler={geoClickHandler}
         applyTooltipsToGeo={applyTooltipsToGeo}
-        displayGeoName={displayGeoName}
         applyLegendToRow={applyLegendToRow}
         titleCase={titleCase}
         setSharedFilterValue={setSharedFilterValue}

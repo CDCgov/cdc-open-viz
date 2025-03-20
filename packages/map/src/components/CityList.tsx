@@ -7,13 +7,12 @@ import ConfigContext from '../context'
 import { supportedCities } from '../data/supported-geos'
 import { getFilterControllingStatePicked } from './UsaMap/helpers/map'
 
-import { getGeoStrokeColor, titleCase } from '../helpers'
+import { getGeoStrokeColor, titleCase, displayGeoName } from '../helpers'
 
 const CityList = ({
   data,
   geoClickHandler,
   applyTooltipsToGeo,
-  displayGeoName,
   applyLegendToRow,
   setSharedFilterValue,
   isFilterValueSupported,

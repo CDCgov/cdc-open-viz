@@ -487,7 +487,6 @@ const UsaMap = () => {
         applyLegendToRow={applyLegendToRow}
         applyTooltipsToGeo={applyTooltipsToGeo}
         data={data}
-        displayGeoName={displayGeoName}
         geoClickHandler={geoClickHandler}
         isFilterValueSupported={isFilterValueSupported}
         key='cities'
