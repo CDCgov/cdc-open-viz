@@ -2,6 +2,9 @@ import { createContext } from 'react'
 import { MapConfig } from './types/MapConfig'
 
 type MapContext = {
+  container
+  tooltipRef
+  containerEl
   applyLegendToRow
   applyTooltipsToGeo
   data

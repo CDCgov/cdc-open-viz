@@ -1,17 +1,13 @@
 import { useEffect, useState, useRef, useContext } from 'react'
-
 import { geoCentroid, geoPath, geoContains } from 'd3-geo'
 import { feature } from 'topojson-client'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import debounce from 'lodash.debounce'
-
 import Loading from '@cdc/core/components/Loading'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { drawShape, createShapeProperties } from '../helpers/shapes'
-
 import { getGeoStrokeColor, handleMapAriaLabels, displayGeoName } from '../../../helpers'
 
 const getCountyTopoURL = year => {
@@ -25,7 +21,7 @@ const sortById = (a, b) => {
 }
 
 const getTopoData = year => {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     const resolveWithTopo = async response => {
       if (response.status !== 200) {
         response = await import(/* webpackChunkName: "cb_2019_us_county_20m" */ './../data/cb_2019_us_county_20m.json')
@@ -33,7 +29,14 @@ const getTopoData = year => {
         response = await response.json()
       }
 
-      let topoData = {}
+      let topoData = {
+        year: undefined,
+        counties: undefined,
+        states: undefined,
+        mapData: undefined,
+        countyIndecies: undefined,
+        projection: undefined
+      }
 
       topoData.year = year || 'default'
       topoData.counties = feature(response, response.objects.counties).features
@@ -118,7 +121,7 @@ const isTopoReady = (topoData, state, runtimeFilters) => {
   return topoData.year && (!currentYear || currentYear === topoData.year)
 }
 
-const CountyMap = props => {
+const CountyMap = () => {
   // prettier-ignore
   const {
       applyLegendToRow,
@@ -136,7 +139,6 @@ const CountyMap = props => {
   } = useContext(ConfigContext)
 
   // CREATE STATE LINES
-  const projection = geoAlbersUsaTerritories()
   const geoStrokeColor = getGeoStrokeColor(state)
 
   const [focus, setFocus] = useState({})
@@ -331,7 +333,7 @@ const CountyMap = props => {
           }
         }
 
-        // If a state is hovered and it is not an unfocused state, search only the counties within that state for the county hovered
+        // If a state is hovered, and it is not an unfocused state, search only the counties within that state for the county hovered
         if (hoveredState && (!focus.id || focus.id === hoveredState) && topoData.countyIndecies[hoveredState]) {
           for (let i = topoData.countyIndecies[hoveredState][0]; i <= topoData.countyIndecies[hoveredState][1]; i++) {
             if (geoContains(topoData.mapData[i], pointCoordinates)) {
@@ -379,7 +381,6 @@ const CountyMap = props => {
           data[runtimeKeys[currentTooltipIndex]][state.columns.latitude.name]
         ])
         if (pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
-          // Who knew pythagorean theorum was useful
           return // The user is still hovering over the previous geo point, don't redraw tooltip
         }
       }
@@ -448,7 +449,8 @@ const CountyMap = props => {
 
   // Redraws canvas. Takes as parameters the fips id of a state to center on and the [lat,long] center of that state
   const drawCanvas = () => {
-    if (canvasRef.current && runtimeLegend.length > 0) {
+    if (canvasRef.current && runtimeLegend.items.length > 0) {
+      console.log('drawing...')
       const canvas = canvasRef.current
       const context = canvas.getContext('2d')
       const path = geoPath(topoData.projection, context)
@@ -465,7 +467,7 @@ const CountyMap = props => {
         if (resetButton.current) resetButton.current.style.display = 'block'
       }
 
-      // Centers the projection on the paramter passed
+      // Centers the projection on the parameter passed
       // Centers the projection on the parameter passed
       if (focus.feature) {
         const PADDING = 10
@@ -484,7 +486,7 @@ const CountyMap = props => {
       context.strokeStyle = geoStrokeColor
 
       // Iterates through each state/county topo and renders it
-      topoData.mapData.forEach((geo, i) => {
+      topoData.mapData.forEach(geo => {
         // If invalid geo item, don't render
         if (!geo.id) return
         // If the map is focused on one state, don't render counties that are not in that state
@@ -591,7 +593,7 @@ const CountyMap = props => {
         className='county-map-canvas'
       ></canvas>
 
-      <button className={`btn btn--reset btn-primary`} onClick={onReset} ref={resetButton} tabIndex='0'>
+      <button className={`btn btn--reset btn-primary`} onClick={onReset} ref={resetButton} tabIndex={0}>
         Reset Zoom
       </button>
     </ErrorBoundary>

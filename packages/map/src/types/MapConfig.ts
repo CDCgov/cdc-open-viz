@@ -81,8 +81,6 @@ export type MapConfig = Visualization & {
     categorical: { name: string }
   }
   dataUrl: string
-  // whether to use the old custom quantile scaling method or new custom quantile scaling method
-  equalNumberOptIn: boolean
   runtimeDataUrl: string
   filters: VizFilter[]
   general: {
@@ -93,6 +91,8 @@ export type MapConfig = Visualization & {
     fullBorder: boolean
     geoBorderColor: string
     geoLabelOverride: string
+    // whether to use the old custom quantile scaling method or new custom quantile scaling method
+    equalNumberOptIn: boolean
     geoType:
       | 'us'
       | 'us-region'

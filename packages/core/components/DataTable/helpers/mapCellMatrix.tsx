@@ -78,18 +78,23 @@ const mapCellArray = ({
   navigationHandler,
   setFilteredCountryCode
 }: MapRowsProps): ReactNode[][] => {
+  const { allowMapZoom, geoType, type } = config.general
   return rows.map(row =>
     Object.keys(columns)
       .filter(column => columns[column].dataTable === true && columns[column].name)
       .map(column => {
         if (column === 'geo') {
           const rowObj = runtimeData[row]
+          if (!rowObj) {
+            throw new Error('No row object found')
+          }
           const legendColor = applyLegendToRow(rowObj)
+          if (!legendColor) {
+            throw new Error('No legend color found')
+          }
           const labelValue = getGeoLabel(config, row, formatLegendLocation, displayGeoName)
           const mapZoomHandler =
-            config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world'
-              ? () => setFilteredCountryCode(row)
-              : undefined
+            type === 'bubble' && allowMapZoom && geoType === 'world' ? () => setFilteredCountryCode(row) : undefined
           return (
             <div className='col-12'>
               <LegendShape fill={legendColor[0]} />

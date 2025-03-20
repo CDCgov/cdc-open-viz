@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../../../context'
 import { MapContext } from '../../../../types/MapContext'
-import { getGeoFillColor } from '../../../../helpers'
+import { getGeoFillColor, displayGeoName } from '../../../../helpers'
 
 interface CountyOutputProps {
   counties: any[]
@@ -12,8 +12,7 @@ interface CountyOutputProps {
 }
 
 const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoStrokeColor, tooltipId }) => {
-  const { applyTooltipsToGeo, applyLegendToRow, displayGeoName, state, data, geoClickHandler } =
-    useContext<MapContext>(ConfigContext)
+  const { applyTooltipsToGeo, applyLegendToRow, state, data, geoClickHandler } = useContext<MapContext>(ConfigContext)
 
   const geoFillColor = getGeoFillColor(state)
   return (

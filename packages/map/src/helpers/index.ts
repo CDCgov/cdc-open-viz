@@ -1,5 +1,4 @@
 export { applyColorToLegend } from './applyColorToLegend'
-export { applyLegendToRow } from './applyLegendToRow'
 export { closeModal } from './closeModal'
 export { colorDistributions } from './colorDistributions'
 export { getGeoStrokeColor, getGeoFillColor } from './colors'

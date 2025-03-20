@@ -29,6 +29,8 @@ export const generateRuntimeLegend = (
     if (!runtimeData) Error('No runtime data provided')
     if (!hash) Error('No hash provided')
     if (!configObj) Error('No config object provided')
+    if (!legendMemo) Error('No legend memo provided')
+    if (!legendSpecialClassLastMemo) Error('No legend special class last memo provided')
 
     // Define variables..
     const newLegendMemo = new Map() // Reset memoization
@@ -325,7 +327,7 @@ export const generateRuntimeLegend = (
 
         const getDomain = () => {
           // backwards compatibility
-          if (columns?.primary?.roundToPlace !== undefined && configObj?.general?.equalNumberOptIn) {
+          if (columns?.primary?.roundToPlace !== undefined && general?.equalNumberOptIn) {
             return _.uniq(
               dataSet.map(item => Number(item[columns.primary.name]).toFixed(Number(columns?.primary?.roundToPlace)))
             )
@@ -335,7 +337,7 @@ export const generateRuntimeLegend = (
 
         const getBreaks = scale => {
           // backwards compatibility
-          if (columns?.primary?.roundToPlace !== undefined && configObj?.general?.equalNumberOptIn) {
+          if (columns?.primary?.roundToPlace !== undefined && general?.equalNumberOptIn) {
             return scale.quantiles().map(b => Number(b)?.toFixed(Number(columns?.primary?.roundToPlace)))
           }
           return scale.quantiles().map(item => Number(Math.round(item)))
@@ -402,11 +404,7 @@ export const generateRuntimeLegend = (
             let number = row[columns.primary.name]
             let updated = result.items.length - 1
 
-            if (
-              result.items?.[updated]?.min === (null || undefined) ||
-              result.items?.[updated]?.max === (null || undefined)
-            )
-              return
+            if (result.items?.[updated]?.min === undefined || result.items?.[updated]?.max === undefined) return
 
             if (number >= result?.items?.[updated].min && number <= result?.items?.[updated].max) {
               newLegendMemo.set(hashObj(row), updated)
@@ -482,16 +480,8 @@ export const generateRuntimeLegend = (
       }
     }
 
-    //----------
-    // DEV-784
-    // before returning the legend result
-    // add property for bin number and set to index location
     setBinNumbers(result)
-
-    // Move all special legend items from "Special Classes"  to the end of the legend
     sortSpecialClassesLast(result, legend)
-
-    //-----------
 
     const assignSpecialClassLastIndex = (value, key) => {
       const newIndex = result.items.findIndex(d => d.bin === value)

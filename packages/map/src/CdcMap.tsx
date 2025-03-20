@@ -348,11 +348,15 @@ const CdcMap = ({
   // this is passed DOWN into the various components
   // then they do a lookup based on the bin number as index into here
   const applyLegendToRow = rowObj => {
+    const { general, color, legend } = state
+    const { type } = general
+    const { showSpecialClassesLast } = legend
     try {
       if (!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
-      // Navigation mapchanged
-      if ('navigation' === state.general.type) {
-        let mapColorPalette = colorPalettes[state.color] || colorPalettes['bluegreenreverse']
+
+      // Navigation map changed
+      if ('navigation' === type) {
+        let mapColorPalette = colorPalettes[color] ?? colorPalettes['bluegreenreverse']
         return generateColorsArray(mapColorPalette[3])
       }
 
@@ -362,11 +366,12 @@ const CdcMap = ({
         let idx = legendMemo.current.get(hash)
         let disabledIdx = idx
 
-        if (state.legend.showSpecialClassesLast) {
+        if (showSpecialClassesLast) {
           disabledIdx = legendSpecialClassLastMemo.current.get(hash)
         }
 
         if (runtimeLegend[disabledIdx]?.disabled) return false
+        if (!runtimeLegend.items) return false
 
         // changed to use bin prop to get color instead of idx
         // bc we re-order legend when showSpecialClassesLast is checked
@@ -831,7 +836,6 @@ const CdcMap = ({
           {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
             <section className={sectionClassNames()} aria-label={'Map: ' + title} ref={innerContainerRef}>
               {state?.runtime?.editorErrorMessage.length > 0 && <Error state={state} />}
-              {/* prettier-ignore */}
               <Title
                 title={title}
                 superTitle={general.superTitle}
@@ -940,6 +944,7 @@ const CdcMap = ({
                 general.type !== 'navigation' &&
                 false === loading && (
                   <DataTable
+                    applyLegendToRow={applyLegendToRow}
                     config={state}
                     rawData={state.data}
                     navigationHandler={navigationHandler}
@@ -950,7 +955,6 @@ const CdcMap = ({
                     runtimeLegend={runtimeLegend}
                     runtimeData={runtimeData}
                     displayGeoName={displayGeoName}
-                    applyLegendToRow={applyLegendToRow}
                     tableTitle={table.label}
                     indexTitle={table.indexLabel}
                     vizTitle={general.title}

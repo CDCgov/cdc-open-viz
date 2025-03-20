@@ -56,7 +56,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const getFormattedLegendItems = () => {
     try {
-      if (!runtimeLegend) Error('No runtime legend data')
+      if (!runtimeLegend.items) Error('No runtime legend data')
       return runtimeLegend.items.map((entry, idx) => {
         const entryMax = displayDataAsText(entry.max, 'primary', state)
 

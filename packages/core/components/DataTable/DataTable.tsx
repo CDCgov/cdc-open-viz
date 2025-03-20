@@ -58,20 +58,21 @@ export type DataTableProps = {
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = (props: DataTableProps) => {
   const {
+    applyLegendToRow,
+    columns,
     config,
     dataConfig,
     defaultSortBy,
     displayGeoName,
-    tableTitle,
-    vizTitle,
+    expandDataTable,
+    formatLegendLocation,
+    headerColor,
     rawData,
     runtimeData: parentRuntimeData,
-    headerColor,
-    expandDataTable,
-    columns,
-    viewport,
-    formatLegendLocation,
     tabbingId,
+    tableTitle,
+    viewport,
+    vizTitle,
     wrapColumns
   } = props
   const runtimeData = useMemo(() => {
@@ -273,7 +274,7 @@ const DataTable = (props: DataTableProps) => {
 
     const childrenMatrix =
       config.type === 'map'
-        ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData, viewport })
+        ? mapCellMatrix({ ...props, applyLegendToRow, rows, wrapColumns, runtimeData, viewport })
         : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
 
     // If every value in a column is a number, record the column index so the header and cells can be right-aligned
