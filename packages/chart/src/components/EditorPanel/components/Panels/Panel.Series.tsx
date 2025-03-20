@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useContext } from 'react'
 import ConfigContext from '../../../../ConfigContext'
 
 // Core
@@ -17,7 +17,7 @@ import {
   AccordionItemPanel,
   AccordionItemButton
 } from 'react-accessible-accordion'
-import { Draggable } from '@hello-pangea/dnd'
+import { Draggable, DragDropContext, Droppable } from '@hello-pangea/dnd'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 
 const SeriesContext = React.createContext({})
@@ -422,6 +422,64 @@ const SeriesDropdownConfidenceInterval = props => {
   )
 }
 
+const DynamicSeriesOrder = () => {
+  const { config, updateConfig } = useContext(ConfigContext)
+  const handleFilterOrder = (index1, index2) => {
+    const values = [...config.runtime.seriesKeys]
+
+    const [removed] = values.splice(index1, 1)
+    values.splice(index2, 0, removed)
+
+    updateConfig({ ...config, legend: { ...config.legend, orderedValues: values } })
+  }
+
+  return (
+    <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source?.index, destination?.index)}>
+      <Droppable droppableId='filter_order'>
+        {provided => (
+          <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
+            {config.runtime.seriesLabelsAll?.map((value, index) => {
+              return (
+                <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
+                  {(provided, snapshot) => (
+                    <li>
+                      <div
+                        className={snapshot.isDragging ? 'currently-dragging' : ''}
+                        style={provided.draggableProps.style}
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        {value}
+                      </div>
+                    </li>
+                  )}
+                </Draggable>
+              )
+            })}
+            {provided.placeholder}
+          </ul>
+        )}
+      </Droppable>
+    </DragDropContext>
+  )
+}
+const legendOrderOptions: { label: string; value: string }[] = [
+  { label: 'Order By Data Column', value: 'dataColumn' },
+  {
+    label: 'Custom',
+    value: 'custom'
+  },
+  {
+    label: 'Ascending Alphanumeric',
+    value: 'asc'
+  },
+  {
+    label: 'Descending Alphanumeric',
+    value: 'desc'
+  }
+]
+
 const SeriesInputWeight = props => {
   const { series, index: i } = props
   const { config, updateConfig } = useContext(ConfigContext)
@@ -609,7 +667,7 @@ const SeriesButtonRemove = props => {
 }
 
 const SeriesItem = props => {
-  const { config } = useContext(ConfigContext)
+  const { config, updateConfig } = useContext(ConfigContext)
   const { updateSeries, getColumns } = useContext(SeriesContext)
   const { series, getItemStyle, sortableItemStyles, chartsWithOptions, index: i } = props
   const showDynamicCategory =
@@ -669,28 +727,20 @@ const SeriesItem = props => {
                           </Tooltip>
                         }
                       />
-                      <Select
-                        label='Dynamic Category Order'
-                        value={series.dynamicCategory}
-                        options={['- Select - ', ...getColumns().filter(col => series.dataKey !== col)]}
-                        updateField={(_section, _subsection, _fieldName, value) => {
-                          if (value === '- Select -') value = ''
-                          updateSeries(i, value, 'dynamicCategory')
-                        }}
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>
-                                This field is Optional. If you have a dynamic data series you can select the category
-                                field here. You can only add one dynamic category per visualization.
-                              </p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                      />
+
+                      <>
+                        <Select
+                          value={config.legend.order}
+                          options={legendOrderOptions}
+                          section='legend'
+                          fieldName='order'
+                          updateField={(_section, _subsection, _fieldName, value) => {
+                            updateConfig({ ...config, legend: { ...config.legend, order: value } })
+                          }}
+                          label='Dynamic Series Order'
+                        />
+                        {config.legend.order === 'custom' && <DynamicSeriesOrder />}
+                      </>
                     </>
                   )}
                   <Series.Input.Weight series={series} index={i} />

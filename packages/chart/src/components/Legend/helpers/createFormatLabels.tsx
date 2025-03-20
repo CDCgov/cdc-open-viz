@@ -17,7 +17,32 @@ export const createFormatLabels =
           })
         : labels
     const reverseLabels = labels => {
+      if (config.series.some(series => series.dynamicCategory)) {
+        return orderDynamicLabels(labels)
+      }
+
       return config.legend.reverseLabelOrder ? sortVertical(labels).reverse() : sortVertical(labels)
+    }
+    console.log(config.legend, 'legend')
+    const orderDynamicLabels = labels => {
+      return labels.sort((a, b) => {
+        // Extract values with fallback to text if datum is null or undefined
+        const valA = a.datum || a.text
+        const valB = b.datum || b.text
+
+        // Try to convert to floating point numbers
+        const numA = parseFloat(valA)
+        const numB = parseFloat(valB)
+
+        // Check if both are numbers
+        if (!isNaN(numA) && !isNaN(numB)) {
+          // If both are numbers, compare as numbers
+          return config.legend.order === 'asc' ? numA - numB : numB - numA
+        } else {
+          // If one or both are strings, compare as strings
+          return config.legend.order === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA)
+        }
+      })
     }
     const colorCode = config.legend?.colorCode
     if (visualizationType === 'Deviation Bar') {
