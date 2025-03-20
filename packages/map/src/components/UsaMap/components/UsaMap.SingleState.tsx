@@ -113,7 +113,6 @@ const SingleStateMap = props => {
       <CityList
         projection={cityListProjection}
         key='cities'
-        data={data}
         state={state}
         geoClickHandler={geoClickHandler}
         applyTooltipsToGeo={applyTooltipsToGeo}
