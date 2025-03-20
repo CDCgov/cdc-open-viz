@@ -229,6 +229,8 @@ const DataTable = (props: DataTableProps) => {
     const getDownloadData = () => {
       const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
       const sharedFilterColumns = config.table?.sharedFilterColumns || []
+      const vizFilterColumns = (config.filters || []).map(filter => filter.columnName)
+      const filterColumns = [...sharedFilterColumns, ...vizFilterColumns]
       const visibleData =
         config.type === 'map'
           ? getMapRowData(
@@ -238,10 +240,10 @@ const DataTable = (props: DataTableProps) => {
               formatLegendLocation,
               runtimeData as Record<string, Object>,
               displayGeoName,
-              sharedFilterColumns
+              filterColumns
             )
           : runtimeData.map(d => {
-              return _.pick(d, [...sharedFilterColumns, ...dataSeriesColumns])
+              return _.pick(d, [...filterColumns, ...dataSeriesColumns])
             })
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
 

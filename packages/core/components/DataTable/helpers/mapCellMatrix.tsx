@@ -45,18 +45,18 @@ export const getMapRowData = (
   formatLegendLocation: (row: string) => string,
   runtimeData: Record<string, Object>,
   displayGeoName: (row: string) => string,
-  sharedFilterColumns: string[]
+  filterColumns: string[]
 ) => {
   return rows.map((row: string) => {
     const dataRow = {}
     ;[
-      ...sharedFilterColumns,
+      ...filterColumns,
       ...Object.keys(columns).filter(column => columns[column].dataTable === true && columns[column].name)
     ].map(column => {
       const label = columns[column]?.label || columns[column]?.name || column
       if (column === 'geo') {
         dataRow[label] = getGeoLabel(config, row, formatLegendLocation, displayGeoName)
-      } else if (sharedFilterColumns.includes(column)) {
+      } else if (filterColumns.includes(column)) {
         dataRow[label] = runtimeData[row][column]
       } else {
         const dataValue = getDataValue(config, runtimeData[row], column)
