@@ -52,7 +52,8 @@ const Legend: React.FC<LegendProps> = forwardRef(
     ref
   ) => {
     const { innerClasses, containerClasses } = getLegendClasses(config)
-    const { runtime, legend, series } = config
+    const { runtime, legend } = config
+    const { series } = runtime
 
     const seriesWithData = getSeriesWithData(config)
     const dontFilterLegendItems = !series.length || legend.unified
