@@ -167,6 +167,7 @@ export default {
     subStyle: 'linear blocks',
     shape: 'circle',
     tickRotation: '',
+    order: 'dataColumn',
     hideBorder: {
       side: false,
       topBottom: true
