@@ -15,8 +15,7 @@ import { supportedTerritories } from '../../../data/supported-geos'
 
 // Helpers
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
-import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
-import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
+import { displayGeoName, handleMapAriaLabels, getGeoStrokeColor, getGeoFillColor } from '../../../helpers'
 
 const Rect = ({ label, text, stroke, strokeWidth, ...props }) => {
   return (
@@ -41,7 +40,6 @@ const UsaRegionMap = props => {
     applyLegendToRow,
     applyTooltipsToGeo,
     data,
-    displayGeoName,
     geoClickHandler,
     state,
     tooltipId

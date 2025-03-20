@@ -103,6 +103,8 @@ const CdcMap = ({
       setRuntimeFilters(data)
     }
   }
+
+  // state
   const [runtimeLegend, setRuntimeLegend] = useState([])
   const [stateToShow, setStateToShow] = useState(null)
   const [modal, setModal] = useState(null)
@@ -113,20 +115,22 @@ const CdcMap = ({
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
   const [projection, setProjection] = useState(null)
-  const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
 
+  // Refs
   const legendRef = useRef(null)
   const tooltipRef = useRef(null)
+  const legendMemo = useRef(new Map())
+  const legendSpecialClassLastMemo = useRef(new Map())
+  const innerContainerRef = useRef()
 
-  // create random tooltipId
-  const tooltipId = `${Math.random().toString(16).slice(-4)}`
+  // IDs
+  const tooltipId = useId()
   const mapId = useId()
   const legendId = useId()
 
+  // hooks
+  const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
   const { handleSorting } = useFilters({ config: state, setConfig: setState })
-  let legendMemo = useRef(new Map())
-  let legendSpecialClassLastMemo = useRef(new Map())
-  let innerContainerRef = useRef()
 
   const handleDragStateChange = isDragging => {
     setIsDraggingAnnotation(isDragging)
@@ -711,6 +715,7 @@ const CdcMap = ({
     }, [config.data]) // eslint-disable-line
   }
 
+  // Destructuring
   const { general, tooltips, table, columns } = state
   const { subtext = '', geoType } = general
   const { showDownloadImgButton, showDownloadPdfButton, headerColor, introText } = general
@@ -757,9 +762,7 @@ const CdcMap = ({
     container,
     content: modal,
     data: runtimeData,
-    displayGeoName,
     filteredCountryCode,
-    generateColorsArray,
     generateRuntimeData,
     geoClickHandler,
     hasZoom: state.general.allowMapZoom,

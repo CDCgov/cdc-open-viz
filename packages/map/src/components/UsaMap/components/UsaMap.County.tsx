@@ -12,7 +12,7 @@ import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { drawShape, createShapeProperties } from '../helpers/shapes'
 
-import { getGeoStrokeColor, handleMapAriaLabels } from '../../../helpers'
+import { getGeoStrokeColor, handleMapAriaLabels, displayGeoName } from '../../../helpers'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -126,7 +126,6 @@ const CountyMap = props => {
       container,
       containerEl,
       data,
-      displayGeoName,
       geoClickHandler,
       runtimeFilters,
       runtimeLegend,

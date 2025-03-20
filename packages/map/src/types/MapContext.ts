@@ -9,7 +9,6 @@ export type MapContext = {
   displayDataAsText
   displayGeoName
   filteredCountryCode
-  generateColorsArray
   generateRuntimeData
   geoClickHandler
   handleCircleClick: Function

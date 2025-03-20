@@ -1,17 +1,16 @@
 import { memo, useContext, useState, useEffect } from 'react'
-
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { geoMercator } from 'd3-geo'
 import { Mercator } from '@visx/geo'
 import { feature } from 'topojson-client'
+import ConfigContext from '../../context'
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ZoomableGroup from '../ZoomableGroup'
 import Geo from '../Geo'
 import CityList from '../CityList'
 import BubbleList from '../BubbleList'
-import ConfigContext from '../../context'
 import ZoomControls from '../ZoomControls'
 import { supportedCountries } from '../../data/supported-geos'
-import { getGeoFillColor, getGeoStrokeColor, handleMapAriaLabels, titleCase } from '../../helpers'
+import { getGeoFillColor, getGeoStrokeColor, handleMapAriaLabels, titleCase, displayGeoName } from '../../helpers'
 
 let projection = geoMercator()
 
@@ -21,7 +20,6 @@ const WorldMap = () => {
     applyLegendToRow,
     applyTooltipsToGeo,
     data,
-    displayGeoName,
     generateRuntimeData,
     geoClickHandler,
     hasZoom,
