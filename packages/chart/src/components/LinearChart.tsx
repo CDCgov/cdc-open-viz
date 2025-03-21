@@ -7,9 +7,11 @@ import { Line, Bar } from '@visx/shape'
 import { Text } from '@visx/text'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
+import _ from 'lodash'
+
+// CDC Components
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import BrushChart from './BrushChart'
-// CDC Components
 import { AreaChart, AreaChartStacked } from './AreaChart'
 import BarChart from './BarChart'
 import ConfigContext from '../ConfigContext'
@@ -28,7 +30,7 @@ import CategoricalYAxis from './Axis/Categorical.Axis'
 // Helpers
 import { isLegendWrapViewport, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
-import { calcInitialHeight } from '../helpers/sizeHelpers'
+import { calcInitialHeight, handleAutoPaddingRight } from '../helpers/sizeHelpers'
 
 // Hooks
 import useMinMax from '../hooks/useMinMax'
@@ -41,8 +43,6 @@ import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
-import _, { clamp } from 'lodash'
-import { EDITOR_WIDTH } from '../CdcChartComponent'
 
 type LinearChartProps = {
   parentWidth: number
@@ -334,12 +334,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   // Adjust padding on the right side of the chart to accommodate for overflow
   useEffect(() => {
     if (!parentRef.current || !parentWidth || !gridLineRefs.current.length) return
-    const editorIsOpen = !!document.querySelector('.editor-panel:not(.hidden)')
-    const lastTickRect = xAxisLabelRefs.current?.[xAxisLabelRefs.current.length - 1]?.getBoundingClientRect()
-    const lastBottomTickEnd = lastTickRect ? lastTickRect.x + lastTickRect.width : 0
-    const editorWidth = editorIsOpen ? EDITOR_WIDTH : 0
-    const calculatedOverhang = lastBottomTickEnd - editorWidth - parentWidth
-    const paddingToAdd = clamp(calculatedOverhang, 0, 20)
+
+    const [updatePadding, paddingToAdd] = handleAutoPaddingRight(parentRef, xAxisLabelRefs, parentWidth)
+
+    if (!updatePadding) return
 
     parentRef.current.style.paddingRight = `${paddingToAdd}px`
     // subtract padding from grid line's x1 value
