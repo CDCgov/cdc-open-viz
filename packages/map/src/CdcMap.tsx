@@ -357,6 +357,7 @@ const CdcMap = ({
     let filters: VizFilter[]
 
     if (state.filters && (config || hashFilters !== runtimeFilters.fromHash)) {
+      debugger
       filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
 
       if (filters) {

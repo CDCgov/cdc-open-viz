@@ -5,7 +5,7 @@ import { VizFilter } from '@cdc/core/types/VizFilter'
 import { DataRow } from '../types/MapConfig'
 
 const useGenerateRuntimeData = (state: MapConfig) => {
-  return (configObj: MapConfig, filters: VizFilter[], hash: number, test: boolean) => {
+  return (configObj: MapConfig, filters: VizFilter[], hash: number, test?: boolean) => {
     try {
       const result: { [uid: string]: DataRow } = {}
 

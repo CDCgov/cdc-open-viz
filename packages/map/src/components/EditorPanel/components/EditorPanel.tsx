@@ -60,10 +60,6 @@ const EditorPanel = () => {
     state,
     tooltipId,
     runtimeData,
-    setRuntimeData,
-    generateRuntimeData,
-
-
   } = useContext<MapContext>(ConfigContext)
 
   const columnsRequiredChecker = useColumnsRequiredChecker()
@@ -876,8 +872,8 @@ const EditorPanel = () => {
         })
 
         if (state) {
-          const newData = generateRuntimeData(state)
-          setRuntimeData(newData)
+          // const newData = generateRuntimeData(state)
+          // setRuntimeData(newData)
         }
         break
       case 'classificationType':
