@@ -1,9 +1,9 @@
 import { hashObj } from './hashObj'
 import { generateColorsArray } from './generateColorsArray'
-import { type Visualization } from '@cdc/core/types/Visualization'
 import colorPalettes from '@cdc/core/data/colorPalettes'
+import { MapConfig } from '../types/MapConfig'
 
-export const applyLegendToRow = (rowObj, state: Visualization, legendMemo, runtimeLegend) => {
+export const applyLegendToRow = (rowObj: Object, state: MapConfig, legendMemo, runtimeLegend) => {
   try {
     const { legend, general, color } = state
 

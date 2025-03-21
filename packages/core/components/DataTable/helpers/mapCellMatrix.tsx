@@ -88,7 +88,9 @@ const mapCellArray = ({
           if (!rowObj) {
             throw new Error('No row object found')
           }
+
           const legendColor = applyLegendToRow(rowObj)
+
           if (!legendColor) {
             throw new Error('No legend color found')
           }

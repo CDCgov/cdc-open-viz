@@ -132,6 +132,21 @@ const CdcMap = ({
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
   const { handleSorting } = useFilters({ config: state, setConfig: setState })
 
+  // memoized functions
+  const memoizedGenerateRuntimeLegend = useCallback(
+    (legendMemo, legendSpecialClassLastMemo, configObj, runtimeData, hash, runtimeFilters, setState) =>
+      generateRuntimeLegend(
+        legendMemo,
+        legendSpecialClassLastMemo,
+        configObj,
+        runtimeData,
+        hash,
+        runtimeFilters,
+        setState
+      ),
+    []
+  )
+
   const handleDragStateChange = isDragging => {
     setIsDraggingAnnotation(isDragging)
   }
@@ -670,7 +685,7 @@ const CdcMap = ({
       setRuntimeData(newRuntimeData)
     } else {
       if (hashLegend !== runtimeLegend?.fromHash && undefined === runtimeData.init) {
-        const legend = generateRuntimeLegend(
+        const legend = memoizedGenerateRuntimeLegend(
           legendMemo,
           legendSpecialClassLastMemo,
           state,
@@ -688,7 +703,7 @@ const CdcMap = ({
     const hashLegend = generateRuntimeLegendHash(state, runtimeFilters)
 
     // Legend - Update when runtimeData does
-    const legend = generateRuntimeLegend(
+    const legend = memoizedGenerateRuntimeLegend(
       legendMemo,
       legendSpecialClassLastMemo,
       state,
