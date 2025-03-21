@@ -3,19 +3,20 @@ import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
 import ConfigContext from '../context'
+import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 
 export const BubbleList = ({
   data: dataImport,
   state,
   projection,
   applyLegendToRow,
-  applyTooltipsToGeo,
   handleCircleClick,
   runtimeData,
   displayGeoName
 }) => {
   const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
   const { tooltipId } = useContext(ConfigContext)
+  const applyTooltipsToGeo = useApplyTooltipsToGeo()
 
   const hasBubblesWithZeroOnMap = state.visual.showBubbleZeros ? 0 : 1
   // sort runtime data. Smaller bubbles should appear on top.

@@ -10,7 +10,6 @@ type MapContext = {
   tooltipRef
   containerEl
   applyLegendToRow
-  applyTooltipsToGeo
   data
   displayGeoName
   filteredCountryCode

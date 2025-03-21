@@ -13,13 +13,13 @@ import { supportedCountries } from '../../data/supported-geos'
 import { getGeoFillColor, getGeoStrokeColor, handleMapAriaLabels, titleCase, displayGeoName } from '../../helpers'
 import useGeoClickHandler from '../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../hooks/useApplyLegendToRow'
+import useApplyTooltipsToGeo from '../../hooks/useApplyTooltipsToGeo'
 
 let projection = geoMercator()
 
 const WorldMap = () => {
   // prettier-ignore
   const {
-    applyTooltipsToGeo,
     data,
     generateRuntimeData,
     hasZoom,
@@ -37,6 +37,7 @@ const WorldMap = () => {
   const [world, setWorld] = useState(null)
   const geoClickHandler = useGeoClickHandler()
   const applyLegendToRow = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
+  const applyTooltipsToGeo = useApplyTooltipsToGeo()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -187,7 +188,6 @@ const WorldMap = () => {
     geosJsx.push(
       <CityList
         applyLegendToRow={applyLegendToRow}
-        applyTooltipsToGeo={applyTooltipsToGeo}
         geoClickHandler={geoClickHandler}
         key='cities'
         projection={projection}
@@ -207,7 +207,6 @@ const WorldMap = () => {
           state={state}
           projection={projection}
           applyLegendToRow={applyLegendToRow}
-          applyTooltipsToGeo={applyTooltipsToGeo}
           displayGeoName={displayGeoName}
           tooltipId={tooltipId}
           handleCircleClick={country =>

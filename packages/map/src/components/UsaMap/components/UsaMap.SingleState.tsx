@@ -19,6 +19,7 @@ import { titleCase, handleMapAriaLabels, getGeoStrokeColor } from '../../../help
 // state-level helpers
 import { getTopoData, getCurrentTopoYear, isTopoReady } from './../helpers/map'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
+import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 
 // SVG ITEMS
 const WIDTH = 880
@@ -28,7 +29,6 @@ const PADDING = 25
 const SingleStateMap = props => {
   const {
     state,
-    applyTooltipsToGeo,
     applyLegendToRow,
     setSharedFilterValue,
     isFilterValueSupported,
@@ -44,6 +44,7 @@ const SingleStateMap = props => {
   } = useContext<MapContext>(ConfigContext)
 
   const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection, statePicked } = useStateZoom(topoData)
+  const applyTooltipsToGeo = useApplyTooltipsToGeo()
   const geoClickHandler = useGeoClickHandler()
 
   const cityListProjection = geoAlbersUsaTerritories()
@@ -114,7 +115,6 @@ const SingleStateMap = props => {
         key='cities'
         state={state}
         geoClickHandler={geoClickHandler}
-        applyTooltipsToGeo={applyTooltipsToGeo}
         applyLegendToRow={applyLegendToRow}
         titleCase={titleCase}
         setSharedFilterValue={setSharedFilterValue}

@@ -1,10 +1,12 @@
 import { useContext } from 'react'
 import ConfigContext from '../context'
 import Icon from '@cdc/core/components/ui/Icon'
+import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 
 const Modal = () => {
-  const { applyTooltipsToGeo, content, state, currentViewport: viewport } = useContext(ConfigContext)
+  const { content, state, currentViewport: viewport } = useContext(ConfigContext)
   const { capitalizeLabels } = state.tooltips
+  const applyTooltipsToGeo = useApplyTooltipsToGeo()
   const tooltip = applyTooltipsToGeo(content.geoName, content.keyedData, 'jsx')
 
   return (

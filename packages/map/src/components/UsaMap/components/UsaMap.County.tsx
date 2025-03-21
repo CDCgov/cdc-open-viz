@@ -11,6 +11,7 @@ import { drawShape, createShapeProperties } from '../helpers/shapes'
 import { getGeoStrokeColor, handleMapAriaLabels, displayGeoName } from '../../../helpers'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
+import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -126,7 +127,6 @@ const isTopoReady = (topoData, state, runtimeFilters) => {
 const CountyMap = () => {
   // prettier-ignore
   const {
-      applyTooltipsToGeo,
       container,
       containerEl,
       data,
@@ -144,6 +144,7 @@ const CountyMap = () => {
   const geoStrokeColor = getGeoStrokeColor(state)
   const geoClickHandler = useGeoClickHandler()
   const applyLegendToRow = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
+  const applyTooltipsToGeo = useApplyTooltipsToGeo()
   const [focus, setFocus] = useState({})
   const [topoData, setTopoData] = useState({})
 

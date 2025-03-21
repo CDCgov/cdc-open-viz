@@ -18,6 +18,7 @@ import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { displayGeoName, handleMapAriaLabels, getGeoStrokeColor, getGeoFillColor } from '../../../helpers'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
+import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 
 const Rect = ({ label, text, stroke, strokeWidth, ...props }) => {
   return (
@@ -39,7 +40,6 @@ const Rect = ({ label, text, stroke, strokeWidth, ...props }) => {
 const UsaRegionMap = props => {
   // prettier-ignore
   const {
-    applyTooltipsToGeo,
     data,
     state,
     tooltipId,
@@ -53,6 +53,7 @@ const UsaRegionMap = props => {
   const [translate, setTranslate] = useState([455, 200])
   const geoClickHandler = useGeoClickHandler()
   const applyLegendToRow = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
+  const applyTooltipsToGeo = useApplyTooltipsToGeo()
 
   useEffect(() => {
     const fetchData = async () => {

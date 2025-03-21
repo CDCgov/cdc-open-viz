@@ -2,9 +2,6 @@ import { type MapConfig } from './MapConfig'
 import { type ViewPort } from '@cdc/core/types/ViewPort'
 
 export type MapContext = {
-  setRequiredColumns
-  applyLegendToRow
-  applyTooltipsToGeo
   currentViewport: ViewPort
   data
   displayDataAsText

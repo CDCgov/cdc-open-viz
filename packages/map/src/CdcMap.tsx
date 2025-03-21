@@ -20,12 +20,7 @@ import { type Coordinate, type MapConfig } from './types/MapConfig'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
-import { supportedStatesFipsCodes } from './data/supported-geos'
-import colorPalettes from '@cdc/core/data/colorPalettes'
 import initialState from './data/initial-state'
-
-// Assets
-import ExternalIcon from './images/external-link.svg'
 
 // Sass
 import './scss/main.scss'
@@ -34,7 +29,6 @@ import './scss/btn.scss'
 // Core Helpers
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
@@ -315,40 +309,6 @@ const CdcMap = ({
   })
 
   // todo: convert to store or context eventually.
-  const { buildTooltip } = useTooltip({ state, displayGeoName, supportedStatesFipsCodes })
-
-  const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
-    let toolTipText = buildTooltip(row, geoName, '')
-
-    // We convert the markup into JSX and add a navigation link if it's going into a modal.
-    if ('jsx' === returnType) {
-      toolTipText = [<div key='modal-content'>{parse(toolTipText)}</div>]
-
-      if (state.columns.hasOwnProperty('navigate') && row[state.columns.navigate.name]) {
-        toolTipText.push(
-          // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions,jsx-a11y/anchor-is-valid
-          <a
-            href='#'
-            className='navigation-link'
-            key='modal-navigation-link'
-            onClick={e => {
-              e.preventDefault()
-              navigationHandler(
-                state.general.navigationTarget,
-                row[state.columns.navigate.name],
-                customNavigationHandler
-              )
-            }}
-          >
-            {state.tooltips.linkLabel}
-            {isDomainExternal(row[state.columns.navigate.name]) && <ExternalIcon className='inline-icon ms-1' />}
-          </a>
-        )
-      }
-    }
-
-    return toolTipText
-  }
 
   const reloadURLData = async () => {
     if (state.dataUrl) {
@@ -628,7 +588,6 @@ const CdcMap = ({
     translate,
     isDraggingAnnotation,
     handleDragStateChange,
-    applyTooltipsToGeo,
     container,
     content: modal,
     data: runtimeData,
