@@ -66,6 +66,7 @@ import useResizeObserver from './hooks/useResizeObserver'
 import useGenerateRuntimeLegend from './hooks/useGenerateRuntimeLegend'
 import useGenerateRuntimeFilters from './hooks/useGenerateRuntimeFilters'
 import useGenerateRuntimeData from './hooks/useGenerateRuntimeData'
+import { VizFilter } from '@cdc/core/types/VizFilter'
 
 const CdcMap = ({
   config,
@@ -353,13 +354,13 @@ const CdcMap = ({
 
     // Filters
     const hashFilters = hashObj(state.filters)
-    let filters
+    let filters: VizFilter[]
 
     if (state.filters && (config || hashFilters !== runtimeFilters.fromHash)) {
       filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
 
       if (filters) {
-        filters.forEach((filter, index) => {
+        filters.forEach((filter: VizFilter, index: number) => {
           const queryStringFilterValue = getQueryStringFilterValue(filter)
           if (queryStringFilterValue) {
             filters[index].active = queryStringFilterValue
@@ -430,9 +431,8 @@ const CdcMap = ({
   const { general, tooltips, table, columns } = state
   const { subtext = '', geoType } = general
   const { showDownloadImgButton, showDownloadPdfButton, headerColor, introText } = general
-  let title = state.general.title
 
-  // if no title AND in editor then set a default
+  let title = state.general.title
   if (isEditor) {
     if (!title || title === '') title = 'Map Title'
   }
@@ -444,6 +444,7 @@ const CdcMap = ({
     container,
     content: modal,
     currentViewport,
+    customNavigationHandler,
     data: runtimeData,
     dimensions,
     filteredCountryCode,
@@ -552,7 +553,7 @@ const CdcMap = ({
 
               <div
                 role='region'
-                tabIndex='0'
+                tabIndex={0}
                 className={getMapContainerClasses(state, modal).join(' ')}
                 onClick={e => closeModal(e, modal, setModal)}
                 onKeyDown={e => {

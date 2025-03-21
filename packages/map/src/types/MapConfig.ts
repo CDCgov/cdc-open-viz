@@ -68,10 +68,16 @@ export type HexMapSettings = {
 
 export type Coordinate = [number, number]
 
+export type DataRow = {
+  uid?: string // optional 'uid' property
+  [key: string]: any // allowing any additional properties with a dynamic key (e.g., for `configPrimaryName`)
+}
+
 export type MapConfig = Visualization & {
-  type: 'map'
-  color: string // map color palette
-  customColors: string[] // custom color palette
+  // map color palette
+  color: string
+  // custom color palette
+  customColors: string[]
   columns: {
     geo: GeoColumnProperties
     primary: PrimaryColumnProperties
@@ -81,10 +87,13 @@ export type MapConfig = Visualization & {
     categorical: { name: string }
   }
   dataUrl: string
+  data: DataRow[]
   runtimeDataUrl: string
   filters: VizFilter[]
   general: {
     navigationTarget: '_self' | '_blank'
+    subtext: string
+    introText: string
     allowMapZoom: boolean
     convertFipsCodes: boolean
     displayAsHex: boolean
@@ -113,6 +122,8 @@ export type MapConfig = Visualization & {
       isReversed: boolean
     }
     showDownloadMediaButton: boolean
+    showDownloadImgButton: boolean
+    showDownloadPdfButton: boolean
     showSidebar: boolean
     showTitle: boolean
     statePicked: {
@@ -179,6 +190,8 @@ export type MapConfig = Visualization & {
   filterBehavior: string
   filterIntro: string
   visual: MapVisualSettings
+  // visualization type
+  type: 'map'
   // version of the map
   version: Version
 }

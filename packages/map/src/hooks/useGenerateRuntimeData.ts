@@ -1,12 +1,13 @@
-import { useCallback } from 'react'
 import { addUIDs } from '../helpers'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import { MapConfig } from '../types/MapConfig'
+import { VizFilter } from '@cdc/core/types/VizFilter'
+import { DataRow } from '../types/MapConfig'
 
 const useGenerateRuntimeData = (state: MapConfig) => {
-  return useCallback((configObj, filters, hash, test) => {
+  return (configObj: MapConfig, filters: VizFilter[], hash: number, test: boolean) => {
     try {
-      const result = {}
+      const result: { [uid: string]: DataRow } = {}
 
       // Adding property this way prevents it from being enumerated
       Object.defineProperty(result, 'fromHash', {
@@ -15,7 +16,7 @@ const useGenerateRuntimeData = (state: MapConfig) => {
 
       addUIDs(configObj, configObj.columns.geo.name)
 
-      configObj.data.forEach(row => {
+      configObj.data.forEach((row: DataRow) => {
         if (test) {
           console.log('object', configObj) // eslint-disable-line
           console.log('row', row) // eslint-disable-line
@@ -65,7 +66,7 @@ const useGenerateRuntimeData = (state: MapConfig) => {
     } catch (e) {
       console.error('COVE: ', e) // eslint-disable-line
     }
-  })
+  }
 }
 
 export default useGenerateRuntimeData

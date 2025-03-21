@@ -1,9 +1,11 @@
 import { getUniqueValues } from '../helpers'
 import { handleSorting } from '@cdc/core/components/Filters'
 import { MapConfig } from '../types/MapConfig'
+import { VizFilter } from '@cdc/core/types/VizFilter'
+import { useCallback} from "react";
 
 const useGenerateRuntimeFilters = (state: MapConfig) => {
-  return (configObj: MapConfig, hash: number, runtimeFilters) => {
+  return useCallback((configObj: MapConfig, hash: number, runtimeFilters): VizFilter[] => {
     if (typeof configObj === 'undefined' || undefined === configObj.filters || configObj.filters.length === 0) return []
 
     let filters = []
@@ -73,6 +75,6 @@ const useGenerateRuntimeFilters = (state: MapConfig) => {
 
     return filters
   }
-}
+})
 
 export default useGenerateRuntimeFilters

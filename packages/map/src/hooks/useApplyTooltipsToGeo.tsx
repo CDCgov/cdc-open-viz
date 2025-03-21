@@ -8,11 +8,11 @@ import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import ExternalIcon from './../images/external-link.svg'
 
 const useApplyTooltipsToGeo = () => {
-  const { state } = useContext(ConfigContext)
+  const { state, customNavigationHandler } = useContext(ConfigContext)
   const navigationColumnName = state.columns.navigate.name
   const { buildTooltip } = useTooltip({ state, displayGeoName, supportedStatesFipsCodes })
 
-  return (geoName, row, returnType = 'string') => {
+  return (geoName: string, row: Object, returnType = 'string') => {
     let toolTipText: string | ReactNode = buildTooltip(row, geoName, '')
 
     // We convert the markup into JSX and add a navigation link if it's going into a modal.
@@ -22,20 +22,23 @@ const useApplyTooltipsToGeo = () => {
       }
 
       if (state.columns.hasOwnProperty('navigate') && row[navigationColumnName]) {
-        toolTipText.push(
-          <a
-            href='#'
-            className='navigation-link'
-            key='modal-navigation-link'
-            onClick={e => {
-              e.preventDefault()
-              navigationHandler(state.general.navigationTarget, row[navigationColumnName], customNavigationHandler)
-            }}
-          >
-            {state.tooltips.linkLabel}
-            {isDomainExternal(row[navigationColumnName]) && <ExternalIcon className='inline-icon ms-1' />}
-          </a>
-        )
+        // Check that toolTipText is an array before pushing to it
+        if (Array.isArray(toolTipText)) {
+          toolTipText.push(
+            <a
+              href='#'
+              className='navigation-link'
+              key='modal-navigation-link'
+              onClick={e => {
+                e.preventDefault()
+                navigationHandler(state.general.navigationTarget, row[navigationColumnName], customNavigationHandler)
+              }}
+            >
+              {state.tooltips.linkLabel}
+              {isDomainExternal(row[navigationColumnName]) && <ExternalIcon className='inline-icon ms-1' />}
+            </a>
+          )
+        }
       }
     }
 
