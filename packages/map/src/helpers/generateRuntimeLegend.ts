@@ -220,7 +220,9 @@ export const generateRuntimeLegend = (
 
       // filter special classes from results
       const specialValues = result.items.filter(d => d.special).map(d => d.value)
-      return result.items.filter(d => d.special || !specialValues.includes(d.value))
+
+      result.items.filter(d => d.special || !specialValues.includes(d.value))
+      return result
     }
 
     let uniqueValues = {}
