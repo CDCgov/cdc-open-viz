@@ -41,10 +41,8 @@ import {
   closeModal,
   displayGeoName,
   formatLegendLocation,
-  generateColorsArray,
   getMapContainerClasses,
   generateRuntimeLegendHash,
-  getUniqueValues,
   handleMapTabbing,
   hashObj,
   navigationHandler,
@@ -64,9 +62,10 @@ import WorldMap from './components/WorldMap'
 import GoogleMap from './components/GoogleMap'
 
 // hooks
-import useTooltip from './hooks/useTooltip'
 import useResizeObserver from './hooks/useResizeObserver'
 import useGenerateRuntimeLegend from './hooks/useGenerateRuntimeLegend'
+import useGenerateRuntimeFilters from './hooks/useGenerateRuntimeFilters'
+import useGenerateRuntimeData from './hooks/useGenerateRuntimeData'
 
 const CdcMap = ({
   config,
@@ -127,6 +126,8 @@ const CdcMap = ({
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
   const { handleSorting } = useFilters({ config: state, setConfig: setState })
   const generateRuntimeLegend = useGenerateRuntimeLegend(legendMemo, legendSpecialClassLastMemo)
+  const generateRuntimeFilters = useGenerateRuntimeFilters(state)
+  const generateRuntimeData = useGenerateRuntimeData(state)
 
   // Use Effects
   useEffect(() => {
@@ -145,7 +146,7 @@ const CdcMap = ({
     } catch (e) {
       console.error('COVE: Failed to set world map zoom.') // eslint-disable-line
     }
-  }, [filteredCountryCode]) // eslint-disable-line
+  }, [filteredCountryCode])
 
   useEffect(() => {
     setTimeout(() => {
@@ -157,10 +158,10 @@ const CdcMap = ({
         setRuntimeData(tmpData)
       }
     }, 100)
-  }, [filteredCountryCode]) // eslint-disable-line
+  }, [filteredCountryCode])
 
   /**
-   * Seems to be needed for switcing between a selected single state
+   * Seems to be needed for switching between a selected single state
    * and the full world map
    */
   useEffect(() => {
@@ -172,143 +173,6 @@ const CdcMap = ({
   const handleDragStateChange = isDragging => {
     setIsDraggingAnnotation(isDragging)
   }
-
-  const generateRuntimeFilters = useCallback((configObj, hash, runtimeFilters) => {
-    if (typeof configObj === 'undefined' || undefined === configObj.filters || configObj.filters.length === 0) return []
-
-    let filters = []
-
-    if (hash) filters.fromHash = hash
-
-    configObj?.filters.forEach(
-      (
-        {
-          columnName,
-          label,
-          labels,
-          queryParameter,
-          orderedValues,
-          active,
-          values,
-          type,
-          showDropdown,
-          setByQueryParameter
-        },
-        idx
-      ) => {
-        let newFilter = runtimeFilters[idx]
-
-        const { filters } = configObj
-
-        const sort = (a, b) => {
-          const asc = filters[idx].order !== 'desc'
-          return String(asc ? a : b).localeCompare(String(asc ? b : a), 'en', { numeric: true })
-        }
-
-        if (type !== 'url') {
-          values = getUniqueValues(state.data, columnName)
-
-          if (filters[idx].order === 'cust') {
-            if (filters[idx]?.values.length > 0) {
-              values = filters[idx].values
-            }
-          } else {
-            values = values.sort(sort)
-          }
-        }
-
-        if (undefined === newFilter) {
-          newFilter = {}
-        }
-
-        newFilter.order = configObj.filters[idx].order ? configObj.filters[idx].order : 'asc'
-        newFilter.type = type
-        newFilter.label = label ?? ''
-        newFilter.columnName = columnName
-        newFilter.orderedValues = orderedValues
-        newFilter.queryParameter = queryParameter
-        newFilter.labels = labels
-        newFilter.values = values
-        newFilter.setByQueryParameter = setByQueryParameter
-        handleSorting(newFilter)
-        newFilter.active = active || configObj.filters[idx].defaultValue || values[0] // Default to first found value
-        newFilter.defaultValue = configObj.filters[idx].defaultValue || ''
-        newFilter.filterStyle = configObj.filters[idx].filterStyle ? configObj.filters[idx].filterStyle : 'dropdown'
-        newFilter.showDropdown = showDropdown
-        newFilter.subGrouping = configObj.filters[idx].subGrouping
-
-        filters.push(newFilter)
-      }
-    )
-
-    return filters
-  })
-
-  // Calculates what's going to be displayed on the map and data table at render.
-  const generateRuntimeData = useCallback((configObj, filters, hash, test) => {
-    try {
-      const result = {}
-
-      // Adding property this way prevents it from being enumerated
-      Object.defineProperty(result, 'fromHash', {
-        value: hash
-      })
-
-      addUIDs(configObj, configObj.columns.geo.name)
-
-      configObj.data.forEach(row => {
-        if (test) {
-          console.log('object', configObj) // eslint-disable-line
-          console.log('row', row) // eslint-disable-line
-        }
-
-        if (undefined === row.uid) return false // No UID for this row, we can't use for mapping
-        const configPrimaryName = configObj.columns.primary.name
-        if (row[configPrimaryName]) {
-          row[configPrimaryName] = numberFromString(row[configPrimaryName], state)
-        }
-
-        // If this is a navigation only map, skip if it doesn't have a URL
-
-        if ('navigation' === configObj.general.type) {
-          let navigateUrl = row[configObj.columns.navigate.name] || ''
-
-          if (undefined !== navigateUrl && typeof navigateUrl === 'string') {
-            // Strip hidden characters before we check length
-            navigateUrl = navigateUrl.replace(/(\r\n|\n|\r)/gm, '')
-          }
-          if (0 === navigateUrl?.length) {
-            return false
-          }
-        }
-
-        // Filters
-        if (filters?.length) {
-          for (let i = 0; i < filters.length; i++) {
-            const { columnName, active, type, filterStyle, subGrouping } = filters[i]
-            const isDataFilter = type !== 'url'
-            const matchingValue = String(active) === String(row[columnName]) // Group
-            if (isDataFilter && !matchingValue) return false // Bail out, data doesn't match the filter selection
-            if (filterStyle == 'nested-dropdown') {
-              const matchingSubValue = String(row[subGrouping?.columnName]) === String(subGrouping?.active)
-              if (subGrouping?.active && !matchingSubValue) {
-                return false // Bail out, data doesn't match the subgroup selection
-              }
-            }
-          }
-        }
-        // Don't add additional rows with same UID
-        if (result[row.uid] === undefined) {
-          result[row.uid] = row
-        }
-      })
-      return result
-    } catch (e) {
-      console.error('COVE: ', e) // eslint-disable-line
-    }
-  })
-
-  // todo: convert to store or context eventually.
 
   const reloadURLData = async () => {
     if (state.dataUrl) {
@@ -465,21 +329,21 @@ const CdcMap = ({
   // Initial load
   useEffect(() => {
     init()
-  }, []) // eslint-disable-line
+  }, [])
 
   useEffect(() => {
     if (state && !runtimeData.init && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: state })
       setCoveLoadedHasRan(true)
     }
-  }, [state, container, runtimeData.init]) // eslint-disable-line
+  }, [state, container, runtimeData.init])
 
   useEffect(() => {
     // When geotype changes - add UID
     if (state.data && state.columns.geo.name) {
       addUIDs(state, state.columns.geo.name)
     }
-  }, [state]) // eslint-disable-line
+  }, [state])
 
   useEffect(() => {
     // UID
@@ -530,7 +394,7 @@ const CdcMap = ({
         setRuntimeLegend(legend)
       }
     }
-  }, [state]) // eslint-disable-line
+  }, [state])
 
   useEffect(() => {
     const hashLegend = generateRuntimeLegendHash(state, runtimeFilters)
@@ -577,54 +441,54 @@ const CdcMap = ({
 
   // Props passed to all map types
   const mapProps = {
-    projection,
-    setProjection,
-    setRequiredColumns,
-    stateToShow,
-    setStateToShow,
-    setScale,
-    setTranslate,
-    scale,
-    translate,
-    isDraggingAnnotation,
-    handleDragStateChange,
     container,
     content: modal,
+    currentViewport,
     data: runtimeData,
+    dimensions,
     filteredCountryCode,
-    generateRuntimeData,
+    handleDragStateChange,
     hasZoom: state.general.allowMapZoom,
     innerContainerRef,
     isDashboard,
     isDebug,
+    isDraggingAnnotation,
     isEditor,
     legendMemo,
     legendSpecialClassLastMemo,
     loadConfig,
     logo,
+    mapId,
+    outerContainerRef,
     position,
+    projection,
+    runtimeData,
     runtimeFilters,
     runtimeLegend,
-    runtimeData,
+    scale,
     setAccessibleStatus,
     setFilteredCountryCode,
+    setModal,
     setParentConfig: setConfig,
     setPosition,
+    setProjection,
+    setRequiredColumns,
     setRuntimeData,
     setRuntimeFilters,
     setRuntimeLegend,
+    setScale,
+    setSharedFilter,
     setSharedFilterValue,
     setState,
+    setStateToShow,
+    setTopoData,
+    setTranslate,
     state,
+    stateToShow,
     tooltipId,
     tooltipRef,
     topoData,
-    setTopoData,
-    mapId,
-    outerContainerRef,
-    dimensions,
-    currentViewport,
-    setModal
+    translate
   }
 
   if (!mapProps.data || !state.data) return <></>
