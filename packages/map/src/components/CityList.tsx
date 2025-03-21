@@ -5,6 +5,7 @@ import ConfigContext from '../context'
 import { supportedCities } from '../data/supported-geos'
 import { getFilterControllingStatePicked } from './UsaMap/helpers/map'
 import { getGeoStrokeColor, titleCase, displayGeoName } from '../helpers'
+import useGeoClickHandler from '../hooks/useGeoClickHandler'
 
 type CityListProps = {
   data: Object[]
@@ -18,7 +19,6 @@ type CityListProps = {
 }
 
 const CityList: React.FC<CityListProps> = ({
-  geoClickHandler,
   applyTooltipsToGeo,
   applyLegendToRow,
   setSharedFilterValue,
@@ -29,6 +29,8 @@ const CityList: React.FC<CityListProps> = ({
   const [citiesData, setCitiesData] = useState({})
   const { state, topoData, runtimeData, position } = useContext(ConfigContext)
   if (!projection) return
+
+  const geoClickHandler = useGeoClickHandler()
 
   useEffect(() => {
     const citiesDictionary = {}

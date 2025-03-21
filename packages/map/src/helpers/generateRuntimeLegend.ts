@@ -15,15 +15,9 @@ import { supportedCountries } from '../data/supported-geos'
 import { setBinNumbers } from './setBinNumbers'
 import { sortSpecialClassesLast } from './sortSpecialClassesLast'
 
-export const generateRuntimeLegend = (
-  legendMemo: any,
-  legendSpecialClassLastMemo,
-  configObj: MapConfig,
-  runtimeData: Object[],
-  hash: Object,
-  runtimeFilters: VizFilter[],
-  setState: Function
-) => {
+export const generateRuntimeLegend = (configObj: MapConfig, runtimeData: Object[], hash: Object, dependencies) => {
+  const { legendMemo, legendSpecialClassLastMemo, runtimeFilters, setState } = dependencies
+
   try {
     // Throw errors if args missing
     if (!runtimeData) Error('No runtime data provided')

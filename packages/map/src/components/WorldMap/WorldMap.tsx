@@ -11,6 +11,7 @@ import BubbleList from '../BubbleList'
 import ZoomControls from '../ZoomControls'
 import { supportedCountries } from '../../data/supported-geos'
 import { getGeoFillColor, getGeoStrokeColor, handleMapAriaLabels, titleCase, displayGeoName } from '../../helpers'
+import useGeoClickHandler from '../../hooks/useGeoClickHandler'
 
 let projection = geoMercator()
 
@@ -21,7 +22,6 @@ const WorldMap = () => {
     applyTooltipsToGeo,
     data,
     generateRuntimeData,
-    geoClickHandler,
     hasZoom,
     position,
     setFilteredCountryCode,
@@ -33,6 +33,7 @@ const WorldMap = () => {
   } = useContext(ConfigContext)
 
   const [world, setWorld] = useState(null)
+  const geoClickHandler = useGeoClickHandler()
 
   useEffect(() => {
     const fetchData = async () => {

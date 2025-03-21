@@ -136,18 +136,19 @@ const CdcMap = ({
 
   // memoized functions
   const memoizedGenerateRuntimeLegend = useCallback(
-    (legendMemo, legendSpecialClassLastMemo, configObj, runtimeData, hash, runtimeFilters, setState) =>
-      generateRuntimeLegend(
+    (configObj, runtimeData, hash) => {
+      const dependencies = {
         legendMemo,
         legendSpecialClassLastMemo,
-        configObj,
-        runtimeData,
-        hash,
         runtimeFilters,
         setState
-      ),
-    []
+      }
+
+      return generateRuntimeLegend(configObj, runtimeData, hash, dependencies)
+    },
+    [legendMemo]
   )
+
   const memoizedColumnsRequiredChecker = useCallback(
     () => columnsRequiredChecker(state, setRequiredColumns),
     [state.columns, state.general.type]
@@ -410,38 +411,6 @@ const CdcMap = ({
     return toolTipText
   }
 
-  const geoClickHandler = (key, value) => {
-    if (setSharedFilter) {
-      setSharedFilter(state.uid, value)
-    }
-
-    // If world-geocode map zoom to geo point
-    if (['world-geocode'].includes(state.general.type)) {
-      const lat = value[state.columns.latitude.name]
-      const long = value[state.columns.longitude.name]
-
-      setState({
-        ...state,
-        mapPosition: { coordinates: [long, lat], zoom: 3 }
-      })
-    }
-
-    // If modals are set, or we are on a mobile viewport, display modal
-    if (window.matchMedia('(any-hover: none)').matches || 'click' === state.tooltips.appearanceType) {
-      setModal({
-        geoName: key,
-        keyedData: value
-      })
-
-      return
-    }
-
-    // Otherwise if this item has a link specified for it, do regular navigation.
-    if (state.columns.navigate && value[state.columns.navigate.name]) {
-      navigationHandler(state.general.navigationTarget, value[state.columns.navigate.name], customNavigationHandler)
-    }
-  }
-
   const reloadURLData = async () => {
     if (state.dataUrl) {
       const dataUrl = new URL(state.runtimeDataUrl || state.dataUrl, window.location.origin)
@@ -658,15 +627,7 @@ const CdcMap = ({
       setRuntimeData(newRuntimeData)
     } else {
       if (hashLegend !== runtimeLegend?.fromHash && undefined === runtimeData.init) {
-        const legend = memoizedGenerateRuntimeLegend(
-          legendMemo,
-          legendSpecialClassLastMemo,
-          state,
-          runtimeData,
-          hashLegend,
-          runtimeFilters,
-          setState
-        )
+        const legend = memoizedGenerateRuntimeLegend(state, runtimeData, hashLegend)
         setRuntimeLegend(legend)
       }
     }
@@ -676,15 +637,7 @@ const CdcMap = ({
     const hashLegend = generateRuntimeLegendHash(state, runtimeFilters)
 
     // Legend - Update when runtimeData does
-    const legend = memoizedGenerateRuntimeLegend(
-      legendMemo,
-      legendSpecialClassLastMemo,
-      state,
-      runtimeData,
-      hashLegend,
-      runtimeFilters,
-      setState
-    )
+    const legend = memoizedGenerateRuntimeLegend(state, runtimeData, hashLegend)
     setRuntimeLegend(legend)
   }, [
     runtimeData,
@@ -743,7 +696,6 @@ const CdcMap = ({
     data: runtimeData,
     filteredCountryCode,
     generateRuntimeData,
-    geoClickHandler,
     hasZoom: state.general.allowMapZoom,
     innerContainerRef,
     isDashboard,
@@ -772,7 +724,8 @@ const CdcMap = ({
     mapId,
     outerContainerRef,
     dimensions,
-    currentViewport
+    currentViewport,
+    setModal
   }
 
   if (!mapProps.data || !state.data) return <></>

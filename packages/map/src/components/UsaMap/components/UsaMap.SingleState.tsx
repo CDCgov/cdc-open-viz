@@ -18,6 +18,7 @@ import { Text } from '@visx/text'
 import { titleCase, handleMapAriaLabels, getGeoStrokeColor } from '../../../helpers'
 // state-level helpers
 import { getTopoData, getCurrentTopoYear, isTopoReady } from './../helpers/map'
+import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 
 // SVG ITEMS
 const WIDTH = 880
@@ -28,7 +29,6 @@ const SingleStateMap = props => {
   const {
     state,
     applyTooltipsToGeo,
-    geoClickHandler,
     applyLegendToRow,
     setSharedFilterValue,
     isFilterValueSupported,
@@ -44,6 +44,7 @@ const SingleStateMap = props => {
   } = useContext<MapContext>(ConfigContext)
 
   const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection, statePicked } = useStateZoom(topoData)
+  const geoClickHandler = useGeoClickHandler()
 
   const cityListProjection = geoAlbersUsaTerritories()
     .translate([WIDTH / 2, HEIGHT / 2])

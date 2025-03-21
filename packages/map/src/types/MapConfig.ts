@@ -84,6 +84,7 @@ export type MapConfig = Visualization & {
   runtimeDataUrl: string
   filters: VizFilter[]
   general: {
+    navigationTarget: '_self' | '_blank'
     allowMapZoom: boolean
     convertFipsCodes: boolean
     displayAsHex: boolean

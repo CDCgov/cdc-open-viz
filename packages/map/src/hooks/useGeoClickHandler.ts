@@ -1,44 +1,41 @@
-import { useContext } from 'react'
 import ConfigContext from '../context'
-import { navigationHandler } from '../helpers/navigationHandler'
+import { navigationHandler } from '../helpers'
+import { useContext } from 'react'
 
-const geoClickHandler = (key, value) => {
-  const { setSharedFilter, state, setState, setModal, customNavigationHandler } = useContext(ConfigContext)
-  const { general } = state
-  const latitudeColumnName: string = state.columns.latitude.name
-  const longitudeColumnName: string = state.columns.longitude.name
-  const navigationColumnName: string = state.columns.navigate?.name
-  const explicitlySetModal: boolean = 'click' === state.tooltips.appearanceType
-  const mobileViewport: boolean = window.matchMedia('(any-hover: none)').matches
+const useGeoClickHandler = () => {
+  const { state, setState, setModal, setSharedFilter, customNavigationHandler } = useContext(ConfigContext)
 
-  if (setSharedFilter) {
-    setSharedFilter(state.uid, value)
-  }
+  return (geoDisplayName: string, geoData: object) => {
+    if (setSharedFilter) {
+      setSharedFilter(state.uid, geoData)
+    }
 
-  // If world-geocode map zoom to geo point
-  if (['world-geocode'].includes(general.type)) {
-    const lat: number = value[latitudeColumnName]
-    const long: number = value[longitudeColumnName]
+    // If world-geocode map zoom to geo point
+    if (['world-geocode'].includes(state.general.type)) {
+      const lat = geoData[state.columns.latitude.name]
+      const long = geoData[state.columns.longitude.name]
 
-    setState({
-      ...state,
-      mapPosition: { coordinates: [long, lat], zoom: 3 }
-    })
-  }
+      setState({
+        ...state,
+        mapPosition: { coordinates: [long, lat], zoom: 3 }
+      })
+    }
 
-  if (mobileViewport || explicitlySetModal) {
-    setModal({
-      geoName: key,
-      keyedData: value
-    })
+    // If modals are set, or we are on a mobile viewport, display modal
+    if (window.matchMedia('(any-hover: none)').matches || 'click' === state.tooltips.appearanceType) {
+      setModal({
+        geoName: geoDisplayName,
+        keyedData: geoData
+      })
 
-    return
-  }
+      return
+    }
 
-  // Otherwise if this item has a link specified for it, do regular navigation.
-  if (state.columns.navigate && value[navigationColumnName]) {
-    navigationHandler(state.general.navigationTarget, value[navigationColumnName], customNavigationHandler)
+    // Otherwise if this item has a link specified for it, do regular navigation.
+    if (state.columns.navigate && geoData[state.columns.navigate.name]) {
+      navigationHandler(state.general.navigationTarget, geoData[state.columns.navigate.name], customNavigationHandler)
+    }
   }
 }
 
-export { geoClickHandler }
+export default useGeoClickHandler

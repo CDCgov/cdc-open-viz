@@ -3,6 +3,9 @@ import { MapConfig } from './types/MapConfig'
 
 type MapContext = {
   container
+  setSharedFilter
+  setModal
+  customNavigationHandler
   tooltipRef
   containerEl
   applyLegendToRow

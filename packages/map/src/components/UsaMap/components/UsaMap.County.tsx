@@ -9,6 +9,7 @@ import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { drawShape, createShapeProperties } from '../helpers/shapes'
 import { getGeoStrokeColor, handleMapAriaLabels, displayGeoName } from '../../../helpers'
+import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -129,7 +130,6 @@ const CountyMap = () => {
       container,
       containerEl,
       data,
-      geoClickHandler,
       runtimeFilters,
       runtimeLegend,
       setState,
@@ -140,6 +140,7 @@ const CountyMap = () => {
 
   // CREATE STATE LINES
   const geoStrokeColor = getGeoStrokeColor(state)
+  const geoClickHandler = useGeoClickHandler()
 
   const [focus, setFocus] = useState({})
   const [topoData, setTopoData] = useState({})

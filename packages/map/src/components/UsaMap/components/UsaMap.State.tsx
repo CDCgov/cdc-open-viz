@@ -29,6 +29,7 @@ import { titleCase } from '../../../helpers/titleCase'
 import TerritoriesSection from './TerritoriesSection'
 import { displayGeoName } from '../../../helpers/displayGeoName'
 
+import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
@@ -60,7 +61,6 @@ const UsaMap = () => {
       applyLegendToRow,
       applyTooltipsToGeo,
       data,
-      geoClickHandler,
       setSharedFilterValue,
       state,
       tooltipId,
@@ -72,6 +72,7 @@ const UsaMap = () => {
   let isFilterValueSupported = false
   const { general, columns, tooltips, hexMap, map, annotations } = state
   const { displayAsHex } = general
+  const geoClickHandler = useGeoClickHandler()
 
   if (setSharedFilterValue) {
     Object.keys(supportedStates).forEach(supportedState => {
