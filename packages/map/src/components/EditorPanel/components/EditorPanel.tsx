@@ -44,9 +44,10 @@ import { MapContext } from '../../../types/MapContext.js'
 import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 
 // Todo: move to useReducer, seperate files out.
-const EditorPanel = ({ columnsRequiredChecker }) => {
+const EditorPanel = () => {
   // prettier-ignore
   const {
     isDashboard,
@@ -64,6 +65,8 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
 
 
   } = useContext<MapContext>(ConfigContext)
+
+  const columnsRequiredChecker = useColumnsRequiredChecker()
 
   const { general, columns, legend, table, tooltips } = state
   const columnsInData = state?.data?.[0] ? Object.keys(state.data[0]) : []

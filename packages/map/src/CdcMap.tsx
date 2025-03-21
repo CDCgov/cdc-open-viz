@@ -54,8 +54,7 @@ import {
   handleMapTabbing,
   hashObj,
   navigationHandler,
-  validateFipsCodeLength,
-  columnsRequiredChecker
+  validateFipsCodeLength
 } from './helpers'
 
 // Child Components
@@ -134,11 +133,6 @@ const CdcMap = ({
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
   const { handleSorting } = useFilters({ config: state, setConfig: setState })
   const generateRuntimeLegend = useGenerateRuntimeLegend(legendMemo, legendSpecialClassLastMemo)
-
-  const memoizedColumnsRequiredChecker = useCallback(
-    () => columnsRequiredChecker(state, setRequiredColumns),
-    [state.columns, state.general.type]
-  )
 
   // Use Effects
   useEffect(() => {
@@ -666,6 +660,7 @@ const CdcMap = ({
   const mapProps = {
     projection,
     setProjection,
+    setRequiredColumns,
     stateToShow,
     setStateToShow,
     setScale,
@@ -740,7 +735,7 @@ const CdcMap = ({
         imageId={imageId}
         showEditorPanel={state.showEditorPanel}
       >
-        {isEditor && <EditorPanel columnsRequiredChecker={memoizedColumnsRequiredChecker} />}
+        {isEditor && <EditorPanel />}
         <Layout.Responsive isEditor={isEditor}>
           {requiredColumns && (
             <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
