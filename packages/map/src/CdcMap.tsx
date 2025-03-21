@@ -184,6 +184,10 @@ const CdcMap = ({
     }, 100)
   }, [filteredCountryCode]) // eslint-disable-line
 
+  /**
+   * Seems to be needed for switcing between a selected single state
+   * and the full world map
+   */
   useEffect(() => {
     if (state.mapPosition) {
       setPosition(state.mapPosition)

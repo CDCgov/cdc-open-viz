@@ -4,15 +4,21 @@ import { navigationHandler } from '../helpers/navigationHandler'
 
 const geoClickHandler = (key, value) => {
   const { setSharedFilter, state, setState, setModal, customNavigationHandler } = useContext(ConfigContext)
+  const { general } = state
+  const latitudeColumnName: string = state.columns.latitude.name
+  const longitudeColumnName: string = state.columns.longitude.name
+  const navigationColumnName: string = state.columns.navigate?.name
+  const explicitlySetModal: boolean = 'click' === state.tooltips.appearanceType
+  const mobileViewport: boolean = window.matchMedia('(any-hover: none)').matches
 
   if (setSharedFilter) {
     setSharedFilter(state.uid, value)
   }
 
   // If world-geocode map zoom to geo point
-  if (['world-geocode'].includes(state.general.type)) {
-    const lat = value[state.columns.latitude.name]
-    const long = value[state.columns.longitude.name]
+  if (['world-geocode'].includes(general.type)) {
+    const lat: number = value[latitudeColumnName]
+    const long: number = value[longitudeColumnName]
 
     setState({
       ...state,
@@ -20,8 +26,7 @@ const geoClickHandler = (key, value) => {
     })
   }
 
-  // If modals are set, or we are on a mobile viewport, display modal
-  if (window.matchMedia('(any-hover: none)').matches || 'click' === state.tooltips.appearanceType) {
+  if (mobileViewport || explicitlySetModal) {
     setModal({
       geoName: key,
       keyedData: value
@@ -31,8 +36,8 @@ const geoClickHandler = (key, value) => {
   }
 
   // Otherwise if this item has a link specified for it, do regular navigation.
-  if (state.columns.navigate && value[state.columns.navigate.name]) {
-    navigationHandler(state.general.navigationTarget, value[state.columns.navigate.name], customNavigationHandler)
+  if (state.columns.navigate && value[navigationColumnName]) {
+    navigationHandler(state.general.navigationTarget, value[navigationColumnName], customNavigationHandler)
   }
 }
 
