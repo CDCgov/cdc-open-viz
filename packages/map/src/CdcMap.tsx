@@ -49,7 +49,6 @@ import {
   formatLegendLocation,
   generateColorsArray,
   getMapContainerClasses,
-  generateRuntimeLegend,
   generateRuntimeLegendHash,
   getUniqueValues,
   handleMapTabbing,
@@ -74,6 +73,7 @@ import GoogleMap from './components/GoogleMap'
 // hooks
 import useTooltip from './hooks/useTooltip'
 import useResizeObserver from './hooks/useResizeObserver'
+import useGenerateRuntimeLegend from './hooks/useGenerateRuntimeLegend'
 
 const CdcMap = ({
   config,
@@ -133,21 +133,7 @@ const CdcMap = ({
   // hooks
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
   const { handleSorting } = useFilters({ config: state, setConfig: setState })
-
-  // memoized functions
-  const memoizedGenerateRuntimeLegend = useCallback(
-    (configObj, runtimeData, hash) => {
-      const dependencies = {
-        legendMemo,
-        legendSpecialClassLastMemo,
-        runtimeFilters,
-        setState
-      }
-
-      return generateRuntimeLegend(configObj, runtimeData, hash, dependencies)
-    },
-    [legendMemo]
-  )
+  const generateRuntimeLegend = useGenerateRuntimeLegend(legendMemo, legendSpecialClassLastMemo)
 
   const memoizedColumnsRequiredChecker = useCallback(
     () => columnsRequiredChecker(state, setRequiredColumns),
@@ -627,7 +613,7 @@ const CdcMap = ({
       setRuntimeData(newRuntimeData)
     } else {
       if (hashLegend !== runtimeLegend?.fromHash && undefined === runtimeData.init) {
-        const legend = memoizedGenerateRuntimeLegend(state, runtimeData, hashLegend)
+        const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
         setRuntimeLegend(legend)
       }
     }
@@ -637,7 +623,7 @@ const CdcMap = ({
     const hashLegend = generateRuntimeLegendHash(state, runtimeFilters)
 
     // Legend - Update when runtimeData does
-    const legend = memoizedGenerateRuntimeLegend(state, runtimeData, hashLegend)
+    const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
     setRuntimeLegend(legend)
   }, [
     runtimeData,
@@ -649,8 +635,7 @@ const CdcMap = ({
     state.legend.specialClasses,
     state.legend.additionalCategories,
     state,
-    runtimeFilters,
-    memoizedGenerateRuntimeLegend
+    runtimeFilters
   ]) // eslint-disable-line
 
   useEffect(() => {
