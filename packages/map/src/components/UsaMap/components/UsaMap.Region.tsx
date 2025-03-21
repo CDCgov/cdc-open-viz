@@ -103,7 +103,7 @@ const UsaRegionMap = props => {
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
-    const legendColors = applyLegendToRow(territoryData)
+    const legendColors = applyLegendToRow(territoryData, state)
 
     if (legendColors) {
       const textColor = getContrastColor('#FFF', legendColors[0])
@@ -205,7 +205,7 @@ const UsaRegionMap = props => {
       let legendColors
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
-        legendColors = applyLegendToRow(geoData)
+        legendColors = applyLegendToRow(geoData, state)
       }
 
       const geoDisplayName = displayGeoName(geoKey)

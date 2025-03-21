@@ -5,7 +5,7 @@ export const toggleLegendActive = (
   legendLabel: string,
   runtimeLegend,
   setRuntimeLegend,
-  setAccessibleStatus
+  setAccessibleStatus: (message: string) => void
 ) => {
   const runtimeLegendCopy = _.cloneDeep(runtimeLegend)
 

@@ -217,7 +217,7 @@ const DataTable = props => {
   if (!state.data) return <Loading />
 
   const rows = Object.keys(runtimeData)
-    .filter(row => applyLegendToRow(runtimeData[row]))
+    .filter(row => applyLegendToRow(runtimeData[row], state))
     .sort((a, b) => {
       const sortVal = customSort(
         runtimeData[a][state.columns[sortBy.column].name],
@@ -326,7 +326,7 @@ const DataTable = props => {
 
                         if (column === 'geo') {
                           const rowObj = runtimeData[row]
-                          const legendColor = applyLegendToRow(rowObj)
+                          const legendColor = applyLegendToRow(rowObj, state)
 
                           var labelValue
                           if (state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {

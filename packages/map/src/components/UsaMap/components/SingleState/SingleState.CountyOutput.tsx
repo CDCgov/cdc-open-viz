@@ -30,7 +30,7 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
 
         // Once we receive data for this geographic item, setup variables.
         if (geoData !== undefined) {
-          legendColors = applyLegendToRow(geoData)
+          legendColors = applyLegendToRow(geoData, state)
         }
 
         const geoDisplayName = displayGeoName(geoKey)

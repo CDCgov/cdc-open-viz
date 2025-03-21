@@ -107,7 +107,7 @@ const WorldMap = () => {
 
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
-        legendColors = applyLegendToRow(geoData)
+        legendColors = applyLegendToRow(geoData, state)
       }
 
       const geoStrokeColor = getGeoStrokeColor(state)

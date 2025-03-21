@@ -1306,7 +1306,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
 
   const getCategoryValuesOrder = () => {
     let values = runtimeLegend
-      ? runtimeLegend.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value)
+      ? runtimeLegend.items.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value)
       : []
 
     if (state.legend.cateogryValuesOrder) {

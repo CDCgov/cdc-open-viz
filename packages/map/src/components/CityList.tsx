@@ -10,7 +10,7 @@ type CityListProps = {
   data: Object[]
   geoClickHandler: (city: string, geoData: Object) => void
   applyTooltipsToGeo: (city: string, geoData: Object) => string
-  applyLegendToRow: (geoData: Object) => string[]
+  applyLegendToRow: (geoData: Object, state: MapConfig) => string[]
   setSharedFilterValue: string
   isFilterValueSupported: boolean
   tooltipId: string
@@ -74,9 +74,9 @@ const CityList: React.FC<CityListProps> = ({
     const cityDisplayName = titleCase(displayGeoName(city))
 
     const legendColors = geoData
-      ? applyLegendToRow(geoData)
+      ? applyLegendToRow(geoData, state)
       : runtimeData[city]
-      ? applyLegendToRow(runtimeData[city])
+      ? applyLegendToRow(runtimeData[city], state)
       : false
 
     if (legendColors === false) {

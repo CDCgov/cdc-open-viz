@@ -48,13 +48,15 @@ import {
   displayGeoName,
   formatLegendLocation,
   generateColorsArray,
+  getMapContainerClasses,
   generateRuntimeLegend,
   generateRuntimeLegendHash,
   getUniqueValues,
   handleMapTabbing,
   hashObj,
   navigationHandler,
-  validateFipsCodeLength
+  validateFipsCodeLength,
+  columnsRequiredChecker
 } from './helpers'
 
 // Child Components
@@ -86,16 +88,25 @@ const CdcMap = ({
   setSharedFilterValue,
   link
 }) => {
-  const transform = new DataTransform()
-  const [translate, setTranslate] = useState([0, 0])
-  const [scale, setScale] = useState(1)
-  const [state, setState] = useState<MapConfig>({ ...initialState })
-  const [isDraggingAnnotation, setIsDraggingAnnotation] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [displayPanel, setDisplayPanel] = useState(true)
-  const [topoData, setTopoData] = useState<{}>({})
-  const [runtimeFilters, setRuntimeFilters] = useState([])
+  const [accessibleStatus, setAccessibleStatus] = useState<string>()
+  const [coveLoadedHasRan, setCoveLoadedHasRan] = useState<boolean>(false)
+  const [displayPanel, setDisplayPanel] = useState<boolean>(true)
+  const [filteredCountryCode, setFilteredCountryCode] = useState()
+  const [isDraggingAnnotation, setIsDraggingAnnotation] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [modal, setModal] = useState(null)
+  const [projection, setProjection] = useState(null)
+  const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
   const [runtimeData, setRuntimeData] = useState({ init: true })
+  const [runtimeFilters, setRuntimeFilters] = useState([])
+  const [runtimeLegend, setRuntimeLegend] = useState(null)
+  const [scale, setScale] = useState<number>(1)
+  const [state, setState] = useState<MapConfig>({ ...initialState })
+  const [stateToShow, setStateToShow] = useState(null)
+  const [topoData, setTopoData] = useState<{}>({})
+  const [translate, setTranslate] = useState([0, 0])
+
+  const [position, setPosition] = useState(state.mapPosition)
   const _setRuntimeData = (data: any) => {
     if (config) {
       setRuntimeData(data)
@@ -103,30 +114,21 @@ const CdcMap = ({
       setRuntimeFilters(data)
     }
   }
-
-  // state
-  const [runtimeLegend, setRuntimeLegend] = useState([])
-  const [stateToShow, setStateToShow] = useState(null)
-  const [modal, setModal] = useState(null)
-  const [accessibleStatus, setAccessibleStatus] = useState('')
-  const [filteredCountryCode, setFilteredCountryCode] = useState()
-  const [position, setPosition] = useState(state.mapPosition)
-  const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
-  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
-  const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
-  const [projection, setProjection] = useState(null)
+  const transform = new DataTransform()
 
   // Refs
-  const legendRef = useRef(null)
-  const tooltipRef = useRef(null)
-  const legendMemo = useRef(new Map())
-  const legendSpecialClassLastMemo = useRef(new Map())
   const innerContainerRef = useRef()
+  const legendMemo = useRef(new Map())
+  const legendRef = useRef(null)
+  const legendSpecialClassLastMemo = useRef(new Map())
+  const mapSvg = useRef(null)
+  const tooltipRef = useRef(null)
 
   // IDs
-  const tooltipId = useId()
-  const mapId = useId()
+  const imageId = useId()
   const legendId = useId()
+  const mapId = useId()
+  const tooltipId = useId()
 
   // hooks
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
@@ -146,48 +148,12 @@ const CdcMap = ({
       ),
     []
   )
+  const memoizedColumnsRequiredChecker = useCallback(
+    () => columnsRequiredChecker(state, setRequiredColumns),
+    [state.columns, state.general.type]
+  )
 
-  const handleDragStateChange = isDragging => {
-    setIsDraggingAnnotation(isDragging)
-  }
-
-  const columnsRequiredChecker = useCallback(() => {
-    let columnList = []
-
-    // Geo is always required
-    if ('' === state.columns.geo.name) {
-      columnList.push('Geography')
-    }
-
-    // Primary is required if we're on a data map or a point map
-    if ('navigation' !== state.general.type && '' === state.columns.primary.name) {
-      columnList.push('Primary')
-    }
-
-    // Navigate is required for navigation maps
-    if ('navigation' === state.general.type && '' === state.columns.navigate.name) {
-      columnList.push('Navigation')
-    }
-
-    if (
-      ('us-geocode' === state.general.type || 'world-geocode' === state.general.type) &&
-      '' === state.columns.latitude.name
-    ) {
-      columnList.push('Latitude')
-    }
-
-    if (
-      ('us-geocode' === state.general.type || 'world-geocode' === state.general.type) &&
-      '' === state.columns.longitude.name
-    ) {
-      columnList.push('Longitude')
-    }
-
-    if (columnList.length === 0) columnList = null
-
-    setRequiredColumns(columnList)
-  }, [state.columns, state.general.type])
-
+  // Use Effects
   useEffect(() => {
     try {
       if (filteredCountryCode) {
@@ -224,7 +190,10 @@ const CdcMap = ({
     }
   }, [state.mapPosition, setPosition])
 
-  // eslint-disable-next-line
+  const handleDragStateChange = isDragging => {
+    setIsDraggingAnnotation(isDragging)
+  }
+
   const generateRuntimeFilters = useCallback((configObj, hash, runtimeFilters) => {
     if (typeof configObj === 'undefined' || undefined === configObj.filters || configObj.filters.length === 0) return []
 
@@ -250,17 +219,19 @@ const CdcMap = ({
       ) => {
         let newFilter = runtimeFilters[idx]
 
+        const { filters } = configObj
+
         const sort = (a, b) => {
-          const asc = configObj.filters[idx].order !== 'desc'
+          const asc = filters[idx].order !== 'desc'
           return String(asc ? a : b).localeCompare(String(asc ? b : a), 'en', { numeric: true })
         }
 
         if (type !== 'url') {
           values = getUniqueValues(state.data, columnName)
 
-          if (configObj.filters[idx].order === 'cust') {
-            if (configObj.filters[idx]?.values.length > 0) {
-              values = configObj.filters[idx].values
+          if (filters[idx].order === 'cust') {
+            if (filters[idx]?.values.length > 0) {
+              values = filters[idx].values
             }
           } else {
             values = values.sort(sort)
@@ -358,10 +329,10 @@ const CdcMap = ({
     }
   })
 
-  const mapSvg = useRef(null)
-
-  // this is passed DOWN into the various components
-  // then they do a lookup based on the bin number as index into here
+  /**
+   * This function is passed down into various components.
+   * It performs a lookup based on the bin number as an index into the legend.
+   */
   const applyLegendToRow = rowObj => {
     const { general, color, legend } = state
     const { type } = general
@@ -384,9 +355,7 @@ const CdcMap = ({
         if (showSpecialClassesLast) {
           disabledIdx = legendSpecialClassLastMemo.current.get(hash)
         }
-
-        if (runtimeLegend[disabledIdx]?.disabled) return false
-        if (!runtimeLegend.items) return false
+        if (runtimeLegend.items?.[disabledIdx]?.disabled) return generateColorsArray()
 
         // changed to use bin prop to get color instead of idx
         // bc we re-order legend when showSpecialClassesLast is checked
@@ -721,7 +690,10 @@ const CdcMap = ({
     state.general.equalNumberOptIn,
     state.legend.numberOfItems,
     state.legend.specialClasses,
-    state.legend.additionalCategories
+    state.legend.additionalCategories,
+    state,
+    runtimeFilters,
+    memoizedGenerateRuntimeLegend
   ]) // eslint-disable-line
 
   useEffect(() => {
@@ -747,23 +719,6 @@ const CdcMap = ({
   }
 
   if (!table.label || table.label === '') table.label = 'Data Table'
-
-  // Map container classes
-  let mapContainerClasses = [
-    'map-container',
-    state.legend?.position,
-    state.general.type,
-    state.general.geoType,
-    'outline-none'
-  ]
-
-  if (modal) {
-    mapContainerClasses.push('modal-background')
-  }
-
-  if (general.type === 'navigation' && true === general.fullBorder) {
-    mapContainerClasses.push('full-border')
-  }
 
   // Props passed to all map types
   const mapProps = {
@@ -843,7 +798,7 @@ const CdcMap = ({
         imageId={imageId}
         showEditorPanel={state.showEditorPanel}
       >
-        {isEditor && <EditorPanel columnsRequiredChecker={columnsRequiredChecker} />}
+        {isEditor && <EditorPanel columnsRequiredChecker={memoizedColumnsRequiredChecker} />}
         <Layout.Responsive isEditor={isEditor}>
           {requiredColumns && (
             <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
@@ -878,7 +833,7 @@ const CdcMap = ({
               <div
                 role='region'
                 tabIndex='0'
-                className={mapContainerClasses.join(' ')}
+                className={getMapContainerClasses(state, modal).join(' ')}
                 onClick={e => closeModal(e, modal, setModal)}
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
