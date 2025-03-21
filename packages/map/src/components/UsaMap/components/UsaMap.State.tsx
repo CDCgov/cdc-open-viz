@@ -30,6 +30,7 @@ import TerritoriesSection from './TerritoriesSection'
 import { displayGeoName } from '../../../helpers/displayGeoName'
 
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
+import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
@@ -58,7 +59,6 @@ const nudges = {
 const UsaMap = () => {
   // prettier-ignore
   const {
-      applyLegendToRow,
       applyTooltipsToGeo,
       data,
       setSharedFilterValue,
@@ -67,12 +67,15 @@ const UsaMap = () => {
       handleDragStateChange,
       mapId,
       logo,
+    legendMemo,
+    legendSpecialClassLastMemo
     } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
   const { general, columns, tooltips, hexMap, map, annotations } = state
   const { displayAsHex } = general
   const geoClickHandler = useGeoClickHandler()
+  const applyLegendToRow = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
 
   if (setSharedFilterValue) {
     Object.keys(supportedStates).forEach(supportedState => {

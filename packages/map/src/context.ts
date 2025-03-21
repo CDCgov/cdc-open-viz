@@ -39,6 +39,8 @@ type MapContext = {
   setState
   state: MapConfig
   tooltipId: string
+  legendMemo
+  legendSpecialClassLastMemo
 }
 
 const ConfigContext = createContext({} as MapContext)

@@ -6,12 +6,12 @@ import { supportedCities } from '../data/supported-geos'
 import { getFilterControllingStatePicked } from './UsaMap/helpers/map'
 import { getGeoStrokeColor, titleCase, displayGeoName } from '../helpers'
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
+import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
 
 type CityListProps = {
   data: Object[]
   geoClickHandler: (city: string, geoData: Object) => void
   applyTooltipsToGeo: (city: string, geoData: Object) => string
-  applyLegendToRow: (geoData: Object, state: MapConfig) => string[]
   setSharedFilterValue: string
   isFilterValueSupported: boolean
   tooltipId: string
@@ -20,14 +20,14 @@ type CityListProps = {
 
 const CityList: React.FC<CityListProps> = ({
   applyTooltipsToGeo,
-  applyLegendToRow,
   setSharedFilterValue,
   isFilterValueSupported,
   tooltipId,
   projection
 }) => {
   const [citiesData, setCitiesData] = useState({})
-  const { state, topoData, runtimeData, position } = useContext(ConfigContext)
+  const { state, topoData, runtimeData, position, legendMemo, legendSpecialClassLastMemo } = useContext(ConfigContext)
+  const applyLegendToRow = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   if (!projection) return
 
   const geoClickHandler = useGeoClickHandler()

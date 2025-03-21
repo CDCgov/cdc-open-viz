@@ -12,13 +12,13 @@ import ZoomControls from '../ZoomControls'
 import { supportedCountries } from '../../data/supported-geos'
 import { getGeoFillColor, getGeoStrokeColor, handleMapAriaLabels, titleCase, displayGeoName } from '../../helpers'
 import useGeoClickHandler from '../../hooks/useGeoClickHandler'
+import useApplyLegendToRow from '../../hooks/useApplyLegendToRow'
 
 let projection = geoMercator()
 
 const WorldMap = () => {
   // prettier-ignore
   const {
-    applyLegendToRow,
     applyTooltipsToGeo,
     data,
     generateRuntimeData,
@@ -30,10 +30,13 @@ const WorldMap = () => {
     setState,
     state,
     tooltipId,
+    legendMemo,
+    legendSpecialClassLastMemo
   } = useContext(ConfigContext)
 
   const [world, setWorld] = useState(null)
   const geoClickHandler = useGeoClickHandler()
+  const applyLegendToRow = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
 
   useEffect(() => {
     const fetchData = async () => {

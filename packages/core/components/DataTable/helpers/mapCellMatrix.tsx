@@ -4,6 +4,7 @@ import { DataTableProps } from '../DataTable'
 import { ReactNode } from 'react'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import _ from 'lodash'
+import useApplyLegendToRow from '@cdc/map/src/hooks/useApplyLegendToRow'
 
 type MapRowsProps = DataTableProps & {
   rows: string[]
@@ -72,11 +73,12 @@ const mapCellArray = ({
   columns,
   runtimeData,
   config,
-  applyLegendToRow,
   displayGeoName,
   formatLegendLocation,
   navigationHandler,
-  setFilteredCountryCode
+  setFilteredCountryCode,
+  legendMemo,
+  legendSpecialClassLastMemo
 }: MapRowsProps): ReactNode[][] => {
   const { allowMapZoom, geoType, type } = config.general
   return rows.map(row =>
@@ -88,6 +90,8 @@ const mapCellArray = ({
           if (!rowObj) {
             throw new Error('No row object found')
           }
+
+          const applyLegendToRow = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
 
           const legendColor = applyLegendToRow(rowObj)
 

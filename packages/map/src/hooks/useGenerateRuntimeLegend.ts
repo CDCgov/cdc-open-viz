@@ -393,7 +393,7 @@ const useGenerateRuntimeLegend = (legendMemo, legendSpecialClassLastMemo) => {
               }
 
               let min = setMin(index)
-              let max = setMax(index, min)
+              let max = setMax(index)
 
               result.items.push({
                 min,

@@ -27,7 +27,6 @@ import _ from 'lodash'
 import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
 
 export type DataTableProps = {
-  applyLegendToRow?: Function
   colorScale?: Function
   columns?: Record<string, Column>
   config: TableConfig
@@ -58,7 +57,6 @@ export type DataTableProps = {
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = (props: DataTableProps) => {
   const {
-    applyLegendToRow,
     columns,
     config,
     dataConfig,
@@ -274,7 +272,7 @@ const DataTable = (props: DataTableProps) => {
 
     const childrenMatrix =
       config.type === 'map'
-        ? mapCellMatrix({ ...props, applyLegendToRow, rows, wrapColumns, runtimeData, viewport })
+        ? mapCellMatrix({ ...props, rows, wrapColumns, runtimeData, viewport })
         : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
 
     // If every value in a column is a number, record the column index so the header and cells can be right-aligned

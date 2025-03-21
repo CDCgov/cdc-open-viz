@@ -314,47 +314,6 @@ const CdcMap = ({
     }
   })
 
-  /**
-   * This function is passed down into various components.
-   * It performs a lookup based on the bin number as an index into the legend.
-   */
-  const applyLegendToRow = rowObj => {
-    const { general, color, legend } = state
-    const { type } = general
-    const { showSpecialClassesLast } = legend
-    try {
-      if (!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
-
-      // Navigation map changed
-      if ('navigation' === type) {
-        let mapColorPalette = colorPalettes[color] ?? colorPalettes['bluegreenreverse']
-        return generateColorsArray(mapColorPalette[3])
-      }
-
-      let hash = hashObj(rowObj)
-
-      if (legendMemo.current.has(hash)) {
-        let idx = legendMemo.current.get(hash)
-        let disabledIdx = idx
-
-        if (showSpecialClassesLast) {
-          disabledIdx = legendSpecialClassLastMemo.current.get(hash)
-        }
-        if (runtimeLegend.items?.[disabledIdx]?.disabled) return generateColorsArray()
-
-        // changed to use bin prop to get color instead of idx
-        // bc we re-order legend when showSpecialClassesLast is checked
-        let legendBinColor = runtimeLegend.items.find(o => o.bin === idx)?.color
-        return generateColorsArray(legendBinColor, runtimeLegend[idx]?.special)
-      }
-
-      // Fail state
-      return generateColorsArray()
-    } catch (e) {
-      console.error('COVE: ', e) // eslint-disable-line
-    }
-  }
-
   // todo: convert to store or context eventually.
   const { buildTooltip } = useTooltip({ state, displayGeoName, supportedStatesFipsCodes })
 
@@ -669,7 +628,6 @@ const CdcMap = ({
     translate,
     isDraggingAnnotation,
     handleDragStateChange,
-    applyLegendToRow,
     applyTooltipsToGeo,
     container,
     content: modal,
@@ -681,6 +639,8 @@ const CdcMap = ({
     isDashboard,
     isDebug,
     isEditor,
+    legendMemo,
+    legendSpecialClassLastMemo,
     loadConfig,
     logo,
     position,
@@ -851,7 +811,6 @@ const CdcMap = ({
                 general.type !== 'navigation' &&
                 false === loading && (
                   <DataTable
-                    applyLegendToRow={applyLegendToRow}
                     config={state}
                     rawData={state.data}
                     navigationHandler={navigationHandler}
@@ -878,6 +837,8 @@ const CdcMap = ({
                     imageRef={imageId}
                     isDebug={isDebug}
                     wrapColumns={table.wrapColumns}
+                    legendMemo={legendMemo}
+                    legendSpecialClassLastMemo={legendSpecialClassLastMemo}
                   />
                 )}
 
