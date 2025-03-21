@@ -2,6 +2,7 @@ import { createContext } from 'react'
 import { MapConfig } from './types/MapConfig'
 
 type MapContext = {
+  setRequiredColumns
   container
   setSharedFilter
   setModal
