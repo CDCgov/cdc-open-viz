@@ -56,16 +56,13 @@ export const applyColorToLegend = (legendIdx: number, config: ChartConfig, resul
 
     if (config.color.includes('qualitative')) return mapColorPalette[colorIdx]
 
-    // If the current version is newer than 4.24.10, use the color palette
-    if (!config?.migrations?.addColorMigration) {
-      if (config.customColors) return mapColorPalette[legendIdx - specialClasses.length]
-    }
+    if (specialClasses) return mapColorPalette[legendIdx - specialClasses.length]
 
     let amt = Math.max(result.length - specialClasses.length, 1)
     let distributionArray = colorDistributions[amt]
     let specificColor
 
-    if (distributionArray) {
+    if (distributionArray && !config.customColors) {
       specificColor = distributionArray[legendIdx - specialClasses.length]
     } else if (mapColorPalette[colorIdx]) {
       specificColor = colorIdx
