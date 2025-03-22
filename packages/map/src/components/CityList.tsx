@@ -161,8 +161,8 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       stroke:
         setSharedFilterValue &&
         isFilterValueSupported &&
-        runtimeDat[city] &&
-        runtimeDat[city][state.columns.geo.name] === setSharedFilterValue
+        runtimeData[city] &&
+        runtimeData[city][state.columns.geo.name] === setSharedFilterValue
           ? 'rgba(0, 0, 0, 1)'
           : 'rgba(0, 0, 0, 0.4)',
       '&:hover': {
