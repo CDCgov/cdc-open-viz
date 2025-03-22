@@ -872,8 +872,8 @@ const EditorPanel = () => {
         })
 
         if (state) {
-          // const newData = generateRuntimeData(state)
-          // setRuntimeData(newData)
+          const newData = generateRuntimeData(state)
+          setRuntimeData(newData)
         }
         break
       case 'classificationType':
