@@ -717,24 +717,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               yScale={yScale}
             />
           )}
-          {((visualizationType === 'Area Chart' && config.visualizationSubType === 'regular') ||
-            (visualizationType === 'Combo' && config.visualizationSubType === 'regular')) && (
-            <AreaChart
-              xScale={xScale}
-              yScale={yScale}
-              yMax={yMax}
-              xMax={xMax}
-              chartRef={svgRef}
-              width={xMax}
-              height={yMax}
-              handleTooltipMouseOver={handleTooltipMouseOver}
-              handleTooltipMouseOff={handleTooltipMouseOff}
-              tooltipData={tooltipData}
-              showTooltip={showTooltip}
-            />
-          )}
           {((visualizationType === 'Area Chart' && config.visualizationSubType === 'stacked') ||
-            (visualizationType === 'Combo' && config.visualizationSubType === 'stacked')) && (
+            visualizationType === 'Combo') && (
             <AreaChartStacked
               xScale={xScale}
               yScale={yScale}
