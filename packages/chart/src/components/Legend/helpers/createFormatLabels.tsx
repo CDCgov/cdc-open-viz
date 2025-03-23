@@ -28,13 +28,7 @@ export const createFormatLabels =
       // Handle different ordering configurations
       switch (config.legend.order) {
         case 'dataColumn':
-          return labels // Return as is if order is by data column
-
-        case 'custom':
-          if (!config.legend.orderedValues?.length) return labels
-          const datumMap = new Map(labels.map(item => [item.datum, item]))
-          return config.legend.orderedValues.map(({ datum }) => datumMap.get(datum)).filter(item => item !== undefined)
-
+          return labels
         case 'asc':
         case 'desc':
           return labels.sort((a, b) => {
