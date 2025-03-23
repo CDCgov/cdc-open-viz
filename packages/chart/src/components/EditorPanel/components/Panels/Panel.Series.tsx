@@ -422,64 +422,6 @@ const SeriesDropdownConfidenceInterval = props => {
   )
 }
 
-const DynamicSeriesOrder = () => {
-  const { config, updateConfig } = useContext(ConfigContext)
-  const handleFilterOrder = (index1, index2) => {
-    const values = [...config.runtime.seriesKeys]
-
-    const [removed] = values.splice(index1, 1)
-    values.splice(index2, 0, removed)
-
-    updateConfig({ ...config, legend: { ...config.legend, orderedValues: values } })
-  }
-
-  return (
-    <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source?.index, destination?.index)}>
-      <Droppable droppableId='filter_order'>
-        {provided => (
-          <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
-            {config.runtime.seriesLabelsAll?.map((value, index) => {
-              return (
-                <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
-                  {(provided, snapshot) => (
-                    <li>
-                      <div
-                        className={snapshot.isDragging ? 'currently-dragging' : ''}
-                        style={provided.draggableProps.style}
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        {value}
-                      </div>
-                    </li>
-                  )}
-                </Draggable>
-              )
-            })}
-            {provided.placeholder}
-          </ul>
-        )}
-      </Droppable>
-    </DragDropContext>
-  )
-}
-const legendOrderOptions: { label: string; value: string }[] = [
-  { label: 'Order By Data Column', value: 'dataColumn' },
-  {
-    label: 'Custom',
-    value: 'custom'
-  },
-  {
-    label: 'Ascending Alphanumeric',
-    value: 'asc'
-  },
-  {
-    label: 'Descending Alphanumeric',
-    value: 'desc'
-  }
-]
-
 const SeriesInputWeight = props => {
   const { series, index: i } = props
   const { config, updateConfig } = useContext(ConfigContext)
@@ -670,6 +612,17 @@ const SeriesItem = props => {
   const { config, updateConfig } = useContext(ConfigContext)
   const { updateSeries, getColumns } = useContext(SeriesContext)
   const { series, getItemStyle, sortableItemStyles, chartsWithOptions, index: i } = props
+  const legendOrderOptions: { label: string; value: string }[] = [
+    { label: 'Order By Data Column', value: 'dataColumn' },
+    {
+      label: 'Ascending Alphanumeric',
+      value: 'asc'
+    },
+    {
+      label: 'Descending Alphanumeric',
+      value: 'desc'
+    }
+  ]
   const showDynamicCategory =
     ['Bar', 'Line'].includes(config.visualizationType) &&
     config.visualizationSubType !== 'Stacked' &&
@@ -739,7 +692,6 @@ const SeriesItem = props => {
                           }}
                           label='Dynamic Series Order'
                         />
-                        {config.legend.order === 'custom' && <DynamicSeriesOrder />}
                       </>
                     </>
                   )}
