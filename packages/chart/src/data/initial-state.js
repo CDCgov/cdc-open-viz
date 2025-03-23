@@ -172,7 +172,8 @@ export default {
       side: false,
       topBottom: true
     },
-    position: 'right'
+    position: 'right',
+    orderedValues: []
   },
   brush: {
     height: 45,
