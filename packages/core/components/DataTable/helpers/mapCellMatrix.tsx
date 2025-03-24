@@ -3,9 +3,68 @@ import CellAnchor from '../components/CellAnchor'
 import { DataTableProps } from '../DataTable'
 import { ReactNode } from 'react'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
+import _ from 'lodash'
 
 type MapRowsProps = DataTableProps & {
   rows: string[]
+}
+
+const getGeoLabel = (config, row, formatLegendLocation, displayGeoName) => {
+  const { geoType, type } = config.general
+  let labelValue
+  if (!['single-state', 'us-county'].includes(geoType) || type === 'us-geocode') {
+    labelValue = displayGeoName(row)
+    labelValue = String(labelValue).startsWith('region') ? _.capitalize(labelValue) : labelValue
+  } else {
+    labelValue = formatLegendLocation(row)
+  }
+  return labelValue
+}
+
+const getDataValue = (config, rowData, column) => {
+  // check for special classes
+  let specialValFound = ''
+  let columnName = config.columns[column]?.name
+  const { specialClasses } = config.legend
+  if (specialClasses && specialClasses.length && typeof specialClasses[0] === 'object') {
+    specialClasses.forEach(specialClass => {
+      if (specialClass.key === columnName) {
+        if (String(rowData[specialClass.key]) === specialClass.value) {
+          specialValFound = specialClass.label
+        }
+      }
+    })
+  }
+  return specialValFound || rowData[columnName]
+}
+
+export const getMapRowData = (
+  rows: string[],
+  columns: Record<string, { label; name?; dataTable }>,
+  config: Record<string, Object>,
+  formatLegendLocation: (row: string) => string,
+  runtimeData: Record<string, Object>,
+  displayGeoName: (row: string) => string,
+  filterColumns: string[]
+) => {
+  return rows.map((row: string) => {
+    const dataRow = {}
+    ;[
+      ...filterColumns,
+      ...Object.keys(columns).filter(column => columns[column].dataTable === true && columns[column].name)
+    ].map(column => {
+      const label = columns[column]?.label || columns[column]?.name || column
+      if (column === 'geo') {
+        dataRow[label] = getGeoLabel(config, row, formatLegendLocation, displayGeoName)
+      } else if (filterColumns.includes(column)) {
+        dataRow[label] = runtimeData[row][column]
+      } else {
+        const dataValue = getDataValue(config, runtimeData[row], column)
+        dataRow[label] = displayDataAsText(dataValue, column, config)
+      }
+    })
+    return dataRow
+  })
 }
 
 const mapCellArray = ({
@@ -23,30 +82,15 @@ const mapCellArray = ({
     Object.keys(columns)
       .filter(column => columns[column].dataTable === true && columns[column].name)
       .map(column => {
-        let cellValue
-
         if (column === 'geo') {
           const rowObj = runtimeData[row]
           const legendColor = applyLegendToRow(rowObj)
-
-          let labelValue
+          const labelValue = getGeoLabel(config, row, formatLegendLocation, displayGeoName)
           const mapZoomHandler =
             config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world'
               ? () => setFilteredCountryCode(row)
               : undefined
-          if (
-            (config.general.geoType !== 'single-state' && config.general.geoType !== 'us-county') ||
-            config.general.type === 'us-geocode'
-          ) {
-            const capitalize = str => {
-              return str.charAt(0).toUpperCase() + str.slice(1)
-            }
-            labelValue = displayGeoName(row)
-            labelValue = String(labelValue).startsWith('region') ? capitalize(labelValue) : labelValue
-          } else {
-            labelValue = formatLegendLocation(row)
-          }
-          cellValue = (
+          return (
             <div className='col-12'>
               <LegendShape fill={legendColor[0]} />
               <CellAnchor
@@ -59,23 +103,10 @@ const mapCellArray = ({
             </div>
           )
         } else {
-          // check for special classes
-          let specialValFound = ''
-          let columnName = config.columns[column].name
-          const { specialClasses } = config.legend
-          if (specialClasses && specialClasses.length && typeof specialClasses[0] === 'object') {
-            specialClasses.forEach(specialClass => {
-              if (specialClass.key === columnName) {
-                if (String(runtimeData[row][specialClass.key]) === specialClass.value) {
-                  specialValFound = specialClass.label
-                }
-              }
-            })
-          }
-          cellValue = displayDataAsText(specialValFound || runtimeData[row][columnName], column, config)
+          const rowData = runtimeData[row]
+          const dataValue = getDataValue(config, rowData, column)
+          return displayDataAsText(dataValue, column, config)
         }
-
-        return cellValue
       })
   )
 }

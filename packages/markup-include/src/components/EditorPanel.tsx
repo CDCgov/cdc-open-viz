@@ -73,7 +73,7 @@ const EditorPanel: React.FC = () => {
   }
 
   const convertStateToConfig = () => {
-    const strippedState = JSON.parse(JSON.stringify(config))
+    const strippedState = _.cloneDeep(config)
     delete strippedState.newViz
     delete strippedState.runtime
 

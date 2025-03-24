@@ -159,7 +159,7 @@ export const BarChartHorizontal = () => {
                   let yAxisTooltip = config.runtime.yAxis.label
                     ? `${config.runtime.yAxis.label}: ${xAxisValue}`
                     : xAxisValue
-                  const additionalColTooltip = getAdditionalColumn(hoveredBar)
+                  const additionalColTooltip = getAdditionalColumn(bar.key, hoveredBar)
                   const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
                   const tooltip = `<ul>
                   <li class="tooltip-heading"">${yAxisTooltip}</li>
