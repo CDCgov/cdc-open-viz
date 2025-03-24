@@ -11,16 +11,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
-import {
-  drawCircle,
-  drawDiamond,
-  drawSquare,
-  drawTriangle,
-  drawPin,
-  drawStar,
-  drawShape,
-  createShapeProperties
-} from '../helpers/shapes'
+import { drawShape, createShapeProperties } from '../helpers/shapes'
 import { getGeoStrokeColor } from '../../../helpers/colors'
 import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 
@@ -357,7 +348,7 @@ const CountyMap = props => {
         if (county && data[county.id]) {
           if (applyLegendToRow(data[county.id])) {
             context.globalAlpha = 1
-            context.fillStyle = applyLegendToRow(data[county.id])[1]
+            context.fillStyle = applyLegendToRow(data[county.id])[0]
             context.strokeStyle = geoStrokeColor
             context.lineWidth = lineWidth
             context.beginPath()
