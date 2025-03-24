@@ -106,7 +106,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
       return {
         color: entry.color,
-        label: legendLabel,
+        label: parse(legendLabel),
         disabled: entry.disabled,
         special: entry.hasOwnProperty('special'),
         value: [entry.min, entry.max]

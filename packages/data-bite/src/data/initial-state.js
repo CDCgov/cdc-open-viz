@@ -32,7 +32,7 @@ export default {
     background: false,
     hideBackgroundColor: false,
     borderColorTheme: false,
-    hideTitle: false
+    showTitle: true
   },
   general: {
     isCompactStyle: false

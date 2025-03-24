@@ -65,7 +65,7 @@ export const BarChartVertical = () => {
     data = brushConfig.data
   }
 
-  const hasConfidenceInterval = Object.keys(config.confidenceKeys).length > 0
+  const hasConfidenceInterval = _.every(config.confidenceKeys, key => key !== '')
 
   const _data = getBarData(config, data, hasConfidenceInterval)
   return (
@@ -322,7 +322,7 @@ export const BarChartVertical = () => {
                         <Text // prettier-ignore
                           display={displayBar ? 'block' : 'none'}
                           opacity={transparentBar ? 0.5 : 1}
-                          x={barX + barWidth / 2}
+                          x={hasConfidenceInterval ? barX + barWidth : barX + barWidth / 2}
                           y={barY - 5}
                           fill={labelColor}
                           textAnchor='middle'

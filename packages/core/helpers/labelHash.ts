@@ -1,0 +1,21 @@
+export const labelHash = {
+  'data-bite': 'Data Bite',
+  'waffle-chart': 'Waffle Chart',
+  'markup-include': 'Markup Include',
+  Bar: 'Bar',
+  Line: 'Line',
+  'Spark Line': 'Spark Line',
+  'Bump Chart': 'Bump Chart',
+  Pie: 'Pie',
+  us: 'United States (State- or County-Level)',
+  'us-county': 'United States (State- or County-Level)',
+  world: 'World',
+  'single-state': 'U.S. State',
+  'filtered-text': 'Filtered Text',
+  dashboardFilters: 'Filter Dropdowns',
+  Sankey: 'Sankey Chart',
+  table: 'Table',
+  'data-table': 'Data Table',
+  chart: 'Chart',
+  map: 'Map'
+}

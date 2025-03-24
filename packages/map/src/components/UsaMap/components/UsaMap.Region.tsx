@@ -11,15 +11,12 @@ import ConfigContext from '../../../context'
 import Annotation from '../../Annotation'
 
 // Data
-import topoJSON from '../data/us-regions-topo-2.json'
 import { supportedTerritories } from '../../../data/supported-geos'
 
 // Helpers
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
-
-const { features: unitedStates } = feature(topoJSON, topoJSON.objects.regions)
 
 const Rect = ({ label, text, stroke, strokeWidth, ...props }) => {
   return (
@@ -52,8 +49,17 @@ const UsaRegionMap = props => {
 
   // "Choose State" options
   const [extent, setExtent] = useState(null)
-  const [focusedStates, setFocusedStates] = useState(unitedStates)
+  const [focusedStates, setFocusedStates] = useState(null)
   const [translate, setTranslate] = useState([455, 200])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      import(/* webpackChunkName: "us-regions-topo-2" */ '../data/us-regions-topo-2.json').then(topoJSON => {
+        setFocusedStates(feature(topoJSON, topoJSON.objects.regions).features)
+      })
+    }
+    fetchData()
+  }, [])
 
   // When returning from another map we want to reset the state
   useEffect(() => {
@@ -73,6 +79,10 @@ const UsaRegionMap = props => {
 
     setTerritoriesData(territoriesList)
   }, [data])
+
+  if (!focusedStates) {
+    return <></>
+  }
 
   const geoStrokeColor = getGeoStrokeColor(state)
   const geoFillColor = getGeoFillColor(state)

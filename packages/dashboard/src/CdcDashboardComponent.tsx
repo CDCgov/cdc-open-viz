@@ -275,12 +275,17 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     const { config } = state
     const loadAllFilters = shouldLoadAllFilters(config, isEditor && !isPreview)
     const sharedFiltersWithValues = addValuesToDashboardFilters(config.dashboard.sharedFilters, state.data)
-
+    setAPILoading(true)
     loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns, loadAllFilters)?.then(newFilters => {
       const allValuesSelected = newFilters.every(filter => {
         return filter.type === 'datafilter' || filter.active
       })
-      if (allValuesSelected) reloadURLData(newFilters)
+      if (allValuesSelected) {
+        reloadURLData(newFilters)
+        setAPILoading(false)
+      } else {
+        setAPILoading(false)
+      }
     })
   }, [isEditor, isPreview, state.config?.activeDashboard])
 
@@ -506,6 +511,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     if (!subVisualizationEditing) {
       body = (
         <DndProvider backend={HTML5Backend}>
+          {apiLoading && <Loader fullScreen={true} />}
           <div className='header-container'>
             <Header />
             <VisualizationsPanel />
@@ -530,6 +536,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
         <MultiTabs isEditor={isEditor && !isPreview} />
         {errorMessages.map((message, index) => (
           <Alert
+            key={message + index}
             type='danger'
             onDismiss={() => dispatchErrorMessages({ type: 'DISMISS_ERROR_MESSAGE', payload: index })}
             message={message}
@@ -558,7 +565,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                     dataGroups[groupKey].push(d)
                   })
                   return (
-                    <>
+                    <React.Fragment key={`row__${index}`}>
                       {/* Expand/Collapse All */}
                       {!inNoDataState && row.expandCollapseAllButtons === true && (
                         <ExpandCollapseButtons setAllExpanded={setAllExpanded} />
@@ -582,7 +589,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                           />
                         )
                       })}
-                    </>
+                    </React.Fragment>
                   )
                 } else {
                   return (
@@ -634,7 +641,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                 rawData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data}
                 runtimeData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data || []}
                 expandDataTable={config.table.expanded}
-                showDownloadButton={config.table.download}
                 tableTitle={config.dashboard.title || ''}
                 viewport={currentViewport}
                 tabbingId={config.dashboard.title || ''}

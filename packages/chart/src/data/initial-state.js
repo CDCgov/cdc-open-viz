@@ -24,7 +24,6 @@ export default {
   isResponsiveTicks: false,
   general: {
     annotationDropdownText: 'Annotations',
-    showDownloadButton: false,
     showMissingDataLabel: true,
     showSuppressedSymbol: true,
     showZeroValueData: true,
@@ -166,6 +165,7 @@ export default {
     seriesHighlight: [],
     style: 'circles',
     subStyle: 'linear blocks',
+    groupBy: '',
     shape: 'circle',
     tickRotation: '',
     hideBorder: {

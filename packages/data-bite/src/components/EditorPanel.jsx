@@ -1,5 +1,5 @@
 import React, { memo, useContext, useEffect, useState } from 'react'
-
+import _ from 'lodash'
 import {
   Accordion,
   AccordionItem,
@@ -212,7 +212,7 @@ const EditorPanel = memo(() => {
   }
 
   const convertStateToConfig = () => {
-    let strippedState = JSON.parse(JSON.stringify(config))
+    let strippedState = _.cloneDeep(config)
     //if(false === missingRequiredSections()) {
     //strippedState.newViz
     //}
@@ -355,6 +355,14 @@ const EditorPanel = memo(() => {
                     fieldName='title'
                     label='Title'
                     placeholder='Data Bite Title'
+                    updateField={updateField}
+                  />
+                  <CheckBox
+                    value={config.visual?.showTitle}
+                    section='visual'
+                    checked={config.visual?.showTitle}
+                    fieldName='showTitle'
+                    label='Show Title'
                     updateField={updateField}
                   />
 
@@ -615,13 +623,6 @@ const EditorPanel = memo(() => {
                       section='visual'
                       fieldName='hideBackgroundColor'
                       label='Hide Background Color'
-                      updateField={updateField}
-                    />
-                    <CheckBox
-                      value={config.visual?.hideTitle}
-                      section='visual'
-                      fieldName='hideTitle'
-                      label='Hide Title'
                       updateField={updateField}
                     />
                   </div>
