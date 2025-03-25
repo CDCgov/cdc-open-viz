@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import chartGradientConfig from './_mock/legend.gradient_mock.json'
+import chartGroupedLagend from './_mock/legend_groupBy_mock.json'
 import SimplifiedLineConfig from './_mock/simplified_line.json'
 
 import Chart from '../CdcChartComponent'
@@ -15,6 +16,11 @@ type Story = StoryObj<typeof Chart>
 export const Legend_Gradient_Smooth: Story = {
   args: {
     config: chartGradientConfig
+  }
+}
+export const Legend_Group_By: Story = {
+  args: {
+    config: chartGroupedLagend
   }
 }
 

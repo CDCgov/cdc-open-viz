@@ -2,7 +2,8 @@
   &__wrapper {
     flex-wrap: wrap;
     display: flex;
-    gap: 18px 27px;
+    gap: 1rem 1.5rem;
+    margin-bottom: 2rem;
     label {
       display: inherit;
       margin-bottom: 5px;
@@ -19,9 +20,6 @@
   &__buttons {
     width: 100%;
     font-size: var(--filter-buttons-font-size);
-    .apply {
-      margin-right: 10px;
-    }
   }
 }
 
@@ -78,6 +76,7 @@ div.single-filters {
   .tab.tab--simple {
     background: none;
     border: none;
+    border-bottom: 0.3rem solid transparent;
     font-family: var(--app-font-secondary);
     font-size: 1rem;
     font-weight: 300;
@@ -85,11 +84,6 @@ div.single-filters {
     width: auto;
     cursor: pointer;
     border-radius: 6px 6px 0 0;
-
-    @include breakpointClass(xs) {
-      font-size: 0.778em;
-      padding: 0.5rem 0.778em;
-    }
 
     &:hover {
       color: var(--colors-blue-vivid-60, #005ea2);
@@ -106,7 +100,7 @@ div.single-filters {
 
     &.tab--active {
       font-weight: 500;
-      border-bottom: 0.3rem solid var(--colors-blue-vivid-60, #005ea2);
+      border-bottom-color: var(--colors-blue-vivid-60, #005ea2);
       z-index: 1;
     }
   }
@@ -115,7 +109,7 @@ div.single-filters {
   @include breakpointClass(xs) {
     .single-filters--tab-simple .tab-simple-container .tab.tab--simple {
       font-size: 0.778em;
-      padding: 0.5rem 0.778em;
+      padding: 0.5rem 0.73em;
     }
   }
 }

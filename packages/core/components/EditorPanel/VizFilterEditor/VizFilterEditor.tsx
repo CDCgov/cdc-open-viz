@@ -37,6 +37,15 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
     updateField('filters', filterIndex, prop, value)
   }
 
+  const updateFilterDefaultValue = (index, value) => {
+    const filters = _.cloneDeep(config.filters)
+    const currentFilter = { ...filters[index], orderedValues: filters[index].values }
+    currentFilter.defaultValue = value
+    currentFilter.active = value
+    filters[index] = currentFilter
+    updateField(null, null, 'filters', filters)
+  }
+
   const updateFilterStyle = (index, style: VizFilterStyle) => {
     const filters = _.cloneDeep(config.filters)
     const currentFilter = { ...filters[index], orderedValues: filters[index].values }
@@ -158,6 +167,20 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                     label='Filter Style'
                     updateField={(_section, _subsection, _field, value) => updateFilterStyle(filterIndex, value)}
                     options={filterStyleOptions}
+                  />
+
+                  <Select
+                    value={filter.defaultValue}
+                    options={
+                      filter.resetLabel
+                        ? [filter.resetLabel, ...config.filters?.[filterIndex].values]
+                        : config.filters?.[filterIndex].values
+                    }
+                    updateField={(_section, _subSection, _key, value) => {
+                      updateFilterDefaultValue(filterIndex, value)
+                    }}
+                    label='Filter Default Value'
+                    initial='Select'
                   />
 
                   {filter.filterStyle !== 'nested-dropdown' ? (

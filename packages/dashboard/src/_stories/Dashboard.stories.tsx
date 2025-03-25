@@ -256,10 +256,11 @@ const fetchMock = {
           {
             LocationAbbr: 'MS',
             LocationDesc: 'Mississippi',
+            Indicator: 'Some Indicator',
             IndicatorID: 'ALC04',
+            Topic: 'Some Topic',
             TopicID: 'ALC',
             DataSource: null,
-            Indicator: null,
             StratificationCategory: 'Overall',
             Stratification: 'Overall',
             StratificationId1: 'OVR',
