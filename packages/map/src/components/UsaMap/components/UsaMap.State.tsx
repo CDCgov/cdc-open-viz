@@ -75,7 +75,7 @@ const UsaMap = () => {
   const { general, columns, tooltips, hexMap, map, annotations } = state
   const { displayAsHex } = general
   const geoClickHandler = useGeoClickHandler()
-  const applyLegendToRow = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
+  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const applyTooltipsToGeo = useApplyTooltipsToGeo()
 
   if (setSharedFilterValue) {

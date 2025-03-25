@@ -91,7 +91,7 @@ const mapCellArray = ({
             throw new Error('No row object found')
           }
 
-          const applyLegendToRow = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
+          const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
 
           const legendColor = applyLegendToRow(rowObj)
 

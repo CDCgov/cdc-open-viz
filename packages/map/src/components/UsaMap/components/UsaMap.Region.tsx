@@ -52,7 +52,7 @@ const UsaRegionMap = props => {
   const [focusedStates, setFocusedStates] = useState(null)
   const [translate, setTranslate] = useState([455, 200])
   const geoClickHandler = useGeoClickHandler()
-  const applyLegendToRow = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
+  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const applyTooltipsToGeo = useApplyTooltipsToGeo()
 
   useEffect(() => {

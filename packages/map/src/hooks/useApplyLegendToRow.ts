@@ -3,14 +3,13 @@ import ConfigContext from '../context'
 import { generateColorsArray, hashObj } from '../helpers'
 import colorPalettes from '@cdc/core/data/colorPalettes'
 
-export const useApplyLegendToRow = (legendMemo, legendSpecialClassLastMemo) => {
+const useApplyLegendToRow = (legendMemo, legendSpecialClassLastMemo) => {
   const { state, runtimeLegend } = useContext(ConfigContext)
-
   const { general, color, legend } = state
   const { type } = general
   const { showSpecialClassesLast } = legend
 
-  return rowObj => {
+  const applyLegendToRow = rowObj => {
     try {
       if (!rowObj) throw Error('COVE: No rowObj in applyLegendToRow')
 
@@ -43,6 +42,8 @@ export const useApplyLegendToRow = (legendMemo, legendSpecialClassLastMemo) => {
       console.error('COVE: ', e) // eslint-disable-line
     }
   }
+
+  return { applyLegendToRow }
 }
 
 export default useApplyLegendToRow
