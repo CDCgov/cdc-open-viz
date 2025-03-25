@@ -25,7 +25,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
   if (!projection) return
 
   const geoClickHandler = useGeoClickHandler()
-  const applyTooltipsToGeo = useApplyTooltipsToGeo()
+  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
 
   useEffect(() => {
     const citiesDictionary = {}

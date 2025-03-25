@@ -144,7 +144,7 @@ const CountyMap = () => {
   const geoStrokeColor = getGeoStrokeColor(state)
   const geoClickHandler = useGeoClickHandler()
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
-  const applyTooltipsToGeo = useApplyTooltipsToGeo()
+  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const [focus, setFocus] = useState({})
   const [topoData, setTopoData] = useState({})
 

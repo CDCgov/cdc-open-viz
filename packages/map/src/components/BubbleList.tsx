@@ -16,7 +16,7 @@ export const BubbleList = ({
 }) => {
   const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
   const { tooltipId } = useContext(ConfigContext)
-  const applyTooltipsToGeo = useApplyTooltipsToGeo()
+  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
 
   const hasBubblesWithZeroOnMap = state.visual.showBubbleZeros ? 0 : 1
   // sort runtime data. Smaller bubbles should appear on top.

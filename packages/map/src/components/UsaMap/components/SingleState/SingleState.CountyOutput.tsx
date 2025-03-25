@@ -15,7 +15,7 @@ interface CountyOutputProps {
 
 const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoStrokeColor, tooltipId }) => {
   const { state, data, geoClickHandler, legendMemo, legendSpecialClassLastMemo } = useContext<MapContext>(ConfigContext)
-  const applyTooltipsToGeo = useApplyTooltipsToGeo()
+  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const geoFillColor = getGeoFillColor(state)
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   return (

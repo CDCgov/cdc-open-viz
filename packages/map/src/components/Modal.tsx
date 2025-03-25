@@ -6,7 +6,7 @@ import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 const Modal = () => {
   const { content, state, currentViewport: viewport } = useContext(ConfigContext)
   const { capitalizeLabels } = state.tooltips
-  const applyTooltipsToGeo = useApplyTooltipsToGeo()
+  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const tooltip = applyTooltipsToGeo(content.geoName, content.keyedData, 'jsx')
 
   return (

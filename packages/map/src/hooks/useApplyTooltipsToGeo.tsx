@@ -12,7 +12,7 @@ const useApplyTooltipsToGeo = () => {
   const navigationColumnName = state.columns.navigate.name
   const { buildTooltip } = useTooltip({ state, displayGeoName, supportedStatesFipsCodes })
 
-  return (geoName: string, row: Object, returnType = 'string') => {
+  const applyTooltipsToGeo = (geoName: string, row: Object, returnType = 'string') => {
     let toolTipText: string | ReactNode = buildTooltip(row, geoName, '')
 
     // We convert the markup into JSX and add a navigation link if it's going into a modal.
@@ -44,6 +44,8 @@ const useApplyTooltipsToGeo = () => {
 
     return toolTipText
   }
+
+  return { applyTooltipsToGeo }
 }
 
 export default useApplyTooltipsToGeo
