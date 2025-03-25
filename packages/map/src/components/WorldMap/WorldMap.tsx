@@ -1,31 +1,27 @@
 import { memo, useContext, useState, useEffect } from 'react'
-
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { geoMercator } from 'd3-geo'
 import { Mercator } from '@visx/geo'
 import { feature } from 'topojson-client'
+import ConfigContext from '../../context'
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ZoomableGroup from '../ZoomableGroup'
 import Geo from '../Geo'
 import CityList from '../CityList'
 import BubbleList from '../BubbleList'
-import ConfigContext from '../../context'
 import ZoomControls from '../ZoomControls'
-import { getGeoFillColor, getGeoStrokeColor } from '../../helpers/colors'
 import { supportedCountries } from '../../data/supported-geos'
-import { handleMapAriaLabels } from '../../helpers/handleMapAriaLabels'
-import { titleCase } from '../../helpers/titleCase'
+import { getGeoFillColor, getGeoStrokeColor, handleMapAriaLabels, titleCase, displayGeoName } from '../../helpers'
+import useGeoClickHandler from '../../hooks/useGeoClickHandler'
+import useApplyLegendToRow from '../../hooks/useApplyLegendToRow'
+import useApplyTooltipsToGeo from '../../hooks/useApplyTooltipsToGeo'
+import useGenerateRuntimeData from '../../hooks/useGenerateRuntimeData'
 
 let projection = geoMercator()
 
 const WorldMap = () => {
   // prettier-ignore
   const {
-    applyLegendToRow,
-    applyTooltipsToGeo,
     data,
-    displayGeoName,
-    generateRuntimeData,
-    geoClickHandler,
     hasZoom,
     position,
     setFilteredCountryCode,
@@ -34,9 +30,15 @@ const WorldMap = () => {
     setState,
     state,
     tooltipId,
+    legendMemo,
+    legendSpecialClassLastMemo
   } = useContext(ConfigContext)
 
   const [world, setWorld] = useState(null)
+  const { geoClickHandler } = useGeoClickHandler()
+  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
+  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
+  const { generateRuntimeData } = useGenerateRuntimeData(state)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,9 +55,9 @@ const WorldMap = () => {
 
   // TODO Refactor - state should be set together here to avoid rerenders
   // Resets to original data & zooms out
-  const handleReset = (state, setState, setRuntimeData, generateRuntimeData) => {
-    let reRun = generateRuntimeData(state)
-    setRuntimeData(reRun)
+  const handleReset = (state, setState, setRuntimeData) => {
+    const newRuntimeData = generateRuntimeData(state)
+    setRuntimeData(newRuntimeData)
     setState({
       ...state,
       focusedCountry: false,
@@ -74,7 +76,7 @@ const WorldMap = () => {
   }
 
   // TODO Refactor - state should be set together here to avoid rerenders
-  const handleCircleClick = (country, state, setState, setRuntimeData, generateRuntimeData) => {
+  const handleCircleClick = (country, state, setState, setRuntimeData) => {
     if (!state.general.allowMapZoom) return
     let newRuntimeData = state.data.filter(item => item[state.columns.geo.name] === country[state.columns.geo.name])
     setFilteredCountryCode(newRuntimeData[0].uid)
@@ -111,7 +113,7 @@ const WorldMap = () => {
 
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
-        legendColors = applyLegendToRow(geoData)
+        legendColors = applyLegendToRow(geoData, state)
       }
 
       const geoStrokeColor = getGeoStrokeColor(state)
@@ -186,10 +188,6 @@ const WorldMap = () => {
     // Cities
     geosJsx.push(
       <CityList
-        applyLegendToRow={applyLegendToRow}
-        applyTooltipsToGeo={applyTooltipsToGeo}
-        data={data}
-        displayGeoName={displayGeoName}
         geoClickHandler={geoClickHandler}
         key='cities'
         projection={projection}
@@ -209,12 +207,9 @@ const WorldMap = () => {
           state={state}
           projection={projection}
           applyLegendToRow={applyLegendToRow}
-          applyTooltipsToGeo={applyTooltipsToGeo}
           displayGeoName={displayGeoName}
           tooltipId={tooltipId}
-          handleCircleClick={country =>
-            handleCircleClick(country, state, setState, setRuntimeData, generateRuntimeData)
-          }
+          handleCircleClick={country => handleCircleClick(country, state, setState, setRuntimeData)}
         />
       )
     }
@@ -226,12 +221,7 @@ const WorldMap = () => {
     <ErrorBoundary component='WorldMap'>
       {hasZoom ? (
         <svg viewBox='0 0 880 500' role='img' aria-label={handleMapAriaLabels(state)}>
-          <rect
-            height={500}
-            width={880}
-            onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)}
-            fill='white'
-          />
+          <rect height={500} width={880} onClick={() => handleReset(state, setState, setRuntimeData)} fill='white' />
           <ZoomableGroup
             zoom={position.zoom}
             center={position.coordinates}
@@ -263,8 +253,6 @@ const WorldMap = () => {
         (state.general.type === 'world-geocode' && hasZoom) ||
         (state.general.type === 'bubble' && hasZoom)) && (
         <ZoomControls
-          // prettier-ignore
-          generateRuntimeData={generateRuntimeData}
           handleZoomIn={handleZoomIn}
           handleZoomOut={handleZoomOut}
           position={position}

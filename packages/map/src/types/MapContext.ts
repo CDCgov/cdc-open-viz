@@ -2,14 +2,11 @@ import { type MapConfig } from './MapConfig'
 import { type ViewPort } from '@cdc/core/types/ViewPort'
 
 export type MapContext = {
-  applyLegendToRow
-  applyTooltipsToGeo
   currentViewport: ViewPort
   data
   displayDataAsText
   displayGeoName
   filteredCountryCode
-  generateColorsArray
   generateRuntimeData
   geoClickHandler
   handleCircleClick: Function
