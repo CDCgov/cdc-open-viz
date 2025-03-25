@@ -42,7 +42,6 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
           x='50%'
           y='54%'
           fill={text}
-          style={{ stroke: 'none' }}
           className='territory-text'
           paintOrder='stroke'
           onClick={handleShapeClick}

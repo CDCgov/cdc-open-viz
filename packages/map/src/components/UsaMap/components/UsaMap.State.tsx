@@ -554,7 +554,8 @@ const UsaMap = () => {
           <text
             x={x}
             y={y}
-            fontSize={14}
+            fontSize={13}
+            fontWeight={900}
             strokeWidth='0'
             // paintOrder='stroke' // PENDING DEV-9278: Adds a stroke around the text potentially for 508 compliance
             // stroke={strokeColor}
@@ -585,6 +586,7 @@ const UsaMap = () => {
           // paintOrder='stroke' // PENDING DEV-9278: Adds a stroke around the text potentially for 508 compliance
           // stroke={strokeColor}
           fontSize={13}
+          fontWeight={900}
           style={{ fill: textColor }}
           alignmentBaseline='middle'
           transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
