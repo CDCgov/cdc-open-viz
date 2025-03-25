@@ -38,7 +38,7 @@ const WorldMap = () => {
   const geoClickHandler = useGeoClickHandler()
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const generateRuntimeData = useGenerateRuntimeData(state)
+  const { generateRuntimeData } = useGenerateRuntimeData(state)
 
   useEffect(() => {
     const fetchData = async () => {

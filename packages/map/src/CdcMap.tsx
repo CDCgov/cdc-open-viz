@@ -128,7 +128,7 @@ const CdcMap = ({
   const { handleSorting } = useFilters({ config: state, setConfig: setState })
   const generateRuntimeLegend = useGenerateRuntimeLegend(legendMemo, legendSpecialClassLastMemo)
   const generateRuntimeFilters = useGenerateRuntimeFilters(state)
-  const generateRuntimeData = useGenerateRuntimeData(state)
+  const { generateRuntimeData } = useGenerateRuntimeData(state)
 
   // Use Effects
   useEffect(() => {

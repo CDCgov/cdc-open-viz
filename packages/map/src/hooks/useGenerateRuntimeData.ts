@@ -5,7 +5,7 @@ import { VizFilter } from '@cdc/core/types/VizFilter'
 import { DataRow } from '../types/MapConfig'
 
 const useGenerateRuntimeData = (state: MapConfig) => {
-  return (configObj: MapConfig, filters: VizFilter[], hash: number, test?: boolean) => {
+  const generateRuntimeData = (configObj: MapConfig, filters: VizFilter[], hash: number, test?: boolean) => {
     try {
       const result: { [uid: string]: DataRow } = {}
 
@@ -67,6 +67,8 @@ const useGenerateRuntimeData = (state: MapConfig) => {
       console.error('COVE: ', e) // eslint-disable-line
     }
   }
+
+  return { generateRuntimeData }
 }
 
 export default useGenerateRuntimeData
