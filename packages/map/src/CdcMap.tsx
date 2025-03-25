@@ -127,7 +127,7 @@ const CdcMap = ({
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
   const { handleSorting } = useFilters({ config: state, setConfig: setState })
   const generateRuntimeLegend = useGenerateRuntimeLegend(legendMemo, legendSpecialClassLastMemo)
-  const generateRuntimeFilters = useGenerateRuntimeFilters(state)
+  const { generateRuntimeFilters } = useGenerateRuntimeFilters(state)
   const { generateRuntimeData } = useGenerateRuntimeData(state)
 
   // Use Effects

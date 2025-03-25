@@ -4,7 +4,7 @@ import { MapConfig } from '../types/MapConfig'
 import { useCallback } from 'react'
 
 const useGenerateRuntimeFilters = (state: MapConfig) => {
-  return useCallback((obj, hash, runtimeFilters) => {
+  const generateRuntimeFilters = useCallback((obj, hash, runtimeFilters) => {
     if (typeof obj === 'undefined' || undefined === obj.filters || obj.filters.length === 0) return []
 
     let filters = []
@@ -71,6 +71,8 @@ const useGenerateRuntimeFilters = (state: MapConfig) => {
 
     return filters
   })
+
+  return { generateRuntimeFilters }
 }
 
 export default useGenerateRuntimeFilters
