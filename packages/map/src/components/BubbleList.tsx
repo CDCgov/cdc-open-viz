@@ -1,55 +1,67 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
 import ConfigContext from '../context'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
+import { type MapConfig } from '../types/MapConfig'
+import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
+import { type GeoProjection } from 'd3-geo'
 
-export const BubbleList = ({
+type BubbleListProps = {
+  state: MapConfig
+  projection: GeoProjection
+  data: Object
+  handleCircleClick: Function
+  runtimeData: Object
+  displayGeoName: Function
+}
+
+export const BubbleList: React.FC<BubbleListProps> = ({
   data: dataImport,
-  state,
   projection,
-  applyLegendToRow,
   handleCircleClick,
   runtimeData,
   displayGeoName
 }) => {
-  const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
-  const { tooltipId } = useContext(ConfigContext)
+  const { state, tooltipId, legendMemo, legendSpecialClassLastMemo } = useContext(ConfigContext)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
+  const { geoType } = state.general
+  const { minBubbleSize, maxBubbleSize, showBubbleZeros } = state.visual
+  const geoColumnName = state.columns.geo.name
+  const primaryColumnName = state.columns.primary.name
+  const hasBubblesWithZeroOnMap = showBubbleZeros ? 0 : 1
+  const clickTolerance = 10
+  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
+  const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
 
-  const hasBubblesWithZeroOnMap = state.visual.showBubbleZeros ? 0 : 1
   // sort runtime data. Smaller bubbles should appear on top.
   const sortedRuntimeData = Object.values(runtimeData).sort((a, b) =>
-    a[state.columns.primary.name] < b[state.columns.primary.name] ? 1 : -1
+    a[state.columns.primary.name] < b[primaryColumnName] ? 1 : -1
   )
   if (!sortedRuntimeData) return
 
-  const clickTolerance = 10
   // Set bubble sizes
-  var size = scaleLinear()
-    .domain([hasBubblesWithZeroOnMap, maxDataValue])
-    .range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
+  const size = scaleLinear().domain([hasBubblesWithZeroOnMap, maxDataValue]).range([minBubbleSize, maxBubbleSize])
 
   // Start looping through the countries to create the bubbles.
-  if (state.general.geoType === 'world') {
-    const countries =
+  if (geoType === 'world') {
+    return (
       sortedRuntimeData &&
       sortedRuntimeData.map((country, index) => {
         let coordinates = countryCoordinates[country.uid]
 
         if (!coordinates) return true
 
-        const countryName = displayGeoName(country[state.columns.geo.name])
+        const countryName = displayGeoName(country[geoColumnName])
         const toolTip = applyTooltipsToGeo(countryName, country)
-        const legendColors = applyLegendToRow(country, state)
+        const legendColors = applyLegendToRow(country)
 
-        let primaryKey = state.columns.primary.name
         if (
-          (Math.floor(Number(country[primaryKey])) === 0 || country[primaryKey] === '') &&
+          (Math.floor(Number(country[primaryColumnName])) === 0 || country[primaryColumnName] === '') &&
           !state.visual.showBubbleZeros
         )
-          return
+          return <></>
 
         let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 
@@ -58,14 +70,14 @@ export const BubbleList = ({
         if (!projection(coordinates)) return true
 
         const circle = (
-          <>
+          <React.Fragment key={index}>
             <circle
               tabIndex={-1}
               key={`circle-${countryName.replace(' ', '')}`}
               className={`bubble country--${countryName}`}
               cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0} // || 0 handles error on loads where the data isn't ready
               cy={Number(projection(coordinates[1], coordinates[0])[1]) || 0}
-              r={Number(size(country[primaryKey]))}
+              r={Number(size(country[primaryColumnName]))}
               fill={legendColors[0]}
               stroke={legendColors[0]}
               strokeWidth={1.25}
@@ -101,7 +113,7 @@ export const BubbleList = ({
                 className='bubble'
                 cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0} // || 0 handles error on loads where the data isn't ready
                 cy={Number(projection(coordinates[1], coordinates[0])[1]) || 0}
-                r={Number(size(country[primaryKey])) + 1}
+                r={Number(size(country[primaryColumnName])) + 1}
                 fill={'transparent'}
                 stroke={'white'}
                 strokeWidth={0.5}
@@ -129,31 +141,33 @@ export const BubbleList = ({
                 data-tooltip-html={toolTip}
               />
             )}
-          </>
+          </React.Fragment>
         )
 
         return (
-          <g key={`group-${countryName.replace(' ', '')}`} tabIndex={-1}>
+          <g key={`group-${countryName.replace(' ', '')}-${index}`} tabIndex={-1}>
             {circle}
           </g>
         )
       })
-    return countries
+    )
   }
 
   if (state.general.geoType === 'us') {
-    const bubbles =
+    return (
       sortedRuntimeData &&
       sortedRuntimeData.map((item, index) => {
         let stateData = stateCoordinates[item.uid]
-        let primaryKey = state?.columns?.primary?.name
-        if (Number(size(item[primaryKey])) === 0) return
+        if (Number(size(item[primaryColumnName])) === 0) return
 
-        if (item[primaryKey] === null) item[primaryKey] = ''
+        if (item[primaryColumnName] === null) item[primaryColumnName] = ''
 
         // Return if hiding zeros on the map
-        if ((Math.floor(Number(item[primaryKey])) === 0 || item[primaryKey] === '') && !state.visual.showBubbleZeros)
-          return
+        if (
+          (Math.floor(Number(item[primaryColumnName])) === 0 || item[primaryColumnName] === '') &&
+          !state.visual.showBubbleZeros
+        )
+          return <React.Fragment key={index}></React.Fragment>
 
         if (!stateData) return true
         let longitude = Number(stateData.Longitude)
@@ -172,14 +186,14 @@ export const BubbleList = ({
 
         let pointerX, pointerY
         const circle = (
-          <>
+          <React.Fragment key={`random-${index}`}>
             <circle
               tabIndex={-1}
-              key={`circle-${stateName.replace(' ', '')}`}
+              key={`circle-inside-${index}`}
               className='bubble'
               cx={projection(coordinates)[0] || 0} // || 0 handles error on loads where the data isn't ready
               cy={projection(coordinates)[1] || 0}
-              r={Number(size(item[primaryKey]))}
+              r={Number(size(item[primaryColumnName]))}
               fill={legendColors[0]}
               stroke={legendColors[0]}
               strokeWidth={1.25}
@@ -210,11 +224,11 @@ export const BubbleList = ({
             {state.visual.extraBubbleBorder && (
               <circle
                 tabIndex={-1}
-                key={`circle-${stateName.replace(' ', '')}`}
+                key={`circle-outside-${index}`}
                 className='bubble'
                 cx={projection(coordinates)[0] || 0} // || 0 handles error on loads where the data isn't ready
                 cy={projection(coordinates)[1] || 0}
-                r={Number(size(item[primaryKey])) + 1}
+                r={Number(size(item[primaryColumnName])) + 1}
                 fill={'transparent'}
                 stroke={'white'}
                 strokeWidth={0.5}
@@ -243,12 +257,12 @@ export const BubbleList = ({
                 data-tooltip-html={toolTip}
               />
             )}
-          </>
+          </React.Fragment>
         )
 
-        return <g key={`group-${stateName.replace(' ', '')}`}>{circle}</g>
+        return <g key={`group-${index}`}>{circle}</g>
       })
-    return bubbles
+    )
   }
 }
 export default BubbleList
