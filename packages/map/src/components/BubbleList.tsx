@@ -1,43 +1,46 @@
 import React, { useContext } from 'react'
+import { geoMercator } from 'd3-geo'
 import { scaleLinear } from 'd3-scale'
+
+// data
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
-import ConfigContext from '../context'
+
+// hooks
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
-import { type MapConfig } from '../types/MapConfig'
 import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
-import { type GeoProjection } from 'd3-geo'
+import { displayGeoName } from '../helpers'
+
+// context
+import ConfigContext from '../context'
 
 type BubbleListProps = {
-  state: MapConfig
-  projection: GeoProjection
-  data: Object
-  handleCircleClick: Function
   runtimeData: Object
-  displayGeoName: Function
 }
 
-export const BubbleList: React.FC<BubbleListProps> = ({
-  data: dataImport,
-  projection,
-  handleCircleClick,
-  runtimeData,
-  displayGeoName
-}) => {
-  const { state, tooltipId, legendMemo, legendSpecialClassLastMemo } = useContext(ConfigContext)
+export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData }) => {
+  const { state, tooltipId, legendMemo, legendSpecialClassLastMemo, setFilteredCountryCode } = useContext(ConfigContext)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
+  const { data } = state
   const { geoType } = state.general
   const { minBubbleSize, maxBubbleSize, showBubbleZeros } = state.visual
   const geoColumnName = state.columns.geo.name
   const primaryColumnName = state.columns.primary.name
   const hasBubblesWithZeroOnMap = showBubbleZeros ? 0 : 1
   const clickTolerance = 10
+  const maxDataValue = Math.max(...data.map(d => d[primaryColumnName]))
+  const projection = geoMercator()
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
-  const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
+
+  const handleBubbleClick = country => {
+    if (!state.general.allowMapZoom) return
+    let newRuntimeData = data.filter(item => item[geoColumnName] === country[geoColumnName])
+    setFilteredCountryCode(newRuntimeData[0].uid)
+  }
 
   // sort runtime data. Smaller bubbles should appear on top.
   const sortedRuntimeData = Object.values(runtimeData).sort((a, b) =>
-    a[state.columns.primary.name] < b[primaryColumnName] ? 1 : -1
+    a[primaryColumnName] < b[primaryColumnName] ? 1 : -1
   )
   if (!sortedRuntimeData) return
 
@@ -95,7 +98,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({
                   e.clientY > pointerY - clickTolerance &&
                   e.clientY < pointerY + clickTolerance
                 ) {
-                  handleCircleClick(country)
+                  handleBubbleClick(country)
                   pointerX = undefined
                   pointerY = undefined
                 }
@@ -130,7 +133,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({
                     e.clientY > pointerY - clickTolerance &&
                     e.clientY < pointerY + clickTolerance
                   ) {
-                    handleCircleClick(country)
+                    handleBubbleClick(country)
                     pointerX = undefined
                     pointerY = undefined
                   }
@@ -211,7 +214,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({
                   e.clientY > pointerY - clickTolerance &&
                   e.clientY < pointerY + clickTolerance
                 ) {
-                  handleCircleClick(state)
+                  handleBubbleClick(state)
                   pointerX = undefined
                   pointerY = undefined
                 }
@@ -246,7 +249,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({
                     e.clientY > pointerY - clickTolerance &&
                     e.clientY < pointerY + clickTolerance
                   ) {
-                    handleCircleClick(state)
+                    handleBubbleClick(state)
                     pointerX = undefined
                     pointerY = undefined
                   }
