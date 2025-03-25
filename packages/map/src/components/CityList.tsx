@@ -1,46 +1,50 @@
 import { useState, useEffect, useContext } from 'react'
-
-import { jsx } from '@emotion/react'
-import { supportedCities } from '../data/supported-geos'
 import { scaleLinear } from 'd3-scale'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
-import { getFilterControllingStatePicked } from './UsaMap/helpers/map'
-import { titleCase } from '../helpers/titleCase'
-
 import ConfigContext from '../context'
-import { getGeoStrokeColor } from '../helpers/colors'
+import { supportedCities } from '../data/supported-geos'
+import { getFilterControllingStatePicked } from './UsaMap/helpers/map'
+import { getGeoStrokeColor, titleCase, displayGeoName } from '../helpers'
+import useGeoClickHandler from '../hooks/useGeoClickHandler'
+import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
+import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
 
-const CityList = ({
-  data,
-  geoClickHandler,
-  applyTooltipsToGeo,
-  displayGeoName,
-  applyLegendToRow,
-  setSharedFilterValue,
-  isFilterValueSupported,
-  tooltipId,
-  projection
-}) => {
+type CityListProps = {
+  data: Object[]
+  geoClickHandler: (city: string, geoData: Object) => void
+  setSharedFilterValue: string
+  isFilterValueSupported: boolean
+  tooltipId: string
+  projection: any
+}
+
+const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValueSupported, tooltipId, projection }) => {
   const [citiesData, setCitiesData] = useState({})
-  const { state, topoData, runtimeData, position } = useContext(ConfigContext)
+  const { state, topoData, runtimeData, position, legendMemo, legendSpecialClassLastMemo } = useContext(ConfigContext)
+  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   if (!projection) return
+
+  const { geoClickHandler } = useGeoClickHandler()
+  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
 
   useEffect(() => {
     const citiesDictionary = {}
 
-    if (data) {
-      Object.keys(data).forEach(key => {
-        const city = data[key]
+    if (runtimeData) {
+      Object.keys(runtimeData).forEach(key => {
+        const city = runtimeData[key]
         citiesDictionary[city[state.columns.geo.name]] = city
       })
     }
 
     setCitiesData(citiesDictionary)
-  }, [data])
+  }, [runtimeData])
 
   if (state.general.type === 'bubble') {
-    const maxDataValue = Math.max(...(data ? Object.keys(data).map(key => data[key][state.columns.primary.name]) : [0]))
-    const sortedRuntimeData = Object.values(data).sort((a, b) =>
+    const maxDataValue = Math.max(
+      ...(runtimeData ? Object.keys(runtimeData).map(key => runtimeData[key][state.columns.primary.name]) : [0])
+    )
+    const sortedRuntimeData = Object.values(runtimeData).sort((a, b) =>
       a[state.columns.primary.name] < b[state.columns.primary.name] ? 1 : -1
     )
     if (!sortedRuntimeData) return
@@ -48,31 +52,35 @@ const CityList = ({
     // Set bubble sizes
     var size = scaleLinear().domain([1, maxDataValue]).range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
   }
-  let cityList = Object.keys(citiesData).filter(c => undefined !== c || undefined !== data[c])
+  let cityList = Object.keys(citiesData).filter(c => undefined !== c || undefined !== runtimeData[c])
   if (!cityList) return true
 
   // Cities output
   const cities = cityList.map((city, i) => {
     let geoData
-    if (data) {
-      Object.keys(data).forEach(key => {
-        if (city === data[key][state.columns.geo.name]) {
-          geoData = data[key]
+    if (runtimeData) {
+      Object.keys(runtimeData).forEach(key => {
+        if (city === runtimeData[key][state.columns.geo.name]) {
+          geoData = runtimeData[key]
         }
       })
     }
     if (!geoData) {
-      geoData = data ? data[city] : undefined
+      geoData = runtimeData ? runtimeData[city] : undefined
     }
     const cityDisplayName = titleCase(displayGeoName(city))
 
-    const legendColors = geoData ? applyLegendToRow(geoData) : data[city] ? applyLegendToRow(data[city]) : false
+    const legendColors = geoData
+      ? applyLegendToRow(geoData, state)
+      : runtimeData[city]
+      ? applyLegendToRow(runtimeData[city], state)
+      : false
 
     if (legendColors === false) {
       return true
     }
 
-    const toolTip = applyTooltipsToGeo(cityDisplayName, geoData || data[city])
+    const toolTip = applyTooltipsToGeo(cityDisplayName, geoData || runtimeData[city])
 
     const radius = state.visual.geoCodeCircleSize || 8
 
@@ -153,8 +161,8 @@ const CityList = ({
       stroke:
         setSharedFilterValue &&
         isFilterValueSupported &&
-        data[city] &&
-        data[city][state.columns.geo.name] === setSharedFilterValue
+        runtimeData[city] &&
+        runtimeData[city][state.columns.geo.name] === setSharedFilterValue
           ? 'rgba(0, 0, 0, 1)'
           : 'rgba(0, 0, 0, 0.4)',
       '&:hover': {
@@ -198,7 +206,7 @@ const CityList = ({
     }
 
     const { additionalCityStyles } = state.visual || []
-    const cityStyle = Object.values(data)
+    const cityStyle = Object.values(runtimeData)
       .filter(d => additionalCityStyles.some(style => String(d[style.column]) === String(style.value)))
       .map(d => {
         const conditionsMatched = additionalCityStyles.find(style => String(d[style.column]) === String(style.value))
@@ -227,7 +235,6 @@ const CityList = ({
       if (geoData?.[state.columns.longitude.name] && geoData?.[state.columns.latitude.name]) {
         const coords = [Number(geoData?.[state.columns.longitude.name]), Number(geoData?.[state.columns.latitude.name])]
         let translate = `translate(${projection(coords)})`
-        console.log(translate, 'translate')
         return (
           <g key={i} transform={translate} style={styles} className='geo-point' tabIndex={-1}>
             {cityStyleShapes[cityStyle.shape.toLowerCase()]}
