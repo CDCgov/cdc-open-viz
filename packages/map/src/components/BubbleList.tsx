@@ -13,6 +13,7 @@ import { displayGeoName } from '../helpers'
 
 // context
 import ConfigContext from '../context'
+import { DataRow } from '../types/MapConfig'
 
 type BubbleListProps = {
   runtimeData: Object
@@ -34,7 +35,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData }) => {
 
   const handleBubbleClick = country => {
     if (!state.general.allowMapZoom) return
-    let newRuntimeData = data.filter(item => item[geoColumnName] === country[geoColumnName])
+    let newRuntimeData: DataRow = data.filter(item => item[geoColumnName] === country[geoColumnName])
     setFilteredCountryCode(newRuntimeData[0].uid)
   }
 
@@ -78,8 +79,8 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData }) => {
               tabIndex={-1}
               key={`circle-${countryName.replace(' ', '')}`}
               className={`bubble country--${countryName}`}
-              cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0} // || 0 handles error on loads where the data isn't ready
-              cy={Number(projection(coordinates[1], coordinates[0])[1]) || 0}
+              cx={Number(projection((coordinates[1], coordinates?.[0]))[0]) || null}
+              cy={Number(projection((coordinates[1], coordinates?.[0]))[1]) || null}
               r={Number(size(country[primaryColumnName]))}
               fill={legendColors[0]}
               stroke={legendColors[0]}
@@ -114,8 +115,8 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData }) => {
                 tabIndex={-1}
                 key={`circle-${countryName.replace(' ', '')}`}
                 className='bubble'
-                cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0} // || 0 handles error on loads where the data isn't ready
-                cy={Number(projection(coordinates[1], coordinates[0])[1]) || 0}
+                cx={Number(projection((coordinates[1], coordinates[0]))[0]) || null}
+                cy={Number(projection((coordinates[1], coordinates[0]))[1]) || null}
                 r={Number(size(country[primaryColumnName])) + 1}
                 fill={'transparent'}
                 stroke={'white'}
@@ -175,13 +176,13 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData }) => {
         if (!stateData) return true
         let longitude = Number(stateData.Longitude)
         let latitude = Number(stateData.Latitude)
-        let coordinates = [longitude, latitude]
+        let coordinates: [number, number] = [longitude, latitude]
         let stateName = stateData.Name
         if (!coordinates) return true
 
         stateName = displayGeoName(stateName)
         const toolTip = applyTooltipsToGeo(stateName, item)
-        const legendColors = applyLegendToRow(item, state)
+        const legendColors = applyLegendToRow(item)
 
         let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 
@@ -194,8 +195,8 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData }) => {
               tabIndex={-1}
               key={`circle-inside-${index}`}
               className='bubble'
-              cx={projection(coordinates)[0] || 0} // || 0 handles error on loads where the data isn't ready
-              cy={projection(coordinates)[1] || 0}
+              cx={projection(coordinates)[0] || null}
+              cy={projection(coordinates)[1] || null}
               r={Number(size(item[primaryColumnName]))}
               fill={legendColors[0]}
               stroke={legendColors[0]}
