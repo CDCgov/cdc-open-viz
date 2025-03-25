@@ -34,6 +34,7 @@ const WorldMap = () => {
     legendSpecialClassLastMemo
   } = useContext(ConfigContext)
 
+  const { type } = state.general
   const [world, setWorld] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
@@ -230,9 +231,7 @@ const WorldMap = () => {
           </ZoomableGroup>
         </svg>
       )}
-      {(state.general.type === 'data' ||
-        (state.general.type === 'world-geocode' && hasZoom) ||
-        (state.general.type === 'bubble' && hasZoom)) && (
+      {(type === 'data' || (type === 'world-geocode' && hasZoom) || (type === 'bubble' && hasZoom)) && (
         <ZoomControls
           handleZoomIn={handleZoomIn}
           handleZoomOut={handleZoomOut}

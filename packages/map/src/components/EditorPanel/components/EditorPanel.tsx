@@ -688,6 +688,10 @@ const EditorPanel = () => {
               table: {
                 ...state.table,
                 forceDisplay: true
+              },
+              mapPosition: {
+                coordinates: [0, 30],
+                zoom: 1
               }
             })
             break
@@ -1456,34 +1460,30 @@ const EditorPanel = () => {
               )}
 
               {state.general.geoType === 'single-state' && runtimeData && (
-                <label>
-                  <span className='edit-label column-heading'>Filter Controlling State Picked</span>
-                  <select
-                    value={state.general.filterControlsStatePicked || ''}
-                    onChange={event => {
-                      handleEditorChanges('filterControlsStatePicked', event.target.value)
-                    }}
-                  >
-                    <option value=''>None</option>
-                    {runtimeData && columnsInData?.map(col => <option>{col}</option>)}
-                  </select>
-                </label>
+                <Select
+                  label='Filter Controlling State Picked'
+                  value={state.general.filterControlsStatePicked || ''}
+                  options={runtimeData && columnsInData?.map(col => ({ value: col, label: col }))}
+                  onChange={event => {
+                    handleEditorChanges('filterControlsStatePicked', event.target.value)
+                  }}
+                />
               )}
 
               {/* Type */}
               {/* Select > Filter a state */}
               {state.general.geoType === 'single-state' && (
-                <label>
-                  <span className='edit-label column-heading'>State Selector</span>
-                  <select
-                    value={state.general.statePicked.stateName}
-                    onChange={event => {
-                      handleEditorChanges('chooseState', event.target.value)
-                    }}
-                  >
-                    <StateOptionList />
-                  </select>
-                </label>
+                <Select
+                  label='State Selector'
+                  value={state.general.statePicked.stateName}
+                  options={StateOptionList().map(option => ({
+                    value: option.props.value,
+                    label: option.props.children
+                  }))}
+                  onChange={event => {
+                    handleEditorChanges('chooseState', event.target.value)
+                  }}
+                />
               )}
               {/* Type */}
               <Select

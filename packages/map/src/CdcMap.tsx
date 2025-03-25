@@ -87,7 +87,7 @@ const CdcMap = ({
   const [filteredCountryCode, setFilteredCountryCode] = useState()
   const [isDraggingAnnotation, setIsDraggingAnnotation] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(true)
-  const [modal, setModal] = useState(null)
+  const [modal, setModal] = useState<React.ReactNode>(null)
   const [projection, setProjection] = useState(null)
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
   const [runtimeData, setRuntimeData] = useState({ init: true })
@@ -98,8 +98,8 @@ const CdcMap = ({
   const [stateToShow, setStateToShow] = useState(null)
   const [topoData, setTopoData] = useState<{}>({})
   const [translate, setTranslate] = useState([0, 0])
+  const [position, setPosition] = useState<{ x: number; y: number; k: number }>(state.mapPosition)
 
-  const [position, setPosition] = useState(state.mapPosition)
   const _setRuntimeData = (data: any) => {
     if (config) {
       setRuntimeData(data)
@@ -340,13 +340,6 @@ const CdcMap = ({
   }, [state, container, runtimeData.init])
 
   useEffect(() => {
-    // When geotype changes - add UID
-    if (state.data && state.columns.geo.name) {
-      addUIDs(state, state.columns.geo.name)
-    }
-  }, [state])
-
-  useEffect(() => {
     // UID
     if (state.data && state.columns.geo.name && state.columns.geo.name !== state.data.fromColumn) {
       addUIDs(state, state.columns.geo.name)
@@ -414,7 +407,7 @@ const CdcMap = ({
     state.legend.additionalCategories,
     state,
     runtimeFilters
-  ]) // eslint-disable-line
+  ])
 
   useEffect(() => {
     reloadURLData()

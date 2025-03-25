@@ -1,9 +1,8 @@
 import { useContext, useEffect, useState } from 'react'
 import ConfigContext from '../context'
-import { geoAlbersUsaTerritories, GeoProjection } from 'd3-composite-projections'
+import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import { MapContext } from '../types/MapContext'
 import { geoPath, GeoPath } from 'd3-geo'
-import _ from 'lodash'
 import { getFilterControllingStatePicked } from '../components/UsaMap/helpers/map'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
 
@@ -22,9 +21,10 @@ interface Position {
 }
 
 const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
-  const { setTranslate, setScale, setStateToShow, setPosition, state, setState, runtimeData } = useContext<MapContext>(ConfigContext)
+  const { setTranslate, setScale, setStateToShow, setPosition, state, setState, runtimeData } =
+    useContext<MapContext>(ConfigContext)
+
   const statePicked = getFilterControllingStatePicked(state, runtimeData)
-  const defaultStateToShow = 'Alabama'
   useEffect(() => {
     const fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === statePicked)
     const stateName = statePicked
@@ -74,7 +74,6 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     I'm not sure why the value is 1070 but it does appear to work during the switching.
     During zoom it does not work.
   */
-  const NORMALIZATION_FACTOR = 1070
   const _statePickedData = topoData?.states?.find(s => s.properties.name === statePicked)
   const newProjection = projection.fitExtent(
     [
@@ -83,13 +82,6 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     ],
     _statePickedData
   )
-
-  // Work for centering the state.
-  const newScale = newProjection.scale()
-  const normalizedScale = newScale / NORMALIZATION_FACTOR
-  let [x, y] = newProjection.translate()
-  x = x - WIDTH / 2
-  y = y - HEIGHT / 2
 
   const path: GeoPath = geoPath().projection(projection)
   const featureCenter = path.centroid(_statePickedData)
