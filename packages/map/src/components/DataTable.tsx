@@ -193,7 +193,7 @@ const DataTable = props => {
     return (
       <MediaControls.Section classes={['download-links']}>
         <MediaControls.Link config={state} />
-        {state.general.showDownloadButton && <DownloadButton />}
+        {state.table.download && <DownloadButton />}
       </MediaControls.Section>
     )
   }

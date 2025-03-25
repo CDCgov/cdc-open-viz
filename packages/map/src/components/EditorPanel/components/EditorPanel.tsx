@@ -1116,7 +1116,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
   }
 
   const convertStateToConfig = () => {
-    let strippedState = JSON.parse(JSON.stringify(state)) // Deep copy
+    let strippedState = _.cloneDeep(state) // Deep copy
 
     // Strip ref
     delete strippedState['']
@@ -1124,7 +1124,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     delete strippedState.newViz
 
     // Remove the legend
-    let strippedLegend = JSON.parse(JSON.stringify(state.legend))
+    let strippedLegend = _.cloneDeep(state.legend)
 
     delete strippedLegend.disabledAmt
 
@@ -1134,7 +1134,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     delete strippedState.defaultData
 
     // Remove tooltips if they're active in the editor
-    let strippedGeneral = JSON.parse(JSON.stringify(state.general))
+    let strippedGeneral = _.cloneDeep(state.general)
 
     strippedState.general = strippedGeneral
 
@@ -2834,6 +2834,36 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   />
                   <span className='edit-label'>Map loads with data table expanded</span>
                 </label>
+                <CheckBox
+                  value={state.table.download}
+                  fieldName='download'
+                  label='Show Download CSV Link'
+                  section='table'
+                  updateField={updateField}
+                />
+                {state.table.download && (
+                  <>
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        className='ms-4'
+                        checked={state.table.showDownloadLinkBelow}
+                        onChange={event => {
+                          handleEditorChanges('toggleDownloadLinkBelow', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Show Link Below Table</span>
+                    </label>
+                    <CheckBox
+                      value={state.table.downloadVisibleDataOnly}
+                      fieldName='downloadVisibleDataOnly'
+                      className='ms-4'
+                      label='Download only visible data'
+                      section='table'
+                      updateField={updateField}
+                    />
+                  </>
+                )}
                 {isDashboard && (
                   <label className='checkbox'>
                     <input
@@ -2878,16 +2908,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   />
                   <span className='edit-label'>Enable Image Download</span>
                 </label>
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={state.table.showDownloadLinkBelow}
-                    onChange={event => {
-                      handleEditorChanges('toggleDownloadLinkBelow', event.target.checked)
-                    }}
-                  />
-                  <span className='edit-label'>Show Download Link Below Table</span>
-                </label>
+
                 {/* <label className='checkbox'>
                       <input
                         type='checkbox'

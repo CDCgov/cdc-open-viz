@@ -74,6 +74,8 @@ import { getColorScale } from './helpers/getColorScale'
 import './scss/main.scss'
 import { getInitialState, reducer } from './store/chart.reducer'
 
+export const EDITOR_WIDTH = 350
+
 interface CdcChartProps {
   config?: ChartConfig
   isEditor?: boolean
@@ -179,8 +181,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (newConfig.visualizationType === 'Bump Chart') {
       newConfig.xAxis.type === 'date-time'
     }
-
-    return { ...coveUpdateWorker(newConfig) }
+    if (!isDashboard) return coveUpdateWorker(newConfig)
+    return newConfig
   }
 
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
@@ -344,10 +346,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
-      const svgMarginWidth = 15
-      const editorWidth = 350
 
-      width = isEditor ? width - editorWidth : width
+      width = isEditor ? width - EDITOR_WIDTH : width
 
       const newViewport = getViewport(width)
 
@@ -357,7 +357,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         width = width - 2.5
       }
 
-      width = width - svgMarginWidth
+      width = width
       dispatch({ type: 'SET_DIMENSIONS', payload: [width, height] })
     }
   })
@@ -565,6 +565,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     addColRoundTo,
     { index, length } = { index: null, length: null }
   ) => {
+    if (num === '') return 'N/A'
     // if num is NaN return num
     if (isNaN(num) || !num) return num
     // Check if the input number is negative
@@ -749,9 +750,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (!Array.isArray(data)) return []
     if (config.visualizationType === 'Forecasting') return data
     //  specify keys that needs  to be cleaned to render chart and skip rest
-    const CIkeys: string[] = Object.values(config.confidenceKeys) as string[]
-    const seriesKeys: string[] = config.series.map(s => s.dataKey)
-    const keysToClean: string[] = seriesKeys.concat(CIkeys)
+    const CIkeys: string[] = Object.values(_.get(config, 'confidenceKeys', {})) as string[]
+    const seriesKeys: string[] = _.get(config, 'series', []).map((s: any) => s.dataKey)
+    const keysToClean: string[] = [...(seriesKeys ?? []), ...(CIkeys ?? [])]
+
     // key that does not need to be cleaned
     const excludedKey = config.xAxis.dataKey
     return config?.xAxis?.dataKey ? transform.cleanData(data, excludedKey, keysToClean) : data
@@ -913,11 +915,23 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           </ParentSize>
                         </div>
                       ) : (
-                        <div ref={parentRef} style={{ width: `100%` }}>
+                        <div ref={parentRef} style={{ width: '100%' }}>
                           <ParentSize>
-                            {parent => (
-                              <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
-                            )}
+                            {parent => {
+                              const labelMargin = 120
+                              const widthReduction =
+                                config.showLineSeriesLabels &&
+                                (config.legend.position !== 'right' || config.legend.hide)
+                                  ? labelMargin
+                                  : 0
+                              return (
+                                <LinearChart
+                                  ref={svgRef}
+                                  parentWidth={parent.width - widthReduction}
+                                  parentHeight={parent.height}
+                                />
+                              )
+                            }}
                           </ParentSize>
                         </div>
                       ))}

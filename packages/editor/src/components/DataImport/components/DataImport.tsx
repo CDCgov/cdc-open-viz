@@ -1,36 +1,42 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { csvParse } from 'd3'
 import axios from 'axios'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
-import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
+import ConfigContext, { EditorDispatchContext } from '../../../ConfigContext'
 
-import TabPane from './TabPane'
-import Tabs from './Tabs'
-import PreviewDataTable from './PreviewDataTable'
-import LinkIcon from '../assets/icons/link.svg'
-import SampleDataContext from './../samples/SampleDataContext'
+import TabPane from '../../TabPane'
+import Tabs from '../../Tabs'
+import PreviewDataTable from '../../PreviewDataTable'
+import LinkIcon from '../../../assets/icons/link.svg'
+import SampleDataContext from './samples/SampleDataContext'
 import SampleData from './SampleData'
 
-import FileUploadIcon from '../assets/icons/file-upload-solid.svg'
+import FileUploadIcon from '../../../assets/icons/file-upload-solid.svg'
 import CloseIcon from '@cdc/core/assets/icon-close.svg'
 
-import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
-
-import '../scss/data-import.scss'
-
-import '@cdc/core/styles/v2/components/data-designer.scss'
-import { errorMessages, maxFileSize } from '../helpers/errorMessages'
-import { Visualization } from '@cdc/core/types/Visualization'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
+import { type Visualization } from '@cdc/core/types/Visualization'
+import { type DataSet } from '@cdc/dashboard/src/types/DataSet'
 
-export default function DataImport() {
+import './data-import.scss'
+import '@cdc/core/styles/v2/components/data-designer.scss'
+
+import { errorMessages, maxFileSize } from '../../../helpers/errorMessages'
+import { displaySize } from '../helpers/displaySize'
+import { supportedDataTypes } from '../helpers/supportedDataTypes'
+import { getFileExtension } from '../helpers/getFileExtension'
+import { parseTextByMimeType } from '../helpers/parseTextByMimeType'
+import { getMimeType } from '../helpers/getMimeType'
+
+const DataImport = () => {
   const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)
+  const dispatch = useContext(EditorDispatchContext)
+  const transform = new DataTransform()
 
   const setConfig = (conf: Visualization) => {
     dispatch({ type: 'EDITOR_SET_CONFIG', payload: conf })
@@ -38,37 +44,18 @@ export default function DataImport() {
   const setErrors = (err: string[]) => {
     dispatch({ type: 'EDITOR_SET_ERRORS', payload: err })
   }
-  const transform = new DataTransform()
 
   const [externalURL, setExternalURL] = useState(
     config.dataFileSourceType === 'url' ? config.dataFileName : config.dataUrl || ''
   )
 
   const [keepURL, setKeepURL] = useState(!!config.dataUrl)
-
   const [addingDataset, setAddingDataset] = useState(config.type === 'dashboard' || !config.data)
-
-  const [editingDataset, setEditingDataset] = useState<string>(undefined)
-
-  const dispatch = useContext(EditorDispatchContext)
-
-  const supportedDataTypes = {
-    '.csv': 'text/csv',
-    '.json': 'application/json'
-  }
-
-  const displaySize = size => {
-    if (size === undefined) return ''
-
-    if (size > Math.pow(1024, 3)) {
-      return Math.round((size / Math.pow(1024, 3)) * 100) / 100 + 'GB'
-    } else if (size > Math.pow(1024, 2)) {
-      return Math.round((size / Math.pow(1024, 2)) * 100) / 100 + 'MB'
-    } else if (size > 1024) {
-      return Math.round((size / 1024) * 100) / 100 + 'KB'
-    } else {
-      return size + 'B'
-    }
+  const [editingDataset, _setEditingDataset] = useState<string>(undefined)
+  const [newDatasetName, setNewDatasetName] = useState<string>(undefined)
+  const setEditingDataset = (datasetKey: string) => {
+    _setEditingDataset(datasetKey)
+    setNewDatasetName(datasetKey)
   }
 
   /**
@@ -77,8 +64,6 @@ export default function DataImport() {
   const dataExists = (newData, oldSeries, oldAxisX) => {
     // Loop through old series to make sure each exists in the new data
 
-    // TODO: move to forEach?
-    // eslint-disable-next-line array-callback-return
     oldSeries.map(function (currentValue, index, newData) {
       if (!newData.find(element => element.dataKey === currentValue.dataKey)) return false
     })
@@ -89,15 +74,8 @@ export default function DataImport() {
     return true
   }
 
-  const getFileExtension = (url: URL) => {
-    return isSolrCsv(externalURL)
-      ? '.csv'
-      : isSolrJson(externalURL)
-      ? '.json'
-      : Object.keys(supportedDataTypes).find(extension => url.pathname.endsWith(extension))
-  }
-
   const loadExternal = async () => {
+    let responseBlob: Blob = null
     let dataURL: URL
     // Is URL valid?
 
@@ -107,9 +85,8 @@ export default function DataImport() {
     } catch {
       throw errorMessages.urlInvalid
     }
-    let responseBlob: Blob = null
-
     const fileExtension = getFileExtension(dataURL)
+
     try {
       // eslint-disable-next-line no-unused-vars
       await axios
@@ -132,7 +109,8 @@ export default function DataImport() {
           }
         })
     } catch (err) {
-      console.error(err)
+      // eslint-disable-next-line no-console
+      console.error('Error in loadExternal', err)
 
       const error = err.toString()
 
@@ -155,7 +133,7 @@ export default function DataImport() {
   /**
    * Handle loading data
    */
-  const loadData = async (fileBlob = null, fileName, editingDatasetKey) => {
+  const loadData = async (fileBlob = null, fileName, editingDatasetKey: string) => {
     let fileData = fileBlob
     let fileSource = fileData?.path ?? fileName ?? externalURL
     if (fileSource && typeof fileSource === 'string') fileSource = fileSource.trim()
@@ -179,79 +157,55 @@ export default function DataImport() {
       return
     }
 
-    // checking the file source type allows us to handle real urls better
-    // For example, query parameters in API's and cache busting strings
-    // file matching can handle .csv and .json, but doesn't handle
-    // .csv?version=1 or .json?version=1
-    const getMimeType = () => {
-      const path = fileBlob?.name || externalURL || fileName
-      if (fileSourceType === 'file') {
-        const pathMatch = path.match(/(?:\.([^.]+))?$/g)
-        const ext = pathMatch.length === 0 ? '.csv' : pathMatch[0]
-        return supportedDataTypes[ext]
-      }
-
-      if (fileSourceType === 'url') {
-        return fileData.type
-      }
-    }
-
-    const mimeType = getMimeType()
+    const mimeType = getMimeType({
+      fileBlob,
+      externalURL,
+      fileName,
+      fileSourceType,
+      fileData
+    })
 
     // Convert from blob into raw text
     // Have to use FileReader instead of just .text because IE11 and the polyfills for this are bugged
     const filereader = new FileReader()
 
-    const getText = resultText => {
-      switch (mimeType) {
-        case 'text/csv':
-          return csvParse(resultText)
-        case 'text/plain':
-        case 'application/json':
-          try {
-            return isSolrJson(externalURL) ? JSON.parse(resultText).response.docs : JSON.parse(resultText)
-          } catch (errors) {
-            setErrors([errorMessages.formatting])
-            return
-          }
-        default:
-          setErrors([errorMessages.fileType])
-          return
-      }
-    }
-
     filereader.onload = function () {
-      const handleSetConfig = (text: string, useTempConfig = false) => {
+      const handleSetConfig = (newData: Object[], useTempConfig = false) => {
+        const setDataURL = keepURL && fileSourceType === 'url'
         if (config.type === 'dashboard') {
-          let newDatasets = { ...config.datasets }
-
-          Object.keys(newDatasets).forEach(datasetKey => (newDatasets[datasetKey].preview = false))
           const dataFileFormat = mimeType.split('/')[1].toUpperCase()
-          newDatasets[editingDatasetKey || fileSource] = {
-            data: text, // new data
+          const dataset = {
+            data: newData,
             dataFileSize: fileSize,
             dataFileName: fileSource, // new file source
             dataFileSourceType: fileSourceType, // new file source type
             dataFileFormat,
             preview: true
-          }
+          } as DataSet
 
-          if (keepURL) {
-            newDatasets[editingDatasetKey || fileSource].dataUrl = fileSource
+          if (setDataURL) {
+            dataset.dataUrl = fileSource
           }
 
           const conf = useTempConfig ? { ...config, ...tempConfig } : config
-          setConfig({ ...conf, datasets: newDatasets })
+          setConfig(conf)
+
+          const oldDatasetKey = newDatasetName !== editingDatasetKey ? editingDatasetKey : undefined
+
+          dispatch({
+            type: 'SET_DASHBOARD_DATASET',
+            payload: { datasetKey: newDatasetName || fileSource, dataset, oldDatasetKey }
+          })
         } else {
           let newConfig = {
             ...config,
             ...tempConfig,
-            data: text, // new data
+            data: newData,
             dataFileName: fileSource, // new file source
             dataFileSourceType: fileSourceType, // new file source type
-            formattedData: transform.developerStandardize(text, config.dataDescription)
+            formattedData: transform.developerStandardize(newData, config.dataDescription)
           }
-          if (keepURL) {
+          if (setDataURL) {
             newConfig.dataUrl = fileSource
           }
           setConfig(newConfig)
@@ -260,7 +214,7 @@ export default function DataImport() {
 
       // Validate parsed data and set if no issues.
       try {
-        const result = getText(this.result.toString())
+        const result = parseTextByMimeType(this.result.toString(), mimeType, externalURL, setErrors)
         const text = transform.autoStandardize(result)
         if (config.data && config.series) {
           if (dataExists(text, config.series, config?.xAxis.dataKey)) {
@@ -353,26 +307,31 @@ export default function DataImport() {
   const loadDataFromUrl = () => {
     return (
       <>
-        <form className='input-group d-flex' onSubmit={e => e.preventDefault()}>
+        <label htmlFor='dataset-name' className='col-12 mt-2'>
+          <span>Dataset Name</span>
           <input
-            id='external-data'
+            id='dataset-name'
+            placeholder='Enter Dataset Name'
             type='text'
-            className='form-control flex-grow-1 border-right-0'
+            aria-label='Enter Dataset Name'
+            value={newDatasetName}
+            className='form-control'
+            onChange={e => setNewDatasetName(e.target.value)}
+          />
+        </label>
+        <label htmlFor='external-datas' className='col-12 mt-2'>
+          <span>URL</span>
+          <textarea
+            id='external-datas'
+            className='form-control'
             placeholder='e.g., https://data.cdc.gov/resources/file.json'
             aria-label='Load data from external URL'
             aria-describedby='load-data'
+            rows={2}
             value={externalURL}
             onChange={e => setExternalURL(e.target.value)}
           />
-          <button
-            className='rounded-0 border-0 btn btn-primary px-4'
-            type='submit'
-            id='load-data'
-            onClick={() => loadData(null, externalURL, editingDataset)}
-          >
-            Load
-          </button>
-        </form>
+        </label>
         <label htmlFor='keep-url' className='mt-1 d-flex keep-url'>
           <input
             type='checkbox'
@@ -382,6 +341,17 @@ export default function DataImport() {
           />{' '}
           Always load from URL (normally will only pull once)
         </label>
+        <div className='d-flex justify-content-end mt-2'>
+          <button
+            className='btn btn-primary px-4'
+            type='submit'
+            id='load-data'
+            disabled={!newDatasetName || !externalURL}
+            onClick={() => loadData(null, externalURL, editingDataset)}
+          >
+            Save & Load
+          </button>
+        </div>
       </>
     )
   }
@@ -442,52 +412,20 @@ export default function DataImport() {
   }
 
   const removeDataset = datasetKey => {
-    let newDatasets = { ...config.datasets }
-    let newVisualizations = { ...config.visualizations }
-
-    Object.keys(newVisualizations).forEach(vizKey => {
-      if (newVisualizations[vizKey].dataKey === datasetKey) {
-        delete newVisualizations[vizKey].dataKey
-      }
-    })
-
-    delete newDatasets[datasetKey]
-
-    setConfig({ ...config, datasets: newDatasets, visualizations: newVisualizations })
-  }
-
-  const renameDataset = (oldName, newName) => {
-    if (oldName === newName) return
-
-    let newDatasets = { ...config.datasets }
-    let newVisualizations = { ...config.visualizations }
-
-    let suffix = 2
-    let originalName = newName
-    while (newDatasets[newName]) {
-      newName = originalName + '-' + suffix
-      suffix++
-    }
-
-    newDatasets[newName] = newDatasets[oldName]
-    delete newDatasets[oldName]
-
-    Object.keys(newVisualizations).forEach(vizKey => {
-      if (newVisualizations[vizKey].dataKey === oldName) {
-        newVisualizations[vizKey].dataKey = newName
-      }
-    })
-
-    setConfig({ ...config, datasets: newDatasets, visualizations: newVisualizations })
+    const datasetKeys = Object.keys(config.datasets).filter(key => key !== datasetKey)
+    setEditingDataset(undefined)
+    if (!datasetKeys.length) setAddingDataset(true)
+    dispatch({ type: 'DELETE_DASHBOARD_DATASET', payload: { datasetKey } })
   }
 
   let configureData,
-    readyToConfigure = false
+    readyToConfigure: boolean | Object[] = false
 
   if (config.type === 'dashboard') {
     readyToConfigure = Object.keys(config.datasets).length > 0
   } else {
     configureData = config
+
     readyToConfigure =
       !!config.formattedData || (config.data && config.dataDescription && transform.autoStandardize(config.data))
   }
@@ -668,14 +606,7 @@ export default function DataImport() {
                   datasetKey =>
                     config.datasets[datasetKey].dataFileName && (
                       <tr key={`tr-${datasetKey}`}>
-                        <td>
-                          <input
-                            className='dataset-name-input'
-                            type='text'
-                            defaultValue={datasetKey}
-                            onBlur={e => renameDataset(datasetKey, e.target.value)}
-                          />
-                        </td>
+                        <td>{datasetKey}</td>
                         <td className='p-1'>{displaySize(config.datasets[datasetKey].dataFileSize)}</td>
                         <td className='p-1'>{config.datasets[datasetKey].dataFileFormat}</td>
                         <td>
@@ -687,24 +618,26 @@ export default function DataImport() {
                           </button>
                         </td>
                         <td>
-                          <button
-                            className='btn btn-link p-1'
-                            onClick={() => {
-                              if (editingDataset === datasetKey) {
-                                setEditingDataset(undefined)
-                                setExternalURL('')
-                                setKeepURL(false)
-                              } else {
-                                setEditingDataset(datasetKey)
-                                setExternalURL(
-                                  config.datasets[datasetKey].dataUrl || config.datasets[datasetKey].dataFileName
-                                )
-                                setKeepURL(!!config.datasets[datasetKey].dataUrl)
-                              }
-                            }}
-                          >
-                            Edit
-                          </button>
+                          {config.datasets[datasetKey].dataFileSourceType === 'url' && (
+                            <button
+                              className='btn btn-link p-1'
+                              onClick={() => {
+                                if (editingDataset === datasetKey) {
+                                  setEditingDataset(undefined)
+                                  setExternalURL('')
+                                  setKeepURL(false)
+                                } else {
+                                  setEditingDataset(datasetKey)
+                                  setExternalURL(
+                                    config.datasets[datasetKey].dataUrl || config.datasets[datasetKey].dataFileName
+                                  )
+                                  setKeepURL(!!config.datasets[datasetKey].dataUrl)
+                                }
+                              }}
+                            >
+                              Edit
+                            </button>
+                          )}
                         </td>
                         <td>
                           <button className='btn btn-danger' onClick={() => removeDataset(datasetKey)}>
@@ -776,30 +709,37 @@ export default function DataImport() {
         {(editingDataset || addingDataset) && ( // dataFileSourceType needs to be checked here since earlier versions did not track this state
           <div className='load-data-area'>
             <div className='heading-3'>{editingDataset ? `Editing ${editingDataset}` : 'Add Dataset'}</div>
-            <Tabs startingTab={editingDataset && config.datasets[editingDataset].dataFileSourceType === 'url' ? 1 : 0}>
-              <TabPane title='Upload File' icon={<FileUploadIcon className='inline-icon' />}>
-                {sharepath && <p className='alert--info'>The share path set for this website is: {sharepath}</p>}
-                <div
-                  className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'}
-                  {...getRootProps()}
-                >
-                  <input {...getInputProps()} />
-                  {isDragActive ? (
-                    <p>Drop file here</p>
-                  ) : (
-                    <p>
-                      Drag file to this area, or <span>select a file</span>.
-                    </p>
-                  )}
-                </div>
-                <p className='footnote'>
-                  Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.
-                </p>
-              </TabPane>
+            {editingDataset ? (
               <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
                 {loadDataFromUrl()}
               </TabPane>
-            </Tabs>
+            ) : (
+              <Tabs startingTab={0}>
+                <TabPane title='Upload File' icon={<FileUploadIcon className='inline-icon' />}>
+                  {sharepath && <p className='alert--info'>The share path set for this website is: {sharepath}</p>}
+                  <div
+                    className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'}
+                    {...getRootProps()}
+                  >
+                    <input {...getInputProps()} />
+                    {isDragActive ? (
+                      <p>Drop file here</p>
+                    ) : (
+                      <p>
+                        Drag file to this area, or <span>select a file</span>.
+                      </p>
+                    )}
+                  </div>
+                  <p className='footnote'>
+                    Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}
+                    MB.
+                  </p>
+                </TabPane>
+                <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
+                  {loadDataFromUrl()}
+                </TabPane>
+              </Tabs>
+            )}
             {errors &&
               (Array.isArray(errors)
                 ? errors.map((message, index) => (
@@ -857,3 +797,5 @@ export default function DataImport() {
     </>
   )
 }
+
+export default DataImport

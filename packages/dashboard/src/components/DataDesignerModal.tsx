@@ -3,6 +3,7 @@ import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 import { useContext, useMemo, useState } from 'react'
 import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 import Modal from '@cdc/core/components/ui/Modal'
+import Loader from '@cdc/core/components/Loader'
 import { CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import _ from 'lodash'
@@ -25,6 +26,8 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
   const [canContinue, setCanContinue] = useState(false)
   const [useRow, setUseRow] = useState(!vizKey)
   const [multiViz, setMultiViz] = useState(!!config.rows[rowIndex].multiVizColumn)
+  const [errorMessage, setErrorMessage] = useState('')
+  const [loadingAPIData, setLoadingAPIData] = useState(false)
 
   const configureData = useMemo(() => {
     if (vizKey && !useRow) {
@@ -41,24 +44,45 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
     }
   }
 
-  const changeDataset = ({ target: { value } }) => {
-    const newConfigureData = { dataDescription: {}, formattedData: undefined, dataKey: value }
+  const fetchData = async datasetKey => {
+    const { data, dataUrl } = config.datasets[datasetKey]
+    if (!dataUrl) return data
+    let newData = data
+    const noCachedData = dataUrl && !data
+    const dataSetChanged = datasetKey !== configureData.dataKey
+    setErrorMessage('')
+    if (dataSetChanged || noCachedData) {
+      setLoadingAPIData(true)
+      try {
+        newData = await fetchRemoteData(dataUrl)
+        newData = transform.autoStandardize(newData)
+      } catch (e) {
+        setErrorMessage('There was an issue loading the data source. Please check the datasource URL and try again.')
+      }
+
+      setLoadingAPIData(false)
+    }
+    return newData
+  }
+
+  const changeDataset = async ({ target: { value } }) => {
+    const newData = await fetchData(value)
+    const newConfigureData = { dataDescription: {}, formattedData: undefined, dataKey: value, data: newData }
 
     updateConfigureData(newConfigureData)
   }
 
   const updateDescriptionProp = async (key, value) => {
     const datasetKey = configureData.dataKey
-    const { data, dataUrl } = config.datasets[datasetKey]
-    let newData = data
-    if (!data && dataUrl) {
-      newData = await fetchRemoteData(dataUrl)
-      newData = transform.autoStandardize(newData)
-    }
+    const newData = configureData.data || (await fetchData(datasetKey))
 
     const dataDescription = { ...configureData.dataDescription, [key]: value }
 
-    const newConfigureData = { data: newData, dataDescription, formattedData: transform.developerStandardize(newData, dataDescription) }
+    const newConfigureData = {
+      data: newData,
+      dataDescription,
+      formattedData: transform.developerStandardize(newData, dataDescription)
+    }
 
     updateConfigureData(newConfigureData)
     setCanContinue(true)
@@ -79,11 +103,13 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
   return (
     <Modal>
       <Modal.Content>
+        {loadingAPIData && <Loader fullScreen />}
         <div className='dataset-selector-container'>
           Select a dataset:&nbsp;
           <select className='dataset-selector' value={configureData.dataKey || ''} onChange={changeDataset}>
             <option value=''>Select a dataset</option>
-            {config.datasets && Object.keys(config.datasets).map(datasetKey => <option key={datasetKey}>{datasetKey}</option>)}
+            {config.datasets &&
+              Object.keys(config.datasets).map(datasetKey => <option key={datasetKey}>{datasetKey}</option>)}
           </select>
           {vizKey && (
             <CheckBox
@@ -96,6 +122,7 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
             />
           )}
         </div>
+        {errorMessage && <p className='text-danger'>{errorMessage}</p>}
         {configureData.dataKey && (
           <DataDesigner
             {...{
@@ -116,7 +143,10 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p>You can select a column where for each unique value in the column the configuration for the row will be repeated in to the data preview.</p>
+                    <p>
+                      You can select a column where for each unique value in the column the configuration for the row
+                      will be repeated in to the data preview.
+                    </p>
                   </Tooltip.Content>
                 </Tooltip>
               }
@@ -127,15 +157,31 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
             />
           ) : (
             <>
-              <InputSelect options={Object.keys(config.datasets[configureData.dataKey]?.data[0] || {})} value={config.rows[rowIndex].multiVizColumn} label='Multi-Visualization Column' initial='--Select--' updateField={(section, subsection, fieldName, value) => setMultiVizColumn(value)} required />
-              <CheckBox value={config.rows[rowIndex].expandCollapseAllButtons} label=' Add Expand/Collapse All buttons' fieldName='' updateField={(section, subsection, fieldName, value) => setExpandCollapseAllButtons(value)} />
+              <InputSelect
+                options={Object.keys(config.datasets[configureData.dataKey]?.data[0] || {})}
+                value={config.rows[rowIndex].multiVizColumn}
+                label='Multi-Visualization Column'
+                initial='--Select--'
+                updateField={(section, subsection, fieldName, value) => setMultiVizColumn(value)}
+                required
+              />
+              <CheckBox
+                value={config.rows[rowIndex].expandCollapseAllButtons}
+                label=' Add Expand/Collapse All buttons'
+                fieldName=''
+                updateField={(section, subsection, fieldName, value) => setExpandCollapseAllButtons(value)}
+              />
             </>
           )
         ) : (
           <></>
         )}
         {canContinue && (
-          <button style={{ margin: '1em', display: 'block' }} className='cove-button' onClick={() => overlay?.actions.toggleOverlay()}>
+          <button
+            style={{ margin: '1em', display: 'block' }}
+            className='cove-button'
+            onClick={() => overlay?.actions.toggleOverlay()}
+          >
             Continue
           </button>
         )}

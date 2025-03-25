@@ -906,7 +906,7 @@ const EditorPanel = () => {
     return Object.keys(columns)
   }
 
-  const getLegendStyleOptions = (option: 'style' | 'subStyle' | 'shapes'): string[] => {
+  const getLegendStyleOptions = (option: 'style' | 'subStyle' | 'shapes' | 'groupBy'): string[] => {
     const options: string[] = []
 
     switch (option) {
@@ -929,6 +929,9 @@ const EditorPanel = () => {
           options.push('linear blocks', 'smooth')
         }
 
+        break
+      case 'groupBy':
+        options.push(...getColumns())
         break
     }
     return options
@@ -962,7 +965,7 @@ const EditorPanel = () => {
   }
 
   const convertStateToConfig = () => {
-    let strippedState = JSON.parse(JSON.stringify(config))
+    let strippedState = _.cloneDeep(config)
     if (false === missingRequiredSections(config)) {
       delete strippedState.newViz
     }
@@ -2698,7 +2701,7 @@ const EditorPanel = () => {
                         </>
                       )}
 
-                      {isDateScale(config.xAxis) && (
+                      {(isDateScale(config.xAxis) || config?.visualizationType === 'Bump Chart') && (
                         <>
                           <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
                             Format how charts should parse and display your dates using{' '}
@@ -2909,27 +2912,26 @@ const EditorPanel = () => {
                             </>
                           )}
 
-                          {config.xAxis.type === 'date' ||
-                            (config.xAxis.type === 'date-time' && (
-                              <>
-                                <TextField
-                                  type='date'
-                                  section='exclusions'
-                                  fieldName='dateStart'
-                                  label='Start Date'
-                                  updateField={updateField}
-                                  value={config.exclusions.dateStart || ''}
-                                />
-                                <TextField
-                                  type='date'
-                                  section='exclusions'
-                                  fieldName='dateEnd'
-                                  label='End Date'
-                                  updateField={updateField}
-                                  value={config.exclusions.dateEnd || ''}
-                                />
-                              </>
-                            ))}
+                          {(config.xAxis.type === 'date' || config.xAxis.type === 'date-time') && (
+                            <>
+                              <TextField
+                                type='date'
+                                section='exclusions'
+                                fieldName='dateStart'
+                                label='Start Date'
+                                updateField={updateField}
+                                value={config.exclusions.dateStart || ''}
+                              />
+                              <TextField
+                                type='date'
+                                section='exclusions'
+                                fieldName='dateEnd'
+                                label='End Date'
+                                updateField={updateField}
+                                value={config.exclusions.dateEnd || ''}
+                              />
+                            </>
+                          )}
                         </>
                       )}
 
@@ -3691,6 +3693,17 @@ const EditorPanel = () => {
                     updateField={updateField}
                     options={getLegendStyleOptions('style')}
                   />
+
+                  <Select
+                    value={config.legend.groupBy}
+                    section='legend'
+                    fieldName='groupBy'
+                    initial='Select'
+                    label='Legend Group By:'
+                    updateField={updateField}
+                    options={getLegendStyleOptions('groupBy')}
+                  />
+
                   <CheckBox
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
@@ -3985,6 +3998,29 @@ const EditorPanel = () => {
                     section='legend'
                     fieldName='description'
                     label='Legend Description'
+                  />
+                  <CheckBox
+                    value={config.legend.unified}
+                    section='legend'
+                    fieldName='unified'
+                    label='Unified Legend'
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display='question'
+                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>
+                            For a chart with filters, check this option if you want the legend to contain an item for
+                            every series in the data set, including those that are filtered.
+                          </p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
                   />
                 </AccordionItemPanel>
               </AccordionItem>
