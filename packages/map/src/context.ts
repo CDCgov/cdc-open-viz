@@ -2,8 +2,14 @@ import { createContext } from 'react'
 import { MapConfig } from './types/MapConfig'
 
 type MapContext = {
+  setRequiredColumns
+  container
+  setSharedFilter
+  setModal
+  customNavigationHandler
+  tooltipRef
+  containerEl
   applyLegendToRow
-  applyTooltipsToGeo
   data
   displayGeoName
   filteredCountryCode
@@ -32,6 +38,8 @@ type MapContext = {
   setState
   state: MapConfig
   tooltipId: string
+  legendMemo
+  legendSpecialClassLastMemo
 }
 
 const ConfigContext = createContext({} as MapContext)

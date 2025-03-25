@@ -1,15 +1,16 @@
 import React, { useContext } from 'react'
-import { MapConfig } from '../types/MapConfig'
 import ConfigContext from '../context'
+import { type MapConfig } from '../types/MapConfig'
+import { MapContext } from '../types/MapContext'
 
 type ZoomControlsProps = {
   handleZoomIn: (coordinates: [Number, Number], setPosition: Function) => void
   handleZoomOut: (coordinates: [Number, Number], setPosition: Function) => void
-  handleReset: (coordinates: [Number, Number], setPosition: Function) => void
+  handleReset: (state: MapConfig, setState: Function, setRuntimeData: Function) => void
 }
 
 const ZoomControls: React.FC<ZoomControlsProps> = ({ handleZoomIn, handleZoomOut, handleReset }) => {
-  const { state, setState, setRuntimeData, setPosition, position, generateRuntimeData } = useContext<MapContext>(ConfigContext)
+  const { state, setState, setRuntimeData, setPosition, position } = useContext<MapContext>(ConfigContext)
   if (!state.general.allowMapZoom) return
   return (
     <div className='zoom-controls' data-html2canvas-ignore>
@@ -25,12 +26,16 @@ const ZoomControls: React.FC<ZoomControlsProps> = ({ handleZoomIn, handleZoomOut
         </svg>
       </button>
       {state.general.type === 'bubble' && (
-        <button onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)} className='reset' aria-label='Reset Zoom and Map Filters'>
+        <button
+          onClick={() => handleReset(state, setState, setRuntimeData)}
+          className='reset'
+          aria-label='Reset Zoom and Map Filters'
+        >
           Reset Filters
         </button>
       )}
       {(state.general.type === 'world-geocode' || state.general.geoType === 'single-state') && (
-        <button onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)} className='reset' aria-label='Reset Zoom'>
+        <button onClick={() => handleReset(state, setState, setRuntimeData)} className='reset' aria-label='Reset Zoom'>
           Reset Zoom
         </button>
       )}
