@@ -351,54 +351,25 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                   updateField={(_section, _subSection, _key, value) => updateFilterProp('queryParameter', value)}
                 />
               )}
-              <label>
-                <span>API Endpoint: </span>
-                <textarea value={filter?.apiFilter.apiEndpoint || ''} />
-                {isNestedDropdown && (
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>Your API Endpoint should return both value selector values.</p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                )}
-              </label>
-              <div className={isNestedDropdown ? 'border border-dark p-1 my-1' : ''}>
+              <div className='bg-secondary-subtle p-2 my-2'>
                 <label>
-                  <span>Value Selector: </span>
-                  <input value={filter?.apiFilter.valueSelector || ''} />
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>Value to use in the html option element</p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                  {` * Required`}
+                  <span>API Endpoint: </span>
+                  <textarea value={filter?.apiFilter?.apiEndpoint || ''} disabled />
+                  {isNestedDropdown && (
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                      </Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>Your API Endpoint should return both value selector values.</p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  )}
                 </label>
-                <label>
-                  <span>Display Text Selector: </span>
-                  <input value={filter?.apiFilter.textSelector || ''} />
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>Text to use in the html option element. If none is applied value selector will be used.</p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                  {` * Optional`}
-                </label>
-              </div>
-
-              {isNestedDropdown && (
                 <div className={isNestedDropdown ? 'border border-dark p-1 my-1' : ''}>
                   <label>
-                    <span>Subgroup Value Selector: </span>
-                    <input value={filter?.apiFilter.subgroupValueSelector || ''} />
+                    <span>Value Selector: </span>
+                    <input value={filter?.apiFilter?.valueSelector || ''} disabled />
                     <Tooltip style={{ textTransform: 'none' }}>
                       <Tooltip.Target>
                         <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -407,11 +378,11 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                         <p>Value to use in the html option element</p>
                       </Tooltip.Content>
                     </Tooltip>
-                    {` * Required`}
+                    <div>{` * Required`}</div>
                   </label>
                   <label>
-                    <span>Subgroup Display Text Selector: </span>
-                    <input value={filter?.apifilter.subgroupTextSelector || ''} />
+                    <span>Display Text Selector: </span>
+                    <input value={filter?.apiFilter?.textSelector || ''} disabled />
                     <Tooltip style={{ textTransform: 'none' }}>
                       <Tooltip.Target>
                         <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -420,14 +391,48 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                         <p>Text to use in the html option element. If none is applied value selector will be used.</p>
                       </Tooltip.Content>
                     </Tooltip>
-                    {` * Optional`}
+                    <div>{` * Optional`}</div>
                   </label>
                 </div>
-              )}
 
-              <button onClick={() => handleEditAPIValues(filter, isNestedDropdown, updateAPIFilter)}>
-                Edit API Values
-              </button>
+                {isNestedDropdown && (
+                  <div className={isNestedDropdown ? 'border border-dark p-1 my-1' : ''}>
+                    <label>
+                      <span>Subgroup Value Selector: </span>
+                      <input value={filter?.apiFilter?.subgroupValueSelector || ''} disabled />
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Value to use in the html option element</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                      <div>{` * Required`}</div>
+                    </label>
+                    <label>
+                      <span>Subgroup Display Text Selector: </span>
+                      <input value={filter?.apifilter?.subgroupTextSelector || ''} disabled />
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Text to use in the html option element. If none is applied value selector will be used.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                      <div>{` * Optional`}</div>
+                    </label>
+                  </div>
+                )}
+
+                <button
+                  onClick={() => handleEditAPIValues(filter, isNestedDropdown, updateAPIFilter)}
+                  className='btn mt-2'
+                >
+                  Edit API Values
+                </button>
+              </div>
 
               <label>
                 <input

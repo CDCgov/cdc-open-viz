@@ -22,10 +22,12 @@ const APIModal: React.FC<APIModalProps> = ({
   const [APIEndpoint, setAPIEndpoint] = useState(filter.apiFilter?.apiEndpoint || '')
   const [APIValueSelector, setAPIValueSelector] = useState(filter.apiFilter?.valueSelector || '')
   const [APITextSelector, setAPITextSelector] = useState(filter.apiFilter?.textSelector || '')
-  const [APISubGroupValueSelector, setAPISubGroupValueSelector] = useState(filter.apiFilter?.subgroupValueSelector)
-  const [APISubGroupTextSelector, setAPISubGroupTextSelector] = useState(filter.apiFilter?.subgroupTextSelector)
+  const [APISubGroupValueSelector, setAPISubGroupValueSelector] = useState(
+    filter.apiFilter?.subgroupValueSelector || ''
+  )
+  const [APISubGroupTextSelector, setAPISubGroupTextSelector] = useState(filter.apiFilter?.subgroupTextSelector || '')
   return (
-    <fieldset className='mb-1 px-3 cdc-open-viz-module'>
+    <fieldset className='edit-block mb-1 px-3 cdc-open-viz-module'>
       <label className='d-block'>
         <span>API Endpoint: </span>
         <textarea
@@ -59,7 +61,7 @@ const APIModal: React.FC<APIModalProps> = ({
                 <p>Value to use in the html option element</p>
               </Tooltip.Content>
             </Tooltip>
-            <p>{` * Required`}</p>
+            <div>{` * Required`}</div>
           </label>
           <label>
             <span>Display Text Selector: </span>
@@ -72,7 +74,7 @@ const APIModal: React.FC<APIModalProps> = ({
                 <p>Text to use in the html option element. If none is applied value selector will be used.</p>
               </Tooltip.Content>
             </Tooltip>
-            <p>{` * Optional`}</p>
+            <div>{` * Optional`}</div>
           </label>
         </div>
 
@@ -92,7 +94,7 @@ const APIModal: React.FC<APIModalProps> = ({
                   <p>Value to use in the html option element</p>
                 </Tooltip.Content>
               </Tooltip>
-              <p>{` * Required`}</p>
+              <div>{` * Required`}</div>
             </label>
             <label>
               <span>Subgroup Display Text Selector: </span>
@@ -105,14 +107,14 @@ const APIModal: React.FC<APIModalProps> = ({
                   <p>Text to use in the html option element. If none is applied value selector will be used.</p>
                 </Tooltip.Content>
               </Tooltip>
-              <p>{` * Optional`}</p>
+              <div>{` * Optional`}</div>
             </label>
           </div>
         )}
       </div>
       <div className='d-flex justify-content-end mt-2'>
         <button
-          className='btn btn-primary mt-2'
+          className='btn mt-2'
           onClick={() => updateAPIFilter(APIEndpoint, APIValueSelector, APITextSelector, valueSelector, textSelector)}
         >
           Save
