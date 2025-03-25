@@ -4,7 +4,7 @@ import ConfigContext from '../context'
 const useColumnsRequiredChecker = () => {
   const { state, setRequiredColumns } = useContext(ConfigContext)
 
-  return () => {
+  const columnsRequiredChecker = () => {
     const primaryColumnName = state.columns.primary.name
     const geographyColumnName = state.columns.geo.name
 
@@ -43,6 +43,8 @@ const useColumnsRequiredChecker = () => {
 
     setRequiredColumns(columnList)
   }
+
+  return { columnsRequiredChecker }
 }
 
 export default useColumnsRequiredChecker

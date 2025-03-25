@@ -62,17 +62,13 @@ const EditorPanel = () => {
     runtimeData,
   } = useContext<MapContext>(ConfigContext)
 
-  const columnsRequiredChecker = useColumnsRequiredChecker()
-
+  const { columnsRequiredChecker } = useColumnsRequiredChecker()
   const { general, columns, legend, table, tooltips } = state
   const columnsInData = state?.data?.[0] ? Object.keys(state.data[0]) : []
 
   const [configTextboxValue, setConfigTextbox] = useState({}) // eslint-disable-line
-
   const [loadedDefault, setLoadedDefault] = useState(false)
-
   const [displayPanel, setDisplayPanel] = useState(true)
-
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
 
   const headerColors = [
