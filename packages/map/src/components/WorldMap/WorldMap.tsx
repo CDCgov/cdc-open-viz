@@ -35,7 +35,7 @@ const WorldMap = () => {
   } = useContext(ConfigContext)
 
   const [world, setWorld] = useState(null)
-  const geoClickHandler = useGeoClickHandler()
+  const { geoClickHandler } = useGeoClickHandler()
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const { generateRuntimeData } = useGenerateRuntimeData(state)

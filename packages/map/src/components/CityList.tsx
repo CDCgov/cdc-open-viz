@@ -24,7 +24,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   if (!projection) return
 
-  const geoClickHandler = useGeoClickHandler()
+  const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
 
   useEffect(() => {

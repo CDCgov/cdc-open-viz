@@ -5,7 +5,7 @@ import { useContext } from 'react'
 const useGeoClickHandler = () => {
   const { state, setState, setModal, setSharedFilter, customNavigationHandler } = useContext(ConfigContext)
 
-  return (geoDisplayName: string, geoData: object) => {
+  const geoClickHandler = (geoDisplayName: string, geoData: object) => {
     if (setSharedFilter) {
       setSharedFilter(state.uid, geoData)
     }
@@ -36,6 +36,8 @@ const useGeoClickHandler = () => {
       navigationHandler(state.general.navigationTarget, geoData[state.columns.navigate.name], customNavigationHandler)
     }
   }
+
+  return { geoClickHandler }
 }
 
 export default useGeoClickHandler

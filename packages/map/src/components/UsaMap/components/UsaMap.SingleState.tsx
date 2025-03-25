@@ -45,7 +45,7 @@ const SingleStateMap = props => {
 
   const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection, statePicked } = useStateZoom(topoData)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const geoClickHandler = useGeoClickHandler()
+  const { geoClickHandler } = useGeoClickHandler()
 
   const cityListProjection = geoAlbersUsaTerritories()
     .translate([WIDTH / 2, HEIGHT / 2])

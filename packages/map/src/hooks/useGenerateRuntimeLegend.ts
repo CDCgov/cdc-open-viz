@@ -19,7 +19,7 @@ import { supportedCountries } from '../data/supported-geos'
 const useGenerateRuntimeLegend = (legendMemo, legendSpecialClassLastMemo) => {
   const { state, setState, runtimeFilters } = useContext(ConfigContext)
 
-  return useCallback(
+  const generateRuntimeLegend = useCallback(
     (configObj, runtimeData, hash) => {
       try {
         // Throw errors if args missing
@@ -499,6 +499,8 @@ const useGenerateRuntimeLegend = (legendMemo, legendSpecialClassLastMemo) => {
     },
     [legendMemo, state, runtimeFilters, setState]
   )
+
+  return { generateRuntimeLegend }
 }
 
 export default useGenerateRuntimeLegend

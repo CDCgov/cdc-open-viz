@@ -74,7 +74,7 @@ const UsaMap = () => {
   let isFilterValueSupported = false
   const { general, columns, tooltips, hexMap, map, annotations } = state
   const { displayAsHex } = general
-  const geoClickHandler = useGeoClickHandler()
+  const { geoClickHandler } = useGeoClickHandler()
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
 
