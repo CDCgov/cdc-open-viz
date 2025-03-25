@@ -97,7 +97,9 @@ $medium: 768px;
 }
 
 .territories-label {
-  font-size: 1em;
+  font-size: var(--territory-label-font-size);
+  color: var(--cool-gray-90);
+  font-weight: 900;
 }
 
 // Cities and Territories
@@ -109,7 +111,10 @@ $medium: 768px;
     transition: 0.3s all;
 
     text {
-      font-size: 0.95em;
+      font-size: var(--territories-text-font-size);
+      font-weight: 900;
+      //stroke: #fff;
+      //stroke-width: 0.056rem;
     }
   }
 }
@@ -130,7 +135,7 @@ $medium: 768px;
       transition: 0.2s all;
     }
     &:active {
-      transform: scale(0.9);
+      //transform: scale(0.9);
     }
     &:focus {
       background: #005eaa;
