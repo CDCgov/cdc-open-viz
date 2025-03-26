@@ -65,7 +65,11 @@ export const BarChartVertical = () => {
     data = brushConfig.data
   }
 
-  const hasConfidenceInterval = _.every(config.confidenceKeys, key => key !== '')
+  const hasConfidenceInterval =
+    config.confidenceKeys.upper &&
+    config.confidenceKeys.lower &&
+    config.confidenceKeys.upper !== '' &&
+    config.confidenceKeys.lower !== ''
 
   const _data = getBarData(config, data, hasConfidenceInterval)
   return (
