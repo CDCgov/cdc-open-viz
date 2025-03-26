@@ -9,7 +9,7 @@ export const getSeriesWithData = (config: ChartConfig) => {
     .map(s => ({
       ...s,
       data: filteredData
-        .filter(d => (s.dynamicCategory ? d[s.dynamicCategory] === s.dataKey : d[s.dataKey]))
+        .filter(d => (s.dynamicCategory ? d[s.dynamicCategory] === s.dataKey : d[s.dataKey] || d[s.dataKey] === 0))
         .filter(d => !s.dynamicCategory || d[s.originalDataKey])
     }))
     .filter(s => s.data.length)
