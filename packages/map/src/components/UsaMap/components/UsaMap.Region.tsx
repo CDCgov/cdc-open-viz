@@ -98,8 +98,7 @@ const UsaRegionMap = props => {
     let toolTip
 
     let styles: React.CSSProperties = {
-      fill: geoFillColor,
-      color: '#202020'
+      fill: geoFillColor
     }
 
     const label = supportedTerritories[territory][1]
@@ -176,7 +175,7 @@ const UsaRegionMap = props => {
           x={4}
           strokeWidth='0'
           fontSize={13}
-          style={{ fill: '#202020' }}
+          style={{ fill: '#1c1d1f' }}
           alignmentBaseline='middle'
           transform={`translate(${centroid[0] + x}, ${centroid[1] + y})`}
         >
