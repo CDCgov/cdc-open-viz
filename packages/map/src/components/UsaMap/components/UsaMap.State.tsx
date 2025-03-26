@@ -145,7 +145,7 @@ const UsaMap = () => {
     let styles = {
       fill: geoFillColor,
       stroke: geoStrokeColor,
-      color: '#202020'
+      color: '#1c1d1f'
     }
 
     const label = supportedTerritories[territory][1]
@@ -177,7 +177,7 @@ const UsaMap = () => {
       }
 
       styles = {
-        color: textColor,
+        color: textColor === '#000' ? '#1c1d1f' : textColor,
         fill: legendColors[0],
         opacity:
           setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== territoryData[columns.geo.name]

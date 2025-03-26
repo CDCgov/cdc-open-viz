@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { isSmallTerritoryViewport } from '@cdc/core/helpers/viewports'
+
 type TerritoriesSectionProps = {
   territories: JSX.Element[]
   // Keys of the territories to display
@@ -33,6 +35,9 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
       return a.props.label.localeCompare(b.props.label)
     })
 
+  const SVG_GAP = 9
+  const SVG_WIDTH = 45 // isSmallTerritoryViewport(currentViewport) ? 35 : 45
+
   return (
     territoriesData.length > 0 && (
       <>
@@ -43,18 +48,32 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
               <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
             )}
           </div>
-          <div>
+          <div className='d-flex flex-wrap' style={{ columnGap: '1.5rem' }}>
             {(usTerritories.length > 0 || config.general.territoriesAlwaysShow) && (
-              <>
-                <h5 className='territories-label'>U.S. territories</h5>
-                <span className='mt-1 mb-2 d-flex flex-wrap territories'>{usTerritories}</span>
-              </>
+              <div>
+                <h5
+                  className='territories-label'
+                  style={{ minWidth: `${usTerritories.length * SVG_WIDTH + (usTerritories.length - 1) * SVG_GAP}px` }}
+                >
+                  U.S. territories
+                </h5>
+                <span className='mt-2 mb-3 d-flex territories'>{usTerritories}</span>
+              </div>
             )}
             {(freelyAssociatedStates.length > 0 || config.general.territoriesAlwaysShow) && (
-              <>
+              <div>
                 <h5 className='territories-label'>Freely associated states</h5>
-                <span className='mt-1 mb-2 d-flex flex-wrap territories'>{freelyAssociatedStates}</span>
-              </>
+                <span
+                  className='mt-2 mb-3 d-flex territories'
+                  style={{
+                    minWidth: `${
+                      freelyAssociatedStates.length * SVG_WIDTH + (freelyAssociatedStates.length - 1) * SVG_GAP
+                    }px`
+                  }}
+                >
+                  {freelyAssociatedStates}
+                </span>
+              </div>
             )}
           </div>
         </div>

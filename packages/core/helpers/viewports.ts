@@ -8,3 +8,5 @@ export const isBelowBreakpoint = (breakpoint: ViewportSize, currentViewport: Vie
 export const isLegendWrapViewport = currentViewport => isBelowBreakpoint('sm', currentViewport)
 
 export const isMobileHeightViewport = currentViewport => isBelowBreakpoint('sm', currentViewport)
+
+export const isSmallTerritoryViewport = currentViewport => isBelowBreakpoint('sm', currentViewport)
