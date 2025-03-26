@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react'
+import { useEffect, useId, useState, type MouseEvent, type ChangeEvent } from 'react'
 import { feature } from 'topojson-client'
 import { Group } from '@visx/group'
 import { MapConfig } from '../types/MapConfig'
@@ -16,7 +16,12 @@ import { MapConfig } from '../types/MapConfig'
  * 3) Clean (ie. mapshaper -clean) and edit the shape as needed and export the new layer as geoJSON
  * 4) Save the geoJSON somewhere external.
  */
-export default function useMapLayers(config: MapConfig, setConfig, pathGenerator, tooltipId) {
+export default function useMapLayers(
+  config: MapConfig,
+  setConfig: Function,
+  pathGenerator: Function,
+  tooltipId: string
+) {
   const [fetchedTopoJSON, setFetchedTopoJSON] = useState([])
   const geoId = useId()
 
@@ -25,11 +30,15 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
   const [featureArray, setFeatureArray] = useState([])
 
   useEffect(() => {
-    fetchGeoJSONLayers()
-  }, [])
+    const fetchLayers = async () => {
+      try {
+        await fetchGeoJSONLayers()
+      } catch (error) {
+        console.error('Error fetching GeoJSON layers:', error)
+      }
+    }
 
-  useEffect(() => {
-    fetchGeoJSONLayers()
+    fetchLayers()
   }, [config.map.layers])
 
   useEffect(() => {
@@ -43,14 +52,14 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
     setFetchedTopoJSON(geos)
   }
 
-  const handleRemoveLayer = (e: Event, index: number) => {
+  const handleRemoveLayer = (e: MouseEvent<HTMLButtonElement>, index: number) => {
     e.preventDefault()
 
     const updatedState = {
       ...config,
       map: {
         ...config.map,
-        layers: config.map.layers.filter((layer, i) => i !== index)
+        layers: config.map.layers.filter((_layer, i) => i !== index)
       }
     }
 
@@ -75,7 +84,7 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
     setConfig(updatedState)
   }
 
-  const handleMapLayer = (e: Event, index: number, layerKey: string) => {
+  const handleMapLayer = (e: ChangeEvent<HTMLInputElement>, index: number, layerKey: string) => {
     e.preventDefault()
 
     let layerValue = e.target.value
@@ -118,10 +127,9 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
 
   /**
    * Updates the custom map layers based on the topojson data
-   * @returns {void} new map layers to the config
    */
-  const generateCustomLayers = () => {
-    if (fetchedTopoJSON.length === 0 || !fetchedTopoJSON) return false
+  const generateCustomLayers = (): void => {
+    if (fetchedTopoJSON.length === 0 || !fetchedTopoJSON) return
     let tempArr = []
     let tempFeatureArray = []
 
