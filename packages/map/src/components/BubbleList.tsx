@@ -6,9 +6,8 @@ import ConfigContext from '../context'
 import { type Coordinate, DataRow } from '../types/MapConfig'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
-import { displayGeoName } from '../helpers'
+import { displayGeoName, SVG_HEIGHT, SVG_WIDTH } from '../helpers'
 import { geoMercator, geoAlbersUsa, type GeoProjection } from 'd3-geo'
-import _ from 'lodash'
 
 type BubbleListProps = {
   runtimeData: Object[]
@@ -16,7 +15,8 @@ type BubbleListProps = {
 }
 
 export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProjection }) => {
-  const { state, tooltipId, legendMemo, legendSpecialClassLastMemo, setState, setPosition } = useContext(ConfigContext)
+  const { state, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, setPosition } =
+    useContext(ConfigContext)
   const { columns, data, general, visual } = state
   const { primary, geo } = columns
   const { geoType, allowMapZoom } = general
@@ -33,7 +33,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
   const getProjection = () => {
     try {
       if (geoType === 'world') return geoMercator()
-      if (geoType === 'us') return geoAlbersUsa().translate([455, 250]) // translate is half of each svg x/y viewbox values
+      if (geoType === 'us') return geoAlbersUsa().translate([SVG_WIDTH / 2 + 15, SVG_HEIGHT / 2]) // translate is half of each svg x/y viewbox values
       if (customProjection) return customProjection
       throw new Error('No projection found in BubbleList component')
     } catch (e) {
@@ -43,20 +43,24 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
 
   const projection = getProjection()
 
-  const handleCircleClick = async country => {
+  const handleBubbleClick = country => {
     if (!allowMapZoom) return
-    const _state = _.cloneDeep(state)
     const newRuntimeData = data.filter(item => item[geoColumnName] === country[geoColumnName])
     const _filteredCountryCode = newRuntimeData[0].uid
     const coordinates = countryCoordinates[_filteredCountryCode]
     const long = coordinates[1]
     const lat = coordinates[0]
     const reversedCoordinates: Coordinate = [long, lat]
+    const filteredCountryObj = runtimeData[_filteredCountryCode]
+    const _tempRuntimeData = {
+      [_filteredCountryCode]: filteredCountryObj
+    }
 
-    setState({
-      ...state,
-      mapPosition: { coordinates: reversedCoordinates, zoom: 3 }
-    })
+    // Zoom the map in...
+    setPosition({ coordinates: reversedCoordinates, zoom: 3 })
+
+    // ...and show the data for the clicked country
+    setRuntimeData(_tempRuntimeData)
   }
 
   const sortedRuntimeData: DataRow = Object.values(runtimeData).sort((a, b) =>
@@ -115,7 +119,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
                   e.clientY > pointerY - clickTolerance &&
                   e.clientY < pointerY + clickTolerance
                 ) {
-                  handleCircleClick(country)
+                  handleBubbleClick(country)
                   pointerX = undefined
                   pointerY = undefined
                 }
@@ -150,7 +154,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
                     e.clientY > pointerY - clickTolerance &&
                     e.clientY < pointerY + clickTolerance
                   ) {
-                    handleCircleClick(country)
+                    handleBubbleClick(country)
                     pointerX = undefined
                     pointerY = undefined
                   }
@@ -227,7 +231,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
                   e.clientY > pointerY - clickTolerance &&
                   e.clientY < pointerY + clickTolerance
                 ) {
-                  handleCircleClick(state)
+                  handleBubbleClick(state)
                   pointerX = undefined
                   pointerY = undefined
                 }
@@ -262,7 +266,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
                     e.clientY > pointerY - clickTolerance &&
                     e.clientY < pointerY + clickTolerance
                   ) {
-                    handleCircleClick(state)
+                    handleBubbleClick(state)
                     pointerX = undefined
                     pointerY = undefined
                   }

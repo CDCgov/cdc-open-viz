@@ -8,7 +8,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 
 // Core Components
 import DataTable from '@cdc/core/components/DataTable'
-import Filters, { useFilters } from '@cdc/core/components/Filters'
+import Filters from '@cdc/core/components/Filters'
 import Layout from '@cdc/core/components/Layout'
 import MediaControls from '@cdc/core/components/MediaControls'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
@@ -84,7 +84,7 @@ const CdcMap = ({
   const [accessibleStatus, setAccessibleStatus] = useState<string>()
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState<boolean>(false)
   const [displayPanel, setDisplayPanel] = useState<boolean>(true)
-  const [filteredCountryCode, setFilteredCountryCode] = useState()
+  const [filteredCountryCode, setFilteredCountryCode] = useState<string>('')
   const [isDraggingAnnotation, setIsDraggingAnnotation] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(true)
   const [modal, setModal] = useState(null)
@@ -128,37 +128,6 @@ const CdcMap = ({
   const { generateRuntimeLegend } = useGenerateRuntimeLegend(legendMemo, legendSpecialClassLastMemo)
   const { generateRuntimeFilters } = useGenerateRuntimeFilters(state)
   const { generateRuntimeData } = useGenerateRuntimeData(state)
-
-  // Use Effects
-  useEffect(() => {
-    try {
-      if (filteredCountryCode) {
-        const coordinates = countryCoordinates[filteredCountryCode]
-        const long = coordinates[1]
-        const lat = coordinates[0]
-        const reversedCoordinates: Coordinate = [long, lat]
-
-        setState({
-          ...state,
-          mapPosition: { coordinates: reversedCoordinates, zoom: 3 }
-        })
-      }
-    } catch (e) {
-      console.error('COVE: Failed to set world map zoom.') // eslint-disable-line
-    }
-  }, [filteredCountryCode])
-
-  useEffect(() => {
-    setTimeout(() => {
-      if (filteredCountryCode) {
-        const filteredCountryObj = runtimeData[filteredCountryCode]
-        const tmpData = {
-          [filteredCountryCode]: filteredCountryObj
-        }
-        setRuntimeData(tmpData)
-      }
-    }, 100)
-  }, [filteredCountryCode])
 
   const handleDragStateChange = isDragging => {
     setIsDraggingAnnotation(isDragging)
@@ -618,34 +587,33 @@ const CdcMap = ({
                 general.type !== 'navigation' &&
                 false === loading && (
                   <DataTable
-                    config={state}
-                    rawData={state.data}
-                    navigationHandler={navigationHandler}
-                    expandDataTable={table.expanded}
-                    headerColor={general.headerColor}
                     columns={columns}
-                    showFullGeoNameInCSV={table.showFullGeoNameInCSV}
-                    runtimeLegend={runtimeLegend}
-                    runtimeData={runtimeData}
+                    config={state}
+                    currentViewport={currentViewport}
                     displayGeoName={displayGeoName}
-                    tableTitle={table.label}
-                    indexTitle={table.indexLabel}
-                    vizTitle={general.title}
-                    viewport={currentViewport}
+                    expandDataTable={table.expanded}
                     formatLegendLocation={key =>
                       formatLegendLocation(key, runtimeData?.[key]?.[state.columns.geo.name])
                     }
-                    setFilteredCountryCode={setFilteredCountryCode}
-                    tabbingId={tabId}
-                    showDownloadImgButton={showDownloadImgButton}
-                    showDownloadPdfButton={showDownloadPdfButton}
-                    innerContainerRef={innerContainerRef}
-                    outerContainerRef={outerContainerRef}
+                    headerColor={general.headerColor}
                     imageRef={imageId}
+                    indexTitle={table.indexLabel}
+                    innerContainerRef={innerContainerRef}
                     isDebug={isDebug}
-                    wrapColumns={table.wrapColumns}
                     legendMemo={legendMemo}
                     legendSpecialClassLastMemo={legendSpecialClassLastMemo}
+                    navigationHandler={navigationHandler}
+                    outerContainerRef={outerContainerRef}
+                    rawData={state.data}
+                    runtimeData={runtimeData}
+                    runtimeLegend={runtimeLegend}
+                    setFilteredCountryCode={setFilteredCountryCode}
+                    showDownloadImgButton={showDownloadImgButton}
+                    showDownloadPdfButton={showDownloadPdfButton}
+                    tabbingId={tabId}
+                    tableTitle={table.label}
+                    vizTitle={general.title}
+                    wrapColumns={table.wrapColumns}
                   />
                 )}
 

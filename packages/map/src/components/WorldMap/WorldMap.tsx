@@ -68,13 +68,9 @@ const WorldMap = () => {
   // Resets to original data & zooms out
   const handleReset = (state, setState, setRuntimeData) => {
     const newRuntimeData = generateRuntimeData(state)
-    setRuntimeData(newRuntimeData)
-    setState({
-      ...state,
-      focusedCountry: false,
-      mapPosition: { coordinates: [0, 30], zoom: 1 }
-    })
+    setPosition({ coordinates: [0, 30], zoom: 1 })
     setFilteredCountryCode('')
+    setRuntimeData(newRuntimeData)
   }
   const handleZoomIn = (position, setPosition) => {
     if (position.zoom >= 4) return

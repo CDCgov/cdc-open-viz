@@ -1,14 +1,13 @@
-import { useState, useEffect, useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { scaleLinear } from 'd3-scale'
-import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
+import { GlyphCircle, GlyphDiamond, GlyphSquare, GlyphStar, GlyphTriangle } from '@visx/glyph'
 import ConfigContext from '../context'
 import { supportedCities } from '../data/supported-geos'
 import { getFilterControllingStatePicked } from './UsaMap/helpers/map'
-import { getGeoStrokeColor, titleCase, displayGeoName } from '../helpers'
+import { displayGeoName, getGeoStrokeColor, SVG_HEIGHT, SVG_PADDING, SVG_WIDTH, titleCase } from '../helpers'
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
-import { SVG_WIDTH, SVG_HEIGHT, SVG_PADDING } from '../helpers'
 
 type CityListProps = {
   data: Object[]
@@ -53,12 +52,12 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     // Set bubble sizes
     var size = scaleLinear().domain([1, maxDataValue]).range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
   }
-  let cityList = Object.keys(citiesData).filter(c => undefined !== c || undefined !== runtimeData[c])
+  const cityList = Object.keys(citiesData).filter(c => undefined !== c || undefined !== runtimeData[c])
   if (!cityList) return true
 
   // Cities output
-  const cities = cityList.map((city, i) => {
-    let geoData
+  return cityList.map((city, i) => {
+    let geoData: Object
     if (runtimeData) {
       Object.keys(runtimeData).forEach(key => {
         if (city === runtimeData[key][state.columns.geo.name]) {
@@ -245,8 +244,6 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       </g>
     )
   })
-
-  return cities
 }
 
 export default CityList
