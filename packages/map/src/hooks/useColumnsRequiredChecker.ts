@@ -1,17 +1,17 @@
 import { useContext } from 'react'
 import ConfigContext from '../context'
+import useColumnNames from './useColumnNames'
 
 const useColumnsRequiredChecker = () => {
   const { state, setRequiredColumns } = useContext(ConfigContext)
 
   const columnsRequiredChecker = () => {
-    const primaryColumnName = state.columns.primary.name
-    const geographyColumnName = state.columns.geo.name
+    const { primaryColumnName, geoColumnName } = useColumnNames()
 
     let columnList = []
 
     // Geo is always required
-    if (!geographyColumnName) {
+    if (!geoColumnName) {
       columnList.push('Geography')
     }
 

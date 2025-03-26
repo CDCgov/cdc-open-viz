@@ -8,6 +8,7 @@ import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
 import { displayGeoName, SVG_HEIGHT, SVG_WIDTH } from '../helpers'
 import { geoMercator, geoAlbersUsa, type GeoProjection } from 'd3-geo'
+import useColumnNames from '../hooks/useColumnNames'
 
 type BubbleListProps = {
   runtimeData: Object[]
@@ -18,15 +19,16 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
   const { state, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, setPosition } =
     useContext(ConfigContext)
   const { columns, data, general, visual } = state
-  const { primary, geo } = columns
   const { geoType, allowMapZoom } = general
   const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder } = visual
-  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
-  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const primaryColumnName = primary.name
-  const geoColumnName = geo.name
   const hasBubblesWithZeroOnMap = showBubbleZeros ? 0 : 1
   const clickTolerance = 10
+
+  // hooks
+  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
+  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
+  const { primaryColumnName, geoColumnName } = useColumnNames()
+
   const maxDataValue = Math.max(...data.map(d => d[primaryColumnName]))
   const size = scaleLinear().domain([hasBubblesWithZeroOnMap, maxDataValue]).range([minBubbleSize, maxBubbleSize])
 

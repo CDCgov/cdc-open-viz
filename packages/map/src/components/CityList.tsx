@@ -8,6 +8,7 @@ import { displayGeoName, getGeoStrokeColor, SVG_HEIGHT, SVG_PADDING, SVG_WIDTH, 
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
+import useColumnNames from '../hooks/useColumnNames'
 
 type CityListProps = {
   data: Object[]
@@ -22,6 +23,9 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
   const [citiesData, setCitiesData] = useState({})
   const { state, topoData, runtimeData, position, legendMemo, legendSpecialClassLastMemo } = useContext(ConfigContext)
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
+  const { geoColumnName, latitudeColumnName, longitudeColumnName, primaryColumnName } = useColumnNames()
+  const { additionalCityStyles } = state.visual || []
+
   if (!projection) return
 
   const { geoClickHandler } = useGeoClickHandler()
@@ -33,7 +37,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     if (runtimeData) {
       Object.keys(runtimeData).forEach(key => {
         const city = runtimeData[key]
-        citiesDictionary[city[state.columns.geo.name]] = city
+        citiesDictionary[city[geoColumnName]] = city
       })
     }
 
@@ -45,7 +49,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       ...(runtimeData ? Object.keys(runtimeData).map(key => runtimeData[key][state.columns.primary.name]) : [0])
     )
     const sortedRuntimeData = Object.values(runtimeData).sort((a, b) =>
-      a[state.columns.primary.name] < b[state.columns.primary.name] ? 1 : -1
+      a[primaryColumnName] < b[primaryColumnName] ? 1 : -1
     )
     if (!sortedRuntimeData) return
 
@@ -109,8 +113,8 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     let transform = ''
 
     if (
-      !geoData?.[state.columns.longitude.name] &&
-      !geoData?.[state.columns.latitude.name] &&
+      !geoData?.[longitudeColumnName] &&
+      !geoData?.[latitudeColumnName] &&
       city &&
       supportedCities[city.toUpperCase()]
     ) {
@@ -119,17 +123,13 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
 
     let needsPointer = false
 
-    if (geoData?.[state.columns.longitude.name] && geoData?.[state.columns.latitude.name]) {
-      let coords = [Number(geoData?.[state.columns.longitude.name]), Number(geoData?.[state.columns.latitude.name])]
+    if (geoData?.[longitudeColumnName] && geoData?.[latitudeColumnName]) {
+      let coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
       transform = `translate(${projection(coords)})`
       needsPointer = true
     }
 
-    if (
-      geoData?.[state.columns.longitude.name] &&
-      geoData?.[state.columns.latitude.name] &&
-      state.general.geoType === 'single-state'
-    ) {
+    if (geoData?.[longitudeColumnName] && geoData?.[latitudeColumnName] && state.general.geoType === 'single-state') {
       const statePicked = getFilterControllingStatePicked(state, runtimeData)
       const _statePickedData = topoData?.states?.find(s => s.properties.name === statePicked)
 
@@ -140,7 +140,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
         ],
         _statePickedData
       )
-      let coords = [Number(geoData?.[state.columns.longitude.name]), Number(geoData?.[state.columns.latitude.name])]
+      let coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
       transform = `translate(${newProjection(coords)}) scale(${
         state.visual.geoCodeCircleSize / (position.zoom > 1 ? position.zoom : 1)
       })`
@@ -182,7 +182,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
 
     const shapeProps = {
       onClick: () => geoClickHandler(cityDisplayName, geoData),
-      size: state.general.type === 'bubble' ? size(geoData[state.columns.primary.name]) : radius * 30,
+      size: state.general.type === 'bubble' ? size(geoData[primaryColumnName]) : radius * 30,
       title: 'Select for more information',
       'data-tooltip-id': `tooltip__${tooltipId}`,
       'data-tooltip-html': toolTip,
@@ -201,7 +201,6 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       triangle: <GlyphTriangle {...shapeProps} />
     }
 
-    const { additionalCityStyles } = state.visual || []
     const cityStyle = Object.values(runtimeData)
       .filter(d => additionalCityStyles.some(style => String(d[style.column]) === String(style.value)))
       .map(d => {
@@ -214,8 +213,8 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
 
     if (cityStyle !== undefined && cityStyle.shape) {
       if (
-        !geoData?.[state.columns.longitude.name] &&
-        !geoData?.[state.columns.latitude.name] &&
+        !geoData?.[longitudeColumnName] &&
+        !geoData?.[latitudeColumnName] &&
         city &&
         supportedCities[city.toUpperCase()]
       ) {
@@ -228,8 +227,8 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
         )
       }
 
-      if (geoData?.[state.columns.longitude.name] && geoData?.[state.columns.latitude.name]) {
-        const coords = [Number(geoData?.[state.columns.longitude.name]), Number(geoData?.[state.columns.latitude.name])]
+      if (geoData?.[longitudeColumnName] && geoData?.[latitudeColumnName]) {
+        const coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
         let translate = `translate(${projection(coords)})`
         return (
           <g key={i} transform={translate} style={styles} className='geo-point' tabIndex={-1}>
