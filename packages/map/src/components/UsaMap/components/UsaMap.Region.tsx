@@ -15,7 +15,7 @@ import { supportedTerritories } from '../../../data/supported-geos'
 
 // Helpers
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
-import { displayGeoName, handleMapAriaLabels, getGeoStrokeColor, getGeoFillColor } from '../../../helpers'
+import { displayGeoName, handleMapAriaLabels, getGeoStrokeColor, getGeoFillColor, SVG_VIEWBOX } from '../../../helpers'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
@@ -309,7 +309,7 @@ const UsaRegionMap = props => {
 
   return (
     <ErrorBoundary component='UsaRegionMap'>
-      <svg viewBox='0 0 880 500' role='img' aria-label={handleMapAriaLabels(state)}>
+      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(state)}>
         <Mercator data={focusedStates} scale={620} translate={[1500, 735]}>
           {({ features, projection }) => constructGeoJsx(features, projection)}
         </Mercator>

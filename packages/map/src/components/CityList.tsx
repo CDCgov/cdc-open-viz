@@ -8,6 +8,7 @@ import { getGeoStrokeColor, titleCase, displayGeoName } from '../helpers'
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
+import { SVG_WIDTH, SVG_HEIGHT, SVG_PADDING } from '../helpers'
 
 type CityListProps = {
   data: Object[]
@@ -132,15 +133,11 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     ) {
       const statePicked = getFilterControllingStatePicked(state, runtimeData)
       const _statePickedData = topoData?.states?.find(s => s.properties.name === statePicked)
-      // SVG ITEMS
-      const WIDTH = 880
-      const HEIGHT = 500
-      const PADDING = 50
 
       const newProjection = projection.fitExtent(
         [
-          [PADDING, PADDING],
-          [WIDTH - PADDING, HEIGHT - PADDING]
+          [SVG_PADDING, SVG_PADDING],
+          [SVG_WIDTH - SVG_PADDING, SVG_HEIGHT - SVG_PADDING]
         ],
         _statePickedData
       )

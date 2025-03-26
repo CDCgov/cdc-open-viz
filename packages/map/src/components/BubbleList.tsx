@@ -3,11 +3,12 @@ import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
 import ConfigContext from '../context'
-import { DataRow } from '../types/MapConfig'
+import { type Coordinate, DataRow } from '../types/MapConfig'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
 import { displayGeoName } from '../helpers'
 import { geoMercator, geoAlbersUsa, type GeoProjection } from 'd3-geo'
+import _ from 'lodash'
 
 type BubbleListProps = {
   runtimeData: Object[]
@@ -15,8 +16,7 @@ type BubbleListProps = {
 }
 
 export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProjection }) => {
-  const { state, tooltipId, legendMemo, legendSpecialClassLastMemo, setFilteredCountryCode, translate, scale } =
-    useContext(ConfigContext)
+  const { state, tooltipId, legendMemo, legendSpecialClassLastMemo, setState, setPosition } = useContext(ConfigContext)
   const { columns, data, general, visual } = state
   const { primary, geo } = columns
   const { geoType, allowMapZoom } = general
@@ -43,10 +43,20 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
 
   const projection = getProjection()
 
-  const handleCircleClick = country => {
+  const handleCircleClick = async country => {
     if (!allowMapZoom) return
-    let newRuntimeData = data.filter(item => item[geoColumnName] === country[geoColumnName])
-    setFilteredCountryCode(newRuntimeData[0].uid)
+    const _state = _.cloneDeep(state)
+    const newRuntimeData = data.filter(item => item[geoColumnName] === country[geoColumnName])
+    const _filteredCountryCode = newRuntimeData[0].uid
+    const coordinates = countryCoordinates[_filteredCountryCode]
+    const long = coordinates[1]
+    const lat = coordinates[0]
+    const reversedCoordinates: Coordinate = [long, lat]
+
+    setState({
+      ...state,
+      mapPosition: { coordinates: reversedCoordinates, zoom: 3 }
+    })
   }
 
   const sortedRuntimeData: DataRow = Object.values(runtimeData).sort((a, b) =>
