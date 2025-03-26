@@ -503,18 +503,7 @@ const UsaMap = () => {
 
     // Bubbles
     if (general.type === 'bubble') {
-      geosJsx.push(
-        <BubbleList
-          key='bubbles'
-          data={state.data}
-          runtimeData={data}
-          state={state}
-          projection={projection}
-          applyLegendToRow={applyLegendToRow}
-          applyTooltipsToGeo={applyTooltipsToGeo}
-          displayGeoName={displayGeoName}
-        />
-      )
+      geosJsx.push(<BubbleList runtimeData={data} projection={projection} />)
     }
 
     // })

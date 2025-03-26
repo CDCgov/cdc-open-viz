@@ -75,13 +75,6 @@ const WorldMap = () => {
     setPosition(pos => ({ ...pos, zoom: pos.zoom / 1.5 }))
   }
 
-  // TODO Refactor - state should be set together here to avoid rerenders
-  const handleCircleClick = (country, state, setState, setRuntimeData) => {
-    if (!state.general.allowMapZoom) return
-    let newRuntimeData = state.data.filter(item => item[state.columns.geo.name] === country[state.columns.geo.name])
-    setFilteredCountryCode(newRuntimeData[0].uid)
-  }
-
   const handleMoveEnd = position => {
     setPosition(position)
   }
@@ -199,19 +192,7 @@ const WorldMap = () => {
 
     // Bubbles
     if (state.general.type === 'bubble') {
-      geosJsx.push(
-        <BubbleList
-          key='bubbles'
-          data={state.data}
-          runtimeData={data}
-          state={state}
-          projection={projection}
-          applyLegendToRow={applyLegendToRow}
-          displayGeoName={displayGeoName}
-          tooltipId={tooltipId}
-          handleCircleClick={country => handleCircleClick(country, state, setState, setRuntimeData)}
-        />
-      )
+      geosJsx.push(<BubbleList runtimeData={data} />)
     }
 
     return geosJsx

@@ -40,6 +40,8 @@ type MapContext = {
   tooltipId: string
   legendMemo
   legendSpecialClassLastMemo
+  translate
+  scale
 }
 
 const ConfigContext = createContext({} as MapContext)
