@@ -45,6 +45,7 @@ import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
+import { addUIDs } from '../../../helpers'
 
 // Todo: move to useReducer, seperate files out.
 const EditorPanel = () => {
@@ -60,6 +61,7 @@ const EditorPanel = () => {
     state,
     tooltipId,
     runtimeData,
+    setPosition
   } = useContext<MapContext>(ConfigContext)
 
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
@@ -634,6 +636,9 @@ const EditorPanel = () => {
         }
         break
       case 'geoType':
+        addUIDs(state, state.columns.geo.name)
+        setPosition([0, 30])
+
         // If we're still working with default data, switch to the world default to show it as an example
         if (true === loadedDefault && 'world' === value) {
           loadConfig(worldDefaultConfig)
@@ -972,6 +977,7 @@ const EditorPanel = () => {
         })
         break
       case 'name':
+        addUIDs(state, state.columns.geo.name)
         setState({
           ...state,
           columns: {

@@ -125,7 +125,6 @@ const CdcMap = ({
 
   // hooks
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
-  const { handleSorting } = useFilters({ config: state, setConfig: setState })
   const { generateRuntimeLegend } = useGenerateRuntimeLegend(legendMemo, legendSpecialClassLastMemo)
   const { generateRuntimeFilters } = useGenerateRuntimeFilters(state)
   const { generateRuntimeData } = useGenerateRuntimeData(state)
@@ -160,16 +159,6 @@ const CdcMap = ({
       }
     }, 100)
   }, [filteredCountryCode])
-
-  /**
-   * Seems to be needed for switching between a selected single state
-   * and the full world map
-   */
-  useEffect(() => {
-    if (state.mapPosition) {
-      setPosition(state.mapPosition)
-    }
-  }, [state.mapPosition, setPosition])
 
   const handleDragStateChange = isDragging => {
     setIsDraggingAnnotation(isDragging)
@@ -340,13 +329,6 @@ const CdcMap = ({
   }, [state, container, runtimeData.init])
 
   useEffect(() => {
-    // When geotype changes - add UID
-    if (state.data && state.columns.geo.name) {
-      addUIDs(state, state.columns.geo.name)
-    }
-  }, [state])
-
-  useEffect(() => {
     // UID
     if (state.data && state.columns.geo.name && state.columns.geo.name !== state.data.fromColumn) {
       addUIDs(state, state.columns.geo.name)
@@ -414,7 +396,7 @@ const CdcMap = ({
     state.legend.additionalCategories,
     state,
     runtimeFilters
-  ]) // eslint-disable-line
+  ])
 
   useEffect(() => {
     reloadURLData()
@@ -433,6 +415,7 @@ const CdcMap = ({
   const { showDownloadImgButton, showDownloadPdfButton, headerColor, introText } = general
 
   let title = state.general.title
+
   if (isEditor) {
     if (!title || title === '') title = 'Map Title'
   }

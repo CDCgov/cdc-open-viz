@@ -42,6 +42,7 @@ type MapContext = {
   legendSpecialClassLastMemo
   translate
   scale
+  annotations
 }
 
 const ConfigContext = createContext({} as MapContext)
