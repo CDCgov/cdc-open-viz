@@ -7,13 +7,14 @@ import { DataRow } from '../types/MapConfig'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
 import { displayGeoName } from '../helpers'
-import { geoMercator, geoAlbersUsa } from 'd3-geo'
+import { geoMercator, geoAlbersUsa, type GeoProjection } from 'd3-geo'
 
 type BubbleListProps = {
   runtimeData: Object[]
+  customProjection?: GeoProjection
 }
 
-export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData }) => {
+export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProjection }) => {
   const { state, tooltipId, legendMemo, legendSpecialClassLastMemo, setFilteredCountryCode, translate, scale } =
     useContext(ConfigContext)
   const { columns, data, general, visual } = state
@@ -33,8 +34,10 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData }) => {
     try {
       if (geoType === 'world') return geoMercator()
       if (geoType === 'us') return geoAlbersUsa().translate([455, 250]) // translate is half of each svg x/y viewbox values
+      if (customProjection) return customProjection
+      throw new Error('No projection found in BubbleList component')
     } catch (e) {
-      console.error('No projection setup bubble types on this type of map.')
+      console.error(e)
     }
   }
 
