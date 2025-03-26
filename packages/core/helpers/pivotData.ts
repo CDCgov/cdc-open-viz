@@ -20,16 +20,16 @@ export const pivotData = (
   const columns = getColumns(data, columnName, pivot, excludeColumns)
   const newColumns = {}
   // there should be one row for every aggregate row
-  const aggregateRows = data.reduce((acc, row) => {
-    const key = getKeyFromRow(row, columns)
+  const aggregateRows = data.reduce((acc, row, index) => {
+    const key = getKeyFromRow(row, columns) + index
     if (!acc[key]) {
       acc[key] = {}
     }
     return acc
   }, {})
 
-  data.forEach(row => {
-    const key = getKeyFromRow(row, columns)
+  data.forEach((row, index) => {
+    const key = getKeyFromRow(row, columns) + index
     if (pivot.length > 1) {
       pivot.forEach(pivotColumn => {
         const toAdd = _.omit(row, [columnName, ...pivot])
