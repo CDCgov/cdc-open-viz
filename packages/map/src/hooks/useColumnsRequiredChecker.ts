@@ -6,7 +6,8 @@ const useColumnsRequiredChecker = () => {
   const { state, setRequiredColumns } = useContext(ConfigContext)
 
   const columnsRequiredChecker = () => {
-    const { primaryColumnName, geoColumnName } = useColumnNames()
+    const primaryColumnName = state.columns.primary.name
+    const geoColumnName = state.columns.geo.name
 
     let columnList = []
 
