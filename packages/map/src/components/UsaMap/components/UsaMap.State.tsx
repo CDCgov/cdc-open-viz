@@ -532,7 +532,7 @@ const UsaMap = () => {
     if (undefined === abbr) return null
 
     // HI background is always white since it is off to the side
-    if ((abbr === 'US-HI' && !general.displayAsHex) || Object.keys(offsets).includes(abbr)) {
+    if ((abbr === 'US-HI' && !general.displayAsHex) || (Object.keys(offsets).includes(abbr) && !general.displayAsHex)) {
       bgColor = '#FFF'
     }
     const { textColor, strokeColor } = outlinedTextColor(bgColor)
