@@ -26,29 +26,24 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
 
   useEffect(() => {
     fetchGeoJSONLayers()
-  }, []) //eslint-disable-line
+  }, [])
 
   useEffect(() => {
     fetchGeoJSONLayers()
-  }, [config.map.layers]) //eslint-disable-line
+  }, [config.map.layers])
 
   useEffect(() => {
     if (pathGenerator) {
       generateCustomLayers()
     }
-  }, [fetchedTopoJSON]) //eslint-disable-line
+  }, [fetchedTopoJSON])
 
   const fetchGeoJSONLayers = async () => {
-    let geos = await getMapTopoJSONLayers()
+    const geos = await getMapTopoJSONLayers()
     setFetchedTopoJSON(geos)
   }
 
-  /**
-   * Removes a custom map layer from the config.
-   * @param { Event } e Remove onclick event
-   * @param { Integer } index index of layer to remove
-   */
-  const handleRemoveLayer = (e, index) => {
+  const handleRemoveLayer = (e: Event, index: number) => {
     e.preventDefault()
 
     const updatedState = {
@@ -62,11 +57,7 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
     setConfig(updatedState)
   }
 
-  /**
-   * Adds a new custom map layer to the config
-   * @param { Event } e Add onclick event
-   */
-  const handleAddLayer = e => {
+  const handleAddLayer = (e: Event) => {
     e.preventDefault()
     const updatedState = {
       ...config,
@@ -84,7 +75,7 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
     setConfig(updatedState)
   }
 
-  const handleMapLayer = (e, index, layerKey) => {
+  const handleMapLayer = (e: Event, index: number, layerKey: string) => {
     e.preventDefault()
 
     let layerValue = e.target.value
@@ -117,7 +108,7 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
     for (const mapLayer of config.map.layers) {
       let newLayerItem = await fetch(mapLayer.url)
         .then(res => res.json())
-        .catch(e => console.warn('error with newLayer item'))
+        .catch(e => console.warn('error with newLayer item', e))
       if (!newLayerItem) newLayerItem = []
       TopoJSONObjects.push(newLayerItem)
     }
@@ -149,7 +140,10 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
         // feature array for county maps
         tempFeatureArray.push(item)
         tempArr.push(
-          <Group className={layerClasses.join(' ')} key={`customMapLayer-${item.properties.name.replace(' ', '-')}-${index}`}>
+          <Group
+            className={layerClasses.join(' ')}
+            key={`customMapLayer-${item.properties.name.replace(' ', '-')}-${index}`}
+          >
             {/* prettier-ignore */}
             <path
               d={pathGenerator(item)}

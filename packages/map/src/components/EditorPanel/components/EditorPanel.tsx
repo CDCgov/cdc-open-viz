@@ -219,7 +219,7 @@ const EditorPanel = () => {
       if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
         handleEditorChanges('changeLegendDescription', [String(activeFilterValueForDescription), debouncedValue])
       }
-    }, [debouncedValue]) // eslint-disable-line
+    }, [debouncedValue])
 
     const onChange = e => setValue(e.target.value)
 
