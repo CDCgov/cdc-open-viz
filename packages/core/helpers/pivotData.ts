@@ -19,17 +19,25 @@ export const pivotData = (
 ): Record<string, any>[] => {
   const columns = getColumns(data, columnName, pivot, excludeColumns)
   const newColumns = {}
+  data.map(row => {
+    newColumns[row[columnName]] = ''
+  })
+  // if there is only one column header, we need to avoid duplicate values overwriting each other other values in the row
+  const isSingleColumn = Object.keys(newColumns).length === 1
+
   // there should be one row for every aggregate row
-  const aggregateRows = data.reduce((acc, row) => {
-    const key = getKeyFromRow(row, columns)
+  const aggregateRows = data.reduce((acc, row, index) => {
+    const keyIndex = isSingleColumn ? index : ''
+    const key = getKeyFromRow(row, columns) + keyIndex
     if (!acc[key]) {
       acc[key] = {}
     }
     return acc
   }, {})
 
-  data.forEach(row => {
-    const key = getKeyFromRow(row, columns)
+  data.forEach((row, index) => {
+    const keyIndex = isSingleColumn ? index : ''
+    const key = getKeyFromRow(row, columns) + keyIndex
     if (pivot.length > 1) {
       pivot.forEach(pivotColumn => {
         const toAdd = _.omit(row, [columnName, ...pivot])
@@ -50,8 +58,6 @@ export const pivotData = (
         _pivotedFrom: _pivot
       }
     }
-
-    newColumns[row[columnName]] = ''
   })
 
   if (pivot.length > 1) {
