@@ -12,7 +12,7 @@ const remapTableDownloadCSV = config => {
 const update_4_25_3 = config => {
   const ver = '4.25.3'
   const newConfig = _.cloneDeep(config)
-  remapTableDownloadCSV
+  remapTableDownloadCSV(newConfig)
   newConfig.version = ver
   return newConfig
 }
