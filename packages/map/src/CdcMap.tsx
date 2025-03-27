@@ -89,7 +89,7 @@ const CdcMap = ({
   const [loading, setLoading] = useState<boolean>(true)
   const [modal, setModal] = useState(null)
   const [projection, setProjection] = useState(null)
-  const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
+  const [requiredColumns, setRequiredColumns] = useState<string[]>(null) // Simple state so we know if we need more information before parsing the map
   const [runtimeData, setRuntimeData] = useState({ init: true })
   const [runtimeFilters, setRuntimeFilters] = useState([])
   const [runtimeLegend, setRuntimeLegend] = useState(null)
@@ -98,8 +98,8 @@ const CdcMap = ({
   const [stateToShow, setStateToShow] = useState(null)
   const [topoData, setTopoData] = useState<{}>({})
   const [translate, setTranslate] = useState([0, 0])
-
   const [position, setPosition] = useState(state.mapPosition)
+
   const _setRuntimeData = (data: any) => {
     if (config) {
       setRuntimeData(data)
