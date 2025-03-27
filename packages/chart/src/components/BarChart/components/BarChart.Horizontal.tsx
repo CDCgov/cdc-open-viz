@@ -120,18 +120,17 @@ export const BarChartHorizontal = () => {
                   const defaultBarWidth = Math.abs(xScale(bar.value) - xScale(scaleVal))
                   const isPositiveBar = bar.value >= 0 && isNumber(bar.value)
 
-                  const {
-                    barWidthHorizontal: barWidth,
-                    isSuppressed,
-                    getAbsentDataLabel
-                  } = getBarConfig({ bar, defaultBarWidth, config, isNumber, isVertical: false })
                   const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const yAxisValue = formatNumber(bar.value, 'left')
                   const xAxisValue =
                     config.runtime[section].type === 'date' ? formatDate(parseDate(dataValue)) : dataValue
-
+                  const {
+                    barWidthHorizontal: barWidth,
+                    isSuppressed,
+                    absentDataLabel
+                  } = getBarConfig({ bar, defaultBarWidth, config, isNumber, isVertical: false, yAxisValue })
                   const barPosition = !isPositiveBar ? 'below' : 'above'
-                  const absentDataLabel = getAbsentDataLabel(yAxisValue)
+
                   const barDefaultLabel = !config.yAxis.displayNumbersOnBar ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
@@ -192,7 +191,7 @@ export const BarChartHorizontal = () => {
                     ? highlightedBar.borderWidth
                     : config.isLollipopChart
                     ? 0
-                    : config.barHasBorder === 'true'
+                    : config.barHasBorder === 'true' && !absentDataLabel && !isSuppressed
                     ? barBorderWidth
                     : 0
                   const displaylollipopShape = testZeroValue(bar.value) ? 'none' : 'block'
