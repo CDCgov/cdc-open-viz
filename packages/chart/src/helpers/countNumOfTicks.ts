@@ -25,7 +25,7 @@ export const countNumOfTicks = ({ axis, max, runtime, currentViewport, isHorizon
     }
     if (Number(tickCount) > Number(max) && !isHorizontal) {
       // cap it and round it so its an integer
-      tickCount = Number(min) < 0 ? Math.round(max) * 2 : Math.round(max)
+      tickCount = Math.max(2, Number(min) < 0 ? Math.round(max) * 2 : Math.round(max))
     }
   }
 
