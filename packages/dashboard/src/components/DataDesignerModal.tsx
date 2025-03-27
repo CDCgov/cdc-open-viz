@@ -29,20 +29,16 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
   const [errorMessage, setErrorMessage] = useState('')
   const [loadingAPIData, setLoadingAPIData] = useState(false)
 
+  const dataIsOnVisualization = useMemo(() => {
+    return vizKey && !useRow
+  }, [vizKey, useRow])
+
   const configureData = useMemo(() => {
-    if (vizKey && !useRow) {
+    if (dataIsOnVisualization) {
       return config.visualizations[vizKey]
     }
     return config.rows[rowIndex]
-  }, [config.visualizations, config.rows, vizKey, rowIndex, useRow])
-
-  const updateConfigureData = (newConfigureData: Partial<ConfigureData>) => {
-    if (vizKey && !useRow) {
-      dispatch({ type: 'UPDATE_VISUALIZATION', payload: { vizKey, configureData: newConfigureData } })
-    } else {
-      dispatch({ type: 'UPDATE_ROW', payload: { rowIndex, rowData: newConfigureData } })
-    }
-  }
+  }, [config.visualizations, config.rows, rowIndex, dataIsOnVisualization])
 
   const fetchData = async datasetKey => {
     const { data, dataUrl } = config.datasets[datasetKey]
@@ -65,12 +61,70 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
     return newData
   }
 
-  const changeDataset = async ({ target: { value } }) => {
-    const newData = await fetchData(value)
-    const newConfigureData = { dataDescription: {}, formattedData: undefined, dataKey: value, data: newData }
-
-    updateConfigureData(newConfigureData)
+  const removeDataset = (newConfigureData: ConfigureData) => {
+    delete newConfigureData.data
+    delete newConfigureData.dataKey
+    delete newConfigureData.dataDescription
+    delete newConfigureData.formattedData
   }
+
+  const updateConfigureData = (newConfigureData: Partial<ConfigureData>, updateViz = false) => {
+    if (updateViz) {
+      dispatch({ type: 'UPDATE_VISUALIZATION', payload: { vizKey, configureData: newConfigureData } })
+    } else {
+      dispatch({ type: 'UPDATE_ROW', payload: { rowIndex, rowData: newConfigureData } })
+    }
+  }
+
+  const removeDatasetsFromVisualizations = () => {
+    const columnVisualizations = config.rows[rowIndex].columns.map(column => column.widget).filter(Boolean)
+    columnVisualizations.forEach(currentVisualizationKey => {
+      const viz = _.cloneDeep(config.visualizations[currentVisualizationKey]) as ConfigureData
+      removeDataset(viz)
+      dispatch({ type: 'UPDATE_VISUALIZATION', payload: { vizKey: currentVisualizationKey, configureData: viz } })
+    })
+  }
+
+  const changeDataset = async ({ target: { value } }, updateViz = dataIsOnVisualization) => {
+    if (!updateViz) removeDatasetsFromVisualizations()
+    //const cachedData = config.datasets[value]
+    const newData = value === '' ? {} : await fetchData(value)
+    const newConfigureData = {
+      dataDescription: {},
+      formattedData: undefined,
+      dataKey: value,
+      data: newData
+    } as ConfigureData
+    if (updateViz) {
+      dispatch({ type: 'UPDATE_VISUALIZATION', payload: { vizKey, configureData: newConfigureData } })
+    } else {
+      dispatch({ type: 'UPDATE_ROW', payload: { rowIndex, rowData: newConfigureData } })
+    }
+  }
+
+  // const changeDataset = async ({ target: { value } }) => {
+
+  //   const noValueSelected = value === ''
+  //   let newConfigureData
+  //   if (noValueSelected) {
+  //     newConfigureData = removeDataset(config.rows[rowIndex])
+  //   } else {
+  //     const newData = await fetchData(value)
+  //     newConfigureData = {
+  //       dataDescription: {},
+  //       formattedData: undefined,
+  //       dataKey: value,
+  //       data: newData
+  //     } as ConfigureData
+  //   }
+
+  //   const columnWidgets = config.rows[rowIndex].columns.filter(column => column.widget).map(column => column.widget)
+  //   if (!vizKey) {
+  //     columnWidgets.forEach(currentWidgetKey => removeDataset(config.visualizations[currentWidgetKey] as ConfigureData))
+  //   }
+
+  //   updateConfigureData(newConfigureData)
+  // }
 
   const updateDescriptionProp = async (key, value) => {
     const datasetKey = configureData.dataKey
@@ -112,12 +166,13 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
               Object.keys(config.datasets).map(datasetKey => <option key={datasetKey}>{datasetKey}</option>)}
           </select>
           {vizKey && (
+            // only shows for visualizations
             <CheckBox
               label='Apply To Row'
               value={useRow}
               updateField={(section, subsection, fieldName, value) => {
                 setUseRow(value)
-                changeDataset({ target: { value: '' } })
+                changeDataset({ target: { value: configureData.dataKey } }, false)
               }}
             />
           )}
