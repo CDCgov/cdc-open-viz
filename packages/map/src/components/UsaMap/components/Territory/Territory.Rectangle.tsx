@@ -108,7 +108,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                 style={{
                   fill: patternData ? 'white' : 'black',
                   stroke: patternData ? 'black' : textColor,
-                  strokeWidth: patternData ? 6 : 0
+                  strokeWidth: 1
                 }}
                 className='territory-text'
                 paint-order='stroke'
