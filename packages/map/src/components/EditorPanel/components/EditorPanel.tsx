@@ -45,14 +45,11 @@ import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
-import { addUIDs } from '../../../helpers'
+import { addUIDs, HEADER_COLORS } from '../../../helpers'
 
-// Todo: move to useReducer, seperate files out.
 const EditorPanel = () => {
-  // prettier-ignore
   const {
     isDashboard,
-    isDebug,
     loadConfig,
     runtimeFilters,
     runtimeLegend,
@@ -73,20 +70,6 @@ const EditorPanel = () => {
   const [displayPanel, setDisplayPanel] = useState(true)
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
 
-  const headerColors = [
-    'theme-blue',
-    'theme-purple',
-    'theme-brown',
-    'theme-teal',
-    'theme-pink',
-    'theme-orange',
-    'theme-slate',
-    'theme-indigo',
-    'theme-cyan',
-    'theme-green',
-    'theme-amber'
-  ]
-
   const {
     // prettier-ignore
     MapLayerHandlers: {
@@ -98,11 +81,8 @@ const EditorPanel = () => {
 
   const categoryMove = (idx1, idx2) => {
     let categoryValuesOrder = getCategoryValuesOrder()
-
     let [movedItem] = categoryValuesOrder.splice(idx1, 1)
-
     categoryValuesOrder.splice(idx2, 0, movedItem)
-
     state.legend.categoryValuesOrder?.forEach(value => {
       if (categoryValuesOrder.indexOf(value) === -1) {
         categoryValuesOrder.push(value)
@@ -1148,6 +1128,7 @@ const EditorPanel = () => {
   }
 
   const isReversed = state.general.palette.isReversed
+
   function filterColorPalettes() {
     let sequential = []
     let nonSequential = []
@@ -1191,7 +1172,6 @@ const EditorPanel = () => {
 
   useEffect(() => {
     setLoadedDefault(state.defaultData)
-
     columnsRequiredChecker()
   }, [state])
 
@@ -1240,8 +1220,6 @@ const EditorPanel = () => {
     })
   }
 
-  const usedFilterColumns = {}
-
   const StateOptionList = () => {
     const arrOfArrays = Object.entries(supportedStatesFipsCodes)
 
@@ -1270,21 +1248,6 @@ const EditorPanel = () => {
       })
     })
   }
-
-  useEffect(() => {
-    const parsedData = convertStateToConfig()
-    const formattedData = JSON.stringify(parsedData, undefined, 2)
-
-    setConfigTextbox(formattedData)
-  }, [state]) // eslint-disable-line
-
-  useEffect(() => {
-    // Pass up to Editor if needed
-    if (setParentConfig) {
-      const newConfig = convertStateToConfig()
-      setParentConfig(newConfig)
-    }
-  }, [state]) // eslint-disable-line
 
   let numberOfItemsLimit = 8
 
@@ -2970,7 +2933,7 @@ const EditorPanel = () => {
               <label>
                 <span className='edit-label'>Header Theme</span>
                 <ul className='color-palette'>
-                  {headerColors.map(palette => {
+                  {HEADER_COLORS.map(palette => {
                     return (
                       <li
                         title={palette}
