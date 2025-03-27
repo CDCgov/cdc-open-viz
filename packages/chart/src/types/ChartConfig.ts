@@ -80,7 +80,7 @@ type Exclusions = {
 
 export type Legend = CoreLegend & {
   seriesHighlight: string[]
-  unified: boolean
+
   hideSuppressionLink: boolean
   style: 'circles' | 'boxes' | 'gradient' | 'lines'
   subStyle: 'linear blocks' | 'smooth'
