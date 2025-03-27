@@ -20,7 +20,6 @@ type CityListProps = {
 }
 
 const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValueSupported, tooltipId, projection }) => {
-  const [citiesData, setCitiesData] = useState({})
   const { state, topoData, runtimeData, position, legendMemo, legendSpecialClassLastMemo } = useContext(ConfigContext)
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { geoColumnName, latitudeColumnName, longitudeColumnName, primaryColumnName } = useColumnNames()
@@ -31,18 +30,13 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
 
-  useEffect(() => {
-    const citiesDictionary = {}
-
-    if (runtimeData) {
-      Object.keys(runtimeData).forEach(key => {
+  const citiesData = runtimeData
+    ? Object.keys(runtimeData).reduce((acc, key) => {
         const city = runtimeData[key]
-        citiesDictionary[city[geoColumnName]] = city
-      })
-    }
-
-    setCitiesData(citiesDictionary)
-  }, [runtimeData])
+        acc[city[geoColumnName]] = city
+        return acc
+      }, {})
+    : {}
 
   if (state.general.type === 'bubble') {
     const maxDataValue = Math.max(
