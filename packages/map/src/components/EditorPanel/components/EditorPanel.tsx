@@ -2819,6 +2819,18 @@ const EditorPanel = () => {
                     max='500'
                   />
                 )}
+
+                <TextField
+                  value={table.cellMinWidth}
+                  updateField={updateField}
+                  section='table'
+                  fieldName='cellMinWidth'
+                  label='Table Cell Min Width'
+                  type='number'
+                  min='0'
+                  max='500'
+                />
+
                 <label className='checkbox'>
                   <input
                     type='checkbox'
