@@ -116,10 +116,10 @@ $medium: 768px;
     transition: 0.3s all;
 
     text {
-      font-size: var(--territories-text-font-size);
+      font-size: var(--territory-label-font-size);
       font-weight: 900;
-      //stroke: #fff;
-      //stroke-width: 0.056rem;
+      stroke: #fff;
+      stroke-width: 0.056rem;
     }
   }
 }
