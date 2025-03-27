@@ -280,6 +280,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       newConfig.series.forEach(series => {
         newConfig.runtime.areaSeriesKeys.push({ ...series, type: 'Area Chart' })
       })
+      newConfig.visualizationSubType = 'stacked'
     }
 
     if (
