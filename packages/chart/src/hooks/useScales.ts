@@ -22,6 +22,8 @@ const scaleTypes = {
   BAND: 'band'
 }
 
+export const TOP_PADDING = 10
+
 type useScaleProps = {
   config: ChartConfig // standard chart config
   data: Object[] // standard data array
@@ -392,7 +394,7 @@ const composeYScale = ({ min, max, yMax, config, leftMax }) => {
 
   // If the visualization type is a bump chart then the domain and range need different values
   const domainSet = config.visualizationType === 'Bump Chart' ? [1, max] : [min, max]
-  const yRange = config.visualizationType === 'Bump Chart' ? [30, yMax] : [yMax, 0]
+  const yRange = config.visualizationType === 'Bump Chart' ? [30, yMax] : [yMax, TOP_PADDING]
   // Return the configured scale function
   return scaleFunc({
     domain: domainSet,
