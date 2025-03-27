@@ -1190,23 +1190,10 @@ const EditorPanel = () => {
   const [sequential, nonSequential, accessibleColors] = filterColorPalettes()
 
   useEffect(() => {
-    let paletteName = ''
-    if (isReversed && !state.color.endsWith('reverse')) {
-      paletteName = state.color + 'reverse'
-    }
-    if (!isReversed && state.color.endsWith('reverse')) {
-      paletteName = state.color.slice(0, -7)
-    }
-    if (paletteName) {
-      handleEditorChanges('color', paletteName)
-    }
-  }, [isReversed])
-
-  useEffect(() => {
     setLoadedDefault(state.defaultData)
 
     columnsRequiredChecker()
-  }, [state]) // eslint-disable-line
+  }, [state])
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -3042,7 +3029,21 @@ const EditorPanel = () => {
                 fieldName='isReversed'
                 size='small'
                 label='Use selected palette in reverse order'
-                updateField={updateField}
+                onClick={() => {
+                  const _state = _.cloneDeep(state)
+                  _state.general.palette.isReversed = !_state.general.palette.isReversed
+                  let paletteName = ''
+                  if (_state.general.palette.isReversed && !state.color.endsWith('reverse')) {
+                    paletteName = state.color + 'reverse'
+                  }
+                  if (!_state.general.palette.isReversed && state.color.endsWith('reverse')) {
+                    paletteName = state.color.slice(0, -7)
+                  }
+                  if (paletteName) {
+                    _state.color = paletteName
+                  }
+                  setState(_state)
+                }}
                 value={state.general.palette.isReversed}
               />
               <span>Sequential</span>
