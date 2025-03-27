@@ -74,6 +74,7 @@ export type DataRow = {
 }
 
 export type MapConfig = Visualization & {
+  annotations: Annotation[]
   // map color palette
   color: string
   // custom color palette

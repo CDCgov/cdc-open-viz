@@ -20,11 +20,7 @@ import { titleCase, handleMapAriaLabels, getGeoStrokeColor } from '../../../help
 import { getTopoData, getCurrentTopoYear, isTopoReady } from './../helpers/map'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
-
-// SVG ITEMS
-const WIDTH = 880
-const HEIGHT = 500
-const PADDING = 25
+import { SVG_WIDTH, SVG_HEIGHT, SVG_PADDING, SVG_VIEWBOX } from '../../../helpers'
 
 const SingleStateMap = props => {
   const {
@@ -48,7 +44,7 @@ const SingleStateMap = props => {
   const { geoClickHandler } = useGeoClickHandler()
 
   const cityListProjection = geoAlbersUsaTerritories()
-    .translate([WIDTH / 2, HEIGHT / 2])
+    .translate([SVG_WIDTH / 2, SVG_HEIGHT / 2])
     .scale(1)
   const geoStrokeColor = getGeoStrokeColor(state)
   const path = geoPath().projection(projection)
@@ -69,7 +65,7 @@ const SingleStateMap = props => {
 
   if (!isTopoReady(topoData, state, runtimeFilters)) {
     return (
-      <div style={{ height: `${HEIGHT}px` }}>
+      <div style={{ height: `${SVG_HEIGHT}px` }}>
         <Loading />
       </div>
     )
@@ -129,7 +125,7 @@ const SingleStateMap = props => {
     <ErrorBoundary component='SingleStateMap'>
       {statePicked && state.general.allowMapZoom && state.general.statePicked.fipsCode && (
         <svg
-          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+          viewBox={SVG_VIEWBOX}
           preserveAspectRatio='xMinYMin'
           className='svg-container'
           role='img'
@@ -142,13 +138,13 @@ const SingleStateMap = props => {
             maxZoom={4} // Adjust this value to limit the maximum zoom level
             onMoveEnd={handleMoveEnd}
             projection={projection}
-            width={880}
-            height={500}
+            width={SVG_WIDTH}
+            height={SVG_HEIGHT}
           >
             <rect
               className='background center-container ocean'
-              width={WIDTH}
-              height={HEIGHT}
+              width={SVG_WIDTH}
+              height={SVG_HEIGHT}
               fillOpacity={1}
               fill='white'
             ></rect>
@@ -162,8 +158,8 @@ const SingleStateMap = props => {
               projection={geoAlbersUsaTerritories}
               fitExtent={[
                 [
-                  [PADDING, PADDING],
-                  [WIDTH - PADDING, HEIGHT - PADDING]
+                  [SVG_PADDING, SVG_PADDING],
+                  [SVG_WIDTH - SVG_PADDING, SVG_HEIGHT - SVG_PADDING]
                 ],
                 stateToShow
               ]}
@@ -190,7 +186,7 @@ const SingleStateMap = props => {
       )}
       {statePicked && !state.general.allowMapZoom && state.general.statePicked.fipsCode && (
         <svg
-          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+          viewBox={SVG_VIEWBOX}
           preserveAspectRatio='xMinYMin'
           className='svg-container'
           role='img'
@@ -198,8 +194,8 @@ const SingleStateMap = props => {
         >
           <rect
             className='background center-container ocean'
-            width={WIDTH}
-            height={HEIGHT}
+            width={SVG_WIDTH}
+            height={SVG_HEIGHT}
             fillOpacity={1}
             fill='white'
           ></rect>
@@ -213,8 +209,8 @@ const SingleStateMap = props => {
             projection={geoAlbersUsaTerritories}
             fitExtent={[
               [
-                [PADDING, PADDING],
-                [WIDTH - PADDING, HEIGHT - PADDING]
+                [SVG_PADDING, SVG_PADDING],
+                [SVG_WIDTH - SVG_PADDING, SVG_HEIGHT - SVG_PADDING]
               ],
               stateToShow
             ]}
@@ -241,7 +237,7 @@ const SingleStateMap = props => {
 
       {checkForNoData() && (
         <svg
-          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+          viewBox={SVG_VIEWBOX}
           preserveAspectRatio='xMinYMin'
           className='svg-container'
           role='img'
@@ -250,9 +246,9 @@ const SingleStateMap = props => {
           <Text
             verticalAnchor='start'
             textAnchor='middle'
-            x={WIDTH / 2}
-            width={WIDTH}
-            y={HEIGHT / 2}
+            x={SVG_WIDTH / 2}
+            width={SVG_WIDTH}
+            y={SVG_HEIGHT / 2}
             fontSize={18}
             style={{ fontSize: '28px', height: '18px' }}
           >
