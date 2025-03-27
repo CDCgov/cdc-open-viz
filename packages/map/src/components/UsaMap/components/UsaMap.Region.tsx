@@ -1,4 +1,4 @@
-import { useState, useEffect, memo, useContext } from 'react'
+import React, { memo, useContext, useEffect, useState } from 'react'
 
 // 3rd party
 import { geoCentroid } from 'd3-geo'
@@ -15,12 +15,24 @@ import { supportedTerritories } from '../../../data/supported-geos'
 
 // Helpers
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
-import { displayGeoName, handleMapAriaLabels, getGeoStrokeColor, getGeoFillColor, SVG_VIEWBOX } from '../../../helpers'
+import { displayGeoName, getGeoFillColor, getGeoStrokeColor, handleMapAriaLabels, SVG_VIEWBOX } from '../../../helpers'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 
-const Rect = ({ label, text, stroke, strokeWidth, ...props }) => {
+type TerritoryRectProps = {
+  posX?: number
+  tName: string
+}
+
+type RectProps = {
+  label: string
+  text: string
+  stroke: string
+  strokeWidth: number
+}
+
+const Rect: React.FC<RectProps> = ({ label, text, stroke, strokeWidth, ...props }) => {
   return (
     <svg viewBox='0 0 45 28'>
       <g {...props} strokeLinejoin='round'>
@@ -37,23 +49,18 @@ const Rect = ({ label, text, stroke, strokeWidth, ...props }) => {
   )
 }
 
-const UsaRegionMap = props => {
-  // prettier-ignore
-  const {
-    data,
-    state,
-    tooltipId,
-    legendMemo,
-    legendSpecialClassLastMemo
-  } = useContext(ConfigContext)
-
-  // "Choose State" options
-  const [extent, setExtent] = useState(null)
+const UsaRegionMap = () => {
+  const { data, state, tooltipId, legendMemo, legendSpecialClassLastMemo } = useContext(ConfigContext)
   const [focusedStates, setFocusedStates] = useState(null)
-  const [translate, setTranslate] = useState([455, 200])
   const { geoClickHandler } = useGeoClickHandler()
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
+  const { general } = state
+  const { displayStateLabels, territoriesLabel, displayAsHex, type } = general
+  const tooltipInteractionType = state.tooltips.appearanceType
+  const isHex = displayAsHex
+  const [territoriesData, setTerritoriesData] = useState([])
+  const CIRCLE_RADIUS = 15
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,16 +70,6 @@ const UsaRegionMap = props => {
     }
     fetchData()
   }, [])
-
-  // When returning from another map we want to reset the state
-  useEffect(() => {
-    setTranslate([455, 250])
-    setExtent(null)
-  }, [state.general.geoType])
-
-  const isHex = state.general.displayAsHex
-
-  const [territoriesData, setTerritoriesData] = useState([])
 
   const territoriesKeys = Object.keys(supportedTerritories) // data will have already mapped abbreviated territories to their full names
 
@@ -95,7 +92,7 @@ const UsaRegionMap = props => {
 
     const territoryData = data[territory]
 
-    let toolTip
+    let toolTip: string
 
     let styles: React.CSSProperties = {
       fill: geoFillColor,
@@ -108,7 +105,7 @@ const UsaRegionMap = props => {
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
-    const legendColors = applyLegendToRow(territoryData, state)
+    const legendColors = applyLegendToRow(territoryData)
 
     if (legendColors) {
       const textColor = getContrastColor('#FFF', legendColors[0])
@@ -118,7 +115,7 @@ const UsaRegionMap = props => {
       // If we need to add a pointer cursor
       if (
         (state.columns.navigate && territoryData[state.columns.navigate.name]) ||
-        state.tooltips.appearanceType === 'click'
+        tooltipInteractionType === 'click'
       ) {
         needsPointer = true
       }
@@ -157,8 +154,6 @@ const UsaRegionMap = props => {
 
     if (undefined === abbr) return null
 
-    const textColor = getContrastColor('#FFF', bgColor)
-
     let x = 0,
       y = 5
 
@@ -188,9 +183,7 @@ const UsaRegionMap = props => {
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
-    let showLabel = state.general.displayStateLabels
-
-    const geosJsx = geographies.map(({ feature: geo, path = '', index }) => {
+    return geographies.map(({ feature: geo, path = '', index }) => {
       const key = isHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
 
       let styles = {
@@ -201,8 +194,6 @@ const UsaRegionMap = props => {
       // Map the name from the geo data with the appropriate key for the processed data
       let geoKey = geo.properties.iso
 
-      // Manually add Washington D.C. in for Hex maps
-
       if (!geoKey) return
 
       const geoData = data[geoKey]
@@ -210,7 +201,7 @@ const UsaRegionMap = props => {
       let legendColors
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
-        legendColors = applyLegendToRow(geoData, state)
+        legendColors = applyLegendToRow(geoData)
       }
 
       const geoDisplayName = displayGeoName(geoKey)
@@ -220,25 +211,22 @@ const UsaRegionMap = props => {
         const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
 
         styles = {
-          fill: state.general.type !== 'bubble' ? legendColors[0] : geoFillColor,
+          fill: type !== 'bubble' ? legendColors[0] : geoFillColor,
           cursor: 'default',
           '&:hover': {
-            fill: state.general.type !== 'bubble' ? legendColors[1] : geoFillColor
+            fill: type !== 'bubble' ? legendColors[1] : geoFillColor
           },
           '&:active': {
-            fill: state.general.type !== 'bubble' ? legendColors[2] : geoFillColor
+            fill: type !== 'bubble' ? legendColors[2] : geoFillColor
           }
         }
 
         // When to add pointer cursor
-        if (
-          (state.columns.navigate && geoData[state.columns.navigate.name]) ||
-          state.tooltips.appearanceType === 'click'
-        ) {
+        if ((state.columns.navigate && geoData[state.columns.navigate.name]) || tooltipInteractionType === 'click') {
           styles.cursor = 'pointer'
         }
 
-        const TerratoryRect = props => {
+        const TerritoryRect: React.FC<TerritoryRectProps> = props => {
           const { posX = 0, tName } = props
           const textColor = getContrastColor('#FFF', legendColors[0])
           const geoStrokeColor = getGeoStrokeColor(state)
@@ -252,8 +240,6 @@ const UsaRegionMap = props => {
           )
         }
 
-        const circleRadius = 15
-
         return (
           <g
             key={key}
@@ -266,29 +252,29 @@ const UsaRegionMap = props => {
           >
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1} d={path} />
             <g id={`region-${index + 1}-label`}>
-              <circle fill='#fff' stroke='#999' cx={circleRadius} cy={circleRadius} r={circleRadius} />
+              <circle fill='#fff' stroke='#999' cx={CIRCLE_RADIUS} cy={CIRCLE_RADIUS} r={CIRCLE_RADIUS} />
               <text fill='#333' x='15px' y='20px' textAnchor='middle'>
                 {index + 1}
               </text>
             </g>
             {geoKey === 'region 2' && (
               <g id='region-2-territories'>
-                <TerratoryRect tName='PR' />
-                <TerratoryRect posX={45} tName='VI' />
+                <TerritoryRect tName='PR' />
+                <TerritoryRect posX={45} tName='VI' />
               </g>
             )}
 
             {geoKey === 'region 9' && (
               <g id='region-9-territories'>
                 <g className='region-9-row1'>
-                  <TerratoryRect tName='AS' />
-                  <TerratoryRect posX={45} tName='GU' />
-                  <TerratoryRect posX={90} tName='MP' />
+                  <TerritoryRect tName='AS' />
+                  <TerritoryRect posX={45} tName='GU' />
+                  <TerritoryRect posX={90} tName='MP' />
                 </g>
                 <g className='region-9-row2'>
-                  <TerratoryRect tName='FM' />
-                  <TerratoryRect posX={45} tName='PW' />
-                  <TerratoryRect posX={90} tName='MH' />
+                  <TerritoryRect tName='FM' />
+                  <TerritoryRect posX={45} tName='PW' />
+                  <TerritoryRect posX={90} tName='MH' />
                 </g>
               </g>
             )}
@@ -300,11 +286,10 @@ const UsaRegionMap = props => {
       return (
         <g key={key} className='geo-group' style={styles}>
           <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1} d={path} />
-          {(isHex || showLabel) && geoLabel(geo, styles.fill, projection)}
+          {(isHex || displayStateLabels) && geoLabel(geo, styles.fill, projection)}
         </g>
       )
     })
-    return geosJsx
   }
 
   return (
@@ -317,7 +302,7 @@ const UsaRegionMap = props => {
       </svg>
       {territories.length > 0 && (
         <section className='territories'>
-          <span className='label'>{state.general.territoriesLabel}</span>
+          <span className='label'>{territoriesLabel}</span>
           {territories}
         </section>
       )}
