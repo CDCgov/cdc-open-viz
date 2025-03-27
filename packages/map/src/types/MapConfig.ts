@@ -169,6 +169,7 @@ export type MapConfig = Visualization & {
     forceDisplay: boolean
     download: boolean
     indexLabel: string
+    cellMinWidth: string
   }
   tooltips: {
     appearanceType: 'hover' | 'click'
