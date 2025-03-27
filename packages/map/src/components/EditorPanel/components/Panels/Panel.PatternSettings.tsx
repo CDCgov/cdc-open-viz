@@ -77,7 +77,7 @@ const PatternSettings = ({ name }: PanelProps) => {
       const geoKey = geo.properties.iso
       if (!geoKey || !runtimeData) return
 
-      const legendColors = runtimeData[geoKey] ? applyLegendToRow(runtimeData[geoKey]) : undefined
+      const legendColors = runtimeData[geoKey] ? applyLegendToRow(runtimeData[geoKey], state) : undefined
       const geoData = runtimeData[geoKey]
       if (!geoData) return
 

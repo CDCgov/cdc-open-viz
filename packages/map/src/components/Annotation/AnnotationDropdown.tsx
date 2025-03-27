@@ -6,7 +6,7 @@ import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
 import AnnotationList from './AnnotationList'
 
 const AnnotationDropdown = () => {
-  const { state: config, isEditor, currentViewport: viewport } = useContext(ConfigContext)
+  const { state: config, currentViewport: viewport } = useContext(ConfigContext)
   const [expanded, setExpanded] = useState(false)
 
   const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${appFontSize}px`

@@ -15,8 +15,10 @@ import { supportedTerritories } from '../../../data/supported-geos'
 
 // Helpers
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
-import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
-import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
+import { displayGeoName, handleMapAriaLabels, getGeoStrokeColor, getGeoFillColor } from '../../../helpers'
+import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
+import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
+import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 
 const Rect = ({ label, text, stroke, strokeWidth, ...props }) => {
   return (
@@ -38,19 +40,20 @@ const Rect = ({ label, text, stroke, strokeWidth, ...props }) => {
 const UsaRegionMap = props => {
   // prettier-ignore
   const {
-    applyLegendToRow,
-    applyTooltipsToGeo,
     data,
-    displayGeoName,
-    geoClickHandler,
     state,
-    tooltipId
+    tooltipId,
+    legendMemo,
+    legendSpecialClassLastMemo
   } = useContext(ConfigContext)
 
   // "Choose State" options
   const [extent, setExtent] = useState(null)
   const [focusedStates, setFocusedStates] = useState(null)
   const [translate, setTranslate] = useState([455, 200])
+  const { geoClickHandler } = useGeoClickHandler()
+  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
+  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -105,7 +108,7 @@ const UsaRegionMap = props => {
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
-    const legendColors = applyLegendToRow(territoryData)
+    const legendColors = applyLegendToRow(territoryData, state)
 
     if (legendColors) {
       const textColor = getContrastColor('#FFF', legendColors[0])
@@ -207,7 +210,7 @@ const UsaRegionMap = props => {
       let legendColors
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
-        legendColors = applyLegendToRow(geoData)
+        legendColors = applyLegendToRow(geoData, state)
       }
 
       const geoDisplayName = displayGeoName(geoKey)
