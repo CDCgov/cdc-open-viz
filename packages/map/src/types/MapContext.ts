@@ -4,6 +4,7 @@ import { type ViewPort } from '@cdc/core/types/ViewPort'
 export type MapContext = {
   currentViewport: ViewPort
   data
+  dimensions
   displayDataAsText
   displayGeoName
   filteredCountryCode
