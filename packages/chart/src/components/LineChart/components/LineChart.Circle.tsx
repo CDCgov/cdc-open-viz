@@ -210,7 +210,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
 
       return (
         <g transform={transformShape(positionTop, positionLeft)}>
-          <Shape size={124} stroke={color} fill={color} />
+          <Shape size={55} stroke={color} fill={color} />
         </g>
       )
     }
