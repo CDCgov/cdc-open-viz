@@ -9,4 +9,6 @@ export const isLegendWrapViewport = currentViewport => isBelowBreakpoint('sm', c
 
 export const isMobileHeightViewport = currentViewport => isBelowBreakpoint('sm', currentViewport)
 
-export const isSmallTerritoryViewport = currentViewport => isBelowBreakpoint('sm', currentViewport)
+export const isMobileStateLabelViewport = currentViewport => isBelowBreakpoint('md', currentViewport)
+
+export const isMobileTerritoryViewport = currentViewport => isBelowBreakpoint('sm', currentViewport)

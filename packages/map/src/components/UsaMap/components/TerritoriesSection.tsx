@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
-import { isSmallTerritoryViewport } from '@cdc/core/helpers/viewports'
+import ConfigContext from '../../../context'
+import { isMobileTerritoryViewport } from '@cdc/core/helpers/viewports'
 
 type TerritoriesSectionProps = {
   territories: JSX.Element[]
@@ -11,6 +12,8 @@ type TerritoriesSectionProps = {
 }
 
 const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, logo, config, territoriesData }) => {
+  const { currentViewport } = useContext<MapContext>(ConfigContext)
+
   // filter territioriesData into the two groups below
   const freelyAssociatedKeys = territoriesData.filter(territory => {
     return ['US-FM', 'US-MH', 'US-PW'].includes(territory)
@@ -36,7 +39,7 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
     })
 
   const SVG_GAP = 9
-  const SVG_WIDTH = 45 // isSmallTerritoryViewport(currentViewport) ? 35 : 45
+  const SVG_WIDTH = isMobileTerritoryViewport(currentViewport) ? 35 : 45
 
   return (
     territoriesData.length > 0 && (
@@ -51,13 +54,13 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
           <div className='d-flex flex-wrap' style={{ columnGap: '1.5rem' }}>
             {(usTerritories.length > 0 || config.general.territoriesAlwaysShow) && (
               <div>
-                <h5
-                  className='territories-label'
+                <h5 className='territories-label'>U.S. territories</h5>
+                <span
+                  className='mt-2 mb-3 d-flex territories'
                   style={{ minWidth: `${usTerritories.length * SVG_WIDTH + (usTerritories.length - 1) * SVG_GAP}px` }}
                 >
-                  U.S. territories
-                </h5>
-                <span className='mt-2 mb-3 d-flex territories'>{usTerritories}</span>
+                  {usTerritories}
+                </span>
               </div>
             )}
             {(freelyAssociatedStates.length > 0 || config.general.territoriesAlwaysShow) && (
