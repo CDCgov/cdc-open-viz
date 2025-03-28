@@ -37,10 +37,10 @@ const TerritoryHexagon = ({
   handleShapeClick,
   label,
   stroke,
+  strokeColor,
   strokeWidth,
   territory,
   territoryData,
-  text,
   textColor,
   ...props
 }) => {
@@ -132,7 +132,8 @@ const TerritoryHexagon = ({
             fontSize={14}
             x={'50%'}
             y={y}
-            style={{ fill: 'currentColor', stroke: 'initial', fontWeight: 900, opacity: 1, fillOpacity: 1 }}
+            style={{ fill: 'currentColor', stroke: strokeColor, fontWeight: 900, opacity: 1, fillOpacity: 1 }}
+            paintOrder='stroke'
             textAnchor='middle'
             verticalAnchor='middle'
             onClick={handleShapeClick}

@@ -158,7 +158,8 @@ const UsaMap = () => {
           key={label}
           label={label}
           style={styles}
-          text={styles.color}
+          textColor={styles.color}
+          strokeColor='#fff'
           territoryData={territoryData}
           backgroundColor={styles.fill}
         />
@@ -169,14 +170,14 @@ const UsaMap = () => {
     const legendColors = applyLegendToRow(territoryData, state)
 
     if (legendColors) {
-      const textColor = getContrastColor('#FFF', legendColors[0])
-
       let needsPointer = false
 
       // If we need to add a pointer cursor
       if ((columns.navigate && territoryData[columns.navigate.name]) || tooltips.appearanceType === 'click') {
         needsPointer = true
       }
+
+      const { textColor, strokeColor } = outlinedTextColor(legendColors[0])
 
       styles = {
         color: textColor === '#000' ? '#1c1d1f' : textColor,
@@ -203,9 +204,9 @@ const UsaMap = () => {
           key={`label__${territoryIndex}`}
           label={label}
           style={styles}
-          text={styles.color}
           strokeWidth={1}
           textColor={textColor}
+          strokeColor={strokeColor}
           handleShapeClick={() => geoClickHandler(territory, territoryData)}
           dataTooltipId={`tooltip__${tooltipId}`}
           dataTooltipHtml={toolTip}
