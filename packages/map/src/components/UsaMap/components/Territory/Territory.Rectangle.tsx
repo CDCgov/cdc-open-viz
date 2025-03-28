@@ -13,9 +13,9 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
   hasPattern,
   label,
   stroke,
+  strokeColor,
   strokeWidth,
   territory,
-  text,
   textColor,
   backgroundColor,
   ...props
@@ -41,7 +41,8 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
           dominantBaseline='middle'
           x='50%'
           y='54%'
-          fill={text}
+          fill={textColor}
+          stroke={strokeColor}
           className='territory-text'
           paintOrder='stroke'
           onClick={handleShapeClick}
@@ -93,7 +94,6 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                 strokeWidth={strokeWidth}
                 d={rectanglePath}
                 fill={`url(#territory-${territory}-${patternData?.dataKey}--${patternIndex})`}
-                color={patternData ? 'white' : textColor}
                 className={[
                   `territory-pattern-${patternData?.dataKey}`,
                   `territory-pattern-${patternData?.dataKey}--${patternData.dataValue}`
@@ -104,12 +104,8 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                 dominantBaseline='middle'
                 x='50%'
                 y='54%'
-                fill={text}
-                style={{
-                  fill: patternData ? 'white' : 'black',
-                  stroke: patternData ? 'black' : textColor,
-                  strokeWidth: 1
-                }}
+                fill={textColor}
+                stroke={strokeColor}
                 className='territory-text'
                 paint-order='stroke'
                 onClick={handleShapeClick}
