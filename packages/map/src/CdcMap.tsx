@@ -258,15 +258,6 @@ const CdcMap = ({
       if (newState.dataUrl) newState.dataUrl = `${newState.dataUrl}`
       let newData = await fetchRemoteData(newState.dataUrl, 'map')
 
-      let g = newData.find(d => d.State == 'Virgin Islands' && d.pathogen == 'COVID-19')
-      g.activity_level = '8'
-      g.activity_level_label = 'High'
-      g = newData.find(d => d.State == 'Guam' && d.pathogen == 'COVID-19')
-      g.activity_level = '4'
-      g.activity_level_label = 'Low'
-
-      console.log(newData)
-
       if (newData && newState.dataDescription) {
         newData = transform.autoStandardize(newData)
         newData = transform.developerStandardize(newData, newState.dataDescription)
