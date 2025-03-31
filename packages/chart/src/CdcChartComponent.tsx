@@ -883,7 +883,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     className={
                       legend.hide || isLegendWrapViewport(currentViewport)
                         ? 'w-100'
-                        : legend.position === 'bottom' || legend.position === 'top' || visualizationType === 'Sankey'
+                        : legend.position === 'bottom' ||
+                          legend.position === 'top' ||
+                          visualizationType === 'Sankey' ||
+                          visualizationType === 'Spark Line'
                         ? 'w-100'
                         : 'w-75'
                     }
