@@ -129,25 +129,19 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
     loadColumnData()
   }, [config.datasets, config.dashboard.sharedFilters])
 
-  const updateAPIFilter = (
-    APIEndpoint,
-    APIValueSelector,
-    APITextSelector,
-    APISubgroupValueSelector,
-    APISubgroupTextSelector
-  ) => {
+  const updateAPIFilter = (apiEndpoint, valueSelector, textSelector, subgroupValueSelector, subgroupTextSelector) => {
     const newAPIFilter = !isNestedDropdown
       ? {
-          apiEndpoint: APIEndpoint,
-          valueSelector: APIValueSelector,
-          textSelector: APITextSelector
+          apiEndpoint,
+          valueSelector,
+          textSelector
         }
       : {
-          apiEndpoint: APIEndpoint,
-          valueSelector: APIValueSelector,
-          textSelector: APITextSelector,
-          subgroupValueSelector: APISubgroupValueSelector,
-          subgroupTextSelector: APISubgroupTextSelector
+          apiEndpoint,
+          valueSelector,
+          textSelector,
+          subgroupValueSelector,
+          subgroupTextSelector
         }
     updateFilterProp('apiFilter', newAPIFilter)
     overlay.actions.toggleOverlay(false)
@@ -163,20 +157,17 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
 
   const isNestedDropdown = filter.filterStyle === FILTER_STYLE.nestedDropdown
 
-  const EditAPIValues = (filter, isNestedDropdown, updateAPIFilter) => {
-    return (
-      <Modal>
-        <Modal.Content>
-          <APIModal filter={filter} isNestedDropdown={isNestedDropdown} updateAPIFilter={updateAPIFilter} />
-        </Modal.Content>
-      </Modal>
-    )
-  }
   const { overlay } = useGlobalContext()
 
   const handleEditAPIValues = (filter, isNestedDropdown, updateAPIFilter) => {
     {
-      overlay.actions.openOverlay(EditAPIValues(filter, isNestedDropdown, updateAPIFilter))
+      overlay.actions.openOverlay(
+        <Modal>
+          <Modal.Content>
+            <APIModal filter={filter} isNestedDropdown={isNestedDropdown} updateAPIFilter={updateAPIFilter} />
+          </Modal.Content>
+        </Modal>
+      )
     }
   }
 
