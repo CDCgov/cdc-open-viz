@@ -39,10 +39,6 @@ header + .map-container.full-border {
 }
 
 @include breakpointClass(md) {
-  // US Specific
-  .map-container.us {
-    margin: 0 1em;
-  }
   // Data Specific
   .map-container.data {
     &.side {

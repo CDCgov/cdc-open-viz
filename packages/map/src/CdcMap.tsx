@@ -561,7 +561,6 @@ const CdcMap = ({
                     closeModal(e, modal, setModal)
                   }
                 }}
-                style={{ padding: '15px 0px', margin: '0px' }}
               >
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
                 <section className='outline-none geography-container w-100' ref={mapSvg} tabIndex='0'>
