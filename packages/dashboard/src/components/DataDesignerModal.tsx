@@ -29,20 +29,16 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
   const [errorMessage, setErrorMessage] = useState('')
   const [loadingAPIData, setLoadingAPIData] = useState(false)
 
+  const isUpdatingVisualization = useMemo(() => {
+    return !!vizKey && !useRow
+  }, [vizKey, useRow])
+
   const configureData = useMemo(() => {
-    if (vizKey && !useRow) {
+    if (isUpdatingVisualization) {
       return config.visualizations[vizKey]
     }
     return config.rows[rowIndex]
-  }, [config.visualizations, config.rows, vizKey, rowIndex, useRow])
-
-  const updateConfigureData = (newConfigureData: Partial<ConfigureData>) => {
-    if (vizKey && !useRow) {
-      dispatch({ type: 'UPDATE_VISUALIZATION', payload: { vizKey, configureData: newConfigureData } })
-    } else {
-      dispatch({ type: 'UPDATE_ROW', payload: { rowIndex, rowData: newConfigureData } })
-    }
-  }
+  }, [config.visualizations, config.rows, rowIndex, isUpdatingVisualization])
 
   const fetchData = async datasetKey => {
     const { data, dataUrl } = config.datasets[datasetKey]
@@ -65,26 +61,32 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
     return newData
   }
 
-  const removeDataset = (widgetKey = vizKey) => {
-    const newConfigureData = widgetKey ? config.visualizations[widgetKey] : config.rows[rowIndex]
-    delete newConfigureData.data
-    delete newConfigureData.dataKey
-    delete newConfigureData.dataDescription
-    delete newConfigureData.formattedData
+  const updateConfigureData = (newConfigureData: Partial<ConfigureData>) => {
+    if (isUpdatingVisualization) {
+      dispatch({ type: 'UPDATE_VISUALIZATION', payload: { vizKey, configureData: newConfigureData } })
+    } else {
+      dispatch({ type: 'UPDATE_ROW', payload: { rowIndex, rowData: newConfigureData } })
+    }
+  }
 
-    return (newConfigureData as ConfigureData) || {}
+  const removeDatasetsFromVisualizations = () => {
+    const columnVisualizations = config.rows[rowIndex].columns.map(column => column.widget).filter(Boolean)
+    columnVisualizations.forEach(currentVisualizationKey => {
+      dispatch({ type: 'RESET_VISUALIZATION', payload: { vizKey: currentVisualizationKey } })
+    })
   }
 
   const changeDataset = async ({ target: { value } }) => {
+    if (!isUpdatingVisualization) removeDatasetsFromVisualizations()
     const newData = value === '' ? {} : await fetchData(value)
-    const newConfigureData =
-      value === '' ? removeDataset() : { dataDescription: {}, formattedData: undefined, dataKey: value, data: newData }
-
-    const columnWidgets = config.rows[rowIndex].columns.filter(column => column.widget).map(column => column.widget)
-    if (!vizKey) {
-      columnWidgets.forEach(currentWidgetKey => removeDataset(currentWidgetKey))
-    }
-
+    const newConfigureData = {
+      dataDescription: {
+        horizontal: false
+      },
+      formattedData: undefined,
+      dataKey: value,
+      data: newData
+    } as ConfigureData
     updateConfigureData(newConfigureData)
   }
 
@@ -128,12 +130,13 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
               Object.keys(config.datasets).map(datasetKey => <option key={datasetKey}>{datasetKey}</option>)}
           </select>
           {vizKey && (
+            // only shows for visualizations
             <CheckBox
               label='Apply To Row'
               value={useRow}
               updateField={(section, subsection, fieldName, value) => {
                 setUseRow(value)
-                changeDataset({ target: { value: '' } })
+                changeDataset({ target: { value: configureData.dataKey } })
               }}
             />
           )}
