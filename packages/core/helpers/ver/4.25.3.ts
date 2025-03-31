@@ -1,4 +1,3 @@
-import { VisualizationType } from './../../../chart/src/types/ChartConfig'
 import _ from 'lodash'
 
 const remapTableDownloadCSV = config => {
@@ -8,6 +7,16 @@ const remapTableDownloadCSV = config => {
     config.table.download = download
   }
   return config
+}
+
+const handleVisualizations = newConfig => {
+  if (newConfig.type === 'dashboard') {
+    Object.keys(newConfig.visualizations).forEach(key => {
+      const currentViz = newConfig.visualizations[key]
+      remapTableDownloadCSV(currentViz)
+    })
+  }
+  remapTableDownloadCSV(newConfig)
 }
 
 const migrateAreaChart = config => {
@@ -20,9 +29,10 @@ const migrateAreaChart = config => {
 
 const update_4_25_3 = config => {
   const ver = '4.25.3'
-  let newConfig = _.cloneDeep(config)
-  newConfig = remapTableDownloadCSV(newConfig)
-  newConfig = migrateAreaChart(newConfig)
+  const newConfig = _.cloneDeep(config)
+  handleVisualizations(newConfig)
+  remapTableDownloadCSV(newConfig)
+  migrateAreaChart(newConfig)
   newConfig.version = ver
   return newConfig
 }

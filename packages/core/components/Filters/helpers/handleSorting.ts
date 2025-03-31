@@ -17,8 +17,8 @@ export const handleSorting = singleFilter => {
     return String(asc ? a : b).localeCompare(String(asc ? b : a), 'en', { numeric: true })
   }
 
-  singleFilter.values = singleFilterValues.sort(sort)
-  singleFilter.orderedValues = singleFilterValues.sort(sort)
+  singleFilter.values = singleFilterValues?.sort(sort)
+  singleFilter.orderedValues = singleFilterValues?.sort(sort)
 
   return singleFilter
 }
