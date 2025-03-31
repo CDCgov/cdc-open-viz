@@ -1,9 +1,11 @@
 import { scaleLinear } from '@visx/scale'
 import useReduceData from './useReduceData'
+import { TOP_PADDING } from './useScales'
 
 export default function useRightAxis({ config, yMax = 0, data = [], updateConfig }) {
   const hasRightAxis = config.visualizationType === 'Combo' && config.orientation === 'vertical'
-  const rightSeriesKeys = config.series && config.series.filter(series => series.axis === 'Right').map(key => key.dataKey)
+  const rightSeriesKeys =
+    config.series && config.series.filter(series => series.axis === 'Right').map(key => key.dataKey)
   let { minValue } = useReduceData(config, data)
 
   const allRightAxisData = rightSeriesKeys => {
@@ -35,7 +37,7 @@ export default function useRightAxis({ config, yMax = 0, data = [], updateConfig
 
   const yScaleRight = scaleLinear({
     domain: [minValue, max],
-    range: [yMax, 0]
+    range: [yMax, TOP_PADDING]
   })
 
   return { yScaleRight, hasRightAxis }

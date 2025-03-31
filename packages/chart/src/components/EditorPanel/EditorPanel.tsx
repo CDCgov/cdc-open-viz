@@ -3999,29 +3999,6 @@ const EditorPanel = () => {
                     fieldName='description'
                     label='Legend Description'
                   />
-                  <CheckBox
-                    value={config.legend.unified}
-                    section='legend'
-                    fieldName='unified'
-                    label='Unified Legend'
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>
-                            For a chart with filters, check this option if you want the legend to contain an item for
-                            every series in the data set, including those that are filtered.
-                          </p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
                 </AccordionItemPanel>
               </AccordionItem>
             )}
