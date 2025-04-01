@@ -280,6 +280,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       newConfig.series.forEach(series => {
         newConfig.runtime.areaSeriesKeys.push({ ...series, type: 'Area Chart' })
       })
+      newConfig.visualizationSubType = 'stacked'
     }
 
     if (
@@ -565,6 +566,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     addColRoundTo,
     { index, length } = { index: null, length: null }
   ) => {
+    if (num === '') return 'N/A'
     // if num is NaN return num
     if (isNaN(num) || !num) return num
     // Check if the input number is negative
@@ -882,7 +884,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     className={
                       legend.hide || isLegendWrapViewport(currentViewport)
                         ? 'w-100'
-                        : legend.position === 'bottom' || legend.position === 'top' || visualizationType === 'Sankey'
+                        : legend.position === 'bottom' ||
+                          legend.position === 'top' ||
+                          visualizationType === 'Sankey' ||
+                          visualizationType === 'Spark Line'
                         ? 'w-100'
                         : 'w-75'
                     }

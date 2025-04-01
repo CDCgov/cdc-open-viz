@@ -44,9 +44,10 @@ import { MapContext } from '../../../types/MapContext.js'
 import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 
 // Todo: move to useReducer, seperate files out.
-const EditorPanel = ({ columnsRequiredChecker }) => {
+const EditorPanel = () => {
   // prettier-ignore
   const {
     isDashboard,
@@ -59,21 +60,15 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     state,
     tooltipId,
     runtimeData,
-    setRuntimeData,
-    generateRuntimeData,
-
-
   } = useContext<MapContext>(ConfigContext)
 
+  const { columnsRequiredChecker } = useColumnsRequiredChecker()
   const { general, columns, legend, table, tooltips } = state
   const columnsInData = state?.data?.[0] ? Object.keys(state.data[0]) : []
 
   const [configTextboxValue, setConfigTextbox] = useState({}) // eslint-disable-line
-
   const [loadedDefault, setLoadedDefault] = useState(false)
-
   const [displayPanel, setDisplayPanel] = useState(true)
-
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
 
   const headerColors = [
@@ -1306,7 +1301,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
 
   const getCategoryValuesOrder = () => {
     let values = runtimeLegend
-      ? runtimeLegend.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value)
+      ? runtimeLegend.items.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value)
       : []
 
     if (state.legend.cateogryValuesOrder) {
@@ -2824,6 +2819,18 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                     max='500'
                   />
                 )}
+
+                <TextField
+                  value={table.cellMinWidth}
+                  updateField={updateField}
+                  section='table'
+                  fieldName='cellMinWidth'
+                  label='Table Cell Min Width'
+                  type='number'
+                  min='0'
+                  max='500'
+                />
+
                 <label className='checkbox'>
                   <input
                     type='checkbox'

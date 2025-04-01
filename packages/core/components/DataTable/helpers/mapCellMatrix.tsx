@@ -4,6 +4,7 @@ import { DataTableProps } from '../DataTable'
 import { ReactNode } from 'react'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import _ from 'lodash'
+import useApplyLegendToRow from '@cdc/map/src/hooks/useApplyLegendToRow'
 
 type MapRowsProps = DataTableProps & {
   rows: string[]
@@ -45,18 +46,18 @@ export const getMapRowData = (
   formatLegendLocation: (row: string) => string,
   runtimeData: Record<string, Object>,
   displayGeoName: (row: string) => string,
-  sharedFilterColumns: string[]
+  filterColumns: string[]
 ) => {
   return rows.map((row: string) => {
     const dataRow = {}
     ;[
-      ...sharedFilterColumns,
+      ...filterColumns,
       ...Object.keys(columns).filter(column => columns[column].dataTable === true && columns[column].name)
     ].map(column => {
       const label = columns[column]?.label || columns[column]?.name || column
       if (column === 'geo') {
         dataRow[label] = getGeoLabel(config, row, formatLegendLocation, displayGeoName)
-      } else if (sharedFilterColumns.includes(column)) {
+      } else if (filterColumns.includes(column)) {
         dataRow[label] = runtimeData[row][column]
       } else {
         const dataValue = getDataValue(config, runtimeData[row], column)
@@ -72,24 +73,34 @@ const mapCellArray = ({
   columns,
   runtimeData,
   config,
-  applyLegendToRow,
   displayGeoName,
   formatLegendLocation,
   navigationHandler,
-  setFilteredCountryCode
+  setFilteredCountryCode,
+  legendMemo,
+  legendSpecialClassLastMemo
 }: MapRowsProps): ReactNode[][] => {
+  const { allowMapZoom, geoType, type } = config.general
   return rows.map(row =>
     Object.keys(columns)
       .filter(column => columns[column].dataTable === true && columns[column].name)
       .map(column => {
         if (column === 'geo') {
           const rowObj = runtimeData[row]
+          if (!rowObj) {
+            throw new Error('No row object found')
+          }
+
+          const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
+
           const legendColor = applyLegendToRow(rowObj)
+
+          if (!legendColor) {
+            throw new Error('No legend color found')
+          }
           const labelValue = getGeoLabel(config, row, formatLegendLocation, displayGeoName)
           const mapZoomHandler =
-            config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world'
-              ? () => setFilteredCountryCode(row)
-              : undefined
+            type === 'bubble' && allowMapZoom && geoType === 'world' ? () => setFilteredCountryCode(row) : undefined
           return (
             <div className='col-12'>
               <LegendShape fill={legendColor[0]} />
@@ -103,7 +114,8 @@ const mapCellArray = ({
             </div>
           )
         } else {
-          const dataValue = getDataValue(config, runtimeData, row, column)
+          const rowData = runtimeData[row]
+          const dataValue = getDataValue(config, rowData, column)
           return displayDataAsText(dataValue, column, config)
         }
       })

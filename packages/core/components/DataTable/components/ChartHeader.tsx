@@ -54,7 +54,7 @@ const ChartHeader = ({
   }
 
   const ColumnHeadingText = ({ column, text, config }) => {
-    if (text === 'pivotColumn') return ''
+    if (text === '_pivotedFrom') return ''
     let notApplicableText = 'Not Applicable'
     if (text === '__series__' && config.table.indexLabel) return `${config.table.indexLabel} `
     if (text === '__series__' && !config.table.indexLabel)

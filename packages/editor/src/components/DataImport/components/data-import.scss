@@ -1,10 +1,10 @@
-@import 'variables';
+@import './../../../scss/variables.scss';
 
 .cdc-editor .data-designer {
   display: flex;
   justify-content: flex-end;
   .left-col {
-    background: #fff;
+    background: var(--white);
     padding: $gbl-padding;
     width: 50%;
     border-right: var(--lightGray) 1px solid;

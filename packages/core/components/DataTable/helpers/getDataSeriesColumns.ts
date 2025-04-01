@@ -57,9 +57,13 @@ export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, r
   })
 
   tmpSeriesColumns.sort((a, b) => {
-    if (a === 'pivotColumn') return -1
-    if (b === 'pivotColumn') return 1
+    if (a === '_pivotedFrom') return -1
+    if (b === '_pivotedFrom') return 1
     return columnOrderingHash[a] - columnOrderingHash[b]
   })
-  return tmpSeriesColumns
+
+  return tmpSeriesColumns.filter(colName => {
+    // remove metadata added by pivotData function
+    return colName !== '_pivotedFrom'
+  })
 }

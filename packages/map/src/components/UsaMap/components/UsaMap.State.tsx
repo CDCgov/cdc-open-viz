@@ -29,6 +29,9 @@ import { titleCase } from '../../../helpers/titleCase'
 import TerritoriesSection from './TerritoriesSection'
 import { displayGeoName } from '../../../helpers/displayGeoName'
 
+import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
+import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
+import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
@@ -57,20 +60,23 @@ const nudges = {
 const UsaMap = () => {
   // prettier-ignore
   const {
-      applyLegendToRow,
-      applyTooltipsToGeo,
       data,
-      geoClickHandler,
       setSharedFilterValue,
       state,
       tooltipId,
       handleDragStateChange,
       mapId,
       logo,
+    legendMemo,
+    legendSpecialClassLastMemo
     } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
-  const { general, columns, feature, tooltips, hexMap, map, annotations } = state
+  const { general, columns, tooltips, hexMap, map, annotations } = state
+  const { displayAsHex } = general
+  const { geoClickHandler } = useGeoClickHandler()
+  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
+  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
 
   if (setSharedFilterValue) {
     Object.keys(supportedStates).forEach(supportedState => {
@@ -111,8 +117,6 @@ const UsaMap = () => {
     setExtent(null)
   }, [general.geoType])
 
-  const isHex = general.displayAsHex
-
   const [territoriesData, setTerritoriesData] = useState([])
 
   const territoriesKeys = Object.keys(supportedTerritories) // data will have already mapped abbreviated territories to their full names
@@ -132,7 +136,7 @@ const UsaMap = () => {
   const geoFillColor = getGeoFillColor(state)
 
   const territories = territoriesData.map((territory, territoryIndex) => {
-    const Shape = isHex ? Territory.Hexagon : Territory.Rectangle
+    const Shape = displayAsHex ? Territory.Hexagon : Territory.Rectangle
 
     const territoryData = data[territory]
 
@@ -160,7 +164,7 @@ const UsaMap = () => {
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
-    const legendColors = applyLegendToRow(territoryData)
+    const legendColors = applyLegendToRow(territoryData, state)
 
     if (legendColors) {
       const textColor = getContrastColor('#FFF', legendColors[0])
@@ -246,7 +250,7 @@ const UsaMap = () => {
     })
 
     const geosJsx = geographies.map(({ feature: geo, path = '' }, geoIndex) => {
-      const key = isHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
+      const key = displayAsHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
 
       let styles = {
         fill: geoFillColor,
@@ -265,7 +269,7 @@ const UsaMap = () => {
 
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
-        legendColors = applyLegendToRow(geoData)
+        legendColors = applyLegendToRow(geoData, state)
       }
 
       const geoDisplayName = displayGeoName(geoKey)
@@ -461,8 +465,8 @@ const UsaMap = () => {
                   </>
                 )
               })}
-              {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
-              {isHex && hexMap.type === 'shapes' && getArrowDirection(geoData, geo, legendColors[0])}
+              {(displayAsHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
+              {displayAsHex && hexMap.type === 'shapes' && getArrowDirection(geoData, geo, legendColors[0])}
             </g>
           </g>
         )
@@ -473,21 +477,19 @@ const UsaMap = () => {
         <g data-name={geoName} key={key} tabIndex={-1}>
           <g className='geo-group' style={styles} tabIndex={-1}>
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
-            {(isHex || showLabel) && geoLabel(geo, styles.fill, projection)}
+            {(displayAsHex || showLabel) && geoLabel(geo, styles.fill, projection)}
           </g>
         </g>
       )
     })
 
-    if (isHex) return geosJsx
+    if (displayAsHex) return geosJsx
 
     // Cities
     geosJsx.push(
       <CityList
         applyLegendToRow={applyLegendToRow}
         applyTooltipsToGeo={applyTooltipsToGeo}
-        data={data}
-        displayGeoName={displayGeoName}
         geoClickHandler={geoClickHandler}
         isFilterValueSupported={isFilterValueSupported}
         key='cities'
@@ -526,13 +528,13 @@ const UsaMap = () => {
   }
 
   const geoLabel = (geo, bgColor = '#FFFFFF', projection) => {
-    let centroid = projection ? projection(geoCentroid(geo)) : [22, 17.5]
-    let abbr = geo.properties.iso
+    const centroid = projection ? projection(geoCentroid(geo)) : [22, 17.5]
+    const abbr = geo.properties.iso
 
     if (undefined === abbr) return null
 
     // HI background is always white since it is off to the side
-    if (abbr === 'US-HI' && !general.displayAsHex) {
+    if ((abbr === 'US-HI' && !general.displayAsHex) || (Object.keys(offsets).includes(abbr) && !general.displayAsHex)) {
       bgColor = '#FFF'
     }
     const { textColor, strokeColor } = outlinedTextColor(bgColor)
@@ -541,12 +543,12 @@ const UsaMap = () => {
       y = hexMap.type === 'shapes' && general.displayAsHex ? -10 : 5
 
     // used to nudge/move some of the labels for better readability
-    if (nudges[abbr] && false === isHex) {
+    if (nudges[abbr] && false === displayAsHex) {
       x += nudges[abbr][0]
       y += nudges[abbr][1]
     }
 
-    if (undefined === offsets[abbr] || isHex) {
+    if (undefined === offsets[abbr] || displayAsHex) {
       return (
         <g transform={`translate(${centroid})`} tabIndex={-1}>
           <text
