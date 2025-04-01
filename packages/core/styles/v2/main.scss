@@ -6,11 +6,6 @@
   font-size: 16px;
   line-height: 1.4;
 
-  :focus,
-  [tabindex]:focus-visible {
-    outline: 2px solid rgba(255, 102, 1, 0.9);
-  }
-
   margin: 0;
   font-family: var(--app-font-main);
   font-size: 1em;
