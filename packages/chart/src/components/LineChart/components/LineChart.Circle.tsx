@@ -46,7 +46,7 @@ const Glyphs = [
 const LineChartCircle = (props: LineChartCircleProps) => {
   const {
     config,
-    d,
+    d: pointData,
     tableData,
     displayArea,
     seriesKey,
@@ -96,7 +96,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
   if (mode === 'ALWAYS_SHOW_POINTS' && lineDatapointStyle !== 'hidden') {
     if (lineDatapointStyle === 'always show') {
       const isMatch = circleData?.some(
-        cd => cd[config.xAxis.dataKey] === d[config.xAxis.dataKey] && cd[seriesKey] === d[seriesKey]
+        cd => cd[config.xAxis.dataKey] === pointData[config.xAxis.dataKey] && cd[seriesKey] === pointData[seriesKey]
       )
 
       if (
@@ -105,13 +105,14 @@ const LineChartCircle = (props: LineChartCircleProps) => {
         (visual.maximumShapeAmount === seriesIndex && visual.lineDatapointSymbol === 'standard')
       )
         return <></>
-      const positionLeft = getXPos(d[config.xAxis.dataKey])
-      const positionTop = filtered.axis === 'Right' ? yScaleRight(d[filtered.dataKey]) : yScale(d[filtered.dataKey])
+      const positionLeft = getXPos(pointData[config.xAxis.dataKey])
+      const positionTop =
+        filtered.axis === 'Right' ? yScaleRight(pointData[filtered.dataKey]) : yScale(pointData[filtered.dataKey])
 
       return (
         <g transform={transformShape(positionTop, positionLeft)}>
           <Shape
-            opacity={d[seriesKey] ? 1 : 0}
+            opacity={pointData[seriesKey] ? 1 : 0}
             fillOpacity={1}
             fill={getColor(displayArea, colorScale, config, seriesKey, seriesKey)}
             style={{ filter: 'unset', opacity: 1 }}
@@ -197,10 +198,14 @@ const LineChartCircle = (props: LineChartCircleProps) => {
 
       return isFirstPoint || isLastPoint || isMiddlePoint
     }
+    const _dataIndex = pointData
+      ? data.findIndex(item => item[config.xAxis.dataKey] === pointData[config.xAxis.dataKey])
+      : dataIndex
 
-    if (drawIsolatedPoints(dataIndex, seriesKey)) {
-      const positionTop = filtered?.axis === 'Right' ? yScaleRight(d[filtered?.dataKey]) : yScale(d[filtered?.dataKey])
-      const positionLeft = getXPos(d[config.xAxis?.dataKey])
+    if (drawIsolatedPoints(_dataIndex, seriesKey)) {
+      const positionTop =
+        filtered?.axis === 'Right' ? yScaleRight(pointData[filtered?.dataKey]) : yScale(pointData[filtered?.dataKey])
+      const positionLeft = getXPos(pointData[config.xAxis?.dataKey])
       const color = colorScale(config.runtime.seriesLabelsAll[seriesIndex])
 
       return (
