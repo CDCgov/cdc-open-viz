@@ -5,6 +5,7 @@ import { BarStackHorizontal } from '@visx/shape'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/cove/fontSettings'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 // types
@@ -60,8 +61,8 @@ const BarChartStackedHorizontal = () => {
                   seriesHighlight.indexOf(bar.key) !== -1
                 config.barHeight = Number(config.barHeight)
                 let barColor = colorScale(config.runtime.seriesLabels[bar.key])
-                let labelColor = getContrastColor('#000', barColor)
-                let constrast = getColorContrast('#000', barColor)
+                let labelColor = getContrastColor(APP_FONT_COLOR, barColor)
+                let constrast = getColorContrast(APP_FONT_COLOR, barColor)
                 const contrastLevel = 7
                 if (constrast < contrastLevel) {
                   labelColor = '#fff'

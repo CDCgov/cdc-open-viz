@@ -1,5 +1,7 @@
 import chroma from 'chroma-js'
 
+import { APP_FONT_COLOR } from '@cdc/core/helpers/cove/fontSettings'
+
 /**
  * WCAG 2.1 CONSTANTS
  * TEXT (4.5 Contrast Ratio): https://www.w3.org/TR/WCAG20-TECHS/G18.html
@@ -15,8 +17,8 @@ export const getContrastColor = (textColor: string, bgColor: string) => {
   if (chroma.contrast(textColor, bgColor) < WCAG_TEXT_CONTRAST_RATIO) {
     switch (textColor) {
       case '#FFF':
-        return '#000'
-      case '#000':
+        return APP_FONT_COLOR
+      case APP_FONT_COLOR:
         return '#FFF'
       default:
         return textColor
@@ -47,14 +49,11 @@ type OutlinedTextColors = {
  * @returns {OutlinedTextColors} Text and outline stroke color ideal for the background in hex (e.g. '#abc123') format
  */
 export const outlinedTextColor = (bgColor: string): OutlinedTextColors => {
-  const bodyStyles = getComputedStyle(document.body)
-  let coolGray90 = bodyStyles.getPropertyValue('--cool-gray-90')
-  if (!coolGray90 || coolGray90 === '') { coolGray90 = '#1c1d1f' }
   const white = '#ffffff'
 
-  if (!chroma.valid(bgColor) || chroma.contrast(coolGray90, bgColor) >= WCAG_TEXT_CONTRAST_RATIO) {
-    return { textColor: coolGray90, strokeColor: white }
+  if (!chroma.valid(bgColor) || chroma.contrast(APP_FONT_COLOR, bgColor) >= WCAG_TEXT_CONTRAST_RATIO) {
+    return { textColor: APP_FONT_COLOR, strokeColor: white }
   } else {
-    return { textColor: white, strokeColor: coolGray90 }
+    return { textColor: white, strokeColor: APP_FONT_COLOR }
   }
 }

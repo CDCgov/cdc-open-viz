@@ -6,6 +6,7 @@ import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import useIntersectionObserver from '../hooks/useIntersectionObserver'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/cove/fontSettings'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 export default function DeviationBar({ height, xScale }) {
@@ -178,7 +179,7 @@ export default function DeviationBar({ height, xScale }) {
           // colors
           const [leftColor, rightColor] = twoColorPalette[twoColor.palette]
           const barColor = { left: leftColor, right: rightColor }
-          const fill = getContrastColor('#000', barColor[barPosition])
+          const fill = getContrastColor(APP_FONT_COLOR, barColor[barPosition])
 
           let textProps = getTextProps(config.isLollipopChart, textFits, lollipopShapeSize, fill)
           // tooltips

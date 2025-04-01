@@ -2,14 +2,14 @@ import React, { useContext, useState } from 'react'
 import ConfigContext from '../../context'
 import './AnnotationDropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
-import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_SIZE } from '@cdc/core/helpers/cove/fontSettings'
 import AnnotationList from './AnnotationList'
 
 const AnnotationDropdown = () => {
   const { state: config, currentViewport: viewport } = useContext(ConfigContext)
   const [expanded, setExpanded] = useState(false)
 
-  const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${appFontSize}px`
+  const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${APP_FONT_SIZE}px`
 
   const annotations = config?.annotations || []
 

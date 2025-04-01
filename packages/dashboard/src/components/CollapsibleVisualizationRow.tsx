@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Icon from '../../../core/components/ui/Icon'
-import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_SIZE } from '@cdc/core/helpers/cove/fontSettings'
 
 type CollapsableVizRow = {
   allExpanded: boolean
@@ -17,7 +17,7 @@ const CollapsibleVisualizationRow: React.FC<CollapsableVizRow> = ({
   children
 }) => {
   const [isExpanded, setIsExpanded] = useState(allExpanded)
-  const titleFontSize = ['xs', 'xxs'].includes(currentViewport) ? '13px' : `${appFontSize}px`
+  const titleFontSize = ['xs', 'xxs'].includes(currentViewport) ? '13px' : `${APP_FONT_SIZE}px`
 
   useEffect(() => {
     setIsExpanded(allExpanded)

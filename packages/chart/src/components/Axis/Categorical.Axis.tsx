@@ -7,7 +7,7 @@ import ConfigContext from '../../ConfigContext'
 import chroma from 'chroma-js'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
-import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_SIZE } from '@cdc/core/helpers/cove/fontSettings'
 
 const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
   const { config } = useContext(ConfigContext)
@@ -94,7 +94,7 @@ const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
           barStacks.map(barStack =>
             barStack.bars.map(bar => {
               const isLastIndex = config.yAxis.categories.length - 1 === barStack.index
-              const textSize = appFontSize / 1.3
+              const textSize = APP_FONT_SIZE / 1.3
               const textColor = chroma(bar.color).luminance() < 0.4 ? '#fff' : '#000'
               const textWidth = getTextWidth(bar.key, `${textSize}px`)
               const displayText = Number(textWidth) < bar.width && bar.height > textSize
