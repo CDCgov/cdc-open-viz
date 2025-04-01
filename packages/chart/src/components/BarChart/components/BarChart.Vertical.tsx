@@ -65,7 +65,11 @@ export const BarChartVertical = () => {
     data = brushConfig.data
   }
 
-  const hasConfidenceInterval = _.every(config.confidenceKeys, key => key !== '')
+  const hasConfidenceInterval =
+    config.confidenceKeys.upper &&
+    config.confidenceKeys.lower &&
+    config.confidenceKeys.upper !== '' &&
+    config.confidenceKeys.lower !== ''
 
   const _data = getBarData(config, data, hasConfidenceInterval)
   return (
@@ -144,7 +148,14 @@ export const BarChartVertical = () => {
                   <li class="tooltip-body ">${tooltipBody}</li>
                   ${additionalColTooltip ? '<li class="tooltip-body ">' + additionalColTooltip + '</li>' : ''}
                     </li></ul>`
-
+                  const { barHeight, isSuppressed, getBarY, absentDataLabel } = getBarConfig({
+                    bar,
+                    defaultBarHeight,
+                    config,
+                    barWidth,
+                    isVertical: true,
+                    yAxisValue
+                  })
                   // configure colors
                   let labelColor = '#000000'
                   labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor) // Set if background is transparent'
@@ -153,6 +164,7 @@ export const BarChartVertical = () => {
                   const isHighlightedBar = highlightedBarValues?.includes(xAxisValue)
                   const highlightedBarColor = getHighlightedBarColorByValue(xAxisValue)
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
+
                   const borderColor = isHighlightedBar
                     ? highlightedBarColor
                     : config.barHasBorder === 'true'
@@ -162,19 +174,10 @@ export const BarChartVertical = () => {
                     ? highlightedBar.borderWidth
                     : config.isLollipopChart
                     ? 0
-                    : config.barHasBorder === 'true'
+                    : config.barHasBorder === 'true' && !absentDataLabel && !isSuppressed
                     ? barBorderWidth
                     : 0
 
-                  const { barHeight, isSuppressed, getBarY, getAbsentDataLabel } = getBarConfig({
-                    bar,
-                    defaultBarHeight,
-                    config,
-                    barWidth,
-                    isVertical: true
-                  })
-
-                  const absentDataLabel = getAbsentDataLabel(yAxisValue)
                   const barDefaultLabel = isSuppressed || !config.labels ? '' : yAxisValue
                   const barY = getBarY(defaultBarY, yScale(scaleVal))
                   const displaylollipopShape = testZeroValue(bar.value) ? 'none' : 'block'

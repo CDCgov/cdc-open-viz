@@ -161,7 +161,7 @@ const Select = memo((props: SelectProps) => {
     initial: initialValue,
     ...attributes
   } = props
-  const optionsJsx = options.map((option, index) => {
+  const optionsJsx = options?.map((option, index) => {
     if (typeof option === 'string') {
       return (
         <option value={option} key={index}>
@@ -178,7 +178,7 @@ const Select = memo((props: SelectProps) => {
   })
 
   if (initialValue) {
-    optionsJsx.unshift(
+    optionsJsx?.unshift(
       <option value='' key='initial'>
         {initialValue}
       </option>

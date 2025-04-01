@@ -1,6 +1,6 @@
 export const drawCircle = (circle, context, state) => {
   const percentOfOriginalSize = 0.75
-  const scaleVal = 3
+  const scaleVal = 1
   const adjustedGeoRadius =
     state.mapPosition.zoom > 1
       ? Number(circle.geoRadius * scaleVal) * percentOfOriginalSize
@@ -14,7 +14,7 @@ export const drawCircle = (circle, context, state) => {
 }
 export const drawSquare = (square, context, state) => {
   const percentOfOriginalSize = 0.75
-  const scaleVal = 5
+  const scaleVal = 1.75
   const sideLength = square.size * scaleVal
 
   const adjustedSize = state.mapPosition.zoom > 1 ? sideLength * percentOfOriginalSize : sideLength
@@ -34,7 +34,7 @@ export const drawSquare = (square, context, state) => {
 
 export const drawDiamond = (diamond, context, state) => {
   const percentOfOriginalSize = 0.75
-  const scaleVal = 7
+  const scaleVal = 2.2
   const fullSize = diamond.size * scaleVal
 
   const adjustedSize = state.mapPosition.zoom > 1 ? fullSize * percentOfOriginalSize : fullSize
@@ -71,7 +71,7 @@ export const drawDiamond = (diamond, context, state) => {
 }
 export const drawTriangle = (triangle, context, state) => {
   const percentOfOriginalSize = 0.75
-  const scaleVal = 6
+  const scaleVal = 2.2
   const baseLength = triangle.size * scaleVal
 
   // Adjust the size
@@ -104,7 +104,7 @@ export const drawTriangle = (triangle, context, state) => {
 }
 export const drawStar = (star, context, state) => {
   const percentOfOriginalSize = 0.75
-  const scaleVal = 5.5
+  const scaleVal = 2.2
   const spikes = star.spikes
   const outerRadius = star.outerRadius * scaleVal
   const innerRadius = star.innerRadius * scaleVal
@@ -143,7 +143,7 @@ export const drawStar = (star, context, state) => {
 }
 
 export const drawPin = (pin, ctx, state) => {
-  const scaleVal = 25
+  const scaleVal = 10
   const percentOfOriginalSize = 0.75
   const baseSize = pin.size * scaleVal
   const size = state.mapPosition.zoom > 1 ? baseSize * percentOfOriginalSize : baseSize

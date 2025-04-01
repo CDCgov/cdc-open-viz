@@ -93,6 +93,7 @@ export type Legend = CoreLegend & {
     side: boolean
     topBottom: boolean
   }
+  groupBy: string
 }
 
 type Visual = {

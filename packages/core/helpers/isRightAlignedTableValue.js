@@ -1,6 +1,6 @@
 import { footnotesSymbols } from '@cdc/core/helpers/footnoteSymbols'
 
-const numericStrings = ['N/A', 'NA', ''].concat(footnotesSymbols.map(s => s[0]))
+const numericStrings = ['N/A', 'NA', '', 'Suppressed'].concat(footnotesSymbols.map(s => s[0]))
 
 export default function isRightAlignedTableValue(value = '') {
   if (!value) return false
