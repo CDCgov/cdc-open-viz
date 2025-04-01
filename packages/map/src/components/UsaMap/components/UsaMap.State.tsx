@@ -29,6 +29,7 @@ import { titleCase } from '../../../helpers/titleCase'
 import TerritoriesSection from './TerritoriesSection'
 import { displayGeoName } from '../../../helpers/displayGeoName'
 import { isMobileStateLabelViewport } from '@cdc/core/helpers/viewports'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/cove/fontSettings'
 
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
@@ -147,7 +148,7 @@ const UsaMap = () => {
     let styles = {
       fill: geoFillColor,
       stroke: geoStrokeColor,
-      color: '#1c1d1f'
+      color: APP_FONT_COLOR
     }
 
     const label = supportedTerritories[territory][1]
@@ -180,7 +181,7 @@ const UsaMap = () => {
       const { textColor, strokeColor } = outlinedTextColor(legendColors[0])
 
       styles = {
-        color: textColor === '#000' ? '#1c1d1f' : textColor,
+        color: textColor,
         fill: legendColors[0],
         opacity:
           setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== territoryData[columns.geo.name]
@@ -586,7 +587,7 @@ const UsaMap = () => {
         <text
           x={4}
           strokeWidth='0'
-          stroke='#1c1d1f'
+          stroke={APP_FONT_COLOR}
           fontSize={isMobileStateLabelViewport(currentViewport) ? 16 : 13}
           fontWeight={900}
           style={{ fill: textColor }}

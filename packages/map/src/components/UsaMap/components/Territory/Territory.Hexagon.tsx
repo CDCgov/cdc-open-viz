@@ -5,6 +5,7 @@ import { MapContext } from './../../../../types/MapContext'
 import HexIcon from '../HexIcon'
 import { Text } from '@visx/text'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/cove/fontSettings'
 
 const offsets = {
   'US-VT': [50, -8],
@@ -163,7 +164,7 @@ const TerritoryHexagon = ({
           x={4}
           strokeWidth='0'
           fontSize={13}
-          style={{ fill: '#1c1d1f' }}
+          style={{ fill: APP_FONT_COLOR }}
           alignmentBaseline='middle'
           transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
           onClick={handleShapeClick}
