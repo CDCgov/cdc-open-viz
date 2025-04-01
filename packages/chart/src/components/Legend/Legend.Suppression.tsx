@@ -2,6 +2,7 @@ import React from 'react'
 import { ChartConfig } from '../../types/ChartConfig'
 import Icon from '@cdc/core/components/ui/Icon'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
+import TooltipLink from '@cdc/core/components/TooltipLink/TooltipLink'
 interface LegendProps {
   config: ChartConfig
   isLegendBottom: boolean
@@ -35,10 +36,6 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) =>
           </div>
         )
     )
-  const handleLinkClick = event => {
-    // prevent defintion link to change URl
-    event.preventDefault()
-  }
 
   const renderSuppressedItems = () => {
     const getStyle = displayGray => {
@@ -125,37 +122,10 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) =>
           <Icon alt='info-icon' display='info' />
           <p>
             This chart contains
-            <a
-              className='legend-container__outer link'
-              onClick={handleLinkClick}
-              data-tooltip-content='Data is
-               suppressed to maintain statistical reliability.
-                This occurs when the number of respondents or 
-                reported values does not meet the minimum
-                 reporting threshold.'
-              data-tooltip-id='supression-tooltip'
-              href='no-router-link'
-            >
-              suppressed data
-            </a>
+            <TooltipLink linkText='suppressed data' href={null} tooltipOpacity={config.tooltips.opacity} />
           </p>
         </div>
       )}
-
-      <ReactTooltip
-        id='supression-tooltip'
-        place='top'
-        effect='solid'
-        variant='light'
-        style={{
-          background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`,
-          color: 'black',
-          padding: '9px 18px',
-          boxShadow: '0px 2px 2px rgba(28, 29, 31, 0.45)',
-          maxWidth: '239px',
-          borderRadius: '4px'
-        }}
-      />
     </React.Fragment>
   )
 }
