@@ -31,11 +31,7 @@ export default function useMapLayers(
 
   useEffect(() => {
     const fetchLayers = async () => {
-      try {
-        await fetchGeoJSONLayers()
-      } catch (error) {
-        console.error('Error fetching GeoJSON layers:', error)
-      }
+      await fetchGeoJSONLayers()
     }
 
     fetchLayers()
@@ -48,8 +44,12 @@ export default function useMapLayers(
   }, [fetchedTopoJSON])
 
   const fetchGeoJSONLayers = async () => {
-    const geos = await getMapTopoJSONLayers()
-    setFetchedTopoJSON(geos)
+    try {
+      const geos = await getMapTopoJSONLayers()
+      setFetchedTopoJSON(geos)
+    } catch (e) {
+      console.error('Error fetching GeoJSON layers:', e)
+    }
   }
 
   const handleRemoveLayer = (e: MouseEvent<HTMLButtonElement>, index: number) => {
