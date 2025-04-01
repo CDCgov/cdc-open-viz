@@ -5,15 +5,6 @@ import { VizFilter } from '@cdc/core/types/VizFilter'
 import { DataRow } from '../types/MapConfig'
 
 const useGenerateRuntimeData = (state: MapConfig) => {
-  /**
-   * Generates runtime data based on the provided configuration object, filters, and hash.
-   *
-   * @param {MapConfig} configObj - The configuration object for the map.
-   * @param {VizFilter[]} filters - The array of filters to apply to the data.
-   * @param {number} hash - The hash value to associate with the result.
-   * @param {boolean} [test] - Optional flag to enable test logging.
-   * @returns {{ [uid: string]: DataRow }} - The generated runtime data.
-   */
   const generateRuntimeData = (
     configObj: MapConfig,
     filters: VizFilter[],
