@@ -243,7 +243,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   return (
     <ErrorBoundary component='Sidebar'>
-      <div className={`legends ${needsTopMargin ? 'mt-1' : ''}`}>
+      <div className={`legends ${needsTopMargin ? 'mt-4' : ''}`}>
         <aside
           id={skipId || 'legend'}
           className={legendClasses.aside.join(' ') || ''}

@@ -352,7 +352,7 @@ const CountyMap = () => {
         if (county && data[county.id]) {
           if (applyLegendToRow(data[county.id], state)) {
             context.globalAlpha = 1
-            context.fillStyle = applyLegendToRow(data[county.id], state)[1]
+            context.fillStyle = applyLegendToRow(data[county.id], state)[0]
             context.strokeStyle = geoStrokeColor
             context.lineWidth = lineWidth
             context.beginPath()
