@@ -86,7 +86,7 @@ export type Legend = CoreLegend & {
   style: 'circles' | 'boxes' | 'gradient' | 'lines'
   subStyle: 'linear blocks' | 'smooth'
   hasShape: boolean
-  order: 'custom' | 'dataColumn' | 'asc' | 'desc'
+  order: 'dataColumn' | 'asc' | 'desc'
   orderedValues: Label[]
   tickRotation: string
   hideBorder: {
