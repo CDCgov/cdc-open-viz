@@ -88,7 +88,8 @@ export default {
     showFullGeoNameInCSV: false,
     forceDisplay: true,
     download: false,
-    indexLabel: ''
+    indexLabel: '',
+    cellMinWidth: '0'
   },
   tooltips: {
     appearanceType: 'hover',

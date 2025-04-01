@@ -10,7 +10,7 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 
 import Loading from '@cdc/core/components/Loading'
-import { navigationHandler } from '../helpers/navigationHandler'
+import { navigationHandler } from '../helpers'
 import ConfigContext from '../context'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
@@ -217,7 +217,7 @@ const DataTable = props => {
   if (!state.data) return <Loading />
 
   const rows = Object.keys(runtimeData)
-    .filter(row => applyLegendToRow(runtimeData[row]))
+    .filter(row => applyLegendToRow(runtimeData[row], state))
     .sort((a, b) => {
       const sortVal = customSort(
         runtimeData[a][state.columns[sortBy.column].name],
@@ -326,7 +326,7 @@ const DataTable = props => {
 
                         if (column === 'geo') {
                           const rowObj = runtimeData[row]
-                          const legendColor = applyLegendToRow(rowObj)
+                          const legendColor = applyLegendToRow(rowObj, state)
 
                           var labelValue
                           if (state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {

@@ -1,4 +1,4 @@
-import { useEffect, memo, useContext, useRef, useState } from 'react'
+import { useEffect, memo, useContext } from 'react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { geoPath } from 'd3-geo'
 import { CustomProjection } from '@visx/geo'
@@ -8,15 +8,18 @@ import CityList from '../../CityList'
 import ConfigContext from '../../../context'
 import Annotation from '../../Annotation'
 import SingleState from './SingleState'
-import { getTopoData, getCurrentTopoYear, isTopoReady } from './../helpers/map'
 import ZoomableGroup from '../../ZoomableGroup'
 import ZoomControls from '../../ZoomControls'
 import { MapContext } from '../../../types/MapContext'
 import useStateZoom from '../../../hooks/useStateZoom'
 import { Text } from '@visx/text'
-import { getGeoStrokeColor } from '../../../helpers/colors'
-import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
-import { titleCase } from '../../../helpers/titleCase'
+
+// map-level helpers
+import { titleCase, handleMapAriaLabels, getGeoStrokeColor } from '../../../helpers'
+// state-level helpers
+import { getTopoData, getCurrentTopoYear, isTopoReady } from './../helpers/map'
+import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
+import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 
 // SVG ITEMS
 const WIDTH = 880
@@ -26,17 +29,12 @@ const PADDING = 25
 const SingleStateMap = props => {
   const {
     state,
-    applyTooltipsToGeo,
-    data,
-    geoClickHandler,
     applyLegendToRow,
-    displayGeoName,
     setSharedFilterValue,
     isFilterValueSupported,
     runtimeFilters,
     tooltipId,
     position,
-    setPosition,
     stateToShow,
     topoData,
     setTopoData,
@@ -46,6 +44,8 @@ const SingleStateMap = props => {
   } = useContext<MapContext>(ConfigContext)
 
   const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection, statePicked } = useStateZoom(topoData)
+  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
+  const { geoClickHandler } = useGeoClickHandler()
 
   const cityListProjection = geoAlbersUsaTerritories()
     .translate([WIDTH / 2, HEIGHT / 2])
@@ -113,11 +113,8 @@ const SingleStateMap = props => {
       <CityList
         projection={cityListProjection}
         key='cities'
-        data={data}
         state={state}
         geoClickHandler={geoClickHandler}
-        applyTooltipsToGeo={applyTooltipsToGeo}
-        displayGeoName={displayGeoName}
         applyLegendToRow={applyLegendToRow}
         titleCase={titleCase}
         setSharedFilterValue={setSharedFilterValue}

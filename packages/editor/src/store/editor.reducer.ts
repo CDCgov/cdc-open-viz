@@ -6,7 +6,7 @@ import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 export type EditorState = {
   config?: Visualization
   tempConfig?: Visualization | null
-  errors: string[]
+  errors: Record<string, string>
   currentViewport: string
   globalActive: number
   newViz?: boolean

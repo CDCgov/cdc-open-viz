@@ -16,7 +16,7 @@ type VisualizationWrapper = {
   showEditorPanel?: boolean
 }
 
-const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) => {
+const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, ref) => {
   const {
     config = {},
     isEditor = false,
@@ -93,7 +93,6 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
   }
 
   return (
-    // prettier-ignore
     <div
       {...(config.type === 'chart' ? { 'data-lollipop': config.isLollipopChart } : {})}
       className={getWrappingClasses().join(' ')}

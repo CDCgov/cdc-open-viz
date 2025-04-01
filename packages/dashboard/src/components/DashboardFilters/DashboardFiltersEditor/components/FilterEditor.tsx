@@ -6,11 +6,6 @@ import DataTransform from '@cdc/core/helpers/DataTransform'
 import { useEffect, useMemo, useState } from 'react'
 import { SharedFilter } from '../../../../types/SharedFilter'
 
-// Add defaultValue to SharedFilter type
-interface SharedFilter {
-  defaultValue?: string
-  resetLabel?: string
-}
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'

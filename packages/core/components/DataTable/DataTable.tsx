@@ -27,7 +27,6 @@ import _ from 'lodash'
 import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
 
 export type DataTableProps = {
-  applyLegendToRow?: Function
   colorScale?: Function
   columns?: Record<string, Column>
   config: TableConfig
@@ -58,20 +57,20 @@ export type DataTableProps = {
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = (props: DataTableProps) => {
   const {
+    columns,
     config,
     dataConfig,
     defaultSortBy,
     displayGeoName,
-    tableTitle,
-    vizTitle,
+    expandDataTable,
+    formatLegendLocation,
+    headerColor,
     rawData,
     runtimeData: parentRuntimeData,
-    headerColor,
-    expandDataTable,
-    columns,
-    viewport,
-    formatLegendLocation,
     tabbingId,
+    tableTitle,
+    viewport,
+    vizTitle,
     wrapColumns
   } = props
   const runtimeData = useMemo(() => {
@@ -229,6 +228,8 @@ const DataTable = (props: DataTableProps) => {
     const getDownloadData = () => {
       const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
       const sharedFilterColumns = config.table?.sharedFilterColumns || []
+      const vizFilterColumns = (config.filters || []).map(filter => filter.columnName)
+      const filterColumns = [...sharedFilterColumns, ...vizFilterColumns]
       const visibleData =
         config.type === 'map'
           ? getMapRowData(
@@ -238,10 +239,10 @@ const DataTable = (props: DataTableProps) => {
               formatLegendLocation,
               runtimeData as Record<string, Object>,
               displayGeoName,
-              sharedFilterColumns
+              filterColumns
             )
           : runtimeData.map(d => {
-              return _.pick(d, [...sharedFilterColumns, ...dataSeriesColumns])
+              return _.pick(d, [...filterColumns, ...dataSeriesColumns])
             })
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
 
@@ -273,7 +274,7 @@ const DataTable = (props: DataTableProps) => {
 
     const childrenMatrix =
       config.type === 'map'
-        ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData, viewport })
+        ? mapCellMatrix({ ...props, rows, wrapColumns, runtimeData, viewport })
         : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
 
     // If every value in a column is a number, record the column index so the header and cells can be right-aligned

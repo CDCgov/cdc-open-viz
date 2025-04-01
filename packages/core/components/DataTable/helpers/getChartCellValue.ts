@@ -4,7 +4,7 @@ import { TableConfig } from '../types/TableConfig'
 
 const isPivotColumn = (columnName, config) => {
   const tableHasPivotColumnConfigured = config.table.pivot?.valueColumns?.length
-  const originalColumnNames = Object.keys(config.data[0] || {})
+  const originalColumnNames = Object.keys(config.data?.[0] || {})
   const columnIsPivot = originalColumnNames.length && !originalColumnNames.includes(columnName)
   return tableHasPivotColumnConfigured && columnIsPivot
 }
