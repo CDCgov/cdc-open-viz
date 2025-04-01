@@ -1,14 +1,9 @@
 import { MapConfig, Coordinate, DataRow } from '../src/types/MapConfig'
 import { GeneratedLegend } from '../src/hooks/useGenerateRuntimeLegend'
 import { VizFilter } from '@cdc/core/types/VizFilter'
-
-type Action<T, P = undefined, R = undefined> = {
-  type: T
-  payload?: P
-}
-
-type RuntimeData = { [uid: string]: DataRow }[]
-type Modal = { geoName: string; keyedData: Record<string, any>[] }
+import { type Action } from '@cdc/core/types/Action'
+import { RuntimeData } from '../src/types/RuntimeData'
+import { Modal } from '../src/types/Modal'
 
 // Action Types
 type SET_ACCESSIBLE_STATUS = Action<'SET_ACCESSIBLE_STATUS', string>
