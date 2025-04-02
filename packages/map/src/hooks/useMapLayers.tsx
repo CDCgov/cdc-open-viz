@@ -30,11 +30,7 @@ export default function useMapLayers(
   const [featureArray, setFeatureArray] = useState([])
 
   useEffect(() => {
-    const fetchLayers = async () => {
-      await fetchGeoJSONLayers()
-    }
-
-    fetchLayers()
+    fetchGeoJSONLayers()
   }, [config.map.layers])
 
   useEffect(() => {
