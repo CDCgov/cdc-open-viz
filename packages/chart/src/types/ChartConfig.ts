@@ -233,6 +233,7 @@ export type ForestPlotConfig = {
 export type LineChartConfig = {
   allowLineToBarGraph: boolean
   convertLineToBarGraph: boolean
+  enlargeIsolatedDots: boolean
   lineDatapointStyle: 'hidden' | 'always show' | 'hover'
   visualizationType: 'Line'
 } & AllChartsConfig

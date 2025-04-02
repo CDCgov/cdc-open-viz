@@ -1,6 +1,6 @@
 import React from 'react'
 import chroma from 'chroma-js'
-import { type ChartConfig } from '../../../types/ChartConfig'
+import { LineChartConfig, type ChartConfig } from '../../../types/ChartConfig'
 import { GlyphDiamond, GlyphCircle, GlyphSquare, GlyphTriangle, GlyphCross, Glyph as CustomGlyph } from '@visx/glyph'
 import { Text } from '@visx/text'
 
@@ -62,7 +62,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     mode,
     seriesIndex
   } = props
-  const { lineDatapointStyle, visual } = config
+  const { enlargeIsolatedDots, lineDatapointStyle, visual } = config as LineChartConfig
   const filtered = config?.series.filter(s => s.dataKey === seriesKey)?.[0]
   const Shape =
     Glyphs[
@@ -70,6 +70,9 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     ]
   const isReversedTriangle = seriesIndex === 4
   const transformShape = (top, left) => `translate(${left}, ${top})${isReversedTriangle ? ' rotate(180)' : ''}`
+  const LARGE_DOT_SIZE = 124
+  const REGULAR_DOT_SIZE = 55
+  const dotSize = enlargeIsolatedDots ? LARGE_DOT_SIZE : REGULAR_DOT_SIZE
 
   // If we're not showing the circle, simply return
   const getColor = (
@@ -210,7 +213,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
 
       return (
         <g transform={transformShape(positionTop, positionLeft)}>
-          <Shape size={55} stroke={color} fill={color} />
+          <Shape size={dotSize} stroke={color} fill={color} />
         </g>
       )
     }
