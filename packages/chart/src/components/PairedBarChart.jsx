@@ -6,6 +6,7 @@ import { Text } from '@visx/text'
 
 import ConfigContext from '../ConfigContext'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 const PairedBarChart = ({ width, height, originalWidth }) => {
@@ -47,8 +48,8 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
   })
 
   // Set label color
-  groupOne.labelColor = groupOne.color ? getContrastColor('#000', groupOne.color) : '#000'
-  groupTwo.labelColor = groupTwo.color ? getContrastColor('#000', groupTwo.color) : '#000'
+  groupOne.labelColor = groupOne.color ? getContrastColor(APP_FONT_COLOR, groupOne.color) : APP_FONT_COLOR
+  groupTwo.labelColor = groupTwo.color ? getContrastColor(APP_FONT_COLOR, groupTwo.color) : APP_FONT_COLOR
 
   const label = config.yAxis.label ? `${config.yAxis.label}: ` : ''
 
