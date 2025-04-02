@@ -173,7 +173,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                       height={sizes[size] ?? 10}
                       width={sizes[size] ?? 10}
                       fill={defaultPatternColor}
-                      radius={0.5}
+                      radius={1.25}
                     />
                   )}
                   {pattern === 'lines' && (
