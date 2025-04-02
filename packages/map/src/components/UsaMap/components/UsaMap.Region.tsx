@@ -19,6 +19,7 @@ import { displayGeoName, handleMapAriaLabels, getGeoStrokeColor, getGeoFillColor
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 const Rect = ({ label, text, stroke, strokeWidth, ...props }) => {
   return (
@@ -98,8 +99,7 @@ const UsaRegionMap = props => {
     let toolTip
 
     let styles: React.CSSProperties = {
-      fill: geoFillColor,
-      color: '#202020'
+      fill: geoFillColor
     }
 
     const label = supportedTerritories[territory][1]
@@ -176,7 +176,7 @@ const UsaRegionMap = props => {
           x={4}
           strokeWidth='0'
           fontSize={13}
-          style={{ fill: '#202020' }}
+          style={{ fill: APP_FONT_COLOR }}
           alignmentBaseline='middle'
           transform={`translate(${centroid[0] + x}, ${centroid[1] + y})`}
         >

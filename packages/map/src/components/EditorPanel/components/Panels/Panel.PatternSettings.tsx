@@ -18,6 +18,7 @@ import Alert from '@cdc/core/components/Alert'
 import { feature } from 'topojson-client'
 import { checkColorContrast, getContrastColor, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
 import useApplyLegendToRow from '../../../../hooks/useApplyLegendToRow'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 type PanelProps = {
   name: string
@@ -88,7 +89,8 @@ const PatternSettings = ({ name }: PanelProps) => {
         if (!hasMatchingValues) return
 
         const currentFill = legendColors[0]
-        const patternColor = keyToUpdate === 'color' && value !== '' ? value : getContrastColor('#000', currentFill)
+        const patternColor =
+          keyToUpdate === 'color' && value !== '' ? value : getContrastColor(APP_FONT_COLOR, currentFill)
         const contrastCheck = checkColorContrast(currentFill, patternColor)
 
         // Log a warning if the contrast check fails

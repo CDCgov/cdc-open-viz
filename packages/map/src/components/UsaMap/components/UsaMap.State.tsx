@@ -28,6 +28,8 @@ import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { titleCase } from '../../../helpers/titleCase'
 import TerritoriesSection from './TerritoriesSection'
 import { displayGeoName } from '../../../helpers/displayGeoName'
+import { isMobileStateLabelViewport } from '@cdc/core/helpers/viewports'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
@@ -67,8 +69,9 @@ const UsaMap = () => {
       handleDragStateChange,
       mapId,
       logo,
-    legendMemo,
-    legendSpecialClassLastMemo
+      legendMemo,
+      legendSpecialClassLastMemo,
+      currentViewport
     } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
@@ -145,7 +148,7 @@ const UsaMap = () => {
     let styles = {
       fill: geoFillColor,
       stroke: geoStrokeColor,
-      color: '#202020'
+      color: APP_FONT_COLOR
     }
 
     const label = supportedTerritories[territory][1]
@@ -156,7 +159,8 @@ const UsaMap = () => {
           key={label}
           label={label}
           style={styles}
-          text={styles.color}
+          textColor={styles.color}
+          strokeColor='#fff'
           territoryData={territoryData}
           backgroundColor={styles.fill}
         />
@@ -167,14 +171,14 @@ const UsaMap = () => {
     const legendColors = applyLegendToRow(territoryData, state)
 
     if (legendColors) {
-      const textColor = getContrastColor('#FFF', legendColors[0])
-
       let needsPointer = false
 
       // If we need to add a pointer cursor
       if ((columns.navigate && territoryData[columns.navigate.name]) || tooltips.appearanceType === 'click') {
         needsPointer = true
       }
+
+      const { textColor, strokeColor } = outlinedTextColor(legendColors[0])
 
       styles = {
         color: textColor,
@@ -201,9 +205,9 @@ const UsaMap = () => {
           key={`label__${territoryIndex}`}
           label={label}
           style={styles}
-          text={styles.color}
           strokeWidth={1}
           textColor={textColor}
+          strokeColor={strokeColor}
           handleShapeClick={() => geoClickHandler(territory, territoryData)}
           dataTooltipId={`tooltip__${tooltipId}`}
           dataTooltipHtml={toolTip}
@@ -554,10 +558,11 @@ const UsaMap = () => {
           <text
             x={x}
             y={y}
-            fontSize={14}
-            strokeWidth='0'
-            // paintOrder='stroke' // PENDING DEV-9278: Adds a stroke around the text potentially for 508 compliance
-            // stroke={strokeColor}
+            fontSize={isMobileStateLabelViewport(currentViewport) ? 16 : 13}
+            fontWeight={900}
+            strokeWidth='1'
+            paintOrder='stroke'
+            stroke={strokeColor}
             style={{ fill: textColor }}
             textAnchor='middle'
           >
@@ -582,9 +587,9 @@ const UsaMap = () => {
         <text
           x={4}
           strokeWidth='0'
-          // paintOrder='stroke' // PENDING DEV-9278: Adds a stroke around the text potentially for 508 compliance
-          // stroke={strokeColor}
-          fontSize={13}
+          stroke={APP_FONT_COLOR}
+          fontSize={isMobileStateLabelViewport(currentViewport) ? 16 : 13}
+          fontWeight={900}
           style={{ fill: textColor }}
           alignmentBaseline='middle'
           transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}

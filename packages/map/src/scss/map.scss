@@ -97,7 +97,14 @@ $medium: 768px;
 }
 
 .territories-label {
-  font-size: 1em;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+@include breakpointClass(sm) {
+  .territories-label {
+    font-size: 1rem;
+  }
 }
 
 // Cities and Territories
@@ -105,11 +112,12 @@ $medium: 768px;
   gap: 0.5em;
   svg {
     max-width: 35px;
-    min-width: 25px;
+    min-width: 35px;
     transition: 0.3s all;
 
     text {
-      font-size: 0.95em;
+      font-size: var(--territory-label-font-size);
+      font-weight: 900;
     }
   }
 }
@@ -177,6 +185,11 @@ $medium: 768px;
       width: 2.5em;
     }
   }
+  .territories {
+    svg {
+      max-width: 45px;
+    }
+  }
 }
 
 @include breakpointClass(md) {
@@ -184,14 +197,6 @@ $medium: 768px;
     top: 1em;
     left: 1em;
     transform: none;
-  }
-  .territories {
-    > span {
-      margin-left: 0;
-    }
-    svg {
-      max-width: 45px;
-    }
   }
 }
 
