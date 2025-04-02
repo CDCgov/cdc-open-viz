@@ -1,9 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-import CdcDataBite from './CdcDataBite'
 import '@cdc/core/styles/cove-main.scss'
 import './coreStyles_databite.scss'
+
+import CdcDataBite from './CdcDataBite'
 
 let isEditor = window.location.href.includes('editor=true')
 
