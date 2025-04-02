@@ -16,6 +16,7 @@ import Regions from '../../Regions'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import isNumber from '@cdc/core/helpers/isNumber'
 import createBarElement from '@cdc/core/components/createBarElement'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 // Third party libraries
 import chroma from 'chroma-js'
 // Types
@@ -50,8 +51,6 @@ export const BarChartVertical = () => {
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
   const root = document.documentElement
-
-  const coolGray90 = getComputedStyle(root).getPropertyValue('--cool-gray-90')
 
   let data = transformedData
   // check if user add suppression
@@ -376,7 +375,7 @@ export const BarChartVertical = () => {
                         {hasConfidenceInterval && bar.value !== undefined && datum && (
                           <path
                             key={`confidence-interval-v-${datum[config.runtime.originalXAxis.dataKey]}`}
-                            stroke={coolGray90}
+                            stroke={APP_FONT_COLOR}
                             strokeWidth='px'
                             d={`M${xPos - tickWidth} ${upperPos}
                                 L${xPos + tickWidth} ${upperPos}

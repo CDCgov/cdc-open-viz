@@ -441,6 +441,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   }, [maxValue])
 
   useEffect(() => {
+    if (!yScale?.ticks) return
     const ticks = yScale.ticks(handleNumTicks)
     if (orientation === 'horizontal' || !labelsOverflow || config.yAxis?.max || ticks.length === 0) {
       setYAxisAutoPadding(0)
