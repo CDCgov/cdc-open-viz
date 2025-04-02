@@ -19,7 +19,7 @@ import { displayGeoName, handleMapAriaLabels, getGeoStrokeColor, getGeoFillColor
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
-import { APP_FONT_COLOR } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 const Rect = ({ label, text, stroke, strokeWidth, ...props }) => {
   return (

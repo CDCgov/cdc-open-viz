@@ -5,7 +5,7 @@ import { MapContext } from './../../../../types/MapContext'
 import HexIcon from '../HexIcon'
 import { Text } from '@visx/text'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
-import { APP_FONT_COLOR } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 const offsets = {
   'US-VT': [50, -8],

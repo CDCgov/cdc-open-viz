@@ -29,7 +29,7 @@ import { titleCase } from '../../../helpers/titleCase'
 import TerritoriesSection from './TerritoriesSection'
 import { displayGeoName } from '../../../helpers/displayGeoName'
 import { isMobileStateLabelViewport } from '@cdc/core/helpers/viewports'
-import { APP_FONT_COLOR } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import ConfigContext, { ChartDispatchContext } from '../ConfigContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
-import { APP_FONT_SIZE } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 export const useBarChart = () => {
   const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, setSeriesHighlight, seriesHighlight } =
     useContext(ConfigContext)

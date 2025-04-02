@@ -14,7 +14,7 @@ import { type ChartContext } from '@cdc/chart/src/types/ChartContext'
 
 // cdc
 import ConfigContext from '../../ConfigContext'
-import { APP_FONT_SIZE } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 
 const ForestPlot = ({
   xScale,

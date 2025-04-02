@@ -18,7 +18,7 @@ import Alert from '@cdc/core/components/Alert'
 import { feature } from 'topojson-client'
 import { checkColorContrast, getContrastColor, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
 import useApplyLegendToRow from '../../../../hooks/useApplyLegendToRow'
-import { APP_FONT_COLOR } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 type PanelProps = {
   name: string

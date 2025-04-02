@@ -5,7 +5,7 @@ import { BarStackHorizontal } from '@visx/shape'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
-import { APP_FONT_COLOR } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 // types

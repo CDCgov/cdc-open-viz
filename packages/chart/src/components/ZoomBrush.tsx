@@ -7,7 +7,7 @@ import { ScaleLinear, ScaleBand } from 'd3-scale'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
-import { APP_FONT_SIZE } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 
 interface Props {
   xScaleBrush: ScaleLinear<number, number>

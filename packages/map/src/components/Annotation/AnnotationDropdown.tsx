@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 import ConfigContext from '../../context'
 import './AnnotationDropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
-import { APP_FONT_SIZE } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 import AnnotationList from './AnnotationList'
 
 const AnnotationDropdown = () => {

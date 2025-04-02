@@ -1,6 +1,6 @@
 import chroma from 'chroma-js'
 
-import { APP_FONT_COLOR } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 /**
  * WCAG 2.1 CONSTANTS

@@ -6,7 +6,7 @@ import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import useIntersectionObserver from '../hooks/useIntersectionObserver'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
-import { APP_FONT_COLOR } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 export default function DeviationBar({ height, xScale }) {

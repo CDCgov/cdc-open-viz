@@ -12,7 +12,7 @@ import { BarGroup } from '@visx/shape'
 
 // CDC core components and helpers
 import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
-import { APP_FONT_COLOR } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { getBarConfig, testZeroValue } from '../helpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'

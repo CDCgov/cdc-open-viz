@@ -7,7 +7,7 @@ import ConfigContext from '../../ConfigContext'
 import chroma from 'chroma-js'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
-import { APP_FONT_SIZE } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 
 const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
   const { config } = useContext(ConfigContext)

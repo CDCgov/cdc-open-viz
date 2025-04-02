@@ -3,7 +3,7 @@ import ConfigContext from '../../../ConfigContext'
 import './AnnotationDropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
 import Annotation from '..'
-import { APP_FONT_SIZE } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 
 const AnnotationDropdown = () => {
   const { currentViewport: viewport, config } = useContext(ConfigContext)
