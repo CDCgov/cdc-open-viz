@@ -164,6 +164,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                       height={sizes[size] ?? 10}
                       width={sizes[size] ?? 10}
                       fill={defaultPatternColor}
+                      strokeWidth={0.25}
                     />
                   )}
                   {pattern === 'circles' && (
@@ -172,6 +173,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                       height={sizes[size] ?? 10}
                       width={sizes[size] ?? 10}
                       fill={defaultPatternColor}
+                      radius={0.5}
                     />
                   )}
                   {pattern === 'lines' && (
@@ -180,7 +182,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                       height={sizes[size] ?? 6}
                       width={sizes[size] ?? 10}
                       stroke={defaultPatternColor}
-                      strokeWidth={2}
+                      strokeWidth={0.75}
                       orientation={['diagonalRightToLeft']}
                     />
                   )}
