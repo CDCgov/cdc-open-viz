@@ -1,13 +1,12 @@
 import { useContext } from 'react'
 import ConfigContext from '../context'
-import useColumnNames from './useColumnNames'
+import { getColumnNames } from '../helpers/getColumnNames'
 
 const useColumnsRequiredChecker = () => {
   const { state, setRequiredColumns } = useContext(ConfigContext)
 
   const columnsRequiredChecker = () => {
-    const primaryColumnName = state.columns.primary.name
-    const geoColumnName = state.columns.geo.name
+    const { primaryColumnName, geoColumnName } = getColumnNames(state.columns)
 
     let columnList = []
 

@@ -8,7 +8,7 @@ import { displayGeoName, getGeoStrokeColor, SVG_HEIGHT, SVG_PADDING, SVG_WIDTH, 
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
-import useColumnNames from '../hooks/useColumnNames'
+import { getColumnNames } from '../helpers/getColumnNames'
 
 type CityListProps = {
   data: Object[]
@@ -22,7 +22,7 @@ type CityListProps = {
 const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValueSupported, tooltipId, projection }) => {
   const { state, topoData, runtimeData, position, legendMemo, legendSpecialClassLastMemo } = useContext(ConfigContext)
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
-  const { geoColumnName, latitudeColumnName, longitudeColumnName, primaryColumnName } = useColumnNames()
+  const { geoColumnName, latitudeColumnName, longitudeColumnName, primaryColumnName } = getColumnNames(state.columns)
   const { additionalCityStyles } = state.visual || []
 
   if (!projection) return

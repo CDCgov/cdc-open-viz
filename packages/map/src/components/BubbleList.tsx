@@ -8,7 +8,7 @@ import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
 import { displayGeoName, SVG_HEIGHT, SVG_WIDTH } from '../helpers'
 import { geoMercator, geoAlbersUsa, type GeoProjection } from 'd3-geo'
-import useColumnNames from '../hooks/useColumnNames'
+import { getColumnNames } from '../helpers/getColumnNames'
 
 type BubbleListProps = {
   runtimeData: Object[]
@@ -27,7 +27,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
   // hooks
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const { primaryColumnName, geoColumnName } = useColumnNames()
+  const { primaryColumnName, geoColumnName } = getColumnNames(state.columns)
 
   const maxDataValue = Math.max(...data.map(d => d[primaryColumnName]))
   const size = scaleLinear().domain([hasBubblesWithZeroOnMap, maxDataValue]).range([minBubbleSize, maxBubbleSize])
