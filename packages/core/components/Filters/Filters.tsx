@@ -284,28 +284,36 @@ type FilterProps = {
 const Filters = (props: FilterProps) => {
   const { config: visualizationConfig, filteredData, dimensions, standaloneMap } = props
   const { filters, general, theme, filterBehavior } = visualizationConfig
-  const [mobileFilterStyle, setMobileFilterStyle] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState<EventTarget>(null)
-  const [wrappingFilters, setWrappingFilters] = useState({})
-  const [initialActiveFilters, setInitialActiveFilters] = useState([])
 
-  useEffect(() => {
-    if (!filteredData) return
-
-    setInitialActiveFilters(filters.map(filter => filter.active))
+  const initialActiveFilters = useMemo(() => {
+    if (!filteredData) return []
+    return filters.map(filter => filter.active)
   }, [])
 
-  const activeFilters = filters.map(filter => filter.active)
-  const initialFiltersActive = initialActiveFilters.every((filter, i) => activeFilters.includes(filter))
+  const initialFiltersActive = useMemo(() => {
+    const activeFilters = filters.map(filter => filter.active)
+    return initialActiveFilters.every(filter => activeFilters.includes(filter))
+  }, [filters])
+
   const id = useId()
 
+  // Handle Wrapping Filters
   const wrappingFilterRefs = useRef({})
-  const filterWrappingStatusesToUpdate = getWrappingStatuses(wrappingFilterRefs, wrappingFilters, filters)
 
-  if (filterWrappingStatusesToUpdate.length) {
-    const validStatuses = filterWrappingStatusesToUpdate.filter(Boolean) as [string, any][]
-    setWrappingFilters({ ...wrappingFilters, ...Object.fromEntries(validStatuses) })
-  }
+  const [wrappingFilters, setWrappingFilters] = useState<
+    Record<string, { highestWrappedWidth: number; isDropdown: boolean }>
+  >({})
+
+  useEffect(() => {
+    const filterWrappingStatusesToUpdate = getWrappingStatuses(wrappingFilterRefs, wrappingFilters, filters)
+
+    if (filterWrappingStatusesToUpdate.length) {
+      const validStatuses = filterWrappingStatusesToUpdate.filter(Boolean) as [string, any][]
+      setWrappingFilters({ ...wrappingFilters, ...Object.fromEntries(validStatuses) })
+    }
+  }, [filters, dimensions?.[0]])
+  // end of Handle Wrapping Filters
 
   // useFilters hook provides data and logic for handling various filter functions
   // prettier-ignore
@@ -318,33 +326,15 @@ const Filters = (props: FilterProps) => {
     handleSorting
   } = useFilters(props)
 
-  useEffect(() => {
-    if (!dimensions) return
+  const mobileFilterStyle = useMemo(() => {
+    if (!dimensions) return false
     const [width] = dimensions
 
     const isMobile = Number(width) < 768
     const isTabSimple = filters?.some(filter => filter.filterStyle === VIZ_FILTER_STYLE.tabSimple)
 
-    const defaultToMobile = isMobile && filters?.length && !isTabSimple
-
-    setMobileFilterStyle(defaultToMobile)
-  }, [dimensions])
-
-  useEffect(() => {
-    const noLongerTabSimple = Object.keys(wrappingFilters).filter(columnName => {
-      const filter = filters.find(filter => filter.columnName === columnName)
-      if (!filter) return false
-      return filter.filterStyle !== VIZ_FILTER_STYLE.tabSimple
-    })
-
-    if (!noLongerTabSimple.length) return
-
-    setWrappingFilters(
-      Object.fromEntries(
-        Object.entries(wrappingFilters).filter(([columnName]) => !noLongerTabSimple.includes(columnName))
-      )
-    )
-  }, [filters])
+    return isMobile && filters?.length && !isTabSimple
+  }, [dimensions[0]])
 
   useEffect(() => {
     if (selectedFilter) {
@@ -422,6 +412,7 @@ const Filters = (props: FilterProps) => {
 
       const { active, queuedActive, label, filterStyle, columnName } = singleFilter as VizFilter
       const { isDropdown } = wrappingFilters[columnName] || {}
+      //const isDropdown = false
 
       handleSorting(singleFilter)
       singleFilter.values?.forEach((filterOption, index) => {
