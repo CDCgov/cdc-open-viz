@@ -5,7 +5,7 @@ import _ from 'lodash'
 import Button from '../elements/Button'
 import MultiSelect from '../MultiSelect'
 import { Visualization } from '../../types/Visualization'
-import { MultiSelectFilter, OrderBy, VizFilter } from '../../types/VizFilter'
+import { MultiSelectFilter, VizFilter } from '../../types/VizFilter'
 import { addValuesToFilters } from '../../helpers/addValuesToFilters'
 import { DimensionsType } from '../../types/Dimensions'
 import NestedDropdown from '../NestedDropdown'
@@ -17,6 +17,8 @@ import { getNewRuntime } from './helpers/getNewRuntime'
 import { filterVizData } from '../../helpers/filterVizData'
 import { getQueryParams, updateQueryString } from '../../helpers/queryStringUtils'
 import { applyQueuedActive } from './helpers/applyQueuedActive'
+import Tabs from './components/Tabs'
+import Dropdown from './components/Dropdown'
 
 export const VIZ_FILTER_STYLE = {
   dropdown: 'dropdown',
@@ -28,30 +30,12 @@ export const VIZ_FILTER_STYLE = {
   multiSelect: 'multi-select'
 } as const
 
-export const DROPDOWN_STYLES = 'py-2 ps-2 w-100 d-block'
-
 export type VizFilterStyle = (typeof VIZ_FILTER_STYLE)[keyof typeof VIZ_FILTER_STYLE]
 
 export const filterStyleOptions = Object.values(VIZ_FILTER_STYLE)
 
-export const filterOrderOptions: { label: string; value: OrderBy }[] = [
-  {
-    label: 'Ascending Alphanumeric',
-    value: 'asc'
-  },
-  {
-    label: 'Descending Alphanumeric',
-    value: 'desc'
-  },
-  {
-    label: 'Custom',
-    value: 'cust'
-  },
-  { label: 'Order By Data Column', value: 'column' }
-]
-
-const filterConstants = {
-  buttonText: 'Apply',
+const BUTTON_TEXT = {
+  apply: 'Apply',
   resetText: 'Clear Filters'
 }
 
@@ -68,39 +52,24 @@ type FilterProps = {
   getUniqueValues: Function
 }
 
-const Filters = (props: FilterProps) => {
-  const {
-    config: visualizationConfig,
-    filteredData,
-    dimensions,
-    standaloneMap,
-    setConfig,
-    setFilteredData,
-    excludedData,
-    getUniqueValues
-  } = props
+const Filters: React.FC<FilterProps> = ({
+  config: visualizationConfig,
+  filteredData,
+  dimensions,
+  standaloneMap,
+  setConfig,
+  setFilteredData,
+  excludedData,
+  getUniqueValues
+}) => {
   const { filters, general, theme, filterBehavior } = visualizationConfig
-  const [selectedFilter, setSelectedFilter] = useState<EventTarget>(null)
   const [showApplyButton, setShowApplyButton] = useState(false)
-
-  const initialActiveFilters = useMemo(() => {
-    if (!filteredData) return []
-    return filters.map(filter => filter.active)
-  }, [])
-
-  const initialFiltersActive = useMemo(() => {
-    const activeFilters = filters.map(filter => filter.active)
-    return initialActiveFilters.every(filter => activeFilters.includes(filter))
-  }, [filters])
-
-  const id = useId()
-
   // Handle Wrapping Filters
-  const wrappingFilterRefs = useRef({})
-
   const [wrappingFilters, setWrappingFilters] = useState<
     Record<string, { highestWrappedWidth: number; isDropdown: boolean }>
   >({})
+
+  const wrappingFilterRefs = useRef({})
 
   useEffect(() => {
     const filterWrappingStatusesToUpdate = getWrappingStatuses(wrappingFilterRefs, wrappingFilters, filters)
@@ -111,6 +80,16 @@ const Filters = (props: FilterProps) => {
     }
   }, [filters, dimensions?.[0]])
   // end of Handle Wrapping Filters
+
+  const initialActiveFilters = useMemo(() => {
+    if (!filteredData) return []
+    return filters.map(filter => filter.active)
+  }, [])
+
+  const initialFiltersActive = useMemo(() => {
+    const activeFilters = filters.map(filter => filter.active)
+    return initialActiveFilters.every(filter => activeFilters.includes(filter))
+  }, [filters])
 
   const changeFilterActive = (index, value) => {
     let newFilters = standaloneMap ? [...filteredData] : [...visualizationConfig.filters]
@@ -207,68 +186,12 @@ const Filters = (props: FilterProps) => {
 
   const mobileFilterStyle = useMemo(() => {
     if (!dimensions) false
-    const [width] = dimensions
+    const [width] = dimensions || []
     const isMobile = Number(width) < 768
     const isTabSimple = filters?.some(filter => filter.filterStyle === VIZ_FILTER_STYLE.tabSimple)
 
     return isMobile && filters?.length && !isTabSimple
-  }, [dimensions[0]])
-
-  useEffect(() => {
-    if (selectedFilter) {
-      const el = document.getElementById(selectedFilter.id)
-      if (el) el.focus()
-    }
-  }, [selectedFilter])
-
-  const TabBar = props => {
-    const { filter: singleFilter, index: outerIndex } = props
-    return (
-      <section className='single-filters__tab-bar'>
-        {singleFilter.values.map((filter, index) => {
-          const buttonClassList = ['button__tab-bar', singleFilter.active === filter ? 'button__tab-bar--active' : '']
-          return (
-            <button
-              id={`${filter}-${outerIndex}-${index}-${id}`}
-              className={buttonClassList.join(' ')}
-              key={filter}
-              onClick={e => {
-                changeFilterActive(outerIndex, filter)
-                setSelectedFilter(e.target)
-              }}
-              onKeyDown={e => {
-                if (e.keyCode === 13) {
-                  changeFilterActive(outerIndex, filter)
-                  setSelectedFilter(e.target)
-                }
-              }}
-            >
-              {filter}
-            </button>
-          )
-        })}
-      </section>
-    )
-  }
-
-  const Dropdown = props => {
-    const { index: outerIndex, label, active, filters } = props
-    return (
-      <select
-        id={`filter-${outerIndex}`}
-        name={label}
-        aria-label={`Filter by ${label}`}
-        className={`cove-form-select ${DROPDOWN_STYLES}`}
-        data-index='0'
-        value={active}
-        onChange={e => {
-          changeFilterActive(outerIndex, e.target.value)
-        }}
-      >
-        {filters}
-      </select>
-    )
-  }
+  }, [dimensions?.[0]])
 
   const vizFiltersWithValues = useMemo(() => {
     // Here charts is using config.filters where maps is using a runtime value
@@ -277,140 +200,6 @@ const Filters = (props: FilterProps) => {
     if (vizfilters.fromHash) delete vizfilters.fromHash // support for Maps config
     return addValuesToFilters(vizfilters as VizFilter[], visualizationConfig.data)
   }, [filters, filteredData])
-
-  // Resolve Filter Styles
-  const Style = () => {
-    return vizFiltersWithValues.map((singleFilter: VizFilter, outerIndex) => {
-      if (singleFilter.showDropdown === false) return
-
-      const DropdownOptions = []
-      const Pills = []
-      const Tabs = []
-      const isTabSimple = singleFilter.filterStyle === 'tab-simple'
-
-      const { active, queuedActive, label, filterStyle, columnName } = singleFilter as VizFilter
-      const { isDropdown } = wrappingFilters[columnName] || {}
-      //const isDropdown = false
-
-      handleSorting(singleFilter)
-      singleFilter.values?.forEach((filterOption, index) => {
-        const isActive = active === filterOption
-
-        const pillClassList = ['pill', isActive ? 'pill--active' : null, theme && theme]
-        const tabClassList = ['tab', isActive && 'tab--active', theme && theme, isTabSimple && 'tab--simple']
-
-        Pills.push(
-          <div className='pill__wrapper' key={`pill-${index}`}>
-            <button
-              id={`${filterOption}-${outerIndex}-${index}-${id}`}
-              className={pillClassList.join(' ')}
-              onKeyDown={e => {
-                if (e.keyCode === 13) {
-                  changeFilterActive(outerIndex, filterOption)
-                  setSelectedFilter(e.target)
-                }
-              }}
-              onClick={e => {
-                changeFilterActive(outerIndex, filterOption)
-                setSelectedFilter(e.target)
-              }}
-              name={label}
-            >
-              {filterOption}
-            </button>
-          </div>
-        )
-
-        DropdownOptions.push(
-          <option key={index} value={filterOption} aria-label={filterOption}>
-            {singleFilter.labels && singleFilter.labels[filterOption]
-              ? singleFilter.labels[filterOption]
-              : filterOption}
-          </option>
-        )
-
-        Tabs.push(
-          <button
-            id={`${filterOption}-${outerIndex}-${index}-${id}`}
-            className={tabClassList.join(' ')}
-            onClick={e => {
-              changeFilterActive(outerIndex, filterOption)
-              setSelectedFilter(e.target)
-            }}
-            onKeyDown={e => {
-              if (e.keyCode === 13) {
-                changeFilterActive(outerIndex, filterOption)
-                setSelectedFilter(e.target)
-              }
-            }}
-          >
-            {filterOption}
-          </button>
-        )
-      })
-
-      const classList = [
-        'single-filters',
-        'form-group',
-        mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`
-      ]
-      const mobileExempt = ['nested-dropdown', 'multi-select', VIZ_FILTER_STYLE.tabSimple].includes(filterStyle)
-      const showDefaultDropdown = ((filterStyle === 'dropdown' || mobileFilterStyle) && !mobileExempt) || isDropdown
-      const [nestedActiveGroup, nestedActiveSubGroup] = useMemo<string[]>(() => {
-        if (filterStyle !== 'nested-dropdown') return []
-        return (singleFilter.queuedActive || [singleFilter.active, singleFilter.subGrouping?.active]) as [
-          string,
-          string
-        ]
-      }, [singleFilter])
-      const hideLabelMargin = isTabSimple && !showDefaultDropdown
-      return (
-        <div className={classList.join(' ')} key={outerIndex} ref={el => (wrappingFilterRefs.current[columnName] = el)}>
-          <>
-            {label && (
-              <label className={`font-weight-bold mb-${hideLabelMargin ? '0' : '2'}`} htmlFor={`filter-${outerIndex}`}>
-                {label}
-              </label>
-            )}
-            {filterStyle === 'tab' && !mobileFilterStyle && Tabs}
-            {filterStyle === 'tab-simple' && !showDefaultDropdown && (
-              <div className='tab-simple-container d-flex w-100'>{Tabs}</div>
-            )}
-            {filterStyle === 'pill' && !mobileFilterStyle && Pills}
-            {filterStyle === 'tab bar' && !mobileFilterStyle && <TabBar filter={singleFilter} index={outerIndex} />}
-            {filterStyle === 'multi-select' && (
-              <MultiSelect
-                options={singleFilter.values.map(v => ({ value: v, label: v }))}
-                fieldName={outerIndex}
-                updateField={(_section, _subSection, fieldName, value) => changeFilterActive(fieldName, value)}
-                selected={singleFilter.active as string[]}
-                limit={(singleFilter as MultiSelectFilter).selectLimit || 5}
-              />
-            )}
-            {filterStyle === 'nested-dropdown' && (
-              <NestedDropdown
-                activeGroup={nestedActiveGroup}
-                activeSubGroup={nestedActiveSubGroup}
-                filterIndex={outerIndex}
-                options={getNestedOptions(singleFilter)}
-                listLabel={label}
-                handleSelectedItems={value => changeFilterActive(outerIndex, value)}
-              />
-            )}
-            {showDefaultDropdown && (
-              <Dropdown
-                filter={singleFilter}
-                index={outerIndex}
-                label={label}
-                active={queuedActive || active}
-                filters={DropdownOptions}
-              />
-            )}
-          </>
-        </div>
-      )
-    })
-  }
 
   if (visualizationConfig?.filters?.length === 0) return
 
@@ -429,9 +218,91 @@ const Filters = (props: FilterProps) => {
         <p className='filters-section__intro-text mb-3'>{visualizationConfig.filterIntro}</p>
       )}
       <div className='d-flex flex-wrap w-100 filters-section__wrapper align-items-end'>
-        {' '}
         <>
-          <Style />
+          {vizFiltersWithValues.map((singleFilter: VizFilter, outerIndex) => {
+            if (singleFilter.showDropdown === false) return
+            const { active, queuedActive, label, filterStyle, columnName } = singleFilter as VizFilter
+            const { isDropdown } = wrappingFilters[columnName] || {}
+
+            handleSorting(singleFilter)
+
+            const classList = [
+              'single-filters',
+              'form-group',
+              mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`
+            ]
+            const mobileExempt = ['nested-dropdown', 'multi-select', VIZ_FILTER_STYLE.tabSimple].includes(filterStyle)
+            const showDefaultDropdown =
+              ((filterStyle === 'dropdown' || mobileFilterStyle) && !mobileExempt) || isDropdown
+            const [nestedActiveGroup, nestedActiveSubGroup] = useMemo<string[]>(() => {
+              if (filterStyle !== 'nested-dropdown') return []
+              return (singleFilter.queuedActive || [singleFilter.active, singleFilter.subGrouping?.active]) as [
+                string,
+                string
+              ]
+            }, [singleFilter])
+            const hideLabelMargin = singleFilter.filterStyle === 'tab-simple' && !showDefaultDropdown
+            return (
+              <div
+                className={classList.join(' ')}
+                key={outerIndex}
+                ref={el => (wrappingFilterRefs.current[columnName] = el)}
+              >
+                {label && (
+                  <label
+                    className={`font-weight-bold mb-${hideLabelMargin ? '0' : '2'}`}
+                    htmlFor={`filter-${outerIndex}`}
+                  >
+                    {label}
+                  </label>
+                )}
+                {showDefaultDropdown && (
+                  <Dropdown
+                    filter={singleFilter}
+                    index={outerIndex}
+                    label={label}
+                    changeFilterActive={changeFilterActive}
+                  />
+                )}
+                {['tab', 'tab bar', 'pill'].includes(filterStyle) && !mobileFilterStyle && (
+                  <Tabs
+                    filter={singleFilter}
+                    index={outerIndex}
+                    changeFilterActive={changeFilterActive}
+                    theme={theme}
+                  />
+                )}
+                {filterStyle === 'tab-simple' && !showDefaultDropdown && (
+                  <Tabs
+                    filter={singleFilter}
+                    index={outerIndex}
+                    changeFilterActive={changeFilterActive}
+                    theme={theme}
+                  />
+                )}
+
+                {filterStyle === 'multi-select' && (
+                  <MultiSelect
+                    options={singleFilter.values.map(v => ({ value: v, label: v }))}
+                    fieldName={outerIndex}
+                    updateField={(_section, _subSection, fieldName, value) => changeFilterActive(fieldName, value)}
+                    selected={singleFilter.active as string[]}
+                    limit={(singleFilter as MultiSelectFilter).selectLimit || 5}
+                  />
+                )}
+                {filterStyle === 'nested-dropdown' && (
+                  <NestedDropdown
+                    activeGroup={nestedActiveGroup}
+                    activeSubGroup={nestedActiveSubGroup}
+                    filterIndex={outerIndex}
+                    options={getNestedOptions(singleFilter)}
+                    listLabel={label}
+                    handleSelectedItems={value => changeFilterActive(outerIndex, value)}
+                  />
+                )}
+              </div>
+            )
+          })}
           {filterBehavior === 'Apply Button' ? (
             <div className='filters-section__buttons'>
               <Button
@@ -441,10 +312,10 @@ const Filters = (props: FilterProps) => {
                 disabled={!showApplyButton}
                 className={[general?.headerColor ? general.headerColor : theme, 'apply', 'me-2'].join(' ')}
               >
-                {filterConstants.buttonText}
+                {BUTTON_TEXT.apply}
               </Button>
               <Button secondary disabled={initialFiltersActive} onClick={handleReset}>
-                {filterConstants.resetText}
+                {BUTTON_TEXT.resetText}
               </Button>
             </div>
           ) : (

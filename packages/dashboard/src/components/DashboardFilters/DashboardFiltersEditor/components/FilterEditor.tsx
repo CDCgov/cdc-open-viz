@@ -16,7 +16,7 @@ import { Visualization } from '@cdc/core/types/Visualization'
 import { hasDashboardApplyBehavior } from '../../../../helpers/hasDashboardApplyBehavior'
 import NestedDropDownDashboard from './NestedDropDownDashboard'
 import { FILTER_STYLE } from '../../../../types/FilterStyles'
-import { filterOrderOptions } from '@cdc/core/components/Filters'
+import { filterOrderOptions } from '@cdc/core/helpers/filterOrderOptions'
 import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/components/FilterOrder'
 
 type FilterEditorProps = {
