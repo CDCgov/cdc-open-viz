@@ -419,7 +419,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
 
                 <button
                   onClick={() => handleEditAPIValues(filter, isNestedDropdown, updateAPIFilter)}
-                  className='btn mt-2'
+                  className='btn btn-primary mt-2'
                 >
                   Edit API Values
                 </button>
