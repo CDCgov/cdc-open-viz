@@ -221,8 +221,7 @@ const Filters: React.FC<FilterProps> = ({
         <>
           {vizFiltersWithValues.map((singleFilter: VizFilter, outerIndex) => {
             if (singleFilter.showDropdown === false) return
-            const { active, queuedActive, label, filterStyle, columnName } = singleFilter as VizFilter
-            const { isDropdown } = wrappingFilters[columnName] || {}
+            const { label, filterStyle, columnName } = singleFilter as VizFilter
 
             handleSorting(singleFilter)
 
@@ -232,6 +231,7 @@ const Filters: React.FC<FilterProps> = ({
               mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`
             ]
             const mobileExempt = ['nested-dropdown', 'multi-select', VIZ_FILTER_STYLE.tabSimple].includes(filterStyle)
+            const { isDropdown } = wrappingFilters[columnName] || {}
             const showDefaultDropdown =
               ((filterStyle === 'dropdown' || mobileFilterStyle) && !mobileExempt) || isDropdown
             const [nestedActiveGroup, nestedActiveSubGroup] = useMemo<string[]>(() => {
