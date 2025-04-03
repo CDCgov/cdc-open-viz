@@ -20,26 +20,29 @@ const Tabs: React.FC<TabsProps> = ({ filter, index: outerIndex, changeFilterActi
     }
   }, [selectedFilter])
 
-  const getClassList = (isActive, value) => {
-    const tabSimple = filter.filterStyle === 'tab-simple' ? 'tab--simple' : ''
-
+  const getClassList = value => {
+    const isActive = filter.active === value
+    let classList = []
     switch (filter.filterStyle) {
       case 'tab bar':
-        return ['button__tab-bar', filter.active === value ? 'button__tab-bar--active' : '']
+        classList = ['button__tab-bar', isActive && 'button__tab-bar--active']
+        break
       case 'pill':
-        return ['pill', isActive ? 'pill--active' : null, theme && theme]
+        classList = ['pill', isActive && 'pill--active', theme && theme]
+        break
       default:
-        return ['tab', isActive && 'tab--active', theme && theme, tabSimple]
+        const tabSimple = filter.filterStyle === 'tab-simple' && 'tab--simple'
+        classList = ['tab', isActive && 'tab--active', theme && theme, tabSimple]
+        break
     }
+    return classList.filter(Boolean).join(' ')
   }
 
   const Tabs = filter.values.map((value, index) => {
-    const isActive = filter.active === value
-
     return (
       <button
         id={`${value}-${outerIndex}-${index}-${id}`}
-        className={getClassList(isActive, value).join(' ')}
+        className={getClassList(value)}
         onClick={e => {
           changeFilterActive(outerIndex, value)
           setSelectedFilter(e.target)
