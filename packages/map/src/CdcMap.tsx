@@ -8,7 +8,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 
 // Core Components
 import DataTable from '@cdc/core/components/DataTable'
-import Filters, { useFilters } from '@cdc/core/components/Filters'
+import Filters from '@cdc/core/components/Filters'
 import Layout from '@cdc/core/components/Layout'
 import MediaControls from '@cdc/core/components/MediaControls'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
@@ -125,7 +125,6 @@ const CdcMap = ({
 
   // hooks
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
-  const { handleSorting } = useFilters({ config: state, setConfig: setState })
   const { generateRuntimeLegend } = useGenerateRuntimeLegend(legendMemo, legendSpecialClassLastMemo)
   const { generateRuntimeFilters } = useGenerateRuntimeFilters(state)
   const { generateRuntimeData } = useGenerateRuntimeData(state)
