@@ -1,9 +1,5 @@
 import _ from 'lodash'
 
-const getKeyFromRow = (row: Record<string, any>, columns: string[]) => {
-  return columns.map(column => row[column] || '').join(':')
-}
-
 const getColumns = (data: Record<string, any>[], columnName: string, pivot: string[], excludeColumns: string[]) => {
   const excludedColumns = [columnName, ...pivot, ...excludeColumns]
   return _.uniq(data.flatMap(row => Object.keys(row))).filter(col => !excludedColumns.includes(col))
@@ -18,17 +14,21 @@ export const pivotData = (
   excludeColumns: string[]
 ): Record<string, any>[] => {
   const columns = getColumns(data, columnName, pivot, excludeColumns)
-  const newColumns = {}
-  data.map(row => {
-    newColumns[row[columnName]] = ''
-  })
-  // if there is only one column header, we need to avoid duplicate values overwriting each other other values in the row
-  const isSingleColumn = Object.keys(newColumns).length === 1
+  const newColumns = data.reduce((acc, row) => {
+    acc[row[columnName]] = ''
+    return acc
+  }, {})
+
+  const getKeyFromRow = (row: Record<string, any>, columns: string[], index) => {
+    // if there is only one column header, we need to avoid duplicate values overwriting each other other values in the row
+    const isSingleColumn = Object.keys(newColumns).length === 1
+    const keyIndex = isSingleColumn ? index : ''
+    return columns.map(column => row[column] || '').join(':') + keyIndex
+  }
 
   // there should be one row for every aggregate row
   const aggregateRows = data.reduce((acc, row, index) => {
-    const keyIndex = isSingleColumn ? index : ''
-    const key = getKeyFromRow(row, columns) + keyIndex
+    const key = getKeyFromRow(row, columns, index)
     if (!acc[key]) {
       acc[key] = {}
     }
@@ -36,8 +36,7 @@ export const pivotData = (
   }, {})
 
   data.forEach((row, index) => {
-    const keyIndex = isSingleColumn ? index : ''
-    const key = getKeyFromRow(row, columns) + keyIndex
+    const key = getKeyFromRow(row, columns, index)
     if (pivot.length > 1) {
       pivot.forEach(pivotColumn => {
         const toAdd = _.omit(row, [columnName, ...pivot])
