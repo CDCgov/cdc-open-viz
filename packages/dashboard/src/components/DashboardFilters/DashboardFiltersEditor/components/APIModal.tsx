@@ -112,7 +112,7 @@ const APIModal: React.FC<APIModalProps> = ({
       </div>
       <div className='d-flex justify-content-end mt-2'>
         <button
-          className='btn mt-2'
+          className='btn btn-primary mt-2'
           onClick={() => updateAPIFilter(APIEndpoint, APIValueSelector, APITextSelector, valueSelector, textSelector)}
         >
           Save
