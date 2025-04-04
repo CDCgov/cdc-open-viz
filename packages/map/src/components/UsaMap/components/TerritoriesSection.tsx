@@ -38,8 +38,9 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
       return a.props.label.localeCompare(b.props.label)
     })
 
+  const isMobileViewport = isMobileTerritoryViewport(currentViewport)
   const SVG_GAP = 9
-  const SVG_WIDTH = isMobileTerritoryViewport(currentViewport) ? 35 : 45
+  const SVG_WIDTH = isMobileViewport ? 30 : 45
 
   return (
     territoriesData.length > 0 && (
@@ -56,7 +57,7 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
               <div>
                 <h5 className='territories-label'>U.S. territories</h5>
                 <span
-                  className='mt-2 mb-3 d-flex territories'
+                  className={`mt-2 ${isMobileViewport ? 'mb-3' : 'mb-4'} d-flex territories`}
                   style={{ minWidth: `${usTerritories.length * SVG_WIDTH + (usTerritories.length - 1) * SVG_GAP}px` }}
                 >
                   {usTerritories}
@@ -67,7 +68,7 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
               <div>
                 <h5 className='territories-label'>Freely associated states</h5>
                 <span
-                  className='mt-2 mb-3 d-flex territories'
+                  className={`mt-2 ${isMobileViewport ? 'mb-3' : 'mb-4'} d-flex territories`}
                   style={{
                     minWidth: `${
                       freelyAssociatedStates.length * SVG_WIDTH + (freelyAssociatedStates.length - 1) * SVG_GAP

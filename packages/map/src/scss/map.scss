@@ -111,13 +111,16 @@ $medium: 768px;
 .territories {
   gap: 0.5em;
   svg {
-    max-width: 35px;
-    min-width: 35px;
+    max-width: 30px;
+    min-width: 30px;
     transition: 0.3s all;
 
     text {
       font-size: var(--territory-label-font-size);
       font-weight: 900;
+      @include breakpointClass(sm) {
+        font-size: var(--territory-label-font-size-mobile);
+      }
     }
   }
 }
