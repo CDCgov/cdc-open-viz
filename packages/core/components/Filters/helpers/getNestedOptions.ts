@@ -12,7 +12,7 @@ export const getNestedOptions = ({ orderedValues, values, subGrouping }: GetOpti
   const filteredValues = orderedValues?.length
     ? orderedValues.filter(orderedValue => values.includes(orderedValue))
     : values
-  const v: NestedOptions = filteredValues.map<[ValueTextPair, ValueTextPair[]]>(value => {
+  const options: NestedOptions = filteredValues.map<[ValueTextPair, ValueTextPair[]]>(value => {
     if (!subGrouping) return [[value], []]
     const { orderedValues, values: filteredSubValues } = subGrouping.valuesLookup[value]
     // keep custom subFilter order
@@ -25,5 +25,5 @@ export const getNestedOptions = ({ orderedValues, values, subGrouping }: GetOpti
     return structuredNestedDropdownData
   })
 
-  return v
+  return options
 }
