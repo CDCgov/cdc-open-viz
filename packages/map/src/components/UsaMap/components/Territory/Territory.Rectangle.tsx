@@ -67,6 +67,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                   height={patternSizes[patternData?.size] ?? 10}
                   width={patternSizes[patternData?.size] ?? 10}
                   fill={patternColor}
+                  strokeWidth={0.25}
                   complement
                 />
               )}
@@ -76,6 +77,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                   height={patternSizes[patternData?.size] ?? 10}
                   width={patternSizes[patternData?.size] ?? 10}
                   fill={patternColor}
+                  radius={0.5}
                   complement
                 />
               )}
@@ -85,7 +87,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                   height={patternSizes[patternData?.size] ?? 6}
                   width={patternSizes[patternData?.size] ?? 6}
                   stroke={patternColor}
-                  strokeWidth={1}
+                  strokeWidth={0.75}
                   orientation={['diagonalRightToLeft']}
                 />
               )}
@@ -107,7 +109,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                 fill={textColor}
                 stroke={strokeColor}
                 className='territory-text'
-                paint-order='stroke'
+                paintOrder='stroke'
                 onClick={handleShapeClick}
                 data-tooltip-id={dataTooltipId}
                 data-tooltip-html={dataTooltipHtml}
