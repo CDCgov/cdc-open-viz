@@ -439,6 +439,7 @@ const UsaMap = () => {
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
+                        strokeWidth={0.25}
                       />
                     )}
                     {pattern === 'circles' && (
@@ -447,6 +448,7 @@ const UsaMap = () => {
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
+                        radius={0.5}
                       />
                     )}
                     {pattern === 'lines' && (
@@ -455,7 +457,7 @@ const UsaMap = () => {
                         height={patternSizes[size] ?? 6}
                         width={patternSizes[size] ?? 6}
                         stroke={patternColor}
-                        strokeWidth={1}
+                        strokeWidth={0.75}
                         orientation={['diagonalRightToLeft']}
                       />
                     )}
