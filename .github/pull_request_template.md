@@ -1,23 +1,20 @@
-## [Replace With Ticket Number]
+---
+name: Pull Request
+about: Describe the purpose and details of your PR
+---
 
-<!-- Provide a brief description of the changes made in this PR -->
+## [NEW-XXXX] Summary
+<!-- Provide a brief explanation of the changes -->
+
 
 ## Testing Steps
+<!-- Describe how this has been tested -->
+<!-- E.g., "Tested on mobile and desktop browsers" -->
 
-<!-- Provide testing steps and reference storybook stories if necessary -->
-<!-- Add applicable configs to JIRA ticket for testers-->
+## Optional
+### Storybook Links
+<!-- Add links to Storybook components if relevant -->
+<!-- E.g., "Storybook URL: [Link to component]" -->
 
-## Self Review
-
-- I have added testing steps for reviewers
-- I have commented my code, particularly in hard-to-understand areas
-- My changes generate no new warnings
-- New and existing unit tests are passing
-
-## Screenshots (if applicable)
-
-<!-- Add screenshots to help explain the changes made in this PR -->
-
-## Additional Notes
-
-<!-- Add any additional notes about this PR -->
+### Screenshots
+<!-- Add any relevant screenshots for UI changes -->
