@@ -37,14 +37,14 @@ import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
-  'US-VT': [50, -8],
-  'US-NH': [34, 2],
-  'US-MA': [30, -1],
-  'US-RI': [28, 2],
-  'US-CT': [35, 10],
-  'US-NJ': [42, 1],
+  'US-VT': [53, -7],
+  'US-NH': [38, 7],
+  'US-MA': [34, -1],
+  'US-RI': [29, 7],
+  'US-CT': [43, 20],
+  'US-NJ': [26, 7],
   'US-DE': [33, 0],
-  'US-MD': [47, 10]
+  'US-MD': [51, 16]
 }
 
 const nudges = {
