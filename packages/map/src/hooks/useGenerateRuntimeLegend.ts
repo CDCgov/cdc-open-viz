@@ -37,6 +37,7 @@ const useGenerateRuntimeLegend = (legendMemo, legendSpecialClassLastMemo) => {
 
   const generateRuntimeLegend = useCallback(
     (configObj, runtimeData, hash): GeneratedLegend | [] => {
+      // if (!runtimeData) return
       try {
         // Throw errors if args missing
         if (!runtimeData) Error('No runtime data provided')
@@ -68,7 +69,7 @@ const useGenerateRuntimeLegend = (legendMemo, legendSpecialClassLastMemo) => {
         result.runtimeDataHash = runtimeFilters?.fromHash
 
         // Unified will base the legend off ALL the data maps received. Otherwise, it will use
-        let dataSet = legend.unified ? data : Object.values(runtimeData)
+        let dataSet = legend.unified ? data : Object?.values(runtimeData)
         let specialClasses = 0
         let specialClassesHash = {}
 
