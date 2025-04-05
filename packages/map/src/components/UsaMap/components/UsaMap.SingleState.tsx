@@ -56,7 +56,7 @@ const SingleStateMap = props => {
   useEffect(() => {
     let currentYear = getCurrentTopoYear(state, runtimeFilters)
 
-    if (currentYear !== topoData.year) {
+    if (currentYear !== topoData?.year) {
       getTopoData(currentYear).then(response => {
         setTopoData(response)
       })
