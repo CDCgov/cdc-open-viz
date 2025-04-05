@@ -1,43 +1,3 @@
-// Map Download UI
-.map-downloads {
-  position: relative;
-  z-index: 3;
-
-  .map-downloads__ui.btn-group {
-    transform: scale(0.8);
-  }
-
-  .map-downloads__ui {
-    position: absolute;
-    top: 0.5em;
-    left: 0.5em;
-    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 5px 12px -8px rgba(0, 0, 0, 0.5);
-    user-select: none;
-    height: 42px;
-  }
-}
-
-.map-container {
-  &.full-border {
-    border: #c2c2c2 1px solid;
-  }
-}
-
-header + .map-container.full-border {
-  border-top: 0; // When they have a header, don't add a border top
-}
-
-// World Specific Styles
-.map-container.world {
-  &.data .geography-container {
-    border-bottom: var(--lightGray) 1px solid;
-  }
-  .geography-container {
-    cursor: move;
-  }
-}
-
 @include breakpointClass(md) {
   // Data Specific
   .map-container.data {
@@ -66,27 +26,6 @@ header + .map-container.full-border {
 
 $small: 500px;
 $medium: 768px;
-
-.geography-container {
-  position: relative;
-  flex-grow: 1;
-  width: 100%;
-  .geo-point {
-    transition: 0.3s all;
-    circle {
-      fill: inherit;
-      transition: 0.1s transform;
-    }
-    &:hover {
-      transition: 0.2s all;
-    }
-  }
-  .map-logo {
-    display: block;
-    margin: 0 0 0 auto;
-    max-height: 35px;
-  }
-}
 
 .single-geo {
   transition: 0.2s fill;
@@ -122,60 +61,6 @@ $medium: 768px;
   }
 }
 
-.zoom-controls {
-  display: flex;
-  position: absolute;
-  bottom: 2em;
-  left: 1em;
-  z-index: 4;
-  > button.reset {
-    margin-left: 5px;
-    background: rgba(0, 0, 0, 0.65);
-    transition: 0.2s all;
-    color: #fff;
-    &:hover {
-      background: rgba(0, 0, 0, 0.8);
-      transition: 0.2s all;
-    }
-    &:active {
-      transform: scale(0.9);
-    }
-    &:focus {
-      background: #005eaa;
-    }
-  }
-  > button:not(.reset) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.2em;
-    height: 1.75em;
-    width: 1.75em;
-    background: rgba(0, 0, 0, 0.65);
-    transition: 0.2s all;
-    color: #fff;
-    border-radius: 100%;
-    border: 0;
-    &:hover {
-      background: rgba(0, 0, 0, 0.8);
-      transition: 0.2s all;
-    }
-    &:active {
-      transform: scale(0.9);
-    }
-    svg {
-      height: 1.75em;
-      width: 1.75em;
-    }
-    &:focus {
-      background: #005eaa;
-    }
-  }
-  > button:first-child {
-    margin-right: 0.25em;
-  }
-}
-
 @include breakpointClass(sm) {
   .zoom-controls > button:not(.reset) {
     height: 2.5em;
@@ -190,25 +75,6 @@ $medium: 768px;
       max-width: 45px;
     }
   }
-}
-
-@include breakpointClass(md) {
-  .map-downloads .map-downloads__ui.btn-group {
-    top: 1em;
-    left: 1em;
-    transform: none;
-  }
-}
-
-.countyMapGroup {
-  transition: transform 1s;
-  will-change: transform;
-  transform-origin: center;
-  stroke: none !important;
-}
-
-.countyMapGroup--no-transition {
-  transition: none !important;
 }
 
 .state {
@@ -229,81 +95,6 @@ $medium: 768px;
   display: none;
 }
 
-//Region Maps
-#region-1-label,
-#region-2-label,
-#region-3-label,
-#region-4-label,
-#region-5-label,
-#region-6-label,
-#region-7-label,
-#region-8-label,
-#region-9-label,
-#region-10-label {
-  background: #fff;
-}
-
-#region-1-label {
-  transform: translate(90%, 22%);
-}
-
-#region-2-label {
-  //transform: translate(83%, 31%); SIDE CHART EXPERIMENT
-  transform: translate(83%, 33%);
-}
-
-#region-3-label {
-  //transform: translate(78%, 48%); SIDE CHART EXPERIMENT
-  transform: translate(75%, 45%);
-}
-
-#region-4-label {
-  transform: translate(68%, 70%);
-}
-
-#region-5-label {
-  transform: translate(65%, 44%);
-}
-
-#region-6-label {
-  transform: translate(45%, 75%);
-}
-
-#region-7-label {
-  transform: translate(53%, 47%);
-}
-
-#region-8-label {
-  transform: translate(35%, 30%);
-}
-
-#region-9-label {
-  transform: translate(18%, 58%);
-}
-
-#region-10-label {
-  transform: translate(15%, 28%);
-}
-
-#region-2-territories,
-#region-9-territories {
-  text {
-    font-weight: bold;
-    font-size: 14px;
-  }
-}
-
-#region-2-territories {
-  transform: translate(86%, 40%);
-}
-
-#region-9-territories {
-  transform: translate(4%, 72%);
-
-  .region-9-row2 {
-    transform: translateY(34px);
-  }
-}
 
 .county-borders {
   fill: none;

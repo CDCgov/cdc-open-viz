@@ -20,6 +20,7 @@ import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import './UsaMap.Region.styles.css'
 
 type TerritoryRectProps = {
   posX?: number

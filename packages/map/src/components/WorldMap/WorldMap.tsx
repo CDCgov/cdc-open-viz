@@ -18,12 +18,16 @@ import {
   displayGeoName,
   SVG_VIEWBOX,
   SVG_WIDTH,
-  SVG_HEIGHT
+  SVG_HEIGHT,
+  MAX_ZOOM_LEVEL
 } from '../../helpers'
 import useGeoClickHandler from '../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../hooks/useApplyTooltipsToGeo'
 import useGenerateRuntimeData from '../../hooks/useGenerateRuntimeData'
+import useMapDispatch from './../../hooks/useMapDispatch'
+
+import './WorldMap.styles.css'
 
 let projection = geoMercator()
 
@@ -31,10 +35,7 @@ const WorldMap = () => {
   // prettier-ignore
   const {
     data,
-    hasZoom,
     position,
-    setFilteredCountryCode,
-    setPosition,
     setRuntimeData,
     setState,
     state,
@@ -43,13 +44,14 @@ const WorldMap = () => {
     legendSpecialClassLastMemo
   } = useContext(ConfigContext)
 
-  const { type } = state.general
+  const { type, allowMapZoom } = state.general
 
   const [world, setWorld] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const { generateRuntimeData } = useGenerateRuntimeData(state)
+  const dispatch = useMapDispatch()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,22 +70,22 @@ const WorldMap = () => {
   // Resets to original data & zooms out
   const handleReset = (state, setState, setRuntimeData) => {
     const newRuntimeData = generateRuntimeData(state)
-    setPosition({ coordinates: [0, 30], zoom: 1 })
-    setFilteredCountryCode('')
+    dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
+    dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
     setRuntimeData(newRuntimeData)
   }
-  const handleZoomIn = (position, setPosition) => {
+  const handleZoomIn = position => {
     if (position.zoom >= 4) return
-    setPosition(pos => ({ ...pos, zoom: pos.zoom * 1.5 }))
+    dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: pos.zoom * 1.5 } })
   }
 
-  const handleZoomOut = (position, setPosition) => {
+  const handleZoomOut = position => {
     if (position.zoom <= 1) return
-    setPosition(pos => ({ ...pos, zoom: pos.zoom / 1.5 }))
+    dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: pos.zoom / 1.5 } })
   }
 
   const handleMoveEnd = position => {
-    setPosition(position)
+    dispatch({ type: 'SET_POSITION', payload: position })
   }
 
   const constructGeoJsx = geographies => {
@@ -203,7 +205,7 @@ const WorldMap = () => {
 
   return (
     <ErrorBoundary component='WorldMap'>
-      {hasZoom ? (
+      {allowMapZoom ? (
         <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(state)}>
           <rect
             height={SVG_HEIGHT}
@@ -215,10 +217,10 @@ const WorldMap = () => {
             zoom={position.zoom}
             center={position.coordinates}
             onMoveEnd={handleMoveEnd}
-            maxZoom={4}
+            maxZoom={MAX_ZOOM_LEVEL}
             projection={projection}
-            width={880}
-            height={500}
+            width={SVG_WIDTH}
+            height={SVG_HEIGHT}
           >
             <Mercator data={world}>{({ features }) => constructGeoJsx(features)}</Mercator>
           </ZoomableGroup>
@@ -238,7 +240,7 @@ const WorldMap = () => {
           </ZoomableGroup>
         </svg>
       )}
-      {(type === 'data' || (type === 'world-geocode' && hasZoom) || (type === 'bubble' && hasZoom)) && (
+      {(type === 'data' || (type === 'world-geocode' && allowMapZoom) || (type === 'bubble' && allowMapZoom)) && (
         <ZoomControls handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} handleReset={handleReset} />
       )}
     </ErrorBoundary>

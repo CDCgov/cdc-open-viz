@@ -9,6 +9,7 @@ import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
 import { displayGeoName, SVG_HEIGHT, SVG_WIDTH } from '../helpers'
 import { geoMercator, geoAlbersUsa, type GeoProjection } from 'd3-geo'
 import { getColumnNames } from '../helpers/getColumnNames'
+import useMapDispatch from '../hooks/useMapDispatch'
 
 type BubbleListProps = {
   runtimeData: Object[]
@@ -16,13 +17,13 @@ type BubbleListProps = {
 }
 
 export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProjection }) => {
-  const { state, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, setPosition } =
-    useContext(ConfigContext)
+  const { state, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData } = useContext(ConfigContext)
   const { columns, data, general, visual } = state
   const { geoType, allowMapZoom } = general
   const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder } = visual
   const hasBubblesWithZeroOnMap = showBubbleZeros ? 0 : 1
   const clickTolerance = 10
+  const dispatch = useMapDispatch()
 
   // hooks
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
@@ -59,7 +60,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
     }
 
     // Zoom the map in...
-    setPosition({ coordinates: reversedCoordinates, zoom: 3 })
+    dispatch({ type: 'SET_POSITION', payload: { coordinates: reversedCoordinates, zoom: 3 } })
 
     // ...and show the data for the clicked country
     setRuntimeData(_tempRuntimeData)

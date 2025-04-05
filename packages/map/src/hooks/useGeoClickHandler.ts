@@ -1,9 +1,11 @@
 import ConfigContext from '../context'
 import { navigationHandler } from '../helpers'
 import { useContext } from 'react'
+import useMapDispatch from './useMapDispatch'
 
 const useGeoClickHandler = () => {
   const { state, setState, setModal, setSharedFilter, customNavigationHandler } = useContext(ConfigContext)
+  const dispatch = useMapDispatch()
 
   const geoClickHandler = (geoDisplayName: string, geoData: object): void => {
     if (setSharedFilter) {
@@ -23,10 +25,11 @@ const useGeoClickHandler = () => {
 
     // If modals are set, or we are on a mobile viewport, display modal
     if (window.matchMedia('(any-hover: none)').matches || 'click' === state.tooltips.appearanceType) {
-      setModal({
+      const modalData = {
         geoName: geoDisplayName,
         keyedData: geoData
-      })
+      }
+      dispatch({ type: 'SET_MODAL', payload: modalData })
 
       return
     }

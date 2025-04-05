@@ -1,0 +1,9 @@
+.map-container {
+  &.full-border {
+    border: #c2c2c2 1px solid;
+  }
+}
+
+header + .map-container.full-border {
+  border-top: 0; // When they have a header, don't add a border top
+}

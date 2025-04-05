@@ -22,6 +22,7 @@ import { isBelowBreakpoint, isMobileHeightViewport } from '@cdc/core/helpers/vie
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
 import { resetLegendToggles } from '../../../helpers'
+import useMapDispatch from './../../../hooks/useMapDispatch'
 
 const LEGEND_PADDING = 30
 
@@ -39,12 +40,13 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const {
     runtimeFilters,
     runtimeLegend,
-    setAccessibleStatus,
     setRuntimeLegend,
     state,
     currentViewport: viewport,
     mapId
   } = useContext(ConfigContext)
+
+  const dispatch = useMapDispatch()
 
   const { legend } = state
   const isLegendGradient = legend.style === 'gradient'
@@ -113,6 +115,10 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         else if (hasDisabledItems) classes.push('legend-container__li--not-disabled')
         if (item.special) classes.push('legend-container__li--special-class')
         return classes.join(' ')
+      }
+
+      const setAccessibleStatus = (message: string) => {
+        dispatch({ type: 'SET_ACCESSIBLE_STATUS', payload: message })
       }
 
       return (
@@ -218,7 +224,10 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       e.preventDefault()
     }
     resetLegendToggles(runtimeLegend, setRuntimeLegend)
-    setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.')
+    dispatch({
+      type: 'SET_ACCESSIBLE_STATUS',
+      payload: 'Legend has been reset, please reference the data table to see updated values.'
+    })
     if (legend) {
       legend.focus()
     }

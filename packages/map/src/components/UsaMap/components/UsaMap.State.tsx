@@ -34,7 +34,8 @@ import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
-import { SVG_VIEWBOX } from '../../../helpers'
+import { SVG_HEIGHT, SVG_VIEWBOX, SVG_WIDTH } from '../../../helpers'
+import useMapDispatch from '../../../hooks/useMapDispatch'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
@@ -67,12 +68,12 @@ const UsaMap = () => {
       setSharedFilterValue,
       state,
       tooltipId,
-      handleDragStateChange,
       mapId,
       logo,
       legendMemo,
       legendSpecialClassLastMemo,
-      currentViewport
+      currentViewport,
+    translate
     } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
@@ -81,6 +82,11 @@ const UsaMap = () => {
   const { geoClickHandler } = useGeoClickHandler()
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
+  const dispatch = useMapDispatch()
+
+  const handleDragStateChange = (dragState: any) => {
+    dispatch({ type: 'SET_IS_DRAGGING_ANNOTATION', payload: dragState })
+  }
 
   if (setSharedFilterValue) {
     Object.keys(supportedStates).forEach(supportedState => {
@@ -102,9 +108,7 @@ const UsaMap = () => {
   }
 
   // "Choose State" options
-  const [extent, setExtent] = useState(null)
   const [focusedStates, setFocusedStates] = useState(null)
-  const [translate, setTranslate] = useState([455, 200])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -117,8 +121,7 @@ const UsaMap = () => {
 
   // When returning from another map we want to reset the state
   useEffect(() => {
-    setTranslate([455, 250])
-    setExtent(null)
+    dispatch({ type: 'SET_TRANSLATE', payload: [SVG_WIDTH / 2, SVG_HEIGHT / 2] })
   }, [general.geoType])
 
   const [territoriesData, setTerritoriesData] = useState([])
@@ -600,7 +603,7 @@ const UsaMap = () => {
             {({ features, projection }) => constructGeoJsx(features, projection)}
           </Mercator>
         ) : (
-          <AlbersUsa data={focusedStates} translate={translate} fitExtent={extent}>
+          <AlbersUsa data={focusedStates} translate={translate}>
             {({ features, projection }) => constructGeoJsx(features, projection)}
           </AlbersUsa>
         )}

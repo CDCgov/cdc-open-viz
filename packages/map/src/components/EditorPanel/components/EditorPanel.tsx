@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 // Third Party
 import {
   Accordion,
   AccordionItem,
+  AccordionItemButton,
   AccordionItemHeading,
-  AccordionItemPanel,
-  AccordionItemButton
+  AccordionItemPanel
 } from 'react-accessible-accordion'
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
 import { useDebounce } from 'use-debounce'
 import _ from 'lodash'
 // import ReactTags from 'react-tag-autocomplete'
@@ -46,37 +46,24 @@ import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs, HEADER_COLORS } from '../../../helpers'
+import useMapDispatch from '../../../hooks/useMapDispatch'
+import './EditorPanel.styles.css'
 
 const EditorPanel = () => {
-  const {
-    isDashboard,
-    loadConfig,
-    runtimeFilters,
-    runtimeLegend,
-    setParentConfig,
-    setState,
-    state,
-    tooltipId,
-    runtimeData,
-    setPosition
-  } = useContext<MapContext>(ConfigContext)
+  const { isDashboard, loadConfig, runtimeFilters, runtimeLegend, setState, state, tooltipId, runtimeData } =
+    useContext<MapContext>(ConfigContext)
 
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
+  const dispatch = useMapDispatch()
   const { general, columns, legend, table, tooltips } = state
   const columnsInData = state?.data?.[0] ? Object.keys(state.data[0]) : []
 
-  const [configTextboxValue, setConfigTextbox] = useState({}) // eslint-disable-line
   const [loadedDefault, setLoadedDefault] = useState(false)
   const [displayPanel, setDisplayPanel] = useState(true)
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
 
   const {
-    // prettier-ignore
-    MapLayerHandlers: {
-      handleMapLayer,
-      handleAddLayer,
-      handleRemoveLayer
-    }
+    MapLayerHandlers: { handleMapLayer, handleAddLayer, handleRemoveLayer }
   } = useMapLayers(state, setState, false, tooltipId)
 
   const categoryMove = (idx1, idx2) => {
@@ -617,7 +604,7 @@ const EditorPanel = () => {
         break
       case 'geoType':
         addUIDs(state, state.columns.geo.name)
-        setPosition([0, 30])
+        dispatch({ type: 'SET_POSITION', payload: [0, 30] })
 
         // If we're still working with default data, switch to the world default to show it as an example
         if (true === loadedDefault && 'world' === value) {
@@ -985,63 +972,6 @@ const EditorPanel = () => {
     }
   }
 
-  const changeFilter = async (idx, target, value) => {
-    let newFilters = [...state.filters]
-
-    switch (target) {
-      case 'addNew':
-        newFilters.push({
-          label: '',
-          values: []
-        })
-        break
-      case 'remove':
-        if (newFilters.length === 1) {
-          newFilters = []
-        } else {
-          newFilters.splice(idx, 1)
-        }
-        break
-      case 'filterStyle':
-        newFilters[idx] = { ...newFilters[idx] }
-        newFilters[idx].filterStyle = value
-        break
-      case 'showDropdown':
-        newFilters[idx] = { ...newFilters[idx] }
-        newFilters[idx].showDropdown = value
-        break
-      case 'columnName':
-        newFilters[idx] = { ...newFilters[idx] }
-        newFilters[idx].columnName = value
-        newFilters[idx].values = [] // when a column name changes knock the previous values out
-        break
-      case 'filterOrder':
-        if (value === 'desc') {
-          newFilters[idx] = { ...runtimeFilters[idx] }
-          delete newFilters[idx].active
-          newFilters[idx].order = 'desc'
-        }
-        if (value === 'asc') {
-          newFilters[idx] = { ...runtimeFilters[idx] }
-          delete newFilters[idx].active
-          newFilters[idx].order = 'asc'
-        }
-        if (value === 'cust') {
-          newFilters[idx] = { ...runtimeFilters[idx] }
-          newFilters[idx].order = 'cust'
-        }
-        break
-      default:
-        newFilters[idx][target] = value
-        break
-    }
-
-    setState({
-      ...state,
-      filters: newFilters
-    })
-  }
-
   // just adds a new column but not set to any data yet
   const addAdditionalColumn = number => {
     const columnKey = `additionalColumn${number}`
@@ -1115,9 +1045,7 @@ const EditorPanel = () => {
     delete strippedState.defaultData
 
     // Remove tooltips if they're active in the editor
-    let strippedGeneral = _.cloneDeep(state.general)
-
-    strippedState.general = strippedGeneral
+    strippedState.general = _.cloneDeep(state.general)
 
     // Add columns property back to data if it's there
     if (state.columns) {
@@ -1204,10 +1132,7 @@ const EditorPanel = () => {
   const additionalColumns = Object.keys(state.columns).filter(value => {
     const defaultCols = ['geo', 'navigate', 'primary', 'latitude', 'longitude']
 
-    if (true === defaultCols.includes(value)) {
-      return false
-    }
-    return true
+    return true !== defaultCols.includes(value)
   })
 
   const updateField = updateFieldFactory(state, setState)
@@ -1397,49 +1322,49 @@ const EditorPanel = () => {
                 />
               )}
               {(state.general.geoType === 'us-county' || state.general.geoType === 'single-state') && (
-                <label>
-                  <span className='edit-label column-heading'>Filter Controlling County Census Year</span>
-                  <select
-                    value={state.general.filterControlsCountyYear || ''}
-                    onChange={event => {
-                      handleEditorChanges('filterControlsCountyYear', event.target.value)
-                    }}
-                  >
-                    <option value=''>None</option>
-                    {state.filters && state.filters.map(filter => <option>{filter.columnName}</option>)}
-                  </select>
-                </label>
+                <Select
+                  label='Filter Controlling County Census Year'
+                  value={state.general.filterControlsCountyYear || ''}
+                  options={[
+                    { value: '', label: 'None' },
+                    ...(state.filters
+                      ? state.filters.map(filter => ({ value: filter.columnName, label: filter.columnName }))
+                      : [])
+                  ]}
+                  onChange={event => {
+                    handleEditorChanges('filterControlsCountyYear', event.target.value)
+                  }}
+                />
               )}
 
               {state.general.geoType === 'single-state' && runtimeData && (
-                <label>
-                  <span className='edit-label column-heading'>Filter Controlling State Picked</span>
-                  <select
-                    value={state.general.filterControlsStatePicked || ''}
-                    onChange={event => {
-                      handleEditorChanges('filterControlsStatePicked', event.target.value)
-                    }}
-                  >
-                    <option value=''>None</option>
-                    {runtimeData && columnsInData?.map(col => <option>{col}</option>)}
-                  </select>
-                </label>
+                <Select
+                  label='Filter Controlling State Picked'
+                  value={state.general.filterControlsStatePicked || ''}
+                  options={[
+                    { value: '', label: 'None' },
+                    ...(runtimeData && columnsInData?.map(col => ({ value: col, label: col })))
+                  ]}
+                  onChange={event => {
+                    handleEditorChanges('filterControlsStatePicked', event.target.value)
+                  }}
+                />
               )}
 
               {/* Type */}
               {/* Select > Filter a state */}
               {state.general.geoType === 'single-state' && (
-                <label>
-                  <span className='edit-label column-heading'>State Selector</span>
-                  <select
-                    value={state.general.statePicked.stateName}
-                    onChange={event => {
-                      handleEditorChanges('chooseState', event.target.value)
-                    }}
-                  >
-                    <StateOptionList />
-                  </select>
-                </label>
+                <Select
+                  label='State Selector'
+                  value={state.general.statePicked?.stateName || ''}
+                  options={StateOptionList().map(option => ({
+                    value: option.props.value,
+                    label: option.props.children
+                  }))}
+                  onChange={event => {
+                    handleEditorChanges('chooseState', event.target.value)
+                  }}
+                />
               )}
               {/* Type */}
               <Select
@@ -1956,38 +1881,38 @@ const EditorPanel = () => {
                         Remove
                       </button>
                       <p>Special Class {i + 1}</p>
-                      <label>
-                        <span className='edit-label column-heading'>Data Key</span>
-                        <select
-                          value={specialClass.key}
-                          onChange={e => {
-                            editColumn('primary', 'specialClassEdit', { prop: 'key', index: i, value: e.target.value })
-                          }}
-                        >
-                          {columnsOptions}
-                        </select>
-                      </label>
-                      <label>
-                        <span className='edit-label column-heading'>Value</span>
-                        <select
-                          value={specialClass.value}
-                          onChange={e => {
-                            editColumn('primary', 'specialClassEdit', {
-                              prop: 'value',
-                              index: i,
-                              value: e.target.value
-                            })
-                          }}
-                        >
-                          <option value=''>- Select Value -</option>
-                          {columnsByKey[specialClass.key] &&
-                            columnsByKey[specialClass.key]
-                              .sort()
-                              .map(option => (
-                                <option key={`special-class-value-option-${i}-${option}`}>{option}</option>
-                              ))}
-                        </select>
-                      </label>
+                      <Select
+                        label='Data Key'
+                        value={specialClass.key}
+                        options={columnsOptions.map(option => ({
+                          value: option.key,
+                          label: option.key
+                        }))}
+                        onChange={event => {
+                          editColumn('primary', 'specialClassEdit', {
+                            prop: 'key',
+                            index: i,
+                            value: event.target.value
+                          })
+                        }}
+                      />
+                      <Select
+                        label='Value'
+                        value={specialClass.value}
+                        options={[
+                          { value: '', label: '- Select Value -' },
+                          ...(columnsByKey[specialClass.key] || [])
+                            .sort()
+                            .map(option => ({ value: option, label: option }))
+                        ]}
+                        onChange={event => {
+                          editColumn('primary', 'specialClassEdit', {
+                            prop: 'value',
+                            index: i,
+                            value: event.target.value
+                          })
+                        }}
+                      />
                       <label>
                         <span className='edit-label column-heading'>Label</span>
                         <input
@@ -2070,17 +1995,17 @@ const EditorPanel = () => {
                       >
                         Remove
                       </button>
-                      <label>
-                        <span className='edit-label column-heading'>Column</span>
-                        <select
-                          value={state.columns[val] ? state.columns[val].name : columnsOptions[0]}
-                          onChange={event => {
-                            editColumn(val, 'name', event.target.value)
-                          }}
-                        >
-                          {columnsOptions}
-                        </select>
-                      </label>
+                      <Select
+                        label='Column'
+                        value={state.columns[val] ? state.columns[val].name : ''}
+                        options={columnsOptions.map(option => ({
+                          value: option.props.value,
+                          label: option.props.children
+                        }))}
+                        onChange={event => {
+                          editColumn(val, 'name', event.target.value)
+                        }}
+                      />
                       <TextField
                         value={columns[val].label}
                         section='columns'
@@ -2892,28 +2817,31 @@ const EditorPanel = () => {
               <AccordionItemButton>Interactivity</AccordionItemButton>
             </AccordionItemHeading>
             <AccordionItemPanel>
-              <label>
-                <span className='edit-label'>
-                  Detail displays on{' '}
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>At mobile sizes, information always appears in a popover modal when a user taps on an item.</p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                </span>
-                <select
-                  value={state.tooltips.appearanceType}
-                  onChange={event => {
-                    handleEditorChanges('appearanceType', event.target.value)
-                  }}
-                >
-                  <option value='hover'>Hover - Tooltip</option>
-                  <option value='click'>Click - Popover Modal</option>
-                </select>
-              </label>
+              <Select
+                label={
+                  <>
+                    Detail displays on{' '}
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                      </Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>
+                          At mobile sizes, information always appears in a popover modal when a user taps on an item.
+                        </p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  </>
+                }
+                value={state.tooltips.appearanceType}
+                options={[
+                  { value: 'hover', label: 'Hover - Tooltip' },
+                  { value: 'click', label: 'Click - Popover Modal' }
+                ]}
+                onChange={event => {
+                  handleEditorChanges('appearanceType', event.target.value)
+                }}
+              />
               {'click' === state.tooltips.appearanceType && (
                 <TextField
                   value={tooltips.linkLabel}
@@ -2982,18 +2910,17 @@ const EditorPanel = () => {
                   <span className='edit-label'>Add border around map</span>
                 </label>
               )}
-              <label>
-                <span className='edit-label'>Geo Border Color</span>
-                <select
-                  value={state.general.geoBorderColor || false}
-                  onChange={event => {
-                    handleEditorChanges('geoBorderColor', event.target.value)
-                  }}
-                >
-                  <option value='darkGray'>Dark Gray (Default)</option>
-                  <option value='sameAsBackground'>White</option>
-                </select>
-              </label>
+              <Select
+                label='Geo Border Color'
+                value={state.general.geoBorderColor || ''}
+                options={[
+                  { value: 'darkGray', label: 'Dark Gray (Default)' },
+                  { value: 'sameAsBackground', label: 'White' }
+                ]}
+                onChange={event => {
+                  handleEditorChanges('geoBorderColor', event.target.value)
+                }}
+              />
               <label>
                 <span className='edit-label'>Map Color Palette</span>
               </label>
