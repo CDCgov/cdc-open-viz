@@ -72,7 +72,8 @@ export default {
     subStyle: 'linear blocks',
     tickRotation: '',
     singleColumnLegend: false,
-    hideBorder: false
+    hideBorder: false,
+    groupBy: ''
   },
   filters: [],
   table: {

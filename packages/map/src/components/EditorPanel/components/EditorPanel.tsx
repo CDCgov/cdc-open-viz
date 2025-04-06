@@ -368,6 +368,15 @@ const EditorPanel = () => {
           }
         })
         break
+      case 'legendGroupBy':
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            groupBy: value
+          }
+        })
+        break
       case 'legendSubStyle':
         setState({
           ...state,
@@ -2312,6 +2321,17 @@ const EditorPanel = () => {
                     ]}
                     onChange={event => {
                       handleEditorChanges('legendStyle', event.target.value)
+                    }}
+                  />
+                )}
+
+                {'navigation' !== state.general.type && (
+                  <Select
+                    label='Legend Group By :'
+                    value={legend.groupBy || ''}
+                    options={columnsOptions.map(c => c.key)}
+                    onChange={event => {
+                      handleEditorChanges('legendGroupBy', event.target.value)
                     }}
                   />
                 )}

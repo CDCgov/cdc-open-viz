@@ -102,6 +102,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const legendList = (patternsOnly = false) => {
     const formattedItems = patternsOnly ? [] : getFormattedLegendItems()
+    console.log(state.legend, 'state')
     const patternsOnlyFont = isMobileHeightViewport(currentViewport) ? '12px' : '14px'
     const hasDisabledItems = formattedItems.some(item => item.disabled)
     let legendItems
