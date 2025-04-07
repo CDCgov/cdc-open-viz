@@ -62,7 +62,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     mode,
     seriesIndex
   } = props
-  const { enlargeIsolatedDots, lineDatapointStyle, visual } = config as LineChartConfig
+  const { isolatedDotsSameSize, lineDatapointStyle, visual } = config as LineChartConfig
   const filtered = config?.series.filter(s => s.dataKey === seriesKey)?.[0]
   const Shape =
     Glyphs[
@@ -72,7 +72,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
   const transformShape = (top, left) => `translate(${left}, ${top})${isReversedTriangle ? ' rotate(180)' : ''}`
   const LARGE_DOT_SIZE = 124
   const REGULAR_DOT_SIZE = 55
-  const dotSize = enlargeIsolatedDots ? LARGE_DOT_SIZE : REGULAR_DOT_SIZE
+  const dotSize = isolatedDotsSameSize ? REGULAR_DOT_SIZE : LARGE_DOT_SIZE
 
   // If we're not showing the circle, simply return
   const getColor = (

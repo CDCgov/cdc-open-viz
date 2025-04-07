@@ -222,9 +222,9 @@ const PanelVisual: FC<PanelProps> = props => {
               options={['Same as Line', 'Lighter than Line']}
             />
             <CheckBox
-              value={(config as LineChartConfig).enlargeIsolatedDots}
-              fieldName='enlargeIsolatedDots'
-              label='Enlarge Isolated Dots'
+              value={(config as LineChartConfig).isolatedDotsSameSize}
+              fieldName='isolatedDotsSameSize'
+              label='Isolated Dots Same Size'
               updateField={updateField}
             />
           </>

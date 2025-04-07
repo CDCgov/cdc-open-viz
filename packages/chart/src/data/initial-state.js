@@ -13,7 +13,6 @@ export default {
   animate: false,
   lineDatapointStyle: 'hover',
   lineDatapointColor: 'Same as Line',
-  enlargeIsolatedDots: true,
   barHasBorder: 'true',
   isLollipopChart: false,
   lollipopShape: 'circle',
