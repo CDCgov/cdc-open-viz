@@ -16,7 +16,7 @@ import { hasDashboardApplyBehavior } from '../../../../helpers/hasDashboardApply
 import APIModal from './APIModal'
 import NestedDropDownDashboard from './NestedDropDownDashboard'
 import { FILTER_STYLE } from '../../../../types/FilterStyles'
-import { filterOrderOptions } from '@cdc/core/components/Filters'
+import { filterOrderOptions } from '@cdc/core/helpers/filterOrderOptions'
 import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/components/FilterOrder'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Modal from '@cdc/core/components/ui/Modal'
