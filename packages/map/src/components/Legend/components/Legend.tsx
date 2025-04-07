@@ -22,6 +22,7 @@ import { isBelowBreakpoint, isMobileHeightViewport } from '@cdc/core/helpers/vie
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
 import { resetLegendToggles } from '../../../helpers'
+import LegendGroup from './LegendGroup/Legend.Group'
 
 const LEGEND_PADDING = 30
 
@@ -102,7 +103,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const legendList = (patternsOnly = false) => {
     const formattedItems = patternsOnly ? [] : getFormattedLegendItems()
-    console.log(state.legend, 'state')
     const patternsOnlyFont = isMobileHeightViewport(currentViewport) ? '12px' : '14px'
     const hasDisabledItems = formattedItems.some(item => item.disabled)
     let legendItems
@@ -293,11 +293,18 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               }
               config={state}
             />
+
             {!!legendListItems.length && (
               <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
                 {legendListItems}
               </ul>
             )}
+            <LegendGroup
+              runtimeLegend={runtimeLegend}
+              legendListItems={legendListItems}
+              legendItems={getFormattedLegendItems()}
+              state={state}
+            />
             {(state.visual.additionalCityStyles.some(c => c.label) || state.visual.cityStyleLabel) && (
               <>
                 <hr />

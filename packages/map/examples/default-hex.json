@@ -138,10 +138,7 @@
     "showBubbleZeros": false
   },
   "mapPosition": {
-    "coordinates": [
-      0,
-      30
-    ],
+    "coordinates": [0, 30],
     "zoom": 1
   },
   "map": {
@@ -172,187 +169,218 @@
       "STATE": "AL",
       "Rate": 10,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Main Group"
     },
     {
       "STATE": "AK",
       "Rate": 12,
       "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Main Group"
     },
     {
       "STATE": "AS",
       "Rate": 14,
       "Location": "Work",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Main Group"
     },
     {
       "STATE": "AZ",
       "Rate": 9,
       "Location": "School",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Main Group"
     },
     {
       "STATE": "AR",
       "Rate": 17,
       "Location": "School",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Main Group"
     },
     {
       "STATE": "CA",
       "Rate": "*",
       "Location": "Work",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Second Group"
     },
     {
       "STATE": "CO",
       "Rate": 22,
       "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Second Group"
     },
     {
       "STATE": "CT",
       "Rate": 10,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Second Group"
     },
     {
       "STATE": "DE",
       "Rate": 12,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Second Group"
     },
     {
       "STATE": "District of Columbia",
       "Rate": 14,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Second Group"
     },
     {
       "STATE": "FL",
       "Rate": 9,
       "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Second Group"
     },
     {
       "STATE": "GA",
       "Rate": 17,
       "Location": "Work",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Second Group"
     },
     {
       "STATE": "GU",
       "Rate": 20,
       "Location": "School",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Second Group"
     },
     {
       "STATE": "HI",
       "Rate": 22,
       "Location": "School",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Second Group"
     },
     {
       "STATE": "ID",
       "Rate": "*",
       "Location": "Work",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Second Group"
     },
     {
       "STATE": "IL",
       "Rate": 12,
       "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Third Group"
     },
     {
       "STATE": "IN",
       "Rate": 14,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Third Group"
     },
     {
       "STATE": "IA",
       "Rate": 9,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Third Group"
     },
     {
       "STATE": "KS",
       "Rate": "NA",
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Third Group"
     },
     {
       "STATE": "KY",
       "Rate": 20,
       "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Third Group"
     },
     {
       "STATE": "LA",
       "Rate": 22,
       "Location": "Work",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Third Group"
     },
     {
       "STATE": "ME",
       "Rate": 10,
       "Location": "School",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Third Group"
     },
     {
       "STATE": "MH",
       "Rate": 12,
       "Location": "School",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Third Group"
     },
     {
       "STATE": "MD",
       "Rate": "*",
       "Location": "Work",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Third Group"
     },
     {
       "STATE": "MA",
       "Rate": 9,
       "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Fifth Group"
     },
     {
       "STATE": "MI",
       "Rate": 17,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Fifth Group"
     },
     {
       "STATE": "FM",
       "Rate": 20,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Fifth Group"
     },
     {
       "STATE": "MN",
       "Rate": 22,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Fifth Group"
     },
     {
       "STATE": "MS",
       "Rate": 10,
       "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Fifth Group"
     },
     {
       "STATE": "MO",
       "Rate": 11,
       "Location": "Work",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Fifth Group"
     },
     {
       "STATE": "MT",
       "Rate": 14,
       "Location": "School",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Fifth Group"
     },
     {
       "STATE": "NE",
@@ -364,199 +392,232 @@
       "STATE": "NV",
       "Rate": 17,
       "Location": "Work",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Fifth Group"
     },
     {
       "STATE": "NH",
       "Rate": 20,
       "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "Fifth Group"
     },
     {
       "STATE": "NJ",
       "Rate": 28,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "six Group"
     },
     {
       "STATE": "NM",
       "Rate": 10,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "six Group"
     },
     {
       "STATE": "NY",
       "Rate": 12,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "six Group"
     },
     {
       "STATE": "NC",
       "Rate": 14,
       "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "six Group"
     },
     {
       "STATE": "ND",
       "Rate": 9,
       "Location": "Work",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "six Group"
     },
     {
       "STATE": "MP",
       "Rate": 17,
       "Location": "School",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "seventh Group"
     },
     {
       "STATE": "OH",
       "Rate": "NA",
       "Location": "School",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "seventh Group"
     },
     {
       "STATE": "OK",
       "Rate": 22,
       "Location": "Work",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "seventh Group"
     },
     {
       "STATE": "OR",
       "Rate": 10,
       "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "seventh Group"
     },
     {
       "STATE": "PW",
       "Rate": 12,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "seventh Group"
     },
     {
       "STATE": "PA",
       "Rate": 14,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "seventh Group"
     },
     {
       "STATE": "PR",
       "Rate": 6,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "alfa Group"
     },
     {
       "STATE": "RI",
       "Rate": 17,
       "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "alfa Group"
     },
     {
       "STATE": "SC",
       "Rate": 20,
       "Location": "Work",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "alfa Group"
     },
     {
       "STATE": "SD",
       "Rate": 22,
       "Location": "School",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "alfa Group"
     },
     {
       "STATE": "TN",
       "Rate": 10,
       "Location": "School",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "alfa Group"
     },
     {
       "STATE": "TX",
       "Rate": 12,
       "Location": "Work",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "unique Group"
     },
     {
       "STATE": "VT",
       "Rate": 9,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "unique Group"
     },
     {
       "STATE": "VI",
       "Rate": 17,
       "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "unique Group"
     },
     {
       "STATE": "VA",
       "Rate": 20,
       "Location": "Work",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "unique Group"
     },
     {
       "STATE": "WA",
       "Rate": 22,
       "Location": "School",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "unique Group"
     },
     {
       "STATE": "WV",
       "Rate": 10,
       "Location": "School",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "eight Group"
     },
     {
       "STATE": "WI",
       "Rate": 12,
       "Location": "Work",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "eight Group"
     },
     {
       "STATE": "WY",
       "Rate": 14,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "eight Group"
     },
     {
       "STATE": "Los Angeles",
       "Rate": 14,
       "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "eight Group"
     },
     {
       "STATE": "Atlanta",
       "Rate": 12,
       "Location": "Work",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "eight Group"
     },
     {
       "STATE": "Boston",
       "Rate": 20,
       "Location": "School",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "seventh Group"
     },
     {
       "STATE": "New York City",
       "Rate": 22,
       "Location": "School",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "eight Group"
     },
     {
       "STATE": "Dallas",
       "Rate": 18,
       "Location": "Work",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "seventh Group"
     },
     {
       "STATE": "Seattle",
       "Rate": 17,
       "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "seventh Group"
     },
     {
       "STATE": "New Orleans",
       "Rate": 14,
       "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
+      "URL": "https://www.cdc.gov/",
+      "group": "eight Group"
     }
   ],
   "sharing": {
