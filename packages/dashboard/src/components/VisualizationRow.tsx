@@ -24,31 +24,20 @@ type VisualizationWrapperProps = {
   children: React.ReactNode
   currentViewport: ViewPort
   groupName: string
-  hideVisualization: boolean
-  row: ConfigRow
+  collapsible?: boolean
 }
 
 const VisualizationWrapper: React.FC<VisualizationWrapperProps> = ({
   allExpanded,
   currentViewport,
   groupName,
-  hideVisualization,
-  row,
+  collapsible,
   children
 }) => {
-  return hideVisualization ? (
-    <></>
-  ) : row.expandCollapseAllButtons ? (
-    <div className='collapsable-multiviz-container'>
-      <CollapsibleVisualizationRow
-        allExpanded={allExpanded}
-        fontSize={'26px'}
-        groupName={groupName}
-        currentViewport={currentViewport}
-      >
-        {children}
-      </CollapsibleVisualizationRow>
-    </div>
+  return collapsible ? (
+    <CollapsibleVisualizationRow allExpanded={allExpanded} groupName={groupName} currentViewport={currentViewport}>
+      {children}
+    </CollapsibleVisualizationRow>
   ) : (
     <>
       {groupName !== '' ? <h3>{groupName}</h3> : <></>}
@@ -185,148 +174,150 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                 hideVisualization ? ' hide-parent-visualization' : hasMarginBottom ? ' mb-4' : ''
               }`}
             >
-              <VisualizationWrapper
-                allExpanded={allExpanded}
-                currentViewport={currentViewport}
-                groupName={groupName}
-                hideVisualization={hideVisualization}
-                row={row}
-              >
-                {visualizationConfig.type === 'chart' && (
-                  <CdcChart
-                    key={col.widget}
-                    config={visualizationConfig}
-                    dashboardConfig={config}
-                    isEditor={false}
-                    setConfig={newConfig => {
-                      updateChildConfig(col.widget, newConfig)
-                    }}
-                    setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
-                    isDashboard={true}
-                    link={
-                      config.table &&
-                      config.table.show &&
-                      config.datasets &&
-                      visualizationConfig.table &&
-                      visualizationConfig.table.showDataTableLink
-                        ? tableLink
-                        : undefined
-                    }
-                    configUrl={undefined}
-                    setEditing={undefined}
-                    hostname={undefined}
-                    setSharedFilterValue={undefined}
-                  />
-                )}
-                {visualizationConfig.type === 'map' && (
-                  <CdcMap
-                    key={col.widget}
-                    config={visualizationConfig}
-                    isEditor={false}
-                    setConfig={newConfig => {
-                      updateChildConfig(col.widget, newConfig)
-                    }}
-                    showLoader={false}
-                    setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
-                    setSharedFilterValue={setSharedFilterValue}
-                    isDashboard={true}
-                    link={
-                      config.table &&
-                      config.table.show &&
-                      config.datasets &&
-                      visualizationConfig.table &&
-                      visualizationConfig.table.showDataTableLink
-                        ? tableLink
-                        : undefined
-                    }
-                  />
-                )}
-                {visualizationConfig.type === 'data-bite' && (
-                  <CdcDataBite
-                    key={col.widget}
-                    config={visualizationConfig}
-                    isEditor={false}
-                    setConfig={newConfig => {
-                      updateChildConfig(col.widget, newConfig)
-                    }}
-                    isDashboard={true}
-                  />
-                )}
-                {visualizationConfig.type === 'waffle-chart' && (
-                  <CdcWaffleChart
-                    key={col.widget}
-                    config={visualizationConfig}
-                    isEditor={false}
-                    setConfig={newConfig => {
-                      updateChildConfig(col.widget, newConfig)
-                    }}
-                    isDashboard={true}
-                    configUrl={
-                      config.table &&
-                      config.table.show &&
-                      config.datasets &&
-                      visualizationConfig.table &&
-                      visualizationConfig.table.showDataTableLink
-                        ? tableLink
-                        : undefined
-                    }
-                  />
-                )}
-                {visualizationConfig.type === 'markup-include' && (
-                  <CdcMarkupInclude
-                    key={col.widget}
-                    config={visualizationConfig}
-                    configUrl={undefined}
-                    isDashboard={true}
-                    isEditor={false}
-                    setConfig={newConfig => {
-                      updateChildConfig(col.widget, newConfig)
-                    }}
-                  />
-                )}
-                {visualizationConfig.type === 'filtered-text' && (
-                  <CdcFilteredText
-                    key={col.widget}
-                    config={visualizationConfig}
-                    isEditor={false}
-                    setConfig={newConfig => {
-                      updateChildConfig(col.widget, newConfig)
-                    }}
-                    isDashboard={true}
-                    configUrl={undefined}
-                  />
-                )}
-                {visualizationConfig.type === 'dashboardFilters' && (
-                  <DashboardSharedFilters
-                    setConfig={newConfig => {
-                      updateChildConfig(col.widget, newConfig)
-                    }}
-                    key={col.widget}
-                    visualizationConfig={visualizationConfig as DashboardFilters}
-                    apiFilterDropdowns={apiFilterDropdowns}
-                    currentViewport={currentViewport}
-                  />
-                )}
-                {visualizationConfig.type === 'table' && (
-                  <DataTableStandAlone
-                    key={col.widget}
-                    updateConfig={newConfig => {
-                      updateChildConfig(col.widget, newConfig)
-                    }}
-                    visualizationKey={col.widget}
-                    config={visualizationConfig as TableConfig}
-                    viewport={currentViewport}
-                  />
-                )}
-                {visualizationConfig.type === 'footnotes' && (
-                  <FootnotesStandAlone
-                    key={col.widget}
-                    visualizationKey={col.widget}
-                    config={visualizationConfig}
-                    viewport={currentViewport}
-                  />
-                )}
-              </VisualizationWrapper>
+              {' '}
+              {!hideVisualization && (
+                <VisualizationWrapper
+                  allExpanded={allExpanded}
+                  currentViewport={currentViewport}
+                  groupName={groupName}
+                  collapsible={row.expandCollapseAllButtons}
+                >
+                  {visualizationConfig.type === 'chart' && (
+                    <CdcChart
+                      key={col.widget}
+                      config={visualizationConfig}
+                      dashboardConfig={config}
+                      isEditor={false}
+                      setConfig={newConfig => {
+                        updateChildConfig(col.widget, newConfig)
+                      }}
+                      setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                      isDashboard={true}
+                      link={
+                        config.table &&
+                        config.table.show &&
+                        config.datasets &&
+                        visualizationConfig.table &&
+                        visualizationConfig.table.showDataTableLink
+                          ? tableLink
+                          : undefined
+                      }
+                      configUrl={undefined}
+                      setEditing={undefined}
+                      hostname={undefined}
+                      setSharedFilterValue={undefined}
+                    />
+                  )}
+                  {visualizationConfig.type === 'map' && (
+                    <CdcMap
+                      key={col.widget}
+                      config={visualizationConfig}
+                      isEditor={false}
+                      setConfig={newConfig => {
+                        updateChildConfig(col.widget, newConfig)
+                      }}
+                      showLoader={false}
+                      setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                      setSharedFilterValue={setSharedFilterValue}
+                      isDashboard={true}
+                      link={
+                        config.table &&
+                        config.table.show &&
+                        config.datasets &&
+                        visualizationConfig.table &&
+                        visualizationConfig.table.showDataTableLink
+                          ? tableLink
+                          : undefined
+                      }
+                    />
+                  )}
+                  {visualizationConfig.type === 'data-bite' && (
+                    <CdcDataBite
+                      key={col.widget}
+                      config={visualizationConfig}
+                      isEditor={false}
+                      setConfig={newConfig => {
+                        updateChildConfig(col.widget, newConfig)
+                      }}
+                      isDashboard={true}
+                    />
+                  )}
+                  {visualizationConfig.type === 'waffle-chart' && (
+                    <CdcWaffleChart
+                      key={col.widget}
+                      config={visualizationConfig}
+                      isEditor={false}
+                      setConfig={newConfig => {
+                        updateChildConfig(col.widget, newConfig)
+                      }}
+                      isDashboard={true}
+                      configUrl={
+                        config.table &&
+                        config.table.show &&
+                        config.datasets &&
+                        visualizationConfig.table &&
+                        visualizationConfig.table.showDataTableLink
+                          ? tableLink
+                          : undefined
+                      }
+                    />
+                  )}
+                  {visualizationConfig.type === 'markup-include' && (
+                    <CdcMarkupInclude
+                      key={col.widget}
+                      config={visualizationConfig}
+                      configUrl={undefined}
+                      isDashboard={true}
+                      isEditor={false}
+                      setConfig={newConfig => {
+                        updateChildConfig(col.widget, newConfig)
+                      }}
+                    />
+                  )}
+                  {visualizationConfig.type === 'filtered-text' && (
+                    <CdcFilteredText
+                      key={col.widget}
+                      config={visualizationConfig}
+                      isEditor={false}
+                      setConfig={newConfig => {
+                        updateChildConfig(col.widget, newConfig)
+                      }}
+                      isDashboard={true}
+                      configUrl={undefined}
+                    />
+                  )}
+                  {visualizationConfig.type === 'dashboardFilters' && (
+                    <DashboardSharedFilters
+                      setConfig={newConfig => {
+                        updateChildConfig(col.widget, newConfig)
+                      }}
+                      key={col.widget}
+                      visualizationConfig={visualizationConfig as DashboardFilters}
+                      apiFilterDropdowns={apiFilterDropdowns}
+                      currentViewport={currentViewport}
+                    />
+                  )}
+                  {visualizationConfig.type === 'table' && (
+                    <DataTableStandAlone
+                      key={col.widget}
+                      updateConfig={newConfig => {
+                        updateChildConfig(col.widget, newConfig)
+                      }}
+                      visualizationKey={col.widget}
+                      config={visualizationConfig as TableConfig}
+                      viewport={currentViewport}
+                    />
+                  )}
+                  {visualizationConfig.type === 'footnotes' && (
+                    <FootnotesStandAlone
+                      key={col.widget}
+                      visualizationKey={col.widget}
+                      config={visualizationConfig}
+                      viewport={currentViewport}
+                    />
+                  )}
+                </VisualizationWrapper>
+              )}
             </div>
           )
         }
