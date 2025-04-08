@@ -19,13 +19,6 @@ import Loading from '@cdc/core/components/Loading'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import getViewport from '@cdc/core/helpers/getViewport'
 
-import CdcChart from '@cdc/chart/src/CdcChartComponent'
-import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
-import CdcMap from '@cdc/map/src/CdcMap'
-import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
-import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
-import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'
-
 import Grid from './components/Grid'
 import Header from './components/Header/Header'
 import DataTable from '@cdc/core/components/DataTable'
@@ -49,23 +42,20 @@ import MultiTabs from './components/MultiConfigTabs'
 import _ from 'lodash'
 import EditorContext from '../../editor/src/ConfigContext'
 import { APIFilterDropdowns } from './components/DashboardFilters'
-import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import VisualizationRow from './components/VisualizationRow'
 import { getVizConfig } from './helpers/getVizConfig'
 import { getFilteredData } from './helpers/getFilteredData'
 import { getVizRowColumnLocator } from './helpers/getVizRowColumnLocator'
 import Layout from '@cdc/core/components/Layout'
-import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import * as reloadURLHelpers from './helpers/reloadURLHelpers'
 import { addValuesToDashboardFilters } from './helpers/addValuesToDashboardFilters'
 import { DashboardFilters } from './types/DashboardFilters'
-import DashboardSharedFilters from './components/DashboardFilters'
-import ExpandCollapseButtons from './components/ExpandCollapseButtons'
 import { loadAPIFiltersFactory } from './helpers/loadAPIFilters'
 import Loader from '@cdc/core/components/Loader'
 import Alert from '@cdc/core/components/Alert'
 import { shouldLoadAllFilters } from './helpers/shouldLoadAllFilters'
+import DashboardEditors from './components/DashboardEditors'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -346,12 +336,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       )
       visualizationConfig.uid = visualizationKey
       if (visualizationConfig.type === 'footnotes') visualizationConfig.formattedData = undefined
-      const setsSharedFilter =
-        state.config.dashboard.sharedFilters &&
-        state.config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey).length > 0
-      const setSharedFilterValue = setsSharedFilter
-        ? state.config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey)[0].active
-        : undefined
 
       if (visualizationConfig.editing) {
         subVisualizationEditing = true
@@ -363,151 +347,21 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
           updateChildConfig(visualizationKey, dataCorrectedConfig)
         }
 
-        switch (visualizationConfig.type) {
-          case 'chart':
-            body = (
-              <>
-                <Header visualizationKey={visualizationKey} subEditor='Chart' />
-                <CdcChart
-                  key={visualizationKey}
-                  config={visualizationConfig}
-                  isEditor={true}
-                  isDebug={isDebug}
-                  setConfig={_updateConfig}
-                  setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
-                  setSharedFilterValue={setSharedFilterValue}
-                  dashboardConfig={state.config}
-                  isDashboard={true}
-                  configUrl={undefined}
-                  setEditing={undefined}
-                  hostname={undefined}
-                  link={undefined}
-                />
-              </>
-            )
-            break
-          case 'map':
-            body = (
-              <>
-                <Header visualizationKey={visualizationKey} subEditor='Map' />
-                <CdcMap
-                  key={visualizationKey}
-                  config={visualizationConfig}
-                  isEditor={true}
-                  isDebug={isDebug}
-                  setConfig={_updateConfig}
-                  setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
-                  setSharedFilterValue={setSharedFilterValue}
-                  isDashboard={true}
-                  showLoader={false}
-                  dashboardConfig={state.config}
-                />
-              </>
-            )
-            break
-          case 'data-bite':
-            body = (
-              <>
-                <Header visualizationKey={visualizationKey} subEditor='Data Bite' />
-                <CdcDataBite
-                  key={visualizationKey}
-                  config={{ ...visualizationConfig, newViz: true }}
-                  isEditor={true}
-                  setConfig={_updateConfig}
-                  isDashboard={true}
-                />
-              </>
-            )
-            break
-          case 'waffle-chart':
-            body = (
-              <>
-                <Header visualizationKey={visualizationKey} subEditor='Waffle Chart' />
-                <CdcWaffleChart
-                  key={visualizationKey}
-                  config={visualizationConfig}
-                  isEditor={true}
-                  setConfig={_updateConfig}
-                  isDashboard={true}
-                  configUrl={undefined}
-                />
-              </>
-            )
-            break
-          case 'markup-include':
-            body = (
-              <>
-                <Header visualizationKey={visualizationKey} subEditor='Markup Include' />
-                <CdcMarkupInclude
-                  key={visualizationKey}
-                  config={visualizationConfig}
-                  isEditor={true}
-                  setConfig={_updateConfig}
-                  isDashboard={true}
-                  configUrl={undefined}
-                />
-              </>
-            )
-            break
-          case 'filtered-text':
-            body = (
-              <>
-                <Header visualizationKey={visualizationKey} subEditor='Filtered Text' />
-                <CdcFilteredText
-                  key={visualizationKey}
-                  config={visualizationConfig}
-                  isEditor={true}
-                  setConfig={_updateConfig}
-                  isDashboard={true}
-                  configUrl={undefined}
-                />
-              </>
-            )
-            break
-          case 'dashboardFilters':
-            body = (
-              <>
-                <Header visualizationKey={visualizationKey} subEditor='Filter Dropdowns' />
-                <DashboardSharedFilters
-                  isEditor={true}
-                  visualizationConfig={visualizationConfig}
-                  apiFilterDropdowns={apiFilterDropdowns}
-                  setConfig={_updateConfig}
-                />
-              </>
-            )
-            break
-          case 'table':
-            body = (
-              <>
-                <Header visualizationKey={visualizationKey} subEditor='Table' />
-                <DataTableStandAlone
-                  visualizationKey={visualizationKey}
-                  config={visualizationConfig}
-                  isEditor={true}
-                  updateConfig={_updateConfig}
-                />
-              </>
-            )
-            break
-          case 'footnotes':
-            body = (
-              <>
-                <Header visualizationKey={visualizationKey} subEditor='Footnotes' />
-                {/* Datasets are passed in just for reference and need to be removed */}
-                <FootnotesStandAlone
-                  visualizationKey={visualizationKey}
-                  config={{ ...visualizationConfig, datasets: state.config.datasets }}
-                  isEditor={true}
-                  updateConfig={conf => _updateConfig(_.omit(conf, 'datasets'))}
-                />
-              </>
-            )
-            break
-          default:
-            body = <></>
-            break
-        }
+        body = (
+          <>
+            <Header visualizationKey={visualizationKey} subEditor={true} />
+            <DashboardEditors
+              key={visualizationKey}
+              visualizationKey={visualizationKey}
+              visualizationConfig={visualizationConfig}
+              _updateConfig={_updateConfig}
+              isDebug={isDebug}
+              setSharedFilter={setSharedFilter}
+              apiFilterDropdowns={apiFilterDropdowns}
+              state={state}
+            />
+          </>
+        )
       }
     })
 
@@ -530,7 +384,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     const { config } = state
     const { title, description } = config.dashboard || {}
 
-    const filteredRows = config.rows && config.rows.filter(row => row.columns.filter(col => col.widget).length !== 0)
+    const filteredRows = config.rows?.filter(row => row.columns.filter(col => col.widget).length !== 0)
 
     body = (
       <>
@@ -556,62 +410,22 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             {/* Description */}
             {description && <div className='subtext mb-3'>{parse(description)}</div>}
             {/* Visualizations */}
-            {filteredRows &&
-              filteredRows.map((row, index) => {
-                if (row.multiVizColumn && (isPreview || !isEditor)) {
-                  const filteredData = getFilteredData(state, _.cloneDeep(state.data))
-                  const data = filteredData[index] ?? row.formattedData
-                  const dataGroups = {}
-                  data.forEach(d => {
-                    const groupKey = d[row.multiVizColumn]
-                    if (!dataGroups[groupKey]) dataGroups[groupKey] = []
-                    dataGroups[groupKey].push(d)
-                  })
-                  return (
-                    <React.Fragment key={`row__${index}`}>
-                      {/* Expand/Collapse All */}
-                      {!inNoDataState && row.expandCollapseAllButtons === true && (
-                        <ExpandCollapseButtons setAllExpanded={setAllExpanded} />
-                      )}
-                      {Object.keys(dataGroups).map(groupName => {
-                        const dataValue = dataGroups[groupName]
-                        return (
-                          <VisualizationRow
-                            key={`row__${index}__${groupName}`}
-                            allExpanded={allExpanded}
-                            filteredDataOverride={dataValue}
-                            groupName={groupName}
-                            row={row}
-                            rowIndex={index}
-                            setSharedFilter={setSharedFilter}
-                            updateChildConfig={updateChildConfig}
-                            apiFilterDropdowns={apiFilterDropdowns}
-                            currentViewport={currentViewport}
-                            inNoDataState={inNoDataState}
-                            isLastRow={index === filteredRows.length - 1}
-                          />
-                        )
-                      })}
-                    </React.Fragment>
-                  )
-                } else {
-                  return (
-                    <VisualizationRow
-                      key={`row__${index}`}
-                      allExpanded={false}
-                      groupName={''}
-                      row={row}
-                      rowIndex={index}
-                      setSharedFilter={setSharedFilter}
-                      updateChildConfig={updateChildConfig}
-                      apiFilterDropdowns={apiFilterDropdowns}
-                      currentViewport={currentViewport}
-                      inNoDataState={inNoDataState}
-                      isLastRow={index === filteredRows.length - 1}
-                    />
-                  )
-                }
-              })}
+            {filteredRows?.map((row, index) => (
+              <VisualizationRow
+                key={`row__${index}`}
+                allExpanded={allExpanded}
+                groupName={''}
+                row={row}
+                rowIndex={index}
+                setSharedFilter={setSharedFilter}
+                setAllExpanded={setAllExpanded}
+                updateChildConfig={updateChildConfig}
+                apiFilterDropdowns={apiFilterDropdowns}
+                currentViewport={currentViewport}
+                inNoDataState={inNoDataState}
+                isLastRow={index === filteredRows.length - 1}
+              />
+            ))}
 
             {inNoDataState ? <div className='mt-5'>Please complete your selection to continue.</div> : <></>}
 

@@ -185,8 +185,8 @@ const Filters: React.FC<FilterProps> = ({
   }
 
   const mobileFilterStyle = useMemo(() => {
-    if (!dimensions) false
-    const [width] = dimensions || []
+    if (!dimensions) return false
+    const [width] = dimensions
     const isMobile = Number(width) < 768
     const isTabSimple = filters?.some(filter => filter.filterStyle === VIZ_FILTER_STYLE.tabSimple)
 

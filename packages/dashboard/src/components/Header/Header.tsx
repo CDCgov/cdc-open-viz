@@ -9,7 +9,7 @@ import _ from 'lodash'
 
 type HeaderProps = {
   back?: any
-  subEditor?: any
+  subEditor?: boolean
   visualizationKey?: string
 }
 
@@ -96,14 +96,12 @@ const Header = (props: HeaderProps) => {
             multidashboard
           </span>
           <br />
-          {
-            <input
-              type='text'
-              placeholder='Enter Dashboard Name Here'
-              defaultValue={config.dashboard?.title}
-              onChange={e => changeConfigValue('dashboard', 'title', e.target.value)}
-            />
-          }
+          <input
+            type='text'
+            placeholder='Enter Dashboard Name Here'
+            defaultValue={config.dashboard?.title}
+            onChange={e => changeConfigValue('dashboard', 'title', e.target.value)}
+          />
         </div>
       )}
       {!subEditor && (
