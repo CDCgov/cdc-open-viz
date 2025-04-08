@@ -442,8 +442,7 @@ const CdcMap = ({
     tooltipId,
     tooltipRef,
     topoData,
-    translate,
-    generateRuntimeLegend
+    translate
   }
 
   if (!mapProps.data || !state.data) return <></>

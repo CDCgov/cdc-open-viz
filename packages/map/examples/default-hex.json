@@ -1,4 +1,5 @@
 {
+  "annotations": [],
   "general": {
     "title": "Example Data Map with Cities",
     "subtext": "*: Lorem ipsum; NA: Lorem ipsum.",
@@ -7,11 +8,9 @@
     "headerColor": "theme-cyan",
     "showSidebar": true,
     "showTitle": true,
-    "showDownloadButton": true,
-    "expandDataTable": true,
+    "expandDataTable": false,
     "backgroundColor": "#f5f5f5",
     "geoBorderColor": "darkGray",
-    "territoriesLabel": "Territories",
     "language": "en",
     "hasRegions": false,
     "displayAsHex": true,
@@ -30,7 +29,10 @@
     "statePicked": {
       "fipsCode": "01",
       "stateName": "Alabama"
-    }
+    },
+    "navigationTarget": "_self",
+    "noStateFoundMessage": "Map Unavailable",
+    "annotationDropdownText": "Annotations"
   },
   "type": "map",
   "color": "yelloworangered",
@@ -43,11 +45,12 @@
     },
     "primary": {
       "dataTable": true,
-      "label": "Rate",
-      "name": "Rate",
+      "label": "Location",
+      "name": "Location",
       "prefix": "",
       "suffix": "",
-      "tooltip": false
+      "tooltip": false,
+      "roundToPlace": 0
     },
     "navigate": {
       "dataTable": false,
@@ -74,11 +77,11 @@
     }
   },
   "legend": {
-    "numberOfItems": 3,
+    "numberOfItems": 1,
     "position": "side",
     "title": "Legend Title",
     "description": "Legend Text",
-    "type": "equalnumber",
+    "type": "category",
     "specialClasses": [
       {
         "key": "Rate",
@@ -97,13 +100,21 @@
     "descriptions": {},
     "singleRow": false,
     "verticalSorted": false,
-    "showSpecialClassesLast": false
+    "showSpecialClassesLast": false,
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "singleColumnLegend": false,
+    "hideBorder": false,
+    "groupBy": ""
   },
   "filters": [
     {
       "label": "",
       "values": [],
-      "columnName": "Condition"
+      "columnName": "Condition",
+      "id": 1744141866718,
+      "filterStyle": "dropdown"
     }
   ],
   "table": {
@@ -117,8 +128,10 @@
     "showDataTableLink": true,
     "showFullGeoNameInCSV": false,
     "forceDisplay": true,
-    "download": false,
-    "indexLabel": ""
+    "download": true,
+    "indexLabel": "",
+    "showDownloadLinkBelow": true,
+    "cellMinWidth": "0"
   },
   "tooltips": {
     "appearanceType": "hover",
@@ -135,7 +148,9 @@
     "extraBubbleBorder": false,
     "cityStyle": "circle",
     "geoCodeCircleSize": 8,
-    "showBubbleZeros": false
+    "showBubbleZeros": false,
+    "cityStyleLabel": "",
+    "additionalCityStyles": []
   },
   "mapPosition": {
     "coordinates": [0, 30],
@@ -164,6 +179,7 @@
     ]
   },
   "filterBehavior": "Filter Change",
+  "filterIntro": "",
   "data": [
     {
       "STATE": "AL",
@@ -371,7 +387,7 @@
     {
       "STATE": "MO",
       "Rate": 11,
-      "Location": "Work",
+      "Location": "Univercity",
       "URL": "https://www.cdc.gov/",
       "group": "Fifth Group"
     },
@@ -629,5 +645,9 @@
     "title": "Data Table"
   },
   "usingWidgetLoader": true,
-  "validated": 4.23
+  "validated": 4.23,
+  "version": "4.25.4",
+  "migrations": {
+    "addColorMigration": true
+  }
 }

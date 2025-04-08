@@ -10,6 +10,7 @@ import LegendShape from '@cdc/core/components/LegendShape'
 import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import LegendItemHex from './LegendItem.Hex'
 import Button from '@cdc/core/components/elements/Button'
+import LegendGroup from './LegendGroup/Legend.Group'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import ConfigContext from '../../../context'
@@ -22,7 +23,6 @@ import { isBelowBreakpoint, isMobileHeightViewport } from '@cdc/core/helpers/vie
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
 import { resetLegendToggles } from '../../../helpers'
-import LegendGroup from './LegendGroup/Legend.Group'
 
 const LEGEND_PADDING = 30
 
@@ -35,7 +35,7 @@ type LegendProps = {
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const { skipId, containerWidthPadding } = props
-  const { isEditor, dimensions, currentViewport, generateRuntimeLegend } = useContext(ConfigContext)
+  const { isEditor, dimensions, currentViewport } = useContext(ConfigContext)
 
   const {
     runtimeFilters,
@@ -293,19 +293,13 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               }
               config={state}
             />
+            <LegendGroup legendItems={getFormattedLegendItems()} state={state} />
 
-            {!!legendListItems.length && (
+            {!!legendListItems.length && !state.legend.groupBy && (
               <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
                 {legendListItems}
               </ul>
             )}
-            <LegendGroup
-              generateRuntimeLegend={generateRuntimeLegend}
-              runtimeLegend={runtimeLegend}
-              legendListItems={legendListItems}
-              legendItems={getFormattedLegendItems()}
-              state={state}
-            />
             {(state.visual.additionalCityStyles.some(c => c.label) || state.visual.cityStyleLabel) && (
               <>
                 <hr />
