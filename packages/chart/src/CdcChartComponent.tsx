@@ -955,7 +955,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                             {parse(config.introText)}
                           </section>
                         )}
-                        <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles, paddingRight: '0.8rem' }}>
+                        <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles }}>
                           <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
                         </div>
                         {description && (
