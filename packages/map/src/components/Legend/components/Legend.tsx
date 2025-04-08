@@ -35,7 +35,7 @@ type LegendProps = {
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const { skipId, containerWidthPadding } = props
-  const { isEditor, dimensions, currentViewport } = useContext(ConfigContext)
+  const { isEditor, dimensions, currentViewport, generateRuntimeLegend } = useContext(ConfigContext)
 
   const {
     runtimeFilters,
@@ -300,6 +300,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               </ul>
             )}
             <LegendGroup
+              generateRuntimeLegend={generateRuntimeLegend}
               runtimeLegend={runtimeLegend}
               legendListItems={legendListItems}
               legendItems={getFormattedLegendItems()}

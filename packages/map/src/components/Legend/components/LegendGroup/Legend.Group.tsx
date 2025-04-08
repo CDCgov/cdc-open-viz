@@ -1,8 +1,8 @@
 import React from 'react'
 import _ from 'lodash'
 import './Legend.Group.css'
-
-const LegendGroup = ({ state, legendItems, legendListItems, runtimeLegend }) => {
+import LegendShape from '@cdc/core/components/LegendShape'
+const LegendGroup = ({ state, legendItems, legendListItems, runtimeLegend, generateRuntimeLegend }) => {
   // get unique subgroup itsms
   const getSubGroups = (data, key: string): string[] => _.uniq(_.map(data, key).filter(Boolean))
   const legendSubGroups = getSubGroups(state.data, state.legend.groupBy)
@@ -32,8 +32,8 @@ const LegendGroup = ({ state, legendItems, legendListItems, runtimeLegend }) => 
 
     return result
   }
-
-  function groupByGroupName(data, groups, key) {
+  console.log(groupByLegendMatch(state.data, legendItems, legendSubGroups, state.legend.groupBy), 'lsdmfl,sdmf')
+  function groupByGroupName(data: any[], groups: any[], key: string | number) {
     // Create result object with empty arrays for each group
     const result = {}
     groups.forEach(group => {
@@ -120,20 +120,40 @@ const LegendGroup = ({ state, legendItems, legendListItems, runtimeLegend }) => 
   //   console.log(groupByGroupName(state.data, legendSubGroups, state.legend.groupBy), 'ddd')
   // Logging the output to see the structured groups and bins
   //   console.log(categorizedData, 'categorizedData')
+
   return (
     <div className='space-y-4'>
-      {legendSubGroups.map(group => (
-        <div key={group}>
-          <h2 className='text-lg font-semibold'>{group}</h2>
+      {Object.entries(groupedLegendItems).map(([groupName, data]) => {
+        // const newRunTIme = generateRuntimeLegend(state, data, '55555')
 
-          {newLegendBins
-            .filter(bin => Array.isArray(bin.groups) && bin.groups.includes(group))
-            .map((bin, idx) => (
-              <p key={idx}>{bin.label}</p>
-            ))}
-        </div>
-      ))}
+        return (
+          <div key={groupName} className='border p-4 rounded-xl shadow'>
+            <h2 className='text-lg font-semibold mb-2'>{groupName}</h2>
+            {legendItems.map(item => {
+              return (
+                <li title={`Legend item ${item.label} - Click to disable`}>
+                  <LegendShape shape={state.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
+                  <span>{item.label}</span>
+                </li>
+              )
+            })}
+          </div>
+        )
+      })}
     </div>
+    // <div className='space-y-4'>
+    //   {legendSubGroups.map(group => (
+    //     <div key={group}>
+    //       <h2 className='text-lg font-semibold'>{group}</h2>
+
+    //       {newLegendBins
+    //         .filter(bin => Array.isArray(bin.groups) && bin.groups.includes(group))
+    //         .map((bin, idx) => (
+    //           <p key={idx}>{bin.label}</p>
+    //         ))}
+    //     </div>
+    //   ))}
+    // </div>
     // <div className='space-y-4'>
     //   {Object.entries(legendMinMax).map(([groupName, { label }]) => (
     //     <div key={groupName} className='border p-4 rounded-xl shadow'>

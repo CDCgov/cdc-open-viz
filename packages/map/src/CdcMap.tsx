@@ -353,6 +353,7 @@ const CdcMap = ({
 
     // Legend - Update when runtimeData does
     const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
+
     setRuntimeLegend(legend)
   }, [
     runtimeData,
@@ -441,7 +442,8 @@ const CdcMap = ({
     tooltipId,
     tooltipRef,
     topoData,
-    translate
+    translate,
+    generateRuntimeLegend
   }
 
   if (!mapProps.data || !state.data) return <></>
