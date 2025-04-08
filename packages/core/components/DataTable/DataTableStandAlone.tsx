@@ -33,6 +33,12 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
     setFilteredData(filterVizData(filters, config?.formattedData?.length > 0 ? config.formattedData : config.data))
   }, [config.filters])
 
+  const setFilters = (newFilters: any) => {
+    const filters = addValuesToFilters(newFilters, config.data)
+    updateConfig({ ...config, filters })
+    setFilteredData(filterVizData(filters, config?.formattedData?.length > 0 ? config.formattedData : config.data))
+  }
+
   if (isEditor)
     return (
       <EditorWrapper
@@ -49,13 +55,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
 
   return (
     <>
-      <Filters
-        config={config}
-        setConfig={updateConfig}
-        setFilteredData={setFilteredData}
-        filteredData={filteredData}
-        excludedData={config.formattedData}
-      />
+      <Filters config={config} setFilters={setFilters} excludedData={config.formattedData} />
       <DataTable
         expandDataTable={config.table.expanded}
         config={config}

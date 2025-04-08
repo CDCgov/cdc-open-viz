@@ -74,6 +74,8 @@ import { getColorScale } from './helpers/getColorScale'
 // styles
 import './scss/main.scss'
 import { getInitialState, reducer } from './store/chart.reducer'
+import { VizFilter } from '@cdc/core/types/VizFilter'
+import { getNewRuntime } from './helpers/getNewRuntime'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -128,10 +130,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (isEditor && !isDashboard) {
       editorContext.setTempConfig(newConfig)
     }
-  }
-
-  const setFiltersData = (filteredData: object[]): void => {
-    dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
   }
 
   const legendRef = useRef(null)
@@ -339,6 +337,30 @@ const CdcChart: React.FC<CdcChartProps> = ({
       return config.sortData === 'ascending' ? -1 : 1
     } else {
       return 0
+    }
+  }
+
+  const setFilters = (newFilters: VizFilter[]) => {
+    if (!config.dynamicSeries) {
+      const _newFilters = addValuesToFilters(newFilters, excludedData)
+      setConfig({
+        ...config,
+        filters: _newFilters
+      })
+    }
+
+    if (config.filterBehavior === 'Filter Change') {
+      const newFilteredData = filterVizData(newFilters, excludedData)
+
+      dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+      if (config.dynamicSeries) {
+        const runtime = getNewRuntime(config, newFilteredData)
+        setConfig({
+          ...config,
+          filters: newFilters,
+          runtime
+        })
+      }
     }
   }
 
@@ -862,11 +884,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
                   <Filters
                     config={config}
-                    setConfig={setConfig}
-                    setFilteredData={setFiltersData}
-                    filteredData={filteredData}
+                    setFilters={setFilters}
                     excludedData={excludedData}
-                    filterData={filterVizData}
                     dimensions={dimensions}
                   />
                 )}
@@ -943,11 +962,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       <>
                         <Filters
                           config={config}
-                          setConfig={setConfig}
-                          setFilteredData={setFiltersData}
-                          filteredData={filteredData}
+                          setFilters={setFilters}
                           excludedData={excludedData}
-                          filterData={filterVizData}
                           dimensions={dimensions}
                         />
                         {config?.introText && (

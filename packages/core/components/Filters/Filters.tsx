@@ -13,8 +13,6 @@ import { getNestedOptions } from './helpers/getNestedOptions'
 import { getWrappingStatuses } from './helpers/filterWrapping'
 import { handleSorting } from './helpers/handleSorting'
 import { getChangedFilters } from './helpers/getChangedFilters'
-import { getNewRuntime } from './helpers/getNewRuntime'
-import { filterVizData } from '../../helpers/filterVizData'
 import { getQueryParams, updateQueryString } from '../../helpers/queryStringUtils'
 import { applyQueuedActive } from './helpers/applyQueuedActive'
 import Tabs from './components/Tabs'
@@ -40,25 +38,19 @@ const BUTTON_TEXT = {
 }
 
 type FilterProps = {
-  filteredData: Object[]
-  dimensions: DimensionsType
+  dimensions?: DimensionsType
   config: Visualization
-  // function for updating the runtime filters
-  setFilteredData: Function
-  // updating function for setting fitlerBehavior
-  setConfig: Function
+  setFilters: Function
   standaloneMap?: boolean
   excludedData?: Object[]
-  getUniqueValues: Function
+  getUniqueValues?: Function
 }
 
 const Filters: React.FC<FilterProps> = ({
   config: visualizationConfig,
-  filteredData,
   dimensions,
   standaloneMap,
-  setConfig,
-  setFilteredData,
+  setFilters,
   excludedData,
   getUniqueValues
 }) => {
@@ -82,7 +74,7 @@ const Filters: React.FC<FilterProps> = ({
   // end of Handle Wrapping Filters
 
   const initialActiveFilters = useMemo(() => {
-    if (!filteredData) return []
+    //if (!filteredData) return []
     return filters.map(filter => filter.active)
   }, [])
 
@@ -92,36 +84,10 @@ const Filters: React.FC<FilterProps> = ({
   }, [filters])
 
   const changeFilterActive = (index, value) => {
-    let newFilters = standaloneMap ? [...filteredData] : [...visualizationConfig.filters]
+    if (filterBehavior === 'Apply Button') setShowApplyButton(true)
 
-    newFilters = getChangedFilters(newFilters, index, value, visualizationConfig.filterBehavior)
-    if (visualizationConfig.filterBehavior === 'Apply Button') setShowApplyButton(true)
-
-    if (!visualizationConfig.dynamicSeries) {
-      const _newFilters = addValuesToFilters(newFilters, excludedData)
-      setConfig({
-        ...visualizationConfig,
-        filters: _newFilters
-      })
-    }
-
-    if (visualizationConfig.filterBehavior === 'Filter Change') {
-      if (standaloneMap) {
-        setFilteredData(newFilters)
-      } else {
-        const newFilteredData = filterVizData(newFilters, excludedData)
-        setFilteredData(newFilteredData)
-
-        if (visualizationConfig.dynamicSeries) {
-          const runtime = getNewRuntime(visualizationConfig, newFilteredData)
-          setConfig({
-            ...visualizationConfig,
-            filters: newFilters,
-            runtime
-          })
-        }
-      }
-    }
+    const newFilters = getChangedFilters([...filters], index, value, filterBehavior)
+    setFilters(newFilters)
   }
 
   const handleApplyButton = newFilters => {
@@ -140,19 +106,13 @@ const Filters: React.FC<FilterProps> = ({
       updateQueryString(queryParams)
     }
 
-    setConfig({ ...visualizationConfig, filters: newFilters })
-
-    if (standaloneMap) {
-      setFilteredData(newFilters, excludedData)
-    } else {
-      setFilteredData(filterVizData(newFilters, excludedData))
-    }
+    setFilters(newFilters)
 
     setShowApplyButton(false)
   }
 
   const handleReset = e => {
-    let newFilters = [...visualizationConfig.filters]
+    let newFilters = [...filters]
     e.preventDefault()
 
     // reset to first item in values array.
@@ -175,13 +135,7 @@ const Filters: React.FC<FilterProps> = ({
       updateQueryString(queryParams)
     }
 
-    setConfig({ ...visualizationConfig, filters: newFilters })
-
-    if (standaloneMap) {
-      setFilteredData(newFilters, excludedData)
-    } else {
-      setFilteredData(filterVizData(newFilters, excludedData))
-    }
+    setFilters(newFilters)
   }
 
   const mobileFilterStyle = useMemo(() => {
@@ -195,11 +149,10 @@ const Filters: React.FC<FilterProps> = ({
 
   const vizFiltersWithValues = useMemo(() => {
     // Here charts is using config.filters where maps is using a runtime value
-    let vizfilters = standaloneMap ? filteredData : filters
-    if (!vizfilters) return []
-    if (vizfilters.fromHash) delete vizfilters.fromHash // support for Maps config
-    return addValuesToFilters(vizfilters as VizFilter[], visualizationConfig.data)
-  }, [filters, filteredData])
+    if (!filters) return []
+    if (filters.fromHash) delete filters.fromHash // support for Maps config
+    return addValuesToFilters(filters as VizFilter[], visualizationConfig.data)
+  }, [filters])
 
   if (visualizationConfig?.filters?.length === 0) return
 
@@ -212,6 +165,11 @@ const Filters: React.FC<FilterProps> = ({
     return [baseClass, conditionalClass, legendClass, 'w-100'].filter(Boolean)
   }
 
+  const getNestedGroup = (singleFilter: VizFilter): string[] => {
+    if (singleFilter.filterStyle !== 'nested-dropdown') return []
+    return (singleFilter.queuedActive || [singleFilter.active, singleFilter.subGrouping?.active]) as [string, string]
+  }
+
   return (
     <section className={getClasses().join(' ')}>
       {visualizationConfig.filterIntro && (
@@ -222,6 +180,7 @@ const Filters: React.FC<FilterProps> = ({
           {vizFiltersWithValues.map((singleFilter: VizFilter, outerIndex) => {
             if (singleFilter.showDropdown === false) return
             const { label, filterStyle, columnName } = singleFilter as VizFilter
+            const [nestedActiveGroup, nestedActiveSubGroup] = getNestedGroup(singleFilter)
 
             handleSorting(singleFilter)
 
@@ -234,13 +193,6 @@ const Filters: React.FC<FilterProps> = ({
             const { isDropdown } = wrappingFilters[columnName] || {}
             const showDefaultDropdown =
               ((filterStyle === 'dropdown' || mobileFilterStyle) && !mobileExempt) || isDropdown
-            const [nestedActiveGroup, nestedActiveSubGroup] = useMemo<string[]>(() => {
-              if (filterStyle !== 'nested-dropdown') return []
-              return (singleFilter.queuedActive || [singleFilter.active, singleFilter.subGrouping?.active]) as [
-                string,
-                string
-              ]
-            }, [singleFilter])
             const hideLabelMargin = singleFilter.filterStyle === 'tab-simple' && !showDefaultDropdown
             return (
               <div
