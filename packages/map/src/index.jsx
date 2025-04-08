@@ -1,11 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-import CdcMap from './CdcMap'
-
 import '@cdc/core/styles/cove-main.scss'
 import 'react-tooltip/dist/react-tooltip.css'
 import './coreStyles_map.scss'
+
+import CdcMap from './CdcMap'
 
 let isEditor = window.location.href.includes('editor=true')
 let isDebug = window.location.href.includes('debug=true')

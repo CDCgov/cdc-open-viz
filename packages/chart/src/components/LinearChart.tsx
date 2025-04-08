@@ -441,7 +441,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   }, [maxValue])
 
   useEffect(() => {
-    if (orientation === 'horizontal' || !labelsOverflow || config.yAxis?.max) {
+    if (!yScale?.ticks) return
+    const ticks = yScale.ticks(handleNumTicks)
+    if (orientation === 'horizontal' || !labelsOverflow || config.yAxis?.max || ticks.length === 0) {
       setYAxisAutoPadding(0)
       return
     }
@@ -449,13 +451,12 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     // minimum percentage of the max value that the distance should be from the top grid line
     const MINIMUM_DISTANCE_PERCENTAGE = 0.025
 
-    const topGridLine = Math.max(...yScale.ticks(handleNumTicks))
+    const topGridLine = Math.max(...ticks)
     const needsPaddingThreshold = topGridLine - maxValue * MINIMUM_DISTANCE_PERCENTAGE
     const maxValueIsGreaterThanThreshold = maxValue > needsPaddingThreshold
 
     if (!maxValueIsGreaterThanThreshold) return
 
-    const ticks = yScale.ticks(handleNumTicks)
     const tickGap = ticks.length === 1 ? ticks[0] : ticks[1] - ticks[0]
     const nextTick = Math.max(...yScale.ticks(handleNumTicks)) + tickGap
     const divideBy = minValue < 0 ? maxValue / 2 : maxValue

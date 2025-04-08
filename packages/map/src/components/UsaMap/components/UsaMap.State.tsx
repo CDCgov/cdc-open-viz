@@ -28,21 +28,24 @@ import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { titleCase } from '../../../helpers/titleCase'
 import TerritoriesSection from './TerritoriesSection'
 import { displayGeoName } from '../../../helpers/displayGeoName'
+import { isMobileStateLabelViewport } from '@cdc/core/helpers/viewports'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
+import { SVG_VIEWBOX } from '../../../helpers'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
-  'US-VT': [50, -8],
-  'US-NH': [34, 2],
-  'US-MA': [30, -1],
-  'US-RI': [28, 2],
-  'US-CT': [35, 10],
-  'US-NJ': [42, 1],
+  'US-VT': [53, -7],
+  'US-NH': [38, 7],
+  'US-MA': [34, -1],
+  'US-RI': [29, 7],
+  'US-CT': [43, 20],
+  'US-NJ': [26, 7],
   'US-DE': [33, 0],
-  'US-MD': [47, 10]
+  'US-MD': [51, 16]
 }
 
 const nudges = {
@@ -67,8 +70,9 @@ const UsaMap = () => {
       handleDragStateChange,
       mapId,
       logo,
-    legendMemo,
-    legendSpecialClassLastMemo
+      legendMemo,
+      legendSpecialClassLastMemo,
+      currentViewport
     } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
@@ -145,7 +149,7 @@ const UsaMap = () => {
     let styles = {
       fill: geoFillColor,
       stroke: geoStrokeColor,
-      color: '#202020'
+      color: APP_FONT_COLOR
     }
 
     const label = supportedTerritories[territory][1]
@@ -156,7 +160,8 @@ const UsaMap = () => {
           key={label}
           label={label}
           style={styles}
-          text={styles.color}
+          textColor={styles.color}
+          strokeColor='#fff'
           territoryData={territoryData}
           backgroundColor={styles.fill}
         />
@@ -167,14 +172,14 @@ const UsaMap = () => {
     const legendColors = applyLegendToRow(territoryData, state)
 
     if (legendColors) {
-      const textColor = getContrastColor('#FFF', legendColors[0])
-
       let needsPointer = false
 
       // If we need to add a pointer cursor
       if ((columns.navigate && territoryData[columns.navigate.name]) || tooltips.appearanceType === 'click') {
         needsPointer = true
       }
+
+      const { textColor, strokeColor } = outlinedTextColor(legendColors[0])
 
       styles = {
         color: textColor,
@@ -201,9 +206,9 @@ const UsaMap = () => {
           key={`label__${territoryIndex}`}
           label={label}
           style={styles}
-          text={styles.color}
           strokeWidth={1}
           textColor={textColor}
+          strokeColor={strokeColor}
           handleShapeClick={() => geoClickHandler(territory, territoryData)}
           dataTooltipId={`tooltip__${tooltipId}`}
           dataTooltipHtml={toolTip}
@@ -435,6 +440,7 @@ const UsaMap = () => {
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
+                        strokeWidth={0.25}
                       />
                     )}
                     {pattern === 'circles' && (
@@ -443,6 +449,7 @@ const UsaMap = () => {
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
+                        radius={0.5}
                       />
                     )}
                     {pattern === 'lines' && (
@@ -451,7 +458,7 @@ const UsaMap = () => {
                         height={patternSizes[size] ?? 6}
                         width={patternSizes[size] ?? 6}
                         stroke={patternColor}
-                        strokeWidth={1}
+                        strokeWidth={0.75}
                         orientation={['diagonalRightToLeft']}
                       />
                     )}
@@ -503,18 +510,7 @@ const UsaMap = () => {
 
     // Bubbles
     if (general.type === 'bubble') {
-      geosJsx.push(
-        <BubbleList
-          key='bubbles'
-          data={state.data}
-          runtimeData={data}
-          state={state}
-          projection={projection}
-          applyLegendToRow={applyLegendToRow}
-          applyTooltipsToGeo={applyTooltipsToGeo}
-          displayGeoName={displayGeoName}
-        />
-      )
+      geosJsx.push(<BubbleList runtimeData={data} projection={projection} />)
     }
 
     // })
@@ -554,10 +550,11 @@ const UsaMap = () => {
           <text
             x={x}
             y={y}
-            fontSize={14}
-            strokeWidth='0'
-            // paintOrder='stroke' // PENDING DEV-9278: Adds a stroke around the text potentially for 508 compliance
-            // stroke={strokeColor}
+            fontSize={isMobileStateLabelViewport(currentViewport) ? 16 : 13}
+            fontWeight={900}
+            strokeWidth='1'
+            paintOrder='stroke'
+            stroke={strokeColor}
             style={{ fill: textColor }}
             textAnchor='middle'
           >
@@ -582,9 +579,9 @@ const UsaMap = () => {
         <text
           x={4}
           strokeWidth='0'
-          // paintOrder='stroke' // PENDING DEV-9278: Adds a stroke around the text potentially for 508 compliance
-          // stroke={strokeColor}
-          fontSize={13}
+          stroke={APP_FONT_COLOR}
+          fontSize={isMobileStateLabelViewport(currentViewport) ? 16 : 13}
+          fontWeight={900}
           style={{ fill: textColor }}
           alignmentBaseline='middle'
           transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
@@ -597,7 +594,7 @@ const UsaMap = () => {
 
   return (
     <ErrorBoundary component='UsaMap'>
-      <svg viewBox='0 0 880 500' role='img' aria-label={handleMapAriaLabels(state)}>
+      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(state)}>
         {general.displayAsHex ? (
           <Mercator data={unitedStatesHex} scale={650} translate={[1600, 775]}>
             {({ features, projection }) => constructGeoJsx(features, projection)}
