@@ -650,7 +650,7 @@ const CdcMap = ({
               display: 'none' // can't use d-none here
             }}
           ></div>
-          <FootnotesStandAlone config={footnotes} />
+          <FootnotesStandAlone config={{ ...footnotes, filters: config.filters.filter(f => f.filterFootnotes) }} />
         </Layout.Responsive>
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>
