@@ -1,10 +1,9 @@
 ## Summary
 <!-- Provide a brief explanation of the changes -->
 
-
 ## Testing Steps
-<!-- Describe how this has been tested -->
-<!-- E.g., "Tested on mobile and desktop browsers" -->
+<!-- Provide testing steps -->
+<!-- Add applicable configs to JIRA ticket for testers-->
 
 ## Optional
 ### Storybook Links
