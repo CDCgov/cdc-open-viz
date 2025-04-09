@@ -244,6 +244,8 @@ export const BarChartVertical = () => {
                   )
                   // End Confidence Interval Variables
 
+                  const BAR_LABEL_PADDING = 10
+
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
@@ -325,7 +327,7 @@ export const BarChartVertical = () => {
                           display={displayBar ? 'block' : 'none'}
                           opacity={transparentBar ? 0.5 : 1}
                           x={hasConfidenceInterval ? barX + barWidth : barX + barWidth / 2}
-                          y={barY - 5}
+                          y={barY - BAR_LABEL_PADDING}
                           fill={labelColor}
                           textAnchor='middle'
                         >
@@ -335,7 +337,7 @@ export const BarChartVertical = () => {
                           display={displayBar ? 'block' : 'none'}
                           opacity={transparentBar ? 0.5 : 1}
                           x={barX + barWidth / 2}
-                          y={barY - 5}
+                          y={barY - BAR_LABEL_PADDING}
                           fill={labelColor}
                           textAnchor='middle'
                           fontSize={config.isLollipopChart ? null : barWidth / 2}
