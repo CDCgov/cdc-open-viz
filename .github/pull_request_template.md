@@ -1,15 +1,9 @@
----
-name: Pull Request
-about: Describe the purpose and details of your PR
----
-
-## [NEW-XXXX] Summary
+## Summary
 <!-- Provide a brief explanation of the changes -->
 
-
 ## Testing Steps
-<!-- Describe how this has been tested -->
-<!-- E.g., "Tested on mobile and desktop browsers" -->
+<!-- Provide testing steps -->
+<!-- Add applicable configs to JIRA ticket for testers-->
 
 ## Optional
 ### Storybook Links
