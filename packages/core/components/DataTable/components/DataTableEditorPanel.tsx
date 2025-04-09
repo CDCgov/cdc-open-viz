@@ -1,4 +1,10 @@
-import { Accordion, AccordionItem, AccordionItemButton, AccordionItemHeading, AccordionItemPanel } from 'react-accessible-accordion'
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemButton,
+  AccordionItemHeading,
+  AccordionItemPanel
+} from 'react-accessible-accordion'
 import DataTableEditor from '../../EditorPanel/DataTableEditor'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
@@ -33,7 +39,12 @@ const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateCo
           <AccordionItemButton>Filters</AccordionItemButton>
         </AccordionItemHeading>
         <AccordionItemPanel>
-          <VizFilterEditor config={config} updateField={updateField} rawData={config.originalFormattedData} />
+          <VizFilterEditor
+            config={config}
+            updateField={updateField}
+            rawData={config.originalFormattedData}
+            hasFootnotes={true}
+          />
         </AccordionItemPanel>
       </AccordionItem>
       <AccordionItem>
