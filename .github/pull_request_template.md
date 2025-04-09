@@ -1,9 +1,4 @@
----
-name: Pull Request
-about: Describe the purpose and details of your PR
----
-
-## [NEW-XXXX] Summary
+## Summary
 <!-- Provide a brief explanation of the changes -->
 
 

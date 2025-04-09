@@ -11,12 +11,6 @@ jobs:
       - name: Checkout PR
         uses: actions/checkout@v3
 
-      - name: Ensure Ticket Number is in Summary Section (case-insensitive)
-        run: |
-          PR_BODY=$(curl -s https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} | jq -r '.body')
-
-          echo "$PR_BODY" | perl -0777 -ne 'exit 1 unless /^## (\[[a-z]{3,7}-\d+\] Summary|\[NO-TICKET\] Summary|Summary)/i'
-
       - name: Check 'Testing Steps' Section Has Content
         run: |
           PR_BODY=$(curl -s https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} | jq -r '.body')
