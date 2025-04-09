@@ -68,8 +68,6 @@ export const mapReducer = (state: MapState, action: MapActions): MapState => {
       return { ...state, translate: action.payload }
     case 'SET_POSITION':
       return { ...state, position: action.payload }
-    case 'SET_PROJECTION':
-      return { ...state, projection: action.payload }
     case 'SET_REQUIRED_COLUMNS':
       return { ...state, requiredColumns: action.payload }
     case 'SET_SCALE':

@@ -15,7 +15,6 @@ type SET_IS_DRAGGING_ANNOTATION = Action<'SET_IS_DRAGGING_ANNOTATION', boolean>
 type SET_LOADING = Action<'SET_LOADING', boolean>
 type SET_MODAL = Action<'SET_MODAL', Modal>
 type SET_POSITION = Action<'SET_POSITION', { coordinates: Coordinate; zoom: number }>
-type SET_PROJECTION = Action<'SET_PROJECTION', unknown>
 type SET_REQUIRED_COLUMNS = Action<'SET_REQUIRED_COLUMNS', string[]>
 type SET_RUNTIME_DATA = Action<'SET_RUNTIME_DATA', RuntimeData>
 type SET_RUNTIME_FILTERS = Action<'SET_RUNTIME_FILTERS', VizFilter[]>
@@ -35,7 +34,6 @@ export type MapActions =
   | SET_LOADING
   | SET_MODAL
   | SET_POSITION
-  | SET_PROJECTION
   | SET_REQUIRED_COLUMNS
   | SET_RUNTIME_DATA
   | SET_RUNTIME_FILTERS
