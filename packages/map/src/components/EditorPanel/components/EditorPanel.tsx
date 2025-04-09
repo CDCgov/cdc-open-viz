@@ -48,11 +48,22 @@ import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs, HEADER_COLORS } from '../../../helpers'
 import useMapDispatch from '../../../hooks/useMapDispatch'
 import './EditorPanel.styles.css'
-import { RuntimeLegend } from '../../../types/runtimeLegend'
+import EditorContext from '@cdc/editor/src/ConfigContext'
 
 const EditorPanel = () => {
-  const { isDashboard, loadConfig, runtimeFilters, runtimeLegend, setState, state, tooltipId, runtimeData } =
-    useContext<MapContext>(ConfigContext)
+  const {
+    setConfig,
+    isDashboard,
+    isEditor,
+    loadConfig,
+    runtimeFilters,
+    runtimeLegend,
+    setState,
+    state,
+    tooltipId,
+    runtimeData
+  } = useContext<MapContext>(ConfigContext)
+  const editorContext = useContext(EditorContext)
 
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
   const dispatch = useMapDispatch()
@@ -1102,6 +1113,14 @@ const EditorPanel = () => {
   useEffect(() => {
     setLoadedDefault(state.defaultData)
     columnsRequiredChecker()
+  }, [state])
+
+  useEffect(() => {
+    const newConfig = convertStateToConfig()
+    if (isEditor) {
+      // editorContext.setTempConfig(newConfig)
+      setConfig(newConfig)
+    }
   }, [state])
 
   const columnsOptions = [

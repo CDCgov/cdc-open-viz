@@ -18,6 +18,7 @@ type CdcMapProps = {
   navigationHandler: Function
   setSharedFilter: Function
   setSharedFilterValue: Function
+  setConfig: Function
 }
 
 const CdcMap: React.FC<CdcMapProps> = ({
@@ -29,16 +30,17 @@ const CdcMap: React.FC<CdcMapProps> = ({
   setSharedFilter,
   setSharedFilterValue,
   link,
-  config: editorsConfig
+  config: editorsConfig,
+  setConfig
 }) => {
   const editorContext = useContext(EditorContext)
-  const [state, _setState] = useState({ ...initialState })
+  const [state, _setState] = useState(null)
 
   const setState = newConfig => {
-    _setState(newConfig)
     if (isEditor) {
       editorContext.setTempConfig(newConfig)
     }
+    _setState(newConfig)
   }
 
   const [loading, setLoading] = useState(true)
@@ -46,10 +48,11 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
   const loadConfig = async configObj => {
     if (!loading) setLoading(true)
+    const configToLoad = editorsConfig || configObj
 
     let newState = {
       ...initialState,
-      ...configObj
+      ...configToLoad
     }
 
     if (newState.dataUrl) {
@@ -124,6 +127,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
   return (
     <CdcMapComponent
       config={state}
+      setConfig={setConfig}
       navigationHandler={customNavigationHandler}
       isDashboard={isDashboard}
       isEditor={isEditor}
