@@ -2639,7 +2639,12 @@ const EditorPanel = () => {
                 <AccordionItemButton>Filters</AccordionItemButton>
               </AccordionItemHeading>
               <AccordionItemPanel>
-                <VizFilterEditor config={state} updateField={updateField} rawData={state.data} />
+                <VizFilterEditor
+                  config={state}
+                  updateField={updateField}
+                  rawData={state.data}
+                  hasFootnotes={isDashboard}
+                />
               </AccordionItemPanel>
             </AccordionItem>
           )}

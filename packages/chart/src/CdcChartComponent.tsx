@@ -76,9 +76,12 @@ import './scss/main.scss'
 import { getInitialState, reducer } from './store/chart.reducer'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { getNewRuntime } from './helpers/getNewRuntime'
+import Footnotes from '@cdc/core/types/Footnotes'
+import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 
 interface CdcChartProps {
   config?: ChartConfig
+  footnotes?: Footnotes
   isEditor?: boolean
   isDebug?: boolean
   isDashboard?: boolean
@@ -92,6 +95,7 @@ interface CdcChartProps {
 }
 const CdcChart: React.FC<CdcChartProps> = ({
   config: configObj,
+  footnotes,
   isEditor = false,
   isDebug = false,
   isDashboard = false,
@@ -1064,6 +1068,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
               </div>
             </div>
           )}
+          <FootnotesStandAlone config={footnotes} />
         </Layout.Responsive>
       </>
     )

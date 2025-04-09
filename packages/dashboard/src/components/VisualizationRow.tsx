@@ -19,6 +19,8 @@ import { DashboardFilters } from '../types/DashboardFilters'
 import { hasDashboardApplyBehavior } from '../helpers/hasDashboardApplyBehavior'
 import CdcChart from '@cdc/chart/src/CdcChartComponent'
 import ExpandCollapseButtons from './ExpandCollapseButtons'
+import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
+import { Visualization } from '@cdc/core/types/Visualization'
 
 type VisualizationWrapperProps = {
   allExpanded: boolean
@@ -107,9 +109,10 @@ const VisualizationRow: React.FC<VizRowProps> = ({
       return acc
     }, {})
 
-  const footnotesConfig = useMemo(() => {
+  const getFootnotesConfig = (vizConfig: Visualization) => {
     if (row.footnotesId) {
       const footnoteConfig = getFootnotesVizConfig(row.footnotesId, index, config)
+      const filters = vizConfig.filters.filter(f => f.filterFootnotes)
       if (row.multiVizColumn && filteredDataOverride) {
         const vizCategory = filteredDataOverride[0][row.multiVizColumn]
         // the multiViz filtering filtering is applied after the dashboard filters
@@ -119,10 +122,10 @@ const VisualizationRow: React.FC<VizRowProps> = ({
         footnoteConfig.formattedData = dashboardFilteredData[row.footnotesId]
       }
 
-      return footnoteConfig
+      return { ...footnoteConfig, filters }
     }
     return null
-  }, [config, row, rawData, dashboardFilteredData])
+  }
 
   const applyButtonNotClicked = (vizConfig: DashboardFilters): boolean => {
     const dashboardFilters = Object.values(config.visualizations).filter(
@@ -238,7 +241,8 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               {type === 'chart' && (
                 <CdcChart
                   key={col.widget}
-                  config={visualizationConfig}
+                  config={visualizationConfig as ChartConfig}
+                  footnotes={getFootnotesConfig(visualizationConfig)}
                   dashboardConfig={config}
                   setConfig={newConfig => {
                     updateChildConfig(col.widget, newConfig)
@@ -252,6 +256,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                 <CdcMap
                   key={col.widget}
                   config={visualizationConfig}
+                  footnotes={getFootnotesConfig(visualizationConfig)}
                   setConfig={newConfig => {
                     updateChildConfig(col.widget, newConfig)
                   }}
@@ -323,6 +328,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   visualizationKey={col.widget}
                   config={visualizationConfig as TableConfig}
                   viewport={currentViewport}
+                  footnotes={getFootnotesConfig(visualizationConfig)}
                 />
               )}
               {type === 'footnotes' && (
@@ -336,11 +342,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
             </VisualizationWrapper>
           )
         }
-        return <React.Fragment key={`vis__${index}__${colIndex}`}></React.Fragment>
       })}
-      {row.footnotesId && !inNoDataState ? (
-        <FootnotesStandAlone visualizationKey={row.footnotesId} config={footnotesConfig} viewport={currentViewport} />
-      ) : null}
     </div>
   )
 }

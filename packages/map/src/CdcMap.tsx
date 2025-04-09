@@ -68,9 +68,11 @@ import useGenerateRuntimeFilters from './hooks/useGenerateRuntimeFilters'
 import useGenerateRuntimeData from './hooks/useGenerateRuntimeData'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
+import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 
 const CdcMap = ({
   config,
+  footnotes,
   navigationHandler: customNavigationHandler,
   isDashboard = false,
   isEditor = false,
@@ -648,6 +650,7 @@ const CdcMap = ({
               display: 'none' // can't use d-none here
             }}
           ></div>
+          <FootnotesStandAlone config={footnotes} />
         </Layout.Responsive>
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>
