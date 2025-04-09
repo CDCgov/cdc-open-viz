@@ -1,17 +1,37 @@
 import _ from 'lodash'
 import './Legend.Group.css'
 import LegendShape from '@cdc/core/components/LegendShape'
-const LegendGroup = ({ state, legendItems }) => {
-  function getGroupedData(legendItems, data, groupByKey) {
+interface LegendItem {
+  color: string
+  label: string
+  disabled?: boolean
+  special: boolean
+}
+interface GroupedData {
+  [key: string]: LegendItem[]
+}
+
+const LegendGroup = ({ state, legendItems, currentViewport }) => {
+  const getGridColumnClasses = (viewport: typeof currentViewport) => {
+    switch (viewport) {
+      case 'xs':
+        return 'col-12'
+      case 'sm':
+        return 'col-6'
+      case 'md':
+        return 'col-4'
+      default:
+        return 'col-3'
+    }
+  }
+  const getGroupedData = (legendItems: LegendItem[], data: object[], groupByKey: string): GroupedData => {
     if (!groupByKey || !data || !legendItems) return {}
-    const result = {}
+    const result: GroupedData = {}
     const column = state.columns.primary.name || ''
     data.forEach(item => {
-      // Check if the group key is undefined or null and skip adding it
       if (item[groupByKey] == null) {
         return
       }
-
       if (!result[item[groupByKey]]) {
         result[item[groupByKey]] = []
       }
@@ -27,24 +47,31 @@ const LegendGroup = ({ state, legendItems }) => {
 
     return result
   }
+  const gridCol = getGridColumnClasses(currentViewport)
+
+  const isSigleCol = state.legend.position === 'bottom' || state.legend.position === 'top' ? gridCol : 'col-12'
   const groupedData = getGroupedData(legendItems, state.data, state.legend.groupBy)
+
+  const classNameItem = [isSigleCol, 'mb-3']
   return (
-    <div className='space-y-4'>
-      {Object.entries(groupedData).map(([groupName, legendItems]) => {
-        return (
-          <div key={groupName} className='border p-4 rounded-xl shadow'>
-            <h2 className='text-lg font-semibold mb-2'>{groupName}</h2>
-            {legendItems.map(item => {
-              return (
-                <li title={`Legend item ${item.label} - Click to disable`}>
-                  <LegendShape shape={state.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
-                  <span>{item.label}</span>
-                </li>
-              )
-            })}
-          </div>
-        )
-      })}
+    <div className='row'>
+      {Object.entries(groupedData).map(([groupName, items]) => (
+        <div className={classNameItem.join(' ')} key={groupName}>
+          <p className='group-label mb-2'>{groupName}</p>
+          <ul className='row'>
+            {items.map((item, index) => (
+              <li
+                key={`${item.label}-${index}`}
+                className={`group-list-item `}
+                title={`Legend item ${item.label} - Click to disable`}
+              >
+                <LegendShape shape={state.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
+                <span>{item.label}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   )
 }

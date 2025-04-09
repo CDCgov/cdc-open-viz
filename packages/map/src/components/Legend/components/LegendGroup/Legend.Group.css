@@ -1,40 +1,13 @@
-.legend-container {
-  .legend-group {
-    font-size: 1rem;
-
-    line-height: 18px;
-    margin-bottom: 0.5rem;
-
-    .group-item .visx-legend-label {
-      font-weight: 400;
-      font-size: 0.889rem;
-      margin-bottom: 0.5rem;
-    }
-    .group-label {
-      font-weight: 500;
-      font-family: Nunito, sans-serif;
-      font-size: 1rem;
-    }
-  }
-
-  .legend-group.top,
-  .legend-group.bottom {
-    grid-gap: 10px;
-
-    &.group-item {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    & .inactive {
-      opacity: 0.5;
-      transition: 0.2s all;
-    }
-    & .highlighted {
-      outline: 1px solid #005ea2;
-      outline-offset: 5px;
-      border-radius: 1px;
-    }
-  }
+.group-label {
+  font-weight: 500;
+  font-family: Nunito, sans-serif;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+.group-list-item {
+  display: block;
+  list-style: none;
+  font-weight: 400;
+  font-size: 0.889rem;
+  margin-bottom: 0.5rem;
 }

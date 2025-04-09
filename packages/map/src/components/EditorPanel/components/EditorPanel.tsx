@@ -2325,7 +2325,7 @@ const EditorPanel = () => {
                   />
                 )}
 
-                {'navigation' !== state.general.type && (
+                {'navigation' !== state.general.type && state.legend.type === 'category' && (
                   <Select
                     label='Legend Group By :'
                     value={legend.groupBy || ''}
