@@ -44,6 +44,7 @@ export type MapState = MapConfig & {
   runtimeFilters: object[]
   runtimeLegend: object[]
   stateToShow: string
+  dataUrl: string
 }
 
 export const mapReducer = (state: MapState, action: MapActions): MapState => {
