@@ -48,6 +48,7 @@ import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs, HEADER_COLORS } from '../../../helpers'
 import useMapDispatch from '../../../hooks/useMapDispatch'
 import './EditorPanel.styles.css'
+import { RuntimeLegend } from '../../../types/runtimeLegend'
 
 const EditorPanel = () => {
   const { isDashboard, loadConfig, runtimeFilters, runtimeLegend, setState, state, tooltipId, runtimeData } =
@@ -1003,7 +1004,7 @@ const EditorPanel = () => {
   }
 
   const displayFilterLegendValue = arr => {
-    const filterName = state.filters[arr[0]].label || `Unlabeled Legend`
+    const filterName = state.filters?.[arr?.[0]]?.label || `Unlabeled Legend`
 
     const filterValue = runtimeFilters[arr[0]]
 
@@ -1180,10 +1181,11 @@ const EditorPanel = () => {
     ...draggableStyle
   })
 
-  const getCategoryValuesOrder = () => {
-    let values = runtimeLegend
-      ? runtimeLegend.items.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value)
-      : []
+  const getCategoryValuesOrder = (): string[] | [] => {
+    let values =
+      runtimeLegend?.items?.length > 0
+        ? runtimeLegend.items.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value)
+        : []
 
     if (state.legend.cateogryValuesOrder) {
       return values.sort((a, b) => {

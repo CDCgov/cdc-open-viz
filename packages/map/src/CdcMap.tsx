@@ -6,11 +6,10 @@ import initialState from './data/initial-state'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { addUIDs, validateFipsCodeLength } from './helpers'
 import EditorContext from '@cdc/editor/src/ConfigContext'
-import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
-import Loader from '@cdc/core/components/Loader'
+import { MapConfig } from './types/MapConfig'
 
 type CdcMapProps = {
-  config: ChartConfig
+  config: MapConfig
   configUrl?: string
   isDashboard?: boolean
   isEditor?: boolean
@@ -33,14 +32,15 @@ const CdcMap: React.FC<CdcMapProps> = ({
   config: editorsConfig
 }) => {
   const editorContext = useContext(EditorContext)
-  const [config, _setConfig] = useState<ChartConfig>({} as ChartConfig)
-  const setConfig = newConfig => {
-    _setConfig(newConfig)
+  const [state, _setState] = useState({ ...initialState })
+
+  const setState = newConfig => {
+    _setState(newConfig)
     if (isEditor) {
       editorContext.setTempConfig(newConfig)
     }
   }
-  const [state, setState] = useState({ ...initialState })
+
   const [loading, setLoading] = useState(true)
   const transform = new DataTransform()
 
@@ -105,8 +105,8 @@ const CdcMap: React.FC<CdcMapProps> = ({
   const init = async () => {
     let configData = null
 
-    if (config) {
-      configData = config
+    if (state) {
+      configData = state
     }
 
     if (configUrl) {

@@ -115,7 +115,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   const setState = (newMapState: MapConfig): void => {
     dispatch({ type: 'SET_STATE', payload: newMapState })
-    if (isEditor && !isDashboard) {
+    if (isEditor) {
       editorContext.setTempConfig(newMapState)
     }
   }
