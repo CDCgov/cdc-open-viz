@@ -9,10 +9,11 @@ import DashboardSharedFilters from './DashboardFilters'
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import _ from 'lodash'
+import { Visualization } from '@cdc/core/types/Visualization'
 
 type DashboardEditorProps = {
   visualizationKey: string
-  visualizationConfig: any
+  visualizationConfig: Visualization
   _updateConfig: (config: any) => void
   isDebug?: boolean
   setSharedFilter?: Function
