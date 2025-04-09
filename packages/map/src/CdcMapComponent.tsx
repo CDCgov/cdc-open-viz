@@ -64,6 +64,7 @@ import { getInitialState, MapReducer, mapReducer } from './store/map.reducer'
 import { RuntimeData } from './types/RuntimeData'
 import EditorContext from '@cdc/editor/src/ConfigContext'
 import MapActions from './store/map.actions'
+import _ from 'lodash'
 
 type CdcMapComponent = {
   config: MapConfig
@@ -223,7 +224,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
         data = transform.developerStandardize(data, state.dataDescription)
       }
 
-      setState({ ...state, runtimeDataUrl: dataUrlFinal, data })
+      const newState = _.cloneDeep(state)
+      newState.data = data
+      newState.runtimeDataUrl = dataUrlFinal
+
+      setState(newState)
     }
   }
 

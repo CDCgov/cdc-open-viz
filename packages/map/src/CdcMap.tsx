@@ -47,11 +47,9 @@ const CdcMap: React.FC<CdcMapProps> = ({
   const loadConfig = async configObj => {
     if (!loading) setLoading(true)
 
-    const configToLoad = editorsConfig ? editorsConfig : configObj
-
     let newState = {
       ...initialState,
-      ...configToLoad
+      ...configObj
     }
 
     if (newState.dataUrl) {
@@ -112,7 +110,6 @@ const CdcMap: React.FC<CdcMapProps> = ({
     if (configUrl) {
       configData = await fetchRemoteData(configUrl)
     }
-
     if ('object' === typeof configData) {
       loadConfig(configData)
     }
@@ -130,12 +127,10 @@ const CdcMap: React.FC<CdcMapProps> = ({
       navigationHandler={customNavigationHandler}
       isDashboard={isDashboard}
       isEditor={isEditor}
-      configUrl={configUrl}
       logo={logo}
       setSharedFilter={setSharedFilter}
       setSharedFilterValue={setSharedFilterValue}
       link={link}
-      loading={loading}
     />
   )
 }
