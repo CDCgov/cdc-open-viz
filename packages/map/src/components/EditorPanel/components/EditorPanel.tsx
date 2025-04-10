@@ -52,7 +52,7 @@ import EditorContext from '@cdc/editor/src/ConfigContext'
 
 const EditorPanel = () => {
   const {
-    setConfig,
+    setEditorConfig,
     isDashboard,
     isEditor,
     loadConfig,
@@ -1116,9 +1116,9 @@ const EditorPanel = () => {
   }, [state])
 
   useEffect(() => {
-    if (isEditor && setConfig) {
-      const newConfig = convertStateToConfig()
-      setConfig(newConfig)
+    const newConfig = convertStateToConfig()
+    if (isEditor && setEditorConfig) {
+      setEditorConfig(newConfig)
     }
   }, [state])
 

@@ -127,7 +127,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
   return (
     <CdcMapComponent
       config={state}
-      setConfig={setConfig}
+      setEditorConfig={setConfig}
       navigationHandler={customNavigationHandler}
       isDashboard={isDashboard}
       isEditor={isEditor}
