@@ -12,6 +12,7 @@ import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Loading from '@cdc/core/components/Loading'
 import { navigationHandler } from '../helpers'
 import ConfigContext from '../context'
+import useMapDipatch from './../hooks/useMapDispatch'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
@@ -29,10 +30,10 @@ const DataTable = props => {
     applyLegendToRow,
     displayGeoName,
     formatLegendLocation,
-    tabbingId,
-    setFilteredCountryCode
+    tabbingId
   } = props
 
+  const dispatch = useMapDispatch()
   const { currentViewport: viewport } = useContext(ConfigContext)
   const [expanded, setExpanded] = useState(expandDataTable)
   const [sortBy, setSortBy] = useState({ column: 'geo', asc: false })
@@ -355,7 +356,7 @@ const DataTable = props => {
                               state.general.type === 'bubble' &&
                               state.general.allowMapZoom &&
                               state.general.geoType === 'world'
-                                ? setFilteredCountryCode(row)
+                                ? dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: row })
                                 : true
                             }
                           >

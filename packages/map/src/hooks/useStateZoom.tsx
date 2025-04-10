@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect } from 'react'
 import ConfigContext from '../context'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import { MapContext } from '../types/MapContext'
@@ -6,6 +6,8 @@ import { geoPath, GeoPath } from 'd3-geo'
 import { getFilterControllingStatePicked } from '../components/UsaMap/helpers/map'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
 import { SVG_HEIGHT, SVG_WIDTH, SVG_PADDING } from '../helpers'
+import useMapDispatch from './useMapDispatch'
+import _ from 'lodash'
 
 interface StateData {
   geometry: { type: 'MultiPolygon'; coordinates: number[][][][] }
@@ -16,61 +18,40 @@ interface StateData {
   type: 'Feature'
 }
 
-interface Position {
-  zoom: number
-  coordinates: [number, number]
-}
-
 const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
-  const { setTranslate, setScale, setStateToShow, setPosition, state, setState, runtimeData } =
-    useContext<MapContext>(ConfigContext)
+  const { state, runtimeData, position } = useContext<MapContext>(ConfigContext)
   const statePicked = getFilterControllingStatePicked(state, runtimeData)
-  const defaultStateToShow = 'Alabama'
+  const dispatch = useMapDispatch()
+
   useEffect(() => {
     const fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === statePicked)
     const stateName = statePicked
     const stateData = { fipsCode, stateName }
-    setScale(1)
-    setTranslate([0, 0])
-    setState({
-      ...state,
-      general: {
-        ...state.general,
-        statePicked: stateData
-      }
-    })
-    setStateToShow(topoData?.states?.find(s => s.properties.name === statePicked))
+    const newState = _.cloneDeep(state)
+    newState.general.statePicked = stateData
+    const stateToShow = topoData?.states?.find(s => s.properties.name === statePicked)
+
+    dispatch({ type: 'SET_SCALE', payload: 1 })
+    dispatch({ type: 'SET_TRANSLATE', payload: [0, 0] })
+    dispatch({ type: 'SET_STATE', payload: newState })
+    dispatch({ type: 'SET_STATE_TO_SHOW', payload: stateToShow })
   }, [topoData])
 
   useEffect(() => {
     const fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === statePicked)
     const stateName = statePicked
     const stateData = { fipsCode, stateName }
-
-    setState({
-      ...state,
-      general: {
-        ...state.general,
-        statePicked: stateData
-      }
-    })
+    const newState = _.cloneDeep(state)
+    newState.general.statePicked = stateData
+    dispatch({ type: 'SET_STATE', payload: newState })
     setScaleAndTranslate('reset')
   }, [statePicked])
 
   // TODO: same as city list projection?
-  const [projection, setProjection] = useState(() =>
-    geoAlbersUsaTerritories()
-      .translate([SVG_WIDTH / 2, SVG_HEIGHT / 2])
-      .scale(1)
-  )
+  const projection = geoAlbersUsaTerritories()
+    .translate([SVG_WIDTH / 2, SVG_HEIGHT / 2])
+    .scale(1)
 
-  /*
-    NORMALIZATION_FACTOR NOTES:
-    This is used during state switching,
-    I'm not sure why the value is 1070 but it does appear to work during the switching.
-    During zoom it does not work.
-  */
-  const NORMALIZATION_FACTOR = 1070
   const _statePickedData = topoData?.states?.find(s => s.properties.name === statePicked)
   const newProjection = projection.fitExtent(
     [
@@ -81,8 +62,6 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
   )
 
   // Work for centering the state.
-  const newScale = newProjection.scale()
-  const normalizedScale = newScale / NORMALIZATION_FACTOR
   let [x, y] = newProjection.translate()
   x = x - SVG_WIDTH / 2
   y = y - SVG_HEIGHT / 2
@@ -92,33 +71,36 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
   const stateCenter = newProjection.invert(featureCenter)
 
   const switchState = () => {
-    setStateToShow(_statePickedData)
+    dispatch({ type: 'SET_STATE_TO_SHOW', payload: _statePickedData })
     setScaleAndTranslate('reset')
   }
 
   const setScaleAndTranslate = (zoomFunction: string = '') => {
-    setPosition((pos: Position) => {
-      let newZoom = pos.zoom
-      let newCoordinates = pos.coordinates
-      if (zoomFunction === 'zoomIn' && pos.zoom < 4) {
-        newZoom = pos.zoom * 1.5
-        newCoordinates = pos.coordinates[0] !== 0 && pos.coordinates[1] !== 0 ? pos.coordinates : stateCenter
-      } else if (zoomFunction === 'zoomOut' && pos.zoom > 1) {
-        newZoom = pos.zoom / 1.5
-        newCoordinates = pos.coordinates[0] !== 0 && pos.coordinates[1] !== 0 ? pos.coordinates : stateCenter
-      } else if (zoomFunction === 'reset') {
-        newZoom = 1
-        newCoordinates = stateCenter
-      }
-      return {
-        zoom: newZoom,
-        coordinates: newCoordinates
-      }
-    })
+    const _prevPosition = position
+    let newZoom = _prevPosition.zoom
+    let newCoordinates = _prevPosition.coordinates
+    if (zoomFunction === 'zoomIn' && _prevPosition.zoom < 4) {
+      newZoom = _prevPosition.zoom * 1.5
+      newCoordinates =
+        _prevPosition.coordinates[0] !== 0 && _prevPosition.coordinates[1] !== 0
+          ? _prevPosition.coordinates
+          : stateCenter
+    } else if (zoomFunction === 'zoomOut' && _prevPosition.zoom > 1) {
+      newZoom = _prevPosition.zoom / 1.5
+      newCoordinates =
+        _prevPosition.coordinates[0] !== 0 && _prevPosition.coordinates[1] !== 0
+          ? _prevPosition.coordinates
+          : stateCenter
+    } else if (zoomFunction === 'reset') {
+      newZoom = 1
+      newCoordinates = stateCenter
+    }
+
+    dispatch({ type: 'SET_POSITION', payload: { coordinates: newCoordinates, zoom: newZoom } })
 
     if (zoomFunction === 'reset') {
-      setTranslate([0, 0]) // needed for state switcher
-      setScale(1) // needed for state switcher
+      dispatch({ type: 'SET_TRANSLATE', payload: [0, 0] }) // needed for state switcher
+      dispatch({ type: 'SET_SCALE', payload: 1 }) // needed for state switcher
     }
   }
 
@@ -131,7 +113,7 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
   }
 
   const handleMoveEnd = position => {
-    setPosition(position)
+    dispatch({ type: 'SET_POSITION', payload: position })
   }
 
   const handleReset = () => {
