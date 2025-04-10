@@ -5,17 +5,9 @@ export const makeChartLegendsUnified = config => {
     config.legend = config.legend || {}
     config.legend.unified = true
   } else if (config.type === 'dashboard') {
-    if (config.multiDashboards) {
-      config.multiDashboards.forEach(dashboard => {
-        Object.values(dashboard.visualizations).forEach(visualization => {
-          makeChartLegendsUnified(visualization)
-        })
-      })
-    } else {
-      Object.values(config.visualizations).forEach(visualization => {
-        makeChartLegendsUnified(visualization)
-      })
-    }
+    Object.values(config.visualizations).forEach(visualization => {
+      makeChartLegendsUnified(visualization)
+    })
   }
 }
 
