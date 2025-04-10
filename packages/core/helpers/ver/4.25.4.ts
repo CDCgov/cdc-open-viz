@@ -19,10 +19,21 @@ export const makeChartLegendsUnified = config => {
   }
 }
 
+const migrateTableGeneralSettings = config => {
+  if (config.type === 'map') {
+    if (config.general.showFullGeoNameInCSV) {
+      config.table.showFullGeoNameInCSV = config.general.showFullGeoNameInCSV
+    }
+    delete config.general.showFullGeoNameInCSV
+    return config
+  }
+}
+
 const update_4_25_4 = config => {
   const ver = '4.25.4'
   const newConfig = _.cloneDeep(config)
   makeChartLegendsUnified(newConfig)
+  migrateTableGeneralSettings(newConfig)
   newConfig.version = ver
   return newConfig
 }
