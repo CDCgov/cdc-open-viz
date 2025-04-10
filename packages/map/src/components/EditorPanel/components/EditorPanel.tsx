@@ -1116,9 +1116,8 @@ const EditorPanel = () => {
   }, [state])
 
   useEffect(() => {
-    const newConfig = convertStateToConfig()
-    if (isEditor) {
-      // editorContext.setTempConfig(newConfig)
+    if (isEditor && setConfig) {
+      const newConfig = convertStateToConfig()
       setConfig(newConfig)
     }
   }, [state])

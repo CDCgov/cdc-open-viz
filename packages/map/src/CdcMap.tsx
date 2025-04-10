@@ -31,7 +31,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
   setSharedFilterValue,
   link,
   config: editorsConfig,
-  setConfig
+  setConfig = null
 }) => {
   const editorContext = useContext(EditorContext)
   const [state, _setState] = useState(null)
