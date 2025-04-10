@@ -222,10 +222,12 @@ const PanelVisual: FC<PanelProps> = props => {
               options={['Same as Line', 'Lighter than Line']}
             />
             <CheckBox
-              value={(config as LineChartConfig).isolatedDotsSameSize}
+              value={!(config as LineChartConfig).isolatedDotsSameSize}
               fieldName='isolatedDotsSameSize'
-              label='Isolated Dots Same Size'
-              updateField={updateField}
+              label='Accentuate isolated data points'
+              updateField={(section, subsection, fieldname, value) =>
+                updateField(section, subsection, fieldname, !value)
+              }
             />
           </>
         )}
