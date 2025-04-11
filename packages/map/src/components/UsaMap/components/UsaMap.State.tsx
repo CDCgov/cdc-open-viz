@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo, useContext } from 'react'
+import React, { useState, useEffect, useContext, useRef } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
@@ -34,7 +34,7 @@ import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
-import { SVG_VIEWBOX } from '../../../helpers'
+import { hashObj, SVG_VIEWBOX } from '../../../helpers'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
@@ -105,6 +105,8 @@ const UsaMap = () => {
   const [extent, setExtent] = useState(null)
   const [focusedStates, setFocusedStates] = useState(null)
   const [translate, setTranslate] = useState([455, 200])
+
+  const dataRef = useRef(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -234,6 +236,16 @@ const UsaMap = () => {
   const constructGeoJsx = (geographies, projection) => {
     let showLabel = general.displayStateLabels
 
+    const legendMemoUpdated = geographies.every(({ feature: geo }) => {
+      const geoKey = geo.properties.iso
+      const geoData = data[geoKey]
+      const hash = hashObj(geoData)
+      return legendMemo.current.has(hash)
+    })
+
+    // If the legend has NOT updated yet, we use the previous data so that it doesn't flash
+    if (legendMemoUpdated) dataRef.current = data
+
     // Order alphabetically. Important for accessibility if ever read out loud.
     geographies.map(state => {
       if (!state.feature.properties.iso) return
@@ -268,7 +280,7 @@ const UsaMap = () => {
 
       if (!geoKey) return
 
-      const geoData = data[geoKey]
+      const geoData = dataRef.current[geoKey]
 
       let legendColors
 
