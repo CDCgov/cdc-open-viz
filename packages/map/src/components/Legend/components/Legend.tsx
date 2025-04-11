@@ -293,7 +293,12 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               }
               config={state}
             />
-            <LegendGroup currentViewport={currentViewport} legendItems={getFormattedLegendItems()} state={state} />
+            <LegendGroup
+              runtimeLegend={runtimeLegend}
+              currentViewport={currentViewport}
+              legendItems={getFormattedLegendItems()}
+              state={state}
+            />
 
             {!!legendListItems.length && ['Select Option', ''].includes(state.legend.groupBy) && (
               <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>

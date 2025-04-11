@@ -5,9 +5,13 @@
   margin-bottom: 0.5rem;
 }
 .group-list-item {
-  display: block;
   list-style: none;
   font-weight: 400;
   font-size: 0.889rem;
-  margin-bottom: 0.5rem;
+  margin-top: 0.5rem !important;
+  cursor: pointer;
+}
+
+.group-container {
+  margin-bottom: 2rem;
 }
