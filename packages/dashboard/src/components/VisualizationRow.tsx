@@ -18,42 +18,40 @@ import CollapsibleVisualizationRow from './CollapsibleVisualizationRow'
 import { DashboardFilters } from '../types/DashboardFilters'
 import { hasDashboardApplyBehavior } from '../helpers/hasDashboardApplyBehavior'
 import CdcChart from '@cdc/chart/src/CdcChartComponent'
+import ExpandCollapseButtons from './ExpandCollapseButtons'
+import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
+import { Visualization } from '@cdc/core/types/Visualization'
 
 type VisualizationWrapperProps = {
   allExpanded: boolean
   children: React.ReactNode
   currentViewport: ViewPort
   groupName: string
-  hideVisualization: boolean
-  row: ConfigRow
+  className: string
+  collapsible?: boolean
 }
 
 const VisualizationWrapper: React.FC<VisualizationWrapperProps> = ({
   allExpanded,
   currentViewport,
   groupName,
-  hideVisualization,
-  row,
+  collapsible,
+  className,
   children
 }) => {
-  return hideVisualization ? (
-    <></>
-  ) : row.expandCollapseAllButtons ? (
-    <div className='collapsable-multiviz-container'>
-      <CollapsibleVisualizationRow
-        allExpanded={allExpanded}
-        fontSize={'26px'}
-        groupName={groupName}
-        currentViewport={currentViewport}
-      >
-        {children}
-      </CollapsibleVisualizationRow>
+  return (
+    <div className={className}>
+      {collapsible ? (
+        <CollapsibleVisualizationRow allExpanded={allExpanded} groupName={groupName} currentViewport={currentViewport}>
+          {children}
+        </CollapsibleVisualizationRow>
+      ) : (
+        <>
+          {groupName !== '' ? <h3>{groupName}</h3> : <></>}
+          {children}
+        </>
+      )}
     </div>
-  ) : (
-    <>
-      {groupName !== '' ? <h3>{groupName}</h3> : <></>}
-      {children}
-    </>
   )
 }
 
@@ -69,6 +67,7 @@ type VizRowProps = {
   apiFilterDropdowns: APIFilterDropdowns
   currentViewport: ViewPort
   isLastRow: boolean
+  setAllExpanded?: (expanded: boolean) => void
 }
 
 const VisualizationRow: React.FC<VizRowProps> = ({
@@ -82,7 +81,8 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   updateChildConfig,
   apiFilterDropdowns,
   currentViewport,
-  isLastRow
+  isLastRow,
+  setAllExpanded
 }) => {
   const { config, filteredData: dashboardFilteredData, data: rawData } = useContext(DashboardContext)
   const [toggledRow, setToggled] = React.useState<number>(0)
@@ -99,9 +99,20 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     }
   }, [config.activeDashboard, toggledRow])
 
-  const footnotesConfig = useMemo(() => {
+  const _data = dashboardFilteredData[index] || row.formattedData || []
+  const dataGroups =
+    row.multiVizColumn &&
+    _data.reduce((acc, dataRow) => {
+      const groupKey = dataRow[row.multiVizColumn]
+      if (!acc[groupKey]) acc[groupKey] = []
+      acc[groupKey].push(dataRow)
+      return acc
+    }, {})
+
+  const getFootnotesConfig = (vizConfig: Visualization) => {
     if (row.footnotesId) {
       const footnoteConfig = getFootnotesVizConfig(row.footnotesId, index, config)
+      const filters = vizConfig.filters.filter(f => f.filterFootnotes)
       if (row.multiVizColumn && filteredDataOverride) {
         const vizCategory = filteredDataOverride[0][row.multiVizColumn]
         // the multiViz filtering filtering is applied after the dashboard filters
@@ -111,10 +122,10 @@ const VisualizationRow: React.FC<VizRowProps> = ({
         footnoteConfig.formattedData = dashboardFilteredData[row.footnotesId]
       }
 
-      return footnoteConfig
+      return { ...footnoteConfig, filters }
     }
     return null
-  }, [config, row, rawData, dashboardFilteredData])
+  }
 
   const applyButtonNotClicked = (vizConfig: DashboardFilters): boolean => {
     const dashboardFilters = Object.values(config.visualizations).filter(
@@ -134,6 +145,39 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     }
     return false
   }
+
+  if (dataGroups) {
+    return (
+      <React.Fragment key={`row__${index}`}>
+        {/* Expand/Collapse All */}
+        {!inNoDataState && row.expandCollapseAllButtons === true && (
+          <ExpandCollapseButtons setAllExpanded={setAllExpanded} />
+        )}
+        {Object.keys(dataGroups).map(groupName => {
+          const dataValue = dataGroups[groupName]
+          const _row = _.cloneDeep(row) // clone the row to avoid mutating the original row
+          _row.multiVizColumn = undefined // reset the multiVizColumn to avoid passing it to the child components
+          return (
+            <VisualizationRow
+              key={`row__${index}__${groupName}`}
+              allExpanded={allExpanded}
+              filteredDataOverride={dataValue}
+              groupName={groupName}
+              row={_row}
+              rowIndex={index}
+              setSharedFilter={setSharedFilter}
+              updateChildConfig={updateChildConfig}
+              apiFilterDropdowns={apiFilterDropdowns}
+              currentViewport={currentViewport}
+              inNoDataState={inNoDataState}
+              isLastRow={isLastRow}
+            />
+          )
+        })}
+      </React.Fragment>
+    )
+  }
+
   return (
     <div className={`row${row.equalHeight ? ' equal-height' : ''}${row.toggle ? ' toggle' : ''}`} key={`row__${index}`}>
       {row.toggle && !inNoDataState && (
@@ -144,6 +188,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
           if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`col col-${col.width}`}></div>
 
           const visualizationConfig = getVizConfig(col.widget, index, config, rawData, dashboardFilteredData)
+          const { type, sharedFilterIndexes, filterBehavior, table, dataKey } = visualizationConfig
           if (filteredDataOverride) {
             visualizationConfig.data = filteredDataOverride
             if (visualizationConfig.formattedData) {
@@ -158,188 +203,146 @@ const VisualizationRow: React.FC<VizRowProps> = ({
             ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget)[0].active
             : undefined
           const tableLink = (
-            <a href={`#data-table-${visualizationConfig.dataKey}`} className='margin-left-href'>
-              {visualizationConfig.dataKey} (Go to Table)
+            <a href={`#data-table-${dataKey}`} className='margin-left-href'>
+              {dataKey} (Go to Table)
             </a>
           )
 
           const hideVisualization =
             inNoDataState &&
-            visualizationConfig.filterBehavior !== 'Apply Button' &&
-            (visualizationConfig.type !== 'dashboardFilters' || applyButtonNotClicked(visualizationConfig))
+            filterBehavior !== 'Apply Button' &&
+            (type !== 'dashboardFilters' || applyButtonNotClicked(visualizationConfig))
 
           const shouldShow = row.toggle === undefined || (row.toggle && show[colIndex])
 
           const hiddenDashboardFilters =
-            visualizationConfig.type === 'dashboardFilters' &&
-            visualizationConfig.sharedFilterIndexes &&
-            visualizationConfig.sharedFilterIndexes.filter(
-              idx => config.dashboard.sharedFilters?.[idx]?.showDropdown === false
-            ).length === visualizationConfig.sharedFilterIndexes.length
+            type === 'dashboardFilters' &&
+            sharedFilterIndexes &&
+            sharedFilterIndexes.filter(idx => config.dashboard.sharedFilters?.[idx]?.showDropdown === false).length ===
+              sharedFilterIndexes.length
           const hasMarginBottom = !isLastRow && !hiddenDashboardFilters
 
-          return (
-            <div
+          const vizWrapperClass = `col-12 col-md-${col.width}${!shouldShow ? ' d-none' : ''}${
+            hideVisualization ? ' hide-parent-visualization' : hasMarginBottom ? ' mb-4' : ''
+          }`
+          const link =
+            config.table && config.table.show && config.datasets && table && table.showDataTableLink
+              ? tableLink
+              : undefined
+          return hideVisualization ? null : (
+            <VisualizationWrapper
               key={`vis__${index}__${colIndex}`}
-              className={`col-12 col-md-${col.width}${!shouldShow ? ' d-none' : ''}${
-                hideVisualization ? ' hide-parent-visualization' : hasMarginBottom ? ' mb-4' : ''
-              }`}
+              className={vizWrapperClass}
+              allExpanded={allExpanded}
+              currentViewport={currentViewport}
+              groupName={groupName}
+              collapsible={row.expandCollapseAllButtons}
             >
-              <VisualizationWrapper
-                allExpanded={allExpanded}
-                currentViewport={currentViewport}
-                groupName={groupName}
-                hideVisualization={hideVisualization}
-                row={row}
-              >
-                {visualizationConfig.type === 'chart' && (
-                  <CdcChart
-                    key={col.widget}
-                    config={visualizationConfig}
-                    dashboardConfig={config}
-                    isEditor={false}
-                    setConfig={newConfig => {
-                      updateChildConfig(col.widget, newConfig)
-                    }}
-                    setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
-                    isDashboard={true}
-                    link={
-                      config.table &&
-                      config.table.show &&
-                      config.datasets &&
-                      visualizationConfig.table &&
-                      visualizationConfig.table.showDataTableLink
-                        ? tableLink
-                        : undefined
-                    }
-                    configUrl={undefined}
-                    setEditing={undefined}
-                    hostname={undefined}
-                    setSharedFilterValue={undefined}
-                  />
-                )}
-                {visualizationConfig.type === 'map' && (
-                  <CdcMap
-                    key={col.widget}
-                    config={visualizationConfig}
-                    isEditor={false}
-                    setConfig={newConfig => {
-                      updateChildConfig(col.widget, newConfig)
-                    }}
-                    showLoader={false}
-                    setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
-                    setSharedFilterValue={setSharedFilterValue}
-                    isDashboard={true}
-                    link={
-                      config.table &&
-                      config.table.show &&
-                      config.datasets &&
-                      visualizationConfig.table &&
-                      visualizationConfig.table.showDataTableLink
-                        ? tableLink
-                        : undefined
-                    }
-                  />
-                )}
-                {visualizationConfig.type === 'data-bite' && (
-                  <CdcDataBite
-                    key={col.widget}
-                    config={visualizationConfig}
-                    isEditor={false}
-                    setConfig={newConfig => {
-                      updateChildConfig(col.widget, newConfig)
-                    }}
-                    isDashboard={true}
-                  />
-                )}
-                {visualizationConfig.type === 'waffle-chart' && (
-                  <CdcWaffleChart
-                    key={col.widget}
-                    config={visualizationConfig}
-                    isEditor={false}
-                    setConfig={newConfig => {
-                      updateChildConfig(col.widget, newConfig)
-                    }}
-                    isDashboard={true}
-                    configUrl={
-                      config.table &&
-                      config.table.show &&
-                      config.datasets &&
-                      visualizationConfig.table &&
-                      visualizationConfig.table.showDataTableLink
-                        ? tableLink
-                        : undefined
-                    }
-                  />
-                )}
-                {visualizationConfig.type === 'markup-include' && (
-                  <CdcMarkupInclude
-                    key={col.widget}
-                    config={visualizationConfig}
-                    configUrl={undefined}
-                    isDashboard={true}
-                    isEditor={false}
-                    setConfig={newConfig => {
-                      updateChildConfig(col.widget, newConfig)
-                    }}
-                  />
-                )}
-                {visualizationConfig.type === 'filtered-text' && (
-                  <CdcFilteredText
-                    key={col.widget}
-                    config={visualizationConfig}
-                    isEditor={false}
-                    setConfig={newConfig => {
-                      updateChildConfig(col.widget, newConfig)
-                    }}
-                    isDashboard={true}
-                    configUrl={undefined}
-                  />
-                )}
-                {visualizationConfig.type === 'dashboardFilters' && (
-                  <DashboardSharedFilters
-                    setConfig={newConfig => {
-                      updateChildConfig(col.widget, newConfig)
-                    }}
-                    key={col.widget}
-                    visualizationConfig={visualizationConfig as DashboardFilters}
-                    apiFilterDropdowns={apiFilterDropdowns}
-                    currentViewport={currentViewport}
-                  />
-                )}
-                {visualizationConfig.type === 'table' && (
-                  <DataTableStandAlone
-                    key={col.widget}
-                    updateConfig={newConfig => {
-                      updateChildConfig(col.widget, newConfig)
-                    }}
-                    visualizationKey={col.widget}
-                    config={visualizationConfig as TableConfig}
-                    viewport={currentViewport}
-                  />
-                )}
-                {visualizationConfig.type === 'footnotes' && (
-                  <FootnotesStandAlone
-                    key={col.widget}
-                    visualizationKey={col.widget}
-                    config={visualizationConfig}
-                    viewport={currentViewport}
-                  />
-                )}
-              </VisualizationWrapper>
-            </div>
+              {type === 'chart' && (
+                <CdcChart
+                  key={col.widget}
+                  config={visualizationConfig as ChartConfig}
+                  footnotes={getFootnotesConfig(visualizationConfig)}
+                  dashboardConfig={config}
+                  setConfig={newConfig => {
+                    updateChildConfig(col.widget, newConfig)
+                  }}
+                  setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                  isDashboard={true}
+                  link={link}
+                />
+              )}
+              {type === 'map' && (
+                <CdcMap
+                  key={col.widget}
+                  config={visualizationConfig}
+                  footnotes={getFootnotesConfig(visualizationConfig)}
+                  setConfig={newConfig => {
+                    updateChildConfig(col.widget, newConfig)
+                  }}
+                  showLoader={false}
+                  setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                  setSharedFilterValue={setSharedFilterValue}
+                  isDashboard={true}
+                  link={link}
+                />
+              )}
+              {type === 'data-bite' && (
+                <CdcDataBite
+                  key={col.widget}
+                  config={visualizationConfig}
+                  setConfig={newConfig => {
+                    updateChildConfig(col.widget, newConfig)
+                  }}
+                  isDashboard={true}
+                />
+              )}
+              {type === 'waffle-chart' && (
+                <CdcWaffleChart
+                  key={col.widget}
+                  config={visualizationConfig}
+                  setConfig={newConfig => {
+                    updateChildConfig(col.widget, newConfig)
+                  }}
+                  isDashboard={true}
+                  configUrl={link}
+                />
+              )}
+              {type === 'markup-include' && (
+                <CdcMarkupInclude
+                  key={col.widget}
+                  config={visualizationConfig}
+                  isDashboard={true}
+                  setConfig={newConfig => {
+                    updateChildConfig(col.widget, newConfig)
+                  }}
+                />
+              )}
+              {type === 'filtered-text' && (
+                <CdcFilteredText
+                  key={col.widget}
+                  config={visualizationConfig}
+                  setConfig={newConfig => {
+                    updateChildConfig(col.widget, newConfig)
+                  }}
+                  isDashboard={true}
+                />
+              )}
+              {type === 'dashboardFilters' && (
+                <DashboardSharedFilters
+                  setConfig={newConfig => {
+                    updateChildConfig(col.widget, newConfig)
+                  }}
+                  key={col.widget}
+                  visualizationConfig={visualizationConfig as DashboardFilters}
+                  apiFilterDropdowns={apiFilterDropdowns}
+                  currentViewport={currentViewport}
+                />
+              )}
+              {type === 'table' && (
+                <DataTableStandAlone
+                  key={col.widget}
+                  updateConfig={newConfig => {
+                    updateChildConfig(col.widget, newConfig)
+                  }}
+                  visualizationKey={col.widget}
+                  config={visualizationConfig as TableConfig}
+                  viewport={currentViewport}
+                  footnotes={getFootnotesConfig(visualizationConfig)}
+                />
+              )}
+              {type === 'footnotes' && (
+                <FootnotesStandAlone
+                  key={col.widget}
+                  visualizationKey={col.widget}
+                  config={visualizationConfig}
+                  viewport={currentViewport}
+                />
+              )}
+            </VisualizationWrapper>
           )
         }
-        return <React.Fragment key={`vis__${index}__${colIndex}`}></React.Fragment>
       })}
-      {row.footnotesId && !inNoDataState ? (
-        <FootnotesStandAlone
-          isEditor={false}
-          visualizationKey={row.footnotesId}
-          config={footnotesConfig}
-          viewport={currentViewport}
-        />
-      ) : null}
     </div>
   )
 }

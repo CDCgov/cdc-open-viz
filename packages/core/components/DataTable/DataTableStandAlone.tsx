@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ViewPort } from '../../types/ViewPort'
+import Footnotes from '../../types/Footnotes'
 import EditorWrapper from '../EditorWrapper/EditorWrapper'
 import DataTable from './DataTable'
 import DataTableEditorPanel from './components/DataTableEditorPanel'
@@ -7,10 +8,12 @@ import Filters from '../Filters'
 import { TableConfig } from './types/TableConfig'
 import { filterVizData } from '../../helpers/filterVizData'
 import { addValuesToFilters } from '../../helpers/addValuesToFilters'
+import FootnotesStandAlone from '../Footnotes/FootnotesStandAlone'
 
 type StandAloneProps = {
   visualizationKey: string
   config: TableConfig
+  footnotes?: Footnotes
   viewport?: ViewPort
   isEditor?: boolean
   updateConfig?: (Visualization) => void
@@ -19,6 +22,7 @@ type StandAloneProps = {
 const DataTableStandAlone: React.FC<StandAloneProps> = ({
   visualizationKey,
   config,
+  footnotes,
   updateConfig,
   viewport,
   isEditor
@@ -32,6 +36,12 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
     const filters = addValuesToFilters(config.filters, config.data)
     setFilteredData(filterVizData(filters, config?.formattedData?.length > 0 ? config.formattedData : config.data))
   }, [config.filters])
+
+  const setFilters = (newFilters: any) => {
+    const filters = addValuesToFilters(newFilters, config.data)
+    updateConfig({ ...config, filters })
+    setFilteredData(filterVizData(filters, config?.formattedData?.length > 0 ? config.formattedData : config.data))
+  }
 
   if (isEditor)
     return (
@@ -49,13 +59,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
 
   return (
     <>
-      <Filters
-        config={config}
-        setConfig={updateConfig}
-        setFilteredData={setFilteredData}
-        filteredData={filteredData}
-        excludedData={config.formattedData}
-      />
+      <Filters config={config} setFilters={setFilters} excludedData={config.formattedData} />
       <DataTable
         expandDataTable={config.table.expanded}
         config={config}
@@ -65,6 +69,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
         tableTitle={config.table.label}
         viewport={viewport || 'lg'}
       />
+      <FootnotesStandAlone config={footnotes} />
     </>
   )
 }

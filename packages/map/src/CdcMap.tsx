@@ -67,9 +67,12 @@ import useGenerateRuntimeLegend from './hooks/useGenerateRuntimeLegend'
 import useGenerateRuntimeFilters from './hooks/useGenerateRuntimeFilters'
 import useGenerateRuntimeData from './hooks/useGenerateRuntimeData'
 import { VizFilter } from '@cdc/core/types/VizFilter'
+import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
+import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 
 const CdcMap = ({
   config,
+  footnotes,
   navigationHandler: customNavigationHandler,
   isDashboard = false,
   isEditor = false,
@@ -101,6 +104,8 @@ const CdcMap = ({
   const [position, setPosition] = useState(state.mapPosition)
 
   const _setRuntimeData = (data: any) => {
+    const _newFilters = addValuesToFilters(data, [])
+    setState({ ...state, filters: _newFilters })
     if (config) {
       setRuntimeData(data)
     } else {
@@ -494,10 +499,8 @@ const CdcMap = ({
 
               {state?.filters?.length > 0 && (
                 <Filters
-                  config={state}
-                  setConfig={setState}
-                  filteredData={runtimeFilters}
-                  setFilteredData={_setRuntimeData}
+                  config={{ ...state, filters: runtimeFilters }}
+                  setFilters={_setRuntimeData}
                   dimensions={dimensions}
                   standaloneMap={!config}
                 />
@@ -647,6 +650,7 @@ const CdcMap = ({
               display: 'none' // can't use d-none here
             }}
           ></div>
+          <FootnotesStandAlone config={{ ...footnotes, filters: config.filters.filter(f => f.filterFootnotes) }} />
         </Layout.Responsive>
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>
