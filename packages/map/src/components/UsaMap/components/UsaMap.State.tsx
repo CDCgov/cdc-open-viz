@@ -108,6 +108,17 @@ const UsaMap = () => {
 
   const dataRef = useRef(null)
 
+  const legendMemoUpdated = focusedStates?.every(geo => {
+    const geoKey = geo.properties.iso
+    const geoData = data[geoKey]
+    const hash = hashObj(geoData)
+    return legendMemo.current.has(hash)
+  })
+
+  // we use dataRef so that we can use the old data when legendMemo has not been updated yet
+  // prevents flickering of the map when filter is changed
+  if (legendMemoUpdated) dataRef.current = data
+
   useEffect(() => {
     const fetchData = async () => {
       import(/* webpackChunkName: "us-topo" */ '../data/us-topo.json').then(topoJSON => {
@@ -133,7 +144,7 @@ const UsaMap = () => {
       setTerritoriesData(territoriesKeys)
     } else {
       // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
-      const territoriesList = territoriesKeys.filter(key => data[key])
+      const territoriesList = territoriesKeys.filter(key => dataRef.current?.[key])
       setTerritoriesData(territoriesList)
     }
   }, [data, general.territoriesAlwaysShow])
@@ -144,7 +155,7 @@ const UsaMap = () => {
   const territories = territoriesData.map((territory, territoryIndex) => {
     const Shape = displayAsHex ? Territory.Hexagon : Territory.Rectangle
 
-    const territoryData = data[territory]
+    const territoryData = dataRef.current?.[territory]
 
     let toolTip
 
@@ -235,16 +246,6 @@ const UsaMap = () => {
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
     let showLabel = general.displayStateLabels
-
-    const legendMemoUpdated = geographies.every(({ feature: geo }) => {
-      const geoKey = geo.properties.iso
-      const geoData = data[geoKey]
-      const hash = hashObj(geoData)
-      return legendMemo.current.has(hash)
-    })
-
-    // If the legend has NOT updated yet, we use the previous data so that it doesn't flash
-    if (legendMemoUpdated) dataRef.current = data
 
     // Order alphabetically. Important for accessibility if ever read out loud.
     geographies.map(state => {
@@ -522,7 +523,7 @@ const UsaMap = () => {
 
     // Bubbles
     if (general.type === 'bubble') {
-      geosJsx.push(<BubbleList runtimeData={data} projection={projection} />)
+      geosJsx.push(<BubbleList runtimeData={dataRef.current} projection={projection} />)
     }
 
     // })
