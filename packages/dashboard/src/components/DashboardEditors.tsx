@@ -9,11 +9,11 @@ import DashboardSharedFilters from './DashboardFilters'
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import _ from 'lodash'
-import { Visualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '@cdc/core/types/Visualization'
 
 type DashboardEditorProps = {
   visualizationKey: string
-  visualizationConfig: Visualization
+  visualizationConfig: AnyVisualization
   _updateConfig: (config: any) => void
   isDebug?: boolean
   setSharedFilter?: Function
@@ -128,19 +128,7 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
           config={visualizationConfig}
           isEditor={true}
           updateConfig={_updateConfig}
-        />
-      )
-
-    case 'footnotes':
-      return (
-        <FootnotesStandAlone
-          visualizationKey={visualizationKey}
-          config={{ ...visualizationConfig, datasets: state.config.datasets }}
-          isEditor={true}
-          updateConfig={conf => {
-            /* Datasets are passed in just for reference and need to be removed */
-            _updateConfig(_.omit(conf, 'datasets'))
-          }}
+          datasets={state.config.datasets}
         />
       )
 

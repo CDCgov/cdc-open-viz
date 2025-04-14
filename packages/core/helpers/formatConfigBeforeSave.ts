@@ -5,29 +5,12 @@ import { removeDashboardFilter } from '@cdc/dashboard/src/helpers/removeDashboar
 import _ from 'lodash'
 
 const cleanDashboardFootnotes = (config: DashboardConfig) => {
-  // strip any blank footnote visualizations
-  const footnoteIds: string[] = []
-
-  if (config.rows) {
-    config.rows.forEach(row => {
-      if (row.footnotesId) {
-        const { dataKey, staticFootnotes } = (config.visualizations[row.footnotesId] || {}) as Footnotes
-        if (!dataKey && !staticFootnotes?.length) {
-          delete config.visualizations[row.footnotesId]
-          delete row.footnotesId
-        } else {
-          footnoteIds.push(row.footnotesId)
-        }
-      }
-    })
-  }
-
   if (config.visualizations) {
     Object.keys(config.visualizations).forEach(vizKey => {
       const viz: Visualization = config.visualizations[vizKey]
-      if (viz.type === 'footnotes' && !footnoteIds.includes(vizKey)) {
-        // if footnote isn't being used by any rows, remove it
-        delete config.visualizations[vizKey]
+      if (viz.footnotes) {
+        delete config.visualizations[vizKey].footnotes.data
+        delete config.visualizations[vizKey].footnotes.formattedData
       }
     })
   }
@@ -64,23 +47,27 @@ const cleanDashboardData = (config: DashboardConfig) => {
 
 export const cleanSharedFilters = (config: DashboardConfig) => {
   if (config.dashboard?.sharedFilters) {
-
     const recursiveRemoveFilters = (sharedFilters, visualizations: Record<string, AnyVisualization>) => {
-      const usedFilters = _.uniq(Object.values(visualizations).reduce((acc, viz) => {
-        if(viz.type === 'dashboardFilters') {
-          acc = acc.concat(viz.sharedFilterIndexes)
-        }
-        return acc
-      }, []))
-      for(let index = 0; index < sharedFilters.length; index++) {
+      const usedFilters = _.uniq(
+        Object.values(visualizations).reduce((acc, viz) => {
+          if (viz.type === 'dashboardFilters') {
+            acc = acc.concat(viz.sharedFilterIndexes)
+          }
+          return acc
+        }, [])
+      )
+      for (let index = 0; index < sharedFilters.length; index++) {
         const filter = sharedFilters[index]
-        if(!usedFilters.includes(index)) {
-
-          const [newSharedFilters, newVisualizations] = removeDashboardFilter(index, config.dashboard.sharedFilters, config.visualizations)
+        if (!usedFilters.includes(index)) {
+          const [newSharedFilters, newVisualizations] = removeDashboardFilter(
+            index,
+            config.dashboard.sharedFilters,
+            config.visualizations
+          )
           config.dashboard.sharedFilters = newSharedFilters
           config.visualizations = newVisualizations
           recursiveRemoveFilters(newSharedFilters, newVisualizations)
-          break;
+          break
         } else {
           delete config.dashboard.sharedFilters[index].active
           if (filter.subGrouping) delete config.dashboard.sharedFilters[index].subGrouping.active
