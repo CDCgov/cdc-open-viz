@@ -9,23 +9,24 @@ import { TableConfig } from './types/TableConfig'
 import { filterVizData } from '../../helpers/filterVizData'
 import { addValuesToFilters } from '../../helpers/addValuesToFilters'
 import FootnotesStandAlone from '../Footnotes/FootnotesStandAlone'
+import { Datasets } from '@cdc/core/types/DataSet'
 
 type StandAloneProps = {
   visualizationKey: string
   config: TableConfig
-  footnotes?: Footnotes
   viewport?: ViewPort
   isEditor?: boolean
   updateConfig?: (Visualization) => void
+  datasets?: Datasets
 }
 
 const DataTableStandAlone: React.FC<StandAloneProps> = ({
   visualizationKey,
   config,
-  footnotes,
   updateConfig,
   viewport,
-  isEditor
+  isEditor,
+  datasets
 }) => {
   const [filteredData, setFilteredData] = useState<Record<string, any>[]>(
     filterVizData(config.filters, config.formattedData || config.data)
@@ -53,7 +54,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
         type={'Table'}
         viewport={viewport}
       >
-        <DataTableEditorPanel key={visualizationKey} config={config} updateConfig={updateConfig} />
+        <DataTableEditorPanel key={visualizationKey} config={config} updateConfig={updateConfig} datasets={datasets} />
       </EditorWrapper>
     )
 
@@ -69,7 +70,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
         tableTitle={config.table.label}
         viewport={viewport || 'lg'}
       />
-      <FootnotesStandAlone config={footnotes} />
+      <FootnotesStandAlone config={config.footnotes} filters={config.filters.filter(f => f.filterFootnotes)} />
     </>
   )
 }
