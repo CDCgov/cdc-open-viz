@@ -117,7 +117,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       }
 
       return (
-        // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
         <li
           className={handleListItemClass()}
           key={idx}
@@ -293,12 +292,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               }
               config={state}
             />
-            <LegendGroup
-              runtimeLegend={runtimeLegend}
-              currentViewport={currentViewport}
-              legendItems={getFormattedLegendItems()}
-              state={state}
-            />
+            <LegendGroup legendItems={getFormattedLegendItems()} />
 
             {!!legendListItems.length && ['Select Option', ''].includes(state.legend.groupBy) && (
               <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>

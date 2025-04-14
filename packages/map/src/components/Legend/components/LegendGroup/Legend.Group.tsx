@@ -1,95 +1,119 @@
-import { useContext } from 'react'
-import _ from 'lodash'
+import { useContext, useMemo } from 'react'
 import './Legend.Group.css'
 import LegendShape from '@cdc/core/components/LegendShape'
 import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../../../../context'
+
 interface LegendItem {
   color: string
   label: string
   disabled?: boolean
   special: boolean
 }
+
 interface GroupedData {
   [key: string]: LegendItem[]
 }
 
 const LegendGroup = ({ legendItems }) => {
   const { runtimeLegend, setAccessibleStatus, setRuntimeLegend, state, currentViewport } = useContext(ConfigContext)
-  const getGridColumnClasses = (viewport: typeof currentViewport) => {
-    switch (viewport) {
-      case 'xs':
-        return 'col-12'
-      case 'sm':
-        return 'col-6'
-      case 'md':
-        return 'col-4'
-      default:
-        return 'col-3'
-    }
+
+  const getGridColClass = (viewport: string) => {
+    const map = { xs: 'col-12', sm: 'col-6', md: 'col-4' }
+    return map[viewport] || 'col-3'
   }
-  const getGroupedData = (legendItems: LegendItem[], data: object[], groupByKey: string): GroupedData => {
-    if (!groupByKey || !data || !legendItems) return {}
+
+  const groupLegendItems = (items: LegendItem[], data: object[], groupByKey: string): GroupedData => {
+    if (!groupByKey || !data || !items) return {}
+
+    const columnKey = state.columns.primary.name || ''
     const result: GroupedData = {}
-    const column = state.columns.primary.name || ''
-    data.forEach(item => {
-      if (item[groupByKey] == null) {
-        return
+
+    for (const row of data) {
+      const groupValue = row[groupByKey]
+      if (!groupValue) continue
+
+      const label = row[columnKey]
+      const match = items.find(i => i.label === label)
+      if (!match) continue
+
+      result[groupValue] ||= []
+      if (!result[groupValue].some(i => i.label === label)) {
+        result[groupValue].push(match)
       }
-      if (!result[item[groupByKey]]) {
-        result[item[groupByKey]] = []
-      }
-      const matchingLegend = legendItems.find(legend => legend.label === item[column])
-      // Check if the legend is already in the group to prevent duplicates
-      if (
-        matchingLegend &&
-        !result[item[groupByKey]].some(existingLegend => existingLegend.label === matchingLegend.label)
-      ) {
-        result[item[groupByKey]].push(matchingLegend)
-      }
+    }
+
+    // Sort items in each group
+    Object.entries(result).forEach(([group, items]) => {
+      result[group] = [...items].sort(
+        (a, b) =>
+          state.legend.categoryValuesOrder?.indexOf(a.label) - state.legend.categoryValuesOrder?.indexOf(b.label)
+      )
     })
 
     return result
   }
-  const gridCol = getGridColumnClasses(currentViewport)
 
-  const isSigleCol = state.legend.position === 'bottom' || state.legend.position === 'top' ? gridCol : 'col-12'
-  const groupedData = getGroupedData(legendItems, state.data, state.legend.groupBy)
+  const handleToggleItem = (item: LegendItem) => {
+    const newItems = runtimeLegend.items.map(legend =>
+      legend.value === item.label ? { ...legend, disabled: !legend.disabled } : legend
+    )
 
-  const classNameItem = [isSigleCol, 'group-container']
+    const wasDisabled = runtimeLegend.items.find(i => i.value === item.label)?.disabled
+    const delta = wasDisabled ? -1 : 1
 
-  const handleListItemClass = item => {
-    console.log(item.disabled, 'item')
-    let classes = ['legend-container__li', 'd-flex', 'align-items-center']
-    if (item.disabled) classes.push('legend-container__li--disabled')
-    // else if (hasDisabledItems) classes.push('legend-container__li--not-disabled')
-    if (item.special) classes.push('legend-container__li--special-class')
-    return classes.join(' ')
+    setRuntimeLegend({
+      ...runtimeLegend,
+      items: newItems,
+      disabledAmt: (runtimeLegend.disabledAmt ?? 0) + delta
+    })
+
+    setAccessibleStatus(
+      `${wasDisabled ? 'Enabled' : 'Disabled'} legend item ${item.label}. Please reference the data table.`
+    )
   }
+
+  const getLegendItemClasses = (item: LegendItem, hasDisabledItems: boolean) => {
+    return [
+      'group-list-item',
+      item.disabled ? 'legend-group-item-disable' : hasDisabledItems ? 'legend-group-item-not-disable' : ''
+    ]
+      .filter(Boolean)
+      .join(' ')
+  }
+
+  const gridClass =
+    state.legend.position === 'bottom' || state.legend.position === 'top' ? getGridColClass(currentViewport) : 'col-12'
+
+  const groupedData = useMemo(
+    () => groupLegendItems(legendItems, state.data, state.legend.groupBy),
+    [legendItems, state.data, state.legend.groupBy]
+  )
+
+  const hasDisabledItems = runtimeLegend.items.some(item => item.disabled)
+
   return (
     <ErrorBoundary component='Grouped Legend'>
       <div className='row'>
         {Object.entries(groupedData).map(([groupName, items]) => (
-          <div className={classNameItem.join(' ')} key={groupName}>
+          <div className={`${gridClass} group-container`} key={groupName}>
             <p className='group-label'>{groupName}</p>
             <ul className='row'>
               {items.map((item, index) => (
                 <li
+                  key={`${item.label}-${index}`}
                   role='button'
-                  onClick={() => {
-                    toggleLegendActive(index, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)
-                  }}
+                  tabIndex={0}
+                  title={`Legend item ${item.label} - Click to disable`}
+                  className={getLegendItemClasses(item, hasDisabledItems)}
+                  onClick={() => handleToggleItem(item)}
                   onKeyDown={e => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault()
                       toggleLegendActive(index, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)
                     }
                   }}
-                  key={`${item.label}-${index}`}
-                  className={`group-list-item ${item.disabled ? 'bg-danger' : 'bg-blue'} ${index} `}
-                  title={`Legend item ${item.label} - Click to disable`}
-                  tabIndex={0}
                 >
                   <LegendShape shape={state.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
                   <span>{item.label}</span>
