@@ -76,12 +76,10 @@ import './scss/main.scss'
 import { getInitialState, reducer } from './store/chart.reducer'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { getNewRuntime } from './helpers/getNewRuntime'
-import Footnotes from '@cdc/core/types/Footnotes'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 
 interface CdcChartProps {
   config?: ChartConfig
-  footnotes?: Footnotes
   isEditor?: boolean
   isDebug?: boolean
   isDashboard?: boolean
@@ -95,7 +93,6 @@ interface CdcChartProps {
 }
 const CdcChart: React.FC<CdcChartProps> = ({
   config: configObj,
-  footnotes,
   isEditor = false,
   isDebug = false,
   isDashboard = false,
@@ -854,7 +851,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     body = (
       <>
-        {isEditor && <EditorPanel />}
+        {isEditor && <EditorPanel datasets={dashboardConfig?.datasets} />}
         <Layout.Responsive isEditor={isEditor}>
           {config.newViz && <Confirm updateConfig={updateConfig} config={config} />}
           {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && (
@@ -1064,11 +1061,16 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 )}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
-                {config?.footnotes && <section className='footnotes pt-2 mt-4'>{parse(config.footnotes)}</section>}
+                {config?.legacyFootnotes && (
+                  <section className='footnotes pt-2 mt-4'>{parse(config.legacyFootnotes)}</section>
+                )}
               </div>
+              <FootnotesStandAlone
+                config={configObj.footnotes}
+                filters={config.filters.filter(f => f.filterFootnotes)}
+              />
             </div>
           )}
-          <FootnotesStandAlone config={{ ...footnotes, filters: config.filters.filter(f => f.filterFootnotes) }} />
         </Layout.Responsive>
       </>
     )

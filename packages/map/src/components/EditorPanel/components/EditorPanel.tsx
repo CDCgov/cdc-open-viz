@@ -46,8 +46,14 @@ import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs, HEADER_COLORS } from '../../../helpers'
+import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
+import { Datasets } from '@cdc/core/types/DataSet'
 
-const EditorPanel = () => {
+type MapEditorPanelProps = {
+  datasets?: Datasets
+}
+
+const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const {
     isDashboard,
     loadConfig,
@@ -2632,21 +2638,30 @@ const EditorPanel = () => {
             </AccordionItem>
           )}
           {'navigation' !== state.general.type && (
-            <AccordionItem>
-              {' '}
-              {/* Filters */}
-              <AccordionItemHeading>
-                <AccordionItemButton>Filters</AccordionItemButton>
-              </AccordionItemHeading>
-              <AccordionItemPanel>
-                <VizFilterEditor
-                  config={state}
-                  updateField={updateField}
-                  rawData={state.data}
-                  hasFootnotes={isDashboard}
-                />
-              </AccordionItemPanel>
-            </AccordionItem>
+            <>
+              <AccordionItem>
+                {/* Filters */}
+                <AccordionItemHeading>
+                  <AccordionItemButton>Filters</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <VizFilterEditor
+                    config={state}
+                    updateField={updateField}
+                    rawData={state.data}
+                    hasFootnotes={isDashboard}
+                  />
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Footnotes</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <FootnotesEditor config={state} updateField={updateField} datasets={datasets} />
+                </AccordionItemPanel>
+              </AccordionItem>
+            </>
           )}
           {'navigation' !== state.general.type && (
             <AccordionItem>

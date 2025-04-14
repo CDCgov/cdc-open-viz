@@ -1,11 +1,15 @@
-import { Visualization } from './Visualization'
+import { VizFilter } from './VizFilter'
 
 export type Footnote = {
   symbol?: string
   text: string
 }
 
-type Footnotes = Visualization & {
+type Footnotes = {
+  filters?: VizFilter[]
+  dataKey?: string
+  data?: Object[]
+  formattedData?: Object[]
   dynamicFootnotes?: {
     symbolColumn?: string
     textColumn: string

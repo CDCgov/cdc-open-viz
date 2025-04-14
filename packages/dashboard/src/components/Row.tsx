@@ -215,26 +215,6 @@ type RowProps = { row: ConfigRow; idx: number; uuid: number | string }
 
 const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
   const { overlay } = useGlobalContext()
-  const dispatch = useContext(DashboardDispatchContext)
-
-  const configureFootnotes = () => {
-    if (!row.footnotesId) {
-      const type = 'footnotes'
-      const uid = type + Date.now()
-      const newVisualizationConfig = {
-        uid,
-        type,
-        visualizationType: type,
-        editing: true
-      }
-      dispatch({
-        type: 'ADD_FOOTNOTE',
-        payload: { id: uid, rowIndex: rowIdx, config: newVisualizationConfig as Visualization }
-      })
-    } else {
-      dispatch({ type: 'UPDATE_VISUALIZATION', payload: { vizKey: row.footnotesId, configureData: { editing: true } } })
-    }
-  }
   return (
     <>
       <div className='builder-row' data-row-id={rowIdx}>
@@ -262,9 +242,6 @@ const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
               />
             ))}
         </div>
-        <button className='btn btn-primary footnotes' onClick={configureFootnotes}>
-          {row.footnotesId ? 'Edit' : 'Add'} Footnotes
-        </button>
       </div>
     </>
   )

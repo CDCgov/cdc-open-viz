@@ -20,7 +20,7 @@ import { hasDashboardApplyBehavior } from '../helpers/hasDashboardApplyBehavior'
 import CdcChart from '@cdc/chart/src/CdcChartComponent'
 import ExpandCollapseButtons from './ExpandCollapseButtons'
 import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
-import { Visualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '@cdc/core/types/Visualization'
 
 type VisualizationWrapperProps = {
   allExpanded: boolean
@@ -109,24 +109,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
       return acc
     }, {})
 
-  const getFootnotesConfig = (vizConfig: Visualization) => {
-    if (row.footnotesId) {
-      const footnoteConfig = getFootnotesVizConfig(row.footnotesId, index, config)
-      const filters = vizConfig.filters.filter(f => f.filterFootnotes)
-      if (row.multiVizColumn && filteredDataOverride) {
-        const vizCategory = filteredDataOverride[0][row.multiVizColumn]
-        // the multiViz filtering filtering is applied after the dashboard filters
-        const categoryFootnote = footnoteConfig.formattedData.filter(d => d[row.multiVizColumn] === vizCategory)
-        footnoteConfig.formattedData = categoryFootnote
-      } else {
-        footnoteConfig.formattedData = dashboardFilteredData[row.footnotesId]
-      }
-
-      return { ...footnoteConfig, filters }
-    }
-    return null
-  }
-
   const applyButtonNotClicked = (vizConfig: DashboardFilters): boolean => {
     const dashboardFilters = Object.values(config.visualizations).filter(
       v => v.type === 'dashboardFilters'
@@ -187,14 +169,17 @@ const VisualizationRow: React.FC<VizRowProps> = ({
         if (col.width) {
           if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`col col-${col.width}`}></div>
 
-          const visualizationConfig = getVizConfig(col.widget, index, config, rawData, dashboardFilteredData)
+          const visualizationConfig = getVizConfig(
+            col.widget,
+            index,
+            config,
+            rawData,
+            dashboardFilteredData,
+            filteredDataOverride,
+            row.multiVizColumn
+          )
+
           const { type, sharedFilterIndexes, filterBehavior, table, dataKey } = visualizationConfig
-          if (filteredDataOverride) {
-            visualizationConfig.data = filteredDataOverride
-            if (visualizationConfig.formattedData) {
-              visualizationConfig.formattedData = filteredDataOverride
-            }
-          }
 
           const setsSharedFilter =
             config.dashboard.sharedFilters &&
@@ -242,7 +227,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                 <CdcChart
                   key={col.widget}
                   config={visualizationConfig as ChartConfig}
-                  footnotes={getFootnotesConfig(visualizationConfig)}
                   dashboardConfig={config}
                   setConfig={newConfig => {
                     updateChildConfig(col.widget, newConfig)
@@ -256,7 +240,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                 <CdcMap
                   key={col.widget}
                   config={visualizationConfig}
-                  footnotes={getFootnotesConfig(visualizationConfig)}
                   setConfig={newConfig => {
                     updateChildConfig(col.widget, newConfig)
                   }}
@@ -265,6 +248,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   setSharedFilterValue={setSharedFilterValue}
                   isDashboard={true}
                   link={link}
+                  dataset={config.datasets}
                 />
               )}
               {type === 'data-bite' && (
@@ -327,15 +311,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   }}
                   visualizationKey={col.widget}
                   config={visualizationConfig as TableConfig}
-                  viewport={currentViewport}
-                  footnotes={getFootnotesConfig(visualizationConfig)}
-                />
-              )}
-              {type === 'footnotes' && (
-                <FootnotesStandAlone
-                  key={col.widget}
-                  visualizationKey={col.widget}
-                  config={visualizationConfig}
                   viewport={currentViewport}
                 />
               )}

@@ -12,13 +12,16 @@ import { useMemo } from 'react'
 import ColumnsEditor from '../../EditorPanel/ColumnsEditor'
 import VizFilterEditor from '../../EditorPanel/VizFilterEditor'
 import _ from 'lodash'
+import FootnotesEditor from '../../EditorPanel/FootnotesEditor'
+import { Datasets } from '@cdc/core/types/DataSet'
 
 type DataTableEditorProps = {
   config: Visualization
   updateConfig: Function
+  datasets?: Datasets
 }
 
-const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateConfig }) => {
+const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateConfig, datasets }) => {
   const updateField = useMemo(() => updateFieldFactory(config, updateConfig), [JSON.stringify(config)])
   const deleteColumn = columnName => {
     const newColumns = _.cloneDeep(config.columns)
@@ -61,6 +64,14 @@ const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateCo
         </AccordionItemHeading>
         <AccordionItemPanel>
           <DataTableEditor config={config} columns={columns} updateField={updateField} isDashboard={true} />
+        </AccordionItemPanel>
+      </AccordionItem>
+      <AccordionItem>
+        <AccordionItemHeading>
+          <AccordionItemButton>Footnotes</AccordionItemButton>
+        </AccordionItemHeading>
+        <AccordionItemPanel>
+          <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />
         </AccordionItemPanel>
       </AccordionItem>
     </Accordion>

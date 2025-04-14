@@ -1,6 +1,6 @@
 import { Series } from '@cdc/core/types/Series'
 import { Runtime } from '@cdc/core/types/Runtime'
-import { DataSet } from './DataSet'
+import { DataSet } from '@cdc/core/types/DataSet'
 import { ConfigRow } from './ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { Table } from '@cdc/core/types/Table'

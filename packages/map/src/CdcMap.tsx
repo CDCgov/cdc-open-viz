@@ -72,7 +72,6 @@ import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAl
 
 const CdcMap = ({
   config,
-  footnotes,
   navigationHandler: customNavigationHandler,
   isDashboard = false,
   isEditor = false,
@@ -82,7 +81,8 @@ const CdcMap = ({
   setConfig,
   setSharedFilter,
   setSharedFilterValue,
-  link
+  link,
+  datasets
 }) => {
   const [accessibleStatus, setAccessibleStatus] = useState<string>()
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState<boolean>(false)
@@ -476,7 +476,7 @@ const CdcMap = ({
         imageId={imageId}
         showEditorPanel={state.showEditorPanel}
       >
-        {isEditor && <EditorPanel />}
+        {isEditor && <EditorPanel datasets={datasets} />}
         <Layout.Responsive isEditor={isEditor}>
           {requiredColumns && (
             <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
@@ -624,11 +624,9 @@ const CdcMap = ({
               {general.footnotes && <section className='footnotes pt-2 mt-4'>{parse(general.footnotes)}</section>}
             </section>
           )}
-
           <div aria-live='assertive' className='cdcdataviz-sr-only'>
             {accessibleStatus}
           </div>
-
           {!isDraggingAnnotation &&
             !window.matchMedia('(any-hover: none)').matches &&
             'hover' === tooltips.appearanceType && (
@@ -650,7 +648,7 @@ const CdcMap = ({
               display: 'none' // can't use d-none here
             }}
           ></div>
-          <FootnotesStandAlone config={{ ...footnotes, filters: config.filters.filter(f => f.filterFootnotes) }} />
+          <FootnotesStandAlone config={config.footnotes} filters={config.filters.filter(f => f.filterFootnotes)} />
         </Layout.Responsive>
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>

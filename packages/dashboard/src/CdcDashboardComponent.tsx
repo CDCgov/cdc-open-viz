@@ -335,8 +335,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
         state.filteredData
       )
       visualizationConfig.uid = visualizationKey
-      if (visualizationConfig.type === 'footnotes') visualizationConfig.formattedData = undefined
-
       if (visualizationConfig.editing) {
         subVisualizationEditing = true
 
