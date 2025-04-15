@@ -50,7 +50,7 @@ const APIModal: React.FC<APIModalProps> = ({
         <div className={`w-50${isNestedDropdown ? ' border border-dark p-1 m-1' : ''}`}>
           <label>
             <span>Value Selector: </span>
-            <input value={APIValueSelector || ''} onChange={e => setAPIValueSelector(e.target.value)} />
+            <input type='text' value={APIValueSelector || ''} onChange={e => setAPIValueSelector(e.target.value)} />
             <Tooltip style={{ textTransform: 'none' }}>
               <Tooltip.Target>
                 <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -63,7 +63,7 @@ const APIModal: React.FC<APIModalProps> = ({
           </label>
           <label>
             <span>Display Text Selector: </span>
-            <input value={APITextSelector || ''} onChange={e => setAPITextSelector(e.target.value)} />
+            <input type='text' value={APITextSelector || ''} onChange={e => setAPITextSelector(e.target.value)} />
             <Tooltip style={{ textTransform: 'none' }}>
               <Tooltip.Target>
                 <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -81,6 +81,7 @@ const APIModal: React.FC<APIModalProps> = ({
             <label>
               <span>Subgroup Value Selector: </span>
               <input
+                type='text'
                 value={APISubGroupValueSelector || ''}
                 onChange={e => setAPISubGroupValueSelector(e.target.value)}
               />
@@ -96,7 +97,11 @@ const APIModal: React.FC<APIModalProps> = ({
             </label>
             <label>
               <span>Subgroup Display Text Selector: </span>
-              <input value={APISubGroupTextSelector || ''} onChange={e => setAPISubGroupTextSelector(e.target.value)} />
+              <input
+                type='text'
+                value={APISubGroupTextSelector || ''}
+                onChange={e => setAPISubGroupTextSelector(e.target.value)}
+              />
               <Tooltip style={{ textTransform: 'none' }}>
                 <Tooltip.Target>
                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />

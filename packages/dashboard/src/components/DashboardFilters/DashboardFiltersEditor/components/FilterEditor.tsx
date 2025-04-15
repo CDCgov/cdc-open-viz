@@ -360,7 +360,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                 <div className={isNestedDropdown ? 'border border-dark p-1 my-1' : ''}>
                   <label>
                     <span>Value Selector: </span>
-                    <input value={filter?.apiFilter?.valueSelector || ''} disabled />
+                    <input type='text' value={filter?.apiFilter?.valueSelector || ''} disabled />
                     <Tooltip style={{ textTransform: 'none' }}>
                       <Tooltip.Target>
                         <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -373,7 +373,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                   </label>
                   <label>
                     <span>Display Text Selector: </span>
-                    <input value={filter?.apiFilter?.textSelector || ''} disabled />
+                    <input type='text' value={filter?.apiFilter?.textSelector || ''} disabled />
                     <Tooltip style={{ textTransform: 'none' }}>
                       <Tooltip.Target>
                         <Icon display='question' style={{ marginLeft: '0.5rem' }} />
