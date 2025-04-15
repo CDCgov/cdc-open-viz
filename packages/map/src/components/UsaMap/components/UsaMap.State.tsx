@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo, useContext } from 'react'
+import React, { useState, useEffect, useContext, useRef } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
@@ -34,7 +34,7 @@ import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
-import { SVG_HEIGHT, SVG_VIEWBOX, SVG_WIDTH } from '../../../helpers'
+import { SVG_HEIGHT, SVG_VIEWBOX, SVG_WIDTH, hashObj } from '../../../helpers'
 import useMapDispatch from '../../../hooks/useMapDispatch'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
@@ -110,6 +110,19 @@ const UsaMap = () => {
   // "Choose State" options
   const [focusedStates, setFocusedStates] = useState(null)
 
+  const dataRef = useRef(null)
+
+  const legendMemoUpdated = focusedStates?.every(geo => {
+    const geoKey = geo.properties.iso
+    const geoData = data[geoKey]
+    const hash = hashObj(geoData)
+    return legendMemo.current.has(hash)
+  })
+
+  // we use dataRef so that we can use the old data when legendMemo has not been updated yet
+  // prevents flickering of the map when filter is changed
+  if (legendMemoUpdated) dataRef.current = data
+
   useEffect(() => {
     const fetchData = async () => {
       import(/* webpackChunkName: "us-topo" */ '../data/us-topo.json').then(topoJSON => {
@@ -134,7 +147,7 @@ const UsaMap = () => {
       setTerritoriesData(territoriesKeys)
     } else {
       // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
-      const territoriesList = territoriesKeys.filter(key => data[key])
+      const territoriesList = territoriesKeys.filter(key => dataRef.current?.[key])
       setTerritoriesData(territoriesList)
     }
   }, [data, general.territoriesAlwaysShow])
@@ -145,7 +158,7 @@ const UsaMap = () => {
   const territories = territoriesData.map((territory, territoryIndex) => {
     const Shape = displayAsHex ? Territory.Hexagon : Territory.Rectangle
 
-    const territoryData = data[territory]
+    const territoryData = data?.[territory]
 
     let toolTip
 
@@ -271,13 +284,13 @@ const UsaMap = () => {
 
       if (!geoKey) return
 
-      const geoData = data[geoKey]
+      const geoData = data?.[geoKey]
 
       let legendColors
 
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
-        legendColors = applyLegendToRow(geoData, state)
+        legendColors = applyLegendToRow(geoData)
       }
 
       const geoDisplayName = displayGeoName(geoKey)
@@ -513,7 +526,7 @@ const UsaMap = () => {
 
     // Bubbles
     if (general.type === 'bubble') {
-      geosJsx.push(<BubbleList runtimeData={data} projection={projection} />)
+      geosJsx.push(<BubbleList runtimeData={dataRef.current} projection={projection} />)
     }
 
     // })
