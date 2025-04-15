@@ -57,17 +57,17 @@ const nudges = {
 const UsaMap = () => {
   // prettier-ignore
   const {
-      applyLegendToRow,
-      applyTooltipsToGeo,
-      data,
-      geoClickHandler,
-      setSharedFilterValue,
-      state,
-      tooltipId,
-      handleDragStateChange,
-      mapId,
-      logo,
-    } = useContext<MapContext>(ConfigContext)
+    applyLegendToRow,
+    applyTooltipsToGeo,
+    data,
+    geoClickHandler,
+    setSharedFilterValue,
+    state,
+    tooltipId,
+    handleDragStateChange,
+    mapId,
+    logo,
+  } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
   const { general, columns, feature, tooltips, hexMap, map, annotations } = state
@@ -526,13 +526,13 @@ const UsaMap = () => {
   }
 
   const geoLabel = (geo, bgColor = '#FFFFFF', projection) => {
-    const centroid = projection ? projection(geoCentroid(geo)) : [22, 17.5]
-    const abbr = geo.properties.iso
+    let centroid = projection ? projection(geoCentroid(geo)) : [22, 17.5]
+    let abbr = geo.properties.iso
 
     if (undefined === abbr) return null
 
     // HI background is always white since it is off to the side
-    if ((abbr === 'US-HI' && !general.displayAsHex) || (Object.keys(offsets).includes(abbr) && !general.displayAsHex)) {
+    if (abbr === 'US-HI' && !general.displayAsHex) {
       bgColor = '#FFF'
     }
     const { textColor, strokeColor } = outlinedTextColor(bgColor)
