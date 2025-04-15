@@ -180,8 +180,12 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
         const isValuePresent = _.values(relevantData).includes(pd.value)
 
         // Check for value match condition
-        const valueMatch = pd.column ? dataItem[pd.column] === pd.value : isValuePresent
+        const dynamicCategory = config.series[0].dynamicCategory
 
+        let valueMatch = pd.column ? dataItem[pd.column] === pd.value : isValuePresent
+        if (dynamicCategory && dataItem[dynamicCategory] === pd.column) {
+          valueMatch = true
+        }
         // Return true if the value matches and it's either the first or the last item
         return valueMatch && (index === 0 || index === tableData.length - 1)
       })

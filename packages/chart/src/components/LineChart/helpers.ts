@@ -92,7 +92,7 @@ export const filterCircles = (
 }
 
 const isCalculable = value => !isNaN(parseFloat(value)) && isFinite(value)
-const handleFirstIndex = (data, seriesKey, preliminaryData) => {
+const handleFirstIndex = (data, seriesKey, preliminaryData, dynamicCategory, originalSeriesKey) => {
   let pairCount = '0'
   const result = {
     data: { '0': [] },
@@ -106,9 +106,18 @@ const handleFirstIndex = (data, seriesKey, preliminaryData) => {
 
   // Function to check if a data item matches the suppression criteria
   const isSuppressed = pd => {
-    if (pd.type === 'effect' || pd.hideLineStyle) return
+    if (pd.type === 'effect' || pd.hideLineStyle) return false
+
+    if (dynamicCategory) {
+      return (
+        pd.type === 'suppression' &&
+        pd.column === firstIndexDataItem[dynamicCategory] &&
+        pd.value === firstIndexDataItem[originalSeriesKey]
+      )
+    }
+
     return (
-      pd.type == 'suppression' && pd.value === firstIndexDataItem[seriesKey] && (!pd.column || pd.column === seriesKey)
+      pd.type === 'suppression' && pd.value === firstIndexDataItem[seriesKey] && (!pd.column || pd.column === seriesKey)
     )
   }
 
@@ -218,16 +227,20 @@ function handleMiddleIndices(data, seriesKey, preliminaryData) {
   return result
 }
 
-// create segments (array of arrays) for building suppressed Lines
-export const createDataSegments = (data, seriesKey, preliminaryData, dataKey) => {
-  // Process the first index if necessary
-  const firstSegment = handleFirstIndex(data, seriesKey, preliminaryData)
-  // Process the last index if necessary
+export const createDataSegments = ({ data, seriesKey, preliminaryData, dynamicCategory, originalSeriesKey }) => {
+  const firstSegment = handleFirstIndex(data, seriesKey, preliminaryData, dynamicCategory, originalSeriesKey)
   const lastSegment = handleLastIndex(data, seriesKey, preliminaryData)
-  // Process the middle segment
   const middleSegments = handleMiddleIndices(data, seriesKey, preliminaryData)
 
-  // Combine all segments into a single array
-  return [firstSegment, middleSegments, lastSegment]
-  // return [firstSegment, middleSegments, lastSegment].filter(segment => segment.data.length > 0 && segment.style !== '')
+  const segments = [firstSegment, middleSegments, lastSegment]
+
+  // ✅ Filter: keep only segments with real data
+  return segments.filter(segment => {
+    if (!segment || !segment.data) return false
+
+    // Check if at least one non-empty array exists in `data`
+    const hasData = Object.values(segment.data).some(arr => Array.isArray(arr) && arr.length > 0)
+
+    return hasData
+  })
 }
