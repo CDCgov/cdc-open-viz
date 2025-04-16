@@ -16,11 +16,11 @@ import Title from '@cdc/core/components/ui/Title'
 import Waiting from '@cdc/core/components/Waiting'
 
 // types
-import { type Coordinate, type MapConfig } from './types/MapConfig'
+import { type MapConfig } from './types/MapConfig'
 
 // Sass
 import './scss/main.scss'
-import './CdcMapComponent.styles.css'
+import './cdcMapComponent.styles.css'
 
 // Core Helpers
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
