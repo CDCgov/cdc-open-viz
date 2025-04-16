@@ -259,7 +259,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     data.length && isDateTime
       ? [0, data.length - 1].map(i => parseDate(data[i][dataKey])).reduce((a, b) => Math.abs(a - b)) / MONTH_AS_MS
       : 0
-  const useDateSpanMonths = isDateTime && dateSpanMonths > xTickCount
+  const useDateSpanMonths = isDateTime && dateSpanMonths > xTickCount && !config.runtime.xAxis.manual
 
   // GETTERS & FUNCTIONS
   const handleLeftTickFormatting = (tick, index, ticks) => {
