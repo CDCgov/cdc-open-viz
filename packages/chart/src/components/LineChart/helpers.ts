@@ -1,23 +1,55 @@
 import { DataItem, StyleProps, Style } from './LineChartProps'
 import { PreliminaryDataItem } from '../../types/ChartConfig'
-import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
+
 import _ from 'lodash'
 export const createStyles = (props: StyleProps): Style[] => {
-  const { preliminaryData, data, stroke, strokeWidth, handleLineType, lineType, seriesKey } = props
+  const {
+    preliminaryData,
+    data,
+    stroke,
+    strokeWidth,
+    handleLineType,
+    lineType,
+    seriesKey,
+    dynamicCategory,
+    originalSeriesKey
+  } = props
+  const dynamicData = data.filter(d => {
+    let filterResult = false
+    preliminaryData.forEach(pd => {
+      if (d[dynamicCategory] === props.seriesKey) {
+        filterResult = true
+      }
+    })
 
+    return filterResult
+  })
+  const dynamicSeriesKey = dynamicCategory ? originalSeriesKey : seriesKey
   const validPreliminaryData: PreliminaryDataItem[] = preliminaryData.filter(
     pd => pd.seriesKey && pd.column && pd.value && pd.type && pd.style && pd.type === 'effect'
   )
-  const getMatchingPd = (point: DataItem): PreliminaryDataItem =>
-    validPreliminaryData.find(
-      pd =>
+  const isEffectLine = (pd, dataPoint) => {
+    if (dynamicCategory) {
+      return (
+        pd.type === 'effect' &&
+        pd.style !== 'Open Circles' &&
         pd.seriesKey === seriesKey &&
-        point[pd.column] === pd.value &&
+        String(dataPoint[dynamicSeriesKey]) === String(pd.value)
+      )
+    } else {
+      return (
+        pd.seriesKey === seriesKey &&
+        dataPoint[pd.column] === pd.value &&
         pd.type === 'effect' &&
         pd.style !== 'Open Circles'
-    )
+      )
+    }
+  }
 
-  let styles: Style[] = []
+  const getMatchingPd = (point: DataItem): PreliminaryDataItem =>
+    validPreliminaryData.find(pd => isEffectLine(pd, point))
+
+  const styles: Style[] = []
   const createStyle = (lineStyle): Style => ({
     stroke: stroke,
     strokeWidth: strokeWidth,
@@ -25,7 +57,8 @@ export const createStyles = (props: StyleProps): Style[] => {
   })
 
   data.forEach((d, index) => {
-    let matchingPd: PreliminaryDataItem = getMatchingPd(d)
+    const matchingPd: PreliminaryDataItem = getMatchingPd(d)
+
     let style: Style = matchingPd
       ? createStyle(handleLineType(matchingPd.style))
       : createStyle(handleLineType(lineType))
@@ -115,6 +148,7 @@ const handleFirstIndex = ({
 
   // Find applicable suppression data for the first item
   const suppressionData = preliminaryData.find(item => isSuppressed(item, firstIndexDataItem))
+  console.log(firstIndexDataItem, 'firstIndexDataItem')
 
   if (suppressionData && suppressionData.style) {
     // Modify first item and add to result
@@ -138,7 +172,6 @@ const handleFirstIndex = ({
     // If no suppression, just add the first item
     result.data[pairCount].push(firstIndexDataItem)
   }
-
   return result
 }
 
@@ -185,27 +218,34 @@ const handleLastIndex = ({
   return result
 }
 
-const handleMiddleIndices = ({ data, seriesKey, preliminaryData }) => {
-  // slice data to remove first and last object these no need for handleMiddleIndices
-
+const handleMiddleIndices = ({
+  data,
+  seriesKey,
+  preliminaryData,
+  dynamicCategory,
+  originalSeriesKey,
+  colorScale,
+  isSuppressed
+}) => {
   let result = {
     data: {},
-    style: ''
+    style: '',
+    color: 'red'
   }
   // Variable to count the number of sibling pairs found
   let pairCount = 1
-
+  const dynamicSeriesKey = dynamicCategory ? originalSeriesKey : seriesKey
   // Loop through the data array to find each occurrence of the target value
+
   data.forEach((item, index) => {
     preliminaryData.forEach(pd => {
-      const targetValue = pd.value
-      if (item[seriesKey] === targetValue) {
+      if (isSuppressed(pd, item)) {
         let siblingBefore = null
         let siblingAfter = null
 
         // Find the nearest numeric sibling before the current index
         for (let i = index - 1; i >= 0; i--) {
-          if (isCalculable(data[i][seriesKey])) {
+          if (isCalculable(data[i][dynamicSeriesKey])) {
             siblingBefore = data[i]
             break // Stop searching once a valid sibling is found
           }
@@ -213,7 +253,7 @@ const handleMiddleIndices = ({ data, seriesKey, preliminaryData }) => {
 
         // Find the nearest numeric sibling after the current index
         for (let j = index + 1; j < data.length; j++) {
-          if (isCalculable(data[j][seriesKey])) {
+          if (isCalculable(data[j][dynamicSeriesKey])) {
             siblingAfter = data[j]
             break // Stop searching once a valid sibling is found
           }
@@ -222,6 +262,7 @@ const handleMiddleIndices = ({ data, seriesKey, preliminaryData }) => {
         // Only add siblings to results if both siblings are found
         if (siblingBefore && siblingAfter) {
           result.style = pd.style
+          result.color = colorScale(item[dynamicCategory])
           result.data[pairCount++] = [siblingBefore, siblingAfter]
         }
       }
@@ -233,26 +274,29 @@ const handleMiddleIndices = ({ data, seriesKey, preliminaryData }) => {
 export const createDataSegments = props => {
   const dynamicData = props.data.filter(d => {
     let filterResult = false
+
+    if (!props.dynamicCategory) {
+      filterResult = true
+    }
+
     props.preliminaryData.forEach(pd => {
-      if (pd.column === d[props.dynamicCategory]) {
+      if (d[props.dynamicCategory] === props.seriesKey) {
         filterResult = true
       }
     })
 
     return filterResult
   })
-
   const isSuppressed = (pd, dataItem) => {
     if (pd.type === 'effect' || pd.hideLineStyle) return false
 
     if (props.dynamicCategory) {
       return (
         pd.type === 'suppression' &&
-        pd.column === dataItem[props.dynamicCategory] &&
+        (!pd.column || pd.column === dataItem[props.dynamicCategory]) &&
         pd.value === dataItem[props.originalSeriesKey]
       )
     }
-
     return (
       pd.type === 'suppression' &&
       pd.value === dataItem[props.seriesKey] &&
@@ -261,7 +305,7 @@ export const createDataSegments = props => {
   }
   const firstSegment = handleFirstIndex({ ...props, data: dynamicData, isSuppressed })
   const lastSegment = handleLastIndex({ ...props, data: dynamicData, isSuppressed })
-  const middleSegments = handleMiddleIndices(props)
+  const middleSegments = handleMiddleIndices({ ...props, data: dynamicData, isSuppressed })
 
   const segments = [firstSegment, middleSegments, lastSegment]
 
