@@ -92,11 +92,20 @@ export const filterCircles = (
 }
 
 const isCalculable = value => !isNaN(parseFloat(value)) && isFinite(value)
-const handleFirstIndex = (data, seriesKey, preliminaryData, dynamicCategory, originalSeriesKey) => {
+const handleFirstIndex = ({
+  data,
+  seriesKey,
+  preliminaryData,
+  dynamicCategory,
+  originalSeriesKey,
+  colorScale,
+  isSuppressed
+}) => {
   let pairCount = '0'
   const result = {
     data: { '0': [] },
-    style: ''
+    style: '',
+    color: ''
   }
 
   // If data is empty, return the empty result
@@ -104,35 +113,22 @@ const handleFirstIndex = (data, seriesKey, preliminaryData, dynamicCategory, ori
 
   const firstIndexDataItem = data[0]
 
-  // Function to check if a data item matches the suppression criteria
-  const isSuppressed = pd => {
-    if (pd.type === 'effect' || pd.hideLineStyle) return false
-
-    if (dynamicCategory) {
-      return (
-        pd.type === 'suppression' &&
-        pd.column === firstIndexDataItem[dynamicCategory] &&
-        pd.value === firstIndexDataItem[originalSeriesKey]
-      )
-    }
-
-    return (
-      pd.type === 'suppression' && pd.value === firstIndexDataItem[seriesKey] && (!pd.column || pd.column === seriesKey)
-    )
-  }
-
   // Find applicable suppression data for the first item
-  const suppressionData = preliminaryData.find(isSuppressed)
+  const suppressionData = preliminaryData.find(item => isSuppressed(item, firstIndexDataItem))
 
   if (suppressionData && suppressionData.style) {
     // Modify first item and add to result
-    const modifiedItem = { ...firstIndexDataItem, [seriesKey]: 0 }
+    const dynamicSeriesKey = dynamicCategory ? originalSeriesKey : seriesKey
+
+    const modifiedItem = { ...firstIndexDataItem, [dynamicSeriesKey]: 0 }
+
     result.data[pairCount].push(modifiedItem)
     result.style = suppressionData.style
+    result.color = colorScale(modifiedItem[dynamicCategory])
 
     // Find the next calculable item index
     let nextIndex = 1
-    while (nextIndex < data.length && !isCalculable(data[nextIndex][seriesKey])) {
+    while (nextIndex < data.length && !isCalculable(data[nextIndex][dynamicSeriesKey])) {
       nextIndex++
     }
     if (nextIndex < data.length) {
@@ -146,29 +142,35 @@ const handleFirstIndex = (data, seriesKey, preliminaryData, dynamicCategory, ori
   return result
 }
 
-const handleLastIndex = (data, seriesKey, preliminaryData) => {
+const handleLastIndex = ({
+  data,
+  seriesKey,
+  preliminaryData,
+  dynamicCategory,
+  originalSeriesKey,
+  colorScale,
+  isSuppressed
+}) => {
   let pairCount = '0'
   const result = {
     data: { '0': [] },
-    style: ''
+    style: '',
+    color: ''
   }
-  let lastAddedIndex = -1 // Tracks the last index added to the result
+  const lastIndexDataItem = data[data.length - 1]
+
+  const dynamicSeriesKey = dynamicCategory ? originalSeriesKey : seriesKey
+  let lastAddedIndex = -1
   preliminaryData?.forEach(pd => {
-    if (pd.type === 'effect') return
-    if (
-      data[data.length - 1][seriesKey] === pd.value &&
-      pd.style &&
-      (!pd.column || pd.column === seriesKey) &&
-      pd.type == 'suppression' &&
-      !pd.hideLineStyle
-    ) {
+    if (pd.type === 'effect') return []
+    if (isSuppressed(pd, lastIndexDataItem)) {
       const lastIndex = data.length - 1
-      const modifiedItem = { ...data[lastIndex], [seriesKey]: 0 }
+      const modifiedItem = { ...data[lastIndex], [dynamicSeriesKey]: 0 }
       result.data[pairCount].push(modifiedItem)
 
       // Find previous calculable item
       let prevIndex = lastIndex - 1
-      while (prevIndex >= 0 && !isCalculable(data[prevIndex][seriesKey])) {
+      while (prevIndex >= 0 && !isCalculable(data[prevIndex][dynamicSeriesKey])) {
         prevIndex--
       }
       if (prevIndex >= 0 && lastAddedIndex !== prevIndex) {
@@ -176,13 +178,14 @@ const handleLastIndex = (data, seriesKey, preliminaryData) => {
         lastAddedIndex = prevIndex
       }
       result.style = pd.style
+      result.color = colorScale(modifiedItem[dynamicCategory])
     }
   })
 
   return result
 }
 
-function handleMiddleIndices(data, seriesKey, preliminaryData) {
+const handleMiddleIndices = ({ data, seriesKey, preliminaryData }) => {
   // slice data to remove first and last object these no need for handleMiddleIndices
 
   let result = {
@@ -227,10 +230,38 @@ function handleMiddleIndices(data, seriesKey, preliminaryData) {
   return result
 }
 
-export const createDataSegments = ({ data, seriesKey, preliminaryData, dynamicCategory, originalSeriesKey }) => {
-  const firstSegment = handleFirstIndex(data, seriesKey, preliminaryData, dynamicCategory, originalSeriesKey)
-  const lastSegment = handleLastIndex(data, seriesKey, preliminaryData)
-  const middleSegments = handleMiddleIndices(data, seriesKey, preliminaryData)
+export const createDataSegments = props => {
+  const dynamicData = props.data.filter(d => {
+    let filterResult = false
+    props.preliminaryData.forEach(pd => {
+      if (pd.column === d[props.dynamicCategory]) {
+        filterResult = true
+      }
+    })
+
+    return filterResult
+  })
+
+  const isSuppressed = (pd, dataItem) => {
+    if (pd.type === 'effect' || pd.hideLineStyle) return false
+
+    if (props.dynamicCategory) {
+      return (
+        pd.type === 'suppression' &&
+        pd.column === dataItem[props.dynamicCategory] &&
+        pd.value === dataItem[props.originalSeriesKey]
+      )
+    }
+
+    return (
+      pd.type === 'suppression' &&
+      pd.value === dataItem[props.seriesKey] &&
+      (!pd.column || pd.column === props.seriesKey)
+    )
+  }
+  const firstSegment = handleFirstIndex({ ...props, data: dynamicData, isSuppressed })
+  const lastSegment = handleLastIndex({ ...props, data: dynamicData, isSuppressed })
+  const middleSegments = handleMiddleIndices(props)
 
   const segments = [firstSegment, middleSegments, lastSegment]
 
