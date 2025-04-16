@@ -4,6 +4,7 @@ import DataTransform from '@cdc/core/helpers/DataTransform'
 import { getApplicableFilters } from './getFilteredData'
 import { filterData } from './filterData'
 import Footnotes from '@cdc/core/types/Footnotes'
+import { AnyVisualization } from '@cdc/core/types/Visualization'
 
 const transform = new DataTransform()
 
@@ -29,7 +30,7 @@ export const getVizConfig = (
   data: Object,
   filteredData?: Object
 ) => {
-  if (rowNumber === undefined) return {}
+  if (rowNumber === undefined) return {} as AnyVisualization
   const visualizationConfig = _.cloneDeep(config.visualizations[visualizationKey])
   const rowData = config.rows[rowNumber]
   if (rowData.footnotesId && rowData.footnotesId === visualizationKey) {

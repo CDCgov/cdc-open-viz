@@ -17,7 +17,7 @@ import PivotFitlerConfig from './_mock/pivot-filter.json'
 import { type DashboardConfig as Config } from '../types/DashboardConfig'
 import { userEvent, within } from '@storybook/testing-library'
 import ToggleExampleConfig from './_mock/toggle-example.json'
-import _ from 'lodash'
+import _, { map } from 'lodash'
 import { footnotesSymbols } from '@cdc/core/helpers/footnoteSymbols'
 import FootnotesConfig from '@cdc/core/types/Footnotes'
 import { ConfigRow } from '../types/ConfigRow'
@@ -28,6 +28,7 @@ import TopSpacing_1 from './_mock/data-bite-dash-test.json'
 import TopSpacing_2 from './_mock/data-bite-dash-test_1.json'
 import TopSpacing_3 from './_mock/data-bite-dash-test_1_1.json'
 import TopSpacing_4 from './_mock/data-bite-dash-test_1_1_1.json'
+import map_issue from './_mock/map-issue.json'
 
 // Dashboard Filter Updates for Ascending, Descending, and Custom Order
 import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
@@ -45,6 +46,13 @@ const meta: Meta<typeof Dashboard> = {
 }
 
 type Story = StoryObj<typeof Dashboard>
+
+export const TEST: Story = {
+  args: {
+    config: map_issue,
+    isEditor: false
+  }
+}
 
 export const Dashboard_Filter_Asc: Story = {
   args: {

@@ -1,5 +1,5 @@
 // Vendor
-import React, { useEffect, useRef, useId, useReducer, useContext } from 'react'
+import React, { useEffect, useRef, useId, useReducer, useContext, useMemo } from 'react'
 import 'whatwg-fetch'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import Papa from 'papaparse'
@@ -57,10 +57,10 @@ import GoogleMap from './components/GoogleMap'
 // hooks
 import useResizeObserver from './hooks/useResizeObserver'
 import useGenerateRuntimeLegend from './hooks/useGenerateRuntimeLegend'
-import useGenerateRuntimeFilters from './hooks/useGenerateRuntimeFilters'
+import { generateRuntimeFilters } from './hooks/useGenerateRuntimeFilters'
 import useGenerateRuntimeData from './hooks/useGenerateRuntimeData'
 import { VizFilter } from '@cdc/core/types/VizFilter'
-import { getInitialState, MapReducer, mapReducer } from './store/map.reducer'
+import { getInitialState, mapReducer } from './store/map.reducer'
 import { RuntimeData } from './types/RuntimeData'
 import EditorContext from '@cdc/editor/src/ConfigContext'
 import MapActions from './store/map.actions'
@@ -74,7 +74,7 @@ type CdcMapComponent = {
   logo?: string
   navigationHandler: Function
   setSharedFilter: Function
-  setSharedFilterValue: Function
+  setSharedFilterValue: string | string[]
 }
 
 const CdcMapComponent: React.FC<CdcMapComponent> = ({
@@ -90,7 +90,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 }) => {
   const initialState = getInitialState(configObj)
 
-  const [mapState, dispatch] = useReducer<MapReducerType<MapState, MapActions>>(mapReducer, initialState)
+  const [mapState, dispatch] = useReducer<MapReducerType<MapState, MapActions>>(mapReducer, initialState as MapState)
 
   const {
     loading,
@@ -167,7 +167,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   // hooks
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
   const { generateRuntimeLegend } = useGenerateRuntimeLegend(legendMemo, legendSpecialClassLastMemo)
-  const { generateRuntimeFilters } = useGenerateRuntimeFilters(state)
   const { generateRuntimeData } = useGenerateRuntimeData(state)
 
   const reloadURLData = async () => {
@@ -253,8 +252,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     const hashFilters = hashObj(state.filters)
     let filters: VizFilter[]
 
-    if (state.filters && (state || hashFilters !== runtimeFilters.fromHash)) {
-      filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
+    if (state.filters) {
+      filters = generateRuntimeFilters({ ...state, data: configObj.data }, hashFilters, runtimeFilters)
 
       if (filters) {
         filters.forEach((filter: VizFilter, index: number) => {
@@ -283,7 +282,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
     // Data
     if (hashData !== runtimeData?.fromHash && state.data?.fromColumn) {
-      const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
+      const newRuntimeData = generateRuntimeData(
+        { ...state, data: configObj.data },
+        filters || runtimeFilters,
+        hashData
+      )
       setRuntimeData(newRuntimeData)
     } else {
       if (hashLegend !== runtimeLegend?.fromHash && undefined === runtimeData?.init) {
@@ -291,11 +294,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
         setRuntimeLegend(legend)
       }
     }
-  }, [state])
+  }, [state, configObj.data])
 
   useEffect(() => {
     const hashLegend = generateRuntimeLegendHash(state, runtimeFilters)
-    const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
+    const legend = generateRuntimeLegend({ ...state, data: configObj.data }, runtimeData, hashLegend)
     setRuntimeLegend(legend)
   }, [
     runtimeData,
@@ -311,7 +314,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   ])
 
   useEffect(() => {
-    reloadURLData()
+    if (!isDashboard) {
+      reloadURLData()
+    }
   }, [JSON.stringify(state.filters)])
 
   const { general, tooltips, table, columns } = state
@@ -379,7 +384,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   const sectionClassNames = () => {
     const classes = ['cove-component__content', 'cdc-map-inner-container', `${currentViewport}`, `${headerColor}`]
-    if (state?.runtime?.editorErrorMessage.length > 0) classes.push('type-map--has-error')
+    if (state?.runtime?.editorErrorMessage?.length > 0) classes.push('type-map--has-error')
     return classes.join(' ')
   }
 
@@ -401,7 +406,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
             )}
             {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
               <section className={sectionClassNames()} aria-label={'Map: ' + title} ref={innerContainerRef}>
-                {state?.runtime?.editorErrorMessage.length > 0 && <Error state={state} />}
+                {state?.runtime?.editorErrorMessage?.length > 0 && <Error state={state} />}
                 <Title
                   title={title}
                   superTitle={general.superTitle}
@@ -417,12 +422,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
                 {state?.filters?.length > 0 && (
                   <Filters
-                    config={state}
+                    config={{ ...state, data: configObj.data }}
                     setConfig={setState}
                     filteredData={runtimeFilters}
                     setFilteredData={_setRuntimeData}
                     dimensions={dimensions}
                     standaloneMap={!state}
+                    getUniqueValues={() => {}}
                   />
                 )}
 
@@ -483,7 +489,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 {/* Link (to data table?) */}
                 {isDashboard && state.table?.forceDisplay && state.table.showDataTableLink ? tableLink : link && link}
 
-                {subtext.length > 0 && <p className='subtext mt-4'>{parse(subtext)}</p>}
+                {subtext?.length > 0 && <p className='subtext mt-4'>{parse(subtext)}</p>}
 
                 <MediaControls.Section classes={['download-buttons']}>
                   {showDownloadImgButton && (
@@ -506,7 +512,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   )}
                 </MediaControls.Section>
 
-                {state.runtime.editorErrorMessage.length === 0 &&
+                {state.runtime?.editorErrorMessage?.length === 0 &&
                   true === table.forceDisplay &&
                   general.type !== 'navigation' &&
                   false === loading && (
@@ -539,7 +545,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     />
                   )}
 
-                {state.annotations.length > 0 && <Annotation.Dropdown />}
+                {state.annotations?.length > 0 && <Annotation.Dropdown />}
 
                 {general.footnotes && <section className='footnotes pt-2 mt-4'>{parse(general.footnotes)}</section>}
               </section>
