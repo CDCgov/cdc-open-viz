@@ -75,12 +75,12 @@ const WorldMap = () => {
   }
   const handleZoomIn = position => {
     if (position.zoom >= 4) return
-    dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: pos.zoom * 1.5 } })
+    dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: position.zoom * 1.5 } })
   }
 
   const handleZoomOut = position => {
     if (position.zoom <= 1) return
-    dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: pos.zoom / 1.5 } })
+    dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: position.zoom / 1.5 } })
   }
 
   const handleMoveEnd = position => {
