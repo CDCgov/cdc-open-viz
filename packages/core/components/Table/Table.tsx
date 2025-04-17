@@ -4,7 +4,7 @@ import GroupRow from './components/GroupRow'
 import { CellMatrix } from './types/CellMatrix'
 import { RowType } from './types/RowType'
 import { PreliminaryDataItem } from '@cdc/chart/src/types/ChartConfig'
-import './Table.styles.css'
+import './table.styles.css'
 
 type TableProps = {
   childrenMatrix: CellMatrix | Map<string, CellMatrix>
