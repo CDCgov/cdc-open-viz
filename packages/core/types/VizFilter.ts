@@ -30,6 +30,9 @@ export type GeneralFilter = FilterBase & {
   setByQueryParameter: string
   subGrouping: SubGrouping
   type: 'url'
+  filterFootnotes?: boolean
+  defaultValue?: string
+  resetLabel?: string
 }
 
 export type MultiSelectFilter = {

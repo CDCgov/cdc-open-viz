@@ -16,6 +16,7 @@ import { Region } from '@cdc/core/types/Region'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { Version } from '@cdc/core/types/Version'
+import Footnotes from '@cdc/core/types/Footnotes'
 
 export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 export type ChartColumns = Record<string, Column>
@@ -139,7 +140,8 @@ export type AllChartsConfig = {
   exclusions: Exclusions
   filters: VizFilter[]
   filterBehavior: FilterBehavior
-  footnotes: string
+  legacyFootnotes: string // this footnote functionality should be moved to the Footnotes component
+  footnotes: Footnotes
   forestPlot: ForestPlotConfigSettings
   formattedData: Object[] & { urlFiltered: boolean }
   heights: {
