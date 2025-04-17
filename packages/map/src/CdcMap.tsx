@@ -128,8 +128,6 @@ const CdcMap: React.FC<CdcMapProps> = ({
       isDashboard={isDashboard}
       isEditor={isEditor}
       logo={logo}
-      setSharedFilter={setSharedFilter}
-      setSharedFilterValue={setSharedFilterValue}
       link={link}
     />
   )

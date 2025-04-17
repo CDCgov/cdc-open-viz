@@ -2,7 +2,7 @@ import { memo, useContext, useState, useEffect } from 'react'
 import { geoMercator } from 'd3-geo'
 import { Mercator } from '@visx/geo'
 import { feature } from 'topojson-client'
-import ConfigContext from '../../context'
+import ConfigContext, { MapDispatchContext } from '../../context'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ZoomableGroup from '../ZoomableGroup'
 import Geo from '../Geo'
@@ -25,7 +25,6 @@ import useGeoClickHandler from '../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../hooks/useApplyTooltipsToGeo'
 import useGenerateRuntimeData from '../../hooks/useGenerateRuntimeData'
-import useMapDispatch from './../../hooks/useMapDispatch'
 
 import './WorldMap.styles.css'
 
@@ -51,7 +50,7 @@ const WorldMap = () => {
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const { generateRuntimeData } = useGenerateRuntimeData(state)
-  const dispatch = useMapDispatch()
+  const dispatch = useContext(MapDispatchContext)
 
   useEffect(() => {
     const fetchData = async () => {

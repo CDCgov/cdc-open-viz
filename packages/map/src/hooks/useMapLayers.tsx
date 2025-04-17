@@ -1,9 +1,9 @@
-import { useEffect, useId, useState, type MouseEvent, type ChangeEvent } from 'react'
+import { useEffect, useId, useState, type MouseEvent, type ChangeEvent, useContext } from 'react'
 import { feature } from 'topojson-client'
 import { Group } from '@visx/group'
 import { MapConfig } from '../types/MapConfig'
-import useMapDispatch from './useMapDispatch'
 import _ from 'lodash'
+import { MapDispatchContext } from '../context'
 
 /**
  * This is the starting structure for adding custom geoJSON shape layers to a projection.
@@ -21,7 +21,7 @@ import _ from 'lodash'
 export default function useMapLayers(config: MapConfig, pathGenerator: Function, tooltipId: string) {
   const [fetchedTopoJSON, setFetchedTopoJSON] = useState([])
   const geoId = useId()
-  const dispatch = useMapDispatch()
+  const dispatch = useContext(MapDispatchContext)
 
   // small reminder that we export the feature and the path as options
   const [pathArray, setPathArray] = useState([])
@@ -91,7 +91,7 @@ export default function useMapLayers(config: MapConfig, pathGenerator: Function,
     for (const mapLayer of config.map.layers) {
       let newLayerItem = await fetch(mapLayer.url)
         .then(res => res.json())
-        .catch(e => console.warn('error with newLayer item', e))
+        .catch(e => console.warn('error with newLayer item', e)) // eslint-disable-line
       if (!newLayerItem) newLayerItem = []
       TopoJSONObjects.push(newLayerItem)
     }

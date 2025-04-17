@@ -1,11 +1,10 @@
 import { useContext } from 'react'
-import ConfigContext from '../context'
+import ConfigContext, { MapDispatchContext } from '../context'
 import { getColumnNames } from '../helpers/getColumnNames'
-import useMapDispatch from './useMapDispatch'
 
 const useColumnsRequiredChecker = () => {
   const { state } = useContext(ConfigContext)
-  const dispatch = useMapDispatch()
+  const dispatch = useContext(MapDispatchContext)
 
   const columnsRequiredChecker = () => {
     const { primaryColumnName, geoColumnName } = getColumnNames(state.columns)

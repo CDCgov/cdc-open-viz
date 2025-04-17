@@ -1,12 +1,11 @@
 import { useContext, useEffect } from 'react'
-import ConfigContext from '../context'
+import ConfigContext, { MapDispatchContext } from '../context'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import { MapContext } from '../types/MapContext'
 import { geoPath, GeoPath } from 'd3-geo'
 import { getFilterControllingStatePicked } from '../components/UsaMap/helpers/map'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
 import { SVG_HEIGHT, SVG_WIDTH, SVG_PADDING } from '../helpers'
-import useMapDispatch from './useMapDispatch'
 import _ from 'lodash'
 
 interface StateData {
@@ -21,7 +20,7 @@ interface StateData {
 const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
   const { state, runtimeData, position } = useContext<MapContext>(ConfigContext)
   const statePicked = getFilterControllingStatePicked(state, runtimeData)
-  const dispatch = useMapDispatch()
+  const dispatch = useContext(MapDispatchContext)
 
   useEffect(() => {
     const fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === statePicked)

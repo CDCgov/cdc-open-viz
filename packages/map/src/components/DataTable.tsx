@@ -11,8 +11,7 @@ import SkipTo from '@cdc/core/components/elements/SkipTo'
 
 import Loading from '@cdc/core/components/Loading'
 import { navigationHandler } from '../helpers'
-import ConfigContext from '../context'
-import useMapDipatch from './../hooks/useMapDispatch'
+import ConfigContext, { MapDispatchContext } from '../context'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
@@ -33,7 +32,7 @@ const DataTable = props => {
     tabbingId
   } = props
 
-  const dispatch = useMapDispatch()
+  const dispatch = useContext(MapDispatchContext)
   const { currentViewport: viewport } = useContext(ConfigContext)
   const [expanded, setExpanded] = useState(expandDataTable)
   const [sortBy, setSortBy] = useState({ column: 'geo', asc: false })
@@ -182,7 +181,7 @@ const DataTable = props => {
         aria-label='Download this data in a CSV file format.'
         className={`${headerColor} no-border`}
         id={`${skipId}`}
-        data-html2canvas-ignore
+        data-html2canvas-ignore={true}
         role='button'
       >
         Download Data (CSV)

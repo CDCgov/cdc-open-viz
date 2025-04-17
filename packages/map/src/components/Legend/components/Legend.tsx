@@ -12,7 +12,7 @@ import LegendItemHex from './LegendItem.Hex'
 import Button from '@cdc/core/components/elements/Button'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-import ConfigContext from '../../../context'
+import ConfigContext, { MapDispatchContext } from '../../../context'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
 import { Group } from '@visx/group'
@@ -22,7 +22,6 @@ import { isBelowBreakpoint, isMobileHeightViewport } from '@cdc/core/helpers/vie
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
 import { resetLegendToggles } from '../../../helpers'
-import useMapDispatch from './../../../hooks/useMapDispatch'
 
 const LEGEND_PADDING = 30
 
@@ -46,7 +45,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     mapId
   } = useContext(ConfigContext)
 
-  const dispatch = useMapDispatch()
+  const dispatch = useContext(MapDispatchContext)
 
   const { legend } = state
   const isLegendGradient = legend.style === 'gradient'

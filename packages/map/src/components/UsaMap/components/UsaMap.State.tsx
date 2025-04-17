@@ -20,22 +20,17 @@ import Annotation from '../../Annotation'
 import Territory from './Territory'
 
 import useMapLayers from '../../../hooks/useMapLayers'
-import ConfigContext from '../../../context'
+import ConfigContext, { MapDispatchContext } from '../../../context'
 import { MapContext } from '../../../types/MapContext'
 import { checkColorContrast, getContrastColor, outlinedTextColor } from '@cdc/core/helpers/cove/accessibility'
-import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
-import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
-import { titleCase } from '../../../helpers/titleCase'
 import TerritoriesSection from './TerritoriesSection'
-import { displayGeoName } from '../../../helpers/displayGeoName'
 import { isMobileStateLabelViewport } from '@cdc/core/helpers/viewports'
-import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
-import { SVG_HEIGHT, SVG_VIEWBOX, SVG_WIDTH, hashObj } from '../../../helpers'
-import useMapDispatch from '../../../hooks/useMapDispatch'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import { getGeoFillColor, getGeoStrokeColor, handleMapAriaLabels, titleCase, displayGeoName, SVG_HEIGHT, SVG_VIEWBOX, SVG_WIDTH, hashObj } from '../../../helpers'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
@@ -82,7 +77,7 @@ const UsaMap = () => {
   const { geoClickHandler } = useGeoClickHandler()
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const dispatch = useMapDispatch()
+  const dispatch = useContext(MapDispatchContext)
 
   const handleDragStateChange = (dragState: any) => {
     dispatch({ type: 'SET_IS_DRAGGING_ANNOTATION', payload: dragState })
@@ -332,7 +327,7 @@ const UsaMap = () => {
 
           return (
             <>
-              {hexMap.shapeGroups.map((group, groupIndex) => {
+              {hexMap.shapeGroups.map((group, _groupIndex) => {
                 return group.items.map((item, itemIndex) => {
                   switch (item.operator) {
                     case '=':
@@ -439,7 +434,7 @@ const UsaMap = () => {
               <path tabIndex={-1} className='single-geo' strokeWidth={1} d={path} />
 
               {/* apply patterns on top of state path*/}
-              {map.patterns.map((patternData, patternIndex) => {
+              {map.patterns.map((patternData, _patternIndex) => {
                 const { pattern, dataKey, size } = patternData
                 const currentFill = styles.fill
                 const hasMatchingValues = patternData.dataValue === geoData?.[patternData.dataKey]

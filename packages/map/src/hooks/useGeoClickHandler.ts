@@ -1,11 +1,10 @@
-import ConfigContext from '../context'
+import ConfigContext, { MapDispatchContext } from '../context'
 import { navigationHandler } from '../helpers'
 import { useContext } from 'react'
-import useMapDispatch from './useMapDispatch'
 
 const useGeoClickHandler = () => {
-  const { state, setState, setModal, setSharedFilter, customNavigationHandler } = useContext(ConfigContext)
-  const dispatch = useMapDispatch()
+  const { state, setState, setSharedFilter, customNavigationHandler } = useContext(ConfigContext)
+  const dispatch = useContext(MapDispatchContext)
 
   const geoClickHandler = (geoDisplayName: string, geoData: object): void => {
     if (setSharedFilter) {

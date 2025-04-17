@@ -39,14 +39,13 @@ import countyDefaultConfig from '../../../../examples/default-county.json'
 import useMapLayers from '../../../hooks/useMapLayers.tsx'
 
 import HexSetting from './HexShapeSettings.jsx'
-import ConfigContext from '../../../context.ts'
+import ConfigContext, { MapDispatchContext } from '../../../context.ts'
 import { MapContext } from '../../../types/MapContext.js'
 import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs, HEADER_COLORS } from '../../../helpers'
-import useMapDispatch from '../../../hooks/useMapDispatch'
 import './EditorPanel.styles.css'
 import EditorContext from '@cdc/editor/src/ConfigContext'
 
@@ -63,10 +62,9 @@ const EditorPanel = () => {
     tooltipId,
     runtimeData
   } = useContext<MapContext>(ConfigContext)
-  const editorContext = useContext(EditorContext)
 
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
-  const dispatch = useMapDispatch()
+  const dispatch = useContext(MapDispatchContext)
   const { general, columns, legend, table, tooltips } = state
   const columnsInData = state?.data?.[0] ? Object.keys(state.data[0]) : []
 

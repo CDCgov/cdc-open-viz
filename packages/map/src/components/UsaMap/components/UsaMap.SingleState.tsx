@@ -5,7 +5,7 @@ import { CustomProjection } from '@visx/geo'
 import Loading from '@cdc/core/components/Loading'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import CityList from '../../CityList'
-import ConfigContext from '../../../context'
+import ConfigContext, { MapDispatchContext } from '../../../context'
 import Annotation from '../../Annotation'
 import SingleState from './SingleState'
 import ZoomableGroup from '../../ZoomableGroup'
@@ -24,7 +24,6 @@ import { getTopoData, getCurrentTopoYear, isTopoReady } from '../helpers/map'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import { SVG_WIDTH, SVG_HEIGHT, SVG_PADDING, SVG_VIEWBOX } from '../../../helpers'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
-import useMapDispatch from './../../../hooks/useMapDispatch'
 
 const SingleStateMap = () => {
   const {
@@ -42,7 +41,7 @@ const SingleStateMap = () => {
     legendSpecialClassLastMemo
   } = useContext<MapContext>(ConfigContext)
 
-  const dispatch = useMapDispatch()
+  const dispatch = useContext(MapDispatchContext)
   const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection, statePicked } = useStateZoom(topoData)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)

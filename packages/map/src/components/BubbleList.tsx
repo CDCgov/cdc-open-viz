@@ -2,14 +2,13 @@ import React, { useContext } from 'react'
 import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
-import ConfigContext from '../context'
+import ConfigContext, { MapDispatchContext } from '../context'
 import { type Coordinate, DataRow } from '../types/MapConfig'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
 import { displayGeoName, SVG_HEIGHT, SVG_WIDTH } from '../helpers'
 import { geoMercator, geoAlbersUsa, type GeoProjection } from 'd3-geo'
 import { getColumnNames } from '../helpers/getColumnNames'
-import useMapDispatch from '../hooks/useMapDispatch'
 
 type BubbleListProps = {
   runtimeData: Object[]
@@ -23,8 +22,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
   const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder } = visual
   const hasBubblesWithZeroOnMap = showBubbleZeros ? 0 : 1
   const clickTolerance = 10
-  const dispatch = useMapDispatch()
-
+  const dispatch = useContext(MapDispatchContext);
 
   // hooks
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
