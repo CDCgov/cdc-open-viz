@@ -92,10 +92,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   const [mapState, dispatch] = useReducer<MapReducerType<MapState, MapActions>>(mapReducer, initialState as MapState)
 
-  useEffect(() => {
-    setState(configObj)
-  }, [configObj.data]) // eslint-disable-line
-
   const {
     loading,
     displayPanel,
@@ -120,7 +116,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const editorContext = useContext(EditorContext)
 
   const setState = (newMapState: MapConfig): void => {
-    // dispatch({ type: 'SET_STATE', payload: newMapState })
     if (isEditor && !isDashboard) {
       dispatch({ type: 'SET_STATE', payload: newMapState })
     } else {
@@ -128,6 +123,10 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       editorContext.setTempConfig(newMapState)
     }
   }
+
+  useEffect(() => {
+    setState({ ...state, data: configObj.data })
+  }, [configObj.data]) // eslint-disable-line
 
   const setModal = modal => {
     dispatch({ type: 'SET_MODAL', payload: modal })
