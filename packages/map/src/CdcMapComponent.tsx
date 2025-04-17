@@ -27,6 +27,7 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { publish } from '@cdc/core/helpers/events'
+import { generateRuntimeFilters } from './hooks/useGenerateRuntimeFilters'
 import { type MapReducerType, MapState } from './store/map.reducer'
 
 // Map Helpers
@@ -57,7 +58,6 @@ import GoogleMap from './components/GoogleMap'
 // hooks
 import useResizeObserver from './hooks/useResizeObserver'
 import useGenerateRuntimeLegend from './hooks/useGenerateRuntimeLegend'
-import useGenerateRuntimeFilters from './hooks/useGenerateRuntimeFilters'
 import useGenerateRuntimeData from './hooks/useGenerateRuntimeData'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { getInitialState, MapReducer, mapReducer } from './store/map.reducer'
@@ -90,7 +90,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 }) => {
   const initialState = getInitialState(configObj)
 
-  const [mapState, dispatch] = useReducer<MapReducerType<MapState, MapActions>>(mapReducer, initialState)
+  const [mapState, dispatch] = useReducer<MapReducerType<MapState, MapActions>>(mapReducer, initialState as MapState)
 
   const {
     loading,
@@ -170,7 +170,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   // hooks
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
   const { generateRuntimeLegend } = useGenerateRuntimeLegend(legendMemo, legendSpecialClassLastMemo)
-  const { generateRuntimeFilters } = useGenerateRuntimeFilters(state)
   const { generateRuntimeData } = useGenerateRuntimeData(state)
 
   const reloadURLData = async () => {
@@ -257,7 +256,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     let filters: VizFilter[]
 
     if (state.filters && (state || hashFilters !== runtimeFilters.fromHash)) {
-      filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
+      filters = generateRuntimeFilters({ ...state, data: configObj.data }, hashFilters, runtimeFilters)
 
       if (filters) {
         filters.forEach((filter: VizFilter, index: number) => {
@@ -286,7 +285,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
     // Data
     if (hashData !== runtimeData?.fromHash && state.data?.fromColumn) {
-      const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
+      const newRuntimeData = generateRuntimeData(
+        { ...state, data: configObj.data },
+        filters || runtimeFilters,
+        hashData
+      )
       setRuntimeData(newRuntimeData)
     } else {
       if (hashLegend !== runtimeLegend?.fromHash && undefined === runtimeData?.init) {
@@ -294,11 +297,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
         setRuntimeLegend(legend)
       }
     }
-  }, [state])
+  }, [state, configObj.data])
 
   useEffect(() => {
     const hashLegend = generateRuntimeLegendHash(state, runtimeFilters)
-    const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
+    const legend = generateRuntimeLegend({ ...state, data: configObj.data }, runtimeData, hashLegend)
     setRuntimeLegend(legend)
   }, [
     runtimeData,
@@ -314,7 +317,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   ])
 
   useEffect(() => {
-    reloadURLData()
+    if (!isDashboard) {
+      reloadURLData()
+    }
   }, [JSON.stringify(state.filters)])
 
   const { general, tooltips, table, columns } = state
@@ -509,7 +514,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   )}
                 </MediaControls.Section>
 
-                {state.runtime.editorErrorMessage.length === 0 &&
+                {state?.runtime?.editorErrorMessage.length === 0 &&
                   true === table.forceDisplay &&
                   general.type !== 'navigation' &&
                   false === loading && (
