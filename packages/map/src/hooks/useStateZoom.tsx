@@ -18,7 +18,7 @@ interface StateData {
 }
 
 const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
-  const { state, runtimeData, position } = useContext<MapContext>(ConfigContext)
+  const { state: config, runtimeData, position } = useContext<MapContext>(ConfigContext)
   const statePicked = getFilterControllingStatePicked(state, runtimeData)
   const dispatch = useContext(MapDispatchContext)
 
@@ -26,7 +26,7 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     const fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === statePicked)
     const stateName = statePicked
     const stateData = { fipsCode, stateName }
-    const newState = _.cloneDeep(state)
+    const newState = _.cloneDeep(config)
     newState.general.statePicked = stateData
     const stateToShow = topoData?.states?.find(s => s.properties.name === statePicked)
 
@@ -40,7 +40,7 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     const fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === statePicked)
     const stateName = statePicked
     const stateData = { fipsCode, stateName }
-    const newState = _.cloneDeep(state)
+    const newState = _.cloneDeep(config)
     newState.general.statePicked = stateData
     dispatch({ type: 'SET_CONFIG', payload: newState })
     setScaleAndTranslate('reset')
