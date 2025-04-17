@@ -5,7 +5,7 @@ import { CustomProjection } from '@visx/geo'
 import Loading from '@cdc/core/components/Loading'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import CityList from '../../CityList'
-import ConfigContext from '../../../context'
+import ConfigContext, { MapDispatchContext } from '../../../context'
 import Annotation from '../../Annotation'
 import SingleState from './SingleState'
 import ZoomableGroup from '../../ZoomableGroup'
@@ -14,18 +14,20 @@ import { MapContext } from '../../../types/MapContext'
 import useStateZoom from '../../../hooks/useStateZoom'
 import { Text } from '@visx/text'
 
-// map-level helpers
-import { titleCase, handleMapAriaLabels, getGeoStrokeColor } from '../../../helpers'
-// state-level helpers
-import { getTopoData, getCurrentTopoYear, isTopoReady } from './../helpers/map'
-import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
-import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
-import { SVG_WIDTH, SVG_HEIGHT, SVG_PADDING, SVG_VIEWBOX } from '../../../helpers'
+import './UsaMap.SingleState.styles.css'
 
-const SingleStateMap = props => {
+// map-level helpers
+import { titleCase, handleMapAriaLabels, getGeoStrokeColor, MAX_ZOOM_LEVEL } from '../../../helpers'
+
+// state-level helpers
+import { getTopoData, getCurrentTopoYear, isTopoReady } from '../helpers/map'
+import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
+import { SVG_WIDTH, SVG_HEIGHT, SVG_PADDING, SVG_VIEWBOX } from '../../../helpers'
+import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
+
+const SingleStateMap = () => {
   const {
     state,
-    applyLegendToRow,
     setSharedFilterValue,
     isFilterValueSupported,
     runtimeFilters,
@@ -33,15 +35,16 @@ const SingleStateMap = props => {
     position,
     stateToShow,
     topoData,
-    setTopoData,
     scale,
     translate,
-    setStateToShow
+    legendMemo,
+    legendSpecialClassLastMemo
   } = useContext<MapContext>(ConfigContext)
 
+  const dispatch = useContext(MapDispatchContext)
   const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection, statePicked } = useStateZoom(topoData)
-  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const { geoClickHandler } = useGeoClickHandler()
+  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
 
   const cityListProjection = geoAlbersUsaTerritories()
     .translate([SVG_WIDTH / 2, SVG_HEIGHT / 2])
@@ -50,15 +53,16 @@ const SingleStateMap = props => {
   const path = geoPath().projection(projection)
 
   useEffect(() => {
-    setStateToShow(topoData?.states?.find(s => s.properties.name === state.general.statePicked.stateName))
+    const stateToShow = topoData?.states?.find(s => s.properties.name === state.general.statePicked.stateName)
+    dispatch({ type: 'SET_STATE_TO_SHOW', payload: stateToShow })
   }, [statePicked])
 
   useEffect(() => {
     let currentYear = getCurrentTopoYear(state, runtimeFilters)
 
-    if (currentYear !== topoData.year) {
+    if (currentYear !== topoData?.year) {
       getTopoData(currentYear).then(response => {
-        setTopoData(response)
+        dispatch({ type: 'SET_TOPO_DATA', payload: response })
       })
     }
   }, [state.general.countyCensusYear, state.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
@@ -77,7 +81,7 @@ const SingleStateMap = props => {
   }
 
   // Constructs and displays markup for all geos on the map (except territories right now)
-  const constructGeoJsx = (geographies, projection) => {
+  const constructGeoJsx = geographies => {
     const counties = geographies[0].feature.counties
 
     let geosJsx = []
@@ -135,7 +139,7 @@ const SingleStateMap = props => {
             center={position.coordinates}
             zoom={position.zoom}
             minZoom={1} // Adjust this value if needed
-            maxZoom={4} // Adjust this value to limit the maximum zoom level
+            maxZoom={MAX_ZOOM_LEVEL}
             onMoveEnd={handleMoveEnd}
             projection={projection}
             width={SVG_WIDTH}

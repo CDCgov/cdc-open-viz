@@ -1,7 +1,9 @@
-import { useEffect, useId, useState, type MouseEvent, type ChangeEvent } from 'react'
+import { useEffect, useId, useState, type MouseEvent, type ChangeEvent, useContext } from 'react'
 import { feature } from 'topojson-client'
 import { Group } from '@visx/group'
 import { MapConfig } from '../types/MapConfig'
+import _ from 'lodash'
+import { MapDispatchContext } from '../context'
 
 /**
  * This is the starting structure for adding custom geoJSON shape layers to a projection.
@@ -16,14 +18,10 @@ import { MapConfig } from '../types/MapConfig'
  * 3) Clean (ie. mapshaper -clean) and edit the shape as needed and export the new layer as geoJSON
  * 4) Save the geoJSON somewhere external.
  */
-export default function useMapLayers(
-  config: MapConfig,
-  setConfig: Function,
-  pathGenerator: Function,
-  tooltipId: string
-) {
+export default function useMapLayers(config: MapConfig, pathGenerator: Function, tooltipId: string) {
   const [fetchedTopoJSON, setFetchedTopoJSON] = useState([])
   const geoId = useId()
+  const dispatch = useContext(MapDispatchContext)
 
   // small reminder that we export the feature and the path as options
   const [pathArray, setPathArray] = useState([])
@@ -50,34 +48,21 @@ export default function useMapLayers(
 
   const handleRemoveLayer = (e: MouseEvent<HTMLButtonElement>, index: number) => {
     e.preventDefault()
-
-    const updatedState = {
-      ...config,
-      map: {
-        ...config.map,
-        layers: config.map.layers.filter((_layer, i) => i !== index)
-      }
-    }
-
-    setConfig(updatedState)
+    const newState = _.cloneDeep(config)
+    const layers = newState.map.layers.filter((_layer, i) => i !== index)
+    newState.map.layers = layers
+    dispatch({ type: 'SET_CONFIG', payload: newState })
   }
 
   const handleAddLayer = (e: Event) => {
     e.preventDefault()
-    const updatedState = {
-      ...config,
-      map: {
-        ...config.map,
-        layers: [
-          ...config.map.layers,
-          {
-            name: 'New Custom Layer',
-            url: ''
-          }
-        ]
-      }
+    const placeHolderLayer = {
+      name: 'New Custom Layer',
+      url: ''
     }
-    setConfig(updatedState)
+    const newState = _.cloneDeep(config)
+    newState.map.layers.unshift(placeHolderLayer)
+    dispatch({ type: 'SET_CONFIG', payload: newState })
   }
 
   const handleMapLayer = (e: ChangeEvent<HTMLInputElement>, index: number, layerKey: string) => {
@@ -89,17 +74,10 @@ export default function useMapLayers(
       layerValue = layerValue / 100
     }
 
-    let newLayers = [...config.map.layers] as Object[]
+    let newLayers = _.cloneDeep(config.map.layers)
+    _.set(newLayers, `[${index}][${layerKey}]`, layerValue)
 
-    newLayers[index][layerKey] = layerValue
-
-    setConfig({
-      ...config,
-      map: {
-        ...config.map,
-        layers: newLayers
-      }
-    })
+    dispatch({ type: 'SET_CONFIG', payload: { ...config, map: { ...config.map, layers: newLayers } } })
   }
 
   /**
@@ -113,7 +91,7 @@ export default function useMapLayers(
     for (const mapLayer of config.map.layers) {
       let newLayerItem = await fetch(mapLayer.url)
         .then(res => res.json())
-        .catch(e => console.warn('error with newLayer item', e))
+        .catch(e => console.warn('error with newLayer item', e)) // eslint-disable-line
       if (!newLayerItem) newLayerItem = []
       TopoJSONObjects.push(newLayerItem)
     }

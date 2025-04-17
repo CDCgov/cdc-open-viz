@@ -12,7 +12,7 @@ import LegendItemHex from './LegendItem.Hex'
 import Button from '@cdc/core/components/elements/Button'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-import ConfigContext from '../../../context'
+import ConfigContext, { MapDispatchContext } from '../../../context'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
 import { Group } from '@visx/group'
@@ -39,12 +39,13 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const {
     runtimeFilters,
     runtimeLegend,
-    setAccessibleStatus,
     setRuntimeLegend,
     state,
     currentViewport: viewport,
     mapId
   } = useContext(ConfigContext)
+
+  const dispatch = useContext(MapDispatchContext)
 
   const { legend } = state
   const isLegendGradient = legend.style === 'gradient'
@@ -113,6 +114,10 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         else if (hasDisabledItems) classes.push('legend-container__li--not-disabled')
         if (item.special) classes.push('legend-container__li--special-class')
         return classes.join(' ')
+      }
+
+      const setAccessibleStatus = (message: string) => {
+        dispatch({ type: 'SET_ACCESSIBLE_STATUS', payload: message })
       }
 
       return (
@@ -218,7 +223,10 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       e.preventDefault()
     }
     resetLegendToggles(runtimeLegend, setRuntimeLegend)
-    setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.')
+    dispatch({
+      type: 'SET_ACCESSIBLE_STATUS',
+      payload: 'Legend has been reset, please reference the data table to see updated values.'
+    })
     if (legend) {
       legend.focus()
     }

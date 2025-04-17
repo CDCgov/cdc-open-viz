@@ -1,9 +1,10 @@
 import { useContext } from 'react'
-import ConfigContext from '../context'
+import ConfigContext, { MapDispatchContext } from '../context'
 import { getColumnNames } from '../helpers/getColumnNames'
 
 const useColumnsRequiredChecker = () => {
-  const { state, setRequiredColumns } = useContext(ConfigContext)
+  const { state } = useContext(ConfigContext)
+  const dispatch = useContext(MapDispatchContext)
 
   const columnsRequiredChecker = () => {
     const { primaryColumnName, geoColumnName } = getColumnNames(state.columns)
@@ -41,7 +42,7 @@ const useColumnsRequiredChecker = () => {
 
     if (columnList.length === 0) columnList = null
 
-    setRequiredColumns(columnList)
+    dispatch({ type: 'SET_REQUIRED_COLUMNS', payload: columnList })
   }
 
   return { columnsRequiredChecker }

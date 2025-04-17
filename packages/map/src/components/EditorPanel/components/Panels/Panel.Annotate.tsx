@@ -6,7 +6,7 @@ import Accordion from '@cdc/core/components/ui/Accordion'
 import Button from '@cdc/core/components/elements/Button'
 import { MapContext } from '../../../../types/MapContext'
 import ConfigContext from '../../../../context'
-
+import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 // types
 // styles
 
@@ -240,85 +240,58 @@ const PanelAnnotate: React.FC = props => {
                     />
                   </label>
 
-                  <label>
-                    Connection Type:
-                    <select
-                      onChange={e => {
-                        const updatedAnnotations = [...config?.annotations]
-                        updatedAnnotations[index].connectionType = e.target.value
-                        updateConfig({
-                          ...config,
-                          annotations: updatedAnnotations
-                        })
-                      }}
-                    >
-                      {['curve', 'line', 'elbow', 'none'].map((side, index) => (
-                        <option key={side} value={side}>
-                          {side}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                  <Select
+                    label='Connection Type'
+                    value={config?.annotations[index]?.connectionType || ''}
+                    options={['curve', 'line', 'elbow', 'none'].map(side => ({
+                      value: side,
+                      label: side
+                    }))}
+                    onChange={event => {
+                      const updatedAnnotations = [...config?.annotations]
+                      updatedAnnotations[index].connectionType = event.target.value
+                      updateConfig({
+                        ...config,
+                        annotations: updatedAnnotations
+                      })
+                    }}
+                  />
 
                   {annotation.connectionType === 'curve' && (
-                    <label>
-                      Line Type:
-                      <select
-                        onChange={e => {
-                          const updatedAnnotations = [...config?.annotations]
-                          updatedAnnotations[index].lineType = e.target.value
-                          updateConfig({
-                            ...config,
-                            annotations: updatedAnnotations
-                          })
-                        }}
-                      >
-                        {Object.entries(approvedCurveTypes).map(([value, key]) => (
-                          <option key={key} value={key}>
-                            {value}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
+                    <Select
+                      label='Line Type'
+                      value={config?.annotations[index]?.lineType || ''}
+                      options={Object.entries(approvedCurveTypes).map(([value, key]) => ({
+                        value: key,
+                        label: value
+                      }))}
+                      onChange={event => {
+                        const updatedAnnotations = [...config?.annotations]
+                        updatedAnnotations[index].lineType = event.target.value
+                        updateConfig({
+                          ...config,
+                          annotations: updatedAnnotations
+                        })
+                      }}
+                    />
                   )}
 
-                  {/* <label>
-                    Connection Location:
-                    <select
-                      onChange={e => {
-                        const updatedAnnotations = [...config?.annotations]
-                        updatedAnnotations[index].connectionLocation = e.target.value
-                        updateConfig({
-                          ...config,
-                          annotations: updatedAnnotations
-                        })
-                      }}
-                    >
-                      {['auto', 'left', 'top', 'bottom', 'right'].map((side, index) => (
-                        <option key={side} value={side}>
-                          {side}
-                        </option>
-                      ))}
-                    </select>
-                  </label> */}
-
-                  <label>
-                    Marker
-                    <select
-                      onChange={e => {
-                        const updatedAnnotations = [...config?.annotations]
-                        updatedAnnotations[index].marker = e.target.value
-                        updateConfig({
-                          ...config,
-                          annotations: updatedAnnotations
-                        })
-                      }}
-                    >
-                      {['circle', 'arrow'].map((column, columnIndex) => {
-                        return <option>{column}</option>
-                      })}
-                    </select>
-                  </label>
+                  <Select
+                    label='Marker'
+                    value={config?.annotations[index]?.marker || ''}
+                    options={['circle', 'arrow'].map(option => ({
+                      value: option,
+                      label: option
+                    }))}
+                    onChange={event => {
+                      const updatedAnnotations = [...config?.annotations]
+                      updatedAnnotations[index].marker = event.target.value
+                      updateConfig({
+                        ...config,
+                        annotations: updatedAnnotations
+                      })
+                    }}
+                  />
 
                   <Button className='btn btn-danger' onClick={() => handleRemoveAnnotation(index)}>
                     Delete Annotation

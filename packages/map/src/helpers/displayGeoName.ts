@@ -48,7 +48,7 @@ export const displayGeoName = (key: string, convertFipsCodes = true): string => 
     value = dict[value]
   }
   // if you get here and it's 2 letters then DONT titleCase state abbreviations like "AL"
-  if (value.length === 2 || value === 'U.S. Virgin Islands') {
+  if (value?.length === 2 || value === 'U.S. Virgin Islands') {
     return value
   } else {
     return titleCase(value)

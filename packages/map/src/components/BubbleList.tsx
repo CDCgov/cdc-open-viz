@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
-import ConfigContext from '../context'
+import ConfigContext, { MapDispatchContext } from '../context'
 import { type Coordinate, DataRow } from '../types/MapConfig'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
@@ -15,19 +15,19 @@ type BubbleListProps = {
   customProjection?: GeoProjection
 }
 
-export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProjection }) => {
-  const { state, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, setPosition } =
-    useContext(ConfigContext)
+export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
+  const { state, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, runtimeData } = useContext(ConfigContext)
   const { columns, data, general, visual } = state
   const { geoType, allowMapZoom } = general
   const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder } = visual
   const hasBubblesWithZeroOnMap = showBubbleZeros ? 0 : 1
   const clickTolerance = 10
+  const dispatch = useContext(MapDispatchContext);
 
   // hooks
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const { primaryColumnName, geoColumnName } = getColumnNames(state.columns)
+  const { primaryColumnName, geoColumnName } = getColumnNames(columns)
 
   const maxDataValue = Math.max(...data.map(d => d[primaryColumnName]))
   const size = scaleLinear().domain([hasBubblesWithZeroOnMap, maxDataValue]).range([minBubbleSize, maxBubbleSize])
@@ -48,7 +48,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
   const handleBubbleClick = country => {
     if (!allowMapZoom) return
     const newRuntimeData = data.filter(item => item[geoColumnName] === country[geoColumnName])
-    const _filteredCountryCode = newRuntimeData[0].uid
+    const _filteredCountryCode = newRuntimeData[0]?.uid
     const coordinates = countryCoordinates[_filteredCountryCode]
     const long = coordinates[1]
     const lat = coordinates[0]
@@ -59,7 +59,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
     }
 
     // Zoom the map in...
-    setPosition({ coordinates: reversedCoordinates, zoom: 3 })
+    dispatch({ type: 'SET_POSITION', payload: { coordinates: reversedCoordinates, zoom: 3 } })
 
     // ...and show the data for the clicked country
     setRuntimeData(_tempRuntimeData)

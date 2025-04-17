@@ -4,7 +4,7 @@ export const handleMapTabbing = (state: MapConfig, loading: boolean, legendId: s
   const { general, runtime, table } = state
 
   const hasDataTable =
-    runtime.editorErrorMessage.length === 0 &&
+    runtime?.editorErrorMessage.length === 0 &&
     true === table.forceDisplay &&
     general.type !== 'navigation' &&
     false === loading
