@@ -34,7 +34,7 @@ export type DataTableProps = {
   defaultSortBy?: string
   displayGeoName?: (row: string) => string
   expandDataTable: boolean
-  formatLegendLocation?: (row: string) => string
+  formatLegendLocation?: (row: string, runtimeLookup: string) => string
   groupBy?: string
   headerColor?: string
   imageRef?: string
@@ -247,9 +247,14 @@ const DataTable = (props: DataTableProps) => {
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
 
       // only use fullGeoName on County maps and no other
-      if (config.general?.geoType === 'us-county') {
+      if (config.general?.geoType === 'us-county' || config.table.showFullGeoNameInCSV) {
         // Add column for full Geo name along with State
-        return csvData.map(row => ({ FullGeoName: formatLegendLocation(row[config.columns.geo.name]), ...row }))
+        return csvData.map(row => {
+          return {
+            FullGeoName: formatLegendLocation(row[config.columns.geo.name]),
+            ...row
+          }
+        })
       } else {
         return csvData
       }
