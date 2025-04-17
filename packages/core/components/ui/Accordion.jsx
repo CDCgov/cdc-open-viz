@@ -12,7 +12,7 @@ import Icon from './Icon'
 import Tooltip from './Tooltip'
 
 import '../../styles/v2/components/accordion.scss'
-import './Accordion.styles.css'
+import './accordion.styles.css'
 
 //Define the "slots" to be populated by subcomponents
 const AccordionSection = children => children
