@@ -11,13 +11,11 @@ import { MapConfig } from './types/MapConfig'
 type CdcMapProps = {
   config: MapConfig
   configUrl?: string
-  isDashboard?: boolean
+  isDashboard: false
   isEditor?: boolean
   link?: string
   logo?: string
   navigationHandler: Function
-  setSharedFilter: Function
-  setSharedFilterValue: Function
   setConfig: Function
 }
 
@@ -27,8 +25,6 @@ const CdcMap: React.FC<CdcMapProps> = ({
   isEditor = false,
   configUrl,
   logo = '',
-  setSharedFilter,
-  setSharedFilterValue,
   link,
   config: editorsConfig,
   setConfig = null
