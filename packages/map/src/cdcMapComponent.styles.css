@@ -5,5 +5,5 @@
 }
 
 header + .map-container.full-border {
-  border-top: 0; // When they have a header, don't add a border top
+  border-top: 0; /* When they have a header, don't add a border top */
 }
