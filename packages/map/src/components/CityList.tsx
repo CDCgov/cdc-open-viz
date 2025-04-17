@@ -196,7 +196,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     }
 
     const cityStyle = Object.values(runtimeData)
-      .filter(d => additionalCityStyles.some(style => String(d[style.column]) === String(style.value)))
+      .filter(d => additionalCityStyles?.some(style => String(d[style.column]) === String(style.value)))
       .map(d => {
         const conditionsMatched = additionalCityStyles.find(style => String(d[style.column]) === String(style.value))
         return { ...conditionsMatched, ...d }
