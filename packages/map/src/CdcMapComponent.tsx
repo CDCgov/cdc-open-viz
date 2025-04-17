@@ -60,7 +60,7 @@ import useResizeObserver from './hooks/useResizeObserver'
 import useGenerateRuntimeLegend from './hooks/useGenerateRuntimeLegend'
 import useGenerateRuntimeData from './hooks/useGenerateRuntimeData'
 import { VizFilter } from '@cdc/core/types/VizFilter'
-import { getInitialState, MapReducer, mapReducer } from './store/map.reducer'
+import { getInitialState,  mapReducer } from './store/map.reducer'
 import { RuntimeData } from './types/RuntimeData'
 import EditorContext from '@cdc/editor/src/ConfigContext'
 import MapActions from './store/map.actions'
@@ -117,9 +117,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   const setState = (newMapState: MapConfig): void => {
     if (isEditor && !isDashboard) {
-      dispatch({ type: 'SET_STATE', payload: newMapState })
+      dispatch({ type: 'SET_CONFIG', payload: newMapState })
     } else {
-      dispatch({ type: 'SET_STATE', payload: newMapState })
+      dispatch({ type: 'SET_CONFIG', payload: newMapState })
       editorContext.setTempConfig(newMapState)
     }
   }

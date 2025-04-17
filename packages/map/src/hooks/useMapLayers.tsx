@@ -51,7 +51,7 @@ export default function useMapLayers(config: MapConfig, pathGenerator: Function,
     const newState = _.cloneDeep(config)
     const layers = newState.map.layers.filter((_layer, i) => i !== index)
     newState.map.layers = layers
-    dispatch({ type: 'SET_STATE', payload: newState })
+    dispatch({ type: 'SET_CONFIG', payload: newState })
   }
 
   const handleAddLayer = (e: Event) => {
@@ -62,7 +62,7 @@ export default function useMapLayers(config: MapConfig, pathGenerator: Function,
     }
     const newState = _.cloneDeep(config)
     newState.map.layers.unshift(placeHolderLayer)
-    dispatch({ type: 'SET_STATE', payload: newState })
+    dispatch({ type: 'SET_CONFIG', payload: newState })
   }
 
   const handleMapLayer = (e: ChangeEvent<HTMLInputElement>, index: number, layerKey: string) => {
@@ -77,7 +77,7 @@ export default function useMapLayers(config: MapConfig, pathGenerator: Function,
     let newLayers = _.cloneDeep(config.map.layers)
     _.set(newLayers, `[${index}][${layerKey}]`, layerValue)
 
-    dispatch({ type: 'SET_STATE', payload: { ...config, map: { ...config.map, layers: newLayers } } })
+    dispatch({ type: 'SET_CONFIG', payload: { ...config, map: { ...config.map, layers: newLayers } } })
   }
 
   /**

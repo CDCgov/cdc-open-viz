@@ -1,4 +1,4 @@
-import { MapConfig, Coordinate, DataRow } from '../types/MapConfig'
+import { MapConfig, Coordinate } from '../types/MapConfig'
 import { GeneratedLegend } from '../hooks/useGenerateRuntimeLegend'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Action } from '@cdc/core/types/Action'
@@ -7,7 +7,7 @@ import { Modal } from '../types/Modal'
 
 // Action Types
 type SET_ACCESSIBLE_STATUS = Action<'SET_ACCESSIBLE_STATUS', string>
-type SET_STATE = Action<'SET_STATE', MapConfig>
+type SET_CONFIG = Action<'SET_CONFIG', MapConfig>
 type SET_COVE_LOADED_HAS_RAN = Action<'SET_COVE_LOADED_HAS_RAN', boolean>
 type SET_DISPLAY_PANEL = Action<'SET_DISPLAY_PANEL', boolean>
 type SET_FILTERED_COUNTRY_CODE = Action<'SET_FILTERED_COUNTRY_CODE', string>
@@ -26,7 +26,7 @@ type SET_TRANSLATE = Action<'SET_TRANSLATE', [number, number]>
 
 export type MapActions =
   | SET_ACCESSIBLE_STATUS
-  | SET_STATE
+  | SET_CONFIG
   | SET_COVE_LOADED_HAS_RAN
   | SET_DISPLAY_PANEL
   | SET_FILTERED_COUNTRY_CODE

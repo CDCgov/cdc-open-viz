@@ -49,7 +49,7 @@ export type MapState = MapConfig & {
 
 export const mapReducer = (state: MapState, action: MapActions): MapState => {
   switch (action.type) {
-    case 'SET_STATE':
+    case 'SET_CONFIG':
       return { ...state, state: action.payload }
     case 'SET_LOADING':
       return { ...state, loading: action.payload }

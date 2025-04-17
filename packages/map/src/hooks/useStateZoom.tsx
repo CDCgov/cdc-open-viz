@@ -32,7 +32,7 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
 
     dispatch({ type: 'SET_SCALE', payload: 1 })
     dispatch({ type: 'SET_TRANSLATE', payload: [0, 0] })
-    dispatch({ type: 'SET_STATE', payload: newState })
+    dispatch({ type: 'SET_CONFIG', payload: newState })
     dispatch({ type: 'SET_STATE_TO_SHOW', payload: stateToShow })
   }, [topoData])
 
@@ -42,7 +42,7 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     const stateData = { fipsCode, stateName }
     const newState = _.cloneDeep(state)
     newState.general.statePicked = stateData
-    dispatch({ type: 'SET_STATE', payload: newState })
+    dispatch({ type: 'SET_CONFIG', payload: newState })
     setScaleAndTranslate('reset')
   }, [statePicked])
 
