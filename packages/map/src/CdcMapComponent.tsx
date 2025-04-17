@@ -92,6 +92,10 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   const [mapState, dispatch] = useReducer<MapReducerType<MapState, MapActions>>(mapReducer, initialState as MapState)
 
+  useEffect(() => {
+    setState(configObj)
+  }, [configObj.data]) // eslint-disable-line
+
   const {
     loading,
     displayPanel,
