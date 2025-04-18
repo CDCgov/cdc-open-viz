@@ -162,10 +162,10 @@ export const BarChartHorizontal = () => {
                   const additionalColTooltip = getAdditionalColumn(bar.key, hoveredBar)
                   const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
                   const tooltip = `<ul>
-                  <li class="tooltip-heading"">${yAxisTooltip}</li>
+                  <li class="tooltip-heading">${yAxisTooltip}</li>
                   <li class="tooltip-body ">${tooltipBody}</li>
                   <li class="tooltip-body ">${additionalColTooltip}</li>
-                    </li></ul>`
+                  </ul>`
 
                   // configure colors
                   let labelColor = '#000000'
