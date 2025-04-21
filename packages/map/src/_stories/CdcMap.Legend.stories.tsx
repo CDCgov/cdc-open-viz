@@ -38,3 +38,12 @@ export const Legend_Bottom_Single_Row: Story = {
     ])
   }
 }
+export const Legend_Grouped: Story = {
+  args: {
+    config: editConfigKeys(WastewaterMap, [
+      { path: ['legend', 'position'], value: 'side' },
+      { path: ['legend', 'style'], value: 'boxes' },
+      { path: ['legend', 'groupBy'], value: 'pathogen' }
+    ])
+  }
+}
