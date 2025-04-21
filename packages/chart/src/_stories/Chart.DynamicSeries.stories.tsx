@@ -53,4 +53,15 @@ export const Bar_Horizontal: Story = {
   }
 }
 
+export const Legend_Order: Story = {
+  args: {
+    config: {
+      ...DynamicSeriesBarConfig,
+      orientation: 'vertical',
+      legend: { ...DynamicSeriesBarConfig, order: 'desc' }
+    },
+    isEditor: false
+  }
+}
+
 export default meta

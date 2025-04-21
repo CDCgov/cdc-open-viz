@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useContext } from 'react'
 import ConfigContext from '../../../../ConfigContext'
 
 // Core
@@ -17,7 +17,7 @@ import {
   AccordionItemPanel,
   AccordionItemButton
 } from 'react-accessible-accordion'
-import { Draggable } from '@hello-pangea/dnd'
+import { Draggable, DragDropContext, Droppable } from '@hello-pangea/dnd'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 
 const SeriesContext = React.createContext({})
@@ -609,9 +609,20 @@ const SeriesButtonRemove = props => {
 }
 
 const SeriesItem = props => {
-  const { config } = useContext(ConfigContext)
+  const { config, updateConfig } = useContext(ConfigContext)
   const { updateSeries, getColumns } = useContext(SeriesContext)
   const { series, getItemStyle, sortableItemStyles, chartsWithOptions, index: i } = props
+  const legendOrderOptions: { label: string; value: string }[] = [
+    { label: 'Order By Data Column', value: 'dataColumn' },
+    {
+      label: 'Ascending Alphanumeric',
+      value: 'asc'
+    },
+    {
+      label: 'Descending Alphanumeric',
+      value: 'desc'
+    }
+  ]
   const showDynamicCategory =
     ['Bar', 'Line'].includes(config.visualizationType) &&
     config.visualizationSubType !== 'Stacked' &&
@@ -646,28 +657,43 @@ const SeriesItem = props => {
                 <AccordionItemPanel>
                   <Series.Input.Name series={series} index={i} />
                   {showDynamicCategory && (
-                    <Select
-                      label='Dynamic Category'
-                      value={series.dynamicCategory}
-                      options={['- Select - ', ...getColumns().filter(col => series.dataKey !== col)]}
-                      updateField={(_section, _subsection, _fieldName, value) => {
-                        if (value === '- Select -') value = ''
-                        updateSeries(i, value, 'dynamicCategory')
-                      }}
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>
-                              This field is Optional. If you have a dynamic data series you can select the category
-                              field here. You can only add one dynamic category per visualization.
-                            </p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                    />
+                    <>
+                      <Select
+                        label='Dynamic Category'
+                        value={series.dynamicCategory}
+                        options={['- Select - ', ...getColumns().filter(col => series.dataKey !== col)]}
+                        updateField={(_section, _subsection, _fieldName, value) => {
+                          if (value === '- Select -') value = ''
+                          updateSeries(i, value, 'dynamicCategory')
+                        }}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                This field is Optional. If you have a dynamic data series you can select the category
+                                field here. You can only add one dynamic category per visualization.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+
+                      <>
+                        <Select
+                          value={config.legend.order}
+                          options={legendOrderOptions}
+                          section='legend'
+                          fieldName='order'
+                          updateField={(_section, _subsection, _fieldName, value) => {
+                            updateConfig({ ...config, legend: { ...config.legend, order: value } })
+                          }}
+                          label='Dynamic Series Order'
+                        />
+                      </>
+                    </>
                   )}
                   <Series.Input.Weight series={series} index={i} />
                   <Series.Dropdown.SeriesType series={series} index={i} />
