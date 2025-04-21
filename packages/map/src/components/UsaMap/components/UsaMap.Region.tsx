@@ -52,14 +52,14 @@ const Rect: React.FC<RectProps> = ({ label, text, stroke, strokeWidth, ...props 
 }
 
 const UsaRegionMap = () => {
-  const { data, state, tooltipId, legendMemo, legendSpecialClassLastMemo } = useContext(ConfigContext)
+  const { data, config, tooltipId, legendMemo, legendSpecialClassLastMemo } = useContext(ConfigContext)
   const [focusedStates, setFocusedStates] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const { general } = state
+  const { general } = config
   const { displayStateLabels, territoriesLabel, displayAsHex, type } = general
-  const tooltipInteractionType = state.tooltips.appearanceType
+  const tooltipInteractionType = config.tooltips.appearanceType
   const isHex = displayAsHex
   const [territoriesData, setTerritoriesData] = useState([])
   const CIRCLE_RADIUS = 15
@@ -86,8 +86,8 @@ const UsaRegionMap = () => {
     return <></>
   }
 
-  const geoStrokeColor = getGeoStrokeColor(state)
-  const geoFillColor = getGeoFillColor(state)
+  const geoStrokeColor = getGeoStrokeColor(config)
+  const geoFillColor = getGeoFillColor(config)
 
   const territories = territoriesData.map(territory => {
     const Shape = Rect
@@ -115,7 +115,7 @@ const UsaRegionMap = () => {
 
       // If we need to add a pointer cursor
       if (
-        (state.columns.navigate && territoryData[state.columns.navigate.name]) ||
+        (config.columns.navigate && territoryData[config.columns.navigate.name]) ||
         tooltipInteractionType === 'click'
       ) {
         needsPointer = true
@@ -223,14 +223,14 @@ const UsaRegionMap = () => {
         }
 
         // When to add pointer cursor
-        if ((state.columns.navigate && geoData[state.columns.navigate.name]) || tooltipInteractionType === 'click') {
+        if ((config.columns.navigate && geoData[config.columns.navigate.name]) || tooltipInteractionType === 'click') {
           styles.cursor = 'pointer'
         }
 
         const TerritoryRect: React.FC<TerritoryRectProps> = props => {
           const { posX = 0, tName } = props
           const textColor = getContrastColor('#FFF', legendColors[0])
-          const geoStrokeColor = getGeoStrokeColor(state)
+          const geoStrokeColor = getGeoStrokeColor(config)
           return (
             <>
               <rect x={posX} width='36' height='24' rx='2' stroke={geoStrokeColor} strokeWidth='1' />
@@ -295,11 +295,11 @@ const UsaRegionMap = () => {
 
   return (
     <ErrorBoundary component='UsaRegionMap'>
-      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(state)}>
+      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(config)}>
         <Mercator data={focusedStates} scale={620} translate={[1500, 735]}>
           {({ features, projection }) => constructGeoJsx(features, projection)}
         </Mercator>
-        {state.annotations.length > 0 && <Annotation.Draggable />}
+        {config.annotations.length > 0 && <Annotation.Draggable />}
       </svg>
       {territories.length > 0 && (
         <section className='territories'>
