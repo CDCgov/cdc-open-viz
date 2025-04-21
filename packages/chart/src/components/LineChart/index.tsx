@@ -68,20 +68,22 @@ const LineChart = (props: LineChartProps) => {
           const seriesAxis = seriesData.axis || 'left'
           const displayArea =
             legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
+          const _seriesKey = seriesData.dynamicCategory ? seriesData.originalDataKey : seriesKey
 
-          const suppressedSegments = createDataSegments(
-            tableData,
+          const suppressedSegments = createDataSegments({
+            data: tableData,
             seriesKey,
-            config.preliminaryData,
-            config.xAxis.dataKey
-          )
+            preliminaryData: config.preliminaryData,
+            dynamicCategory: seriesData.dynamicCategory,
+            originalSeriesKey: _seriesKey,
+            colorScale: colorScale
+          })
           const isSplitLine =
             config?.preliminaryData?.filter(pd => pd.style && !pd.style.includes('Circles')).length > 0
 
           const _data = seriesData.dynamicCategory
             ? data.filter(d => d[seriesData.dynamicCategory] === seriesKey)
             : data
-          const _seriesKey = seriesData.dynamicCategory ? seriesData.originalDataKey : seriesKey
           const circleData = filterCircles(config?.preliminaryData, tableD, _seriesKey)
           return (
             <Group
