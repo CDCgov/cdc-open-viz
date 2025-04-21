@@ -18,8 +18,8 @@ interface StateData {
 }
 
 const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
-  const { state: config, runtimeData, position } = useContext<MapContext>(ConfigContext)
-  const statePicked = getFilterControllingStatePicked(state, runtimeData)
+  const { config, runtimeData, position } = useContext<MapContext>(ConfigContext)
+  const statePicked = getFilterControllingStatePicked(config, runtimeData)
   const dispatch = useContext(MapDispatchContext)
 
   useEffect(() => {
