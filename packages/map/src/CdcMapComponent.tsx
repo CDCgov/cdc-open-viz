@@ -115,7 +115,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   const editorContext = useContext(EditorContext)
 
-  const setState = (newMapState: MapConfig): void => {
+  const setConfig = (newMapState: MapConfig): void => {
     if (isEditor && !isDashboard) {
       dispatch({ type: 'SET_CONFIG', payload: newMapState })
     } else {
@@ -125,7 +125,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   useEffect(() => {
-    setState({ ...config, data: configObj.data })
+    setConfig({ ...config, data: configObj.data })
   }, [configObj.data]) // eslint-disable-line
 
   const setModal = modal => {
@@ -230,11 +230,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
         data = transform.developerStandardize(data, config.dataDescription)
       }
 
-      const newState = _.cloneDeep(config)
-      newState.data = data
-      newState.runtimeDataUrl = dataUrlFinal
+      const newConfig = _.cloneDeep(config)
+      newConfig.data = data
+      newConfig.runtimeDataUrl = dataUrlFinal
 
-      setState(newState)
+      setConfig(newConfig)
     }
   }
 
@@ -358,13 +358,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeLegend,
     scale,
     setModal,
-    setParentConfig: setState,
+    setParentConfig: setConfig,
     setRuntimeData,
     setRuntimeFilters,
     setRuntimeLegend,
     setSharedFilter,
     setSharedFilterValue,
-    setState,
+    setState: setConfig,
     config,
     stateToShow,
     tooltipId,
@@ -426,7 +426,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 {config?.filters?.length > 0 && (
                   <Filters
                     config={config}
-                    setConfig={setState}
+                    setConfig={setConfig}
                     filteredData={runtimeFilters}
                     setFilteredData={_setRuntimeData}
                     dimensions={dimensions}
