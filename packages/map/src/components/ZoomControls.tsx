@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import ConfigContext from '../context'
 import { type MapConfig } from '../types/MapConfig'
 import { MapContext } from '../types/MapContext'
-import './ZoomControls.styles.css'
+import './zoomControls.styles.css'
 
 type ZoomControlsProps = {
   handleZoomIn: (coordinates: [Number, Number]) => void
