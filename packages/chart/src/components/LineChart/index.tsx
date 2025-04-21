@@ -64,26 +64,26 @@ const LineChart = (props: LineChartProps) => {
         {/* left - expects a number not a string */}
         {(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => {
           const seriesData = config.runtime.series.find(item => item.dataKey === seriesKey)
-          const lineType = seriesData.type
+          const lineType = seriesData?.type
           const seriesAxis = seriesData.axis || 'left'
           const displayArea =
             legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
           const _seriesKey = seriesData.dynamicCategory ? seriesData.originalDataKey : seriesKey
+          const _data = seriesData.dynamicCategory
+            ? data.filter(d => d[seriesData.dynamicCategory] === seriesKey)
+            : data
 
           const suppressedSegments = createDataSegments({
-            data: tableData,
+            data: tableD,
             seriesKey,
             preliminaryData: config.preliminaryData,
             dynamicCategory: seriesData.dynamicCategory,
             originalSeriesKey: _seriesKey,
-            colorScale: colorScale
+            colorScale
           })
           const isSplitLine =
             config?.preliminaryData?.filter(pd => pd.style && !pd.style.includes('Circles')).length > 0
 
-          const _data = seriesData.dynamicCategory
-            ? data.filter(d => d[seriesData.dynamicCategory] === seriesKey)
-            : data
           const circleData = filterCircles(config?.preliminaryData, tableD, _seriesKey)
           return (
             <Group
@@ -224,15 +224,17 @@ const LineChart = (props: LineChartProps) => {
                       strokeWidth: seriesData.weight || 2,
                       handleLineType,
                       lineType,
-                      seriesKey
+                      seriesKey,
+                      dynamicCategory: seriesData.dynamicCategory,
+                      originalSeriesKey: _seriesKey
                     })}
                     defined={(item, i) => {
-                      return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                      return item[_seriesKey] !== '' && item[_seriesKey] !== null && item[_seriesKey] !== undefined
                     }}
                   />
 
                   {suppressedSegments.map((segment, index) => {
-                    return Object.entries(segment.data).map(([key, value]) => {
+                    return Object.entries(segment.data).map(([_, value]) => {
                       return (
                         <LinePath
                           key={index}
@@ -240,16 +242,22 @@ const LineChart = (props: LineChartProps) => {
                           x={d => xPos(d)}
                           y={d =>
                             seriesAxis === 'Right'
-                              ? yScaleRight(getYAxisData(d, seriesKey))
-                              : yScale(Number(getYAxisData(d, seriesKey)))
+                              ? yScaleRight(getYAxisData(d, _seriesKey))
+                              : yScale(Number(getYAxisData(d, _seriesKey)))
                           }
-                          stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
+                          stroke={
+                            seriesData.dynamicCategory
+                              ? segment.color
+                              : colorScale(config.runtime.seriesLabels[seriesKey])
+                          }
                           strokeWidth={seriesData[0]?.weight || 2}
                           strokeOpacity={1}
                           shapeRendering='geometricPrecision'
                           strokeDasharray={handleLineType(segment.style)}
                           defined={(item, i) => {
-                            return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                            return (
+                              item[_seriesKey] !== '' && item[_seriesKey] !== null && item[_seriesKey] !== undefined
+                            )
                           }}
                         />
                       )
