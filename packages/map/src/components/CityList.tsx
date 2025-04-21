@@ -20,10 +20,10 @@ type CityListProps = {
 }
 
 const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValueSupported, tooltipId, projection }) => {
-  const { state, topoData, runtimeData, position, legendMemo, legendSpecialClassLastMemo } = useContext(ConfigContext)
+  const { config, topoData, runtimeData, position, legendMemo, legendSpecialClassLastMemo } = useContext(ConfigContext)
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
-  const { geoColumnName, latitudeColumnName, longitudeColumnName, primaryColumnName } = getColumnNames(state.columns)
-  const { additionalCityStyles } = state.visual || []
+  const { geoColumnName, latitudeColumnName, longitudeColumnName, primaryColumnName } = getColumnNames(config.columns)
+  const { additionalCityStyles } = config.visual || []
 
   if (!projection) return
 
@@ -38,9 +38,9 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       }, {})
     : {}
 
-  if (state.general.type === 'bubble') {
+  if (config.general.type === 'bubble') {
     const maxDataValue = Math.max(
-      ...(runtimeData ? Object.keys(runtimeData).map(key => runtimeData[key][state.columns.primary.name]) : [0])
+      ...(runtimeData ? Object.keys(runtimeData).map(key => runtimeData[key][config.columns.primary.name]) : [0])
     )
     const sortedRuntimeData = Object.values(runtimeData).sort((a, b) =>
       a[primaryColumnName] < b[primaryColumnName] ? 1 : -1
@@ -48,7 +48,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     if (!sortedRuntimeData) return
 
     // Set bubble sizes
-    var size = scaleLinear().domain([1, maxDataValue]).range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
+    var size = scaleLinear().domain([1, maxDataValue]).range([config.visual.minBubbleSize, config.visual.maxBubbleSize])
   }
   const cityList = Object.keys(citiesData).filter(c => undefined !== c || undefined !== runtimeData[c])
   if (!cityList) return true
@@ -58,7 +58,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     let geoData: Object
     if (runtimeData) {
       Object.keys(runtimeData).forEach(key => {
-        if (city === runtimeData[key][state.columns.geo.name]) {
+        if (city === runtimeData[key][config.columns.geo.name]) {
           geoData = runtimeData[key]
         }
       })
@@ -69,9 +69,9 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     const cityDisplayName = titleCase(displayGeoName(city))
 
     const legendColors = geoData
-      ? applyLegendToRow(geoData, state)
+      ? applyLegendToRow(geoData, config)
       : runtimeData[city]
-      ? applyLegendToRow(runtimeData[city], state)
+      ? applyLegendToRow(runtimeData[city], config)
       : false
 
     if (legendColors === false) {
@@ -80,13 +80,13 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
 
     const toolTip = applyTooltipsToGeo(cityDisplayName, geoData || runtimeData[city])
 
-    const radius = state.visual.geoCodeCircleSize || 8
+    const radius = config.visual.geoCodeCircleSize || 8
 
     const additionalProps = {
-      fillOpacity: state.general.type === 'bubble' ? 0.4 : 1
+      fillOpacity: config.general.type === 'bubble' ? 0.4 : 1
     }
 
-    const geoStrokeColor = getGeoStrokeColor(state)
+    const geoStrokeColor = getGeoStrokeColor(config)
 
     const pin = (
       <path
@@ -123,8 +123,8 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       needsPointer = true
     }
 
-    if (geoData?.[longitudeColumnName] && geoData?.[latitudeColumnName] && state.general.geoType === 'single-state') {
-      const statePicked = getFilterControllingStatePicked(state, runtimeData)
+    if (geoData?.[longitudeColumnName] && geoData?.[latitudeColumnName] && config.general.geoType === 'single-state') {
+      const statePicked = getFilterControllingStatePicked(config, runtimeData)
       const _statePickedData = topoData?.states?.find(s => s.properties.name === statePicked)
 
       const newProjection = projection.fitExtent(
@@ -136,7 +136,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       )
       let coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
       transform = `translate(${newProjection(coords)}) scale(${
-        state.visual.geoCodeCircleSize / (position.zoom > 1 ? position.zoom : 1)
+        config.visual.geoCodeCircleSize / (position.zoom > 1 ? position.zoom : 1)
       })`
       needsPointer = true
     }
@@ -152,7 +152,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
         setSharedFilterValue &&
         isFilterValueSupported &&
         runtimeData[city] &&
-        runtimeData[city][state.columns.geo.name] === setSharedFilterValue
+        runtimeData[city][config.columns.geo.name] === setSharedFilterValue
           ? 'rgba(0, 0, 0, 1)'
           : 'rgba(0, 0, 0, 0.4)',
       '&:hover': {
@@ -168,15 +168,15 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
 
     // If we need to add a cursor pointer
     if (
-      (state.columns.navigate && geoData?.[state.columns.navigate.name] && geoData[state.columns.navigate.name]) ||
-      state.tooltips.appearanceType === 'click'
+      (config.columns.navigate && geoData?.[config.columns.navigate.name] && geoData[config.columns.navigate.name]) ||
+      config.tooltips.appearanceType === 'click'
     ) {
       styles.cursor = 'pointer'
     }
 
     const shapeProps = {
       onClick: () => geoClickHandler(cityDisplayName, geoData),
-      size: state.general.type === 'bubble' ? size(geoData[primaryColumnName]) : radius * 30,
+      size: config.general.type === 'bubble' ? size(geoData[primaryColumnName]) : radius * 30,
       title: 'Select for more information',
       'data-tooltip-id': `tooltip__${tooltipId}`,
       'data-tooltip-html': toolTip,
@@ -233,7 +233,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     }
     return (
       <g key={i} transform={transform} style={styles} className='geo-point' tabIndex={-1}>
-        {cityStyleShapes[state.visual.cityStyle.toLowerCase()]}
+        {cityStyleShapes[config.visual.cityStyle.toLowerCase()]}
       </g>
     )
   })
