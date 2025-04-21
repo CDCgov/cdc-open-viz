@@ -61,7 +61,7 @@ const UsaMap = () => {
   const {
       data,
       setSharedFilterValue,
-      state,
+      config,
       tooltipId,
       mapId,
       logo,
@@ -72,7 +72,7 @@ const UsaMap = () => {
     } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
-  const { general, columns, tooltips, hexMap, map, annotations } = state
+  const { general, columns, tooltips, hexMap, map, annotations } = config
   const { displayAsHex } = general
   const { geoClickHandler } = useGeoClickHandler()
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
@@ -147,8 +147,8 @@ const UsaMap = () => {
     }
   }, [data, general.territoriesAlwaysShow])
 
-  const geoStrokeColor = getGeoStrokeColor(state)
-  const geoFillColor = getGeoFillColor(state)
+  const geoStrokeColor = getGeoStrokeColor(config)
+  const geoFillColor = getGeoFillColor(config)
 
   const territories = territoriesData.map((territory, territoryIndex) => {
     const Shape = displayAsHex ? Territory.Hexagon : Territory.Rectangle
@@ -180,7 +180,7 @@ const UsaMap = () => {
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
-    const legendColors = applyLegendToRow(territoryData, state)
+    const legendColors = applyLegendToRow(territoryData, config)
 
     if (legendColors) {
       let needsPointer = false
@@ -235,7 +235,7 @@ const UsaMap = () => {
   let pathGenerator = geoPath().projection(geoAlbersUsa().translate(translate))
 
   // Note: Layers are different than patterns
-  const { pathArray } = useMapLayers(state, '', pathGenerator, tooltipId)
+  const { pathArray } = useMapLayers(config, '', pathGenerator, tooltipId)
 
   if (!focusedStates) {
     return <></>
@@ -295,7 +295,7 @@ const UsaMap = () => {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
 
         styles = {
-          fill: state.general.type !== 'bubble' ? legendColors[0] : geoFillColor,
+          fill: config.general.type !== 'bubble' ? legendColors[0] : geoFillColor,
           opacity:
             setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[columns.geo.name]
               ? 0.5
@@ -306,10 +306,10 @@ const UsaMap = () => {
               : geoStrokeColor,
           cursor: 'default',
           '&:hover': {
-            fill: state.general.type !== 'bubble' ? legendColors[1] : geoFillColor
+            fill: config.general.type !== 'bubble' ? legendColors[1] : geoFillColor
           },
           '&:active': {
-            fill: state.general.type !== 'bubble' ? legendColors[2] : geoFillColor
+            fill: config.general.type !== 'bubble' ? legendColors[2] : geoFillColor
           }
         }
 
@@ -513,7 +513,7 @@ const UsaMap = () => {
         key='cities'
         projection={projection}
         setSharedFilterValue={setSharedFilterValue}
-        state={state}
+        state={config}
         titleCase={titleCase}
         tooltipId={tooltipId}
       />
@@ -605,7 +605,7 @@ const UsaMap = () => {
 
   return (
     <ErrorBoundary component='UsaMap'>
-      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(state)}>
+      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(config)}>
         {general.displayAsHex ? (
           <Mercator data={unitedStatesHex} scale={650} translate={[1600, 775]}>
             {({ features, projection }) => constructGeoJsx(features, projection)}
@@ -618,7 +618,7 @@ const UsaMap = () => {
         {annotations.length > 0 && <Annotation.Draggable onDragStateChange={handleDragStateChange} />}
       </svg>
 
-      <TerritoriesSection territories={territories} logo={logo} config={state} territoriesData={territoriesData} />
+      <TerritoriesSection territories={territories} logo={logo} config={config} territoriesData={territoriesData} />
     </ErrorBoundary>
   )
 }
