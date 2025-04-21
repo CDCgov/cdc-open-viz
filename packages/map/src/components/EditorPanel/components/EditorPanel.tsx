@@ -46,7 +46,7 @@ import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs, HEADER_COLORS } from '../../../helpers'
-import './EditorPanel.styles.css'
+import './editorPanel.styles.css'
 import EditorContext from '@cdc/editor/src/ConfigContext'
 
 const EditorPanel = () => {
