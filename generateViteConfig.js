@@ -14,7 +14,12 @@ dns.setDefaultResultOrder('verbatim')
 // - Active dev servers ('lerna run start') must be restarted in order to view the changed settings.
 const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}) => {
   let configOptionsDefault = {
-    server: { port: 8080 },
+    server: {
+      port: 8080,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      }
+    },
     build: {
       commonjsOptions: {
         include: [/@cdc\/core/, /node_modules/]
