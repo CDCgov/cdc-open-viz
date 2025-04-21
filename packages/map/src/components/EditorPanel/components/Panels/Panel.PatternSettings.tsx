@@ -17,16 +17,18 @@ import Alert from '@cdc/core/components/Alert'
 // topojson helpers for checking color contrasts
 import { feature } from 'topojson-client'
 import { checkColorContrast, getContrastColor, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
-import topoJSON from '../../../UsaMap/data/us-topo.json'
+import useApplyLegendToRow from '../../../../hooks/useApplyLegendToRow'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 type PanelProps = {
   name: string
 }
 
 const PatternSettings = ({ name }: PanelProps) => {
-  const { state, setState, applyLegendToRow, runtimeData } = useContext<MapContext>(ConfigContext)
+  const { state, setState, runtimeData, legendMemo, legendSpecialClassLastMemo } = useContext<MapContext>(ConfigContext)
   const defaultPattern = 'circles'
   const patternTypes = ['circles', 'waves', 'lines']
+  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
 
   const {
     map: { patterns },
@@ -87,7 +89,8 @@ const PatternSettings = ({ name }: PanelProps) => {
         if (!hasMatchingValues) return
 
         const currentFill = legendColors[0]
-        const patternColor = keyToUpdate === 'color' && value !== '' ? value : getContrastColor('#000', currentFill)
+        const patternColor =
+          keyToUpdate === 'color' && value !== '' ? value : getContrastColor(APP_FONT_COLOR, currentFill)
         const contrastCheck = checkColorContrast(currentFill, patternColor)
 
         // Log a warning if the contrast check fails

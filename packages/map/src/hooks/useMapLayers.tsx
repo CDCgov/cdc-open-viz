@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react'
+import { useEffect, useId, useState, type MouseEvent, type ChangeEvent } from 'react'
 import { feature } from 'topojson-client'
 import { Group } from '@visx/group'
 import { MapConfig } from '../types/MapConfig'
@@ -16,7 +16,12 @@ import { MapConfig } from '../types/MapConfig'
  * 3) Clean (ie. mapshaper -clean) and edit the shape as needed and export the new layer as geoJSON
  * 4) Save the geoJSON somewhere external.
  */
-export default function useMapLayers(config: MapConfig, setConfig, pathGenerator, tooltipId) {
+export default function useMapLayers(
+  config: MapConfig,
+  setConfig: Function,
+  pathGenerator: Function,
+  tooltipId: string
+) {
   const [fetchedTopoJSON, setFetchedTopoJSON] = useState([])
   const geoId = useId()
 
@@ -26,47 +31,38 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
 
   useEffect(() => {
     fetchGeoJSONLayers()
-  }, []) //eslint-disable-line
-
-  useEffect(() => {
-    fetchGeoJSONLayers()
-  }, [config.map.layers]) //eslint-disable-line
+  }, [config.map.layers])
 
   useEffect(() => {
     if (pathGenerator) {
       generateCustomLayers()
     }
-  }, [fetchedTopoJSON]) //eslint-disable-line
+  }, [fetchedTopoJSON])
 
   const fetchGeoJSONLayers = async () => {
-    let geos = await getMapTopoJSONLayers()
-    setFetchedTopoJSON(geos)
+    try {
+      const geos = await getMapTopoJSONLayers()
+      setFetchedTopoJSON(geos)
+    } catch (e) {
+      console.error('Error fetching GeoJSON layers:', e)
+    }
   }
 
-  /**
-   * Removes a custom map layer from the config.
-   * @param { Event } e Remove onclick event
-   * @param { Integer } index index of layer to remove
-   */
-  const handleRemoveLayer = (e, index) => {
+  const handleRemoveLayer = (e: MouseEvent<HTMLButtonElement>, index: number) => {
     e.preventDefault()
 
     const updatedState = {
       ...config,
       map: {
         ...config.map,
-        layers: config.map.layers.filter((layer, i) => i !== index)
+        layers: config.map.layers.filter((_layer, i) => i !== index)
       }
     }
 
     setConfig(updatedState)
   }
 
-  /**
-   * Adds a new custom map layer to the config
-   * @param { Event } e Add onclick event
-   */
-  const handleAddLayer = e => {
+  const handleAddLayer = (e: Event) => {
     e.preventDefault()
     const updatedState = {
       ...config,
@@ -84,7 +80,7 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
     setConfig(updatedState)
   }
 
-  const handleMapLayer = (e, index, layerKey) => {
+  const handleMapLayer = (e: ChangeEvent<HTMLInputElement>, index: number, layerKey: string) => {
     e.preventDefault()
 
     let layerValue = e.target.value
@@ -117,7 +113,7 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
     for (const mapLayer of config.map.layers) {
       let newLayerItem = await fetch(mapLayer.url)
         .then(res => res.json())
-        .catch(e => console.warn('error with newLayer item'))
+        .catch(e => console.warn('error with newLayer item', e))
       if (!newLayerItem) newLayerItem = []
       TopoJSONObjects.push(newLayerItem)
     }
@@ -127,10 +123,9 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
 
   /**
    * Updates the custom map layers based on the topojson data
-   * @returns {void} new map layers to the config
    */
-  const generateCustomLayers = () => {
-    if (fetchedTopoJSON.length === 0 || !fetchedTopoJSON) return false
+  const generateCustomLayers = (): void => {
+    if (fetchedTopoJSON.length === 0 || !fetchedTopoJSON) return
     let tempArr = []
     let tempFeatureArray = []
 
@@ -149,7 +144,10 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
         // feature array for county maps
         tempFeatureArray.push(item)
         tempArr.push(
-          <Group className={layerClasses.join(' ')} key={`customMapLayer-${item.properties.name.replace(' ', '-')}-${index}`}>
+          <Group
+            className={layerClasses.join(' ')}
+            key={`customMapLayer-${item.properties.name.replace(' ', '-')}-${index}`}
+          >
             {/* prettier-ignore */}
             <path
               d={pathGenerator(item)}

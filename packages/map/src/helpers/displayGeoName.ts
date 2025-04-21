@@ -1,7 +1,14 @@
 import { titleCase } from './titleCase'
 import { supportedStates, supportedTerritories, supportedCountries, supportedCounties } from '../data/supported-geos'
 
-export const displayGeoName = (key, convertFipsCodes = true): string => {
+/**
+ * Converts a geographic key to its display name.
+ *
+ * @param {string} key - The geographic key to convert.
+ * @param {boolean} [convertFipsCodes=true] - Whether to convert FIPS codes.
+ * @returns {string} - The display name for the geographic key.
+ */
+export const displayGeoName = (key: string, convertFipsCodes = true): string => {
   if (!convertFipsCodes) return key
   const stateKeys = Object.keys(supportedStates)
   const territoryKeys = Object.keys(supportedTerritories)

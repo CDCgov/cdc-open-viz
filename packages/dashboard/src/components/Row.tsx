@@ -239,7 +239,7 @@ const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
     <>
       <div className='builder-row' data-row-id={rowIdx}>
         <RowMenu rowIdx={rowIdx} />
-        <p className='position-absolute top-0 left-0 d-block mt-1'>Row - {rowIdx + 1}</p>
+        <p className='ml-2 mt-n3'>Row - {rowIdx + 1}</p>
         <button
           title='Configure Data'
           className='btn btn-configure-row'

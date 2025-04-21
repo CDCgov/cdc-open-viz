@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from 'react'
 import ConfigContext from '../context'
-import { geoAlbersUsaTerritories, GeoProjection } from 'd3-composite-projections'
+import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import { MapContext } from '../types/MapContext'
 import { geoPath, GeoPath } from 'd3-geo'
-import _ from 'lodash'
 import { getFilterControllingStatePicked } from '../components/UsaMap/helpers/map'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
+import { SVG_HEIGHT, SVG_WIDTH, SVG_PADDING } from '../helpers'
 
 interface StateData {
   geometry: { type: 'MultiPolygon'; coordinates: number[][][][] }
@@ -22,7 +22,8 @@ interface Position {
 }
 
 const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
-  const { setTranslate, setScale, setStateToShow, setPosition, state, setState, runtimeData } = useContext<MapContext>(ConfigContext)
+  const { setTranslate, setScale, setStateToShow, setPosition, state, setState, runtimeData } =
+    useContext<MapContext>(ConfigContext)
   const statePicked = getFilterControllingStatePicked(state, runtimeData)
   const defaultStateToShow = 'Alabama'
   useEffect(() => {
@@ -56,15 +57,10 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     setScaleAndTranslate('reset')
   }, [statePicked])
 
-  // SVG ITEMS
-  const WIDTH = 880
-  const HEIGHT = 500
-  const PADDING = 50
-
   // TODO: same as city list projection?
   const [projection, setProjection] = useState(() =>
     geoAlbersUsaTerritories()
-      .translate([WIDTH / 2, HEIGHT / 2])
+      .translate([SVG_WIDTH / 2, SVG_HEIGHT / 2])
       .scale(1)
   )
 
@@ -78,8 +74,8 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
   const _statePickedData = topoData?.states?.find(s => s.properties.name === statePicked)
   const newProjection = projection.fitExtent(
     [
-      [PADDING, PADDING],
-      [WIDTH - PADDING, HEIGHT - PADDING]
+      [SVG_PADDING, SVG_PADDING],
+      [SVG_WIDTH - SVG_PADDING, SVG_HEIGHT - SVG_PADDING]
     ],
     _statePickedData
   )
@@ -88,8 +84,8 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
   const newScale = newProjection.scale()
   const normalizedScale = newScale / NORMALIZATION_FACTOR
   let [x, y] = newProjection.translate()
-  x = x - WIDTH / 2
-  y = y - HEIGHT / 2
+  x = x - SVG_WIDTH / 2
+  y = y - SVG_HEIGHT / 2
 
   const path: GeoPath = geoPath().projection(projection)
   const featureCenter = path.centroid(_statePickedData)

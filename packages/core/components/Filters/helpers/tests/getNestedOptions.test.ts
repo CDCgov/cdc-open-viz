@@ -90,4 +90,35 @@ describe('getNestedOptions', () => {
     ]
     expect(getNestedOptions(params)).toEqual(expectedOutput)
   })
+
+  it('should return an empty array when values is an empty array', () => {
+    const params = {
+      values: [],
+      subGrouping: null
+    }
+    const expectedOutput: NestedOptions = []
+    expect(getNestedOptions(params)).toEqual(expectedOutput)
+  })
+
+  it('should handle values with a single element', () => {
+    const params = {
+      values: ['value1'],
+      subGrouping: null
+    }
+    const expectedOutput: NestedOptions = [[['value1'], []]]
+    expect(getNestedOptions(params)).toEqual(expectedOutput)
+  })
+
+  it('should handle values with multiple elements', () => {
+    const params = {
+      values: ['value1', 'value2', 'value3'],
+      subGrouping: null
+    }
+    const expectedOutput: NestedOptions = [
+      [['value1'], []],
+      [['value2'], []],
+      [['value3'], []]
+    ]
+    expect(getNestedOptions(params)).toEqual(expectedOutput)
+  })
 })

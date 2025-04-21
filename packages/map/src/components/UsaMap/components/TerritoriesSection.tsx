@@ -1,4 +1,7 @@
-import React from 'react'
+import React, { useContext } from 'react'
+
+import ConfigContext from '../../../context'
+import { isMobileTerritoryViewport } from '@cdc/core/helpers/viewports'
 
 type TerritoriesSectionProps = {
   territories: JSX.Element[]
@@ -9,6 +12,8 @@ type TerritoriesSectionProps = {
 }
 
 const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, logo, config, territoriesData }) => {
+  const { currentViewport } = useContext<MapContext>(ConfigContext)
+
   // filter territioriesData into the two groups below
   const freelyAssociatedKeys = territoriesData.filter(territory => {
     return ['US-FM', 'US-MH', 'US-PW'].includes(territory)
@@ -33,6 +38,10 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
       return a.props.label.localeCompare(b.props.label)
     })
 
+  const isMobileViewport = isMobileTerritoryViewport(currentViewport)
+  const SVG_GAP = 9
+  const SVG_WIDTH = isMobileViewport ? 30 : 45
+
   return (
     territoriesData.length > 0 && (
       <>
@@ -43,18 +52,32 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
               <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
             )}
           </div>
-          <div>
+          <div className='d-flex flex-wrap' style={{ columnGap: '1.5rem' }}>
             {(usTerritories.length > 0 || config.general.territoriesAlwaysShow) && (
-              <>
-                <h5 className='territories-label'>U.S. Territories</h5>
-                <span className='mt-1 mb-2 d-flex flex-wrap territories'>{usTerritories}</span>
-              </>
+              <div>
+                <h5 className='territories-label'>U.S. territories</h5>
+                <span
+                  className={`mt-2 ${isMobileViewport ? 'mb-3' : 'mb-4'} d-flex territories`}
+                  style={{ minWidth: `${usTerritories.length * SVG_WIDTH + (usTerritories.length - 1) * SVG_GAP}px` }}
+                >
+                  {usTerritories}
+                </span>
+              </div>
             )}
             {(freelyAssociatedStates.length > 0 || config.general.territoriesAlwaysShow) && (
-              <>
-                <h5 className='territories-label'>Freely Associated States</h5>
-                <span className='mt-1 mb-2 d-flex flex-wrap territories'>{freelyAssociatedStates}</span>
-              </>
+              <div>
+                <h5 className='territories-label'>Freely associated states</h5>
+                <span
+                  className={`mt-2 ${isMobileViewport ? 'mb-3' : 'mb-4'} d-flex territories`}
+                  style={{
+                    minWidth: `${
+                      freelyAssociatedStates.length * SVG_WIDTH + (freelyAssociatedStates.length - 1) * SVG_GAP
+                    }px`
+                  }}
+                >
+                  {freelyAssociatedStates}
+                </span>
+              </div>
             )}
           </div>
         </div>

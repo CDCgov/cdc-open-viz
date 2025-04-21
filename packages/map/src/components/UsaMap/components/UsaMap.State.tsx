@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo, useContext } from 'react'
+import React, { useState, useEffect, useContext, useRef } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
@@ -28,21 +28,24 @@ import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { titleCase } from '../../../helpers/titleCase'
 import TerritoriesSection from './TerritoriesSection'
 import { displayGeoName } from '../../../helpers/displayGeoName'
+import { isMobileStateLabelViewport } from '@cdc/core/helpers/viewports'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
+import { hashObj, SVG_VIEWBOX } from '../../../helpers'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
-  'US-VT': [50, -8],
-  'US-NH': [34, 2],
-  'US-MA': [30, -1],
-  'US-RI': [28, 2],
-  'US-CT': [35, 10],
-  'US-NJ': [42, 1],
+  'US-VT': [53, -7],
+  'US-NH': [38, 7],
+  'US-MA': [34, -1],
+  'US-RI': [29, 7],
+  'US-CT': [43, 20],
+  'US-NJ': [26, 7],
   'US-DE': [33, 0],
-  'US-MD': [47, 10]
+  'US-MD': [51, 16]
 }
 
 const nudges = {
@@ -67,8 +70,9 @@ const UsaMap = () => {
       handleDragStateChange,
       mapId,
       logo,
-    legendMemo,
-    legendSpecialClassLastMemo
+      legendMemo,
+      legendSpecialClassLastMemo,
+      currentViewport
     } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
@@ -102,6 +106,19 @@ const UsaMap = () => {
   const [focusedStates, setFocusedStates] = useState(null)
   const [translate, setTranslate] = useState([455, 200])
 
+  const dataRef = useRef(null)
+
+  const legendMemoUpdated = focusedStates?.every(geo => {
+    const geoKey = geo.properties.iso
+    const geoData = data[geoKey]
+    const hash = hashObj(geoData)
+    return legendMemo.current.has(hash)
+  })
+
+  // we use dataRef so that we can use the old data when legendMemo has not been updated yet
+  // prevents flickering of the map when filter is changed
+  if (legendMemoUpdated) dataRef.current = data
+
   useEffect(() => {
     const fetchData = async () => {
       import(/* webpackChunkName: "us-topo" */ '../data/us-topo.json').then(topoJSON => {
@@ -127,7 +144,7 @@ const UsaMap = () => {
       setTerritoriesData(territoriesKeys)
     } else {
       // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
-      const territoriesList = territoriesKeys.filter(key => data[key])
+      const territoriesList = territoriesKeys.filter(key => dataRef.current?.[key])
       setTerritoriesData(territoriesList)
     }
   }, [data, general.territoriesAlwaysShow])
@@ -138,14 +155,14 @@ const UsaMap = () => {
   const territories = territoriesData.map((territory, territoryIndex) => {
     const Shape = displayAsHex ? Territory.Hexagon : Territory.Rectangle
 
-    const territoryData = data[territory]
+    const territoryData = data?.[territory]
 
     let toolTip
 
     let styles = {
       fill: geoFillColor,
       stroke: geoStrokeColor,
-      color: '#202020'
+      color: APP_FONT_COLOR
     }
 
     const label = supportedTerritories[territory][1]
@@ -156,7 +173,8 @@ const UsaMap = () => {
           key={label}
           label={label}
           style={styles}
-          text={styles.color}
+          textColor={styles.color}
+          strokeColor='#fff'
           territoryData={territoryData}
           backgroundColor={styles.fill}
         />
@@ -167,14 +185,14 @@ const UsaMap = () => {
     const legendColors = applyLegendToRow(territoryData, state)
 
     if (legendColors) {
-      const textColor = getContrastColor('#FFF', legendColors[0])
-
       let needsPointer = false
 
       // If we need to add a pointer cursor
       if ((columns.navigate && territoryData[columns.navigate.name]) || tooltips.appearanceType === 'click') {
         needsPointer = true
       }
+
+      const { textColor, strokeColor } = outlinedTextColor(legendColors[0])
 
       styles = {
         color: textColor,
@@ -201,9 +219,9 @@ const UsaMap = () => {
           key={`label__${territoryIndex}`}
           label={label}
           style={styles}
-          text={styles.color}
           strokeWidth={1}
           textColor={textColor}
+          strokeColor={strokeColor}
           handleShapeClick={() => geoClickHandler(territory, territoryData)}
           dataTooltipId={`tooltip__${tooltipId}`}
           dataTooltipHtml={toolTip}
@@ -263,13 +281,13 @@ const UsaMap = () => {
 
       if (!geoKey) return
 
-      const geoData = data[geoKey]
+      const geoData = data?.[geoKey]
 
       let legendColors
 
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
-        legendColors = applyLegendToRow(geoData, state)
+        legendColors = applyLegendToRow(geoData)
       }
 
       const geoDisplayName = displayGeoName(geoKey)
@@ -435,6 +453,7 @@ const UsaMap = () => {
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
+                        strokeWidth={0.25}
                       />
                     )}
                     {pattern === 'circles' && (
@@ -443,6 +462,7 @@ const UsaMap = () => {
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
+                        radius={0.5}
                       />
                     )}
                     {pattern === 'lines' && (
@@ -451,7 +471,7 @@ const UsaMap = () => {
                         height={patternSizes[size] ?? 6}
                         width={patternSizes[size] ?? 6}
                         stroke={patternColor}
-                        strokeWidth={1}
+                        strokeWidth={0.75}
                         orientation={['diagonalRightToLeft']}
                       />
                     )}
@@ -503,18 +523,7 @@ const UsaMap = () => {
 
     // Bubbles
     if (general.type === 'bubble') {
-      geosJsx.push(
-        <BubbleList
-          key='bubbles'
-          data={state.data}
-          runtimeData={data}
-          state={state}
-          projection={projection}
-          applyLegendToRow={applyLegendToRow}
-          applyTooltipsToGeo={applyTooltipsToGeo}
-          displayGeoName={displayGeoName}
-        />
-      )
+      geosJsx.push(<BubbleList runtimeData={dataRef.current} projection={projection} />)
     }
 
     // })
@@ -554,10 +563,11 @@ const UsaMap = () => {
           <text
             x={x}
             y={y}
-            fontSize={14}
-            strokeWidth='0'
-            // paintOrder='stroke' // PENDING DEV-9278: Adds a stroke around the text potentially for 508 compliance
-            // stroke={strokeColor}
+            fontSize={isMobileStateLabelViewport(currentViewport) ? 16 : 13}
+            fontWeight={900}
+            strokeWidth='1'
+            paintOrder='stroke'
+            stroke={strokeColor}
             style={{ fill: textColor }}
             textAnchor='middle'
           >
@@ -582,9 +592,9 @@ const UsaMap = () => {
         <text
           x={4}
           strokeWidth='0'
-          // paintOrder='stroke' // PENDING DEV-9278: Adds a stroke around the text potentially for 508 compliance
-          // stroke={strokeColor}
-          fontSize={13}
+          stroke={APP_FONT_COLOR}
+          fontSize={isMobileStateLabelViewport(currentViewport) ? 16 : 13}
+          fontWeight={900}
           style={{ fill: textColor }}
           alignmentBaseline='middle'
           transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
@@ -597,7 +607,7 @@ const UsaMap = () => {
 
   return (
     <ErrorBoundary component='UsaMap'>
-      <svg viewBox='0 0 880 500' role='img' aria-label={handleMapAriaLabels(state)}>
+      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(state)}>
         {general.displayAsHex ? (
           <Mercator data={unitedStatesHex} scale={650} translate={[1600, 775]}>
             {({ features, projection }) => constructGeoJsx(features, projection)}

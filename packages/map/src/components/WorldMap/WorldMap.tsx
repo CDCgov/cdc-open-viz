@@ -10,7 +10,16 @@ import CityList from '../CityList'
 import BubbleList from '../BubbleList'
 import ZoomControls from '../ZoomControls'
 import { supportedCountries } from '../../data/supported-geos'
-import { getGeoFillColor, getGeoStrokeColor, handleMapAriaLabels, titleCase, displayGeoName } from '../../helpers'
+import {
+  getGeoFillColor,
+  getGeoStrokeColor,
+  handleMapAriaLabels,
+  titleCase,
+  displayGeoName,
+  SVG_VIEWBOX,
+  SVG_WIDTH,
+  SVG_HEIGHT
+} from '../../helpers'
 import useGeoClickHandler from '../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../hooks/useApplyTooltipsToGeo'
@@ -33,6 +42,8 @@ const WorldMap = () => {
     legendMemo,
     legendSpecialClassLastMemo
   } = useContext(ConfigContext)
+
+  const { type } = state.general
 
   const [world, setWorld] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
@@ -57,13 +68,9 @@ const WorldMap = () => {
   // Resets to original data & zooms out
   const handleReset = (state, setState, setRuntimeData) => {
     const newRuntimeData = generateRuntimeData(state)
-    setRuntimeData(newRuntimeData)
-    setState({
-      ...state,
-      focusedCountry: false,
-      mapPosition: { coordinates: [0, 30], zoom: 1 }
-    })
+    setPosition({ coordinates: [0, 30], zoom: 1 })
     setFilteredCountryCode('')
+    setRuntimeData(newRuntimeData)
   }
   const handleZoomIn = (position, setPosition) => {
     if (position.zoom >= 4) return
@@ -73,13 +80,6 @@ const WorldMap = () => {
   const handleZoomOut = (position, setPosition) => {
     if (position.zoom <= 1) return
     setPosition(pos => ({ ...pos, zoom: pos.zoom / 1.5 }))
-  }
-
-  // TODO Refactor - state should be set together here to avoid rerenders
-  const handleCircleClick = (country, state, setState, setRuntimeData) => {
-    if (!state.general.allowMapZoom) return
-    let newRuntimeData = state.data.filter(item => item[state.columns.geo.name] === country[state.columns.geo.name])
-    setFilteredCountryCode(newRuntimeData[0].uid)
   }
 
   const handleMoveEnd = position => {
@@ -104,10 +104,6 @@ const WorldMap = () => {
 
       let geoData = data[geoKey]
 
-      // if ((geoKey === 'Alaska' || geoKey === 'Hawaii') && !geoData) {
-      //   geoData = data['United States']
-      // }
-
       const geoDisplayName = displayGeoName(supportedCountries[geoKey]?.[0])
       let legendColors
 
@@ -128,16 +124,16 @@ const WorldMap = () => {
 
       // If a legend applies, return it with appropriate information.
       const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
-      if (legendColors && legendColors[0] !== '#000000' && state.general.type !== 'bubble') {
+      if (legendColors && legendColors[0] !== '#000000' && type !== 'bubble') {
         styles = {
           ...styles,
-          fill: state.general.type !== 'world-geocode' ? legendColors[0] : geoFillColor,
+          fill: type !== 'world-geocode' ? legendColors[0] : geoFillColor,
           cursor: 'default',
           '&:hover': {
-            fill: state.general.type !== 'world-geocode' ? legendColors[1] : geoFillColor
+            fill: type !== 'world-geocode' ? legendColors[1] : geoFillColor
           },
           '&:active': {
-            fill: state.general.type !== 'world-geocode' ? legendColors[2] : geoFillColor
+            fill: type !== 'world-geocode' ? legendColors[2] : geoFillColor
           }
         }
 
@@ -198,20 +194,8 @@ const WorldMap = () => {
     )
 
     // Bubbles
-    if (state.general.type === 'bubble') {
-      geosJsx.push(
-        <BubbleList
-          key='bubbles'
-          data={state.data}
-          runtimeData={data}
-          state={state}
-          projection={projection}
-          applyLegendToRow={applyLegendToRow}
-          displayGeoName={displayGeoName}
-          tooltipId={tooltipId}
-          handleCircleClick={country => handleCircleClick(country, state, setState, setRuntimeData)}
-        />
-      )
+    if (type === 'bubble') {
+      geosJsx.push(<BubbleList runtimeData={data} />)
     }
 
     return geosJsx
@@ -220,8 +204,13 @@ const WorldMap = () => {
   return (
     <ErrorBoundary component='WorldMap'>
       {hasZoom ? (
-        <svg viewBox='0 0 880 500' role='img' aria-label={handleMapAriaLabels(state)}>
-          <rect height={500} width={880} onClick={() => handleReset(state, setState, setRuntimeData)} fill='white' />
+        <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(state)}>
+          <rect
+            height={SVG_HEIGHT}
+            width={SVG_WIDTH}
+            onClick={() => handleReset(state, setState, setRuntimeData)}
+            fill='white'
+          />
           <ZoomableGroup
             zoom={position.zoom}
             center={position.coordinates}
@@ -235,33 +224,22 @@ const WorldMap = () => {
           </ZoomableGroup>
         </svg>
       ) : (
-        <svg viewBox='0 0 880 500'>
+        <svg viewBox={SVG_VIEWBOX}>
           <ZoomableGroup
             zoom={1}
             center={position.coordinates}
             onMoveEnd={handleMoveEnd}
             maxZoom={0}
             projection={projection}
-            width={880}
-            height={500}
+            width={SVG_WIDTH}
+            height={SVG_HEIGHT}
           >
             <Mercator data={world}>{({ features }) => constructGeoJsx(features)}</Mercator>
           </ZoomableGroup>
         </svg>
       )}
-      {(state.general.type === 'data' ||
-        (state.general.type === 'world-geocode' && hasZoom) ||
-        (state.general.type === 'bubble' && hasZoom)) && (
-        <ZoomControls
-          handleZoomIn={handleZoomIn}
-          handleZoomOut={handleZoomOut}
-          position={position}
-          setPosition={setPosition}
-          setRuntimeData={setRuntimeData}
-          setState={setState}
-          state={state}
-          handleReset={handleReset}
-        />
+      {(type === 'data' || (type === 'world-geocode' && hasZoom) || (type === 'bubble' && hasZoom)) && (
+        <ZoomControls handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} handleReset={handleReset} />
       )}
     </ErrorBoundary>
   )

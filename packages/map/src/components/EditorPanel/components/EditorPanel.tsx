@@ -45,13 +45,11 @@ import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
+import { addUIDs, HEADER_COLORS } from '../../../helpers'
 
-// Todo: move to useReducer, seperate files out.
 const EditorPanel = () => {
-  // prettier-ignore
   const {
     isDashboard,
-    isDebug,
     loadConfig,
     runtimeFilters,
     runtimeLegend,
@@ -60,6 +58,7 @@ const EditorPanel = () => {
     state,
     tooltipId,
     runtimeData,
+    setPosition
   } = useContext<MapContext>(ConfigContext)
 
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
@@ -70,20 +69,6 @@ const EditorPanel = () => {
   const [loadedDefault, setLoadedDefault] = useState(false)
   const [displayPanel, setDisplayPanel] = useState(true)
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
-
-  const headerColors = [
-    'theme-blue',
-    'theme-purple',
-    'theme-brown',
-    'theme-teal',
-    'theme-pink',
-    'theme-orange',
-    'theme-slate',
-    'theme-indigo',
-    'theme-cyan',
-    'theme-green',
-    'theme-amber'
-  ]
 
   const {
     // prettier-ignore
@@ -96,11 +81,8 @@ const EditorPanel = () => {
 
   const categoryMove = (idx1, idx2) => {
     let categoryValuesOrder = getCategoryValuesOrder()
-
     let [movedItem] = categoryValuesOrder.splice(idx1, 1)
-
     categoryValuesOrder.splice(idx2, 0, movedItem)
-
     state.legend.categoryValuesOrder?.forEach(value => {
       if (categoryValuesOrder.indexOf(value) === -1) {
         categoryValuesOrder.push(value)
@@ -217,7 +199,7 @@ const EditorPanel = () => {
       if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
         handleEditorChanges('changeLegendDescription', [String(activeFilterValueForDescription), debouncedValue])
       }
-    }, [debouncedValue]) // eslint-disable-line
+    }, [debouncedValue])
 
     const onChange = e => setValue(e.target.value)
 
@@ -634,6 +616,9 @@ const EditorPanel = () => {
         }
         break
       case 'geoType':
+        addUIDs(state, state.columns.geo.name)
+        setPosition([0, 30])
+
         // If we're still working with default data, switch to the world default to show it as an example
         if (true === loadedDefault && 'world' === value) {
           loadConfig(worldDefaultConfig)
@@ -972,6 +957,7 @@ const EditorPanel = () => {
         })
         break
       case 'name':
+        addUIDs(state, state.columns.geo.name)
         setState({
           ...state,
           columns: {
@@ -1142,6 +1128,7 @@ const EditorPanel = () => {
   }
 
   const isReversed = state.general.palette.isReversed
+
   function filterColorPalettes() {
     let sequential = []
     let nonSequential = []
@@ -1184,23 +1171,9 @@ const EditorPanel = () => {
   const [sequential, nonSequential, accessibleColors] = filterColorPalettes()
 
   useEffect(() => {
-    let paletteName = ''
-    if (isReversed && !state.color.endsWith('reverse')) {
-      paletteName = state.color + 'reverse'
-    }
-    if (!isReversed && state.color.endsWith('reverse')) {
-      paletteName = state.color.slice(0, -7)
-    }
-    if (paletteName) {
-      handleEditorChanges('color', paletteName)
-    }
-  }, [isReversed])
-
-  useEffect(() => {
     setLoadedDefault(state.defaultData)
-
     columnsRequiredChecker()
-  }, [state]) // eslint-disable-line
+  }, [state])
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -1247,8 +1220,6 @@ const EditorPanel = () => {
     })
   }
 
-  const usedFilterColumns = {}
-
   const StateOptionList = () => {
     const arrOfArrays = Object.entries(supportedStatesFipsCodes)
 
@@ -1277,21 +1248,6 @@ const EditorPanel = () => {
       })
     })
   }
-
-  useEffect(() => {
-    const parsedData = convertStateToConfig()
-    const formattedData = JSON.stringify(parsedData, undefined, 2)
-
-    setConfigTextbox(formattedData)
-  }, [state]) // eslint-disable-line
-
-  useEffect(() => {
-    // Pass up to Editor if needed
-    if (setParentConfig) {
-      const newConfig = convertStateToConfig()
-      setParentConfig(newConfig)
-    }
-  }, [state]) // eslint-disable-line
 
   let numberOfItemsLimit = 8
 
@@ -2989,7 +2945,7 @@ const EditorPanel = () => {
               <label>
                 <span className='edit-label'>Header Theme</span>
                 <ul className='color-palette'>
-                  {headerColors.map(palette => {
+                  {HEADER_COLORS.map(palette => {
                     return (
                       <li
                         title={palette}
@@ -3048,7 +3004,21 @@ const EditorPanel = () => {
                 fieldName='isReversed'
                 size='small'
                 label='Use selected palette in reverse order'
-                updateField={updateField}
+                onClick={() => {
+                  const _state = _.cloneDeep(state)
+                  _state.general.palette.isReversed = !_state.general.palette.isReversed
+                  let paletteName = ''
+                  if (_state.general.palette.isReversed && !state.color.endsWith('reverse')) {
+                    paletteName = state.color + 'reverse'
+                  }
+                  if (!_state.general.palette.isReversed && state.color.endsWith('reverse')) {
+                    paletteName = state.color.slice(0, -7)
+                  }
+                  if (paletteName) {
+                    _state.color = paletteName
+                  }
+                  setState(_state)
+                }}
                 value={state.general.palette.isReversed}
               />
               <span>Sequential</span>
