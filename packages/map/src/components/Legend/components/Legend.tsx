@@ -40,14 +40,14 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     runtimeFilters,
     runtimeLegend,
     setRuntimeLegend,
-    state,
+    config,
     currentViewport: viewport,
     mapId
   } = useContext(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
 
-  const { legend } = state
+  const { legend } = config
   const isLegendGradient = legend.style === 'gradient'
   const boxDynamicallyHidden = isBelowBreakpoint('md', currentViewport)
   const legendWrapping =
@@ -59,9 +59,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     try {
       if (!runtimeLegend.items) Error('No runtime legend data')
       return runtimeLegend.items.map((entry, idx) => {
-        const entryMax = displayDataAsText(entry.max, 'primary', state)
+        const entryMax = displayDataAsText(entry.max, 'primary', config)
 
-        const entryMin = displayDataAsText(entry.min, 'primary', state)
+        const entryMin = displayDataAsText(entry.min, 'primary', config)
         let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
 
         // If interval, add some formatting
@@ -70,7 +70,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         }
 
         if (legend.type === 'category') {
-          formattedText = displayDataAsText(entry.value, 'primary', state)
+          formattedText = displayDataAsText(entry.value, 'primary', config)
         }
 
         if (entry.max === 0 && entry.min === 0) {
@@ -135,15 +135,15 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           }}
           tabIndex={0}
         >
-          <LegendShape shape={state.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
+          <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
           <span>{item.label}</span>
         </li>
       )
     })
 
-    if (state.map.patterns) {
+    if (config.map.patterns) {
       // loop over map patterns
-      state.map.patterns.map((patternData, patternDataIndex) => {
+      config.map.patterns.map((patternData, patternDataIndex) => {
         const { pattern, dataKey, size } = patternData
         let defaultPatternColor = 'black'
         const sizes = {
@@ -215,7 +215,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   }
   const legendListItems = legendList(isLegendGradient)
 
-  const { legendClasses } = useDataVizClasses(state, viewport)
+  const { legendClasses } = useDataVizClasses(config, viewport)
 
   const handleReset = e => {
     const legend = ref.current
@@ -298,32 +298,32 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               parentPaddingToSubtract={
                 containerWidthPadding + (legend.hideBorder || boxDynamicallyHidden ? 0 : LEGEND_PADDING)
               }
-              config={state}
+              config={config}
             />
             {!!legendListItems.length && (
               <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
                 {legendListItems}
               </ul>
             )}
-            {(state.visual.additionalCityStyles.some(c => c.label) || state.visual.cityStyleLabel) && (
+            {(config.visual.additionalCityStyles.some(c => c.label) || config.visual.cityStyleLabel) && (
               <>
                 <hr />
                 <div className={legendClasses.div.join(' ') || ''}>
-                  {state.visual.cityStyleLabel && (
+                  {config.visual.cityStyleLabel && (
                     <div>
                       <svg>
                         <Group
-                          top={state.visual.cityStyle === 'pin' ? 19 : state.visual.cityStyle === 'triangle' ? 13 : 11}
+                          top={config.visual.cityStyle === 'pin' ? 19 : config.visual.cityStyle === 'triangle' ? 13 : 11}
                           left={10}
                         >
-                          {cityStyleShapes[state.visual.cityStyle.toLowerCase()]}
+                          {cityStyleShapes[config.visual.cityStyle.toLowerCase()]}
                         </Group>
                       </svg>
-                      <p>{state.visual.cityStyleLabel}</p>
+                      <p>{config.visual.cityStyleLabel}</p>
                     </div>
                   )}
 
-                  {state.visual.additionalCityStyles.map(
+                  {config.visual.additionalCityStyles.map(
                     ({ shape, label }) =>
                       label && (
                         <div>
@@ -346,8 +346,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             )}
           </section>
         </aside>
-        {state.hexMap.shapeGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && (
-          <LegendItemHex state={state} runtimeLegend={runtimeLegend} viewport={viewport} />
+        {config.hexMap.shapeGroups?.length > 0 && config.hexMap.type === 'shapes' && config.general.displayAsHex && (
+          <LegendItemHex state={config} runtimeLegend={runtimeLegend} viewport={viewport} />
         )}
       </div>
     </ErrorBoundary>
