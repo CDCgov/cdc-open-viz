@@ -17,7 +17,35 @@ export const createFormatLabels =
           })
         : labels
     const reverseLabels = labels => {
+      if (config.series.some(series => series.dynamicCategory)) {
+        return orderDynamicLabels(labels)
+      }
+
       return config.legend.reverseLabelOrder ? sortVertical(labels).reverse() : sortVertical(labels)
+    }
+
+    const orderDynamicLabels = labels => {
+      // Handle different ordering configurations
+      switch (config.legend.order) {
+        case 'dataColumn':
+          return labels
+        case 'asc':
+        case 'desc':
+          return labels.sort((a, b) => {
+            const valA = a.datum || a.text
+            const valB = b.datum || b.text
+            const numA = parseFloat(valA)
+            const numB = parseFloat(valB)
+            if (!isNaN(numA) && !isNaN(numB)) {
+              return config.legend.order === 'asc' ? numA - numB : numB - numA
+            } else {
+              return config.legend.order === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA)
+            }
+          })
+
+        default:
+          return labels // Default case to handle any unexpected config.legend.order values
+      }
     }
     const colorCode = config.legend?.colorCode
     if (visualizationType === 'Deviation Bar') {

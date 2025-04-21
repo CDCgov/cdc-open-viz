@@ -8,7 +8,7 @@ import NestedDropdown from '@cdc/core/components/NestedDropdown'
 import { MouseEventHandler } from 'react'
 import Loader from '@cdc/core/components/Loader'
 import _ from 'lodash'
-import { DROPDOWN_STYLES } from '@cdc/core/components/Filters/Filters'
+import { DROPDOWN_STYLES } from '@cdc/core/components/Filters/components/Dropdown'
 
 type DashboardFilterProps = {
   show: number[]

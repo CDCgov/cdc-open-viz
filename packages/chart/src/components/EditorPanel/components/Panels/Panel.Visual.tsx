@@ -22,6 +22,7 @@ import { useEditorPermissions } from '../../useEditorPermissions.js'
 import { useEditorPanelContext } from '../../EditorPanelContext.js'
 import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
+import { LineChartConfig } from '../../../../types/ChartConfig'
 
 const PanelVisual: FC<PanelProps> = props => {
   const { config, updateConfig, colorPalettes, twoColorPalette } = useContext<ChartContext>(ConfigContext)
@@ -147,9 +148,7 @@ const PanelVisual: FC<PanelProps> = props => {
                   />
                 </Tooltip.Target>
                 <Tooltip.Content>
-                  <p>
-                  Recommended set to display for Section 508 compliance.
-                  </p>
+                  <p>Recommended set to display for Section 508 compliance.</p>
                 </Tooltip.Content>
               </Tooltip>
             }
@@ -221,6 +220,14 @@ const PanelVisual: FC<PanelProps> = props => {
               label='Line Datapoint Color'
               updateField={updateField}
               options={['Same as Line', 'Lighter than Line']}
+            />
+            <CheckBox
+              value={!(config as LineChartConfig).isolatedDotsSameSize}
+              fieldName='isolatedDotsSameSize'
+              label='Accentuate isolated data points'
+              updateField={(section, subsection, fieldname, value) =>
+                updateField(section, subsection, fieldname, !value)
+              }
             />
           </>
         )}

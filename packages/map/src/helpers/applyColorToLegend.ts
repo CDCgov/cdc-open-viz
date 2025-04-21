@@ -42,7 +42,10 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
   if (color.includes('qualitative')) return mapColorPalette[colorIdx]
 
   // Determine color distribution
-  const amt = Math.max(result.length - specialClasses.length, 1)
+  const amt =
+    Math.max(result.length - specialClasses.length, 1) < 10
+      ? Math.max(result.length - specialClasses.length, 1)
+      : Object.keys(colorDistributions).length
   const distributionArray = colorDistributions[amt] ?? []
 
   const specificColor =
