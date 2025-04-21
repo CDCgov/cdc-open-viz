@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import CdcMapComponent from './CdcMapComponent'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'

@@ -1,8 +1,9 @@
 import { MapConfig } from '../types/MapConfig'
 import MapActions from './map.actions'
+import defaults from './../data/initial-state'
 
 export const getInitialState = (configObj): MapConfig => {
-  const initialState = {
+  return {
     config: configObj,
     loading: false,
     accessibleStatus: '',
@@ -20,9 +21,9 @@ export const getInitialState = (configObj): MapConfig => {
     runtimeData: { init: true },
     runtimeFilters: [],
     runtimeLegend: [],
-    stateToShow: ''
+    stateToShow: '',
+    ...defaults,
   }
-  return initialState
 }
 
 export type MapState = MapConfig & {

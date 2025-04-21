@@ -6,12 +6,10 @@ import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 import AnnotationList from './AnnotationList'
 
 const AnnotationDropdown = () => {
-  const { state: config, currentViewport: viewport } = useContext(ConfigContext)
+  const { config, currentViewport: viewport } = useContext(ConfigContext)
   const [expanded, setExpanded] = useState(false)
 
   const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${APP_FONT_SIZE}px`
-
-  const annotations = config?.annotations || []
 
   const limitHeight = {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,

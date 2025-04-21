@@ -34,7 +34,7 @@ type LegendProps = {
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const { skipId, containerWidthPadding } = props
-  const { isEditor, dimensions, currentViewport } = useContext(ConfigContext)
+  const { dimensions, currentViewport } = useContext(ConfigContext)
 
   const {
     runtimeFilters,
@@ -96,7 +96,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         }
       })
     } catch (e) {
-      console.error('Error in getFormattedLegendItems', e)
+      console.error('Error in getFormattedLegendItems', e) // eslint-disable-line
       return []
     }
   }
@@ -305,7 +305,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 {legendListItems}
               </ul>
             )}
-            {(config.visual.additionalCityStyles.some(c => c.label) || config.visual.cityStyleLabel) && (
+            {(config.visual.additionalCityStyles && config.visual.additionalCityStyles.some(c => c.label) || config.visual.cityStyleLabel) && (
               <>
                 <hr />
                 <div className={legendClasses.div.join(' ') || ''}>
@@ -346,7 +346,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             )}
           </section>
         </aside>
-        {config.hexMap.shapeGroups?.length > 0 && config.hexMap.type === 'shapes' && config.general.displayAsHex && (
+        {config.hexMap?.shapeGroups?.length > 0 && config.hexMap.type === 'shapes' && config.general.displayAsHex && (
           <LegendItemHex state={config} runtimeLegend={runtimeLegend} viewport={viewport} />
         )}
       </div>

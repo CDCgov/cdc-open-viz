@@ -17,7 +17,7 @@ type AnnotationsProps = {
 const Annotations: React.FC<AnnotationsProps> = ({ onDragStateChange }) => {
   const [draggingItems, setDraggingItems] = useState([])
   const {
-    state: config,
+    config,
     setState: updateConfig,
     isDraggingAnnotation,
     isEditor,

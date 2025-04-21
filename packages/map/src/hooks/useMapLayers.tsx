@@ -1,9 +1,8 @@
-import { useEffect, useId, useState, type MouseEvent, type ChangeEvent, useContext } from 'react'
+import { useEffect, useId, useState, type MouseEvent, type ChangeEvent } from 'react'
 import { feature } from 'topojson-client'
 import { Group } from '@visx/group'
 import { MapConfig } from '../types/MapConfig'
 import _ from 'lodash'
-import { MapDispatchContext } from '../context'
 
 /**
  * This is the starting structure for adding custom geoJSON shape layers to a projection.
@@ -18,10 +17,9 @@ import { MapDispatchContext } from '../context'
  * 3) Clean (ie. mapshaper -clean) and edit the shape as needed and export the new layer as geoJSON
  * 4) Save the geoJSON somewhere external.
  */
-export default function useMapLayers(config: MapConfig, pathGenerator: Function, tooltipId: string) {
+export default function useMapLayers(config: MapConfig, setConfig, pathGenerator: Function, tooltipId: string) {
   const [fetchedTopoJSON, setFetchedTopoJSON] = useState([])
   const geoId = useId()
-  const dispatch = useContext(MapDispatchContext)
 
   // small reminder that we export the feature and the path as options
   const [pathArray, setPathArray] = useState([])
@@ -42,7 +40,7 @@ export default function useMapLayers(config: MapConfig, pathGenerator: Function,
       const geos = await getMapTopoJSONLayers()
       setFetchedTopoJSON(geos)
     } catch (e) {
-      console.error('Error fetching GeoJSON layers:', e)
+      console.error('Error fetching GeoJSON layers:', e) // eslint-disable-line
     }
   }
 
@@ -51,7 +49,7 @@ export default function useMapLayers(config: MapConfig, pathGenerator: Function,
     const newConfig = _.cloneDeep(config)
     const layers = newConfig.map.layers.filter((_layer, i) => i !== index)
     newConfig.map.layers = layers
-    dispatch({ type: 'SET_CONFIG', payload: newConfig })
+    setConfig(newConfig )
   }
 
   const handleAddLayer = (e: Event) => {
@@ -62,7 +60,7 @@ export default function useMapLayers(config: MapConfig, pathGenerator: Function,
     }
     const newConfig = _.cloneDeep(config)
     newConfig.map.layers.unshift(placeHolderLayer)
-    dispatch({ type: 'SET_CONFIG', payload: newConfig })
+    setConfig( newConfig )
   }
 
   const handleMapLayer = (e: ChangeEvent<HTMLInputElement>, index: number, layerKey: string) => {
@@ -77,7 +75,7 @@ export default function useMapLayers(config: MapConfig, pathGenerator: Function,
     let newLayers = _.cloneDeep(config.map.layers)
     _.set(newLayers, `[${index}][${layerKey}]`, layerValue)
 
-    dispatch({ type: 'SET_CONFIG', payload: { ...config, map: { ...config.map, layers: newLayers } } })
+    setConfig({ ...config, map: { ...config.map, layers: newLayers } })
   }
 
   /**

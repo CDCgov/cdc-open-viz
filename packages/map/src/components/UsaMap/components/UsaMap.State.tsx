@@ -57,11 +57,12 @@ const nudges = {
 }
 
 const UsaMap = () => {
-  // prettier-ignore
+
   const {
       data,
       setSharedFilterValue,
       config,
+    setConfig,
       tooltipId,
       mapId,
       logo,
@@ -235,7 +236,7 @@ const UsaMap = () => {
   let pathGenerator = geoPath().projection(geoAlbersUsa().translate(translate))
 
   // Note: Layers are different than patterns
-  const { pathArray } = useMapLayers(config, '', pathGenerator, tooltipId)
+  const { pathArray } = useMapLayers(config, setConfig, pathGenerator, tooltipId)
 
   if (!focusedStates) {
     return <></>
@@ -434,7 +435,7 @@ const UsaMap = () => {
               <path tabIndex={-1} className='single-geo' strokeWidth={1} d={path} />
 
               {/* apply patterns on top of state path*/}
-              {map.patterns.map((patternData, _patternIndex) => {
+              {map?.patterns?.map((patternData, _patternIndex) => {
                 const { pattern, dataKey, size } = patternData
                 const currentFill = styles.fill
                 const hasMatchingValues = patternData.dataValue === geoData?.[patternData.dataKey]
@@ -615,7 +616,7 @@ const UsaMap = () => {
             {({ features, projection }) => constructGeoJsx(features, projection)}
           </AlbersUsa>
         )}
-        {annotations.length > 0 && <Annotation.Draggable onDragStateChange={handleDragStateChange} />}
+        {annotations?.length > 0 && <Annotation.Draggable onDragStateChange={handleDragStateChange} />}
       </svg>
 
       <TerritoriesSection territories={territories} logo={logo} config={config} territoriesData={territoriesData} />

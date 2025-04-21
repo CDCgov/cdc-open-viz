@@ -37,19 +37,19 @@ const WorldMap = () => {
     position,
     setRuntimeData,
     setState,
-    state,
+    config,
     tooltipId,
     legendMemo,
     legendSpecialClassLastMemo
   } = useContext(ConfigContext)
 
-  const { type, allowMapZoom } = state.general
+  const { type, allowMapZoom } = config.general
 
   const [world, setWorld] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const { generateRuntimeData } = useGenerateRuntimeData(state)
+  const { generateRuntimeData } = useGenerateRuntimeData(config)
   const dispatch = useContext(MapDispatchContext)
 
   useEffect(() => {
@@ -67,8 +67,8 @@ const WorldMap = () => {
 
   // TODO Refactor - state should be set together here to avoid rerenders
   // Resets to original data & zooms out
-  const handleReset = (state, setState, setRuntimeData) => {
-    const newRuntimeData = generateRuntimeData(state)
+  const handleReset = (config, setState, setRuntimeData) => {
+    const newRuntimeData = generateRuntimeData(config)
     dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
     dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
     setRuntimeData(newRuntimeData)
@@ -89,8 +89,8 @@ const WorldMap = () => {
 
   const constructGeoJsx = geographies => {
     const geosJsx = geographies.map(({ feature: geo, path }, i) => {
-      // If the geo.properties.state value is found in the data use that, otherwise fall back to geo.properties.iso
-      const dataHasStateName = state.data.some(d => d[state.columns.geo.name] === geo.properties.state)
+      // If the geo.properties.config value is found in the data use that, otherwise fall back to geo.properties.iso
+      const dataHasStateName = config.data.some(d => d[config.columns.geo.name] === geo.properties.state)
       const geoKey =
         geo.properties.state && data[geo.properties.state]
           ? geo.properties.state
@@ -110,11 +110,11 @@ const WorldMap = () => {
 
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
-        legendColors = applyLegendToRow(geoData, state)
+        legendColors = applyLegendToRow(geoData, config)
       }
 
-      const geoStrokeColor = getGeoStrokeColor(state)
-      const geoFillColor = getGeoFillColor(state)
+      const geoStrokeColor = getGeoStrokeColor(config)
+      const geoFillColor = getGeoFillColor(config)
 
       let styles: Record<string, string | Record<string, string>> = {
         fill: geoFillColor,
@@ -140,8 +140,8 @@ const WorldMap = () => {
 
         // When to add pointer cursor
         if (
-          (state.columns.navigate && geoData[state.columns.navigate.name]) ||
-          state.tooltips.appearanceType === 'click'
+          (config.columns.navigate && geoData[config.columns.navigate.name]) ||
+          config.tooltips.appearanceType === 'click'
         ) {
           styles.cursor = 'pointer'
         }
@@ -150,7 +150,7 @@ const WorldMap = () => {
           <Geo
             additionalData={additionalData}
             geoData={geoData}
-            state={state}
+            state={config}
             key={i + '-geo'}
             style={styles}
             path={path}
@@ -169,7 +169,7 @@ const WorldMap = () => {
         <Geo
           additionaldata={JSON.stringify(additionalData)}
           geodata={JSON.stringify(geoData)}
-          state={state}
+          state={config}
           key={i + '-geo'}
           stroke={geoStrokeColor}
           strokeWidth={strokeWidth}
@@ -188,7 +188,7 @@ const WorldMap = () => {
         geoClickHandler={geoClickHandler}
         key='cities'
         projection={projection}
-        state={state}
+        state={config}
         titleCase={titleCase}
         tooltipId={tooltipId}
       />
@@ -205,11 +205,11 @@ const WorldMap = () => {
   return (
     <ErrorBoundary component='WorldMap'>
       {allowMapZoom ? (
-        <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(state)}>
+        <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(config)}>
           <rect
             height={SVG_HEIGHT}
             width={SVG_WIDTH}
-            onClick={() => handleReset(state, setState, setRuntimeData)}
+            onClick={() => handleReset(config, setState, setRuntimeData)}
             fill='white'
           />
           <ZoomableGroup

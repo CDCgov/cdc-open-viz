@@ -16,8 +16,8 @@ type BubbleListProps = {
 }
 
 export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
-  const { state, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, runtimeData } = useContext(ConfigContext)
-  const { columns, data, general, visual } = state
+  const { config, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, runtimeData } = useContext(ConfigContext)
+  const { columns, data, general, visual } = config
   const { geoType, allowMapZoom } = general
   const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder } = visual
   const hasBubblesWithZeroOnMap = showBubbleZeros ? 0 : 1
@@ -200,7 +200,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
         stateName = displayGeoName(stateName)
         const toolTip = applyTooltipsToGeo(stateName, item)
-        const legendColors = applyLegendToRow(item, state)
+        const legendColors = applyLegendToRow(item, config)
 
         let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 
@@ -233,7 +233,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
                   e.clientY > pointerY - clickTolerance &&
                   e.clientY < pointerY + clickTolerance
                 ) {
-                  handleBubbleClick(state)
+                  handleBubbleClick(config)
                   pointerX = undefined
                   pointerY = undefined
                 }
@@ -268,7 +268,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
                     e.clientY > pointerY - clickTolerance &&
                     e.clientY < pointerY + clickTolerance
                   ) {
-                    handleBubbleClick(state)
+                    handleBubbleClick(config)
                     pointerX = undefined
                     pointerY = undefined
                   }

@@ -3,7 +3,7 @@ import { navigationHandler } from '../helpers'
 import { useContext } from 'react'
 
 const useGeoClickHandler = () => {
-  const { state, setState, setSharedFilter, customNavigationHandler } = useContext(ConfigContext)
+  const { config: state, setState, setSharedFilter, customNavigationHandler } = useContext(ConfigContext)
   const dispatch = useContext(MapDispatchContext)
 
   const geoClickHandler = (geoDisplayName: string, geoData: object): void => {
