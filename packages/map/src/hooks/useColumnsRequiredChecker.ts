@@ -3,11 +3,11 @@ import ConfigContext, { MapDispatchContext } from '../context'
 import { getColumnNames } from '../helpers/getColumnNames'
 
 const useColumnsRequiredChecker = () => {
-  const { state } = useContext(ConfigContext)
+  const { config } = useContext(ConfigContext)
   const dispatch = useContext(MapDispatchContext)
 
   const columnsRequiredChecker = () => {
-    const { primaryColumnName, geoColumnName } = getColumnNames(state.columns)
+    const { primaryColumnName, geoColumnName } = getColumnNames(config.columns)
 
     let columnList = []
 
@@ -17,25 +17,25 @@ const useColumnsRequiredChecker = () => {
     }
 
     // Primary is required if we're on a data map or a point map
-    if ('navigation' !== state.general.type && '' === primaryColumnName) {
+    if ('navigation' !== config.general.type && '' === primaryColumnName) {
       columnList.push('Primary')
     }
 
     // Navigate is required for navigation maps
-    if ('navigation' === state.general.type && '' === state.columns.navigate.name) {
+    if ('navigation' === config.general.type && '' === config.columns.navigate.name) {
       columnList.push('Navigation')
     }
 
     if (
-      ('us-geocode' === state.general.type || 'world-geocode' === state.general.type) &&
-      '' === state.columns.latitude.name
+      ('us-geocode' === config.general.type || 'world-geocode' === config.general.type) &&
+      '' === config.columns.latitude.name
     ) {
       columnList.push('Latitude')
     }
 
     if (
-      ('us-geocode' === state.general.type || 'world-geocode' === state.general.type) &&
-      '' === state.columns.longitude.name
+      ('us-geocode' === config.general.type || 'world-geocode' === config.general.type) &&
+      '' === config.columns.longitude.name
     ) {
       columnList.push('Longitude')
     }
