@@ -37,7 +37,6 @@ const useGenerateRuntimeLegend = (legendMemo, legendSpecialClassLastMemo) => {
 
   const generateRuntimeLegend = useCallback(
     (configObj, runtimeData, hash): GeneratedLegend | [] => {
-      // if (!runtimeData) return
       try {
         // Throw errors if args missing
         if (!runtimeData) Error('No runtime data provided')
