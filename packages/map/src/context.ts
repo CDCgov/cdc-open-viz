@@ -30,8 +30,8 @@ type MapContext = {
   setRuntimeFilters
   setRuntimeLegend
   setSharedFilterValue
-  setState
-  state: MapConfig
+  setConfig: Function
+  config: MapConfig
   tooltipId: string
   legendMemo
   legendSpecialClassLastMemo

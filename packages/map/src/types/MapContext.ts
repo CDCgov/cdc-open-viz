@@ -36,8 +36,8 @@ export type MapContext = {
   setRuntimeFilters: Function
   setRuntimeLegend: Function
   setSharedFilterValue: Function
-  setState: (newState: MapConfig) => MapConfig
-  state: MapConfig
+  setConfig: (newState: MapConfig) => MapConfig
+  config: MapConfig
   viewport: ViewPort
   stateToShow: string
   scale: number

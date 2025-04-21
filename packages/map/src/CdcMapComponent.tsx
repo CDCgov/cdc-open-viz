@@ -98,7 +98,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeData,
     runtimeFilters,
     runtimeLegend,
-    state,
+    config,
     modal,
     accessibleStatus,
     filteredCountryCode,
@@ -125,7 +125,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   useEffect(() => {
-    setState({ ...state, data: configObj.data })
+    setState({ ...config, data: configObj.data })
   }, [configObj.data]) // eslint-disable-line
 
   const setModal = modal => {
@@ -145,7 +145,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   const _setRuntimeData = (data: any) => {
-    if (state) {
+    if (config) {
       setRuntimeData(data)
     } else {
       setRuntimeFilters(data)
@@ -170,15 +170,15 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   // hooks
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
   const { generateRuntimeLegend } = useGenerateRuntimeLegend(legendMemo, legendSpecialClassLastMemo)
-  const { generateRuntimeData } = useGenerateRuntimeData(state)
+  const { generateRuntimeData } = useGenerateRuntimeData(config)
 
   const reloadURLData = async () => {
-    if (state.dataUrl) {
-      const dataUrl = new URL(state.runtimeDataUrl || state.dataUrl, window.location.origin)
+    if (config.dataUrl) {
+      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl, window.location.origin)
       let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
       let isUpdateNeeded = false
-      state.filters.forEach(filter => {
+      config.filters.forEach(filter => {
         if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
           qsParams[filter.queryParameter] = filter.active
           isUpdateNeeded = true
@@ -225,12 +225,12 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
         data = []
       }
 
-      if (state.dataDescription) {
+      if (config.dataDescription) {
         data = transform.autoStandardize(data)
-        data = transform.developerStandardize(data, state.dataDescription)
+        data = transform.developerStandardize(data, config.dataDescription)
       }
 
-      const newState = _.cloneDeep(state)
+      const newState = _.cloneDeep(config)
       newState.data = data
       newState.runtimeDataUrl = dataUrlFinal
 
@@ -239,24 +239,24 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   useEffect(() => {
-    if (state && !runtimeData.init && !coveLoadedHasRan && container) {
-      publish('cove_loaded', { config: state })
+    if (config && !runtimeData.init && !coveLoadedHasRan && container) {
+      publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
     }
-  }, [state, container, runtimeData.init])
+  }, [config, container, runtimeData.init])
 
   useEffect(() => {
     // UID
-    if (state.data && state.columns.geo.name && state.columns.geo.name !== state.data.fromColumn) {
-      addUIDs(state, state.columns.geo.name)
+    if (config.data && config.columns.geo.name && config.columns.geo.name !== config.data.fromColumn) {
+      addUIDs(config, config.columns.geo.name)
     }
 
     // Filters
-    const hashFilters = hashObj(state.filters)
+    const hashFilters = hashObj(config.filters)
     let filters: VizFilter[]
 
-    if (state.filters && (state || hashFilters !== runtimeFilters.fromHash)) {
-      filters = generateRuntimeFilters({ ...state, data: configObj.data }, hashFilters, runtimeFilters)
+    if (config.filters && (config || hashFilters !== runtimeFilters.fromHash)) {
+      filters = generateRuntimeFilters({ ...config, data: configObj.data }, hashFilters, runtimeFilters)
 
       if (filters) {
         filters.forEach((filter: VizFilter, index: number) => {
@@ -269,50 +269,50 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       }
     }
 
-    const hashLegend = generateRuntimeLegendHash(state, runtimeFilters)
+    const hashLegend = generateRuntimeLegendHash(config, runtimeFilters)
 
     const hashData = hashObj({
-      data: state.data,
-      columns: state.columns,
-      geoType: state.general.geoType,
-      type: state.general.type,
-      geo: state.columns.geo.name,
-      primary: state.columns.primary.name,
-      mapPosition: state.mapPosition,
-      map: state.map,
+      data: config.data,
+      columns: config.columns,
+      geoType: config.general.geoType,
+      type: config.general.type,
+      geo: config.columns.geo.name,
+      primary: config.columns.primary.name,
+      mapPosition: config.mapPosition,
+      map: config.map,
       ...runtimeFilters
     })
 
     // Data
-    if (hashData !== runtimeData?.fromHash && state.data?.fromColumn) {
+    if (hashData !== runtimeData?.fromHash && config.data?.fromColumn) {
       const newRuntimeData = generateRuntimeData(
-        { ...state, data: configObj.data },
+        { ...config, data: configObj.data },
         filters || runtimeFilters,
         hashData
       )
       setRuntimeData(newRuntimeData)
     } else {
       if (hashLegend !== runtimeLegend?.fromHash && undefined === runtimeData?.init) {
-        const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
+        const legend = generateRuntimeLegend(config, runtimeData, hashLegend)
         setRuntimeLegend(legend)
       }
     }
-  }, [state, configObj.data])
+  }, [config, configObj.data])
 
   useEffect(() => {
-    const hashLegend = generateRuntimeLegendHash(state, runtimeFilters)
-    const legend = generateRuntimeLegend({ ...state, data: configObj.data }, runtimeData, hashLegend)
+    const hashLegend = generateRuntimeLegendHash(config, runtimeFilters)
+    const legend = generateRuntimeLegend({ ...config, data: configObj.data }, runtimeData, hashLegend)
     setRuntimeLegend(legend)
   }, [
     runtimeData,
-    state.legend.unified,
-    state.legend.showSpecialClassesLast,
-    state.legend.separateZero,
-    state.general.equalNumberOptIn,
-    state.legend.numberOfItems,
-    state.legend.specialClasses,
-    state.legend.additionalCategories,
-    state,
+    config.legend.unified,
+    config.legend.showSpecialClassesLast,
+    config.legend.separateZero,
+    config.general.equalNumberOptIn,
+    config.legend.numberOfItems,
+    config.legend.specialClasses,
+    config.legend.additionalCategories,
+    config,
     runtimeFilters
   ])
 
@@ -320,13 +320,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     if (!isDashboard) {
       reloadURLData()
     }
-  }, [JSON.stringify(state.filters)])
+  }, [JSON.stringify(config.filters)])
 
-  const { general, tooltips, table, columns } = state
+  const { general, tooltips, table, columns } = config
   const { subtext = '', geoType } = general
   const { showDownloadImgButton, showDownloadPdfButton, headerColor, introText } = general
 
-  let title = state.general.title
+  let title = config.general.title
 
   if (isEditor) {
     if (!title || title === '') title = 'Map Title'
@@ -365,7 +365,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     setSharedFilter,
     setSharedFilterValue,
     setState,
-    state,
+    config,
     stateToShow,
     tooltipId,
     tooltipRef,
@@ -374,20 +374,20 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     isDraggingAnnotation
   }
 
-  if (!state.data) return <></>
+  if (!config.data) return <></>
 
-  const tabId = handleMapTabbing(state, loading, legendId)
+  const tabId = handleMapTabbing(config, loading, legendId)
 
   // this only shows in Dashboard config mode and only if Show Table is also set
   const tableLink = (
-    <a href={`#data-table-${state.dataKey}`} className='margin-left-href'>
-      {state.dataKey} (Go to Table)
+    <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
+      {config.dataKey} (Go to Table)
     </a>
   )
 
   const sectionClassNames = () => {
     const classes = ['cove-component__content', 'cdc-map-inner-container', `${currentViewport}`, `${headerColor}`]
-    if (state?.runtime?.editorErrorMessage.length > 0) classes.push('type-map--has-error')
+    if (config?.runtime?.editorErrorMessage.length > 0) classes.push('type-map--has-error')
     return classes.join(' ')
   }
 
@@ -395,12 +395,12 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     <ConfigContext.Provider value={mapProps}>
       <MapDispatchContext.Provider value={dispatch}>
         <Layout.VisualizationWrapper
-          config={state}
+          config={config}
           isEditor={isEditor}
           ref={outerContainerRef}
           currentViewport={currentViewport}
           imageId={imageId}
-          showEditorPanel={state.showEditorPanel}
+          showEditorPanel={config.showEditorPanel}
         >
           {isEditor && <EditorPanel />}
           <Layout.Responsive isEditor={isEditor}>
@@ -409,35 +409,35 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
             )}
             {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
               <section className={sectionClassNames()} aria-label={'Map: ' + title} ref={innerContainerRef}>
-                {state?.runtime?.editorErrorMessage.length > 0 && <Error state={state} />}
+                {config?.runtime?.editorErrorMessage.length > 0 && <Error state={config} />}
                 <Title
                   title={title}
                   superTitle={general.superTitle}
-                  config={state}
+                  config={config}
                   classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${headerColor}`]}
                 />
                 <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
-                {state?.annotations?.length > 0 && (
+                {config?.annotations?.length > 0 && (
                   <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
                 )}
 
                 {introText && <section className='introText mb-4'>{parse(introText)}</section>}
 
-                {state?.filters?.length > 0 && (
+                {config?.filters?.length > 0 && (
                   <Filters
-                    config={state}
+                    config={config}
                     setConfig={setState}
                     filteredData={runtimeFilters}
                     setFilteredData={_setRuntimeData}
                     dimensions={dimensions}
-                    standaloneMap={!state}
+                    standaloneMap={!config}
                   />
                 )}
 
                 <div
                   role='region'
                   tabIndex={0}
-                  className={getMapContainerClasses(state, modal).join(' ')}
+                  className={getMapContainerClasses(config, modal).join(' ')}
                   onClick={e => closeModal(e, modal, setModal)}
                   onKeyDown={e => {
                     if (e.key === 'Enter') {
@@ -451,7 +451,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       <>
                         {modal && <Modal />}
                         {'single-state' === geoType && <UsaMap.SingleState />}
-                        {'us' === geoType && 'us-geocode' !== state.general.type && <UsaMap.State />}
+                        {'us' === geoType && 'us-geocode' !== config.general.type && <UsaMap.State />}
                         {'us-region' === geoType && <UsaMap.Region />}
                         {'us-county' === geoType && <UsaMap.County />}
                         {'world' === geoType && <WorldMap />}
@@ -459,7 +459,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                         {'google-map' === geoType && <GoogleMap />}
                         {'data' === general.type &&
                           logo &&
-                          ('us' !== geoType || 'us-geocode' === state.general.type) && (
+                          ('us' !== geoType || 'us-geocode' === config.general.type) && (
                             <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
                           )}
                       </>
@@ -483,13 +483,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     displayGeoName={displayGeoName}
                     data={runtimeData}
                     options={general}
-                    columns={state.columns}
+                    columns={config.columns}
                     navigationHandler={val => navigationHandler('_blank', val, customNavigationHandler)}
                   />
                 )}
 
                 {/* Link (to data table?) */}
-                {isDashboard && state.table?.forceDisplay && state.table.showDataTableLink ? tableLink : link && link}
+                {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
 
                 {subtext.length > 0 && <p className='subtext mt-4'>{parse(subtext)}</p>}
 
@@ -499,7 +499,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       text='Download Image'
                       title='Download Chart as Image'
                       type='image'
-                      state={state}
+                      state={config}
                       elementToCapture={imageId}
                     />
                   )}
@@ -508,24 +508,24 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       text='Download PDF'
                       title='Download Chart as PDF'
                       type='pdf'
-                      state={state}
+                      state={config}
                       elementToCapture={imageId}
                     />
                   )}
                 </MediaControls.Section>
 
-                {state?.runtime?.editorErrorMessage.length === 0 &&
+                {config?.runtime?.editorErrorMessage.length === 0 &&
                   true === table.forceDisplay &&
                   general.type !== 'navigation' &&
                   false === loading && (
                     <DataTable
                       columns={columns}
-                      config={state}
+                      config={config}
                       currentViewport={currentViewport}
                       displayGeoName={displayGeoName}
                       expandDataTable={table.expanded}
                       formatLegendLocation={key =>
-                        formatLegendLocation(key, runtimeData?.[key]?.[state.columns.geo.name])
+                        formatLegendLocation(key, runtimeData?.[key]?.[config.columns.geo.name])
                       }
                       headerColor={general.headerColor}
                       imageRef={imageId}
@@ -535,7 +535,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       legendSpecialClassLastMemo={legendSpecialClassLastMemo}
                       navigationHandler={navigationHandler}
                       outerContainerRef={outerContainerRef}
-                      rawData={state.data}
+                      rawData={config.data}
                       runtimeData={runtimeData}
                       runtimeLegend={runtimeLegend}
                       showDownloadImgButton={showDownloadImgButton}
@@ -547,7 +547,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     />
                   )}
 
-                {state.annotations.length > 0 && <Annotation.Dropdown />}
+                {config.annotations.length > 0 && <Annotation.Dropdown />}
 
                 {general.footnotes && <section className='footnotes pt-2 mt-4'>{parse(general.footnotes)}</section>}
               </section>
@@ -566,7 +566,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   className={`${
                     tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'
                   }`}
-                  style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }}
+                  style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
                 />
               )}
             <div
@@ -574,7 +574,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
               id={`tooltip__${tooltipId}-canvas`}
               className='tooltip'
               style={{
-                background: `rgba(255,255,255,${state.tooltips.opacity / 100})`,
+                background: `rgba(255,255,255,${config.tooltips.opacity / 100})`,
                 position: 'absolute',
                 whiteSpace: 'nowrap',
                 display: 'none' // can't use d-none here
