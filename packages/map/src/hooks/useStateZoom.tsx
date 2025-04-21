@@ -26,13 +26,13 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     const fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === statePicked)
     const stateName = statePicked
     const stateData = { fipsCode, stateName }
-    const newState = _.cloneDeep(config)
-    newState.general.statePicked = stateData
+    const newConfig = _.cloneDeep(config)
+    newConfig.general.statePicked = stateData
     const stateToShow = topoData?.states?.find(s => s.properties.name === statePicked)
 
     dispatch({ type: 'SET_SCALE', payload: 1 })
     dispatch({ type: 'SET_TRANSLATE', payload: [0, 0] })
-    dispatch({ type: 'SET_CONFIG', payload: newState })
+    dispatch({ type: 'SET_CONFIG', payload: newConfig })
     dispatch({ type: 'SET_STATE_TO_SHOW', payload: stateToShow })
   }, [topoData])
 
@@ -40,9 +40,9 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     const fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === statePicked)
     const stateName = statePicked
     const stateData = { fipsCode, stateName }
-    const newState = _.cloneDeep(config)
-    newState.general.statePicked = stateData
-    dispatch({ type: 'SET_CONFIG', payload: newState })
+    const newConfig = _.cloneDeep(config)
+    newConfig.general.statePicked = stateData
+    dispatch({ type: 'SET_CONFIG', payload: newConfig })
     setScaleAndTranslate('reset')
   }, [statePicked])
 
