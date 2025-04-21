@@ -3,7 +3,7 @@ import MapActions from './map.actions'
 
 export const getInitialState = (configObj): MapConfig => {
   const initialState = {
-    state: configObj,
+    config: configObj,
     loading: false,
     accessibleStatus: '',
     coveLoadedHasRan: false,
@@ -26,7 +26,7 @@ export const getInitialState = (configObj): MapConfig => {
 }
 
 export type MapState = MapConfig & {
-  state: MapConfig
+  config: MapConfig
   loading: boolean
   accessibleStatus: string
   coveLoadedHasRan: boolean
@@ -50,7 +50,7 @@ export type MapState = MapConfig & {
 export const mapReducer = (state: MapState, action: MapActions): MapState => {
   switch (action.type) {
     case 'SET_CONFIG':
-      return { ...state, state: action.payload }
+      return { ...state, config: action.payload }
     case 'SET_LOADING':
       return { ...state, loading: action.payload }
     case 'SET_ACCESSIBLE_STATUS':
