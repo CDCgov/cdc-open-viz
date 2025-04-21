@@ -26,7 +26,7 @@ import useApplyLegendToRow from '../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../hooks/useApplyTooltipsToGeo'
 import useGenerateRuntimeData from '../../hooks/useGenerateRuntimeData'
 
-import './WorldMap.styles.css'
+import './worldMap.styles.css'
 
 let projection = geoMercator()
 
