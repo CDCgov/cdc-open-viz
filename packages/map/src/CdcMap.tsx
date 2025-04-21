@@ -11,7 +11,6 @@ import { MapConfig } from './types/MapConfig'
 type CdcMapProps = {
   config: MapConfig
   configUrl?: string
-  isDashboard: false
   isEditor?: boolean
   link?: string
   logo?: string
@@ -21,7 +20,6 @@ type CdcMapProps = {
 
 const CdcMap: React.FC<CdcMapProps> = ({
   navigationHandler: customNavigationHandler,
-  isDashboard = false,
   isEditor = false,
   configUrl,
   logo = '',
@@ -86,7 +84,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
     }
 
     if (newState.table.forceDisplay === undefined) {
-      newState.table.forceDisplay = !isDashboard
+      newState.table.forceDisplay = true
     }
 
     validateFipsCodeLength(newState)
@@ -125,7 +123,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
       config={state}
       setEditorConfig={setConfig}
       navigationHandler={customNavigationHandler}
-      isDashboard={isDashboard}
+      isDashboard={false}
       isEditor={isEditor}
       logo={logo}
       link={link}
