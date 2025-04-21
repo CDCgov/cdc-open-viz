@@ -155,7 +155,7 @@ const UsaMap = () => {
   const territories = territoriesData.map((territory, territoryIndex) => {
     const Shape = displayAsHex ? Territory.Hexagon : Territory.Rectangle
 
-    const territoryData = dataRef.current?.[territory]
+    const territoryData = data?.[territory]
 
     let toolTip
 
@@ -281,13 +281,13 @@ const UsaMap = () => {
 
       if (!geoKey) return
 
-      const geoData = dataRef.current[geoKey]
+      const geoData = data?.[geoKey]
 
       let legendColors
 
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
-        legendColors = applyLegendToRow(geoData, state)
+        legendColors = applyLegendToRow(geoData)
       }
 
       const geoDisplayName = displayGeoName(geoKey)
