@@ -48,10 +48,10 @@ export default function useMapLayers(config: MapConfig, pathGenerator: Function,
 
   const handleRemoveLayer = (e: MouseEvent<HTMLButtonElement>, index: number) => {
     e.preventDefault()
-    const newState = _.cloneDeep(config)
-    const layers = newState.map.layers.filter((_layer, i) => i !== index)
-    newState.map.layers = layers
-    dispatch({ type: 'SET_CONFIG', payload: newState })
+    const newConfig = _.cloneDeep(config)
+    const layers = newConfig.map.layers.filter((_layer, i) => i !== index)
+    newConfig.map.layers = layers
+    dispatch({ type: 'SET_CONFIG', payload: newConfig })
   }
 
   const handleAddLayer = (e: Event) => {
@@ -60,9 +60,9 @@ export default function useMapLayers(config: MapConfig, pathGenerator: Function,
       name: 'New Custom Layer',
       url: ''
     }
-    const newState = _.cloneDeep(config)
-    newState.map.layers.unshift(placeHolderLayer)
-    dispatch({ type: 'SET_CONFIG', payload: newState })
+    const newConfig = _.cloneDeep(config)
+    newConfig.map.layers.unshift(placeHolderLayer)
+    dispatch({ type: 'SET_CONFIG', payload: newConfig })
   }
 
   const handleMapLayer = (e: ChangeEvent<HTMLInputElement>, index: number, layerKey: string) => {
