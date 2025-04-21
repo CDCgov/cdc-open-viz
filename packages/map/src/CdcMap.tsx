@@ -25,16 +25,16 @@ const CdcMap: React.FC<CdcMapProps> = ({
   logo = '',
   link,
   config: editorsConfig,
-  setConfig = null
+  setConfig: setEditorsConfig
 }) => {
   const editorContext = useContext(EditorContext)
-  const [state, _setState] = useState(null)
+  const [config, _setConfig] = useState(null)
 
-  const setState = newConfig => {
+  const setConfig = newConfig => {
     if (isEditor) {
       editorContext.setTempConfig(newConfig)
     }
-    _setState(newConfig)
+    _setConfig(newConfig)
   }
 
   const [loading, setLoading] = useState(true)
@@ -92,7 +92,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
     const processedConfig = { ...coveUpdateWorker(newState) }
 
     setTimeout(() => {
-      setState(processedConfig)
+      setConfig(processedConfig)
       setLoading(false)
     }, 10)
   }
@@ -100,8 +100,8 @@ const CdcMap: React.FC<CdcMapProps> = ({
   const init = async () => {
     let configData = null
 
-    if (state) {
-      configData = state
+    if (config) {
+      configData = config
     }
 
     if (configUrl) {
@@ -120,10 +120,9 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
   return (
     <CdcMapComponent
-      config={state}
-      setEditorConfig={setConfig}
+      config={config}
+      setEditorConfig={setEditorsConfig}
       navigationHandler={customNavigationHandler}
-      isDashboard={false}
       isEditor={isEditor}
       logo={logo}
       link={link}
