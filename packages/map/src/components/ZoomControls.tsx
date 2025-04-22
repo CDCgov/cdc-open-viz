@@ -7,7 +7,7 @@ import './zoomControls.styles.css'
 type ZoomControlsProps = {
   handleZoomIn: (coordinates: [Number, Number]) => void
   handleZoomOut: (coordinates: [Number, Number]) => void
-  handleReset: (state: MapConfig, setState: Function, setRuntimeData: Function) => void
+  handleReset: (state: MapConfig, setConfig: Function, setRuntimeData: Function) => void
 }
 
 const ZoomControls: React.FC<ZoomControlsProps> = ({ handleZoomIn, handleZoomOut, handleReset }) => {

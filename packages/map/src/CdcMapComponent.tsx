@@ -365,7 +365,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     setRuntimeLegend,
     setSharedFilter,
     setSharedFilterValue,
-    setState: setConfig,
     config,
     stateToShow,
     tooltipId,
