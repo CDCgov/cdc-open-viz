@@ -11,7 +11,7 @@ type ZoomControlsProps = {
 }
 
 const ZoomControls: React.FC<ZoomControlsProps> = ({ handleZoomIn, handleZoomOut, handleReset }) => {
-  const { config, setState, setRuntimeData, position } = useContext<MapContext>(ConfigContext)
+  const { config, setConfig, setRuntimeData, position } = useContext<MapContext>(ConfigContext)
   if (!config.general.allowMapZoom) return
   return (
     <div className='zoom-controls' data-html2canvas-ignore='true'>
@@ -28,7 +28,7 @@ const ZoomControls: React.FC<ZoomControlsProps> = ({ handleZoomIn, handleZoomOut
       </button>
       {config.general.type === 'bubble' && (
         <button
-          onClick={() => handleReset(config, setState, setRuntimeData)}
+          onClick={() => handleReset(config, setConfig, setRuntimeData)}
           className='reset'
           aria-label='Reset Zoom and Map Filters'
         >
@@ -36,7 +36,11 @@ const ZoomControls: React.FC<ZoomControlsProps> = ({ handleZoomIn, handleZoomOut
         </button>
       )}
       {(config.general.type === 'world-geocode' || config.general.geoType === 'single-state') && (
-        <button onClick={() => handleReset(config, setState, setRuntimeData)} className='reset' aria-label='Reset Zoom'>
+        <button
+          onClick={() => handleReset(config, setConfig, setRuntimeData)}
+          className='reset'
+          aria-label='Reset Zoom'
+        >
           Reset Zoom
         </button>
       )}
