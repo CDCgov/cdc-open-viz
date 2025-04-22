@@ -27,6 +27,7 @@ export type MapContext = {
   isFilterValueSupported: boolean
   loadConfig: (configObj: MapConfig) => void
   logo: string
+  mapId: string
   position: 'side' | 'top' | 'bottom'
   resetLegendToggles: Function
   runtimeFilters: Function

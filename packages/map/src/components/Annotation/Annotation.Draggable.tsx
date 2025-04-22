@@ -18,7 +18,7 @@ const Annotations: React.FC<AnnotationsProps> = ({ onDragStateChange }) => {
   const [draggingItems, setDraggingItems] = useState([])
   const {
     config,
-    setState: updateConfig,
+    setConfig,
     isDraggingAnnotation,
     isEditor,
     dimensions
@@ -71,7 +71,7 @@ const Annotations: React.FC<AnnotationsProps> = ({ onDragStateChange }) => {
                         return annotation
                       })
 
-                      updateConfig({
+                      setConfig({
                         ...config,
                         annotations: updatedAnnotations
                       })

@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import parse from 'html-react-parser'
 import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react-icons/ai'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import ConfigContext from '../../../context'
 
 const shapeOptions = ['Arrow Up', 'Arrow Down', 'Arrow Right', 'Arrow Left', 'None']
 
@@ -13,22 +14,22 @@ export const DATA_OPERATOR_LESSEQUAL = '<='
 export const DATA_OPERATOR_GREATEREQUAL = '>='
 export const DATA_OPERATOR_EQUAL = '='
 export const DATA_OPERATOR_NOTEQUAL = '≠'
-
 export const DATA_OPERATORS = [DATA_OPERATOR_LESS, DATA_OPERATOR_GREATER, DATA_OPERATOR_LESSEQUAL, DATA_OPERATOR_GREATEREQUAL, DATA_OPERATOR_EQUAL, DATA_OPERATOR_NOTEQUAL]
 
 const HexSettingDisplayShapesOnHex = props => {
-  const { state, setState } = props
-  if (!state.general.displayAsHex) return <></>
+  const { config, setConfig } = useContext(ConfigContext)
+
+  if (!config.general.displayAsHex) return <></>
   return (
     <label className='checkbox mt-4'>
       <input
         type='checkbox'
-        checked={state.hexMap.type === 'shapes'}
+        checked={config.hexMap.type === 'shapes'}
         onChange={event => {
-          setState({
-            ...state,
+          setConfig({
+            ...config,
             hexMap: {
-              ...state.hexMap,
+              ...config.hexMap,
               type: event.target.checked ? 'shapes' : 'standard'
             }
           })
@@ -40,16 +41,17 @@ const HexSettingDisplayShapesOnHex = props => {
 }
 
 const HexSettingDisplayAsHexMap = props => {
-  const { state, handleEditorChanges } = props
+  const { handleEditorChanges } = props
+  const { config } = useContext(ConfigContext)
 
   return (
-    state.general.geoType === 'us' &&
-    state.general.type !== ' navigation' &&
-    state.general.type !== 'bubble' && (
+    config.general.geoType === 'us' &&
+    config.general.type !== ' navigation' &&
+    config.general.type !== 'bubble' && (
       <label className='checkbox mt-4'>
         <input
           type='checkbox'
-          checked={state.general.displayAsHex}
+          checked={config.general.displayAsHex}
           onChange={event => {
             handleEditorChanges('displayAsHex', event.target.checked)
           }}
@@ -66,14 +68,15 @@ const HexSettingDisplayAsHexMap = props => {
  * @returns
  */
 const HexSettingShapeColumns = props => {
-  const { state, setState, columnsOptions } = props
+  const { columnsOptions } = props
+  const { config, setConfig } = useContext(ConfigContext)
 
   const handleItemUpdate = (key, value, shapeGroupIndex, itemIndex) => {
-    setState({
-      ...state,
+    setConfig({
+      ...config,
       hexMap: {
-        ...state.hexMap,
-        shapeGroups: state.hexMap.shapeGroups.map((group, groupIndex) => {
+        ...config.hexMap,
+        shapeGroups: config.hexMap.shapeGroups.map((group, groupIndex) => {
           if (groupIndex === shapeGroupIndex) {
             return {
               ...group,
@@ -97,11 +100,11 @@ const HexSettingShapeColumns = props => {
   }
 
   const handleRemoveShapeCondition = (shapeGroupIndex, itemIndex) => {
-    setState({
-      ...state,
+    setConfig({
+      ...config,
       hexMap: {
-        ...state.hexMap,
-        shapeGroups: state.hexMap.shapeGroups.map((group, groupIndex) => {
+        ...config.hexMap,
+        shapeGroups: config.hexMap.shapeGroups.map((group, groupIndex) => {
           if (groupIndex === shapeGroupIndex) {
             return {
               ...group,
@@ -116,15 +119,15 @@ const HexSettingShapeColumns = props => {
   }
 
   return (
-    state.general.displayAsHex &&
-    state.hexMap.type === 'shapes' && (
+    config.general.displayAsHex &&
+    config.hexMap.type === 'shapes' && (
       <>
         <fieldset className='edit-block'>
-          {state.hexMap.shapeGroups && (
+          {config.hexMap.shapeGroups && (
             <>
               <Accordion allowZeroExpanded>
                 <ul style={{ listStyle: 'none' }}>
-                  {state.hexMap.shapeGroups?.map((shapeGroup, shapeGroupIndex) => {
+                  {config.hexMap.shapeGroups?.map((shapeGroup, shapeGroupIndex) => {
                     return (
                       <AccordionItem>
                         <AccordionItemHeading>
@@ -137,7 +140,7 @@ const HexSettingShapeColumns = props => {
                               type='text'
                               value={shapeGroup.legendTitle || ''}
                               onChange={e =>
-                                setState(prevState => ({
+                                setConfig(prevState => ({
                                   ...prevState,
                                   hexMap: {
                                     ...prevState.hexMap,
@@ -163,7 +166,7 @@ const HexSettingShapeColumns = props => {
                               type='text'
                               value={shapeGroup.legendDescription || ''}
                               onChange={e =>
-                                setState(prevState => ({
+                                setConfig(prevState => ({
                                   ...prevState,
                                   hexMap: {
                                     ...prevState.hexMap,
@@ -195,7 +198,7 @@ const HexSettingShapeColumns = props => {
                                       <label>
                                         <span className='edit-label column-heading'>Shape Column</span>
                                         <select
-                                          value={state.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].shape ? state.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].shape : 'select'}
+                                          value={config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].shape ? config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].shape : 'select'}
                                           onChange={e => {
                                             handleItemUpdate('shape', e.target.value, shapeGroupIndex, itemIndex)
                                           }}
@@ -212,12 +215,12 @@ const HexSettingShapeColumns = props => {
                                         </label>
                                         <div className='cove-accordion__panel-row cove-accordion__small-inputs'>
                                           <div className='cove-accordion__panel-col cove-input'>
-                                            <select value={state.hexMap.shapeGroups[shapeGroupIndex].key === '' ? 'Select' : state.hexMap.shapeGroups[shapeGroupIndex].key} className='cove-input' onChange={e => handleItemUpdate('key', e.target.value, shapeGroupIndex, itemIndex)}>
+                                            <select value={config.hexMap.shapeGroups[shapeGroupIndex].key === '' ? 'Select' : config.hexMap.shapeGroups[shapeGroupIndex].key} className='cove-input' onChange={e => handleItemUpdate('key', e.target.value, shapeGroupIndex, itemIndex)}>
                                               {columnsOptions}
                                             </select>
                                           </div>
                                           <div className='cove-accordion__panel-col cove-input'>
-                                            <select value={state.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].operator || '-SELECT-'} initial='Select' className='cove-input' onChange={e => handleItemUpdate('operator', e.target.value, shapeGroupIndex, itemIndex)}>
+                                            <select value={config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].operator || '-SELECT-'} initial='Select' className='cove-input' onChange={e => handleItemUpdate('operator', e.target.value, shapeGroupIndex, itemIndex)}>
                                               {[DATA_OPERATOR_EQUAL].map(option => {
                                                 return <option value={option}>{option}</option>
                                               })}
@@ -239,7 +242,7 @@ const HexSettingShapeColumns = props => {
                                             </select>
                                           </div>
                                           <div className='cove-accordion__panel-col cove-input'>
-                                            <input type='text' value={state.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].value || ''} className='cove-input' style={{ height: '100%' }} onChange={e => handleItemUpdate('value', e.target.value, shapeGroupIndex, itemIndex)} />
+                                            <input type='text' value={config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].value || ''} className='cove-input' style={{ height: '100%' }} onChange={e => handleItemUpdate('value', e.target.value, shapeGroupIndex, itemIndex)} />
                                           </div>
                                         </div>
                                       </div>
@@ -258,11 +261,11 @@ const HexSettingShapeColumns = props => {
                               className='cove-button'
                               style={{ marginTop: '15px' }}
                               onClick={() =>
-                                setState({
-                                  ...state,
+                                setConfig({
+                                  ...config,
                                   hexMap: {
-                                    ...state.hexMap,
-                                    shapeGroups: state.hexMap.shapeGroups.map((group, index) => {
+                                    ...config.hexMap,
+                                    shapeGroups: config.hexMap.shapeGroups.map((group, index) => {
                                       if (index === shapeGroupIndex) {
                                         return {
                                           ...group,
@@ -292,12 +295,12 @@ const HexSettingShapeColumns = props => {
                               className='cove-button cove-button--warn'
                               style={{ background: 'none', border: '1px solid red', color: 'red', marginTop: '15px' }}
                               onClick={(e, itemIndex) => {
-                                let newGroups = [...state.hexMap.shapeGroups.slice(0, shapeGroupIndex), ...state.hexMap.shapeGroups.slice(shapeGroupIndex + 1)]
+                                let newGroups = [...config.hexMap.shapeGroups.slice(0, shapeGroupIndex), ...config.hexMap.shapeGroups.slice(shapeGroupIndex + 1)]
 
-                                setState({
-                                  ...state,
+                                setConfig({
+                                  ...config,
                                   hexMap: {
-                                    ...state.hexMap,
+                                    ...config.hexMap,
                                     shapeGroups: newGroups
                                   }
                                 })
@@ -320,7 +323,7 @@ const HexSettingShapeColumns = props => {
             className='cove-button'
             style={{ marginTop: '15px' }}
             onClick={index => {
-              let copy = state.hexMap.shapeGroups
+              let copy = config.hexMap.shapeGroups
               copy.push({
                 legendTitle: '',
                 legendDescription: '',
@@ -328,10 +331,10 @@ const HexSettingShapeColumns = props => {
               })
               copy.legendTitle = ''
               copy.legendDescription = ''
-              setState({
-                ...state,
+              setConfig({
+                ...config,
                 hexMap: {
-                  ...state.hexMap,
+                  ...config.hexMap,
                   shapeGroups: copy
                 }
               })

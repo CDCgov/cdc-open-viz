@@ -33,7 +33,7 @@ export type GeneratedLegend = {
 }
 
 const useGenerateRuntimeLegend = (legendMemo, legendSpecialClassLastMemo) => {
-  const { state, setState, runtimeFilters } = useContext(ConfigContext)
+  const { config, setConfig, runtimeFilters } = useContext(ConfigContext)
 
   const generateRuntimeLegend = useCallback(
     (configObj, runtimeData, hash): GeneratedLegend | [] => {
@@ -434,7 +434,7 @@ const useGenerateRuntimeLegend = (legendMemo, legendSpecialClassLastMemo) => {
         // Equal Interval
         if (legend.type === 'equalinterval' && dataSet?.length !== 0) {
           if (!dataSet || dataSet.length === 0) {
-            setState({
+            setConfig({
               ...configObj,
               runtime: {
                 ...configObj.runtime,
@@ -513,7 +513,7 @@ const useGenerateRuntimeLegend = (legendMemo, legendSpecialClassLastMemo) => {
         return []
       }
     },
-    [legendMemo, state, runtimeFilters, setState]
+    [legendMemo, config, runtimeFilters, setConfig]
   )
 
   return { generateRuntimeLegend }

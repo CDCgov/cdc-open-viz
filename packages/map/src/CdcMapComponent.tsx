@@ -357,6 +357,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeFilters,
     runtimeLegend,
     scale,
+    setConfig,
     setModal,
     setParentConfig: setConfig,
     setRuntimeData,

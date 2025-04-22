@@ -19,17 +19,19 @@ import { patternSizes } from '../helpers/patternSizes'
 import Annotation from '../../Annotation'
 import Territory from './Territory'
 
-import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext, { MapDispatchContext } from '../../../context'
 import { MapContext } from '../../../types/MapContext'
 import { checkColorContrast, getContrastColor, outlinedTextColor } from '@cdc/core/helpers/cove/accessibility'
 import TerritoriesSection from './TerritoriesSection'
-import { isMobileStateLabelViewport } from '@cdc/core/helpers/viewports'
 
+import { isMobileStateLabelViewport } from '@cdc/core/helpers/viewports'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+
+
+import useMapLayers from '../../../hooks/useMapLayers'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
-import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { getGeoFillColor, getGeoStrokeColor, handleMapAriaLabels, titleCase, displayGeoName, SVG_HEIGHT, SVG_VIEWBOX, SVG_WIDTH, hashObj } from '../../../helpers'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 

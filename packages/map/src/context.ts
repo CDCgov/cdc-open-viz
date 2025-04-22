@@ -20,6 +20,7 @@ type MapContext = {
   innerContainerRef
   isDashboard
   isEditor
+  mapId: string
   loadConfig
   position
   resetLegendToggles

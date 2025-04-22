@@ -132,7 +132,6 @@ const CountyMap = () => {
     data,
     runtimeFilters,
     runtimeLegend,
-    setState,
     setConfig,
     config,
     tooltipId,
@@ -211,7 +210,7 @@ const CountyMap = () => {
   const lineWidth = 1
 
   const onReset = () => {
-    setState({
+    setConfig({
       ...config,
       mapPosition: { coordinates: [0, 30], zoom: 1 }
     })
@@ -236,7 +235,7 @@ const CountyMap = () => {
 
     // If the user clicked outside of all states, no behavior
     if (clickedState) {
-      setState({
+      setConfig({
         ...config,
         mapPosition: { coordinates: [0, 30], zoom: 3 }
       })
@@ -455,7 +454,6 @@ const CountyMap = () => {
   // Redraws canvas. Takes as parameters the fips id of a state to center on and the [lat,long] center of that state
   const drawCanvas = () => {
     if (canvasRef.current && runtimeLegend.items.length > 0) {
-      console.log('drawing...')
       const canvas = canvasRef.current
       const context = canvas.getContext('2d')
       const path = geoPath(topoData.projection, context)

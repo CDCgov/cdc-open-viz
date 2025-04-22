@@ -56,7 +56,7 @@ const EditorPanel = () => {
     loadConfig,
     runtimeFilters,
     runtimeLegend,
-    setState,
+    setConfig,
     config,
     tooltipId,
     runtimeData
@@ -73,7 +73,7 @@ const EditorPanel = () => {
 
   const {
     MapLayerHandlers: { handleMapLayer, handleAddLayer, handleRemoveLayer }
-  } = useMapLayers(config, setState, false, tooltipId)
+  } = useMapLayers(config, setConfig, false, tooltipId)
 
   const categoryMove = (idx1, idx2) => {
     let categoryValuesOrder = getCategoryValuesOrder()
@@ -85,7 +85,7 @@ const EditorPanel = () => {
       }
     })
 
-    setState({
+    setConfig({
       ...config,
       legend: {
         ...config.legend,
@@ -104,7 +104,7 @@ const EditorPanel = () => {
       })
     })
     // DEV-3303 - since the above was a repair of bad config - need to backpopulate into the state
-    setState({
+    setConfig({
       ...config,
       legend: {
         ...config.legend,
@@ -146,7 +146,7 @@ const EditorPanel = () => {
       case 'add': {
         const additionalCityStyles = config.visual.additionalCityStyles ? [...config.visual.additionalCityStyles] : []
         additionalCityStyles.push({ label: '', column: '', value: '', shape: '' })
-        setState({
+        setConfig({
           ...config,
           visual: {
             ...config.visual,
@@ -162,7 +162,7 @@ const EditorPanel = () => {
         }
 
         additionalCityStyles.splice(index, 1)
-        setState({
+        setConfig({
           ...config,
           visual: {
             ...config.visual,
@@ -175,7 +175,7 @@ const EditorPanel = () => {
         let additionalCityStyles = []
         additionalCityStyles = [...config.visual.additionalCityStyles]
         additionalCityStyles[index][fieldName] = value
-        setState({
+        setConfig({
           ...config,
           visual: {
             ...config.visual,
@@ -205,7 +205,7 @@ const EditorPanel = () => {
   const handleEditorChanges = async (property, value) => {
     switch (property) {
       case 'navigationTarget':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -217,7 +217,7 @@ const EditorPanel = () => {
       // updateVisualPropertyValue
       // updateGeneralPropertyValue, etc.
       case 'showBubbleZeros':
-        setState({
+        setConfig({
           ...config,
           visual: {
             ...config.visual,
@@ -226,7 +226,7 @@ const EditorPanel = () => {
         })
         break
       case 'showEqualNumber':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -235,7 +235,7 @@ const EditorPanel = () => {
         })
         break
       case 'hideGeoColumnInTooltip':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -245,7 +245,7 @@ const EditorPanel = () => {
         break
 
       case 'toggleDataTableLink':
-        setState({
+        setConfig({
           ...config,
           table: {
             ...config.table,
@@ -255,7 +255,7 @@ const EditorPanel = () => {
         break
 
       case 'toggleDataUrl':
-        setState({
+        setConfig({
           ...config,
           table: {
             ...config.table,
@@ -264,7 +264,7 @@ const EditorPanel = () => {
         })
         break
       case 'toggleExtraBubbleBorder':
-        setState({
+        setConfig({
           ...config,
           visual: {
             ...config.visual,
@@ -273,7 +273,7 @@ const EditorPanel = () => {
         })
         break
       case 'allowMapZoom':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -286,7 +286,7 @@ const EditorPanel = () => {
         })
         break
       case 'hidePrimaryColumnInTooltip':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -295,7 +295,7 @@ const EditorPanel = () => {
         })
         break
       case 'geoLabelOverride':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -304,7 +304,7 @@ const EditorPanel = () => {
         })
         break
       case 'showTitle':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -313,7 +313,7 @@ const EditorPanel = () => {
         })
         break
       case 'showSidebar':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -322,7 +322,7 @@ const EditorPanel = () => {
         })
         break
       case 'fullBorder':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -331,7 +331,7 @@ const EditorPanel = () => {
         })
         break
       case 'expandDataTable':
-        setState({
+        setConfig({
           ...config,
           table: {
             ...config.table,
@@ -340,13 +340,13 @@ const EditorPanel = () => {
         })
         break
       case 'color':
-        setState({
+        setConfig({
           ...config,
           color: value
         })
         break
       case 'sidebarPosition':
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -356,7 +356,7 @@ const EditorPanel = () => {
         })
         break
       case 'legendStyle':
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -365,7 +365,7 @@ const EditorPanel = () => {
         })
         break
       case 'legendSubStyle':
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -374,7 +374,7 @@ const EditorPanel = () => {
         })
         break
       case 'legendTickRotation':
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -383,7 +383,7 @@ const EditorPanel = () => {
         })
         break
       case 'legendBorder':
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -392,7 +392,7 @@ const EditorPanel = () => {
         })
         break
       case 'handleCityStyle':
-        setState({
+        setConfig({
           ...config,
           visual: {
             ...config.visual,
@@ -401,7 +401,7 @@ const EditorPanel = () => {
         })
         break
       case 'geoBorderColor':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -410,7 +410,7 @@ const EditorPanel = () => {
         })
         break
       case 'headerColor':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -419,7 +419,7 @@ const EditorPanel = () => {
         })
         break
       case 'navigateColumn':
-        setState({
+        setConfig({
           ...config,
           columns: {
             ...config.columns,
@@ -431,7 +431,7 @@ const EditorPanel = () => {
         })
         break
       case 'legendDescription':
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -458,7 +458,7 @@ const EditorPanel = () => {
           messages = []
         }
 
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -471,7 +471,7 @@ const EditorPanel = () => {
         })
         break
       case 'legendNumber':
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -485,7 +485,7 @@ const EditorPanel = () => {
         setActiveFilterValueForDescription(arrVal)
         break
       case 'unifiedLegend':
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -494,7 +494,7 @@ const EditorPanel = () => {
         })
         break
       case 'separateZero':
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -503,7 +503,7 @@ const EditorPanel = () => {
         })
         break
       case 'toggleShowFullGeoNameInCSV':
-        setState({
+        setConfig({
           ...config,
           table: {
             // setting both bc DataTable new core needs it here
@@ -513,7 +513,7 @@ const EditorPanel = () => {
         })
         break
       case 'toggleDownloadImgButton':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -522,7 +522,7 @@ const EditorPanel = () => {
         })
         break
       case 'toggleDownloadLinkBelow':
-        setState({
+        setConfig({
           ...config,
           table: {
             ...config.table,
@@ -531,7 +531,7 @@ const EditorPanel = () => {
         })
         break
       case 'toggleDownloadPdfButton':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -540,7 +540,7 @@ const EditorPanel = () => {
         })
         break
       case 'displayAsHex':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -551,7 +551,7 @@ const EditorPanel = () => {
       case 'editorMapType':
         switch (value) {
           case 'us-geocode':
-            setState({
+            setConfig({
               ...config,
               general: {
                 ...config.general,
@@ -560,7 +560,7 @@ const EditorPanel = () => {
             })
             break
           case 'world-geocode':
-            setState({
+            setConfig({
               ...config,
               general: {
                 ...config.general,
@@ -569,7 +569,7 @@ const EditorPanel = () => {
             })
             break
           case 'data':
-            setState({
+            setConfig({
               ...config,
               general: {
                 ...config.general,
@@ -579,7 +579,7 @@ const EditorPanel = () => {
             })
             break
           case 'navigation':
-            setState({
+            setConfig({
               ...config,
               general: {
                 ...config.general,
@@ -593,7 +593,7 @@ const EditorPanel = () => {
             })
             break
           case 'bubble':
-            setState({
+            setConfig({
               ...config,
               general: {
                 ...config.general,
@@ -633,7 +633,7 @@ const EditorPanel = () => {
 
         switch (value) {
           case 'us':
-            setState({
+            setConfig({
               ...config,
               general: {
                 ...config.general,
@@ -647,7 +647,7 @@ const EditorPanel = () => {
             })
             break
           case 'us-region':
-            setState({
+            setConfig({
               ...config,
               general: {
                 ...config.general,
@@ -660,7 +660,7 @@ const EditorPanel = () => {
             })
             break
           case 'world':
-            setState({
+            setConfig({
               ...config,
               general: {
                 ...config.general,
@@ -673,7 +673,7 @@ const EditorPanel = () => {
             })
             break
           case 'us-county':
-            setState({
+            setConfig({
               ...config,
               general: {
                 ...config.general,
@@ -687,7 +687,7 @@ const EditorPanel = () => {
             })
             break
           case 'single-state':
-            setState({
+            setConfig({
               ...config,
               general: {
                 ...config.general,
@@ -701,7 +701,7 @@ const EditorPanel = () => {
             })
             break
           case 'google-map':
-            setState({
+            setConfig({
               ...config,
               general: {
                 ...config.general,
@@ -714,7 +714,7 @@ const EditorPanel = () => {
 
         break
       case 'singleColumnLegend':
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -725,7 +725,7 @@ const EditorPanel = () => {
         })
         break
       case 'singleRowLegend':
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -736,7 +736,7 @@ const EditorPanel = () => {
         })
         break
       case 'verticalSortedLegend':
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -747,7 +747,7 @@ const EditorPanel = () => {
         })
         break
       case 'legendShowSpecialClassesLast':
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -756,7 +756,7 @@ const EditorPanel = () => {
         })
         break
       case 'dynamicDescription':
-        setState({
+        setConfig({
           ...config,
           editor: {
             ...config.editor,
@@ -770,7 +770,7 @@ const EditorPanel = () => {
         break
       case 'changeLegendDescription':
         const [filterValKey, filterValDesc] = value
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -782,7 +782,7 @@ const EditorPanel = () => {
         })
         break
       case 'appearanceType':
-        setState({
+        setConfig({
           ...config,
           tooltips: {
             ...config.tooltips,
@@ -791,7 +791,7 @@ const EditorPanel = () => {
         })
         break
       case 'linkLabel':
-        setState({
+        setConfig({
           ...config,
           tooltips: {
             ...config.tooltips,
@@ -800,7 +800,7 @@ const EditorPanel = () => {
         })
         break
       case 'displayStateLabels':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -809,7 +809,7 @@ const EditorPanel = () => {
         })
         break
       case 'capitalizeLabels':
-        setState({
+        setConfig({
           ...config,
           tooltips: {
             ...config.tooltips,
@@ -818,7 +818,7 @@ const EditorPanel = () => {
         })
         break
       case 'showDataTable':
-        setState({
+        setConfig({
           ...config,
           table: {
             ...config.table,
@@ -827,7 +827,7 @@ const EditorPanel = () => {
         })
         break
       case 'limitDataTableHeight':
-        setState({
+        setConfig({
           ...config,
           table: {
             ...config.table,
@@ -840,7 +840,7 @@ const EditorPanel = () => {
         let stateName = value
         let stateData = { fipsCode, stateName }
 
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -854,7 +854,7 @@ const EditorPanel = () => {
         }
         break
       case 'classificationType':
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -863,7 +863,7 @@ const EditorPanel = () => {
         })
         break
       case 'territoriesAlwaysShow':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -872,7 +872,7 @@ const EditorPanel = () => {
         })
         break
       case 'countyCensusYear':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -881,7 +881,7 @@ const EditorPanel = () => {
         })
         break
       case 'filterControlsCountyYear':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -890,7 +890,7 @@ const EditorPanel = () => {
         })
         break
       case 'filterControlsStatePicked':
-        setState({
+        setConfig({
           ...config,
           general: {
             ...config.general,
@@ -899,7 +899,7 @@ const EditorPanel = () => {
         })
         break
       case 'filterBehavior':
-        setState({
+        setConfig({
           ...config,
           filterBehavior: value
         })
@@ -918,7 +918,7 @@ const EditorPanel = () => {
 
         newSpecialClasses[value.index][value.prop] = value.value
 
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -931,7 +931,7 @@ const EditorPanel = () => {
 
         newSpecialClasses.splice(value, 1)
 
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -944,7 +944,7 @@ const EditorPanel = () => {
 
         newSpecialClasses.push(value)
 
-        setState({
+        setConfig({
           ...config,
           legend: {
             ...config.legend,
@@ -954,7 +954,7 @@ const EditorPanel = () => {
         break
       case 'name':
         addUIDs(config, config.columns.geo.name)
-        setState({
+        setConfig({
           ...config,
           columns: {
             ...config.columns,
@@ -967,7 +967,7 @@ const EditorPanel = () => {
 
         break
       default:
-        setState({
+        setConfig({
           ...config,
           columns: {
             ...config.columns,
@@ -985,7 +985,7 @@ const EditorPanel = () => {
   const addAdditionalColumn = number => {
     const columnKey = `additionalColumn${number}`
 
-    setState({
+    setConfig({
       ...config,
       columns: {
         ...config.columns,
@@ -1005,7 +1005,7 @@ const EditorPanel = () => {
 
     delete newColumns[columnName]
 
-    setState({
+    setConfig({
       ...config,
       columns: newColumns
     })
@@ -1151,11 +1151,11 @@ const EditorPanel = () => {
     return true !== defaultCols.includes(value)
   })
 
-  const updateField = updateFieldFactory(config, setState)
+  const updateField = updateFieldFactory(config, setConfig)
 
   const onBackClick = () => {
     setDisplayPanel(!displayPanel)
-    setState({
+    setConfig({
       ...config,
       showEditorPanel: !displayPanel
     })
@@ -1456,9 +1456,9 @@ const EditorPanel = () => {
                 </div>
               </label>
 
-              <HexSetting.DisplayAsHexMap state={config} setState={setState} handleEditorChanges={handleEditorChanges} />
-              <HexSetting.DisplayShapesOnHex state={config} setState={setState} />
-              <HexSetting.ShapeColumns state={config} setState={setState} columnsOptions={columnsOptions} />
+              <HexSetting.DisplayAsHexMap state={config} setState={setConfig} handleEditorChanges={handleEditorChanges} />
+              <HexSetting.DisplayShapesOnHex state={config} setState={setConfig} />
+              <HexSetting.ShapeColumns state={config} setState={setConfig} columnsOptions={columnsOptions} />
 
               {'us' === config.general.geoType &&
                 'bubble' !== config.general.type &&
@@ -1653,7 +1653,7 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={config.general.convertFipsCodes}
                       onChange={event => {
-                        setState({
+                        setConfig({
                           ...config,
                           general: {
                             ...config.general,
@@ -1705,7 +1705,7 @@ const EditorPanel = () => {
                       const _state = _.cloneDeep(config)
                       _state.columns.primary.name = event.target.value
                       _state.columns.primary.label = event.target.value
-                      setState(_state)
+                      setConfig(_state)
                     }}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
@@ -2617,7 +2617,7 @@ const EditorPanel = () => {
                     type='checkbox'
                     checked={config.table.wrapColumns}
                     onChange={event => {
-                      setState({
+                      setConfig({
                         ...config,
                         table: {
                           ...config.table,
@@ -2961,7 +2961,7 @@ const EditorPanel = () => {
                   if (paletteName) {
                     _state.color = paletteName
                   }
-                  setState(_state)
+                  setConfig(_state)
                 }}
                 value={config.general.palette.isReversed}
               />

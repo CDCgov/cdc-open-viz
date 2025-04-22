@@ -36,7 +36,6 @@ const WorldMap = () => {
     data,
     position,
     setRuntimeData,
-    setState,
     config,
     tooltipId,
     legendMemo,
@@ -67,7 +66,7 @@ const WorldMap = () => {
 
   // TODO Refactor - state should be set together here to avoid rerenders
   // Resets to original data & zooms out
-  const handleReset = (config, setState, setRuntimeData) => {
+  const handleReset = (config, setRuntimeData) => {
     const newRuntimeData = generateRuntimeData(config)
     dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
     dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
@@ -209,7 +208,7 @@ const WorldMap = () => {
           <rect
             height={SVG_HEIGHT}
             width={SVG_WIDTH}
-            onClick={() => handleReset(config, setState, setRuntimeData)}
+            onClick={() => handleReset(config, setRuntimeData)}
             fill='white'
           />
           <ZoomableGroup

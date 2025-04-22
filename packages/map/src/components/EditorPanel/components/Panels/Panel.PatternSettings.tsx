@@ -25,7 +25,7 @@ type PanelProps = {
 }
 
 const PatternSettings = ({ name }: PanelProps) => {
-  const { config, setState, runtimeData, legendMemo, legendSpecialClassLastMemo } = useContext<MapContext>(ConfigContext)
+  const { config, setConfig, runtimeData, legendMemo, legendSpecialClassLastMemo } = useContext<MapContext>(ConfigContext)
   const defaultPattern = 'circles'
   const patternTypes = ['circles', 'waves', 'lines']
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
@@ -54,7 +54,7 @@ const PatternSettings = ({ name }: PanelProps) => {
   const handleAddGeoPattern = () => {
     let patterns = [...config.map.patterns]
     patterns.push({ dataKey: '', pattern: defaultPattern, contrastCheck: true })
-    setState({
+    setConfig({
       ...config,
       map: {
         ...config.map,
@@ -112,7 +112,7 @@ const PatternSettings = ({ name }: PanelProps) => {
       : ''
 
     // Update the state with the new patterns and error message
-    setState(prevState => ({
+    setConfig(prevState => ({
       ...prevState,
       map: {
         ...prevState.map,
@@ -128,7 +128,7 @@ const PatternSettings = ({ name }: PanelProps) => {
   const handleRemovePattern = index => {
     const updatedPatterns = config.map.patterns.filter((pattern, i) => i !== index)
 
-    setState({
+    setConfig({
       ...config,
       map: {
         ...config.map,

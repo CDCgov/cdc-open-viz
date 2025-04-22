@@ -22,6 +22,7 @@ import { isBelowBreakpoint, isMobileHeightViewport } from '@cdc/core/helpers/vie
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
 import { resetLegendToggles } from '../../../helpers'
+import { MapContext } from '../../../types/MapContext'
 
 const LEGEND_PADDING = 30
 
@@ -34,24 +35,24 @@ type LegendProps = {
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const { skipId, containerWidthPadding } = props
-  const { dimensions, currentViewport } = useContext(ConfigContext)
 
   const {
+    config,
+    currentViewport: viewport,
+    dimensions,
+    mapId,
     runtimeFilters,
     runtimeLegend,
     setRuntimeLegend,
-    config,
-    currentViewport: viewport,
-    mapId
-  } = useContext(ConfigContext)
+  } = useContext<MapContext>(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
 
   const { legend } = config
   const isLegendGradient = legend.style === 'gradient'
-  const boxDynamicallyHidden = isBelowBreakpoint('md', currentViewport)
+  const boxDynamicallyHidden = isBelowBreakpoint('md', viewport)
   const legendWrapping =
-    (legend.position === 'left' || legend.position === 'right') && isBelowBreakpoint('md', currentViewport)
+    (legend.position === 'left' || legend.position === 'right') && isBelowBreakpoint('md', viewport)
   const legendOnBottom = legend.position === 'bottom' || legendWrapping
   const needsTopMargin = legend.hideBorder && legendOnBottom
 
@@ -103,7 +104,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const legendList = (patternsOnly = false) => {
     const formattedItems = patternsOnly ? [] : getFormattedLegendItems()
-    const patternsOnlyFont = isMobileHeightViewport(currentViewport) ? '12px' : '14px'
+    const patternsOnlyFont = isMobileHeightViewport(viewport) ? '12px' : '14px'
     const hasDisabledItems = formattedItems.some(item => item.disabled)
     let legendItems
 
