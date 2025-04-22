@@ -6,6 +6,7 @@ import { type RefObject } from 'react'
 
 export type MapContext = {
   currentViewport: ViewPort
+  content: { geoName: string; keyedData: Record<string, any> }
   data: DataRow[]
   dimensions: DimensionsType
   displayDataAsText: string | number
