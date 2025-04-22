@@ -49,7 +49,7 @@ const Annotations: React.FC<AnnotationsProps> = ({ onDragStateChange }) => {
                 <>
                   <AnnotationComponent
                     dx={dx} // label position
-                    dy={dy} // label postion
+                    dy={dy} // label position
                     x={x}
                     y={y}
                     canEditLabel={edit.label || false}
@@ -98,7 +98,7 @@ const Annotations: React.FC<AnnotationsProps> = ({ onDragStateChange }) => {
                         }}
                         role='presentation'
                         // ! IMPORTANT: Workaround for 508
-                        // - HTML needs to be set from the editor and we need a wrapper with the tabIndex
+                        // - HTML needs to be set from the editor, and we need a wrapper with the tabIndex
                         // - TabIndex is only supposed to be used on interactive elements. This is a workaround.
                         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                         tabIndex={0}
