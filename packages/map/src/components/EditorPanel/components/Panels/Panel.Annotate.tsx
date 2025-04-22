@@ -7,16 +7,12 @@ import Button from '@cdc/core/components/elements/Button'
 import { MapContext } from '../../../../types/MapContext'
 import ConfigContext from '../../../../context'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
+import { setConfig } from 'dompurify'
 // types
 // styles
 
 const PanelAnnotate: React.FC = props => {
-  const {
-    state: config,
-    setState: updateConfig,
-    dimensions,
-    isDraggingAnnotation
-  } = useContext<MapContext>(ConfigContext)
+  const { config, setConfig, dimensions, isDraggingAnnotation } = useContext<MapContext>(ConfigContext)
   const getColumns = (filter = true) => {
     const columns = {}
     config.data.forEach(row => {
@@ -42,7 +38,7 @@ const PanelAnnotate: React.FC = props => {
     annotations[index][property] = value
     annotations[index].savedDimensions = [dimensions[0] * 0.73, dimensions[1]]
 
-    updateConfig({
+    setConfig({
       ...config,
       annotations
     })
@@ -94,7 +90,7 @@ const PanelAnnotate: React.FC = props => {
 
     const annotations = Array.isArray(config.annotations) ? config.annotations : []
 
-    updateConfig({
+    setConfig({
       ...config,
       annotations: [...annotations, newAnnotation]
     })
@@ -102,7 +98,7 @@ const PanelAnnotate: React.FC = props => {
 
   const handleRemoveAnnotation = (annotationIndex: number) => {
     const updated = config.annotations.filter((_, index) => index !== annotationIndex)
-    updateConfig({
+    setConfig({
       ...config,
       annotations: updated
     })
@@ -117,7 +113,7 @@ const PanelAnnotate: React.FC = props => {
             type='checkbox'
             checked={config?.general?.showAnnotationDropdown}
             onClick={e => {
-              updateConfig({
+              setConfig({
                 ...config,
                 general: {
                   ...config.general,
@@ -135,7 +131,7 @@ const PanelAnnotate: React.FC = props => {
             style={{ marginBottom: '10px' }}
             value={config?.general?.annotationDropdownText}
             onChange={e => {
-              updateConfig({
+              setConfig({
                 ...config,
                 general: {
                   ...config.general,
@@ -200,7 +196,7 @@ const PanelAnnotate: React.FC = props => {
                       onChange={e => {
                         const updatedAnnotations = [...config?.annotations]
                         updatedAnnotations[index].opacity = e.target.value
-                        updateConfig({
+                        setConfig({
                           ...config,
                           annotations: updatedAnnotations
                         })
@@ -217,7 +213,7 @@ const PanelAnnotate: React.FC = props => {
                       onClick={e => {
                         const updatedAnnotations = [...config?.annotations]
                         updatedAnnotations[index].edit.subject = e.target.checked
-                        updateConfig({
+                        setConfig({
                           ...config,
                           annotations: updatedAnnotations
                         })
@@ -232,7 +228,7 @@ const PanelAnnotate: React.FC = props => {
                       onClick={e => {
                         const updatedAnnotations = [...config?.annotations]
                         updatedAnnotations[index].edit.label = e.target.checked
-                        updateConfig({
+                        setConfig({
                           ...config,
                           annotations: updatedAnnotations
                         })
@@ -250,7 +246,7 @@ const PanelAnnotate: React.FC = props => {
                     onChange={event => {
                       const updatedAnnotations = [...config?.annotations]
                       updatedAnnotations[index].connectionType = event.target.value
-                      updateConfig({
+                      setConfig({
                         ...config,
                         annotations: updatedAnnotations
                       })
@@ -268,7 +264,7 @@ const PanelAnnotate: React.FC = props => {
                       onChange={event => {
                         const updatedAnnotations = [...config?.annotations]
                         updatedAnnotations[index].lineType = event.target.value
-                        updateConfig({
+                        setConfig({
                           ...config,
                           annotations: updatedAnnotations
                         })
@@ -286,7 +282,7 @@ const PanelAnnotate: React.FC = props => {
                     onChange={event => {
                       const updatedAnnotations = [...config?.annotations]
                       updatedAnnotations[index].marker = event.target.value
-                      updateConfig({
+                      setConfig({
                         ...config,
                         annotations: updatedAnnotations
                       })
