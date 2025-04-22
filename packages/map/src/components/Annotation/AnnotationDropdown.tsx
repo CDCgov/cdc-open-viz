@@ -4,9 +4,10 @@ import './AnnotationDropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
 import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 import AnnotationList from './AnnotationList'
+import { MapContext } from '../../types/MapContext'
 
 const AnnotationDropdown = () => {
-  const { config, currentViewport: viewport } = useContext(ConfigContext)
+  const { config, currentViewport: viewport } = useContext<MapContext>(ConfigContext)
   const [expanded, setExpanded] = useState(false)
 
   const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${APP_FONT_SIZE}px`

@@ -43,7 +43,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     mapId,
     runtimeFilters,
     runtimeLegend,
-    setRuntimeLegend,
+    setRuntimeLegend
   } = useContext<MapContext>(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
@@ -306,7 +306,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 {legendListItems}
               </ul>
             )}
-            {(config.visual.additionalCityStyles && config.visual.additionalCityStyles.some(c => c.label) || config.visual.cityStyleLabel) && (
+            {((config.visual.additionalCityStyles && config.visual.additionalCityStyles.some(c => c.label)) ||
+              config.visual.cityStyleLabel) && (
               <>
                 <hr />
                 <div className={legendClasses.div.join(' ') || ''}>
@@ -314,7 +315,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                     <div>
                       <svg>
                         <Group
-                          top={config.visual.cityStyle === 'pin' ? 19 : config.visual.cityStyle === 'triangle' ? 13 : 11}
+                          top={
+                            config.visual.cityStyle === 'pin' ? 19 : config.visual.cityStyle === 'triangle' ? 13 : 11
+                          }
                           left={10}
                         >
                           {cityStyleShapes[config.visual.cityStyle.toLowerCase()]}
@@ -348,7 +351,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           </section>
         </aside>
         {config.hexMap?.shapeGroups?.length > 0 && config.hexMap.type === 'shapes' && config.general.displayAsHex && (
-          <LegendItemHex state={config} runtimeLegend={runtimeLegend} viewport={viewport} />
+          <LegendItemHex runtimeLegend={runtimeLegend} viewport={viewport} />
         )}
       </div>
     </ErrorBoundary>

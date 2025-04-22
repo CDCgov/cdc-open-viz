@@ -9,14 +9,14 @@ import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
 import { displayGeoName, SVG_HEIGHT, SVG_WIDTH } from '../helpers'
 import { geoMercator, geoAlbersUsa, type GeoProjection } from 'd3-geo'
 import { getColumnNames } from '../helpers/getColumnNames'
+import { MapContext } from '../types/MapContext'
 
 type BubbleListProps = {
-  runtimeData: Object[]
   customProjection?: GeoProjection
 }
 
 export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
-  const { config, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, runtimeData } = useContext(ConfigContext)
+  const { config, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, runtimeData } = useContext<MapContext>(ConfigContext)
   const { columns, data, general, visual } = config
   const { geoType, allowMapZoom } = general
   const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder } = visual

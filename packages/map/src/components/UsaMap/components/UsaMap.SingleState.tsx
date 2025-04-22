@@ -113,7 +113,6 @@ const SingleStateMap = () => {
       <CityList
         projection={cityListProjection}
         key='cities'
-        state={config}
         geoClickHandler={geoClickHandler}
         applyLegendToRow={applyLegendToRow}
         titleCase={titleCase}

@@ -16,10 +16,11 @@ export const DATA_OPERATOR_EQUAL = '='
 export const DATA_OPERATOR_NOTEQUAL = '≠'
 export const DATA_OPERATORS = [DATA_OPERATOR_LESS, DATA_OPERATOR_GREATER, DATA_OPERATOR_LESSEQUAL, DATA_OPERATOR_GREATEREQUAL, DATA_OPERATOR_EQUAL, DATA_OPERATOR_NOTEQUAL]
 
-const HexSettingDisplayShapesOnHex = props => {
+const HexSettingDisplayShapesOnHex = () => {
   const { config, setConfig } = useContext(ConfigContext)
+  const { general } = config
 
-  if (!config.general.displayAsHex) return <></>
+  if (!general.displayAsHex) return <></>
   return (
     <label className='checkbox mt-4'>
       <input
@@ -43,11 +44,12 @@ const HexSettingDisplayShapesOnHex = props => {
 const HexSettingDisplayAsHexMap = props => {
   const { handleEditorChanges } = props
   const { config } = useContext(ConfigContext)
+  const { general } = config
 
   return (
-    config.general.geoType === 'us' &&
-    config.general.type !== ' navigation' &&
-    config.general.type !== 'bubble' && (
+    general.geoType === 'us' &&
+    general.type !== 'navigation' &&
+    general.type !== 'bubble' && (
       <label className='checkbox mt-4'>
         <input
           type='checkbox'

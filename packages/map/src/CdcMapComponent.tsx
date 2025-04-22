@@ -60,7 +60,7 @@ import useResizeObserver from './hooks/useResizeObserver'
 import useGenerateRuntimeLegend from './hooks/useGenerateRuntimeLegend'
 import useGenerateRuntimeData from './hooks/useGenerateRuntimeData'
 import { VizFilter } from '@cdc/core/types/VizFilter'
-import { getInitialState,  mapReducer } from './store/map.reducer'
+import { getInitialState, mapReducer } from './store/map.reducer'
 import { RuntimeData } from './types/RuntimeData'
 import EditorContext from '@cdc/editor/src/ConfigContext'
 import MapActions from './store/map.actions'
@@ -410,7 +410,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
             )}
             {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
               <section className={sectionClassNames()} aria-label={'Map: ' + title} ref={innerContainerRef}>
-                {config?.runtime?.editorErrorMessage.length > 0 && <Error state={config} />}
+                {config?.runtime?.editorErrorMessage.length > 0 && <Error />}
                 <Title
                   title={title}
                   superTitle={general.superTitle}

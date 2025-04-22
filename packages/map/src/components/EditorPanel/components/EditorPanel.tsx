@@ -59,7 +59,8 @@ const EditorPanel = () => {
     setConfig,
     config,
     tooltipId,
-    runtimeData
+    runtimeData,
+    setRuntimeData
   } = useContext<MapContext>(ConfigContext)
 
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
@@ -1456,9 +1457,9 @@ const EditorPanel = () => {
                 </div>
               </label>
 
-              <HexSetting.DisplayAsHexMap state={config} setState={setConfig} handleEditorChanges={handleEditorChanges} />
-              <HexSetting.DisplayShapesOnHex state={config} setState={setConfig} />
-              <HexSetting.ShapeColumns state={config} setState={setConfig} columnsOptions={columnsOptions} />
+              <HexSetting.DisplayAsHexMap handleEditorChanges={handleEditorChanges} />
+              <HexSetting.DisplayShapesOnHex />
+              <HexSetting.ShapeColumns columnsOptions={columnsOptions} />
 
               {'us' === config.general.geoType &&
                 'bubble' !== config.general.type &&

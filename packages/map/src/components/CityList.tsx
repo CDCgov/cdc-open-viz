@@ -10,9 +10,9 @@ import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
 import { getColumnNames } from '../helpers/getColumnNames'
 
+
 type CityListProps = {
   data: Object[]
-  geoClickHandler: (city: string, geoData: Object) => void
   setSharedFilterValue: string
   isFilterValueSupported: boolean
   tooltipId: string

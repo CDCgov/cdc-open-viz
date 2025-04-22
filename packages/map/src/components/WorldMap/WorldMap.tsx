@@ -64,8 +64,6 @@ const WorldMap = () => {
     return <></>
   }
 
-  // TODO Refactor - state should be set together here to avoid rerenders
-  // Resets to original data & zooms out
   const handleReset = (config, setRuntimeData) => {
     const newRuntimeData = generateRuntimeData(config)
     dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
@@ -149,9 +147,8 @@ const WorldMap = () => {
           <Geo
             additionalData={additionalData}
             geoData={geoData}
-            state={config}
             key={i + '-geo'}
-            style={styles}
+            styles={styles}
             path={path}
             stroke={geoStrokeColor}
             strokeWidth={strokeWidth}
@@ -168,11 +165,9 @@ const WorldMap = () => {
         <Geo
           additionaldata={JSON.stringify(additionalData)}
           geodata={JSON.stringify(geoData)}
-          state={config}
           key={i + '-geo'}
           stroke={geoStrokeColor}
           strokeWidth={strokeWidth}
-          style={styles}
           styles={styles}
           path={path}
           data-tooltip-id={`tooltip__${tooltipId}`}
@@ -184,18 +179,15 @@ const WorldMap = () => {
     // Cities
     geosJsx.push(
       <CityList
-        geoClickHandler={geoClickHandler}
         key='cities'
         projection={projection}
-        state={config}
-        titleCase={titleCase}
         tooltipId={tooltipId}
       />
     )
 
     // Bubbles
     if (type === 'bubble') {
-      geosJsx.push(<BubbleList runtimeData={data} />)
+      geosJsx.push(<BubbleList />)
     }
 
     return geosJsx

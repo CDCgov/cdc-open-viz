@@ -61,16 +61,16 @@ const nudges = {
 const UsaMap = () => {
 
   const {
-      data,
-      setSharedFilterValue,
-      config,
+    data,
+    setSharedFilterValue,
+    config,
     setConfig,
-      tooltipId,
-      mapId,
-      logo,
-      legendMemo,
-      legendSpecialClassLastMemo,
-      currentViewport,
+    tooltipId,
+    mapId,
+    logo,
+    legendMemo,
+    legendSpecialClassLastMemo,
+    currentViewport,
     translate
     } = useContext<MapContext>(ConfigContext)
 
@@ -183,7 +183,7 @@ const UsaMap = () => {
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
-    const legendColors = applyLegendToRow(territoryData, config)
+    const legendColors = applyLegendToRow(territoryData)
 
     if (legendColors) {
       let needsPointer = false
@@ -237,7 +237,7 @@ const UsaMap = () => {
 
   let pathGenerator = geoPath().projection(geoAlbersUsa().translate(translate))
 
-  // Note: Layers are different than patterns
+  // Note: Layers are different from patterns
   const { pathArray } = useMapLayers(config, setConfig, pathGenerator, tooltipId)
 
   if (!focusedStates) {
@@ -516,7 +516,6 @@ const UsaMap = () => {
         key='cities'
         projection={projection}
         setSharedFilterValue={setSharedFilterValue}
-        state={config}
         titleCase={titleCase}
         tooltipId={tooltipId}
       />
