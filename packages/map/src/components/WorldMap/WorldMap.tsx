@@ -64,7 +64,7 @@ const WorldMap = () => {
     return <></>
   }
 
-  const handleReset = (config, setRuntimeData) => {
+  const handleReset = setRuntimeData => {
     const newRuntimeData = generateRuntimeData(config)
     dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
     dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
@@ -177,13 +177,7 @@ const WorldMap = () => {
     })
 
     // Cities
-    geosJsx.push(
-      <CityList
-        key='cities'
-        projection={projection}
-        tooltipId={tooltipId}
-      />
-    )
+    geosJsx.push(<CityList key='cities' projection={projection} tooltipId={tooltipId} />)
 
     // Bubbles
     if (type === 'bubble') {

@@ -52,6 +52,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
     if (!allowMapZoom) return
     const newRuntimeData = data.filter(item => item[geoColumnName] === dataRow[geoColumnName])
     const _filteredCountryCode = newRuntimeData[0]?.uid
+    if (!_filteredCountryCode) return null
     const coordinates = countryCoordinates[_filteredCountryCode]
     const long = coordinates[1]
     const lat = coordinates[0]

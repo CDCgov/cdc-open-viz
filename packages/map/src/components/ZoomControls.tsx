@@ -7,11 +7,11 @@ import './zoomControls.styles.css'
 type ZoomControlsProps = {
   handleZoomIn: (coordinates: [Number, Number]) => void
   handleZoomOut: (coordinates: [Number, Number]) => void
-  handleReset: (state: MapConfig, setConfig: Function, setRuntimeData: Function) => void
+  handleReset: (setRuntimeData: Function) => void
 }
 
 const ZoomControls: React.FC<ZoomControlsProps> = ({ handleZoomIn, handleZoomOut, handleReset }) => {
-  const { config, setConfig, setRuntimeData, position } = useContext<MapContext>(ConfigContext)
+  const { config, setRuntimeData, position } = useContext<MapContext>(ConfigContext)
   if (!config.general.allowMapZoom) return
   return (
     <div className='zoom-controls' data-html2canvas-ignore='true'>
@@ -27,20 +27,12 @@ const ZoomControls: React.FC<ZoomControlsProps> = ({ handleZoomIn, handleZoomOut
         </svg>
       </button>
       {config.general.type === 'bubble' && (
-        <button
-          onClick={() => handleReset(config, setConfig, setRuntimeData)}
-          className='reset'
-          aria-label='Reset Zoom and Map Filters'
-        >
+        <button onClick={() => handleReset(setRuntimeData)} className='reset' aria-label='Reset Zoom and Map Filters'>
           Reset Filters
         </button>
       )}
       {(config.general.type === 'world-geocode' || config.general.geoType === 'single-state') && (
-        <button
-          onClick={() => handleReset(config, setConfig, setRuntimeData)}
-          className='reset'
-          aria-label='Reset Zoom'
-        >
+        <button onClick={() => handleReset(setRuntimeData)} className='reset' aria-label='Reset Zoom'>
           Reset Zoom
         </button>
       )}
