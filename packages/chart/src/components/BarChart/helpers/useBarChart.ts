@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react'
-import ConfigContext, { ChartDispatchContext } from '../ConfigContext'
+import { ChartDispatchContext } from '../../../ConfigContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
-export const useBarChart = () => {
-  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, setSeriesHighlight, seriesHighlight } =
-    useContext(ConfigContext)
-  const dispatch = useContext(ChartDispatchContext)
+
+export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, configContext) => {
+  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, seriesHighlight } = configContext
   const { orientation } = config
+  const dispatch = useContext(ChartDispatchContext)
   const [hoveredBar, setHoveredBar] = useState(null)
 
   const isHorizontal = orientation === 'horizontal'
@@ -226,17 +226,18 @@ export const useBarChart = () => {
     return additionalTooltipItems
   }
 
-  const onMouseOverBar = (categoryValue, barKey) => {
+  const onMouseOverBar = (categoryValue, barKey, event, data) => {
     if (config.legend.highlightOnHover && config.legend.behavior === 'highlight' && barKey) {
       dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [barKey] })
     }
-
+    handleTooltipMouseOver(event, data)
     setHoveredBar(categoryValue)
   }
   const onMouseLeaveBar = () => {
     if (config.legend.highlightOnHover && config.legend.behavior === 'highlight') {
       dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [] })
     }
+    handleTooltipMouseOff()
   }
 
   return {
