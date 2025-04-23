@@ -2,7 +2,6 @@ import React, { useContext } from 'react'
 
 // Local context and hooks
 import ConfigContext from '../../../ConfigContext'
-import { useBarChart } from '../../../hooks/useBarChart'
 import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
 
 // VisX library imports
@@ -27,7 +26,24 @@ import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
 
 export const BarChartHorizontal = () => {
-  const { xScale, yScale, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
+  const { xScale, yScale, yMax, seriesScale, barChart } = useContext<BarChartContextValues>(BarChartContext)
+  const {
+    isHorizontal,
+    barBorderWidth,
+    updateBars,
+    assignColorsToValues,
+    section,
+    isLabelBelowBar,
+    lollipopBarWidth,
+    lollipopShapeSize,
+    getHighlightedBarColorByValue,
+    getHighlightedBarByValue,
+    getAdditionalColumn,
+    hoveredBar,
+    onMouseLeaveBar,
+    onMouseOverBar
+  } = barChart
+
   const {
     transformedData: data,
     tableData,
@@ -40,31 +56,12 @@ export const BarChartHorizontal = () => {
     setSharedFilter,
     isNumber
   } = useContext<ChartContext>(ConfigContext)
-  const {
-    isHorizontal,
-    barBorderWidth,
-    updateBars,
-    assignColorsToValues,
-    section,
-    isLabelBelowBar,
-    displayNumbersOnBar,
-    lollipopBarWidth,
-    lollipopShapeSize,
-    getHighlightedBarColorByValue,
-    getHighlightedBarByValue,
-    getAdditionalColumn,
-    hoveredBar,
-    onMouseLeaveBar,
-    onMouseOverBar
-  } = useBarChart()
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
   const hasConfidenceInterval = Object.keys(config.confidenceKeys).length > 0
 
   const _data = getBarData(config, data, hasConfidenceInterval)
-
-  const root = document.documentElement
 
   return (
     config.visualizationSubType !== 'stacked' &&
@@ -242,7 +239,7 @@ export const BarChartHorizontal = () => {
                           height: numbericBarHeight,
                           x: barX,
                           y: barHeight * bar.index,
-                          onMouseOver: () => onMouseOverBar(xAxisValue, bar.key),
+                          onMouseOver: e => onMouseOverBar(xAxisValue, bar.key, e, data),
                           onMouseLeave: onMouseLeaveBar,
                           tooltipHtml: tooltip,
                           tooltipId: `cdc-open-viz-tooltip-${config.runtime.uniqueId}`,
