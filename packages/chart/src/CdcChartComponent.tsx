@@ -1067,7 +1067,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
               </div>
               <FootnotesStandAlone
                 config={configObj.footnotes}
-                filters={config.filters.filter(f => f.filterFootnotes)}
+                filters={config.filters?.filter(f => f.filterFootnotes)}
               />
             </div>
           )}

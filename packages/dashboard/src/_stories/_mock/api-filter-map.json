@@ -82,6 +82,7 @@
   ],
   "visualizations": {
     "map1": {
+      "table": {},
       "uid": "map1",
       "type": "map",
       "defaultData": false,
