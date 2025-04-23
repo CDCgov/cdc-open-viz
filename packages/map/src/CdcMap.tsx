@@ -67,6 +67,8 @@ import useGenerateRuntimeLegend from './hooks/useGenerateRuntimeLegend'
 import useGenerateRuntimeFilters from './hooks/useGenerateRuntimeFilters'
 import useGenerateRuntimeData from './hooks/useGenerateRuntimeData'
 import { VizFilter } from '@cdc/core/types/VizFilter'
+import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
+import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 
 const CdcMap = ({
   config,
@@ -79,7 +81,8 @@ const CdcMap = ({
   setConfig,
   setSharedFilter,
   setSharedFilterValue,
-  link
+  link,
+  datasets
 }) => {
   const [accessibleStatus, setAccessibleStatus] = useState<string>()
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState<boolean>(false)
@@ -101,6 +104,8 @@ const CdcMap = ({
   const [position, setPosition] = useState(state.mapPosition)
 
   const _setRuntimeData = (data: any) => {
+    const _newFilters = addValuesToFilters(data, [])
+    setState({ ...state, filters: _newFilters })
     if (config) {
       setRuntimeData(data)
     } else {
@@ -471,7 +476,7 @@ const CdcMap = ({
         imageId={imageId}
         showEditorPanel={state.showEditorPanel}
       >
-        {isEditor && <EditorPanel />}
+        {isEditor && <EditorPanel datasets={datasets} />}
         <Layout.Responsive isEditor={isEditor}>
           {requiredColumns && (
             <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
@@ -494,10 +499,8 @@ const CdcMap = ({
 
               {state?.filters?.length > 0 && (
                 <Filters
-                  config={state}
-                  setConfig={setState}
-                  filteredData={runtimeFilters}
-                  setFilteredData={_setRuntimeData}
+                  config={{ ...state, filters: runtimeFilters }}
+                  setFilters={_setRuntimeData}
                   dimensions={dimensions}
                   standaloneMap={!config}
                 />
@@ -621,11 +624,9 @@ const CdcMap = ({
               {general.footnotes && <section className='footnotes pt-2 mt-4'>{parse(general.footnotes)}</section>}
             </section>
           )}
-
           <div aria-live='assertive' className='cdcdataviz-sr-only'>
             {accessibleStatus}
           </div>
-
           {!isDraggingAnnotation &&
             !window.matchMedia('(any-hover: none)').matches &&
             'hover' === tooltips.appearanceType && (
@@ -647,6 +648,7 @@ const CdcMap = ({
               display: 'none' // can't use d-none here
             }}
           ></div>
+          <FootnotesStandAlone config={config.footnotes} filters={config.filters?.filter(f => f.filterFootnotes)} />
         </Layout.Responsive>
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>
