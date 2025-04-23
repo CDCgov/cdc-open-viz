@@ -70,7 +70,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
         tableTitle={config.table.label}
         viewport={viewport || 'lg'}
       />
-      <FootnotesStandAlone config={config.footnotes} filters={config.filters.filter(f => f.filterFootnotes)} />
+      <FootnotesStandAlone config={config.footnotes} filters={config.filters?.filter(f => f.filterFootnotes)} />
     </>
   )
 }

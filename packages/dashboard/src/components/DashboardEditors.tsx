@@ -7,9 +7,9 @@ import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
 import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'
 import DashboardSharedFilters from './DashboardFilters'
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
-import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import _ from 'lodash'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { DashboardState } from '../store/dashboard.reducer'
 
 type DashboardEditorProps = {
   visualizationKey: string
@@ -18,7 +18,7 @@ type DashboardEditorProps = {
   isDebug?: boolean
   setSharedFilter?: Function
   apiFilterDropdowns?: APIFilterDropdowns
-  state: any
+  state: DashboardState
 }
 
 const DashboardEditors: React.FC<DashboardEditorProps> = ({
@@ -63,7 +63,7 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
           setSharedFilterValue={setSharedFilterValue}
           isDashboard={true}
           showLoader={false}
-          dashboardConfig={state.config}
+          datasets={state.config.datasets}
         />
       )
 
@@ -97,6 +97,7 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
           isEditor={true}
           setConfig={_updateConfig}
           isDashboard={true}
+          datasets={state.config.datasets}
         />
       )
 
