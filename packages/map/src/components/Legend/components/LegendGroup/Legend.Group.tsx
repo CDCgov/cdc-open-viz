@@ -48,8 +48,7 @@ const LegendGroup = ({ legendItems }) => {
     Object.entries(result).forEach(([group, items]) => {
       result[group] = [...items].sort(
         (a, b) =>
-          state.legend.categoryValuesOrder?.indexOf(a.label) - state.legend.categoryValuesOrder?.indexOf(b.label)
-      )
+          (state.legend.categoryValuesOrder ?? []).indexOf(a.label) - (state.legend.categoryValuesOrder ?? []).indexOf(b.label)
     })
 
     return result
