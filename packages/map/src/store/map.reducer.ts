@@ -1,6 +1,7 @@
 import { MapConfig } from '../types/MapConfig'
 import MapActions from './map.actions'
 import defaults from './../data/initial-state'
+import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 
 export const getInitialState = (configObj): MapConfig => {
   return {
@@ -48,7 +49,7 @@ export type MapState = {
   dataUrl: string
 }
 
-export const mapReducer = (state: MapState, action: MapActions): MapState => {
+const reducer = (state: MapState, action: MapActions): MapState => {
   switch (action.type) {
     case 'SET_CONFIG':
       return { ...state, config: action.payload }
@@ -88,5 +89,7 @@ export const mapReducer = (state: MapState, action: MapActions): MapState => {
       return state
   }
 }
+
+export const mapReducer = devToolsWrapper(reducer)
 
 export type MapReducerType<MapState, MapActions> = (state: MapState, action: MapActions) => MapState
