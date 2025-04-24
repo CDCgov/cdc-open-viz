@@ -22,11 +22,11 @@ export const getInitialState = (configObj): MapConfig => {
     runtimeFilters: [],
     runtimeLegend: [],
     stateToShow: '',
-    ...defaults,
+    ...defaults
   }
 }
 
-export type MapState = MapConfig & {
+export type MapState = {
   config: MapConfig
   loading: boolean
   accessibleStatus: string
