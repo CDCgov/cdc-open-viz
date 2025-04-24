@@ -25,7 +25,7 @@ type PanelProps = {
 }
 
 const PatternSettings = ({ name }: PanelProps) => {
-  const { state, setState, runtimeData, legendMemo, legendSpecialClassLastMemo } = useContext<MapContext>(ConfigContext)
+  const { config, setConfig, runtimeData, legendMemo, legendSpecialClassLastMemo } = useContext<MapContext>(ConfigContext)
   const defaultPattern = 'circles'
   const patternTypes = ['circles', 'waves', 'lines']
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
@@ -33,7 +33,7 @@ const PatternSettings = ({ name }: PanelProps) => {
   const {
     map: { patterns },
     data
-  } = state
+  } = config
 
   const [unitedStates, setUnitedStates] = useState(null)
 
@@ -52,12 +52,12 @@ const PatternSettings = ({ name }: PanelProps) => {
 
   /** Updates the map config with a new pattern item */
   const handleAddGeoPattern = () => {
-    let patterns = [...state.map.patterns]
+    let patterns = [...config.map.patterns]
     patterns.push({ dataKey: '', pattern: defaultPattern, contrastCheck: true })
-    setState({
-      ...state,
+    setConfig({
+      ...config,
       map: {
-        ...state.map,
+        ...config.map,
         patterns
       }
     })
@@ -69,7 +69,7 @@ const PatternSettings = ({ name }: PanelProps) => {
     index: number,
     keyToUpdate: 'dataKey' | 'pattern' | 'dataValue' | 'size' | 'label' | 'color'
   ) => {
-    const updatedPatterns = [...state.map.patterns]
+    const updatedPatterns = [...config.map.patterns]
 
     // Update the specific pattern with the new value
     updatedPatterns[index] = { ...updatedPatterns[index], [keyToUpdate]: value }
@@ -79,12 +79,12 @@ const PatternSettings = ({ name }: PanelProps) => {
       const geoKey = geo.properties.iso
       if (!geoKey || !runtimeData) return
 
-      const legendColors = runtimeData[geoKey] ? applyLegendToRow(runtimeData[geoKey], state) : undefined
+      const legendColors = runtimeData[geoKey] ? applyLegendToRow(runtimeData[geoKey], config) : undefined
       const geoData = runtimeData[geoKey]
       if (!geoData) return
 
       // Iterate over each pattern
-      state.map.patterns.forEach((patternData, patternIndex) => {
+      config.map.patterns.forEach((patternData, patternIndex) => {
         const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
         if (!hasMatchingValues) return
 
@@ -95,7 +95,7 @@ const PatternSettings = ({ name }: PanelProps) => {
 
         // Log a warning if the contrast check fails
         if (!contrastCheck) {
-          console.warn(`COVE: pattern contrast check failed on ${geoData?.[state.columns.geo.name]} for ${
+          console.warn(`COVE: pattern contrast check failed on ${geoData?.[config.columns.geo.name]} for ${
             patternData.dataKey
           } with:
             pattern color: ${patternColor}
@@ -112,7 +112,7 @@ const PatternSettings = ({ name }: PanelProps) => {
       : ''
 
     // Update the state with the new patterns and error message
-    setState(prevState => ({
+    setConfig(prevState => ({
       ...prevState,
       map: {
         ...prevState.map,
@@ -126,19 +126,19 @@ const PatternSettings = ({ name }: PanelProps) => {
   }
 
   const handleRemovePattern = index => {
-    const updatedPatterns = state.map.patterns.filter((pattern, i) => i !== index)
+    const updatedPatterns = config.map.patterns.filter((pattern, i) => i !== index)
 
-    setState({
-      ...state,
+    setConfig({
+      ...config,
       map: {
-        ...state.map,
+        ...config.map,
         patterns: updatedPatterns
       }
     })
   }
 
   const checkPatternContrasts = () => {
-    return state.map.patterns.every(pattern => pattern.contrastCheck !== false)
+    return config.map.patterns.every(pattern => pattern.contrastCheck !== false)
   }
 
   return (

@@ -2,12 +2,14 @@ import { DataRow, type MapConfig } from './MapConfig'
 import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { VizFilter } from '@cdc/core/types/VizFilter'
+import { type RefObject } from 'react'
 
 export type MapContext = {
   currentViewport: ViewPort
+  content: { geoName: string; keyedData: Record<string, any> }
   data: DataRow[]
   dimensions: DimensionsType
-  displayDataAsText
+  displayDataAsText: string | number
   displayGeoName: (key: string, convertFipsCodes: boolean) => string
   filteredCountryCode: string
   generateRuntimeData: (
@@ -20,37 +22,31 @@ export type MapContext = {
   handleCircleClick: Function
   handleDragStateChange: Function
   isDraggingAnnotation: boolean
-  hasZoom
-  innerContainerRef
+  innerContainerRef: RefObject<HTMLDivElement>
   isDashboard: boolean
-  isDebug: boolean
   isEditor: boolean
   isFilterValueSupported: boolean
-  loadConfig
+  loadConfig: (configObj: MapConfig) => void
   logo: string
-  position
-  resetLegendToggles
-  runtimeFilters
+  mapId: string
+  position: 'side' | 'top' | 'bottom'
+  resetLegendToggles: Function
+  runtimeFilters: Function
+  legendMemo: Function
+  legendSpecialClassLastMemo: Function
   runtimeLegend
-  setAccessibleStatus
-  setFilteredCountryCode
-  setParentConfig
-  setPosition
-  setRuntimeData
-  setRuntimeFilters
-  setRuntimeLegend
-  setSharedFilterValue
-  setState: (newState: MapConfig) => MapConfig
-  state: MapConfig
-  viewport
-  setStateToShow: (string) => void
+  setParentConfig: Function
+  setRuntimeData: Function
+  setRuntimeFilters: Function
+  setRuntimeLegend: Function
+  setSharedFilterValue: Function
+  setConfig: (newState: MapConfig) => MapConfig
+  config: MapConfig
+  viewport: ViewPort
   stateToShow: string
   scale: number
   translate: [number, number]
-  topoData
-  setScale: (number) => void
-  setTranslate: ([x, y]: [number, number]) => void
+  topoData: object
   runtimeData: Object[]
   tooltipId: string
-  setTopoData: Function
 }

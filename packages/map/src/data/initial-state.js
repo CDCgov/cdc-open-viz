@@ -75,6 +75,7 @@ export default {
     hideBorder: false
   },
   filters: [],
+  data: [],
   table: {
     wrapColumns: false,
     label: 'Data Table',

@@ -1,8 +1,8 @@
-import { createContext } from 'react'
+import { createContext, Dispatch } from 'react'
 import { MapConfig } from './types/MapConfig'
+import MapActions from './store/map.actions'
 
 type MapContext = {
-  setRequiredColumns
   container
   setSharedFilter
   setModal
@@ -17,26 +17,22 @@ type MapContext = {
   generateRuntimeData
   geoClickHandler
   handleCircleClick: Function
-  hasZoom
   innerContainerRef
   isDashboard
-  isDebug
   isEditor
+  mapId: string
   loadConfig
   position
   resetLegendToggles
   runtimeFilters
   runtimeLegend
-  setAccessibleStatus
-  setFilteredCountryCode
   setParentConfig
-  setPosition
   setRuntimeData
   setRuntimeFilters
   setRuntimeLegend
   setSharedFilterValue
-  setState
-  state: MapConfig
+  setConfig: Function
+  config: MapConfig
   tooltipId: string
   legendMemo
   legendSpecialClassLastMemo
@@ -44,6 +40,8 @@ type MapContext = {
   scale
   annotations
 }
+
+export const MapDispatchContext = createContext<Dispatch<MapActions>>(() => {})
 
 const ConfigContext = createContext({} as MapContext)
 

@@ -11,4 +11,5 @@ export type General = {
   showAnnotationDropdown?: boolean
   hideNullValue: boolean
   title: string
+  annotationDropdownText?: string
 }
