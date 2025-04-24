@@ -212,6 +212,11 @@ const Filters: React.FC<FilterProps> = ({
     return [baseClass, conditionalClass, legendClass, 'w-100'].filter(Boolean)
   }
 
+  const getNestedGroup = (singleFilter: VizFilter): string[] => {
+    if (singleFilter.filterStyle !== 'nested-dropdown') return []
+    return (singleFilter.queuedActive || [singleFilter.active, singleFilter.subGrouping?.active]) as [string, string]
+  }
+
   return (
     <section className={getClasses().join(' ')}>
       {visualizationConfig.filterIntro && (
@@ -234,13 +239,7 @@ const Filters: React.FC<FilterProps> = ({
             const { isDropdown } = wrappingFilters[columnName] || {}
             const showDefaultDropdown =
               ((filterStyle === 'dropdown' || mobileFilterStyle) && !mobileExempt) || isDropdown
-            const [nestedActiveGroup, nestedActiveSubGroup] = useMemo<string[]>(() => {
-              if (filterStyle !== 'nested-dropdown') return []
-              return (singleFilter.queuedActive || [singleFilter.active, singleFilter.subGrouping?.active]) as [
-                string,
-                string
-              ]
-            }, [singleFilter])
+            const [nestedActiveGroup, nestedActiveSubGroup] = getNestedGroup(singleFilter)
             const hideLabelMargin = singleFilter.filterStyle === 'tab-simple' && !showDefaultDropdown
             return (
               <div
