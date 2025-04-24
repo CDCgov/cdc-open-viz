@@ -27,7 +27,7 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { publish } from '@cdc/core/helpers/events'
-import { generateRuntimeFilters } from './hooks/useGenerateRuntimeFilters'
+import { generateRuntimeFilters } from './helpers/generateRuntimeFilters'
 import { type MapReducerType, MapState } from './store/map.reducer'
 
 // Map Helpers

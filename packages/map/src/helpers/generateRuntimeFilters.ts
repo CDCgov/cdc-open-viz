@@ -1,4 +1,4 @@
-import { getUniqueValues } from '../helpers'
+import { getUniqueValues } from './index'
 import { handleSorting } from '@cdc/core/components/Filters'
 
 export const generateRuntimeFilters = (state, hash, runtimeFilters) => {
