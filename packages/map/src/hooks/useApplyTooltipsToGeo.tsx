@@ -8,9 +8,9 @@ import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import ExternalIcon from './../images/external-link.svg'
 
 const useApplyTooltipsToGeo = () => {
-  const { state, customNavigationHandler } = useContext(ConfigContext)
-  const navigationColumnName = state.columns.navigate.name
-  const { buildTooltip } = useTooltip({ state, displayGeoName, supportedStatesFipsCodes })
+  const { config, customNavigationHandler } = useContext(ConfigContext)
+  const navigationColumnName = config.columns.navigate.name
+  const { buildTooltip } = useTooltip({ config, displayGeoName, supportedStatesFipsCodes })
 
   const applyTooltipsToGeo = (geoName: string, row: Object, returnType = 'string') => {
     let toolTipText: string | ReactNode = buildTooltip(row, geoName, '')
@@ -21,7 +21,7 @@ const useApplyTooltipsToGeo = () => {
         toolTipText = [<div key='modal-content'>{parse(toolTipText)}</div>]
       }
 
-      if (state.columns.hasOwnProperty('navigate') && row[navigationColumnName]) {
+      if (config.columns.hasOwnProperty('navigate') && row[navigationColumnName]) {
         // Check that toolTipText is an array before pushing to it
         if (Array.isArray(toolTipText)) {
           toolTipText.push(
@@ -31,10 +31,10 @@ const useApplyTooltipsToGeo = () => {
               key='modal-navigation-link'
               onClick={e => {
                 e.preventDefault()
-                navigationHandler(state.general.navigationTarget, row[navigationColumnName], customNavigationHandler)
+                navigationHandler(config.general.navigationTarget, row[navigationColumnName], customNavigationHandler)
               }}
             >
-              {state.tooltips.linkLabel}
+              {config.tooltips.linkLabel}
               {isDomainExternal(row[navigationColumnName]) && <ExternalIcon className='inline-icon ms-1' />}
             </a>
           )

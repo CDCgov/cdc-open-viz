@@ -2,9 +2,8 @@ import { displayDataAsText } from '../../../core/helpers/displayDataAsText'
 import { displayGeoName } from '../helpers/displayGeoName'
 
 const useTooltip = props => {
-  const { state, supportedStatesFipsCodes } = props
+  const { config, supportedStatesFipsCodes } = props
 
-  const config = state
 
   /**
    * On county maps there's a need to append the state name
@@ -108,7 +107,7 @@ const useTooltip = props => {
           let tooltipValue = handleTooltipSpecialClassText(specialClasses, column, row, '', columnKey)
 
           if (!tooltipValue) {
-            tooltipValue = row ? displayDataAsText(row[column.name], columnKey, state) : 'No Data'
+            tooltipValue = row ? displayDataAsText(row[column.name], columnKey, config) : 'No Data'
           }
 
           toolTipText += handleTooltipPrimaryColumn(tooltipValue, column)

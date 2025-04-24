@@ -10,14 +10,14 @@ type StateOutputProps = {
 }
 
 const StateOutput: React.FC<StateOutputProps> = ({ topoData, path, scale, stateToShow }: StateOutputProps) => {
-  const { state } = useContext(ConfigContext)
+  const { config } = useContext(ConfigContext)
   if (!topoData?.objects?.states) return null
   let geo = topoData.objects.states.geometries.filter(s => {
-    return s.properties.name === state.general.statePicked.stateName
+    return s.properties.name === config.general.statePicked.stateName
   })
 
-  const geoStrokeColor = getGeoStrokeColor(state)
-  const geoFillColor = getGeoFillColor(state)
+  const geoStrokeColor = getGeoStrokeColor(config)
+  const geoFillColor = getGeoFillColor(config)
 
   let stateLines = path(mesh(topoData, geo[0]))
 

@@ -14,9 +14,9 @@ interface CountyOutputProps {
 }
 
 const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoStrokeColor, tooltipId }) => {
-  const { state, data, geoClickHandler, legendMemo, legendSpecialClassLastMemo } = useContext<MapContext>(ConfigContext)
+  const { config, data, geoClickHandler, legendMemo, legendSpecialClassLastMemo } = useContext<MapContext>(ConfigContext)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const geoFillColor = getGeoFillColor(state)
+  const geoFillColor = getGeoFillColor(config)
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   return (
     <>
@@ -33,7 +33,7 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
 
         // Once we receive data for this geographic item, setup variables.
         if (geoData !== undefined) {
-          legendColors = applyLegendToRow(geoData, state)
+          legendColors = applyLegendToRow(geoData, config)
         }
 
         const geoDisplayName = displayGeoName(geoKey)
@@ -57,8 +57,8 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
 
           // When to add pointer cursor
           if (
-            (state.columns.navigate && geoData[state.columns.navigate.name]) ||
-            state.tooltips.appearanceType === 'hover'
+            (config.columns.navigate && geoData[config.columns.navigate.name]) ||
+            config.tooltips.appearanceType === 'hover'
           ) {
             styles.cursor = 'pointer'
           }
@@ -67,7 +67,7 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
             <g
               key={`key--${county.id}`}
               className={`county county--${geoDisplayName.split(' ').join('')} county--${
-                geoData[state.columns.geo.name]
+                geoData[config.columns.geo.name]
               }`}
               style={styles}
               onClick={() => geoClickHandler(geoDisplayName, geoData)}

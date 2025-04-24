@@ -15,3 +15,4 @@ export const HEADER_COLORS = [
   'theme-green',
   'theme-amber'
 ]
+export const MAX_ZOOM_LEVEL = 4

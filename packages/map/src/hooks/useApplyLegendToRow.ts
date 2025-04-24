@@ -4,8 +4,8 @@ import { generateColorsArray, hashObj } from '../helpers'
 import colorPalettes from '@cdc/core/data/colorPalettes'
 
 const useApplyLegendToRow = (legendMemo, legendSpecialClassLastMemo) => {
-  const { state, runtimeLegend } = useContext(ConfigContext)
-  const { general, color, legend } = state
+  const { config, runtimeLegend } = useContext(ConfigContext)
+  const { general, color, legend } = config
   const { type } = general
   const { showSpecialClassesLast } = legend
 

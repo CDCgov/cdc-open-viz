@@ -33,7 +33,7 @@ export type GeneratedLegend = {
 }
 
 const useGenerateRuntimeLegend = (legendMemo, legendSpecialClassLastMemo) => {
-  const { state, setState, runtimeFilters } = useContext(ConfigContext)
+  const { config, setConfig, runtimeFilters } = useContext(ConfigContext)
 
   const generateRuntimeLegend = useCallback(
     (configObj, runtimeData, hash): GeneratedLegend | [] => {
@@ -68,7 +68,7 @@ const useGenerateRuntimeLegend = (legendMemo, legendSpecialClassLastMemo) => {
         result.runtimeDataHash = runtimeFilters?.fromHash
 
         // Unified will base the legend off ALL the data maps received. Otherwise, it will use
-        let dataSet = legend.unified ? data : Object.values(runtimeData)
+        let dataSet = legend.unified ? data : Object?.values(runtimeData)
         let specialClasses = 0
         let specialClassesHash = {}
 
@@ -434,7 +434,7 @@ const useGenerateRuntimeLegend = (legendMemo, legendSpecialClassLastMemo) => {
         // Equal Interval
         if (legend.type === 'equalinterval' && dataSet?.length !== 0) {
           if (!dataSet || dataSet.length === 0) {
-            setState({
+            setConfig({
               ...configObj,
               runtime: {
                 ...configObj.runtime,
@@ -513,7 +513,7 @@ const useGenerateRuntimeLegend = (legendMemo, legendSpecialClassLastMemo) => {
         return []
       }
     },
-    [legendMemo, state, runtimeFilters, setState]
+    [legendMemo, config, runtimeFilters, setConfig]
   )
 
   return { generateRuntimeLegend }

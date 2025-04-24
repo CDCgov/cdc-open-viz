@@ -11,7 +11,7 @@ import ConfigContext from '../ConfigContext'
 import MultiDashboardWrapper from '@cdc/dashboard/src/CdcDashboard'
 
 export default function ConfigureTab({ containerEl }) {
-  const { config, setTempConfig, hostname, isDebug } = useContext(ConfigContext)
+  const { config, setTempConfig, isDebug } = useContext(ConfigContext)
 
   let { type } = config
 
@@ -19,14 +19,7 @@ export default function ConfigureTab({ containerEl }) {
     case 'map':
       return (
         <ErrorBoundary component='CdcMap'>
-          <CdcMap
-            isEditor={true}
-            isDebug={isDebug}
-            config={config}
-            hostname={hostname}
-            setConfig={setTempConfig}
-            containerEl={containerEl}
-          />
+          <CdcMap isEditor={true} config={config} containerEl={containerEl} />
         </ErrorBoundary>
       )
     case 'waffle-chart':
