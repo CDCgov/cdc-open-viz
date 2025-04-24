@@ -20,7 +20,7 @@ type CdcMapProps = {
 
 const CdcMap: React.FC<CdcMapProps> = ({
   navigationHandler: customNavigationHandler,
-  isEditor = false,
+  isEditor,
   configUrl,
   logo = '',
   link,
@@ -31,10 +31,10 @@ const CdcMap: React.FC<CdcMapProps> = ({
   const [config, _setConfig] = useState(null)
 
   const setConfig = newConfig => {
+    _setConfig(newConfig)
     if (isEditor) {
       editorContext.setTempConfig(newConfig)
     }
-    _setConfig(newConfig)
   }
 
   const [loading, setLoading] = useState(true)
