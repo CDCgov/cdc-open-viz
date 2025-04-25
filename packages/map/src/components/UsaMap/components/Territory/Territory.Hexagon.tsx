@@ -45,9 +45,9 @@ const TerritoryHexagon = ({
   textColor,
   ...props
 }) => {
-  const { state } = useContext<MapContext>(ConfigContext)
+  const { config } = useContext<MapContext>(ConfigContext)
 
-  const isHex = state.general.displayAsHex
+  const isHex = config.general.displayAsHex
 
   // Labels
   const hexagonLabel = (geo, bgColor = '#FFFFFF', projection) => {
@@ -62,7 +62,7 @@ const TerritoryHexagon = ({
 
       return (
         <>
-          {state.hexMap.shapeGroups.map((group, groupIndex) => {
+          {config.hexMap.shapeGroups.map((group, groupIndex) => {
             return group.items.map((item, itemIndex) => {
               if (!geoData) return
               switch (item.operator) {
@@ -117,7 +117,7 @@ const TerritoryHexagon = ({
     }
 
     let x = 0,
-      y = state.hexMap.type === 'shapes' ? -10 : 5
+      y = config.hexMap.type === 'shapes' ? -10 : 5
 
     // used to nudge/move some of the labels for better readability
     if (nudges[abbr] && false === isHex) {
@@ -126,7 +126,7 @@ const TerritoryHexagon = ({
     }
 
     if (undefined === offsets[abbr] || isHex) {
-      let y = state.hexMap.type === 'shapes' ? '30%' : '50%'
+      let y = config.hexMap.type === 'shapes' ? '30%' : '50%'
       return (
         <>
           <Text
@@ -143,7 +143,7 @@ const TerritoryHexagon = ({
           >
             {abbr.substring(3)}
           </Text>
-          {state.general.displayAsHex && state.hexMap.type === 'shapes' && getArrowDirection(territoryData, geo, true)}
+          {config.general.displayAsHex && config.hexMap.type === 'shapes' && getArrowDirection(territoryData, geo, true)}
         </>
       )
     }
@@ -185,7 +185,7 @@ const TerritoryHexagon = ({
           strokeWidth={strokeWidth}
           points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702'
         />
-        {state.general.displayAsHex && hexagonLabel(territoryData, stroke, false)}
+        {config.general.displayAsHex && hexagonLabel(territoryData, stroke, false)}
       </g>
     </svg>
   )

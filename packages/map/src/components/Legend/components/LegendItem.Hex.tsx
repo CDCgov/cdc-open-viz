@@ -1,9 +1,12 @@
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react-icons/ai'
 import parse from 'html-react-parser'
+import ConfigContext from '../../../context'
+import { useContext } from 'react'
 
 const LegendItemHex = props => {
-  const { state, currentViewport: viewport } = props
+  const { currentViewport: viewport } = props
+  const { config: state } = useContext(ConfigContext)
 
   const getItemShape = shape => {
     switch (shape) {

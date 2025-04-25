@@ -5,7 +5,7 @@ import { CustomProjection } from '@visx/geo'
 import Loading from '@cdc/core/components/Loading'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import CityList from '../../CityList'
-import ConfigContext from '../../../context'
+import ConfigContext, { MapDispatchContext } from '../../../context'
 import Annotation from '../../Annotation'
 import SingleState from './SingleState'
 import ZoomableGroup from '../../ZoomableGroup'
@@ -14,18 +14,20 @@ import { MapContext } from '../../../types/MapContext'
 import useStateZoom from '../../../hooks/useStateZoom'
 import { Text } from '@visx/text'
 
-// map-level helpers
-import { titleCase, handleMapAriaLabels, getGeoStrokeColor } from '../../../helpers'
-// state-level helpers
-import { getTopoData, getCurrentTopoYear, isTopoReady } from './../helpers/map'
-import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
-import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
-import { SVG_WIDTH, SVG_HEIGHT, SVG_PADDING, SVG_VIEWBOX } from '../../../helpers'
+import './UsaMap.SingleState.styles.css'
 
-const SingleStateMap = props => {
+// map-level helpers
+import { titleCase, handleMapAriaLabels, getGeoStrokeColor, MAX_ZOOM_LEVEL } from '../../../helpers'
+
+// state-level helpers
+import { getTopoData, getCurrentTopoYear, isTopoReady } from '../helpers/map'
+import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
+import { SVG_WIDTH, SVG_HEIGHT, SVG_PADDING, SVG_VIEWBOX } from '../../../helpers'
+import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
+
+const SingleStateMap = () => {
   const {
-    state,
-    applyLegendToRow,
+    config,
     setSharedFilterValue,
     isFilterValueSupported,
     runtimeFilters,
@@ -33,37 +35,39 @@ const SingleStateMap = props => {
     position,
     stateToShow,
     topoData,
-    setTopoData,
     scale,
     translate,
-    setStateToShow
+    legendMemo,
+    legendSpecialClassLastMemo
   } = useContext<MapContext>(ConfigContext)
 
+  const dispatch = useContext(MapDispatchContext)
   const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection, statePicked } = useStateZoom(topoData)
-  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const { geoClickHandler } = useGeoClickHandler()
+  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
 
   const cityListProjection = geoAlbersUsaTerritories()
     .translate([SVG_WIDTH / 2, SVG_HEIGHT / 2])
     .scale(1)
-  const geoStrokeColor = getGeoStrokeColor(state)
+  const geoStrokeColor = getGeoStrokeColor(config)
   const path = geoPath().projection(projection)
 
   useEffect(() => {
-    setStateToShow(topoData?.states?.find(s => s.properties.name === state.general.statePicked.stateName))
+    const stateToShow = topoData?.states?.find(s => s.properties.name === config.general.statePicked.stateName)
+    dispatch({ type: 'SET_STATE_TO_SHOW', payload: stateToShow })
   }, [statePicked])
 
   useEffect(() => {
-    let currentYear = getCurrentTopoYear(state, runtimeFilters)
+    let currentYear = getCurrentTopoYear(config, runtimeFilters)
 
-    if (currentYear !== topoData.year) {
+    if (currentYear !== topoData?.year) {
       getTopoData(currentYear).then(response => {
-        setTopoData(response)
+        dispatch({ type: 'SET_TOPO_DATA', payload: response })
       })
     }
-  }, [state.general.countyCensusYear, state.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
+  }, [config.general.countyCensusYear, config.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
 
-  if (!isTopoReady(topoData, state, runtimeFilters)) {
+  if (!isTopoReady(topoData, config, runtimeFilters)) {
     return (
       <div style={{ height: `${SVG_HEIGHT}px` }}>
         <Loading />
@@ -73,16 +77,16 @@ const SingleStateMap = props => {
 
   const checkForNoData = () => {
     // If no statePicked, return true
-    if (!state.general.statePicked.fipsCode) return true
+    if (!config.general.statePicked.fipsCode) return true
   }
 
   // Constructs and displays markup for all geos on the map (except territories right now)
-  const constructGeoJsx = (geographies, projection) => {
+  const constructGeoJsx = geographies => {
     const counties = geographies[0].feature.counties
 
     let geosJsx = []
 
-    // Push state lines
+    // Push config lines
     geosJsx.push(
       // prettier-ignore
       <SingleState.StateOutput
@@ -109,7 +113,6 @@ const SingleStateMap = props => {
       <CityList
         projection={cityListProjection}
         key='cities'
-        state={state}
         geoClickHandler={geoClickHandler}
         applyLegendToRow={applyLegendToRow}
         titleCase={titleCase}
@@ -123,19 +126,19 @@ const SingleStateMap = props => {
   }
   return (
     <ErrorBoundary component='SingleStateMap'>
-      {statePicked && state.general.allowMapZoom && state.general.statePicked.fipsCode && (
+      {statePicked && config.general.allowMapZoom && config.general.statePicked.fipsCode && (
         <svg
           viewBox={SVG_VIEWBOX}
           preserveAspectRatio='xMinYMin'
           className='svg-container'
           role='img'
-          aria-label={handleMapAriaLabels(state)}
+          aria-label={handleMapAriaLabels(config)}
         >
           <ZoomableGroup
             center={position.coordinates}
             zoom={position.zoom}
             minZoom={1} // Adjust this value if needed
-            maxZoom={4} // Adjust this value to limit the maximum zoom level
+            maxZoom={MAX_ZOOM_LEVEL}
             onMoveEnd={handleMoveEnd}
             projection={projection}
             width={SVG_WIDTH}
@@ -152,7 +155,7 @@ const SingleStateMap = props => {
               data={[
                 {
                   states: topoData?.states,
-                  counties: topoData.counties.filter(c => c.id.substring(0, 2) === state.general.statePicked.fipsCode)
+                  counties: topoData.counties.filter(c => c.id.substring(0, 2) === config.general.statePicked.fipsCode)
                 }
               ]}
               projection={geoAlbersUsaTerritories}
@@ -169,7 +172,7 @@ const SingleStateMap = props => {
                   <g
                     id='mapGroup'
                     className={`countyMapGroup ${
-                      state.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''
+                      config.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''
                     }`}
                     transform={`translate(${translate}) scale(${scale})`}
                     data-scale=''
@@ -180,17 +183,17 @@ const SingleStateMap = props => {
                 )
               }}
             </CustomProjection>
-            {state.annotations.length > 0 && <Annotation.Draggable />}
+            {config.annotations.length > 0 && <Annotation.Draggable />}
           </ZoomableGroup>
         </svg>
       )}
-      {statePicked && !state.general.allowMapZoom && state.general.statePicked.fipsCode && (
+      {statePicked && !config.general.allowMapZoom && config.general.statePicked.fipsCode && (
         <svg
           viewBox={SVG_VIEWBOX}
           preserveAspectRatio='xMinYMin'
           className='svg-container'
           role='img'
-          aria-label={handleMapAriaLabels(state)}
+          aria-label={handleMapAriaLabels(config)}
         >
           <rect
             className='background center-container ocean'
@@ -203,7 +206,7 @@ const SingleStateMap = props => {
             data={[
               {
                 states: topoData?.states,
-                counties: topoData.counties.filter(c => c.id.substring(0, 2) === state.general.statePicked.fipsCode)
+                counties: topoData.counties.filter(c => c.id.substring(0, 2) === config.general.statePicked.fipsCode)
               }
             ]}
             projection={geoAlbersUsaTerritories}
@@ -220,7 +223,7 @@ const SingleStateMap = props => {
                 <g
                   id='mapGroup'
                   className={`countyMapGroup ${
-                    state.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''
+                    config.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''
                   }`}
                   transform={`translate(${translate}) scale(${scale})`}
                   data-scale=''
@@ -231,7 +234,7 @@ const SingleStateMap = props => {
               )
             }}
           </CustomProjection>
-          {state.annotations.length > 0 && <Annotation.Draggable />}
+          {config.annotations.length > 0 && <Annotation.Draggable />}
         </svg>
       )}
 
@@ -241,7 +244,7 @@ const SingleStateMap = props => {
           preserveAspectRatio='xMinYMin'
           className='svg-container'
           role='img'
-          aria-label={handleMapAriaLabels(state)}
+          aria-label={handleMapAriaLabels(config)}
         >
           <Text
             verticalAnchor='start'
@@ -252,7 +255,7 @@ const SingleStateMap = props => {
             fontSize={18}
             style={{ fontSize: '28px', height: '18px' }}
           >
-            {state.general.noStateFoundMessage}
+            {config.general.noStateFoundMessage}
           </Text>
         </svg>
       )}
