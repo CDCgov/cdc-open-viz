@@ -1,5 +1,5 @@
 import { useContext, useMemo } from 'react'
-import './Legend.Group.css'
+import './legend.group.css'
 import LegendShape from '@cdc/core/components/LegendShape'
 import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -17,12 +17,7 @@ interface GroupedData {
 }
 
 const LegendGroup = ({ legendItems }) => {
-  const { runtimeLegend, setAccessibleStatus, setRuntimeLegend, state, currentViewport } = useContext(ConfigContext)
-
-  const getGridColClass = (viewport: string) => {
-    const map = { xs: 'col-12', sm: 'col-6', md: 'col-4' }
-    return map[viewport] || 'col-3'
-  }
+  const { runtimeLegend, setAccessibleStatus, setRuntimeLegend, state } = useContext(ConfigContext)
 
   const groupLegendItems = (items: LegendItem[], data: object[], groupByKey: string): GroupedData => {
     if (!groupByKey || !data || !items) return {}
@@ -48,7 +43,8 @@ const LegendGroup = ({ legendItems }) => {
     Object.entries(result).forEach(([group, items]) => {
       result[group] = [...items].sort(
         (a, b) =>
-          state.legend.categoryValuesOrder?.indexOf(a.label) - state.legend.categoryValuesOrder?.indexOf(b.label)
+          (state.legend.categoryValuesOrder?.indexOf(a.label) ?? 0) -
+          (state.legend.categoryValuesOrder?.indexOf(b.label) ?? 0)
       )
     })
 
@@ -83,8 +79,11 @@ const LegendGroup = ({ legendItems }) => {
       .join(' ')
   }
 
+  // Новый способ без viewport
   const gridClass =
-    state.legend.position === 'bottom' || state.legend.position === 'top' ? getGridColClass(currentViewport) : 'col-12'
+    state.legend.position === 'bottom' || state.legend.position === 'top'
+      ? 'col-12 col-sm-6 col-md-4 col-lg-3'
+      : 'col-12'
 
   const groupedData = useMemo(
     () => groupLegendItems(legendItems, state.data, state.legend.groupBy),
