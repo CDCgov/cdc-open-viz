@@ -148,39 +148,6 @@ const UsaRegionMap = () => {
     }
   })
 
-  const geoLabel = (geo, bgColor = '#FFFFFF', projection) => {
-    let centroid = projection(geoCentroid(geo))
-    let abbr = geo.properties.iso
-
-    if (undefined === abbr) return null
-
-    let x = 0,
-      y = 5
-
-    return (
-      <g>
-        <line
-          x1={centroid[0]}
-          y1={centroid[1]}
-          x2={centroid[0] + x}
-          y2={centroid[1] + y}
-          stroke='rgba(0,0,0,.5)'
-          strokeWidth={1}
-        />
-        <text
-          x={4}
-          strokeWidth='0'
-          fontSize={13}
-          style={{ fill: APP_FONT_COLOR }}
-          alignmentBaseline='middle'
-          transform={`translate(${centroid[0] + x}, ${centroid[1] + y})`}
-        >
-          {abbr.substring(3)}
-        </text>
-      </g>
-    )
-  }
-
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
     return geographies.map(({ feature: geo, path = '', index }) => {
@@ -286,7 +253,6 @@ const UsaRegionMap = () => {
       return (
         <g key={key} className='geo-group' style={styles}>
           <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1} d={path} />
-          {(isHex || displayStateLabels) && geoLabel(geo, styles.fill, projection)}
         </g>
       )
     })
