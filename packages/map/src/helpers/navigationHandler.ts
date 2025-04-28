@@ -9,9 +9,9 @@ export const navigationHandler = (
     return
   }
 
-  // Abort if value is blank
-  if (0 === urlString.length) {
-    throw Error('Blank string passed as URL. Navigation aborted.')
+  // Abort if urlString is not a valid string
+  if (typeof urlString !== 'string' || urlString.trim().length === 0) {
+    throw Error('Invalid or blank URL. Navigation aborted.')
   }
 
   const urlObj = new URL(urlString, window.location.origin)
