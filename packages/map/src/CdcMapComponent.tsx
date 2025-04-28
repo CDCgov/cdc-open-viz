@@ -455,13 +455,14 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                         {'us-region' === geoType && <UsaMap.Region />}
                         {'us-county' === geoType && <UsaMap.County />}
                         {'world' === geoType && <WorldMap />}
-                        {/* logo is handled in UsaMap.State when applicable */}
                         {'google-map' === geoType && <GoogleMap />}
-                        {'data' === general.type &&
-                          logo &&
-                          ('us' !== geoType || 'us-geocode' === config.general.type) && (
-                            <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
-                          )}
+                        {
+                          /* logo is handled in UsaMap.State when applicable */
+                          // prettier-ignore
+                          'data' === general.type && logo && ('us' !== geoType || 'us-geocode' === general.type) && (
+                          <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
+                        )
+                        }
                       </>
                     )}
                   </section>

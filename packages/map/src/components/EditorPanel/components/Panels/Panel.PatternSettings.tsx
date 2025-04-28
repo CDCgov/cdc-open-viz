@@ -13,6 +13,7 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import './Panel.PatternSettings-style.css'
 import Alert from '@cdc/core/components/Alert'
+import _ from 'lodash'
 
 // topojson helpers for checking color contrasts
 import { feature } from 'topojson-client'
@@ -25,7 +26,8 @@ type PanelProps = {
 }
 
 const PatternSettings = ({ name }: PanelProps) => {
-  const { config, setConfig, runtimeData, legendMemo, legendSpecialClassLastMemo } = useContext<MapContext>(ConfigContext)
+  const { config, setConfig, runtimeData, legendMemo, legendSpecialClassLastMemo } =
+    useContext<MapContext>(ConfigContext)
   const defaultPattern = 'circles'
   const patternTypes = ['circles', 'waves', 'lines']
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
@@ -52,7 +54,7 @@ const PatternSettings = ({ name }: PanelProps) => {
 
   /** Updates the map config with a new pattern item */
   const handleAddGeoPattern = () => {
-    let patterns = [...config.map.patterns]
+    const patterns = _.cloneDeep(config.map.patterns)
     patterns.push({ dataKey: '', pattern: defaultPattern, contrastCheck: true })
     setConfig({
       ...config,
@@ -69,7 +71,7 @@ const PatternSettings = ({ name }: PanelProps) => {
     index: number,
     keyToUpdate: 'dataKey' | 'pattern' | 'dataValue' | 'size' | 'label' | 'color'
   ) => {
-    const updatedPatterns = [...config.map.patterns]
+    const updatedPatterns = _.cloneDeep(config.map.patterns)
 
     // Update the specific pattern with the new value
     updatedPatterns[index] = { ...updatedPatterns[index], [keyToUpdate]: value }
@@ -78,10 +80,10 @@ const PatternSettings = ({ name }: PanelProps) => {
     unitedStates.forEach(geo => {
       const geoKey = geo.properties.iso
       if (!geoKey || !runtimeData) return
-
-      const legendColors = runtimeData[geoKey] ? applyLegendToRow(runtimeData[geoKey], config) : undefined
       const geoData = runtimeData[geoKey]
       if (!geoData) return
+
+      const legendColors = runtimeData[geoKey] ? applyLegendToRow(runtimeData[geoKey]) : undefined
 
       // Iterate over each pattern
       config.map.patterns.forEach((patternData, patternIndex) => {
@@ -98,31 +100,24 @@ const PatternSettings = ({ name }: PanelProps) => {
           console.warn(`COVE: pattern contrast check failed on ${geoData?.[config.columns.geo.name]} for ${
             patternData.dataKey
           } with:
-            pattern color: ${patternColor}
-            contrast: ${getColorContrast(currentFill, patternColor)}
-          `)
+          pattern color: ${patternColor}
+          contrast: ${getColorContrast(currentFill, patternColor)}
+        `)
         }
 
         updatedPatterns[index] = { ...updatedPatterns[index], [keyToUpdate]: value, contrastCheck }
       })
     })
 
-    const editorErrorMessage = updatedPatterns.some(pattern => pattern.contrastCheck === false)
-      ? 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.'
-      : ''
+    const hasContrastErrors = updatedPatterns.some(pattern => pattern.contrastCheck === false)
 
     // Update the state with the new patterns and error message
-    setConfig(prevState => ({
-      ...prevState,
-      map: {
-        ...prevState.map,
-        patterns: updatedPatterns
-      },
-      runtime: {
-        ...prevState.runtime,
-        editorErrorMessage
-      }
-    }))
+    const newConfig = _.cloneDeep(config)
+    newConfig.map.patterns = updatedPatterns
+    newConfig.runtime.editorErrorMessage = hasContrastErrors
+      ? 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.'
+      : '' // Clear the error message if all patterns pass
+    setConfig(newConfig)
   }
 
   const handleRemovePattern = index => {
