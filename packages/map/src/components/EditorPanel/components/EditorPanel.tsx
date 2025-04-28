@@ -1457,8 +1457,37 @@ const EditorPanel = () => {
                 </div>
               </label>
 
-              <HexSetting.DisplayAsHexMap handleEditorChanges={handleEditorChanges} />
-              <HexSetting.DisplayShapesOnHex />
+              {/* Display as Hex */}
+              {general.geoType === 'us' && general.type !== 'navigation' && general.type !== 'bubble' && (
+                <label className='checkbox mt-4'>
+                  <input
+                    type='checkbox'
+                    checked={config.general.displayAsHex}
+                    onChange={event => {
+                      handleEditorChanges('displayAsHex', event.target.checked)
+                    }}
+                  />
+                  <span className='edit-label'>Display As Hex Map</span>
+                </label>
+              )}
+
+              {/* Shapes on Hex */}
+              <label className='checkbox mt-4'>
+                <input
+                  type='checkbox'
+                  checked={config.hexMap.type === 'shapes'}
+                  onChange={event => {
+                    setConfig({
+                      ...config,
+                      hexMap: {
+                        ...config.hexMap,
+                        type: event.target.checked ? 'shapes' : 'standard'
+                      }
+                    })
+                  }}
+                />
+                <span className='edit-label'>Display Shapes on Hex Map</span>
+              </label>
               <HexSetting.ShapeColumns columnsOptions={columnsOptions} />
 
               {'us' === config.general.geoType &&

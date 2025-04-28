@@ -10,9 +10,7 @@ import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
 import { getColumnNames } from '../helpers/getColumnNames'
 
-
 type CityListProps = {
-  data: Object[]
   setSharedFilterValue: string
   isFilterValueSupported: boolean
   tooltipId: string
@@ -20,15 +18,22 @@ type CityListProps = {
 }
 
 const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValueSupported, tooltipId, projection }) => {
-  const { config, topoData, runtimeData, position, legendMemo, legendSpecialClassLastMemo } = useContext(ConfigContext)
+  const {
+    config,
+    topoData,
+    data: runtimeData,
+    position,
+    legendMemo,
+    legendSpecialClassLastMemo
+  } = useContext(ConfigContext)
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
+  const { geoClickHandler } = useGeoClickHandler()
+  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
+
   const { geoColumnName, latitudeColumnName, longitudeColumnName, primaryColumnName } = getColumnNames(config.columns)
   const { additionalCityStyles } = config.visual || []
 
   if (!projection) return
-
-  const { geoClickHandler } = useGeoClickHandler()
-  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
 
   const citiesData = runtimeData
     ? Object.keys(runtimeData).reduce((acc, key) => {
@@ -224,6 +229,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       if (geoData?.[longitudeColumnName] && geoData?.[latitudeColumnName]) {
         const coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
         let translate = `translate(${projection(coords)})`
+
         return (
           <g key={i} transform={translate} style={styles} className='geo-point' tabIndex={-1}>
             {cityStyleShapes[cityStyle.shape.toLowerCase()]}
@@ -231,6 +237,8 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
         )
       }
     }
+    if (legendColors?.[0] === '#000000') return
+
     return (
       <g key={i} transform={transform} style={styles} className='geo-point' tabIndex={-1}>
         {cityStyleShapes[config.visual.cityStyle.toLowerCase()]}
