@@ -374,6 +374,15 @@ const EditorPanel = () => {
           }
         })
         break
+      case 'legendGroupBy':
+        setConfig({
+          ...config,
+          legend: {
+            ...config.legend,
+            groupBy: value
+          }
+        })
+        break
       case 'legendTickRotation':
         setConfig({
           ...config,
@@ -2331,6 +2340,17 @@ const EditorPanel = () => {
                     />
                     <span className='edit-label'>Single Row Legend</span>
                   </label>
+                )}
+
+                {'navigation' !== config.general.type && config.legend.type === 'category' && (
+                  <Select
+                    label='Legend Group By :'
+                    value={legend.groupBy || ''}
+                    options={columnsOptions.map(c => c.key)}
+                    onChange={event => {
+                      handleEditorChanges('legendGroupBy', event.target.value)
+                    }}
+                  />
                 )}
                 {config.legend.style !== 'gradient' && (
                   <label className='checkbox'>

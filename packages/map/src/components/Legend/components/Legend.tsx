@@ -23,6 +23,7 @@ import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
 import { resetLegendToggles } from '../../../helpers'
 import { MapContext } from '../../../types/MapContext'
+import LegendGroup from './LegendGroup/Legend.Group'
 
 const LEGEND_PADDING = 30
 
@@ -301,11 +302,14 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               }
               config={config}
             />
-            {!!legendListItems.length && (
+            <LegendGroup legendItems={getFormattedLegendItems()} />
+
+            {!!legendListItems.length && ['Select Option', ''].includes(config.legend.groupBy) && (
               <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
                 {legendListItems}
               </ul>
             )}
+
             {((config.visual.additionalCityStyles && config.visual.additionalCityStyles.some(c => c.label)) ||
               config.visual.cityStyleLabel) && (
               <>
