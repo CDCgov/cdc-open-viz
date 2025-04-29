@@ -15,7 +15,7 @@ type GoogleMapComponentProps = {
 
 const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({ apiKey = '' }) => {
   const mapRef = useRef(null)
-  const { state } = useContext(ConfigContext)
+  const { config: state } = useContext(ConfigContext)
 
   useEffect(() => {
     const loader = new Loader({
