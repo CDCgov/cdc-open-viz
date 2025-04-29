@@ -1,16 +1,16 @@
 .tooltip-link {
   text-decoration: underline;
-  text-decoration-color: #005ea2;
+  text-decoration-color: #1c1d1f;
   text-decoration-style: dotted;
   text-decoration-thickness: 2px;
   text-underline-offset: 0.25rem;
   position: relative;
   cursor: pointer;
-  color: #005ea2;
+  color: #1c1d1f;
   font-family: Arial !important;
   font-size: 0.833rem !important;
 }
 .tooltip-link:hover {
-  color: #009ec1;
   text-decoration-color: #009ec1;
+  color: #1c1d1f;
 }

@@ -21,7 +21,7 @@ const TooltipLink = ({ linkText, href = null, tooltipOpacity = 100, tooltipConte
         variant='light'
         style={{
           background: `rgba(255,255,255, ${tooltipOpacity})`,
-          color: 'black',
+          color: '#1c1d1f',
           padding: '9px 18px',
           boxShadow: '0px 2px 2px rgba(28, 29, 31, 0.45)',
           maxWidth: '239px',
