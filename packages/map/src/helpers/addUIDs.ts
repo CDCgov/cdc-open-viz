@@ -98,7 +98,7 @@ const setRowUID = (row: DataRow, uid: string | null): void => {
  * @param {string} fromColumn - Source column identifier
  * @throws {Error} When configuration is invalid or required data is missing
  */
-export const addUIDs = (configObj: MapConfig, fromColumn: DataRow) => {
+export const addUIDs = (configObj: MapConfig, fromColumn: string) => {
   const { general, columns, data } = configObj
   const { displayAsHex, geoType, type: geocodeType } = general
   const { geo } = columns
