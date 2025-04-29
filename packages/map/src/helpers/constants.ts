@@ -16,3 +16,26 @@ export const HEADER_COLORS = [
   'theme-amber'
 ]
 export const MAX_ZOOM_LEVEL = 4
+
+export const SUPPORTED_DC_NAMES = [
+  'WASHINGTON D.C.',
+  'DISTRICT OF COLUMBIA',
+  'WASHINGTON DC',
+  'DC',
+  'WASHINGTON DC.',
+  'D.C.',
+  'D.C'
+] as const
+
+export const GEO_TYPES = {
+  US: 'us',
+  US_REGION: 'us-region',
+  WORLD: 'world',
+  US_COUNTY: 'us-county',
+  SINGLE_STATE: 'single-state'
+} as const
+
+export const GEOCODE_TYPES = {
+  WORLD: 'world-geocode',
+  US: 'us-geocode'
+} as const
