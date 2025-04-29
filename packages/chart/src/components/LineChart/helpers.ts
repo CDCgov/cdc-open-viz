@@ -14,16 +14,7 @@ export const createStyles = (props: StyleProps): Style[] => {
     dynamicCategory,
     originalSeriesKey
   } = props
-  const dynamicData = data.filter(d => {
-    let filterResult = false
-    preliminaryData.forEach(pd => {
-      if (d[dynamicCategory] === props.seriesKey) {
-        filterResult = true
-      }
-    })
 
-    return filterResult
-  })
   const dynamicSeriesKey = dynamicCategory ? originalSeriesKey : seriesKey
   const validPreliminaryData: PreliminaryDataItem[] = preliminaryData.filter(
     pd => pd.seriesKey && pd.column && pd.value && pd.type && pd.style && pd.type === 'effect'
@@ -147,8 +138,9 @@ const handleFirstIndex = ({
   const firstIndexDataItem = data[0]
 
   // Find applicable suppression data for the first item
-  const suppressionData = preliminaryData.find(item => isSuppressed(item, firstIndexDataItem))
-  console.log(firstIndexDataItem, 'firstIndexDataItem')
+  const suppressionData = (preliminaryData ?? []).find(
+    item => item && firstIndexDataItem && isSuppressed(item, firstIndexDataItem)
+  )
 
   if (suppressionData && suppressionData.style) {
     // Modify first item and add to result
@@ -158,7 +150,7 @@ const handleFirstIndex = ({
 
     result.data[pairCount].push(modifiedItem)
     result.style = suppressionData.style
-    result.color = colorScale(modifiedItem[dynamicCategory])
+    result.color = dynamicCategory && modifiedItem ? colorScale(modifiedItem[dynamicCategory]) : ''
 
     // Find the next calculable item index
     let nextIndex = 1
@@ -272,20 +264,10 @@ const handleMiddleIndices = ({
 }
 
 export const createDataSegments = props => {
-  const dynamicData = props.data.filter(d => {
-    let filterResult = false
+  const dynamicData = (props.data ?? []).filter(d => {
+    if (!props?.dynamicCategory) return true
 
-    if (!props.dynamicCategory) {
-      filterResult = true
-    }
-
-    props.preliminaryData.forEach(pd => {
-      if (d[props.dynamicCategory] === props.seriesKey) {
-        filterResult = true
-      }
-    })
-
-    return filterResult
+    return (props.preliminaryData ?? []).some(pd => d?.[props.dynamicCategory] === props?.seriesKey)
   })
   const isSuppressed = (pd, dataItem) => {
     if (pd.type === 'effect' || pd.hideLineStyle) return false
