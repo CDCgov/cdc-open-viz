@@ -1,53 +1,95 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
-import ConfigContext from '../context'
+import ConfigContext, { MapDispatchContext } from '../context'
+import { type Coordinate, DataRow } from '../types/MapConfig'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
+import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
+import { displayGeoName, SVG_HEIGHT, SVG_WIDTH } from '../helpers'
+import { geoMercator, geoAlbersUsa, type GeoProjection } from 'd3-geo'
+import { getColumnNames } from '../helpers/getColumnNames'
+import { MapContext } from '../types/MapContext'
+import useGeoClickHandler from '../hooks/useGeoClickHandler'
 
-export const BubbleList = ({
-  data: dataImport,
-  state,
-  projection,
-  applyLegendToRow,
-  handleCircleClick,
-  runtimeData,
-  displayGeoName
-}) => {
-  const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
-  const { tooltipId } = useContext(ConfigContext)
+type BubbleListProps = {
+  customProjection?: GeoProjection
+}
+
+export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
+  const { config, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, runtimeData } =
+    useContext<MapContext>(ConfigContext)
+  const { columns, data, general, visual } = config
+  const { geoType, allowMapZoom } = general
+  const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder } = visual
+  const hasBubblesWithZeroOnMap = showBubbleZeros ? 0 : 1
+  const clickTolerance = 10
+  const dispatch = useContext(MapDispatchContext)
+  const { geoClickHandler } = useGeoClickHandler()
+
+  // hooks
+  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
+  const { primaryColumnName, geoColumnName } = getColumnNames(columns)
 
-  const hasBubblesWithZeroOnMap = state.visual.showBubbleZeros ? 0 : 1
-  // sort runtime data. Smaller bubbles should appear on top.
-  const sortedRuntimeData = Object.values(runtimeData).sort((a, b) =>
-    a[state.columns.primary.name] < b[state.columns.primary.name] ? 1 : -1
+  const maxDataValue = Math.max(...data.map(d => d[primaryColumnName]))
+  const size = scaleLinear().domain([hasBubblesWithZeroOnMap, maxDataValue]).range([minBubbleSize, maxBubbleSize])
+
+  const getProjection = () => {
+    try {
+      if (geoType === 'world') return geoMercator()
+      if (geoType === 'us') return geoAlbersUsa().translate([SVG_WIDTH / 2 + 15, SVG_HEIGHT / 2]) // translate is half of each svg x/y viewbox values
+      if (customProjection) return customProjection
+      throw new Error('No projection found in BubbleList component')
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const projection = getProjection()
+
+  const handleBubbleClick = (dataRow: DataRow) => {
+    if (!allowMapZoom) return
+    const newRuntimeData = data.filter(item => item[geoColumnName] === dataRow[geoColumnName])
+    const _filteredCountryCode = newRuntimeData[0]?.uid
+    if (!_filteredCountryCode) return null
+    const coordinates = countryCoordinates[_filteredCountryCode]
+    const long = coordinates[1]
+    const lat = coordinates[0]
+    const reversedCoordinates: Coordinate = [long, lat]
+    const filteredCountryObj = runtimeData[_filteredCountryCode]
+    const _tempRuntimeData = {
+      [_filteredCountryCode]: filteredCountryObj
+    }
+
+    // Zoom the map in...
+    dispatch({ type: 'SET_POSITION', payload: { coordinates: reversedCoordinates, zoom: 3 } })
+
+    // ...and show the data for the clicked country
+    setRuntimeData(_tempRuntimeData)
+  }
+
+  const sortedRuntimeData: DataRow = Object.values(runtimeData).sort((a, b) =>
+    a[primaryColumnName] < b[primaryColumnName] ? 1 : -1
   )
+
   if (!sortedRuntimeData) return
 
-  const clickTolerance = 10
-  // Set bubble sizes
-  var size = scaleLinear()
-    .domain([hasBubblesWithZeroOnMap, maxDataValue])
-    .range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
-
-  // Start looping through the countries to create the bubbles.
-  if (state.general.geoType === 'world') {
-    const countries =
+  if (geoType === 'world') {
+    return (
       sortedRuntimeData &&
-      sortedRuntimeData.map((country, index) => {
+      sortedRuntimeData.map(country => {
         let coordinates = countryCoordinates[country.uid]
 
         if (!coordinates) return true
 
-        const countryName = displayGeoName(country[state.columns.geo.name])
+        const countryName = displayGeoName(country[geoColumnName])
         const toolTip = applyTooltipsToGeo(countryName, country)
-        const legendColors = applyLegendToRow(country, state)
+        const legendColors = applyLegendToRow(country)
 
-        let primaryKey = state.columns.primary.name
         if (
-          (Math.floor(Number(country[primaryKey])) === 0 || country[primaryKey] === '') &&
-          !state.visual.showBubbleZeros
+          (Math.floor(Number(country[primaryColumnName])) === 0 || country[primaryColumnName] === '') &&
+          !showBubbleZeros
         )
           return
 
@@ -63,9 +105,9 @@ export const BubbleList = ({
               tabIndex={-1}
               key={`circle-${countryName.replace(' ', '')}`}
               className={`bubble country--${countryName}`}
-              cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0} // || 0 handles error on loads where the data isn't ready
+              cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0}
               cy={Number(projection(coordinates[1], coordinates[0])[1]) || 0}
-              r={Number(size(country[primaryKey]))}
+              r={Number(size(country[primaryColumnName]))}
               fill={legendColors[0]}
               stroke={legendColors[0]}
               strokeWidth={1.25}
@@ -83,7 +125,7 @@ export const BubbleList = ({
                   e.clientY > pointerY - clickTolerance &&
                   e.clientY < pointerY + clickTolerance
                 ) {
-                  handleCircleClick(country)
+                  handleBubbleClick(country)
                   pointerX = undefined
                   pointerY = undefined
                 }
@@ -94,14 +136,14 @@ export const BubbleList = ({
               data-tooltip-html={toolTip}
             />
 
-            {state.visual.extraBubbleBorder && (
+            {extraBubbleBorder && (
               <circle
                 tabIndex={-1}
                 key={`circle-${countryName.replace(' ', '')}`}
                 className='bubble'
-                cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0} // || 0 handles error on loads where the data isn't ready
+                cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0}
                 cy={Number(projection(coordinates[1], coordinates[0])[1]) || 0}
-                r={Number(size(country[primaryKey])) + 1}
+                r={Number(size(country[primaryColumnName])) + 1}
                 fill={'transparent'}
                 stroke={'white'}
                 strokeWidth={0.5}
@@ -118,7 +160,7 @@ export const BubbleList = ({
                     e.clientY > pointerY - clickTolerance &&
                     e.clientY < pointerY + clickTolerance
                   ) {
-                    handleCircleClick(country)
+                    handleBubbleClick(country)
                     pointerX = undefined
                     pointerY = undefined
                   }
@@ -138,21 +180,19 @@ export const BubbleList = ({
           </g>
         )
       })
-    return countries
+    )
   }
 
-  if (state.general.geoType === 'us') {
-    const bubbles =
+  if (geoType === 'us') {
+    return (
       sortedRuntimeData &&
-      sortedRuntimeData.map((item, index) => {
+      sortedRuntimeData.map(item => {
         let stateData = stateCoordinates[item.uid]
-        let primaryKey = state?.columns?.primary?.name
-        if (Number(size(item[primaryKey])) === 0) return
+        if (Number(size(item[primaryColumnName])) === 0) return
 
-        if (item[primaryKey] === null) item[primaryKey] = ''
+        if (item[primaryColumnName] === null) item[primaryColumnName] = ''
 
-        // Return if hiding zeros on the map
-        if ((Math.floor(Number(item[primaryKey])) === 0 || item[primaryKey] === '') && !state.visual.showBubbleZeros)
+        if ((Math.floor(Number(item[primaryColumnName])) === 0 || item[primaryColumnName] === '') && !showBubbleZeros)
           return
 
         if (!stateData) return true
@@ -164,7 +204,7 @@ export const BubbleList = ({
 
         stateName = displayGeoName(stateName)
         const toolTip = applyTooltipsToGeo(stateName, item)
-        const legendColors = applyLegendToRow(item, state)
+        const legendColors = applyLegendToRow(item, config)
 
         let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 
@@ -177,9 +217,9 @@ export const BubbleList = ({
               tabIndex={-1}
               key={`circle-${stateName.replace(' ', '')}`}
               className='bubble'
-              cx={projection(coordinates)[0] || 0} // || 0 handles error on loads where the data isn't ready
+              cx={projection(coordinates)[0] || 0}
               cy={projection(coordinates)[1] || 0}
-              r={Number(size(item[primaryKey]))}
+              r={Number(size(item[primaryColumnName]))}
               fill={legendColors[0]}
               stroke={legendColors[0]}
               strokeWidth={1.25}
@@ -197,7 +237,7 @@ export const BubbleList = ({
                   e.clientY > pointerY - clickTolerance &&
                   e.clientY < pointerY + clickTolerance
                 ) {
-                  handleCircleClick(state)
+                  geoClickHandler(stateName, stateData)
                   pointerX = undefined
                   pointerY = undefined
                 }
@@ -207,14 +247,14 @@ export const BubbleList = ({
               data-tooltip-id={`tooltip__${tooltipId}`}
               data-tooltip-html={toolTip}
             />
-            {state.visual.extraBubbleBorder && (
+            {extraBubbleBorder && (
               <circle
                 tabIndex={-1}
                 key={`circle-${stateName.replace(' ', '')}`}
                 className='bubble'
-                cx={projection(coordinates)[0] || 0} // || 0 handles error on loads where the data isn't ready
+                cx={projection(coordinates)[0] || 0}
                 cy={projection(coordinates)[1] || 0}
-                r={Number(size(item[primaryKey])) + 1}
+                r={Number(size(item[primaryColumnName])) + 1}
                 fill={'transparent'}
                 stroke={'white'}
                 strokeWidth={0.5}
@@ -232,7 +272,7 @@ export const BubbleList = ({
                     e.clientY > pointerY - clickTolerance &&
                     e.clientY < pointerY + clickTolerance
                   ) {
-                    handleCircleClick(state)
+                    geoClickHandler(stateName, stateData)
                     pointerX = undefined
                     pointerY = undefined
                   }
@@ -248,7 +288,7 @@ export const BubbleList = ({
 
         return <g key={`group-${stateName.replace(' ', '')}`}>{circle}</g>
       })
-    return bubbles
+    )
   }
 }
 export default BubbleList

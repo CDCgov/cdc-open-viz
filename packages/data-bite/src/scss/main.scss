@@ -2,10 +2,6 @@
 
 .cdc-open-viz-module.type-data-bite {
   @import 'bite';
-  .visually-hidden {
-    position: fixed;
-    left: -10000px;
-  }
 
   .checkbox-group {
     padding: 16px;

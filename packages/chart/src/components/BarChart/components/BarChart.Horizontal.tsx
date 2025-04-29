@@ -2,7 +2,6 @@ import React, { useContext } from 'react'
 
 // Local context and hooks
 import ConfigContext from '../../../ConfigContext'
-import { useBarChart } from '../../../hooks/useBarChart'
 import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
 
 // VisX library imports
@@ -12,6 +11,7 @@ import { BarGroup } from '@visx/shape'
 
 // CDC core components and helpers
 import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { getBarConfig, testZeroValue } from '../helpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
@@ -26,7 +26,24 @@ import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
 
 export const BarChartHorizontal = () => {
-  const { xScale, yScale, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
+  const { xScale, yScale, yMax, seriesScale, barChart } = useContext<BarChartContextValues>(BarChartContext)
+  const {
+    isHorizontal,
+    barBorderWidth,
+    updateBars,
+    assignColorsToValues,
+    section,
+    isLabelBelowBar,
+    lollipopBarWidth,
+    lollipopShapeSize,
+    getHighlightedBarColorByValue,
+    getHighlightedBarByValue,
+    getAdditionalColumn,
+    hoveredBar,
+    onMouseLeaveBar,
+    onMouseOverBar
+  } = barChart
+
   const {
     transformedData: data,
     tableData,
@@ -39,33 +56,12 @@ export const BarChartHorizontal = () => {
     setSharedFilter,
     isNumber
   } = useContext<ChartContext>(ConfigContext)
-  const {
-    isHorizontal,
-    barBorderWidth,
-    updateBars,
-    assignColorsToValues,
-    section,
-    isLabelBelowBar,
-    displayNumbersOnBar,
-    lollipopBarWidth,
-    lollipopShapeSize,
-    getHighlightedBarColorByValue,
-    getHighlightedBarByValue,
-    getAdditionalColumn,
-    hoveredBar,
-    onMouseLeaveBar,
-    onMouseOverBar
-  } = useBarChart()
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
   const hasConfidenceInterval = Object.keys(config.confidenceKeys).length > 0
 
   const _data = getBarData(config, data, hasConfidenceInterval)
-
-  const root = document.documentElement
-
-  const coolGray90 = getComputedStyle(root).getPropertyValue('--cool-gray-90')
 
   return (
     config.visualizationSubType !== 'stacked' &&
@@ -198,8 +194,8 @@ export const BarChartHorizontal = () => {
 
                   // update label color
                   if (barColor && labelColor && textFits) {
-                    labelColor = getContrastColor('#000', barColor)
-                    let constrast = getColorContrast('#000', barColor)
+                    labelColor = getContrastColor(APP_FONT_COLOR, barColor)
+                    let constrast = getColorContrast(APP_FONT_COLOR, barColor)
                     const contrastLevel = 7
                     if (constrast < contrastLevel) {
                       labelColor = '#fff'
@@ -243,7 +239,7 @@ export const BarChartHorizontal = () => {
                           height: numbericBarHeight,
                           x: barX,
                           y: barHeight * bar.index,
-                          onMouseOver: () => onMouseOverBar(xAxisValue, bar.key),
+                          onMouseOver: e => onMouseOverBar(xAxisValue, bar.key, e, data),
                           onMouseLeave: onMouseLeaveBar,
                           tooltipHtml: tooltip,
                           tooltipId: `cdc-open-viz-tooltip-${config.runtime.uniqueId}`,
@@ -389,7 +385,7 @@ export const BarChartHorizontal = () => {
                         {hasConfidenceInterval && (
                           <path
                             key={`confidence-interval-h-${yPos}-${datum[config.runtime.originalXAxis.dataKey]}`}
-                            stroke={coolGray90}
+                            stroke={APP_FONT_COLOR}
                             strokeWidth='px'
                             d={`
                                 M${lowerPos} ${yPos - tickWidth}

@@ -64,6 +64,7 @@ import getViewport from '@cdc/core/helpers/getViewport'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import EditorContext from '../../editor/src/ConfigContext'
+import { EDITOR_WIDTH } from '@cdc/core/helpers/constants'
 // Local helpers
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
 import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
@@ -73,8 +74,6 @@ import { getColorScale } from './helpers/getColorScale'
 // styles
 import './scss/main.scss'
 import { getInitialState, reducer } from './store/chart.reducer'
-
-export const EDITOR_WIDTH = 350
 
 interface CdcChartProps {
   config?: ChartConfig

@@ -3,7 +3,6 @@ import React, { useContext, useState } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import BarChartContext, { type BarChartContextValues } from './context'
 // Local hooks
-import { useBarChart } from '../../../hooks/useBarChart'
 import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
 import { getBarConfig, testZeroValue } from '../helpers'
 // VisX library imports
@@ -16,6 +15,7 @@ import Regions from '../../Regions'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import isNumber from '@cdc/core/helpers/isNumber'
 import createBarElement from '@cdc/core/components/createBarElement'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 // Third party libraries
 import chroma from 'chroma-js'
 // Types
@@ -24,14 +24,9 @@ import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
 
 export const BarChartVertical = () => {
-  const { xScale, yScale, xMax, yMax, seriesScale, convertLineToBarGraph } =
+  const { xScale, yScale, xMax, yMax, seriesScale, convertLineToBarGraph, barChart } =
     useContext<BarChartContextValues>(BarChartContext)
-
-  const [barWidth, setBarWidth] = useState(0)
-  const [totalBarsInGroup, setTotalBarsInGroup] = useState(0)
-  // prettier-ignore
   const {
-    // prettier-ignore
     assignColorsToValues,
     barBorderWidth,
     getAdditionalColumn,
@@ -42,16 +37,28 @@ export const BarChartVertical = () => {
     onMouseLeaveBar,
     onMouseOverBar,
     section
-  } = useBarChart()
+  } = barChart
 
-  // prettier-ignore
-  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig } = useContext<ChartContext>(ConfigContext)
+  const [barWidth, setBarWidth] = useState(0)
+  const [totalBarsInGroup, setTotalBarsInGroup] = useState(0)
+
+  const {
+    colorScale,
+    config,
+    dashboardConfig,
+    tableData,
+    formatDate,
+    formatNumber,
+    parseDate,
+    seriesHighlight,
+    setSharedFilter,
+    transformedData,
+    brushConfig
+  } = useContext<ChartContext>(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
   const root = document.documentElement
-
-  const coolGray90 = getComputedStyle(root).getPropertyValue('--cool-gray-90')
 
   let data = transformedData
   // check if user add suppression
@@ -245,6 +252,8 @@ export const BarChartVertical = () => {
                   )
                   // End Confidence Interval Variables
 
+                  const BAR_LABEL_PADDING = 10
+
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
@@ -260,7 +269,7 @@ export const BarChartVertical = () => {
                           height: barHeight,
                           x: barX,
                           y: barY,
-                          onMouseOver: () => onMouseOverBar(xAxisValue, bar.key),
+                          onMouseOver: e => onMouseOverBar(xAxisValue, bar.key, e, data),
                           onMouseLeave: onMouseLeaveBar,
                           tooltipHtml: tooltip,
                           tooltipId: `cdc-open-viz-tooltip-${config.runtime.uniqueId}`,
@@ -326,7 +335,7 @@ export const BarChartVertical = () => {
                           display={displayBar ? 'block' : 'none'}
                           opacity={transparentBar ? 0.5 : 1}
                           x={hasConfidenceInterval ? barX + barWidth : barX + barWidth / 2}
-                          y={barY - 5}
+                          y={barY - BAR_LABEL_PADDING}
                           fill={labelColor}
                           textAnchor='middle'
                         >
@@ -336,7 +345,7 @@ export const BarChartVertical = () => {
                           display={displayBar ? 'block' : 'none'}
                           opacity={transparentBar ? 0.5 : 1}
                           x={barX + barWidth / 2}
-                          y={barY - 5}
+                          y={barY - BAR_LABEL_PADDING}
                           fill={labelColor}
                           textAnchor='middle'
                           fontSize={config.isLollipopChart ? null : barWidth / 2}
@@ -376,7 +385,7 @@ export const BarChartVertical = () => {
                         {hasConfidenceInterval && bar.value !== undefined && datum && (
                           <path
                             key={`confidence-interval-v-${datum[config.runtime.originalXAxis.dataKey]}`}
-                            stroke={coolGray90}
+                            stroke={APP_FONT_COLOR}
                             strokeWidth='px'
                             d={`M${xPos - tickWidth} ${upperPos}
                                 L${xPos + tickWidth} ${upperPos}

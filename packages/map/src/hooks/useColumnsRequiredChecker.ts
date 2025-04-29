@@ -1,47 +1,48 @@
 import { useContext } from 'react'
-import ConfigContext from '../context'
+import ConfigContext, { MapDispatchContext } from '../context'
+import { getColumnNames } from '../helpers/getColumnNames'
 
 const useColumnsRequiredChecker = () => {
-  const { state, setRequiredColumns } = useContext(ConfigContext)
+  const { config } = useContext(ConfigContext)
+  const dispatch = useContext(MapDispatchContext)
 
   const columnsRequiredChecker = () => {
-    const primaryColumnName = state.columns.primary.name
-    const geographyColumnName = state.columns.geo.name
+    const { primaryColumnName, geoColumnName } = getColumnNames(config.columns)
 
     let columnList = []
 
     // Geo is always required
-    if (!geographyColumnName) {
+    if (!geoColumnName) {
       columnList.push('Geography')
     }
 
     // Primary is required if we're on a data map or a point map
-    if ('navigation' !== state.general.type && '' === primaryColumnName) {
+    if ('navigation' !== config.general.type && '' === primaryColumnName) {
       columnList.push('Primary')
     }
 
     // Navigate is required for navigation maps
-    if ('navigation' === state.general.type && '' === state.columns.navigate.name) {
+    if ('navigation' === config.general.type && '' === config.columns.navigate.name) {
       columnList.push('Navigation')
     }
 
     if (
-      ('us-geocode' === state.general.type || 'world-geocode' === state.general.type) &&
-      '' === state.columns.latitude.name
+      ('us-geocode' === config.general.type || 'world-geocode' === config.general.type) &&
+      '' === config.columns.latitude.name
     ) {
       columnList.push('Latitude')
     }
 
     if (
-      ('us-geocode' === state.general.type || 'world-geocode' === state.general.type) &&
-      '' === state.columns.longitude.name
+      ('us-geocode' === config.general.type || 'world-geocode' === config.general.type) &&
+      '' === config.columns.longitude.name
     ) {
       columnList.push('Longitude')
     }
 
     if (columnList.length === 0) columnList = null
 
-    setRequiredColumns(columnList)
+    dispatch({ type: 'SET_REQUIRED_COLUMNS', payload: columnList })
   }
 
   return { columnsRequiredChecker }

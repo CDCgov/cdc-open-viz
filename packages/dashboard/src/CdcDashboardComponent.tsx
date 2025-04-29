@@ -120,12 +120,16 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     for (let i = 0; i < datasetKeys.length; i++) {
       const datasetKey = datasetKeys[i]
       const dataset = config.datasets[datasetKey]
-
-      if (dataset.dataUrl && filters) {
+      const windowQueryParams = Object.fromEntries(new URLSearchParams(window.location.search))
+      const loadQueryParam = windowQueryParams[dataset.loadQueryParam || '']
+      if (dataset.dataUrl && (filters || loadQueryParam)) {
         const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl, window.location.origin)
         const currentQSParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
         const updatedQSParams = {}
-        filters.forEach(filter => {
+        if (loadQueryParam) {
+          updatedQSParams[dataset.loadQueryParam] = loadQueryParam
+        }
+        filters?.forEach(filter => {
           if (
             filter.type === 'urlfilter' &&
             reloadURLHelpers.filterUsedByDataUrl(filter, datasetKey, config.visualizations, config.rows)
@@ -143,7 +147,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             }
 
             if (!!filter.setByQueryParameter) {
-              const windowQueryParams = Object.fromEntries(new URLSearchParams(window.location.search))
               const filterValue = windowQueryParams[filter.setByQueryParameter]
               const queryParam = filter.apiFilter?.valueSelector || filter.setByQueryParameter
               if (filterValue) {

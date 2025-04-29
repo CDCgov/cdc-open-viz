@@ -2,16 +2,15 @@ import React, { useContext, useState } from 'react'
 import ConfigContext from '../../context'
 import './AnnotationDropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
-import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 import AnnotationList from './AnnotationList'
+import { MapContext } from '../../types/MapContext'
 
 const AnnotationDropdown = () => {
-  const { state: config, currentViewport: viewport } = useContext(ConfigContext)
+  const { config, currentViewport: viewport } = useContext<MapContext>(ConfigContext)
   const [expanded, setExpanded] = useState(false)
 
-  const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${appFontSize}px`
-
-  const annotations = config?.annotations || []
+  const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${APP_FONT_SIZE}px`
 
   const limitHeight = {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
@@ -49,7 +48,7 @@ const AnnotationDropdown = () => {
           }}
           tabIndex={0}
           onKeyDown={e => {
-            if (e.keyCode === 13) {
+            if (e.key === 'Enter') {
               setExpanded(!expanded)
             }
           }}

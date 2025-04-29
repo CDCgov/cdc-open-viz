@@ -1,10 +1,10 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../../ConfigContext'
-import { useBarChart } from '../../../hooks/useBarChart'
 import { BarStackHorizontal } from '@visx/shape'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 // types
@@ -14,7 +14,7 @@ import { type ChartContext } from '../../../types/ChartContext'
 import createBarElement from '@cdc/core/components/createBarElement'
 
 const BarChartStackedHorizontal = () => {
-  const { yMax, yScale, xScale } = useContext<BarChartContextValues>(BarChartContext)
+  const { yMax, yScale, xScale, barChart } = useContext<BarChartContextValues>(BarChartContext)
 
   // prettier-ignore
   const {
@@ -29,8 +29,18 @@ const BarChartStackedHorizontal = () => {
     transformedData: data
   } = useContext<ChartContext>(ConfigContext)
 
-  // prettier-ignore
-  const { barBorderWidth, displayNumbersOnBar, getAdditionalColumn, hoveredBar, isHorizontal, isLabelBelowBar, onMouseLeaveBar, onMouseOverBar, updateBars, barStackedSeriesKeys } = useBarChart()
+  const {
+    barBorderWidth,
+    displayNumbersOnBar,
+    getAdditionalColumn,
+    hoveredBar,
+    isHorizontal,
+    isLabelBelowBar,
+    onMouseLeaveBar,
+    onMouseOverBar,
+    updateBars,
+    barStackedSeriesKeys
+  } = barChart
 
   const { orientation, visualizationSubType } = config
   return (
@@ -60,8 +70,8 @@ const BarChartStackedHorizontal = () => {
                   seriesHighlight.indexOf(bar.key) !== -1
                 config.barHeight = Number(config.barHeight)
                 let barColor = colorScale(config.runtime.seriesLabels[bar.key])
-                let labelColor = getContrastColor('#000', barColor)
-                let constrast = getColorContrast('#000', barColor)
+                let labelColor = getContrastColor(APP_FONT_COLOR, barColor)
+                let constrast = getColorContrast(APP_FONT_COLOR, barColor)
                 const contrastLevel = 7
                 if (constrast < contrastLevel) {
                   labelColor = '#fff'
@@ -100,7 +110,7 @@ const BarChartStackedHorizontal = () => {
                         height: bar.height,
                         x: bar.x,
                         y: bar.y,
-                        onMouseOver: () => onMouseOverBar(yAxisValue, bar.key),
+                        onMouseOver: e => onMouseOverBar(yAxisValue, bar.key, e, data),
                         onMouseLeave: onMouseLeaveBar,
                         tooltipHtml: tooltip,
                         tooltipId: `cdc-open-viz-tooltip-${config.runtime.uniqueId}`,
