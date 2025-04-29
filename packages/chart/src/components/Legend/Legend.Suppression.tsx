@@ -1,7 +1,5 @@
 import React from 'react'
 import { ChartConfig } from '../../types/ChartConfig'
-import Icon from '@cdc/core/components/ui/Icon'
-import { Tooltip as ReactTooltip } from 'react-tooltip'
 import TooltipLink from '@cdc/core/components/TooltipLink/TooltipLink'
 interface LegendProps {
   config: ChartConfig
@@ -119,10 +117,18 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) =>
       )}
       {shouldShowSuppressedInfo() && (
         <div className='legend-container__outer link-container'>
-          <Icon alt='info-icon' display='info' />
           <p>
             This chart contains
-            <TooltipLink linkText='suppressed data' href={null} tooltipOpacity={config.tooltips.opacity} />
+            <TooltipLink
+              tooltipContent={`Data is
+                           suppressed to maintain statistical reliability.
+                            This occurs when the number of respondents or 
+                            reported values does not meet the minimum
+                             reporting threshold.`}
+              linkText='suppressed data'
+              href={null}
+              tooltipOpacity={config.tooltips.opacity}
+            />
           </p>
         </div>
       )}

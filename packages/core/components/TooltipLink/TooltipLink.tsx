@@ -2,16 +2,12 @@ import React from 'react'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import './TooltipLink.css'
 
-const TooltipLink = ({ linkText, href = null, tooltipOpacity = 100 }) => {
+const TooltipLink = ({ linkText, href = null, tooltipOpacity = 100, tooltipContent }) => {
   return (
     <>
       <a
         className='tooltip-link'
-        data-tooltip-content='Data is
-               suppressed to maintain statistical reliability.
-                This occurs when the number of respondents or 
-                reported values does not meet the minimum
-                 reporting threshold.'
+        data-tooltip-content={tooltipContent}
         data-tooltip-id='supression-tooltip'
         href={href}
       >
@@ -29,6 +25,8 @@ const TooltipLink = ({ linkText, href = null, tooltipOpacity = 100 }) => {
           padding: '9px 18px',
           boxShadow: '0px 2px 2px rgba(28, 29, 31, 0.45)',
           maxWidth: '239px',
+          fontSize: '0.833rem',
+          fontFamily: 'Arial',
           borderRadius: '4px'
         }}
       />
