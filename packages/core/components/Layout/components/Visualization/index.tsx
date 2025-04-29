@@ -6,10 +6,11 @@ import './visualizations.scss'
 import { Config as WaffleChartConfig } from '@cdc/waffle-chart/src/types/Config'
 import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
+import { MapConfig } from '@cdc/map/src/types/MapConfig'
 
 type VisualizationWrapper = {
   children: React.ReactNode
-  config: ChartConfig | DataBiteConfig | WaffleChartConfig | MarkupIncludeConfig | DashboardFilters
+  config: ChartConfig | DataBiteConfig | WaffleChartConfig | MarkupIncludeConfig | DashboardFilters | MapConfig
   currentViewport?: string
   imageId?: string
   isEditor: boolean

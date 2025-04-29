@@ -3,10 +3,6 @@
 @import '../../styles/_mixins';
 @import '../../styles/_global.scss';
 
-.visually-hidden {
-  position: fixed;
-  left: -10000px;
-}
 
 .debug .editor-panel {
   border: 2px dashed red !important;
