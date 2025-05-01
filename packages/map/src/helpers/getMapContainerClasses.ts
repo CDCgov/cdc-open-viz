@@ -8,7 +8,8 @@ export const getMapContainerClasses = (state: MapConfig, modal) => {
     state.legend?.position,
     state.general.type,
     state.general.geoType,
-    'outline-none'
+    'outline-none',
+    'position-relative'
   ]
 
   if (modal) {

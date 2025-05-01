@@ -446,7 +446,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   }}
                 >
                   {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-                  <section className='outline-none geography-container w-100' ref={mapSvg} tabIndex='0'>
+                  <section
+                    className='outline-none geography-container w-100 position-relative'
+                    ref={mapSvg}
+                    tabIndex='0'
+                  >
                     {currentViewport && (
                       <>
                         {modal && <Modal />}
