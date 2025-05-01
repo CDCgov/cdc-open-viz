@@ -2275,8 +2275,8 @@ const EditorPanel = () => {
                       onChange={event => {
                         const _newConfig = _.cloneDeep(config)
                         _newConfig.legend.separateZero = event.target.checked
-                        setConfig(_newConfig)
-                      }
+                        return setConfig(_newConfig)
+                      }}
                     />
                     <span className='edit-label column-heading'>
                       Separate Zero
