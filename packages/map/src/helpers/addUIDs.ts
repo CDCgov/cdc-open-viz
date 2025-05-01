@@ -7,6 +7,10 @@ import {
   supportedTerritories
 } from './../data/supported-geos'
 
+import { SUPPORTED_DC_NAMES, GEO_TYPES, GEOCODE_TYPES } from './constants'
+import { DataRow, MapConfig } from '../types/MapConfig'
+import { memoize } from 'lodash'
+
 // Data props
 const stateKeys = Object.keys(supportedStates)
 const territoryKeys = Object.keys(supportedTerritories)
@@ -15,112 +19,127 @@ const countryKeys = Object.keys(supportedCountries)
 const countyKeys = Object.keys(supportedCounties)
 const cityKeys = Object.keys(supportedCities)
 
-// Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
-// We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
-export const addUIDs = (configObj, fromColumn) => {
+const geoLookups: Record<string, GeoLookup> = {
+  state: { keys: stateKeys, data: supportedStates },
+  territory: { keys: territoryKeys, data: supportedTerritories },
+  region: { keys: regionKeys, data: supportedRegions },
+  country: { keys: countryKeys, data: supportedCountries }
+}
+
+const memoizedFindUID = memoize((geoName: string, type: keyof typeof geoLookups): string | undefined => {
+  const lookup = geoLookups[type]
+  return lookup.keys.find(key => lookup.data[key].includes(geoName))
+})
+
+const hasValidCoordinates = (row: Row, columns: GeoConfig['columns']): boolean => {
+  return !!(
+    columns.latitude?.name &&
+    columns.longitude?.name &&
+    row[columns.latitude.name] &&
+    row[columns.longitude.name]
+  )
+}
+
+const normalizeGeoName = (value: unknown): string => {
+  if (value == null) return ''
+  return String(value).toUpperCase()
+}
+
+const findCityUID = (geoName: string): string | undefined => {
+  if (!geoName) return undefined
+  return cityKeys.find(key => key === geoName.toUpperCase())
+}
+
+const handleDCDisplay = (geoName: string, displayAsHex: boolean): string | null => {
+  if (displayAsHex && SUPPORTED_DC_NAMES.includes(geoName)) {
+    return 'US-DC'
+  }
+  return null
+}
+
+const handleUSLocation = (row: DataRow, geoColumn: string, displayAsHex: boolean): string | null => {
+  const geoName = normalizeGeoName(row[geoColumn])
+
+  let uid = memoizedFindUID(geoName, 'state')
+  if (!uid) uid = memoizedFindUID(geoName, 'territory')
+  if (!uid) uid = findCityUID(geoName)
+  if (!uid) uid = handleDCDisplay(geoName, displayAsHex)
+
+  return uid
+}
+
+const handleWorldLocation = (row: DataRow, geoColumn: string, isWorldGeocodeType: boolean): string | null => {
+  const geoName = row[geoColumn]
+  let uid = memoizedFindUID(geoName, 'country')
+  if (!uid && (isWorldGeocodeType || geoName)) {
+    uid = findCityUID(geoName)
+  }
+
+  return uid
+}
+
+const handleCountyLocation = (row: DataRow, geoColumn: string): string | undefined => {
+  const fips = row[geoColumn]
+  return countyKeys.find(key => key === fips)
+}
+
+const setRowUID = (row: DataRow, uid: string | null): void => {
+  if (uid) {
+    Object.defineProperty(row, 'uid', {
+      value: uid,
+      writable: true
+    })
+  }
+}
+
+/**
+ * Adds unique identifiers to geographic data rows based on their location type and name.
+ * @param {MapConfig} configObj - Configuration object containing data and processing rules
+ * @param {string} fromColumn - Source column identifier
+ * @throws {Error} When configuration is invalid or required data is missing
+ */
+export const addUIDs = (configObj: MapConfig, fromColumn: string) => {
   const { general, columns, data } = configObj
-  const { displayAsHex, geoType } = general
+  const { displayAsHex, geoType, type: geocodeType } = general
   const { geo } = columns
 
   data.forEach(row => {
     let uid = null
+    row.uid = null // Reset existing UID
 
-    if (row.uid) row.uid = null // Wipe existing UIDs
+    if (!geo.name) return
 
-    // United States check
-    if ('us' === geoType && geo.name) {
-      let geoName = ''
-      if (row[geo.name] !== undefined && row[geo.name] !== null) {
-        geoName = String(row[geo.name])
-        geoName = geoName.toUpperCase()
-      }
+    switch (geoType) {
+      case GEO_TYPES.US:
+        uid = handleUSLocation(row, geo.name, displayAsHex)
+        break
 
-      // States
-      uid = stateKeys.find(key => supportedStates[key].includes(geoName))
+      case GEO_TYPES.US_REGION:
+        uid = memoizedFindUID(normalizeGeoName(row[geo.name]), 'region')
+        break
 
-      // Territories
-      if (!uid) {
-        uid = territoryKeys.find(key => supportedTerritories[key].includes(geoName))
-      }
+      case GEO_TYPES.WORLD:
+        uid = handleWorldLocation(row, geo.name, geocodeType === GEOCODE_TYPES.WORLD)
+        break
 
-      // Cities
-      if (!uid && geoName) {
-        uid = cityKeys.find(key => key === geoName.toUpperCase())
-      }
-
-      if (displayAsHex) {
-        const upperCaseKey = geoName.toUpperCase()
-        const supportedDc = [
-          'WASHINGTON D.C.',
-          'DISTRICT OF COLUMBIA',
-          'WASHINGTON DC',
-          'DC',
-          'WASHINGTON DC.',
-          'D.C.',
-          'D.C'
-        ]
-        if (supportedDc.includes(upperCaseKey)) {
-          uid = 'US-DC'
+      case GEO_TYPES.US_COUNTY:
+      case GEO_TYPES.SINGLE_STATE:
+        if (geocodeType !== GEOCODE_TYPES.US) {
+          uid = handleCountyLocation(row, geo.name)
         }
+        break
+    }
+
+    // Handle special cases
+    if (!uid) {
+      if (geocodeType === GEOCODE_TYPES.US) {
+        uid = row[geo.name]
+      } else if (hasValidCoordinates(row, columns)) {
+        uid = `${row[geo.name]}`
       }
     }
 
-    if ('us-region' === geoType && geo.name) {
-      // const geoName = row[configObj.columns.geo.name] && typeof row[configObj.columns.geo.name] === "string" ? row[configObj.columns.geo.name].toUpperCase() : '';
-      let geoName = ''
-
-      if (row[geo.name] !== undefined && row[geo.name] !== null) {
-        geoName = String(row[geo.name])
-        geoName = geoName.toUpperCase()
-      }
-
-      // Regions
-      uid = regionKeys.find(key => supportedRegions[key].includes(geoName))
-    }
-
-    // World Check
-    if ('world' === geoType) {
-      const geoName = row[geo.name]
-
-      uid = countryKeys.find(key => supportedCountries[key].includes(geoName))
-
-      // Cities
-      if (!uid && 'world-geocode' === general.type) {
-        uid = cityKeys.find(key => key === geoName?.toUpperCase())
-      }
-
-      // Cities
-      if (!uid && geoName) {
-        uid = cityKeys.find(key => key === geoName.toUpperCase())
-      }
-    }
-
-    // County Check
-    if (('us-county' === geoType || 'single-state' === geoType) && 'us-geocode' !== general.type) {
-      const fips = row[geo.name]
-      uid = countyKeys.find(key => key === fips)
-    }
-
-    if ('us-geocode' === general.type) {
-      uid = row[geo.name]
-    }
-
-    if (
-      !uid &&
-      columns.latitude?.name &&
-      columns.longitude?.name &&
-      row[columns.latitude?.name] &&
-      row[columns.longitude?.name]
-    ) {
-      uid = `${row[geo.name]}`
-    }
-
-    if (uid) {
-      Object.defineProperty(row, 'uid', {
-        value: uid,
-        writable: true
-      })
-    }
+    setRowUID(row, uid)
   })
 
   configObj.data.fromColumn = fromColumn
