@@ -2,32 +2,35 @@ import React, { useContext } from 'react'
 import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
-import ConfigContext from '../context'
+import ConfigContext, { MapDispatchContext } from '../context'
 import { type Coordinate, DataRow } from '../types/MapConfig'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
 import { displayGeoName, SVG_HEIGHT, SVG_WIDTH } from '../helpers'
 import { geoMercator, geoAlbersUsa, type GeoProjection } from 'd3-geo'
 import { getColumnNames } from '../helpers/getColumnNames'
+import { MapContext } from '../types/MapContext'
+import useGeoClickHandler from '../hooks/useGeoClickHandler'
 
 type BubbleListProps = {
-  runtimeData: Object[]
   customProjection?: GeoProjection
 }
 
-export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProjection }) => {
-  const { state, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, setPosition } =
-    useContext(ConfigContext)
-  const { columns, data, general, visual } = state
+export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
+  const { config, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, runtimeData } =
+    useContext<MapContext>(ConfigContext)
+  const { columns, data, general, visual } = config
   const { geoType, allowMapZoom } = general
   const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder } = visual
   const hasBubblesWithZeroOnMap = showBubbleZeros ? 0 : 1
   const clickTolerance = 10
+  const dispatch = useContext(MapDispatchContext)
+  const { geoClickHandler } = useGeoClickHandler()
 
   // hooks
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const { primaryColumnName, geoColumnName } = getColumnNames(state.columns)
+  const { primaryColumnName, geoColumnName } = getColumnNames(columns)
 
   const maxDataValue = Math.max(...data.map(d => d[primaryColumnName]))
   const size = scaleLinear().domain([hasBubblesWithZeroOnMap, maxDataValue]).range([minBubbleSize, maxBubbleSize])
@@ -45,10 +48,11 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
 
   const projection = getProjection()
 
-  const handleBubbleClick = country => {
+  const handleBubbleClick = (dataRow: DataRow) => {
     if (!allowMapZoom) return
-    const newRuntimeData = data.filter(item => item[geoColumnName] === country[geoColumnName])
-    const _filteredCountryCode = newRuntimeData[0].uid
+    const newRuntimeData = data.filter(item => item[geoColumnName] === dataRow[geoColumnName])
+    const _filteredCountryCode = newRuntimeData[0]?.uid
+    if (!_filteredCountryCode) return null
     const coordinates = countryCoordinates[_filteredCountryCode]
     const long = coordinates[1]
     const lat = coordinates[0]
@@ -59,7 +63,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
     }
 
     // Zoom the map in...
-    setPosition({ coordinates: reversedCoordinates, zoom: 3 })
+    dispatch({ type: 'SET_POSITION', payload: { coordinates: reversedCoordinates, zoom: 3 } })
 
     // ...and show the data for the clicked country
     setRuntimeData(_tempRuntimeData)
@@ -200,7 +204,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
 
         stateName = displayGeoName(stateName)
         const toolTip = applyTooltipsToGeo(stateName, item)
-        const legendColors = applyLegendToRow(item, state)
+        const legendColors = applyLegendToRow(item, config)
 
         let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 
@@ -233,7 +237,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
                   e.clientY > pointerY - clickTolerance &&
                   e.clientY < pointerY + clickTolerance
                 ) {
-                  handleBubbleClick(state)
+                  geoClickHandler(stateName, stateData)
                   pointerX = undefined
                   pointerY = undefined
                 }
@@ -268,7 +272,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ runtimeData, customProje
                     e.clientY > pointerY - clickTolerance &&
                     e.clientY < pointerY + clickTolerance
                   ) {
-                    handleBubbleClick(state)
+                    geoClickHandler(stateName, stateData)
                     pointerX = undefined
                     pointerY = undefined
                   }

@@ -20,6 +20,7 @@ import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import './UsaMap.Region.styles.css'
 
 type TerritoryRectProps = {
   posX?: number
@@ -51,14 +52,14 @@ const Rect: React.FC<RectProps> = ({ label, text, stroke, strokeWidth, ...props 
 }
 
 const UsaRegionMap = () => {
-  const { data, state, tooltipId, legendMemo, legendSpecialClassLastMemo } = useContext(ConfigContext)
+  const { data, config, tooltipId, legendMemo, legendSpecialClassLastMemo } = useContext(ConfigContext)
   const [focusedStates, setFocusedStates] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const { general } = state
+  const { general } = config
   const { displayStateLabels, territoriesLabel, displayAsHex, type } = general
-  const tooltipInteractionType = state.tooltips.appearanceType
+  const tooltipInteractionType = config.tooltips.appearanceType
   const isHex = displayAsHex
   const [territoriesData, setTerritoriesData] = useState([])
   const CIRCLE_RADIUS = 15
@@ -85,8 +86,8 @@ const UsaRegionMap = () => {
     return <></>
   }
 
-  const geoStrokeColor = getGeoStrokeColor(state)
-  const geoFillColor = getGeoFillColor(state)
+  const geoStrokeColor = getGeoStrokeColor(config)
+  const geoFillColor = getGeoFillColor(config)
 
   const territories = territoriesData.map(territory => {
     const Shape = Rect
@@ -114,7 +115,7 @@ const UsaRegionMap = () => {
 
       // If we need to add a pointer cursor
       if (
-        (state.columns.navigate && territoryData[state.columns.navigate.name]) ||
+        (config.columns.navigate && territoryData[config.columns.navigate.name]) ||
         tooltipInteractionType === 'click'
       ) {
         needsPointer = true
@@ -147,39 +148,6 @@ const UsaRegionMap = () => {
       )
     }
   })
-
-  const geoLabel = (geo, bgColor = '#FFFFFF', projection) => {
-    let centroid = projection(geoCentroid(geo))
-    let abbr = geo.properties.iso
-
-    if (undefined === abbr) return null
-
-    let x = 0,
-      y = 5
-
-    return (
-      <g>
-        <line
-          x1={centroid[0]}
-          y1={centroid[1]}
-          x2={centroid[0] + x}
-          y2={centroid[1] + y}
-          stroke='rgba(0,0,0,.5)'
-          strokeWidth={1}
-        />
-        <text
-          x={4}
-          strokeWidth='0'
-          fontSize={13}
-          style={{ fill: APP_FONT_COLOR }}
-          alignmentBaseline='middle'
-          transform={`translate(${centroid[0] + x}, ${centroid[1] + y})`}
-        >
-          {abbr.substring(3)}
-        </text>
-      </g>
-    )
-  }
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
@@ -222,14 +190,14 @@ const UsaRegionMap = () => {
         }
 
         // When to add pointer cursor
-        if ((state.columns.navigate && geoData[state.columns.navigate.name]) || tooltipInteractionType === 'click') {
+        if ((config.columns.navigate && geoData[config.columns.navigate.name]) || tooltipInteractionType === 'click') {
           styles.cursor = 'pointer'
         }
 
         const TerritoryRect: React.FC<TerritoryRectProps> = props => {
           const { posX = 0, tName } = props
           const textColor = getContrastColor('#FFF', legendColors[0])
-          const geoStrokeColor = getGeoStrokeColor(state)
+          const geoStrokeColor = getGeoStrokeColor(config)
           return (
             <>
               <rect x={posX} width='36' height='24' rx='2' stroke={geoStrokeColor} strokeWidth='1' />
@@ -286,7 +254,6 @@ const UsaRegionMap = () => {
       return (
         <g key={key} className='geo-group' style={styles}>
           <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1} d={path} />
-          {(isHex || displayStateLabels) && geoLabel(geo, styles.fill, projection)}
         </g>
       )
     })
@@ -294,11 +261,11 @@ const UsaRegionMap = () => {
 
   return (
     <ErrorBoundary component='UsaRegionMap'>
-      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(state)}>
+      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(config)}>
         <Mercator data={focusedStates} scale={620} translate={[1500, 735]}>
           {({ features, projection }) => constructGeoJsx(features, projection)}
         </Mercator>
-        {state.annotations.length > 0 && <Annotation.Draggable />}
+        {config.annotations.length > 0 && <Annotation.Draggable />}
       </svg>
       {territories.length > 0 && (
         <section className='territories'>

@@ -1,9 +1,9 @@
-import { MapConfig, Coordinate, DataRow } from '../src/types/MapConfig'
-import { GeneratedLegend } from '../src/hooks/useGenerateRuntimeLegend'
+import { MapConfig, Coordinate } from '../types/MapConfig'
+import { GeneratedLegend } from '../hooks/useGenerateRuntimeLegend'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Action } from '@cdc/core/types/Action'
-import { RuntimeData } from '../src/types/RuntimeData'
-import { Modal } from '../src/types/Modal'
+import { RuntimeData } from '../types/RuntimeData'
+import { Modal } from '../types/Modal'
 
 // Action Types
 type SET_ACCESSIBLE_STATUS = Action<'SET_ACCESSIBLE_STATUS', string>
@@ -24,7 +24,7 @@ type SET_STATE_TO_SHOW = Action<'SET_STATE_TO_SHOW', string>
 type SET_TOPO_DATA = Action<'SET_TOPO_DATA', any>
 type SET_TRANSLATE = Action<'SET_TRANSLATE', [number, number]>
 
-type MapActions =
+export type MapActions =
   | SET_ACCESSIBLE_STATUS
   | SET_CONFIG
   | SET_COVE_LOADED_HAS_RAN
