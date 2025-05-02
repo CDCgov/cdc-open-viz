@@ -1,0 +1,57 @@
+/* base styles for the header */
+header.coveComponentHeader {
+  position: relative;
+  padding: 1rem;
+  margin: 0;
+  color: var(--white) !important;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+header.coveComponentHeader > sup {
+  font-size: var(--superTitle-font-size);
+  font-family: var(--app-font-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  top: 0;
+}
+
+.coveComponentHeader h2 {
+  font-size: var(--title-font-size);
+  font-family: var(--app-font-secondary);
+  color: var(--white);
+  margin: 0;
+}
+
+.coveComponentHeader em {
+  font-style: italic;
+}
+
+.coveComponentHeader strong {
+  font-weight: bold;
+}
+
+.coveComponentHeader:not(:empty) {
+  border-bottom-width: 4px;
+  border-bottom-style: solid;
+}
+
+.coveComponentHeader.biteHeader {
+  margin-bottom: 0 !important;
+}
+
+.coveComponentHeader.themeSimple {
+  border-bottom-color: transparent;
+  color: var(--black) !important;
+  .coveComponentHeader h1,h2,h3,h4,h5,h6 {
+    color: var(--black) !important;
+  }
+}
+
+:global(.cdc-open-viz-module.type-sparkline-chart header) {
+  margin: 0 !important;
+}
+
+:global(.cdc-open-viz-module.type-waffle-chart header) {
+  margin-bottom: 0 !important;
+}
