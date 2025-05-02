@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import Title from '../Title'
+import { CDC_THEME_COLORS } from '../../../helpers/constants'
 
 const meta: Meta = {
   title: 'Components/Atoms/Title',
@@ -19,26 +20,13 @@ export const Primary: Story = {
   args: {
     title: 'My Title',
     superTitle: 'My super title',
-    isDashboard: false
+    isDashboard: false,
+    theme: CDC_THEME_COLORS[0]
   },
   argTypes: {
     theme: {
       control: 'select', // or 'inline-radio' for horizontal layout
-      options: [
-        'theme-blue',
-        'theme-purple',
-        'theme-brown',
-        'theme-teal',
-        'theme-pink',
-        'theme-orange',
-        'theme-slate',
-        'theme-indigo',
-        'theme-cyan',
-        'theme-green',
-        'theme-amber',
-        'theme-grayscale'
-      ],
-      defaultValue: 'theme-blue'
+      options: CDC_THEME_COLORS
     }
   }
 }

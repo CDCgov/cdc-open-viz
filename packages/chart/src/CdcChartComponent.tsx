@@ -74,6 +74,7 @@ import { getColorScale } from './helpers/getColorScale'
 // styles
 import './scss/main.scss'
 import { getInitialState, reducer } from './store/chart.reducer'
+import { resolveThemeVariant } from '@cdc/core/helpers/resolveThemeVariant'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -819,6 +820,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return classes
   }
 
+  const theme = resolveThemeVariant(config.theme)
+
   if (!isLoading) {
     const tableLink = (
       <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
@@ -847,8 +850,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 isDashboard={isDashboard}
                 title={title}
                 superTitle={config.superTitle}
-                classes={['chart-title', `${config.theme}`, 'cove-component__header', 'mb-3']}
-                style={undefined}
+                classes={['chart-title']}
+                theme={theme}
               />
 
               {/* Visualization Wrapper */}

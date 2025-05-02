@@ -28,6 +28,7 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import './scss/main.scss'
 import Title from '@cdc/core/components/ui/Title'
 import Layout from '@cdc/core/components/Layout'
+import { resolveThemeVariant } from '@cdc/core/helpers/resolveThemeVariant'
 
 type CdcWaffleChartProps = {
   configUrl?: string
@@ -364,7 +365,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         showTitle={config.showTitle}
         title={title}
         config={config}
-        classes={['chart-title', `${config.theme}`, 'mb-0']}
+        classes={['chart-title', 'mb-0']}
+        theme={resolveThemeVariant(config.theme)}
+        style={{ marginBottom: '0 !important' }}
       />
       <div className={contentClasses.join(' ')}>
         {!config.newViz && config.runtime && config.runtime.editorErrorMessage && (

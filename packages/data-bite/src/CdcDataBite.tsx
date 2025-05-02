@@ -31,6 +31,7 @@ import dataBiteReducer from './store/db.reducer'
 
 // styles
 import './scss/main.scss'
+import { resolveThemeVariant } from '@cdc/core/helpers/resolveThemeVariant'
 
 type CdcDataBiteProps = {
   config: Config
@@ -550,7 +551,8 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
               config={config}
               title={title}
               isDashboard={isDashboard}
-              classes={['bite-header', `${config.theme}`]}
+              classes={['bite-header']}
+              theme={resolveThemeVariant(config.theme)}
             />
             <div className={`bite ${biteClasses.join(' ')}`}>
               <div className={`bite-content-container ${contentClasses.join(' ')}`}>

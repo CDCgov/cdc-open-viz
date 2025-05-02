@@ -4,3 +4,19 @@ export const COOL_GRAY_90 = getComputedStyle(document.documentElement).getProper
 export const APP_FONT_COLOR = COOL_GRAY_90
 
 export const EDITOR_WIDTH = 350
+
+export const CDC_THEME_COLORS = [
+  'blue',
+  'purple',
+  'brown',
+  'teal',
+  'pink',
+  'orange',
+  'slate',
+  'indigo',
+  'cyan',
+  'green',
+  'amber',
+  'grayscale',
+  'simple'
+] as const

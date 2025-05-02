@@ -12,7 +12,7 @@ import Filters from '@cdc/core/components/Filters'
 import Layout from '@cdc/core/components/Layout'
 import MediaControls from '@cdc/core/components/MediaControls'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
-import Title from '@cdc/core/components/ui/Title'
+import Title, { ThemeVariant } from '@cdc/core/components/ui/Title'
 import Waiting from '@cdc/core/components/Waiting'
 
 // types
@@ -29,6 +29,7 @@ import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { publish } from '@cdc/core/helpers/events'
 import { generateRuntimeFilters } from './helpers/generateRuntimeFilters'
 import { type MapReducerType, MapState } from './store/map.reducer'
+import { resolveThemeVariant } from '@cdc/core/helpers/resolveThemeVariant'
 
 // Map Helpers
 import {
@@ -391,6 +392,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     return classes.join(' ')
   }
 
+  const theme = resolveThemeVariant(headerColor)
+
   return (
     <ConfigContext.Provider value={mapProps}>
       <MapDispatchContext.Provider value={dispatch}>
@@ -414,7 +417,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   title={title}
                   superTitle={general.superTitle}
                   config={config}
-                  classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${headerColor}`]}
+                  classes={['map-title', general.showTitle === true ? 'visible' : 'hidden']}
+                  theme={theme}
                 />
                 <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
                 {config?.annotations?.length > 0 && (

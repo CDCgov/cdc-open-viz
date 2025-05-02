@@ -30,6 +30,7 @@ type CdcMarkupIncludeProps = {
 }
 
 import Title from '@cdc/core/components/ui/Title'
+import { resolveThemeVariant } from '@cdc/core/helpers/resolveThemeVariant'
 
 const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   configUrl,
@@ -256,7 +257,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
           <Layout.Responsive isEditor={isEditor}>
             <div className='markup-include-content-container cove-component__content no-borders'>
               <div className={`markup-include-component ${contentClasses.join(' ')}`}>
-                <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
+                <Title title={title} theme={resolveThemeVariant(config.theme)} classes={['mb-0']} />
                 <div className={`${innerContainerClasses.join(' ')}`}>
                   <div className='cove-component__content-wrap'>
                     {!markupError && <Markup allowElements={!!urlMarkup} content={markup} />}

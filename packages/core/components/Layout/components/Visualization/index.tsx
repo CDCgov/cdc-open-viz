@@ -93,12 +93,24 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
     return classes
   }
 
+  const resolveTheme = config => {
+    if (config?.type === 'map') return config.general.headerColor
+    if (config?.theme) {
+      return config.theme
+    } else if (config?.general?.theme) {
+      return config.general.theme
+    } else {
+      return 'theme-not-found'
+    }
+  }
+
   return (
     <div
       {...(config.type === 'chart' ? { 'data-lollipop': config.isLollipopChart } : {})}
       className={getWrappingClasses().join(' ')}
       data-download-id={imageId}
       ref={ref}
+      data-theme={resolveTheme(config) ?? 'theme-not-found'}
     >
       {props.children}
     </div>

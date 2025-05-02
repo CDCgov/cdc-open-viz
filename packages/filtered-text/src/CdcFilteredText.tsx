@@ -21,8 +21,15 @@ import parse from 'html-react-parser'
 
 // styles
 import './scss/main.scss'
+import { resolveThemeVariant } from '@cdc/core/helpers/resolveThemeVariant.ts'
 
-const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
+const CdcFilteredText = ({
+  config: configObj,
+  configUrl,
+  isDashboard = false,
+  isEditor = false,
+  setConfig: setParentConfig
+}) => {
   const transform = new DataTransform()
   // Default States
   const [config, setConfig] = useState(defaults)
@@ -121,7 +128,7 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
       <>
         <Layout.Responsive isEditor={isEditor}>
           <div className={`cove-component__content no-borders`}>
-            <Title classes={[`${config.theme}`]} title={title} style={{ fontSize }} />
+            <Title theme={resolveThemeVariant(config.theme)} title={title} style={{ fontSize }} />
             <div className={`${contentClasses.join(' ')} body`}>
               {filterByTextColumn()
                 .slice(0, 1)

@@ -66,6 +66,7 @@ import { loadAPIFiltersFactory } from './helpers/loadAPIFilters'
 import Loader from '@cdc/core/components/Loader'
 import Alert from '@cdc/core/components/Alert'
 import { shouldLoadAllFilters } from './helpers/shouldLoadAllFilters'
+import { resolveThemeVariant } from '@cdc/core/helpers/resolveThemeVariant'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -551,7 +552,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             <Title
               title={title}
               isDashboard={true}
-              classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]}
+              classes={[`dashboard-title`]}
+              theme={resolveThemeVariant(config.dashboard.theme)}
             />
             {/* Description */}
             {description && <div className='subtext mb-3'>{parse(description)}</div>}
