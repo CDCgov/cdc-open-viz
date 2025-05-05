@@ -1,16 +1,19 @@
 import { useCallback, useEffect, useState } from 'react'
 
+import DataTable from '@cdc/core/components/DataTable'
+import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import Layout from '@cdc/core/components/Layout'
 import Loading from '@cdc/core/components/Loading'
-import DataTable from '@cdc/core/components/DataTable'
-import getViewport from '@cdc/core/helpers/getViewport'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import getViewport from '@cdc/core/helpers/getViewport'
+import { Table } from '@cdc/core/types/Table'
+import { ViewPort } from '@cdc/core/types/ViewPort'
 
-import { Config } from './types/Config'
 import EditorPanel from './components/EditorPanel'
-import { fetchConfig, fetchData } from './helpers/fetchers'
-import { processData } from './helpers/dataHelpers'
 import defaults from './data/initial-state.js'
+import { processData } from './helpers/dataHelpers'
+import { fetchConfig, fetchData } from './helpers/fetchers'
+import { Config } from './types/Config'
 
 type CdcDataTableProps = {
   config?: Config
@@ -23,9 +26,8 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
   const [columns, setColumns] = useState()
   const [config, setConfig] = useState<Config>()
   const [data, setData] = useState()
-  const [table, setTable] = useState()
-
-  const [currentViewport, setCurrentViewport] = useState('lg')
+  const [table, setTable] = useState<Table>()
+  const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
 
   const { data: inputData, dataUrl, dataDescription } = config || {}
   const { label, indexLabel, expanded } = table || {}
@@ -127,7 +129,7 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
       )}
       <div className='bg-white z-1'>
         <DataTable
-          config={configWithStates}
+          config={configWithStates as unknown as TableConfig}
           tableTitle={label}
           indexTitle={indexLabel}
           isEditor={isEditor}
