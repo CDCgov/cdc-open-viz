@@ -4,19 +4,15 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": [
-    "@typescript-eslint"
-  ],
+  "plugins": ["@typescript-eslint", "eslint-plugin-prettier"],
   "extends": [
-    "plugin:jsx-a11y/recommended",
+    // "plugin:jsx-a11y/recommended",
     "prettier",
     "plugin:react-hooks/recommended"
   ],
   "rules": {
-    "import/no-named-as-default": 0,
-    "no-labels": 0,
-    "no-unused-labels": 0,
-    "no-console": 1,
-    "import/no-anonymous-default-export": 0
+    "no-console": "error",
+    "no-debugger": "error",
+    "react-hooks/exhaustive-deps": "off"
   }
 }
