@@ -26,6 +26,9 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Build Packages
+        run: lerna run build
+
       - name: Build Storybook
         run: yarn build-storybook --output-dir storybook-static
 
