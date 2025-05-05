@@ -14,6 +14,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Layout from '@cdc/core/components/Layout'
 
 const EditorPanel = ({ config, columnsState, showEditorPanelState, data, tableState }) => {
+  /* STATES */
   const [table, setTable] = tableState
   const [showEditorPanel, setShowEditorPanel] = showEditorPanelState
   const [columns, setColumns] = columnsState
@@ -22,12 +23,15 @@ const EditorPanel = ({ config, columnsState, showEditorPanelState, data, tableSt
     setShowEditorPanel(cur => !cur)
   }
 
+  // Creates a function that updates a field in a specified state
   const createFieldUpdater = (curValue, setter) => (_section, subsection, fieldName, newValue) => {
+    // Both table and column editors have a field that replaces the entire columns object
     if (fieldName === 'columns') {
       setColumns(newValue)
       return
     }
 
+    // Find/assign the value to be updated
     const valueCopy = _.cloneDeep(curValue)
     if (!subsection) valueCopy[fieldName] = newValue
     else {
@@ -57,11 +61,14 @@ const EditorPanel = ({ config, columnsState, showEditorPanelState, data, tableSt
         <section className='form-container'>
           <form>
             <Accordion allowZeroExpanded={true}>
-              {/* Columns */}
+              {/* COLUMNS */}
               <AccordionItem>
+                {/* LABEL */}
                 <AccordionItemHeading>
                   <AccordionItemButton>Columns</AccordionItemButton>
                 </AccordionItemHeading>
+
+                {/* COLUMNS EDITOR COMPONENT */}
                 <AccordionItemPanel>
                   <ColumnsEditor
                     config={config}
@@ -70,11 +77,15 @@ const EditorPanel = ({ config, columnsState, showEditorPanelState, data, tableSt
                   />
                 </AccordionItemPanel>
               </AccordionItem>
-              {/* Data Table */}
+
+              {/* DATA TABLE */}
               <AccordionItem>
+                {/* LABEL */}
                 <AccordionItemHeading>
                   <AccordionItemButton>Data Table</AccordionItemButton>
                 </AccordionItemHeading>
+
+                {/* DATA TABLE EDITOR COMPONENT */}
                 <AccordionItemPanel>
                   <DataTableEditor
                     config={config}
