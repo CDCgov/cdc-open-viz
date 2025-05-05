@@ -67,24 +67,22 @@ const EditorPanel = ({ config, columnsState, showEditorPanelState, data, tableSt
                     config={config}
                     updateField={createFieldUpdater(columns, setColumns)}
                     deleteColumn={removeAdditionalColumn}
-                  />{' '}
+                  />
                 </AccordionItemPanel>
               </AccordionItem>
-
-              {
-                <AccordionItem>
-                  <AccordionItemHeading>
-                    <AccordionItemButton>Data Table</AccordionItemButton>
-                  </AccordionItemHeading>
-                  <AccordionItemPanel>
-                    <DataTableEditor
-                      config={config}
-                      columns={Object.keys(data[0] || {})}
-                      updateField={createFieldUpdater(table, setTable)}
-                    />
-                  </AccordionItemPanel>
-                </AccordionItem>
-              }
+              {/* Data Table */}
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Data Table</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <DataTableEditor
+                    config={config}
+                    columns={Object.keys(data[0] || {})}
+                    updateField={createFieldUpdater(table, setTable)}
+                  />
+                </AccordionItemPanel>
+              </AccordionItem>
             </Accordion>
           </form>
         </section>

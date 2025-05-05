@@ -22,6 +22,7 @@ type CdcDataTableProps = {
 }
 
 const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTableProps) => {
+  /* STATES */
   const [showEditorPanel, setShowEditorPanel] = useState(isEditor)
   const [columns, setColumns] = useState()
   const [config, setConfig] = useState<Config>()
@@ -29,14 +30,18 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
   const [table, setTable] = useState<Table>()
   const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
 
+  /* CONFIG VARS */
   const { data: inputData, dataUrl, dataDescription } = config || {}
   const { label, indexLabel, expanded } = table || {}
 
+  /* LOADING VARS */
   const configLoading = configUrl && config === undefined
   const dataLoading = data === undefined
+  /* INVALID VARS */
   const invalidConfig = config === null
   const invalidData = data === null
 
+  // processes initial config and sets state
   const initConfig = (newConfig: Config) => {
     const configWithDefaultsAndUpdates = { ...coveUpdateWorker(newConfig), ...defaults }
     const { columns: configColumns, table: configTable } = configWithDefaultsAndUpdates
@@ -45,7 +50,7 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
     setColumns(configColumns)
   }
 
-  //Observes changes to outermost container and changes viewport size in state
+  // Observes changes to outermost container and changes viewport size in state
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let newViewport = getViewport(entry.contentRect.width)
@@ -99,10 +104,12 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
       .catch(() => setData(null))
   }, [inputData, dataUrl, configLoading, invalidConfig, dataDescription])
 
+  /* HANDLE LOADING STATES */
   if (configLoading || dataLoading) return <Loading />
-
+  /* HANDLE INVALID STATES */
   if (invalidConfig || invalidData) return <div>Something went wrong</div>
 
+  // initial static config combined with dynamic states
   const configWithStates = {
     ...config,
     table,
@@ -118,6 +125,7 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
       showEditorPanel={showEditorPanel}
       currentViewport={currentViewport}
     >
+      {/* EDITOR */}
       {isEditor && (
         <EditorPanel
           config={configWithStates}
@@ -127,6 +135,8 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
           data={data}
         />
       )}
+
+      {/* DATA TABLE */}
       <div className='bg-white z-1'>
         <DataTable
           config={configWithStates as unknown as TableConfig}
