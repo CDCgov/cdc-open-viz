@@ -1,6 +1,5 @@
-import { Meta } from '@storybook/blocks'
-import { ColorPalette, ColorItem } from '@storybook/blocks'
-import colorPalettes from '../../../data/colorPalettes'
+import { Meta, ColorPalette, ColorItem } from '@storybook/blocks'
+import colorPalettes from '@cdc/core/data/colorPalettes'
 
 export const orderedPalettes = Object.keys(colorPalettes)
 .sort()
@@ -81,7 +80,6 @@ The color palettes are predefined sets of colors organized into categories like 
 <ColorPalette>
   {Object.entries(orderedPalettes).map(([paletteName, colors]) => {
 
-    console.log(paletteFriendlyNames[paletteName])
 
     return (
     <ColorItem
@@ -217,6 +215,6 @@ These are additional color palettes that can be used for various UI components. 
       colors: ['#d8000c']
     }
   ].map(({ title, colors }) => (
-    <ColorItem key={title} title={title} colors={colors} />
+    <ColorItem key={title} title={title} colors={colors} subtitle={'test'} />
   ))}
 </ColorPalette>
