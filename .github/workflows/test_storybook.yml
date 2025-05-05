@@ -1,0 +1,39 @@
+name: Test Storybook
+
+on:
+  pull_request:
+    paths:
+      - '**.stories.@(js|jsx|ts|tsx|mdx)'
+      - '.storybook/**'
+      - 'src/**'
+      - 'package.json'
+      - 'yarn.lock'
+
+jobs:
+  storybook-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build Storybook
+        run: yarn build-storybook --output-dir storybook-static
+
+      - name: Serve Storybook
+        run: npx serve storybook-static -l 6006 &
+
+      - name: Wait for Storybook to be available
+        run: npx wait-on http://localhost:6006
+
+      - name: Run Storybook tests
+        run: yarn test-storybook
