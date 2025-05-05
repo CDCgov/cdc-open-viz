@@ -104,9 +104,8 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
       .catch(() => setData(null))
   }, [inputData, dataUrl, configLoading, invalidConfig, dataDescription])
 
-  /* HANDLE LOADING STATES */
+  /* HANDLE LOADING/ERROR STATES */
   if (configLoading || dataLoading) return <Loading />
-  /* HANDLE INVALID STATES */
   if (invalidConfig || invalidData) return <div>Something went wrong</div>
 
   // initial static config combined with dynamic states
