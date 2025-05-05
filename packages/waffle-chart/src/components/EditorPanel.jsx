@@ -66,7 +66,6 @@ const EditorPanel = memo(props => {
       const newConfig = convertStateToConfig()
       setParentConfig(newConfig)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config])
 
   useEffect(() => {

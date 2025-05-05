@@ -229,7 +229,6 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       if (geoData?.[longitudeColumnName] && geoData?.[latitudeColumnName]) {
         const coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
         let translate = `translate(${projection(coords)})`
-
         return (
           <g key={i} transform={translate} style={styles} className='geo-point' tabIndex={-1}>
             {cityStyleShapes[cityStyle.shape.toLowerCase()]}

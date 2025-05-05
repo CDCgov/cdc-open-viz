@@ -89,7 +89,7 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
     for (const mapLayer of config.map.layers) {
       let newLayerItem = await fetch(mapLayer.url)
         .then(res => res.json())
-        .catch(e => console.warn('error with newLayer item', e)) // eslint-disable-line
+        .catch(e => console.warn('error with newLayer item')) // eslint-disable-line no-console
       if (!newLayerItem) newLayerItem = []
       TopoJSONObjects.push(newLayerItem)
     }

@@ -351,7 +351,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   }, [parentWidth, parentHeight, data])
 
   // Make sure the chart is visible if in the editor
-  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const element = document.querySelector('.isEditor')
     if (element) {

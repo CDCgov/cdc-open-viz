@@ -129,7 +129,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
         leftMax = Number(enteredMaxValue)
       }
     } catch (e) {
-      console.error(e.message)
+      console.error(e.message) // eslint-disable-line no-console
     }
   }
 

@@ -416,7 +416,7 @@ export const useTooltip = props => {
       })
       return yScaleValues
     } catch (error) {
-      console.error('COVE', error)
+      console.error('COVE', error) // eslint-disable-line no-console
     }
   }
 
@@ -487,7 +487,7 @@ export const useTooltip = props => {
 
       return standardLoopItems
     } catch (error) {
-      console.error('COVE', error)
+      console.error('COVE', error) // eslint-disable-line no-console
     }
   }
 

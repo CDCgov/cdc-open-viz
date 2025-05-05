@@ -200,7 +200,6 @@ const EditorPanel = memo(() => {
 
       setParentConfig(newConfig)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config])
 
   const onBackClick = () => {
