@@ -32,8 +32,10 @@ jobs:
       - name: Build Storybook
         run: yarn build-storybook --output-dir storybook-static
 
-      - name: Serve Storybook
-        run: npx serve storybook-static -l 6006 &
+      - name: Start Storybook
+        run: npx start-storybook -p 6006 &
+        env:
+          NODE_ENV: test
 
       - name: Wait for Storybook to be available
         run: npx wait-on http://localhost:6006
