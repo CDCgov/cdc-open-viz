@@ -246,10 +246,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleTooltipClick,
     handleTooltipMouseOff,
     TooltipListItem,
-    getXValueFromCoordinate
   } = useCoveTooltip({
       xScale,
       yScale,
+      seriesScale,
       showTooltip,
       hideTooltip
   })
@@ -785,7 +785,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               height={yMax}
               xScaleNoPadding={xScaleNoPadding}
               chartRef={svgRef}
-              getXValueFromCoordinate={getXValueFromCoordinate}
               handleTooltipMouseOver={handleTooltipMouseOver}
               handleTooltipMouseOff={handleTooltipMouseOff}
               isBrush={false}

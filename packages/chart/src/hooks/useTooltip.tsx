@@ -8,6 +8,7 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
 import _ from 'lodash'
+import { getHorizontalBarHeights } from '../components/BarChart/helpers/getBarHeights'
 
 export const useTooltip = props => {
   const {
@@ -21,31 +22,35 @@ export const useTooltip = props => {
     setSharedFilter,
     isDraggingAnnotation
   } = useContext<ChartContext>(ConfigContext)
-  const { xScale, yScale, showTooltip, hideTooltip } = props
+  const { xScale, yScale, seriesScale, showTooltip, hideTooltip } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
 
-  /**
-   * Provides the tooltip information based on the tooltip data array and svg cursor coordinates
-   * @function getTooltipInformation
-   * @param {Array} tooltipDataArray - The array containing the tooltip data.
-   * @param {Object} eventSvgCoords - The object containing the SVG coordinates of the event.
-   * @return {Object} - The tooltip information with tooltip data.
-   */
+  const Y_AXIS_SIZE = Number(config.yAxis.size || 0)
 
-  // function handles only Single series hovred data tooltips
+  // function handles only Single series hovered data tooltips
   const findDataKeyByThreshold = (mouseY, datapoint) => {
     let sum = 0
-    let threshold = Number(yScale.invert(mouseY))
+    let threshold
+    try {
+      threshold = Number(yScale.invert(mouseY))
+    } catch (e) {
+      threshold = mouseY
+    }
     let hoveredKey = null
     let hoveredValue = null
-
-    for (let key of config.runtime?.seriesKeys) {
-      if (datapoint.hasOwnProperty(key)) {
-        sum += Number(datapoint[key])
-        if (sum >= threshold) {
-          hoveredValue = datapoint[key]
-          hoveredKey = key
-          break
+    const dynamicSeries = config.series.find(s => s.dynamicCategory)
+    if (dynamicSeries) {
+      hoveredKey = datapoint[dynamicSeries.dynamicCategory]
+      hoveredValue = datapoint[dynamicSeries.dataKey]
+    } else {
+      for (let key of config.runtime?.seriesKeys) {
+        if (datapoint.hasOwnProperty(key)) {
+          sum += Number(datapoint[key])
+          if (sum >= threshold) {
+            hoveredValue = datapoint[key]
+            hoveredKey = key
+            break
+          }
         }
       }
     }
@@ -62,25 +67,6 @@ export const useTooltip = props => {
     return showMissingDataValue ? 'N/A' : formattedValue
   }
 
-  const getTooltipInformation = (tooltipDataArray, eventSvgCoords) => {
-    const { x, y } = eventSvgCoords
-    let initialTooltipData = tooltipDataArray || {}
-
-    const tooltipData = {
-      data: initialTooltipData,
-      dataXPosition: x + 10,
-      dataYPosition: y
-    }
-
-    const tooltipInformation = {
-      tooltipLeft: tooltipData.dataXPosition,
-      tooltipTop: tooltipData.dataYPosition,
-      tooltipData: tooltipData
-    }
-
-    return tooltipInformation
-  }
-
   /**
    * Handles the mouse over event for the tooltip.
    * @function handleTooltipMouseOver
@@ -95,75 +81,64 @@ export const useTooltip = props => {
     const eventSvgCoords = localPoint(e)
     const { x, y } = eventSvgCoords
 
-    // Additional data for pie charts
-    const { data: pieChartData, arc } = additionalChartData ?? {}
+    const resolvedScaleValues = getResolvedScaleValues([x, y])
 
-    const closestXScaleValue = getXValueFromCoordinate(x - Number(config.yAxis.size || 0))
+    const columnsWithTooltips = []
+    const tooltipItems = [] as any[][]
+    for (const [colKey, column] of Object.entries(config.columns)) {
+      const formattingParams = {
+        addColPrefix: column.prefix,
+        addColSuffix: column.suffix,
+        addColRoundTo: column.roundToPlace || '',
+        addColCommas: column.commas
+      }
 
-    const xScaleValues = data.filter(d => d[xAxis.dataKey] === getClosestYValue(y))
+      const pieColumnData = additionalChartData?.arc?.data[column.name]
+      const columnData = resolvedScaleValues[0]?.[colKey]
+      const closestValue = config.visualizationType === 'Pie' ? pieColumnData : columnData
 
-    const resolvedScaleValues = orientation === 'vertical' ? getYScaleValues(closestXScaleValue) : xScaleValues
+      const formattedValue = formatColNumber(closestValue, 'left', true, config, formattingParams)
 
-    const getAxisPosition = seriesKey => {
-      const seriesObj = config.runtime.series.filter(s => s.dataKey === seriesKey)[0]
-      const position = seriesObj?.axis ? String(seriesObj.axis).toLowerCase() : 'left'
-      return position
+      if (column.tooltips) {
+        columnsWithTooltips.push([column.label, formattedValue])
+      }
+    }
+    const additionalTooltipItems = [] as [string, string | number][]
+
+    columnsWithTooltips.forEach(columnData => {
+      additionalTooltipItems.push([columnData[0], columnData[1]])
+    })
+
+    if (visualizationType === 'Pie') {
+      const roundTo = Number(config.dataFormat.roundTo) || 0
+      const { endAngle, startAngle, data: pieData } = additionalChartData?.arc || {}
+      const degrees = ((endAngle - startAngle) * 180) / Math.PI
+
+      // Calculate the percentage of the full circle (360 degrees)
+      const percentageOfCircle = (degrees / 360) * 100
+      const roundedPercentage = percentageOfCircle.toFixed(roundTo)
+
+      tooltipItems.push(
+        // ignore
+        [config.xAxis.dataKey, pieData],
+        [config.runtime.yAxis.dataKey, formatNumber(pieData[config.runtime.yAxis.dataKey])],
+        ['Percent', `${roundedPercentage + '%'}`]
+      )
     }
 
-    const getTooltipDataArray = () => {
-      const columns = config.columns
-      const columnsWithTooltips = []
-      const tooltipItems = []
+    if (visualizationType === 'Forest Plot') {
+      tooltipItems.push([config.xAxis.dataKey, getClosestYValue(y)])
+    }
 
-      for (const [colKeys, colVals] of Object.entries(columns)) {
-        const formattingParams = {
-          addColPrefix: config.columns[colKeys].prefix,
-          addColSuffix: config.columns[colKeys].suffix,
-          addColRoundTo: config.columns[colKeys].roundToPlace ? config.columns[colKeys].roundToPlace : '',
-          addColCommas: config.columns[colKeys].commas
-        }
-        let closestValue = null
-
-        if (config.visualizationType === 'Pie') {
-          closestValue = arc?.data[colVals.name]
-        } else {
-          closestValue = resolvedScaleValues[0]?.[colVals.name]
-        }
-
-        const formattedValue = formatColNumber(closestValue, 'left', true, config, formattingParams)
-
-        if (colVals.tooltips) {
-          columnsWithTooltips.push([colVals.label, formattedValue])
-        }
+    const isLinearChart = !['Pie', 'Forest Plot'].includes(visualizationType)
+    if (isLinearChart) {
+      const getAxisPosition = seriesKey => {
+        const seriesObj = config.runtime.series.filter(s => s.dataKey === seriesKey)[0]
+        const position = seriesObj?.axis ? String(seriesObj.axis).toLowerCase() : 'left'
+        return position
       }
-      const additionalTooltipItems = []
-
-      columnsWithTooltips.forEach(columnData => {
-        additionalTooltipItems.push([columnData[0], columnData[1]])
-      })
-
-      if (visualizationType === 'Pie') {
-        const roundTo = Number(config.dataFormat.roundTo) || 0
-
-        const degrees = ((arc.endAngle - arc.startAngle) * 180) / Math.PI
-
-        // Calculate the percentage of the full circle (360 degrees)
-        const percentageOfCircle = (degrees / 360) * 100
-        const roundedPercentage = percentageOfCircle.toFixed(roundTo)
-
-        tooltipItems.push(
-          // ignore
-          [config.xAxis.dataKey, pieChartData],
-          [config.runtime.yAxis.dataKey, formatNumber(arc?.data[config.runtime.yAxis.dataKey])],
-          ['Percent', `${roundedPercentage + '%'}`]
-        )
-      }
-
-      if (visualizationType === 'Forest Plot') {
-        tooltipItems.push([config.xAxis.dataKey, getClosestYValue(y)])
-      }
-      // handle tooltip for all  hovered series
-      if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot' && !config.tooltips.singleSeries) {
+      if (!config.tooltips.singleSeries) {
+        // Show All Series in One Tooltip
         tooltipItems.push(
           ...getIncludedTooltipSeries()
             ?.filter(seriesKey => {
@@ -195,33 +170,40 @@ export const useTooltip = props => {
           if (series?.dynamicCategory) {
             const seriesKey = series.dataKey
             const resolvedScaleValue = resolvedScaleValues.find(v => v[series.dynamicCategory] === seriesKey)
-            if (!resolvedScaleValue) return
-            const value = resolvedScaleValue[series.originalDataKey]
-            const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
-            tooltipItems.push([seriesKey, formattedValue, getAxisPosition(seriesKey)])
+            if (resolvedScaleValue) {
+              const value = resolvedScaleValue[series.originalDataKey]
+              const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
+              tooltipItems.push([seriesKey, formattedValue, getAxisPosition(seriesKey)])
+            }
           }
         })
-      }
-
-      // handle tooltip for single hovered series
-      if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot' && config.tooltips.singleSeries) {
-        const [seriesKey, value] = findDataKeyByThreshold(y, resolvedScaleValues[0])
+      } else {
+        // Show Only the Hovered Series in Tooltip
+        const dataColumn = resolvedScaleValues[0]
+        const [seriesKey, value] = findDataKeyByThreshold(y, dataColumn)
         if (seriesKey && value) {
-          tooltipItems.push([config.xAxis.dataKey, closestXScaleValue])
+          const xVal = dataColumn[config.xAxis.dataKey]
+          const closestXScaleValue = getXValueFromCoordinate(x - Y_AXIS_SIZE)
+
+          tooltipItems.push([config.xAxis.dataKey, closestXScaleValue || xVal])
           const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
           tooltipItems.push([seriesKey, formattedValue])
         }
       }
-
-      return [...tooltipItems, ...additionalTooltipItems]
     }
 
-    // Returns an array of arrays.
-    // ie. [ ['Date', '01/01/2023'], ['close', 300] ]
-    const tooltipDataArray = getTooltipDataArray()
+    const dataXPosition = eventSvgCoords.x + 10
+    const dataYPosition = eventSvgCoords.y
 
-    if (!tooltipDataArray) return
-    const tooltipInformation = getTooltipInformation(tooltipDataArray, eventSvgCoords)
+    const tooltipInformation = {
+      tooltipLeft: dataXPosition,
+      tooltipTop: dataYPosition,
+      tooltipData: {
+        data: [...tooltipItems, ...additionalTooltipItems],
+        dataXPosition,
+        dataYPosition
+      }
+    }
     showTooltip(tooltipInformation)
   }
 
@@ -291,10 +273,7 @@ export const useTooltip = props => {
       return closestX
     }
 
-    if (
-      config.xAxis.type === 'categorical' ||
-      (visualizationType === 'Combo' && orientation !== 'horizontal' && visualizationType !== 'Forest Plot')
-    ) {
+    if (config.xAxis.type === 'categorical' || visualizationType === 'Combo') {
       let range = xScale.range()[1] - xScale.range()[0]
       let eachBand = range / (xScale.domain().length + 1)
 
@@ -302,17 +281,38 @@ export const useTooltip = props => {
       const index = Math.floor((Number(numerator) - eachBand / 2) / eachBand)
       return xScale.domain()[index] // fixes off by 1 error
     }
-
-    if (isDateScale(xAxis) && visualizationType !== 'Combo' && orientation !== 'horizontal') {
-      const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
-      const x0 = xScale.invert(x)
-      const index = bisectDate(config.data, x0, 1)
-      const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
-      return val
-    }
   }
 
-  const getClosestYValue = (yPosition, key) => {
+  const findClosest = (dataArray: [any, number][], mouseXorY) => {
+    let dataColumn
+    dataArray.find(([d, xOrY]) => {
+      if (xOrY > mouseXorY) {
+        return true
+      }
+      dataColumn = d
+    })
+    return dataColumn
+  }
+
+  const getClosestYValueHorizontalChart = mouseY => {
+    const barGroups = yScale.domain().map((group, index) => ({ group, index }))
+    const barsWithHeights = getHorizontalBarHeights<{ group }>(config, barGroups)
+
+    const barGroup = findClosest(
+      barsWithHeights.map(d => [d, _.round(d.y)]),
+      mouseY
+    )
+
+    const columns = data.filter(d => d[config.xAxis.dataKey] === barGroup.group)
+    const subGroupMouseY = mouseY - barGroup.y
+
+    const columnsWithY = columns.map((c, i) => [c, config.barHeight * i]) as [Object, number][]
+    const dataColumn = findClosest(columnsWithY, subGroupMouseY)
+
+    return dataColumn
+  }
+
+  const getClosestYValue = (yPosition, key = '') => {
     if (visualizationType === 'Pie') return
     let minDistance = Number.MAX_VALUE
     let closestYValue = null
@@ -369,11 +369,15 @@ export const useTooltip = props => {
   }
 
   /**
-   * Provides an array of objects with the closest y series data items
-   * @param {String} closestXScaleValue
-   * @returns an array of objects with the closest y series data items
+   * Provides an array of objects with the closest series data items
    */
-  const getYScaleValues = closestXScaleValue => {
+  const getResolvedScaleValues = ([x, y]) => {
+    if (orientation !== 'vertical') {
+      if (config.visualizationType === 'Bar' && config.tooltips.singleSeries) {
+        return [getClosestYValueHorizontalChart(y)]
+      }
+      return data.filter(d => d[xAxis.dataKey] === getClosestYValue(y))
+    }
     const runtimeSeries = config.runtime.series.filter(
       series => visualizationType === 'Pie' || (series.tooltip === true && !series.dynamicCategory)
     )
@@ -403,21 +407,22 @@ export const useTooltip = props => {
     const colNames = Object.values(config.columns).map(column => column.name)
     // @ Murad why are we adding them twice?
     includedSeries.push(...colNames, ...colNames)
+    const closestXScaleValue = getXValueFromCoordinate(x - Y_AXIS_SIZE)
 
-    try {
-      const dataToSearch = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
-      // Return an empty array if no matching data is found.
-      if (!dataToSearch || dataToSearch.length === 0) {
-        return []
+    let dataToSearch = (data || []).filter(d => d[xAxis.dataKey] === closestXScaleValue)
+
+    if (config.tooltips.singleSeries) {
+      const dynamicSeries = config.series.find(s => s.dynamicCategory)
+      if (dynamicSeries) {
+        const dataWithXScale = dataToSearch.map(
+          d => [d, seriesScale(d[dynamicSeries.dynamicCategory])] as [Object, number]
+        )
+        const xOffset = x - Y_AXIS_SIZE - xScale(closestXScaleValue)
+        dataToSearch = [findClosest(dataWithXScale, xOffset)]
       }
-
-      const yScaleValues = dataToSearch.map(object => {
-        return _.pick(object, includedSeries)
-      })
-      return yScaleValues
-    } catch (error) {
-      console.error('COVE', error)
     }
+
+    return dataToSearch.map(d => _.pick(d, includedSeries))
   }
 
   /**
@@ -427,67 +432,26 @@ export const useTooltip = props => {
    * @returns {Array} Array of items to be included in the tooltip.
    */
   const getIncludedTooltipSeries = () => {
-    try {
-      let standardLoopItems
+    const forcastingSeries = config.runtime.series.filter(series => series.type === 'Forecasting')
+    const stageColumns = forcastingSeries.map(series => series.stageColumn)
+    const ciItems = forcastingSeries.flatMap(series =>
+      series.confidenceIntervals?.filter(ci => ci.showInTooltip).map(ci => [ci.low, ci.high])
+    )
+    const common = [runtime.xAxis.dataKey, ...runtime?.seriesKeys]
+    switch (visualizationType) {
+      case 'Line':
+      case 'Area Chart':
+      case 'Pie':
+        return common
+      case 'Combo':
+        return [...common, ...ciItems]
+      case 'Forecasting':
+        return [runtime.xAxis.dataKey, ...stageColumns, ...ciItems]
 
-      let stageColumns = []
-      let ciItems = []
-
-      // loop through series for items to add to tooltip.
-      // there is probably a better way of doing this.
-      config.runtime.series?.forEach(s => {
-        if (s.type === 'Forecasting') {
-          stageColumns.push(s.stageColumn)
-
-          s?.confidenceIntervals.forEach(ci => {
-            if (ci.showInTooltip === true) {
-              ciItems.push(ci.low)
-              ciItems.push(ci.high)
-            }
-          })
-        }
-      })
-
-      if (!config.dashboard) {
-        switch (visualizationType) {
-          case 'Combo':
-            standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys, ...ciItems]
-            break
-          case 'Forecasting':
-            standardLoopItems = [runtime.xAxis.dataKey, ...stageColumns, ...ciItems]
-            break
-          case 'Line':
-            standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys]
-            break
-          case 'Area Chart':
-            standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys]
-            break
-          case 'Bar':
-            standardLoopItems =
-              orientation === 'vertical'
-                ? [runtime.xAxis.dataKey, ...runtime?.seriesKeys]
-                : [runtime.yAxis.dataKey, ...runtime?.seriesKeys]
-            break
-          case 'Pie':
-            standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys]
-          default:
-            throw new Error('No visualization type found in handleTooltipMouseOver')
-        }
-      }
-
-      if (config.dashboard) {
-        standardLoopItems = [
-          runtime.xAxis.dataKey,
-          ...runtime?.barSeriesKeys,
-          ...runtime?.lineSeriesKeys,
-          ...stageColumns,
-          ...ciItems
-        ]
-      }
-
-      return standardLoopItems
-    } catch (error) {
-      console.error('COVE', error)
+      case 'Bar':
+        return orientation === 'vertical' ? common : [runtime.yAxis.dataKey, ...runtime?.seriesKeys]
+      default:
+        throw new Error('No visualization type found in handleTooltipMouseOver')
     }
   }
 
@@ -586,7 +550,6 @@ export const useTooltip = props => {
     getIncludedTooltipSeries,
     getXValueFromCoordinate,
     getXValueFromCoordinateDate,
-    getYScaleValues,
     handleTooltipClick,
     handleTooltipMouseOff,
     handleTooltipMouseOver,
