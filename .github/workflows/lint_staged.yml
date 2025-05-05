@@ -1,0 +1,33 @@
+name: Lint Staged Files
+
+on:
+  pull_request:
+    paths:
+      - 'packages/**/*.{js,jsx,ts,tsx}'  # Adjust this to match your monorepo folder structure
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # or the version you're using
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Lint staged files
+        run: |
+          STAGED_FILES=$(git diff --cached --name-only --diff-filter=AM | grep -E '\.(js|jsx|ts|tsx)$' || true)
+          
+          if [ -n "$STAGED_FILES" ]; then
+            npx eslint $STAGED_FILES
+          else
+            echo "No staged files to lint."
+          fi
