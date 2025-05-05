@@ -126,9 +126,6 @@ const DataTable = (props: DataTableProps) => {
     case 'Box Plot':
       if (!config.boxplot) return <Loading />
       break
-    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Paired Bar' || 'Sankey' || 'Table':
-      if (!runtimeData) return <Loading />
-      break
     default:
       if (!runtimeData) return <Loading />
       break

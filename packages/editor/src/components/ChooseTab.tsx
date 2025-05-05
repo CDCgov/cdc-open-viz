@@ -25,6 +25,7 @@ import DeviationIcon from '@cdc/core/assets/icon-deviation-bar.svg'
 import SankeyIcon from '@cdc/core/assets/icon-sankey.svg'
 import ComboChartIcon from '@cdc/core/assets/icon-combo-chart.svg'
 import EpiChartIcon from '@cdc/core/assets/icon-epi-chart.svg'
+import TableIcon from '@cdc/core/assets/icon-table.svg'
 import Icon from '@cdc/core/components/ui/Icon'
 
 interface ButtonProps {
@@ -92,6 +93,18 @@ const ChooseTab: React.FC = (): JSX.Element => {
         newConfig['general'] = {
           geoType: visualizationType,
           type: props?.generalType
+        }
+        break
+      }
+
+      case 'Table': {
+        const visualizationType = props.subType
+        newConfig = {
+          ...props,
+          visualizationType,
+          newViz: true,
+          datasets: {},
+          type: 'table'
         }
         break
       }
@@ -437,5 +450,13 @@ const buttons = [
     generalType: 'us-geocode',
     icon: <UsaIcon />,
     content: 'United States GeoCode'
+  },
+  {
+    id: 24,
+    category: 'General',
+    label: 'Data Table',
+    type: 'table',
+    subType: null,
+    icon: <TableIcon />
   }
 ]
