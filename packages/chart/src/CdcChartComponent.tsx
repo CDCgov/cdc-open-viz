@@ -77,6 +77,7 @@ import { getInitialState, reducer } from './store/chart.reducer'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { getNewRuntime } from './helpers/getNewRuntime'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
+import { Datasets } from '@cdc/core/types/DataSet'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -90,6 +91,7 @@ interface CdcChartProps {
   setSharedFilter?: (filter: any) => void
   setSharedFilterValue?: (value: any) => void
   dashboardConfig?: DashboardConfig
+  datasets?: Datasets
 }
 const CdcChart: React.FC<CdcChartProps> = ({
   config: configObj,
@@ -101,7 +103,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   link,
   setSharedFilter,
   setSharedFilterValue,
-  dashboardConfig
+  dashboardConfig,
+  datasets
 }) => {
   const transform = new DataTransform()
   const initialState = getInitialState(configObj)
@@ -161,7 +164,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   const convertLineToBarGraph = isConvertLineToBarGraph(config, filteredData)
 
-  const prepareConfig = async (loadedConfig: ChartConfig) => {
+  const prepareConfig = (loadedConfig: ChartConfig) => {
     let newConfig = _.defaultsDeep(loadedConfig, defaults)
     _.defaultsDeep(newConfig, {
       table: { showVertical: false }
@@ -426,22 +429,19 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        if (configObj) {
-          const preparedConfig = await prepareConfig(configObj)
-          let preppedData = await prepareData(preparedConfig)
-          dispatch({ type: 'SET_STATE_DATA', payload: preppedData.data })
-          dispatch({ type: 'SET_EXCLUDED_DATA', payload: preppedData.data })
-          updateConfig(preparedConfig, preppedData.data)
-        }
-      } catch (err) {
-        console.error('Could not Load!')
+    try {
+      if (configObj) {
+        const preparedConfig = prepareConfig(_.cloneDeep(configObj))
+        const { formattedData } = preparedConfig
+        preparedConfig.data = formattedData
+        dispatch({ type: 'SET_STATE_DATA', payload: formattedData })
+        dispatch({ type: 'SET_EXCLUDED_DATA', payload: formattedData })
+        updateConfig(preparedConfig, formattedData)
       }
+    } catch (err) {
+      console.error('Could not Load!')
     }
-
-    load()
-  }, [configObj?.data?.length ? configObj.data : null])
+  }, [configObj?.data])
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.
@@ -851,7 +851,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     body = (
       <>
-        {isEditor && <EditorPanel datasets={dashboardConfig?.datasets} />}
+        {isEditor && <EditorPanel datasets={datasets} />}
         <Layout.Responsive isEditor={isEditor}>
           {config.newViz && <Confirm updateConfig={updateConfig} config={config} />}
           {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && (

@@ -48,6 +48,7 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
           setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
           setSharedFilterValue={setSharedFilterValue}
           dashboardConfig={state.config}
+          datasets={state.config.datasets}
           isDashboard={true}
         />
       )

@@ -9,7 +9,6 @@ type Footnotes = {
   filters?: VizFilter[]
   dataKey?: string
   data?: Object[]
-  formattedData?: Object[]
   dynamicFootnotes?: {
     symbolColumn?: string
     textColumn: string

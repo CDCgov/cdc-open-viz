@@ -154,7 +154,7 @@ const Filters: React.FC<FilterProps> = ({
     return addValuesToFilters(filters as VizFilter[], visualizationConfig.data)
   }, [filters])
 
-  if (visualizationConfig?.filters?.length === 0) return
+  if (visualizationConfig?.filters?.length === 0) return <></>
 
   const getClasses = () => {
     const { visualizationType, legend } = visualizationConfig || {}

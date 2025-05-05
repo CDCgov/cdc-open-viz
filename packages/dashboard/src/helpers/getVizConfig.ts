@@ -14,15 +14,17 @@ export const getFootnotesVizConfig = (
 ) => {
   const visualizationConfig = _.cloneDeep(_visualizationConfig)
   if (!visualizationConfig?.footnotes) return visualizationConfig
-  const data = config.datasets[visualizationConfig.dataKey]?.data
+  const data = _.cloneDeep(config.datasets[visualizationConfig.footnotes.dataKey]?.data)
   const dataColumns = data?.length ? Object.keys(data[0]) : []
   const filters = (getApplicableFilters(config.dashboard, rowNumber) || []).filter(filter =>
     dataColumns.includes(filter.columnName)
   )
   if (filters.length) {
-    visualizationConfig.footnotes.formattedData = filterData(filters, data)
+    visualizationConfig.footnotes.data = filterData(filters, data)
+  } else {
+    visualizationConfig.footnotes.data = data
   }
-  visualizationConfig.footnotes.data = data
+
   return visualizationConfig
 }
 
@@ -84,21 +86,17 @@ export const getVizConfig = (
 
   if (filteredDataOverride) {
     visualizationConfig.data = filteredDataOverride
-    if (visualizationConfig.formattedData) {
-      visualizationConfig.formattedData = filteredDataOverride
-    }
   }
 
   if (visualizationConfig.footnotes) {
-    const newVizConfig = getFootnotesVizConfig(visualizationConfig, rowNumber, config)
+    const visConfigWithFootnotes = getFootnotesVizConfig(visualizationConfig, rowNumber, config)
     if (multiVizColumn && filteredDataOverride) {
       const vizCategory = filteredDataOverride[0][multiVizColumn]
       // the multiViz filtering filtering is applied after the dashboard filters
-      const categoryFootnote = newVizConfig.footnotes.formattedData.filter(d => d[multiVizColumn] === vizCategory)
-      newVizConfig.footnotes.formattedData = categoryFootnote
-    } else {
-      newVizConfig.footnotes.formattedData = filteredData[newVizConfig.footnotes.dataKey]
+      const categoryFootnote = visConfigWithFootnotes.footnotes.data.filter(d => d[multiVizColumn] === vizCategory)
+      visConfigWithFootnotes.footnotes.data = categoryFootnote
     }
+    return visConfigWithFootnotes
   }
 
   return visualizationConfig as AnyVisualization

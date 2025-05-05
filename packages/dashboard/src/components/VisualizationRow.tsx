@@ -11,16 +11,14 @@ import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'
 import DashboardSharedFilters, { APIFilterDropdowns } from './DashboardFilters'
 import { DashboardContext } from '../DashboardContext'
 import { ViewPort } from '@cdc/core/types/ViewPort'
-import { getFootnotesVizConfig, getVizConfig } from '../helpers/getVizConfig'
+import { getVizConfig } from '../helpers/getVizConfig'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
-import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import CollapsibleVisualizationRow from './CollapsibleVisualizationRow'
 import { DashboardFilters } from '../types/DashboardFilters'
 import { hasDashboardApplyBehavior } from '../helpers/hasDashboardApplyBehavior'
 import CdcChart from '@cdc/chart/src/CdcChartComponent'
 import ExpandCollapseButtons from './ExpandCollapseButtons'
 import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
-import { AnyVisualization } from '@cdc/core/types/Visualization'
 
 type VisualizationWrapperProps = {
   allExpanded: boolean
@@ -228,6 +226,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   key={col.widget}
                   config={visualizationConfig as ChartConfig}
                   dashboardConfig={config}
+                  datasets={config.datasets}
                   setConfig={newConfig => {
                     updateChildConfig(col.widget, newConfig)
                   }}
