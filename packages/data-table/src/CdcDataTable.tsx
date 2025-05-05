@@ -27,20 +27,13 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
 
   const [currentViewport, setCurrentViewport] = useState('lg')
 
-  const { data: inputData, dataUrl, dataDescription, expanded } = config || {}
-  const { label, indexLabel } = table || {}
+  const { data: inputData, dataUrl, dataDescription } = config || {}
+  const { label, indexLabel, expanded } = table || {}
 
   const configLoading = configUrl && config === undefined
   const dataLoading = data === undefined
   const invalidConfig = config === null
   const invalidData = data === null
-
-  const dataTableConfig = {
-    ...config,
-    table,
-    columns,
-    data
-  }
 
   const initConfig = (newConfig: Config) => {
     const configWithDefaultsAndUpdates = { ...coveUpdateWorker(newConfig), ...defaults }
@@ -108,6 +101,13 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
 
   if (invalidConfig || invalidData) return <div>Something went wrong</div>
 
+  const configWithStates = {
+    ...config,
+    table,
+    columns,
+    data
+  }
+
   return (
     <Layout.VisualizationWrapper
       ref={outerContainerRef}
@@ -118,7 +118,7 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
     >
       {isEditor && (
         <EditorPanel
-          config={dataTableConfig}
+          config={configWithStates}
           columnsState={[columns, setColumns]}
           tableState={[table, setTable]}
           showEditorPanelState={[showEditorPanel, setShowEditorPanel]}
@@ -127,7 +127,7 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
       )}
       <div className='bg-white z-1'>
         <DataTable
-          config={dataTableConfig}
+          config={configWithStates}
           tableTitle={label}
           indexTitle={indexLabel}
           isEditor={isEditor}
