@@ -29,13 +29,6 @@ export const useTooltip = props => {
 
   // function handles only Single series hovered data tooltips
   const findDataKeyByThreshold = (mouseY, datapoint) => {
-    let sum = 0
-    let threshold
-    try {
-      threshold = Number(yScale.invert(mouseY))
-    } catch (e) {
-      threshold = mouseY
-    }
     let hoveredKey = null
     let hoveredValue = null
     const dynamicSeries = config.series.find(s => s.dynamicCategory)
@@ -43,6 +36,13 @@ export const useTooltip = props => {
       hoveredKey = datapoint[dynamicSeries.dynamicCategory]
       hoveredValue = datapoint[dynamicSeries.dataKey]
     } else {
+      let sum = 0
+      let threshold
+      try {
+        threshold = Number(yScale.invert(mouseY))
+      } catch (e) {
+        return []
+      }
       for (let key of config.runtime?.seriesKeys) {
         if (datapoint.hasOwnProperty(key)) {
           sum += Number(datapoint[key])
@@ -75,7 +75,7 @@ export const useTooltip = props => {
    */
   const handleTooltipMouseOver = (e, additionalChartData) => {
     if (visualizationType === 'Bump Chart') return
-    e.stopPropagation()
+    //e.stopPropagation()
     if (isDraggingAnnotation) return
 
     const eventSvgCoords = localPoint(e)
@@ -188,6 +188,10 @@ export const useTooltip = props => {
           tooltipItems.push([config.xAxis.dataKey, closestXScaleValue || xVal])
           const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
           tooltipItems.push([seriesKey, formattedValue])
+        } else {
+          Object.keys(dataColumn).forEach(key => {
+            tooltipItems.push([key, dataColumn[key]])
+          })
         }
       }
     }
@@ -284,7 +288,7 @@ export const useTooltip = props => {
   }
 
   const findClosest = (dataArray: [any, number][], mouseXorY) => {
-    let dataColumn
+    let dataColumn: Object
     dataArray.find(([d, xOrY]) => {
       if (xOrY > mouseXorY) {
         return true
@@ -303,13 +307,20 @@ export const useTooltip = props => {
       mouseY
     )
 
-    const columns = data.filter(d => d[config.xAxis.dataKey] === barGroup.group)
     const subGroupMouseY = mouseY - barGroup.y
+    const columns = data.filter(d => d[config.xAxis.dataKey] === barGroup.group)
 
-    const columnsWithY = columns.map((c, i) => [c, config.barHeight * i]) as [Object, number][]
-    const dataColumn = findClosest(columnsWithY, subGroupMouseY)
-
-    return dataColumn
+    if (config.series.length > 1 && !config.series.find(s => s.dynamicCategory)) {
+      const seriesWithY = config.series.map((c, i) => [c, config.barHeight * i]) as [Object, number][]
+      const hoveredSeries = findClosest(seriesWithY, subGroupMouseY)
+      const exludeColumns = config.series.filter(s => s.dataKey !== hoveredSeries.dataKey).map(s => s.dataKey)
+      const dataColumn = _.omit(columns[0], exludeColumns)
+      return dataColumn
+    } else {
+      const columnsWithY = columns.map((c, i) => [c, config.barHeight * i]) as [Object, number][]
+      const dataColumn = findClosest(columnsWithY, subGroupMouseY)
+      return dataColumn
+    }
   }
 
   const getClosestYValue = (yPosition, key = '') => {
