@@ -552,7 +552,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     />
                   )}
 
-                {config.annotations.length > 0 && <Annotation.Dropdown />}
+                {config.annotations?.length > 0 && <Annotation.Dropdown />}
 
                 {general.footnotes && <section className='footnotes pt-2 mt-4'>{parse(general.footnotes)}</section>}
               </section>

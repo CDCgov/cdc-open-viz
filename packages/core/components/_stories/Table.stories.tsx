@@ -37,7 +37,7 @@ function createGroupMatrix(): Record<string, ReactNode[][]> {
   return { group_1: [base, base], group_2: [base, base] }
 }
 
-export const Grouped: Story = {
+const Grouped: Story = {
   args: {
     childrenMatrix: createGroupMatrix(),
     tableName: 'COVE Table',

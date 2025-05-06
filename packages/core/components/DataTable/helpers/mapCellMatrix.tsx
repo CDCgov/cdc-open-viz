@@ -96,14 +96,16 @@ const mapCellArray = ({
           const legendColor = applyLegendToRow(rowObj)
 
           if (!legendColor) {
-            throw new Error('No legend color found')
+            console.error('No legend color found') // eslint-disable-line no-console
           }
           const labelValue = getGeoLabel(config, row, formatLegendLocation, displayGeoName)
           const mapZoomHandler =
             type === 'bubble' && allowMapZoom && geoType === 'world' ? () => setFilteredCountryCode(row) : undefined
           return (
             <div className='col-12'>
-              <LegendShape fill={legendColor[0]} />
+              {legendColor && legendColor.length > 0 && (
+                <LegendShape fill={legendColor[0]} />
+            )}
               <CellAnchor
                 markup={labelValue}
                 row={rowObj}
