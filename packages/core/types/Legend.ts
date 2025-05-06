@@ -15,4 +15,5 @@ export type Legend = {
   singleRow: boolean
   type: string
   verticalSorted: boolean
+  groupBy: string
 }
