@@ -210,7 +210,7 @@ const handleLastIndex = ({
   return result
 }
 
-const handleMiddleIndices = ({
+export const handleMiddleIndices = ({
   data,
   seriesKey,
   preliminaryData,
