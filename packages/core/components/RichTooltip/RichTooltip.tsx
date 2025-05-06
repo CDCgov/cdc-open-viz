@@ -1,8 +1,8 @@
 import React from 'react'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
-import './TooltipLink.css'
+import './richTooltip.css'
 
-const TooltipLink = ({ linkText, href = null, tooltipOpacity = 100, tooltipContent }) => {
+const RichTooltip = ({ linkText, href = null, tooltipOpacity = 100, tooltipContent }) => {
   return (
     <>
       <a
@@ -20,13 +20,13 @@ const TooltipLink = ({ linkText, href = null, tooltipOpacity = 100, tooltipConte
         effect='solid'
         variant='light'
         style={{
-          background: `rgba(255,255,255, ${tooltipOpacity})`,
-          color: '#1c1d1f',
+          background: `rgba(255, 255, 255, ${tooltipOpacity})`,
+          color: 'var(--cool-gray-90)',
           padding: '9px 18px',
           boxShadow: '0px 2px 2px rgba(28, 29, 31, 0.45)',
           maxWidth: '239px',
-          fontSize: '0.833rem',
-          fontFamily: 'Arial',
+          fontSize: 'var(--filter-label-font-size)',
+          fontFamily: 'var(--app-font-main)',
           borderRadius: '4px'
         }}
       />
@@ -34,4 +34,4 @@ const TooltipLink = ({ linkText, href = null, tooltipOpacity = 100, tooltipConte
   )
 }
 
-export default TooltipLink
+export default RichTooltip
