@@ -446,7 +446,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   }}
                 >
                   {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-                  <section className='outline-none geography-container w-100' ref={mapSvg} tabIndex='0'>
+                  <section
+                    className='outline-none geography-container w-100 position-relative'
+                    ref={mapSvg}
+                    tabIndex='0'
+                  >
                     {currentViewport && (
                       <>
                         {modal && <Modal />}
@@ -548,7 +552,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     />
                   )}
 
-                {config.annotations.length > 0 && <Annotation.Dropdown />}
+                {config.annotations?.length > 0 && <Annotation.Dropdown />}
 
                 {general.footnotes && <section className='footnotes pt-2 mt-4'>{parse(general.footnotes)}</section>}
               </section>

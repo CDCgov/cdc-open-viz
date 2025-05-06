@@ -205,87 +205,6 @@ const EditorPanel = () => {
 
   const handleEditorChanges = async (property, value) => {
     switch (property) {
-      case 'navigationTarget':
-        setConfig({
-          ...config,
-          general: {
-            ...config.general,
-            navigationTarget: value
-          }
-        })
-        break
-      // change these to be more generic.
-      // updateVisualPropertyValue
-      // updateGeneralPropertyValue, etc.
-      case 'showBubbleZeros':
-        setConfig({
-          ...config,
-          visual: {
-            ...config.visual,
-            showBubbleZeros: value
-          }
-        })
-        break
-      case 'showEqualNumber':
-        setConfig({
-          ...config,
-          general: {
-            ...config.general,
-            equalNumberOptIn: value
-          }
-        })
-        break
-      case 'hideGeoColumnInTooltip':
-        setConfig({
-          ...config,
-          general: {
-            ...config.general,
-            [property]: value
-          }
-        })
-        break
-
-      case 'toggleDataTableLink':
-        setConfig({
-          ...config,
-          table: {
-            ...config.table,
-            showDataTableLink: value
-          }
-        })
-        break
-
-      case 'toggleDataUrl':
-        setConfig({
-          ...config,
-          table: {
-            ...config.table,
-            showDownloadUrl: value
-          }
-        })
-        break
-      case 'toggleExtraBubbleBorder':
-        setConfig({
-          ...config,
-          visual: {
-            ...config.visual,
-            extraBubbleBorder: value
-          }
-        })
-        break
-      case 'allowMapZoom':
-        setConfig({
-          ...config,
-          general: {
-            ...config.general,
-            allowMapZoom: value
-          },
-          mapPosition: {
-            coordinates: config.general.geoType === 'world' ? [0, 30] : [0, 0],
-            zoom: 1
-          }
-        })
-        break
       case 'hidePrimaryColumnInTooltip':
         setConfig({
           ...config,
@@ -313,24 +232,6 @@ const EditorPanel = () => {
           }
         })
         break
-      case 'showSidebar':
-        setConfig({
-          ...config,
-          general: {
-            ...config.general,
-            showSidebar: value
-          }
-        })
-        break
-      case 'fullBorder':
-        setConfig({
-          ...config,
-          general: {
-            ...config.general,
-            fullBorder: value
-          }
-        })
-        break
       case 'expandDataTable':
         setConfig({
           ...config,
@@ -338,12 +239,6 @@ const EditorPanel = () => {
             ...config.table,
             expanded: value
           }
-        })
-        break
-      case 'color':
-        setConfig({
-          ...config,
-          color: value
         })
         break
       case 'sidebarPosition':
@@ -371,6 +266,15 @@ const EditorPanel = () => {
           legend: {
             ...config.legend,
             subStyle: value
+          }
+        })
+        break
+      case 'legendGroupBy':
+        setConfig({
+          ...config,
+          legend: {
+            ...config.legend,
+            groupBy: value
           }
         })
         break
@@ -494,15 +398,6 @@ const EditorPanel = () => {
           }
         })
         break
-      case 'separateZero':
-        setConfig({
-          ...config,
-          legend: {
-            ...config.legend,
-            separateZero: value
-          }
-        })
-        break
       case 'toggleShowFullGeoNameInCSV':
         setConfig({
           ...config,
@@ -537,15 +432,6 @@ const EditorPanel = () => {
           general: {
             ...config.general,
             showDownloadPdfButton: !config.general.showDownloadPdfButton
-          }
-        })
-        break
-      case 'displayAsHex':
-        setConfig({
-          ...config,
-          general: {
-            ...config.general,
-            displayAsHex: value
           }
         })
         break
@@ -714,28 +600,6 @@ const EditorPanel = () => {
         }
 
         break
-      case 'singleColumnLegend':
-        setConfig({
-          ...config,
-          legend: {
-            ...config.legend,
-            singleColumn: !config.legend.singleColumn,
-            singleRow: false,
-            verticalSorted: false
-          }
-        })
-        break
-      case 'singleRowLegend':
-        setConfig({
-          ...config,
-          legend: {
-            ...config.legend,
-            singleRow: !config.legend.singleRow,
-            singleColumn: false,
-            verticalSorted: false
-          }
-        })
-        break
       case 'verticalSortedLegend':
         setConfig({
           ...config,
@@ -860,15 +724,6 @@ const EditorPanel = () => {
           legend: {
             ...config.legend,
             type: value
-          }
-        })
-        break
-      case 'territoriesAlwaysShow':
-        setConfig({
-          ...config,
-          general: {
-            ...config.general,
-            territoriesAlwaysShow: value
           }
         })
         break
@@ -1427,7 +1282,9 @@ const EditorPanel = () => {
                     { value: '_blank', label: 'New Window' }
                   ]}
                   onChange={event => {
-                    handleEditorChanges('navigationTarget', event.target.value)
+                    const _newConfig = _.cloneDeep(config)
+                    _newConfig.general.navigationTarget = event.target.value
+                    setConfig(_newConfig)
                   }}
                 />
               )}
@@ -1464,7 +1321,9 @@ const EditorPanel = () => {
                     type='checkbox'
                     checked={config.general.displayAsHex}
                     onChange={event => {
-                      handleEditorChanges('displayAsHex', event.target.checked)
+                      const _newConfig = _.cloneDeep(config)
+                      _newConfig.general.displayAsHex = event.target.checked
+                      setConfig(_newConfig)
                     }}
                   />
                   <span className='edit-label'>Display As Hex Map</span>
@@ -1518,7 +1377,9 @@ const EditorPanel = () => {
                     type='checkbox'
                     checked={general.territoriesAlwaysShow || false}
                     onChange={event => {
-                      handleEditorChanges('territoriesAlwaysShow', event.target.checked)
+                      const _newConfig = _.cloneDeep(config)
+                      _newConfig.general.territoriesAlwaysShow = event.target.checked
+                      setConfig(_newConfig)
                     }}
                   />
                   <span className='edit-label'>Show All Territories</span>
@@ -1560,7 +1421,9 @@ const EditorPanel = () => {
                   type='checkbox'
                   checked={config.general.showTitle || false}
                   onChange={event => {
-                    handleEditorChanges('showTitle', event.target.checked)
+                    const _newConfig = _.cloneDeep(config)
+                    _newConfig.general.showTitle = event.target.checked
+                    setConfig(_newConfig)
                   }}
                 />
                 <span className='edit-label'>Show Title</span>
@@ -1701,7 +1564,9 @@ const EditorPanel = () => {
                     type='checkbox'
                     checked={config.general.hideGeoColumnInTooltip || false}
                     onChange={event => {
-                      handleEditorChanges('hideGeoColumnInTooltip', event.target.checked)
+                      const _newConfig = _.cloneDeep(config)
+                      _newConfig.general.hideGeoColumnInTooltip = event.target.checked
+                      setConfig(_newConfig)
                     }}
                   />
                   <span className='edit-label'>Hide Geography Column Name in Tooltip</span>
@@ -2227,7 +2092,9 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={config.general.showSidebar || false}
                       onChange={event => {
-                        handleEditorChanges('showSidebar', event.target.checked)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.general.showSidebar = event.target.checked
+                        setConfig(_newConfig)
                       }}
                     />
                     <span className='edit-label'>Show Legend</span>
@@ -2343,7 +2210,12 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={legend.singleColumn}
                       onChange={event => {
-                        handleEditorChanges('singleColumnLegend', event.target.checked)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.legend.singleColumn = !event.target.checked
+                        _newConfig.legend.singleRow = false
+                        _newConfig.legend.verticalSorted = false
+
+                        setConfig(_newConfig)
                       }}
                     />
                     <span className='edit-label'>Single Column Legend</span>
@@ -2355,11 +2227,29 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={legend.singleRow}
                       onChange={event => {
-                        handleEditorChanges('singleRowLegend', event.target.checked)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.legend.singleRow = !event.target.checked
+                        _newConfig.legend.singleColumn = false
+                        _newConfig.legend.verticalSorted = false
+
+                        setConfig(_newConfig)
                       }}
                     />
                     <span className='edit-label'>Single Row Legend</span>
                   </label>
+                )}
+
+                {'navigation' !== config.general.type && config.legend.type === 'category' && (
+                  <Select
+                    label='Legend Group By :'
+                    value={legend.groupBy || ''}
+                    options={columnsOptions.map(c => c.key)}
+                    onChange={event => {
+                      const _newConfig = _.cloneDeep(config)
+                      _newConfig.legend.groupBy = event.target.value
+                      setConfig(_newConfig)
+                    }}
+                  />
                 )}
                 {config.legend.style !== 'gradient' && (
                   <label className='checkbox'>
@@ -2367,7 +2257,9 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={legend.verticalSorted}
                       onChange={event => {
-                        handleEditorChanges('verticalSortedLegend', event.target.checked)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.legend.verticalSorted = event.target.checked
+                        setConfig(_newConfig)
                       }}
                     />
                     <span className='edit-label'>Vertical sorted legend</span>
@@ -2392,7 +2284,11 @@ const EditorPanel = () => {
                     <input
                       type='checkbox'
                       checked={legend.separateZero || false}
-                      onChange={event => handleEditorChanges('separateZero', event.target.checked)}
+                      onChange={event => {
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.legend.separateZero = event.target.checked
+                        return setConfig(_newConfig)
+                      }}
                     />
                     <span className='edit-label column-heading'>
                       Separate Zero
@@ -2417,7 +2313,9 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={config.general.equalNumberOptIn}
                       onChange={event => {
-                        handleEditorChanges('showEqualNumber', event.target.checked)
+                        const _newConfig = _.clone(config)
+                        _newConfig.general.equalNumberOptIn = event.target.checked
+                        setConfig(_newConfig)
                       }}
                     />
                     <span className='edit-label column-heading'>Use new quantile legend</span>
@@ -2805,7 +2703,9 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={config.table.showDataTableLink}
                       onChange={event => {
-                        handleEditorChanges('toggleDataTableLink', event.target.checked)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.table.showDataTableLink = event.target.checked
+                        setConfig(_newConfig)
                       }}
                     />
                     <span className='edit-label'>Show Data Table Name & Link</span>
@@ -2817,7 +2717,9 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={config.table.showDownloadUrl}
                       onChange={event => {
-                        handleEditorChanges('toggleDataUrl', event.target.checked)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.table.showDownloadUrl = event.target.checked
+                        setConfig(_newConfig)
                       }}
                     />
                     <span className='edit-label'>Show URL to Automatically Updated Data</span>
@@ -2826,7 +2728,7 @@ const EditorPanel = () => {
                 <label className='checkbox'>
                   <input
                     type='checkbox'
-                    checked={config.general.showFullGeoNameInCSV}
+                    checked={config.table.showFullGeoNameInCSV}
                     onChange={event => {
                       handleEditorChanges('toggleShowFullGeoNameInCSV', event.target.checked)
                     }}
@@ -2951,7 +2853,9 @@ const EditorPanel = () => {
                     type='checkbox'
                     checked={config.general.fullBorder || false}
                     onChange={event => {
-                      handleEditorChanges('fullBorder', event.target.checked)
+                      const _newConfig = _.cloneDeep(config)
+                      _newConfig.general.fullBorder = event.target.checked
+                      setConfig(_newConfig)
                     }}
                   />
                   <span className='edit-label'>Add border around map</span>
@@ -3015,7 +2919,9 @@ const EditorPanel = () => {
                       title={palette}
                       key={palette}
                       onClick={() => {
-                        handleEditorChanges('color', palette)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.color = palette
+                        setConfig(_newConfig)
                       }}
                       className={config.color === palette ? 'selected' : ''}
                     >
@@ -3050,7 +2956,9 @@ const EditorPanel = () => {
                       title={palette}
                       key={palette}
                       onClick={() => {
-                        handleEditorChanges('color', palette)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.color = palette
+                        setConfig(_newConfig)
                       }}
                       className={config.color === palette ? 'selected' : ''}
                     >
@@ -3136,7 +3044,9 @@ const EditorPanel = () => {
                     type='checkbox'
                     checked={config.visual.showBubbleZeros}
                     onChange={event => {
-                      handleEditorChanges('showBubbleZeros', event.target.checked)
+                      const _newConfig = _.cloneDeep(config)
+                      _newConfig.visual.showBubbleZeros = event.target.checked
+                      setConfig(_newConfig)
                     }}
                   />
                   <span className='edit-label'>Show Data with Zero's on Bubble Map</span>
@@ -3148,7 +3058,11 @@ const EditorPanel = () => {
                     type='checkbox'
                     checked={config.general.allowMapZoom}
                     onChange={event => {
-                      handleEditorChanges('allowMapZoom', event.target.checked)
+                      const _newConfig = _.cloneDeep(config)
+                      _newConfig.general.allowMapZoom = event.target.checked
+                      _newConfig.mapPosition.coordinates = config.general.geoType === 'world' ? [0, 30] : [0, 0]
+                      _newConfig.mapPosition.zoom = 1
+                      setConfig(_newConfig)
                     }}
                   />
                   <span className='edit-label'>Allow Map Zooming</span>
@@ -3160,7 +3074,9 @@ const EditorPanel = () => {
                     type='checkbox'
                     checked={config.visual.extraBubbleBorder}
                     onChange={event => {
-                      handleEditorChanges('toggleExtraBubbleBorder', event.target.checked)
+                      const _newConfig = _.cloneDeep(config)
+                      _newConfig.visual.extraBubbleBorder = event.target.checked
+                      setConfig(_newConfig)
                     }}
                   />
                   <span className='edit-label'>Bubble Map has extra border</span>
