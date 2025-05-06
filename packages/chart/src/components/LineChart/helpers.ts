@@ -224,11 +224,17 @@ export const handleMiddleIndices = ({
     style: '',
     color: 'red'
   }
+
+  //skip processing if data or preliminaryData is not an array
+  if (!Array.isArray(data) || !Array.isArray(preliminaryData)) {
+    return result
+  }
+
   // Variable to count the number of sibling pairs found
   let pairCount = 1
   const dynamicSeriesKey = dynamicCategory ? originalSeriesKey : seriesKey
-  // Loop through the data array to find each occurrence of the target value
 
+  // Loop through the data array to find each occurrence of the target value
   data.forEach((item, index) => {
     preliminaryData.forEach(pd => {
       if (isSuppressed(pd, item)) {
@@ -260,6 +266,7 @@ export const handleMiddleIndices = ({
       }
     })
   })
+
   return result
 }
 
