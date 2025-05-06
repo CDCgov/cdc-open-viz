@@ -141,8 +141,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     dispatch({ type: 'SET_DRAG_ANNOTATIONS', payload: isDragging })
   }
 
-  if (isDebug) console.log('Chart config, isEditor', config, isEditor)
-
   // Destructure items from config for more readable JSX
   let { legend, title } = config
 
@@ -397,7 +395,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         newConfig.data = newConfig.formattedData
       }
     } catch (err) {
-      console.log('Error on prepareData function ', err)
+      console.error('Error on prepareData function ', err)
     }
     return newConfig
   }
@@ -418,7 +416,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     load()
-  }, [configObj])
+  }, [configObj?.data?.length ? configObj.data : null])
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.

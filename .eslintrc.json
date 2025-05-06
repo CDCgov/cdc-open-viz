@@ -11,7 +11,7 @@
     "plugin:react-hooks/recommended"
   ],
   "rules": {
-    "no-console": "error",
+    "no-console": ["error", { "allow": ["error"] }],
     "no-debugger": "error",
     "react-hooks/exhaustive-deps": "off"
   }
