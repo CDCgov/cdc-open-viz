@@ -1,0 +1,45 @@
+name: PR Template Validation
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, ready_for_review]
+
+jobs:
+  check-pr-template:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v3
+
+      - name: Check 'Testing Steps' Section Has Content
+        run: |
+          PR_BODY=$(curl -s https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} | jq -r '.body')
+
+          # Extract content under "## Testing Steps"
+          TESTING=$(echo "$PR_BODY" | awk 'BEGIN{found=0} /^## Testing Steps/{found=1; next} /^## /{if (found) exit} found {print}')
+
+          # Remove blank lines and HTML comments
+          TESTING=$(echo "$TESTING" | sed '/^\s*$/d' | sed '/<!--.*-->/d')
+
+          if [ -z "$TESTING" ]; then
+            echo "❌ 'Testing Steps' section must contain content (not just comments or whitespace)."
+            exit 1
+          else
+            echo "✅ 'Testing Steps' section has content."
+          fi
+
+      - name: Check Milestone Assigned
+        run: |
+          MILESTONE=$(curl -s https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} | jq -r '.milestone')
+          if [ "$MILESTONE" = "null" ]; then
+            echo "No milestone assigned to the PR."
+            exit 1
+          fi
+
+      - name: Check Reviewers Assigned
+        run: |
+          REVIEWERS=$(curl -s https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers | jq '.users | length')
+          if [ "$REVIEWERS" -eq 0 ]; then
+            echo "No reviewers assigned to the PR."
+            exit 1
+          fi
