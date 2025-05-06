@@ -2728,7 +2728,7 @@ const EditorPanel = () => {
                 <label className='checkbox'>
                   <input
                     type='checkbox'
-                    checked={config.general.showFullGeoNameInCSV}
+                    checked={config.table.showFullGeoNameInCSV}
                     onChange={event => {
                       handleEditorChanges('toggleShowFullGeoNameInCSV', event.target.checked)
                     }}
