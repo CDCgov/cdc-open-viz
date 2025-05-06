@@ -2,6 +2,7 @@ import { Meta, StoryObj } from '@storybook/react'
 
 import Table from '../Table'
 import { ReactNode } from 'react'
+import { create } from 'lodash'
 
 const meta: Meta<typeof Table> = {
   title: 'Components/Molecules/Table',
@@ -16,6 +17,8 @@ function createMatrix(): ReactNode[][] {
   const base = ['a', 'b', 'c'].map(el => <>{el}</>)
   return [base, base]
 }
+
+// make childrenMatrix.keys return createCreatrix()
 
 export const Ungrouped: Story = {
   args: {

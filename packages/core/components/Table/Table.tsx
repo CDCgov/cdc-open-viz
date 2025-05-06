@@ -58,9 +58,9 @@ const Table = ({
           <thead style={headStyle}>{headContent}</thead>
           <tbody>
             {isGroupedMatrix
-              ? Array.from(childrenMatrix.keys()).flatMap(groupName => {
+              ? Object.keys(childrenMatrix).flatMap(groupName => {
                   let colSpan = 0
-                  const rows = childrenMatrix.get(groupName).map((row, i) => {
+                  const rows = childrenMatrix[groupName].map((row, i) => {
                     colSpan = row.length
                     const key = `${tableName}-${groupName}-row-${i}`
                     return (
