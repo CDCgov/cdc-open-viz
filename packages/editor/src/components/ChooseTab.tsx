@@ -27,6 +27,8 @@ import ComboChartIcon from '@cdc/core/assets/icon-combo-chart.svg'
 import EpiChartIcon from '@cdc/core/assets/icon-epi-chart.svg'
 import Icon from '@cdc/core/components/ui/Icon'
 
+import { getVegaConfigType, convertVegaConfig } from '@cdc/editor/src/helpers/vegaConfig'
+
 interface ButtonProps {
   icon: React.ReactElement
   id: number
@@ -55,6 +57,26 @@ const ChooseTab: React.FC = (): JSX.Element => {
       } catch (e) {
         alert('Invalid JSON')
       }
+    }
+    reader.readAsText(file)
+  }
+
+  const handleVegaUpload = e => {
+    const file = e.target.files[0]
+    const reader = new FileReader()
+    reader.onload = e => {
+      const text = e.target.result
+      //try {
+      const vegaConfig = JSON.parse(text as string)
+      const configType = getVegaConfigType(vegaConfig)
+      const button = buttons.find(b => b.label === configType)
+      const coveConfig = generateNewConfig(button)
+      const newConfig = convertVegaConfig(configType, vegaConfig, coveConfig)
+      dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
+      dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
+      //} catch (e) {
+      //alert('Invalid JSON')
+      //}
     }
     reader.readAsText(file)
   }
@@ -167,7 +189,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
       <hr />
       <div className='form-group'>
         <label htmlFor='uploadConfig'>
-          Upload Custom Configuration{' '}
+          Upload COVE Configuration{' '}
           <Tooltip style={{ textTransform: 'none' }}>
             <Tooltip.Target>
               <Icon display='warningCircle' style={{ marginLeft: '0.5rem' }} />
@@ -183,6 +205,26 @@ const ChooseTab: React.FC = (): JSX.Element => {
           className='form-control-file'
           id='uploadConfig'
           onChange={handleUpload}
+        />
+      </div>
+      <div className='form-group'>
+        <label htmlFor='uploadVegaConfig'>
+          Upload Vega Configuration{' '}
+          <Tooltip style={{ textTransform: 'none' }}>
+            <Tooltip.Target>
+              <Icon display='warningCircle' style={{ marginLeft: '0.5rem' }} />
+            </Tooltip.Target>
+            <Tooltip.Content>
+              <p>Make sure you have properly validated the configuration before uploading.</p>
+            </Tooltip.Content>
+          </Tooltip>
+        </label>
+        <input
+          type='file'
+          accept='.txt,.json'
+          className='form-control-file'
+          id='uploadVegaConfig'
+          onChange={handleVegaUpload}
         />
       </div>
     </div>

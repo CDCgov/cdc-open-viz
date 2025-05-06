@@ -32,6 +32,7 @@ import { supportedDataTypes } from '../helpers/supportedDataTypes'
 import { getFileExtension } from '../helpers/getFileExtension'
 import { parseTextByMimeType } from '../helpers/parseTextByMimeType'
 import { getMimeType } from '../helpers/getMimeType'
+import { loadedVegaConfigData } from '@cdc/editor/src/helpers/vegaConfig'
 
 const DataImport = () => {
   const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)
@@ -207,6 +208,10 @@ const DataImport = () => {
           }
           if (setDataURL) {
             newConfig.dataUrl = fileSource
+          }
+          if (newConfig.vegaConfig) {
+            newConfig = loadedVegaConfigData(newConfig)
+            dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 2 })
           }
           setConfig(newConfig)
         }
