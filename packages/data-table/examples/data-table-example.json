@@ -130,13 +130,13 @@
   "dataFormat": {
     "commas": false,
     "prefix": "",
-    "suffix": " hospitalizations per 100,000 people",
+    "suffix": "",
     "abbreviated": true,
     "bottomSuffix": "",
     "bottomPrefix": "",
     "bottomAbbreviated": false,
     "roundTo": "1",
-    "onlyShowTopPrefixSuffix": true
+    "onlyShowTopPrefixSuffix": false
   },
   "confidenceKeys": {},
   "useLogScale": false,
