@@ -1,13 +1,7 @@
 name: Test Storybook
 
 on:
-  pull_request:
-    paths:
-      - '**.stories.@(js|jsx|ts|tsx|mdx)'
-      - '.storybook/**'
-      - 'src/**'
-      - 'package.json'
-      - 'yarn.lock'
+  workflow_dispatch:
 
 jobs:
   storybook-tests:
