@@ -33,9 +33,7 @@ jobs:
         run: yarn build-storybook --output-dir storybook-static
 
       - name: Start Storybook
-        run: npx start-storybook -p 6006 &
-        env:
-          NODE_ENV: test
+        run: yarn storybook -p 6006 &
 
       - name: Wait for Storybook to be available
         run: npx wait-on http://localhost:6006
