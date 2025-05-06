@@ -79,7 +79,6 @@ const LegendGroup = ({ legendItems }) => {
       .join(' ')
   }
 
-  // Новый способ без viewport
   const gridClass =
     config.legend.position === 'bottom' || config.legend.position === 'top'
       ? 'col-12 col-sm-6 col-md-4 col-lg-3'

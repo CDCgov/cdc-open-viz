@@ -123,7 +123,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       }
 
       return (
-        // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
         <li
           className={handleListItemClass()}
           key={idx}
@@ -253,6 +252,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     triangle: <GlyphTriangle color='#000' size={150} />
   }
 
+  const shouldRenderLegendList = legendListItems.length > 0 && ['Select Option', ''].includes(config.legend.groupBy)
+
   return (
     <ErrorBoundary component='Sidebar'>
       <div className={`legends ${needsTopMargin ? 'mt-4' : ''}`}>
@@ -304,8 +305,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             />
             <LegendGroup legendItems={getFormattedLegendItems()} />
 
-            {!!legendListItems.length && ['Select Option', ''].includes(config.legend.groupBy) && (
-              <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
+            {shouldRenderLegendList && (
+              <ul className={legendClasses.ul.join(' ')} aria-label='Legend items'>
                 {legendListItems}
               </ul>
             )}

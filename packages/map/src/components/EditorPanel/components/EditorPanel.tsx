@@ -600,28 +600,6 @@ const EditorPanel = () => {
         }
 
         break
-      case 'singleColumnLegend':
-        setConfig({
-          ...config,
-          legend: {
-            ...config.legend,
-            singleColumn: !config.legend.singleColumn,
-            singleRow: false,
-            verticalSorted: false
-          }
-        })
-        break
-      case 'singleRowLegend':
-        setConfig({
-          ...config,
-          legend: {
-            ...config.legend,
-            singleRow: !config.legend.singleRow,
-            singleColumn: false,
-            verticalSorted: false
-          }
-        })
-        break
       case 'verticalSortedLegend':
         setConfig({
           ...config,
@@ -2232,7 +2210,12 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={legend.singleColumn}
                       onChange={event => {
-                        handleEditorChanges('singleColumnLegend', event.target.checked)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.legend.singleColumn = !event.target.checked
+                        _newConfig.legend.singleRow = false
+                        _newConfig.legend.verticalSorted = false
+
+                        setConfig(_newConfig)
                       }}
                     />
                     <span className='edit-label'>Single Column Legend</span>
@@ -2244,7 +2227,12 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={legend.singleRow}
                       onChange={event => {
-                        handleEditorChanges('singleRowLegend', event.target.checked)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.legend.singleRow = !event.target.checked
+                        _newConfig.legend.singleColumn = false
+                        _newConfig.legend.verticalSorted = false
+
+                        setConfig(_newConfig)
                       }}
                     />
                     <span className='edit-label'>Single Row Legend</span>
@@ -2257,7 +2245,9 @@ const EditorPanel = () => {
                     value={legend.groupBy || ''}
                     options={columnsOptions.map(c => c.key)}
                     onChange={event => {
-                      handleEditorChanges('legendGroupBy', event.target.value)
+                      const _newConfig = _.cloneDeep(config)
+                      _newConfig.legend.groupBy = event.target.value
+                      setConfig(_newConfig)
                     }}
                   />
                 )}
@@ -2267,7 +2257,9 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={legend.verticalSorted}
                       onChange={event => {
-                        handleEditorChanges('verticalSortedLegend', event.target.checked)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.legend.verticalSorted = event.target.checked
+                        setConfig(_newConfig)
                       }}
                     />
                     <span className='edit-label'>Vertical sorted legend</span>
