@@ -546,11 +546,15 @@ const CountyMap = () => {
 
         let cityPixelCoords = []
         cityStyles.forEach(city => {
-          cityPixelCoords = topoData.projection([city[config.columns.longitude.name], city[config.columns.latitude.name]])
+          cityPixelCoords = topoData.projection([
+            city[config.columns.longitude.name],
+            city[config.columns.latitude.name]
+          ])
 
           if (cityPixelCoords) {
             const legendValues = applyLegendToRow(data[city?.value], config)
             if (legendValues) {
+              if (legendValues?.[0] === '#000000') return
               const shapeType = city?.shape?.toLowerCase()
               const shapeProperties = createShapeProperties(shapeType, cityPixelCoords, legendValues, config, geoRadius)
               if (shapeProperties) {
@@ -570,6 +574,7 @@ const CountyMap = () => {
           if (pixelCoords && !citiesList.has(key)) {
             const legendValues = data[key] !== undefined ? applyLegendToRow(data[key], config) : false
             if (legendValues) {
+              if (legendValues?.[0] === '#000000') return
               const shapeType = config.visual.cityStyle.toLowerCase()
               const shapeProperties = createShapeProperties(shapeType, pixelCoords, legendValues, config, geoRadius)
               if (shapeProperties) {
@@ -596,7 +601,7 @@ const CountyMap = () => {
         className='county-map-canvas'
       ></canvas>
 
-      <button className={`btn btn--reset btn-primary`} onClick={onReset} ref={resetButton} tabIndex={0}>
+      <button className={`btn btn--reset btn-primary p-absolute`} onClick={onReset} ref={resetButton} tabIndex={0}>
         Reset Zoom
       </button>
     </ErrorBoundary>

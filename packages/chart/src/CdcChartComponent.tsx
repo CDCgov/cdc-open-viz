@@ -141,8 +141,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     dispatch({ type: 'SET_DRAG_ANNOTATIONS', payload: isDragging })
   }
 
-  if (isDebug) console.log('Chart config, isEditor', config, isEditor)
-
   // Destructure items from config for more readable JSX
   let { legend, title } = config
 
@@ -390,14 +388,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
         if (newData) {
           newConfig.data = newData
         }
-      } else if (newConfig.formattedData) {
-        newConfig.data = newConfig.formattedData
       } else if (newConfig.dataDescription) {
         newConfig.data = transform.autoStandardize(newConfig.data)
         newConfig.data = transform.developerStandardize(newConfig.data, newConfig.dataDescription)
+      } else if (newConfig.formattedData) {
+        newConfig.data = newConfig.formattedData
       }
     } catch (err) {
-      console.log('Error on prepareData function ', err)
+      console.error('Error on prepareData function ', err)
     }
     return newConfig
   }
@@ -407,7 +405,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       try {
         if (configObj) {
           const preparedConfig = await prepareConfig(configObj)
-          let preppedData = await prepareData(preparedConfig)
+          const preppedData = await prepareData(preparedConfig)
           dispatch({ type: 'SET_STATE_DATA', payload: preppedData.data })
           dispatch({ type: 'SET_EXCLUDED_DATA', payload: preppedData.data })
           updateConfig(preparedConfig, preppedData.data)
