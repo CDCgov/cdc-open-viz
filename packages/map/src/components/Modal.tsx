@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import ConfigContext from '../context'
+import ConfigContext, { MapDispatchContext } from '../context'
 import Icon from '@cdc/core/components/ui/Icon'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import { MapContext } from '../types/MapContext'
@@ -9,6 +9,7 @@ const Modal = () => {
   const { capitalizeLabels } = config.tooltips
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const tooltip = applyTooltipsToGeo(content.geoName, content.keyedData, 'jsx')
+  const dispatch = useContext(MapDispatchContext)
 
   return (
     <section
@@ -18,7 +19,16 @@ const Modal = () => {
       aria-hidden='true'
     >
       <div className='content'>{tooltip}</div>
-      <Icon display='close' alt='Close Modal' size={20} color='#000' className='modal-close' />
+      <Icon
+        display='close'
+        alt='Close Modal'
+        size={20}
+        color='#000'
+        className='modal-close'
+        onClick={() => {
+          dispatch({ type: 'SET_MODAL', payload: null })
+        }}
+      />
     </section>
   )
 }
