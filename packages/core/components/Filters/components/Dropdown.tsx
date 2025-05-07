@@ -17,7 +17,7 @@ const Dropdown: React.FC<DropdownProps> = ({ index: outerIndex, label, filter, c
       id={`filter-${outerIndex}`}
       name={label}
       aria-label={`Filter by ${label}`}
-      className={`cove-form-select ${DROPDOWN_STYLES}`}
+      className={`cove-form-select ${DROPDOWN_STYLES} bg-white`}
       data-index='0'
       value={queuedActive || active}
       onChange={e => {
