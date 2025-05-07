@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import '../scss/choose-vis-tab.scss'
 
 import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
@@ -46,20 +46,31 @@ const ChooseTab: React.FC = (): JSX.Element => {
   const dispatch = useContext(EditorDispatchContext)
   const rowLabels = ['General', , 'Charts', 'Maps']
 
+  const [pasteConfig, setPasteConfig] = useState('')
+  const [pasteVegaConfig, setPasteVegaConfig] = useState('')
+
   const handleUpload = e => {
     const file = e.target.files[0]
     const reader = new FileReader()
     reader.onload = e => {
       const text = e.target.result
-      try {
-        const newConfig = JSON.parse(text as string)
-        dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
-        dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
-      } catch (e) {
-        alert('Invalid JSON')
-      }
+      importConfig(text as string)
     }
     reader.readAsText(file)
+  }
+
+  const handlePaste = () => {
+    importConfig(pasteConfig)
+  }
+
+  const importConfig = text => {
+    try {
+      const newConfig = JSON.parse(text)
+      dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
+      dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
+    } catch (e) {
+      alert('Invalid JSON')
+    }
   }
 
   const handleVegaUpload = e => {
@@ -67,19 +78,27 @@ const ChooseTab: React.FC = (): JSX.Element => {
     const reader = new FileReader()
     reader.onload = e => {
       const text = e.target.result
-      //try {
-      const vegaConfig = JSON.parse(text as string)
-      const configType = getVegaConfigType(vegaConfig)
-      const button = buttons.find(b => b.label === configType)
-      const coveConfig = generateNewConfig(button)
-      const newConfig = convertVegaConfig(configType, vegaConfig, coveConfig)
-      dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
-      dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
-      //} catch (e) {
-      //alert('Invalid JSON')
-      //}
+      importVegaConfig(text as string)
     }
     reader.readAsText(file)
+  }
+
+  const handleVegaPaste = () => {
+    importVegaConfig(pasteVegaConfig)
+  }
+
+  const importVegaConfig = text => {
+    //try {
+    const vegaConfig = JSON.parse(text)
+    const configType = getVegaConfigType(vegaConfig)
+    const button = buttons.find(b => b.label === configType)
+    const coveConfig = generateNewConfig(button)
+    const newConfig = convertVegaConfig(configType, vegaConfig, coveConfig)
+    dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
+    dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: newConfig.data?.length ? 2 : 1 })
+    //} catch (e) {
+    //alert('Invalid JSON')
+    //}
   }
 
   const generateNewConfig = props => {
@@ -202,7 +221,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
       <hr />
       <div className='form-group'>
         <label htmlFor='uploadConfig'>
-          Upload COVE Configuration{' '}
+          Select or paste COVE configuration{' '}
           <Tooltip style={{ textTransform: 'none' }}>
             <Tooltip.Target>
               <Icon display='warningCircle' style={{ marginLeft: '0.5rem' }} />
@@ -219,10 +238,12 @@ const ChooseTab: React.FC = (): JSX.Element => {
           id='uploadConfig'
           onChange={handleUpload}
         />
+        <input type='text' value={pasteConfig} onChange={e => setPasteConfig(e.target.value)} />
+        <button onClick={handlePaste}>Use pasted config</button>
       </div>
       <div className='form-group'>
         <label htmlFor='uploadVegaConfig'>
-          Upload Vega Configuration{' '}
+          Select or paste Vega configuration{' '}
           <Tooltip style={{ textTransform: 'none' }}>
             <Tooltip.Target>
               <Icon display='warningCircle' style={{ marginLeft: '0.5rem' }} />
@@ -239,6 +260,8 @@ const ChooseTab: React.FC = (): JSX.Element => {
           id='uploadVegaConfig'
           onChange={handleVegaUpload}
         />
+        <input type='text' value={pasteVegaConfig} onChange={e => setPasteVegaConfig(e.target.value)} />
+        <button onClick={handleVegaPaste}>Use pasted config</button>
       </div>
     </div>
   )
