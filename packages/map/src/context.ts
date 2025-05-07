@@ -5,7 +5,6 @@ import MapActions from './store/map.actions'
 type MapContext = {
   container
   setSharedFilter
-  setModal
   customNavigationHandler
   tooltipRef
   containerEl
