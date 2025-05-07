@@ -269,6 +269,15 @@ const EditorPanel = () => {
           }
         })
         break
+      case 'legendGroupBy':
+        setConfig({
+          ...config,
+          legend: {
+            ...config.legend,
+            groupBy: value
+          }
+        })
+        break
       case 'legendTickRotation':
         setConfig({
           ...config,
@@ -590,28 +599,6 @@ const EditorPanel = () => {
             break
         }
 
-        break
-      case 'singleColumnLegend':
-        setConfig({
-          ...config,
-          legend: {
-            ...config.legend,
-            singleColumn: !config.legend.singleColumn,
-            singleRow: false,
-            verticalSorted: false
-          }
-        })
-        break
-      case 'singleRowLegend':
-        setConfig({
-          ...config,
-          legend: {
-            ...config.legend,
-            singleRow: !config.legend.singleRow,
-            singleColumn: false,
-            verticalSorted: false
-          }
-        })
         break
       case 'verticalSortedLegend':
         setConfig({
@@ -2223,7 +2210,12 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={legend.singleColumn}
                       onChange={event => {
-                        handleEditorChanges('singleColumnLegend', event.target.checked)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.legend.singleColumn = !event.target.checked
+                        _newConfig.legend.singleRow = false
+                        _newConfig.legend.verticalSorted = false
+
+                        setConfig(_newConfig)
                       }}
                     />
                     <span className='edit-label'>Single Column Legend</span>
@@ -2235,11 +2227,29 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={legend.singleRow}
                       onChange={event => {
-                        handleEditorChanges('singleRowLegend', event.target.checked)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.legend.singleRow = !event.target.checked
+                        _newConfig.legend.singleColumn = false
+                        _newConfig.legend.verticalSorted = false
+
+                        setConfig(_newConfig)
                       }}
                     />
                     <span className='edit-label'>Single Row Legend</span>
                   </label>
+                )}
+
+                {'navigation' !== config.general.type && config.legend.type === 'category' && (
+                  <Select
+                    label='Legend Group By :'
+                    value={legend.groupBy || ''}
+                    options={columnsOptions.map(c => c.key)}
+                    onChange={event => {
+                      const _newConfig = _.cloneDeep(config)
+                      _newConfig.legend.groupBy = event.target.value
+                      setConfig(_newConfig)
+                    }}
+                  />
                 )}
                 {config.legend.style !== 'gradient' && (
                   <label className='checkbox'>
@@ -2247,7 +2257,9 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={legend.verticalSorted}
                       onChange={event => {
-                        handleEditorChanges('verticalSortedLegend', event.target.checked)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.legend.verticalSorted = event.target.checked
+                        setConfig(_newConfig)
                       }}
                     />
                     <span className='edit-label'>Vertical sorted legend</span>
@@ -2716,7 +2728,7 @@ const EditorPanel = () => {
                 <label className='checkbox'>
                   <input
                     type='checkbox'
-                    checked={config.general.showFullGeoNameInCSV}
+                    checked={config.table.showFullGeoNameInCSV}
                     onChange={event => {
                       handleEditorChanges('toggleShowFullGeoNameInCSV', event.target.checked)
                     }}
