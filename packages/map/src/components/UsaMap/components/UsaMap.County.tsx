@@ -13,6 +13,7 @@ import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import { MapConfig } from '../../../types/MapConfig'
+import { DEFAULT_MAP_BACKGROUND } from '../../../helpers/constants'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -351,8 +352,10 @@ const CountyMap = () => {
         // If the hovered county is found, show the tooltip for that county, otherwise hide the tooltip
         if (county && data[county.id]) {
           if (applyLegendToRow(data[county.id], config)) {
+            let fillColor = applyLegendToRow(data[county.id], config)[0]
+            if (fillColor === '#000000') return
             context.globalAlpha = 1
-            context.fillStyle = applyLegendToRow(data[county.id], config)[0]
+            context.fillStyle = fillColor
             context.strokeStyle = geoStrokeColor
             context.lineWidth = lineWidth
             context.beginPath()
@@ -502,7 +505,12 @@ const CountyMap = () => {
 
         // Renders state/county
         const legendValues = geoData !== undefined ? applyLegendToRow(geoData, config) : false
-        context.fillStyle = legendValues && config.general.type !== 'us-geocode' ? legendValues[0] : '#EEE'
+        context.fillStyle =
+          legendValues && config.general.type !== 'us-geocode'
+            ? legendValues[0] === '#000000'
+              ? DEFAULT_MAP_BACKGROUND
+              : legendValues[0]
+            : DEFAULT_MAP_BACKGROUND
         context.beginPath()
         path(geo)
         context.fill()
