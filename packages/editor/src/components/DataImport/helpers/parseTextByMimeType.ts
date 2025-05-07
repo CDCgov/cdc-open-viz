@@ -14,7 +14,7 @@ export const parseTextByMimeType = (
   resultText: string,
   mimeType: string,
   externalURL,
-  errorHandler: (err: string[]) => void
+  errorHandler: (err: string) => void
 ) => {
   switch (mimeType) {
     case 'text/csv':
@@ -24,11 +24,11 @@ export const parseTextByMimeType = (
       try {
         return isSolrJson(externalURL) ? JSON.parse(resultText).response.docs : JSON.parse(resultText)
       } catch (errors) {
-        errorHandler([errorMessages.formatting])
+        errorHandler(errorMessages.formatting)
         return
       }
     default:
-      errorHandler([errorMessages.fileType])
+      errorHandler(errorMessages.fileType)
       return
   }
 }

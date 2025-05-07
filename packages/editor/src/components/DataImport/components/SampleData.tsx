@@ -18,7 +18,7 @@ import validSankeyData from './samples/valid-sankey-data.json?raw'
 import pivotData from './samples/pivotData.json?raw'
 
 // Add additional data to samples
-const sampleData = {
+const SAMPLE_DATA = {
   charts: [
     {
       text: 'Chart Sample Data',
@@ -96,53 +96,42 @@ const sampleData = {
 }
 
 // Single Button
-const Button = ({ text, fileName, data }) => {
-  const { editingDataset, loadData } = useContext(SampleDataContext)
-  const handleClick = e => loadData(new Blob([data], { type: 'text/csv' }), fileName, editingDataset)
-  const handleKeyDown = e =>
-    e.keyCode === 13 && loadData(new Blob([data], { type: 'text/csv' }), fileName, editingDataset)
-  // prettier-ignore
+const Button = ({ text, fileName, data, loadData }) => {
+  const handleClick = e => loadData(new Blob([data], { type: 'text/csv' }), fileName)
+  const handleKeyDown = e => e.keyCode === 13 && loadData(new Blob([data], { type: 'text/csv' }), fileName)
   return (
-    <button
-      className='link link-upload'
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}>
+    <button className='link link-upload' onClick={handleClick} onKeyDown={handleKeyDown}>
       {text}
     </button>
   )
 }
 
-// Map Buttons
-const MapSampleDataButtons = () => {
-  return sampleData.maps.map(sample => (
-    <Button key={sample.fileName} text={sample.text} fileName={sample.fileName} data={sample.data} />
-  ))
-}
-
-// Chart Buttons
-const ChartSampleDataButtons = () => {
-  return sampleData.charts.map(sample => (
-    <Button key={sample.fileName} text={sample.text} fileName={sample.fileName} data={sample.data} />
-  ))
-}
-
 // All Buttons
-const Buttons = () => {
-  const { config } = useContext(SampleDataContext)
-
+const SampleData = ({ type, loadData }) => {
+  let sampleData
+  if (type === 'map') {
+    sampleData = SAMPLE_DATA.maps
+  } else if (type === 'chart') {
+    sampleData = SAMPLE_DATA.charts
+  } else {
+    sampleData = [...SAMPLE_DATA.charts, ...SAMPLE_DATA.maps]
+  }
   return (
     <>
       <h3 className='heading-3'>Load Sample Data:</h3>
       <ul className='sample-data-list'>
-        {config.type !== 'map' && <ChartSampleDataButtons />}
-        {config.type !== 'chart' && <MapSampleDataButtons />}
+        {sampleData.map(sample => (
+          <Button
+            key={sample.fileName}
+            text={sample.text}
+            fileName={sample.fileName}
+            data={sample.data}
+            loadData={loadData}
+          />
+        ))}
       </ul>
     </>
   )
 }
-
-const SampleData = () => null
-SampleData.data = sampleData
-SampleData.Buttons = Buttons
 
 export default SampleData

@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
-import axios from 'axios'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
@@ -10,7 +9,6 @@ import TabPane from '../../TabPane'
 import Tabs from '../../Tabs'
 import PreviewDataTable from '../../PreviewDataTable'
 import LinkIcon from '../../../assets/icons/link.svg'
-import SampleDataContext from './samples/SampleDataContext'
 import SampleData from './SampleData'
 
 import FileUploadIcon from '../../../assets/icons/file-upload-solid.svg'
@@ -19,19 +17,16 @@ import CloseIcon from '@cdc/core/assets/icon-close.svg'
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
-import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { type Visualization } from '@cdc/core/types/Visualization'
 import { type DataSet } from '@cdc/dashboard/src/types/DataSet'
 
 import './data-import.scss'
 import '@cdc/core/styles/v2/components/data-designer.scss'
 
-import { errorMessages, maxFileSize } from '../../../helpers/errorMessages'
+import { maxFileSize } from '../../../helpers/errorMessages'
 import { displaySize } from '../helpers/displaySize'
 import { supportedDataTypes } from '../helpers/supportedDataTypes'
-import { getFileExtension } from '../helpers/getFileExtension'
-import { parseTextByMimeType } from '../helpers/parseTextByMimeType'
-import { getMimeType } from '../helpers/getMimeType'
+import { loadData as loadDataHelper } from '../helpers/loadData'
 
 const DataImport = () => {
   const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)
@@ -74,176 +69,83 @@ const DataImport = () => {
     return true
   }
 
-  const loadExternal = async () => {
-    let responseBlob: Blob = null
-    let dataURL: URL
-    // Is URL valid?
+  const fileDropZone = useDropzone({
+    onDrop: ([uploadedFile]) => loadData(uploadedFile, editingDataset)
+  })
 
-    try {
-      dataURL =
-        isSolrCsv(externalURL) || isSolrJson(externalURL) ? externalURL : new URL(externalURL, window.location.origin)
-    } catch {
-      throw errorMessages.urlInvalid
-    }
-    const fileExtension = getFileExtension(dataURL)
+  const handleSetConfig = (newData: Object[], metadata, useTempConfig = false) => {
+    const { fileSource, fileSize, fileSourceType, mimeType } = metadata
+    const setDataURL = keepURL && fileSourceType === 'url'
+    if (config.type === 'dashboard') {
+      const dataFileFormat = mimeType.split('/')[1].toUpperCase()
+      const dataset = {
+        data: newData,
+        dataFileSize: fileSize,
+        dataFileName: fileSource, // new file source
+        dataFileSourceType: fileSourceType, // new file source type
+        dataFileFormat,
+        preview: true
+      } as DataSet
 
-    try {
-      // eslint-disable-next-line no-unused-vars
-      await axios
-        .get(dataURL.toString(), {
-          responseType: 'blob'
-        })
-        .then(response => {
-          responseBlob = response.data
-
-          // Sometimes the files are coming in as plain text types... Maybe when saved from Macs
-          const csvTypes = ['text/csv', 'text/plain']
-          if ((fileExtension === '.csv' && csvTypes.includes(responseBlob.type)) || isSolrCsv(externalURL)) {
-            responseBlob = responseBlob.slice(0, responseBlob.size, 'text/csv')
-          } else if (
-            responseBlob.type === 'application/json' ||
-            (fileExtension === '.json' && responseBlob.type === 'text/plain') ||
-            isSolrJson(externalURL)
-          ) {
-            responseBlob = responseBlob.slice(0, responseBlob.size, 'application/json')
-          }
-        })
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('Error in loadExternal', err)
-
-      const error = err.toString()
-
-      if (Object.values(errorMessages).includes(err)) {
-        throw error
+      if (setDataURL) {
+        dataset.dataUrl = fileSource
       }
 
-      throw errorMessages.failedFetch
-    }
+      const conf = useTempConfig ? { ...config, ...tempConfig } : config
+      setConfig(conf)
 
-    if (config.type === 'dashboard') {
-      setExternalURL('')
-    }
+      const oldDatasetKey = newDatasetName !== editingDataset ? editingDataset : undefined
 
-    return responseBlob
+      dispatch({
+        type: 'SET_DASHBOARD_DATASET',
+        payload: { datasetKey: newDatasetName || fileSource, dataset, oldDatasetKey }
+      })
+    } else {
+      const newConfig = {
+        ...config,
+        ...tempConfig,
+        data: newData,
+        dataFileName: fileSource, // new file source
+        dataFileSourceType: fileSourceType, // new file source type
+        formattedData: transform.developerStandardize(newData, config.dataDescription)
+      }
+      if (setDataURL) {
+        newConfig.dataUrl = fileSource
+      }
+      setConfig(newConfig)
+    }
   }
 
-  const onDrop = ([uploadedFile]) => loadData(uploadedFile, editingDataset, editingDataset)
-
-  /**
-   * Handle loading data
-   */
-  const loadData = async (fileBlob = null, fileName, editingDatasetKey: string) => {
-    let fileData = fileBlob
-    let fileSource = fileData?.path ?? fileName ?? externalURL
-    if (fileSource && typeof fileSource === 'string') fileSource = fileSource.trim()
-    const fileSourceType = fileBlob ? 'file' : 'url'
-
-    // Get the raw data as text from the file
-    if (fileSourceType === 'url') {
-      try {
-        fileData = await loadExternal()
-      } catch (error) {
-        setErrors([error])
-        return
+  const loadData = async (fileBlob = null, fileName) => {
+    try {
+      const { result, metadata } = await loadDataHelper(fileBlob, fileName, externalURL)
+      if (config.type === 'dashboard') {
+        setExternalURL('')
       }
-    }
-
-    const fileSize = fileData.size
-
-    // Check if file is too big
-    if (fileSize > maxFileSize * 1048576) {
-      setErrors([errorMessages.fileTooLarge])
-      return
-    }
-
-    const mimeType = getMimeType({
-      fileBlob,
-      externalURL,
-      fileName,
-      fileSourceType,
-      fileData
-    })
-
-    // Convert from blob into raw text
-    // Have to use FileReader instead of just .text because IE11 and the polyfills for this are bugged
-    const filereader = new FileReader()
-
-    filereader.onload = function () {
-      const handleSetConfig = (newData: Object[], useTempConfig = false) => {
-        const setDataURL = keepURL && fileSourceType === 'url'
-        if (config.type === 'dashboard') {
-          const dataFileFormat = mimeType.split('/')[1].toUpperCase()
-          const dataset = {
-            data: newData,
-            dataFileSize: fileSize,
-            dataFileName: fileSource, // new file source
-            dataFileSourceType: fileSourceType, // new file source type
-            dataFileFormat,
-            preview: true
-          } as DataSet
-
-          if (setDataURL) {
-            dataset.dataUrl = fileSource
-          }
-
-          const conf = useTempConfig ? { ...config, ...tempConfig } : config
-          setConfig(conf)
-
-          const oldDatasetKey = newDatasetName !== editingDatasetKey ? editingDatasetKey : undefined
-
-          dispatch({
-            type: 'SET_DASHBOARD_DATASET',
-            payload: { datasetKey: newDatasetName || fileSource, dataset, oldDatasetKey }
-          })
+      if (config.data && config.series) {
+        if (dataExists(result, config.series, config?.xAxis.dataKey)) {
+          handleSetConfig(result, metadata, true)
         } else {
-          let newConfig = {
-            ...config,
-            ...tempConfig,
-            data: newData,
-            dataFileName: fileSource, // new file source
-            dataFileSourceType: fileSourceType, // new file source type
-            formattedData: transform.developerStandardize(newData, config.dataDescription)
-          }
-          if (setDataURL) {
-            newConfig.dataUrl = fileSource
-          }
-          setConfig(newConfig)
+          resetEditor(
+            {
+              data: result,
+              dataFileName: metadata.fileSource,
+              dataFileSourceType: metadata.fileSourceType
+            } as Visualization,
+            'It appears that your data does not contain all of the columns that your last dataset contained. Continuing will reset your configuration. Do you want to continue?'
+          )
         }
+      } else {
+        handleSetConfig(result, metadata, false)
       }
 
-      // Validate parsed data and set if no issues.
-      try {
-        const result = parseTextByMimeType(this.result.toString(), mimeType, externalURL, setErrors)
-        const text = transform.autoStandardize(result)
-        if (config.data && config.series) {
-          if (dataExists(text, config.series, config?.xAxis.dataKey)) {
-            handleSetConfig(text, true)
-          } else {
-            resetEditor(
-              {
-                data: text,
-                dataFileName: fileSource,
-                dataFileSourceType: fileSourceType
-              } as Visualization,
-              'It appears that your data does not contain all of the columns that your last dataset contained. Continuing will reset your configuration. Do you want to continue?'
-            )
-          }
-        } else {
-          handleSetConfig(text)
-        }
-
-        if (editingDataset) {
-          setEditingDataset(undefined)
-        }
-        setAddingDataset(false)
-      } catch (err) {
-        setErrors(err)
+      if (editingDataset) {
+        setEditingDataset(undefined)
       }
+      setAddingDataset(false)
+    } catch (error) {
+      setErrors([error])
     }
-    // Set encoding for CSV files - needed to render special characters properly
-    const encoding = mimeType === 'text/csv' ? 'utf-8' : ''
-    filereader.readAsText(fileData, encoding)
   }
 
   useEffect(() => {
@@ -297,14 +199,7 @@ const DataImport = () => {
     setKeepURL(value)
   }
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
-  const {
-    getRootProps: getRootProps2,
-    getInputProps: getInputProps2,
-    isDragActive: isDragActive2
-  } = useDropzone({ onDrop })
-
-  const loadDataFromUrl = () => {
+  const LoadDataFromUrl = () => {
     return (
       <>
         <label htmlFor='dataset-name' className='col-12 mt-2'>
@@ -347,7 +242,7 @@ const DataImport = () => {
             type='submit'
             id='load-data'
             disabled={!newDatasetName || !externalURL}
-            onClick={() => loadData(null, externalURL, editingDataset)}
+            onClick={() => loadData(null, externalURL)}
           >
             Save & Load
           </button>
@@ -367,7 +262,11 @@ const DataImport = () => {
     }
   }
 
-  const resetButton = () => {
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: ([uploadedFile]) => loadData(uploadedFile, editingDataset)
+  })
+
+  const ResetButton = () => {
     return (
       //todo convert to modal
       <>
@@ -385,8 +284,8 @@ const DataImport = () => {
         </button>
         {/* DEV-851 link to replace file should pop file dialog */}
         {config.dataFileSourceType === 'file' && (
-          <div className='link link-replace' {...getRootProps2()}>
-            <input {...getInputProps2()} />
+          <div className='link link-replace' {...getRootProps()}>
+            <input {...getInputProps()} />
             <p>
               <span>or replace file</span>
             </p>
@@ -662,14 +561,14 @@ const DataImport = () => {
                     <div className='data-source-options'>
                       <div
                         className={
-                          isDragActive2
+                          isDragActive
                             ? 'drag-active cdcdataviz-file-selector loaded-file'
                             : 'cdcdataviz-file-selector loaded-file'
                         }
-                        {...getRootProps2()}
+                        {...getRootProps()}
                       >
-                        <input {...getInputProps2()} />
-                        {isDragActive2 ? (
+                        <input {...getInputProps()} />
+                        {isDragActive ? (
                           <p>Drop file here</p>
                         ) : (
                           <p>
@@ -677,15 +576,21 @@ const DataImport = () => {
                           </p>
                         )}
                       </div>
-                      <div>{resetButton()}</div>
+                      <div>
+                        <ResetButton />
+                      </div>
                     </div>
                   )}
 
                   {config.dataFileSourceType === 'url' && (
                     <>
                       <div className='url-source-options'>
-                        <div>{loadDataFromUrl()}</div>
-                        <div>{resetButton()}</div>
+                        <div>
+                          <LoadDataFromUrl />
+                        </div>
+                        <div>
+                          <ResetButton />
+                        </div>
                       </div>
                       {config.dataUrl && (config.type === 'chart' || config.type === 'map') && urlFilters}
                     </>
@@ -708,35 +613,41 @@ const DataImport = () => {
 
         {(editingDataset || addingDataset) && ( // dataFileSourceType needs to be checked here since earlier versions did not track this state
           <div className='load-data-area'>
-            <div className='heading-3'>{editingDataset ? `Editing ${editingDataset}` : 'Add Dataset'}</div>
+            <div className='heading-3'>{editingDataset ? `Editing ${editingDataset}` : 'Add Dataset from:'}</div>
             {editingDataset ? (
-              <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
-                {loadDataFromUrl()}
+              <TabPane title='URL' icon={<LinkIcon className='inline-icon' />}>
+                <LoadDataFromUrl />
               </TabPane>
             ) : (
               <Tabs startingTab={0}>
-                <TabPane title='Upload File' icon={<FileUploadIcon className='inline-icon' />}>
-                  {sharepath && <p className='alert--info'>The share path set for this website is: {sharepath}</p>}
-                  <div
-                    className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'}
-                    {...getRootProps()}
-                  >
-                    <input {...getInputProps()} />
-                    {isDragActive ? (
-                      <p>Drop file here</p>
-                    ) : (
-                      <p>
-                        Drag file to this area, or <span>select a file</span>.
-                      </p>
-                    )}
-                  </div>
-                  <p className='footnote'>
-                    Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}
-                    MB.
-                  </p>
+                <TabPane title='File' icon={<FileUploadIcon className='inline-icon' />}>
+                  <>
+                    {sharepath && <p className='alert--info'>The share path set for this website is: {sharepath}</p>}
+
+                    <div
+                      className={
+                        fileDropZone.isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'
+                      }
+                      {...fileDropZone.getRootProps()}
+                    >
+                      <input {...fileDropZone.getInputProps()} />
+                      {fileDropZone.isDragActive ? (
+                        <p>Drop file here</p>
+                      ) : (
+                        <p>
+                          Drag file to this area, or <span>select a file</span>.
+                        </p>
+                      )}
+                    </div>
+                    <p className='footnote'>
+                      Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size{' '}
+                      {maxFileSize}
+                      MB.
+                    </p>
+                  </>
                 </TabPane>
-                <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
-                  {loadDataFromUrl()}
+                <TabPane title='URL' icon={<LinkIcon className='inline-icon' />}>
+                  <LoadDataFromUrl />
                 </TabPane>
               </Tabs>
             )}
@@ -753,10 +664,7 @@ const DataImport = () => {
                   ))
                 : errors.message)}
 
-            {/* prettier-ignore */}
-            <SampleDataContext.Provider value={{ loadData, editingDataset, config }}>
-              <SampleData.Buttons />
-            </SampleDataContext.Provider>
+            <SampleData type={config.type} loadData={loadData} />
           </div>
         )}
 
