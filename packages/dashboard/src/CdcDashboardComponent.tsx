@@ -66,6 +66,7 @@ import { loadAPIFiltersFactory } from './helpers/loadAPIFilters'
 import Loader from '@cdc/core/components/Loader'
 import Alert from '@cdc/core/components/Alert'
 import { shouldLoadAllFilters } from './helpers/shouldLoadAllFilters'
+import { subscribe, unsubscribe } from '@cdc/core/helpers/events'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -273,6 +274,19 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
     dispatch({ type: 'SET_SHARED_FILTERS', payload: newConfig.dashboard.sharedFilters })
   }
+
+  const setEventData = ({ detail }) => {
+    const filteredData = { ...state.filteredData, ...detail }
+    dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
+    dispatch({ type: 'SET_DATA', payload: { ...state.data, ...detail } })
+  }
+
+  useEffect(() => {
+    subscribe('cove_set_data', setEventData)
+    return () => {
+      unsubscribe('cove_set_data', setEventData)
+    }
+  }, [])
 
   useEffect(() => {
     const { config } = state
