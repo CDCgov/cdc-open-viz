@@ -1,0 +1,211 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": [
+      {
+        "key": "Filter Individual State",
+        "values": [
+          "Alabama",
+          "Florida",
+          "Georgia"
+        ],
+        "columnName": "state",
+        "showDropdown": false,
+        "setBy": "map1686086427622",
+        "resetLabel": "Reset",
+        "tier": 1,
+        "orderedValues": [
+          "Alabama",
+          "Florida",
+          "Georgia"
+        ]
+      }
+    ],
+    "title": "State Filter with Reset"
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "sharedDropdownFilter"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "map1686086427622"
+        },
+        {
+          "equalHeight": false
+        },
+        {},
+        {}
+      ]
+    }
+  ],
+  "visualizations": {
+    "map1686086427622": {
+      "general": {
+        "geoType": "us",
+        "geoBorderColor": "darkGray",
+        "headerColor": "theme-blue",
+        "title": "",
+        "showTitle": true,
+        "showSidebar": true,
+        "showDownloadMediaButton": false,
+        "displayAsHex": false,
+        "displayStateLabels": false,
+        "territoriesLabel": "Territories",
+        "territoriesAlwaysShow": false,
+        "language": "en",
+        "geoLabelOverride": "",
+        "hasRegions": false,
+        "fullBorder": false,
+        "type": "data",
+        "palette": {
+          "isReversed": false
+        },
+        "allowMapZoom": true,
+        "hideGeoColumnInTooltip": false,
+        "hidePrimaryColumnInTooltip": false,
+        "statePicked": {
+          "fipsCode": "01",
+          "stateName": "Alabama"
+        }
+      },
+      "type": "map",
+      "color": "pinkpurple",
+      "columns": {
+        "geo": {
+          "name": "state",
+          "label": "Location",
+          "tooltip": false,
+          "dataTable": false
+        },
+        "primary": {
+          "dataTable": false,
+          "tooltip": true,
+          "prefix": "",
+          "suffix": "",
+          "name": "Insured Rate",
+          "label": ""
+        },
+        "navigate": {
+          "name": ""
+        },
+        "latitude": {
+          "name": ""
+        },
+        "longitude": {
+          "name": ""
+        }
+      },
+      "legend": {
+        "descriptions": {},
+        "specialClasses": [],
+        "unified": false,
+        "singleColumn": false,
+        "singleRow": false,
+        "showSpecialClassesLast": false,
+        "dynamicDescription": false,
+        "type": "equalnumber",
+        "numberOfItems": 3,
+        "position": "side",
+        "title": "Legend"
+      },
+      "filters": [],
+      "table": {
+        "label": "Data Table",
+        "expanded": false,
+        "limitHeight": false,
+        "height": "",
+        "caption": "",
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "forceDisplay": true,
+        "download": false,
+        "indexLabel": ""
+      },
+      "tooltips": {
+        "appearanceType": "hover",
+        "linkLabel": "Learn More",
+        "capitalizeLabels": true
+      },
+      "visual": {
+        "minBubbleSize": 1,
+        "maxBubbleSize": 20,
+        "extraBubbleBorder": false,
+        "cityStyle": "circle",
+        "geoCodeCircleSize": 2,
+        "showBubbleZeros": false
+      },
+      "mapPosition": {
+        "coordinates": [
+          0,
+          30
+        ],
+        "zoom": 1
+      },
+      "map": {
+        "layers": []
+      },
+      "filterBehavior": "Filter Change",
+      "openModal": false,
+      "uid": "map1686086427622",
+      "dataKey": "data.json",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      }
+    },
+    "sharedDropdownFilter": {
+      "type": "dashboardFilters",
+      "visualizationType": "dashboardFilters",
+      "sharedFilterIndexes": [
+        0
+      ],
+      "filterBehavior": "Filter Change",
+      "uid": "sharedDropdownFilter"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": false,
+    "showDownloadUrl": false,
+    "showVertical": true
+  },
+  "newViz": true,
+  "datasets": {
+    "data.json": {
+      "data": [
+        {
+          "Insured Rate": 43,
+          "state": "Alabama"
+        },
+        {
+          "Insured Rate": 63,
+          "state": "Georgia"
+        },
+        {
+          "Insured Rate": 53,
+          "state": "Florida"
+        }
+      ],
+      "dataFileSize": 170,
+      "dataFileName": "data.json",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "JSON",
+      "preview": false
+    }
+  },
+  "type": "dashboard",
+  "runtime": {},
+  "uuid": 1686086423805,
+  "version": "4.25.4",
+  "migrations": {
+    "addColorMigration": true
+  }
+}
