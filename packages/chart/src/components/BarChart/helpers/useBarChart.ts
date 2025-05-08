@@ -123,43 +123,6 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     const barColor = palette[barIndex]
     return barColor
   }
-  const updateBars = defaultBars => {
-    // function updates  stacked && regular && lollipop horizontal bars
-    if (config.visualizationType !== 'Bar' && !isHorizontal) return defaultBars
-
-    const barsArr = [...defaultBars]
-    let barHeight
-
-    const heights = {
-      stacked: config.barHeight,
-      lollipop: lollipopBarWidth
-    }
-
-    if (!isStacked) {
-      barHeight = heights[config.isLollipopChart ? 'lollipop' : 'stacked'] * stackCount
-    } else {
-      barHeight = heights.stacked
-    }
-
-    const labelHeight = isLabelBelowBar ? APP_FONT_SIZE * 1.2 : 0
-    let barSpace = Number(config.barSpace)
-
-    // calculate height of container based height, space and fontSize of labels
-    let totalHeight = barsArr.length * (barHeight + labelHeight + barSpace)
-
-    if (isHorizontal) {
-      config.heights.horizontal = totalHeight
-    }
-
-    // return new updated bars/groupes
-    return barsArr.map((bar, i) => {
-      // set bars Y dynamically to handle space between bars
-      let y = 0
-      bar.index !== 0 && (y = (barHeight + barSpace + labelHeight) * i)
-
-      return { ...bar, y: y, height: barHeight }
-    })
-  }
 
   const getHighlightedBarColorByValue = value => {
     const match = config?.highlightedBarValues.find(item => {
@@ -257,7 +220,6 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     barStackedSeriesKeys,
     hasMultipleSeries,
     applyRadius,
-    updateBars,
     assignColorsToValues,
     getHighlightedBarColorByValue,
     getHighlightedBarByValue,

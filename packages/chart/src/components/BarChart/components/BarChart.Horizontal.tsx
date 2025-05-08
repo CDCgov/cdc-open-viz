@@ -24,13 +24,13 @@ import BarChartContext, { BarChartContextValues } from './context'
 import { ChartContext } from '../../../types/ChartContext'
 import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
+import { getHorizontalBarHeights } from '../helpers/getBarHeights'
 
 export const BarChartHorizontal = () => {
   const { xScale, yScale, yMax, seriesScale, barChart } = useContext<BarChartContextValues>(BarChartContext)
   const {
     isHorizontal,
     barBorderWidth,
-    updateBars,
     assignColorsToValues,
     section,
     isLabelBelowBar,
@@ -81,7 +81,7 @@ export const BarChartHorizontal = () => {
           }}
         >
           {barGroups => {
-            return updateBars(barGroups).map((barGroup, index) => (
+            return getHorizontalBarHeights(config, barGroups).map((barGroup, index) => (
               <Group
                 className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`}
                 key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}

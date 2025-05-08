@@ -25,7 +25,6 @@ export type BarChartContextValues = {
     isHorizontal: boolean
     isLabelBelowBar: boolean
     displayNumbersOnBar: boolean
-    updateBars: Function
     barStackedSeriesKeys: string[]
   }
 }
