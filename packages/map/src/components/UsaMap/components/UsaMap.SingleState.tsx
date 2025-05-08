@@ -23,7 +23,6 @@ import { titleCase, handleMapAriaLabels, getGeoStrokeColor, MAX_ZOOM_LEVEL } fro
 import { getTopoData, getCurrentTopoYear, isTopoReady } from '../helpers/map'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import { SVG_WIDTH, SVG_HEIGHT, SVG_PADDING, SVG_VIEWBOX } from '../../../helpers'
-import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 
 const SingleStateMap = () => {
   const {
@@ -44,7 +43,6 @@ const SingleStateMap = () => {
   const dispatch = useContext(MapDispatchContext)
   const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection, statePicked } = useStateZoom(topoData)
   const { geoClickHandler } = useGeoClickHandler()
-  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
 
   const cityListProjection = geoAlbersUsaTerritories()
     .translate([SVG_WIDTH / 2, SVG_HEIGHT / 2])
@@ -114,7 +112,6 @@ const SingleStateMap = () => {
         projection={cityListProjection}
         key='cities'
         geoClickHandler={geoClickHandler}
-        applyLegendToRow={applyLegendToRow}
         titleCase={titleCase}
         setSharedFilterValue={setSharedFilterValue}
         isFilterValueSupported={isFilterValueSupported}

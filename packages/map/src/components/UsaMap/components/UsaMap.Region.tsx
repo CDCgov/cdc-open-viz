@@ -17,10 +17,9 @@ import { supportedTerritories } from '../../../data/supported-geos'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { displayGeoName, getGeoFillColor, getGeoStrokeColor, handleMapAriaLabels, SVG_VIEWBOX } from '../../../helpers'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
-import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
-import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import './UsaMap.Region.styles.css'
+import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 
 type TerritoryRectProps = {
   posX?: number
@@ -52,10 +51,9 @@ const Rect: React.FC<RectProps> = ({ label, text, stroke, strokeWidth, ...props 
 }
 
 const UsaRegionMap = () => {
-  const { data, config, tooltipId, legendMemo, legendSpecialClassLastMemo } = useContext(ConfigContext)
+  const { data, config, tooltipId, legendMemo, legendSpecialClassLastMemo, runtimeLegend } = useContext(ConfigContext)
   const [focusedStates, setFocusedStates] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
-  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const { general } = config
   const { displayStateLabels, territoriesLabel, displayAsHex, type } = general
@@ -106,7 +104,7 @@ const UsaRegionMap = () => {
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
-    const legendColors = applyLegendToRow(territoryData)
+    const legendColors = applyLegendToRow(territoryData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
 
     if (legendColors) {
       const textColor = getContrastColor('#FFF', legendColors[0])
@@ -169,7 +167,7 @@ const UsaRegionMap = () => {
       let legendColors
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
-        legendColors = applyLegendToRow(geoData)
+        legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
       }
 
       const geoDisplayName = displayGeoName(geoKey)
