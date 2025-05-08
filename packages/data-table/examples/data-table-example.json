@@ -1,78 +1,12 @@
 {
+  "version": "4.25.1",
   "type": "table",
   "visualizationType": "Table",
-  "title": "",
-  "showTitle": true,
-  "theme": "theme-blue",
-  "fontSize": "medium",
+  "dataUrl": "https://www.cdc.gov/wcms/vizdata/Respitory_Viruses/NHSNWeeklyHospitalRate.json",
   "general": {
-    "annotationDropdownText": "Annotations",
-    "showDownloadButton": false,
     "showMissingDataLabel": true,
-    "showSuppressedSymbol": true,
-    "showZeroValueData": true,
-    "hideNullValue": true
+    "showSuppressedSymbol": true
   },
-  "padding": {
-    "left": 5,
-    "right": 5
-  },
-  "preliminaryData": [
-    {
-      "type": "effect",
-      "seriesKey": "COVID-19",
-      "label": "Less than 80% of hospitals reporting",
-      "column": "reporting_above_80_percent",
-      "value": "False",
-      "style": "Open Circles",
-      "displayTooltip": true,
-      "displayLegend": true,
-      "displayTable": true,
-      "symbol": "",
-      "iconCode": "",
-      "lineCode": "◯",
-      "hideBarSymbol": false,
-      "hideLineStyle": false,
-      "circleSize": 6,
-      "displayGray": true
-    },
-    {
-      "type": "effect",
-      "seriesKey": "Influenza",
-      "label": "",
-      "column": "reporting_above_80_percent",
-      "value": "False",
-      "style": "Open Circles",
-      "displayTooltip": true,
-      "displayLegend": true,
-      "displayTable": true,
-      "symbol": "",
-      "iconCode": "",
-      "lineCode": "◯",
-      "hideBarSymbol": false,
-      "hideLineStyle": false,
-      "circleSize": 6,
-      "displayGray": true
-    },
-    {
-      "type": "effect",
-      "seriesKey": "RSV",
-      "label": "",
-      "column": "reporting_above_80_percent",
-      "value": "False",
-      "style": "Open Circles",
-      "displayTooltip": true,
-      "displayLegend": true,
-      "displayTable": true,
-      "symbol": "",
-      "iconCode": "",
-      "lineCode": "◯",
-      "hideBarSymbol": false,
-      "hideLineStyle": false,
-      "circleSize": 6,
-      "displayGray": true
-    }
-  ],
   "table": {
     "label": "Data Table",
     "expanded": true,
@@ -122,65 +56,13 @@
       "name": "week_end"
     }
   },
-  "exclusions": {
-    "active": false,
-    "keys": []
-  },
-  "labels": false,
   "dataFormat": {
     "commas": false,
     "prefix": "",
     "suffix": "",
     "abbreviated": true,
-    "bottomSuffix": "",
-    "bottomPrefix": "",
-    "bottomAbbreviated": false,
-    "roundTo": "1",
-    "onlyShowTopPrefixSuffix": false
+    "roundTo": "1"
   },
-  "confidenceKeys": {},
-  "useLogScale": false,
-  "series": [
-    {
-      "dataKey": "COVID-19",
-      "type": "Line",
-      "axis": "Left",
-      "tooltip": true
-    },
-    {
-      "dataKey": "Influenza",
-      "type": "Line",
-      "axis": "Left",
-      "tooltip": true
-    },
-    {
-      "dataKey": "RSV",
-      "type": "Line",
-      "axis": "Left",
-      "tooltip": true
-    }
-  ],
-  "suppressedData": [],
-  "customColors": ["#f06f19", "#0a58d6", "#890664", "#000000", "#0A6C75", "#C0F2FD", "#C0F2FD", "#C0F2FD", "#C0F2FD"],
-  "dataFileName": "https://www.cdc.gov/wcms/vizdata/Respitory_Viruses/NHSNWeeklyHospitalRate.json",
-  "dataFileSourceType": "url",
-  "dataUrl": "https://www.cdc.gov/wcms/vizdata/Respitory_Viruses/NHSNWeeklyHospitalRate.json",
-  "dataDescription": {
-    "horizontal": false,
-    "series": true,
-    "singleRow": false,
-    "seriesKey": "pathogen",
-    "xKey": "week_end",
-    "valueKeys": ["new_admissions_100k_currentweek"],
-    "ignoredKeys": [
-      "new_admissions_selected_pathogen_previousweek",
-      "new_admissions_100k_previousweek",
-      "percent_change_admissions_per100k",
-      "percent_change_admissions",
-      "new_admissions_selected_pathogen_currentweek"
-    ]
-  },
-  "validated": "4.24.3",
   "filters": [
     {
       "values": [
@@ -305,21 +187,5 @@
         "Wyoming"
       ]
     }
-  ],
-  "runtimeDataUrl": "https://www.cdc.gov/wcms/vizdata/Respitory_Viruses/NHSNWeeklyHospitalRate.json",
-  "dynamicMarginTop": 0,
-  "description": "<div class=\"text-left\"><p class=\"fnote\">Data last updated on <span data-timestamp=\"NHSNWeeklyHospitalRate:Data_as_of\"></span> and presented through <span data-timestamp=\"NHSNWeeklyHospitalRate:Data_Presented_Through\"></span>. <a href=\"https://data.cdc.gov/Public-Health-Surveillance/Weekly-Hospital-Respiratory-Data-HRD-Metrics-by-Ju/ua7e-t2fy/about_data\">View this dataset</a> on data.cdc.gov.</p></div>",
-  "regions": [
-    {
-      "background": "#777777",
-      "from": "7",
-      "to": "2024-01-13",
-      "fromType": "Previous Days",
-      "toType": "Last Date"
-    }
-  ],
-  "version": "4.25.1",
-  "migrations": {
-    "addColorMigration": true
-  }
+  ]
 }
