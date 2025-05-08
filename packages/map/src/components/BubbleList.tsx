@@ -5,7 +5,7 @@ import stateCoordinates from '../data/state-coordinates'
 import ConfigContext, { MapDispatchContext } from '../context'
 import { type Coordinate, DataRow } from '../types/MapConfig'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
-import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
+import { applyLegendToRow } from '../helpers/applyLegendToRow'
 import { displayGeoName, SVG_HEIGHT, SVG_WIDTH } from '../helpers'
 import { geoMercator, geoAlbersUsa, type GeoProjection } from 'd3-geo'
 import { getColumnNames } from '../helpers/getColumnNames'
@@ -17,7 +17,7 @@ type BubbleListProps = {
 }
 
 export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
-  const { config, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, runtimeData } =
+  const { config, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, runtimeData, runtimeLegend } =
     useContext<MapContext>(ConfigContext)
   const { columns, data, general, visual } = config
   const { geoType, allowMapZoom } = general
@@ -28,7 +28,6 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
   const { geoClickHandler } = useGeoClickHandler()
 
   // hooks
-  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const { primaryColumnName, geoColumnName } = getColumnNames(columns)
 
@@ -85,7 +84,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
         const countryName = displayGeoName(country[geoColumnName])
         const toolTip = applyTooltipsToGeo(countryName, country)
-        const legendColors = applyLegendToRow(country)
+        const legendColors = applyLegendToRow(country, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
 
         if (
           (Math.floor(Number(country[primaryColumnName])) === 0 || country[primaryColumnName] === '') &&
@@ -204,7 +203,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
         stateName = displayGeoName(stateName)
         const toolTip = applyTooltipsToGeo(stateName, item)
-        const legendColors = applyLegendToRow(item, config)
+        const legendColors = applyLegendToRow(item, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
 
         let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 

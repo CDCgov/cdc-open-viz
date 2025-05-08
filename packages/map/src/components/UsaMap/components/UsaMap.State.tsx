@@ -27,12 +27,21 @@ import TerritoriesSection from './TerritoriesSection'
 import { isMobileStateLabelViewport } from '@cdc/core/helpers/viewports'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
-
 import useMapLayers from '../../../hooks/useMapLayers'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
-import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
+import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
-import { getGeoFillColor, getGeoStrokeColor, handleMapAriaLabels, titleCase, displayGeoName, SVG_HEIGHT, SVG_VIEWBOX, SVG_WIDTH, hashObj } from '../../../helpers'
+import {
+  getGeoFillColor,
+  getGeoStrokeColor,
+  handleMapAriaLabels,
+  titleCase,
+  displayGeoName,
+  SVG_HEIGHT,
+  SVG_VIEWBOX,
+  SVG_WIDTH,
+  hashObj
+} from '../../../helpers'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
@@ -59,7 +68,6 @@ const nudges = {
 }
 
 const UsaMap = () => {
-
   const {
     data,
     setSharedFilterValue,
@@ -71,14 +79,14 @@ const UsaMap = () => {
     legendMemo,
     legendSpecialClassLastMemo,
     currentViewport,
-    translate
-    } = useContext<MapContext>(ConfigContext)
+    translate,
+    runtimeLegend
+  } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
   const { general, columns, tooltips, hexMap, map, annotations } = config
   const { displayAsHex } = general
   const { geoClickHandler } = useGeoClickHandler()
-  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const dispatch = useContext(MapDispatchContext)
 
@@ -183,7 +191,7 @@ const UsaMap = () => {
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
-    const legendColors = applyLegendToRow(territoryData)
+    const legendColors = applyLegendToRow(territoryData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
 
     if (legendColors) {
       let needsPointer = false
@@ -288,7 +296,7 @@ const UsaMap = () => {
 
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
-        legendColors = applyLegendToRow(geoData)
+        legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
       }
 
       const geoDisplayName = displayGeoName(geoKey)

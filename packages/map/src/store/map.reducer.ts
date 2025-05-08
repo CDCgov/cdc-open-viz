@@ -2,10 +2,11 @@ import { MapConfig } from '../types/MapConfig'
 import MapActions from './map.actions'
 import defaults from './../data/initial-state'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
+import _ from 'lodash'
 
-export const getInitialState = (configObj): MapConfig => {
+export const getInitialState = (configObj = {}): MapConfig => {
   return {
-    config: configObj,
+    config: _.merge({}, defaults, configObj),
     loading: false,
     accessibleStatus: '',
     coveLoadedHasRan: false,
@@ -22,8 +23,7 @@ export const getInitialState = (configObj): MapConfig => {
     runtimeData: { init: true },
     runtimeFilters: [],
     runtimeLegend: [],
-    stateToShow: '',
-    ...defaults
+    stateToShow: ''
   }
 }
 

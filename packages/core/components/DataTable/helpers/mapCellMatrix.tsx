@@ -4,7 +4,7 @@ import { DataTableProps } from '../DataTable'
 import { ReactNode } from 'react'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import _ from 'lodash'
-import useApplyLegendToRow from '@cdc/map/src/hooks/useApplyLegendToRow'
+import { applyLegendToRow } from '@cdc/map/src/helpers/applyLegendToRow'
 
 type MapRowsProps = DataTableProps & {
   rows: string[]
@@ -78,7 +78,8 @@ const mapCellArray = ({
   navigationHandler,
   setFilteredCountryCode,
   legendMemo,
-  legendSpecialClassLastMemo
+  legendSpecialClassLastMemo,
+  runtimeLegend
 }: MapRowsProps): ReactNode[][] => {
   const { allowMapZoom, geoType, type } = config.general
   return rows.map(row =>
@@ -91,9 +92,7 @@ const mapCellArray = ({
             throw new Error('No row object found')
           }
 
-          const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
-
-          const legendColor = applyLegendToRow(rowObj)
+          const legendColor = applyLegendToRow(rowObj, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
 
           if (!legendColor) {
             console.error('No legend color found') // eslint-disable-line no-console
@@ -103,9 +102,7 @@ const mapCellArray = ({
             type === 'bubble' && allowMapZoom && geoType === 'world' ? () => setFilteredCountryCode(row) : undefined
           return (
             <div className='col-12'>
-              {legendColor && legendColor.length > 0 && (
-                <LegendShape fill={legendColor[0]} />
-            )}
+              {legendColor && legendColor.length > 0 && <LegendShape fill={legendColor[0]} />}
               <CellAnchor
                 markup={labelValue}
                 row={rowObj}

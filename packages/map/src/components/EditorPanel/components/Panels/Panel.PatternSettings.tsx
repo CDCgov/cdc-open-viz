@@ -18,7 +18,7 @@ import _ from 'lodash'
 // topojson helpers for checking color contrasts
 import { feature } from 'topojson-client'
 import { checkColorContrast, getContrastColor, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
-import useApplyLegendToRow from '../../../../hooks/useApplyLegendToRow'
+import { applyLegendToRow } from '../../../../helpers/applyLegendToRow'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 type PanelProps = {
@@ -26,11 +26,10 @@ type PanelProps = {
 }
 
 const PatternSettings = ({ name }: PanelProps) => {
-  const { config, setConfig, runtimeData, legendMemo, legendSpecialClassLastMemo } =
+  const { config, setConfig, runtimeData, legendMemo, legendSpecialClassLastMemo, runtimeLegend } =
     useContext<MapContext>(ConfigContext)
   const defaultPattern = 'circles'
   const patternTypes = ['circles', 'waves', 'lines']
-  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
 
   const {
     map: { patterns },
@@ -83,7 +82,9 @@ const PatternSettings = ({ name }: PanelProps) => {
       const geoData = runtimeData[geoKey]
       if (!geoData) return
 
-      const legendColors = runtimeData[geoKey] ? applyLegendToRow(runtimeData[geoKey]) : undefined
+      const legendColors = runtimeData[geoKey]
+        ? applyLegendToRow(runtimeData[geoKey], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+        : undefined
 
       // Iterate over each pattern
       config.map.patterns.forEach((patternData, patternIndex) => {

@@ -7,7 +7,7 @@ import { getFilterControllingStatePicked } from './UsaMap/helpers/map'
 import { displayGeoName, getGeoStrokeColor, SVG_HEIGHT, SVG_PADDING, SVG_WIDTH, titleCase } from '../helpers'
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
-import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
+import { applyLegendToRow } from '../helpers/applyLegendToRow'
 import { getColumnNames } from '../helpers/getColumnNames'
 
 type CityListProps = {
@@ -24,9 +24,9 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     data: runtimeData,
     position,
     legendMemo,
-    legendSpecialClassLastMemo
+    legendSpecialClassLastMemo,
+    runtimeLegend
   } = useContext(ConfigContext)
-  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
 
@@ -74,9 +74,9 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     const cityDisplayName = titleCase(displayGeoName(city))
 
     const legendColors = geoData
-      ? applyLegendToRow(geoData, config)
+      ? applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
       : runtimeData[city]
-      ? applyLegendToRow(runtimeData[city], config)
+      ? applyLegendToRow(runtimeData[city], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
       : false
 
     if (legendColors === false) {

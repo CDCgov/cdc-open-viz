@@ -2,8 +2,8 @@ import React, { useContext } from 'react'
 import ConfigContext from '../../../../context'
 import { MapContext } from '../../../../types/MapContext'
 import { getGeoFillColor, displayGeoName } from '../../../../helpers'
-import useApplyLegendToRow from '../../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../../hooks/useApplyTooltipsToGeo'
+import { applyLegendToRow } from '../../../../helpers/applyLegendToRow'
 
 interface CountyOutputProps {
   counties: any[]
@@ -14,10 +14,10 @@ interface CountyOutputProps {
 }
 
 const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoStrokeColor, tooltipId }) => {
-  const { config, data, geoClickHandler, legendMemo, legendSpecialClassLastMemo } = useContext<MapContext>(ConfigContext)
+  const { config, data, geoClickHandler, legendMemo, legendSpecialClassLastMemo, runtimeLegend } =
+    useContext<MapContext>(ConfigContext)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const geoFillColor = getGeoFillColor(config)
-  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   return (
     <>
       {counties.map(county => {
@@ -33,7 +33,7 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
 
         // Once we receive data for this geographic item, setup variables.
         if (geoData !== undefined) {
-          legendColors = applyLegendToRow(geoData, config)
+          legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
         }
 
         const geoDisplayName = displayGeoName(geoKey)
