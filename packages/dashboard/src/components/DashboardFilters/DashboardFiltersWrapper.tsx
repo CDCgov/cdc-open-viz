@@ -143,6 +143,21 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       }
     }
   }
+
+  const resetFilters = sharedFitlers => {
+    const newSharedFilters = _.cloneDeep(sharedFitlers)
+    newSharedFilters.forEach((filter, index) => {
+      filter.active = ''
+      filter.queuedActive = ''
+      if (filter.subGrouping) {
+        filter.subGrouping.active = ''
+        filter.subGrouping.queuedActive = ''
+      }
+    })
+    dispatch({ type: 'SET_DATA', payload: {} })
+    dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+  }
+
   const [displayPanel, setDisplayPanel] = useState(true)
   const onBackClick = () => {
     setDisplayPanel(!displayPanel)
@@ -187,6 +202,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
               showSubmit={visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad}
               applyFilters={applyFilters}
               applyFiltersButtonText={visualizationConfig.applyFiltersButtonText}
+              resetFilters={resetFilters}
             />
           </div>
         </Layout.Responsive>
