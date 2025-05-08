@@ -41,7 +41,7 @@ const BUTTON_TEXT = {
 
 type FilterProps = {
   filteredData: Object[]
-  dimensions: DimensionsType
+  dimensions?: DimensionsType
   config: Visualization
   // function for updating the runtime filters
   setFilteredData: Function
@@ -49,7 +49,7 @@ type FilterProps = {
   setConfig: Function
   standaloneMap?: boolean
   excludedData?: Object[]
-  getUniqueValues: Function
+  getUniqueValues?: Function
 }
 
 const Filters: React.FC<FilterProps> = ({

@@ -2,12 +2,16 @@ import { useCallback, useEffect, useState } from 'react'
 
 import DataTable from '@cdc/core/components/DataTable'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
+import Filters from '@cdc/core/components/Filters'
 import Layout from '@cdc/core/components/Layout'
 import Loading from '@cdc/core/components/Loading'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import getViewport from '@cdc/core/helpers/getViewport'
 import { Table } from '@cdc/core/types/Table'
 import { ViewPort } from '@cdc/core/types/ViewPort'
+import { Visualization } from '@cdc/core/types/Visualization'
+import { VizFilter } from '@cdc/core/types/VizFilter'
 
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state.js'
@@ -29,10 +33,15 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
   const [data, setData] = useState()
   const [table, setTable] = useState<Table>()
   const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
+  const [filters, setFilters] = useState<VizFilter[]>()
+  const [filterIntro, setFilterIntro] = useState<string>()
 
   /* CONFIG VARS */
   const { data: inputData, dataUrl, dataDescription } = config || {}
   const { label, indexLabel, expanded } = table || {}
+
+  /* FILTERED DATA */
+  const filteredData = filterVizData(filters, data)
 
   /* LOADING VARS */
   const configLoading = configUrl && config === undefined
@@ -43,11 +52,17 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
 
   // processes initial config and sets state
   const initConfig = (newConfig: Config) => {
-    const configWithDefaultsAndUpdates = { ...coveUpdateWorker(newConfig), ...defaults }
-    const { columns: configColumns, table: configTable } = configWithDefaultsAndUpdates
-    setConfig(configWithDefaultsAndUpdates)
-    setTable(configTable)
-    setColumns(configColumns)
+    const updatedConfig = { ...coveUpdateWorker(newConfig), ...defaults }
+    setConfig(updatedConfig)
+    setTable(updatedConfig.table)
+    setColumns(updatedConfig.columns)
+    setFilters(updatedConfig.filters)
+    setFilterIntro(updatedConfig.filterIntro)
+  }
+
+  const updateFilters = (newConfig: Config) => {
+    const { filters: newFilters } = newConfig
+    setFilters(newFilters)
   }
 
   // Observes changes to outermost container and changes viewport size in state
@@ -113,7 +128,9 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
     ...config,
     table,
     columns,
-    data
+    data,
+    filters,
+    filterIntro
   }
 
   return (
@@ -130,20 +147,31 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
           config={configWithStates}
           columnsState={[columns, setColumns]}
           tableState={[table, setTable]}
+          filtersState={[filters, setFilters]}
           showEditorPanelState={[showEditorPanel, setShowEditorPanel]}
+          setFilterIntro={setFilterIntro}
           data={data}
         />
       )}
 
-      {/* DATA TABLE */}
+      {/* FILTERS */}
       <div className='bg-white z-1'>
+        <Filters
+          config={configWithStates as unknown as Visualization}
+          setConfig={updateFilters}
+          setFilteredData={() => {}}
+          filteredData={filteredData}
+          excludedData={data}
+        />
+
+        {/* DATA TABLE */}
         <DataTable
           config={configWithStates as unknown as TableConfig}
           tableTitle={label}
           indexTitle={indexLabel}
           isEditor={isEditor}
-          rawData={data}
-          runtimeData={data}
+          rawData={filteredData}
+          runtimeData={filteredData}
           columns={columns}
           viewport={currentViewport}
           tabbingId={'dataTableSection'}
