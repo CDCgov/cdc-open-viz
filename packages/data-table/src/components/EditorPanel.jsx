@@ -10,26 +10,32 @@ import {
 
 import ColumnsEditor from '@cdc/core/components/EditorPanel/ColumnsEditor'
 import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
+import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Layout from '@cdc/core/components/Layout'
 
-const EditorPanel = ({ config, columnsState, showEditorPanelState, data, tableState }) => {
+const EditorPanel = ({
+  config,
+  data,
+  columnsState,
+  showEditorPanelState,
+  tableState,
+  filtersState,
+  setFilterIntro
+}) => {
   /* STATES */
   const [table, setTable] = tableState
   const [showEditorPanel, setShowEditorPanel] = showEditorPanelState
   const [columns, setColumns] = columnsState
+  const [filters, setFilters] = filtersState
 
   const onBackClick = () => {
     setShowEditorPanel(cur => !cur)
   }
 
   // Creates a function that updates a field in a specified state
-  const createFieldUpdater = (curValue, setter) => (_section, subsection, fieldName, newValue) => {
-    // Both table and column editors have a field that replaces the entire columns object
-    if (fieldName === 'columns') {
-      setColumns(newValue)
-      return
-    }
+  const createFieldUpdater = (curValue, setter) => (section, subsection, fieldName, newValue) => {
+    if (!section) return setter(newValue)
 
     // Find/assign the value to be updated
     const valueCopy = _.cloneDeep(curValue)
@@ -39,6 +45,18 @@ const EditorPanel = ({ config, columnsState, showEditorPanelState, data, tableSt
       valueCopy[subsection][fieldName] = newValue
     }
     setter(valueCopy)
+  }
+
+  const updateDataTable = (section, subsection, fieldName, newValue) => {
+    if (section === 'columns') return setColumns(newValue)
+
+    createFieldUpdater(table, setTable)(section, subsection, fieldName, newValue)
+  }
+
+  const updateFilters = (section, subsection, fieldName, newValue) => {
+    if (fieldName === 'filterIntro') return setFilterIntro(newValue)
+
+    createFieldUpdater(filters, setFilters)(section, subsection, fieldName, newValue)
   }
 
   const removeAdditionalColumn = columnName => {
@@ -87,11 +105,17 @@ const EditorPanel = ({ config, columnsState, showEditorPanelState, data, tableSt
 
                 {/* DATA TABLE EDITOR COMPONENT */}
                 <AccordionItemPanel>
-                  <DataTableEditor
-                    config={config}
-                    columns={Object.keys(data[0] || {})}
-                    updateField={createFieldUpdater(table, setTable)}
-                  />
+                  <DataTableEditor config={config} columns={Object.keys(data[0] || {})} updateField={updateDataTable} />
+                </AccordionItemPanel>
+              </AccordionItem>
+
+              {/* FILTERS */}
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Filters</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <VizFilterEditor config={config} updateField={updateFilters} rawData={data} />
                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>
