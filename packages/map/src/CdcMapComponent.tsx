@@ -241,76 +241,82 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     }
   }, [config, container, runtimeData.init])
 
-  useEffect(() => {
-    // UID
+  const processUIDs = () => {
+    console.info('processing UIDs...')
     if (config.data && config.columns.geo.name && config.columns.geo.name !== config.data.fromColumn) {
       addUIDs(config, config.columns.geo.name)
     }
+  }
 
-    // Filters
+  const updateFilters = () => {
     const hashFilters = hashObj(config.filters)
-    let filters: VizFilter[]
+    if (!config.filters || hashFilters === runtimeFilters.fromHash) return null
 
-    if (config.filters && (config || hashFilters !== runtimeFilters.fromHash)) {
-      filters = generateRuntimeFilters({ ...config, data: configObj.data }, hashFilters, runtimeFilters)
+    const newFilters = generateRuntimeFilters({ ...config, data: configObj.data }, hashFilters, runtimeFilters)
 
-      if (filters) {
-        filters.forEach((filter: VizFilter, index: number) => {
-          const queryStringFilterValue = getQueryStringFilterValue(filter)
-          if (queryStringFilterValue) {
-            filters[index].active = queryStringFilterValue
-          }
-        })
-        setRuntimeFilters(filters)
+    if (!newFilters) return null
+
+    newFilters.forEach((filter: VizFilter, index: number) => {
+      const queryStringValue = getQueryStringFilterValue(filter)
+      if (queryStringValue) {
+        newFilters[index].active = queryStringValue
       }
-    }
-
-    const hashLegend = generateRuntimeLegendHash(config, runtimeFilters)
-
-    const hashData = hashObj({
-      data: config.data,
-      columns: config.columns,
-      geoType: config.general.geoType,
-      type: config.general.type,
-      geo: config.columns.geo.name,
-      primary: config.columns.primary.name,
-      mapPosition: config.mapPosition,
-      map: config.map,
-      ...runtimeFilters
     })
 
-    // Data
-    if (hashData !== runtimeData?.fromHash && config.data?.fromColumn) {
-      const newRuntimeData = generateRuntimeData(
-        { ...config, data: configObj.data },
-        filters || runtimeFilters,
-        hashData
-      )
-      setRuntimeData(newRuntimeData)
-    } else {
-      if (hashLegend !== runtimeLegend?.fromHash && undefined === runtimeData?.init) {
+    setRuntimeFilters(newFilters)
+    return newFilters
+  }
+
+  // When data changes re-run processUIDs
+  useEffect(() => {
+    processUIDs()
+  }, [configObj.data])
+
+  useEffect(() => {
+    const updateDataAndLegend = () => {
+      const currentFilters = updateFilters()
+      const activeFilters = currentFilters || runtimeFilters
+      const hashLegend = generateRuntimeLegendHash(config, activeFilters)
+
+      const dataHashPayload = {
+        data: config.data,
+        columns: config.columns,
+        geoType: config.general.geoType,
+        type: config.general.type,
+        geo: config.columns.geo.name,
+        primary: config.columns.primary.name,
+        mapPosition: config.mapPosition,
+        map: config.map,
+        ...activeFilters
+      }
+      const hashData = hashObj(dataHashPayload)
+
+      const shouldUpdateData = hashData !== runtimeData?.fromHash && config.data?.fromColumn
+      const shouldUpdateLegend = hashLegend !== runtimeLegend?.fromHash && runtimeData?.init === undefined
+
+      if (shouldUpdateData) {
+        const newRuntimeData = generateRuntimeData({ ...config, data: configObj.data }, activeFilters, hashData)
+        setRuntimeData(newRuntimeData)
+      } else if (shouldUpdateLegend) {
         const legend = generateRuntimeLegend(config, runtimeData, hashLegend)
         setRuntimeLegend(legend)
       }
     }
-  }, [config, configObj.data])
+
+    updateDataAndLegend()
+  }, [configObj.legend, configObj.data])
 
   useEffect(() => {
-    const hashLegend = generateRuntimeLegendHash(config, runtimeFilters)
-    const legend = generateRuntimeLegend({ ...config, data: configObj.data }, runtimeData, hashLegend)
-    setRuntimeLegend(legend)
-  }, [
-    runtimeData,
-    config.legend.unified,
-    config.legend.showSpecialClassesLast,
-    config.legend.separateZero,
-    config.general.equalNumberOptIn,
-    config.legend.numberOfItems,
-    config.legend.specialClasses,
-    config.legend.additionalCategories,
-    config,
-    runtimeFilters
-  ])
+    const updateLegend = () => {
+      console.log('updating legend...')
+      const configWithData = { ...config, data: configObj.data }
+      const hashLegend = generateRuntimeLegendHash(config, runtimeFilters)
+      const newLegend = generateRuntimeLegend(configWithData, runtimeData, hashLegend)
+      setRuntimeLegend(newLegend)
+    }
+
+    updateLegend()
+  }, [runtimeData, config.legend, runtimeFilters])
 
   useEffect(() => {
     if (!isDashboard) {

@@ -1,7 +1,7 @@
 import { hashObj } from './hashObj'
 import { MapConfig } from '../types/MapConfig'
 
-export const generateRuntimeLegendHash = (config: MapConfig, runtimeFilters) => {
+export const generateRuntimeLegendHash = (config: MapConfig, runtimeFilters): number => {
   return hashObj({
     unified: config.legend.unified ?? false,
     equalNumberOptIn: config.general.equalNumberOptIn ?? false,

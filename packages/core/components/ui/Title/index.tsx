@@ -16,14 +16,10 @@ type HeaderProps = {
 }
 
 const Title = (props: HeaderProps) => {
-  const { isDashboard, title, superTitle, classes = [], showTitle = true, ariaLevel = 2, theme = 'theme-blue' } = props
+  const { isDashboard, title, superTitle, classes = [], showTitle = true, ariaLevel = 2 } = props
 
   // standard classes every vis should have
   const updatedClasses = ['cove-component__header', 'component__header', 'mb-3', ...classes]
-
-  if (theme) {
-    updatedClasses.push(theme)
-  }
 
   return (
     title &&
