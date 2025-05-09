@@ -116,6 +116,8 @@ const EditorPanel = () => {
     specialClasses = legend.specialClasses || []
   }
 
+  const allowLegendSeparators = legend.style === 'gradient' && legend.subStyle === 'linear blocks'
+
   const getCityStyleOptions = target => {
     switch (target) {
       case 'value': {
@@ -2167,6 +2169,28 @@ const EditorPanel = () => {
                       <option value='smooth'>smooth</option>
                     </select>
                   </label>
+                )}
+                {allowLegendSeparators && (
+                  <TextField
+                    value={legend.separators}
+                    updateField={updateField}
+                    section='legend'
+                    fieldName='separators'
+                    label='Legend Separators'
+                    placeholder='ex: 1,4'
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>
+                            Separators between legend items represented by the legend item numbers separated by commas.
+                          </p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                 )}
                 {'navigation' !== config.general.type && config.legend.style === 'gradient' && (
                   <label>
