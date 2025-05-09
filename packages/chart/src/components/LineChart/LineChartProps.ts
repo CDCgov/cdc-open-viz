@@ -32,8 +32,6 @@ export interface StyleProps {
   seriesKey: 'string'
   stroke: string
   strokeWidth: number
-  dynamicCategory?: string
-  originalSeriesKey: string
 }
 export interface Style {
   stroke: string
