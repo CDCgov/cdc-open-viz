@@ -116,6 +116,8 @@ const EditorPanel = () => {
     specialClasses = legend.specialClasses || []
   }
 
+  const allowLegendSpaces = legend.style === 'gradient' && legend.subStyle === 'linear blocks'
+
   const getCityStyleOptions = target => {
     switch (target) {
       case 'value': {
@@ -2167,6 +2169,26 @@ const EditorPanel = () => {
                       <option value='smooth'>smooth</option>
                     </select>
                   </label>
+                )}
+                {allowLegendSpaces && (
+                  <TextField
+                    value={legend.spaces}
+                    updateField={updateField}
+                    section='legend'
+                    fieldName='spaces'
+                    label='Legend Spaces'
+                    placeholder='ex: 1,4'
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Spaces between legend items represented by the legend item numbers separated by commas.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                 )}
                 {'navigation' !== config.general.type && config.legend.style === 'gradient' && (
                   <label>

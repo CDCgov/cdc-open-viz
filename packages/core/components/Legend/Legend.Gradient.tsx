@@ -4,10 +4,15 @@ import { type MapConfig } from '@cdc/map/src/types/MapConfig'
 import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { getTextWidth } from '../../helpers/getTextWidth'
 import { DimensionsType } from '../../types/Dimensions'
+import { clamp } from 'lodash'
 
 const MARGIN = 1
 const BORDER_SIZE = 1
+const BORDER_COLOR = '#d3d3d3'
 const MOBILE_BREAKPOINT = 576
+const LEGEND_SPACE_SIZE = 0.02
+const LEGEND_SPACE_SIZE_MAX = 20
+const LEGEND_SPACE_SIZE_MIN = 8
 
 type CombinedConfig = MapConfig | ChartConfig
 
@@ -27,7 +32,7 @@ const LegendGradient = ({
   parentPaddingToSubtract = 0
 }: GradientProps): JSX.Element => {
   const { uid, legend, type } = config
-  const { tickRotation, position, style, subStyle, hideBorder } = legend
+  const { tickRotation, position, style, subStyle, spaces } = legend
 
   const isLinearBlocks = subStyle === 'linear blocks'
   let [width] = dimensions
@@ -35,6 +40,13 @@ const LegendGradient = ({
   const smallScreen = width <= MOBILE_BREAKPOINT
   const legendWidth = Number(width) - parentPaddingToSubtract - MARGIN * 2 - BORDER_SIZE * 2
   const uniqueID = `${uid}-${Date.now()}`
+
+  // Legend spacer logic
+  const legendSpaces = isLinearBlocks ? spaces?.replace(' ', '').split(',').map(Number).filter(Boolean) || [] : []
+  const spaceSize = clamp(legendWidth * LEGEND_SPACE_SIZE, LEGEND_SPACE_SIZE_MIN, LEGEND_SPACE_SIZE_MAX)
+  const legendSpacesToSubtract = legendSpaces.length * spaceSize
+  const getTickSpaceAdjustment = (index: number) =>
+    legendSpaces.reduce((acc, space) => (index >= space ? acc + spaceSize : acc), 0)
 
   const numTicks = colors?.length
 
@@ -57,8 +69,8 @@ const LegendGradient = ({
 
   // render ticks and labels
   const ticks = labels.map((key, index) => {
-    const segmentWidth = legendWidth / numTicks
-    const xPositionX = index * segmentWidth + segmentWidth + MARGIN
+    const segmentWidth = (legendWidth - legendSpacesToSubtract) / numTicks
+    const xPositionX = index * segmentWidth + segmentWidth + MARGIN + getTickSpaceAdjustment(index)
     const textAnchor = rotationAngle ? 'end' : 'middle'
     const verticalAnchor = rotationAngle ? 'middle' : 'start'
     const lastTick = index === labels.length - 1
@@ -94,7 +106,7 @@ const LegendGradient = ({
     return (
       <svg className={'w-100 overflow-visible'} height={newHeight}>
         {/* background border*/}
-        <rect x={0} y={0} width={legendWidth + MARGIN * 2} height={boxHeight + MARGIN * 2} fill='#d3d3d3' />
+        <rect x={0} y={0} width={legendWidth + MARGIN * 2} height={boxHeight + MARGIN * 2} fill={BORDER_COLOR} />
         {/* Define the gradient */}
         <linearGradient id={`gradient-smooth-${uniqueID}`} x1='0%' y1='0%' x2='100%' y2='0%'>
           {stops}
@@ -110,25 +122,62 @@ const LegendGradient = ({
           />
         )}
 
-        {subStyle === 'linear blocks' &&
-          colors.map((color, index) => {
-            const segmentWidth = legendWidth / numTicks
-            const xPosition = index * segmentWidth + MARGIN
-            return (
-              <Group>
-                <rect
-                  key={index}
-                  x={xPosition}
-                  y={MARGIN}
-                  width={segmentWidth}
-                  height={boxHeight}
-                  fill={color}
-                  stroke='white'
-                  strokeWidth='0'
-                />
-              </Group>
-            )
-          })}
+        {subStyle === 'linear blocks' && (
+          <>
+            {colors.map((color, index) => {
+              const segmentWidth = (legendWidth - legendSpacesToSubtract) / numTicks
+              const xPosition = index * segmentWidth + MARGIN + getTickSpaceAdjustment(index)
+              return (
+                <Group>
+                  <rect
+                    key={index}
+                    x={xPosition}
+                    y={MARGIN}
+                    width={segmentWidth}
+                    height={boxHeight}
+                    fill={color}
+                    stroke='white'
+                    strokeWidth='0'
+                  />
+                </Group>
+              )
+            })}
+            {/* Legend space */}
+            {legendSpaces.map((spaceAfter, index) => {
+              const segmentWidth = (legendWidth - legendSpacesToSubtract) / numTicks
+              const xPosition = spaceAfter * segmentWidth + MARGIN + getTickSpaceAdjustment(spaceAfter - 1)
+              return (
+                <Group>
+                  {/* Space block */}
+                  <rect
+                    key={index}
+                    x={xPosition}
+                    y={MARGIN / 2}
+                    width={spaceSize}
+                    height={boxHeight + MARGIN}
+                    fill={'white'}
+                    stroke={'white'}
+                    strokeWidth={MARGIN}
+                  />
+
+                  {/* Dotted dividing line */}
+                  <line
+                    key={index}
+                    x1={xPosition + spaceSize / 2}
+                    x2={xPosition + spaceSize / 2}
+                    y1={-3}
+                    y2={boxHeight + MARGIN + 3}
+                    stroke={'var(--colors-gray-cool-40'}
+                    strokeWidth={1}
+                    strokeDasharray='5,3'
+                    strokeDashoffset={1}
+                  />
+                </Group>
+              )
+            })}
+          </>
+        )}
+
         {/* Ticks and labels */}
         <g>{ticks}</g>
       </svg>
