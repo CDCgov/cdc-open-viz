@@ -16,6 +16,16 @@ export const bar_chart_with_labels: Story = {
     isEditor: false
   }
 }
+export const bar_chart_horizontal_labels: Story = {
+  args: {
+    config: {
+      ...barChartCiLabels,
+      orientation: 'horizontal',
+      yAxis: { ...barChartCiLabels.yAxis, displayNumbersOnBar: true }
+    },
+    isEditor: false
+  }
+}
 
 export const line_Chart_Dynamic_Confidence_Intervals: Story = {
   args: {
