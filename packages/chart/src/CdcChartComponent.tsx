@@ -388,18 +388,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
         if (newData) {
           newConfig.data = newData
         }
+      } else if (newConfig.formattedData) {
+        newConfig.data = newConfig.formattedData
       } else if (newConfig.dataDescription) {
         newConfig.data = transform.autoStandardize(newConfig.data)
         newConfig.data = transform.developerStandardize(newConfig.data, newConfig.dataDescription)
-      } else if (newConfig.formattedData) {
-        newConfig.data = newConfig.formattedData
       }
     } catch (err) {
       console.error('Error on prepareData function ', err)
     }
     return newConfig
   }
-
   useEffect(() => {
     const load = async () => {
       try {
