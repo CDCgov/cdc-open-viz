@@ -158,7 +158,7 @@ export type MapConfig = Visualization & {
     tickRotation: string
     hideBorder: false
     singleColumnLegend: false
-    spaces?: string
+    separators?: string
   }
   table: {
     label: string

@@ -116,7 +116,7 @@ const EditorPanel = () => {
     specialClasses = legend.specialClasses || []
   }
 
-  const allowLegendSpaces = legend.style === 'gradient' && legend.subStyle === 'linear blocks'
+  const allowLegendSeparators = legend.style === 'gradient' && legend.subStyle === 'linear blocks'
 
   const getCityStyleOptions = target => {
     switch (target) {
@@ -2170,13 +2170,13 @@ const EditorPanel = () => {
                     </select>
                   </label>
                 )}
-                {allowLegendSpaces && (
+                {allowLegendSeparators && (
                   <TextField
-                    value={legend.spaces}
+                    value={legend.separators}
                     updateField={updateField}
                     section='legend'
-                    fieldName='spaces'
-                    label='Legend Spaces'
+                    fieldName='separators'
+                    label='Legend Separators'
                     placeholder='ex: 1,4'
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
@@ -2184,7 +2184,9 @@ const EditorPanel = () => {
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>Spaces between legend items represented by the legend item numbers separated by commas.</p>
+                          <p>
+                            Separators between legend items represented by the legend item numbers separated by commas.
+                          </p>
                         </Tooltip.Content>
                       </Tooltip>
                     }

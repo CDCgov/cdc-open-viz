@@ -94,7 +94,7 @@ export type Legend = CoreLegend & {
     topBottom: boolean
   }
   groupBy: string
-  spaces?: string
+  separators?: string
 }
 
 type Visual = {

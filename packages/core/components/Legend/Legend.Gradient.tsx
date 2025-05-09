@@ -10,9 +10,9 @@ const MARGIN = 1
 const BORDER_SIZE = 1
 const BORDER_COLOR = '#d3d3d3'
 const MOBILE_BREAKPOINT = 576
-const LEGEND_SPACE_SIZE = 0.02
-const LEGEND_SPACE_SIZE_MAX = 20
-const LEGEND_SPACE_SIZE_MIN = 8
+const LEGEND_SEPARATOR_SIZE = 0.02
+const LEGEND_SEPARATOR_SIZE_MAX = 20
+const LEGEND_SEPARATOR_SIZE_MIN = 8
 
 type CombinedConfig = MapConfig | ChartConfig
 
@@ -32,7 +32,7 @@ const LegendGradient = ({
   parentPaddingToSubtract = 0
 }: GradientProps): JSX.Element => {
   const { uid, legend, type } = config
-  const { tickRotation, position, style, subStyle, spaces } = legend
+  const { tickRotation, position, style, subStyle, separators } = legend
 
   const isLinearBlocks = subStyle === 'linear blocks'
   let [width] = dimensions
@@ -41,12 +41,14 @@ const LegendGradient = ({
   const legendWidth = Number(width) - parentPaddingToSubtract - MARGIN * 2 - BORDER_SIZE * 2
   const uniqueID = `${uid}-${Date.now()}`
 
-  // Legend spacer logic
-  const legendSpaces = isLinearBlocks ? spaces?.replace(' ', '').split(',').map(Number).filter(Boolean) || [] : []
-  const spaceSize = clamp(legendWidth * LEGEND_SPACE_SIZE, LEGEND_SPACE_SIZE_MIN, LEGEND_SPACE_SIZE_MAX)
-  const legendSpacesToSubtract = legendSpaces.length * spaceSize
-  const getTickSpaceAdjustment = (index: number) =>
-    legendSpaces.reduce((acc, space) => (index >= space ? acc + spaceSize : acc), 0)
+  // Legend separators logic
+  const legendSeparators = isLinearBlocks
+    ? separators?.replace(' ', '').split(',').map(Number).filter(Boolean) || []
+    : []
+  const separatorSize = clamp(legendWidth * LEGEND_SEPARATOR_SIZE, LEGEND_SEPARATOR_SIZE_MIN, LEGEND_SEPARATOR_SIZE_MAX)
+  const legendSeparatorsToSubtract = legendSeparators.length * separatorSize
+  const getTickSeparatorsAdjustment = (index: number) =>
+    legendSeparators.reduce((acc, separators) => (index >= separators ? acc + separatorSize : acc), 0)
 
   const numTicks = colors?.length
 
@@ -69,8 +71,8 @@ const LegendGradient = ({
 
   // render ticks and labels
   const ticks = labels.map((key, index) => {
-    const segmentWidth = (legendWidth - legendSpacesToSubtract) / numTicks
-    const xPositionX = index * segmentWidth + segmentWidth + MARGIN + getTickSpaceAdjustment(index)
+    const segmentWidth = (legendWidth - legendSeparatorsToSubtract) / numTicks
+    const xPositionX = index * segmentWidth + segmentWidth + MARGIN + getTickSeparatorsAdjustment(index)
     const textAnchor = rotationAngle ? 'end' : 'middle'
     const verticalAnchor = rotationAngle ? 'middle' : 'start'
     const lastTick = index === labels.length - 1
@@ -125,8 +127,8 @@ const LegendGradient = ({
         {subStyle === 'linear blocks' && (
           <>
             {colors.map((color, index) => {
-              const segmentWidth = (legendWidth - legendSpacesToSubtract) / numTicks
-              const xPosition = index * segmentWidth + MARGIN + getTickSpaceAdjustment(index)
+              const segmentWidth = (legendWidth - legendSeparatorsToSubtract) / numTicks
+              const xPosition = index * segmentWidth + MARGIN + getTickSeparatorsAdjustment(index)
               return (
                 <Group>
                   <rect
@@ -142,18 +144,18 @@ const LegendGradient = ({
                 </Group>
               )
             })}
-            {/* Legend space */}
-            {legendSpaces.map((spaceAfter, index) => {
-              const segmentWidth = (legendWidth - legendSpacesToSubtract) / numTicks
-              const xPosition = spaceAfter * segmentWidth + MARGIN + getTickSpaceAdjustment(spaceAfter - 1)
+            {/* Legend separators */}
+            {legendSeparators.map((separatorAfter, index) => {
+              const segmentWidth = (legendWidth - legendSeparatorsToSubtract) / numTicks
+              const xPosition = separatorAfter * segmentWidth + MARGIN + getTickSeparatorsAdjustment(separatorAfter - 1)
               return (
                 <Group>
-                  {/* Space block */}
+                  {/* Separators block */}
                   <rect
                     key={index}
                     x={xPosition}
                     y={MARGIN / 2}
-                    width={spaceSize}
+                    width={separatorSize}
                     height={boxHeight + MARGIN}
                     fill={'white'}
                     stroke={'white'}
@@ -163,8 +165,8 @@ const LegendGradient = ({
                   {/* Dotted dividing line */}
                   <line
                     key={index}
-                    x1={xPosition + spaceSize / 2}
-                    x2={xPosition + spaceSize / 2}
+                    x1={xPosition + separatorSize / 2}
+                    x2={xPosition + separatorSize / 2}
                     y1={-3}
                     y2={boxHeight + MARGIN + 3}
                     stroke={'var(--colors-gray-cool-40'}
