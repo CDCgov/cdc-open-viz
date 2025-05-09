@@ -34,6 +34,7 @@ const Widget = ({
   const { overlay } = useGlobalContext()
   const { config, data } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
+  const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
 
   const [isEditing, setIsEditing] = useState(false)
   const [toggleName, setToggleName] = useState(
@@ -71,7 +72,24 @@ const Widget = ({
 
   const deleteWidget = () => {
     if (!widgetConfig) return
+    // if last widget left in row remove whole row on delete
+    if (widgetConfig.colIdx === 0) {
+      let newVisualizations = { ...config.visualizations }
+      const rows = config.rows
+      const rowIdx = widgetConfig.rowIdx
 
+      //delete the instantiated widgets
+      if (rows[rowIdx] && rows[rowIdx].columns && rows[rowIdx].columns.length && config.visualizations) {
+        rows[rowIdx].columns.forEach(column => {
+          if (column.widget) {
+            delete newVisualizations[column.widget]
+          }
+        })
+      }
+
+      config.rows.splice(rowIdx, 1) // delete the row
+      updateConfig({ ...config, rows, visualizations: newVisualizations })
+    }
     dispatch({
       type: 'DELETE_WIDGET',
       payload: { uid: widgetConfig.uid as string }
