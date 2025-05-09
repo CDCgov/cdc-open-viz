@@ -5,7 +5,6 @@ import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 import { Group } from '@visx/group'
 import { Line, Bar } from '@visx/shape'
 import { Text } from '@visx/text'
-import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import _ from 'lodash'
 
@@ -755,9 +754,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               chartRef={svgRef}
             />
           )}
-          {((visualizationType === 'Line' && !convertLineToBarGraph) ||
-            visualizationType === 'Combo' ||
-            visualizationType === 'Bump Chart') && (
+          {(visualizationType === 'Combo' || visualizationType === 'Bump Chart') && (
             <LineChart
               xScale={xScale}
               yScale={yScale}
@@ -771,7 +768,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               handleTooltipClick={handleTooltipClick}
               tooltipData={tooltipData}
               showTooltip={showTooltip}
-              //chartRef={svgRef}
             />
           )}
           {(visualizationType === 'Forecasting' || visualizationType === 'Combo') && (
@@ -828,6 +824,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   xMax={xMax}
                   yMax={yMax}
                   seriesStyle={config.runtime.series}
+                  tooltipData={tooltipData}
+                  handleTooltipMouseOver={handleTooltipMouseOver}
+                  handleTooltipMouseOff={handleTooltipMouseOff}
                 />
               </>
             )}
