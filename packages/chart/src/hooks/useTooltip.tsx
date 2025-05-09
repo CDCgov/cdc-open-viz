@@ -82,7 +82,7 @@ export const useTooltip = props => {
     const { x, y } = eventSvgCoords
 
     const resolvedScaleValues = getResolvedScaleValues([x, y])
-
+    const singleSeriesValue = getYValueFromCoordinate(y, resolvedScaleValues)
     const columnsWithTooltips = []
     const tooltipItems = [] as any[][]
     for (const [colKey, column] of Object.entries(config.columns)) {
@@ -94,7 +94,12 @@ export const useTooltip = props => {
       }
 
       const pieColumnData = additionalChartData?.arc?.data[column.name]
-      const columnData = resolvedScaleValues[0]?.[colKey]
+      const columnData =
+        config.tooltips.singleSeries && visualizationType === 'Line'
+          ? resolvedScaleValues.filter(
+              value => value[config.runtime.series[0].dynamicCategory] === singleSeriesValue
+            )[0][colKey]
+          : resolvedScaleValues[0]?.[colKey]
       const closestValue = config.visualizationType === 'Pie' ? pieColumnData : columnData
 
       const formattedValue = formatColNumber(closestValue, 'left', true, config, formattingParams)
@@ -137,8 +142,7 @@ export const useTooltip = props => {
         const position = seriesObj?.axis ? String(seriesObj.axis).toLowerCase() : 'left'
         return position
       }
-      if (!config.tooltips.singleSeries) {
-        // Show All Series in One Tooltip
+      if (!config.tooltips.singleSeries || visualizationType === 'Line') {
         tooltipItems.push(
           ...getIncludedTooltipSeries()
             ?.filter(seriesKey => {
@@ -166,7 +170,12 @@ export const useTooltip = props => {
             })
         )
 
-        config.runtime.series?.forEach(series => {
+        const runtimeSeries =
+          config.tooltips.singleSeries && visualizationType === 'Line'
+            ? [_.find(config.runtime.series, d => d.dataKey === singleSeriesValue)]
+            : config.runtime.series
+
+        runtimeSeries?.forEach(series => {
           if (series?.dynamicCategory) {
             const seriesKey = series.dataKey
             const resolvedScaleValue = resolvedScaleValues.find(v => v[series.dynamicCategory] === seriesKey)
@@ -298,6 +307,23 @@ export const useTooltip = props => {
     return dataColumn
   }
 
+  const getYValueFromCoordinate = (y, xData) => {
+    let closestYSeriesValue = null
+    let minDistance = Number.MAX_VALUE
+    let offset = y
+
+    xData.forEach(d => {
+      const yPosition = yScale(d[config.runtime.series[0].originalDataKey])
+      const distance = Math.abs(Number(yPosition - offset))
+
+      if (distance <= minDistance) {
+        minDistance = distance
+        closestYSeriesValue = d[config.runtime.series[0].dynamicCategory]
+      }
+    })
+    return closestYSeriesValue
+  }
+
   const getClosestYValueHorizontalChart = mouseY => {
     const barGroups = yScale.domain().map((group, index) => ({ group, index }))
     const barsWithHeights = getHorizontalBarHeights<{ group }>(config, barGroups)
@@ -422,7 +448,7 @@ export const useTooltip = props => {
 
     let dataToSearch = (data || []).filter(d => d[xAxis.dataKey] === closestXScaleValue)
 
-    if (config.tooltips.singleSeries) {
+    if (config.tooltips.singleSeries && config.visualizationType !== 'Line') {
       const dynamicSeries = config.series.find(s => s.dynamicCategory)
       if (dynamicSeries) {
         const dataWithXScale = dataToSearch.map(
