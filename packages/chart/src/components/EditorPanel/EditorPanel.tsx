@@ -59,12 +59,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   const hasComboBarSeries = isCombo && barSeriesExists
 
   const getColumnOptions = () => {
-    const dynamicCategory = config.series[0]?.dynamicCategory || ''
-    if (dynamicCategory) {
-      return _.uniq(_.compact(_.map(data, dynamicCategory)))
-    } else {
-      return _.uniq(_.flatMap(data, _.keys))
-    }
+    return _.uniq(_.flatMap(data, _.keys))
   }
 
   const getTypeOptions = () => {
