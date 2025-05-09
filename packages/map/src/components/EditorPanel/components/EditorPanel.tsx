@@ -346,37 +346,6 @@ const EditorPanel = () => {
           }
         })
         break
-      case 'legendType':
-        let testForType = Number(typeof config.data[0][config.columns.primary.name])
-        let hasValue = config.data[0][config.columns.primary.name]
-        let messages = []
-
-        if (!hasValue) {
-          messages.push(
-            `There appears to be values missing for data in the primary column ${config.columns.primary.name}`
-          )
-        }
-
-        if (testForType === 'string' && isNaN(testForType) && value !== 'category') {
-          messages.push(
-            'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to DEV-12345categorical.'
-          )
-        } else {
-          messages = []
-        }
-
-        setConfig({
-          ...config,
-          legend: {
-            ...config.legend,
-            type: value
-          },
-          runtime: {
-            ...config.runtime,
-            editorErrorMessage: messages
-          }
-        })
-        break
       case 'legendNumber':
         setConfig({
           ...config,
@@ -2084,7 +2053,29 @@ const EditorPanel = () => {
                       { value: 'equalinterval', label: 'Equal Interval' }
                     ]}
                     onChange={event => {
-                      handleEditorChanges('legendType', event.target.value)
+                      let testForType = Number(typeof config.data[0][config.columns.primary.name])
+                      let hasValue = config.data[0][config.columns.primary.name]
+                      let messages = []
+
+                      if (!hasValue) {
+                        messages.push(
+                          `There appears to be values missing for data in the primary column ${config.columns.primary.name}`
+                        )
+                      }
+
+                      if (testForType === 'string' && isNaN(testForType) && value !== 'category') {
+                        messages.push(
+                          'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to DEV-12345categorical.'
+                        )
+                      } else {
+                        messages = []
+                      }
+
+                      const _newConfig = _.cloneDeep(config)
+                      _newConfig.general.equalNumberOptIn = true
+                      _newConfig.legend.type = event.target.value
+                      _newConfig.runtime.editorErrorMessage = messages
+                      setConfig(_newConfig)
                     }}
                   />
                 )}
@@ -2330,32 +2321,7 @@ const EditorPanel = () => {
                     </span>
                   </label>
                 )}
-                {/* Temp Checkbox */}
-                {config.legend.type === 'equalnumber' && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={config.general.equalNumberOptIn}
-                      onChange={event => {
-                        const _newConfig = _.clone(config)
-                        _newConfig.general.equalNumberOptIn = event.target.checked
-                        setConfig(_newConfig)
-                      }}
-                    />
-                    <span className='edit-label column-heading'>Use new quantile legend</span>
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon
-                          display='question'
-                          style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                        />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>This prevents numbers from being used in more than one category (ie. 0-1, 1-2, 2-3) </p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  </label>
-                )}
+
                 {'category' !== legend.type && (
                   <Select
                     label={
