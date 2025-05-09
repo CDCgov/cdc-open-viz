@@ -2083,6 +2083,7 @@ const EditorPanel = () => {
                       }
 
                       const _newConfig = _.cloneDeep(config)
+                      _newConfig.general.equalNumberOptIn = true
                       _newConfig.legend.type = event.target.value
                       _newConfig.runtime.editorErrorMessage = messages
                       setConfig(_newConfig)
