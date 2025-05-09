@@ -82,7 +82,7 @@ export const getCurrentTopoYear = (state, runtimeFilters) => {
 export const isTopoReady = (topoData, state, runtimeFilters) => {
   let currentYear = getCurrentTopoYear(state, runtimeFilters)
 
-  return topoData.year && (!currentYear || currentYear === topoData.year)
+  return topoData?.year && (!currentYear || currentYear === topoData?.year)
 }
 
 export const hasMoreThanFromHash = (data: { [key: string]: any }): boolean => {

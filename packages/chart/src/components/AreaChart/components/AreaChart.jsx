@@ -14,13 +14,28 @@ import { bisector } from 'd3-array'
 const AreaChart = props => {
   const { xScale, yScale, yMax, xMax, handleTooltipMouseOver, handleTooltipMouseOff, isDebug, children } = props
   // import data from context
-  let { transformedData, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight, colorScale, rawData, brushConfig } = useContext(ConfigContext)
+  let {
+    transformedData,
+    config,
+    handleLineType,
+    parseDate,
+    formatDate,
+    formatNumber,
+    seriesHighlight,
+    colorScale,
+    rawData,
+    brushConfig
+  } = useContext(ConfigContext)
   const data = config.brush?.active && brushConfig.data?.length ? brushConfig.data : transformedData
 
   if (!data) return
 
   const handleX = d => {
-    return (isDateScale(config.xAxis) ? xScale(parseDate(d[config.xAxis.dataKey], false)) : xScale(d[config.xAxis.dataKey])) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+    return (
+      (isDateScale(config.xAxis)
+        ? xScale(parseDate(d[config.xAxis.dataKey], false))
+        : xScale(d[config.xAxis.dataKey])) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+    )
   }
 
   const handleY = (d, index, s = undefined) => {
@@ -41,8 +56,14 @@ const AreaChart = props => {
               })
 
               let curveType = allCurves[s.lineType]
-              let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s.dataKey) === -1
-              let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s.dataKey) !== -1
+              let transparentArea =
+                config.legend.behavior === 'highlight' &&
+                seriesHighlight.length > 0 &&
+                seriesHighlight.indexOf(s.dataKey) === -1
+              let displayArea =
+                config.legend.behavior === 'highlight' ||
+                seriesHighlight.length === 0 ||
+                seriesHighlight.indexOf(s.dataKey) !== -1
 
               return (
                 <React.Fragment key={index}>
@@ -74,7 +95,14 @@ const AreaChart = props => {
                 </React.Fragment>
               )
             })}
-            <Bar width={Number(xMax)} height={Number(yMax)} fill={'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />
+            <Bar
+              width={Number(xMax)}
+              height={Number(yMax)}
+              fill={'transparent'}
+              fillOpacity={0.05}
+              onMouseMove={e => handleTooltipMouseOver(e, rawData)}
+              onMouseLeave={handleTooltipMouseOff}
+            />
           </Group>
         </ErrorBoundary>
       </svg>

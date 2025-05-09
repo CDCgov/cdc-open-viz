@@ -6,17 +6,18 @@ import './visualizations.scss'
 import { Config as WaffleChartConfig } from '@cdc/waffle-chart/src/types/Config'
 import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
+import { MapConfig } from '@cdc/map/src/types/MapConfig'
 
 type VisualizationWrapper = {
   children: React.ReactNode
-  config: ChartConfig | DataBiteConfig | WaffleChartConfig | MarkupIncludeConfig | DashboardFilters
+  config: ChartConfig | DataBiteConfig | WaffleChartConfig | MarkupIncludeConfig | DashboardFilters | MapConfig
   currentViewport?: string
   imageId?: string
   isEditor: boolean
   showEditorPanel?: boolean
 }
 
-const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) => {
+const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, ref) => {
   const {
     config = {},
     isEditor = false,
@@ -93,7 +94,6 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
   }
 
   return (
-    // prettier-ignore
     <div
       {...(config.type === 'chart' ? { 'data-lollipop': config.isLollipopChart } : {})}
       className={getWrappingClasses().join(' ')}

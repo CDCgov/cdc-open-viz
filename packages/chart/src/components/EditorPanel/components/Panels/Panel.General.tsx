@@ -113,7 +113,7 @@ const PanelGeneral: FC<PanelProps> = props => {
             )}
           </div>
         )}
-        {(visualizationType === 'Bar' || visualizationType === 'Combo' || visualizationType === 'Area Chart') && (
+        {(visualizationType === 'Bar' || visualizationType === 'Combo') && (
           <Select
             value={visualizationSubType || 'Regular'}
             fieldName='visualizationSubType'
@@ -209,10 +209,8 @@ const PanelGeneral: FC<PanelProps> = props => {
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p>
-                      Recommended set to display for Section 508 compliance.
-                    </p>
-                    <hr/>
+                    <p>Recommended set to display for Section 508 compliance.</p>
+                    <hr />
                     <p>
                       Selecting this option will <i> not </i> hide the display of "zero value", "suppressed data", or
                       "missing data" indicators on the chart (if applicable).

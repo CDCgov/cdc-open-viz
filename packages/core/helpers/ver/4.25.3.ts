@@ -9,10 +9,30 @@ const remapTableDownloadCSV = config => {
   return config
 }
 
+const handleVisualizations = newConfig => {
+  if (newConfig.type === 'dashboard') {
+    Object.keys(newConfig.visualizations).forEach(key => {
+      const currentViz = newConfig.visualizations[key]
+      remapTableDownloadCSV(currentViz)
+    })
+  }
+  remapTableDownloadCSV(newConfig)
+}
+
+const migrateAreaChart = config => {
+  // Migrate regular Area Chart to Stacked
+  if (config.visualizationType === 'Area Chart' && config.visualizationSubType === 'regular') {
+    config.visualizationSubType = 'stacked'
+  }
+  return config
+}
+
 const update_4_25_3 = config => {
   const ver = '4.25.3'
   const newConfig = _.cloneDeep(config)
-  remapTableDownloadCSV
+  handleVisualizations(newConfig)
+  remapTableDownloadCSV(newConfig)
+  migrateAreaChart(newConfig)
   newConfig.version = ver
   return newConfig
 }

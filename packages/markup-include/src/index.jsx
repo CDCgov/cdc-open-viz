@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom/client'
 
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 
-import CdcMarkupInclude from './CdcMarkupInclude'
-
 import '@cdc/core/styles/cove-main.scss'
 import './coreStyles_markupinclude.scss'
+
+import CdcMarkupInclude from './CdcMarkupInclude'
 
 let isEditor = window.location.href.includes('editor=true')
 

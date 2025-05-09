@@ -1,10 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-import CdcWaffleChart from './CdcWaffleChart'
-
 import '@cdc/core/styles/cove-main.scss'
 import './coreStyles_wafflechart.scss'
+
+import CdcWaffleChart from './CdcWaffleChart'
 
 let isEditor = window.location.href.includes('editor=true')
 

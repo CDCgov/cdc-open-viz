@@ -190,6 +190,13 @@ const EditorPanel = memo(props => {
           placeholder='Chart Title'
           updateField={updateField}
         />
+        <InputCheckbox
+          size='small'
+          label='show title'
+          value={config.showTitle}
+          fieldName='showTitle'
+          updateField={updateField}
+        />
         <InputText
           type='textarea'
           value={config.content}

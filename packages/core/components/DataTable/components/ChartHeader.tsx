@@ -4,6 +4,7 @@ import { getDataSeriesColumns } from '../helpers/getDataSeriesColumns'
 import ScreenReaderText from '@cdc/core/components/elements/ScreenReaderText'
 import { SortIcon } from './SortIcon'
 import { getNewSortBy } from '../helpers/getNewSortBy'
+import parse from 'html-react-parser'
 
 type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; hasRowType?; viewport; rightAlignedCols }
 
@@ -75,7 +76,7 @@ const ChartHeader = ({
     return (
       <tr>
         {dataSeriesColumns.map((column, index) => {
-          const text = getSeriesName(column, config)
+          const text = parse(getSeriesName(column, config))
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
           const isSortedCol = column === sortBy.column && !hasRowType

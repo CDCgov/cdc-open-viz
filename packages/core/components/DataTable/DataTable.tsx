@@ -27,7 +27,6 @@ import _ from 'lodash'
 import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
 
 export type DataTableProps = {
-  applyLegendToRow?: Function
   colorScale?: Function
   columns?: Record<string, Column>
   config: TableConfig
@@ -35,7 +34,7 @@ export type DataTableProps = {
   defaultSortBy?: string
   displayGeoName?: (row: string) => string
   expandDataTable: boolean
-  formatLegendLocation?: (row: string) => string
+  formatLegendLocation?: (row: string, runtimeLookup: string) => string
   groupBy?: string
   headerColor?: string
   imageRef?: string
@@ -58,20 +57,20 @@ export type DataTableProps = {
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = (props: DataTableProps) => {
   const {
+    columns,
     config,
     dataConfig,
     defaultSortBy,
     displayGeoName,
-    tableTitle,
-    vizTitle,
+    expandDataTable,
+    formatLegendLocation,
+    headerColor,
     rawData,
     runtimeData: parentRuntimeData,
-    headerColor,
-    expandDataTable,
-    columns,
-    viewport,
-    formatLegendLocation,
     tabbingId,
+    tableTitle,
+    viewport,
+    vizTitle,
     wrapColumns
   } = props
   const runtimeData = useMemo(() => {
@@ -248,9 +247,14 @@ const DataTable = (props: DataTableProps) => {
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
 
       // only use fullGeoName on County maps and no other
-      if (config.general?.geoType === 'us-county') {
+      if (config.general?.geoType === 'us-county' || config.table.showFullGeoNameInCSV) {
         // Add column for full Geo name along with State
-        return csvData.map(row => ({ FullGeoName: formatLegendLocation(row[config.columns.geo.name]), ...row }))
+        return csvData.map(row => {
+          return {
+            FullGeoName: formatLegendLocation(row[config.columns.geo.name]),
+            ...row
+          }
+        })
       } else {
         return csvData
       }
@@ -275,7 +279,7 @@ const DataTable = (props: DataTableProps) => {
 
     const childrenMatrix =
       config.type === 'map'
-        ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData, viewport })
+        ? mapCellMatrix({ ...props, rows, wrapColumns, runtimeData, viewport })
         : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
 
     // If every value in a column is a number, record the column index so the header and cells can be right-aligned
@@ -352,7 +356,8 @@ const DataTable = (props: DataTableProps) => {
                 }`,
                 'aria-live': 'assertive',
                 'aria-rowcount': config?.data?.length ? config.data.length : -1,
-                hidden: !expanded
+                hidden: !expanded,
+                cellMinWidth: 100
               }}
               rightAlignedCols={rightAlignedCols}
             />

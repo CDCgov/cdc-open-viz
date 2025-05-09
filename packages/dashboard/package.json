@@ -34,16 +34,11 @@
     "@cdc/map": "^4.25.3",
     "@cdc/markup-include": "^4.25.3",
     "@cdc/waffle-chart": "^4.25.3",
-    "html-react-parser": "^3.0.8",
     "js-base64": "^2.5.2",
-    "papaparse": "^5.3.0",
     "react-accessible-accordion": "^3.3.4",
     "react-dnd": "^14.0.2",
     "react-dnd-html5-backend": "^14.0.0",
-    "react-table": "^7.5.0",
-    "react-tooltip": "5.8.2-beta.3",
-    "use-debounce": "^6.0.1",
-    "whatwg-fetch": "^3.6.2"
+    "use-debounce": "^6.0.1"
   },
   "peerDependencies": {
     "react": "^18.2.0",

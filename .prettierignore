@@ -1,8 +1,1 @@
 node_modules
-packages/map/src/data/us-topo.json
-packages/map/src/data/world-topo.json
-packages/map/src/data/us-hex.json
-packages/map/src/data/us-regions-topo.json
-packages/map/src/data/us-regions-topo-2.json
-packages/map/src/data/county-topo.json
-packages/map/src/data/county-map.json

@@ -14,7 +14,7 @@ import { type ChartContext } from '@cdc/chart/src/types/ChartContext'
 
 // cdc
 import ConfigContext from '../../ConfigContext'
-import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 
 const ForestPlot = ({
   xScale,
@@ -254,7 +254,7 @@ const ForestPlot = ({
             <LinePath
               data={regressionPoints}
               x={d => d.x}
-              y={d => d.y - appFontSize / 2}
+              y={d => d.y - APP_FONT_SIZE / 2}
               stroke='black'
               strokeWidth={2}
               fill={'black'}

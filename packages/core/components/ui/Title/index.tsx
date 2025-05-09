@@ -1,6 +1,7 @@
 import React from 'react'
 import parse from 'html-react-parser'
-import './Title.scss'
+import './title.styles.css'
+import { Visualization } from '../../../types/Visualization'
 
 type HeaderProps = {
   title?: string
@@ -10,13 +11,19 @@ type HeaderProps = {
   style?: React.CSSProperties
   showTitle?: boolean
   ariaLevel?: number
+  config: Visualization
+  theme?: string
 }
 
 const Title = (props: HeaderProps) => {
-  const { isDashboard, title, superTitle, classes = [], showTitle = true, ariaLevel = 2 } = props
+  const { isDashboard, title, superTitle, classes = [], showTitle = true, ariaLevel = 2, theme = 'theme-blue' } = props
 
   // standard classes every vis should have
   const updatedClasses = ['cove-component__header', 'component__header', 'mb-3', ...classes]
+
+  if (theme) {
+    updatedClasses.push(theme)
+  }
 
   return (
     title &&
