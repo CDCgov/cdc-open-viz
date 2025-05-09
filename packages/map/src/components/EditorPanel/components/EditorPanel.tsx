@@ -116,6 +116,8 @@ const EditorPanel = () => {
     specialClasses = legend.specialClasses || []
   }
 
+  const allowLegendSeparators = legend.style === 'gradient' && legend.subStyle === 'linear blocks'
+
   const getCityStyleOptions = target => {
     switch (target) {
       case 'value': {
@@ -269,6 +271,15 @@ const EditorPanel = () => {
           }
         })
         break
+      case 'legendGroupBy':
+        setConfig({
+          ...config,
+          legend: {
+            ...config.legend,
+            groupBy: value
+          }
+        })
+        break
       case 'legendTickRotation':
         setConfig({
           ...config,
@@ -332,37 +343,6 @@ const EditorPanel = () => {
           legend: {
             ...config.legend,
             description: value
-          }
-        })
-        break
-      case 'legendType':
-        let testForType = Number(typeof config.data[0][config.columns.primary.name])
-        let hasValue = config.data[0][config.columns.primary.name]
-        let messages = []
-
-        if (!hasValue) {
-          messages.push(
-            `There appears to be values missing for data in the primary column ${config.columns.primary.name}`
-          )
-        }
-
-        if (testForType === 'string' && isNaN(testForType) && value !== 'category') {
-          messages.push(
-            'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to DEV-12345categorical.'
-          )
-        } else {
-          messages = []
-        }
-
-        setConfig({
-          ...config,
-          legend: {
-            ...config.legend,
-            type: value
-          },
-          runtime: {
-            ...config.runtime,
-            editorErrorMessage: messages
           }
         })
         break
@@ -590,28 +570,6 @@ const EditorPanel = () => {
             break
         }
 
-        break
-      case 'singleColumnLegend':
-        setConfig({
-          ...config,
-          legend: {
-            ...config.legend,
-            singleColumn: !config.legend.singleColumn,
-            singleRow: false,
-            verticalSorted: false
-          }
-        })
-        break
-      case 'singleRowLegend':
-        setConfig({
-          ...config,
-          legend: {
-            ...config.legend,
-            singleRow: !config.legend.singleRow,
-            singleColumn: false,
-            verticalSorted: false
-          }
-        })
         break
       case 'verticalSortedLegend':
         setConfig({
@@ -2095,7 +2053,29 @@ const EditorPanel = () => {
                       { value: 'equalinterval', label: 'Equal Interval' }
                     ]}
                     onChange={event => {
-                      handleEditorChanges('legendType', event.target.value)
+                      let testForType = Number(typeof config.data[0][config.columns.primary.name])
+                      let hasValue = config.data[0][config.columns.primary.name]
+                      let messages = []
+
+                      if (!hasValue) {
+                        messages.push(
+                          `There appears to be values missing for data in the primary column ${config.columns.primary.name}`
+                        )
+                      }
+
+                      if (testForType === 'string' && isNaN(testForType) && value !== 'category') {
+                        messages.push(
+                          'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to DEV-12345categorical.'
+                        )
+                      } else {
+                        messages = []
+                      }
+
+                      const _newConfig = _.cloneDeep(config)
+                      _newConfig.general.equalNumberOptIn = true
+                      _newConfig.legend.type = event.target.value
+                      _newConfig.runtime.editorErrorMessage = messages
+                      setConfig(_newConfig)
                     }}
                   />
                 )}
@@ -2181,6 +2161,28 @@ const EditorPanel = () => {
                     </select>
                   </label>
                 )}
+                {allowLegendSeparators && (
+                  <TextField
+                    value={legend.separators}
+                    updateField={updateField}
+                    section='legend'
+                    fieldName='separators'
+                    label='Legend Separators'
+                    placeholder='ex: 1,4'
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>
+                            Separators between legend items represented by the legend item numbers separated by commas.
+                          </p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                )}
                 {'navigation' !== config.general.type && config.legend.style === 'gradient' && (
                   <label>
                     <span className='edit-label'>Tick Rotation (Degrees)</span>
@@ -2223,7 +2225,12 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={legend.singleColumn}
                       onChange={event => {
-                        handleEditorChanges('singleColumnLegend', event.target.checked)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.legend.singleColumn = !event.target.checked
+                        _newConfig.legend.singleRow = false
+                        _newConfig.legend.verticalSorted = false
+
+                        setConfig(_newConfig)
                       }}
                     />
                     <span className='edit-label'>Single Column Legend</span>
@@ -2235,11 +2242,29 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={legend.singleRow}
                       onChange={event => {
-                        handleEditorChanges('singleRowLegend', event.target.checked)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.legend.singleRow = !event.target.checked
+                        _newConfig.legend.singleColumn = false
+                        _newConfig.legend.verticalSorted = false
+
+                        setConfig(_newConfig)
                       }}
                     />
                     <span className='edit-label'>Single Row Legend</span>
                   </label>
+                )}
+
+                {'navigation' !== config.general.type && config.legend.type === 'category' && (
+                  <Select
+                    label='Legend Group By :'
+                    value={legend.groupBy || ''}
+                    options={columnsOptions.map(c => c.key)}
+                    onChange={event => {
+                      const _newConfig = _.cloneDeep(config)
+                      _newConfig.legend.groupBy = event.target.value
+                      setConfig(_newConfig)
+                    }}
+                  />
                 )}
                 {config.legend.style !== 'gradient' && (
                   <label className='checkbox'>
@@ -2247,7 +2272,9 @@ const EditorPanel = () => {
                       type='checkbox'
                       checked={legend.verticalSorted}
                       onChange={event => {
-                        handleEditorChanges('verticalSortedLegend', event.target.checked)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.legend.verticalSorted = event.target.checked
+                        setConfig(_newConfig)
                       }}
                     />
                     <span className='edit-label'>Vertical sorted legend</span>
@@ -2294,32 +2321,7 @@ const EditorPanel = () => {
                     </span>
                   </label>
                 )}
-                {/* Temp Checkbox */}
-                {config.legend.type === 'equalnumber' && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={config.general.equalNumberOptIn}
-                      onChange={event => {
-                        const _newConfig = _.clone(config)
-                        _newConfig.general.equalNumberOptIn = event.target.checked
-                        setConfig(_newConfig)
-                      }}
-                    />
-                    <span className='edit-label column-heading'>Use new quantile legend</span>
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon
-                          display='question'
-                          style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                        />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>This prevents numbers from being used in more than one category (ie. 0-1, 1-2, 2-3) </p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  </label>
-                )}
+
                 {'category' !== legend.type && (
                   <Select
                     label={
@@ -2716,7 +2718,7 @@ const EditorPanel = () => {
                 <label className='checkbox'>
                   <input
                     type='checkbox'
-                    checked={config.general.showFullGeoNameInCSV}
+                    checked={config.table.showFullGeoNameInCSV}
                     onChange={event => {
                       handleEditorChanges('toggleShowFullGeoNameInCSV', event.target.checked)
                     }}

@@ -5,7 +5,6 @@ import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 import { Group } from '@visx/group'
 import { Line, Bar } from '@visx/shape'
 import { Text } from '@visx/text'
-import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import _ from 'lodash'
 
@@ -246,10 +245,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleTooltipClick,
     handleTooltipMouseOff,
     TooltipListItem,
-    getXValueFromCoordinate
   } = useCoveTooltip({
       xScale,
       yScale,
+      seriesScale,
       showTooltip,
       hideTooltip
   })
@@ -755,9 +754,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               chartRef={svgRef}
             />
           )}
-          {((visualizationType === 'Line' && !convertLineToBarGraph) ||
-            visualizationType === 'Combo' ||
-            visualizationType === 'Bump Chart') && (
+          {(visualizationType === 'Combo' || visualizationType === 'Bump Chart') && (
             <LineChart
               xScale={xScale}
               yScale={yScale}
@@ -771,7 +768,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               handleTooltipClick={handleTooltipClick}
               tooltipData={tooltipData}
               showTooltip={showTooltip}
-              //chartRef={svgRef}
             />
           )}
           {(visualizationType === 'Forecasting' || visualizationType === 'Combo') && (
@@ -785,7 +781,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               height={yMax}
               xScaleNoPadding={xScaleNoPadding}
               chartRef={svgRef}
-              getXValueFromCoordinate={getXValueFromCoordinate}
               handleTooltipMouseOver={handleTooltipMouseOver}
               handleTooltipMouseOff={handleTooltipMouseOff}
               isBrush={false}
@@ -829,6 +824,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   xMax={xMax}
                   yMax={yMax}
                   seriesStyle={config.runtime.series}
+                  tooltipData={tooltipData}
+                  handleTooltipMouseOver={handleTooltipMouseOver}
+                  handleTooltipMouseOff={handleTooltipMouseOff}
                 />
               </>
             )}
@@ -913,36 +911,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               width={width}
             />
           )}
-          {chartHasTooltipGuides && showTooltip && tooltipData && config.visual.verticalHoverLine && (
-            <Group key='tooltipLine-vertical' className='vertical-tooltip-line'>
-              <Line
-                from={{ x: tooltipData.dataXPosition - 10, y: 0 }}
-                to={{ x: tooltipData.dataXPosition - 10, y: yMax }}
-                stroke={'black'}
-                strokeWidth={1}
-                pointerEvents='none'
-                strokeDasharray='5,5'
-                className='vertical-tooltip-line'
-              />
-            </Group>
-          )}
-          {chartHasTooltipGuides && showTooltip && tooltipData && config.visual.horizontalHoverLine && (
-            <Group
-              key='tooltipLine-horizontal'
-              className='horizontal-tooltip-line'
-              left={config.yAxis.size ? config.yAxis.size : 0}
-            >
-              <Line
-                from={{ x: 0, y: tooltipData.dataYPosition }}
-                to={{ x: xMax, y: tooltipData.dataYPosition }}
-                stroke={'black'}
-                strokeWidth={1}
-                pointerEvents='none'
-                strokeDasharray='5,5'
-                className='horizontal-tooltip-line'
-              />
-            </Group>
-          )}
           {isNoDataAvailable && (
             <Text
               x={Number(config.yAxis.size) + Number(xMax / 2)}
@@ -952,40 +920,36 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               {config.chartMessage.noData}
             </Text>
           )}
-          {(config.visualizationType === 'Bar' || convertLineToBarGraph) &&
-            config.tooltips.singleSeries &&
-            config.visual.horizontalHoverLine && (
-              <Group
-                key='tooltipLine-horizontal'
+          {config.visual.horizontalHoverLine && tooltipData && (
+            <Group
+              key={`tooltipLine-horizontal${point.y}${point.x}`}
+              className='horizontal-tooltip-line'
+              left={config.yAxis.size ? config.yAxis.size : 0}
+            >
+              <Line
+                from={{ x: 0, y: point.y }}
+                to={{ x: xMax, y: point.y }}
+                stroke={'black'}
+                strokeWidth={1}
+                pointerEvents='none'
+                strokeDasharray='5,5'
                 className='horizontal-tooltip-line'
-                left={config.yAxis.size ? config.yAxis.size : 0}
-              >
-                <Line
-                  from={{ x: 0, y: point.y }}
-                  to={{ x: xMax, y: point.y }}
-                  stroke={'black'}
-                  strokeWidth={1}
-                  pointerEvents='none'
-                  strokeDasharray='5,5'
-                  className='horizontal-tooltip-line'
-                />
-              </Group>
-            )}
-          {(config.visualizationType === 'Bar' || convertLineToBarGraph) &&
-            config.tooltips.singleSeries &&
-            config.visual.verticalHoverLine && (
-              <Group key='tooltipLine-vertical' className='vertical-tooltip-line'>
-                <Line
-                  from={{ x: point.x, y: 0 }}
-                  to={{ x: point.x, y: yMax }}
-                  stroke={'black'}
-                  strokeWidth={1}
-                  pointerEvents='none'
-                  strokeDasharray='5,5'
-                  className='vertical-tooltip-line'
-                />
-              </Group>
-            )}
+              />
+            </Group>
+          )}
+          {config.visual.verticalHoverLine && tooltipData && (
+            <Group key={`tooltipLine-vertical${point.y}${point.x}`} className='vertical-tooltip-line'>
+              <Line
+                from={{ x: point.x, y: 0 }}
+                to={{ x: point.x, y: yMax }}
+                stroke={'black'}
+                strokeWidth={1}
+                pointerEvents='none'
+                strokeDasharray='5,5'
+                className='vertical-tooltip-line'
+              />
+            </Group>
+          )}
           <Group left={Number(config.runtime.yAxis.size)}>
             <Annotation.Draggable
               xScale={xScale}

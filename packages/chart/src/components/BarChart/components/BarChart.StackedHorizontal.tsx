@@ -12,6 +12,7 @@ import BarChartContext, { type BarChartContextValues } from './context'
 import { type ChartContext } from '../../../types/ChartContext'
 
 import createBarElement from '@cdc/core/components/createBarElement'
+import { getHorizontalBarHeights } from '../helpers/getBarHeights'
 
 const BarChartStackedHorizontal = () => {
   const { yMax, yScale, xScale, barChart } = useContext<BarChartContextValues>(BarChartContext)
@@ -38,7 +39,6 @@ const BarChartStackedHorizontal = () => {
     isLabelBelowBar,
     onMouseLeaveBar,
     onMouseOverBar,
-    updateBars,
     barStackedSeriesKeys
   } = barChart
 
@@ -59,7 +59,7 @@ const BarChartStackedHorizontal = () => {
         >
           {barStacks =>
             barStacks.map(barStack =>
-              updateBars(barStack.bars).map((bar, index) => {
+              getHorizontalBarHeights(config, barStack.bars).map((bar, index) => {
                 const transparentBar =
                   config.legend.behavior === 'highlight' &&
                   seriesHighlight.length > 0 &&

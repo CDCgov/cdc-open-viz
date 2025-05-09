@@ -22,9 +22,9 @@ import {
   MAX_ZOOM_LEVEL
 } from '../../helpers'
 import useGeoClickHandler from '../../hooks/useGeoClickHandler'
-import useApplyLegendToRow from '../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../hooks/useApplyTooltipsToGeo'
 import useGenerateRuntimeData from '../../hooks/useGenerateRuntimeData'
+import { applyLegendToRow } from '../../helpers/applyLegendToRow'
 
 import './worldMap.styles.css'
 
@@ -38,6 +38,7 @@ const WorldMap = () => {
     setRuntimeData,
     config,
     tooltipId,
+    runtimeLegend,
     legendMemo,
     legendSpecialClassLastMemo
   } = useContext(ConfigContext)
@@ -46,7 +47,6 @@ const WorldMap = () => {
 
   const [world, setWorld] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
-  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const { generateRuntimeData } = useGenerateRuntimeData(config)
   const dispatch = useContext(MapDispatchContext)
@@ -107,7 +107,7 @@ const WorldMap = () => {
 
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
-        legendColors = applyLegendToRow(geoData, config)
+        legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
       }
 
       const geoStrokeColor = getGeoStrokeColor(config)

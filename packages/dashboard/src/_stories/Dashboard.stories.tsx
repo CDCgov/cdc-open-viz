@@ -341,6 +341,8 @@ export const RegressionAPIFiltersMap: Story = {
     await sleep(1000)
     const topicsFilter = canvas.getByLabelText('Category', { selector: 'select' })
     await user.selectOptions(topicsFilter, ['topicId'])
+    await sleep(1000)
+
     const indicatorsFilter = canvas.getByLabelText('Indicator', { selector: 'select' })
     await user.selectOptions(indicatorsFilter, ['indicatorID'])
     const yearsFilter = canvas.getByLabelText('Year', { selector: 'select' })

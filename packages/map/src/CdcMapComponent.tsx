@@ -33,7 +33,6 @@ import { type MapReducerType, MapState } from './store/map.reducer'
 // Map Helpers
 import {
   addUIDs,
-  closeModal,
   displayGeoName,
   formatLegendLocation,
   getMapContainerClasses,
@@ -65,6 +64,7 @@ import { RuntimeData } from './types/RuntimeData'
 import EditorContext from '@cdc/editor/src/ConfigContext'
 import MapActions from './store/map.actions'
 import _ from 'lodash'
+import useModal from './hooks/useModal'
 
 type CdcMapComponent = {
   config: MapConfig
@@ -127,10 +127,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   useEffect(() => {
     setConfig({ ...config, data: configObj.data })
   }, [configObj.data]) // eslint-disable-line
-
-  const setModal = modal => {
-    dispatch({ type: 'SET_MODAL', payload: modal })
-  }
 
   const setRuntimeData = (data: RuntimeData) => {
     dispatch({ type: 'SET_RUNTIME_DATA', payload: data })
@@ -325,6 +321,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const { general, tooltips, table, columns } = config
   const { subtext = '', geoType } = general
   const { showDownloadImgButton, showDownloadPdfButton, headerColor, introText } = general
+  const { closeModal } = useModal()
 
   let title = config.general.title
 
@@ -358,7 +355,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeLegend,
     scale,
     setConfig,
-    setModal,
     setParentConfig: setConfig,
     setRuntimeData,
     setRuntimeFilters,
@@ -438,10 +434,10 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   role='region'
                   tabIndex={0}
                   className={getMapContainerClasses(config, modal).join(' ')}
-                  onClick={e => closeModal(e, modal, setModal)}
+                  onClick={e => closeModal(e, modal)}
                   onKeyDown={e => {
                     if (e.key === 'Enter') {
-                      closeModal(e, modal, setModal)
+                      closeModal(e, modal)
                     }
                   }}
                 >
@@ -552,7 +548,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     />
                   )}
 
-                {config.annotations.length > 0 && <Annotation.Dropdown />}
+                {config.annotations?.length > 0 && <Annotation.Dropdown />}
 
                 {general.footnotes && <section className='footnotes pt-2 mt-4'>{parse(general.footnotes)}</section>}
               </section>

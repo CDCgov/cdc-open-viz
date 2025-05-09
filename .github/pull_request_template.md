@@ -1,23 +1,14 @@
-## [Replace With Ticket Number]
-
-<!-- Provide a brief description of the changes made in this PR -->
+## Summary
+<!-- Provide a brief explanation of the changes -->
 
 ## Testing Steps
-
-<!-- Provide testing steps and reference storybook stories if necessary -->
+<!-- Provide testing steps -->
 <!-- Add applicable configs to JIRA ticket for testers-->
 
-## Self Review
+## Optional
+### Storybook Links
+<!-- Add links to Storybook components if relevant -->
+<!-- E.g., "Storybook URL: [Link to component]" -->
 
-- I have added testing steps for reviewers
-- I have commented my code, particularly in hard-to-understand areas
-- My changes generate no new warnings
-- New and existing unit tests are passing
-
-## Screenshots (if applicable)
-
-<!-- Add screenshots to help explain the changes made in this PR -->
-
-## Additional Notes
-
-<!-- Add any additional notes about this PR -->
+### Screenshots
+<!-- Add any relevant screenshots for UI changes -->
