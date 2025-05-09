@@ -356,7 +356,8 @@ const DataTable = (props: DataTableProps) => {
                 }`,
                 'aria-live': 'assertive',
                 'aria-rowcount': config?.data?.length ? config.data.length : -1,
-                hidden: !expanded
+                hidden: !expanded,
+                cellMinWidth: 100
               }}
               rightAlignedCols={rightAlignedCols}
             />
