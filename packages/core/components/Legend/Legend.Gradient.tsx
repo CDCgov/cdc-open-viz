@@ -4,15 +4,12 @@ import { type MapConfig } from '@cdc/map/src/types/MapConfig'
 import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { getTextWidth } from '../../helpers/getTextWidth'
 import { DimensionsType } from '../../types/Dimensions'
-import { clamp } from 'lodash'
+import useLegendSeparators from '@cdc/map/src/hooks/useLegendSeparators'
 
 const MARGIN = 1
 const BORDER_SIZE = 1
 const BORDER_COLOR = '#d3d3d3'
 const MOBILE_BREAKPOINT = 576
-const LEGEND_SEPARATOR_SIZE = 0.02
-const LEGEND_SEPARATOR_SIZE_MAX = 20
-const LEGEND_SEPARATOR_SIZE_MIN = 8
 
 type CombinedConfig = MapConfig | ChartConfig
 
@@ -42,13 +39,8 @@ const LegendGradient = ({
   const uniqueID = `${uid}-${Date.now()}`
 
   // Legend separators logic
-  const legendSeparators = isLinearBlocks
-    ? separators?.replace(' ', '').split(',').map(Number).filter(Boolean) || []
-    : []
-  const separatorSize = clamp(legendWidth * LEGEND_SEPARATOR_SIZE, LEGEND_SEPARATOR_SIZE_MIN, LEGEND_SEPARATOR_SIZE_MAX)
-  const legendSeparatorsToSubtract = legendSeparators.length * separatorSize
-  const getTickSeparatorsAdjustment = (index: number) =>
-    legendSeparators.reduce((acc, separators) => (index >= separators ? acc + separatorSize : acc), 0)
+  const { legendSeparators, separatorSize, legendSeparatorsToSubtract, getTickSeparatorsAdjustment } =
+    useLegendSeparators(separators, legendWidth, isLinearBlocks)
 
   const numTicks = colors?.length
 
