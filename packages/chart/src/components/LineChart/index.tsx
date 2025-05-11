@@ -61,24 +61,26 @@ const LineChart = (props: LineChartProps) => {
         {/* left - expects a number not a string */}
         {(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => {
           const seriesData = config.runtime.series.find(item => item.dataKey === seriesKey)
+          const _seriesKey = seriesData.dynamicCategory ? seriesData.originalDataKey : seriesKey
           const lineType = seriesData.type
           const seriesAxis = seriesData.axis || 'left'
           const displayArea =
             legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
 
-          const suppressedSegments = createDataSegments(
-            tableData,
+          const suppressedSegments = createDataSegments({
+            data: tableData,
             seriesKey,
-            config.preliminaryData,
-            config.xAxis.dataKey
-          )
+            preliminaryData: config.preliminaryData,
+            dynamicCategory: seriesData.dynamicCategory,
+            originalSeriesKey: _seriesKey,
+            colorScale
+          })
           const isSplitLine =
             config?.preliminaryData?.filter(pd => pd.style && !pd.style.includes('Circles')).length > 0
 
           const _data = seriesData.dynamicCategory
             ? data.filter(d => d[seriesData.dynamicCategory] === seriesKey)
             : data
-          const _seriesKey = seriesData.dynamicCategory ? seriesData.originalDataKey : seriesKey
           return (
             <Group
               key={`series-${seriesKey}-${index}`}
@@ -213,15 +215,17 @@ const LineChart = (props: LineChartProps) => {
                     }
                     styles={createStyles({
                       preliminaryData: config.preliminaryData,
-                      data: _tableData,
+                      data: tableData,
                       stroke: colorScale(config.runtime.seriesLabels[seriesKey]),
                       strokeWidth: seriesData.weight || 2,
                       handleLineType,
                       lineType,
-                      seriesKey
+                      seriesKey,
+                      dynamicCategory: seriesData.dynamicCategory,
+                      originalSeriesKey: _seriesKey
                     })}
                     defined={(item, i) => {
-                      return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                      return item[_seriesKey] !== '' && item[_seriesKey] !== null && item[_seriesKey] !== undefined
                     }}
                   />
 
@@ -234,16 +238,22 @@ const LineChart = (props: LineChartProps) => {
                           x={d => xPos(d)}
                           y={d =>
                             seriesAxis === 'Right'
-                              ? yScaleRight(getYAxisData(d, seriesKey))
-                              : yScale(Number(getYAxisData(d, seriesKey)))
+                              ? yScaleRight(getYAxisData(d, _seriesKey))
+                              : yScale(Number(getYAxisData(d, _seriesKey)))
                           }
-                          stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
+                          stroke={
+                            seriesData.dynamicCategory
+                              ? segment.color
+                              : colorScale(config.runtime.seriesLabels[seriesKey])
+                          }
                           strokeWidth={seriesData[0]?.weight || 2}
                           strokeOpacity={1}
                           shapeRendering='geometricPrecision'
                           strokeDasharray={handleLineType(segment.style)}
                           defined={(item, i) => {
-                            return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                            return (
+                              item[_seriesKey] !== '' && item[_seriesKey] !== null && item[_seriesKey] !== undefined
+                            )
                           }}
                         />
                       )
