@@ -1,5 +1,6 @@
 import DynamicSeriesConfig from './_mock/dynamic_series_config.json'
 import DynamicSeriesBarConfig from './_mock/dynamic_series_bar_config.json'
+import DynamicSeriesSuppression from './_mock/dynamic_series_suppression_mock.json'
 import { Meta, StoryObj } from '@storybook/react'
 import Chart from '../CdcChartComponent'
 
@@ -21,6 +22,13 @@ export const LineShowPoints: Story = {
       formattedData: data,
       lineDatapointStyle: 'always show'
     },
+    isEditor: false
+  }
+}
+
+export const LineSuppression: Story = {
+  args: {
+    config: DynamicSeriesSuppression,
     isEditor: false
   }
 }
