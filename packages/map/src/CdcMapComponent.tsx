@@ -114,8 +114,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     isDraggingAnnotation
   } = mapState
 
-  const editorContext = useContext(EditorContext)
-
   const setConfig = (newMapState: MapConfig): void => {
     dispatch({ type: 'SET_CONFIG', payload: newMapState })
     if (isEditor && isDashboard) {
