@@ -74,6 +74,10 @@ import { getColorScale } from './helpers/getColorScale'
 // styles
 import './scss/main.scss'
 import { getInitialState, reducer } from './store/chart.reducer'
+import { VizFilter } from '@cdc/core/types/VizFilter'
+import { getNewRuntime } from './helpers/getNewRuntime'
+import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
+import { Datasets } from '@cdc/core/types/DataSet'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -87,6 +91,7 @@ interface CdcChartProps {
   setSharedFilter?: (filter: any) => void
   setSharedFilterValue?: (value: any) => void
   dashboardConfig?: DashboardConfig
+  datasets?: Datasets
 }
 const CdcChart: React.FC<CdcChartProps> = ({
   config: configObj,
@@ -98,7 +103,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   link,
   setSharedFilter,
   setSharedFilterValue,
-  dashboardConfig
+  dashboardConfig,
+  datasets
 }) => {
   const transform = new DataTransform()
   const initialState = getInitialState(configObj)
@@ -130,10 +136,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
   }
 
-  const setFiltersData = (filteredData: object[]): void => {
-    dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
-  }
-
   const legendRef = useRef(null)
   const parentRef = useRef(null)
 
@@ -160,7 +162,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   const convertLineToBarGraph = isConvertLineToBarGraph(config, filteredData)
 
-  const prepareConfig = async (loadedConfig: ChartConfig) => {
+  const prepareConfig = (loadedConfig: ChartConfig) => {
     let newConfig = _.defaultsDeep(loadedConfig, defaults)
     _.defaultsDeep(newConfig, {
       table: { showVertical: false }
@@ -340,6 +342,30 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
   }
 
+  const setFilters = (newFilters: VizFilter[]) => {
+    if (!config.dynamicSeries) {
+      const _newFilters = addValuesToFilters(newFilters, excludedData)
+      setConfig({
+        ...config,
+        filters: _newFilters
+      })
+    }
+
+    if (config.filterBehavior === 'Filter Change') {
+      const newFilteredData = filterVizData(newFilters, excludedData)
+
+      dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+      if (config.dynamicSeries) {
+        const runtime = getNewRuntime(config, newFilteredData)
+        setConfig({
+          ...config,
+          filters: newFilters,
+          runtime
+        })
+      }
+    }
+  }
+
   // Observes changes to outermost container and changes viewport size in state
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -400,21 +426,18 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return newConfig
   }
   useEffect(() => {
-    const load = async () => {
-      try {
-        if (configObj) {
-          const preparedConfig = await prepareConfig(configObj)
-          const preppedData = await prepareData(preparedConfig)
-          dispatch({ type: 'SET_STATE_DATA', payload: preppedData.data })
-          dispatch({ type: 'SET_EXCLUDED_DATA', payload: preppedData.data })
-          updateConfig(preparedConfig, preppedData.data)
-        }
-      } catch (err) {
-        console.error('Could not Load!')
+    try {
+      if (configObj) {
+        const preparedConfig = prepareConfig(_.cloneDeep(configObj))
+        const { formattedData } = preparedConfig
+        preparedConfig.data = formattedData
+        dispatch({ type: 'SET_STATE_DATA', payload: formattedData })
+        dispatch({ type: 'SET_EXCLUDED_DATA', payload: formattedData })
+        updateConfig(preparedConfig, formattedData)
       }
+    } catch (err) {
+      console.error('Could not Load!')
     }
-
-    load()
   }, [configObj?.data?.length ? configObj.data : null])
 
   /**
@@ -825,7 +848,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     body = (
       <>
-        {isEditor && <EditorPanel />}
+        {isEditor && <EditorPanel datasets={datasets} />}
         <Layout.Responsive isEditor={isEditor}>
           {config.newViz && <Confirm updateConfig={updateConfig} config={config} />}
           {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && (
@@ -859,11 +882,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
                   <Filters
                     config={config}
-                    setConfig={setConfig}
-                    setFilteredData={setFiltersData}
-                    filteredData={filteredData}
+                    setFilters={setFilters}
                     excludedData={excludedData}
-                    filterData={filterVizData}
                     dimensions={dimensions}
                   />
                 )}
@@ -940,11 +960,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       <>
                         <Filters
                           config={config}
-                          setConfig={setConfig}
-                          setFilteredData={setFiltersData}
-                          filteredData={filteredData}
+                          setFilters={setFilters}
                           excludedData={excludedData}
-                          filterData={filterVizData}
                           dimensions={dimensions}
                         />
                         {config?.introText && (
@@ -1041,8 +1058,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 )}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
-                {config?.footnotes && <section className='footnotes pt-2 mt-4'>{parse(config.footnotes)}</section>}
+                {config?.legacyFootnotes && (
+                  <section className='footnotes pt-2 mt-4'>{parse(config.legacyFootnotes)}</section>
+                )}
               </div>
+              <FootnotesStandAlone
+                config={configObj.footnotes}
+                filters={config.filters?.filter(f => f.filterFootnotes)}
+              />
             </div>
           )}
         </Layout.Responsive>

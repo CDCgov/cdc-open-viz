@@ -5,13 +5,11 @@ import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 type CollapsableVizRow = {
   allExpanded: boolean
   children: React.ReactNode
-  fontSize: string
   groupName: string
   currentViewport: string
 }
 const CollapsibleVisualizationRow: React.FC<CollapsableVizRow> = ({
   allExpanded,
-  fontSize,
   groupName,
   currentViewport,
   children
@@ -24,7 +22,7 @@ const CollapsibleVisualizationRow: React.FC<CollapsableVizRow> = ({
   }, [allExpanded])
 
   return (
-    <>
+    <div className='collapsable-multiviz-container'>
       <div
         style={{ fontSize: titleFontSize }}
         role='button'
@@ -43,7 +41,7 @@ const CollapsibleVisualizationRow: React.FC<CollapsableVizRow> = ({
         {groupName}
       </div>
       {isExpanded && children}
-    </>
+    </div>
   )
 }
 
