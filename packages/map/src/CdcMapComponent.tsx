@@ -86,7 +86,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   setSharedFilter,
   setSharedFilterValue,
   link,
-  setEditorConfig
+  setEditorConfig,
+  loadConfig
 }) => {
   const initialState = getInitialState(configObj)
 
@@ -367,7 +368,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     tooltipRef,
     topoData,
     translate,
-    isDraggingAnnotation
+    isDraggingAnnotation,
+    loadConfig
   }
 
   if (!config.data) return <></>

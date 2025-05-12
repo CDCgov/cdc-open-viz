@@ -7,6 +7,7 @@ import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { addUIDs, validateFipsCodeLength } from './helpers'
 import EditorContext from '@cdc/editor/src/ConfigContext'
 import { MapConfig } from './types/MapConfig'
+import _ from 'lodash'
 
 type CdcMapProps = {
   config: MapConfig
@@ -42,13 +43,12 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
   const loadConfig = async configObj => {
     if (!loading) setLoading(true)
-    const configToLoad = editorsConfig || configObj
+    const configToLoad = editorsConfig ?? configObj
 
     let newState = {
       ...initialState,
       ...configToLoad
     }
-
     if (newState.dataUrl) {
       let newData = await fetchRemoteData(newState.dataUrl, 'map')
 
@@ -98,17 +98,13 @@ const CdcMap: React.FC<CdcMapProps> = ({
   }
 
   const init = async () => {
-    let configData = null
-
-    if (config) {
-      configData = config
-    }
+    let _newConfig = _.cloneDeep(config ?? initialState)
 
     if (configUrl) {
-      configData = await fetchRemoteData(configUrl)
+      _newConfig = await fetchRemoteData(configUrl)
     }
-    if ('object' === typeof configData) {
-      loadConfig(configData)
+    if ('object' === typeof _newConfig) {
+      loadConfig(_newConfig)
     }
   }
 
@@ -126,6 +122,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
       isEditor={isEditor}
       logo={logo}
       link={link}
+      loadConfig={loadConfig}
     />
   )
 }
