@@ -1,11 +1,45 @@
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
+
 export const getVegaConfigType = vegaConfig => {
   if (vegaConfig.projections) {
     return 'Map'
-  } else if (vegaConfig.mark === 'bar') {
-    return 'Bar'
-  } else {
-    return 'Line'
   }
+
+  const mainMark = getMainMark(vegaConfig)
+  if (!mainMark) {
+    return undefined
+  }
+
+  if (mainMark.type === 'line') {
+    return 'Line'
+  } else if (mainMark.type === 'area') {
+    return 'Area Chart'
+  }
+  return 'Bar'
+}
+
+const getMainMark = vegaConfig => {
+  const marks = vegaConfig.marks.map(m => (m.type === 'group' ? m.marks[0] : m))
+  const mainMarks = marks.filter(m => ['rect', 'line', 'area'].includes(m.type))
+  return mainMarks.length ? mainMarks[0] : undefined
+}
+
+const getStack = vegaConfig => {
+  return vegaConfig.data.length ? vegaConfig.data[0].transform?.find(t => t.type === 'stack') : undefined
+}
+
+const getGroupMark = vegaConfig => {
+  return vegaConfig.marks.find(m => m.type === 'group')
+}
+
+const getSeriesKey = vegaConfig => {
+  const groupMark = getGroupMark(vegaConfig)
+  let seriesKey = groupMark?.from?.facet?.groupby
+  const stack = getStack(vegaConfig)
+  if (stack && !seriesKey) {
+    seriesKey = stack.sort.field
+  }
+  return seriesKey
 }
 
 export const convertVegaConfig = (configType: string, vegaConfig: any, config: any) => {
@@ -17,39 +51,7 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
   config.showTitle = false
   config.table = config.table || { expanded: false }
 
-  if (configType === 'Bar') {
-    config.xAxis.dataKey = vegaConfig.encoding.x.field
-
-    config.dataDescription = {
-      horizontal: false,
-      series: false
-    }
-
-    config.series = [
-      {
-        dataKey: vegaConfig.encoding.y.field,
-        type: 'Bar',
-        axis: 'Left',
-        tooltip: true
-      }
-    ]
-
-    config.legend = {
-      hide: true
-    }
-  } else if (configType === 'Line') {
-    config.xAxis = config.xAxis || {}
-    config.xAxis.dataKey = vegaConfig.marks[0].marks[0].encode.enter.x.field
-
-    config.dataDescription = {
-      horizontal: false,
-      series: true,
-      singleRow: false,
-      seriesKey: vegaConfig.marks[0].from.facet.groupby,
-      xKey: config.xAxis.dataKey,
-      valueKeys: [vegaConfig.marks[0].marks[0].encode.enter.y.field]
-    }
-  } else if (configType === 'Map') {
+  if (configType === 'Map') {
     const geoData = vegaConfig.data.find(d => d.format?.type === 'topojson')
     const transform = geoData.transform.find(t => t.type === 'lookup')
 
@@ -65,7 +67,60 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
       dataTable: true,
       tooltip: true
     }
-    console.log(config.columns)
+  } else {
+    const mainMark = getMainMark(vegaConfig)
+    const mainMarkEncoder = mainMark.encode.enter || mainMark.encode.update
+    const seriesKey = getSeriesKey(vegaConfig)
+    const stack = getStack(vegaConfig)
+
+    config.xAxis = config.xAxis || {}
+
+    if (configType === 'Bar' || configType === 'Area Chart') {
+      config.xAxis.dataKey = mainMarkEncoder.x.field
+
+      if (seriesKey) {
+        config.visualizationSubType = stack ? 'stacked' : ''
+
+        config.dataDescription = {
+          horizontal: false,
+          series: true,
+          singleRow: false,
+          seriesKey: seriesKey,
+          xKey: config.xAxis.dataKey,
+          valueKeysTallSupport: [vegaConfig.data[0].transform[0].field]
+        }
+      } else {
+        config.dataDescription = {
+          horizontal: false,
+          series: false,
+          singleRow: true
+        }
+
+        config.series = [
+          {
+            dataKey: mainMarkEncoder.y.field,
+            type: configType,
+            axis: 'Left',
+            tooltip: true
+          }
+        ]
+      }
+
+      config.legend = {
+        hide: !seriesKey
+      }
+    } else if (configType === 'Line') {
+      config.xAxis.dataKey = mainMark.encode.enter.x.field
+
+      config.dataDescription = {
+        horizontal: false,
+        series: true,
+        singleRow: false,
+        seriesKey: seriesKey,
+        xKey: config.xAxis.dataKey,
+        valueKeys: [mainMark.encode.enter.y.field]
+      }
+    }
   }
 
   const vegaData = Array.isArray(vegaConfig.data) ? vegaConfig.data[0] : vegaConfig.data
@@ -80,18 +135,27 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
 }
 
 export const loadedVegaConfigData = (config: any) => {
-  if (config.vegaType === 'Line') {
-    if (!config.series) {
-      const seriesVals = [...new Set(config.data.map(d => d[config.dataDescription.seriesKey]))]
-      config.series = seriesVals.map(val => {
-        return {
-          dataKey: val,
-          type: 'Line',
-          axis: 'Left',
-          tooltip: true
-        }
-      })
-    }
+  const seriesKey = getSeriesKey(config.vegaConfig)
+  if (seriesKey && !config.series) {
+    const seriesVals = [...new Set(config.data.map(d => d[seriesKey]))]
+    config.series = seriesVals.map(val => {
+      return {
+        dataKey: val,
+        type: config.vegaType,
+        axis: 'Left',
+        tooltip: true
+      }
+    })
+    config.data.forEach(d => {
+      d[seriesKey] = `${d[seriesKey]}`
+    })
   }
+
+  if (config.dataDescription) {
+    const transform = new DataTransform()
+    config.data = transform.autoStandardize(config.data)
+    config.data = transform.developerStandardize(config.data, config.dataDescription)
+  }
+
   return config
 }
