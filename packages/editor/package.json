@@ -38,6 +38,8 @@
     "react-dropzone": "^11.2.4",
     "react-table": "^7.6.2",
     "use-debounce": "^5.2.0",
+    "vega": "^6.1.0",
+    "vega-lite": "^6.1.0",
     "whatwg-fetch": "^3.6.2"
   },
   "peerDependencies": {
