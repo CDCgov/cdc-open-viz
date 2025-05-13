@@ -333,6 +333,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   if (!table.label || table.label === '') table.label = 'Data Table'
 
   const mapProps = {
+    setDashboardConfig,
     container,
     content: modal,
     currentViewport,

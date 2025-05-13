@@ -28,7 +28,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
   config: editorsConfig
 }) => {
   const editorContext = useContext(EditorContext)
-  const [config, _setConfig] = useState(editorsConfig)
+  const [config, _setConfig] = useState(null)
 
   const setConfig = newConfig => {
     _setConfig(newConfig)
@@ -42,7 +42,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
   const loadConfig = async configObj => {
     if (!loading) setLoading(true)
-    const configToLoad = configObj
+    const configToLoad = editorsConfig ?? configObj
 
     let newState = {
       ...initialState,

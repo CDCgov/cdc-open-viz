@@ -50,7 +50,7 @@ import './editorPanel.styles.css'
 
 const EditorPanel = () => {
   const {
-    setEditorsConfig,
+    setDashboardConfig: setEditorsConfig,
     isDashboard,
     isEditor,
     loadConfig,
