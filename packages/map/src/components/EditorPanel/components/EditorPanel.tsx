@@ -50,7 +50,7 @@ import './editorPanel.styles.css'
 
 const EditorPanel = () => {
   const {
-    setEditorConfig,
+    setEditorsConfig,
     isDashboard,
     isEditor,
     loadConfig,
@@ -868,7 +868,9 @@ const EditorPanel = () => {
     // Strip ref
     delete strippedState['']
 
-    delete strippedState.newViz
+    if (strippedState.columns.geo.name && strippedState.columns.primary.name) {
+      delete strippedState.newViz
+    }
 
     // Remove the legend
     let strippedLegend = _.cloneDeep(config.legend)
@@ -941,8 +943,8 @@ const EditorPanel = () => {
 
   useEffect(() => {
     const newConfig = convertStateToConfig()
-    if (isEditor && setEditorConfig) {
-      setEditorConfig(newConfig)
+    if (isEditor && setEditorsConfig) {
+      setEditorsConfig(newConfig)
     }
   }, [config])
 
@@ -1508,6 +1510,7 @@ const EditorPanel = () => {
                     options={columnsOptions.map(c => c.key)}
                     onChange={event => {
                       editColumn('geo', 'name', event.target.value)
+                      checkConfigurationNeeded(config)
                     }}
                   />
                 </label>
@@ -1572,6 +1575,7 @@ const EditorPanel = () => {
                       _state.columns.primary.name = event.target.value
                       _state.columns.primary.label = event.target.value
                       setConfig(_state)
+                      checkConfigurationNeeded(_state)
                     }}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
