@@ -25,11 +25,10 @@ const CdcMap: React.FC<CdcMapProps> = ({
   configUrl,
   logo = '',
   link,
-  config: editorsConfig,
-  setConfig: setEditorsConfig
+  config: editorsConfig
 }) => {
   const editorContext = useContext(EditorContext)
-  const [config, _setConfig] = useState(null)
+  const [config, _setConfig] = useState(editorsConfig)
 
   const setConfig = newConfig => {
     _setConfig(newConfig)
@@ -43,7 +42,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
   const loadConfig = async configObj => {
     if (!loading) setLoading(true)
-    const configToLoad = editorsConfig ?? configObj
+    const configToLoad = configObj
 
     let newState = {
       ...initialState,
@@ -117,7 +116,6 @@ const CdcMap: React.FC<CdcMapProps> = ({
   return (
     <CdcMapComponent
       config={config}
-      setEditorConfig={setEditorsConfig}
       navigationHandler={customNavigationHandler}
       isEditor={isEditor}
       logo={logo}
