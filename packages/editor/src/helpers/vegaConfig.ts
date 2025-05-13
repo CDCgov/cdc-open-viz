@@ -15,6 +15,7 @@ export const parseVegaConfig = vegaConfig => {
   if (vegaConfig['$schema'].includes('vega-lite')) {
     vegaConfig = vegaLite.compile(vegaConfig).spec
   }
+  console.log(vegaConfig)
   return vegaConfig
 }
 
@@ -37,7 +38,7 @@ export const getVegaConfigType = vegaConfig => {
 }
 
 const getMainMark = vegaConfig => {
-  const marks = vegaConfig.marks.map(m => (m.type === 'group' ? m.marks[0] : m))
+  const marks = vegaConfig.marks.map(m => (m.type === 'group' && m.marks ? m.marks[0] : m))
   const mainMarks = marks.filter(m => ['rect', 'line', 'area'].includes(m.type))
   return mainMarks.length ? mainMarks[0] : undefined
 }
@@ -47,12 +48,19 @@ const getStack = vegaConfig => {
   return stackData ? stackData.transform.find(t => t.type === 'stack') : undefined
 }
 
-const getStackedData = (stack, data) => {
-  return _.groupBy(data, stack.groupby[0])
+const groupByMultiple = (array, keys) => {
+  return _.groupBy(array, item => keys.map(key => item[key]).join('-'))
 }
 
-const getMaxStackSize = (stack, data) => {
-  return Math.max(...Object.values(getStackedData(stack, data)).map(d => d.length))
+const getGroupedData = (data, groupBy) => {
+  if (groupBy.length > 1) {
+    return groupByMultiple(data, groupBy)
+  }
+  return _.groupBy(data, groupBy[0])
+}
+
+const getMaxGroupSize = (data, groupBy) => {
+  return Math.max(...Object.values(getGroupedData(data, groupBy)).map(d => d.length))
 }
 
 const getVegaData = vegaConfig => {
@@ -69,7 +77,8 @@ const getSeriesKey = (vegaConfig, xField, yField) => {
   let seriesKey = groupMark?.from?.facet?.groupby
   const stack = getStack(vegaConfig)
   const vegaData = getVegaData(vegaConfig)
-  if (stack && !seriesKey && getMaxStackSize(stack, vegaData) > 1) {
+  const groupBy = _.difference(stack.groupby, [xField, yField])
+  if (stack && !seriesKey && getMaxGroupSize(vegaData, groupBy) > 1) {
     seriesKey = _.difference(Object.keys(vegaData[0]), [xField, yField])[0]
   }
   return seriesKey
@@ -109,18 +118,19 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
     const xField = enterEncoder?.x?.field || updateEncoder?.x?.field
     const yField = stackField || enterEncoder?.y?.field || updateEncoder?.y?.field
     const seriesKey = getSeriesKey(vegaConfig, xField, yField)
+    const vegaData = getVegaData(vegaConfig)
 
-    const bottomAxis = vegaConfig.axes.find(a => a.orient === 'bottom')
+    const bottomAxis = vegaConfig.axes.sort((a, b) => (a.grid ? 1 : -1)).find(a => a.orient === 'bottom')
     config.xAxis = config.xAxis || {}
     config.xAxis.dataKey = xField
     config.xAxis.label = bottomAxis?.title
 
-    const leftAxis = vegaConfig.axes.find(a => a.orient === 'left')
+    const leftAxis = vegaConfig.axes.sort((a, b) => (a.grid ? 1 : -1)).find(a => a.orient === 'left')
     config.yAxis = config.yAxis || {}
     config.yAxis.label = leftAxis?.title
 
     if (seriesKey) {
-      config.visualizationSubType = stack ? 'stacked' : ''
+      config.visualizationSubType = stack && getMaxGroupSize(vegaData, stack.groupby) > 1 ? 'stacked' : ''
 
       config.dataDescription = {
         horizontal: false,
@@ -148,7 +158,8 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
     }
 
     config.legend = {
-      hide: !seriesKey
+      hide: !seriesKey,
+      label: seriesKey
     }
 
     const interpolateValue = enterEncoder?.interpolate?.value || updateEncoder?.interpolate?.value
