@@ -5,7 +5,7 @@
  */
 export const hashObj = row => {
   try {
-    if (!row || row === undefined) throw new Error('No row supplied to hashObj')
+    if (!row || row === undefined) return null
 
     let str = JSON.stringify(row)
     let hash = 0

@@ -68,9 +68,17 @@ export type HexMapSettings = {
 
 export type Coordinate = [number, number]
 
+export type DataRow = {
+  uid?: string // optional 'uid' property
+  [key: string]: any // allowing any additional properties with a dynamic key (e.g., for `configPrimaryName`)
+}
+
 export type MapConfig = Visualization & {
-  color: string // map color palette
-  customColors: string[] // custom color palette
+  annotations: Annotation[]
+  // map color palette
+  color: string
+  // custom color palette
+  customColors: string[]
   columns: {
     geo: GeoColumnProperties
     primary: PrimaryColumnProperties
@@ -80,9 +88,13 @@ export type MapConfig = Visualization & {
     categorical: { name: string }
   }
   dataUrl: string
+  data: DataRow[]
   runtimeDataUrl: string
   filters: VizFilter[]
   general: {
+    navigationTarget: '_self' | '_blank'
+    subtext: string
+    introText: string
     allowMapZoom: boolean
     convertFipsCodes: boolean
     displayAsHex: boolean
@@ -90,6 +102,8 @@ export type MapConfig = Visualization & {
     fullBorder: boolean
     geoBorderColor: string
     geoLabelOverride: string
+    // whether to use the old custom quantile scaling method or new custom quantile scaling method
+    equalNumberOptIn: boolean
     geoType:
       | 'us'
       | 'us-region'
@@ -109,6 +123,8 @@ export type MapConfig = Visualization & {
       isReversed: boolean
     }
     showDownloadMediaButton: boolean
+    showDownloadImgButton: boolean
+    showDownloadPdfButton: boolean
     showSidebar: boolean
     showTitle: boolean
     statePicked: {
@@ -142,6 +158,7 @@ export type MapConfig = Visualization & {
     tickRotation: string
     hideBorder: false
     singleColumnLegend: false
+    separators?: string
   }
   table: {
     label: string
@@ -154,6 +171,7 @@ export type MapConfig = Visualization & {
     forceDisplay: boolean
     download: boolean
     indexLabel: string
+    cellMinWidth: string
   }
   tooltips: {
     appearanceType: 'hover' | 'click'
@@ -175,6 +193,8 @@ export type MapConfig = Visualization & {
   filterBehavior: string
   filterIntro: string
   visual: MapVisualSettings
+  // visualization type
+  type: 'map'
   // version of the map
   version: Version
 }

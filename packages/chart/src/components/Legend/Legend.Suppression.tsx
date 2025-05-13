@@ -1,7 +1,6 @@
 import React from 'react'
 import { ChartConfig } from '../../types/ChartConfig'
-import Icon from '@cdc/core/components/ui/Icon'
-import { Tooltip as ReactTooltip } from 'react-tooltip'
+import RichTooltip from '@cdc/core/components/RichTooltip/RichTooltip'
 interface LegendProps {
   config: ChartConfig
   isLegendBottom: boolean
@@ -35,10 +34,6 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) =>
           </div>
         )
     )
-  const handleLinkClick = event => {
-    // prevent defintion link to change URl
-    event.preventDefault()
-  }
 
   const renderSuppressedItems = () => {
     const getStyle = displayGray => {
@@ -121,27 +116,22 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) =>
         </React.Fragment>
       )}
       {shouldShowSuppressedInfo() && (
-        <div className='legend-container__outer definition-link'>
-          <Icon alt='info-icon' display='info' />
+        <div className='legend-container__outer link-container'>
           <p>
             This chart contains
-            <a // prettier-ignore
-              onClick={handleLinkClick}
-              data-tooltip-content='Data is suppressed to maintain statistical reliability. This occurs when the number of respondents or reported values does not meet the minimum reporting threshold.'
-              data-tooltip-id='my-tooltip'
-              href='no-router-link'
-            >
-              suppressed data
-            </a>
+            <RichTooltip
+              tooltipContent={`Data is
+                           suppressed to maintain statistical reliability.
+                            This occurs when the number of respondents or 
+                            reported values does not meet the minimum
+                             reporting threshold.`}
+              linkText='suppressed data'
+              href={null}
+              tooltipOpacity={config.tooltips.opacity}
+            />
           </p>
         </div>
       )}
-
-      <ReactTooltip // prettier-ignore
-        id='my-tooltip'
-        variant='light'
-        style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black', maxWidth: '100%' }}
-      />
     </React.Fragment>
   )
 }

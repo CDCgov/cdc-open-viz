@@ -1,22 +1,15 @@
-import React from 'react'
 import chroma from 'chroma-js'
-import { type ChartConfig } from '../../../types/ChartConfig'
+import { LineChartConfig, type ChartConfig } from '../../../types/ChartConfig'
 import { GlyphDiamond, GlyphCircle, GlyphSquare, GlyphTriangle, GlyphCross, Glyph as CustomGlyph } from '@visx/glyph'
 import { Text } from '@visx/text'
 
 type LineChartCircleProps = {
-  circleData: object[]
   config: ChartConfig
   data: object[]
   tableData: object[]
   d?: Object
   displayArea: boolean
   seriesKey: string
-  tooltipData: {
-    data: []
-    tooltipDataX: number
-    tooltipDataY: number
-  }
   xScale: any
   yScale: any
   yScaleRight: any
@@ -25,7 +18,14 @@ type LineChartCircleProps = {
   seriesAxis: string
   dataIndex: number
   seriesIndex: number
-  mode: 'ISOLATED_POINTS' | 'HOVER_POINTS' | 'ALWAYS_SHOW_POINTS'
+  mode: 'ISOLATED_POINTS' | 'HOVER_POINTS' | 'ALWAYS_SHOW_POINTS' | 'TOOLTIP_POINTS'
+  tooltipPoint: {
+    xValue: string | number
+    yValue: string | number
+    color: string
+  }
+  handleTooltipMouseOver?: Function
+  handleTooltipMouseOff?: Function
 }
 const Glyphs = [
   GlyphCircle,
@@ -47,146 +47,79 @@ const LineChartCircle = (props: LineChartCircleProps) => {
   const {
     config,
     d: pointData,
-    tableData,
     displayArea,
     seriesKey,
-    tooltipData,
     xScale,
     yScale,
     colorScale,
     parseDate,
     yScaleRight,
     data,
-    circleData,
+    tooltipPoint,
     dataIndex,
     mode,
-    seriesIndex
+    seriesIndex,
+    handleTooltipMouseOver,
+    handleTooltipMouseOff
   } = props
-  const { lineDatapointStyle, visual } = config
+  const { isolatedDotsSameSize, lineDatapointStyle, visual } = config as LineChartConfig
   const filtered = config?.series.filter(s => s.dataKey === seriesKey)?.[0]
   const Shape =
     Glyphs[
       config.visual.lineDatapointSymbol === 'standard' && seriesIndex < visual.maximumShapeAmount ? seriesIndex : 0
     ]
   const isReversedTriangle = seriesIndex === 4
-  const transformShape = (top, left) => `translate(${left}, ${top})${isReversedTriangle ? ' rotate(180)' : ''}`
+  const LARGE_DOT_SIZE = 124
+  const REGULAR_DOT_SIZE = 55
+  const dotSize = isolatedDotsSameSize ? REGULAR_DOT_SIZE : LARGE_DOT_SIZE
 
-  // If we're not showing the circle, simply return
-  const getColor = (
-    displayArea: boolean,
-    colorScale: Function,
-    config: ChartConfig,
-    hoveredKey: string,
-    seriesKey: string
-  ) => {
-    const seriesLabels = config.runtime.seriesLabels || []
-    const seriesLabelsAll = config.runtime.seriesLabelsAll || []
-    let color = displayArea ? colorScale(seriesLabels[hoveredKey] || seriesLabelsAll[seriesIndex]) : ' transparent'
-    if (config.lineDatapointColor === 'Lighter than Line' && color !== 'transparent' && color) {
-      color = chroma(color).brighten(1)
-    }
-    return color
-  }
   const getXPos = hoveredXValue => {
     return (
       (config.xAxis.type === 'categorical' ? xScale(hoveredXValue) : xScale(parseDate(hoveredXValue))) +
       (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
     )
   }
-  if (mode === 'ALWAYS_SHOW_POINTS' && lineDatapointStyle !== 'hidden') {
-    if (lineDatapointStyle === 'always show') {
-      const isMatch = circleData?.some(
-        cd => cd[config.xAxis.dataKey] === pointData[config.xAxis.dataKey] && cd[seriesKey] === pointData[seriesKey]
-      )
 
-      if (
-        isMatch ||
-        !filtered ||
-        (visual.maximumShapeAmount === seriesIndex && visual.lineDatapointSymbol === 'standard')
-      )
-        return <></>
-      const positionLeft = getXPos(pointData[config.xAxis.dataKey])
-      const positionTop =
-        filtered.axis === 'Right' ? yScaleRight(pointData[filtered.dataKey]) : yScale(pointData[filtered.dataKey])
+  const transformShape = (xValue, yValue) => {
+    const positionLeft = getXPos(xValue)
+    const positionTop = filtered?.axis === 'Right' ? yScaleRight(yValue) : yScale(yValue)
 
-      return (
-        <g transform={transformShape(positionTop, positionLeft)}>
-          <Shape
-            opacity={pointData[seriesKey] ? 1 : 0}
-            fillOpacity={1}
-            fill={getColor(displayArea, colorScale, config, seriesKey, seriesKey)}
-            style={{ filter: 'unset', opacity: 1 }}
-          />
-        </g>
-      )
-    }
+    return `translate(${positionLeft}, ${positionTop})${isReversedTriangle ? ' rotate(180)' : ''}`
   }
 
-  if (mode === 'HOVER_POINTS') {
-    if (lineDatapointStyle === 'hover') {
-      if (!tooltipData) return
-      if (!seriesKey) return
-      if (!tooltipData.data) return
-      let hoveredXValue = tooltipData?.data?.[0]?.[1]
-      if (!hoveredXValue) return
-
-      let hoveredSeriesValue
-      let hoveredSeriesData = tooltipData.data.filter(d => d[0] === seriesKey)
-      let hoveredSeriesKey = hoveredSeriesData?.[0]?.[0]
-      let hoveredSeriesAxis = hoveredSeriesData?.[0]?.[2]
-      const dynamicSeriesConfig = config.runtime.series.find(s => s.dynamicCategory)
-      const originalDataKey = dynamicSeriesConfig?.originalDataKey ?? seriesKey
-
-      if (!hoveredSeriesKey) return
-      hoveredSeriesValue = tableData?.find(d => {
-        const dynamicCategory = dynamicSeriesConfig?.dynamicCategory
-        const matchingXValue = d[config.xAxis.dataKey] === hoveredXValue
-        if (!matchingXValue) return false
-        if (dynamicCategory) {
-          const match = d[dynamicCategory] === hoveredSeriesKey
-          return match
-        }
-        return true
-      })?.[originalDataKey]
-
-      //    hoveredSeriesValue = extractNumber(hoveredSeriesValue)
-      return tooltipData?.data.map((tooltipItem, index) => {
-        if (isNaN(hoveredSeriesValue)) return <></>
-        const isMatch = circleData?.some(cd => cd[config.xAxis.dataKey] === hoveredXValue)
-
-        if (
-          isMatch ||
-          !hoveredSeriesValue ||
-          (visual.maximumShapeAmount === seriesIndex && visual.lineDatapointSymbol === 'standard')
-        ) {
-          return <></>
-        }
-
-        const positionTop = hoveredSeriesAxis === 'right' ? yScaleRight(hoveredSeriesValue) : yScale(hoveredSeriesValue)
-        const positionLeft = getXPos(hoveredXValue)
-        return (
-          <g transform={transformShape(positionTop, positionLeft)}>
-            <Shape
-              size={55}
-              opacity={1}
-              fillOpacity={1}
-              fill={getColor(displayArea, colorScale, config, hoveredSeriesKey, seriesKey)}
-              style={{ filter: 'unset', opacity: 1 }}
-            />
-          </g>
-        )
-      })
+  // If we're not showing the circle, simply return
+  const getColor = (displayArea: boolean, colorScale: Function, config: ChartConfig, hoveredKey: string) => {
+    const seriesLabels = config.runtime.seriesLabels || []
+    const seriesLabelsAll = config.runtime.seriesLabelsAll || []
+    let color = displayArea ? colorScale(seriesLabels[hoveredKey] || seriesLabelsAll[seriesIndex]) : 'transparent'
+    if (config.lineDatapointColor === 'Lighter than Line' && color !== 'transparent' && color) {
+      color = chroma(color).brighten(1)
     }
+    return color
   }
+
+  if (['ALWAYS_SHOW_POINTS', 'HOVER_POINTS'].includes(mode)) {
+    if (!filtered || (visual.maximumShapeAmount === seriesIndex && visual.lineDatapointSymbol === 'standard'))
+      return <></>
+    return (
+      <g
+        transform={transformShape(pointData[config.xAxis.dataKey], pointData[filtered?.dataKey])}
+        className={`visx-glyph-group${displayArea ? '' : '-hidden'}`}
+        data-seriesIndex={seriesIndex}
+      >
+        <Shape
+          fillOpacity={mode === 'ALWAYS_SHOW_POINTS' ? 1 : 0}
+          fill={getColor(displayArea, colorScale, config, seriesKey)}
+        />
+      </g>
+    )
+  }
+
   if (mode === 'ISOLATED_POINTS') {
     const drawIsolatedPoints = (currentIndex, seriesKey) => {
       const currentPoint = data[currentIndex]
       const previousPoint = data[currentIndex - 1] || {}
       const nextPoint = data[currentIndex + 1] || {}
-
-      const isMatch = circleData.some(item => item?.data[seriesKey] === currentPoint[seriesKey])
-      if (isMatch) return false
-
       const isFirstPoint = currentIndex === 0 && !nextPoint[seriesKey]
       const isLastPoint = currentIndex === data.length - 1 && !previousPoint[seriesKey]
       const isMiddlePoint =
@@ -203,17 +136,37 @@ const LineChartCircle = (props: LineChartCircleProps) => {
       : dataIndex
 
     if (drawIsolatedPoints(_dataIndex, seriesKey)) {
-      const positionTop =
-        filtered?.axis === 'Right' ? yScaleRight(pointData[filtered?.dataKey]) : yScale(pointData[filtered?.dataKey])
-      const positionLeft = getXPos(pointData[config.xAxis?.dataKey])
       const color = colorScale(config.runtime.seriesLabelsAll[seriesIndex])
 
       return (
-        <g transform={transformShape(positionTop, positionLeft)}>
-          <Shape size={124} stroke={color} fill={color} />
+        <g
+          transform={transformShape(pointData[config.xAxis?.dataKey], pointData[filtered?.dataKey])}
+          className={`visx-glyph-group${displayArea ? '' : '-hidden'}`}
+          data-seriesIndex={seriesIndex}
+        >
+          <Shape size={dotSize} stroke={color} fill={color} />
         </g>
       )
     }
+  }
+
+  if (mode === 'TOOLTIP_POINTS' && displayArea === true) {
+    return (
+      <g
+        transform={transformShape(tooltipPoint.xValue, tooltipPoint.yValue)}
+        className='visx-glyph-circle'
+        onMouseOver={e => {
+          handleTooltipMouseOver(e)
+          if (lineDatapointStyle == 'hover') (e.target as HTMLElement).style.fillOpacity = '1'
+        }}
+        onMouseOut={e => {
+          handleTooltipMouseOff()
+          if (lineDatapointStyle == 'hover') (e.target as HTMLElement).style.fillOpacity = '0'
+        }}
+      >
+        <Shape size={55} fill={tooltipPoint.color} fillOpacity={'0'} />
+      </g>
+    )
   }
 
   return null

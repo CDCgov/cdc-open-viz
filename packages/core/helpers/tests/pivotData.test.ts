@@ -51,4 +51,78 @@ describe('pivotData', () => {
       { city: 'San Francisco', Jane: 'yellow', John: 'green', _pivotedFrom: 'color' }
     ])
   })
+  it('should allow for duplicate data when there is 1 Column Header but different columnName data', () => {
+    // when there are multiple pivot value columns, if any other data is present it will break the pivot.
+    // so we need to tell it which columns to exclude from the pivot.
+    // 'other' is added here as an example.
+    const data = [
+      { name: 'John', age: 27, color: 'blue', city: 'New York', other: 'yes' },
+      { name: 'Jane', age: 27, color: 'red', city: 'New York', other: 'no' },
+      { name: 'Bob', age: 31, color: 'yellow', city: 'New York', other: 'yes' },
+      { name: 'Betty', age: 31, color: 'green', city: 'New York', other: 'no' },
+      { name: 'Jane', age: 31, color: 'yellow', city: 'New York', other: 'yes' },
+      { name: 'John', age: 31, color: 'green', city: 'New York', other: 'no' },
+      { name: 'Bob', age: 27, color: 'blue', city: 'New York', other: 'yes' },
+      { name: 'Betty', age: 27, color: 'red', city: 'New York', other: 'no' }
+    ]
+    const result = pivotData(data, 'city', ['name'], [])
+    expect(result).toEqual([
+      {
+        'New York': 'John',
+        age: 27,
+        color: 'blue',
+        other: 'yes',
+        _pivotedFrom: 'name'
+      },
+      {
+        'New York': 'Jane',
+        age: 27,
+        color: 'red',
+        other: 'no',
+        _pivotedFrom: 'name'
+      },
+      {
+        'New York': 'Bob',
+        age: 31,
+        color: 'yellow',
+        other: 'yes',
+        _pivotedFrom: 'name'
+      },
+      {
+        'New York': 'Betty',
+        age: 31,
+        color: 'green',
+        other: 'no',
+        _pivotedFrom: 'name'
+      },
+      {
+        'New York': 'Jane',
+        age: 31,
+        color: 'yellow',
+        other: 'yes',
+        _pivotedFrom: 'name'
+      },
+      {
+        'New York': 'John',
+        age: 31,
+        color: 'green',
+        other: 'no',
+        _pivotedFrom: 'name'
+      },
+      {
+        'New York': 'Bob',
+        age: 27,
+        color: 'blue',
+        other: 'yes',
+        _pivotedFrom: 'name'
+      },
+      {
+        'New York': 'Betty',
+        age: 27,
+        color: 'red',
+        other: 'no',
+        _pivotedFrom: 'name'
+      }
+    ])
+  })
 })

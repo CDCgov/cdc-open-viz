@@ -1,6 +1,6 @@
 import { memo, useEffect, useState } from 'react'
 import { useDebounce } from 'use-debounce'
-import { DROPDOWN_STYLES } from '../Filters/Filters'
+import { DROPDOWN_STYLES } from '../Filters/components/Dropdown'
 
 export type Input = {
   label: string

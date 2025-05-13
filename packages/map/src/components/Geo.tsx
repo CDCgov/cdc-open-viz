@@ -1,6 +1,14 @@
 import React, { memo } from 'react'
 
-const Geo = ({ path, styles, stroke, strokeWidth, ...props }) => {
+type GeoProps = {
+  styles?: React.CSSProperties
+  stroke?: string
+  strokeWidth?: number
+  path?: string
+  className?: string
+}
+
+const Geo: React.FC<GeoProps> = ({ path, styles, stroke, strokeWidth, ...props }) => {
   const { className, ...restProps } = props
   const geoClassName = String(props.additionalData?.name)?.toLowerCase()?.replaceAll(' ', '') || 'country'
   return (
