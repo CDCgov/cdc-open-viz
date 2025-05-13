@@ -86,8 +86,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   setSharedFilter,
   setSharedFilterValue,
   link,
-  setConfig: setEditorsConfig,
-  loadConfig
+  loadConfig,
+  setConfig: setDashboardConfig
 }) => {
   const initialState = getInitialState(configObj)
 
@@ -114,10 +114,14 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     isDraggingAnnotation
   } = mapState
 
+  const editorContext = useContext(EditorContext)
+
   const setConfig = (newMapState: MapConfig): void => {
     dispatch({ type: 'SET_CONFIG', payload: newMapState })
-    if (isEditor && isDashboard) {
-      setEditorsConfig(newMapState)
+    if (isEditor && !isDashboard) {
+      editorContext.setTempConfig(newMapState)
+    } else if (isDashboard && isEditor) {
+      setDashboardConfig(newMapState)
     }
   }
 
@@ -329,7 +333,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   if (!table.label || table.label === '') table.label = 'Data Table'
 
   const mapProps = {
-    setEditorsConfig,
     container,
     content: modal,
     currentViewport,
