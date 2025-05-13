@@ -48,7 +48,7 @@ const EditorPanel = ({
   }
 
   const updateDataTable = (section, subsection, fieldName, newValue) => {
-    if (section === 'columns') return setColumns(newValue)
+    if (fieldName === 'columns') return setColumns(newValue)
 
     createFieldUpdater(table, setTable)(section, subsection, fieldName, newValue)
   }
