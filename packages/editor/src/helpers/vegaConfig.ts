@@ -1,4 +1,22 @@
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
+import { _ } from 'lodash'
+import * as vegaLite from 'vega-lite'
+
+const CURVE_LOOKUP = {
+  linear: 'Linear',
+  cardinal: 'Cardinal',
+  natural: 'Natural',
+  monotone: 'Monotone X',
+  step: 'Step',
+  basis: 'Curve Basis'
+}
+
+export const parseVegaConfig = vegaConfig => {
+  if (vegaConfig['$schema'].includes('vega-lite')) {
+    vegaConfig = vegaLite.compile(vegaConfig).spec
+  }
+  return vegaConfig
+}
 
 export const getVegaConfigType = vegaConfig => {
   if (vegaConfig.projections) {
@@ -25,19 +43,34 @@ const getMainMark = vegaConfig => {
 }
 
 const getStack = vegaConfig => {
-  return vegaConfig.data.length ? vegaConfig.data[0].transform?.find(t => t.type === 'stack') : undefined
+  const stackData = vegaConfig.data.find(d => d.transform?.find(t => t.type === 'stack'))
+  return stackData ? stackData.transform.find(t => t.type === 'stack') : undefined
+}
+
+const getStackedData = (stack, data) => {
+  return _.groupBy(data, stack.groupby[0])
+}
+
+const getMaxStackSize = (stack, data) => {
+  return Math.max(...Object.values(getStackedData(stack, data)).map(d => d.length))
+}
+
+const getVegaData = vegaConfig => {
+  const vegaData = Array.isArray(vegaConfig.data) ? vegaConfig.data.find(d => d.values) : vegaConfig.data
+  return Array.isArray(vegaData?.values) ? vegaData.values : undefined
 }
 
 const getGroupMark = vegaConfig => {
   return vegaConfig.marks.find(m => m.type === 'group')
 }
 
-const getSeriesKey = vegaConfig => {
+const getSeriesKey = (vegaConfig, xField, yField) => {
   const groupMark = getGroupMark(vegaConfig)
   let seriesKey = groupMark?.from?.facet?.groupby
   const stack = getStack(vegaConfig)
-  if (stack && !seriesKey) {
-    seriesKey = stack.sort.field
+  const vegaData = getVegaData(vegaConfig)
+  if (stack && !seriesKey && getMaxStackSize(stack, vegaData) > 1) {
+    seriesKey = _.difference(Object.keys(vegaData[0]), [xField, yField])[0]
   }
   return seriesKey
 }
@@ -68,64 +101,65 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
       tooltip: true
     }
   } else {
-    const mainMark = getMainMark(vegaConfig)
-    const mainMarkEncoder = mainMark.encode.enter || mainMark.encode.update
-    const seriesKey = getSeriesKey(vegaConfig)
     const stack = getStack(vegaConfig)
+    const stackField = stack?.field
+    const mainMark = getMainMark(vegaConfig)
+    const enterEncoder = mainMark.encode.enter
+    const updateEncoder = mainMark.encode.update
+    const xField = enterEncoder?.x?.field || updateEncoder?.x?.field
+    const yField = stackField || enterEncoder?.y?.field || updateEncoder?.y?.field
+    const seriesKey = getSeriesKey(vegaConfig, xField, yField)
 
+    const bottomAxis = vegaConfig.axes.find(a => a.orient === 'bottom')
     config.xAxis = config.xAxis || {}
+    config.xAxis.dataKey = xField
+    config.xAxis.label = bottomAxis?.title
 
-    if (configType === 'Bar' || configType === 'Area Chart') {
-      config.xAxis.dataKey = mainMarkEncoder.x.field
+    const leftAxis = vegaConfig.axes.find(a => a.orient === 'left')
+    config.yAxis = config.yAxis || {}
+    config.yAxis.label = leftAxis?.title
 
-      if (seriesKey) {
-        config.visualizationSubType = stack ? 'stacked' : ''
-
-        config.dataDescription = {
-          horizontal: false,
-          series: true,
-          singleRow: false,
-          seriesKey: seriesKey,
-          xKey: config.xAxis.dataKey,
-          valueKeysTallSupport: [vegaConfig.data[0].transform[0].field]
-        }
-      } else {
-        config.dataDescription = {
-          horizontal: false,
-          series: false,
-          singleRow: true
-        }
-
-        config.series = [
-          {
-            dataKey: mainMarkEncoder.y.field,
-            type: configType,
-            axis: 'Left',
-            tooltip: true
-          }
-        ]
-      }
-
-      config.legend = {
-        hide: !seriesKey
-      }
-    } else if (configType === 'Line') {
-      config.xAxis.dataKey = mainMark.encode.enter.x.field
+    if (seriesKey) {
+      config.visualizationSubType = stack ? 'stacked' : ''
 
       config.dataDescription = {
         horizontal: false,
         series: true,
         singleRow: false,
         seriesKey: seriesKey,
-        xKey: config.xAxis.dataKey,
-        valueKeys: [mainMark.encode.enter.y.field]
+        xKey: xField,
+        valueKeysTallSupport: [yField]
       }
+    } else {
+      config.dataDescription = {
+        horizontal: false,
+        series: false,
+        singleRow: true
+      }
+
+      config.series = [
+        {
+          dataKey: stackField || yField,
+          type: configType,
+          axis: 'Left',
+          tooltip: true
+        }
+      ]
+    }
+
+    config.legend = {
+      hide: !seriesKey
+    }
+
+    const interpolateValue = enterEncoder?.interpolate?.value || updateEncoder?.interpolate?.value
+    if (configType == 'Area Chart' && interpolateValue) {
+      config.stackedAreaChartLineType = CURVE_LOOKUP[interpolateValue]
     }
   }
 
-  const vegaData = Array.isArray(vegaConfig.data) ? vegaConfig.data[0] : vegaConfig.data
-  if (Array.isArray(vegaData?.values)) {
-    config.data = vegaData.values
+  const vegaData = getVegaData(vegaConfig)
+  if (vegaData) {
+    config.data = vegaData
     config = loadedVegaConfigData(config)
   }
 
@@ -135,7 +169,7 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
 }
 
 export const loadedVegaConfigData = (config: any) => {
-  const seriesKey = getSeriesKey(config.vegaConfig)
+  const seriesKey = config.dataDescription.seriesKey
   if (seriesKey && !config.series) {
     const seriesVals = [...new Set(config.data.map(d => d[seriesKey]))]
     config.series = seriesVals.map(val => {

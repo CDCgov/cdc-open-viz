@@ -28,7 +28,7 @@ import EpiChartIcon from '@cdc/core/assets/icon-epi-chart.svg'
 import TableIcon from '@cdc/core/assets/icon-table.svg'
 import Icon from '@cdc/core/components/ui/Icon'
 
-import { getVegaConfigType, convertVegaConfig } from '@cdc/editor/src/helpers/vegaConfig'
+import { getVegaConfigType, convertVegaConfig, parseVegaConfig } from '@cdc/editor/src/helpers/vegaConfig'
 
 interface ButtonProps {
   icon: React.ReactElement
@@ -89,7 +89,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
 
   const importVegaConfig = text => {
     //try {
-    const vegaConfig = JSON.parse(text)
+    const vegaConfig = parseVegaConfig(JSON.parse(text))
     const configType = getVegaConfigType(vegaConfig)
     const button = buttons.find(b => b.label === configType)
     const coveConfig = generateNewConfig(button)
