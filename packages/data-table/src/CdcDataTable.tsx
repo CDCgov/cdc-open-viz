@@ -156,13 +156,15 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
 
       {/* FILTERS */}
       <div className='bg-white z-1'>
-        <Filters
-          config={configWithStates as unknown as Visualization}
-          setConfig={updateFilters}
-          setFilteredData={() => {}}
-          filteredData={filteredData}
-          excludedData={data}
-        />
+        {filters && (
+          <Filters
+            config={configWithStates as unknown as Visualization}
+            setConfig={updateFilters}
+            setFilteredData={() => {}}
+            filteredData={filteredData}
+            excludedData={data}
+          />
+        )}
 
         {/* DATA TABLE */}
         <DataTable
