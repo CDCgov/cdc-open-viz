@@ -358,10 +358,7 @@ export const useEditorPermissions = () => {
 
   const visSupportsReactTooltip = () => {
     if (config.yAxis.type === 'categorical') return true
-    if (
-      ['Deviation Bar', 'Box Plot', 'Scatter Plot', 'Paired Bar'].includes(visualizationType) ||
-      (visualizationType === 'Bar' && config.tooltips.singleSeries)
-    ) {
+    if (['Deviation Bar', 'Box Plot', 'Scatter Plot', 'Paired Bar'].includes(visualizationType)) {
       return true
     }
   }

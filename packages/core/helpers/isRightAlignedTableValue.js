@@ -12,7 +12,7 @@ export default function isRightAlignedTableValue(value = '') {
     if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(value)) {
       return false
     }
-    return numericStrings.includes(value) || /^[\$\d\.\%\,\-\s\(\)CI]*$/.test(value)
+    return numericStrings.includes(value) || /^[\$\d\.\%\,\-\s\(\)CI<>]*$/.test(value)
   }
   return false
 }

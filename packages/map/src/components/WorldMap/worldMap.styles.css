@@ -1,0 +1,28 @@
+.world {
+  &.data .geography-container {
+    border-bottom: var(--lightGray) 1px solid;
+  }
+  .geography-container {
+    cursor: move;
+    position: relative;
+    flex-grow: 1;
+    width: 100%;
+    .geo-point {
+      transition: 0.3s all;
+      circle {
+        fill: inherit;
+        transition: 0.1s transform;
+      }
+      &:hover {
+        transition: 0.2s all;
+      }
+    }
+    .map-logo {
+      display: block;
+      margin: 0 0 0 auto;
+      max-height: 35px;
+    }
+  }
+}
+
+

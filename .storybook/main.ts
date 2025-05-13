@@ -6,7 +6,7 @@ import svgr from 'vite-plugin-svgr' // Svg Support
 const config: StorybookConfig = {
   stories: [
     '../_stories/*.mdx',
-    '../packages/**/_stories/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/**/_stories/*.stories.@(js|jsx|ts|tsx|mdx)',
     '../_stories/private/**/*.stories.@(js|jsx|ts|tsx)'
   ],
   addons: [
@@ -14,7 +14,8 @@ const config: StorybookConfig = {
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
     'storybook-addon-fetch-mock',
-    '@storybook/addon-a11y'
+    '@storybook/addon-a11y',
+    '@storybook/addon-docs'
   ],
   staticDirs: ['./assets'],
   framework: {

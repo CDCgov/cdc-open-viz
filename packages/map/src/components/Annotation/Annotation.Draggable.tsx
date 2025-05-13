@@ -1,4 +1,4 @@
-import { useContext, useState, useRef } from 'react'
+import React, { useContext, useState } from 'react'
 
 // visx
 import { HtmlLabel, CircleSubject, EditableAnnotation, Connector, Annotation as VisxAnnotation } from '@visx/annotation'
@@ -10,53 +10,56 @@ import './Annotation.Draggable.styles.css'
 import ConfigContext from '../../context'
 import { MapContext } from '../../types/MapContext'
 
-const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
+type AnnotationsProps = {
+  onDragStateChange: (state: boolean) => void
+}
+
+const Annotations: React.FC<AnnotationsProps> = ({ onDragStateChange }) => {
   const [draggingItems, setDraggingItems] = useState([])
   const {
-    state: config,
-    setState: updateConfig,
+    config,
+    setConfig,
     isDraggingAnnotation,
     isEditor,
     dimensions
   } = useContext<MapContext>(ConfigContext)
   const [width, height] = dimensions
   const { annotations } = config
-  const prevDimensions = useRef(dimensions)
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
 
   return (
     annotations &&
     annotations.map((annotation, index) => {
+      const { marker, x, y, dx, dy, edit, connectionType } = annotation
+
       return (
         <>
           <Drag
             key={`annotation--${index}`}
             width={width}
             height={height}
-            x={annotation.x} // subject x
-            y={annotation.y} // subject y
+            x={x}
+            y={y} // subject y
             onDragStart={() => {
               setDraggingItems(raise(annotations, index))
             }}
           >
-            {({ dragStart, dragEnd, dragMove, isDragging, x, y, dx, dy }) => {
+            {({ dragStart, dragEnd, dragMove }) => {
               return (
                 <>
                   <AnnotationComponent
-                    dx={annotation.dx} // label position
-                    dy={annotation.dy} // label postion
-                    x={annotation.x}
-                    y={annotation.y}
-                    canEditLabel={annotation.edit.label || false}
-                    canEditSubject={annotation.edit.subject || false}
+                    dx={dx} // label position
+                    dy={dy} // label position
+                    x={x}
+                    y={y}
+                    canEditLabel={edit.label || false}
+                    canEditSubject={edit.subject || false}
                     labelDragHandleProps={{ r: 15, stroke: isDraggingAnnotation ? 'red' : 'var(--primary)' }}
                     subjectDragHandleProps={{ r: 15, stroke: isDraggingAnnotation ? 'red' : 'var(--primary)' }}
                     onDragEnd={props => {
                       onDragStateChange(false)
                       const updatedAnnotations = annotations.map((annotation, idx) => {
                         if (idx === index) {
-                          const nearestDatum = annotation
-
                           return {
                             ...annotation,
                             x: props.x,
@@ -68,7 +71,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
                         return annotation
                       })
 
-                      updateConfig({
+                      setConfig({
                         ...config,
                         annotations: updatedAnnotations
                       })
@@ -95,7 +98,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
                         }}
                         role='presentation'
                         // ! IMPORTANT: Workaround for 508
-                        // - HTML needs to be set from the editor and we need a wrapper with the tabIndex
+                        // - HTML needs to be set from the editor, and we need a wrapper with the tabIndex
                         // - TabIndex is only supposed to be used on interactive elements. This is a workaround.
                         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                         tabIndex={0}
@@ -104,24 +107,22 @@ const Annotations = ({ xScale, yScale, xMax, svgRef, onDragStateChange }) => {
                       />
                     </HtmlLabel>
 
-                    {annotation.connectionType === 'line' && (
+                    {connectionType === 'line' && (
                       <Connector type='line' pathProps={{ markerStart: 'url(#marker-start)' }} />
                     )}
 
-                    {annotation.connectionType === 'elbow' && (
+                    {connectionType === 'elbow' && (
                       <Connector type='elbow' pathProps={{ markerStart: 'url(#marker-start)' }} />
                     )}
 
                     {/* MARKERS */}
-                    {annotation.marker === 'circle' && (
-                      <CircleSubject className='circle-subject' stroke={'black'} radius={8} />
-                    )}
-                    {annotation.marker === 'arrow' && (
+                    {marker === 'circle' && <CircleSubject className='circle-subject' stroke={'black'} radius={8} />}
+                    {marker === 'arrow' && (
                       <MarkerArrow
                         fill='black'
                         id='marker-start'
-                        x={annotation.x}
-                        y={annotation.dy}
+                        x={x}
+                        y={dy}
                         stroke='#333'
                         markerWidth={10}
                         size={10}

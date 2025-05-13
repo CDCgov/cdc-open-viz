@@ -90,7 +90,8 @@ const ChooseTab: React.FC = (): JSX.Element => {
           type: 'map'
         }
         newConfig['general'] = {
-          geoType: visualizationType
+          geoType: visualizationType,
+          type: props?.generalType
         }
         break
       }

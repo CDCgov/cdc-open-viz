@@ -109,34 +109,47 @@ export const drawStar = (star, context, state) => {
   const outerRadius = star.outerRadius * scaleVal
   const innerRadius = star.innerRadius * scaleVal
 
+  // Adjust for zoom (based on your existing logic)
   const adjustedOuterRadius = state.mapPosition.zoom > 1 ? outerRadius * percentOfOriginalSize : outerRadius
   const adjustedInnerRadius = state.mapPosition.zoom > 1 ? innerRadius * percentOfOriginalSize : innerRadius
 
+  // Set line width and color
   context.lineWidth = star.lineWidth
   context.fillStyle = star.color
   context.beginPath()
 
-  let rot = (Math.PI / 2) * 3
-  let step = Math.PI / spikes
+  // Start drawing the star from the top (no rotation)
+  const startAngle = Math.PI / 2 // 90 degrees (points upwards)
+  let rot = startAngle
+  const step = Math.PI / spikes // angle between each spike
 
-  // Starting coordinates for the first point
-  let x = star.x
-  let y = star.y
-  context.moveTo(x, y - adjustedOuterRadius)
+  // Starting coordinates for the first point of the star
+  let x = star.x + Math.cos(rot) * adjustedOuterRadius
+  let y = star.y + Math.sin(rot) * adjustedOuterRadius
+  context.moveTo(x, y)
 
+  // Draw the star
   for (let i = 0; i < spikes; i++) {
+    // Outer points of the star
     x = star.x + Math.cos(rot) * adjustedOuterRadius
     y = star.y + Math.sin(rot) * adjustedOuterRadius
     context.lineTo(x, y)
     rot += step
 
+    // Inner points of the star
     x = star.x + Math.cos(rot) * adjustedInnerRadius
     y = star.y + Math.sin(rot) * adjustedInnerRadius
     context.lineTo(x, y)
     rot += step
   }
 
-  context.lineTo(star.x, star.y - adjustedOuterRadius)
+  // Close the path by returning to the starting outer point
+  // This fixes the gap issue by making sure the first outer point is exactly the same
+  x = star.x + Math.cos(startAngle) * adjustedOuterRadius
+  y = star.y + Math.sin(startAngle) * adjustedOuterRadius
+  context.lineTo(x, y)
+
+  // Apply fill and stroke
   context.closePath()
   context.fill()
   context.stroke()

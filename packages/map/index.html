@@ -14,51 +14,65 @@
       }
     </style>
     <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
+
+    <!-- This is temporary and for testing until Nunito/900 is added to TP -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@900&display=swap" rel="stylesheet" />
+    <style type="text/css">
+      @font-face {
+        font-family: 'Nunito';
+        font-weight: 900;
+        font-display: swap;
+        src: url('https://app.unpkg.com/@fontsource/nunito@5.0.18/files/files/nunito-latin-900-normal.woff2')
+          format('woff2');
+      }
+    </style>
   </head>
 
   <body>
     <!-- DEFAULT EXAMPLES -->
-    <!-- <div class="react-container" data-config="/examples/private/nhis.json"></div> -->
+    <!--<div class="react-container" data-config="/examples/custom-map-layers.json"></div>-->
+    <!--<div class="react-container" data-config="/examples/example-hex-map-with-filter.json"></div>-->
+
     <!-- <div class="react-container" data-config="/examples/hex-colors.json"></div> -->
     <!-- <div class="react-container react-container--maps" data-config="/examples/annotation/index.json">/</div> -->
 
     <!-- <div class="react-container react-container--maps" data-config="/examples/private/tooltip-issue.json"></div> -->
-    <!-- <div class="react-container react-container--maps" data-config="/examples/test.json"></div> -->
-    <!-- <div class="react-container react-container--maps" data-config="/examples/test.json"></div> -->
-    <!-- <div class="react-container react-container--maps" data-config="/examples/private/map-text-wrap.json"></div> -->
-    <!-- <div class="react-container react-container--maps" data-config="/examples/private/tooltip-issue.json"></div> -->
-    <!-- <div class="react-container react-container--maps" data-config="/examples/test.json"></div> -->
-    <!-- <div class="react-container react-container--maps" data-config="/examples/default-usa-regions.json"></div> -->
+    <!--     <div class="react-container react-container&#45;&#45;maps" data-config="/examples/private/map-text-wrap.json"></div>-->
+    <!--     <div class="react-container react-container&#45;&#45;maps" data-config="/examples/private/tooltip-issue.json"></div> -->
+    <!--     <div class="react-container react-container&#45;&#45;maps" data-config="/examples/default-usa-regions.json"></div>-->
     <!-- <div class="react-container react-container--maps" data-config="/examples/default-usa.json"></div> -->
-    <!-- <div
-      class="react-container react-container--maps"
-      data-config="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/US-County-Level-Map.json"
-    ></div> -->
+    <!--    <div-->
+    <!--      class="react-container react-container&#45;&#45;maps"-->
+    <!--      data-config="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/US-County-Level-Map.json"-->
+    <!--    ></div>-->
     <!-- <div class="react-container react-container&#45;&#45;maps" data-config="/examples/default-geocode.json"></div> -->
     <!-- <div class="react-container react-container&#45;&#45;maps" data-config="/examples/default-single-state.json"></div> -->
-    <!-- <div class="react-container react-container&#45;&#45;maps" data-config="/examples/bubble-us.json"></div> -->
+    <!-- <div class="react-container react-container--maps" data-config="/examples/bubble-us.json"></div> -->
     <!-- <div class="react-container react-container&#45;&#45;maps" data-config="/examples/bubble-world.json"></div> -->
 
     <!-- TESTS DATA TABLE SORT-->
     <!-- <div class="react-container" data-config="/examples/private/wastewater.json"></div> -->
 
     <!-- TP4 EXAMPLES -->
-    <!-- <div class="react-container react-container--maps" data-config="/examples/custom-map-layers.json"></div> -->
+    <!--    <div-->
+    <!--      class="react-container react-container&#45;&#45;maps"-->
+    <!--      data-config="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Scale-Based-Categorical-Map-With-Special-Classes.json"-->
+    <!--    ></div>-->
     <!-- <div class="react-container react-container--maps" data-config="/examples/private/world-map.json"></div> -->
     <!-- <div class="react-container react-container--maps" data-config="/examples/default-hex.json"></div> -->
     <!-- <div class="react-container react-container--maps" data-config="/examples/default-hex.json"></div> -->
-    <!-- <div class="react-container react-container--maps" data-config="/examples/hex-with-arrows.json"></div> -->
+    <!--     <div class="react-container react-container&#45;&#45;maps" data-config="/examples/hex-with-arrows.json"></div>-->
 
     <!-- TP4 EXAMPLES -->
-    <div class="react-container react-container&#45;&#45;maps" data-config="/examples/example-city-state.json"></div>
+    <!--    <div class="react-container react-container&#45;&#45;maps" data-config="/examples/example-city-state.json"></div>-->
     <!-- <div
-      class="react-container react-container--maps"
-      data-config="/examples/example-city-state-no-territories.json"
-    ></div> -->
-    <!-- <div class="react-container react-container--maps" data-config="/examples/example-world-map.json"></div> -->
-    <!-- <div class="react-container react-container--maps" data-config="/examples/default-hex.json"></div> -->
+  class="react-container react-container--maps"
+  data-config="/examples/example-city-state-no-territories.json"
+></div> -->
+    <!--     <div class="react-container react-container&#45;&#45;maps" data-config="/examples/example-world-map.json"></div>-->
+    <!--     <div class="react-container react-container&#45;&#45;maps" data-config="/examples/default-hex.json"></div>-->
 
-    <!-- <div class="react-container" data-config="/examples/example-hex-map-with-filter.json"></div> -->
+    <div class="react-container" data-config="/examples/example-hex-map-with-filter.json"></div>
 
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <script type="module" src="./src/index.jsx"></script>
