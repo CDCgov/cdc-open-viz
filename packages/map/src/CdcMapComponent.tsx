@@ -117,9 +117,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const editorContext = useContext(EditorContext)
 
   const setConfig = (newMapState: MapConfig): void => {
-    dispatch({ type: 'SET_CONFIG', payload: newMapState })
     if (isEditor && !isDashboard) {
       editorContext.setTempConfig(newMapState)
+      dispatch({ type: 'SET_CONFIG', payload: newMapState })
     } else if (isDashboard && isEditor) {
       setParentConfig(newMapState)
     }
@@ -162,7 +162,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const imageId = useId()
   const legendId = useId()
   const mapId = useId()
-  const tooltipId = useId()
+  const tooltipId = 'test'
 
   // hooks
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
