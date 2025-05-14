@@ -23,7 +23,7 @@ export type MapVisualSettings = {
   additionalCityStyles: [] | [{ label: string; column: string; value: string; shape: string }]
 }
 
-type PatternSelection = {
+export type PatternSelection = {
   // dropdown selection for getting the column used on a pattern
   dataKey: string
   // text field input to match values found in the column
