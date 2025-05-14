@@ -122,15 +122,13 @@ const PatternSettings = ({ name }: PanelProps) => {
   }
 
   const handleRemovePattern = index => {
+    const _newConfig = _.cloneDeep(config)
     const updatedPatterns = config.map.patterns.filter((pattern, i) => i !== index)
-
-    setConfig({
-      ...config,
-      map: {
-        ...config.map,
-        patterns: updatedPatterns
-      }
-    })
+    _newConfig.map.patterns = updatedPatterns
+    if (checkPatternContrasts()) {
+      _newConfig.runtime.editorErrorMessage = ''
+    }
+    setConfig(_newConfig)
   }
 
   const checkPatternContrasts = () => {
