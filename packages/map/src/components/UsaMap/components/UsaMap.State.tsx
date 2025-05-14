@@ -153,10 +153,10 @@ const UsaMap = () => {
       setTerritoriesData(territoriesKeys)
     } else {
       // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
-      const territoriesList = territoriesKeys.filter(key => dataRef.current?.[key])
+      const territoriesList = territoriesKeys.filter(key => data?.[key])
       setTerritoriesData(territoriesList)
     }
-  }, [data, general.territoriesAlwaysShow])
+  }, [data, dataRef.current, general.territoriesAlwaysShow])
 
   const geoStrokeColor = getGeoStrokeColor(config)
   const geoFillColor = getGeoFillColor(config)
