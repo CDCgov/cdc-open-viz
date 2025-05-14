@@ -142,11 +142,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   const _setRuntimeData = (data: any) => {
-    if (config) {
-      setRuntimeData(data)
-    } else {
-      setRuntimeFilters(data)
-    }
+    setRuntimeData(data)
   }
   const transform = new DataTransform()
 
