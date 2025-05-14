@@ -471,7 +471,7 @@ const UsaMap = () => {
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
-                        radius={0.5}
+                        strokeWidth={0.5}
                       />
                     )}
                     {pattern === 'lines' && (
