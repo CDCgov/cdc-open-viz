@@ -27,9 +27,10 @@ type CdcDataTableProps = {
 
 const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTableProps) => {
   /* STATES */
+  // config is only used to capture the initial config data anything dynamic is updated in other states
+  const [config, setConfig] = useState<Config>()
   const [showEditorPanel, setShowEditorPanel] = useState(isEditor)
   const [columns, setColumns] = useState()
-  const [config, setConfig] = useState<Config>()
   const [data, setData] = useState()
   const [table, setTable] = useState<Table>()
   const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
