@@ -41,4 +41,4 @@ export const GEOCODE_TYPES = {
   US: 'us-geocode'
 } as const
 
-export const DEFAULT_MAP_BACKGROUND = '#EEE'
+export const DEFAULT_MAP_BACKGROUND = '#DFE1E2'
