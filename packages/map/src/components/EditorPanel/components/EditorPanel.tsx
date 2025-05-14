@@ -50,7 +50,7 @@ import './editorPanel.styles.css'
 
 const EditorPanel = () => {
   const {
-    setEditorsConfig,
+    setParentConfig,
     isDashboard,
     isEditor,
     loadConfig,
@@ -943,8 +943,8 @@ const EditorPanel = () => {
 
   useEffect(() => {
     const newConfig = convertStateToConfig()
-    if (isEditor && setEditorsConfig) {
-      setEditorsConfig(newConfig)
+    if (isEditor && setParentConfig) {
+      setParentConfig(newConfig)
     }
   }, [config])
 
