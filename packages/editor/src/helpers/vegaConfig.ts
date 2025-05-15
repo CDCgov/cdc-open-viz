@@ -150,7 +150,6 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
   const vegaData = getVegaData(vegaConfig)
 
   config.vegaType = configType
-  config.vegaConfig = vegaConfig
 
   config.showTitle = false
   config.table = config.table || { expanded: false }
