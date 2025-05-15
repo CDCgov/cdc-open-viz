@@ -86,8 +86,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   setSharedFilter,
   setSharedFilterValue,
   link,
-  setConfig: setEditorsConfig,
-  loadConfig
+  loadConfig,
+  setConfig: setParentConfig
 }) => {
   const initialState = getInitialState(configObj)
 
@@ -114,10 +114,15 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     isDraggingAnnotation
   } = mapState
 
+  const editorContext = useContext(EditorContext)
+
   const setConfig = (newMapState: MapConfig): void => {
     dispatch({ type: 'SET_CONFIG', payload: newMapState })
-    if (isEditor && isDashboard) {
-      setEditorsConfig(newMapState)
+
+    if (isEditor && !isDashboard) {
+      editorContext.setTempConfig(newMapState)
+    } else if (isDashboard && isEditor) {
+      setParentConfig(newMapState)
     }
   }
 
@@ -138,11 +143,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   const _setRuntimeData = (data: any) => {
-    if (config) {
-      setRuntimeData(data)
-    } else {
-      setRuntimeFilters(data)
-    }
+    setRuntimeData(data)
   }
   const transform = new DataTransform()
 
@@ -158,7 +159,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const imageId = useId()
   const legendId = useId()
   const mapId = useId()
-  const tooltipId = useId()
+  const tooltipId = 'test'
 
   // hooks
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
@@ -329,7 +330,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   if (!table.label || table.label === '') table.label = 'Data Table'
 
   const mapProps = {
-    setEditorsConfig,
+    setParentConfig,
     container,
     content: modal,
     currentViewport,
@@ -352,7 +353,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeLegend,
     scale,
     setConfig,
-    setParentConfig: setConfig,
     setRuntimeData,
     setRuntimeFilters,
     setRuntimeLegend,
@@ -439,7 +439,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     }
                   }}
                 >
-                  {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
                   <section
                     className='outline-none geography-container w-100 position-relative'
                     ref={mapSvg}

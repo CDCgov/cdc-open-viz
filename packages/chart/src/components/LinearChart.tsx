@@ -4,6 +4,7 @@ import React, { forwardRef, useContext, useEffect, useMemo, useRef, useState } f
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 import { Group } from '@visx/group'
 import { Line, Bar } from '@visx/shape'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { Text } from '@visx/text'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import _ from 'lodash'
