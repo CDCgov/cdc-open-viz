@@ -27,6 +27,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@hello-pangea/dnd": "^16.2.0",
+    "@react-spring/web": "^9.7.5",
     "@visx/axis": "3.12.0",
     "@visx/curve": "3.12.0",
     "@visx/event": "3.12.0",
@@ -46,7 +47,6 @@
     "js-base64": "^2.5.2",
     "react-accessible-accordion": "^3.3.4",
     "react-icons": "5.5.0",
-    "react-spring": "9.7.2",
     "use-debounce": "^6.0.1"
   },
   "peerDependencies": {

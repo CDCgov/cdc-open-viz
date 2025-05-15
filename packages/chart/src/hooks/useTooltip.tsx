@@ -116,18 +116,19 @@ export const useTooltip = props => {
 
     if (visualizationType === 'Pie') {
       const roundTo = Number(config.dataFormat.roundTo) || 0
-      const { endAngle, startAngle, data: pieData } = additionalChartData?.arc || {}
-      const degrees = ((endAngle - startAngle) * 180) / Math.PI
 
-      // Calculate the percentage of the full circle (360 degrees)
-      const percentageOfCircle = (degrees / 360) * 100
-      const roundedPercentage = percentageOfCircle.toFixed(roundTo)
+      const pieData = additionalChartData?.data ?? {}
+      const startAngle = additionalChartData?.startAngle ?? 0
+      const endAngle = additionalChartData?.endAngle ?? 0
+
+      const degrees = ((endAngle - startAngle) * 180) / Math.PI
+      const pctOf360 = (degrees / 360) * 100
+      const pctString = pctOf360.toFixed(roundTo) + '%'
 
       tooltipItems.push(
-        // ignore
-        [config.xAxis.dataKey, pieData],
+        [config.xAxis.dataKey, pieData[config.xAxis.dataKey]],
         [config.runtime.yAxis.dataKey, formatNumber(pieData[config.runtime.yAxis.dataKey])],
-        ['Percent', `${roundedPercentage + '%'}`]
+        ['Percent', pctString]
       )
     }
 
