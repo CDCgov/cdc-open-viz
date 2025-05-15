@@ -405,9 +405,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
         if (configObj) {
           const preparedConfig = await prepareConfig(configObj)
           const preppedData = await prepareData(preparedConfig)
-          dispatch({ type: 'SET_STATE_DATA', payload: preppedData.data })
-          dispatch({ type: 'SET_EXCLUDED_DATA', payload: preppedData.data })
-          updateConfig(preparedConfig, preppedData.data)
+          const transformedData = transform.developerStandardize(preppedData.data, config.dataDescription)
+
+          dispatch({ type: 'SET_STATE_DATA', payload: transformedData })
+          dispatch({ type: 'SET_EXCLUDED_DATA', payload: transformedData })
+          updateConfig(preparedConfig, transformedData)
         }
       } catch (err) {
         console.error('Could not Load!')
