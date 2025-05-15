@@ -68,7 +68,8 @@ const ChooseTab: React.FC = (): JSX.Element => {
       console.log('IS VEGA')
       const vegaConfig = parseVegaConfig(JSON.parse(text))
       const configType = getVegaConfigType(vegaConfig)
-      const button = buttons.find(b => b.label === configType)
+      const configSubType = configType === 'Map' ? 'United States (State- or County-Level)' : configType
+      const button = buttons.find(b => b.label === configSubType)
       const coveConfig = generateNewConfig(button)
       newConfig = convertVegaConfig(configType, vegaConfig, coveConfig)
     }

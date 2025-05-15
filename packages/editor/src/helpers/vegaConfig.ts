@@ -46,7 +46,7 @@ export const getVegaConfigType = vegaConfig => {
 
 const getMainMark = vegaConfig => {
   const marks = vegaConfig.marks.map(m => (m.type === 'group' && m.marks ? m.marks[0] : m))
-  const mainMarks = marks.filter(m => ['rect', 'line', 'area'].includes(m.type))
+  const mainMarks = marks.filter(m => ['rect', 'line', 'area', 'shape'].includes(m.type))
   return mainMarks.length ? mainMarks[0] : undefined
 }
 
@@ -148,6 +148,9 @@ const getXDateFormat = (xField, vegaData) => {
   }
 }
 
+const getGeoName = (vegaData: { [key: string]: any }[]) =>
+  Object.entries(vegaData[0]).find(([, v]) => states.includes(v))[0]
+
 export const convertVegaConfig = (configType: string, vegaConfig: any, config: any) => {
   delete config.newViz
 
@@ -162,18 +165,23 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
   config.table = config.table || { expanded: false }
 
   if (configType === 'Map') {
-    const geoData = vegaConfig.data.find(d => d.format?.type === 'topojson')
-    const transform = geoData.transform.find(t => t.type === 'lookup')
+    const geoName = getGeoName(vegaData)
+    const colorData = getMainMark(vegaConfig).encode.update.fill
+    const colorLabel = vegaConfig.legends[0].title
+    const vegaColorScaleType = vegaConfig.scales.find(s => s.name === colorData.scale).type
+
+    if (!config.legend) config.legend = {}
+    config.legend.type = vegaColorScaleType === 'ordinal' ? 'category' : 'equalnumber'
 
     config.columns ||= {}
     config.columns.geo = {
-      name: transform.fields[0],
+      name: geoName,
       label: 'Location',
       dataTable: true
     }
     config.columns.primary = {
-      name: transform.values[0],
-      label: transform.values[0],
+      name: colorData.field,
+      label: colorLabel,
       dataTable: true,
       tooltip: true
     }
@@ -255,7 +263,7 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
 }
 
 export const loadedVegaConfigData = (config: any) => {
-  const seriesKey = config.dataDescription.seriesKey
+  const seriesKey = config.dataDescription?.seriesKey
   if (seriesKey && !config.series) {
     const seriesVals = [...new Set(config.data.map(d => d[seriesKey]))]
     config.series = seriesVals.map(val => {
@@ -280,3 +288,56 @@ export const loadedVegaConfigData = (config: any) => {
 
   return config
 }
+
+export const states = [
+  'Alabama',
+  'Alaska',
+  'Arizona',
+  'Arkansas',
+  'California',
+  'Colorado',
+  'Connecticut',
+  'Delaware',
+  'Florida',
+  'Georgia',
+  'Hawaii',
+  'Idaho',
+  'Illinois',
+  'Indiana',
+  'Iowa',
+  'Kansas',
+  'Kentucky',
+  'Louisiana',
+  'Maine',
+  'Maryland',
+  'Massachusetts',
+  'Michigan',
+  'Minnesota',
+  'Mississippi',
+  'Missouri',
+  'Montana',
+  'Nebraska',
+  'Nevada',
+  'New Hampshire',
+  'New Jersey',
+  'New Mexico',
+  'New York',
+  'North Carolina',
+  'North Dakota',
+  'Ohio',
+  'Oklahoma',
+  'Oregon',
+  'Pennsylvania',
+  'Rhode Island',
+  'South Carolina',
+  'South Dakota',
+  'Tennessee',
+  'Texas',
+  'Utah',
+  'Vermont',
+  'Virginia',
+  'Washington',
+  'West Virginia',
+  'Wisconsin',
+  'Wyoming'
+]
