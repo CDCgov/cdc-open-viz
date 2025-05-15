@@ -69,7 +69,7 @@ const PatternSettings = ({ name }: PanelProps) => {
     const contrastCheck = checkColorContrast(fill, patternColor)
 
     if (!contrastCheck) {
-      console.warn(
+      console.error(
         `COVE: pattern contrast check failed on ${geoName} for ${dataKey} with:
       pattern color: ${patternColor}
       contrast: ${getColorContrast(fill, patternColor)}`
