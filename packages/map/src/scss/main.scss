@@ -2,11 +2,10 @@
 @import 'editor-panel';
 
 .type-map--has-error {
-  overflow: hidden !important;
-  height: 100vh;
 
   .waiting {
     display: flex;
+    overflow: hidden !important;
     align-content: center;
     flex-wrap: wrap;
     height: 100vh;

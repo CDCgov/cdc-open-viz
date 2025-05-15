@@ -153,10 +153,10 @@ const UsaMap = () => {
       setTerritoriesData(territoriesKeys)
     } else {
       // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
-      const territoriesList = territoriesKeys.filter(key => dataRef.current?.[key])
+      const territoriesList = territoriesKeys.filter(key => data?.[key])
       setTerritoriesData(territoriesList)
     }
-  }, [data, general.territoriesAlwaysShow])
+  }, [data, dataRef.current, general.territoriesAlwaysShow])
 
   const geoStrokeColor = getGeoStrokeColor(config)
   const geoFillColor = getGeoFillColor(config)
@@ -471,7 +471,7 @@ const UsaMap = () => {
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
-                        radius={0.5}
+                        strokeWidth={0.5}
                       />
                     )}
                     {pattern === 'lines' && (
@@ -545,13 +545,13 @@ const UsaMap = () => {
   }
 
   const geoLabel = (geo, bgColor = '#FFFFFF', projection) => {
-    let centroid = projection ? projection(geoCentroid(geo)) : [22, 17.5]
-    let abbr = geo.properties.iso
+    const centroid = projection ? projection(geoCentroid(geo)) : [22, 17.5]
+    const abbr = geo.properties.iso
 
     if (undefined === abbr) return null
 
     // HI background is always white since it is off to the side
-    if (abbr === 'US-HI' && !general.displayAsHex) {
+    if ((abbr === 'US-HI' && !general.displayAsHex) || (Object.keys(offsets).includes(abbr) && !general.displayAsHex)) {
       bgColor = '#FFF'
     }
     const { textColor, strokeColor } = outlinedTextColor(bgColor)

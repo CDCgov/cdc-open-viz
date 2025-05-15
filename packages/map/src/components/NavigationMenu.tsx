@@ -24,7 +24,7 @@ const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoN
       navGo = 'Ir'
       break
     default:
-      navSelect = 'Select an Item'
+      navSelect = 'Select a Location'
       navGo = 'Go'
   }
 
@@ -55,15 +55,17 @@ const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoN
       <form onSubmit={handleSubmit} type='get'>
         <label htmlFor={mapTabbingID.replace('#', '')}>
           <div className='select-heading'>{navSelect}</div>
-          <select value={activeGeo} id={mapTabbingID.replace('#', '')} onChange={e => setActiveGeo(e.target.value)}>
-            {Object.keys(dropdownItems).map(key => (
-              <option key={key} value={key}>
-                {key}
-              </option>
-            ))}
-          </select>
+          <div className='d-flex'>
+            <select value={activeGeo} id={mapTabbingID.replace('#', '')} onChange={e => setActiveGeo(e.target.value)}>
+              {Object.keys(dropdownItems).map(key => (
+                <option key={key} value={key}>
+                  {key}
+                </option>
+              ))}
+            </select>
+            <input type='submit' value={navGo} className={`${options.headerColor} btn`} id='cdcnavmap-dropdown-go' />
+          </div>
         </label>
-        <input type='submit' value={navGo} className={`${options.headerColor} btn`} id='cdcnavmap-dropdown-go' />
       </form>
     </section>
   )
