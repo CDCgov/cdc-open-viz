@@ -13,6 +13,10 @@ const CURVE_LOOKUP = {
   basis: 'Curve Basis'
 }
 
+export const isVegaConfig = config => {
+  return config.scales || config.axes || config.marks || config.layer || config.params
+}
+
 export const parseVegaConfig = vegaConfig => {
   try {
     vegaConfig = vegaLite.compile(vegaConfig).spec
