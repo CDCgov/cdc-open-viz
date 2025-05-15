@@ -82,11 +82,13 @@ const useScales = (properties: useScaleProps) => {
   if (xAxis.type === 'date-time' || xAxis.type === 'continuous') {
     let xAxisMin = Math.min(...xAxisDataMapped.map(Number))
     let xAxisMax = Math.max(...xAxisDataMapped.map(Number))
-    xAxisMin -= (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
-    xAxisMax +=
-      visualizationType === 'Line'
-        ? 0
-        : (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
+    let paddingRatio = config.xAxis.padding ? config.xAxis.padding * 0.01 : 0
+    if (config.brush.active) {
+      paddingRatio = config.barThickness * 0.2
+    }
+
+    xAxisMin -= paddingRatio * (xAxisMax - xAxisMin)
+    xAxisMax += visualizationType === 'Line' ? 0 : paddingRatio * (xAxisMax - xAxisMin)
     const range = config.xAxis.sortByRecentDate ? [xMax, 0] : [0, xMax]
     xScale = scaleTime({
       domain: [xAxisMin, xAxisMax],

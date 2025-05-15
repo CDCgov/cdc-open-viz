@@ -118,6 +118,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   const setConfig = (newMapState: MapConfig): void => {
     dispatch({ type: 'SET_CONFIG', payload: newMapState })
+
     if (isEditor && !isDashboard) {
       editorContext.setTempConfig(newMapState)
     } else if (isDashboard && isEditor) {
@@ -142,11 +143,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   const _setRuntimeData = (data: any) => {
-    if (config) {
-      setRuntimeData(data)
-    } else {
-      setRuntimeFilters(data)
-    }
+    setRuntimeData(data)
   }
   const transform = new DataTransform()
 
@@ -162,7 +159,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const imageId = useId()
   const legendId = useId()
   const mapId = useId()
-  const tooltipId = useId()
+  const tooltipId = 'test'
 
   // hooks
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
@@ -442,7 +439,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     }
                   }}
                 >
-                  {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
                   <section
                     className='outline-none geography-container w-100 position-relative'
                     ref={mapSvg}

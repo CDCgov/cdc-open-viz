@@ -26,10 +26,10 @@ const geoLookups: Record<string, GeoLookup> = {
   country: { keys: countryKeys, data: supportedCountries }
 }
 
-const memoizedFindUID = memoize((geoName: string, type: keyof typeof geoLookups): string | undefined => {
+const memoizedFindUID = (geoName: string, type: keyof typeof geoLookups): string | undefined => {
   const lookup = geoLookups[type]
   return lookup.keys.find(key => lookup.data[key].includes(geoName))
-})
+}
 
 const hasValidCoordinates = (row: Row, columns: GeoConfig['columns']): boolean => {
   return !!(
@@ -61,7 +61,10 @@ const handleUSLocation = (row: DataRow, geoColumn: string, displayAsHex: boolean
   const geoName = normalizeGeoName(row[geoColumn])
 
   let uid = memoizedFindUID(geoName, 'state')
-  if (!uid) uid = memoizedFindUID(geoName, 'territory')
+  if (!uid) {
+    uid = memoizedFindUID(geoName, 'territory')
+  }
+
   if (!uid) uid = findCityUID(geoName)
   if (!uid) uid = handleDCDisplay(geoName, displayAsHex)
 
