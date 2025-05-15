@@ -14,7 +14,7 @@ import ConfigContext from '../../ConfigContext'
 import useRightAxis from '../../hooks/useRightAxis'
 
 // Local helpers and components
-import { createStyles, createDataSegments } from './helpers'
+import { filterCircles, createStyles, createDataSegments } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
 import LineChartBumpCircle from './components/LineChart.BumpCircle'
 import isNumber from '@cdc/core/helpers/isNumber'
@@ -79,6 +79,7 @@ const LineChart = (props: LineChartProps) => {
             ? data.filter(d => d[seriesData.dynamicCategory] === seriesKey)
             : data
           const _seriesKey = seriesData.dynamicCategory ? seriesData.originalDataKey : seriesKey
+          const circleData = filterCircles(config?.preliminaryData, tableData, _seriesKey)
           return (
             <Group
               key={`series-${seriesKey}-${index}`}
@@ -332,6 +333,31 @@ const LineChart = (props: LineChartProps) => {
                   />
                 </>
               )}
+
+              {/* circles for preliminaryData data */}
+              {circleData.map((item, i) => {
+                return (
+                  <circle
+                    key={i}
+                    cx={xPos(item.data)}
+                    cy={
+                      seriesAxis === 'Right'
+                        ? yScaleRight(getYAxisData(item.data, _seriesKey))
+                        : yScale(Number(getYAxisData(item.data, _seriesKey)))
+                    }
+                    r={item.size}
+                    strokeWidth={seriesData.weight || 2}
+                    stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'}
+                    fill={
+                      item.isFilled
+                        ? colorScale
+                          ? colorScale(config.runtime.seriesLabels[seriesKey])
+                          : '#000'
+                        : '#fff'
+                    }
+                  />
+                )
+              })}
 
               {/* ANIMATED LINE */}
               {config.animate && (
