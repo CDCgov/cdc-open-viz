@@ -70,7 +70,7 @@ const getMaxGroupSize = (data, groupBy) => {
   return Math.max(...Object.values(getGroupedData(data, groupBy)).map(d => d.length))
 }
 
-const getVegaData = vegaConfig => {
+export const getVegaData = vegaConfig => {
   const mainMark = getMainMark(vegaConfig)
   const groupMark = getGroupMark(vegaConfig)
   const name = groupMark?.from?.facet?.data || mainMark.from.data
@@ -154,6 +154,9 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
   const vegaData = getVegaData(vegaConfig)
 
   config.vegaType = configType
+
+  config.dataFileName = 'vega-config.json'
+  config.dataFileSourceType = 'file'
 
   config.showTitle = false
   config.table = config.table || { expanded: false }
@@ -272,6 +275,7 @@ export const loadedVegaConfigData = (config: any) => {
     const transform = new DataTransform()
     config.data = transform.autoStandardize(config.data)
     config.data = transform.developerStandardize(config.data, config.dataDescription)
+    config.formattedData = config.data
   }
 
   return config

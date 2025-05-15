@@ -32,7 +32,7 @@ import { supportedDataTypes } from '../helpers/supportedDataTypes'
 import { getFileExtension } from '../helpers/getFileExtension'
 import { parseTextByMimeType } from '../helpers/parseTextByMimeType'
 import { getMimeType } from '../helpers/getMimeType'
-import { loadedVegaConfigData } from '@cdc/editor/src/helpers/vegaConfig'
+import { getVegaData, loadedVegaConfigData } from '@cdc/editor/src/helpers/vegaConfig'
 
 const DataImport = () => {
   const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)
@@ -70,7 +70,8 @@ const DataImport = () => {
     })
 
     // Is the X Axis still in the dataset?
-    if (newData.columns.indexOf(oldAxisX) < 0) return false
+    const columns = newData.columns || Object.keys(newData[0])
+    if (columns.indexOf(oldAxisX) < 0) return false
 
     return true
   }
@@ -208,10 +209,6 @@ const DataImport = () => {
           }
           if (setDataURL) {
             newConfig.dataUrl = fileSource
-          }
-          if (newConfig.vegaConfig) {
-            newConfig = loadedVegaConfigData(newConfig)
-            dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 2 })
           }
           setConfig(newConfig)
         }
@@ -421,6 +418,16 @@ const DataImport = () => {
     setEditingDataset(undefined)
     if (!datasetKeys.length) setAddingDataset(true)
     dispatch({ type: 'DELETE_DASHBOARD_DATASET', payload: { datasetKey } })
+  }
+
+  const updateVegaData = text => {
+    const newData = getVegaData(JSON.parse(text))
+    let newConfig = {
+      ...config,
+      data: newData
+    }
+    loadedVegaConfigData(newConfig)
+    setConfig(newConfig)
   }
 
   let configureData,
@@ -659,7 +666,7 @@ const DataImport = () => {
 
         {configureData?.data && (
           <>
-            {config.type !== 'dashboard' && (
+            {config.type !== 'dashboard' && !config.vegaType && (
               <>
                 <div className='heading-3'>Data Source</div>
                 <div className='file-loaded-area'>
@@ -696,6 +703,25 @@ const DataImport = () => {
                     </>
                   )}
                 </div>
+              </>
+            )}
+
+            {config.vegaType && (
+              <>
+                <div className='heading-3'>Data Source</div>
+                <label htmlFor='uploadConfig'>paste configuration json</label>
+                <textarea
+                  id='pasteConfig'
+                  onChange={e => {
+                    updateVegaData(e.target.value)
+                  }}
+                  placeholder='{ }'
+                />
+                <>
+                  <div className='url-source-options'>
+                    <div>{loadDataFromUrl()}</div>
+                  </div>
+                </>
               </>
             )}
 
