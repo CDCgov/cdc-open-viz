@@ -59,7 +59,11 @@ export const BarChartHorizontal = () => {
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
-  const hasConfidenceInterval = Object.keys(config.confidenceKeys).length > 0
+  const hasConfidenceInterval =
+    config.confidenceKeys.upper &&
+    config.confidenceKeys.lower &&
+    config.confidenceKeys.upper !== '' &&
+    config.confidenceKeys.lower !== ''
 
   const _data = getBarData(config, data, hasConfidenceInterval)
 
@@ -222,7 +226,8 @@ export const BarChartHorizontal = () => {
                     const d = datum[config.confidenceKeys[position]]
                     return xScale(d)
                   })
-                  // End Confidence Interval Variables
+                  const labelX = bar.y
+                  const overlapWithCI = hasConfidenceInterval && labelX >= lowerPos && labelX <= upperPos
 
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
@@ -300,8 +305,12 @@ export const BarChartHorizontal = () => {
                             display={displayBar ? 'block' : 'none'}
                             x={bar.y}
                             opacity={transparentBar ? 0.5 : 1}
-                            y={config.barHeight / 2 + config.barHeight * bar.index}
-                            fill={labelColor}
+                            y={
+                              hasConfidenceInterval && overlapWithCI
+                                ? config.barHeight * bar.index
+                                : config.barHeight / 2 + config.barHeight * bar.index
+                            }
+                            fill={hasConfidenceInterval && overlapWithCI ? '#000' : labelColor}
                             dx={textPadding}
                             verticalAnchor='middle'
                             textAnchor={textAnchor}
@@ -382,7 +391,7 @@ export const BarChartHorizontal = () => {
                             <animate attributeName='height' values={`0, ${lollipopShapeSize}`} dur='2.5s' />
                           </rect>
                         )}
-                        {hasConfidenceInterval && (
+                        {hasConfidenceInterval && displayBar && (
                           <path
                             key={`confidence-interval-h-${yPos}-${datum[config.runtime.originalXAxis.dataKey]}`}
                             stroke={APP_FONT_COLOR}
