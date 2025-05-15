@@ -21,12 +21,24 @@ const BarChartStackedVertical = () => {
     onMouseOverBar,
     barStackedSeriesKeys
   } = barChart
-  const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter } =
-    useContext(ConfigContext)
+  const {
+    transformedData,
+    colorScale,
+    seriesHighlight,
+    config,
+    formatNumber,
+    formatDate,
+    parseDate,
+    setSharedFilter,
+    brushConfig
+  } = useContext(ConfigContext)
 
   const { orientation } = config
 
-  const data = config.brush?.active && config.brush.data?.length ? config.brush.data : transformedData
+  let data = transformedData
+  if (brushConfig.data.length) {
+    data = brushConfig.data
+  }
   const isDateAxisType = config.runtime.xAxis.type === 'date-time' || config.runtime.xAxis.type === 'date'
   const isDateTimeScaleAxisType = config.runtime.xAxis.type === 'date-time'
 
