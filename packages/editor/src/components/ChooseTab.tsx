@@ -62,17 +62,12 @@ const ChooseTab: React.FC = (): JSX.Element => {
 
   const importConfig = text => {
     //try {
-    let newConfig = JSON.parse(text)
-    const isVega = isVegaConfig(newConfig)
-    if (isVega) {
-      console.log('IS VEGA')
-      const vegaConfig = parseVegaConfig(JSON.parse(text))
-      const configType = getVegaConfigType(vegaConfig)
-      const configSubType = configType === 'Map' ? 'United States (State- or County-Level)' : configType
-      const button = buttons.find(b => b.label === configSubType)
-      const coveConfig = generateNewConfig(button)
-      newConfig = convertVegaConfig(configType, vegaConfig, coveConfig)
-    }
+    const vegaConfig = parseVegaConfig(JSON.parse(text))
+    const configType = getVegaConfigType(vegaConfig)
+    const configSubType = configType === 'Map' ? 'United States (State- or County-Level)' : configType
+    const button = buttons.find(b => b.label === configSubType)
+    const coveConfig = generateNewConfig(button)
+    const newConfig = convertVegaConfig(configType, vegaConfig, coveConfig)
     dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
     dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: isVega && newConfig.data?.length ? 2 : 1 })
     //} catch (e) {
