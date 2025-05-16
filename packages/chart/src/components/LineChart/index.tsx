@@ -38,9 +38,10 @@ const LineChart = (props: LineChartProps) => {
     } = props
 
   // prettier-ignore
-  const { colorScale, config, formatNumber, handleLineType, parseDate, seriesHighlight, tableData, transformedData, updateConfig, brushConfig,clean  } = useContext<ChartContext>(ConfigContext)
-  const { yScaleRight } = useRightAxis({ config, yMax, data: transformedData, updateConfig })
+  const { colorScale, config, formatNumber, handleLineType, parseDate, seriesHighlight, tableData, transformedData, brushConfig,clean  } = useContext<ChartContext>(ConfigContext)
+  const { yScaleRight } = useRightAxis({ config, yMax, data: transformedData })
   const showSingleSeries = config.tooltips.singleSeries
+  if (!handleTooltipMouseOver) return
 
   const DEBUG = false
   const { lineDatapointStyle, showLineSeriesLabels, legend } = config

@@ -24,16 +24,20 @@ import './scss/main.scss'
 type CdcMarkupIncludeProps = {
   config: MarkupIncludeConfig
   configUrl: string
+  datasets: Datasets
   isDashboard: boolean
   isEditor: boolean
   setConfig: any
 }
 
 import Title from '@cdc/core/components/ui/Title'
+import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
+import { Datasets } from '@cdc/core/types/DataSet'
 
 const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   configUrl,
   config: configObj,
+  datasets,
   isDashboard = true,
   isEditor = false,
   setConfig: setParentConfig
@@ -251,7 +255,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   if (loading === false) {
     content = (
       <>
-        {isEditor && <EditorPanel />}
+        {isEditor && <EditorPanel datasets={datasets} />}
         {!hideMarkupInclude && (
           <Layout.Responsive isEditor={isEditor}>
             <div className='markup-include-content-container cove-component__content no-borders'>
@@ -264,6 +268,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
                   </div>
                 </div>
               </div>
+              <FootnotesStandAlone config={configObj.footnotes} filters={[]} />
             </div>
           </Layout.Responsive>
         )}

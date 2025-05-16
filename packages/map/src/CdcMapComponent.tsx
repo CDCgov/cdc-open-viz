@@ -14,9 +14,11 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Title from '@cdc/core/components/ui/Title'
 import Waiting from '@cdc/core/components/Waiting'
+import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 
 // types
 import { type MapConfig } from './types/MapConfig'
+import { Datasets } from '@cdc/core/types/DataSet'
 
 // Sass
 import './scss/main.scss'
@@ -29,6 +31,7 @@ import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { publish } from '@cdc/core/helpers/events'
 import { generateRuntimeFilters } from './helpers/generateRuntimeFilters'
 import { type MapReducerType, MapState } from './store/map.reducer'
+import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 
 // Map Helpers
 import {
@@ -75,6 +78,7 @@ type CdcMapComponent = {
   navigationHandler: Function
   setSharedFilter: Function
   setSharedFilterValue: Function
+  datasets?: Datasets
 }
 
 const CdcMapComponent: React.FC<CdcMapComponent> = ({
@@ -86,8 +90,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   setSharedFilter,
   setSharedFilterValue,
   link,
+  setConfig: setParentConfig,
   loadConfig,
-  setConfig: setParentConfig
+  datasets
 }) => {
   const initialState = getInitialState(configObj)
 
@@ -143,7 +148,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   const _setRuntimeData = (data: any) => {
-    setRuntimeData(data)
+    const _newFilters = addValuesToFilters(data, [])
+    setConfig({ ...config, filters: _newFilters })
+    if (config) {
+      setRuntimeData(data)
+    } else {
+      setRuntimeFilters(data)
+    }
   }
   const transform = new DataTransform()
 
@@ -396,7 +407,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
           imageId={imageId}
           showEditorPanel={config.showEditorPanel}
         >
-          {isEditor && <EditorPanel />}
+          {isEditor && <EditorPanel datasets={datasets} />}
           <Layout.Responsive isEditor={isEditor}>
             {requiredColumns?.length > 0 && (
               <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
@@ -578,6 +589,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 display: 'none' // can't use d-none here
               }}
             ></div>
+            <FootnotesStandAlone config={config.footnotes} filters={config.filters?.filter(f => f.filterFootnotes)} />
           </Layout.Responsive>
         </Layout.VisualizationWrapper>
       </MapDispatchContext.Provider>
