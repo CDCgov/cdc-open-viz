@@ -127,7 +127,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   useEffect(() => {
-    setConfig({ ...config, data: configObj.data })
+    const _newConfig = _.cloneDeep(configObj)
+    if (configObj.data) {
+      _newConfig.data = configObj.data
+    }
+    setConfig(_newConfig)
   }, [configObj.data]) // eslint-disable-line
 
   const setRuntimeData = (data: RuntimeData) => {
