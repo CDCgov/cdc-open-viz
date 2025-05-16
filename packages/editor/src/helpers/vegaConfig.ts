@@ -76,7 +76,7 @@ export const getVegaData = vegaConfig => {
   const name = groupMark?.from?.facet?.data || mainMark.from.data
   const view = new vega.View(vega.parse(vegaConfig)).run()
   const data = view.data(name)
-  const keysToRemove = getKeysToRemove(vegaConfig)
+  const keysToRemove = getKeysToRemove(vegaConfig, data)
   data.forEach(d => {
     keysToRemove.forEach(k => delete d[k])
     Object.keys(d).forEach(k => {
@@ -128,12 +128,17 @@ const getSeriesKey = (vegaConfig, xField, yField) => {
   return undefined
 }
 
-const getKeysToRemove = vegaConfig => {
+const getKeysToRemove = (vegaConfig, data) => {
   let keysToRemove = []
   const stack = getStack(vegaConfig)
   if (stack) {
     keysToRemove = [...keysToRemove, ...(stack.as || ['y0', 'y1'])]
   }
+  Object.keys(data[0]).forEach(k => {
+    if (typeof data[0][k] === 'object') {
+      keysToRemove.push(k)
+    }
+  })
   return keysToRemove
 }
 
