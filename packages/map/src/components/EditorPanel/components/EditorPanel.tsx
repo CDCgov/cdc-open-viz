@@ -47,8 +47,14 @@ import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/In
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs, HEADER_COLORS } from '../../../helpers'
 import './editorPanel.styles.css'
+import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
+import { Datasets } from '@cdc/core/types/DataSet'
 
-const EditorPanel = () => {
+type MapEditorPanelProps = {
+  datasets?: Datasets
+}
+
+const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const {
     setParentConfig,
     isDashboard,
@@ -2496,16 +2502,30 @@ const EditorPanel = () => {
             </AccordionItem>
           )}
           {'navigation' !== config.general.type && (
-            <AccordionItem>
-              {' '}
-              {/* Filters */}
-              <AccordionItemHeading>
-                <AccordionItemButton>Filters</AccordionItemButton>
-              </AccordionItemHeading>
-              <AccordionItemPanel>
-                <VizFilterEditor config={config} updateField={updateField} rawData={config.data} />
-              </AccordionItemPanel>
-            </AccordionItem>
+            <>
+              <AccordionItem>
+                {/* Filters */}
+                <AccordionItemHeading>
+                  <AccordionItemButton>Filters</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <VizFilterEditor
+                    config={config}
+                    updateField={updateField}
+                    rawData={config.data}
+                    hasFootnotes={isDashboard}
+                  />
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Footnotes</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />
+                </AccordionItemPanel>
+              </AccordionItem>
+            </>
           )}
           {'navigation' !== config.general.type && (
             <AccordionItem>

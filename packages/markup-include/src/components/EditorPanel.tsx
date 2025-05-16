@@ -24,6 +24,8 @@ import '@cdc/core/styles/v2/components/editor.scss'
 import './editorPanel.style.css'
 import VariableSection from './Variables'
 import { CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
+import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
+import { Datasets } from '@cdc/core/types/DataSet'
 
 const headerColors = [
   'theme-blue',
@@ -39,7 +41,11 @@ const headerColors = [
   'theme-amber'
 ]
 
-const EditorPanel: React.FC = () => {
+type MarkupIncludeEditorPanelProps = {
+  datasets?: Datasets
+}
+
+const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
   const { config, data, isDashboard, loading, setParentConfig, updateConfig } = useContext(ConfigContext)
   const { contentEditor, theme, visual } = config
   const { inlineHTML, markupVariables, srcUrl, title, useInlineHTML, allowHideSection } = contentEditor
@@ -296,6 +302,11 @@ const EditorPanel: React.FC = () => {
           />
         </div>
       </Accordion.Section>
+      {isDashboard && (
+        <Accordion.Section title='Footnotes'>
+          <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />
+        </Accordion.Section>
+      )}
     </Accordion>
   )
 

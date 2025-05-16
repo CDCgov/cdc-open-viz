@@ -4,7 +4,28 @@ import { ChartConfig, type ViewportSize } from '../types/ChartConfig'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import _ from 'lodash'
 
-export const getInitialState = (configObj: ChartConfig) => {
+type ChartState = {
+  isLoading: boolean
+  config: ChartConfig
+  stateData: object[]
+  colorScale: Function
+  excludedData: object[]
+  filteredData: object[]
+  seriesHighlight: string[]
+  currentViewport: ViewportSize
+  dimensions: DimensionsType
+  container: HTMLElement | null
+  coveLoadedEventRan: boolean
+  isDraggingAnnotation: boolean
+  imageId: string
+  brushConfig: {
+    data: object[]
+    isActive: boolean
+    isBrushing: boolean
+  }
+}
+
+export const getInitialState = (configObj: ChartConfig): ChartState => {
   return {
     isLoading: true,
     config: defaults,
@@ -28,28 +49,7 @@ export const getInitialState = (configObj: ChartConfig) => {
   }
 }
 
-type State = {
-  isLoading: boolean
-  config: ChartConfig
-  stateData: object[]
-  colorScale: Function
-  excludedData: object[]
-  filteredData: object[]
-  seriesHighlight: string[]
-  currentViewport: ViewportSize
-  dimensions: DimensionsType
-  container: HTMLElement | null
-  coveLoadedEventRan: boolean
-  isDraggingAnnotation: boolean
-  imageId: string
-  brushConfig: {
-    data: object[]
-    isActive: boolean
-    isBrushing: boolean
-  }
-}
-
-export const reducer = (state: State, action: ChartActions) => {
+export const reducer = (state: ChartState, action: ChartActions): ChartState => {
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload }

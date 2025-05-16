@@ -18,6 +18,7 @@ export const updateFieldFactory =
     const isArray = Array.isArray(config[section])
 
     let sectionValue = isArray ? [...config[section], newValue] : { ...config[section], [fieldName]: newValue }
+    if (!fieldName && !legacy) sectionValue = newValue
 
     if (null !== subsection) {
       if (isArray) {
