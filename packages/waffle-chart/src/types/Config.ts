@@ -33,6 +33,7 @@ export type Config = {
   suffix: string
   theme: ComponentThemes
   title: string
+  showTitle: boolean
   type: 'waffle-chart'
   valueDescription: string
   visual: ComponentStyles

@@ -1,0 +1,1874 @@
+[
+  {
+    "epi_week": "05/10/2025",
+    "state": "Alabama",
+    "animal_category": "All Animals",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Alabama",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Alabama",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Alabama",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Alaska",
+    "animal_category": "All Animals",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Alaska",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Alaska",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Alaska",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Arizona",
+    "animal_category": "All Animals",
+    "total_animal_detections": 9,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Arizona",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 3,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Arizona",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Arizona",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 4,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Arkansas",
+    "animal_category": "All Animals",
+    "total_animal_detections": 9,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Arkansas",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 6,
+    "total_animal_detections_cat": "6-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Arkansas",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 3,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Arkansas",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "California",
+    "animal_category": "All Animals",
+    "total_animal_detections": 851,
+    "total_animal_detections_cat": ">100",
+    "total_human_detections": 38,
+    "total_human_detections_cat": ">20"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "California",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 17,
+    "total_animal_detections_cat": "11-20",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "California",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 68,
+    "total_animal_detections_cat": ">20",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "California",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 766,
+    "total_animal_detections_cat": ">100",
+    "total_human_detections": 36,
+    "total_human_detections_cat": ">20"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Colorado",
+    "animal_category": "All Animals",
+    "total_animal_detections": 79,
+    "total_animal_detections_cat": "51-100",
+    "total_human_detections": 10,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Colorado",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 11,
+    "total_animal_detections_cat": "11-20",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Colorado",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 4,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 9,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Colorado",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 64,
+    "total_animal_detections_cat": "51-100",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Connecticut",
+    "animal_category": "All Animals",
+    "total_animal_detections": 3,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Connecticut",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 3,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Connecticut",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Connecticut",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Delaware",
+    "animal_category": "All Animals",
+    "total_animal_detections": 4,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Delaware",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Delaware",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 3,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Delaware",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "District of Columbia",
+    "animal_category": "All Animals",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "District of Columbia",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "District of Columbia",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "District of Columbia",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Florida",
+    "animal_category": "All Animals",
+    "total_animal_detections": 22,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Florida",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 22,
+    "total_animal_detections_cat": ">20",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Florida",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Florida",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Georgia",
+    "animal_category": "All Animals",
+    "total_animal_detections": 3,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Georgia",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Georgia",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Georgia",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Hawaii",
+    "animal_category": "All Animals",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Hawaii",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Hawaii",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Hawaii",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Idaho",
+    "animal_category": "All Animals",
+    "total_animal_detections": 114,
+    "total_animal_detections_cat": ">100",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Idaho",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 24,
+    "total_animal_detections_cat": ">20",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Idaho",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Idaho",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 90,
+    "total_animal_detections_cat": "51-100",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Illinois",
+    "animal_category": "All Animals",
+    "total_animal_detections": 9,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Illinois",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 5,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Illinois",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 4,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Illinois",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Indiana",
+    "animal_category": "All Animals",
+    "total_animal_detections": 29,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Indiana",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 8,
+    "total_animal_detections_cat": "6-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Indiana",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 21,
+    "total_animal_detections_cat": ">20",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Indiana",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Iowa",
+    "animal_category": "All Animals",
+    "total_animal_detections": 31,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Iowa",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 4,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Iowa",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 14,
+    "total_animal_detections_cat": "11-20",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Iowa",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 13,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Kansas",
+    "animal_category": "All Animals",
+    "total_animal_detections": 24,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Kansas",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 13,
+    "total_animal_detections_cat": "11-20",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Kansas",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 7,
+    "total_animal_detections_cat": "6-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Kansas",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 4,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Kentucky",
+    "animal_category": "All Animals",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Kentucky",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Kentucky",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Kentucky",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Louisiana",
+    "animal_category": "All Animals",
+    "total_animal_detections": 3,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Louisiana",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 3,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Louisiana",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Louisiana",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Maine",
+    "animal_category": "All Animals",
+    "total_animal_detections": 5,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Maine",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 5,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Maine",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Maine",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Maryland",
+    "animal_category": "All Animals",
+    "total_animal_detections": 10,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Maryland",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 5,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Maryland",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 5,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Maryland",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Massachusetts",
+    "animal_category": "All Animals",
+    "total_animal_detections": 5,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Massachusetts",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 5,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Massachusetts",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Massachusetts",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Michigan",
+    "animal_category": "All Animals",
+    "total_animal_detections": 53,
+    "total_animal_detections_cat": "51-100",
+    "total_human_detections": 2,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Michigan",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 9,
+    "total_animal_detections_cat": "6-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Michigan",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 13,
+    "total_animal_detections_cat": "11-20",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Michigan",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 31,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 2,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Minnesota",
+    "animal_category": "All Animals",
+    "total_animal_detections": 45,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Minnesota",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 10,
+    "total_animal_detections_cat": "6-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Minnesota",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 26,
+    "total_animal_detections_cat": ">20",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Minnesota",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 9,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Mississippi",
+    "animal_category": "All Animals",
+    "total_animal_detections": 3,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Mississippi",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Mississippi",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 3,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Mississippi",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Missouri",
+    "animal_category": "All Animals",
+    "total_animal_detections": 35,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Missouri",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 10,
+    "total_animal_detections_cat": "6-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Missouri",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 25,
+    "total_animal_detections_cat": ">20",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Missouri",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Montana",
+    "animal_category": "All Animals",
+    "total_animal_detections": 4,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Montana",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 4,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Montana",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Montana",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Nebraska",
+    "animal_category": "All Animals",
+    "total_animal_detections": 10,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Nebraska",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 7,
+    "total_animal_detections_cat": "6-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Nebraska",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 3,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Nebraska",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Nevada",
+    "animal_category": "All Animals",
+    "total_animal_detections": 12,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Nevada",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Nevada",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Nevada",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 11,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "New Hampshire",
+    "animal_category": "All Animals",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "New Hampshire",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "New Hampshire",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "New Hampshire",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "New Jersey",
+    "animal_category": "All Animals",
+    "total_animal_detections": 6,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "New Jersey",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 6,
+    "total_animal_detections_cat": "6-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "New Jersey",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "New Jersey",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "New Mexico",
+    "animal_category": "All Animals",
+    "total_animal_detections": 16,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "New Mexico",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 4,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "New Mexico",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 3,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "New Mexico",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 9,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "New York",
+    "animal_category": "All Animals",
+    "total_animal_detections": 36,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "New York",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 35,
+    "total_animal_detections_cat": ">20",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "New York",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "New York",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "North Carolina",
+    "animal_category": "All Animals",
+    "total_animal_detections": 8,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "North Carolina",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "North Carolina",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 5,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "North Carolina",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "North Dakota",
+    "animal_category": "All Animals",
+    "total_animal_detections": 6,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "North Dakota",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 5,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "North Dakota",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "North Dakota",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Ohio",
+    "animal_category": "All Animals",
+    "total_animal_detections": 78,
+    "total_animal_detections_cat": "51-100",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Ohio",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 6,
+    "total_animal_detections_cat": "6-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Ohio",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 71,
+    "total_animal_detections_cat": ">20",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Ohio",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Oklahoma",
+    "animal_category": "All Animals",
+    "total_animal_detections": 9,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Oklahoma",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 4,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Oklahoma",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 3,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Oklahoma",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Oregon",
+    "animal_category": "All Animals",
+    "total_animal_detections": 12,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Oregon",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 11,
+    "total_animal_detections_cat": "11-20",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Oregon",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Oregon",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Pennsylvania",
+    "animal_category": "All Animals",
+    "total_animal_detections": 24,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Pennsylvania",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 16,
+    "total_animal_detections_cat": "11-20",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Pennsylvania",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 8,
+    "total_animal_detections_cat": "6-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Pennsylvania",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Puerto Rico",
+    "animal_category": "All Animals",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Puerto Rico",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Puerto Rico",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Puerto Rico",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Rhode Island",
+    "animal_category": "All Animals",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Rhode Island",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Rhode Island",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Rhode Island",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "South Carolina",
+    "animal_category": "All Animals",
+    "total_animal_detections": 4,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "South Carolina",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 3,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "South Carolina",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "South Carolina",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "South Dakota",
+    "animal_category": "All Animals",
+    "total_animal_detections": 32,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "South Dakota",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 6,
+    "total_animal_detections_cat": "6-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "South Dakota",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 19,
+    "total_animal_detections_cat": "11-20",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "South Dakota",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 7,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Tennessee",
+    "animal_category": "All Animals",
+    "total_animal_detections": 3,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Tennessee",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Tennessee",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Tennessee",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Texas",
+    "animal_category": "All Animals",
+    "total_animal_detections": 32,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Texas",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 4,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Texas",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Texas",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 27,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Utah",
+    "animal_category": "All Animals",
+    "total_animal_detections": 20,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Utah",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Utah",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 5,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Utah",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 13,
+    "total_animal_detections_cat": "11-50",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Vermont",
+    "animal_category": "All Animals",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Vermont",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Vermont",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Vermont",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Virginia",
+    "animal_category": "All Animals",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Virginia",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Virginia",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Virginia",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Washington",
+    "animal_category": "All Animals",
+    "total_animal_detections": 9,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 11,
+    "total_human_detections_cat": "11-20"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Washington",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 7,
+    "total_animal_detections_cat": "6-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Washington",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 11,
+    "total_human_detections_cat": "11-20"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Washington",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "West Virginia",
+    "animal_category": "All Animals",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "West Virginia",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "West Virginia",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "West Virginia",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Wisconsin",
+    "animal_category": "All Animals",
+    "total_animal_detections": 5,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Wisconsin",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 2,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Wisconsin",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 3,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Wisconsin",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Wyoming",
+    "animal_category": "All Animals",
+    "total_animal_detections": 5,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Wyoming",
+    "animal_category": "Backyard Flocks",
+    "total_animal_detections": 4,
+    "total_animal_detections_cat": "1-5",
+    "total_human_detections": 1,
+    "total_human_detections_cat": "1-10"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Wyoming",
+    "animal_category": "Commercial Poultry Flocks",
+    "total_animal_detections": 0,
+    "total_animal_detections_cat": "0",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  },
+  {
+    "epi_week": "05/10/2025",
+    "state": "Wyoming",
+    "animal_category": "Dairy Herds",
+    "total_animal_detections": 1,
+    "total_animal_detections_cat": "1-10",
+    "total_human_detections": 0,
+    "total_human_detections_cat": "0"
+  }
+]

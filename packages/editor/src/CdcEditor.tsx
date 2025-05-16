@@ -43,6 +43,15 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
   useEffect(() => {
     // for testing reducer using Redux Dev Tools
     devToolsStore && devToolsStore?.init()
+    document.addEventListener('click', e => {
+      // Prevents mistaken clicks on label from triggering checkbox
+      // Can be removed once all custom checkboxes are replaced with Checkbox component from @cdc/core/components/EditorPanel/Inputs.tsx
+      if (e.target.className === 'checkbox') {
+        if (!['SPAN', 'INPUT'].includes(e.target.nodeName)) {
+          e.preventDefault()
+        }
+      }
+    })
   }, [])
 
   const [state, dispatch] = useReducer(editorReducer, initialState)

@@ -4,6 +4,9 @@
     font-weight: 400;
     display: block;
     padding: 0.5rem 1rem;
+    @media (max-width: 480px) {
+      padding: 0.5rem 0.8rem;
+    }
     color: var(--primary);
     border-color: var(--lightGray);
     :is(button) {

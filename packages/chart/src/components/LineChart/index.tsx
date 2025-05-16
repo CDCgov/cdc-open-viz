@@ -28,7 +28,6 @@ const LineChart = (props: LineChartProps) => {
   const {
     getXAxisData,
     getYAxisData,
-    handleTooltipClick,
     handleTooltipMouseOff,
     handleTooltipMouseOver,
     tooltipData,
@@ -36,53 +35,53 @@ const LineChart = (props: LineChartProps) => {
     xScale,
     yMax,
     yScale,
-  } = props
+    } = props
 
   // prettier-ignore
   const { colorScale, config, formatNumber, handleLineType, parseDate, seriesHighlight, tableData, transformedData, updateConfig, brushConfig,clean  } = useContext<ChartContext>(ConfigContext)
   const { yScaleRight } = useRightAxis({ config, yMax, data: transformedData, updateConfig })
-  if (!handleTooltipMouseOver) return
+  const showSingleSeries = config.tooltips.singleSeries
 
   const DEBUG = false
   const { lineDatapointStyle, showLineSeriesLabels, legend } = config
-  let data = transformedData
-  let tableD = tableData
+  const isBrushOn = brushConfig.data.length > 0 && config.brush?.active
   // if brush on use brush data and clean
-  if (brushConfig.data.length > 0 && config.brush?.active) {
-    data = clean(brushConfig.data)
-    tableD = clean(brushConfig.data)
-  }
+  const data = isBrushOn ? clean(brushConfig.data) : transformedData
+  const _tableData = isBrushOn ? clean(brushConfig.data) : tableData
 
   const xPos = d => {
     return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
   }
 
+  const tooltipPoints = []
+
   return (
     <ErrorBoundary component='LineChart'>
-      <Group left={Number(config.runtime.yAxis.size)}>
-        {' '}
+      <Group left={Number(config.runtime.yAxis.size)} className='line-chart-group'>
         {/* left - expects a number not a string */}
         {(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => {
           const seriesData = config.runtime.series.find(item => item.dataKey === seriesKey)
+          const _seriesKey = seriesData.dynamicCategory ? seriesData.originalDataKey : seriesKey
           const lineType = seriesData.type
           const seriesAxis = seriesData.axis || 'left'
           const displayArea =
             legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
 
-          const suppressedSegments = createDataSegments(
-            tableData,
+          const suppressedSegments = createDataSegments({
+            data: tableData,
             seriesKey,
-            config.preliminaryData,
-            config.xAxis.dataKey
-          )
+            preliminaryData: config.preliminaryData,
+            dynamicCategory: seriesData.dynamicCategory,
+            originalSeriesKey: _seriesKey,
+            colorScale
+          })
           const isSplitLine =
             config?.preliminaryData?.filter(pd => pd.style && !pd.style.includes('Circles')).length > 0
 
           const _data = seriesData.dynamicCategory
             ? data.filter(d => d[seriesData.dynamicCategory] === seriesKey)
             : data
-          const _seriesKey = seriesData.dynamicCategory ? seriesData.originalDataKey : seriesKey
-          const circleData = filterCircles(config?.preliminaryData, tableD, _seriesKey)
+          const circleData = filterCircles(config?.preliminaryData, tableData, _seriesKey)
           return (
             <Group
               key={`series-${seriesKey}-${index}`}
@@ -108,11 +107,15 @@ const LineChart = (props: LineChartProps) => {
                 height={Number(yMax)}
                 fill={DEBUG ? 'red' : 'transparent'}
                 fillOpacity={0.05}
-                onMouseMove={e => handleTooltipMouseOver(e, tableData)}
-                onMouseOut={handleTooltipMouseOff}
-                onClick={e => handleTooltipClick(e, data)}
               />
               {_data.map((d, dataIndex) => {
+                tooltipPoints.push({
+                  color: colorScale(config.runtime.seriesLabels[seriesKey]),
+                  seriesKey: _seriesKey,
+                  seriesIndex: index,
+                  xValue: d[config.xAxis.dataKey],
+                  yValue: d[_seriesKey]
+                })
                 return (
                   isNumber(d[_seriesKey]) && (
                     <React.Fragment key={`series-${seriesKey}-point-${dataIndex}`}>
@@ -136,7 +139,6 @@ const LineChart = (props: LineChartProps) => {
                         <LineChartCircle
                           mode='ALWAYS_SHOW_POINTS'
                           dataIndex={dataIndex}
-                          circleData={circleData}
                           tableData={tableData}
                           data={_data}
                           d={d}
@@ -155,18 +157,37 @@ const LineChart = (props: LineChartProps) => {
                         />
                       )}
 
+                      {(lineDatapointStyle === 'hover' || lineDatapointStyle === 'hidden') && (
+                        <LineChartCircle
+                          mode='HOVER_POINTS'
+                          dataIndex={dataIndex}
+                          tableData={tableData}
+                          data={_data}
+                          d={d}
+                          config={config}
+                          seriesKey={_seriesKey}
+                          displayArea={displayArea}
+                          xScale={xScale}
+                          yScale={yScale}
+                          colorScale={colorScale}
+                          parseDate={parseDate}
+                          yScaleRight={yScaleRight}
+                          seriesAxis={seriesAxis}
+                          seriesIndex={index}
+                          key={`line-hover-circle--${dataIndex}`}
+                        />
+                      )}
+
                       <LineChartCircle
                         mode='ISOLATED_POINTS'
                         seriesIndex={index}
                         dataIndex={dataIndex}
                         tableData={tableData}
-                        circleData={circleData}
                         data={_data}
                         d={d}
                         config={config}
                         seriesKey={_seriesKey}
                         displayArea={displayArea}
-                        tooltipData={tooltipData}
                         xScale={xScale}
                         yScale={yScale}
                         colorScale={colorScale}
@@ -179,28 +200,6 @@ const LineChart = (props: LineChartProps) => {
                   )
                 )
               })}
-              <>
-                {lineDatapointStyle === 'hover' && (
-                  <LineChartCircle
-                    seriesIndex={index}
-                    tableData={tableData}
-                    dataIndex={0}
-                    mode='HOVER_POINTS'
-                    circleData={circleData}
-                    data={_data}
-                    config={config}
-                    seriesKey={seriesKey}
-                    displayArea={displayArea}
-                    tooltipData={tooltipData}
-                    xScale={xScale}
-                    yScale={yScale}
-                    colorScale={colorScale}
-                    parseDate={parseDate}
-                    yScaleRight={yScaleRight}
-                    seriesAxis={seriesAxis}
-                  />
-                )}
-              </>
 
               {/* SPLIT LINE */}
               {isSplitLine ? (
@@ -217,15 +216,17 @@ const LineChart = (props: LineChartProps) => {
                     }
                     styles={createStyles({
                       preliminaryData: config.preliminaryData,
-                      data: tableD,
+                      data: tableData,
                       stroke: colorScale(config.runtime.seriesLabels[seriesKey]),
                       strokeWidth: seriesData.weight || 2,
                       handleLineType,
                       lineType,
-                      seriesKey
+                      seriesKey,
+                      dynamicCategory: seriesData.dynamicCategory,
+                      originalSeriesKey: _seriesKey
                     })}
                     defined={(item, i) => {
-                      return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                      return item[_seriesKey] !== '' && item[_seriesKey] !== null && item[_seriesKey] !== undefined
                     }}
                   />
 
@@ -238,16 +239,22 @@ const LineChart = (props: LineChartProps) => {
                           x={d => xPos(d)}
                           y={d =>
                             seriesAxis === 'Right'
-                              ? yScaleRight(getYAxisData(d, seriesKey))
-                              : yScale(Number(getYAxisData(d, seriesKey)))
+                              ? yScaleRight(getYAxisData(d, _seriesKey))
+                              : yScale(Number(getYAxisData(d, _seriesKey)))
                           }
-                          stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
+                          stroke={
+                            seriesData.dynamicCategory
+                              ? segment.color
+                              : colorScale(config.runtime.seriesLabels[seriesKey])
+                          }
                           strokeWidth={seriesData[0]?.weight || 2}
                           strokeOpacity={1}
                           shapeRendering='geometricPrecision'
                           strokeDasharray={handleLineType(segment.style)}
                           defined={(item, i) => {
-                            return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                            return (
+                              item[_seriesKey] !== '' && item[_seriesKey] !== null && item[_seriesKey] !== undefined
+                            )
                           }}
                         />
                       )
@@ -269,6 +276,7 @@ const LineChart = (props: LineChartProps) => {
                           return (
                             <AreaClosed
                               key={`area-closed-${seriesKey}-${categoryIndex}`}
+                              className='confidence-interval'
                               data={categoryData}
                               x={d => xPos(d)}
                               y0={d => yScale(d[config.confidenceKeys.lower])} // Lower bound of the confidence interval
@@ -431,6 +439,52 @@ const LineChart = (props: LineChartProps) => {
             {config.legend.dynamicLegendChartMessage}
           </Text>
         )}
+      </Group>
+      <Group left={Number(config.runtime.yAxis.size)} className='glyph-tooltip-group'>
+        <Group key={`tooltip-group`} display={'block'}>
+          {/* tooltips */}
+          <Bar
+            key={'tooltip bars'}
+            width={Number(xMax)}
+            height={Number(yMax)}
+            fill={DEBUG ? 'red' : 'transparent'}
+            fillOpacity={0.05}
+            onMouseMove={e => {
+              if (showSingleSeries) return
+              handleTooltipMouseOver(e, tableData)
+            }}
+            onMouseOut={handleTooltipMouseOff}
+          />
+          {tooltipPoints.map((d, dataIndex) => {
+            const { _data, seriesKey, seriesIndex, color } = d
+            return (
+              <React.Fragment key={`series-${seriesKey}-point-${dataIndex}`}>
+                <LineChartCircle
+                  mode='TOOLTIP_POINTS'
+                  dataIndex={dataIndex}
+                  tooltipPoint={d}
+                  tableData={tableData}
+                  data={_data}
+                  d={d}
+                  config={config}
+                  seriesKey={seriesKey}
+                  displayArea={true}
+                  tooltipData={tooltipData}
+                  xScale={xScale}
+                  yScale={yScale}
+                  colorScale={colorScale}
+                  parseDate={parseDate}
+                  yScaleRight={yScaleRight}
+                  seriesAxis={'[circle]'}
+                  seriesIndex={seriesIndex}
+                  key={`line-circle--${dataIndex}`}
+                  handleTooltipMouseOver={handleTooltipMouseOver}
+                  handleTooltipMouseOff={handleTooltipMouseOff}
+                />
+              </React.Fragment>
+            )
+          })}
+        </Group>
       </Group>
       {config.visualizationType === 'Bump Chart' && (
         <LineChartBumpCircle config={config} xScale={xScale} yScale={yScale} />

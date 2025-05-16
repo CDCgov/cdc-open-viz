@@ -113,6 +113,45 @@
         "hideGeoColumnInTooltip": false,
         "hidePrimaryColumnInTooltip": false
       },
+      "tooltips": {
+        "appearanceType": "hover",
+        "linkLabel": "Learn More",
+        "capitalizeLabels": true,
+        "opacity": 90
+      },
+      "map": {
+        "layers": [],
+        "patterns": []
+      },
+      "visual": {
+        "minBubbleSize": 1,
+        "maxBubbleSize": 20,
+        "extraBubbleBorder": false,
+        "cityStyle": "circle",
+        "cityStyleLabel": "",
+        "showBubbleZeros": false,
+        "additionalCityStyles": [],
+        "geoCodeCircleSize": 8
+      },
+      "hexMap": {
+        "type": "",
+        "shapeGroups": [
+          {
+            "legendTitle": "",
+            "legendDescription": "",
+            "items": [
+              {
+                "key": "",
+                "shape": "Arrow Up",
+                "column": "",
+                "operator": "=",
+                "value": ""
+              }
+            ]
+          }
+        ]
+      },
+      "annotations": [],
       "color": "greenBlue",
       "columns": {
         "geo": {
@@ -170,7 +209,8 @@
         "position": "side",
         "title": "Crude Prevalence",
         "separateZero": true
-      }
+      },
+      "table": {}
     }
   },
   "type": "dashboard",
@@ -179,6 +219,7 @@
       "dataUrl": "http://test.gov/api/POC/TableData?DataValueTypeId=CRDMEDN"
     }
   },
+  "table": {},
   "filterBehavior": "Apply Button",
   "runtime": {},
   "uuid": 1684783370106

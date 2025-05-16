@@ -1,7 +1,10 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../../../context'
 import { MapContext } from '../../../../types/MapContext'
-import { getGeoFillColor } from '../../../../helpers/colors'
+import { getGeoFillColor, displayGeoName } from '../../../../helpers'
+import useApplyTooltipsToGeo from '../../../../hooks/useApplyTooltipsToGeo'
+import { applyLegendToRow } from '../../../../helpers/applyLegendToRow'
+import useGeoClickHandler, { geoClickHandler } from '././../../../../hooks/useGeoClickHandler'
 
 interface CountyOutputProps {
   counties: any[]
@@ -12,10 +15,11 @@ interface CountyOutputProps {
 }
 
 const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoStrokeColor, tooltipId }) => {
-  const { applyTooltipsToGeo, applyLegendToRow, displayGeoName, state, data, geoClickHandler } =
-    useContext<MapContext>(ConfigContext)
+  const { config, data, legendMemo, legendSpecialClassLastMemo, runtimeLegend } = useContext<MapContext>(ConfigContext)
+  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
+  const geoFillColor = getGeoFillColor(config)
+  const geoClickHandler = useGeoClickHandler()
 
-  const geoFillColor = getGeoFillColor(state)
   return (
     <>
       {counties.map(county => {
@@ -31,7 +35,7 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
 
         // Once we receive data for this geographic item, setup variables.
         if (geoData !== undefined) {
-          legendColors = applyLegendToRow(geoData)
+          legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
         }
 
         const geoDisplayName = displayGeoName(geoKey)
@@ -55,8 +59,8 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
 
           // When to add pointer cursor
           if (
-            (state.columns.navigate && geoData[state.columns.navigate.name]) ||
-            state.tooltips.appearanceType === 'hover'
+            (config.columns.navigate && geoData[config.columns.navigate.name]) ||
+            config.tooltips.appearanceType === 'hover'
           ) {
             styles.cursor = 'pointer'
           }
@@ -65,7 +69,7 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
             <g
               key={`key--${county.id}`}
               className={`county county--${geoDisplayName.split(' ').join('')} county--${
-                geoData[state.columns.geo.name]
+                geoData[config.columns.geo.name]
               }`}
               style={styles}
               onClick={() => geoClickHandler(geoDisplayName, geoData)}

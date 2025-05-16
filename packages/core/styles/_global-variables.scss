@@ -8,6 +8,7 @@ $colors: (
   'darkGray': #333,
   'red': #d8000c,
   'white': #fff,
+  'silver': #eee,
 
   'primary': #005eaa,
   'secondary': #88c3ea,
@@ -106,4 +107,6 @@ $colors: (
   --filter-buttons-font-size: 0.889rem;
   --superTitle-font-size: 0.833rem;
   --title-font-size: 1.222rem;
+  --territory-label-font-size: 0.809rem;
+  --territory-label-font-size-mobile: 0.556rem;
 }

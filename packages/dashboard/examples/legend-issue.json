@@ -1,0 +1,749 @@
+{
+  "table": { "label": "Data Table", "show": false, "showDownloadUrl": false, "showVertical": true },
+  "errors": [],
+  "currentViewport": "lg",
+  "id": 15,
+  "category": "General",
+  "type": "dashboard",
+  "subType": null,
+  "orientation": null,
+  "icon": { "key": null, "ref": null, "props": {}, "_owner": null, "_store": {} },
+  "content": "Present multiple data visualizations with shared filter controls.",
+  "datasets": {
+    "H5N1_latest_cases_by_state.csv": {
+      "dataFileSize": 53012,
+      "dataFileName": "/wcms/vizdata/NCIRD_FLU/H5Viz/states.json",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": true,
+      "dataUrl": "/examples/legend-issue-data.json"
+    }
+  },
+  "visualizationType": null,
+  "activeVizButtonID": 15,
+  "version": "4.25.1",
+  "migrations": { "addColorMigration": true },
+  "multiDashboards": [
+    {
+      "dashboard": {
+        "theme": "theme-blue",
+        "sharedFilters": [
+          {
+            "key": "",
+            "showDropdown": false,
+            "values": ["All Animals", "Backyard Flocks", "Commercial Poultry Flocks", "Dairy Herds"],
+            "type": "datafilter",
+            "orderedValues": ["All Animals", "Backyard Flocks", "Commercial Poultry Flocks", "Dairy Herds"],
+            "columnName": "animal_category",
+            "tier": 1,
+            "defaultValue": "All Animals",
+            "usedBy": [0, 1]
+          }
+        ]
+      },
+      "visualizations": {
+        "dashboardFilters1743195120124": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1743195120124",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [0],
+          "visualizationType": "dashboardFilters"
+        },
+        "map1743195174834": {
+          "annotations": [],
+          "general": {
+            "geoType": "us",
+            "navigationTarget": "_self",
+            "noStateFoundMessage": "Map Unavailable",
+            "annotationDropdownText": "Annotations",
+            "geoBorderColor": "darkGray",
+            "headerColor": "theme-blue",
+            "title": "",
+            "showTitle": true,
+            "showSidebar": true,
+            "showDownloadMediaButton": false,
+            "displayAsHex": false,
+            "displayStateLabels": true,
+            "territoriesAlwaysShow": false,
+            "language": "en",
+            "geoLabelOverride": "",
+            "hasRegions": false,
+            "fullBorder": false,
+            "type": "data",
+            "convertFipsCodes": true,
+            "palette": { "isReversed": false },
+            "allowMapZoom": true,
+            "hideGeoColumnInTooltip": false,
+            "hidePrimaryColumnInTooltip": true,
+            "statePicked": { "fipsCode": "01", "stateName": "Alabama" },
+            "expandDataTable": false,
+            "equalNumberOptIn": false
+          },
+          "type": "map",
+          "color": "sequential-blue-2(MPX)",
+          "columns": {
+            "geo": { "name": "state", "label": "Location", "tooltip": false, "dataTable": true },
+            "primary": {
+              "dataTable": false,
+              "tooltip": false,
+              "prefix": "",
+              "suffix": "",
+              "name": "total_animal_detections_cat",
+              "label": "total_animal_detections_cat",
+              "roundToPlace": 0
+            },
+            "navigate": { "name": "" },
+            "latitude": { "name": "" },
+            "longitude": { "name": "" },
+            "additionalColumn1": {
+              "label": "Human cases",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "name": "total_human_detections",
+              "tooltip": true
+            },
+            "additionalColumn2": {
+              "label": "Animal cases",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "name": "total_animal_detections",
+              "tooltip": true
+            }
+          },
+          "legend": {
+            "descriptions": {},
+            "specialClasses": [{ "key": "total_animal_detections_cat", "value": "0" }],
+            "unified": true,
+            "singleColumn": false,
+            "singleRow": false,
+            "verticalSorted": false,
+            "showSpecialClassesLast": false,
+            "dynamicDescription": false,
+            "type": "category",
+            "numberOfItems": 5,
+            "position": "top",
+            "title": "",
+            "style": "gradient",
+            "subStyle": "linear blocks",
+            "tickRotation": "",
+            "singleColumnLegend": false,
+            "hideBorder": true,
+            "categoryValuesOrder": ["0", "1-10", "11-50", "51-100", ">100"],
+            "description": "Number of affected dairy herds, commercial poultry flocks, or backyard flocks",
+            "additionalCategories": ["1-10", "11-50", "51-100", ">100"]
+          },
+          "filters": [],
+          "table": {
+            "wrapColumns": false,
+            "label": "Data Table",
+            "expanded": false,
+            "limitHeight": false,
+            "height": "",
+            "caption": "",
+            "showDownloadUrl": false,
+            "showDataTableLink": false,
+            "showDownloadLinkBelow": true,
+            "showFullGeoNameInCSV": false,
+            "forceDisplay": true,
+            "download": true,
+            "indexLabel": "",
+            "cellMinWidth": "0",
+            "sharedFilterColumns": []
+          },
+          "tooltips": { "appearanceType": "hover", "linkLabel": "Learn More", "capitalizeLabels": true, "opacity": 90 },
+          "visual": {
+            "minBubbleSize": 1,
+            "maxBubbleSize": 20,
+            "extraBubbleBorder": false,
+            "cityStyle": "circle",
+            "cityStyleLabel": "",
+            "showBubbleZeros": false,
+            "additionalCityStyles": [],
+            "geoCodeCircleSize": 8
+          },
+          "mapPosition": { "coordinates": [0, 30], "zoom": 1 },
+          "map": { "layers": [], "patterns": [] },
+          "hexMap": {
+            "type": "",
+            "shapeGroups": [
+              {
+                "legendTitle": "",
+                "legendDescription": "",
+                "items": [{ "key": "", "shape": "Arrow Up", "column": "", "operator": "=", "value": "" }]
+              }
+            ]
+          },
+          "filterBehavior": "Filter Change",
+          "filterIntro": "",
+          "openModal": true,
+          "uid": "map1743195174834",
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "H5N1_latest_cases_by_state.csv",
+          "version": "4.25.1",
+          "migrations": { "addColorMigration": true }
+        }
+      },
+      "rows": [
+        {
+          "columns": [{ "width": 12, "widget": "dashboardFilters1743195120124" }, {}, {}],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "H5N1_latest_cases_by_state.csv"
+        },
+        {
+          "columns": [{ "width": 12, "widget": "map1743195174834" }],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "H5N1_latest_cases_by_state.csv"
+        }
+      ],
+      "label": "All Animals"
+    },
+    {
+      "dashboard": {
+        "theme": "theme-blue",
+        "sharedFilters": [
+          {
+            "key": "",
+            "showDropdown": false,
+            "values": ["All Animals", "Backyard Flocks", "Commercial Poultry Flocks", "Dairy Herds"],
+            "type": "datafilter",
+            "orderedValues": ["All Animals", "Backyard Flocks", "Commercial Poultry Flocks", "Dairy Herds"],
+            "columnName": "animal_category",
+            "tier": 1,
+            "defaultValue": "Dairy Herds",
+            "usedBy": [0, 1]
+          }
+        ]
+      },
+      "visualizations": {
+        "dashboardFilters1743195120124": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1743195120124",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [0],
+          "visualizationType": "dashboardFilters"
+        },
+        "map1743195174834": {
+          "annotations": [],
+          "general": {
+            "geoType": "us",
+            "navigationTarget": "_self",
+            "noStateFoundMessage": "Map Unavailable",
+            "annotationDropdownText": "Annotations",
+            "geoBorderColor": "darkGray",
+            "headerColor": "theme-blue",
+            "title": "",
+            "showTitle": true,
+            "showSidebar": true,
+            "showDownloadMediaButton": false,
+            "displayAsHex": false,
+            "displayStateLabels": true,
+            "territoriesAlwaysShow": false,
+            "language": "en",
+            "geoLabelOverride": "",
+            "hasRegions": false,
+            "fullBorder": false,
+            "type": "data",
+            "convertFipsCodes": true,
+            "palette": { "isReversed": false },
+            "allowMapZoom": true,
+            "hideGeoColumnInTooltip": false,
+            "hidePrimaryColumnInTooltip": true,
+            "statePicked": { "fipsCode": "01", "stateName": "Alabama" },
+            "expandDataTable": false,
+            "equalNumberOptIn": false
+          },
+          "type": "map",
+          "color": "sequential-blue-2(MPX)",
+          "columns": {
+            "geo": { "name": "state", "label": "Location", "tooltip": false, "dataTable": true },
+            "primary": {
+              "dataTable": false,
+              "tooltip": false,
+              "prefix": "",
+              "suffix": "",
+              "name": "total_animal_detections_cat",
+              "label": "total_animal_detections_cat",
+              "roundToPlace": 0
+            },
+            "navigate": { "name": "" },
+            "latitude": { "name": "" },
+            "longitude": { "name": "" },
+            "additionalColumn1": {
+              "label": "Human cases",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "name": "total_human_detections",
+              "tooltip": true
+            },
+            "additionalColumn2": {
+              "label": "Animal cases",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "name": "total_animal_detections",
+              "tooltip": true
+            }
+          },
+          "legend": {
+            "descriptions": {},
+            "specialClasses": [{ "key": "total_animal_detections_cat", "value": "0" }],
+            "unified": true,
+            "singleColumn": false,
+            "singleRow": false,
+            "verticalSorted": false,
+            "showSpecialClassesLast": false,
+            "dynamicDescription": false,
+            "type": "category",
+            "numberOfItems": 5,
+            "position": "top",
+            "title": "",
+            "style": "gradient",
+            "subStyle": "linear blocks",
+            "tickRotation": "",
+            "singleColumnLegend": false,
+            "hideBorder": true,
+            "categoryValuesOrder": ["0", "1-10", "11-50", "51-100", ">100"],
+            "description": "Number of affected dairy herds",
+            "additionalCategories": ["1-10", "11-50", "51-100", ">100"]
+          },
+          "filters": [],
+          "table": {
+            "wrapColumns": false,
+            "label": "Data Table",
+            "expanded": false,
+            "limitHeight": false,
+            "height": "",
+            "caption": "",
+            "showDownloadUrl": false,
+            "showDataTableLink": false,
+            "showDownloadLinkBelow": true,
+            "showFullGeoNameInCSV": false,
+            "forceDisplay": true,
+            "download": true,
+            "indexLabel": "",
+            "cellMinWidth": "0",
+            "sharedFilterColumns": []
+          },
+          "tooltips": { "appearanceType": "hover", "linkLabel": "Learn More", "capitalizeLabels": true, "opacity": 90 },
+          "visual": {
+            "minBubbleSize": 1,
+            "maxBubbleSize": 20,
+            "extraBubbleBorder": false,
+            "cityStyle": "circle",
+            "cityStyleLabel": "",
+            "showBubbleZeros": false,
+            "additionalCityStyles": [],
+            "geoCodeCircleSize": 8
+          },
+          "mapPosition": { "coordinates": [0, 30], "zoom": 1 },
+          "map": { "layers": [], "patterns": [] },
+          "hexMap": {
+            "type": "",
+            "shapeGroups": [
+              {
+                "legendTitle": "",
+                "legendDescription": "",
+                "items": [{ "key": "", "shape": "Arrow Up", "column": "", "operator": "=", "value": "" }]
+              }
+            ]
+          },
+          "filterBehavior": "Filter Change",
+          "filterIntro": "",
+          "openModal": true,
+          "uid": "map1743195174834",
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "H5N1_latest_cases_by_state.csv",
+          "version": "4.25.1",
+          "migrations": { "addColorMigration": true }
+        }
+      },
+      "rows": [
+        {
+          "columns": [{ "width": 12, "widget": "dashboardFilters1743195120124" }, {}, {}],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "H5N1_latest_cases_by_state.csv"
+        },
+        {
+          "columns": [{ "width": 12, "widget": "map1743195174834" }],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "H5N1_latest_cases_by_state.csv"
+        }
+      ],
+      "label": "Dairy Herds"
+    },
+    {
+      "dashboard": {
+        "theme": "theme-blue",
+        "sharedFilters": [
+          {
+            "key": "",
+            "showDropdown": false,
+            "values": ["All Animals", "Backyard Flocks", "Commercial Poultry Flocks", "Dairy Herds"],
+            "type": "datafilter",
+            "orderedValues": ["All Animals", "Backyard Flocks", "Commercial Poultry Flocks", "Dairy Herds"],
+            "columnName": "animal_category",
+            "tier": 1,
+            "defaultValue": "Commercial Poultry Flocks",
+            "usedBy": [0, 1]
+          }
+        ]
+      },
+      "visualizations": {
+        "dashboardFilters1743195120124": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1743195120124",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [0],
+          "visualizationType": "dashboardFilters"
+        },
+        "map1743195174834": {
+          "annotations": [],
+          "general": {
+            "geoType": "us",
+            "navigationTarget": "_self",
+            "noStateFoundMessage": "Map Unavailable",
+            "annotationDropdownText": "Annotations",
+            "geoBorderColor": "darkGray",
+            "headerColor": "theme-blue",
+            "title": "",
+            "showTitle": true,
+            "showSidebar": true,
+            "showDownloadMediaButton": false,
+            "displayAsHex": false,
+            "displayStateLabels": true,
+            "territoriesAlwaysShow": false,
+            "language": "en",
+            "geoLabelOverride": "",
+            "hasRegions": false,
+            "fullBorder": false,
+            "type": "data",
+            "convertFipsCodes": true,
+            "palette": { "isReversed": false },
+            "allowMapZoom": true,
+            "hideGeoColumnInTooltip": false,
+            "hidePrimaryColumnInTooltip": true,
+            "statePicked": { "fipsCode": "01", "stateName": "Alabama" },
+            "expandDataTable": false,
+            "equalNumberOptIn": false
+          },
+          "type": "map",
+          "color": "bluegreen",
+          "columns": {
+            "geo": { "name": "state", "label": "Location", "tooltip": false, "dataTable": true },
+            "primary": {
+              "dataTable": false,
+              "tooltip": false,
+              "prefix": "",
+              "suffix": "",
+              "name": "total_animal_detections_cat",
+              "label": "total_animal_detections_cat",
+              "roundToPlace": 0
+            },
+            "navigate": { "name": "" },
+            "latitude": { "name": "" },
+            "longitude": { "name": "" },
+            "additionalColumn1": {
+              "label": "Human cases",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "name": "total_human_detections",
+              "tooltip": true
+            },
+            "additionalColumn2": {
+              "label": "Animal cases",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "name": "total_animal_detections",
+              "tooltip": true
+            }
+          },
+          "legend": {
+            "descriptions": {},
+            "specialClasses": [{ "key": "total_animal_detections_cat", "value": "0" }],
+            "unified": true,
+            "singleColumn": false,
+            "singleRow": false,
+            "verticalSorted": false,
+            "showSpecialClassesLast": false,
+            "dynamicDescription": false,
+            "type": "category",
+            "numberOfItems": 5,
+            "position": "top",
+            "title": "",
+            "style": "gradient",
+            "subStyle": "linear blocks",
+            "tickRotation": "",
+            "singleColumnLegend": false,
+            "hideBorder": true,
+            "categoryValuesOrder": ["0", "1-5", "6-10", "11-20", ">20"],
+            "description": "Number of affected commercial poultry flocks",
+            "additionalCategories": ["1-5", "6-10", "11-20", ">20"]
+          },
+          "filters": [],
+          "table": {
+            "wrapColumns": false,
+            "label": "Data Table",
+            "expanded": false,
+            "limitHeight": false,
+            "height": "",
+            "caption": "",
+            "showDownloadUrl": false,
+            "showDataTableLink": false,
+            "showDownloadLinkBelow": true,
+            "showFullGeoNameInCSV": false,
+            "forceDisplay": true,
+            "download": true,
+            "indexLabel": "",
+            "cellMinWidth": "0",
+            "sharedFilterColumns": []
+          },
+          "tooltips": { "appearanceType": "hover", "linkLabel": "Learn More", "capitalizeLabels": true, "opacity": 90 },
+          "visual": {
+            "minBubbleSize": 1,
+            "maxBubbleSize": 20,
+            "extraBubbleBorder": false,
+            "cityStyle": "circle",
+            "cityStyleLabel": "",
+            "showBubbleZeros": false,
+            "additionalCityStyles": [],
+            "geoCodeCircleSize": 8
+          },
+          "mapPosition": { "coordinates": [0, 30], "zoom": 1 },
+          "map": { "layers": [], "patterns": [] },
+          "hexMap": {
+            "type": "",
+            "shapeGroups": [
+              {
+                "legendTitle": "",
+                "legendDescription": "",
+                "items": [{ "key": "", "shape": "Arrow Up", "column": "", "operator": "=", "value": "" }]
+              }
+            ]
+          },
+          "filterBehavior": "Filter Change",
+          "filterIntro": "",
+          "openModal": true,
+          "uid": "map1743195174834",
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "H5N1_latest_cases_by_state.csv",
+          "version": "4.25.1",
+          "migrations": { "addColorMigration": true }
+        }
+      },
+      "rows": [
+        {
+          "columns": [{ "width": 12, "widget": "dashboardFilters1743195120124" }, {}, {}],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "H5N1_latest_cases_by_state.csv"
+        },
+        {
+          "columns": [{ "width": 12, "widget": "map1743195174834" }],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "H5N1_latest_cases_by_state.csv"
+        }
+      ],
+      "label": "Commercial Poultry Flocks"
+    },
+    {
+      "dashboard": {
+        "theme": "theme-blue",
+        "sharedFilters": [
+          {
+            "key": "",
+            "showDropdown": false,
+            "values": ["All Animals", "Backyard Flocks", "Commercial Poultry Flocks", "Dairy Herds"],
+            "type": "datafilter",
+            "orderedValues": ["All Animals", "Backyard Flocks", "Commercial Poultry Flocks", "Dairy Herds"],
+            "columnName": "animal_category",
+            "tier": 1,
+            "defaultValue": "Backyard Flocks",
+            "usedBy": [0, 1]
+          }
+        ]
+      },
+      "visualizations": {
+        "dashboardFilters1743195120124": {
+          "filters": [],
+          "filterBehavior": "Filter Change",
+          "newViz": true,
+          "openModal": true,
+          "uid": "dashboardFilters1743195120124",
+          "type": "dashboardFilters",
+          "sharedFilterIndexes": [0],
+          "visualizationType": "dashboardFilters"
+        },
+        "map1743195174834": {
+          "annotations": [],
+          "general": {
+            "geoType": "us",
+            "navigationTarget": "_self",
+            "noStateFoundMessage": "Map Unavailable",
+            "annotationDropdownText": "Annotations",
+            "geoBorderColor": "darkGray",
+            "headerColor": "theme-blue",
+            "title": "",
+            "showTitle": true,
+            "showSidebar": true,
+            "showDownloadMediaButton": false,
+            "displayAsHex": false,
+            "displayStateLabels": true,
+            "territoriesAlwaysShow": false,
+            "language": "en",
+            "geoLabelOverride": "",
+            "hasRegions": false,
+            "fullBorder": false,
+            "type": "data",
+            "convertFipsCodes": true,
+            "palette": { "isReversed": false },
+            "allowMapZoom": true,
+            "hideGeoColumnInTooltip": false,
+            "hidePrimaryColumnInTooltip": true,
+            "statePicked": { "fipsCode": "01", "stateName": "Alabama" },
+            "expandDataTable": false,
+            "equalNumberOptIn": false
+          },
+          "type": "map",
+          "color": "bluegreen",
+          "columns": {
+            "geo": { "name": "state", "label": "Location", "tooltip": false, "dataTable": true },
+            "primary": {
+              "dataTable": false,
+              "tooltip": false,
+              "prefix": "",
+              "suffix": "",
+              "name": "total_animal_detections_cat",
+              "label": "total_animal_detections_cat",
+              "roundToPlace": 0
+            },
+            "navigate": { "name": "" },
+            "latitude": { "name": "" },
+            "longitude": { "name": "" },
+            "additionalColumn1": {
+              "label": "Human cases",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "name": "total_human_detections",
+              "tooltip": true
+            },
+            "additionalColumn2": {
+              "label": "Animal cases",
+              "dataTable": true,
+              "tooltips": false,
+              "prefix": "",
+              "suffix": "",
+              "name": "total_animal_detections",
+              "tooltip": true
+            }
+          },
+          "legend": {
+            "descriptions": {},
+            "specialClasses": [{ "key": "total_animal_detections_cat", "value": "0" }],
+            "unified": true,
+            "singleColumn": false,
+            "singleRow": false,
+            "verticalSorted": false,
+            "showSpecialClassesLast": false,
+            "dynamicDescription": false,
+            "type": "category",
+            "numberOfItems": 5,
+            "position": "top",
+            "title": "",
+            "style": "gradient",
+            "subStyle": "linear blocks",
+            "tickRotation": "",
+            "singleColumnLegend": false,
+            "hideBorder": true,
+            "categoryValuesOrder": ["0", "1-5", "6-10", "11-20", ">20"],
+            "description": "Number of affected backyard flocks",
+            "additionalCategories": ["1-5", "6-10", "11-20", ">20"]
+          },
+          "filters": [],
+          "table": {
+            "wrapColumns": false,
+            "label": "Data Table",
+            "expanded": false,
+            "limitHeight": false,
+            "height": "",
+            "caption": "",
+            "showDownloadUrl": false,
+            "showDataTableLink": false,
+            "showDownloadLinkBelow": true,
+            "showFullGeoNameInCSV": false,
+            "forceDisplay": true,
+            "download": true,
+            "indexLabel": "",
+            "cellMinWidth": "0",
+            "sharedFilterColumns": []
+          },
+          "tooltips": { "appearanceType": "hover", "linkLabel": "Learn More", "capitalizeLabels": true, "opacity": 90 },
+          "visual": {
+            "minBubbleSize": 1,
+            "maxBubbleSize": 20,
+            "extraBubbleBorder": false,
+            "cityStyle": "circle",
+            "cityStyleLabel": "",
+            "showBubbleZeros": false,
+            "additionalCityStyles": [],
+            "geoCodeCircleSize": 8
+          },
+          "mapPosition": { "coordinates": [0, 30], "zoom": 1 },
+          "map": { "layers": [], "patterns": [] },
+          "hexMap": {
+            "type": "",
+            "shapeGroups": [
+              {
+                "legendTitle": "",
+                "legendDescription": "",
+                "items": [{ "key": "", "shape": "Arrow Up", "column": "", "operator": "=", "value": "" }]
+              }
+            ]
+          },
+          "filterBehavior": "Filter Change",
+          "filterIntro": "",
+          "openModal": true,
+          "uid": "map1743195174834",
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "H5N1_latest_cases_by_state.csv",
+          "version": "4.25.1",
+          "migrations": { "addColorMigration": true }
+        }
+      },
+      "rows": [
+        {
+          "columns": [{ "width": 12, "widget": "dashboardFilters1743195120124" }, {}, {}],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "H5N1_latest_cases_by_state.csv"
+        },
+        {
+          "columns": [{ "width": 12, "widget": "map1743195174834" }],
+          "dataDescription": { "horizontal": false, "series": false },
+          "dataKey": "H5N1_latest_cases_by_state.csv"
+        }
+      ],
+      "label": "Backyard Flocks"
+    }
+  ],
+  "uuid": 1743195172497
+}

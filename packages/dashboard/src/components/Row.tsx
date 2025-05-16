@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from 'react'
+import React, { useContext, useMemo } from 'react'
 
 import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 
@@ -239,6 +239,7 @@ const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
     <>
       <div className='builder-row' data-row-id={rowIdx}>
         <RowMenu rowIdx={rowIdx} />
+        <p className='ml-2 mt-n3'>Row - {rowIdx + 1}</p>
         <button
           title='Configure Data'
           className='btn btn-configure-row'

@@ -56,7 +56,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
     const { series } = runtime
 
     const seriesWithData = getSeriesWithData(config)
-    const dontFilterLegendItems = !series.length || legend.unified
+    const dontFilterLegendItems = !series.length || legend.unified || !seriesWithData.length
 
     const isLegendBottom =
       legend?.position === 'bottom' ||

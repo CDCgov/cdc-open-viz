@@ -21,7 +21,7 @@ import getViewport from '@cdc/core/helpers/getViewport'
 
 import CdcChart from '@cdc/chart/src/CdcChartComponent'
 import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
-import CdcMap from '@cdc/map/src/CdcMap'
+import CdcMap from '@cdc/map/src/CdcMapComponent'
 import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
 import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
 import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'
@@ -66,6 +66,7 @@ import { loadAPIFiltersFactory } from './helpers/loadAPIFilters'
 import Loader from '@cdc/core/components/Loader'
 import Alert from '@cdc/core/components/Alert'
 import { shouldLoadAllFilters } from './helpers/shouldLoadAllFilters'
+import { subscribe, unsubscribe } from '@cdc/core/helpers/events'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -120,12 +121,16 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     for (let i = 0; i < datasetKeys.length; i++) {
       const datasetKey = datasetKeys[i]
       const dataset = config.datasets[datasetKey]
-
-      if (dataset.dataUrl && filters) {
+      const windowQueryParams = Object.fromEntries(new URLSearchParams(window.location.search))
+      const loadQueryParam = windowQueryParams[dataset.loadQueryParam || '']
+      if (dataset.dataUrl && (filters || loadQueryParam)) {
         const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl, window.location.origin)
         const currentQSParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
         const updatedQSParams = {}
-        filters.forEach(filter => {
+        if (loadQueryParam) {
+          updatedQSParams[dataset.loadQueryParam] = loadQueryParam
+        }
+        filters?.forEach(filter => {
           if (
             filter.type === 'urlfilter' &&
             reloadURLHelpers.filterUsedByDataUrl(filter, datasetKey, config.visualizations, config.rows)
@@ -143,7 +148,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             }
 
             if (!!filter.setByQueryParameter) {
-              const windowQueryParams = Object.fromEntries(new URLSearchParams(window.location.search))
               const filterValue = windowQueryParams[filter.setByQueryParameter]
               const queryParam = filter.apiFilter?.valueSelector || filter.setByQueryParameter
               if (filterValue) {
@@ -270,6 +274,29 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
     dispatch({ type: 'SET_SHARED_FILTERS', payload: newConfig.dashboard.sharedFilters })
   }
+
+  const setEventData = ({ detail }) => {
+    try {
+      const newDatasets = Object.keys(detail).reduce((acc, key) => {
+        if (state.data[key] !== undefined) {
+          acc[key] = detail[key]
+        }
+        return acc
+      }, {})
+      const filteredData = { ...state.filteredData, ...newDatasets }
+      dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
+      dispatch({ type: 'SET_DATA', payload: { ...state.data, ...newDatasets } })
+    } catch (e) {
+      console.error('Error setting event data: ', e)
+    }
+  }
+
+  useEffect(() => {
+    subscribe('cove_set_data', setEventData)
+    return () => {
+      unsubscribe('cove_set_data', setEventData)
+    }
+  }, [])
 
   useEffect(() => {
     const { config } = state

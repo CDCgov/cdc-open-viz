@@ -569,7 +569,7 @@ const DataImport = () => {
           )
         )}
       <button
-        className='btn full-width'
+        className='btn full-width btn-primary'
         onClick={() => {
           setConfig({
             ...config,

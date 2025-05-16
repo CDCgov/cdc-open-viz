@@ -196,7 +196,7 @@
   ],
   "tooltips": {
     "opacity": 90,
-    "singleSeries": false,
+    "singleSeries": true,
     "dateDisplayFormat": ""
   },
   "area": {

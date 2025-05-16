@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect, useRef, useMemo } from 'react'
-import { animated, useTransition, interpolate } from 'react-spring'
+import { animated, useTransition, to } from '@react-spring/web'
 
 // visx
 import { Pie } from '@visx/shape'
@@ -14,15 +14,8 @@ import { useTooltip as useCoveTooltip } from '../../hooks/useTooltip'
 import useIntersectionObserver from '../../hooks/useIntersectionObserver'
 import { handleChartAriaLabels } from '../../helpers/handleChartAriaLabels'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import LegendComponent from '../Legend/Legend.Component'
-import { createFormatLabels } from '../Legend/helpers/createFormatLabels'
 import { scaleOrdinal } from '@visx/scale'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
-
-const enterUpdateTransition = ({ startAngle, endAngle }) => ({
-  startAngle,
-  endAngle
-})
 
 type TooltipData = {
   data: {
@@ -117,92 +110,71 @@ const PieChart = props => {
     }
   }, [dataRef?.isIntersecting, config.animate]) // eslint-disable-line
 
-  const AnimatedPie = ({ arcs, path, getKey }) => {
-    const transitions = useTransition(arcs, getKey, {
-      from: enterUpdateTransition,
-      enter: enterUpdateTransition,
-      update: enterUpdateTransition,
-      leave: enterUpdateTransition
+  function AnimatedPie({ arcs, path, getKey, colorScale, onHover, onLeave }) {
+    const enterExit = ({ startAngle, endAngle }) => ({ startAngle, endAngle })
+    const transitions = useTransition(arcs, {
+      keys: getKey,
+      from: enterExit,
+      enter: enterExit,
+      update: enterExit,
+      leave: enterExit
     })
 
-    // DEV-5053
-    // onMouseLeave function doesn't work on animated.path for some reason.
-    // As a workaround, we continue to fire the tooltipData while hovered,
-    // and use this useEffect to hide the tooltip so it doesn't persist when users scroll.
-    useEffect(() => {
-      const timeout = setTimeout(() => {
-        hideTooltip()
-      }, 500)
-      return () => {
-        clearTimeout(timeout)
+    return transitions((styles, arc) => {
+      const key = getKey(arc)
+      let textColor = '#FFF'
+
+      if (key && _colorScale(key)) {
+        textColor = getContrastColor(textColor, _colorScale(arc.data[config.runtime.xAxis.dataKey]))
       }
-    }, [tooltipData])
+      const roundTo = Number(config.dataFormat.roundTo) || 0
+      // Calculate the percentage of the full circle (360 degrees)
+      const degrees = ((arc.endAngle - arc.startAngle) * 180) / Math.PI
 
-    return (
-      <>
-        {transitions.map(({ item: arc, props, key }, animatedPieIndex) => {
-          return (
-            <Group
-              className={arc.data[config.xAxis.dataKey]}
-              key={`${key}-${animatedPieIndex}`}
-              style={{
-                opacity:
-                  config.legend.behavior === 'highlight' &&
-                  seriesHighlight.length > 0 &&
-                  seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) === -1
-                    ? 0.5
-                    : 1
-              }}
+      const percentageOfCircle = (degrees / 360) * 100
+      const roundedPercentage = percentageOfCircle.toFixed(roundTo) + '%'
+      return (
+        <Group key={key} className={`slice-${key}`}>
+          {/* ── the slice */}
+          <animated.path
+            d={to([styles.startAngle, styles.endAngle], (start, end) =>
+              path({ ...arc, startAngle: start, endAngle: end })
+            )}
+            fill={colorScale(key)}
+            onMouseEnter={e =>
+              onHover(e, {
+                data: arc.data,
+                dataXPosition: e.clientX,
+                dataYPosition: e.clientY,
+                startAngle: arc.startAngle,
+                endAngle: arc.endAngle
+              })
+            }
+            onMouseLeave={onLeave}
+          />
+
+          {/* ── the percentage label */}
+          {arc.endAngle - arc.startAngle > 0.1 && (
+            <animated.text
+              transform={to([styles.startAngle, styles.endAngle], (start, end) => {
+                const [x, y] = path.centroid({
+                  ...arc,
+                  startAngle: start,
+                  endAngle: end
+                })
+                return `translate(${x},${y})`
+              })}
+              textAnchor='middle'
+              pointerEvents='none'
+              fill={textColor}
             >
-              <animated.path
-                d={interpolate([props.startAngle, props.endAngle], (startAngle, endAngle) =>
-                  path({
-                    ...arc,
-                    startAngle,
-                    endAngle
-                  })
-                )}
-                fill={_colorScale(arc.data[config.runtime.xAxis.dataKey])}
-                onMouseEnter={e => handleTooltipMouseOver(e, { data: arc.data[config.runtime.xAxis.dataKey], arc })}
-                onMouseLeave={e => handleTooltipMouseOff()}
-              />
-            </Group>
-          )
-        })}
-        {transitions.map(({ item: arc, key }, i) => {
-          const roundTo = Number(config.dataFormat.roundTo) || 0
-          const [centroidX, centroidY] = path.centroid(arc)
-          const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1
-
-          let textColor = '#FFF'
-          if (_colorScale(arc.data[config.runtime.xAxis.dataKey])) {
-            textColor = getContrastColor(textColor, _colorScale(arc.data[config.runtime.xAxis.dataKey]))
-          }
-          const degrees = ((arc.endAngle - arc.startAngle) * 180) / Math.PI
-
-          // Calculate the percentage of the full circle (360 degrees)
-          const percentageOfCircle = (degrees / 360) * 100
-          const roundedPercentage = percentageOfCircle.toFixed(roundTo)
-
-          return (
-            <animated.g key={`${key}${i}`}>
-              {hasSpaceForLabel && (
-                <Text
-                  style={{ fill: textColor }}
-                  x={centroidX}
-                  y={centroidY}
-                  dy='.33em'
-                  textAnchor='middle'
-                  pointerEvents='none'
-                >
-                  {roundedPercentage + '%'}
-                </Text>
-              )}
-            </animated.g>
-          )
-        })}
-      </>
-    )
+              {/** compute text inside the spring callback */}
+              {roundedPercentage}
+            </animated.text>
+          )}
+        </Group>
+      )
+    })
   }
 
   let chartWidth = props.parentWidth
@@ -257,12 +229,20 @@ const PieChart = props => {
             {/* prettier-ignore */}
             <Pie
             data={filteredData || _data}
-            pieValue={d => d[pivotKey || config.runtime.yAxis.dataKey]}
+            pieValue={d => parseFloat(d[pivotKey || config.runtime.yAxis.dataKey])}
             pieSortValues={() => -1}
             innerRadius={radius - donutThickness}
             outerRadius={radius}
           >
-            {pie => <AnimatedPie {...pie} getKey={d => d.data[config.runtime.xAxis.dataKey]}/>}
+           {pie => (
+             <AnimatedPie
+             {...pie}
+              getKey={d => d.data[config.runtime.xAxis.dataKey]}
+                colorScale={_colorScale}
+              onHover={handleTooltipMouseOver}
+               onLeave={handleTooltipMouseOff}
+           />
+            )}
           </Pie>
           </Group>
         </svg>

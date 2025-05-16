@@ -33,6 +33,16 @@ export const Gradient_With_Box: Story = {
   }
 }
 
+export const Gradient_With_Space: Story = {
+  args: {
+    config: editConfigKeys(UsGradient, [
+      { path: ['legend', 'subStyle'], value: 'linear blocks' },
+      { path: ['legend', 'spaces'], value: '2' },
+      { path: ['legend', 'hideBorder'], value: false }
+    ])
+  }
+}
+
 export const Gradient_With_Text: Story = {
   args: {
     config: editConfigKeys(UsGradient, [

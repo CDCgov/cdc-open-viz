@@ -9,6 +9,7 @@ interface BarConfigProps {
   config: { [key: string]: any }
   barWidth: number
   isVertical: boolean
+  yAxisValue: number
 }
 
 // Function to create bar width based on suppression status and missing data label
@@ -18,7 +19,8 @@ export const getBarConfig = ({
   defaultBarWidth,
   config,
   barWidth,
-  isVertical
+  isVertical,
+  yAxisValue
 }: BarConfigProps) => {
   const heightMini = 3 /// height of small bars aka suppressed/NA/Zero valued
   let barHeight = defaultBarHeight
@@ -97,7 +99,8 @@ export const getBarConfig = ({
       return labelFits && isVertical ? label : !isVertical ? label : ''
     }
   }
-  return { barWidthHorizontal, barHeight, isSuppressed, showMissingDataLabel, getBarY, getAbsentDataLabel }
+  const absentDataLabel = getAbsentDataLabel(yAxisValue)
+  return { barWidthHorizontal, barHeight, isSuppressed, showMissingDataLabel, getBarY, absentDataLabel }
 }
 
 export const testZeroValue = value => {

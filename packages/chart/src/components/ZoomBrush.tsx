@@ -7,7 +7,7 @@ import { ScaleLinear, ScaleBand } from 'd3-scale'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
-import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
+import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 
 interface Props {
   xScaleBrush: ScaleLinear<number, number>
@@ -210,7 +210,7 @@ const BrushHandle = props => {
   const transform = isLeft ? 'scale(-1, 1)' : 'translate(0,0)'
   const textAnchor = isLeft ? 'end' : 'start'
   const tooltipText = isLeft ? ` Drag edges to focus on a specific segment ` : ''
-  const textWidth = getTextWidth(tooltipText, `${appFontSize / 1.1}px`)
+  const textWidth = getTextWidth(tooltipText, `${APP_FONT_SIZE / 1.1}px`)
 
   return (
     <>
@@ -219,7 +219,7 @@ const BrushHandle = props => {
           x={(Number(textProps.xMax) - textWidth) / 2}
           dy={-12}
           pointerEvents='visiblePainted'
-          fontSize={appFontSize / 1.1}
+          fontSize={APP_FONT_SIZE / 1.1}
         >
           {tooltipText}
         </Text>
@@ -232,7 +232,7 @@ const BrushHandle = props => {
           y={25}
           verticalAnchor='start'
           textAnchor={textAnchor}
-          fontSize={appFontSize / 1.4}
+          fontSize={APP_FONT_SIZE / 1.4}
         >
           {isLeft ? textProps.startValue : textProps.endValue}
         </Text>

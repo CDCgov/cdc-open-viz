@@ -195,6 +195,21 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         config: saveMultiChanges({ ...state.config, rows: newRows }, state.config.activeDashboard)
       }
     }
+    case 'RESET_VISUALIZATION': {
+      const { vizKey } = action.payload
+      const updatedViz = { ...state.config.visualizations[vizKey] } as AnyVisualization
+      delete updatedViz.data
+      delete updatedViz.dataKey
+      delete updatedViz.dataDescription
+      delete updatedViz.formattedData
+      return {
+        ...state,
+        config: saveMultiChanges(
+          { ...state.config, visualizations: { ...state.config.visualizations, [vizKey]: updatedViz } },
+          state.config.activeDashboard
+        )
+      }
+    }
     case 'UPDATE_VISUALIZATION': {
       const { vizKey, configureData } = action.payload
       const updatedViz = { ...state.config.visualizations[vizKey], ...configureData } as AnyVisualization

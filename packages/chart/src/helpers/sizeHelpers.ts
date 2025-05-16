@@ -2,7 +2,7 @@ import { clamp } from 'lodash'
 
 import { isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 import { ChartConfig, ViewportSize } from '../types/ChartConfig'
-import { EDITOR_WIDTH } from '../CdcChartComponent'
+import { EDITOR_WIDTH } from '@cdc/core/helpers/constants'
 
 export function getOrientation(
   { orientation, heights, visualizationType }: Pick<ChartConfig, 'orientation' | 'heights' | 'visualizationType'>,

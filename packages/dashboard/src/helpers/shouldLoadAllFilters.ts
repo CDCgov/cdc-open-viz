@@ -23,7 +23,7 @@ export const shouldLoadAllFilters = (config, isEditorPanel): boolean => {
       .map((visualization: Visualization) => visualization.dataKey)
       .filter(Boolean)
       .concat(rowDataSetKeys)
-    const missingData = dataKeys.find(dataset => !config.datasets[dataset].data?.length)
+    const missingData = dataKeys.find(dataset => !config.datasets[dataset]?.data?.length)
     return Boolean(missingData)
   }
   return false

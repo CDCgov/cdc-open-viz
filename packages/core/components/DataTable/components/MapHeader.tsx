@@ -36,6 +36,7 @@ const MapHeader = ({ columns, config, indexTitle, sortBy, setSortBy, rightAligne
           return (
             <th
               style={{
+                minWidth: (config.table.cellMinWidth || 0) + 'px',
                 textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
                 paddingRight: '1.3em'
               }}

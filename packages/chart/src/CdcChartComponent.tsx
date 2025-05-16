@@ -64,6 +64,7 @@ import getViewport from '@cdc/core/helpers/getViewport'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import EditorContext from '../../editor/src/ConfigContext'
+import { EDITOR_WIDTH } from '@cdc/core/helpers/constants'
 // Local helpers
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
 import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
@@ -73,8 +74,6 @@ import { getColorScale } from './helpers/getColorScale'
 // styles
 import './scss/main.scss'
 import { getInitialState, reducer } from './store/chart.reducer'
-
-export const EDITOR_WIDTH = 350
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -141,8 +140,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const handleDragStateChange = isDragging => {
     dispatch({ type: 'SET_DRAG_ANNOTATIONS', payload: isDragging })
   }
-
-  if (isDebug) console.log('Chart config, isEditor', config, isEditor)
 
   // Destructure items from config for more readable JSX
   let { legend, title } = config
@@ -280,14 +277,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
       newConfig.series.forEach(series => {
         newConfig.runtime.areaSeriesKeys.push({ ...series, type: 'Area Chart' })
       })
+      newConfig.visualizationSubType = 'stacked'
     }
 
     if (
       (newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') ||
       ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)
     ) {
-      newConfig.runtime.xAxis = newConfig.yAxis['yAxis'] ? newConfig.yAxis['yAxis'] : newConfig.yAxis
-      newConfig.runtime.yAxis = newConfig.xAxis['xAxis'] ? newConfig.xAxis['xAxis'] : newConfig.xAxis
+      newConfig.runtime.xAxis = _.cloneDeep(newConfig.yAxis.yAxis || newConfig.yAxis)
+      newConfig.runtime.yAxis = _.cloneDeep(newConfig.xAxis.xAxis || newConfig.xAxis)
       newConfig.runtime.yAxis.labelOffset *= -1
 
       newConfig.runtime.horizontal = false
@@ -397,17 +395,16 @@ const CdcChart: React.FC<CdcChartProps> = ({
         newConfig.data = transform.developerStandardize(newConfig.data, newConfig.dataDescription)
       }
     } catch (err) {
-      console.log('Error on prepareData function ', err)
+      console.error('Error on prepareData function ', err)
     }
     return newConfig
   }
-
   useEffect(() => {
     const load = async () => {
       try {
         if (configObj) {
           const preparedConfig = await prepareConfig(configObj)
-          let preppedData = await prepareData(preparedConfig)
+          const preppedData = await prepareData(preparedConfig)
           dispatch({ type: 'SET_STATE_DATA', payload: preppedData.data })
           dispatch({ type: 'SET_EXCLUDED_DATA', payload: preppedData.data })
           updateConfig(preparedConfig, preppedData.data)
@@ -883,7 +880,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     className={
                       legend.hide || isLegendWrapViewport(currentViewport)
                         ? 'w-100'
-                        : legend.position === 'bottom' || legend.position === 'top' || visualizationType === 'Sankey'
+                        : legend.position === 'bottom' ||
+                          legend.position === 'top' ||
+                          visualizationType === 'Sankey' ||
+                          visualizationType === 'Spark Line'
                         ? 'w-100'
                         : 'w-75'
                     }
