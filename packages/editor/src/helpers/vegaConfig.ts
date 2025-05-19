@@ -173,10 +173,11 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
     const geoName = getGeoName(vegaData)
     const colorData = getMainMark(vegaConfig).encode.update.fill
     const colorLabel = vegaConfig.legends[0].title
-    const vegaColorScaleType = vegaConfig.scales.find(s => s.name === colorData.scale).type
+    const vegaColorScale = vegaConfig.scales.find(s => s.name === colorData.scale)
+    const legendItems = vegaColorScale.domain
+    const legendType = vegaColorScale.type === 'ordinal' ? 'category' : 'equalnumber'
 
     if (!config.legend) config.legend = {}
-    config.legend.type = vegaColorScaleType === 'ordinal' ? 'category' : 'equalnumber'
 
     config.columns ||= {}
     config.columns.geo = {
@@ -190,6 +191,17 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
       dataTable: true,
       tooltip: true
     }
+    config.legend = {
+      type: legendType,
+      additionalCategories: [...legendItems],
+      categoryValuesOrder: [...legendItems],
+      numberOfItems: legendItems.length,
+      position: 'top',
+      style: 'gradient',
+      subStyle: 'linear blocks',
+      hideBorder: true
+    }
+    config.color = 'sequential-blue-2(MPX)'
   } else {
     const stack = getStack(vegaConfig)
     const stackField = stack?.field
