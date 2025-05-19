@@ -14,7 +14,17 @@ const CURVE_LOOKUP = {
 }
 
 export const isVegaConfig = config => {
-  return config.scales || config.axes || config.marks || config.layer || config.params
+  return (
+    config.scales ||
+    config.axes ||
+    config.marks ||
+    config.layer ||
+    config.params ||
+    config.transform ||
+    config.projection ||
+    config.encoding ||
+    config.datasets
+  )
 }
 
 export const parseVegaConfig = vegaConfig => {

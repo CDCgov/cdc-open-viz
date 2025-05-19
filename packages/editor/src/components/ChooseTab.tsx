@@ -72,6 +72,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
       const coveConfig = generateNewConfig(button)
       newConfig = convertVegaConfig(configType, vegaConfig, coveConfig)
     }
+
     dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
     dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: isVega && newConfig.data?.length ? 2 : 1 })
     //} catch (e) {
