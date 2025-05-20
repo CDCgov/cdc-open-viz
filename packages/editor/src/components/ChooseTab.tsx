@@ -62,7 +62,6 @@ const ChooseTab: React.FC = (): JSX.Element => {
     let newConfig = JSON.parse(text)
     const isVega = isVegaConfig(newConfig)
     if (isVega) {
-      console.log('IS VEGA')
       const vegaConfig = parseVegaConfig(JSON.parse(text))
       const configType = getVegaConfigType(vegaConfig)
       const configSubType = configType === 'Map' ? 'United States (State- or County-Level)' : configType
