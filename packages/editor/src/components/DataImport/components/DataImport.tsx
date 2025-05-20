@@ -50,10 +50,11 @@ const DataImport = () => {
     config.dataFileSourceType === 'url' ? config.dataFileName : config.dataUrl || ''
   )
 
-  const [keepURL, setKeepURL] = useState(!!config.dataUrl)
+  const [keepURL, setKeepURL] = useState(!!config.dataUrl || !!config.vegaType)
   const [addingDataset, setAddingDataset] = useState(config.type === 'dashboard' || !config.data)
   const [editingDataset, _setEditingDataset] = useState<string>(undefined)
   const [newDatasetName, setNewDatasetName] = useState<string>(undefined)
+  const [pastedConfig, setPastedConfig] = useState<string>(undefined)
   const setEditingDataset = (datasetKey: string) => {
     _setEditingDataset(datasetKey)
     setNewDatasetName(datasetKey)
@@ -309,20 +310,34 @@ const DataImport = () => {
   const loadDataFromUrl = () => {
     return (
       <>
-        <label htmlFor='dataset-name' className='col-12 mt-2'>
-          <span>Dataset Name</span>
-          <input
-            id='dataset-name'
-            placeholder='Enter Dataset Name'
-            type='text'
-            aria-label='Enter Dataset Name'
-            value={newDatasetName}
-            className='form-control'
-            onChange={e => setNewDatasetName(e.target.value)}
-          />
-        </label>
+        {!config.vegaType && (
+          <label htmlFor='dataset-name' className='col-12 mt-2'>
+            <span>Dataset Name</span>
+            <input
+              id='dataset-name'
+              placeholder='Enter Dataset Name'
+              type='text'
+              aria-label='Enter Dataset Name'
+              value={newDatasetName}
+              className='form-control'
+              onChange={e => setNewDatasetName(e.target.value)}
+            />
+          </label>
+        )}
         <label htmlFor='external-datas' className='col-12 mt-2'>
-          <span>URL</span>
+          <span>
+            URL{' '}
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p style={{ padding: '0.5rem' }}>
+                  URL data must be fully prepared and not dependant on any Vega transforms
+                </p>
+              </Tooltip.Content>
+            </Tooltip>
+          </span>
           <textarea
             id='external-datas'
             className='form-control'
@@ -334,16 +349,18 @@ const DataImport = () => {
             onChange={e => setExternalURL(e.target.value)}
           />
         </label>
-        <label htmlFor='keep-url' className='mt-1 d-flex keep-url'>
-          <input
-            type='checkbox'
-            id='keep-url'
-            checked={keepURL}
-            onChange={() => changeKeepURL(!keepURL, editingDataset)}
-          />{' '}
-          Always load from URL (normally will only pull once)
-        </label>
-        <div className='d-flex justify-content-end mt-2'>
+        {!config.vegaType && (
+          <label htmlFor='keep-url' className='mt-1 d-flex keep-url'>
+            <input
+              type='checkbox'
+              id='keep-url'
+              checked={keepURL}
+              onChange={() => changeKeepURL(!keepURL, editingDataset)}
+            />{' '}
+            Always load from URL (normally will only pull once)
+          </label>
+        )}
+        <div className='d-flex justify-content-end mt-2 mb-3'>
           <button
             className='btn btn-primary px-4'
             type='submit'
@@ -708,20 +725,52 @@ const DataImport = () => {
 
             {config.vegaType && (
               <>
-                <div className='heading-3'>Data Source</div>
-                <label htmlFor='uploadConfig'>paste configuration json</label>
-                <textarea
-                  id='pasteConfig'
-                  onChange={e => {
-                    updateVegaData(e.target.value)
-                  }}
-                  placeholder='{ }'
-                />
-                <>
-                  <div className='url-source-options'>
-                    <div>{loadDataFromUrl()}</div>
-                  </div>
-                </>
+                <div className='heading-3'>Update Dataset</div>
+                <Tabs startingTab={0}>
+                  <TabPane title='Upload New Vega JSON' icon={<FileUploadIcon className='inline-icon' />}>
+                    {sharepath && <p className='alert--info'>The share path set for this website is: {sharepath}</p>}
+                    <div
+                      className={`${
+                        isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'
+                      } mb-3`}
+                      {...getRootProps()}
+                    >
+                      <input {...getInputProps()} />
+                      {isDragActive ? (
+                        <p>Drop file here</p>
+                      ) : (
+                        <p>
+                          Drag file to this area, or <span>select a file</span>.
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label htmlFor='uploadConfig'>or paste Vega configuration JSON:</label>
+
+                      <textarea
+                        id='pasteConfig'
+                        className='w-100 mb-2'
+                        onChange={e => setPastedConfig(e.target.value)}
+                        placeholder='{ }'
+                      />
+                      <div className='mb-3 d-flex justify-content-end'>
+                        <button
+                          className='btn btn-primary px-4'
+                          type='submit'
+                          id='load-data'
+                          disabled={!pastedConfig}
+                          onClick={() => updateVegaData(pastedConfig)}
+                        >
+                          Save & Load
+                        </button>
+                      </div>
+                    </div>
+                  </TabPane>
+                  <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
+                    {loadDataFromUrl()}
+                  </TabPane>
+                </Tabs>
               </>
             )}
 
@@ -825,6 +874,67 @@ const DataImport = () => {
       <div className='right-col'>
         <PreviewDataTable />
       </div>
+    </>
+  )
+}
+
+const AddDataset = ({
+  editingDataset,
+  loadDataFromUrl,
+  sharepath,
+  isDragActive,
+  getRootProps,
+  getInputProps,
+  errors,
+  setErrors
+}) => {
+  return (
+    <>
+      {' '}
+      <div className='heading-3'>{editingDataset ? `Editing ${editingDataset}` : 'Add Dataset'}</div>
+      {editingDataset ? (
+        <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
+          {loadDataFromUrl()}
+        </TabPane>
+      ) : (
+        <Tabs startingTab={0}>
+          <TabPane title='Upload File' icon={<FileUploadIcon className='inline-icon' />}>
+            {sharepath && <p className='alert--info'>The share path set for this website is: {sharepath}</p>}
+            <div
+              className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'}
+              {...getRootProps()}
+            >
+              <input {...getInputProps()} />
+              {isDragActive ? (
+                <p>Drop file here</p>
+              ) : (
+                <p>
+                  Drag file to this area, or <span>select a file</span>.
+                </p>
+              )}
+            </div>
+            <p className='footnote'>
+              Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}
+              MB.
+            </p>
+          </TabPane>
+          <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
+            {loadDataFromUrl()}
+          </TabPane>
+        </Tabs>
+      )}
+      {errors &&
+        (Array.isArray(errors)
+          ? errors.map((message, index) => (
+              <div className='error-box slim mt-2' key={`error-${message}`}>
+                <span>{message}</span>{' '}
+                <CloseIcon
+                  className='inline-icon dismiss-error'
+                  onClick={() => setErrors(errors.filter((val, i) => i !== index))}
+                />
+              </div>
+            ))
+          : errors.message)}
     </>
   )
 }

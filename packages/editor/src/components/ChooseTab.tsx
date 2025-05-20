@@ -43,6 +43,8 @@ interface ButtonProps {
 const ChooseTab: React.FC = (): JSX.Element => {
   const { config, tempConfig } = useContext(ConfigContext)
 
+  const [pastedConfig, setPastedConfig] = useState('')
+
   const dispatch = useContext(EditorDispatchContext)
   const rowLabels = ['General', , 'Charts', 'Maps']
 
@@ -54,10 +56,6 @@ const ChooseTab: React.FC = (): JSX.Element => {
       importConfig(text as string)
     }
     reader.readAsText(file)
-  }
-
-  const handlePaste = pasteConfig => {
-    importConfig(pasteConfig)
   }
 
   const importConfig = text => {
@@ -212,14 +210,27 @@ const ChooseTab: React.FC = (): JSX.Element => {
           id='uploadConfig'
           onChange={handleUpload}
         />
-        <label htmlFor='uploadConfig'>or paste configuration json</label>
-        <textarea
-          id='pasteConfig'
-          onChange={e => {
-            handlePaste(e.target.value)
-          }}
-          placeholder='{ }'
-        />
+        <div className='d-flex align-items-start mt-1'>
+          <label htmlFor='uploadConfig'>or paste configuration JSON</label>
+          <textarea
+            id='pasteConfig'
+            className='ms-2 '
+            onChange={e => {
+              setPastedConfig(e.target.value)
+            }}
+            placeholder='{ }'
+            value={pastedConfig}
+          />
+          <button
+            className='btn btn-primary px-4 ms-2'
+            type='submit'
+            id='load-data'
+            disabled={!pastedConfig}
+            onClick={() => importConfig(pastedConfig)}
+          >
+            Load
+          </button>
+        </div>
       </div>
     </div>
   )
