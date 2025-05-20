@@ -33,20 +33,22 @@ export const getVegaConfigType = vegaConfig => {
 
   const mainMark = getMainMark(vegaConfig)
   if (!mainMark) {
-    return undefined
+    return
   }
 
   if (mainMark.type === 'line') {
     return 'Line'
   } else if (mainMark.type === 'area') {
     return 'Area Chart'
+  } else if (mainMark.type === 'symbol') {
+    return 'Scatter Plot'
   }
   return 'Bar'
 }
 
 const getMainMark = vegaConfig => {
   const marks = vegaConfig.marks.map(m => (m.type === 'group' && m.marks ? m.marks[0] : m))
-  const mainMarks = marks.filter(m => ['rect', 'line', 'area', 'shape'].includes(m.type))
+  const mainMarks = marks.filter(m => ['rect', 'line', 'area', 'shape', 'symbol'].includes(m.type))
   return mainMarks.length ? mainMarks[0] : undefined
 }
 
@@ -97,35 +99,44 @@ const getGroupMark = vegaConfig => {
   return vegaConfig.marks.find(m => m.type === 'group')
 }
 
-const getSeriesKey = (vegaConfig, xField, yField) => {
+const isValidSeriesKey = (seriesKey, vegaData) => {
+  const seriesVals = [...new Set(vegaData.map(d => d[seriesKey]))]
+  return seriesVals.length > 1 && seriesVals.length <= 10
+}
+
+const getSeriesKey = (vegaConfig, vegaData, configType, xField, yField) => {
+  if (configType === 'Scatter Plot') return
+
   const groupMark = getGroupMark(vegaConfig)
   let seriesKey = groupMark?.from?.facet?.groupby
-  if (seriesKey) return seriesKey
+  if (isValidSeriesKey(seriesKey, vegaData)) return seriesKey
 
   const mainMark = getMainMark(vegaConfig)
   const enterEncoder = mainMark.encode.enter
   const updateEncoder = mainMark.encode.update
   seriesKey =
-    enterEncoder?.fill?.field ||
     updateEncoder?.fill?.field ||
+    enterEncoder?.fill?.field ||
+    updateEncoder?.stroke?.field ||
     enterEncoder?.stroke?.field ||
-    updateEncoder?.stroke?.field
-  if (seriesKey) return seriesKey
+    updateEncoder?.shape?.field ||
+    enterEncoder?.shape?.field ||
+    updateEncoder?.size?.field ||
+    enterEncoder?.size?.field
+  if (isValidSeriesKey(seriesKey, vegaData)) return seriesKey
 
   const stack = getStack(vegaConfig)
   if (stack) {
-    const vegaData = getVegaData(vegaConfig)
     const groupBy = _.difference(stack.groupby, [xField, yField])
     if (getMaxGroupSize(vegaData, groupBy) > 1) {
       let possibleKeys = _.difference(Object.keys(vegaData[0]), [xField, yField])
       const groupSizes = Object.fromEntries(possibleKeys.map(k => [k, getMaxGroupSize(vegaData, [...groupBy, ...[k]])]))
-      possibleKeys = possibleKeys.filter(k => groupSizes[k] > 1)
+      possibleKeys = possibleKeys.filter(k => groupSizes[k] > 1 && isValidSeriesKey(k, vegaData))
       if (possibleKeys.length) {
         return possibleKeys.sort((a, b) => (groupSizes[a] > groupSizes[b] ? 1 : -1))[0]
       }
     }
   }
-  return undefined
 }
 
 const getKeysToRemove = (vegaConfig, data) => {
@@ -208,15 +219,18 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
     const mainMark = getMainMark(vegaConfig)
     const enterEncoder = mainMark.encode.enter
     const updateEncoder = mainMark.encode.update
-    const xField = enterEncoder?.x?.field || updateEncoder?.x?.field
-    const yField = stackField || enterEncoder?.y?.field || updateEncoder?.y?.field
-    const seriesKey = getSeriesKey(vegaConfig, xField, yField)
+    const xField = updateEncoder?.x?.field || enterEncoder?.x?.field
+    const yField = stackField || updateEncoder?.y?.field || enterEncoder?.y?.field
+    const seriesKey = getSeriesKey(vegaConfig, vegaData, configType, xField, yField)
 
     const xDateFormat = getXDateFormat(xField, vegaData)
     const bottomAxis = vegaConfig.axes.sort((a, b) => (a.grid ? 1 : -1)).find(a => a.orient === 'bottom')
     config.xAxis = config.xAxis || {}
     config.xAxis.dataKey = xField
     config.xAxis.label = bottomAxis?.title
+    if (configType === 'Scatter Plot') {
+      config.xAxis.type = 'continuous'
+    }
     if (xDateFormat) {
       config.xAxis.type = configType === 'Bar' ? 'date' : 'date-time'
       config.xAxis.dateParseFormat = xDateFormat
@@ -262,7 +276,7 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
       label: seriesKey
     }
 
-    const interpolateValue = enterEncoder?.interpolate?.value || updateEncoder?.interpolate?.value
+    const interpolateValue = updateEncoder?.interpolate?.value || enterEncoder?.interpolate?.value
     if (configType == 'Area Chart' && interpolateValue) {
       config.stackedAreaChartLineType = CURVE_LOOKUP[interpolateValue]
     }
