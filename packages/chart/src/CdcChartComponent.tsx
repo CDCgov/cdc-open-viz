@@ -286,8 +286,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
       (newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') ||
       ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)
     ) {
-      newConfig.runtime.xAxis = newConfig.yAxis['yAxis'] ? newConfig.yAxis['yAxis'] : newConfig.yAxis
-      newConfig.runtime.yAxis = newConfig.xAxis['xAxis'] ? newConfig.xAxis['xAxis'] : newConfig.xAxis
+      newConfig.runtime.xAxis = _.cloneDeep(newConfig.yAxis.yAxis || newConfig.yAxis)
+      newConfig.runtime.yAxis = _.cloneDeep(newConfig.xAxis.xAxis || newConfig.xAxis)
       newConfig.runtime.yAxis.labelOffset *= -1
 
       newConfig.runtime.horizontal = false
