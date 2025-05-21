@@ -53,7 +53,7 @@ const DataImport = () => {
   const [keepURL, setKeepURL] = useState(!!config.dataUrl || !!config.vegaType)
   const [addingDataset, setAddingDataset] = useState(config.type === 'dashboard' || !config.data)
   const [editingDataset, _setEditingDataset] = useState<string>(undefined)
-  const [newDatasetName, setNewDatasetName] = useState<string>(undefined)
+  const [newDatasetName, setNewDatasetName] = useState<string>(config.vegaType ? 'vega_data' : undefined)
   const [pastedConfig, setPastedConfig] = useState<string>(undefined)
   const setEditingDataset = (datasetKey: string) => {
     _setEditingDataset(datasetKey)
@@ -727,24 +727,7 @@ const DataImport = () => {
               <>
                 <div className='heading-3'>Update Dataset</div>
                 <Tabs startingTab={0}>
-                  <TabPane title='Upload New Vega JSON' icon={<FileUploadIcon className='inline-icon' />}>
-                    {sharepath && <p className='alert--info'>The share path set for this website is: {sharepath}</p>}
-                    <div
-                      className={`${
-                        isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'
-                      } mb-3`}
-                      {...getRootProps()}
-                    >
-                      <input {...getInputProps()} />
-                      {isDragActive ? (
-                        <p>Drop file here</p>
-                      ) : (
-                        <p>
-                          Drag file to this area, or <span>select a file</span>.
-                        </p>
-                      )}
-                    </div>
-
+                  <TabPane title='Update Vega config' icon={<FileUploadIcon className='inline-icon' />}>
                     <div>
                       <label htmlFor='uploadConfig'>or paste Vega configuration JSON:</label>
 
