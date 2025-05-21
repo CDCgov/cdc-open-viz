@@ -29,6 +29,7 @@ import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { publish } from '@cdc/core/helpers/events'
 import { generateRuntimeFilters } from './helpers/generateRuntimeFilters'
 import { type MapReducerType, MapState } from './store/map.reducer'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
 // Map Helpers
 import {
@@ -63,7 +64,7 @@ import { getInitialState, mapReducer } from './store/map.reducer'
 import { RuntimeData } from './types/RuntimeData'
 import EditorContext from '@cdc/editor/src/ConfigContext'
 import MapActions from './store/map.actions'
-import _ from 'lodash'
+import _, { set } from 'lodash'
 import useModal from './hooks/useModal'
 
 type CdcMapComponent = {
@@ -75,6 +76,7 @@ type CdcMapComponent = {
   navigationHandler: Function
   setSharedFilter: Function
   setSharedFilterValue: Function
+  setEditorConfig: Function
 }
 
 const CdcMapComponent: React.FC<CdcMapComponent> = ({
@@ -87,7 +89,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   setSharedFilterValue,
   link,
   loadConfig,
-  setConfig: setParentConfig
+  setConfig: setParentConfig,
+  setEditorConfig
 }) => {
   const initialState = getInitialState(configObj)
 
@@ -117,12 +120,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const editorContext = useContext(EditorContext)
 
   const setConfig = (newMapState: MapConfig): void => {
-    dispatch({ type: 'SET_CONFIG', payload: newMapState })
-
     if (isEditor && !isDashboard) {
+      dispatch({ type: 'SET_CONFIG', payload: newMapState })
+    } else {
+      dispatch({ type: 'SET_CONFIG', payload: newMapState })
       editorContext.setTempConfig(newMapState)
-    } else if (isDashboard && isEditor) {
-      setParentConfig(newMapState)
     }
   }
 
@@ -334,6 +336,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   if (!table.label || table.label === '') table.label = 'Data Table'
 
   const mapProps = {
+    setEditorConfig,
     setParentConfig,
     container,
     content: modal,

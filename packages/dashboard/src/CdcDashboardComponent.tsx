@@ -21,7 +21,7 @@ import getViewport from '@cdc/core/helpers/getViewport'
 
 import CdcChart from '@cdc/chart/src/CdcChartComponent'
 import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
-import CdcMap from '@cdc/map/src/CdcMapComponent'
+import CdcMap from '@cdc/map/src/CdcMap'
 import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
 import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
 import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'

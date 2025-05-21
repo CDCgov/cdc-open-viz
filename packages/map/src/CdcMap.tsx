@@ -25,7 +25,8 @@ const CdcMap: React.FC<CdcMapProps> = ({
   configUrl,
   logo = '',
   link,
-  config: editorsConfig
+  config: editorsConfig,
+  setConfig: setEditorConfig
 }) => {
   const editorContext = useContext(EditorContext)
   const [config, _setConfig] = useState(null)
@@ -121,6 +122,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
       logo={logo}
       link={link}
       loadConfig={loadConfig}
+      setEditorConfig={setEditorConfig}
     />
   )
 }

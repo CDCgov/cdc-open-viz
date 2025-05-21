@@ -60,7 +60,8 @@ const EditorPanel = () => {
     config,
     tooltipId,
     runtimeData,
-    setRuntimeData
+    setRuntimeData,
+    setEditorConfig
   } = useContext<MapContext>(ConfigContext)
 
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
@@ -943,8 +944,8 @@ const EditorPanel = () => {
 
   useEffect(() => {
     const newConfig = convertStateToConfig()
-    if (isEditor && setParentConfig) {
-      setParentConfig(newConfig)
+    if (isEditor && setEditorConfig) {
+      setEditorConfig(newConfig)
     }
   }, [config])
 
