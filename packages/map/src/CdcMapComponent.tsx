@@ -68,8 +68,8 @@ import useModal from './hooks/useModal'
 
 type CdcMapComponent = {
   config: MapConfig
-  isDashboard?: boolean
   isEditor?: boolean
+  isDashboard?: boolean
   link?: string
   logo?: string
   navigationHandler: Function

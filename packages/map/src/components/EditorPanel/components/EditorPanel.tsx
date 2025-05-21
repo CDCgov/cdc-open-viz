@@ -3315,7 +3315,7 @@ const EditorPanel = () => {
           {config.general.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}
           {config.general.geoType !== 'us-county' && <Panels.Annotate name='Text Annotations' />}
         </Accordion>
-        <AdvancedEditor loadConfig={loadConfig} config={config} convertStateToConfig={convertStateToConfig} />
+        <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={convertStateToConfig} />
       </Layout.Sidebar>
     </ErrorBoundary>
   )
