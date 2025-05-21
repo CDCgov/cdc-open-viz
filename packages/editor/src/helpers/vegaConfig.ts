@@ -146,7 +146,7 @@ const getKeysToRemove = (vegaConfig, data) => {
     keysToRemove = [...keysToRemove, ...(stack.as || ['y0', 'y1'])]
   }
   Object.keys(data[0]).forEach(k => {
-    if (typeof data[0][k] === 'object') {
+    if (typeof data[0][k] === 'object' && !(data[0][k] instanceof Date)) {
       keysToRemove.push(k)
     }
   })
