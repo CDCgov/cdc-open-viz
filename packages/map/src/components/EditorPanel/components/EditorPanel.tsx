@@ -76,6 +76,13 @@ const EditorPanel = () => {
     MapLayerHandlers: { handleMapLayer, handleAddLayer, handleRemoveLayer }
   } = useMapLayers(config, setConfig, false, tooltipId)
 
+  useEffect(() => {
+    // Pass up to Editor if needed
+    if (setParentConfig) {
+      setParentConfig(convertStateToConfig())
+    }
+  }, [config])
+
   const categoryMove = (idx1, idx2) => {
     let categoryValuesOrder = getCategoryValuesOrder()
     let [movedItem] = categoryValuesOrder.splice(idx1, 1)

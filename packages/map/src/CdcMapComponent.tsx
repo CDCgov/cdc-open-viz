@@ -116,18 +116,15 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   const editorContext = useContext(EditorContext)
 
-  const setConfig = (newMapState: MapConfig): void => {
-    dispatch({ type: 'SET_CONFIG', payload: newMapState })
-
+  const setConfig = (newMapConfig: MapConfig): void => {
+    dispatch({ type: 'SET_CONFIG', payload: newMapConfig })
     if (isEditor && !isDashboard) {
-      editorContext.setTempConfig(newMapState)
-    } else if (isDashboard && isEditor) {
-      setParentConfig(newMapState)
+      editorContext.setTempConfig(newMapConfig)
     }
   }
 
   useEffect(() => {
-    const _newConfig = _.cloneDeep(configObj)
+    const _newConfig = getInitialState(_.cloneDeep(configObj)).config
     if (configObj.data) {
       _newConfig.data = configObj.data
     }
