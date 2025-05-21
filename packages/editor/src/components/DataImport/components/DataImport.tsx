@@ -32,7 +32,7 @@ import { supportedDataTypes } from '../helpers/supportedDataTypes'
 import { getFileExtension } from '../helpers/getFileExtension'
 import { parseTextByMimeType } from '../helpers/parseTextByMimeType'
 import { getMimeType } from '../helpers/getMimeType'
-import { getVegaData, loadedVegaConfigData } from '@cdc/editor/src/helpers/vegaConfig'
+import { getVegaData, parseVegaConfig, loadedVegaConfigData } from '@cdc/editor/src/helpers/vegaConfig'
 
 const DataImport = () => {
   const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)
@@ -438,7 +438,8 @@ const DataImport = () => {
   }
 
   const updateVegaData = text => {
-    const newData = getVegaData(JSON.parse(text))
+    const vegaConfig = parseVegaConfig(JSON.parse(text))
+    const newData = getVegaData(vegaConfig)
     let newConfig = {
       ...config,
       data: newData
