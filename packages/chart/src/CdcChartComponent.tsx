@@ -612,8 +612,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         rightSuffix,
         bottomPrefix,
         bottomSuffix,
-        bottomAbbreviated,
-        onlyShowTopPrefixSuffix
+        bottomAbbreviated
       }
     } = config
 
@@ -706,9 +705,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (addColPrefix && axis === 'left') {
       result = addColPrefix + result
     } else {
-      // if onlyShowTopPrefixSuffix only show top prefix
-      const suppressAllButLast = onlyShowTopPrefixSuffix && length - 1 !== index
-      if (prefix && axis === 'left' && !suppressAllButLast) {
+      if (prefix && axis === 'left') {
         result += prefix
       }
     }
@@ -727,7 +724,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (addColSuffix && axis === 'left') {
       result += addColSuffix
     } else {
-      if (suffix && axis === 'left' && !onlyShowTopPrefixSuffix) {
+      if (suffix && axis === 'left') {
         result += suffix
       }
     }

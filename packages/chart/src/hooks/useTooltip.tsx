@@ -571,14 +571,14 @@ export const useTooltip = props => {
     let newValue = label || value
     const style = displayGray ? { color: '#8b8b8a' } : {}
 
-    if (index == 1 && config.dataFormat.onlyShowTopPrefixSuffix) {
-      newValue = `${config.dataFormat.prefix}${newValue}${config.dataFormat.suffix}`
+    if (index == 1 && config.yAxis?.inlineLabel) {
+      newValue = `${config.dataFormat.prefix}${newValue}${config.dataFormat.suffix}${config.yAxis?.inlineLabel}`
     }
     const activeLabel = getSeriesNameFromLabel(key)
     const displayText = activeLabel ? `${activeLabel}: ${newValue}` : newValue
 
     return (
-      <li style={style} className='tooltip-body'>
+      <li style={style} className='tooltip-body mb-1'>
         {displayText}
       </li>
     )

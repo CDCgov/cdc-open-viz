@@ -381,7 +381,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsYPadding = () => {
-    return !config.dataFormat.onlyShowTopPrefixSuffix || !config.dataFormat.suffix?.includes(' ')
+    return !config.yAxis.inlineLabel || !config.yAxis.inlineLabel?.includes(' ')
   }
 
   const visHasSingleSeriesTooltip = () => {

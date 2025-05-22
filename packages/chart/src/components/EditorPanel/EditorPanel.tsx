@@ -1656,6 +1656,44 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           </Tooltip>
                         }
                       />
+                      <TextField
+                        display={!visHasCategoricalAxis()}
+                        value={config.yAxis.inlineLabel}
+                        section='yAxis'
+                        fieldName='inlineLabel'
+                        label='Inline Label'
+                        updateField={updateField}
+                        maxLength={35}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>35 character limit</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                      <TextField
+                        display={!visHasCategoricalAxis()}
+                        value={config.yAxis.inlineLabel}
+                        section='yAxis'
+                        fieldName='inlineLabel'
+                        label='Inline Label'
+                        updateField={updateFieldDeprecated}
+                        maxLength={35}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>35 character limit</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
                       {config.runtime.seriesKeys &&
                         config.runtime.seriesKeys.length === 1 &&
                         !['Box Plot', 'Deviation Bar', 'Forest Plot'].includes(config.visualizationType) && (
@@ -2000,14 +2038,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                   ) : (
                     config.visualizationType !== 'Pie' && (
                       <>
-                        <CheckBox
-                          display={!visHasCategoricalAxis()}
-                          value={config.dataFormat.onlyShowTopPrefixSuffix}
-                          section='dataFormat'
-                          fieldName='onlyShowTopPrefixSuffix'
-                          label='Only Show Top Prefix/Suffix'
-                          updateField={updateFieldDeprecated}
-                        />
                         <CheckBox
                           display={!visHasCategoricalAxis()}
                           value={config.yAxis.hideAxis}
