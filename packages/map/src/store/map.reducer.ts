@@ -4,8 +4,9 @@ import defaults from './../data/initial-state'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 import _ from 'lodash'
 
-export const getInitialState = (configObj = {}): MapConfig => {
+export const getInitialState = (configObj = {}): MapState => {
   return {
+    dataUrl: configObj.dataUrl || '',
     config: _.merge({}, defaults, configObj),
     loading: false,
     accessibleStatus: '',
