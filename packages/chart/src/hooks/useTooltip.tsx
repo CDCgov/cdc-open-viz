@@ -572,7 +572,7 @@ export const useTooltip = props => {
     const style = displayGray ? { color: '#8b8b8a' } : {}
 
     if (index == 1 && config.yAxis?.inlineLabel) {
-      newValue = `${config.dataFormat.prefix}${newValue}${config.dataFormat.suffix}${config.yAxis?.inlineLabel}`
+      newValue = `${config.dataFormat.prefix}${newValue}${config.dataFormat.suffix}`
     }
     const activeLabel = getSeriesNameFromLabel(key)
     const displayText = activeLabel ? `${activeLabel}: ${newValue}` : newValue
