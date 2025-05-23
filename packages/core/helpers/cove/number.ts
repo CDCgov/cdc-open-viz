@@ -54,7 +54,6 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
       bottomSuffix,
       bottomComas,
       commas,
-      onlyShowTopPrefixSuffix,
       prefix,
       rightPrefix,
       rightRoundTo,
@@ -63,6 +62,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
       suffix
     }
   } = config
+  const { inlineLabel } = config.yAxis || {}
 
   // destructure Additional Col dataformat values
   const { addColCommas, addColRoundTo, addColPrefix, addColSuffix } = addColParams || {}
@@ -154,7 +154,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
     num = abbreviateNumber(parseFloat(num))
   }
 
-  if (!onlyShowTopPrefixSuffix) {
+  if (!inlineLabel) {
     if (addColPrefix !== undefined && axis === 'left') {
       result = addColPrefix + result
     } else {
@@ -174,7 +174,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
 
   result += num
 
-  if (!onlyShowTopPrefixSuffix) {
+  if (!inlineLabel) {
     if (addColSuffix !== undefined && axis === 'left') {
       result += addColSuffix
     } else {

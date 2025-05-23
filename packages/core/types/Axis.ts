@@ -17,6 +17,7 @@ export type Axis = {
   hideAxis?: boolean
   hideLabel?: boolean
   hideTicks?: boolean
+  inlineLabel?: string
   label?: string
   labelOffset?: number
   labelPlacement?: string

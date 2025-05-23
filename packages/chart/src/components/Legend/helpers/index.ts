@@ -36,7 +36,7 @@ export const getMarginBottom = (isLegendBottom, config) => {
 
   if (isLegendTop) marginBottom = 27
 
-  if (isLegendTop && config.dataFormat?.onlyShowTopPrefixSuffix) marginBottom += 9
+  if (isLegendTop && config.yAxis?.inlineLabel) marginBottom += 9
 
   if (isLegendBottom) marginBottom += 9
 
