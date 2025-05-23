@@ -183,8 +183,17 @@ const getXDateFormat = (xField, vegaData) => {
   }
 }
 
-const getGeoName = (vegaData: { [key: string]: any }[]) =>
-  Object.entries(vegaData[0]).find(([, v]) => states.includes(v))[0]
+const getGeoName = (vegaData: { [key: string]: any }[]) => {
+  const keys = Object.keys(vegaData[0])
+  const lowerStates = states.map(s => s.toLowerCase())
+  for (let i = 0; i < vegaData.length; i++) {
+    for (let j = 0; j < keys.length; j++) {
+      if (lowerStates.includes(`${vegaData[i][keys[j]]}`.toLowerCase())) {
+        return keys[j]
+      }
+    }
+  }
+}
 
 export const convertVegaConfig = (configType: string, vegaConfig: any, config: any) => {
   delete config.newViz
@@ -366,6 +375,7 @@ export const states = [
   'California',
   'Colorado',
   'Connecticut',
+  'District of Columbia',
   'Delaware',
   'Florida',
   'Georgia',
