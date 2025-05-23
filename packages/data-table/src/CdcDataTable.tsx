@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useReducer } from 'react'
 
 import DataTable from '@cdc/core/components/DataTable'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
@@ -8,16 +8,15 @@ import Loading from '@cdc/core/components/Loading'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import getViewport from '@cdc/core/helpers/getViewport'
-import { Table } from '@cdc/core/types/Table'
-import { ViewPort } from '@cdc/core/types/ViewPort'
 import { Visualization } from '@cdc/core/types/Visualization'
-import { VizFilter } from '@cdc/core/types/VizFilter'
 
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state.js'
 import { processData } from './helpers/dataHelpers'
 import { fetchConfig, fetchData } from './helpers/fetchers'
 import { Config } from './types/Config'
+import { getInitialState, reducer, State } from './store/dataTable.reducer'
+import { ActionType } from './store/dataTable.actions'
 
 type CdcDataTableProps = {
   config?: Config
@@ -26,16 +25,25 @@ type CdcDataTableProps = {
 }
 
 const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTableProps) => {
+  /* STORE */
+  const initialState = getInitialState(isEditor)
+  const [state, dispatch] = useReducer(reducer, initialState)
+
+  const builtSetter = (type: ActionType) => payload => {
+    dispatch({ type, payload })
+  }
+
   /* STATES */
-  // config is only used to capture the initial config data anything dynamic is updated in other states
-  const [config, setConfig] = useState<Config>()
-  const [showEditorPanel, setShowEditorPanel] = useState(isEditor)
-  const [columns, setColumns] = useState()
-  const [data, setData] = useState()
-  const [table, setTable] = useState<Table>()
-  const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
-  const [filters, setFilters] = useState<VizFilter[]>()
-  const [filterIntro, setFilterIntro] = useState<string>()
+  const { config, showEditorPanel, columns, data, table, filters, currentViewport, filterIntro } = state as State
+
+  const setConfig = builtSetter('SET_CONFIG')
+  const setShowEditorPanel = builtSetter('SET_SHOW_EDITOR_PANEL')
+  const setColumns = builtSetter('SET_COLUMNS')
+  const setData = builtSetter('SET_DATA')
+  const setTable = builtSetter('SET_TABLE')
+  const setFilters = builtSetter('SET_FILTERS')
+  const setCurrentViewport = builtSetter('SET_CURRENT_VIEWPORT')
+  const setFilterIntro = builtSetter('SET_FILTER_INTRO')
 
   /* CONFIG VARS */
   const { data: inputData, dataUrl, dataDescription } = config || {}
