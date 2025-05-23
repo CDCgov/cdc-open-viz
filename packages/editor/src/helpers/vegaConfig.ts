@@ -90,6 +90,13 @@ export const getVegaData = vegaConfig => {
       }
     })
   })
+  const sortDomain = vegaConfig.scales?.find(s => s.domain?.sort)?.domain
+  if (sortDomain) {
+    const sortField = sortDomain.sort.field || sortDomain.field
+    const sortDirection = sortDomain.sort.order === 'descending' ? -1 : 1
+    data.sort((a, b) => (a[sortField] > b[sortField] ? sortDirection : sortDirection * -1))
+  }
+
   console.log('------------- vega data -------------')
   console.log(data)
   return data
@@ -177,8 +184,10 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
   config.dataFileName = 'vega-config.json'
   config.dataFileSourceType = 'file'
 
-  config.showTitle = false
   config.table = config.table || { expanded: false }
+
+  config.title = vegaConfig.title?.text
+  config.showTitle = config.title ? true : false
 
   if (configType === 'Map') {
     const geoName = getGeoName(vegaData)
@@ -219,12 +228,28 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
     const mainMark = getMainMark(vegaConfig)
     const enterEncoder = mainMark.encode.enter
     const updateEncoder = mainMark.encode.update
-    const xField = updateEncoder?.x?.field || enterEncoder?.x?.field
-    const yField = stackField || updateEncoder?.y?.field || enterEncoder?.y?.field
+    let xField =
+      updateEncoder?.x?.field || enterEncoder?.x?.field || updateEncoder?.x2?.field || enterEncoder?.x2?.field
+    let yField =
+      stackField ||
+      updateEncoder?.y?.field ||
+      enterEncoder?.y?.field ||
+      updateEncoder?.y2?.field ||
+      enterEncoder?.y2?.field
     const seriesKey = getSeriesKey(vegaConfig, vegaData, configType, xField, yField)
 
-    const xDateFormat = getXDateFormat(xField, vegaData)
+    const leftAxis = vegaConfig.axes.sort((a, b) => (a.grid ? 1 : -1)).find(a => a.orient === 'left')
     const bottomAxis = vegaConfig.axes.sort((a, b) => (a.grid ? 1 : -1)).find(a => a.orient === 'bottom')
+
+    const yScale = vegaConfig.scales?.find(s => s.name === leftAxis?.scale)
+    const isHorizontalBar = configType === 'Bar' && yScale?.type === 'band'
+
+    if (isHorizontalBar) {
+      ;[xField, yField] = [yField, xField]
+      config.orientation = 'horizontal'
+    }
+
+    const xDateFormat = getXDateFormat(xField, vegaData)
     config.xAxis = config.xAxis || {}
     config.xAxis.dataKey = xField
     config.xAxis.label = bottomAxis?.title
@@ -239,7 +264,6 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
       config.xAxis.label = ''
     }
 
-    const leftAxis = vegaConfig.axes.sort((a, b) => (a.grid ? 1 : -1)).find(a => a.orient === 'left')
     config.yAxis = config.yAxis || {}
     config.yAxis.label = leftAxis?.title
 
