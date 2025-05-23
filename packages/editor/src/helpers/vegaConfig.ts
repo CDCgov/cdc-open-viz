@@ -14,7 +14,16 @@ const CURVE_LOOKUP = {
 }
 
 export const isVegaConfig = config => {
-  return config.scales || config.axes || config.marks || config.layer || config.params
+  return (
+    config.scales ||
+    config.axes ||
+    config.marks ||
+    config.layer ||
+    config.params ||
+    config.transform ||
+    config.projection ||
+    config.encoding
+  )
 }
 
 export const parseVegaConfig = vegaConfig => {
@@ -111,12 +120,11 @@ const isValidSeriesKey = (seriesKey, vegaData) => {
   return seriesVals.length > 1 && seriesVals.length <= 10
 }
 
-const getSeriesKey = (vegaConfig, vegaData, configType, xField, yField) => {
+const getSeriesKey = (vegaConfig, vegaData, xField, yField) => {
+  const configType = getVegaConfigType(vegaConfig)
   if (configType === 'Scatter Plot') return
 
-  const groupMark = getGroupMark(vegaConfig)
-  let seriesKey = groupMark?.from?.facet?.groupby
-  if (isValidSeriesKey(seriesKey, vegaData)) return seriesKey
+  let seriesKey
 
   const mainMark = getMainMark(vegaConfig)
   const enterEncoder = mainMark.encode.enter
@@ -130,6 +138,10 @@ const getSeriesKey = (vegaConfig, vegaData, configType, xField, yField) => {
     enterEncoder?.shape?.field ||
     updateEncoder?.size?.field ||
     enterEncoder?.size?.field
+  if (isValidSeriesKey(seriesKey, vegaData)) return seriesKey
+
+  const groupMark = getGroupMark(vegaConfig)
+  seriesKey = groupMark?.from?.facet?.groupby
   if (isValidSeriesKey(seriesKey, vegaData)) return seriesKey
 
   const stack = getStack(vegaConfig)
@@ -189,7 +201,7 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
   config.title = vegaConfig.title?.text
   config.showTitle = config.title ? true : false
 
-  if (configType === 'Map') {
+  if (config.vegaType === 'Map') {
     const geoName = getGeoName(vegaData)
     const colorData = getMainMark(vegaConfig).encode.update.fill
     const colorLabel = vegaConfig.legends[0].title
@@ -226,38 +238,39 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
     const stack = getStack(vegaConfig)
     const stackField = stack?.field
     const mainMark = getMainMark(vegaConfig)
+    const groupMark = getGroupMark(vegaConfig)
     const enterEncoder = mainMark.encode.enter
     const updateEncoder = mainMark.encode.update
     let xField =
       updateEncoder?.x?.field || enterEncoder?.x?.field || updateEncoder?.x2?.field || enterEncoder?.x2?.field
     let yField =
-      stackField ||
-      updateEncoder?.y?.field ||
-      enterEncoder?.y?.field ||
-      updateEncoder?.y2?.field ||
-      enterEncoder?.y2?.field
-    const seriesKey = getSeriesKey(vegaConfig, vegaData, configType, xField, yField)
+      updateEncoder?.y?.field || enterEncoder?.y?.field || updateEncoder?.y2?.field || enterEncoder?.y2?.field
 
     const leftAxis = vegaConfig.axes.sort((a, b) => (a.grid ? 1 : -1)).find(a => a.orient === 'left')
     const bottomAxis = vegaConfig.axes.sort((a, b) => (a.grid ? 1 : -1)).find(a => a.orient === 'bottom')
 
     const yScale = vegaConfig.scales?.find(s => s.name === leftAxis?.scale)
-    const isHorizontalBar = configType === 'Bar' && yScale?.type === 'band'
+    const isHorizontalBar = config.vegaType === 'Bar' && yScale?.type === 'band'
 
     if (isHorizontalBar) {
       ;[xField, yField] = [yField, xField]
+      xField = groupMark?.from?.facet?.groupby || xField
       config.orientation = 'horizontal'
     }
+
+    yField = stackField || yField
+
+    const seriesKey = getSeriesKey(vegaConfig, vegaData, xField, yField)
 
     const xDateFormat = getXDateFormat(xField, vegaData)
     config.xAxis = config.xAxis || {}
     config.xAxis.dataKey = xField
-    config.xAxis.label = bottomAxis?.title
-    if (configType === 'Scatter Plot') {
+    config.xAxis.label = isHorizontalBar ? leftAxis?.title : bottomAxis?.title
+    if (config.vegaType === 'Scatter Plot') {
       config.xAxis.type = 'continuous'
     }
     if (xDateFormat) {
-      config.xAxis.type = configType === 'Bar' ? 'date' : 'date-time'
+      config.xAxis.type = config.vegaType === 'Bar' ? 'date' : 'date-time'
       config.xAxis.dateParseFormat = xDateFormat
       config.xAxis.dateDisplayFormat = '%b. %Y'
       config.xAxis.showYearsOnce = true
@@ -265,7 +278,7 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
     }
 
     config.yAxis = config.yAxis || {}
-    config.yAxis.label = leftAxis?.title
+    config.yAxis.label = isHorizontalBar ? bottomAxis?.title : leftAxis?.title
 
     if (seriesKey) {
       config.visualizationSubType = stack && getMaxGroupSize(vegaData, stack.groupby) > 1 ? 'stacked' : ''
@@ -288,7 +301,7 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
       config.series = [
         {
           dataKey: yField,
-          type: configType,
+          type: config.vegaType,
           axis: 'Left',
           tooltip: true
         }
@@ -297,11 +310,12 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
 
     config.legend = {
       hide: !seriesKey,
-      label: seriesKey
+      label: seriesKey,
+      position: 'top'
     }
 
     const interpolateValue = updateEncoder?.interpolate?.value || enterEncoder?.interpolate?.value
-    if (configType == 'Area Chart' && interpolateValue) {
+    if (config.vegaType == 'Area Chart' && interpolateValue) {
       config.stackedAreaChartLineType = CURVE_LOOKUP[interpolateValue]
     }
   }
@@ -320,7 +334,7 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
 export const loadedVegaConfigData = (config: any) => {
   const seriesKey = config.dataDescription?.seriesKey
   if (seriesKey && !config.series) {
-    const seriesVals = [...new Set(config.data.map(d => d[seriesKey]))]
+    const seriesVals = [...new Set(config.data.map(d => d[seriesKey]))].sort((a, b) => (a > b ? 1 : -1))
     config.series = seriesVals.map(val => {
       return {
         dataKey: val,
