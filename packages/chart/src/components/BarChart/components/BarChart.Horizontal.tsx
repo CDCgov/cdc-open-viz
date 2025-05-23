@@ -54,8 +54,7 @@ export const BarChartHorizontal = () => {
     formatNumber,
     formatDate,
     parseDate,
-    setSharedFilter,
-    isNumber
+    setSharedFilter
   } = useContext<ChartContext>(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
@@ -129,7 +128,8 @@ export const BarChartHorizontal = () => {
                     barWidthHorizontal: barWidth,
                     isSuppressed,
                     absentDataLabel
-                  } = getBarConfig({ bar, defaultBarWidth, config, isNumber, isVertical: false, yAxisValue })
+                  } = getBarConfig({ bar, defaultBarWidth, config, isVertical: false, yAxisValue, barWidth: 0 })
+
                   const barPosition = !isPositiveBar ? 'below' : 'above'
 
                   const barDefaultLabel = !config.yAxis.displayNumbersOnBar ? '' : yAxisValue
