@@ -473,10 +473,17 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   useEffect(() => {
     if (!tooltipOpen) return
     if (!tooltipRef.current) return
+
     const { dataXPosition } = tooltipData as { [key: string]: number }
+
     if (!dataXPosition) return
-    const rightSide = dataXPosition > parentWidth / 2
-    const maxWidth = rightSide ? dataXPosition - 10 : parentWidth - (dataXPosition + 6) // 20px padding
+
+    const { width: tooltipWidth } = tooltipRef.current.node.getBoundingClientRect()
+
+    const rightSideRemainingSpace = parentWidth - dataXPosition
+
+    const rightSide = rightSideRemainingSpace <= tooltipWidth && dataXPosition > parentWidth / 2 - 10
+    const maxWidth = rightSide ? dataXPosition - 10 : parentWidth - (dataXPosition + 6)
     tooltipRef.current.node.style.maxWidth = `${maxWidth}px`
   }, [tooltipOpen, tooltipData])
 
@@ -1022,7 +1029,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       />
                     )}
                     {props.ticks.map((tick, i) => {
-                      console.log('🧙‍♂️ ✨ {props.ticks.map ✨ tick.formattedValue:', tick.formattedValue)
                       const minY = props.ticks[0].to.y
                       const barMinHeight = 15 // 15 is the min height for bars by default
                       const showTicks = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
@@ -1031,6 +1037,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
                       // Vertical value/suffix vars
                       const lastTick = props.ticks.length - 1 === i
+                      const useInlineLabel = lastTick && inlineLabel
                       const hideTopTick = lastTick && inlineLabel && !inlineLabelHasNoSpace
                       const valueOnLinePadding = hideAxis ? -8 : -12
                       const labelXPadding = labelsAboveGridlines ? valueOnLinePadding : TICK_LABEL_MARGIN_RIGHT
@@ -1039,6 +1046,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       const labelY = tick.to.y - labelYPadding
                       const labelVerticalAnchor = labelsAboveGridlines ? 'end' : 'middle'
                       const combineDomInlineLabelWithValue = inlineLabel && labelsAboveGridlines && lastTick
+                      const formattedValue = useInlineLabel
+                        ? tick.formattedValue.replace(config.dataFormat.suffix, '')
+                        : tick.formattedValue
 
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
@@ -1200,7 +1210,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                   style={{ whiteSpace: 'pre-wrap' }} // prevents leading spaces from being trimmed
                                   fontSize={tickLabelFontSize}
                                 >
-                                  {`${tick.formattedValue}${combineDomInlineLabelWithValue ? inlineLabel : ''}`}
+                                  {`${formattedValue}${combineDomInlineLabelWithValue ? inlineLabel : ''}`}
                                 </BlurStrokeText>
                               </>
                             )}
