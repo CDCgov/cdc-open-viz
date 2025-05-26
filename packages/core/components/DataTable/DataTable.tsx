@@ -92,6 +92,15 @@ const DataTable = (props: DataTableProps) => {
     colIndex: null
   })
 
+  // Pagination state for US county-level maps
+  const [currentPage, setCurrentPage] = useState(1)
+  const [rowsPerPage] = useState(50) // You can adjust this value as needed
+
+  // Reset to first page when rows change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [rawData?.length])
+
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
   const isVertical = !(config.type === 'chart' && !config.table?.showVertical)
@@ -135,27 +144,42 @@ const DataTable = (props: DataTableProps) => {
   }
 
   const rawRows = Object.keys(runtimeData).filter(column => column != 'columns')
-  const rows =
-    isVertical && sortBy.column
-      ? rawRows.sort((a, b) => {
-          let dataA
-          let dataB
-          if (config.type === 'map' && config.columns) {
-            const sortByColName = config.columns[sortBy.column].name
-            dataA = runtimeData[a][sortByColName]
-            dataB = runtimeData[b][sortByColName]
-          }
-          if (['chart', 'dashboard', 'table'].includes(config.type)) {
-            dataA = runtimeData[a][sortBy.column]
-            dataB = runtimeData[b][sortBy.column]
-          }
-          if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
-            dataA = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[a][config.xAxis.dataKey])
-            dataB = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[b][config.xAxis.dataKey])
-          }
-          return dataA && dataB ? customSort(dataA, dataB, sortBy, config) : 0
-        })
-      : rawRows
+
+  // Memoize sorted rows for performance
+  const memoizedRows = useMemo(() => {
+    if (isVertical && sortBy.column) {
+      return [...rawRows].sort((a, b) => {
+        let dataA
+        let dataB
+        if (config.type === 'map' && config.columns) {
+          const sortByColName = config.columns[sortBy.column].name
+          dataA = runtimeData[a][sortByColName]
+          dataB = runtimeData[b][sortByColName]
+        }
+        if (['chart', 'dashboard', 'table'].includes(config.type)) {
+          dataA = runtimeData[a][sortBy.column]
+          dataB = runtimeData[b][sortBy.column]
+        }
+        if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
+          dataA = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[a][config.xAxis.dataKey])
+          dataB = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[b][config.xAxis.dataKey])
+        }
+        return dataA && dataB ? customSort(dataA, dataB, sortBy, config) : 0
+      })
+    }
+    return rawRows
+  }, [isVertical, sortBy, rawRows, config, runtimeData])
+
+  // Pagination logic for county-level maps
+  const isCountyMap = config.type === 'map' && config.general?.geoType === 'us-county'
+  const totalRows = memoizedRows.length
+  const totalPages = isCountyMap ? Math.ceil(totalRows / rowsPerPage) : 1
+  const memoizedPaginatedRows = useMemo(() => {
+    if (isCountyMap) {
+      return memoizedRows.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+    }
+    return memoizedRows
+  }, [isCountyMap, memoizedRows, currentPage, rowsPerPage])
 
   const limitHeight = {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
@@ -233,7 +257,7 @@ const DataTable = (props: DataTableProps) => {
       const visibleData =
         config.type === 'map'
           ? getMapRowData(
-              rows,
+              rawRows,
               columns,
               config,
               formatLegendLocation,
@@ -277,21 +301,44 @@ const DataTable = (props: DataTableProps) => {
       return classes
     }
 
-    const childrenMatrix =
-      config.type === 'map'
-        ? mapCellMatrix({ ...props, rows, wrapColumns, runtimeData, viewport })
-        : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
+    // Memoize childrenMatrix for performance
+    const memoizedChildrenMatrix = useMemo(() => {
+      return config.type === 'map'
+        ? mapCellMatrix({
+            ...props,
+            rows: isCountyMap ? memoizedPaginatedRows : memoizedRows,
+            wrapColumns,
+            runtimeData,
+            viewport
+          })
+        : chartCellMatrix({ rows: memoizedRows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
+    }, [
+      config.type,
+      isCountyMap,
+      memoizedPaginatedRows,
+      memoizedRows,
+      props,
+      wrapColumns,
+      runtimeData,
+      viewport,
+      isVertical,
+      sortBy,
+      hasRowType
+    ])
 
-    // If every value in a column is a number, record the column index so the header and cells can be right-aligned
-    const rightAlignedCols = childrenMatrix.length
-      ? Object.fromEntries(
-          Object.keys(childrenMatrix[0])
-            .filter(
-              i => childrenMatrix.filter(row => isRightAlignedTableValue(row[i])).length === childrenMatrix.length
-            )
-            .map(x => [x, true])
-        )
-      : {}
+    // Memoize rightAlignedCols for performance
+    const rightAlignedCols = useMemo(() => {
+      if (!memoizedChildrenMatrix.length) return {}
+      return Object.fromEntries(
+        Object.keys(memoizedChildrenMatrix[0])
+          .filter(
+            i =>
+              memoizedChildrenMatrix.filter(row => isRightAlignedTableValue(row[i])).length ===
+              memoizedChildrenMatrix.length
+          )
+          .map(x => [x, true])
+      )
+    }, [memoizedChildrenMatrix])
 
     const TableMediaControls = ({ belowTable }) => {
       const hasDownloadLink = config.table.download
@@ -323,7 +370,7 @@ const DataTable = (props: DataTableProps) => {
               viewport={viewport}
               wrapColumns={wrapColumns}
               noData={hasNoData}
-              childrenMatrix={childrenMatrix}
+              childrenMatrix={memoizedChildrenMatrix}
               tableName={config.type}
               caption={caption}
               stickyHeader
@@ -361,6 +408,34 @@ const DataTable = (props: DataTableProps) => {
               }}
               rightAlignedCols={rightAlignedCols}
             />
+
+            {/* Pagination controls for US county-level map tables */}
+            {isCountyMap && totalPages > 1 && (
+              <div
+                className='data-table-pagination'
+                style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '1rem 0' }}
+              >
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  aria-label='Previous page'
+                  style={{ marginRight: '1rem' }}
+                >
+                  Previous
+                </button>
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  aria-label='Next page'
+                  style={{ marginLeft: '1rem' }}
+                >
+                  Next
+                </button>
+              </div>
+            )}
 
             {/* REGION Data Table */}
             {noRelativeRegions &&
