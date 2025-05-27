@@ -415,9 +415,13 @@ export const generateRuntimeLegend = (
 
           result.items.push({
             min,
-            max,
-            color: scale(item)
+            max
           })
+          result.items[result.items.length - 1].color = applyColorToLegend(
+            result.items.length - 1,
+            configObj,
+            result.items
+          )
 
           dataSet.forEach(row => {
             let number = row[columns.primary.name]

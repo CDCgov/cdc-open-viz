@@ -23,7 +23,7 @@ import {
 } from '../../helpers'
 import useGeoClickHandler from '../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../hooks/useApplyTooltipsToGeo'
-import useGenerateRuntimeData from '../../hooks/useGenerateRuntimeData'
+import useGenerateRuntimeData from '../../helpers/generateRuntimeData'
 import { applyLegendToRow } from '../../helpers/applyLegendToRow'
 
 import './worldMap.styles.css'
