@@ -310,34 +310,20 @@ const DataImport = () => {
   const loadDataFromUrl = () => {
     return (
       <>
-        {!config.vegaType && (
-          <label htmlFor='dataset-name' className='col-12 mt-2'>
-            <span>Dataset Name</span>
-            <input
-              id='dataset-name'
-              placeholder='Enter Dataset Name'
-              type='text'
-              aria-label='Enter Dataset Name'
-              value={newDatasetName}
-              className='form-control'
-              onChange={e => setNewDatasetName(e.target.value)}
-            />
-          </label>
-        )}
+        <label htmlFor='dataset-name' className='col-12 mt-2'>
+          <span>Dataset Name</span>
+          <input
+            id='dataset-name'
+            placeholder='Enter Dataset Name'
+            type='text'
+            aria-label='Enter Dataset Name'
+            value={newDatasetName}
+            className='form-control'
+            onChange={e => setNewDatasetName(e.target.value)}
+          />
+        </label>
         <label htmlFor='external-datas' className='col-12 mt-2'>
-          <span>
-            URL{' '}
-            <Tooltip style={{ textTransform: 'none' }}>
-              <Tooltip.Target>
-                <Icon display='question' />
-              </Tooltip.Target>
-              <Tooltip.Content>
-                <p style={{ padding: '0.5rem' }}>
-                  URL data must be fully prepared and not dependant on any Vega transforms
-                </p>
-              </Tooltip.Content>
-            </Tooltip>
-          </span>
+          <span>URL </span>
           <textarea
             id='external-datas'
             className='form-control'
@@ -349,17 +335,15 @@ const DataImport = () => {
             onChange={e => setExternalURL(e.target.value)}
           />
         </label>
-        {!config.vegaType && (
-          <label htmlFor='keep-url' className='mt-1 d-flex keep-url'>
-            <input
-              type='checkbox'
-              id='keep-url'
-              checked={keepURL}
-              onChange={() => changeKeepURL(!keepURL, editingDataset)}
-            />{' '}
-            Always load from URL (normally will only pull once)
-          </label>
-        )}
+        <label htmlFor='keep-url' className='mt-1 d-flex keep-url'>
+          <input
+            type='checkbox'
+            id='keep-url'
+            checked={keepURL}
+            onChange={() => changeKeepURL(!keepURL, editingDataset)}
+          />{' '}
+          Always load from URL (normally will only pull once)
+        </label>
         <div className='d-flex justify-content-end mt-2 mb-3'>
           <button
             className='btn btn-primary px-4'
@@ -728,9 +712,9 @@ const DataImport = () => {
               <>
                 <div className='heading-3'>Update Dataset</div>
                 <Tabs startingTab={0}>
-                  <TabPane title='Update Vega config' icon={<FileUploadIcon className='inline-icon' />}>
+                  <TabPane title='Update with Vega config' icon={<FileUploadIcon className='inline-icon' />}>
                     <div>
-                      <label htmlFor='uploadConfig'>or paste Vega configuration JSON:</label>
+                      <label htmlFor='uploadConfig'>Paste full Vega configuration JSON:</label>
 
                       <textarea
                         id='pasteConfig'
@@ -751,8 +735,63 @@ const DataImport = () => {
                       </div>
                     </div>
                   </TabPane>
-                  <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
-                    {loadDataFromUrl()}
+                  <TabPane title='Update with JSON data' icon={<LinkIcon className='inline-icon' />}>
+                    <div>
+                      To change this chart to use a JSON file as its data source, the file must contain data — an array
+                      of objects — that matches COVE's format, shown in the Data Preview on the right.
+                    </div>
+                    <div>&nbsp;</div>
+                    <div>Upload JSON file:</div>
+                    <div className='data-source-options'>
+                      <div
+                        className={
+                          isDragActive2
+                            ? 'drag-active cdcdataviz-file-selector loaded-file'
+                            : 'cdcdataviz-file-selector loaded-file'
+                        }
+                        {...getRootProps2()}
+                      >
+                        <input {...getInputProps2()} />
+                        {isDragActive2 ? (
+                          <p>Drop file here</p>
+                        ) : (
+                          <p>
+                            <FileUploadIcon /> <span>{config.dataFileName ?? 'Replace data file'}</span>
+                          </p>
+                        )}
+                      </div>
+                      <div className='link link-replace' {...getRootProps2()}>
+                        <input {...getInputProps2()} />
+                        <p>
+                          <span>Replace file</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <label htmlFor='external-datas' className='col-12 mt-2'>
+                      <span>Or connect chart to URL:</span>
+                      <textarea
+                        id='external-datas'
+                        className='form-control'
+                        placeholder='e.g., https://data.cdc.gov/resources/file.json'
+                        aria-label='Load data from external URL'
+                        aria-describedby='load-data'
+                        rows={2}
+                        value={externalURL}
+                        onChange={e => setExternalURL(e.target.value)}
+                      />
+                    </label>
+                    <div className='d-flex justify-content-end mt-2 mb-3'>
+                      <button
+                        className='btn btn-primary px-4'
+                        type='submit'
+                        id='load-data'
+                        disabled={!newDatasetName || !externalURL}
+                        onClick={() => loadData(null, externalURL, editingDataset)}
+                      >
+                        Save & Load
+                      </button>
+                    </div>
                   </TabPane>
                 </Tabs>
               </>
@@ -858,67 +897,6 @@ const DataImport = () => {
       <div className='right-col'>
         <PreviewDataTable />
       </div>
-    </>
-  )
-}
-
-const AddDataset = ({
-  editingDataset,
-  loadDataFromUrl,
-  sharepath,
-  isDragActive,
-  getRootProps,
-  getInputProps,
-  errors,
-  setErrors
-}) => {
-  return (
-    <>
-      {' '}
-      <div className='heading-3'>{editingDataset ? `Editing ${editingDataset}` : 'Add Dataset'}</div>
-      {editingDataset ? (
-        <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
-          {loadDataFromUrl()}
-        </TabPane>
-      ) : (
-        <Tabs startingTab={0}>
-          <TabPane title='Upload File' icon={<FileUploadIcon className='inline-icon' />}>
-            {sharepath && <p className='alert--info'>The share path set for this website is: {sharepath}</p>}
-            <div
-              className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'}
-              {...getRootProps()}
-            >
-              <input {...getInputProps()} />
-              {isDragActive ? (
-                <p>Drop file here</p>
-              ) : (
-                <p>
-                  Drag file to this area, or <span>select a file</span>.
-                </p>
-              )}
-            </div>
-            <p className='footnote'>
-              Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}
-              MB.
-            </p>
-          </TabPane>
-          <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
-            {loadDataFromUrl()}
-          </TabPane>
-        </Tabs>
-      )}
-      {errors &&
-        (Array.isArray(errors)
-          ? errors.map((message, index) => (
-              <div className='error-box slim mt-2' key={`error-${message}`}>
-                <span>{message}</span>{' '}
-                <CloseIcon
-                  className='inline-icon dismiss-error'
-                  onClick={() => setErrors(errors.filter((val, i) => i !== index))}
-                />
-              </div>
-            ))
-          : errors.message)}
     </>
   )
 }

@@ -382,16 +382,18 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
 
 export const loadedVegaConfigData = (config: any) => {
   const seriesKey = config.dataDescription?.seriesKey
-  if (seriesKey && !config.series) {
-    const seriesVals = [...new Set(config.data.map(d => d[seriesKey]))].sort((a, b) => (a > b ? 1 : -1))
-    config.series = seriesVals.map(val => {
-      return {
-        dataKey: val,
-        type: config.vegaType,
-        axis: 'Left',
-        tooltip: true
-      }
-    })
+  if (seriesKey) {
+    if (!config.series) {
+      const seriesVals = [...new Set(config.data.map(d => d[seriesKey]))].sort((a, b) => (a > b ? 1 : -1))
+      config.series = seriesVals.map(val => {
+        return {
+          dataKey: val,
+          type: config.vegaType,
+          axis: 'Left',
+          tooltip: true
+        }
+      })
+    }
     config.data.forEach(d => {
       d[seriesKey] = `${d[seriesKey]}`
     })
