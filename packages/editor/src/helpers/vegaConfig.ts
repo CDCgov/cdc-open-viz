@@ -13,6 +13,9 @@ const CURVE_LOOKUP = {
   basis: 'Curve Basis'
 }
 
+const SUPPORTED_MARKS = ['rect', 'line', 'area', 'shape', 'symbol']
+const COMBO_MARKS = { rect: 'Bar', line: 'Line', area: 'Area Chart' }
+
 export const isVegaConfig = config => {
   return (
     config.scales ||
@@ -22,7 +25,8 @@ export const isVegaConfig = config => {
     config.params ||
     config.transform ||
     config.projection ||
-    config.encoding
+    config.encoding ||
+    config.spec
   )
 }
 
@@ -38,6 +42,12 @@ export const parseVegaConfig = vegaConfig => {
 export const getVegaConfigType = vegaConfig => {
   if (vegaConfig.projections) {
     return 'Map'
+  }
+
+  const comboMarks = getComboMarks(vegaConfig)
+  const typeCount = [...new Set(comboMarks.map(m => m.type))].length
+  if (comboMarks.length > 1 && typeCount > 1) {
+    return 'Combo Chart'
   }
 
   const mainMark = getMainMark(vegaConfig)
@@ -56,9 +66,20 @@ export const getVegaConfigType = vegaConfig => {
 }
 
 const getMainMark = vegaConfig => {
-  const marks = vegaConfig.marks.map(m => (m.type === 'group' && m.marks ? m.marks[0] : m))
-  const mainMarks = marks.filter(m => ['rect', 'line', 'area', 'shape', 'symbol'].includes(m.type))
-  return mainMarks.length ? mainMarks[0] : undefined
+  const allMarks = getMarks(vegaConfig)
+  return allMarks.length ? allMarks[0] : undefined
+}
+
+const getMarks = vegaConfig => {
+  const marks = vegaConfig.marks.map(m =>
+    m.type === 'group' && m.marks ? m.marks.find(mm => SUPPORTED_MARKS.includes(mm.type)) : m
+  )
+  return marks.filter(m => m && SUPPORTED_MARKS.includes(m.type))
+}
+
+const getComboMarks = vegaConfig => {
+  const allMarks = getMarks(vegaConfig)
+  return allMarks.filter(m => Object.keys(COMBO_MARKS).includes(m.type))
 }
 
 const getStack = vegaConfig => {
@@ -102,8 +123,10 @@ export const getVegaData = vegaConfig => {
   const sortDomain = vegaConfig.scales?.find(s => s.domain?.sort)?.domain
   if (sortDomain) {
     const sortField = sortDomain.sort.field || sortDomain.field
-    const sortDirection = sortDomain.sort.order === 'descending' ? -1 : 1
-    data.sort((a, b) => (a[sortField] > b[sortField] ? sortDirection : sortDirection * -1))
+    if (sortField) {
+      const sortDirection = sortDomain.sort.order === 'descending' ? -1 : 1
+      data.sort((a, b) => (a[sortField] > b[sortField] ? sortDirection : sortDirection * -1))
+    }
   }
 
   console.log('------------- vega data -------------')
@@ -122,7 +145,7 @@ const isValidSeriesKey = (seriesKey, vegaData) => {
 
 const getSeriesKey = (vegaConfig, vegaData, xField, yField) => {
   const configType = getVegaConfigType(vegaConfig)
-  if (configType === 'Scatter Plot') return
+  if (['Scatter Plot', 'Combo Chart'].includes(configType)) return
 
   let seriesKey
 
@@ -307,18 +330,35 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
         singleRow: true
       }
 
-      config.series = [
-        {
-          dataKey: yField,
-          type: config.vegaType,
-          axis: 'Left',
-          tooltip: true
-        }
-      ]
+      if (config.vegaType === 'Combo Chart') {
+        const comboMarks = getComboMarks(vegaConfig)
+
+        config.series = comboMarks.map(mark => {
+          const enterEncoder = mark.encode.enter
+          const updateEncoder = mark.encode.update
+          let yField =
+            updateEncoder?.y?.field || enterEncoder?.y?.field || updateEncoder?.y2?.field || enterEncoder?.y2?.field
+          return {
+            dataKey: yField.replace('_end', ''),
+            type: COMBO_MARKS[mark.type],
+            axis: 'Left',
+            tooltip: true
+          }
+        })
+      } else {
+        config.series = [
+          {
+            dataKey: yField,
+            type: config.vegaType,
+            axis: 'Left',
+            tooltip: true
+          }
+        ]
+      }
     }
 
     config.legend = {
-      hide: !seriesKey,
+      hide: !seriesKey && config.vegaType !== 'Combo Chart',
       label: seriesKey,
       position: 'top'
     }
