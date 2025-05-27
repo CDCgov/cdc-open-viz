@@ -23,7 +23,7 @@ import {
 } from '../../helpers'
 import useGeoClickHandler from '../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../hooks/useApplyTooltipsToGeo'
-import useGenerateRuntimeData from '../../helpers/generateRuntimeData'
+import generateRuntimeData from '../../helpers/generateRuntimeData'
 import { applyLegendToRow } from '../../helpers/applyLegendToRow'
 
 import './worldMap.styles.css'
@@ -40,7 +40,7 @@ const WorldMap = () => {
     tooltipId,
     runtimeLegend,
     legendMemo,
-    legendSpecialClassLastMemo
+    legendSpecialClassLastMemo,
   } = useContext(ConfigContext)
 
   const { type, allowMapZoom } = config.general
@@ -48,7 +48,6 @@ const WorldMap = () => {
   const [world, setWorld] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const { generateRuntimeData } = useGenerateRuntimeData(config)
   const dispatch = useContext(MapDispatchContext)
 
   useEffect(() => {
@@ -191,12 +190,7 @@ const WorldMap = () => {
     <ErrorBoundary component='WorldMap'>
       {allowMapZoom ? (
         <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(config)}>
-          <rect
-            height={SVG_HEIGHT}
-            width={SVG_WIDTH}
-            onClick={() => handleReset(config, setRuntimeData)}
-            fill='white'
-          />
+          <rect height={SVG_HEIGHT} width={SVG_WIDTH} onClick={() => handleReset(setRuntimeData)} fill='white' />
           <ZoomableGroup
             zoom={position.zoom}
             center={position.coordinates}
