@@ -41,6 +41,8 @@ import {
   hashObj,
   navigationHandler
 } from './helpers'
+import generateRuntimeLegend from './helpers/generateRuntimeLegend'
+import generateRuntimeData from './helpers/generateRuntimeData'
 
 // Child Components
 import Annotation from './components/Annotation'
@@ -56,8 +58,6 @@ import GoogleMap from './components/GoogleMap'
 
 // hooks
 import useResizeObserver from './hooks/useResizeObserver'
-import useGenerateRuntimeLegend from './hooks/useGenerateRuntimeLegend'
-import useGenerateRuntimeData from './hooks/useGenerateRuntimeData'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { getInitialState, mapReducer } from './store/map.reducer'
 import { RuntimeData } from './types/RuntimeData'
@@ -164,8 +164,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   // hooks
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
-  const { generateRuntimeLegend } = useGenerateRuntimeLegend(legendMemo, legendSpecialClassLastMemo)
-  const { generateRuntimeData } = useGenerateRuntimeData(config)
 
   const reloadURLData = async () => {
     if (config.dataUrl) {
@@ -280,15 +278,25 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
     // Data
     if (hashData !== runtimeData?.fromHash && config.data?.fromColumn) {
+      const isCategoryLegend = config?.legend?.type === 'category'
       const newRuntimeData = generateRuntimeData(
         { ...config, data: configObj.data },
         filters || runtimeFilters,
-        hashData
+        hashData,
+        isCategoryLegend
       )
       setRuntimeData(newRuntimeData)
     } else {
       if (hashLegend !== runtimeLegend?.fromHash && undefined === runtimeData?.init) {
-        const legend = generateRuntimeLegend(config, runtimeData, hashLegend)
+        const legend = generateRuntimeLegend(
+          config,
+          runtimeData,
+          hashLegend,
+          setConfig,
+          runtimeFilters,
+          legendMemo,
+          legendSpecialClassLastMemo
+        )
         setRuntimeLegend(legend)
       }
     }
@@ -296,20 +304,17 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   useEffect(() => {
     const hashLegend = generateRuntimeLegendHash(config, runtimeFilters)
-    const legend = generateRuntimeLegend({ ...config, data: configObj.data }, runtimeData, hashLegend)
+    const legend = generateRuntimeLegend(
+      { ...config, data: configObj.data },
+      runtimeData,
+      hashLegend,
+      setConfig,
+      runtimeFilters,
+      legendMemo,
+      legendSpecialClassLastMemo
+    )
     setRuntimeLegend(legend)
-  }, [
-    runtimeData,
-    config.legend.unified,
-    config.legend.showSpecialClassesLast,
-    config.legend.separateZero,
-    config.general.equalNumberOptIn,
-    config.legend.numberOfItems,
-    config.legend.specialClasses,
-    config.legend.additionalCategories,
-    config,
-    runtimeFilters
-  ])
+  }, [runtimeData, config, runtimeFilters])
 
   useEffect(() => {
     if (!isDashboard) {
