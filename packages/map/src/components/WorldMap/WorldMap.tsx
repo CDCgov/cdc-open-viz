@@ -63,7 +63,7 @@ const WorldMap = () => {
     return <></>
   }
 
-  const handleReset = setRuntimeData => {
+  const handleReset = () => {
     const newRuntimeData = generateRuntimeData(config)
     dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
     dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
@@ -190,7 +190,7 @@ const WorldMap = () => {
     <ErrorBoundary component='WorldMap'>
       {allowMapZoom ? (
         <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(config)}>
-          <rect height={SVG_HEIGHT} width={SVG_WIDTH} onClick={() => handleReset(setRuntimeData)} fill='white' />
+          <rect height={SVG_HEIGHT} width={SVG_WIDTH} onClick={handleReset} fill='white' />
           <ZoomableGroup
             zoom={position.zoom}
             center={position.coordinates}
