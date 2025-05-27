@@ -1,8 +1,9 @@
-import React, { useEffect, useState, memo, useContext } from 'react'
+import React, { useEffect, useState, memo, useContext, useCallback, useMemo } from 'react'
 
 import Papa from 'papaparse'
 import ExternalIcon from '../images/external-link.svg' // TODO: Move to Icon component
 import Icon from '@cdc/core/components/ui/Icon'
+import { FixedSizeList as List } from 'react-window'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendShape from '@cdc/core/components/LegendShape'
@@ -37,83 +38,52 @@ const DataTable = props => {
   const [expanded, setExpanded] = useState(expandDataTable)
   const [sortBy, setSortBy] = useState({ column: 'geo', asc: false })
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [rowsPerPage] = useState(50) // Adjust as needed
   const fileName = `${mapTitle || 'data-table'}.csv`
 
-  // Catch all sorting method used on load by default but also on user click
-  // Having a custom method means we can add in any business logic we want going forward
-  const customSort = (a, b) => {
+  // New state for virtualization
+  const [useVirtualization] = useState(true) // Set to true to enable virtualization
+  const rowHeight = 44 // px, adjust as needed for your table row height
+  const maxVisibleRows = 12 // Number of rows visible in viewport (for height calculation)
+
+  // Memoize customSort for performance
+  const customSort = useCallback((a, b) => {
     const digitRegex = /\d+/
-
     const hasNumber = value => digitRegex.test(value)
-
-    // force null and undefined to the bottom
     a = a === null || a === undefined ? '' : a
     b = b === null || b === undefined ? '' : b
-
-    // convert any strings that are actually numbers to proper data type
     const aNum = Number(a)
-
-    if (!Number.isNaN(aNum)) {
-      a = aNum
-    }
-
+    if (!Number.isNaN(aNum)) a = aNum
     const bNum = Number(b)
-
-    if (!Number.isNaN(bNum)) {
-      b = bNum
-    }
-
-    // remove iso code prefixes
+    if (!Number.isNaN(bNum)) b = bNum
     if (typeof a === 'string') {
       a = a.replace('us-', '')
       a = displayGeoName(a)
     }
-
     if (typeof b === 'string') {
       b = b.replace('us-', '')
       b = displayGeoName(b)
     }
-
-    // force any string values to lowercase
     a = typeof a === 'string' ? a.toLowerCase() : a
     b = typeof b === 'string' ? b.toLowerCase() : b
-
-    // If the string contains a number, remove the text from the value and only sort by the number. Only uses the first number it finds.
     if (typeof a === 'string' && hasNumber(a) === true) {
       a = a.match(digitRegex)[0]
-
       a = Number(a)
     }
-
     if (typeof b === 'string' && hasNumber(b) === true) {
       b = b.match(digitRegex)[0]
-
       b = Number(b)
     }
-
-    // When comparing a number to a string, always send string to bottom
-    if (typeof a === 'number' && typeof b === 'string') {
-      return 1
-    }
-
-    if (typeof b === 'number' && typeof a === 'string') {
-      return -1
-    }
-
-    // Return either 1 or -1 to indicate a sort priority
-    if (a > b) {
-      return 1
-    }
-    if (a < b) {
-      return -1
-    }
-    // returning 0, undefined or any falsey value will use subsequent sorts or
-    // the index as a tiebreaker
+    if (typeof a === 'number' && typeof b === 'string') return 1
+    if (typeof b === 'number' && typeof a === 'string') return -1
+    if (a > b) return 1
+    if (a < b) return -1
     return 0
-  }
+  }, [displayGeoName])
 
-  // Optionally wrap cell with anchor if config defines a navigation url
-  const getCellAnchor = (markup, row) => {
+  // Memoize getCellAnchor for performance
+  const getCellAnchor = useCallback((markup, row) => {
     if (columns.navigate && row[columns.navigate.name]) {
       markup = (
         <span
@@ -121,7 +91,7 @@ const DataTable = props => {
           className='table-link'
           title='Click for more information (Opens in a new window)'
           role='link'
-          tabIndex='0'
+          tabIndex={0}
           onKeyDown={e => {
             if (e.keyCode === 13) {
               navigationHandler(state.general.navigationTarget, row[columns.navigate.name])
@@ -133,9 +103,8 @@ const DataTable = props => {
         </span>
       )
     }
-
     return markup
-  }
+  }, [columns, navigationHandler, state.general.navigationTarget])
 
   const rand = Math.random().toString(16).substr(2, 8)
   const skipId = `btn__${rand}`
@@ -214,20 +183,135 @@ const DataTable = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded])
 
+  // Reset to first page when data changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [rawData?.length])
+
+  // Memoize sorted rows for performance
+  const sortedRows = useMemo(() => {
+    if (!runtimeData) return []
+    return Object.keys(runtimeData)
+      .filter(row => applyLegendToRow(runtimeData[row], state))
+      .sort((a, b) => {
+        const sortVal = customSort(
+          runtimeData[a][state.columns[sortBy.column].name],
+          runtimeData[b][state.columns[sortBy.column].name]
+        )
+        if (!sortBy.asc) return sortVal
+        if (sortVal === 0) return 0
+        if (sortVal < 0) return 1
+        return -1
+      })
+  }, [runtimeData, state, sortBy, applyLegendToRow, customSort])
+
+  // Virtualization threshold: enable virtualization for large datasets
+  const VIRTUALIZATION_THRESHOLD = 200
+  const isVirtualized = sortedRows.length > VIRTUALIZATION_THRESHOLD
+  const ROW_HEIGHT = 48 // px, adjust as needed for your row height
+  const TABLE_HEIGHT = Math.min(12, sortedRows.length) * ROW_HEIGHT // Show up to 12 rows at once
+
+  // Memoize paginated rows for performance
+  const paginatedRows = useMemo(() => {
+    return sortedRows.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+  }, [sortedRows, currentPage, rowsPerPage])
+
+  const totalPages = useMemo(() => Math.ceil(sortedRows.length / rowsPerPage), [sortedRows, rowsPerPage])
+
   if (!state.data) return <Loading />
 
-  const rows = Object.keys(runtimeData)
-    .filter(row => applyLegendToRow(runtimeData[row], state))
-    .sort((a, b) => {
-      const sortVal = customSort(
-        runtimeData[a][state.columns[sortBy.column].name],
-        runtimeData[b][state.columns[sortBy.column].name]
-      )
-      if (!sortBy.asc) return sortVal
-      if (sortVal === 0) return 0
-      if (sortVal < 0) return 1
-      return -1
-    })
+  // Memoized row component for performance
+  const MemoTableRow = memo(({ rowKey }) => {
+    return (
+      <tr role='row'>
+        {Object.keys(columns)
+          .filter(column => columns[column].dataTable === true && columns[column].name)
+          .map(column => {
+            let cellValue
+            if (column === 'geo') {
+              const rowObj = runtimeData[rowKey]
+              const legendColor = applyLegendToRow(rowObj, state)
+              var labelValue
+              if (state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
+                labelValue = displayGeoName(rowKey)
+              } else {
+                labelValue = formatLegendLocation(rowKey)
+              }
+              labelValue = getCellAnchor(labelValue, rowObj)
+              cellValue = (
+                <>
+                  <LegendShape fill={legendColor[0]} />
+                  {labelValue}
+                </>
+              )
+            } else {
+              cellValue = displayDataAsText(runtimeData[rowKey][state.columns[column].name], column, state)
+            }
+            return (
+              <td
+                tabIndex='0'
+                role='gridcell'
+                onClick={e =>
+                  state.general.type === 'bubble' && state.general.allowMapZoom && state.general.geoType === 'world'
+                    ? dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: rowKey })
+                    : true
+                }
+                key={column}
+              >
+                {cellValue}
+              </td>
+            )
+          })}
+      </tr>
+    )
+  })
+
+  // Virtualized row renderer for react-window
+  const VirtualizedRow = memo(({ index, style, data }) => {
+    const rowKey = data[index]
+    return (
+      <tr role='row' style={style}>
+        {Object.keys(columns)
+          .filter(column => columns[column].dataTable === true && columns[column].name)
+          .map(column => {
+            let cellValue
+            if (column === 'geo') {
+              const rowObj = runtimeData[rowKey]
+              const legendColor = applyLegendToRow(rowObj, state)
+              var labelValue
+              if (state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
+                labelValue = displayGeoName(rowKey)
+              } else {
+                labelValue = formatLegendLocation(rowKey)
+              }
+              labelValue = getCellAnchor(labelValue, rowObj)
+              cellValue = (
+                <>
+                  <LegendShape fill={legendColor[0]} />
+                  {labelValue}
+                </>
+              )
+            } else {
+              cellValue = displayDataAsText(runtimeData[rowKey][state.columns[column].name], column, state)
+            }
+            return (
+              <td
+                tabIndex='0'
+                role='gridcell'
+                onClick={e =>
+                  state.general.type === 'bubble' && state.general.allowMapZoom && state.general.geoType === 'world'
+                    ? dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: rowKey })
+                    : true
+                }
+                key={column}
+              >
+                {cellValue}
+              </td>
+            )
+          })}
+      </tr>
+    )
+  })
 
   return (
     <ErrorBoundary component='DataTable'>
@@ -316,58 +400,49 @@ const DataTable = props => {
               </tr>
             </thead>
             <tbody>
-              {rows.map(row => {
-                return (
-                  <tr role='row'>
-                    {Object.keys(columns)
-                      .filter(column => columns[column].dataTable === true && columns[column].name)
-                      .map(column => {
-                        let cellValue
-
-                        if (column === 'geo') {
-                          const rowObj = runtimeData[row]
-                          const legendColor = applyLegendToRow(rowObj, state)
-
-                          var labelValue
-                          if (state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
-                            labelValue = displayGeoName(row)
-                          } else {
-                            labelValue = formatLegendLocation(row)
-                          }
-
-                          labelValue = getCellAnchor(labelValue, rowObj)
-
-                          cellValue = (
-                            <>
-                              <LegendShape fill={legendColor[0]} />
-                              {labelValue}
-                            </>
-                          )
-                        } else {
-                          cellValue = displayDataAsText(runtimeData[row][state.columns[column].name], column, state)
-                        }
-
-                        return (
-                          <td
-                            tabIndex='0'
-                            role='gridcell'
-                            onClick={e =>
-                              state.general.type === 'bubble' &&
-                              state.general.allowMapZoom &&
-                              state.general.geoType === 'world'
-                                ? dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: row })
-                                : true
-                            }
-                          >
-                            {cellValue}
-                          </td>
-                        )
-                      })}
-                  </tr>
-                )
-              })}
+              {isVirtualized ? (
+                <List
+                  height={TABLE_HEIGHT}
+                  itemCount={sortedRows.length}
+                  itemSize={ROW_HEIGHT}
+                  width={'100%'}
+                  itemData={sortedRows}
+                  outerElementType={React.forwardRef((props, ref) => <tbody ref={ref} {...props} />)}
+                  innerElementType={React.forwardRef((props, ref) => <React.Fragment ref={ref} {...props} />)}
+                >
+                  {VirtualizedRow}
+                </List>
+              ) : (
+                paginatedRows.map(row => (
+                  <MemoTableRow key={row} rowKey={row} />
+                ))
+              )}
             </tbody>
           </table>
+          {/* Pagination controls */}
+          {!isVirtualized && totalPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '1rem 0' }}>
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                aria-label='Previous page'
+                style={{ marginRight: '1rem' }}
+              >
+                Previous
+              </button>
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                aria-label='Next page'
+                style={{ marginLeft: '1rem' }}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </section>
       {state.table.showDownloadLinkBelow && <TableMediaControls belowTable={true} />}
