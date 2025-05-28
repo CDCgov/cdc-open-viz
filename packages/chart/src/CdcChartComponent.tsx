@@ -514,7 +514,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = (label: Label): void => {
-    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && config.visualizationType !== 'Forecasting') {
+    if (
+      seriesHighlight.length + 1 === config.runtime.seriesKeys.length &&
+      config.visualizationType !== 'Forecasting' &&
+      !seriesHighlight.includes(label.datum)
+    ) {
       return handleShowAll()
     }
 
