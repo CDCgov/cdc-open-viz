@@ -53,7 +53,6 @@ export const Legend_Tests: Story = {
     const coolGray90 = '#dfe1e2'
     const legendSelection = 'section > ul > li:nth-child(3) > span.legend-item.me-2'
     const legendTextSelection = 'section > ul > li:nth-child(3) > span:nth-child(2)'
-    const unifiedLegendCheckbox = ''
 
     // Wait for the component to render fully
     await new Promise(resolve => setTimeout(resolve, 2000))
