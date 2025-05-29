@@ -1,5 +1,6 @@
 import { useContext } from 'react'
 // Local imports
+import parse from 'html-react-parser'
 import ConfigContext from '../ConfigContext'
 import { type ChartContext } from '../types/ChartContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
@@ -579,7 +580,7 @@ export const useTooltip = props => {
 
     return (
       <li style={style} className='tooltip-body'>
-        {displayText}
+        {parse(displayText)}
       </li>
     )
   }
