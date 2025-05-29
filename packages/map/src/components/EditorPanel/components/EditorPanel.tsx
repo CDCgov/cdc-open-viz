@@ -2236,7 +2236,7 @@ const EditorPanel = () => {
                       checked={legend.singleColumn}
                       onChange={event => {
                         const _newConfig = _.cloneDeep(config)
-                        _newConfig.legend.singleColumn = !event.target.checked
+                        _newConfig.legend.singleColumn = event.target.checked
                         _newConfig.legend.singleRow = false
                         _newConfig.legend.verticalSorted = false
 
@@ -2253,7 +2253,7 @@ const EditorPanel = () => {
                       checked={legend.singleRow}
                       onChange={event => {
                         const _newConfig = _.cloneDeep(config)
-                        _newConfig.legend.singleRow = !event.target.checked
+                        _newConfig.legend.singleRow = event.target.checked
                         _newConfig.legend.singleColumn = false
                         _newConfig.legend.verticalSorted = false
 
