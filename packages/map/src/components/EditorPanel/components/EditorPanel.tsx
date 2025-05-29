@@ -2333,33 +2333,6 @@ const EditorPanel = () => {
                   </label>
                 )}
 
-                {/* Temp Checkbox */}
-                {config.legend.type === 'equalnumber' && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={config.general.equalNumberOptIn}
-                      onChange={event => {
-                        const _newConfig = _.clone(config)
-                        _newConfig.general.equalNumberOptIn = event.target.checked
-                        setConfig(_newConfig)
-                      }}
-                    />
-                    <span className='edit-label column-heading'>Use new quantile legend</span>
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon
-                          display='question'
-                          style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                        />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>This prevents numbers from being used in more than one category (ie. 0-1, 1-2, 2-3) </p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  </label>
-                )}
-
                 {'category' !== legend.type && (
                   <Select
                     label={
