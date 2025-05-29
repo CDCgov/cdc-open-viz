@@ -740,10 +740,14 @@
   border: 2px solid red;
 }
 
+// Only frontend styles are applied in WCMS/TP
+// This helps match those styles when viewing in the editor
 .modal.cdc-cove-editor *:focus-visible,
 .cdc-open-viz-module *:focus-visible {
-  outline: inherit !important;
-  outline-offset: 3px !important;
+  outline-width: inherit !important;
+  outline-style: inherit !important;
+  outline-color: inherit !important;
+  outline-offset: inherit !important;
 }
 
 // Only frontend styles are applied in WCMS/TP
