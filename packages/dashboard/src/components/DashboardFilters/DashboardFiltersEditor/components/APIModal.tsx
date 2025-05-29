@@ -5,20 +5,11 @@ import Icon from '@cdc/core/components/ui/Icon'
 
 type APIModalProps = {
   filter: SharedFilter
-  isSubgroup: boolean
   isNestedDropdown: boolean
-  textSelector: string
-  valueSelector: string
   updateAPIFilter: Function
 }
 
-const APIModal: React.FC<APIModalProps> = ({
-  filter,
-  isNestedDropdown,
-  updateAPIFilter,
-  valueSelector,
-  textSelector
-}) => {
+const APIModal: React.FC<APIModalProps> = ({ filter, isNestedDropdown, updateAPIFilter }) => {
   const [APIEndpoint, setAPIEndpoint] = useState(filter.apiFilter?.apiEndpoint || '')
   const [APIValueSelector, setAPIValueSelector] = useState(filter.apiFilter?.valueSelector || '')
   const [APITextSelector, setAPITextSelector] = useState(filter.apiFilter?.textSelector || '')
@@ -118,7 +109,15 @@ const APIModal: React.FC<APIModalProps> = ({
       <div className='d-flex justify-content-end mt-2'>
         <button
           className='btn btn-primary mt-2'
-          onClick={() => updateAPIFilter(APIEndpoint, APIValueSelector, APITextSelector, valueSelector, textSelector)}
+          onClick={() =>
+            updateAPIFilter(
+              APIEndpoint,
+              APIValueSelector,
+              APITextSelector,
+              APISubGroupValueSelector,
+              APISubGroupTextSelector
+            )
+          }
         >
           Save
         </button>
