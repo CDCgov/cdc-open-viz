@@ -395,7 +395,7 @@ export const generateRuntimeLegend = (
             }
 
             if (index + 1 === breaks.length) {
-              max = domainNums[1]
+              max = domainNums[domainNums.length - 1]
             }
 
             return max
