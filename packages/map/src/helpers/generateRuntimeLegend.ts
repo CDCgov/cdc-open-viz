@@ -73,46 +73,38 @@ export const generateRuntimeLegend = (
 
     // Unified will base the legend off ALL the data maps received. Otherwise, it will use
     let dataSet = legend.unified ? data : Object?.values(runtimeData)
+    const domainNums = Array.from(new Set(data.map(item => item[configObj.columns.primary.name])))
+      .filter(d => typeof d === 'number' && !isNaN(d))
+      .sort((a, b) => a - b)
+
     let specialClasses = 0
     let specialClassesHash = {}
 
-    // Special classes
     if (legend.specialClasses.length) {
       if (typeof legend.specialClasses[0] === 'object') {
         legend.specialClasses.forEach(specialClass => {
-          dataSet = dataSet.filter(row => {
-            const val = String(row[specialClass.key])
-
-            if (specialClass.value === val) {
-              if (undefined === specialClassesHash[val]) {
-                specialClassesHash[val] = true
-
-                result.items.push({
-                  special: true,
-                  value: val,
-                  label: specialClass.label
-                })
-
-                result.items[result.items.length - 1].color = applyColorToLegend(
-                  result.items.length - 1,
-                  configObj,
-                  result.items
-                )
-
-                specialClasses += 1
-              }
-
-              let specialColor: number
-
-              // color the configObj if val is in row
-              specialColor = result.items.findIndex(p => p.value === val)
-
+          const val = String(specialClass.value)
+          if (undefined === specialClassesHash[val]) {
+            specialClassesHash[val] = true
+            result.items.push({
+              special: true,
+              value: val,
+              label: specialClass.label
+            })
+            result.items[result.items.length - 1].color = applyColorToLegend(
+              result.items.length - 1,
+              configObj,
+              result.items
+            )
+            specialClasses += 1
+          }
+          // Optionally, still map any rows that match this special class
+          dataSet.forEach(row => {
+            const rowVal = String(row[specialClass.key])
+            if (rowVal === val) {
+              let specialColor = result.items.findIndex(p => p.value === val)
               newLegendMemo.set(hashObj(row), specialColor)
-
-              return false
             }
-
-            return true
           })
         })
       } else {
@@ -336,11 +328,6 @@ export const generateRuntimeLegend = (
           numberOfRows -= chunkAmt
         }
       } else {
-        // get nums
-        let domainNums = new Set(dataSet.map(item => item[columns.primary.name]))
-
-        domainNums = d3.extent(domainNums)
-
         let colors = colorPalettes[configObj.color]
         let colorRange = colors.slice(0, legend.numberOfItems)
 
@@ -368,16 +355,20 @@ export const generateRuntimeLegend = (
           .range(colorRange) // set range to our colors array
 
         const breaks = getBreaks(scale)
+        let cachedBreaks = null
+        if (!cachedBreaks) {
+          cachedBreaks = breaks
+        }
 
         // if separating zero force it into breaks
-        if (breaks[0] !== 0) {
-          breaks.unshift(0)
+        if (cachedBreaks[0] !== 0) {
+          cachedBreaks.unshift(0)
         }
 
         // eslint-disable-next-line array-callback-return
-        breaks.map((item, index) => {
+        cachedBreaks.map((item, index) => {
           const setMin = index => {
-            let min = breaks[index]
+            let min = cachedBreaks[index]
 
             // if first break is a seperated zero, min is zero
             if (index === 0 && legend.separateZero) {
