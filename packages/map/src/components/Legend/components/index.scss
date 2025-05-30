@@ -70,6 +70,10 @@
     .legend-container {
       position: relative;
 
+      .legend-container__li--disabled {
+        opacity: 0.4;
+      }
+
       .tspan {
         font-size: var(--legend-item-font-size) !important;
       }
