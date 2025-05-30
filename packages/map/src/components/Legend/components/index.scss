@@ -97,7 +97,7 @@
       }
       .legend-container__ul:not(.single-row) {
         list-style: none;
-        display: grid;
+        display: grid !important;
         grid-template-columns: 1fr;
 
         @include breakpoint(md) {
@@ -117,15 +117,24 @@
           width: 100%;
         }
         .legend-container__li {
-          flex-shrink: 0;
-          display: inline-block;
+          display: flex;
+          align-items: center;
+          gap: 0.5em;
+          width: 100%;
           padding-right: 1em;
           vertical-align: middle;
           transition: 0.1s opacity;
-          display: flex;
           cursor: pointer;
-          white-space: wrap;
           flex-grow: 1;
+          white-space: nowrap; // Prevents label wrapping
+
+          .legend-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+          }
+
           &:last-child {
             margin-bottom: 0;
           }
