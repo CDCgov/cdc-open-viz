@@ -190,7 +190,7 @@ export const BarChartVertical = () => {
                     ? barBorderWidth
                     : 0
 
-                  const barDefaultLabel = isSuppressed || !config.labels ? '' : yAxisValue
+                  const barDefaultLabel = isSuppressed || absentDataLabel || !config.labels ? '' : yAxisValue
                   const barY = getBarY(defaultBarY, yScale(scaleVal))
                   const displaylollipopShape = testZeroValue(bar.value) ? 'none' : 'block'
                   const getBarBackgroundColor = (barColor: string, filteredOutColor?: string): string => {
