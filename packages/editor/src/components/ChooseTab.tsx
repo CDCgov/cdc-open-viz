@@ -28,7 +28,13 @@ import EpiChartIcon from '@cdc/core/assets/icon-epi-chart.svg'
 import TableIcon from '@cdc/core/assets/icon-table.svg'
 import Icon from '@cdc/core/components/ui/Icon'
 
-import { convertVegaConfig, getVegaConfigType, isVegaConfig, parseVegaConfig } from '@cdc/editor/src/helpers/vegaConfig'
+import {
+  convertVegaConfig,
+  getVegaConfigType,
+  getVegaErrors,
+  isVegaConfig,
+  parseVegaConfig
+} from '@cdc/editor/src/helpers/vegaConfig'
 
 interface ButtonProps {
   icon: React.ReactElement
@@ -59,29 +65,36 @@ const ChooseTab: React.FC = (): JSX.Element => {
   }
 
   const importConfig = text => {
-    //try {
-    const vegaConfig = parseVegaConfig(JSON.parse(text))
-    const configType = getVegaConfigType(vegaConfig)
-    const configSubType = configType === 'Map' ? 'United States (State- or County-Level)' : configType
-    const button = buttons.find(b => b.label === configSubType)
-    const coveConfig = generateNewConfig(button)
-    const newConfig = convertVegaConfig(configType, vegaConfig, coveConfig)
-    let newConfig = JSON.parse(text)
+    let newConfig
+    try {
+      newConfig = JSON.parse(text)
+    } catch (e) {
+      alert('Invalid JSON')
+      throw new Error()
+    }
+
     const isVega = isVegaConfig(newConfig)
     if (isVega) {
-      const vegaConfig = parseVegaConfig(newConfig)
-      const configType = getVegaConfigType(vegaConfig)
-      const configSubType = configType === 'Map' ? 'United States (State- or County-Level)' : configType
-      const button = buttons.find(b => b.label === configSubType)
-      const coveConfig = generateNewConfig(button)
-      newConfig = convertVegaConfig(configType, vegaConfig, coveConfig)
+      newConfig = importVegaConfig(newConfig)
     }
 
     dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
     dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: isVega && newConfig.data?.length ? 2 : 1 })
-    //} catch (e) {
-    //  alert('Invalid JSON')
-    //}
+  }
+
+  const importVegaConfig = newConfig => {
+    const vegaConfig = parseVegaConfig(newConfig)
+    const vegaErrors = getVegaErrors(newConfig, vegaConfig)
+    if (vegaErrors.length) {
+      const errorText = vegaErrors.join('\n\n')
+      alert(errorText)
+      throw new Error(errorText)
+    }
+    const configType = getVegaConfigType(vegaConfig)
+    const configSubType = configType === 'Map' ? 'United States (State- or County-Level)' : configType
+    const button = buttons.find(b => b.label === configSubType)
+    const coveConfig = generateNewConfig(button)
+    return convertVegaConfig(configType, vegaConfig, coveConfig)
   }
 
   const generateNewConfig = props => {
