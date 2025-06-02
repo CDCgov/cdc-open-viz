@@ -617,7 +617,7 @@ const CountyMap = () => {
                 ? applyLegendToRow(data[key], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
                 : false
             if (legendValues) {
-              if (legendValues?.[0] === '#000000') return
+              if (legendValues?.[0] === '#000000' || legendValues?.[0] === DEFAULT_MAP_BACKGROUND) return
               const shapeType = config.visual.cityStyle.toLowerCase()
               const shapeProperties = createShapeProperties(shapeType, pixelCoords, legendValues, config, geoRadius)
               if (shapeProperties) {
