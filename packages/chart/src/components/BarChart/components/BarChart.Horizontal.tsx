@@ -132,7 +132,7 @@ export const BarChartHorizontal = () => {
 
                   const barPosition = !isPositiveBar ? 'below' : 'above'
 
-                  const barDefaultLabel = !config.yAxis.displayNumbersOnBar ? '' : yAxisValue
+                  const barDefaultLabel = !config.yAxis.displayNumbersOnBar || absentDataLabel ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
                   const textWidth = getTextWidth(barDefaultLabel)
