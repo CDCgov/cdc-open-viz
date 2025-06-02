@@ -30,6 +30,25 @@ export const isVegaConfig = config => {
   )
 }
 
+export const getVegaErrors = (vegaOrVegaLiteConfig, vegaConfig) => {
+  const errors = []
+
+  if (vegaOrVegaLiteConfig.repeat || vegaOrVegaLiteConfig.spec) {
+    errors.push('The Vega importer does not support the repeat/spec operator.')
+  }
+
+  const configType = getVegaConfigType(vegaConfig)
+  if (!configType) {
+    errors.push('The Vega importer could not find a COVE chart type that matches the Vega chart.')
+  }
+
+  if (errors.length) {
+    errors.push('Reach out to the COVE team if you think this Vega config should be supported.')
+  }
+
+  return errors
+}
+
 export const parseVegaConfig = vegaConfig => {
   try {
     vegaConfig = vegaLite.compile(vegaConfig).spec
@@ -57,17 +76,23 @@ export const getVegaConfigType = vegaConfig => {
 
   if (mainMark.type === 'line') {
     return 'Line'
+  } else if (mainMark.type === 'rect') {
+    return 'Bar'
   } else if (mainMark.type === 'area') {
     return 'Area Chart'
   } else if (mainMark.type === 'symbol') {
     return 'Scatter Plot'
   }
-  return 'Bar'
 }
 
 const getMainMark = vegaConfig => {
-  const allMarks = getMarks(vegaConfig)
-  return allMarks.length ? allMarks[0] : undefined
+  let allMarks = getMarks(vegaConfig)
+  if (!allMarks.length) return
+  if (allMarks.length === 1) return allMarks[0]
+  const dataSizes = Object.fromEntries(
+    allMarks.map(mark => [mark.from?.data, getVegaData(vegaConfig, mark.from?.data).length])
+  )
+  return allMarks.sort((a, b) => (dataSizes[a.from?.data] < dataSizes[b.from?.data] ? 1 : -1))[0]
 }
 
 const getMarks = vegaConfig => {
@@ -102,12 +127,48 @@ const getMaxGroupSize = (data, groupBy) => {
   return Math.max(...Object.values(getGroupedData(data, groupBy)).map(d => d.length))
 }
 
-export const getVegaData = vegaConfig => {
+const mergeByKeys = (a1, a2, k1, k2) =>
+  a1.map(itm => ({
+    ...a2.find(item => item[k2] === itm[k1] && item),
+    ...itm
+  }))
+
+const getVegaData = (vegaConfig, name) => {
+  if (!name) return []
+  const view = new vega.View(vega.parse(vegaConfig)).run()
+  try {
+    return view.data(name)
+  } catch (error) {
+    return []
+  }
+}
+
+export const convertVegaData = vegaConfig => {
+  const marks = getMarks(vegaConfig)
   const mainMark = getMainMark(vegaConfig)
   const groupMark = getGroupMark(vegaConfig)
-  const name = groupMark?.from?.facet?.data || mainMark.from.data
-  const view = new vega.View(vega.parse(vegaConfig)).run()
-  const data = view.data(name)
+  const facetName = groupMark?.from?.facet?.data
+  const name = facetName || mainMark.from.data
+  let data = getVegaData(vegaConfig, name)
+
+  if (!facetName) {
+    const otherNames = [...new Set(getMarks(vegaConfig).map(m => m.from?.data))].filter(n => n)
+    _.difference(otherNames, [name]).forEach(on => {
+      let mergedData
+      const otherData = getVegaData(vegaConfig, on)
+      const keys1 = Object.keys(data[0]).filter(k => new Set(data.map(d => d[k])).size === data.length)
+      const keys2 = Object.keys(otherData[0]).filter(k => new Set(otherData.map(d => d[k])).size === data.length)
+      keys1.forEach(k1 => {
+        keys2.forEach(k2 => {
+          mergedData = mergeByKeys(data, otherData, k1, k2)
+          if (mergedData.filter(d => d.hasOwnProperty(k1) && d.hasOwnProperty(k2)).length === data.length) {
+            data = mergedData
+          }
+        })
+      })
+    })
+  }
+
   const keysToRemove = getKeysToRemove(vegaConfig, data)
   data.forEach(d => {
     keysToRemove.forEach(k => delete d[k])
@@ -122,7 +183,9 @@ export const getVegaData = vegaConfig => {
   })
   const sortDomain = vegaConfig.scales?.find(s => s.domain?.sort)?.domain
   if (sortDomain) {
-    const sortField = sortDomain.sort.field || sortDomain.field
+    const keys = Object.keys(data[0])
+    const sortField =
+      (sortDomain.sort.field && keys.includes(sortDomain.sort.field) ? sortDomain.sort.field : null) || sortDomain.field
     if (sortField) {
       const sortDirection = sortDomain.sort.order === 'descending' ? -1 : 1
       data.sort((a, b) => (a[sortField] > b[sortField] ? sortDirection : sortDirection * -1))
@@ -138,12 +201,13 @@ const getGroupMark = vegaConfig => {
   return vegaConfig.marks.find(m => m.type === 'group')
 }
 
-const isValidSeriesKey = (seriesKey, vegaData) => {
-  const seriesVals = [...new Set(vegaData.map(d => d[seriesKey]))]
-  return seriesVals.length > 1 && seriesVals.length <= 10
+const isValidSeriesKey = (seriesKey, data) => {
+  const seriesVals = [...new Set(data.map(d => d[seriesKey]))]
+  const maxGroupSize = getMaxGroupSize(data, [seriesKey])
+  return seriesVals.length > 1 && seriesVals.length <= 10 && maxGroupSize > 1
 }
 
-const getSeriesKey = (vegaConfig, vegaData, xField, yField) => {
+const getSeriesKey = (vegaConfig, data, xField, yField) => {
   const configType = getVegaConfigType(vegaConfig)
   if (['Scatter Plot', 'Combo Chart'].includes(configType)) return
 
@@ -161,19 +225,19 @@ const getSeriesKey = (vegaConfig, vegaData, xField, yField) => {
     enterEncoder?.shape?.field ||
     updateEncoder?.size?.field ||
     enterEncoder?.size?.field
-  if (isValidSeriesKey(seriesKey, vegaData)) return seriesKey
+  if (isValidSeriesKey(seriesKey, data)) return seriesKey
 
   const groupMark = getGroupMark(vegaConfig)
   seriesKey = groupMark?.from?.facet?.groupby
-  if (isValidSeriesKey(seriesKey, vegaData)) return seriesKey
+  if (isValidSeriesKey(seriesKey, data)) return seriesKey
 
   const stack = getStack(vegaConfig)
   if (stack) {
     const groupBy = _.difference(stack.groupby, [xField, yField])
-    if (getMaxGroupSize(vegaData, groupBy) > 1) {
-      let possibleKeys = _.difference(Object.keys(vegaData[0]), [xField, yField])
-      const groupSizes = Object.fromEntries(possibleKeys.map(k => [k, getMaxGroupSize(vegaData, [...groupBy, ...[k]])]))
-      possibleKeys = possibleKeys.filter(k => groupSizes[k] > 1 && isValidSeriesKey(k, vegaData))
+    if (getMaxGroupSize(data, groupBy) > 1) {
+      let possibleKeys = _.difference(Object.keys(data[0]), [xField, yField])
+      const groupSizes = Object.fromEntries(possibleKeys.map(k => [k, getMaxGroupSize(data, [...groupBy, ...[k]])]))
+      possibleKeys = possibleKeys.filter(k => groupSizes[k] > 1 && isValidSeriesKey(k, data))
       if (possibleKeys.length) {
         return possibleKeys.sort((a, b) => (groupSizes[a] > groupSizes[b] ? 1 : -1))[0]
       }
@@ -195,8 +259,8 @@ const getKeysToRemove = (vegaConfig, data) => {
   return keysToRemove
 }
 
-const getXDateFormat = (xField, vegaData) => {
-  const str = vegaData[0][xField].toString()
+const getXDateFormat = (xField, data) => {
+  const str = data[0][xField].toString()
   if (str.match(/\d{4}\-\d{2}\-\d{2}/)) {
     return '%Y-%m-%d'
   } else if (str.match(/\d{2}\-\d{2}\-\d{4}/)) {
@@ -206,12 +270,12 @@ const getXDateFormat = (xField, vegaData) => {
   }
 }
 
-const getGeoName = (vegaData: { [key: string]: any }[]) => {
-  const keys = Object.keys(vegaData[0])
+const getGeoName = (data: { [key: string]: any }[]) => {
+  const keys = Object.keys(data[0])
   const lowerStates = states.map(s => s.toLowerCase())
-  for (let i = 0; i < vegaData.length; i++) {
+  for (let i = 0; i < data.length; i++) {
     for (let j = 0; j < keys.length; j++) {
-      if (lowerStates.includes(`${vegaData[i][keys[j]]}`.toLowerCase())) {
+      if (lowerStates.includes(`${data[i][keys[j]]}`.toLowerCase())) {
         return keys[j]
       }
     }
@@ -221,7 +285,7 @@ const getGeoName = (vegaData: { [key: string]: any }[]) => {
 export const convertVegaConfig = (configType: string, vegaConfig: any, config: any) => {
   delete config.newViz
 
-  const vegaData = getVegaData(vegaConfig)
+  const data = convertVegaData(vegaConfig)
 
   config.vegaType = configType
 
@@ -234,7 +298,7 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
   config.showTitle = config.title ? true : false
 
   if (config.vegaType === 'Map') {
-    const geoName = getGeoName(vegaData)
+    const geoName = getGeoName(data)
     const colorData = getMainMark(vegaConfig).encode.update.fill
     const colorLabel = vegaConfig.legends[0].title
     const vegaColorScale = vegaConfig.scales.find(s => s.name === colorData.scale)
@@ -274,9 +338,19 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
     const enterEncoder = mainMark.encode.enter
     const updateEncoder = mainMark.encode.update
     let xField =
-      updateEncoder?.x?.field || enterEncoder?.x?.field || updateEncoder?.x2?.field || enterEncoder?.x2?.field
+      updateEncoder?.x?.field ||
+      enterEncoder?.x?.field ||
+      updateEncoder?.x2?.field ||
+      enterEncoder?.x2?.field ||
+      updateEncoder?.xc?.field ||
+      enterEncoder?.xc?.field
     let yField =
-      updateEncoder?.y?.field || enterEncoder?.y?.field || updateEncoder?.y2?.field || enterEncoder?.y2?.field
+      updateEncoder?.y?.field ||
+      enterEncoder?.y?.field ||
+      updateEncoder?.y2?.field ||
+      enterEncoder?.y2?.field ||
+      updateEncoder?.yc?.field ||
+      enterEncoder?.yc?.field
 
     const leftAxis = vegaConfig.axes.sort((a, b) => (a.grid ? 1 : -1)).find(a => a.orient === 'left')
     const bottomAxis = vegaConfig.axes.sort((a, b) => (a.grid ? 1 : -1)).find(a => a.orient === 'bottom')
@@ -292,9 +366,9 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
 
     yField = stackField || yField
 
-    const seriesKey = getSeriesKey(vegaConfig, vegaData, xField, yField)
+    const seriesKey = getSeriesKey(vegaConfig, data, xField, yField)
 
-    const xDateFormat = getXDateFormat(xField, vegaData)
+    const xDateFormat = getXDateFormat(xField, data)
     config.xAxis = config.xAxis || {}
     config.xAxis.dataKey = xField
     config.xAxis.label = isHorizontalBar ? leftAxis?.title : bottomAxis?.title
@@ -307,13 +381,19 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
       config.xAxis.dateDisplayFormat = '%b. %Y'
       config.xAxis.showYearsOnce = true
       config.xAxis.label = ''
+
+      config.tooltips = config.tooltips || {}
+      config.tooltips.dateDisplayFormat = '%B %-d, %Y'
+
+      config.table = config.table || {}
+      config.table.dateDisplayFormat = '%B %-d, %Y'
     }
 
     config.yAxis = config.yAxis || {}
     config.yAxis.label = isHorizontalBar ? bottomAxis?.title : leftAxis?.title
 
     if (seriesKey) {
-      config.visualizationSubType = stack && getMaxGroupSize(vegaData, stack.groupby) > 1 ? 'stacked' : ''
+      config.visualizationSubType = stack && getMaxGroupSize(data, stack.groupby) > 1 ? 'stacked' : ''
 
       config.dataDescription = {
         horizontal: false,
@@ -367,10 +447,21 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
     if (config.vegaType == 'Area Chart' && interpolateValue) {
       config.stackedAreaChartLineType = CURVE_LOOKUP[interpolateValue]
     }
+
+    Object.assign(config.yAxis, {
+      size: 60,
+      gridLines: true,
+      hideAxis: !isHorizontalBar,
+      hideTicks: true
+    })
+    Object.assign(config, {
+      isolatedDotsSameSize: true,
+      barThickness: 0.8
+    })
   }
 
-  if (vegaData) {
-    config.data = vegaData
+  if (data) {
+    config.data = data
     config = loadedVegaConfigData(config)
   }
 
