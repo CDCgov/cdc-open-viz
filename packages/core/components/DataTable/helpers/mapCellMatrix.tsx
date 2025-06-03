@@ -10,15 +10,12 @@ type MapRowsProps = DataTableProps & {
   rows: string[]
 }
 
-const geoSpecialTypes = new Set(['single-state', 'us-county'])
 const getGeoLabel = (config, row, formatLegendLocation, displayGeoName) => {
   const { geoType, type } = config.general
   let labelValue
-  if (!geoSpecialTypes.has(geoType) || type === 'us-geocode') {
+  if (!['single-state', 'us-county'].includes(geoType) || type === 'us-geocode') {
     labelValue = displayGeoName(row)
-    if (typeof labelValue === 'string' && labelValue.startsWith('region')) {
-      labelValue = labelValue.charAt(0).toUpperCase() + labelValue.slice(1)
-    }
+    labelValue = String(labelValue).startsWith('region') ? _.capitalize(labelValue) : labelValue
   } else {
     labelValue = formatLegendLocation(row)
   }
@@ -43,32 +40,24 @@ const getDataValue = (config, rowData, column) => {
 }
 
 export const getMapRowData = (
-  rows,
-  columns,
-  config,
-  formatLegendLocation,
-  runtimeData,
-  displayGeoName,
-  filterColumns
+  rows: string[],
+  columns: Record<string, { label; name?; dataTable }>,
+  config: Record<string, Object>,
+  formatLegendLocation: (row: string) => string,
+  runtimeData: Record<string, Object>,
+  displayGeoName: (row: string) => string,
+  filterColumns: string[]
 ) => {
-  // Precompute columns to include and their labels
-  const filterColSet = new Set(filterColumns)
-  const dataTableCols = Object.keys(columns).filter(
-    column => columns[column].dataTable === true && columns[column].name
-  )
-  const allColumns = [...filterColumns, ...dataTableCols]
-  const columnLabels = {}
-  allColumns.forEach(column => {
-    columnLabels[column] = columns[column]?.label || columns[column]?.name || column
-  })
-
-  return rows.map(row => {
+  return rows.map((row: string) => {
     const dataRow = {}
-    allColumns.forEach(column => {
-      const label = columnLabels[column]
+    ;[
+      ...filterColumns,
+      ...Object.keys(columns).filter(column => columns[column].dataTable === true && columns[column].name)
+    ].map(column => {
+      const label = columns[column]?.label || columns[column]?.name || column
       if (column === 'geo') {
         dataRow[label] = getGeoLabel(config, row, formatLegendLocation, displayGeoName)
-      } else if (filterColSet.has(column)) {
+      } else if (filterColumns.includes(column)) {
         dataRow[label] = runtimeData[row][column]
       } else {
         const dataValue = getDataValue(config, runtimeData[row], column)
