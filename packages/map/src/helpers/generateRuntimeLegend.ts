@@ -194,6 +194,8 @@ export const generateRuntimeLegend = (
 
       // Add legend item for each
       sorted.forEach(val => {
+        // Skip if this value is already a special class
+        if (result?.items?.some(item => item.value === val && item.special)) return
         result.items.push({
           value: val
         })
@@ -228,10 +230,6 @@ export const generateRuntimeLegend = (
       newLegendMemo.forEach(assignSpecialClassLastIndex)
       legendSpecialClassLastMemo.current = newLegendSpecialClassLastMemo
 
-      // filter special classes from results
-      const specialValues = result.items.filter(d => d.special).map(d => d.value)
-
-      result.items = result.items.filter(d => d.special || !specialValues.includes(d.value))
       return result
     }
 
@@ -504,7 +502,7 @@ export const generateRuntimeLegend = (
     }
     newLegendMemo.forEach(assignSpecialClassLastIndex)
     legendSpecialClassLastMemo.current = newLegendSpecialClassLastMemo
-    result.items = result.items.filter(item => !item.special)
+    if (result?.items?.some(item => item.value === val && item.special)) return
 
     return result
   } catch (e) {
