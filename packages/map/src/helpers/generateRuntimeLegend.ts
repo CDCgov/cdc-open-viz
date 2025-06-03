@@ -231,7 +231,7 @@ export const generateRuntimeLegend = (
       // filter special classes from results
       const specialValues = result.items.filter(d => d.special).map(d => d.value)
 
-      result.items.filter(d => d.special || !specialValues.includes(d.value))
+      result.items = result.items.filter(d => d.special || !specialValues.includes(d.value))
       return result
     }
 
@@ -504,6 +504,7 @@ export const generateRuntimeLegend = (
     }
     newLegendMemo.forEach(assignSpecialClassLastIndex)
     legendSpecialClassLastMemo.current = newLegendSpecialClassLastMemo
+    result.items = result.items.filter(item => !item.special)
 
     return result
   } catch (e) {
