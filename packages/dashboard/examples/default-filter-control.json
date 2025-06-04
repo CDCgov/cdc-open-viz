@@ -1,4 +1,184 @@
 {
+  "dashboard": {
+    "sharedFilters": [
+      {
+        "key": "sharedFilter1",
+        "columnName": "state",
+        "setBy": "map1",
+        "usedBy": [
+          "chart1"
+        ],
+        "values": [
+          "Alabama",
+          "Florida",
+          "Georgia"
+        ],
+        "tier": 1,
+        "orderedValues": [
+          "Alabama",
+          "Florida",
+          "Georgia"
+        ],
+        "type": "datafilter",
+        "showDropdown": true
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "legacySharedFilters"
+        }
+      ]
+    },
+    {
+      "uuid": "__​undefined__",
+      "toggle": "__​undefined__",
+      "equalHeight": "__​undefined__",
+      "columns": [
+        {
+          "width": 12,
+          "widget": "map1"
+        },
+        {},
+        {}
+      ]
+    },
+    {
+      "uuid": "__​undefined__",
+      "toggle": "__​undefined__",
+      "equalHeight": "__​undefined__",
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart1"
+        },
+        {},
+        {}
+      ]
+    }
+  ],
+  "visualizations": {
+    "map1": {
+      "uid": "map1",
+      "type": "map",
+      "defaultData": false,
+      "dataKey": "data2",
+      "general": {
+        "title": "Map Example",
+        "subtext": "",
+        "territoriesLabel": "Territories",
+        "type": "data",
+        "geoType": "us",
+        "headerColor": "theme-blue",
+        "showSidebar": true,
+        "showTitle": true,
+        "geoBorderColor": "darkGray",
+        "expandDataTable": true
+      },
+      "color": "pinkpurple",
+      "columns": {
+        "geo": {
+          "name": "state",
+          "label": "Location",
+          "tooltip": false,
+          "dataTable": true
+        },
+        "primary": {
+          "name": "Insured Rate",
+          "label": "Data Label",
+          "prefix": "",
+          "suffix": "%",
+          "dataTable": true,
+          "tooltip": true
+        },
+        "navigate": {
+          "name": "link",
+          "tooltip": false,
+          "dataTable": false
+        }
+      },
+      "legend": {
+        "numberOfItems": 3,
+        "position": "side",
+        "title": "Legend Title",
+        "description": "Legend Text",
+        "type": "equalnumber",
+        "specialClasses": [
+          "N/A"
+        ]
+      },
+      "dataTable": {},
+      "table": {
+        "download": true
+      }
+    },
+    "chart1": {
+      "uid": "chart1",
+      "type": "chart",
+      "dataKey": "data1",
+      "title": "Test",
+      "description": "<p>Test</p>",
+      "visualizationType": "Line",
+      "series": [
+        {
+          "dataKey": "Insured Rate",
+          "label": "Insured Rate"
+        }
+      ],
+      "fontSize": "large",
+      "dataFormat": {
+        "commas": false,
+        "prefix": "",
+        "suffix": ""
+      },
+      "padding": {
+        "left": 15,
+        "right": 15
+      },
+      "yAxis": {
+        "label": "Insured Rate",
+        "paddingPercent": 0.15
+      },
+      "xAxis": {
+        "label": "Date",
+        "dataKey": "date",
+        "type": "date",
+        "dateParseFormat": "%Y-%m-%d",
+        "dateDisplayFormat": "%b %d",
+        "numTicks": 8,
+        "tickRotation": 50
+      },
+      "legend": {
+        "label": "Legend",
+        "above": true,
+        "left": true,
+        "unified": true
+      },
+      "table": {
+        "label": "Data Table",
+        "expanded": false,
+        "download": true
+      }
+    },
+    "legacySharedFilters": {
+      "type": "dashboardFilters",
+      "visualizationType": "dashboardFilters",
+      "sharedFilterIndexes": [
+        0
+      ],
+      "filterBehavior": "Filter Change",
+      "uid": "legacySharedFilters"
+    }
+  },
+  "table": {
+    "downloadImageButton": true,
+    "downloadPdfButton": true,
+    "download": true,
+    "show": true
+  },
   "type": "dashboard",
   "datasets": {
     "data1": {
@@ -53,157 +233,23 @@
     "data2": {
       "data": [
         {
-          "Insured Rate": "43",
+          "Insured Rate": 43,
           "state": "Alabama"
         },
         {
-          "Insured Rate": "63",
+          "Insured Rate": 63,
           "state": "Georgia"
         },
         {
-          "Insured Rate": "53",
+          "Insured Rate": 53,
           "state": "Florida"
         }
       ]
     }
   },
-  "dashboard": {
-    "sharedFilters": [
-      {
-        "key": "sharedFilter1",
-        "columnName": "state",
-        "setBy": "map1",
-        "usedBy": [
-          "chart1"
-        ]
-      }
-    ]
-  },
-  "rows": [
-    [
-      {
-        "width": 12,
-        "widget": "map1"
-      },
-      {},
-      {}
-    ],
-    [
-      {
-        "width": 12,
-        "widget": "chart1"
-      },
-      {},
-      {}
-    ]
-  ],
-  "visualizations": {
-    "map1": {
-      "uid": "map1",
-      "type": "map",
-      "defaultData": false,
-      "dataKey": "data2",
-      "general": {
-        "title": "Map Example",
-        "subtext": "",
-        "territoriesLabel": "Territories",
-        "type": "data",
-        "geoType": "us",
-        "headerColor": "theme-blue",
-        "showSidebar": true,
-        "showTitle": true,
-        "geoBorderColor": "darkGray",
-        "showDownloadButton": true,
-        "expandDataTable": true
-      },
-      "color": "pinkpurple",
-      "columns": {
-        "geo": {
-          "name": "state",
-          "label": "Location",
-          "tooltip": false,
-          "dataTable": true
-        },
-        "primary": {
-          "name": "Insured Rate",
-          "label": "Data Label",
-          "prefix": "",
-          "suffix": "%",
-          "dataTable": true,
-          "tooltip": true
-        },
-        "navigate": {
-          "name": "link",
-          "tooltip": false,
-          "dataTable": false
-        }
-      },
-      "legend": {
-        "numberOfItems": 3,
-        "position": "side",
-        "title": "Legend Title",
-        "description": "Legend Text",
-        "type": "equalnumber",
-        "specialClasses": [
-          "N/A"
-        ]
-      },
-      "dataTable": {
-        
-      }
-    },
-    "chart1": {
-      "uid": "chart1",
-      "type": "chart",
-      "dataKey": "data1",
-      "title": "Test",
-      "description": "<p>Test</p>",
-      "visualizationType": "Line",
-      "series": [
-        {
-          "dataKey": "Insured Rate",
-          "label": "Insured Rate"
-        }
-      ],
-      "fontSize": "large",
-      "dataFormat": {
-        "commas": false,
-        "prefix": "",
-        "suffix": ""
-      },
-      "padding": {
-        "left": 15,
-        "right": 15
-      },
-      "yAxis": {
-        "label": "Insured Rate",
-        "paddingPercent": 0.15
-      },
-      "xAxis": {
-        "label": "Date",
-        "dataKey": "date",
-        "type": "date",
-        "dateParseFormat": "%Y-%m-%d",
-        "dateDisplayFormat": "%b %d",
-        "numTicks": 8,
-        "tickRotation": 50
-      },
-      "legend": {
-        "label": "Legend",
-        "above": true,
-        "left": true
-      },
-      "table": {
-        "label": "Data Table",
-        "expanded": false,
-        "download": true
-      }
-    }
-  },
-  "table": {
-    "downloadImageButton": true,
-    "downloadPdfButton": true,
-    "download": true,
-    "show": true
+  "runtime": {},
+  "version": "4.25.4",
+  "migrations": {
+    "addColorMigration": true
   }
 }
