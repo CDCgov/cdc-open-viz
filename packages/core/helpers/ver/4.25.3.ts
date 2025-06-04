@@ -7,6 +7,9 @@ const remapTableDownloadCSV = config => {
       download = config.table.download || config.general.showDownloadButton
     }
     delete config.general.showDownloadButton
+    if (!config.table) {
+      config.table = {}
+    }
     config.table.download = download
   }
   return config
