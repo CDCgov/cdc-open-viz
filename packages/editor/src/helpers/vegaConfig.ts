@@ -454,6 +454,9 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
       hideAxis: !isHorizontalBar,
       hideTicks: true
     })
+    Object.assign(config.xAxis, {
+      size: isHorizontalBar ? 30 : null
+    })
     Object.assign(config, {
       isolatedDotsSameSize: true,
       barThickness: 0.8
