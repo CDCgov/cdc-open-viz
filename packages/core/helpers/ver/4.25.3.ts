@@ -2,7 +2,10 @@ import _ from 'lodash'
 
 const remapTableDownloadCSV = config => {
   if (config.general?.showDownloadButton !== undefined) {
-    const download = config.general.showDownloadButton
+    let download = config.general.showDownloadButton
+    if (config.type === 'chart') {
+      download = config.table.download || config.general.showDownloadButton
+    }
     delete config.general.showDownloadButton
     config.table.download = download
   }
