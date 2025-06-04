@@ -502,7 +502,6 @@ export const generateRuntimeLegend = (
     }
     newLegendMemo.forEach(assignSpecialClassLastIndex)
     legendSpecialClassLastMemo.current = newLegendSpecialClassLastMemo
-    if (result?.items?.some(item => item.value === val && item.special)) return
 
     return result
   } catch (e) {
