@@ -208,10 +208,34 @@ export const generateRuntimeLegend = (
         }
       })
 
-      // Add color to new legend item
+      // Add color to new legend item (normal items only, not special classes)
       for (let i = 0; i < result.items.length; i++) {
-        result.items[i].color = applyColorToLegend(i, configObj, result.items)
+        if (!result.items[i].special) {
+          result.items[i].color = applyColorToLegend(i, configObj, result.items)
+        }
       }
+
+      // Now apply special class colors last, to overwrite if needed
+      for (let i = 0; i < result.items.length; i++) {
+        if (result.items[i].special) {
+          result.items[i].color = applyColorToLegend(i, configObj, result.items)
+        }
+      }
+
+      // Overwrite legendMemo for special class rows to ensure correct color lookup
+      result.items.forEach((item, idx) => {
+        if (item.special) {
+          // Find all rows in the data that match this special class value
+          let specialRows = data.filter(row => {
+            // If special class has a key, use it, otherwise use primaryColName
+            const key = legend.specialClasses.find(sc => String(sc.value) === String(item.value))?.key || primaryColName
+            return String(row[key]) === String(item.value)
+          })
+          specialRows.forEach(row => {
+            newLegendMemo.set(hashObj(row), idx)
+          })
+        }
+      })
 
       legendMemo.current = newLegendMemo
 
