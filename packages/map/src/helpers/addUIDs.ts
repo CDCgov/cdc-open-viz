@@ -108,7 +108,9 @@ export const addUIDs = (configObj: MapConfig, fromColumn: string) => {
 
   data.forEach(row => {
     let uid = null
-    row.uid = null // Reset existing UID
+    if (row.uid) {
+      row.uid = null // Reset existing UID
+    }
 
     if (!geo.name) return
 
