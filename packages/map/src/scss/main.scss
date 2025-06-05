@@ -1,18 +1,11 @@
 @import 'mixins';
-
-@import 'variables';
 @import 'editor-panel';
-@import 'filters';
 
 .type-map--has-error {
-  overflow: hidden !important;
-  height: 100vh;
 
   .waiting {
     display: flex;
-    align-content: center;
-    flex-wrap: wrap;
-    display: flex;
+    overflow: hidden !important;
     align-content: center;
     flex-wrap: wrap;
     height: 100vh;
@@ -24,16 +17,6 @@
   display: flex; // Needed for the main content
   .loading > div.la-ball-beat {
     margin-top: 20%;
-  }
-
-  .visually-hidden {
-    clip: rect(0 0 0 0);
-    clip-path: inset(50%);
-    height: 1px;
-    overflow: hidden;
-    position: absolute;
-    white-space: nowrap;
-    width: 1px;
   }
 
   @include breakpointClass(md) {
@@ -48,7 +31,6 @@
 .cdc-map-inner-container {
   @import './map';
   flex-grow: 1;
-  color: #202020;
   border: 0;
   text-align: left;
   max-width: 100%;

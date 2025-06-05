@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react'
 import ConfigContext from '../../../ConfigContext'
-import { useBarChart } from '../../../hooks/useBarChart'
 import { BarStack } from '@visx/shape'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
@@ -12,22 +11,34 @@ import createBarElement from '@cdc/core/components/createBarElement'
 
 const BarChartStackedVertical = () => {
   const [barWidth, setBarWidth] = useState(0)
-  const { xScale, yScale, seriesScale, xMax, yMax } = useContext(BarChartContext)
-  const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter } =
-    useContext(ConfigContext)
+  const { xScale, yScale, seriesScale, xMax, yMax, barChart } = useContext(BarChartContext)
   const {
     isHorizontal,
     barBorderWidth,
-    applyRadius,
     hoveredBar,
     getAdditionalColumn,
     onMouseLeaveBar,
     onMouseOverBar,
     barStackedSeriesKeys
-  } = useBarChart()
+  } = barChart
+  const {
+    transformedData,
+    colorScale,
+    seriesHighlight,
+    config,
+    formatNumber,
+    formatDate,
+    parseDate,
+    setSharedFilter,
+    brushConfig
+  } = useContext(ConfigContext)
+
   const { orientation } = config
 
-  const data = config.brush?.active && config.brush.data?.length ? config.brush.data : transformedData
+  let data = transformedData
+  if (brushConfig.data.length) {
+    data = brushConfig.data
+  }
   const isDateAxisType = config.runtime.xAxis.type === 'date-time' || config.runtime.xAxis.type === 'date'
   const isDateTimeScaleAxisType = config.runtime.xAxis.type === 'date-time'
 
@@ -98,7 +109,7 @@ const BarChartStackedVertical = () => {
                         height: bar.height,
                         x: barX,
                         y: bar.y,
-                        onMouseOver: () => onMouseOverBar(xAxisValue, bar.key),
+                        onMouseOver: e => onMouseOverBar(xAxisValue, bar.key, e, data),
                         onMouseLeave: onMouseLeaveBar,
                         tooltipHtml: tooltip,
                         tooltipId: `cdc-open-viz-tooltip-${config.runtime.uniqueId}`,

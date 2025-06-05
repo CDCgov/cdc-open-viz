@@ -1,0 +1,10 @@
+.countyMapGroup {
+  transition: transform 1s;
+  will-change: transform;
+  transform-origin: center;
+  stroke: none !important;
+}
+
+.countyMapGroup--no-transition {
+  transition: none !important;
+}

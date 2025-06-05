@@ -22,6 +22,8 @@ const scaleTypes = {
   BAND: 'band'
 }
 
+export const TOP_PADDING = 10
+
 type useScaleProps = {
   config: ChartConfig // standard chart config
   data: Object[] // standard data array
@@ -80,11 +82,13 @@ const useScales = (properties: useScaleProps) => {
   if (xAxis.type === 'date-time' || xAxis.type === 'continuous') {
     let xAxisMin = Math.min(...xAxisDataMapped.map(Number))
     let xAxisMax = Math.max(...xAxisDataMapped.map(Number))
-    xAxisMin -= (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
-    xAxisMax +=
-      visualizationType === 'Line'
-        ? 0
-        : (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
+    let paddingRatio = config.xAxis.padding ? config.xAxis.padding * 0.01 : 0
+    if (config.brush.active) {
+      paddingRatio = config.barThickness * 0.2
+    }
+
+    xAxisMin -= paddingRatio * (xAxisMax - xAxisMin)
+    xAxisMax += visualizationType === 'Line' ? 0 : paddingRatio * (xAxisMax - xAxisMin)
     const range = config.xAxis.sortByRecentDate ? [xMax, 0] : [0, xMax]
     xScale = scaleTime({
       domain: [xAxisMin, xAxisMax],
@@ -392,7 +396,7 @@ const composeYScale = ({ min, max, yMax, config, leftMax }) => {
 
   // If the visualization type is a bump chart then the domain and range need different values
   const domainSet = config.visualizationType === 'Bump Chart' ? [1, max] : [min, max]
-  const yRange = config.visualizationType === 'Bump Chart' ? [30, yMax] : [yMax, 0]
+  const yRange = config.visualizationType === 'Bump Chart' ? [30, yMax] : [yMax, TOP_PADDING]
   // Return the configured scale function
   return scaleFunc({
     domain: domainSet,

@@ -5,6 +5,7 @@ import { AnyVisualization, Visualization } from '@cdc/core/types/Visualization'
 import _ from 'lodash'
 import { DashboardConfig } from '../types/DashboardConfig'
 import { ConfigRow } from '../types/ConfigRow'
+import { getVizRowColumnLocator } from './getVizRowColumnLocator'
 
 export const isUpdateNeeded = (
   filters: SharedFilter[],
@@ -111,9 +112,16 @@ export const filterUsedByDataUrl = (
   if (!filter.usedBy || !filter.usedBy.length) return true
   const vizUsingFilters = filter.usedBy?.map(vizOrRowKey => visualizations[vizOrRowKey] || rows[vizOrRowKey])
   // push any footnotes which are using the filter also
+  const vizRowLookup = getVizRowColumnLocator(rows) // ensure we have the footnotesId in the rows
   filter.usedBy?.forEach(vizOrRowKey => {
-    if (rows[vizOrRowKey] && rows[vizOrRowKey].footnotesId)
-      return vizUsingFilters.push(visualizations[rows[vizOrRowKey].footnotesId])
+    const vizLookup = vizRowLookup[vizOrRowKey] // if found vizOrRowKey is a viz key
+    const row = rows[vizLookup?.row || vizOrRowKey]
+    if (row?.footnotesId) {
+      // if the widget is using the filter and the widget is on this row and the row has a footnoteId
+      // then the footnote's endpoint should be filtered by the filter
+      vizUsingFilters.push(visualizations[row.footnotesId])
+    }
   })
+
   return vizUsingFilters?.some(viz => viz?.dataKey === datasetKey)
 }

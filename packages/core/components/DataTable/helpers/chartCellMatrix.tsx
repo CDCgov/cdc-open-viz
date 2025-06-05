@@ -7,6 +7,7 @@ import { getDataSeriesColumns } from './getDataSeriesColumns'
 import { ReactNode } from 'react'
 import { CellMatrix, GroupCellMatrix } from '../../Table/types/CellMatrix'
 import { getRowType } from './getRowType'
+import parse from 'html-react-parser'
 
 type ChartRowsProps = DataTableProps & {
   rows: string[]
@@ -84,7 +85,7 @@ const chartCellArray = ({
           ? [
               <>
                 {colorScale && colorScale(seriesName) && <LegendShape fill={colorScale(seriesName)} />}
-                {seriesName}
+                {parse(seriesName)}
               </>
             ]
           : []

@@ -12,7 +12,7 @@ import LegendItemHex from './LegendItem.Hex'
 import Button from '@cdc/core/components/elements/Button'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-import ConfigContext from '../../../context'
+import ConfigContext, { MapDispatchContext } from '../../../context'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
 import { Group } from '@visx/group'
@@ -20,6 +20,10 @@ import './index.scss'
 import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { isBelowBreakpoint, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
+import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
+import { resetLegendToggles } from '../../../helpers'
+import { MapContext } from '../../../types/MapContext'
+import LegendGroup from './LegendGroup/Legend.Group'
 
 const LEGEND_PADDING = 30
 
@@ -32,91 +36,76 @@ type LegendProps = {
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const { skipId, containerWidthPadding } = props
-  const { isEditor, dimensions, currentViewport } = useContext(ConfigContext)
 
   const {
-    // prettier-ignore
-    resetLegendToggles,
+    config,
+    currentViewport: viewport,
+    dimensions,
+    mapId,
     runtimeFilters,
     runtimeLegend,
-    setAccessibleStatus,
-    setRuntimeLegend,
-    state,
-    currentViewport: viewport,
-    mapId
-  } = useContext(ConfigContext)
+    setRuntimeLegend
+  } = useContext<MapContext>(ConfigContext)
 
-  const { legend } = state
+  const dispatch = useContext(MapDispatchContext)
+
+  const { legend } = config
   const isLegendGradient = legend.style === 'gradient'
-  const boxDynamicallyHidden = isBelowBreakpoint('md', currentViewport)
+  const boxDynamicallyHidden = isBelowBreakpoint('md', viewport)
   const legendWrapping =
-    (legend.position === 'left' || legend.position === 'right') && isBelowBreakpoint('md', currentViewport)
+    (legend.position === 'left' || legend.position === 'right') && isBelowBreakpoint('md', viewport)
   const legendOnBottom = legend.position === 'bottom' || legendWrapping
   const needsTopMargin = legend.hideBorder && legendOnBottom
 
-  // Toggles if a legend is active and being applied to the map and data table.
-  const toggleLegendActive = (i, legendLabel) => {
-    const newValue = !runtimeLegend[i].disabled
-
-    runtimeLegend[i].disabled = newValue // Toggle!
-
-    let newLegend = [...runtimeLegend]
-
-    newLegend[i].disabled = newValue
-
-    const disabledAmt = runtimeLegend.disabledAmt ?? 0
-
-    newLegend['disabledAmt'] = newValue ? disabledAmt + 1 : disabledAmt - 1
-
-    setRuntimeLegend(newLegend)
-
-    setAccessibleStatus(
-      `Disabled legend item ${legendLabel ?? ''}. Please reference the data table to see updated values.`
-    )
-  }
   const getFormattedLegendItems = () => {
-    return runtimeLegend.map((entry, idx) => {
-      const entryMax = displayDataAsText(entry.max, 'primary', state)
+    try {
+      if (!runtimeLegend.items) Error('No runtime legend data')
+      return runtimeLegend.items.map((entry, idx) => {
+        const entryMax = displayDataAsText(entry.max, 'primary', config)
 
-      const entryMin = displayDataAsText(entry.min, 'primary', state)
-      let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
+        const entryMin = displayDataAsText(entry.min, 'primary', config)
+        let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
 
-      // If interval, add some formatting
-      if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
-        formattedText = `${entryMin} - < ${entryMax}`
-      }
+        // If interval, add some formatting
+        if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
+          formattedText = `${entryMin} - < ${entryMax}`
+        }
 
-      if (legend.type === 'category') {
-        formattedText = displayDataAsText(entry.value, 'primary', state)
-      }
+        if (legend.type === 'category') {
+          formattedText = displayDataAsText(entry.value, 'primary', config)
+        }
 
-      if (entry.max === 0 && entry.min === 0) {
-        formattedText = '0'
-      }
+        if (entry.max === 0 && entry.min === 0) {
+          formattedText = '0'
+        }
 
-      if (entry.max === null && entry.min === null) {
-        formattedText = 'No data'
-      }
+        if (entry.max === null && entry.min === null) {
+          formattedText = 'No data'
+        }
 
-      let legendLabel = formattedText
+        let legendLabel = formattedText
 
-      if (entry.hasOwnProperty('special')) {
-        legendLabel = entry.label || entry.value
-      }
+        if (entry.hasOwnProperty('special')) {
+          legendLabel = entry.label || entry.value
+        }
 
-      return {
-        color: entry.color,
-        label: parse(legendLabel),
-        disabled: entry.disabled,
-        special: entry.hasOwnProperty('special'),
-        value: [entry.min, entry.max]
-      }
-    })
+        return {
+          color: entry.color,
+          label: parse(legendLabel),
+          disabled: entry.disabled,
+          special: entry.hasOwnProperty('special'),
+          value: [entry.min, entry.max]
+        }
+      })
+    } catch (e) {
+      console.error('Error in getFormattedLegendItems', e) // eslint-disable-line
+      return []
+    }
   }
 
   const legendList = (patternsOnly = false) => {
     const formattedItems = patternsOnly ? [] : getFormattedLegendItems()
-    const patternsOnlyFont = isMobileHeightViewport(currentViewport) ? '12px' : '14px'
+    const patternsOnlyFont = isMobileHeightViewport(viewport) ? '12px' : '14px'
     const hasDisabledItems = formattedItems.some(item => item.disabled)
     let legendItems
 
@@ -129,30 +118,33 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         return classes.join(' ')
       }
 
+      const setAccessibleStatus = (message: string) => {
+        dispatch({ type: 'SET_ACCESSIBLE_STATUS', payload: message })
+      }
+
       return (
-        // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
         <li
           className={handleListItemClass()}
           key={idx}
           title={`Legend item ${item.label} - Click to disable`}
-          onClick={() => toggleLegendActive(idx, item.label)}
+          onClick={() => toggleLegendActive(idx, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)}
           onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault()
-              toggleLegendActive(idx, item.label)
+              toggleLegendActive(idx, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)
             }
           }}
           tabIndex={0}
         >
-          <LegendShape shape={state.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
+          <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
           <span>{item.label}</span>
         </li>
       )
     })
 
-    if (state.map.patterns) {
+    if (config.map.patterns) {
       // loop over map patterns
-      state.map.patterns.map((patternData, patternDataIndex) => {
+      config.map.patterns.map((patternData, patternDataIndex) => {
         const { pattern, dataKey, size } = patternData
         let defaultPatternColor = 'black'
         const sizes = {
@@ -178,6 +170,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                       height={sizes[size] ?? 10}
                       width={sizes[size] ?? 10}
                       fill={defaultPatternColor}
+                      strokeWidth={0.25}
                     />
                   )}
                   {pattern === 'circles' && (
@@ -186,6 +179,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                       height={sizes[size] ?? 10}
                       width={sizes[size] ?? 10}
                       fill={defaultPatternColor}
+                      radius={1.25}
                     />
                   )}
                   {pattern === 'lines' && (
@@ -194,7 +188,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                       height={sizes[size] ?? 6}
                       width={sizes[size] ?? 10}
                       stroke={defaultPatternColor}
-                      strokeWidth={2}
+                      strokeWidth={0.75}
                       orientation={['diagonalRightToLeft']}
                     />
                   )}
@@ -222,15 +216,18 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   }
   const legendListItems = legendList(isLegendGradient)
 
-  const { legendClasses } = useDataVizClasses(state, viewport)
+  const { legendClasses } = useDataVizClasses(config, viewport)
 
   const handleReset = e => {
     const legend = ref.current
     if (e) {
       e.preventDefault()
     }
-    resetLegendToggles()
-    setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.')
+    resetLegendToggles(runtimeLegend, setRuntimeLegend)
+    dispatch({
+      type: 'SET_ACCESSIBLE_STATUS',
+      payload: 'Legend has been reset, please reference the data table to see updated values.'
+    })
     if (legend) {
       legend.focus()
     }
@@ -255,9 +252,11 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     triangle: <GlyphTriangle color='#000' size={150} />
   }
 
+  const shouldRenderLegendList = legendListItems.length > 0 && ['Select Option', ''].includes(config.legend.groupBy)
+
   return (
     <ErrorBoundary component='Sidebar'>
-      <div className={`legends ${needsTopMargin ? 'mt-1' : ''}`}>
+      <div className={`legends ${needsTopMargin ? 'mt-4' : ''}`}>
         <aside
           id={skipId || 'legend'}
           className={legendClasses.aside.join(' ') || ''}
@@ -296,38 +295,44 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             )}
 
             <LegendGradient
-              labels={getFormattedLegendItems().map(item => item?.label) ?? []}
-              colors={getFormattedLegendItems().map(item => item?.color) ?? []}
+              labels={getFormattedLegendItems()?.map(item => item?.label) ?? []}
+              colors={getFormattedLegendItems()?.map(item => item?.color) ?? []}
               dimensions={dimensions}
               parentPaddingToSubtract={
                 containerWidthPadding + (legend.hideBorder || boxDynamicallyHidden ? 0 : LEGEND_PADDING)
               }
-              config={state}
+              config={config}
             />
-            {!!legendListItems.length && (
-              <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
+            <LegendGroup legendItems={getFormattedLegendItems()} />
+
+            {shouldRenderLegendList && (
+              <ul className={legendClasses.ul.join(' ')} aria-label='Legend items'>
                 {legendListItems}
               </ul>
             )}
-            {(state.visual.additionalCityStyles.some(c => c.label) || state.visual.cityStyleLabel) && (
+
+            {((config.visual.additionalCityStyles && config.visual.additionalCityStyles.some(c => c.label)) ||
+              config.visual.cityStyleLabel) && (
               <>
                 <hr />
                 <div className={legendClasses.div.join(' ') || ''}>
-                  {state.visual.cityStyleLabel && (
+                  {config.visual.cityStyleLabel && (
                     <div>
                       <svg>
                         <Group
-                          top={state.visual.cityStyle === 'pin' ? 19 : state.visual.cityStyle === 'triangle' ? 13 : 11}
+                          top={
+                            config.visual.cityStyle === 'pin' ? 19 : config.visual.cityStyle === 'triangle' ? 13 : 11
+                          }
                           left={10}
                         >
-                          {cityStyleShapes[state.visual.cityStyle.toLowerCase()]}
+                          {cityStyleShapes[config.visual.cityStyle.toLowerCase()]}
                         </Group>
                       </svg>
-                      <p>{state.visual.cityStyleLabel}</p>
+                      <p>{config.visual.cityStyleLabel}</p>
                     </div>
                   )}
 
-                  {state.visual.additionalCityStyles.map(
+                  {config.visual.additionalCityStyles.map(
                     ({ shape, label }) =>
                       label && (
                         <div>
@@ -350,8 +355,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             )}
           </section>
         </aside>
-        {state.hexMap.shapeGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && (
-          <LegendItemHex state={state} runtimeLegend={runtimeLegend} viewport={viewport} />
+        {config.hexMap?.shapeGroups?.length > 0 && config.hexMap.type === 'shapes' && config.general.displayAsHex && (
+          <LegendItemHex runtimeLegend={runtimeLegend} viewport={viewport} />
         )}
       </div>
     </ErrorBoundary>

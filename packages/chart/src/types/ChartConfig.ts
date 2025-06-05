@@ -10,6 +10,7 @@ import { General } from '@cdc/core/types/General'
 import { type Link } from './../components/Sankey/types'
 import { type DataDescription } from '@cdc/core/types/DataDescription'
 import { type Legend as CoreLegend } from '@cdc/core/types/Legend'
+import { Label } from './Label'
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
 import { VizFilter } from '@cdc/core/types/VizFilter'
@@ -85,12 +86,15 @@ export type Legend = CoreLegend & {
   style: 'circles' | 'boxes' | 'gradient' | 'lines'
   subStyle: 'linear blocks' | 'smooth'
   hasShape: boolean
+  order: 'dataColumn' | 'asc' | 'desc'
+  orderedValues: Label[]
   tickRotation: string
   hideBorder: {
     side: boolean
     topBottom: boolean
   }
   groupBy: string
+  separators?: string
 }
 
 type Visual = {
@@ -233,6 +237,7 @@ export type ForestPlotConfig = {
 export type LineChartConfig = {
   allowLineToBarGraph: boolean
   convertLineToBarGraph: boolean
+  isolatedDotsSameSize: boolean
   lineDatapointStyle: 'hidden' | 'always show' | 'hover'
   visualizationType: 'Line'
 } & AllChartsConfig

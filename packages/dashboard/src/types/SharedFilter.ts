@@ -22,6 +22,8 @@ export type SharedFilter = FilterBase & {
   datasetKey?: string
   subGrouping: SubGrouping
   tier?: number
+  // value to use when the filter loads
+  defaultValue?: string
   /**
    * How to format the end file name when filter.filterBy is set to "File Name"
    *

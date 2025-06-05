@@ -6,7 +6,7 @@ const CellAnchor = ({ markup, row, columns, navigationHandler, mapZoomHandler })
   if (columns.navigate && row[columns.navigate.name]) {
     return (
       <span
-        onClick={() => navigationHandler(row[columns.navigate.name])}
+        onClick={() => navigationHandler('_blank', row[columns.navigate.name])}
         className='table-link'
         title='Click for more information (Opens in a new window)'
         role='link'

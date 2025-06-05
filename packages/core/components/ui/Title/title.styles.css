@@ -43,7 +43,6 @@
     margin-bottom: 0 !important;
   }
 
-  // THEMES
   &.theme-purple {
     background: #712177;
     border-bottom-color: #b890bb;
@@ -94,7 +93,6 @@
   }
 }
 
-// fix sparkline bottom margin gap
 .type-sparkline.type-chart .cove-component__header {
   margin: 0px !important;
 }

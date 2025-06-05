@@ -360,7 +360,12 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
 
   return (
     <div className='cove-component__content'>
-      <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
+      <Title
+        showTitle={config.showTitle}
+        title={title}
+        config={config}
+        classes={['chart-title', `${config.theme}`, 'mb-0']}
+      />
       <div className={contentClasses.join(' ')}>
         {!config.newViz && config.runtime && config.runtime.editorErrorMessage && (
           <Error updateConfig={updateConfig} config={config} />

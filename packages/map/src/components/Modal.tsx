@@ -1,14 +1,15 @@
 import { useContext } from 'react'
-import LegendShape from '@cdc/core/components/LegendShape'
-import ConfigContext from '../context'
+import ConfigContext, { MapDispatchContext } from '../context'
 import Icon from '@cdc/core/components/ui/Icon'
+import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
+import { MapContext } from '../types/MapContext'
 
 const Modal = () => {
-  const { applyTooltipsToGeo, applyLegendToRow, content, state, currentViewport: viewport } = useContext(ConfigContext)
-  const { capitalizeLabels } = state.tooltips
+  const { content, config, currentViewport: viewport } = useContext<MapContext>(ConfigContext)
+  const { capitalizeLabels } = config.tooltips
+  const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const tooltip = applyTooltipsToGeo(content.geoName, content.keyedData, 'jsx')
-  const type = state.general.type
-  const legendColors = applyLegendToRow(content.keyedData)
+  const dispatch = useContext(MapDispatchContext)
 
   return (
     <section
@@ -18,7 +19,16 @@ const Modal = () => {
       aria-hidden='true'
     >
       <div className='content'>{tooltip}</div>
-      <Icon display='close' alt='Close Modal' size={20} color='#000' className='modal-close' />
+      <Icon
+        display='close'
+        alt='Close Modal'
+        size={20}
+        color='#000'
+        className='modal-close'
+        onClick={() => {
+          dispatch({ type: 'SET_MODAL', payload: null })
+        }}
+      />
     </section>
   )
 }

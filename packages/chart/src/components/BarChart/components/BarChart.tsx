@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { MouseEventHandler, useContext, useState } from 'react'
 
 // visx
 import { Group } from '@visx/group'
@@ -9,8 +9,21 @@ import BarChartType from './BarChartType'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../../../ConfigContext'
 import BarChartContext from './context'
+import { useBarChart } from '../helpers/useBarChart'
+import { PositionScale } from '@visx/shape/lib/types'
 
-const BarChart = ({
+type BarChartProps = {
+  xScale: PositionScale
+  yScale: PositionScale
+  seriesScale: PositionScale
+  xMax: number
+  yMax: number
+  handleTooltipMouseOver: MouseEventHandler<SVGRectElement>
+  handleTooltipMouseOff: MouseEventHandler<SVGRectElement>
+  handleTooltipClick: MouseEventHandler<SVGRectElement>
+}
+
+const BarChart: React.FC<BarChartProps> = ({
   xScale,
   yScale,
   seriesScale,
@@ -20,7 +33,9 @@ const BarChart = ({
   handleTooltipMouseOff,
   handleTooltipClick
 }) => {
-  const { transformedData: data, config, convertLineToBarGraph } = useContext(ConfigContext)
+  const configContext = useContext(ConfigContext)
+  const { transformedData: data, config, convertLineToBarGraph } = configContext
+  const barChart = useBarChart(handleTooltipMouseOver, handleTooltipMouseOff, configContext)
 
   const contextValues = {
     xScale,
@@ -28,7 +43,8 @@ const BarChart = ({
     xMax,
     yMax,
     seriesScale,
-    convertLineToBarGraph
+    convertLineToBarGraph,
+    barChart
   }
 
   return (
@@ -46,7 +62,9 @@ const BarChart = ({
             height={Number(yMax)}
             fill={'transparent'}
             fillOpacity={0.05}
-            onMouseMove={e => handleTooltipMouseOver(e, data)}
+            onMouseMove={e => {
+              handleTooltipMouseOver(e, data)
+            }}
             onMouseOut={handleTooltipMouseOff}
             onClick={e => handleTooltipClick(e, data)}
           />

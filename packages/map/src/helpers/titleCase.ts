@@ -22,7 +22,7 @@ export const titleCase = string => {
       // just return with each word uppercase
       return string
         .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+        .map(word => (word === 'of' ? word : word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()))
         .join(' ')
     }
   }

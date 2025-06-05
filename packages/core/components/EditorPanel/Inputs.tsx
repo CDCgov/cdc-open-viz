@@ -1,6 +1,6 @@
 import { memo, useEffect, useState } from 'react'
 import { useDebounce } from 'use-debounce'
-import { DROPDOWN_STYLES } from '../Filters/Filters'
+import { DROPDOWN_STYLES } from '../Filters/components/Dropdown'
 
 export type Input = {
   label: string
@@ -118,9 +118,17 @@ const CheckBox = memo((props: CheckboxProps) => {
     return <></>
   }
   return (
-    <label className='checkbox column-heading'>
+    <label
+      className='checkbox column-heading'
+      onClick={e => {
+        if (!['SPAN', 'INPUT'].includes(e.target.nodeName)) {
+          e.preventDefault()
+        }
+      }}
+    >
       <input
         type='checkbox'
+        className='edit-checkbox'
         name={fieldName}
         checked={value}
         onChange={e => {
@@ -161,7 +169,7 @@ const Select = memo((props: SelectProps) => {
     initial: initialValue,
     ...attributes
   } = props
-  const optionsJsx = options.map((option, index) => {
+  const optionsJsx = options?.map((option, index) => {
     if (typeof option === 'string') {
       return (
         <option value={option} key={index}>
@@ -178,7 +186,7 @@ const Select = memo((props: SelectProps) => {
   })
 
   if (initialValue) {
-    optionsJsx.unshift(
+    optionsJsx?.unshift(
       <option value='' key='initial'>
         {initialValue}
       </option>
