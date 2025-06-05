@@ -13,6 +13,7 @@ type CdcMapProps = {
   config: MapConfig
   configUrl?: string
   isEditor?: boolean
+  isDashboard?: boolean
   link?: string
   logo?: string
   navigationHandler: Function
@@ -22,6 +23,7 @@ type CdcMapProps = {
 const CdcMap: React.FC<CdcMapProps> = ({
   navigationHandler: customNavigationHandler,
   isEditor,
+  isDashboard,
   configUrl,
   logo = '',
   link,
@@ -32,7 +34,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
   const setConfig = newConfig => {
     _setConfig(newConfig)
-    if (isEditor) {
+    if (isEditor && !isDashboard) {
       editorContext.setTempConfig(newConfig)
     }
   }
@@ -118,6 +120,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
       config={config}
       navigationHandler={customNavigationHandler}
       isEditor={isEditor}
+      isDashboard={isDashboard}
       logo={logo}
       link={link}
       loadConfig={loadConfig}

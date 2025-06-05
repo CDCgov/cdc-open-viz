@@ -82,6 +82,13 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     MapLayerHandlers: { handleMapLayer, handleAddLayer, handleRemoveLayer }
   } = useMapLayers(config, setConfig, false, tooltipId)
 
+  useEffect(() => {
+    // Pass up to Editor if needed
+    if (setParentConfig) {
+      setParentConfig(convertStateToConfig())
+    }
+  }, [config])
+
   const categoryMove = (idx1, idx2) => {
     let categoryValuesOrder = getCategoryValuesOrder()
     let [movedItem] = categoryValuesOrder.splice(idx1, 1)
@@ -2082,7 +2089,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       }
 
                       const _newConfig = _.cloneDeep(config)
-                      _newConfig.general.equalNumberOptIn = true
                       _newConfig.legend.type = event.target.value
                       _newConfig.runtime.editorErrorMessage = messages
                       setConfig(_newConfig)
@@ -2329,6 +2335,33 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         </Tooltip.Content>
                       </Tooltip>
                     </span>
+                  </label>
+                )}
+
+                {/* Temp Checkbox */}
+                {config.legend.type === 'equalnumber' && (
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={config.general.equalNumberOptIn}
+                      onChange={event => {
+                        const _newConfig = _.clone(config)
+                        _newConfig.general.equalNumberOptIn = event.target.checked
+                        setConfig(_newConfig)
+                      }}
+                    />
+                    <span className='edit-label column-heading'>Use new quantile legend</span>
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon
+                          display='question'
+                          style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                        />
+                      </Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>This prevents numbers from being used in more than one category (ie. 0-1, 1-2, 2-3) </p>
+                      </Tooltip.Content>
+                    </Tooltip>
                   </label>
                 )}
 
@@ -3328,7 +3361,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           {config.general.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}
           {config.general.geoType !== 'us-county' && <Panels.Annotate name='Text Annotations' />}
         </Accordion>
-        <AdvancedEditor loadConfig={loadConfig} config={config} convertStateToConfig={convertStateToConfig} />
+        <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={convertStateToConfig} />
       </Layout.Sidebar>
     </ErrorBoundary>
   )

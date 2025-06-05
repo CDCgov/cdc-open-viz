@@ -139,7 +139,8 @@ export const Custom_Color_Distributions_Without_Special_Classes: Story = {
 
 export const Standard_Color_Distributions_With_Special_Classes: Story = {
   args: {
-    config: exampleCityStateStandardColors
+    config: exampleCityStateStandardColors,
+    isEditor: true
   }
 }
 

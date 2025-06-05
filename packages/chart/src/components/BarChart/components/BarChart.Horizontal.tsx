@@ -15,6 +15,7 @@ import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { getBarConfig, testZeroValue } from '../helpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
+import isNumber from '@cdc/core/helpers/isNumber'
 
 // Third party libraries
 import chroma from 'chroma-js'
@@ -53,8 +54,7 @@ export const BarChartHorizontal = () => {
     formatNumber,
     formatDate,
     parseDate,
-    setSharedFilter,
-    isNumber
+    setSharedFilter
   } = useContext<ChartContext>(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
@@ -128,10 +128,11 @@ export const BarChartHorizontal = () => {
                     barWidthHorizontal: barWidth,
                     isSuppressed,
                     absentDataLabel
-                  } = getBarConfig({ bar, defaultBarWidth, config, isNumber, isVertical: false, yAxisValue })
+                  } = getBarConfig({ bar, defaultBarWidth, config, isVertical: false, yAxisValue, barWidth: 0 })
+
                   const barPosition = !isPositiveBar ? 'below' : 'above'
 
-                  const barDefaultLabel = !config.yAxis.displayNumbersOnBar ? '' : yAxisValue
+                  const barDefaultLabel = !config.yAxis.displayNumbersOnBar || absentDataLabel ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
                   const textWidth = getTextWidth(barDefaultLabel)
@@ -195,6 +196,11 @@ export const BarChartHorizontal = () => {
                     ? barBorderWidth
                     : 0
                   const displaylollipopShape = testZeroValue(bar.value) ? 'none' : 'block'
+                  const hideGroup =
+                    (!isNumber(bar.value) && !config.general.showMissingDataLabel) ||
+                    (String(bar.value) === '0' && !config.general.showZeroValueData)
+                      ? 'none'
+                      : 'block' // hide bar group if no value or zero value
 
                   // update label color
                   if (barColor && labelColor && textFits) {
@@ -230,7 +236,7 @@ export const BarChartHorizontal = () => {
                   const overlapWithCI = hasConfidenceInterval && labelX >= lowerPos && labelX <= upperPos
 
                   return (
-                    <Group key={`${barGroup.index}--${index}`}>
+                    <Group display={hideGroup} key={`${barGroup.index}--${index}`}>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                         {createBarElement({
                           config: config,

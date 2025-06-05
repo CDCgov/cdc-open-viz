@@ -171,6 +171,11 @@ export const BarChartVertical = () => {
                   const isHighlightedBar = highlightedBarValues?.includes(xAxisValue)
                   const highlightedBarColor = getHighlightedBarColorByValue(xAxisValue)
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
+                  const hideGroup =
+                    (!isNumber(bar.value) && !config.general.showMissingDataLabel) ||
+                    (String(bar.value) === '0' && !config.general.showZeroValueData)
+                      ? 'none'
+                      : 'block' // hide bar group if no value or zero value
 
                   const borderColor = isHighlightedBar
                     ? highlightedBarColor
@@ -185,7 +190,7 @@ export const BarChartVertical = () => {
                     ? barBorderWidth
                     : 0
 
-                  const barDefaultLabel = isSuppressed || !config.labels ? '' : yAxisValue
+                  const barDefaultLabel = isSuppressed || absentDataLabel || !config.labels ? '' : yAxisValue
                   const barY = getBarY(defaultBarY, yScale(scaleVal))
                   const displaylollipopShape = testZeroValue(bar.value) ? 'none' : 'block'
                   const getBarBackgroundColor = (barColor: string, filteredOutColor?: string): string => {
@@ -255,7 +260,7 @@ export const BarChartVertical = () => {
                   const BAR_LABEL_PADDING = 10
 
                   return (
-                    <Group key={`${barGroup.index}--${index}`}>
+                    <Group display={hideGroup} key={`${barGroup.index}--${index}`}>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                         {createBarElement({
                           config: config,

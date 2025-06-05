@@ -59,6 +59,11 @@ const ScatterPlot = ({ xScale, yScale }) => {
             opacity: 1,
             stroke: displayArea ? 'black' : ''
           }
+          if (item[s]==='') {
+            return <> </>
+          }
+
+
 
           return (
             <circle
