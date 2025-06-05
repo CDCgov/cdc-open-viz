@@ -5,6 +5,7 @@ import { MapContext } from './../../../../types/MapContext'
 import HexIcon from '../HexIcon'
 import { Text } from '@visx/text'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 const offsets = {
   'US-VT': [50, -8],
@@ -37,16 +38,16 @@ const TerritoryHexagon = ({
   handleShapeClick,
   label,
   stroke,
+  strokeColor,
   strokeWidth,
   territory,
   territoryData,
-  text,
   textColor,
   ...props
 }) => {
-  const { state } = useContext<MapContext>(ConfigContext)
+  const { config } = useContext<MapContext>(ConfigContext)
 
-  const isHex = state.general.displayAsHex
+  const isHex = config.general.displayAsHex
 
   // Labels
   const hexagonLabel = (geo, bgColor = '#FFFFFF', projection) => {
@@ -61,7 +62,7 @@ const TerritoryHexagon = ({
 
       return (
         <>
-          {state.hexMap.shapeGroups.map((group, groupIndex) => {
+          {config.hexMap.shapeGroups.map((group, groupIndex) => {
             return group.items.map((item, itemIndex) => {
               if (!geoData) return
               switch (item.operator) {
@@ -116,7 +117,7 @@ const TerritoryHexagon = ({
     }
 
     let x = 0,
-      y = state.hexMap.type === 'shapes' ? -10 : 5
+      y = config.hexMap.type === 'shapes' ? -10 : 5
 
     // used to nudge/move some of the labels for better readability
     if (nudges[abbr] && false === isHex) {
@@ -125,14 +126,15 @@ const TerritoryHexagon = ({
     }
 
     if (undefined === offsets[abbr] || isHex) {
-      let y = state.hexMap.type === 'shapes' ? '30%' : '50%'
+      let y = config.hexMap.type === 'shapes' ? '30%' : '50%'
       return (
         <>
           <Text
             fontSize={14}
             x={'50%'}
             y={y}
-            style={{ fill: 'currentColor', stroke: 'initial', fontWeight: 400, opacity: 1, fillOpacity: 1 }}
+            style={{ fill: 'currentColor', stroke: strokeColor, fontWeight: 900, opacity: 1, fillOpacity: 1 }}
+            paintOrder='stroke'
             textAnchor='middle'
             verticalAnchor='middle'
             onClick={handleShapeClick}
@@ -141,7 +143,7 @@ const TerritoryHexagon = ({
           >
             {abbr.substring(3)}
           </Text>
-          {state.general.displayAsHex && state.hexMap.type === 'shapes' && getArrowDirection(territoryData, geo, true)}
+          {config.general.displayAsHex && config.hexMap.type === 'shapes' && getArrowDirection(territoryData, geo, true)}
         </>
       )
     }
@@ -162,7 +164,7 @@ const TerritoryHexagon = ({
           x={4}
           strokeWidth='0'
           fontSize={13}
-          style={{ fill: '#202020' }}
+          style={{ fill: APP_FONT_COLOR }}
           alignmentBaseline='middle'
           transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
           onClick={handleShapeClick}
@@ -183,7 +185,7 @@ const TerritoryHexagon = ({
           strokeWidth={strokeWidth}
           points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702'
         />
-        {state.general.displayAsHex && hexagonLabel(territoryData, stroke, false)}
+        {config.general.displayAsHex && hexagonLabel(territoryData, stroke, false)}
       </g>
     </svg>
   )

@@ -113,7 +113,7 @@ const PanelGeneral: FC<PanelProps> = props => {
             )}
           </div>
         )}
-        {(visualizationType === 'Bar' || visualizationType === 'Combo' || visualizationType === 'Area Chart') && (
+        {(visualizationType === 'Bar' || visualizationType === 'Combo') && (
           <Select
             value={visualizationSubType || 'Regular'}
             fieldName='visualizationSubType'
@@ -209,10 +209,8 @@ const PanelGeneral: FC<PanelProps> = props => {
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p>
-                      Recommended set to display for Section 508 compliance.
-                    </p>
-                    <hr/>
+                    <p>Recommended set to display for Section 508 compliance.</p>
+                    <hr />
                     <p>
                       Selecting this option will <i> not </i> hide the display of "zero value", "suppressed data", or
                       "missing data" indicators on the chart (if applicable).
@@ -245,35 +243,7 @@ const PanelGeneral: FC<PanelProps> = props => {
               label='Display "Zero Data" Label'
               updateField={updateField}
             />
-            <CheckBox
-              tooltip={
-                <Tooltip style={{ textTransform: 'none' }}>
-                  <Tooltip.Target>
-                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                  </Tooltip.Target>
-                  <Tooltip.Content>
-                    {config.visualizationSubType === 'stacked' && (
-                      <p>
-                        We do not recommend using stacked vertical/horizontal bar charts for missing data. If you choose
-                        to proceed, selecting this option will display 'N/A' in the tooltip hover and data table (e.g.
-                        nothing will display in chart).
-                      </p>
-                    )}
-                    {config.visualizationSubType !== 'stacked' && (
-                      <p>
-                        Selecting this option will display 'N/A' on the Date/Category Axis, in the tooltip hover, and in
-                        the data table to indicate missing or undefined data values.
-                      </p>
-                    )}
-                  </Tooltip.Content>
-                </Tooltip>
-              }
-              value={config.general.showMissingDataLabel}
-              section='general'
-              fieldName='showMissingDataLabel'
-              label='Display "Missing Data" Label'
-              updateField={updateField}
-            />
+
             <CheckBox
               display={config.visualizationType === 'Bar' || config.visualizationType === 'Combo'}
               tooltip={
@@ -328,6 +298,36 @@ const PanelGeneral: FC<PanelProps> = props => {
             />
           </>
         )}
+
+        <CheckBox
+          tooltip={
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                {config.visualizationSubType === 'stacked' && (
+                  <p>
+                    We do not recommend using stacked vertical/horizontal bar charts for missing data. If you choose to
+                    proceed, selecting this option will display 'N/A' in the tooltip hover and data table (e.g. nothing
+                    will display in chart).
+                  </p>
+                )}
+                {config.visualizationSubType !== 'stacked' && (
+                  <p>
+                    Selecting this option will display 'N/A' on the Date/Category Axis, in the tooltip hover, and in the
+                    data table to indicate missing or undefined data values.
+                  </p>
+                )}
+              </Tooltip.Content>
+            </Tooltip>
+          }
+          value={config.general.showMissingDataLabel}
+          section='general'
+          fieldName='showMissingDataLabel'
+          label='Display "Missing Data" Label'
+          updateField={updateField}
+        />
 
         {visualizationType === 'Pie' && (
           <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />

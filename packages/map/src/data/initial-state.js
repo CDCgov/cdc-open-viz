@@ -72,9 +72,11 @@ export default {
     subStyle: 'linear blocks',
     tickRotation: '',
     singleColumnLegend: false,
-    hideBorder: false
+    hideBorder: false,
+    groupBy: ''
   },
   filters: [],
+  data: [],
   table: {
     wrapColumns: false,
     label: 'Data Table',
@@ -88,7 +90,8 @@ export default {
     showFullGeoNameInCSV: false,
     forceDisplay: true,
     download: false,
-    indexLabel: ''
+    indexLabel: '',
+    cellMinWidth: '0'
   },
   tooltips: {
     appearanceType: 'hover',

@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react'
-import ConfigContext, { ChartDispatchContext } from '../ConfigContext'
+import { ChartDispatchContext } from '../../../ConfigContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
-import { appFontSize } from '@cdc/core/helpers/cove/fontSettings'
-export const useBarChart = () => {
-  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, setSeriesHighlight, seriesHighlight } =
-    useContext(ConfigContext)
-  const dispatch = useContext(ChartDispatchContext)
+import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
+
+export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, configContext) => {
+  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, seriesHighlight } = configContext
   const { orientation } = config
+  const dispatch = useContext(ChartDispatchContext)
   const [hoveredBar, setHoveredBar] = useState(null)
 
   const isHorizontal = orientation === 'horizontal'
@@ -123,43 +123,6 @@ export const useBarChart = () => {
     const barColor = palette[barIndex]
     return barColor
   }
-  const updateBars = defaultBars => {
-    // function updates  stacked && regular && lollipop horizontal bars
-    if (config.visualizationType !== 'Bar' && !isHorizontal) return defaultBars
-
-    const barsArr = [...defaultBars]
-    let barHeight
-
-    const heights = {
-      stacked: config.barHeight,
-      lollipop: lollipopBarWidth
-    }
-
-    if (!isStacked) {
-      barHeight = heights[config.isLollipopChart ? 'lollipop' : 'stacked'] * stackCount
-    } else {
-      barHeight = heights.stacked
-    }
-
-    const labelHeight = isLabelBelowBar ? appFontSize * 1.2 : 0
-    let barSpace = Number(config.barSpace)
-
-    // calculate height of container based height, space and fontSize of labels
-    let totalHeight = barsArr.length * (barHeight + labelHeight + barSpace)
-
-    if (isHorizontal) {
-      config.heights.horizontal = totalHeight
-    }
-
-    // return new updated bars/groupes
-    return barsArr.map((bar, i) => {
-      // set bars Y dynamically to handle space between bars
-      let y = 0
-      bar.index !== 0 && (y = (barHeight + barSpace + labelHeight) * i)
-
-      return { ...bar, y: y, height: barHeight }
-    })
-  }
 
   const getHighlightedBarColorByValue = value => {
     const match = config?.highlightedBarValues.find(item => {
@@ -226,17 +189,18 @@ export const useBarChart = () => {
     return additionalTooltipItems
   }
 
-  const onMouseOverBar = (categoryValue, barKey) => {
+  const onMouseOverBar = (categoryValue, barKey, event, data) => {
     if (config.legend.highlightOnHover && config.legend.behavior === 'highlight' && barKey) {
       dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [barKey] })
     }
-
+    handleTooltipMouseOver(event, data)
     setHoveredBar(categoryValue)
   }
   const onMouseLeaveBar = () => {
     if (config.legend.highlightOnHover && config.legend.behavior === 'highlight') {
       dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [] })
     }
+    handleTooltipMouseOff()
   }
 
   return {
@@ -256,7 +220,6 @@ export const useBarChart = () => {
     barStackedSeriesKeys,
     hasMultipleSeries,
     applyRadius,
-    updateBars,
     assignColorsToValues,
     getHighlightedBarColorByValue,
     getHighlightedBarByValue,

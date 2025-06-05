@@ -196,7 +196,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
         />
       )}
       {config?.visualizationType !== 'Sankey' && (
-        <label>
+        <label onClick={e => e.preventDefault()}>
           <span className='edit-label column-heading mt-1'>Exclude Columns </span>
           <MultiSelect
             key={excludedColumns.join('') + 'excluded'}

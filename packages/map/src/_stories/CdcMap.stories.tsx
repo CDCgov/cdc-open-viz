@@ -14,6 +14,7 @@ type Story = StoryObj<typeof CdcMap>
 
 export const Equal_Interval_Map: Story = {
   args: {
+    isEditor: true,
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/page-elements/equal-interval-map.json'
   }
 }
@@ -26,6 +27,7 @@ export const Equal_Number_Opt_In: Story = {
 
 export const Equal_Number_Map: Story = {
   args: {
+    isEditor: true,
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/page-elements/equal-number-map.json'
   }
 }
@@ -137,7 +139,8 @@ export const Custom_Color_Distributions_Without_Special_Classes: Story = {
 
 export const Standard_Color_Distributions_With_Special_Classes: Story = {
   args: {
-    config: exampleCityStateStandardColors
+    config: exampleCityStateStandardColors,
+    isEditor: true
   }
 }
 

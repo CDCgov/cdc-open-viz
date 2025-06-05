@@ -2,7 +2,6 @@ import React, { useContext } from 'react'
 
 // Local context and hooks
 import ConfigContext from '../../../ConfigContext'
-import { useBarChart } from '../../../hooks/useBarChart'
 import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
 
 // VisX library imports
@@ -12,9 +11,11 @@ import { BarGroup } from '@visx/shape'
 
 // CDC core components and helpers
 import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { getBarConfig, testZeroValue } from '../helpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
+import isNumber from '@cdc/core/helpers/isNumber'
 
 // Third party libraries
 import chroma from 'chroma-js'
@@ -24,9 +25,26 @@ import BarChartContext, { BarChartContextValues } from './context'
 import { ChartContext } from '../../../types/ChartContext'
 import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
+import { getHorizontalBarHeights } from '../helpers/getBarHeights'
 
 export const BarChartHorizontal = () => {
-  const { xScale, yScale, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
+  const { xScale, yScale, yMax, seriesScale, barChart } = useContext<BarChartContextValues>(BarChartContext)
+  const {
+    isHorizontal,
+    barBorderWidth,
+    assignColorsToValues,
+    section,
+    isLabelBelowBar,
+    lollipopBarWidth,
+    lollipopShapeSize,
+    getHighlightedBarColorByValue,
+    getHighlightedBarByValue,
+    getAdditionalColumn,
+    hoveredBar,
+    onMouseLeaveBar,
+    onMouseOverBar
+  } = barChart
+
   const {
     transformedData: data,
     tableData,
@@ -36,36 +54,18 @@ export const BarChartHorizontal = () => {
     formatNumber,
     formatDate,
     parseDate,
-    setSharedFilter,
-    isNumber
+    setSharedFilter
   } = useContext<ChartContext>(ConfigContext)
-  const {
-    isHorizontal,
-    barBorderWidth,
-    updateBars,
-    assignColorsToValues,
-    section,
-    isLabelBelowBar,
-    displayNumbersOnBar,
-    lollipopBarWidth,
-    lollipopShapeSize,
-    getHighlightedBarColorByValue,
-    getHighlightedBarByValue,
-    getAdditionalColumn,
-    hoveredBar,
-    onMouseLeaveBar,
-    onMouseOverBar
-  } = useBarChart()
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
-  const hasConfidenceInterval = Object.keys(config.confidenceKeys).length > 0
+  const hasConfidenceInterval =
+    config.confidenceKeys.upper &&
+    config.confidenceKeys.lower &&
+    config.confidenceKeys.upper !== '' &&
+    config.confidenceKeys.lower !== ''
 
   const _data = getBarData(config, data, hasConfidenceInterval)
-
-  const root = document.documentElement
-
-  const coolGray90 = getComputedStyle(root).getPropertyValue('--cool-gray-90')
 
   return (
     config.visualizationSubType !== 'stacked' &&
@@ -85,7 +85,7 @@ export const BarChartHorizontal = () => {
           }}
         >
           {barGroups => {
-            return updateBars(barGroups).map((barGroup, index) => (
+            return getHorizontalBarHeights(config, barGroups).map((barGroup, index) => (
               <Group
                 className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`}
                 key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
@@ -120,19 +120,19 @@ export const BarChartHorizontal = () => {
                   const defaultBarWidth = Math.abs(xScale(bar.value) - xScale(scaleVal))
                   const isPositiveBar = bar.value >= 0 && isNumber(bar.value)
 
-                  const {
-                    barWidthHorizontal: barWidth,
-                    isSuppressed,
-                    getAbsentDataLabel
-                  } = getBarConfig({ bar, defaultBarWidth, config, isNumber, isVertical: false })
                   const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const yAxisValue = formatNumber(bar.value, 'left')
                   const xAxisValue =
                     config.runtime[section].type === 'date' ? formatDate(parseDate(dataValue)) : dataValue
+                  const {
+                    barWidthHorizontal: barWidth,
+                    isSuppressed,
+                    absentDataLabel
+                  } = getBarConfig({ bar, defaultBarWidth, config, isVertical: false, yAxisValue, barWidth: 0 })
 
                   const barPosition = !isPositiveBar ? 'below' : 'above'
-                  const absentDataLabel = getAbsentDataLabel(yAxisValue)
-                  const barDefaultLabel = !config.yAxis.displayNumbersOnBar ? '' : yAxisValue
+
+                  const barDefaultLabel = !config.yAxis.displayNumbersOnBar || absentDataLabel ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
                   const textWidth = getTextWidth(barDefaultLabel)
@@ -192,15 +192,20 @@ export const BarChartHorizontal = () => {
                     ? highlightedBar.borderWidth
                     : config.isLollipopChart
                     ? 0
-                    : config.barHasBorder === 'true'
+                    : config.barHasBorder === 'true' && !absentDataLabel && !isSuppressed
                     ? barBorderWidth
                     : 0
                   const displaylollipopShape = testZeroValue(bar.value) ? 'none' : 'block'
+                  const hideGroup =
+                    (!isNumber(bar.value) && !config.general.showMissingDataLabel) ||
+                    (String(bar.value) === '0' && !config.general.showZeroValueData)
+                      ? 'none'
+                      : 'block' // hide bar group if no value or zero value
 
                   // update label color
                   if (barColor && labelColor && textFits) {
-                    labelColor = getContrastColor('#000', barColor)
-                    let constrast = getColorContrast('#000', barColor)
+                    labelColor = getContrastColor(APP_FONT_COLOR, barColor)
+                    let constrast = getColorContrast(APP_FONT_COLOR, barColor)
                     const contrastLevel = 7
                     if (constrast < contrastLevel) {
                       labelColor = '#fff'
@@ -227,10 +232,11 @@ export const BarChartHorizontal = () => {
                     const d = datum[config.confidenceKeys[position]]
                     return xScale(d)
                   })
-                  // End Confidence Interval Variables
+                  const labelX = bar.y
+                  const overlapWithCI = hasConfidenceInterval && labelX >= lowerPos && labelX <= upperPos
 
                   return (
-                    <Group key={`${barGroup.index}--${index}`}>
+                    <Group display={hideGroup} key={`${barGroup.index}--${index}`}>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                         {createBarElement({
                           config: config,
@@ -244,7 +250,7 @@ export const BarChartHorizontal = () => {
                           height: numbericBarHeight,
                           x: barX,
                           y: barHeight * bar.index,
-                          onMouseOver: () => onMouseOverBar(xAxisValue, bar.key),
+                          onMouseOver: e => onMouseOverBar(xAxisValue, bar.key, e, data),
                           onMouseLeave: onMouseLeaveBar,
                           tooltipHtml: tooltip,
                           tooltipId: `cdc-open-viz-tooltip-${config.runtime.uniqueId}`,
@@ -305,8 +311,12 @@ export const BarChartHorizontal = () => {
                             display={displayBar ? 'block' : 'none'}
                             x={bar.y}
                             opacity={transparentBar ? 0.5 : 1}
-                            y={config.barHeight / 2 + config.barHeight * bar.index}
-                            fill={labelColor}
+                            y={
+                              hasConfidenceInterval && overlapWithCI
+                                ? config.barHeight * bar.index
+                                : config.barHeight / 2 + config.barHeight * bar.index
+                            }
+                            fill={hasConfidenceInterval && overlapWithCI ? '#000' : labelColor}
                             dx={textPadding}
                             verticalAnchor='middle'
                             textAnchor={textAnchor}
@@ -387,10 +397,10 @@ export const BarChartHorizontal = () => {
                             <animate attributeName='height' values={`0, ${lollipopShapeSize}`} dur='2.5s' />
                           </rect>
                         )}
-                        {hasConfidenceInterval && (
+                        {hasConfidenceInterval && displayBar && (
                           <path
                             key={`confidence-interval-h-${yPos}-${datum[config.runtime.originalXAxis.dataKey]}`}
-                            stroke={coolGray90}
+                            stroke={APP_FONT_COLOR}
                             strokeWidth='px'
                             d={`
                                 M${lowerPos} ${yPos - tickWidth}

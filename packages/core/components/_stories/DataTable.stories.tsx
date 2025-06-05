@@ -8,6 +8,7 @@ import CityStateExample from './_mocks/example-city-state.json'
 import { displayGeoName } from '@cdc/map/src/helpers/displayGeoName'
 import rowTypeData from './_mocks/row_type.json'
 import { TableConfig } from '../DataTable/types/TableConfig'
+import ConfigContext from '@cdc/map/src/context'
 
 const meta: Meta<typeof DataTable> = {
   title: 'Components/Organisms/DataTable',
@@ -36,7 +37,6 @@ export const Primary: Story = {
 export const CityState: Story = {
   args: {
     config: CityStateExample,
-    dataConfig: CityStateExample,
     rawData: CityStateExample.data,
     runtimeData: CityStateExample.data,
     expandDataTable: true,
@@ -46,7 +46,14 @@ export const CityState: Story = {
     columns: CityStateExample.columns,
     applyLegendToRow: () => ['#000'],
     displayGeoName
-  }
+  },
+  decorators: [
+    Story => (
+      <ConfigContext.Provider value={{ config: CityStateExample }}>
+        <Story />
+      </ConfigContext.Provider>
+    )
+  ]
 }
 
 export const Grouped: Story = {
