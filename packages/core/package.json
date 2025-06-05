@@ -1,6 +1,6 @@
 {
   "name": "@cdc/core",
-  "version": "4.25.3",
+  "version": "4.25.5",
   "description": "Core components, styles, hooks, and helpers, for the CDC Open Visualization project",
   "moduleName": "CdcCore",
   "main": "dist/cdccore",
@@ -26,8 +26,8 @@
     "prop-types": "^15.8.1",
     "react-accessible-accordion": "^5.0.0",
     "react-select": "^5.3.1",
-    "use-debounce": "^6.0.1",
-    "react-tooltip": "5.8.2-beta.3"
+    "react-tooltip": "5.8.2-beta.3",
+    "use-debounce": "^6.0.1"
   },
   "peerDependencies": {
     "react": "^18.2.0",
