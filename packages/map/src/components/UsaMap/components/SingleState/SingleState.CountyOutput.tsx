@@ -18,7 +18,7 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
   const { config, data, legendMemo, legendSpecialClassLastMemo, runtimeLegend } = useContext<MapContext>(ConfigContext)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const geoFillColor = getGeoFillColor(config)
-  const geoClickHandler = useGeoClickHandler()
+  const { geoClickHandler } = useGeoClickHandler()
 
   return (
     <>
