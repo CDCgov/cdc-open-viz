@@ -33,7 +33,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "gitHead": "6c7ac5215dcf3bc1cc7d199089c8c2e75f53a93e",
+  "gitHead": "f600807a95d9689aeb74f2408b238468b5ff6c01",
   "devDependencies": {
     "sass": "^1.79.4"
   }
