@@ -46,7 +46,6 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
 
   min = enteredMinValue && isMinValid ? Number(enteredMinValue) : minValue
   max = enteredMaxValue && isMaxValid ? Number(enteredMaxValue) : Number.MIN_VALUE
-
   const { lower, upper } = config?.confidenceKeys || {}
 
   if (lower && upper && config.visualizationType === 'Bar') {
@@ -234,6 +233,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
 
   if (config.visualizationType === 'Scatter Plot') {
     max = max * 1.1
+    min = min / 1.1
   }
 
   return { min, max, leftMax, rightMax }
