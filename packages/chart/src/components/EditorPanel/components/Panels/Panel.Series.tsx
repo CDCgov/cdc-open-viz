@@ -627,6 +627,7 @@ const SeriesItem = props => {
     ['Bar', 'Line'].includes(config.visualizationType) &&
     config.visualizationSubType !== 'Stacked' &&
     !config.series.find(s => s.dynamicCategory && s.dataKey !== series.dataKey)
+  const SELECT = '- Select -'
   return (
     <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
       {(provided, snapshot) => (
@@ -661,9 +662,9 @@ const SeriesItem = props => {
                       <Select
                         label='Dynamic Category'
                         value={series.dynamicCategory}
-                        options={['- Select - ', ...getColumns().filter(col => series.dataKey !== col)]}
+                        options={[SELECT, ...getColumns().filter(col => series.dataKey !== col)]}
                         updateField={(_section, _subsection, _fieldName, value) => {
-                          if (value === '- Select -') value = ''
+                          if (value === SELECT) value = ''
                           updateSeries(i, value, 'dynamicCategory')
                         }}
                         tooltip={
