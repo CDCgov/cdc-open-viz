@@ -32,6 +32,7 @@ import {
   convertVegaConfig,
   getVegaConfigType,
   getVegaErrors,
+  getVegaWarnings,
   isVegaConfig,
   parseVegaConfig
 } from '@cdc/editor/src/helpers/vegaConfig'
@@ -69,7 +70,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
     try {
       newConfig = JSON.parse(text)
     } catch (e) {
-      alert('Invalid JSON')
+      alert('The JSON that was entered is invalid.')
       throw new Error()
     }
 
@@ -83,18 +84,31 @@ const ChooseTab: React.FC = (): JSX.Element => {
   }
 
   const importVegaConfig = newConfig => {
-    const vegaConfig = parseVegaConfig(newConfig)
-    const vegaErrors = getVegaErrors(newConfig, vegaConfig)
-    if (vegaErrors.length) {
-      const errorText = vegaErrors.join('\n\n')
-      alert(errorText)
-      throw new Error(errorText)
+    let vegaErrors
+    try {
+      const vegaConfig = parseVegaConfig(newConfig)
+      vegaErrors = getVegaErrors(newConfig, vegaConfig)
+      if (vegaErrors.length === 0) {
+        const configType = getVegaConfigType(vegaConfig)
+        const configSubType = configType === 'Map' ? 'United States (State- or County-Level)' : configType
+        const button = buttons.find(b => b.label === configSubType)
+        const coveConfig = generateNewConfig(JSON.parse(JSON.stringify(button)))
+        const vegaWarnings = getVegaWarnings(newConfig, vegaConfig)
+        const config = convertVegaConfig(configType, vegaConfig, coveConfig)
+        if (vegaWarnings.length) {
+          alert(vegaWarnings.join('\n\n'))
+        }
+        return config
+      }
+    } catch {
+      vegaErrors = [
+        'An unknown error occurred while importing this Vega config. Reach out to the COVE team if you think it should be supported.'
+      ]
     }
-    const configType = getVegaConfigType(vegaConfig)
-    const configSubType = configType === 'Map' ? 'United States (State- or County-Level)' : configType
-    const button = buttons.find(b => b.label === configSubType)
-    const coveConfig = generateNewConfig(button)
-    return convertVegaConfig(configType, vegaConfig, coveConfig)
+
+    const errorText = vegaErrors.join('\n\n')
+    alert(errorText)
+    throw new Error(errorText)
   }
 
   const generateNewConfig = props => {
