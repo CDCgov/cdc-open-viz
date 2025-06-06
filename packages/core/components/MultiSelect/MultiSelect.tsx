@@ -36,9 +36,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   tooltip,
   loading
 }) => {
-  const preselectedItems = useMemo(() => options.filter(opt => selected.includes(opt.value)).slice(0, limit), [options])
-  const [selectedItems, setSelectedItems] = useState<Option[]>()
-  const items = selectedItems || preselectedItems
+  const items = useMemo(() => options.filter(opt => selected.includes(opt.value)).slice(0, limit), [options])
   const [expanded, setExpanded] = useState(false)
   const multiSelectRef = useRef(null)
 
@@ -68,14 +66,12 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
     if (e && e.type === 'keyup' && e.key !== 'Enter') return
     if (limit && items?.length >= limit) return
     const newItems = [...items, option]
-    setSelectedItems(newItems)
     update(newItems)
   }
 
   const handleItemRemove = (option: Option, e = null) => {
     if (e && e.type === 'keyup' && e.key !== 'Enter') return
     const newItems = items.filter(item => item.value !== option.value)
-    setSelectedItems(newItems)
     update(newItems)
   }
 
@@ -99,6 +95,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
             items.map(item => (
               <div key={item.value} aria-labelledby={label ? multiID + label : undefined}>
                 {item.label}
+
                 <button
                   aria-label='Remove'
                   onClick={e => {

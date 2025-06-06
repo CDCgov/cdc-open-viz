@@ -237,7 +237,11 @@ const Filters: React.FC<FilterProps> = ({
                   <MultiSelect
                     options={singleFilter.values.map(v => ({ value: v, label: v }))}
                     fieldName={outerIndex}
-                    updateField={(_section, _subSection, fieldName, value) => changeFilterActive(fieldName, value)}
+                    updateField={(_section, _subSection, fieldName, value) => {
+                      const defaultSelection = singleFilter.defaultValue || [singleFilter.values[0]]
+                      const selection = value?.length ? value : defaultSelection
+                      changeFilterActive(fieldName, selection)
+                    }}
                     selected={singleFilter.active as string[]}
                     limit={(singleFilter as MultiSelectFilter).selectLimit || 5}
                   />
