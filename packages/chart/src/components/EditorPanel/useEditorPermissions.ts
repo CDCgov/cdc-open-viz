@@ -197,7 +197,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsTooltipLines = () => {
-    const enabledCharts = ['Combo', 'Forecasting', 'Area Chart', 'Line', 'Bar']
+    const enabledCharts = ['Combo', 'Forecasting', 'Area Chart', 'Line', 'Bar', 'Scatter Plot']
     if (enabledCharts.includes(visualizationType)) return true
     return false
   }

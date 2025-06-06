@@ -425,19 +425,23 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
     return newConfig
   }
+
   useEffect(() => {
-    try {
-      if (configObj) {
-        const preparedConfig = prepareConfig(_.cloneDeep(configObj))
-        const { formattedData } = preparedConfig
-        preparedConfig.data = formattedData
-        dispatch({ type: 'SET_STATE_DATA', payload: formattedData })
-        dispatch({ type: 'SET_EXCLUDED_DATA', payload: formattedData })
-        updateConfig(preparedConfig, formattedData)
+    const load = async () => {
+      try {
+        if (configObj) {
+          const preparedConfig = await prepareConfig(configObj)
+          const preppedData = await prepareData(preparedConfig)
+          dispatch({ type: 'SET_STATE_DATA', payload: preppedData.data })
+          dispatch({ type: 'SET_EXCLUDED_DATA', payload: preppedData.data })
+          updateConfig(preparedConfig, preppedData.data)
+        }
+      } catch (err) {
+        console.error('Could not Load!')
       }
-    } catch (err) {
-      console.error('Could not Load!')
     }
+
+    load()
   }, [configObj?.data?.length ? configObj.data : null])
 
   /**

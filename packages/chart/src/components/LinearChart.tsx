@@ -43,6 +43,7 @@ import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
+import HoverLine from './HoverLine/HoverLine'
 
 type LinearChartProps = {
   parentWidth: number
@@ -58,6 +59,20 @@ const TICK_LABEL_FONT_SIZE_SMALL = 13
 const AXIS_LABEL_FONT_SIZE = 18
 const AXIS_LABEL_FONT_SIZE_SMALL = 14
 const TICK_LABEL_MARGIN_RIGHT = 4.5
+
+type TooltipData = {
+  dataXPosition?: number
+  dataYPosition?: number
+}
+
+type UseTooltipReturn<T = TooltipData> = {
+  tooltipData: T | null
+  showTooltip: (tooltipData: T) => void
+  hideTooltip: () => void
+  tooltipOpen: boolean
+  tooltipLeft: number | null
+  tooltipTop: number | null
+}
 
 const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, parentWidth }, svgRef) => {
   // prettier-ignore
@@ -237,7 +252,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const handleNumTicks = isForestPlot ? config.data.length : yTickCount
 
   // Tooltip Helpers
-  const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip()
+
+  const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } =
+    useTooltip<UseTooltipReturn<TooltipData>>()
 
   // prettier-ignore
   const {
@@ -794,7 +811,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               xScale={xScale}
               yScale={yScale}
               width={xMax}
-              le
               height={yMax}
               xScaleNoPadding={xScaleNoPadding}
               chartRef={svgRef}
@@ -937,36 +953,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               {config.chartMessage.noData}
             </Text>
           )}
-          {config.visual.horizontalHoverLine && tooltipData && (
-            <Group
-              key={`tooltipLine-horizontal${point.y}${point.x}`}
-              className='horizontal-tooltip-line'
-              left={config.yAxis.size ? config.yAxis.size : 0}
-            >
-              <Line
-                from={{ x: 0, y: point.y }}
-                to={{ x: xMax, y: point.y }}
-                stroke={'black'}
-                strokeWidth={1}
-                pointerEvents='none'
-                strokeDasharray='5,5'
-                className='horizontal-tooltip-line'
-              />
-            </Group>
-          )}
-          {config.visual.verticalHoverLine && tooltipData && (
-            <Group key={`tooltipLine-vertical${point.y}${point.x}`} className='vertical-tooltip-line'>
-              <Line
-                from={{ x: point.x, y: 0 }}
-                to={{ x: point.x, y: yMax }}
-                stroke={'black'}
-                strokeWidth={1}
-                pointerEvents='none'
-                strokeDasharray='5,5'
-                className='vertical-tooltip-line'
-              />
-            </Group>
-          )}
+          <HoverLine xMax={xMax} yMax={yMax} point={point} tooltipData={tooltipData} orientation='horizontal' />
+          <HoverLine xMax={xMax} yMax={yMax} point={point} tooltipData={tooltipData} orientation='vertical' />
           <Group left={Number(config.runtime.yAxis.size)}>
             <Annotation.Draggable
               xScale={xScale}
