@@ -144,7 +144,11 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                 label={label}
                 options={multiValues}
                 fieldName={filterIndex}
-                updateField={updateField}
+                updateField={(_section, _subsection, fieldName, val) => {
+                  const defaultSelection = filter.defaultValue || [multiValues[0]?.value]
+                  const selection = val?.length ? val : defaultSelection
+                  updateField(null, null, fieldName, selection)
+                }}
                 selected={filter.active as string[]}
                 limit={filter.selectLimit || 5}
                 loading={loading}
