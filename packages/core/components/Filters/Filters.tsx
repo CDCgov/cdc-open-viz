@@ -238,7 +238,7 @@ const Filters: React.FC<FilterProps> = ({
                     options={singleFilter.values.map(v => ({ value: v, label: v }))}
                     fieldName={outerIndex}
                     updateField={(_section, _subSection, fieldName, value) => {
-                      const defaultSelection = [singleFilter.values[0]]
+                      const defaultSelection = singleFilter.defaultValue || [singleFilter.values[0]]
                       const selection = value?.length ? value : defaultSelection
                       changeFilterActive(fieldName, selection)
                     }}
