@@ -1,6 +1,7 @@
 export default {
   annotations: [],
   general: {
+    equalNumberOptIn: true,
     navigationTarget: '_self',
     noStateFoundMessage: 'Map Unavailable',
     annotationDropdownText: 'Annotations',

@@ -4,7 +4,7 @@ import { MapConfig } from '../types/MapConfig'
 export const generateRuntimeLegendHash = (config: MapConfig, runtimeFilters) => {
   return hashObj({
     unified: config.legend.unified ?? false,
-    equalNumberOptIn: config.general.equalNumberOptIn ?? false,
+    equalNumberOptIn: config.general.equalNumberOptIn ?? true,
     specialClassesLast: config.legend.showSpecialClassesLast ?? false,
     color: config.color,
     customColors: config.customColors,
