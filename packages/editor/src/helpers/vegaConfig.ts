@@ -33,13 +33,37 @@ export const isVegaConfig = config => {
 export const getVegaErrors = (vegaOrVegaLiteConfig, vegaConfig) => {
   const errors = []
 
+  const data = convertVegaData(vegaConfig)
+
   if (vegaOrVegaLiteConfig.repeat || vegaOrVegaLiteConfig.spec) {
-    errors.push('The Vega importer does not support the repeat/spec operator.')
+    errors.push("COVE's Vega importer does not support vega-lite's repeat/spec operator.")
   }
 
   const configType = getVegaConfigType(vegaConfig)
   if (!configType) {
-    errors.push('The Vega importer could not find a COVE chart type that matches the Vega chart.')
+    errors.push(
+      `COVE's Vega importer could not find a COVE chart type that matches this Vega config. Supported marks are: ${SUPPORTED_MARKS.join(
+        ', '
+      )}.`
+    )
+  }
+
+  if (data.length === 0 && errors.length === 0) {
+    errors.push(
+      "No data was found in the Vega config. COVE's Vega importer requires data to be embedded in the config; if the config was exported from 1CDP, make sure it was copied from the Preview tab."
+    )
+  }
+
+  const stack = getStack(vegaConfig)
+  if (configType === 'Combo Chart' && stack && getMaxGroupSize(data, stack.groupby) > 1) {
+    const comboMarks = getComboMarks(vegaConfig)
+    errors.push(
+      `This config contains multiple types of marks (${comboMarks
+        .map(m => m.type)
+        .join(
+          ', '
+        )}) and one of them appears to be stacked. COVE's combo charts do not support both stacked and unstacked data (e.g. a stacked bar chart with a line).`
+    )
   }
 
   if (errors.length) {
@@ -47,6 +71,29 @@ export const getVegaErrors = (vegaOrVegaLiteConfig, vegaConfig) => {
   }
 
   return errors
+}
+
+export const getVegaWarnings = (vegaOrVegaLiteConfig, vegaConfig) => {
+  const warnings = []
+
+  const configType = getVegaConfigType(vegaConfig)
+  const allMarks = getMarks(vegaConfig)
+  const comboMarks = getComboMarks(vegaConfig)
+  const allMarksTypeCount = [...new Set(allMarks.map(m => m.type))].length
+  if (
+    (configType !== 'Combo Chart' && allMarksTypeCount > 1) ||
+    (configType === 'Combo Chart' && allMarks.length > comboMarks.length)
+  ) {
+    warnings.push(
+      `This Vega config contains multiple types of marks (${allMarks
+        .map(m => m.type)
+        .join(', ')}), but COVE's combo charts only support these types of marks: (${Object.keys(COMBO_MARKS).join(
+        ', '
+      )}). Not all marks were imported.`
+    )
+  }
+
+  return warnings
 }
 
 export const parseVegaConfig = vegaConfig => {
@@ -137,7 +184,7 @@ const getVegaData = (vegaConfig, name) => {
   if (!name) return []
   const view = new vega.View(vega.parse(vegaConfig)).run()
   try {
-    return view.data(name)
+    return view.data(name) || []
   } catch (error) {
     return []
   }
@@ -148,8 +195,10 @@ export const convertVegaData = vegaConfig => {
   const mainMark = getMainMark(vegaConfig)
   const groupMark = getGroupMark(vegaConfig)
   const facetName = groupMark?.from?.facet?.data
-  const name = facetName || mainMark.from.data
+  const name = facetName || mainMark?.from?.data
   let data = getVegaData(vegaConfig, name)
+
+  if (data.length === 0) return data
 
   if (!facetName) {
     const otherNames = [...new Set(getMarks(vegaConfig).map(m => m.from?.data))].filter(n => n)
