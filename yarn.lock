@@ -5101,7 +5101,7 @@
   dependencies:
     "@visx/vendor" "3.12.0"
 
-"@visx/shape@3.12.0", "@visx/shape@^3.0.0":
+"@visx/shape@3.12.0", "@visx/shape@^3.12.0":
   version "3.12.0"
   resolved "https://registry.yarnpkg.com/@visx/shape/-/shape-3.12.0.tgz#ce54491d2fb2d96a1f31095ff12218d85d3a2e15"
   integrity sha512-/1l0lrpX9tPic6SJEalryBKWjP/ilDRnQA+BGJTI1tj7i23mJ/J0t4nJHyA1GrL4QA/bM/qTJ35eyz5dEhJc4g==
@@ -5132,7 +5132,7 @@
     d3-shape "^1.2.0"
     prop-types "^15.5.10"
 
-"@visx/text@3.12.0", "@visx/text@^3.0.0":
+"@visx/text@3.12.0", "@visx/text@^3.12.0":
   version "3.12.0"
   resolved "https://registry.yarnpkg.com/@visx/text/-/text-3.12.0.tgz#2d023a6ac561557c5a7e7538bea4015d987e5238"
   integrity sha512-0rbDYQlbuKPhBqXkkGYKFec1gQo05YxV45DORzr6hCyaizdJk1G+n9VkuKSHKBy1vVQhBA0W3u/WXd7tiODQPA==
@@ -13182,7 +13182,7 @@ react-accessible-accordion@^3.0.1, react-accessible-accordion@^3.3.4:
   resolved "https://registry.yarnpkg.com/react-accessible-accordion/-/react-accessible-accordion-3.3.5.tgz#5d035994a261c832a57e7822f1bbacf914c5a5cc"
   integrity sha512-yCh3tx+jNuOPs+m58LOBFTGDEaGvM8UfuCNznr855FDAWzwV8V/ZH/TVBvgqH0npP58KrrVrHpj4jcy0EE5hEw==
 
-react-accessible-accordion@^5.0.0:
+react-accessible-accordion@^5.0.0, react-accessible-accordion@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/react-accessible-accordion/-/react-accessible-accordion-5.0.1.tgz#b406822d28e945bf7c2ffefbcd484bd6a8e679f5"
   integrity sha512-EIXkdQs4BObemHtRizVIq4wnbS3z0TPLAmiR2nZSG0Z3Mpm7pr8cwBddK5OcuWniRJ8OpJBqtlpUz0XnQCV06w==
