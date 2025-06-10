@@ -7,7 +7,7 @@ import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { addUIDs, validateFipsCodeLength } from './helpers'
 import EditorContext from '@cdc/editor/src/ConfigContext'
 import { MapConfig } from './types/MapConfig'
-import _ from 'lodash'
+import _, { set } from 'lodash'
 
 type CdcMapProps = {
   config: MapConfig
@@ -30,7 +30,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
   config: editorsConfig
 }) => {
   const editorContext = useContext(EditorContext)
-  const [config, _setConfig] = useState(null)
+  const [config, _setConfig] = useState(editorsConfig ?? null)
 
   const setConfig = newConfig => {
     _setConfig(newConfig)
@@ -116,6 +116,10 @@ const CdcMap: React.FC<CdcMapProps> = ({
   useEffect(() => {
     init()
   }, [configUrl])
+
+  useEffect(() => {
+    setConfig(editorsConfig)
+  }, [editorsConfig])
 
   if (loading) return null
 
