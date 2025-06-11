@@ -139,7 +139,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
 
   /* HANDLE LOADING/ERROR STATES */
   if (configLoading || dataLoading) return <Loading />
-  if (invalidConfig || invalidData) return <div>Something went wrong</div>
+  if (invalidConfig || invalidData) throw new Error('Invalid config or data provided to CdcDataTable component')
 
   // initial static config combined with dynamic states
   const configWithStates = {
