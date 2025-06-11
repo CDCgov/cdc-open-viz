@@ -24,7 +24,7 @@ type CdcDataTableProps = {
   isEditor: boolean
 }
 
-const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTableProps) => {
+const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTableProps) => {
   /* STORE */
   const initialState = getInitialState(isEditor)
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -89,14 +89,14 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
 
   useEffect(() => {
     /* NO VALID INPUT */
-    if (!inputConfig && !configUrl) {
+    if (!configObj && !configUrl) {
       setConfig(null)
       return
     }
 
     /* FULL CONFIG PROVIDED */
-    if (inputConfig) {
-      initConfig(inputConfig)
+    if (configObj) {
+      initConfig(configObj)
       return
     }
 
@@ -104,7 +104,7 @@ const CdcDataTable = ({ config: inputConfig, configUrl, isEditor }: CdcDataTable
     fetchConfig(configUrl)
       .then(resConfig => initConfig(resConfig))
       .catch(err => setConfig(null))
-  }, [inputConfig, configUrl])
+  }, [configObj, configUrl])
 
   useEffect(() => {
     if (configLoading || invalidConfig) return
