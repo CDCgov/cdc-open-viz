@@ -69,25 +69,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
     setFilterIntro(updatedConfig.filterIntro)
   }
 
-  const updateFilters = (newConfig: Config) => {
-    const { filters: newFilters } = newConfig
-    setFilters(newFilters)
-  }
-
-  // Observes changes to outermost container and changes viewport size in state
-  const resizeObserver = new ResizeObserver(entries => {
-    for (let entry of entries) {
-      let newViewport = getViewport(entry.contentRect.width)
-      setCurrentViewport(newViewport)
-    }
-  })
-  // Load data when component first mounts
-  const outerContainerRef = useCallback(node => {
-    if (node === null) return
-    resizeObserver.observe(node)
-  }, [])
-
-  useEffect(() => {
+  const loadConfig = () => {
     /* NO VALID INPUT */
     if (!configObj && !configUrl) {
       setConfig(null)
@@ -104,9 +86,9 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
     fetchConfig(configUrl)
       .then(resConfig => initConfig(resConfig))
       .catch(err => setConfig(null))
-  }, [configObj, configUrl])
+  }
 
-  useEffect(() => {
+  const loadData = () => {
     if (configLoading || invalidConfig) return
 
     /* NO CONFIG DATA */
@@ -126,7 +108,30 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
         setData(processedData)
       })
       .catch(() => setData(null))
-  }, [inputData, dataUrl, configLoading, invalidConfig, dataDescription])
+  }
+
+  const updateFilters = (newConfig: Config) => {
+    const { filters: newFilters } = newConfig
+    setFilters(newFilters)
+  }
+
+  // Observes changes to outermost container and changes viewport size in state
+  const resizeObserver = new ResizeObserver(entries => {
+    for (let entry of entries) {
+      let newViewport = getViewport(entry.contentRect.width)
+      setCurrentViewport(newViewport)
+    }
+  })
+  // Load data when component first mounts
+  const outerContainerRef = useCallback(node => {
+    if (node === null) return
+    resizeObserver.observe(node)
+  }, [])
+
+  useEffect(() => {
+    loadConfig()
+    loadData()
+  }, [configObj, configUrl, inputData, dataUrl, configLoading, invalidConfig, dataDescription])
 
   /* HANDLE LOADING/ERROR STATES */
   if (configLoading || dataLoading) return <Loading />
