@@ -52,7 +52,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
   const { label, indexLabel, expanded } = table || {}
 
   /* FILTERED DATA */
-  const filteredData = filterVizData(filters, data)
+  const filteredData = data ? filterVizData(filters, data) : []
 
   /* LOADING VARS */
   const configLoading = configUrl && config === undefined
