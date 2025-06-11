@@ -1,4 +1,5 @@
 export default {
+  type: 'table',
   table: {
     label: 'Data Table',
     expanded: true,

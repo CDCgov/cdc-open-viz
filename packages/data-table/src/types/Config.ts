@@ -14,6 +14,7 @@ export type Config = {
   dataUrl?: string
   filters?: VizFilter[]
   filterBehavior?: FilterBehavior
+  filterIntro?: string
   general?: General
   table: Table
   type: 'table'
