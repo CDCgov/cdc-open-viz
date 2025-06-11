@@ -1,5 +1,6 @@
 import { Column } from '@cdc/core/types/Column'
 import { DataDescription } from '@cdc/core/types/DataDescription'
+import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 import { General } from '@cdc/core/types/General'
 import { Table } from '@cdc/core/types/Table'
 import { Version } from '@cdc/core/types/Version'
@@ -12,6 +13,7 @@ export type Config = {
   dataFormat?: DataFormat
   dataUrl?: string
   filters?: VizFilter[]
+  filterBehavior?: FilterBehavior
   general?: General
   table: Table
   type: 'table'

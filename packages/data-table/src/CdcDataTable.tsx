@@ -34,7 +34,8 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
   }
 
   /* STATES */
-  const { config, showEditorPanel, columns, data, table, filters, currentViewport, filterIntro } = state as State
+  const { config, showEditorPanel, columns, data, table, filters, currentViewport, filterIntro, filterBehavior } =
+    state as State
 
   const setConfig = builtSetter('SET_CONFIG')
   const setShowEditorPanel = builtSetter('SET_SHOW_EDITOR_PANEL')
@@ -42,6 +43,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
   const setData = builtSetter('SET_DATA')
   const setTable = builtSetter('SET_TABLE')
   const setFilters = builtSetter('SET_FILTERS')
+  const setFilterBehavior = builtSetter('SET_FILTER_BEHAVIOR')
   const setCurrentViewport = builtSetter('SET_CURRENT_VIEWPORT')
   const setFilterIntro = builtSetter('SET_FILTER_INTRO')
 
@@ -66,6 +68,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
     setTable(updatedConfig.table)
     setColumns(updatedConfig.columns)
     setFilters(updatedConfig.filters)
+    setFilterBehavior(updatedConfig.filterBehavior)
     setFilterIntro(updatedConfig.filterIntro)
   }
 
@@ -144,7 +147,8 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
     columns,
     data,
     filters,
-    filterIntro
+    filterIntro,
+    filterBehavior
   }
 
   return (
@@ -162,6 +166,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
           columnsState={[columns, setColumns]}
           tableState={[table, setTable]}
           filtersState={[filters, setFilters]}
+          setFilterBehavior={setFilterBehavior}
           showEditorPanelState={[showEditorPanel, setShowEditorPanel]}
           setFilterIntro={setFilterIntro}
           data={data}

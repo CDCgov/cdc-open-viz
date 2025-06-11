@@ -21,6 +21,7 @@ const EditorPanel = ({
   showEditorPanelState,
   tableState,
   filtersState,
+  setFilterBehavior,
   setFilterIntro
 }) => {
   /* STATES */
@@ -55,6 +56,7 @@ const EditorPanel = ({
 
   const updateFilters = (section, subsection, fieldName, newValue) => {
     if (fieldName === 'filterIntro') return setFilterIntro(newValue)
+    if (fieldName === 'filterBehavior') return setFilterBehavior(newValue)
 
     createFieldUpdater(filters, setFilters)(section, subsection, fieldName, newValue)
   }
