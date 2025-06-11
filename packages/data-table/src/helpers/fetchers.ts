@@ -1,4 +1,3 @@
-import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
 export const fetchConfig = (configUrl: string) =>
@@ -9,6 +8,6 @@ export const fetchConfig = (configUrl: string) =>
     })
 
 export const fetchData = (dataUrl: string) =>
-  fetchRemoteData(`${dataUrl}?${cacheBustingString()}`).catch(err => {
+  fetchRemoteData(`${dataUrl}`).catch(err => {
     console.error('Error fetching data:', err)
   })
