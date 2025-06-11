@@ -141,17 +141,6 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
   if (configLoading || dataLoading) return <Loading />
   if (invalidConfig || invalidData) throw new Error('Invalid config or data provided to CdcDataTable component')
 
-  // initial static config combined with dynamic states
-  const configWithStates = {
-    ...config,
-    table,
-    columns,
-    data,
-    filters,
-    filterIntro,
-    filterBehavior
-  }
-
   return (
     <Layout.VisualizationWrapper
       ref={outerContainerRef}
@@ -163,7 +152,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
       {/* EDITOR */}
       {isEditor && (
         <EditorPanel
-          config={configWithStates}
+          config={config}
           columnsState={[columns, setColumns]}
           tableState={[table, setTable]}
           filtersState={[filters, setFilters]}
@@ -178,7 +167,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
       <div className='bg-white z-1'>
         {filters && (
           <Filters
-            config={configWithStates as unknown as Visualization}
+            config={config as unknown as Visualization}
             setConfig={updateFilters}
             setFilteredData={() => {}}
             filteredData={filteredData}
@@ -188,7 +177,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
 
         {/* DATA TABLE */}
         <DataTable
-          config={configWithStates as unknown as TableConfig}
+          config={config as unknown as TableConfig}
           tableTitle={label}
           indexTitle={indexLabel}
           isEditor={isEditor}
