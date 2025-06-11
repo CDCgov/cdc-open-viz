@@ -5,6 +5,7 @@ import { Column } from '@cdc/core/types/Column'
 import { Table } from '@cdc/core/types/Table'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { ViewportSize } from '@cdc/chart/src/types/ChartConfig'
+import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 
 export const getInitialState = (isEditor: boolean): State => {
   return {
@@ -14,6 +15,7 @@ export const getInitialState = (isEditor: boolean): State => {
     data: undefined,
     table: undefined,
     filters: undefined,
+    filterBehavior: undefined,
     currentViewport: 'lg',
     filterIntro: undefined
   }
@@ -26,6 +28,7 @@ export type State = {
   data: object[]
   table: Table
   filters: VizFilter[]
+  filterBehavior?: FilterBehavior
   currentViewport: ViewportSize
   filterIntro: string
 }
@@ -44,6 +47,8 @@ export const reducer = (state: State, action: DataTableActions) => {
       return { ...state, table: action.payload }
     case 'SET_FILTERS':
       return { ...state, filters: action.payload }
+    case 'SET_FILTER_BEHAVIOR':
+      return { ...state, filterBehavior: action.payload }
     case 'SET_CURRENT_VIEWPORT':
       return { ...state, currentViewport: action.payload }
     case 'SET_FILTER_INTRO':
