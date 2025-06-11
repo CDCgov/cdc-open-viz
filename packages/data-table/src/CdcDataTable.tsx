@@ -6,6 +6,7 @@ import Filters from '@cdc/core/components/Filters'
 import Layout from '@cdc/core/components/Layout'
 import Loading from '@cdc/core/components/Loading'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import getViewport from '@cdc/core/helpers/getViewport'
 import { Visualization } from '@cdc/core/types/Visualization'
@@ -13,10 +14,9 @@ import { Visualization } from '@cdc/core/types/Visualization'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state.js'
 import { processData } from './helpers/dataHelpers'
-import { fetchConfig, fetchData } from './helpers/fetchers'
-import { Config } from './types/Config'
-import { getInitialState, reducer, State } from './store/dataTable.reducer'
 import { ActionType } from './store/dataTable.actions'
+import { getInitialState, reducer, State } from './store/dataTable.reducer'
+import { Config } from './types/Config'
 
 type CdcDataTableProps = {
   config?: Config
@@ -86,7 +86,8 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
     }
 
     /* FETCH REQUIRED */
-    fetchConfig(configUrl)
+    fetch(configUrl)
+      .then(res => res.json())
       .then(resConfig => initConfig(resConfig))
       .catch(err => setConfig(null))
   }
@@ -105,7 +106,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
     }
 
     /* FETCH DATA */
-    fetchData(dataUrl)
+    fetchRemoteData(`${dataUrl}`)
       .then(resData => {
         const processedData = processData(resData, dataDescription)
         setData(processedData)
