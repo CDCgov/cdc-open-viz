@@ -29,8 +29,7 @@
   "dependencies": {
     "@cdc/core": "^4.25.5",
     "chroma": "0.0.1",
-    "react-accessible-accordion": "^3.3.4",
-    "react-beautiful-dnd": "^13.0.0"
+    "react-accessible-accordion": "^3.3.4"
   },
   "peerDependencies": {
     "react": "^18.2.0",
