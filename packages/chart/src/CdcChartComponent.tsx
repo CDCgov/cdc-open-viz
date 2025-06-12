@@ -432,7 +432,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
         if (configObj) {
           const preparedConfig = await prepareConfig(configObj)
           const preppedData = await prepareData(preparedConfig)
-          if (preparedConfig.formattedData.length) {
+
+          if (preparedConfig?.formattedData?.length) {
             preppedData.data = preparedConfig.formattedData
           }
 
