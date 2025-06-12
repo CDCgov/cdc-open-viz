@@ -230,7 +230,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   //Load initial config
   useEffect(() => {
-    loadConfig().catch(err => console.log(err))
+    loadConfig().catch(err => console.error(err))
     publish('cove_loaded', { loadConfigHasRun: true })
   }, [])
 
@@ -243,7 +243,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   //Reload any functions when config is updated
   useEffect(() => {
-    loadConfigMarkupData().catch(err => console.log(err))
+    loadConfigMarkupData().catch(err => console.error(err))
   }, [config])
 
   let content = <Loading />
@@ -268,7 +268,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
                   </div>
                 </div>
               </div>
-              <FootnotesStandAlone config={configObj.footnotes} filters={[]} />
+              <FootnotesStandAlone config={configObj?.footnotes} filters={[]} />
             </div>
           </Layout.Responsive>
         )}
