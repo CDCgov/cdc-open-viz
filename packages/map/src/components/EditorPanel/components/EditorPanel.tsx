@@ -11,7 +11,6 @@ import {
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
 import { useDebounce } from 'use-debounce'
 import _ from 'lodash'
-// import ReactTags from 'react-tag-autocomplete'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import Panels from './Panels'
 import Layout from '@cdc/core/components/Layout'
@@ -2460,20 +2459,17 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       <DynamicDesc value={legend.descriptions[String(activeFilterValueForDescription)]} />
                     </label>
                     <label>
-                      <select
+                      <Select
+                        label='Filter Value'
                         value={String(activeFilterValueForDescription)}
+                        options={filterValueOptionList.map(arr => ({
+                          value: arr,
+                          label: displayFilterLegendValue(arr)
+                        }))}
                         onChange={event => {
                           handleEditorChanges('changeActiveFilterValue', event.target.value)
                         }}
-                      >
-                        {filterValueOptionList.map((arr, i) => {
-                          return (
-                            <option value={arr} key={i}>
-                              {displayFilterLegendValue(arr)}
-                            </option>
-                          )
-                        })}
-                      </select>
+                      />
                     </label>
                   </React.Fragment>
                 )}
