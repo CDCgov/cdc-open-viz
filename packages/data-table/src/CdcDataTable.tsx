@@ -29,23 +29,23 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
   const initialState = getInitialState(isEditor)
   const [state, dispatch] = useReducer(reducer, initialState)
 
-  const builtSetter = (type: ActionType) => payload => {
-    dispatch({ type, payload })
-  }
-
   /* STATES */
   const { config, showEditorPanel, columns, data, table, filters, currentViewport, filterIntro, filterBehavior } =
     state as State
 
-  const setConfig = builtSetter('SET_CONFIG')
-  const setShowEditorPanel = builtSetter('SET_SHOW_EDITOR_PANEL')
-  const setColumns = builtSetter('SET_COLUMNS')
-  const setData = builtSetter('SET_DATA')
-  const setTable = builtSetter('SET_TABLE')
-  const setFilters = builtSetter('SET_FILTERS')
-  const setFilterBehavior = builtSetter('SET_FILTER_BEHAVIOR')
-  const setCurrentViewport = builtSetter('SET_CURRENT_VIEWPORT')
-  const setFilterIntro = builtSetter('SET_FILTER_INTRO')
+  const buildSetter = (type: ActionType) => payload => {
+    dispatch({ type, payload })
+  }
+
+  const setConfig = buildSetter('SET_CONFIG')
+  const setShowEditorPanel = buildSetter('SET_SHOW_EDITOR_PANEL')
+  const setColumns = buildSetter('SET_COLUMNS')
+  const setData = buildSetter('SET_DATA')
+  const setTable = buildSetter('SET_TABLE')
+  const setFilters = buildSetter('SET_FILTERS')
+  const setFilterBehavior = buildSetter('SET_FILTER_BEHAVIOR')
+  const setCurrentViewport = buildSetter('SET_CURRENT_VIEWPORT')
+  const setFilterIntro = buildSetter('SET_FILTER_INTRO')
 
   /* CONFIG VARS */
   const { data: inputData, dataUrl, dataDescription } = config || {}
