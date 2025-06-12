@@ -46,28 +46,51 @@ const PieChart = props => {
   const pivotColumns = Object.values(config.columns).filter(column => column.showInViz)
   const dataNeedsPivot = pivotColumns.length > 0
   const pivotKey = dataNeedsPivot ? 'pivotColumn' : undefined
+  const showPercentage = config.dataFormat.showPiePercent
+  const labelForCalcArea = 'Calculated Area'
+
   const _data = useMemo(() => {
+    let baseData = []
+
     if (dataNeedsPivot) {
-      let newData = []
       const primaryColumn = config.yAxis.dataKey
       const additionalColumns = pivotColumns.map(column => column.name)
       const allColumns = [primaryColumn, ...additionalColumns]
       const columnToUpdate = config.xAxis.dataKey
+
       data.forEach(d => {
         allColumns.forEach(col => {
-          const data = d[col]
-          if (data) {
-            newData.push({
-              [pivotKey]: data,
+          const val = d[col]
+          if (val) {
+            baseData.push({
+              [pivotKey]: val,
               [columnToUpdate]: `${d[columnToUpdate]} - ${col}`
             })
           }
         })
       })
-      return newData
+    } else {
+      baseData = [...data]
     }
-    return data
-  }, [data, dataNeedsPivot])
+
+    // === ADD "OTHER" IF PERCENT MODE IS ENABLED ===
+    if (showPercentage) {
+      const total = baseData.reduce((sum, d) => {
+        const val = parseFloat(d[config.runtime.yAxis.dataKey])
+        return sum + (isNaN(val) ? 0 : val)
+      }, 0)
+
+      if (total < 100) {
+        const remaining = 100 - total
+        baseData.push({
+          [config.runtime.xAxis.dataKey]: labelForCalcArea,
+          [config.runtime.yAxis.dataKey]: remaining
+        })
+      }
+    }
+
+    return baseData
+  }, [data, dataNeedsPivot, showPercentage, config])
 
   const _colorScale = useMemo(() => {
     if (dataNeedsPivot) {
@@ -78,15 +101,31 @@ const PieChart = props => {
       const numberOfKeys = Object.entries(keys).length
       let palette = config.customColors || colorPalettes[config.palette]
       palette = palette.slice(0, numberOfKeys)
-
       return scaleOrdinal({
         domain: Object.keys(keys),
         range: palette,
         unknown: null
       })
     }
+
+    if (showPercentage) {
+      const keys = {}
+      _data.forEach(d => {
+        keys[d[config.xAxis.dataKey]] = true
+      })
+      // take out Calculated Area so it falls back to `unknown`
+      const domainKeys = Object.keys(keys).filter(k => k !== labelForCalcArea)
+
+      const basePalette = (config.customColors || colorPalettes[config.palette]).slice(0, domainKeys.length)
+      const COOL_GRAY_90 = getComputedStyle(document.documentElement).getPropertyValue('--cool-gray-10').trim()
+      return scaleOrdinal({
+        domain: domainKeys,
+        range: basePalette,
+        unknown: COOL_GRAY_90
+      })
+    }
     return colorScale
-  }, [colorScale, dataNeedsPivot])
+  }, [config, _data])
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -130,9 +169,15 @@ const PieChart = props => {
       const roundTo = Number(config.dataFormat.roundTo) || 0
       // Calculate the percentage of the full circle (360 degrees)
       const degrees = ((arc.endAngle - arc.startAngle) * 180) / Math.PI
+      const valueFromData = parseFloat(arc.data[config.runtime.yAxis.dataKey])
+      const percentageToDisplay = showPercentage ? valueFromData : (degrees / 360) * 100
 
-      const percentageOfCircle = (degrees / 360) * 100
-      const roundedPercentage = percentageOfCircle.toFixed(roundTo) + '%'
+      let roundedPercentage = percentageToDisplay.toFixed(roundTo) + '%'
+      // add missing pie part
+      if (arc.data[config.xAxis.dataKey] === labelForCalcArea && config.dataFormat.showPiePercent) {
+        roundedPercentage = '**'
+      }
+
       return (
         <Group key={key} className={`slice-${key}`}>
           {/* ── the slice */}
@@ -229,7 +274,7 @@ const PieChart = props => {
             {/* prettier-ignore */}
             <Pie
             data={filteredData || _data}
-            pieValue={d => parseFloat(d[pivotKey || config.runtime.yAxis.dataKey])}
+            pieValue={d => parseFloat(d[config.runtime.yAxis.dataKey])  }
             pieSortValues={() => -1}
             innerRadius={radius - donutThickness}
             outerRadius={radius}
@@ -238,7 +283,7 @@ const PieChart = props => {
              <AnimatedPie
              {...pie}
               getKey={d => d.data[config.runtime.xAxis.dataKey]}
-                colorScale={_colorScale}
+              colorScale={_colorScale}
               onHover={handleTooltipMouseOver}
                onLeave={handleTooltipMouseOff}
            />

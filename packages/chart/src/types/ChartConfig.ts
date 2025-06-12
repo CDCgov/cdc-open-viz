@@ -70,6 +70,7 @@ type DataFormat = {
   roundTo: number
   suffix: string
   onlyShowTopPrefixSuffix?: boolean
+  showPiePercent: boolean
 }
 
 type Exclusions = {
