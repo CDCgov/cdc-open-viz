@@ -1,0 +1,8 @@
+.type-chart .sidebar .color-palette button:not(.selected) {
+  border:  var(--cool-gray-30) 2px solid !important;
+
+}
+
+.type-chart .sidebar .color-palette button.selected {
+  border:  black 2px solid !important;
+}
