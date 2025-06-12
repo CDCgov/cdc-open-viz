@@ -99,13 +99,31 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) =>
     !config.legend.hideSuppressionLink &&
     config.visualizationSubType !== 'stacked' &&
     preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value && (pd?.style || pd.symbol))
+  // controls Pie chart Legend  for calculated Area
+  const shouldShowCalculatedPie = () => {
+    return config.dataFormat.showPiePercent
+  }
 
+  const renderCalculatedAreaItems = () => {
+    return (
+      <div key={'iii'} className='legend-preliminary'>
+        <span className={'Asterisk'}>{'**'}</span>
+        <p>{'Calculated Area'}</p>
+      </div>
+    )
+  }
   return (
     <React.Fragment>
       {hasOpenCircleEffects() && (
         <React.Fragment>
           <hr />
           <div className={getLegendContainerClass()}>{renderEffectItems()}</div>
+        </React.Fragment>
+      )}
+      {shouldShowCalculatedPie() && (
+        <React.Fragment>
+          <hr />
+          <div className={getLegendContainerClass()}>{renderCalculatedAreaItems()}</div>
         </React.Fragment>
       )}
 
@@ -126,6 +144,19 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) =>
                             reported values does not meet the minimum
                              reporting threshold.`}
               linkText='suppressed data'
+              href={null}
+              tooltipOpacity={config.tooltips.opacity}
+            />
+          </p>
+        </div>
+      )}
+      {shouldShowCalculatedPie() && (
+        <div className='legend-container__outer link-container'>
+          <p>
+            ** This graph contains
+            <RichTooltip
+              tooltipContent={`Calculated Areas are used to supplement the pie chart when the sum of the values in the data is less than 100%"`}
+              linkText='calculated area'
               href={null}
               tooltipOpacity={config.tooltips.opacity}
             />
