@@ -14,7 +14,6 @@ import { Visualization } from '@cdc/core/types/Visualization'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state.js'
 import { processData } from './helpers/dataHelpers'
-import { ActionType } from './store/dataTable.actions'
 import { getInitialState, reducer, State } from './store/dataTable.reducer'
 import { Config } from './types/Config'
 
@@ -33,20 +32,6 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
   const { config, showEditorPanel, columns, data, table, filters, currentViewport, filterIntro, filterBehavior } =
     state as State
 
-  const buildSetter = (type: ActionType) => payload => {
-    dispatch({ type, payload })
-  }
-
-  const setConfig = buildSetter('SET_CONFIG')
-  const setShowEditorPanel = buildSetter('SET_SHOW_EDITOR_PANEL')
-  const setColumns = buildSetter('SET_COLUMNS')
-  const setData = buildSetter('SET_DATA')
-  const setTable = buildSetter('SET_TABLE')
-  const setFilters = buildSetter('SET_FILTERS')
-  const setFilterBehavior = buildSetter('SET_FILTER_BEHAVIOR')
-  const setCurrentViewport = buildSetter('SET_CURRENT_VIEWPORT')
-  const setFilterIntro = buildSetter('SET_FILTER_INTRO')
-
   /* CONFIG VARS */
   const { data: inputData, dataUrl, dataDescription } = config || {}
   const { label, indexLabel, expanded } = table || {}
@@ -64,18 +49,18 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
   // processes initial config and sets state
   const initConfig = (newConfig: Config) => {
     const updatedConfig = { ...coveUpdateWorker(newConfig), ...defaults }
-    setConfig(updatedConfig)
-    setTable(updatedConfig.table)
-    setColumns(updatedConfig.columns)
-    setFilters(updatedConfig.filters)
-    setFilterBehavior(updatedConfig.filterBehavior)
-    setFilterIntro(updatedConfig.filterIntro)
+    dispatch({ type: 'SET_CONFIG', payload: updatedConfig })
+    dispatch({ type: 'SET_TABLE', payload: updatedConfig.table })
+    dispatch({ type: 'SET_COLUMNS', payload: updatedConfig.columns })
+    dispatch({ type: 'SET_FILTERS', payload: updatedConfig.filters })
+    dispatch({ type: 'SET_FILTER_BEHAVIOR', payload: updatedConfig.filterBehavior })
+    dispatch({ type: 'SET_FILTER_INTRO', payload: updatedConfig.filterIntro })
   }
 
   const loadConfig = () => {
     /* NO VALID INPUT */
     if (!configObj && !configUrl) {
-      setConfig(null)
+      dispatch({ type: 'SET_CONFIG', payload: null })
       return
     }
 
@@ -89,7 +74,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
     fetch(configUrl)
       .then(res => res.json())
       .then(resConfig => initConfig(resConfig))
-      .catch(err => setConfig(null))
+      .catch(err => dispatch({ type: 'SET_CONFIG', payload: null }))
   }
 
   const loadData = () => {
@@ -101,7 +86,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
     /* DATA PROVIDED */
     if (inputData) {
       const processedData = processData(inputData, dataDescription)
-      setData(processedData)
+      dispatch({ type: 'SET_DATA', payload: processedData })
       return
     }
 
@@ -109,21 +94,21 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
     fetchRemoteData(`${dataUrl}`)
       .then(resData => {
         const processedData = processData(resData, dataDescription)
-        setData(processedData)
+        dispatch({ type: 'SET_DATA', payload: processedData })
       })
-      .catch(() => setData(null))
+      .catch(() => dispatch({ type: 'SET_DATA', payload: null }))
   }
 
   const updateFilters = (newConfig: Config) => {
     const { filters: newFilters } = newConfig
-    setFilters(newFilters)
+    dispatch({ type: 'SET_FILTERS', payload: newFilters })
   }
 
   // Observes changes to outermost container and changes viewport size in state
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let newViewport = getViewport(entry.contentRect.width)
-      setCurrentViewport(newViewport)
+      dispatch({ type: 'SET_CURRENT_VIEWPORT', payload: newViewport })
     }
   })
   // Load data when component first mounts
@@ -150,18 +135,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
       currentViewport={currentViewport}
     >
       {/* EDITOR */}
-      {isEditor && (
-        <EditorPanel
-          config={config}
-          columnsState={[columns, setColumns]}
-          tableState={[table, setTable]}
-          filtersState={[filters, setFilters]}
-          setFilterBehavior={setFilterBehavior}
-          showEditorPanelState={[showEditorPanel, setShowEditorPanel]}
-          setFilterIntro={setFilterIntro}
-          data={data}
-        />
-      )}
+      {isEditor && <EditorPanel dispatch={dispatch} state={state} />}
 
       {/* FILTERS */}
       <div className='bg-white z-1'>

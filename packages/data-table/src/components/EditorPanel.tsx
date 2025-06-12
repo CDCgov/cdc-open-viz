@@ -14,29 +14,18 @@ import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Layout from '@cdc/core/components/Layout'
 
-const EditorPanel = ({
-  config,
-  data,
-  columnsState,
-  showEditorPanelState,
-  tableState,
-  filtersState,
-  setFilterBehavior,
-  setFilterIntro
-}) => {
-  /* STATES */
-  const [table, setTable] = tableState
-  const [showEditorPanel, setShowEditorPanel] = showEditorPanelState
-  const [columns, setColumns] = columnsState
-  const [filters, setFilters] = filtersState
+import { State } from '../store/dataTable.reducer'
+
+const EditorPanel = ({ state, dispatch }) => {
+  const { table, showEditorPanel, columns, filters, data, config } = state as State
 
   const onBackClick = () => {
-    setShowEditorPanel(cur => !cur)
+    dispatch({ type: 'SET_SHOW_EDITOR_PANEL', payload: !showEditorPanel })
   }
 
   // Creates a function that updates a field in a specified state
   const createFieldUpdater = (curValue, setter) => (section, subsection, fieldName, newValue) => {
-    if (!section) return setter(newValue)
+    if (!section) return dispatch({ type: setter, payload: newValue })
 
     // Find/assign the value to be updated
     const valueCopy = _.cloneDeep(curValue)
@@ -45,20 +34,20 @@ const EditorPanel = ({
       if (!valueCopy[subsection]) valueCopy[subsection] = {}
       valueCopy[subsection][fieldName] = newValue
     }
-    setter(valueCopy)
+    dispatch({ type: setter, payload: valueCopy })
   }
 
   const updateDataTable = (section, subsection, fieldName, newValue) => {
-    if (fieldName === 'columns') return setColumns(newValue)
+    if (fieldName === 'columns') return dispatch({ type: 'SET_COLUMNS', payload: newValue })
 
-    createFieldUpdater(table, setTable)(section, subsection, fieldName, newValue)
+    createFieldUpdater(table, 'SET_TABLE')(section, subsection, fieldName, newValue)
   }
 
   const updateFilters = (section, subsection, fieldName, newValue) => {
-    if (fieldName === 'filterIntro') return setFilterIntro(newValue)
-    if (fieldName === 'filterBehavior') return setFilterBehavior(newValue)
+    if (fieldName === 'filterIntro') return dispatch({ type: 'SET_FILTER_INTRO', payload: newValue })
+    if (fieldName === 'filterBehavior') return dispatch({ type: 'SET_FILTER_BEHAVIOR', payload: newValue })
 
-    createFieldUpdater(filters, setFilters)(section, subsection, fieldName, newValue)
+    createFieldUpdater(filters, 'SET_FILTERS')(section, subsection, fieldName, newValue)
   }
 
   const removeAdditionalColumn = columnName => {
@@ -66,7 +55,7 @@ const EditorPanel = ({
 
     delete newColumns[columnName]
 
-    setColumns(newColumns)
+    dispatch({ type: 'SET_COLUMNS', payload: newColumns })
   }
 
   return (
@@ -92,7 +81,7 @@ const EditorPanel = ({
                 <AccordionItemPanel>
                   <ColumnsEditor
                     config={config}
-                    updateField={createFieldUpdater(columns, setColumns)}
+                    updateField={createFieldUpdater(columns, 'SET_COLUMNS')}
                     deleteColumn={removeAdditionalColumn}
                   />
                 </AccordionItemPanel>
