@@ -1,5 +1,5 @@
 // Vendor
-import React, { useEffect, useRef, useId, useReducer, useContext } from 'react'
+import React, { useEffect, useRef, useId, useReducer, useContext, useMemo } from 'react'
 import 'whatwg-fetch'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import Papa from 'papaparse'
@@ -168,7 +168,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const tooltipRef = useRef(null)
 
   // IDs
-  const imageId = useId()
+  const imageId = useMemo(() => `download-id-${Math.random().toString(36).substr(2, 9)}`, [])
   const legendId = useId()
   const mapId = useId()
   const tooltipId = 'test'
@@ -439,7 +439,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     config={config}
                     setConfig={setConfig}
                     filteredData={runtimeFilters}
-                    setFilteredData={_setRuntimeData}
+                    setFilters={_setRuntimeData}
                     dimensions={dimensions}
                     standaloneMap={!config}
                   />
@@ -474,8 +474,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                           /* logo is handled in UsaMap.State when applicable */
                           // prettier-ignore
                           'data' === general.type && logo && ('us' !== geoType || 'us-geocode' === general.type) && (
-                          <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
-                        )
+                            <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
+                          )
                         }
                       </>
                     )}

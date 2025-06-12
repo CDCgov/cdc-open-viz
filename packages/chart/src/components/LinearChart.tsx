@@ -43,6 +43,7 @@ import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
+import HoverLine from './HoverLine/HoverLine'
 
 type LinearChartProps = {
   parentWidth: number
@@ -58,6 +59,20 @@ const TICK_LABEL_FONT_SIZE_SMALL = 13
 const AXIS_LABEL_FONT_SIZE = 18
 const AXIS_LABEL_FONT_SIZE_SMALL = 14
 const TICK_LABEL_MARGIN_RIGHT = 4.5
+
+type TooltipData = {
+  dataXPosition?: number
+  dataYPosition?: number
+}
+
+type UseTooltipReturn<T = TooltipData> = {
+  tooltipData: T | null
+  showTooltip: (tooltipData: T) => void
+  hideTooltip: () => void
+  tooltipOpen: boolean
+  tooltipLeft: number | null
+  tooltipTop: number | null
+}
 
 const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, parentWidth }, svgRef) => {
   // prettier-ignore
@@ -237,7 +252,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const handleNumTicks = isForestPlot ? config.data.length : yTickCount
 
   // Tooltip Helpers
-  const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip()
+
+  const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } =
+    useTooltip<UseTooltipReturn<TooltipData>>()
 
   // prettier-ignore
   const {
@@ -246,11 +263,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleTooltipMouseOff,
     TooltipListItem,
   } = useCoveTooltip({
-      xScale,
-      yScale,
-      seriesScale,
-      showTooltip,
-      hideTooltip
+    xScale,
+    yScale,
+    seriesScale,
+    showTooltip,
+    hideTooltip
   })
   // get the number of months between the first and last date
   const { dataKey } = runtime.xAxis
@@ -787,6 +804,27 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               showTooltip={showTooltip}
             />
           )}
+          {/* Line chart */}
+          {/* TODO: Make this just line or combo? */}
+          {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(
+            visualizationType
+          ) &&
+            !convertLineToBarGraph && (
+              <>
+                <LineChart
+                  xScale={xScale}
+                  yScale={yScale}
+                  getXAxisData={getXAxisData}
+                  getYAxisData={getYAxisData}
+                  xMax={xMax}
+                  yMax={yMax}
+                  seriesStyle={config.runtime.series}
+                  tooltipData={tooltipData}
+                  handleTooltipMouseOver={handleTooltipMouseOver}
+                  handleTooltipMouseOff={handleTooltipMouseOff}
+                />
+              </>
+            )}
           {(visualizationType === 'Forecasting' || visualizationType === 'Combo') && (
             <Forecasting
               showTooltip={showTooltip}
@@ -794,7 +832,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               xScale={xScale}
               yScale={yScale}
               width={xMax}
-              le
               height={yMax}
               xScaleNoPadding={xScaleNoPadding}
               chartRef={svgRef}
@@ -826,27 +863,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           )}
           {/*Brush chart */}
           {config.brush.active && config.xAxis.type !== 'categorical' && <BrushChart xMax={xMax} yMax={yMax} />}
-          {/* Line chart */}
-          {/* TODO: Make this just line or combo? */}
-          {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(
-            visualizationType
-          ) &&
-            !convertLineToBarGraph && (
-              <>
-                <LineChart
-                  xScale={xScale}
-                  yScale={yScale}
-                  getXAxisData={getXAxisData}
-                  getYAxisData={getYAxisData}
-                  xMax={xMax}
-                  yMax={yMax}
-                  seriesStyle={config.runtime.series}
-                  tooltipData={tooltipData}
-                  handleTooltipMouseOver={handleTooltipMouseOver}
-                  handleTooltipMouseOff={handleTooltipMouseOff}
-                />
-              </>
-            )}
           {/* y anchors */}
           {config.yAxis.anchors &&
             config.yAxis.anchors.map((anchor, index) => {
@@ -871,7 +887,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   strokeDasharray={handleLineType(anchor.lineStyle)}
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   className='anchor-y'
-                  from={{ x: 0 + padding, y: position - middleOffset}}
+                  from={{ x: 0 + padding, y: position - middleOffset }}
                   to={{ x: width - config.yAxis.rightAxisSize, y: position - middleOffset }}
                 />
               )
@@ -903,14 +919,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               return (
                 // prettier-ignore
                 <Line
-                key={`xAxis-${anchor.value}--${index}`}
-                strokeDasharray={handleLineType(anchor.lineStyle)}
-                stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                className='anchor-x'
-                from={{ x: Number(anchorPosition) + Number(padding), y: 0 }}
-                to={{ x: Number(anchorPosition) + Number(padding), y: yMax }}
-              />
+                  key={`xAxis-${anchor.value}--${index}`}
+                  strokeDasharray={handleLineType(anchor.lineStyle)}
+                  stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                  fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                  className='anchor-x'
+                  from={{ x: Number(anchorPosition) + Number(padding), y: 0 }}
+                  to={{ x: Number(anchorPosition) + Number(padding), y: yMax }}
+                />
               )
             })}
           {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}
@@ -937,36 +953,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               {config.chartMessage.noData}
             </Text>
           )}
-          {config.visual.horizontalHoverLine && tooltipData && (
-            <Group
-              key={`tooltipLine-horizontal${point.y}${point.x}`}
-              className='horizontal-tooltip-line'
-              left={config.yAxis.size ? config.yAxis.size : 0}
-            >
-              <Line
-                from={{ x: 0, y: point.y }}
-                to={{ x: xMax, y: point.y }}
-                stroke={'black'}
-                strokeWidth={1}
-                pointerEvents='none'
-                strokeDasharray='5,5'
-                className='horizontal-tooltip-line'
-              />
-            </Group>
-          )}
-          {config.visual.verticalHoverLine && tooltipData && (
-            <Group key={`tooltipLine-vertical${point.y}${point.x}`} className='vertical-tooltip-line'>
-              <Line
-                from={{ x: point.x, y: 0 }}
-                to={{ x: point.x, y: yMax }}
-                stroke={'black'}
-                strokeWidth={1}
-                pointerEvents='none'
-                strokeDasharray='5,5'
-                className='vertical-tooltip-line'
-              />
-            </Group>
-          )}
+          <HoverLine xMax={xMax} yMax={yMax} point={point} tooltipData={tooltipData} orientation='horizontal' />
+          <HoverLine xMax={xMax} yMax={yMax} point={point} tooltipData={tooltipData} orientation='vertical' />
           <Group left={Number(config.runtime.yAxis.size)}>
             <Annotation.Draggable
               xScale={xScale}
