@@ -5723,7 +5723,7 @@ axios@^0.21.1:
   dependencies:
     follow-redirects "^1.14.0"
 
-axios@^1.0.0, axios@^1.6.0:
+axios@^1.0.0, axios@^1.6.0, axios@^1.9.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.9.0.tgz#25534e3b72b54540077d33046f77e3b8d7081901"
   integrity sha512-re4CqKTJaURpzbLHtIi6XpDv20/CnpXOtjRY5/CU32L8gU8ek9UIivcfvSWvmKEngmVbrUtPpdDwWDWL7DNHvg==
@@ -9631,7 +9631,7 @@ internmap@^1.0.0:
   resolved "https://registry.yarnpkg.com/internmap/-/internmap-1.0.1.tgz#0017cc8a3b99605f0302f2b198d272e015e5df95"
   integrity sha512-lDB5YccMydFBtasVtxnZ3MRBHuaoE8GKsppq+EchKL2U4nK/DmEpPHNH8MZe5HkMtpSiTSOZwfN0tzYjO/lJEw==
 
-interweave@^13.0.0:
+interweave@^13.1.1:
   version "13.1.1"
   resolved "https://registry.yarnpkg.com/interweave/-/interweave-13.1.1.tgz#0393f84fa2cd916016a2593ad4ef9620a39aab01"
   integrity sha512-5GdAavzK1i2BeeLTPzj0o6/zJMfLqQZq/2Q4c3ALT8ByEWf1syzl2MlQMTUoWzETy1x1/cAkZjiqOlulaoDRxw==
@@ -13052,7 +13052,7 @@ react-accessible-accordion@^3.0.1, react-accessible-accordion@^3.3.4:
   resolved "https://registry.yarnpkg.com/react-accessible-accordion/-/react-accessible-accordion-3.3.5.tgz#5d035994a261c832a57e7822f1bbacf914c5a5cc"
   integrity sha512-yCh3tx+jNuOPs+m58LOBFTGDEaGvM8UfuCNznr855FDAWzwV8V/ZH/TVBvgqH0npP58KrrVrHpj4jcy0EE5hEw==
 
-react-accessible-accordion@^5.0.1:
+react-accessible-accordion@^5.0.0, react-accessible-accordion@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/react-accessible-accordion/-/react-accessible-accordion-5.0.1.tgz#b406822d28e945bf7c2ffefbcd484bd6a8e679f5"
   integrity sha512-EIXkdQs4BObemHtRizVIq4wnbS3z0TPLAmiR2nZSG0Z3Mpm7pr8cwBddK5OcuWniRJ8OpJBqtlpUz0XnQCV06w==
