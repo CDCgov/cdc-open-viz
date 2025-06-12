@@ -263,11 +263,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleTooltipMouseOff,
     TooltipListItem,
   } = useCoveTooltip({
-      xScale,
-      yScale,
-      seriesScale,
-      showTooltip,
-      hideTooltip
+    xScale,
+    yScale,
+    seriesScale,
+    showTooltip,
+    hideTooltip
   })
   // get the number of months between the first and last date
   const { dataKey } = runtime.xAxis
@@ -804,6 +804,27 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               showTooltip={showTooltip}
             />
           )}
+          {/* Line chart */}
+          {/* TODO: Make this just line or combo? */}
+          {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(
+            visualizationType
+          ) &&
+            !convertLineToBarGraph && (
+              <>
+                <LineChart
+                  xScale={xScale}
+                  yScale={yScale}
+                  getXAxisData={getXAxisData}
+                  getYAxisData={getYAxisData}
+                  xMax={xMax}
+                  yMax={yMax}
+                  seriesStyle={config.runtime.series}
+                  tooltipData={tooltipData}
+                  handleTooltipMouseOver={handleTooltipMouseOver}
+                  handleTooltipMouseOff={handleTooltipMouseOff}
+                />
+              </>
+            )}
           {(visualizationType === 'Forecasting' || visualizationType === 'Combo') && (
             <Forecasting
               showTooltip={showTooltip}
@@ -842,27 +863,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           )}
           {/*Brush chart */}
           {config.brush.active && config.xAxis.type !== 'categorical' && <BrushChart xMax={xMax} yMax={yMax} />}
-          {/* Line chart */}
-          {/* TODO: Make this just line or combo? */}
-          {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(
-            visualizationType
-          ) &&
-            !convertLineToBarGraph && (
-              <>
-                <LineChart
-                  xScale={xScale}
-                  yScale={yScale}
-                  getXAxisData={getXAxisData}
-                  getYAxisData={getYAxisData}
-                  xMax={xMax}
-                  yMax={yMax}
-                  seriesStyle={config.runtime.series}
-                  tooltipData={tooltipData}
-                  handleTooltipMouseOver={handleTooltipMouseOver}
-                  handleTooltipMouseOff={handleTooltipMouseOff}
-                />
-              </>
-            )}
           {/* y anchors */}
           {config.yAxis.anchors &&
             config.yAxis.anchors.map((anchor, index) => {
@@ -887,7 +887,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   strokeDasharray={handleLineType(anchor.lineStyle)}
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   className='anchor-y'
-                  from={{ x: 0 + padding, y: position - middleOffset}}
+                  from={{ x: 0 + padding, y: position - middleOffset }}
                   to={{ x: width - config.yAxis.rightAxisSize, y: position - middleOffset }}
                 />
               )
@@ -919,14 +919,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               return (
                 // prettier-ignore
                 <Line
-                key={`xAxis-${anchor.value}--${index}`}
-                strokeDasharray={handleLineType(anchor.lineStyle)}
-                stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                className='anchor-x'
-                from={{ x: Number(anchorPosition) + Number(padding), y: 0 }}
-                to={{ x: Number(anchorPosition) + Number(padding), y: yMax }}
-              />
+                  key={`xAxis-${anchor.value}--${index}`}
+                  strokeDasharray={handleLineType(anchor.lineStyle)}
+                  stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                  fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                  className='anchor-x'
+                  from={{ x: Number(anchorPosition) + Number(padding), y: 0 }}
+                  to={{ x: Number(anchorPosition) + Number(padding), y: yMax }}
+                />
               )
             })}
           {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}

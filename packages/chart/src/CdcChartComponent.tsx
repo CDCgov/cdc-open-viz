@@ -404,7 +404,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       if (newConfig.dataUrl && !urlFilters) {
         // handle urls with spaces in the name.
         if (newConfig.dataUrl) newConfig.dataUrl = `${newConfig.dataUrl}`
-        let newData = await fetchRemoteData(newConfig.dataUrl, 'Chart')
+        let newData = await fetchRemoteData(newConfig.dataUrl)
 
         if (newData && newConfig.dataDescription) {
           newData = transform.autoStandardize(newData)
@@ -432,6 +432,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
         if (configObj) {
           const preparedConfig = await prepareConfig(configObj)
           const preppedData = await prepareData(preparedConfig)
+          if (preparedConfig.formattedData.length) {
+            preppedData.data = preparedConfig.formattedData
+          }
+
           dispatch({ type: 'SET_STATE_DATA', payload: preppedData.data })
           dispatch({ type: 'SET_EXCLUDED_DATA', payload: preppedData.data })
           updateConfig(preparedConfig, preppedData.data)
@@ -1037,7 +1041,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
                   <DataTable
                     /* changing the "key" will force the table to re-render
-                    when the default sort changes while editing */
+                      when the default sort changes while editing */
                     key={dataTableDefaultSortBy}
                     config={pivotDynamicSeries(config)}
                     rawData={
