@@ -1,5 +1,6 @@
 import { useContext } from 'react'
 // Local imports
+import parse from 'html-react-parser'
 import ConfigContext from '../ConfigContext'
 import { type ChartContext } from '../types/ChartContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
