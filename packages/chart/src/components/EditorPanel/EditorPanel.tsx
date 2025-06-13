@@ -989,6 +989,16 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
     return strippedState
   }
+  const {
+    highlightedBarValues,
+    highlightedSeriesValues,
+    handleUpdateHighlightedBar,
+    handleAddNewHighlightedBar,
+    handleRemoveHighlightedBar,
+    handleUpdateHighlightedBarColor,
+    handleHighlightedBarLegendLabel,
+    handleUpdateHighlightedBorderWidth
+  } = useHighlightedBars(config, updateConfig)
 
   useEffect(() => {
     // Pass up to Editor if needed
@@ -1379,6 +1389,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleUpdateHighlightedBorderWidth,
     handleUpdateHighlightedBarColor,
     setLollipopShape
+  }
+  if (isLoading) {
+    return <></>
   }
 
   if (isLoading) {
@@ -1893,6 +1906,31 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>{`This option abbreviates very large or very small numbers on the value axis`}</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                  <CheckBox
+                    display={config.visualizationType === 'Pie'}
+                    value={config.dataFormat.showPiePercent}
+                    section='dataFormat'
+                    fieldName='showPiePercent'
+                    label='Display Value From Data'
+                    updateField={updateFieldDeprecated}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display='question'
+                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content className='text-start'>
+                          <p className='mb-2'>
+                            When enabled, pie slices are drawn using the exact values from your data as percentages. For
+                            example, 25 means 25%. If the sum of values below 100 will be supplemented to complete the
+                            pie. Feature is disabled if the sum of values is above 100
+                          </p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
