@@ -432,7 +432,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
         if (configObj) {
           const preparedConfig = await prepareConfig(configObj)
           const preppedData = await prepareData(preparedConfig)
-          if (preparedConfig.formattedData.length) {
+
+          if (preparedConfig?.formattedData?.length) {
             preppedData.data = preparedConfig.formattedData
           }
 
@@ -1041,7 +1042,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
                   <DataTable
                     /* changing the "key" will force the table to re-render
-                    when the default sort changes while editing */
+                      when the default sort changes while editing */
                     key={dataTableDefaultSortBy}
                     config={pivotDynamicSeries(config)}
                     rawData={
