@@ -197,7 +197,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsTooltipLines = () => {
-    const enabledCharts = ['Combo', 'Forecasting', 'Area Chart', 'Line', 'Bar']
+    const enabledCharts = ['Combo', 'Forecasting', 'Area Chart', 'Line', 'Bar', 'Scatter Plot']
     if (enabledCharts.includes(visualizationType)) return true
     return false
   }
@@ -381,7 +381,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsYPadding = () => {
-    return !config.dataFormat.onlyShowTopPrefixSuffix || !config.dataFormat.suffix?.includes(' ')
+    return !config.yAxis.inlineLabel || !config.yAxis.inlineLabel?.includes(' ')
   }
 
   const visHasSingleSeriesTooltip = () => {

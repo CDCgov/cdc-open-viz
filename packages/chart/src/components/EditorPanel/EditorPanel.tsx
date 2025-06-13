@@ -747,7 +747,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   const updateField = updateFieldFactory(config, updateConfig)
   const updateFieldDeprecated = (section, subsection, fieldName, newValue) => {
     if (isDebug)
-      console.log(
+      console.error(
         '#COVE: CHART: EditorPanel: section, subsection, fieldName, newValue',
         section,
         subsection,
@@ -820,10 +820,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
   const [displayPanel, setDisplayPanel] = useState(true)
   const [displayViewportOverrides, setDisplayViewportOverrides] = useState(false)
-
-  if (isLoading) {
-    return null
-  }
 
   const setLollipopShape = shape => {
     updateConfig({
@@ -971,6 +967,18 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       showEditorPanel: !displayPanel
     })
   }
+
+  // prettier-ignore
+  const {
+      highlightedBarValues,
+      highlightedSeriesValues,
+      handleUpdateHighlightedBar,
+      handleAddNewHighlightedBar,
+      handleRemoveHighlightedBar,
+      handleUpdateHighlightedBarColor,
+      handleHighlightedBarLegendLabel,
+      handleUpdateHighlightedBorderWidth
+     } = useHighlightedBars(config, updateConfig)
 
   const convertStateToConfig = () => {
     let strippedState = _.cloneDeep(config)
@@ -1185,7 +1193,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   if (isDebug && config?.series?.length === 0) {
     let setdatacol = setDataColumn()
     if (setdatacol !== '') addNewSeries(setdatacol)
-    if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
+    if (isDebug) console.error('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
   const chartsWithOptions = [
@@ -1303,18 +1311,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     }
   }
 
-  // prettier-ignore
-  const {
-    highlightedBarValues,
-    highlightedSeriesValues,
-    handleUpdateHighlightedBar,
-    handleAddNewHighlightedBar,
-    handleRemoveHighlightedBar,
-    handleUpdateHighlightedBarColor,
-    handleHighlightedBarLegendLabel,
-    handleUpdateHighlightedBorderWidth
-   } = useHighlightedBars(config, updateConfig)
-
   const updateSeriesTooltip = (column, event) => {
     let updatedColumns = config.columns
 
@@ -1383,6 +1379,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleUpdateHighlightedBorderWidth,
     handleUpdateHighlightedBarColor,
     setLollipopShape
+  }
+
+  if (isLoading) {
+    return null
   }
 
   return (
@@ -1643,6 +1643,44 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         section='yAxis'
                         fieldName='label'
                         label='Label'
+                        updateField={updateFieldDeprecated}
+                        maxLength={35}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>35 character limit</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                      <TextField
+                        display={!visHasCategoricalAxis()}
+                        value={config.yAxis.inlineLabel}
+                        section='yAxis'
+                        fieldName='inlineLabel'
+                        label='Inline Label'
+                        updateField={updateField}
+                        maxLength={35}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>35 character limit</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                      <TextField
+                        display={!visHasCategoricalAxis()}
+                        value={config.yAxis.inlineLabel}
+                        section='yAxis'
+                        fieldName='inlineLabel'
+                        label='Inline Label'
                         updateField={updateFieldDeprecated}
                         maxLength={35}
                         tooltip={
@@ -2000,14 +2038,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                   ) : (
                     config.visualizationType !== 'Pie' && (
                       <>
-                        <CheckBox
-                          display={!visHasCategoricalAxis()}
-                          value={config.dataFormat.onlyShowTopPrefixSuffix}
-                          section='dataFormat'
-                          fieldName='onlyShowTopPrefixSuffix'
-                          label='Only Show Top Prefix/Suffix'
-                          updateField={updateFieldDeprecated}
-                        />
                         <CheckBox
                           display={!visHasCategoricalAxis()}
                           value={config.yAxis.hideAxis}

@@ -404,7 +404,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       if (newConfig.dataUrl && !urlFilters) {
         // handle urls with spaces in the name.
         if (newConfig.dataUrl) newConfig.dataUrl = `${newConfig.dataUrl}`
-        let newData = await fetchRemoteData(newConfig.dataUrl, 'Chart')
+        let newData = await fetchRemoteData(newConfig.dataUrl)
 
         if (newData && newConfig.dataDescription) {
           newData = transform.autoStandardize(newData)
@@ -425,19 +425,28 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
     return newConfig
   }
+
   useEffect(() => {
-    try {
-      if (configObj) {
-        const preparedConfig = prepareConfig(_.cloneDeep(configObj))
-        const { formattedData } = preparedConfig
-        preparedConfig.data = formattedData
-        dispatch({ type: 'SET_STATE_DATA', payload: formattedData })
-        dispatch({ type: 'SET_EXCLUDED_DATA', payload: formattedData })
-        updateConfig(preparedConfig, formattedData)
+    const load = async () => {
+      try {
+        if (configObj) {
+          const preparedConfig = await prepareConfig(configObj)
+          const preppedData = await prepareData(preparedConfig)
+
+          if (preparedConfig?.formattedData?.length) {
+            preppedData.data = preparedConfig.formattedData
+          }
+
+          dispatch({ type: 'SET_STATE_DATA', payload: preppedData.data })
+          dispatch({ type: 'SET_EXCLUDED_DATA', payload: preppedData.data })
+          updateConfig(preparedConfig, preppedData.data)
+        }
+      } catch (err) {
+        console.error('Could not Load!')
       }
-    } catch (err) {
-      console.error('Could not Load!')
     }
+
+    load()
   }, [configObj?.data?.length ? configObj.data : null])
 
   /**
@@ -616,8 +625,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         rightSuffix,
         bottomPrefix,
         bottomSuffix,
-        bottomAbbreviated,
-        onlyShowTopPrefixSuffix
+        bottomAbbreviated
       }
     } = config
 
@@ -710,9 +718,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (addColPrefix && axis === 'left') {
       result = addColPrefix + result
     } else {
-      // if onlyShowTopPrefixSuffix only show top prefix
-      const suppressAllButLast = onlyShowTopPrefixSuffix && length - 1 !== index
-      if (prefix && axis === 'left' && !suppressAllButLast) {
+      if (prefix && axis === 'left') {
         result += prefix
       }
     }
@@ -731,7 +737,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (addColSuffix && axis === 'left') {
       result += addColSuffix
     } else {
-      if (suffix && axis === 'left' && !onlyShowTopPrefixSuffix) {
+      if (suffix && axis === 'left') {
         result += suffix
       }
     }
@@ -1036,7 +1042,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
                   <DataTable
                     /* changing the "key" will force the table to re-render
-                    when the default sort changes while editing */
+                      when the default sort changes while editing */
                     key={dataTableDefaultSortBy}
                     config={pivotDynamicSeries(config)}
                     rawData={

@@ -7,12 +7,13 @@ import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { addUIDs, validateFipsCodeLength } from './helpers'
 import EditorContext from '@cdc/editor/src/ConfigContext'
 import { MapConfig } from './types/MapConfig'
-import _ from 'lodash'
+import _, { set } from 'lodash'
 
 type CdcMapProps = {
   config: MapConfig
   configUrl?: string
   isEditor?: boolean
+  isDashboard?: boolean
   link?: string
   logo?: string
   navigationHandler: Function
@@ -22,17 +23,18 @@ type CdcMapProps = {
 const CdcMap: React.FC<CdcMapProps> = ({
   navigationHandler: customNavigationHandler,
   isEditor,
+  isDashboard,
   configUrl,
   logo = '',
   link,
   config: editorsConfig
 }) => {
   const editorContext = useContext(EditorContext)
-  const [config, _setConfig] = useState(null)
+  const [config, _setConfig] = useState(editorsConfig ?? null)
 
   const setConfig = newConfig => {
     _setConfig(newConfig)
-    if (isEditor) {
+    if (isEditor && !isDashboard) {
       editorContext.setTempConfig(newConfig)
     }
   }
@@ -111,6 +113,14 @@ const CdcMap: React.FC<CdcMapProps> = ({
     init()
   }, [])
 
+  useEffect(() => {
+    init()
+  }, [configUrl])
+
+  useEffect(() => {
+    setConfig(editorsConfig)
+  }, [editorsConfig])
+
   if (loading) return null
 
   return (
@@ -118,6 +128,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
       config={config}
       navigationHandler={customNavigationHandler}
       isEditor={isEditor}
+      isDashboard={isDashboard}
       logo={logo}
       link={link}
       loadConfig={loadConfig}
