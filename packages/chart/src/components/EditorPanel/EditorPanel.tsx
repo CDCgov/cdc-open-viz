@@ -1895,7 +1895,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     }
                   />
                   <CheckBox
-                    display={!visHasCategoricalAxis() && config.visualizationType === 'Pie'}
+                    display={config.visualizationType === 'Pie'}
                     value={config.dataFormat.showPiePercent}
                     section='dataFormat'
                     fieldName='showPiePercent'

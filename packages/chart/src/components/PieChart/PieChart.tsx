@@ -125,7 +125,7 @@ const PieChart = props => {
       })
     }
     return colorScale
-  }, [config, _data])
+  }, [config, _data, dataNeedsPivot, colorScale])
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -274,7 +274,7 @@ const PieChart = props => {
             {/* prettier-ignore */}
             <Pie
             data={filteredData || _data}
-            pieValue={d => parseFloat(d[config.runtime.yAxis.dataKey])  }
+            pieValue={d => parseFloat(d[pivotKey || config.runtime.yAxis.dataKey])}
             pieSortValues={() => -1}
             innerRadius={radius - donutThickness}
             outerRadius={radius}

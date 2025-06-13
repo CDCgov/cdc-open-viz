@@ -114,7 +114,7 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) =>
 
   const renderCalculatedAreaItems = () => {
     return (
-      <div key={'iii'} className='legend-preliminary'>
+      <div key={'pie-asterisk'} className='legend-preliminary'>
         <span className={'Asterisk'}>{'**'}</span>
         <p>{'Calculated Area'}</p>
       </div>
