@@ -125,7 +125,7 @@ const PieChart = props => {
       })
     }
     return colorScale
-  }, [config, _data, dataNeedsPivot, colorScale])
+  }, [_data, dataNeedsPivot, colorScale])
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
