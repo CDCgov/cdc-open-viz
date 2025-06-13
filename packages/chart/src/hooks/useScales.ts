@@ -75,8 +75,19 @@ const useScales = (properties: useScaleProps) => {
 
   // handle Linear scaled viz
   if (config.xAxis.type === 'date' && !isHorizontal) {
-    const xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
-    xScale = composeScaleBand(xAxisDataMappedSorted, [0, xMax], 1 - config.barThickness)
+    const sorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
+
+    if (visualizationType === 'Area Chart') {
+      xScale = scalePoint({
+        domain: sorted,
+        range: [0, xMax],
+        padding: 0
+      })
+      xScale.type = scaleTypes.POINT
+    } else {
+      xScale = composeScaleBand(sorted, [0, xMax], 1 - config.barThickness)
+      xScale.type = scaleTypes.BAND
+    }
   }
 
   if (xAxis.type === 'date-time' || xAxis.type === 'continuous') {
