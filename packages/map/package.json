@@ -1,6 +1,6 @@
 {
   "name": "@cdc/map",
-  "version": "4.25.3",
+  "version": "4.25.5",
   "description": "React component for visualizing tabular data on a map of the United States or the world.",
   "moduleName": "CdcMap",
   "main": "dist/cdcmap",
@@ -25,7 +25,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@cdc/core": "^4.25.3",
+    "@cdc/core": "^4.25.5",
     "@emotion/core": "^10.0.28",
     "@emotion/react": "^11.1.5",
     "@googlemaps/markerclusterer": "^2.5.3",
@@ -51,5 +51,5 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "gitHead": "c4b0402afe6ed209a85b7078711549b9fd7dae7d"
+  "gitHead": "f600807a95d9689aeb74f2408b238468b5ff6c01"
 }
