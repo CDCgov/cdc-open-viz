@@ -131,7 +131,7 @@ const PanelGeneral: FC<PanelProps> = props => {
             options={Object.keys(approvedCurveTypes)}
           />
         )}
-        {visualizationType === 'Bar' && (
+        {(visualizationType === 'Bar' || visualizationType === 'Box Plot') && (
           <Select
             value={config.orientation || 'vertical'}
             fieldName='orientation'

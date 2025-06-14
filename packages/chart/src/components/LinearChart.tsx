@@ -15,7 +15,8 @@ import BrushChart from './BrushChart'
 import { AreaChart, AreaChartStacked } from './AreaChart'
 import BarChart from './BarChart'
 import ConfigContext from '../ConfigContext'
-import BoxPlot from './BoxPlot'
+import BoxPlotVertical from './BoxPlot/BoxPlot.Vertical'
+import BoxPlotHorizontal from './BoxPlot/BoxPlot.Horizontal'
 import ScatterPlot from './ScatterPlot'
 import DeviationBar from './DeviationBar'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -709,8 +710,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               showTooltip={showTooltip}
             />
           )}
-          {visualizationType === 'Box Plot' && (
-            <BoxPlot
+          {visualizationType === 'Box Plot' && config.orientation === 'vertical' && (
+            <BoxPlotVertical
               seriesScale={seriesScale}
               xMax={xMax}
               yMax={yMax}
@@ -719,6 +720,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               xScale={xScale}
               yScale={yScale}
             />
+          )}
+          {visualizationType === 'Box Plot' && config.orientation === 'horizontal' && (
+            <BoxPlotHorizontal xMax={xMax} yMax={yMax} min={min} max={max} xScale={xScale} yScale={yScale} />
           )}
           {((visualizationType === 'Area Chart' && config.visualizationSubType === 'stacked') ||
             visualizationType === 'Combo') && (
