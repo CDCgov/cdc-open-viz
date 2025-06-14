@@ -281,7 +281,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     if (
-      (newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') ||
+      ((newConfig.visualizationType === 'Bar' || newConfig.visualizationType === 'Box Plot') &&
+        newConfig.orientation === 'horizontal') ||
       ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)
     ) {
       newConfig.runtime.xAxis = _.cloneDeep(newConfig.yAxis.yAxis || newConfig.yAxis)
@@ -822,7 +823,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
         {config.dataKey} (Go to Table)
       </a>
     )
-
     body = (
       <>
         {isEditor && <EditorPanel />}

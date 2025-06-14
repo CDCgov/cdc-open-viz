@@ -722,7 +722,15 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             />
           )}
           {visualizationType === 'Box Plot' && config.orientation === 'horizontal' && (
-            <BoxPlotHorizontal xMax={xMax} yMax={yMax} min={min} max={max} xScale={xScale} yScale={yScale} />
+            <BoxPlotHorizontal
+              seriesScale={seriesScale}
+              xMax={xMax}
+              yMax={yMax}
+              min={min}
+              max={max}
+              xScale={xScale}
+              yScale={yScale}
+            />
           )}
           {((visualizationType === 'Area Chart' && config.visualizationSubType === 'stacked') ||
             visualizationType === 'Combo') && (

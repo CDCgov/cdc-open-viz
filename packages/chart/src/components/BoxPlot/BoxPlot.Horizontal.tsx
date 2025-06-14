@@ -1,46 +1,23 @@
 import React, { useContext } from 'react'
 import { Group } from '@visx/group'
 import { BoxPlot } from '@visx/stats'
-import { scaleLinear, scaleBand } from '@visx/scale'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../../ConfigContext'
 import { handleTooltip, createPlots } from './helpers/index'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import _ from 'lodash'
-import { fi } from '@faker-js/faker'
-// Renders multiple horizontal box plots per category for each series key
-export default function BoxPlotHorizontal({ xMax, yMax, min, max }) {
+
+const BoxPlotHorizontal = ({ xScale, yScale, seriesScale }) => {
   const { config, transformedData: data, colorScale, seriesHighlight } = useContext(ConfigContext)
-  const yOffset = Number(config.yAxis.size)
+  const yOffset = Number(config.xAxis.size)
   const defaultColor = APP_FONT_COLOR
+  const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
   // generate summary stats
   const plots = createPlots(data, config)
-  const categories = plots.map(p => p.columnCategory)
   const { plotNonOutlierValues, plotOutlierValues } = config.boxplot
-  // overall min/max come from props in config
-  const xScale = scaleLinear({
-    domain: [min, max],
-    range: [0, xMax],
-    nice: true
-  })
-
-  // band scale for category rows
-  const yScale = scaleBand({
-    domain: categories,
-    range: [0, yMax],
-    padding: 0.3
-  })
-  // series keys (e.g. ['Value','Price','Distance'])
-  const seriesKeys = config.runtime.seriesKeys
-  // band scale for series within each category
-  const seriesScale = scaleBand({
-    domain: seriesKeys,
-    range: [0, yScale.bandwidth()],
-    padding: 0.1
-  })
 
   return (
-    <ErrorBoundary component='BoxPlotHorizontal'>
+    <ErrorBoundary component='BoxPlot Horizontal'>
       <Group left={yOffset} className='boxplot'>
         {plots.map(plot => {
           const category = plot.columnCategory
@@ -62,41 +39,61 @@ export default function BoxPlotHorizontal({ xMax, yMax, min, max }) {
 
             return (
               <Group key={`${category}-${item.dataKey}`} top={y}>
-                <BoxPlot
-                  min={Number(plot.min[item.dataKey])}
-                  max={Number(plot.max[item.dataKey])}
-                  thirdQuartile={plot.q3[item.dataKey]}
-                  firstQuartile={plot.q1[item.dataKey]}
-                  median={plot.median[item.dataKey]}
-                  horizontal={true}
-                  valueScale={xScale}
-                  boxWidth={seriesScale.bandwidth()}
-                  fill={colorScale(item.dataKey)}
-                  fillOpacity={1}
-                  stroke={defaultColor}
-                  boxProps={{
-                    fill: colorScale(item.dataKey),
-                    strokeWidth: config.boxplot.borders === 'true' ? 1.5 : 0,
-                    stroke: defaultColor
-                  }}
-                  minProps={{ stroke: colorScale(item.dataKey), strokeWidth: 1, opacity: fillOpacity }}
-                  maxProps={{ stroke: colorScale(item.dataKey), strokeWidth: 1, opacity: fillOpacity }}
-                  medianProps={{ stroke: defaultColor, strokeWidth: 1, opacity: fillOpacity }}
-                  outliers={
-                    config.boxplot.plotOutlierValues ? _.map(plot.columnOutliers[item.dataKey], item => item) : []
-                  }
-                  outlierProps={{
-                    style: {
-                      fill: 'green',
-                      opacity: 1,
-                      stroke: 'green'
+                {displayPlot && (
+                  <BoxPlot
+                    min={Number(plot.min[item.dataKey])}
+                    max={Number(plot.max[item.dataKey])}
+                    thirdQuartile={plot.q3[item.dataKey]}
+                    firstQuartile={plot.q1[item.dataKey]}
+                    median={plot.median[item.dataKey]}
+                    horizontal={true}
+                    valueScale={xScale}
+                    boxWidth={seriesScale.bandwidth()}
+                    fill={colorScale(item.dataKey)}
+                    fillOpacity={1}
+                    stroke={defaultColor}
+                    boxProps={{
+                      fill: colorScale(item.dataKey),
+                      strokeWidth: config.boxplot.borders === 'true' ? 1.5 : 0,
+                      stroke: defaultColor
+                    }}
+                    minProps={{ stroke: colorScale(item.dataKey), strokeWidth: 1, opacity: fillOpacity }}
+                    maxProps={{ stroke: colorScale(item.dataKey), strokeWidth: 1, opacity: fillOpacity }}
+                    medianProps={{ stroke: defaultColor, strokeWidth: 1, opacity: fillOpacity }}
+                    outliers={
+                      config.boxplot.plotOutlierValues ? _.map(plot.columnOutliers[item.dataKey], item => item) : []
                     }
-                  }}
-                />
+                    outlierProps={{
+                      style: {
+                        fill: 'green',
+                        opacity: 1,
+                        stroke: 'green'
+                      }
+                    }}
+                    container
+                    containerProps={{
+                      'data-tooltip-html': handleTooltip(
+                        config.boxplot,
+                        plot.columnCategory,
+                        item.dataKey,
+                        _.round(plot.q1[item.dataKey], config.dataFormat.roundTo),
+                        _.round(plot.q3[item.dataKey], config.dataFormat.roundTo),
+                        _.round(plot.median[item.dataKey], config.dataFormat.roundTo),
+                        _.round(plot.iqr[item.dataKey], config.dataFormat.roundTo),
+                        config.xAxis.label,
+                        defaultColor
+                      ),
+                      'data-tooltip-id': tooltip_id,
+                      tabIndex: -1
+                    }}
+                  />
+                )}
+
                 {/* non-outlier points */}
                 {plotNonOutlierValues &&
                   nonOut.map((value, idx) => (
                     <circle
+                      display={displayPlot ? 'block' : 'none'}
                       key={`non-${category}-${item.dataKey}-${idx}`}
                       cx={xScale(value)}
                       cy={seriesScale.bandwidth() / 2}
@@ -111,6 +108,7 @@ export default function BoxPlotHorizontal({ xMax, yMax, min, max }) {
                 {plotOutlierValues &&
                   out.map((value, idx) => (
                     <circle
+                      display={displayPlot ? 'block' : 'none'}
                       key={`out-${category}-${item.dataKey}-${idx}`}
                       cx={xScale(value)}
                       cy={seriesScale.bandwidth() / 2}
@@ -128,3 +126,4 @@ export default function BoxPlotHorizontal({ xMax, yMax, min, max }) {
     </ErrorBoundary>
   )
 }
+export default BoxPlotHorizontal
