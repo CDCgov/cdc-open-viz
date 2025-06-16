@@ -143,7 +143,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
           <Filters
             config={config as unknown as Visualization}
             setConfig={updateFilters}
-            setFilteredData={() => {}}
+            setFilters={newFilters => dispatch({ type: 'SET_FILTERS', payload: newFilters })}
             filteredData={filteredData}
             excludedData={data}
           />
