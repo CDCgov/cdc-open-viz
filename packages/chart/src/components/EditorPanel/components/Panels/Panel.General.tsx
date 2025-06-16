@@ -131,7 +131,7 @@ const PanelGeneral: FC<PanelProps> = props => {
             options={Object.keys(approvedCurveTypes)}
           />
         )}
-        {visualizationType === 'Bar' && (
+        {(visualizationType === 'Bar' || visualizationType === 'Box Plot') && (
           <Select
             value={config.orientation || 'vertical'}
             fieldName='orientation'
@@ -178,7 +178,7 @@ const PanelGeneral: FC<PanelProps> = props => {
             options={['standard', 'shallow', 'finger']}
           />
         )}
-        {visualizationType === 'Bar' && config.orientation === 'horizontal' && (
+        {(visualizationType === 'Bar' || visualizationType === 'Box Plot') && config.orientation === 'horizontal' && (
           <Select
             value={config.yAxis.labelPlacement || 'Below Bar'}
             section='yAxis'

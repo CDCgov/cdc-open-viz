@@ -9,7 +9,6 @@ import pairedBar from './_mock/paired-bar.json'
 import horizontalBarConfig from './_mock/horizontal_bar.json'
 import barChartLabels from './_mock/barchart_labels.mock.json'
 import pieConfig from './_mock/pie_with_data.json'
-import boxPlotConfig from './_mock/boxplot_multiseries.json'
 import areaChartStacked from './_mock/area_chart_stacked.json'
 import multipleLines from './_mock/short_dates.json'
 import { editConfigKeys } from '../helpers/configHelpers'
@@ -74,12 +73,6 @@ export const Pie: Story = {
 export const Paired_Bar: Story = {
   args: {
     config: pairedBar
-  }
-}
-export const BoxPlot_Multiseries: Story = {
-  args: {
-    config: boxPlotConfig,
-    isEditor: false
   }
 }
 
