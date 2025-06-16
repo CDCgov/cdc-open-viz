@@ -752,7 +752,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   const updateField = updateFieldFactory(config, updateConfig)
   const updateFieldDeprecated = (section, subsection, fieldName, newValue) => {
     if (isDebug)
-      console.error(
+      console.log(
         '#COVE: CHART: EditorPanel: section, subsection, fieldName, newValue',
         section,
         subsection,
@@ -1198,7 +1198,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   if (isDebug && config?.series?.length === 0) {
     let setdatacol = setDataColumn()
     if (setdatacol !== '') addNewSeries(setdatacol)
-    if (isDebug) console.error('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
+    if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
   const chartsWithOptions = [
