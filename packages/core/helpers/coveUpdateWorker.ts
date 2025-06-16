@@ -15,6 +15,7 @@ import update_4_25_1 from './ver/4.25.1'
 import update_4_25_3 from './ver/4.25.3'
 import update_4_25_4 from './ver/4.25.4'
 import update_4_25_6 from './ver/4.25.6'
+import update_4_25_7 from './ver/4.25.7'
 
 export const coveUpdateWorker = (config, multiDashboardVersion?) => {
   let genConfig = config
@@ -32,7 +33,8 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
     ['4.25.1', update_4_25_1],
     ['4.25.3', update_4_25_3],
     ['4.25.4', update_4_25_4],
-    ['4.25.6', update_4_25_6]
+    ['4.25.6', update_4_25_6],
+    ['4.25.7', update_4_25_7]
   ]
 
   versions.forEach(([version, updateFunction, alwaysRun]: [string, UpdateFunction, boolean?]) => {
