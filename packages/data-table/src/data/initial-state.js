@@ -16,5 +16,6 @@ export default {
     showMissingDataLabel: true,
     showSuppressedSymbol: true
   },
-  columns: {}
+  columns: {},
+  dataFormat: {}
 }
