@@ -294,7 +294,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
         { ...config, data: configObj.data },
         filters || runtimeFilters,
         hashData,
-        isCategoryLegend
+        isCategoryLegend,
+        config.table.dontFilterNonGeoRows
       )
       setRuntimeData(newRuntimeData)
     } else {

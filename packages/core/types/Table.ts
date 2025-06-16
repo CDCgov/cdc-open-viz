@@ -8,6 +8,7 @@ export type Table = {
   cellMinWidth?: number
   collapsible?: boolean
   dateDisplayFormat?: string
+  dontFilterNonGeoRows?: boolean
   download?: boolean
   downloadVisibleDataOnly?: boolean
   downloadImageButton?: boolean
