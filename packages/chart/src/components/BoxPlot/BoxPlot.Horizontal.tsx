@@ -18,12 +18,12 @@ const BoxPlotHorizontal = ({ xScale, yScale, seriesScale }) => {
 
   return (
     <ErrorBoundary component='BoxPlot Horizontal'>
-      <Group left={yOffset} className='boxplot'>
+      <Group left={yOffset} top={0} className='boxplot murraddd'>
         {plots.map(plot => {
           const category = plot.columnCategory
 
           return config.series.map(item => {
-            const y = (yScale(category) || 0) + seriesScale(item.dataKey) + seriesScale.bandwidth() / 2
+            const y = yScale(category)
             const isTransparent =
               config.legend.behavior === 'highlight' &&
               seriesHighlight.length > 0 &&

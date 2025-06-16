@@ -1057,6 +1057,25 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                           )}
 
                           {orientation === 'horizontal' &&
+                            visualizationType === 'Box Plot' &&
+                            config.yAxis.labelPlacement === 'On Date/Category Axis' &&
+                            !config.yAxis.hideLabel && (
+                              <Text
+                                x={tick.to.x}
+                                y={tick.to.y}
+                                transform={`rotate(${
+                                  config.runtime.horizontal ? config.runtime.yAxis.tickRotation || 0 : 0
+                                }, ${tick.to.x}, ${tick.to.y})`}
+                                verticalAnchor={'start'}
+                                textAnchor={'end'}
+                                fontSize={tickLabelFontSize}
+                              >
+                                {tick.formattedValue}
+                              </Text>
+                            )}
+
+                          {orientation === 'horizontal' &&
+                            visualizationType !== 'Box Plot' &&
                             visualizationSubType !== 'stacked' &&
                             config.yAxis.labelPlacement === 'On Date/Category Axis' &&
                             !config.yAxis.hideLabel && (

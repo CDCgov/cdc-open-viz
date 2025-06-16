@@ -173,11 +173,21 @@ const useScales = (properties: useScaleProps) => {
     const cats = Array.from(new Set(data.map(d => d[dataKey])))
 
     if (orientation === 'horizontal') {
-      xScale = composeXScale({ min, max, xMax, config })
-      xScale.type = scaleTypes.LINEAR
-
-      yScale = composeScaleBand(cats, [0, yMax], 0.4)
-      seriesScale = composeScaleBand(seriesKeys, [0, yScale.bandwidth()], 0.3)
+      xScale = scaleLinear({
+        domain: [min, max],
+        range: [0, xMax],
+        nice: true,
+        clamp: true
+      })
+      yScale = scaleBand({
+        domain: cats,
+        range: [0, yMax]
+      })
+      seriesScale = scaleBand({
+        domain: seriesKeys,
+        range: [0, yScale.bandwidth()],
+        padding: Number(config.barHeight) / 100
+      })
     } else {
       xScale = composeScaleBand(cats, [0, xMax], 1 - barThickness)
       xScale.type = scaleTypes.BAND
