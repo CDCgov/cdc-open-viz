@@ -126,11 +126,15 @@ export const useTooltip = props => {
       const pctOf360 = (degrees / 360) * 100
       const pctString = pctOf360.toFixed(roundTo) + '%'
 
-      tooltipItems.push(
-        [config.xAxis.dataKey, pieData[config.xAxis.dataKey]],
-        [config.runtime.yAxis.dataKey, formatNumber(pieData[config.runtime.yAxis.dataKey])],
-        ['Percent', pctString]
-      )
+      if (config.dataFormat.showPiePercent && pieData[config.xAxis.dataKey] === 'Calculated Area') {
+        tooltipItems.push(['', 'Calculated Area'])
+      } else {
+        tooltipItems.push(
+          [config.xAxis.dataKey, pieData[config.xAxis.dataKey]],
+          [config.runtime.yAxis.dataKey, formatNumber(pieData[config.runtime.yAxis.dataKey])],
+          ['Percent', pctString]
+        )
+      }
     }
 
     if (visualizationType === 'Forest Plot') {
@@ -547,7 +551,9 @@ export const useTooltip = props => {
           config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ` : ''
         )} ${config.xAxis.type === 'date' ? formattedDate : value}`}</li>
       )
-
+    if (visualizationType === 'Pie' && config.dataFormat.showPiePercent && value === 'Calculated Area') {
+      return <li className='tooltip-heading'>{`${capitalize('Calculated Area')} `}</li>
+    }
     if (key === config.xAxis.dataKey)
       return (
         <li className='tooltip-heading'>{`${capitalize(
