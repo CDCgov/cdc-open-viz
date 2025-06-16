@@ -53,7 +53,7 @@ const Filters: React.FC<FilterProps> = ({
   standaloneMap,
   setFilters,
   excludedData,
-  getUniqueValues,
+  getUniqueValues
 }) => {
   const { filters, general, theme, filterBehavior } = visualizationConfig
   const [showApplyButton, setShowApplyButton] = useState(false)

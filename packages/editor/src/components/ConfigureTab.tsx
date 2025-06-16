@@ -9,6 +9,7 @@ import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import MultiDashboardWrapper from '@cdc/dashboard/src/CdcDashboard'
+import CdcDataTable from '../../../data-table/src/CdcDataTable'
 
 export default function ConfigureTab({ containerEl }) {
   const { config, setTempConfig, isDebug } = useContext(ConfigContext)
@@ -53,6 +54,12 @@ export default function ConfigureTab({ containerEl }) {
       return (
         <ErrorBoundary component='CdcDashboard'>
           <CdcMarkupInclude isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
+        </ErrorBoundary>
+      )
+    case 'table':
+      return (
+        <ErrorBoundary component='CdcDataTable'>
+          <CdcDataTable isEditor={true} isDebug={isDebug} config={config} />
         </ErrorBoundary>
       )
     default:

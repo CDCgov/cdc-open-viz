@@ -154,7 +154,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
     num = abbreviateNumber(parseFloat(num))
   }
 
-  if (!inlineLabel) {
+  if (!inlineLabel || addColPrefix) {
     if (addColPrefix !== undefined && axis === 'left') {
       result = addColPrefix + result
     } else {
@@ -174,7 +174,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
 
   result += num
 
-  if (!inlineLabel) {
+  if (!inlineLabel || addColSuffix) {
     if (addColSuffix !== undefined && axis === 'left') {
       result += addColSuffix
     } else {

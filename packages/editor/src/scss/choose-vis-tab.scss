@@ -13,7 +13,7 @@
     list-style: none;
     display: grid;
     &.category_general {
-      grid-template-columns: repeat(4, 180px);
+      grid-template-columns: repeat(5, 180px);
     }
     &.category_charts {
       grid-template-columns: repeat(7, 180px);
