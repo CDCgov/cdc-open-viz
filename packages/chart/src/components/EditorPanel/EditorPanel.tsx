@@ -989,16 +989,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
     return strippedState
   }
-  const {
-    highlightedBarValues,
-    highlightedSeriesValues,
-    handleUpdateHighlightedBar,
-    handleAddNewHighlightedBar,
-    handleRemoveHighlightedBar,
-    handleUpdateHighlightedBarColor,
-    handleHighlightedBarLegendLabel,
-    handleUpdateHighlightedBorderWidth
-  } = useHighlightedBars(config, updateConfig)
 
   useEffect(() => {
     // Pass up to Editor if needed
