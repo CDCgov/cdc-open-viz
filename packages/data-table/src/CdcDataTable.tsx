@@ -119,8 +119,11 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
 
   useEffect(() => {
     loadConfig()
+  }, [configObj, configUrl])
+
+  useEffect(() => {
     loadData()
-  }, [configObj, configUrl, inputData, dataUrl, configLoading, invalidConfig, dataDescription])
+  }, [inputData, dataUrl, configLoading, invalidConfig, dataDescription])
 
   /* HANDLE LOADING/ERROR STATES */
   if (configLoading || dataLoading) return <Loading />
