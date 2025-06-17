@@ -202,7 +202,7 @@ const Filters: React.FC<FilterProps> = ({
               >
                 {label && (
                   <label
-                    className={`font-weight-bold mb-${hideLabelMargin ? '0' : '2'}`}
+                    className={`fw-700 fw-bold mb-${hideLabelMargin ? '0' : '2'}`}
                     htmlFor={`filter-${outerIndex}`}
                   >
                     {label}
