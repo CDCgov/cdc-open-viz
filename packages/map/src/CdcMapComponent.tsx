@@ -284,6 +284,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       primary: config.columns.primary.name,
       mapPosition: config.mapPosition,
       map: config.map,
+      table: config.table,
       ...runtimeFilters
     })
 
