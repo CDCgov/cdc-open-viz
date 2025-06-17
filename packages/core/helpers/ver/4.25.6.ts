@@ -21,6 +21,7 @@ export const changeOnlyShowTopSuffixToInlineLabel = config => {
     Object.values(config.visualizations).forEach(visualization => {
       changeOnlyShowTopSuffixToInlineLabel(visualization)
     })
+    return config
   }
 }
 
