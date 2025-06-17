@@ -1133,7 +1133,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
     setSharedFilterValue,
     svgRef,
     tableData: filteredData || excludedData,
-    transformedData: clean(filteredData || excludedData),
+    transformedData: clean(
+      Array.isArray(state.brushData) && state.brushData.length
+        ? state.brushData
+        : Array.isArray(filteredData) && filteredData.length
+        ? filteredData
+        : excludedData
+    ),
     twoColorPalette,
     unfilteredData: _.cloneDeep(stateData),
     updateConfig

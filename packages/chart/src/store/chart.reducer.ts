@@ -77,7 +77,7 @@ export const reducer = (state: ChartState, action: ChartActions): ChartState => 
       return { ...state, coveLoadedEventRan: action.payload }
     case 'SET_DRAG_ANNOTATIONS':
       return { ...state, isDraggingAnnotation: action.payload }
-    case 'SET_BRUSH_CONFIG':
-      return { ...state, brushConfig: action.payload }
+    case 'SET_BRUSH_DATA':
+      return { ...state, brushData: action.payload }
   }
 }

@@ -120,10 +120,7 @@ export type AllChartsConfig = {
   barStyle: 'lollipop' | 'rounded' | 'flat'
   barThickness: number
   boxplot: BoxPlot
-  brush: {
-    active: boolean
-    height: number
-  }
+  brushData: []
   chartMessage: { noData?: string }
   color: string
   colorMatchLineSeriesLabels: boolean
