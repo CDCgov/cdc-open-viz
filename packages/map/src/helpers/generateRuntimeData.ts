@@ -26,7 +26,7 @@ const generateRuntimeData = (
     configObj.data.forEach((row: DataRow) => {
       if (!row.uid) {
         if (!keepNoUidRows) return false // No UID for this row, we can't use for mapping
-        row.uid = row.geography
+        row.uid = row[configObj.columns.geo.name]
       }
       const configPrimaryName = configObj.columns.primary.name
       const value = row[configPrimaryName]

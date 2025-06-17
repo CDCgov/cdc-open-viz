@@ -2628,19 +2628,19 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 <label className='checkbox'>
                   <input
                     type='checkbox'
-                    checked={config.table.dontFilterNonGeoRows}
+                    checked={config.table.showNonGeoData}
                     onChange={event => {
                       setConfig({
                         ...config,
                         table: {
                           ...config.table,
-                          dontFilterNonGeoRows: event.target.checked
+                          showNonGeoData: event.target.checked
                         }
                       })
                     }}
                   />
                   <span className='edit-label column-heading'>
-                    Don't Filter Non-Geo Rows
+                    Show Non Geographic Data
                     <Tooltip style={{ textTransform: 'none' }}>
                       <Tooltip.Target>
                         <Icon
