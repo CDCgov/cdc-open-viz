@@ -50,7 +50,7 @@ const Options: React.FC<{
         onKeyUp={handleKeyUp}
         className={`nested-dropdown-group-${filterIndex}`}
       >
-        <span className={'fw-700 fw-bold'}>{label} </span>
+        <span className={'font-weight-bold fw-bold'}>{label} </span>
         {
           <span className='list-arrow' aria-hidden='true'>
             {isTierOneExpanded ? (

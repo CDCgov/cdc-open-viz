@@ -267,7 +267,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
               const orderedSubGroupValues = subGrouping.valuesLookup[groupName].orderedValues
               return (
                 <div key={`group-subgroup-values-${groupName}-${i}`}>
-                  <span className='fw-700 fw-bold'>{groupName}</span>
+                  <span className='font-weight-bold fw-bold'>{groupName}</span>
                   <FilterOrder
                     key={`subgroup-values-${groupName}-${i}`}
                     orderedValues={orderedSubGroupValues}
