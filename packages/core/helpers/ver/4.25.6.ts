@@ -2,20 +2,26 @@ import _ from 'lodash'
 
 // *NOTE: This ends support for only showing the top prefix
 export const changeOnlyShowTopSuffixToInlineLabel = config => {
-  if (!config.dataFormat?.suffix) return config
-  if (!config.dataFormat.onlyShowTopPrefixSuffix) return config
+  if (config.type === 'chart') {
+    if (!config.dataFormat?.suffix) return config
+    if (!config.dataFormat.onlyShowTopPrefixSuffix) return config
 
-  delete config.dataFormat.onlyShowTopPrefixSuffix
+    delete config.dataFormat.onlyShowTopPrefixSuffix
 
-  if (!config.yAxis) config.yAxis = {}
+    if (!config.yAxis) config.yAxis = {}
 
-  if (!config.yAxis?.inlineLabel) {
-    config.yAxis.inlineLabel = config.dataFormat.suffix
+    if (!config.yAxis?.inlineLabel) {
+      config.yAxis.inlineLabel = config.dataFormat.suffix
+    }
+
+    config.dataFormat.suffix = ''
+
+    return config
+  } else if (config.type === 'dashboard') {
+    Object.values(config.visualizations).forEach(visualization => {
+      changeOnlyShowTopSuffixToInlineLabel(visualization)
+    })
   }
-
-  config.dataFormat.suffix = ''
-
-  return config
 }
 
 const update_4_25_6 = config => {
