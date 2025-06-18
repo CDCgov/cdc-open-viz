@@ -1854,7 +1854,7 @@ const EditorPanel = () => {
                     section='dataFormat'
                     fieldName='showPiePercent'
                     label='Display Value From Data'
-                    updateField={updateFieldDeprecated}
+                    updateField={updateField}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
