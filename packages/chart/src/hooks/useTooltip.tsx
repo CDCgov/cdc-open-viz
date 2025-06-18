@@ -193,6 +193,8 @@ export const useTooltip = props => {
           }
         })
       } else {
+        const dynamicSeries = config.series.find(s => s.dynamicCategory)
+
         // Show Only the Hovered Series in Tooltip
         const dataColumn = resolvedScaleValues[0]
         const [seriesKey, value] = findDataKeyByThreshold(y, dataColumn)
@@ -203,7 +205,7 @@ export const useTooltip = props => {
           tooltipItems.push([config.xAxis.dataKey, closestXScaleValue || xVal])
           const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
           tooltipItems.push([seriesKey, formattedValue])
-        } else {
+        } else if (dynamicSeries) {
           Object.keys(dataColumn).forEach(key => {
             tooltipItems.push([key, dataColumn[key]])
           })
