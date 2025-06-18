@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
 import ZoomBrush from './BrushChart'
-const ParentBrush = ({ yMax, xMax }) => {
+const BrushController = ({ yMax, xMax }) => {
   const { tableData, config, parseDate, dashboardConfig } = useContext(ConfigContext)
   const dataKey = config.xAxis.dataKey
   const [brushKey, setBrushKey] = useState(0)
@@ -36,4 +36,4 @@ const ParentBrush = ({ yMax, xMax }) => {
     />
   )
 }
-export default ParentBrush
+export default BrushController

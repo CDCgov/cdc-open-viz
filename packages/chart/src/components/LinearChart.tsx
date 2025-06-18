@@ -17,7 +17,7 @@ import ConfigContext from '../ConfigContext'
 import BoxPlot from './BoxPlot'
 import ScatterPlot from './ScatterPlot'
 import DeviationBar from './DeviationBar'
-import ParentBrush from './Brush/ParentBrush'
+import BrushController from './Brush/BrushController.'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Forecasting from './Forecasting'
 import LineChart from './LineChart'
@@ -413,11 +413,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const topLabelOnGridline = topYLabelRef.current && yAxis.labelsAboveGridlines
 
     // Heights to add
-
-    const brushHeight = config.brush?.active ? 50 : 0
+    const brushHeight = 25
+    const brushHeightWithMargin = config.brush?.active ? brushHeight + brushHeight : 0
     const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
     const topLabelOnGridlineHeight = topLabelOnGridline ? topYLabelRef.current.getBBox().height : 0
-    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight + topLabelOnGridlineHeight
+    const additionalHeight = axisBottomHeight + brushHeightWithMargin + forestRowsHeight + topLabelOnGridlineHeight
     const newHeight = initialHeight + additionalHeight
     if (!parentRef.current) return
 
@@ -857,7 +857,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             />
           )}
           {/*Brush chart */}
-          {config.brush.active && config.xAxis.type !== 'categorical' && <ParentBrush xMax={xMax} yMax={yMax} />}
+          {config.brush.active && config.xAxis.type !== 'categorical' && <BrushController xMax={xMax} yMax={yMax} />}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
           {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(

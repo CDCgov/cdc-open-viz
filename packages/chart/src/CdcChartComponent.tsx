@@ -71,6 +71,7 @@ import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
 import { getComboChartConfig } from './helpers/getComboChartConfig'
 import { getExcludedData } from './helpers/getExcludedData'
 import { getColorScale } from './helpers/getColorScale'
+import { getTransformedData } from './helpers/getTransformedData'
 // styles
 import './scss/main.scss'
 import { getInitialState, reducer } from './store/chart.reducer'
@@ -1133,13 +1134,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     setSharedFilterValue,
     svgRef,
     tableData: filteredData || excludedData,
-    transformedData: clean(
-      Array.isArray(state.brushData) && state.brushData.length
-        ? state.brushData
-        : Array.isArray(filteredData) && filteredData.length
-        ? filteredData
-        : excludedData
-    ),
+    transformedData: getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean }),
     twoColorPalette,
     unfilteredData: _.cloneDeep(stateData),
     updateConfig
