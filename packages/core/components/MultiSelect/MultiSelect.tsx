@@ -111,7 +111,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
               </div>
             ))
           ) : (
-            <span className='pl-1 pt-1'>{loading ? 'Loading...' : '- Select -'}</span>
+            <span className='ps-1 pt-1'>{loading ? 'Loading...' : '- Select -'}</span>
           )}
           <button
             aria-label={expanded ? 'Collapse' : 'Expand'}

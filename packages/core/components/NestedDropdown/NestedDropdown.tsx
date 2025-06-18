@@ -50,7 +50,7 @@ const Options: React.FC<{
         onKeyUp={handleKeyUp}
         className={`nested-dropdown-group-${filterIndex}`}
       >
-        <span className={'font-weight-bold'}>{label} </span>
+        <span className={'font-weight-bold fw-bold'}>{label} </span>
         {
           <span className='list-arrow' aria-hidden='true'>
             {isTierOneExpanded ? (
@@ -241,7 +241,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
       setInputHasFocus(false)
       setIsListOpened(false)
     } else {
-      ;(e.relatedTarget as HTMLElement).focus()
+      ; (e.relatedTarget as HTMLElement).focus()
     }
   }
 
@@ -302,23 +302,23 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
         >
           {filterOptions.length
             ? filterOptions.map(([group, subgroup], index) => {
-                const [groupValue, groupText] = group
-                const groupTextValue = String(groupText || groupValue)
-                return (
-                  <Options
-                    key={groupTextValue + '_' + index}
-                    handleBlur={handleOnBlur}
-                    subOptions={subgroup}
-                    filterIndex={filterIndex}
-                    label={groupTextValue}
-                    handleSubGroupSelect={subGroupValue => {
-                      chooseSelectedSubGroup(groupValue, subGroupValue)
-                    }}
-                    userSelectedLabel={activeGroup + activeSubGroup}
-                    userSearchTerm={userSearchTerm || ''}
-                  />
-                )
-              })
+              const [groupValue, groupText] = group
+              const groupTextValue = String(groupText || groupValue)
+              return (
+                <Options
+                  key={groupTextValue + '_' + index}
+                  handleBlur={handleOnBlur}
+                  subOptions={subgroup}
+                  filterIndex={filterIndex}
+                  label={groupTextValue}
+                  handleSubGroupSelect={subGroupValue => {
+                    chooseSelectedSubGroup(groupValue, subGroupValue)
+                  }}
+                  userSelectedLabel={activeGroup + activeSubGroup}
+                  userSearchTerm={userSearchTerm || ''}
+                />
+              )
+            })
             : 'There are no matching items'}
         </ul>
       </div>
