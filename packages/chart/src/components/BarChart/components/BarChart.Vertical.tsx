@@ -52,8 +52,7 @@ export const BarChartVertical = () => {
     parseDate,
     seriesHighlight,
     setSharedFilter,
-    transformedData,
-    brushConfig
+    transformedData
   } = useContext<ChartContext>(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
@@ -66,10 +65,6 @@ export const BarChartVertical = () => {
   // if suppression active use table data (filtere | excluded) but non cleaned
   if (isSuppressionActive) {
     data = tableData
-  }
-  // if brush active use brush data (filtered|excluded) not cleaned
-  if (brushConfig.data.length) {
-    data = brushConfig.data
   }
 
   const hasConfidenceInterval =
