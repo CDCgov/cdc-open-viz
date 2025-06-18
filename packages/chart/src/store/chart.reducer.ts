@@ -28,6 +28,7 @@ type ChartState = {
 export const getInitialState = (configObj: ChartConfig): ChartState => {
   return {
     isLoading: true,
+
     config: defaults,
     stateData: _.cloneDeep(configObj?.data) || [],
     colorScale: null,
@@ -41,11 +42,7 @@ export const getInitialState = (configObj: ChartConfig): ChartState => {
     coveLoadedEventRan: false,
     isDraggingAnnotation: false,
     imageId: `cove-${Math.random().toString(16).slice(-4)}`,
-    brushConfig: {
-      data: [],
-      isActive: false,
-      isBrushing: false
-    }
+    brushData: []
   }
 }
 
