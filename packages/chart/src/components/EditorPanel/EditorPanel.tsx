@@ -747,7 +747,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   const updateField = updateFieldFactory(config, updateConfig)
   const updateFieldDeprecated = (section, subsection, fieldName, newValue) => {
     if (isDebug)
-      console.log(
+      console.error(
         '#COVE: CHART: EditorPanel: section, subsection, fieldName, newValue',
         section,
         subsection,
@@ -820,10 +820,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
   const [displayPanel, setDisplayPanel] = useState(true)
   const [displayViewportOverrides, setDisplayViewportOverrides] = useState(false)
-
-  if (isLoading) {
-    return null
-  }
 
   const setLollipopShape = shape => {
     updateConfig({
@@ -971,6 +967,18 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       showEditorPanel: !displayPanel
     })
   }
+
+  // prettier-ignore
+  const {
+      highlightedBarValues,
+      highlightedSeriesValues,
+      handleUpdateHighlightedBar,
+      handleAddNewHighlightedBar,
+      handleRemoveHighlightedBar,
+      handleUpdateHighlightedBarColor,
+      handleHighlightedBarLegendLabel,
+      handleUpdateHighlightedBorderWidth
+     } = useHighlightedBars(config, updateConfig)
 
   const convertStateToConfig = () => {
     let strippedState = _.cloneDeep(config)
@@ -1185,7 +1193,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   if (isDebug && config?.series?.length === 0) {
     let setdatacol = setDataColumn()
     if (setdatacol !== '') addNewSeries(setdatacol)
-    if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
+    if (isDebug) console.error('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
   const chartsWithOptions = [
@@ -1303,18 +1311,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     }
   }
 
-  // prettier-ignore
-  const {
-    highlightedBarValues,
-    highlightedSeriesValues,
-    handleUpdateHighlightedBar,
-    handleAddNewHighlightedBar,
-    handleRemoveHighlightedBar,
-    handleUpdateHighlightedBarColor,
-    handleHighlightedBarLegendLabel,
-    handleUpdateHighlightedBorderWidth
-   } = useHighlightedBars(config, updateConfig)
-
   const updateSeriesTooltip = (column, event) => {
     let updatedColumns = config.columns
 
@@ -1383,6 +1379,13 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleUpdateHighlightedBorderWidth,
     handleUpdateHighlightedBarColor,
     setLollipopShape
+  }
+  if (isLoading) {
+    return <></>
+  }
+
+  if (isLoading) {
+    return null
   }
 
   return (
@@ -1893,6 +1896,31 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>{`This option abbreviates very large or very small numbers on the value axis`}</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                  <CheckBox
+                    display={config.visualizationType === 'Pie'}
+                    value={config.dataFormat.showPiePercent}
+                    section='dataFormat'
+                    fieldName='showPiePercent'
+                    label='Display Value From Data'
+                    updateField={updateFieldDeprecated}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display='question'
+                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content className='text-start'>
+                          <p className='mb-2'>
+                            When enabled, pie slices are drawn using the exact values from your data as percentages. For
+                            example, 25 means 25%. If the sum of values below 100 will be supplemented to complete the
+                            pie. Feature is disabled if the sum of values is above 100
+                          </p>
                         </Tooltip.Content>
                       </Tooltip>
                     }

@@ -186,7 +186,7 @@ const EditorPanel = memo(() => {
                     fieldName='biteStyle'
                     label='Data Bite Style'
                     updateField={updateField}
-                    options={Object.keys(BITE_LOCATIONS)}
+                    options={Object.entries(BITE_LOCATIONS).map(([key, value]) => ({ value: key, label: value }))}
                     initial='Select'
                   />
                   <TextField

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useId } from 'react'
 import _ from 'lodash'
+import parse from 'html-react-parser'
 
 // CDC
 import Button from '../elements/Button'
@@ -52,7 +53,7 @@ const Filters: React.FC<FilterProps> = ({
   standaloneMap,
   setFilters,
   excludedData,
-  getUniqueValues,
+  getUniqueValues
 }) => {
   const { filters, general, theme, filterBehavior } = visualizationConfig
   const [showApplyButton, setShowApplyButton] = useState(false)
@@ -173,7 +174,7 @@ const Filters: React.FC<FilterProps> = ({
   return (
     <section className={getClasses().join(' ')}>
       {visualizationConfig.filterIntro && (
-        <p className='filters-section__intro-text mb-3'>{visualizationConfig.filterIntro}</p>
+        <p className='filters-section__intro-text mb-3'>{parse(visualizationConfig.filterIntro)}</p>
       )}
       <div className='d-flex flex-wrap w-100 filters-section__wrapper align-items-end'>
         <>

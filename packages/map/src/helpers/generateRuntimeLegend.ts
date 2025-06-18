@@ -1,6 +1,7 @@
 import { useCallback, useContext } from 'react'
 import ConfigContext from '../context'
 import {
+  addUIDs,
   applyColorToLegend,
   getGeoFillColor,
   hashObj,
@@ -53,10 +54,14 @@ export const generateRuntimeLegend = (
     const newLegendMemo = new Map() // Reset memoization
     const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
     const countryKeys = Object.keys(supportedCountries)
-    const { data, legend, columns, general } = configObj
+    const { legend, columns, general } = configObj
     const primaryColName = columns.primary.name
     const isBubble = general.type === 'bubble'
     const categoricalCol = columns.categorical ? columns.categorical.name : undefined
+
+    // filter out rows without a geo column
+    addUIDs(configObj, configObj.columns.geo.name)
+    const data = configObj.data.filter(row => row.uid) // Filter out rows without UIDs
 
     const result = {
       fromHash: null,
