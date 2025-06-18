@@ -1523,7 +1523,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           showTooltip &&
           !tooltipData?.data?.some(subArray => subArray.some(item => item === undefined)) &&
           tooltipData.dataYPosition &&
-          tooltipData.dataXPosition && (
+          tooltipData.dataXPosition &&
+          !config.tooltips.singleSeries && (
             <>
               <style>{`.tooltip {background-color: rgba(255,255,255, ${
                 config.tooltips.opacity / 100
@@ -1554,7 +1555,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
           />
         )}
-        {visSupportsReactTooltip() && !isDraggingAnnotation && (
+        {!isDraggingAnnotation && (
           <ReactTooltip
             id={`cdc-open-viz-tooltip-${runtime.uniqueId}`}
             variant='light'
