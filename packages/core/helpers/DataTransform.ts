@@ -137,13 +137,20 @@ export class DataTransform {
           (description.valueKeys !== undefined && description.valueKeys.length > 0) ||
           (description.valueKeysTallSupport !== undefined && description.valueKeysTallSupport.length > 0))
       ) {
-        if (Array.isArray(description.valueKeysTallSupport) && description.valueKeysTallSupport.length > 0) {
+        const hasTallSupportKeys =
+          Array.isArray(description.valueKeysTallSupport) && description.valueKeysTallSupport.length > 0
+        const hasSeriesKeyInData = data.some(row => row.hasOwnProperty(description.seriesKey))
+        const hasAnyTallKeyInData = data.some(row =>
+          description.valueKeysTallSupport.some(key => row.hasOwnProperty(key))
+        )
+        if (hasTallSupportKeys && hasSeriesKeyInData && hasAnyTallKeyInData) {
           const standardizedMapped = {}
 
           data.forEach(row => {
             // must have xKey and seriesKey
             if (!row.hasOwnProperty(description.xKey) || !row.hasOwnProperty(description.seriesKey)) return
 
+            // Build grouping key parts
             const parts = [String(row[description.xKey])]
             Object.entries(row).forEach(([key, val]) => {
               if (
@@ -157,10 +164,11 @@ export class DataTransform {
             })
             const uniqueKey = parts.join('|')
 
+            // Initialize with xKey
             if (!standardizedMapped[uniqueKey]) {
               standardizedMapped[uniqueKey] = {
                 [description.xKey]: row[description.xKey],
-                // save original tall-support values
+                // save original tall support values
                 ...description.valueKeysTallSupport.reduce((acc, key) => {
                   if (row.hasOwnProperty(key)) acc[key] = row[key]
                   return acc
