@@ -89,6 +89,7 @@ export default {
   topAxis: {
     hasLine: false
   },
+  brushData: [],
   isLegendValue: false,
   barThickness: 0.35,
   barHeight: 25,
@@ -176,10 +177,7 @@ export default {
     position: 'right',
     orderedValues: []
   },
-  brush: {
-    height: 45,
-    active: false
-  },
+
   exclusions: {
     active: false,
     keys: []

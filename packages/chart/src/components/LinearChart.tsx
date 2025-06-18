@@ -11,13 +11,13 @@ import _ from 'lodash'
 
 // CDC Components
 import { isDateScale } from '@cdc/core/helpers/cove/date'
-import BrushChart from './BrushChart'
-import { AreaChart, AreaChartStacked } from './AreaChart'
+import { AreaChartStacked } from './AreaChart'
 import BarChart from './BarChart'
 import ConfigContext from '../ConfigContext'
 import BoxPlot from './BoxPlot'
 import ScatterPlot from './ScatterPlot'
 import DeviationBar from './DeviationBar'
+import BrushController from './Brush/BrushController.'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Forecasting from './Forecasting'
 import LineChart from './LineChart'
@@ -77,7 +77,6 @@ type UseTooltipReturn<T = TooltipData> = {
 const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, parentWidth }, svgRef) => {
   // prettier-ignore
   const {
-    brushConfig,
     colorScale,
     config,
     convertLineToBarGraph,
@@ -207,10 +206,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime()
       : d[config.runtime.originalXAxis.dataKey]
   const getYAxisData = (d, seriesKey) => d[seriesKey]
-  const xAxisDataMapped =
-    config.brush.active && brushConfig.data?.length
-      ? brushConfig.data.map(d => getXAxisData(d))
-      : data.map(d => getXAxisData(d))
+  const xAxisDataMapped = data.map(d => getXAxisData(d))
   const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
   const properties = {
     data,
@@ -417,11 +413,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const topLabelOnGridline = topYLabelRef.current && yAxis.labelsAboveGridlines
 
     // Heights to add
-
-    const brushHeight = brush?.active ? brush?.height + brush?.height : 0
+    const brushHeight = 25
+    const brushHeightWithMargin = config.brush?.active ? brushHeight + brushHeight : 0
     const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
     const topLabelOnGridlineHeight = topLabelOnGridline ? topYLabelRef.current.getBBox().height : 0
-    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight + topLabelOnGridlineHeight
+    const additionalHeight = axisBottomHeight + brushHeightWithMargin + forestRowsHeight + topLabelOnGridlineHeight
     const newHeight = initialHeight + additionalHeight
     if (!parentRef.current) return
 
@@ -837,7 +833,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               chartRef={svgRef}
               handleTooltipMouseOver={handleTooltipMouseOver}
               handleTooltipMouseOff={handleTooltipMouseOff}
-              isBrush={false}
             />
           )}
           {visualizationType === 'Forest Plot' && (
@@ -862,7 +857,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             />
           )}
           {/*Brush chart */}
-          {config.brush.active && config.xAxis.type !== 'categorical' && <BrushChart xMax={xMax} yMax={yMax} />}
+          {config.brush.active && config.xAxis.type !== 'categorical' && <BrushController xMax={xMax} yMax={yMax} />}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
           {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(
