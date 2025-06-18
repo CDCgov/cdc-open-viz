@@ -137,47 +137,58 @@ export class DataTransform {
           (description.valueKeys !== undefined && description.valueKeys.length > 0) ||
           (description.valueKeysTallSupport !== undefined && description.valueKeysTallSupport.length > 0))
       ) {
-        if (description.valueKeysTallSupport !== undefined) {
-          let standardizedMapped = {}
-          let standardized: string[] = []
+        if (Array.isArray(description.valueKeysTallSupport) && description.valueKeysTallSupport.length > 0) {
+          const standardizedMapped = {}
 
           data.forEach(row => {
-            let uniqueKey = row[description.xKey]
-            Object.keys(row).forEach(key => {
+            // must have xKey and seriesKey
+            if (!row.hasOwnProperty(description.xKey) || !row.hasOwnProperty(description.seriesKey)) return
+
+            const parts = [String(row[description.xKey])]
+            Object.entries(row).forEach(([key, val]) => {
               if (
                 key !== description.xKey &&
                 key !== description.seriesKey &&
-                description.valueKeysTallSupport.indexOf(key) === -1 &&
-                (!description.ignoredKeys || description.ignoredKeys.indexOf(key) === -1)
+                !description.valueKeysTallSupport.includes(key) &&
+                !(Array.isArray(description.ignoredKeys) && description.ignoredKeys.includes(key))
               ) {
-                uniqueKey += '|' + row[key]
+                parts.push(`${key}=${val}`)
+              }
+            })
+            const uniqueKey = parts.join('|')
+
+            if (!standardizedMapped[uniqueKey]) {
+              standardizedMapped[uniqueKey] = {
+                [description.xKey]: row[description.xKey],
+                // save original tall-support values
+                ...description.valueKeysTallSupport.reduce((acc, key) => {
+                  if (row.hasOwnProperty(key)) acc[key] = row[key]
+                  return acc
+                }, {})
+              }
+            }
+
+            Object.entries(row).forEach(([key, val]) => {
+              if (
+                key !== description.xKey &&
+                key !== description.seriesKey &&
+                !description.valueKeysTallSupport.includes(key) &&
+                !(Array.isArray(description.ignoredKeys) && description.ignoredKeys.includes(key))
+              ) {
+                standardizedMapped[uniqueKey][key] = val
               }
             })
 
-            if (!standardizedMapped[uniqueKey]) {
-              standardizedMapped[uniqueKey] = { [description.xKey]: row[description.xKey] }
-            }
-            Object.keys(row).forEach(key => {
-              if (
-                key !== description.xKey &&
-                key !== description.seriesKey &&
-                description.valueKeysTallSupport.indexOf(key) === -1 &&
-                (!description.ignoredKeys || description.ignoredKeys.indexOf(key) === -1)
-              ) {
-                standardizedMapped[uniqueKey][key] = row[key]
-              }
-            })
             description.valueKeysTallSupport.forEach((valueKey, i) => {
-              if (row[description.seriesKey])
-                standardizedMapped[uniqueKey][
-                  i === 0 ? row[description.seriesKey] : row[description.seriesKey] + '-' + valueKey
-                ] = row[valueKey]
+              if (row.hasOwnProperty(valueKey)) {
+                const seriesVal = String(row[description.seriesKey])
+                const colName = i === 0 ? seriesVal : `${seriesVal}-${valueKey}`
+                standardizedMapped[uniqueKey][colName] = row[valueKey]
+              }
             })
           })
 
-          standardized = Object.keys(standardizedMapped).map(key => standardizedMapped[key])
-
-          return standardized
+          return Object.values(standardizedMapped)
         } else if (description.valueKeys !== undefined) {
           let standardizedMapped = {}
           let standardized: string[] = []
