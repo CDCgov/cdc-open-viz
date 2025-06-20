@@ -243,11 +243,46 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   useEffect(() => {
-    if (config && !runtimeData.init && !coveLoadedHasRan && container) {
-      publish('cove_loaded', { config: config })
-      dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
+    // Wait until the map SVG is rendered and visible before publishing the event
+    if (!coveLoadedHasRan && mapSvg.current) {
+      const svgEl = mapSvg.current.querySelector('svg')
+      if (svgEl && svgEl.childNodes.length > 0 && svgEl.offsetParent !== null) {
+        publish('cove_loaded', { config })
+        dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
+      }
     }
-  }, [config, container, runtimeData.init])
+  }, [mapSvg, config, coveLoadedHasRan])
+
+  /**
+   * Publishes 'cove_loaded' only after the map SVG is rendered in the DOM.
+   * Checks immediately, then uses a MutationObserver as a fallback for async rendering.
+   */
+  useEffect(() => {
+    if (!mapSvg.current || coveLoadedHasRan) return
+
+    // Immediate check in case SVG is already present
+    const svgEl = mapSvg.current.querySelector('svg')
+    if (svgEl && svgEl.childNodes.length > 0) {
+      publish('cove_loaded', { config })
+      dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
+      return
+    }
+
+    // Fallback to observer for async SVG rendering
+    const observer = new MutationObserver(() => {
+      const svgEl = mapSvg.current.querySelector('svg')
+      if (svgEl && svgEl.childNodes.length > 0) {
+        publish('cove_loaded', { config })
+        dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
+        observer.disconnect()
+      }
+    })
+
+    observer.observe(mapSvg.current, { childList: true, subtree: true })
+
+    // Cleanup
+    return () => observer.disconnect()
+  }, [config, loading, runtimeData, coveLoadedHasRan])
 
   useEffect(() => {
     // UID
