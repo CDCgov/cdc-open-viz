@@ -1,3 +1,5 @@
+import { VisualizationType } from './../../../../node_modules/@cdc/chart/src/types/ChartConfig'
+import { Visualization } from '@cdc/core/types/Visualization'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 
 const abbreviateNumber = num => {
@@ -175,6 +177,9 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   result += num
 
   if (!inlineLabel || addColSuffix) {
+    if (config.visualizationType === 'Pie' && config.dataFormat.showPiePercent) {
+      result = `${result}%`
+    }
     if (addColSuffix !== undefined && axis === 'left') {
       result += addColSuffix
     } else {
