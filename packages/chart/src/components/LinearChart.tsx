@@ -857,7 +857,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             />
           )}
           {/*Brush chart */}
-          {config.brush.active && config.xAxis.type !== 'categorical' && <BrushController xMax={xMax} yMax={yMax} />}
+          {config.xAxis.brushActive && config.xAxis.type !== 'categorical' && (
+            <BrushController xMax={xMax} yMax={yMax} />
+          )}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
           {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(

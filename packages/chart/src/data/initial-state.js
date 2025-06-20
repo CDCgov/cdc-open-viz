@@ -121,7 +121,8 @@ export default {
     maxTickRotation: 0,
     padding: 5,
     showYearsOnce: false,
-    sortByRecentDate: false
+    sortByRecentDate: false,
+    brushActive: false
   },
   table: {
     label: 'Data Table',

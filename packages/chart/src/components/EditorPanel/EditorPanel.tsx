@@ -2926,7 +2926,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       />
                       {visHasBrushChart() && (
                         <CheckBox
-                          value={config.brush?.active}
+                          value={config.xAxis.brushActive}
                           section='brush'
                           fieldName='active'
                           label='Brush Slider '
