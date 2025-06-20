@@ -51,4 +51,5 @@ export type Axis = {
   axisBBox: number
   maxValue: string
   sortByRecentDate: boolean
+  brushActive: boolean
 }
