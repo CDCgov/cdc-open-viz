@@ -32,7 +32,13 @@ import { supportedDataTypes } from '../helpers/supportedDataTypes'
 import { getFileExtension } from '../helpers/getFileExtension'
 import { parseTextByMimeType } from '../helpers/parseTextByMimeType'
 import { getMimeType } from '../helpers/getMimeType'
-import { convertVegaData, parseVegaConfig, loadedVegaConfigData } from '@cdc/editor/src/helpers/vegaConfig'
+import {
+  addVegaData,
+  convertVegaData,
+  getSampleVegaJson,
+  parseVegaConfig,
+  loadedVegaConfigData
+} from '@cdc/editor/src/helpers/vegaConfig'
 
 const DataImport = () => {
   const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)
@@ -217,7 +223,10 @@ const DataImport = () => {
 
       // Validate parsed data and set if no issues.
       try {
-        const result = parseTextByMimeType(this.result.toString(), mimeType, externalURL, setErrors)
+        let result = parseTextByMimeType(this.result.toString(), mimeType, externalURL, setErrors)
+        if (config.vegaConfig) {
+          result = convertVegaData(addVegaData(config.vegaConfig, result))
+        }
         const text = transform.autoStandardize(result)
         if (config.data && config.series) {
           if (dataExists(text, config.series, config?.xAxis.dataKey)) {
@@ -737,8 +746,9 @@ const DataImport = () => {
                   </TabPane>
                   <TabPane title='Update with JSON data' icon={<LinkIcon className='inline-icon' />}>
                     <div>
-                      To change this chart to use a JSON file as its data source, the file must contain data — an array
-                      of objects — that matches COVE's format, shown in the Data Preview on the right.
+                      To change this chart to use a JSON file as its data source, the file should be formatted like this
+                      sample:
+                      <pre style={{ backgroundColor: '#f2f2f2' }}>{getSampleVegaJson(config.vegaConfig)}</pre>
                     </div>
                     <div>&nbsp;</div>
                     <div>Upload JSON file:</div>

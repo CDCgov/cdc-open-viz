@@ -331,12 +331,45 @@ const getGeoName = (data: { [key: string]: any }[]) => {
   }
 }
 
+export const addVegaData = (vegaConfig, newData) => {
+  const newConfig = JSON.parse(JSON.stringify(vegaConfig))
+  newConfig.data.forEach(d => {
+    if (newData[d.name]) {
+      d.values = newData[d.name]
+    }
+  })
+  return newConfig
+}
+
+const stripVegaData = vegaConfig => {
+  const newConfig = JSON.parse(JSON.stringify(vegaConfig))
+  newConfig.data.forEach(d => {
+    if (d.values?.arcs) {
+      d.values.arcs = d.values.arcs.map(a => 0)
+    } else if (Array.isArray(d.values)) {
+      d.values = d.values.slice(0, 3)
+    }
+  })
+  return newConfig
+}
+
+export const getSampleVegaJson = vegaConfig => {
+  return JSON.stringify(
+    Object.fromEntries(
+      vegaConfig.data.filter(d => d.values && !(d.format?.type === 'topojson')).map(d => [d.name, d.values])
+    ),
+    null,
+    4
+  )
+}
+
 export const convertVegaConfig = (configType: string, vegaConfig: any, config: any) => {
   delete config.newViz
 
   const data = convertVegaData(vegaConfig)
 
   config.vegaType = configType
+  config.vegaConfig = stripVegaData(vegaConfig)
 
   config.dataFileName = 'vega-config.json'
   config.dataFileSourceType = 'file'

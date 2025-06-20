@@ -6,6 +6,7 @@ import initialState from './data/initial-state'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { addUIDs, validateFipsCodeLength } from './helpers'
 import EditorContext from '@cdc/editor/src/ConfigContext'
+import { addVegaData, convertVegaData } from '@cdc/editor/src/helpers/vegaConfig'
 import { MapConfig } from './types/MapConfig'
 import _, { set } from 'lodash'
 
@@ -52,6 +53,10 @@ const CdcMap: React.FC<CdcMapProps> = ({
     }
     if (newState.dataUrl) {
       let newData = await fetchRemoteData(newState.dataUrl, 'map')
+
+      if (newState.vegaConfig) {
+        newData = convertVegaData(addVegaData(newState.vegaConfig, newData))
+      }
 
       if (newData && newState.dataDescription) {
         newData = transform.autoStandardize(newData)
