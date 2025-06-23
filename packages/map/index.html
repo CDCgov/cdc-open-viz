@@ -1,38 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <style type="text/css">
-      body {
-        margin: 0;
-        border-top: none !important;
-      }
 
-      .cdc-map-outer-container {
-        min-height: 100vh;
-      }
-    </style>
-    <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <style type="text/css">
+    body {
+      margin: 0;
+      border-top: none !important;
+    }
 
-    <!-- This is temporary and for testing until Nunito/900 is added to TP -->
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@900&display=swap" rel="stylesheet" />
-    <style type="text/css">
-      @font-face {
-        font-family: 'Nunito';
-        font-weight: 900;
-        font-display: swap;
-        src: url('https://app.unpkg.com/@fontsource/nunito@5.0.18/files/files/nunito-latin-900-normal.woff2')
-          format('woff2');
-      }
-    </style>
-  </head>
+    .cdc-map-outer-container {
+      min-height: 100vh;
+    }
+  </style>
+  <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
 
-  <body>
-    <!-- DEFAULT EXAMPLES -->
-    <div class="react-container" data-config="/examples/private/measles.json"></div>
+  <!-- This is temporary and for testing until Nunito/900 is added to TP -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@900&display=swap" rel="stylesheet" />
+  <style type="text/css">
+    @font-face {
+      font-family: 'Nunito';
+      font-weight: 900;
+      font-display: swap;
+      src: url('https://app.unpkg.com/@fontsource/nunito@5.0.18/files/files/nunito-latin-900-normal.woff2') format('woff2');
+    }
+  </style>
 
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <script type="module" src="./src/index.jsx"></script>
-  </body>
+</head>
+
+<body>
+  <!-- DEFAULT EXAMPLES -->
+  <div class="react-container" data-config="/examples/default-hex.json"></div>
+
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <script type="module" src="./src/index.jsx"></script>
+  <!-- add cove_loaded listener -->
+  <!-- <script>
+    document.addEventListener('cove_loaded', function () {
+      // This is a temporary fix to ensure the map loads after Cove has loaded
+      // and the cdc-map-outer-container is available.
+      debugger
+      console.log('Cove has loaded, initializing map...');
+    });
+  </script> -->
+</body>
+
 </html>
