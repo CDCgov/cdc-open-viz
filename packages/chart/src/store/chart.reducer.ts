@@ -18,11 +18,7 @@ type ChartState = {
   coveLoadedEventRan: boolean
   isDraggingAnnotation: boolean
   imageId: string
-  brushConfig: {
-    data: object[]
-    isActive: boolean
-    isBrushing: boolean
-  }
+  brushData: []
 }
 
 export const getInitialState = (configObj: ChartConfig): ChartState => {

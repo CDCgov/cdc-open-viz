@@ -122,8 +122,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     coveLoadedEventRan,
     imageId,
     seriesHighlight,
-    colorScale,
-    brushConfig
+    colorScale
   } = state
   const { description, visualizationType } = config
   const svgRef = useRef(null)
@@ -1096,7 +1095,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   const contextValues = {
     ...state,
-    brushConfig,
+
     capitalize,
     convertLineToBarGraph,
     clean,

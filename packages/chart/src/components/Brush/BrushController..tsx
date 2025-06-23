@@ -24,7 +24,7 @@ const BrushController = ({ yMax, xMax }) => {
     setBrushPosition({ start: { x: 0 }, end: { x: xMax } })
     dispatch({ type: 'SET_BRUSH_DATA', payload: [] })
     setBrushKey(k => k + 1)
-  }, [config.filters, config.exclusions, config.brush?.active, isDashboardFilters])
+  }, [config.filters, config.exclusions, config.xAxis.brushActive, isDashboardFilters])
 
   return (
     <ZoomBrush
