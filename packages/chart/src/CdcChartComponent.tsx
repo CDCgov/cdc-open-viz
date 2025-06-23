@@ -65,7 +65,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import EditorContext from '../../editor/src/ConfigContext'
 import { EDITOR_WIDTH } from '@cdc/core/helpers/constants'
-import { extractCoveData, updateVegaData } from '@cdc/editor/src/helpers/vegaConfig'
+import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 // Local helpers
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
 import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'

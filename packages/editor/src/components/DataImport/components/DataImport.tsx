@@ -38,7 +38,7 @@ import {
   loadedVegaConfigData,
   parseVegaConfig,
   updateVegaData
-} from '@cdc/editor/src/helpers/vegaConfig'
+} from '@cdc/core/helpers/vegaConfig'
 
 const DataImport = () => {
   const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)
