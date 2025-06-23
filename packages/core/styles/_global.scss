@@ -193,4 +193,8 @@ section.footnotes {
   -webkit-appearance: none;
   -moz-appearance: none;
   cursor: pointer;
+  &:focus-visible {
+    outline: 2px dashed var(--colors-blue-vivid-60, #005ea2) !important;
+    outline-offset: 2px;
+  }
 }

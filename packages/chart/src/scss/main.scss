@@ -513,6 +513,10 @@
     }
   }
 
+  [tabindex]:focus-visible {
+    outline: 2px solid rgb(0, 95, 204) !important;
+  }
+
   // ANIMATIONS
   // Pie Chart Animations
   .animated-pie {
@@ -738,21 +742,4 @@
 
 .cdc-open-viz-module .debug {
   border: 2px solid red;
-}
-
-// Only frontend styles are applied in WCMS/TP
-// This helps match those styles when viewing in the editor
-.modal.cdc-cove-editor *:focus-visible,
-.cdc-open-viz-module *:focus-visible {
-  outline-width: inherit !important;
-  outline-style: inherit !important;
-  outline-color: inherit !important;
-  outline-offset: inherit !important;
-}
-
-// Only frontend styles are applied in WCMS/TP
-// This helps match those styles when viewing in the editor
-.modal.cdc-cove-editor *:focus-visible {
-  outline: dashed 2px rgba(255, 102, 1, 0.9) !important;
-  outline-offset: 3px !important;
 }
