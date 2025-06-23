@@ -162,7 +162,7 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) =>
       {showPiePercent && (total < 100 || total > 100) && (
         <div className='legend-container__outer link-container'>
           <p>
-            {total < 100 ? '** This graph contains ' : 'The sum of percentages in this graph is larger than 100 '}
+            {total < 100 ? '** This graph contains a' : 'The sum of percentages in this graph is larger than 100 '}
             <RichTooltip
               tooltipContent={
                 total < 100

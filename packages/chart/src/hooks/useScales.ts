@@ -94,9 +94,6 @@ const useScales = (properties: useScaleProps) => {
     let xAxisMin = Math.min(...xAxisDataMapped.map(Number))
     let xAxisMax = Math.max(...xAxisDataMapped.map(Number))
     let paddingRatio = config.xAxis.padding ? config.xAxis.padding * 0.01 : 0
-    if (config.brush.active) {
-      paddingRatio = config.barThickness * 0.2
-    }
 
     xAxisMin -= paddingRatio * (xAxisMax - xAxisMin)
     xAxisMax += visualizationType === 'Line' ? 0 : paddingRatio * (xAxisMax - xAxisMin)
