@@ -121,6 +121,7 @@ export const useTooltip = props => {
       const pieData = additionalChartData?.data ?? {}
       const startAngle = additionalChartData?.startAngle ?? 0
       const endAngle = additionalChartData?.endAngle ?? 0
+      const actualPieValue = Number(additionalChartData.data[config?.yAxis?.dataKey])
 
       const degrees = ((endAngle - startAngle) * 180) / Math.PI
       const pctOf360 = (degrees / 360) * 100
@@ -134,7 +135,7 @@ export const useTooltip = props => {
           [config.xAxis.dataKey, pieData[config.xAxis.dataKey]],
           [
             config.runtime.yAxis.dataKey,
-            showPiePercent ? pctString(pctOf360) : formatNumber(pieData[config.runtime.yAxis.dataKey])
+            showPiePercent ? pctString(actualPieValue) : formatNumber(pieData[config.runtime.yAxis.dataKey])
           ],
           showPiePercent ? [] : ['Percent', pctString(pctOf360)]
         )
