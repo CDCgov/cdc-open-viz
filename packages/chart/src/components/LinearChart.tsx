@@ -17,7 +17,6 @@ import ConfigContext from '../ConfigContext'
 import BoxPlot from './BoxPlot'
 import ScatterPlot from './ScatterPlot'
 import DeviationBar from './DeviationBar'
-import BrushController from './Brush/BrushController.'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Forecasting from './Forecasting'
 import LineChart from './LineChart'
@@ -44,6 +43,7 @@ import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
 import HoverLine from './HoverLine/HoverLine'
+import BrushChart from './BrushChart'
 
 type LinearChartProps = {
   parentWidth: number
@@ -94,6 +94,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     tableData,
     transformedData: data,
     seriesHighlight,
+    brushConfig
   } = useContext(ConfigContext)
 
   // CONFIG
@@ -206,7 +207,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime()
       : d[config.runtime.originalXAxis.dataKey]
   const getYAxisData = (d, seriesKey) => d[seriesKey]
-  const xAxisDataMapped = data.map(d => getXAxisData(d))
+  const xAxisDataMapped =
+    config.brush.active && brushConfig.data?.length
+      ? brushConfig.data.map(d => getXAxisData(d))
+      : data.map(d => getXAxisData(d))
   const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
   const properties = {
     data,
@@ -413,7 +417,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const topLabelOnGridline = topYLabelRef.current && yAxis.labelsAboveGridlines
 
     // Heights to add
-    const brushHeight = 25
+    const brushHeight = brush?.active ? brush?.height + brush?.height : 0
     const brushHeightWithMargin = config.brush?.active ? brushHeight + brushHeight : 0
     const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
     const topLabelOnGridlineHeight = topLabelOnGridline ? topYLabelRef.current.getBBox().height : 0
@@ -857,9 +861,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             />
           )}
           {/*Brush chart */}
-          {config.xAxis.brushActive && config.xAxis.type !== 'categorical' && (
-            <BrushController xMax={xMax} yMax={yMax} />
-          )}
+          {config.brush.active && config.xAxis.type !== 'categorical' && <BrushChart xMax={xMax} yMax={yMax} />}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
           {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(
