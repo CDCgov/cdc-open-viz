@@ -1,8 +1,8 @@
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { formatDate } from '@cdc/core/helpers/cove/date.js'
 import { _ } from 'lodash'
-import * as vegaLite from 'vega-lite'
-import * as vega from 'vega'
+import { compile as vegaLiteCompile } from 'vega-lite'
+import { parse as vegaParse, View as vegaView } from 'vega'
 
 const CURVE_LOOKUP = {
   linear: 'Linear',
@@ -18,15 +18,16 @@ const COMBO_MARKS = { rect: 'Bar', line: 'Line', area: 'Area Chart' }
 
 export const isVegaConfig = config => {
   return (
-    config.scales ||
-    config.axes ||
-    config.marks ||
-    config.layer ||
-    config.params ||
-    config.transform ||
-    config.projection ||
-    config.encoding ||
-    config.spec
+    (config.scales ||
+      config.axes ||
+      config.marks ||
+      config.layer ||
+      config.params ||
+      config.transform ||
+      config.projection ||
+      config.encoding ||
+      config.spec) &&
+    !(config.xAxis || config.yAxis || config.general || config.columns)
   )
 }
 
@@ -98,7 +99,7 @@ export const getVegaWarnings = (vegaOrVegaLiteConfig, vegaConfig) => {
 
 export const parseVegaConfig = vegaConfig => {
   try {
-    vegaConfig = vegaLite.compile(vegaConfig).spec
+    vegaConfig = vegaLiteCompile(vegaConfig).spec
   } catch {}
   console.log('------------- vega config -------------')
   console.log(vegaConfig)
@@ -182,10 +183,11 @@ const mergeByKeys = (a1, a2, k1, k2) =>
 
 const getVegaData = (vegaConfig, name) => {
   if (!name) return []
-  const view = new vega.View(vega.parse(vegaConfig)).run()
+  const view = new vegaView(vegaParse(vegaConfig)).run()
   try {
     return view.data(name) || []
   } catch (error) {
+    console.error(error)
     return []
   }
 }
@@ -376,7 +378,7 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
 
   config.table = config.table || { expanded: false }
 
-  config.title = vegaConfig.title?.text
+  config.title = vegaConfig.title?.text || ''
   config.showTitle = config.title ? true : false
 
   if (config.vegaType === 'Map') {
