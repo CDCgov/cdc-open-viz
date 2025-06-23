@@ -453,7 +453,7 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
     const xDateFormat = getXDateFormat(xField, data)
     config.xAxis = config.xAxis || {}
     config.xAxis.dataKey = xField
-    config.xAxis.label = isHorizontalBar ? leftAxis?.title : bottomAxis?.title
+    config.xAxis.label = (isHorizontalBar ? leftAxis?.title : bottomAxis?.title) || ''
     if (config.vegaType === 'Scatter Plot') {
       config.xAxis.type = 'continuous'
     }
@@ -472,7 +472,7 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
     }
 
     config.yAxis = config.yAxis || {}
-    config.yAxis.label = isHorizontalBar ? bottomAxis?.title : leftAxis?.title
+    config.yAxis.label = (isHorizontalBar ? bottomAxis?.title : leftAxis?.title) || ''
 
     if (seriesKey) {
       config.visualizationSubType = stack && getMaxGroupSize(data, stack.groupby) > 1 ? 'stacked' : ''

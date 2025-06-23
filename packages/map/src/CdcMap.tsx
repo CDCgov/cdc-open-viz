@@ -6,7 +6,7 @@ import initialState from './data/initial-state'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { addUIDs, validateFipsCodeLength } from './helpers'
 import EditorContext from '@cdc/editor/src/ConfigContext'
-import { extractCoveData, updateVegaData } from '@cdc/editor/src/helpers/vegaConfig'
+import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 import { MapConfig } from './types/MapConfig'
 import _, { set } from 'lodash'
 

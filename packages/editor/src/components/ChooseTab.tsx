@@ -35,7 +35,7 @@ import {
   getVegaWarnings,
   isVegaConfig,
   parseVegaConfig
-} from '@cdc/editor/src/helpers/vegaConfig'
+} from '@cdc/core/helpers/vegaConfig'
 
 interface ButtonProps {
   icon: React.ReactElement
