@@ -65,7 +65,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import EditorContext from '../../editor/src/ConfigContext'
 import { EDITOR_WIDTH } from '@cdc/core/helpers/constants'
-import { addVegaData, convertVegaData } from '@cdc/editor/src/helpers/vegaConfig'
+import { extractCoveData, updateVegaData } from '@cdc/editor/src/helpers/vegaConfig'
 // Local helpers
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
 import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
@@ -412,7 +412,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         let newData = await fetchRemoteData(newConfig.dataUrl)
 
         if (newConfig.vegaConfig) {
-          newData = convertVegaData(addVegaData(newConfig.vegaConfig, newData))
+          newData = extractCoveData(updateVegaData(newConfig.vegaConfig, newData))
         }
 
         if (newData && newConfig.dataDescription) {

@@ -33,7 +33,7 @@ export const isVegaConfig = config => {
 export const getVegaErrors = (vegaOrVegaLiteConfig, vegaConfig) => {
   const errors = []
 
-  const data = convertVegaData(vegaConfig)
+  const data = extractCoveData(vegaConfig)
 
   if (vegaOrVegaLiteConfig.repeat || vegaOrVegaLiteConfig.spec) {
     errors.push("COVE's Vega importer does not support vega-lite's repeat/spec operator.")
@@ -190,7 +190,7 @@ const getVegaData = (vegaConfig, name) => {
   }
 }
 
-export const convertVegaData = vegaConfig => {
+export const extractCoveData = vegaConfig => {
   const marks = getMarks(vegaConfig)
   const mainMark = getMainMark(vegaConfig)
   const groupMark = getGroupMark(vegaConfig)
@@ -331,7 +331,7 @@ const getGeoName = (data: { [key: string]: any }[]) => {
   }
 }
 
-export const addVegaData = (vegaConfig, newData) => {
+export const updateVegaData = (vegaConfig, newData) => {
   const newConfig = JSON.parse(JSON.stringify(vegaConfig))
   newConfig.data.forEach(d => {
     if (newData[d.name]) {
@@ -359,19 +359,19 @@ export const getSampleVegaJson = vegaConfig => {
       vegaConfig.data.filter(d => d.values && !(d.format?.type === 'topojson')).map(d => [d.name, d.values])
     ),
     null,
-    4
+    2
   )
 }
 
 export const convertVegaConfig = (configType: string, vegaConfig: any, config: any) => {
   delete config.newViz
 
-  const data = convertVegaData(vegaConfig)
+  const data = extractCoveData(vegaConfig)
 
   config.vegaType = configType
   config.vegaConfig = stripVegaData(vegaConfig)
 
-  config.dataFileName = 'vega-config.json'
+  config.dataFileName = 'vega-data.json'
   config.dataFileSourceType = 'file'
 
   config.table = config.table || { expanded: false }

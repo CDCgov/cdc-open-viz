@@ -33,11 +33,11 @@ import { getFileExtension } from '../helpers/getFileExtension'
 import { parseTextByMimeType } from '../helpers/parseTextByMimeType'
 import { getMimeType } from '../helpers/getMimeType'
 import {
-  addVegaData,
-  convertVegaData,
+  extractCoveData,
   getSampleVegaJson,
+  loadedVegaConfigData,
   parseVegaConfig,
-  loadedVegaConfigData
+  updateVegaData
 } from '@cdc/editor/src/helpers/vegaConfig'
 
 const DataImport = () => {
@@ -225,7 +225,7 @@ const DataImport = () => {
       try {
         let result = parseTextByMimeType(this.result.toString(), mimeType, externalURL, setErrors)
         if (config.vegaConfig) {
-          result = convertVegaData(addVegaData(config.vegaConfig, result))
+          result = extractCoveData(updateVegaData(config.vegaConfig, result))
         }
         const text = transform.autoStandardize(result)
         if (config.data && config.series) {
@@ -430,9 +430,9 @@ const DataImport = () => {
     dispatch({ type: 'DELETE_DASHBOARD_DATASET', payload: { datasetKey } })
   }
 
-  const updateVegaData = text => {
+  const updateDataFromVegaConfig = text => {
     const vegaConfig = parseVegaConfig(JSON.parse(text))
-    const newData = convertVegaData(vegaConfig)
+    const newData = extractCoveData(vegaConfig)
     let newConfig = {
       ...config,
       data: newData
@@ -737,7 +737,7 @@ const DataImport = () => {
                           type='submit'
                           id='load-data'
                           disabled={!pastedConfig}
-                          onClick={() => updateVegaData(pastedConfig)}
+                          onClick={() => updateDataFromVegaConfig(pastedConfig)}
                         >
                           Save & Load
                         </button>
@@ -748,7 +748,9 @@ const DataImport = () => {
                     <div>
                       To change this chart to use a JSON file as its data source, the file should be formatted like this
                       sample:
-                      <pre style={{ backgroundColor: '#f2f2f2' }}>{getSampleVegaJson(config.vegaConfig)}</pre>
+                      <pre style={{ backgroundColor: '#f2f2f2', fontFamily: 'monospace' }}>
+                        {getSampleVegaJson(config.vegaConfig)}
+                      </pre>
                     </div>
                     <div>&nbsp;</div>
                     <div>Upload JSON file:</div>
