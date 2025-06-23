@@ -89,7 +89,11 @@ export default {
   topAxis: {
     hasLine: false
   },
-  brushData: [],
+  brush: {
+    isActive: false,
+    isBrushing: false,
+    data: []
+  },
   isLegendValue: false,
   barThickness: 0.35,
   barHeight: 25,
