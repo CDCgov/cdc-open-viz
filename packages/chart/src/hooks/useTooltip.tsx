@@ -124,15 +124,19 @@ export const useTooltip = props => {
 
       const degrees = ((endAngle - startAngle) * 180) / Math.PI
       const pctOf360 = (degrees / 360) * 100
-      const pctString = pctOf360.toFixed(roundTo) + '%'
+      const pctString = value => value.toFixed(roundTo) + '%'
+      const showPiePercent = config.dataFormat.showPiePercent || false
 
-      if (config.dataFormat.showPiePercent && pieData[config.xAxis.dataKey] === 'Calculated Area') {
+      if (showPiePercent && pieData[config.xAxis.dataKey] === 'Calculated Area') {
         tooltipItems.push(['', 'Calculated Area'])
       } else {
         tooltipItems.push(
           [config.xAxis.dataKey, pieData[config.xAxis.dataKey]],
-          [config.runtime.yAxis.dataKey, formatNumber(pieData[config.runtime.yAxis.dataKey])],
-          ['Percent', pctString]
+          [
+            config.runtime.yAxis.dataKey,
+            showPiePercent ? pctString(pctOf360) : formatNumber(pieData[config.runtime.yAxis.dataKey])
+          ],
+          showPiePercent ? [] : ['Percent', pctString(pctOf360)]
         )
       }
     }

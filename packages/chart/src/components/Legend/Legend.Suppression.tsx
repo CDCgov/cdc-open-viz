@@ -8,7 +8,7 @@ interface LegendProps {
 
 const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) => {
   const { preliminaryData, visualizationType, visualizationSubType, legend, data } = config
-  const showPiePercent = config.dataFormat.showPiePercent
+  const showPiePercent = config.dataFormat.showPiePercent && config.visualizationType === 'Pie'
   const hasOpenCircleEffects = () =>
     preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style !== 'Filled Circles') &&
     ['Line', 'Combo'].includes(visualizationType)
