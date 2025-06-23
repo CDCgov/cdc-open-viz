@@ -225,7 +225,7 @@ const DataImport = () => {
       try {
         let result = parseTextByMimeType(this.result.toString(), mimeType, externalURL, setErrors)
         if (config.vegaConfig) {
-          result = extractCoveData(updateVegaData(config.vegaConfig, result))
+          return updateDataFromVegaData(result, fileSource, fileSourceType)
         }
         const text = transform.autoStandardize(result)
         if (config.data && config.series) {
@@ -430,11 +430,25 @@ const DataImport = () => {
     dispatch({ type: 'DELETE_DASHBOARD_DATASET', payload: { datasetKey } })
   }
 
-  const updateDataFromVegaConfig = text => {
-    const vegaConfig = parseVegaConfig(JSON.parse(text))
+  const updateDataFromVegaConfig = pastedConfig => {
+    const vegaConfig = parseVegaConfig(JSON.parse(pastedConfig))
     const newData = extractCoveData(vegaConfig)
     let newConfig = {
       ...config,
+      data: newData
+    }
+    loadedVegaConfigData(newConfig)
+    setConfig(newConfig)
+  }
+
+  const updateDataFromVegaData = (vegaData, fileSource, fileSourceType) => {
+    const newData = extractCoveData(updateVegaData(config.vegaConfig, vegaData))
+    const splitSource = fileSource.split(/[\/\\]/)
+    let newConfig = {
+      ...config,
+      dataFileName: splitSource[splitSource.length - 1],
+      dataFileSourceType: fileSourceType,
+      dataUrl: fileSourceType === 'url' ? fileSource : null,
       data: newData
     }
     loadedVegaConfigData(newConfig)

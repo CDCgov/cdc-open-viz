@@ -241,7 +241,7 @@ export const extractCoveData = vegaConfig => {
     }
   }
 
-  console.log('------------- vega data -------------')
+  console.log('------------- cove data -------------')
   console.log(data)
   return data
 }
