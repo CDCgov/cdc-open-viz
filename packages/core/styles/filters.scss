@@ -93,6 +93,10 @@ div.single-filters {
     &:focus:not(:focus-visible) {
       outline: none !important;
     }
+    &:focus-visible {
+      outline: 2px dashed var(--colors-blue-vivid-60, #005ea2) !important;
+      outline-offset: 3px;
+    }
 
     &.tab--active {
       font-weight: 500;
