@@ -67,6 +67,15 @@ export const getVegaErrors = (vegaOrVegaLiteConfig, vegaConfig) => {
     )
   }
 
+  if (configType === 'Map') {
+    const geoName = getGeoName(data)
+    if (!geoName) {
+      errors.push(
+        "COVE's Vega importer could not find a column containing geographies. To import a state-level choropleth map, one column in the dataset must contain state names."
+      )
+    }
+  }
+
   if (errors.length) {
     errors.push('Reach out to the COVE team if you think this Vega config should be supported.')
   }
@@ -381,10 +390,14 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
   config.title = vegaConfig.title?.text || ''
   config.showTitle = config.title ? true : false
 
+  const mainMark = getMainMark(vegaConfig)
+  const enterEncoder = mainMark.encode?.enter
+  const updateEncoder = mainMark.encode?.update
+
   if (config.vegaType === 'Map') {
     const geoName = getGeoName(data)
-    const colorData = getMainMark(vegaConfig).encode.update.fill
-    const colorLabel = vegaConfig.legends[0].title
+    const colorData = updateEncoder?.fill || enterEncoder?.fill
+    const colorLabel = vegaConfig.legends?.length ? vegaConfig.legends[0].title : ''
     const vegaColorScale = vegaConfig.scales.find(s => s.name === colorData.scale)
     const legendItems = vegaColorScale.domain
     const legendType = vegaColorScale.type === 'ordinal' ? 'category' : 'equalnumber'
@@ -407,20 +420,19 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
       type: legendType,
       additionalCategories: [...legendItems],
       categoryValuesOrder: [...legendItems],
-      numberOfItems: legendItems.length,
+      numberOfItems: legendType === 'category' ? legendItems.length : 5,
       position: 'top',
       style: 'gradient',
       subStyle: 'linear blocks',
-      hideBorder: true
+      hideBorder: true,
+      title: colorLabel
     }
     config.color = 'sequential-blue-2(MPX)'
   } else {
     const stack = getStack(vegaConfig)
     const stackField = stack?.field
-    const mainMark = getMainMark(vegaConfig)
     const groupMark = getGroupMark(vegaConfig)
-    const enterEncoder = mainMark.encode.enter
-    const updateEncoder = mainMark.encode.update
+
     let xField =
       updateEncoder?.x?.field ||
       enterEncoder?.x?.field ||
