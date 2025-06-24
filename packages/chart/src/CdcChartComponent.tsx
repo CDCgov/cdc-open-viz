@@ -352,7 +352,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       })
     }
 
-    if (config.filterBehavior === 'Filter Change') {
+    if (config.filterBehavior === 'Filter Change' || config.filterBehavior === 'Apply Button') {
       const newFilteredData = filterVizData(newFilters, excludedData)
 
       dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
