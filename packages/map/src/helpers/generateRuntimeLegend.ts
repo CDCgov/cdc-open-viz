@@ -86,69 +86,44 @@ export const generateRuntimeLegend = (
     let specialClasses = 0
     let specialClassesHash = {}
 
+    // Special classes
     if (legend.specialClasses.length) {
       if (typeof legend.specialClasses[0] === 'object') {
         legend.specialClasses.forEach(specialClass => {
-          const val = String(specialClass.value)
-          if (undefined === specialClassesHash[val]) {
-            specialClassesHash[val] = true
-            result.items.push({
-              special: true,
-              value: val,
-              label: specialClass.label
-            })
-            result.items[result.items.length - 1].color = applyColorToLegend(
-              result.items.length - 1,
-              configObj,
-              result.items
-            )
-            specialClasses += 1
-          }
-          // Optionally, still map any rows that match this special class
-          dataSet.forEach(row => {
-            const rowVal = String(row[specialClass.key])
-            if (rowVal === val) {
-              let specialColor = result.items.findIndex(p => p.value === val)
-              newLegendMemo.set(hashObj(row), specialColor)
-            }
-          })
-        })
-      } else {
-        dataSet = dataSet.filter(row => {
-          const val = row[primaryColName]
+          dataSet = dataSet.filter(row => {
+            const val = String(row[specialClass.key])
 
-          if (legend.specialClasses.includes(val)) {
-            // apply the special color to the legend
-            if (undefined === specialClassesHash[val]) {
-              specialClassesHash[val] = true
+            if (specialClass.value === val) {
+              if (undefined === specialClassesHash[val]) {
+                specialClassesHash[val] = true
 
-              result.items.push({
-                special: true,
-                value: val
-              })
+                result.items.push({
+                  special: true,
+                  value: val,
+                  label: specialClass.label
+                })
 
-              result.items[result.items.length - 1].color = applyColorToLegend(
-                result.items.length - 1,
-                configObj,
-                result.items
-              )
+                result.items[result.items.length - 1].color = applyColorToLegend(
+                  result.items.length - 1,
+                  configObj,
+                  result.items
+                )
 
-              specialClasses += 1
-            }
+                specialClasses += 1
+              }
 
-            let specialColor = 0
+              let specialColor: number
 
-            // color the configObj if val is in row
-            if (Object.values(row).includes(val)) {
+              // color the configObj if val is in row
               specialColor = result.items.findIndex(p => p.value === val)
+
+              newLegendMemo.set(hashObj(row), specialColor)
+
+              return false
             }
 
-            newLegendMemo.set(hashObj(row), specialColor)
-
-            return false
-          }
-
-          return true
+            return true
+          })
         })
       }
     }
