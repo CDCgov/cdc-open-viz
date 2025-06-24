@@ -18,7 +18,6 @@ type DashboardFilterProps = {
   showSubmit: boolean
   applyFilters: MouseEventHandler<HTMLButtonElement>
   applyFiltersButtonText?: string
-  resetFilters: Function
 }
 
 const DashboardFilters: React.FC<DashboardFilterProps> = ({
@@ -28,8 +27,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
   handleOnChange,
   showSubmit,
   applyFilters,
-  applyFiltersButtonText,
-  resetFilters
+  applyFiltersButtonText
 }) => {
   const nullVal = (filter: SharedFilter) => {
     const val = filter.queuedActive || filter.active
@@ -135,7 +133,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         return (
           <div className={formGroupClass} key={`${filter.key}-filtersection-${filterIndex}`}>
             {label && (
-              <label className='font-weight-bold fw-bold mb-2' htmlFor={`filter-${filterIndex}`}>
+              <label className='font-weight-bold mb-2' htmlFor={`filter-${filterIndex}`}>
                 {label}
               </label>
             )}
@@ -144,11 +142,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                 label={label}
                 options={multiValues}
                 fieldName={filterIndex}
-                updateField={(_section, _subsection, fieldName, val) => {
-                  const defaultSelection = filter.defaultValue || [multiValues[0]?.value]
-                  const selection = val?.length ? val : defaultSelection
-                  updateField(null, null, fieldName, selection)
-                }}
+                updateField={updateField}
                 selected={filter.active as string[]}
                 limit={filter.selectLimit || 5}
                 loading={loading}
@@ -190,31 +184,19 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         )
       })}
       {showSubmit && (
-        <>
-          <button
-            className='btn btn-primary mb-1'
-            onClick={applyFilters}
-            disabled={show.some(filterIndex => {
-              const emptyFilterValues = [undefined, '', '- Select -']
-              return (
-                emptyFilterValues.includes(sharedFilters[filterIndex].queuedActive) &&
-                emptyFilterValues.includes(sharedFilters[filterIndex].active)
-              )
-            })}
-          >
-            {applyFiltersButtonText || 'GO!'}
-          </button>
-          <button
-            type='reset'
-            className='btn btn-link bg-body text-primary mb-1'
-            onClick={e => {
-              e.preventDefault()
-              resetFilters(sharedFilters)
-            }}
-          >
-            Clear Filters
-          </button>
-        </>
+        <button
+          className='btn btn-primary mb-1'
+          onClick={applyFilters}
+          disabled={show.some(filterIndex => {
+            const emptyFilterValues = [undefined, '', '- Select -']
+            return (
+              emptyFilterValues.includes(sharedFilters[filterIndex].queuedActive) &&
+              emptyFilterValues.includes(sharedFilters[filterIndex].active)
+            )
+          })}
+        >
+          {applyFiltersButtonText || 'GO!'}
+        </button>
       )}
     </form>
   )
