@@ -443,10 +443,9 @@ const DataImport = () => {
 
   const updateDataFromVegaData = (vegaData, fileSource, fileSourceType) => {
     const newData = extractCoveData(updateVegaData(config.vegaConfig, vegaData))
-    const splitSource = fileSource.split(/[\/\\]/)
     let newConfig = {
       ...config,
-      dataFileName: splitSource[splitSource.length - 1],
+      dataFileName: fileSource,
       dataFileSourceType: fileSourceType,
       dataUrl: fileSourceType === 'url' ? fileSource : null,
       data: newData
