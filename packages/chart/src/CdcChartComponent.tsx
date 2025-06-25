@@ -72,6 +72,8 @@ import { getComboChartConfig } from './helpers/getComboChartConfig'
 import { getExcludedData } from './helpers/getExcludedData'
 import { getColorScale } from './helpers/getColorScale'
 import { getTransformedData } from './helpers/getTransformedData'
+import { getPiePercent } from './helpers/getPiePercent'
+
 // styles
 import './scss/main.scss'
 import { getInitialState, reducer } from './store/chart.reducer'
