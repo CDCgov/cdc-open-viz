@@ -72,6 +72,8 @@ import { getComboChartConfig } from './helpers/getComboChartConfig'
 import { getExcludedData } from './helpers/getExcludedData'
 import { getColorScale } from './helpers/getColorScale'
 import { getTransformedData } from './helpers/getTransformedData'
+import { getPiePercent } from './helpers/getPiePercent'
+
 // styles
 import './scss/main.scss'
 import { getInitialState, reducer } from './store/chart.reducer'
@@ -793,6 +795,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const getTableRuntimeData = () => {
     if (visualizationType === 'Sankey') return config?.data?.[0]?.tableData
     const data = filteredData || excludedData
+    if (config.visualizationType === 'Pie' && !config.dataFormat?.showPiePercent) {
+      return getPiePercent(data, config?.yAxis?.dataKey)
+    }
+
     const dynamicSeries = config.series.find(series => !!series.dynamicCategory)
     if (!dynamicSeries) return data
     const usedColumns = Object.values(config.columns)
