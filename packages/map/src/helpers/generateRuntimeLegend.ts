@@ -458,7 +458,11 @@ export const generateRuntimeLegend = (
               }
             }
 
-
+            // Final fallback: assign to last range
+            if (!assigned) {
+              console.warn('Unassigned geo value:', number, 'from state:', row[columns.geo.name], 'assigning to last range')
+              newLegendMemo.set(hashObj(row), result.items.length - 1)
+            }
           }
         })
       }
