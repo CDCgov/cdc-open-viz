@@ -3,8 +3,10 @@ import _ from 'lodash'
 export const updatePreliminaryDataSeriesKeys = config => {
   if (config.type === 'chart') {
     ;(config.preliminaryData || []).forEach(pd => {
-      pd.seriesKeys = pd.seriesKey ? [pd.seriesKey] : []
-      delete pd.seriesKey
+      if (!pd.seriesKeys) {
+        pd.seriesKeys = pd.seriesKey ? [pd.seriesKey] : []
+        delete pd.seriesKey
+      }
     })
   } else if (config.type === 'dashboard') {
     Object.values(config.visualizations).forEach(visualization => {
