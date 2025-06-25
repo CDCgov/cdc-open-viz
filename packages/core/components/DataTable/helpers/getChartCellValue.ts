@@ -62,19 +62,14 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
     })
 
     let addColParams = isAdditionalColumn(column, config, rowObj)
-    const piePercent =
-      (_.toNumber(runtimeData[row][column]) / _.sumBy(runtimeData, d => _.toNumber(d[column]))) * 100 || 0
-
-    const valueToFormat =
-      config.visualizationType === 'Pie' && !config.dataFormat.showPiePercent ? piePercent : runtimeData[row][column]
 
     if (Object.keys(addColParams).length > 0) {
       cellValue = config.dataFormat
-        ? formatNumber(valueToFormat, resolvedAxis, false, config, addColParams)
+        ? formatNumber(runtimeData[row][column], resolvedAxis, false, config, addColParams)
         : runtimeData[row][column]
     } else {
       cellValue = config.dataFormat
-        ? formatNumber(valueToFormat, resolvedAxis, false, config)
+        ? formatNumber(runtimeData[row][column], resolvedAxis, false, config)
         : runtimeData[row][column]
     }
   }
