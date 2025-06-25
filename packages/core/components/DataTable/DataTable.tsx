@@ -279,6 +279,8 @@ const DataTable = (props: DataTableProps) => {
         ? mapCellMatrix({ ...props, rows, wrapColumns, runtimeData, viewport })
         : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
 
+    const useBottomExpandCollapse = expanded && Array.isArray(childrenMatrix) && childrenMatrix.length >= 19
+
     // If every value in a column is a number, record the column index so the header and cells can be right-aligned
     const rightAlignedCols = childrenMatrix.length
       ? Object.fromEntries(
@@ -312,7 +314,7 @@ const DataTable = (props: DataTableProps) => {
         <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           {config.table.collapsible !== false && (
-            <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} viewport={viewport} />
+            <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
           )}
           <div className='table-container' style={limitHeight}>
             <Table
@@ -381,6 +383,9 @@ const DataTable = (props: DataTableProps) => {
                 />
               )}
           </div>
+          {config.table.collapsible !== false && useBottomExpandCollapse && (
+            <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} end />
+          )}
         </section>
         {config.table.showDownloadLinkBelow && <TableMediaControls belowTable={true} />}
         <div id={skipId} className='cdcdataviz-sr-only'>

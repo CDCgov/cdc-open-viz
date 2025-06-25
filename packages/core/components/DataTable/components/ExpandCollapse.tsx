@@ -1,7 +1,13 @@
 import Icon from '../../ui/Icon'
 import parse from 'html-react-parser'
 
-const ExpandCollapse = ({ expanded, setExpanded, tableTitle, fontSize, viewport }) => {
+interface ExpandCollapseProps {
+  expanded: boolean
+  setExpanded: (expanded: boolean) => void
+  tableTitle: string
+}
+
+const ExpandCollapse = ({ expanded, setExpanded, tableTitle }: ExpandCollapseProps) => {
   return (
     <div
       role='button'
