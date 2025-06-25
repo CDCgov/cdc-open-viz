@@ -26,6 +26,8 @@ import './data-table.css'
 import _ from 'lodash'
 import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
 
+const USE_BOTTOM_COLLAPSE_THRESHOLD = 20
+
 export type DataTableProps = {
   colorScale?: Function
   columns?: Record<string, Column>
@@ -279,7 +281,8 @@ const DataTable = (props: DataTableProps) => {
         ? mapCellMatrix({ ...props, rows, wrapColumns, runtimeData, viewport })
         : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
 
-    const useBottomExpandCollapse = expanded && Array.isArray(childrenMatrix) && childrenMatrix.length >= 19
+    const useBottomExpandCollapse =
+      expanded && Array.isArray(childrenMatrix) && childrenMatrix.length >= USE_BOTTOM_COLLAPSE_THRESHOLD
 
     // If every value in a column is a number, record the column index so the header and cells can be right-aligned
     const rightAlignedCols = childrenMatrix.length
