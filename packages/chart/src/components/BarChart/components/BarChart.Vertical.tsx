@@ -271,7 +271,8 @@ export const BarChartVertical = () => {
                           y: barY,
                           onMouseOver: e => onMouseOverBar(xAxisValue, bar.key, e, data),
                           onMouseLeave: onMouseLeaveBar,
-
+                          tooltipHtml: tooltip,
+                          tooltipId: `cdc-open-viz-tooltip-${config.runtime.uniqueId}`,
                           onClick: e => {
                             e.preventDefault()
                             if (setSharedFilter) {
@@ -286,19 +287,7 @@ export const BarChartVertical = () => {
                             cursor: dashboardConfig ? 'pointer' : 'default'
                           }
                         })}
-                        {/* Invisible hit-area for N/A bars */}
-                        {(isSuppressed || absentDataLabel) && (
-                          <rect
-                            x={barX}
-                            y={barY - barHeight * 20}
-                            width={barWidth}
-                            height={barHeight * 20}
-                            fill='transparent'
-                            tooltipHtml={tooltip}
-                            tooltipId={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                            onMouseOver={e => onMouseOverBar(xAxisValue, bar.key, e, data)}
-                          />
-                        )}
+
                         {config.preliminaryData.map((pd, index) => {
                           // check if user selected column
                           const selectedSuppressionColumn = !pd.column || pd.column === bar.key
