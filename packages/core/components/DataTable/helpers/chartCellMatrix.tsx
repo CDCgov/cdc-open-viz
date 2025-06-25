@@ -26,8 +26,11 @@ const chartCellArray = ({
   colorScale,
   hasRowType
 }: ChartRowsProps): CellMatrix | GroupCellMatrix => {
+  const rightAxisItems = config.series?.filter(item => item?.axis === 'Right') || []
+  const rightAxisItemsMap = new Map(rightAxisItems.map(item => [item.dataKey, item]))
   const groupBy = config.table?.groupBy
   const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
+
 
   const dataSeriesColumnsSorted = () => {
     if (!sortBy && sortBy.colIndex === null) return dataSeriesColumns
@@ -53,9 +56,9 @@ const chartCellArray = ({
         let groupValues = []
         dataSeriesColumns.forEach((column, j) => {
           if (groupBy === column) {
-            groupKey = getChartCellValue(row, column, config, runtimeData)
+            groupKey = getChartCellValue(row, column, config, runtimeData, rightAxisItemsMap)
           } else {
-            groupValues.push(getChartCellValue(row, column, config, runtimeData))
+            groupValues.push(getChartCellValue(row, column, config, runtimeData, rightAxisItemsMap))
           }
         })
         if (!cellMatrix.has(groupKey)) {
@@ -70,10 +73,10 @@ const chartCellArray = ({
       return rows.map(row => {
         if (hasRowType) {
           const rowType = getRowType(runtimeData[row])
-          const rowValues = dataSeriesColumns.map(column => getChartCellValue(row, column, config, runtimeData))
+          const rowValues = dataSeriesColumns.map(column => getChartCellValue(row, column, config, runtimeData, rightAxisItemsMap))
           return [rowType, ...rowValues]
         } else {
-          return dataSeriesColumns.map((column, j) => getChartCellValue(row, column, config, runtimeData))
+          return dataSeriesColumns.map((column, j) => getChartCellValue(row, column, config, runtimeData, rightAxisItemsMap))
         }
       })
     }
@@ -83,13 +86,13 @@ const chartCellArray = ({
       let nodes: ReactNode[] =
         config.visualizationType !== 'Pie'
           ? [
-              <>
-                {colorScale && colorScale(seriesName) && <LegendShape fill={colorScale(seriesName)} />}
-                {parse(seriesName)}
-              </>
-            ]
+            <>
+              {colorScale && colorScale(seriesName) && <LegendShape fill={colorScale(seriesName)} />}
+              {parse(seriesName)}
+            </>
+          ]
           : []
-      return nodes.concat(rows.map((row, i) => getChartCellValue(row, column, config, runtimeData)))
+      return nodes.concat(rows.map((row, i) => getChartCellValue(row, column, config, runtimeData, rightAxisItems)))
     })
   }
 }
