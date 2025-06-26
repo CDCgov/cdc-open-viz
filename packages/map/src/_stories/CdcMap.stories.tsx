@@ -4,6 +4,7 @@ import EqualNumberOptInExample from './_mock/DEV-7286.json'
 import SingleStateWithFilters from './_mock/DEV-8942.json'
 import exampleCityState from './_mock/example-city-state.json'
 import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
+import exampleLegendBins from './_mock/legend-bins.json'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map',
@@ -153,6 +154,13 @@ export const Standard_Color_Distributions_Without_Special_Classes: Story = {
 export const Custom_Color_Distributions_With_Update_Needed: Story = {
   args: {
     config: editConfigKeys(newConfig, [{ path: ['version'], value: '4.24.10' }])
+  }
+}
+
+export const Legend_Bins: Story = {
+  args: {
+    config: exampleLegendBins,
+    isEditor: true
   }
 }
 
