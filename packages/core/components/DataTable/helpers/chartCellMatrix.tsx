@@ -92,7 +92,7 @@ const chartCellArray = ({
             </>
           ]
           : []
-      return nodes.concat(rows.map((row, i) => getChartCellValue(row, column, config, runtimeData, rightAxisItems)))
+      return nodes.concat(rows.map((row, i) => getChartCellValue(row, column, config, runtimeData, rightAxisItemsMap)))
     })
   }
 }
