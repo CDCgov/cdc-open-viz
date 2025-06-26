@@ -275,8 +275,9 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
         }
         return acc
       }, {})
-      const filteredData = { ...state.filteredData, ...newDatasets }
-      dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
+      const newConfig = { ...state, data: { ...state.data, ...newDatasets } }
+      const newFilteredData = getFilteredData(newConfig, _.cloneDeep(state.filteredData))
+      dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
       dispatch({ type: 'SET_DATA', payload: { ...state.data, ...newDatasets } })
     } catch (e) {
       console.error('Error setting event data: ', e)
