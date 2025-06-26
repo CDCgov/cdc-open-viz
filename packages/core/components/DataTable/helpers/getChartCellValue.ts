@@ -31,16 +31,28 @@ const isAdditionalColumn = (column: string, config, rowData) => {
   return formattingParams
 }
 
-export const getChartCellValue = (row: string, column: string, config: TableConfig, runtimeData: Object[]) => {
-  if (config.visualizationType === 'Sankey' || runtimeData?.[0]?.tableData) return runtimeData[row][column]
+export const getChartCellValue = (row: string, column: string, config: TableConfig, runtimeData: Object[], rightAxisItemsMap) => {
 
+  // Variables for xAxis config
+  const { type, dateDisplayFormat, dateParseFormat, dataKey: xAxisDataKey } = config.xAxis || {}
+  const { showMissingDataLabel } = config.general || {}
+  const { visualizationType } = config || {}
+
+  // Early returns...
   const rowObj = runtimeData[row]
-  let cellValue // placeholder for formatting below
-  const labelValue = rowObj[column] // just raw X axis string
-  if (column === config.xAxis?.dataKey) {
-    const { type, dateDisplayFormat, dateParseFormat } = config.xAxis || {}
-    const dateFormat = config.table?.dateDisplayFormat || dateDisplayFormat
+  if (!rowObj) return
 
+  if (visualizationType === 'Sankey' || runtimeData?.[0]?.tableData) {
+    return runtimeData?.[row]?.[column]
+  }
+
+  let cellValue
+  const rightMatch = rightAxisItemsMap.get(column)
+  const resolvedAxis = rightMatch ? 'right' : 'left'
+  const labelValue = rowObj[column]
+
+  if (column === xAxisDataKey) {
+    const dateFormat = config.table?.dateDisplayFormat || dateDisplayFormat
     if (type === 'date' || type === 'date-time') {
       cellValue = formatDate(dateFormat, parseDate(dateParseFormat, labelValue))
     } else if (type === 'continuous') {
@@ -49,28 +61,30 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
       cellValue = labelValue
     }
   } else {
-    let resolvedAxis = 'left'
-    let leftAxisItems = config.series ? config.series.filter(item => item?.axis === 'Left') : []
-    let rightAxisItems = config.series ? config.series.filter(item => item?.axis === 'Right') : []
-
-    leftAxisItems.map(leftSeriesItem => {
-      if (leftSeriesItem.dataKey === column) resolvedAxis = 'left'
-    })
-
-    rightAxisItems.map(rightSeriesItem => {
-      if (rightSeriesItem.dataKey === column) resolvedAxis = 'right'
-    })
 
     let addColParams = isAdditionalColumn(column, config, rowObj)
 
-    if (Object.keys(addColParams).length > 0) {
-      cellValue = config.dataFormat
-        ? formatNumber(runtimeData[row][column], resolvedAxis, false, config, addColParams)
-        : runtimeData[row][column]
+    let piePercent = 0
+    if (config.visualizationType === 'Pie' && !config.dataFormat.showPiePercent) {
+      piePercent = (_.toNumber(runtimeData[row][column]) / _.sumBy(runtimeData, d => _.toNumber(d[column]))) * 100 || 0
+    }
+
+    const valueToFormat = config.visualizationType === 'Pie' && !config.dataFormat.showPiePercent
+      ? piePercent
+      : runtimeData[row][column]
+
+    const hasAdditionalParams = Object.keys(addColParams).length > 0
+
+    if (config.dataFormat) {
+      cellValue = formatNumber(
+        valueToFormat,
+        resolvedAxis,
+        false,
+        config,
+        hasAdditionalParams ? addColParams : undefined
+      )
     } else {
-      cellValue = config.dataFormat
-        ? formatNumber(runtimeData[row][column], resolvedAxis, false, config)
-        : runtimeData[row][column]
+      cellValue = runtimeData[row][column]
     }
   }
 
@@ -103,6 +117,6 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
       }
     }
   })
-  const shoMissingDataCellValue = config.general?.showMissingDataLabel && (!labelValue || labelValue === 'null')
-  return shoMissingDataCellValue ? 'N/A' : cellValue
+  const showMissingDataCellValue = showMissingDataLabel && (!labelValue || labelValue === 'null')
+  return showMissingDataCellValue ? 'N/A' : cellValue
 }
