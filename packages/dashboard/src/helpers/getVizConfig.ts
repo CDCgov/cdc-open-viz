@@ -85,8 +85,10 @@ export const getVizConfig = (
 
   if (filteredDataOverride) {
     visualizationConfig.data = filteredDataOverride
+    if (visualizationConfig.formattedData) {
+      visualizationConfig.formattedData = filteredDataOverride
+    }
   }
-
   if (visualizationConfig.footnotes) {
     const visConfigWithFootnotes = getFootnotesVizConfig(visualizationConfig, rowNumber, config)
     if (multiVizColumn && filteredDataOverride) {
