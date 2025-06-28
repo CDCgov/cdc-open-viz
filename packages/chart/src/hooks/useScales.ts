@@ -114,8 +114,9 @@ const useScales = (properties: useScaleProps) => {
     if (xAxisDataMapped.length === 1 || minDistance > xMax / 4) {
       minDistance = xMax / 4
     }
+    const barThickness = config.xAxis.brushActive ? 0.3 : config.barThickness
 
-    seriesScale = composeScaleBand(seriesDomain, [0, (config.barThickness || 1) * minDistance], 0)
+    seriesScale = composeScaleBand(seriesDomain, [0, barThickness * minDistance], 0)
   }
 
   // handle Deviation bar
