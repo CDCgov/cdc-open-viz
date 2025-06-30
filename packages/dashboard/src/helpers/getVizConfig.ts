@@ -18,13 +18,16 @@ export const getFootnotesVizConfig = (
   const filters = (getApplicableFilters(config.dashboard, rowNumber) || []).filter(filter =>
     dataColumns.includes(filter.columnName)
   )
+
+  const newConfig = _.cloneDeep(visualizationConfig)
+
   if (filters.length) {
-    visualizationConfig.footnotes.data = filterData(filters, data)
+    _.set(newConfig, 'footnotes.data', filterData(filters, data))
   } else {
-    visualizationConfig.footnotes.data = data
+    _.set(newConfig, 'footnotes.data', data)
   }
 
-  return visualizationConfig
+  return newConfig
 }
 
 export const getVizConfig = (
@@ -40,7 +43,7 @@ export const getVizConfig = (
   const visualizationConfig = _.cloneDeep(config.visualizations[visualizationKey])
   const rowData = config.rows[rowNumber]
   if (visualizationConfig.footnotes?.dataKey) {
-    visualizationConfig.footnotes.data = config.datasets[visualizationConfig.footnotes.dataKey]?.data
+    _.set(visualizationConfig, 'footnotes.data', config.datasets[visualizationConfig.footnotes.dataKey]?.data)
   }
   if (rowData?.dataKey) {
     // data configured on the row
@@ -85,15 +88,18 @@ export const getVizConfig = (
 
   if (filteredDataOverride) {
     visualizationConfig.data = filteredDataOverride
+    if (visualizationConfig.formattedData) {
+      visualizationConfig.formattedData = filteredDataOverride
+    }
   }
-
   if (visualizationConfig.footnotes) {
     const visConfigWithFootnotes = getFootnotesVizConfig(visualizationConfig, rowNumber, config)
     if (multiVizColumn && filteredDataOverride) {
       const vizCategory = filteredDataOverride[0][multiVizColumn]
       // the multiViz filtering filtering is applied after the dashboard filters
+
       const categoryFootnote = visConfigWithFootnotes.footnotes.data.filter(d => d[multiVizColumn] === vizCategory)
-      visConfigWithFootnotes.footnotes.data = categoryFootnote
+      _.set(visConfigWithFootnotes, 'footnotes.data', categoryFootnote)
     }
     return visConfigWithFootnotes
   }
