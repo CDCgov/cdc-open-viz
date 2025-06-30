@@ -4,6 +4,7 @@
   .map-container.world aside.side {
     border-top: 0;
   }
+
   @include breakpointClass(md) {
     .map-container.world aside.side {
       border-top: var(--cool-gray-10) 1px solid;
@@ -19,10 +20,12 @@
     border-radius: 6px;
 
     @include breakpointClass(md) {
+
       &.bottom,
       &.top {
         border: var(--cool-gray-10) 1px solid;
       }
+
       &.side {
         z-index: 1;
         box-sizing: content-box;
@@ -40,7 +43,8 @@
           display: block;
           column-count: 2;
           column-fill: balance;
-          & > li {
+
+          &>li {
             white-space: nowrap;
           }
         }
@@ -53,6 +57,7 @@
           flex-wrap: wrap;
         }
       }
+
       &.no-border {
         border: none;
       }
@@ -84,12 +89,15 @@
         padding-bottom: 0;
         display: inline-block;
       }
+
       .legend-container__description {
         font-size: var(--legend-description-font-size);
       }
+
       .legend-container__reset-button {
         margin-top: 1em;
       }
+
       p {
         line-height: 1.4em;
       }
@@ -99,7 +107,9 @@
         row-gap: var(--space-between-legend-item-rows);
         column-gap: var(--space-between-legend-item-columns);
       }
-      .legend-container__ul:not(.single-row) {
+
+
+      .legend-container__ul:not(.single-row, .legend-container__ul--single-column) {
         list-style: none;
         display: grid !important;
         grid-template-columns: 1fr;
@@ -114,12 +124,28 @@
         }
 
         &.vertical-sorted {
-          flex-direction: column;
+          // Remove the grid overrides - let the existing column rules handle this
+          display: block !important; // Switch from grid to block to enable columns
+
+          @include breakpoint(md) {
+            column-count: 2;
+            column-fill: balance;
+          }
+
+          // Add spacing between legend items in vertical sorted mode
+          .legend-container__li {
+            margin-bottom: var(--space-between-legend-item-rows);
+
+            &:last-child {
+              margin-bottom: 0; // Remove margin from last item
+            }
+          }
         }
 
         &:not(.vertical-sorted, .legend-container__ul--single-column, .single-row) {
           width: 100%;
         }
+
         .legend-container__li {
           display: flex;
           align-items: center;
@@ -142,6 +168,7 @@
           &:last-child {
             margin-bottom: 0;
           }
+
           @include breakpoint(md) {
             white-space: nowrap;
           }
@@ -149,6 +176,7 @@
           &.legend-container__li--disabled {
             opacity: 0.4;
           }
+
           &.legend-container__li--not-disabled {
             outline: 1px solid #005ea2;
             outline-offset: 5px;
@@ -156,6 +184,7 @@
           }
         }
       }
+
       .legend-container__ul.single-row {
         width: 100%;
         cursor: pointer;
@@ -166,12 +195,13 @@
         justify-content: flex-start;
         flex-wrap: wrap;
 
-        & > li {
+        &>li {
           white-space: wrap;
           display: flex;
           justify-content: center;
           align-items: center;
           vertical-align: middle;
+
           @include breakpoint(md) {
             white-space: nowrap;
           }
@@ -181,6 +211,7 @@
           }
         }
       }
+
       .legend-container__ul.patterns-only {
         margin-top: 10px;
       }
@@ -203,19 +234,24 @@
       @include breakpointClass(md) {
         width: 25%;
         min-width: 200px;
+
         .legend-section ul {
           flex-direction: column;
+
           li {
             width: 100%;
+
             &:nth-last-of-type(-n + 2) {
               padding-bottom: 1em;
             }
+
             &:last-child {
               padding-bottom: 0;
             }
           }
         }
       }
+
       li {
         width: 100%;
       }
@@ -225,6 +261,7 @@
       .legend-container ul:not(.single-row) {
         align-items: flex-start;
         justify-content: space-between;
+
         li {
           flex-grow: 1;
           padding-right: 0.5em;
@@ -234,24 +271,29 @@
 
     .filters-section {
       padding: 0 1em 1em;
+
       .heading-3 {
         font-weight: bold;
         margin-bottom: 0.5em;
       }
+
       form {
         margin-top: 0.5em;
         line-height: 2em;
         display: flex;
         align-items: flex-end;
-        section + section {
+
+        section+section {
           margin-left: 0.75em;
         }
+
         select {
           display: block;
           font-size: 1em;
         }
       }
     }
+
     & .shape-container {
       &.single-row {
         display: flex;
@@ -260,23 +302,26 @@
         justify-content: flex-start;
         flex-wrap: wrap;
 
-        & > div {
+        &>div {
           margin-right: 2em;
         }
-        & > div:last-child {
+
+        &>div:last-child {
           margin-right: 0;
         }
       }
 
-      & > div {
+      &>div {
         display: flex;
         flex-direction: row;
       }
-      & div > svg {
+
+      & div>svg {
         width: 25px;
         height: 32px;
       }
-      & div > p {
+
+      & div>p {
         white-space: nowrap;
         margin-top: 1px;
       }
