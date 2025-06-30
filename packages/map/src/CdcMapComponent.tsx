@@ -1,5 +1,5 @@
 // Vendor
-import React, { useEffect, useRef, useId, useReducer, useContext } from 'react'
+import React, { useEffect, useRef, useId, useReducer, useContext, useMemo } from 'react'
 import 'whatwg-fetch'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import Papa from 'papaparse'
@@ -14,9 +14,11 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Title from '@cdc/core/components/ui/Title'
 import Waiting from '@cdc/core/components/Waiting'
+import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 
 // types
 import { type MapConfig } from './types/MapConfig'
+import { Datasets } from '@cdc/core/types/DataSet'
 
 // Sass
 import './scss/main.scss'
@@ -29,6 +31,7 @@ import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { publish } from '@cdc/core/helpers/events'
 import { generateRuntimeFilters } from './helpers/generateRuntimeFilters'
 import { type MapReducerType, MapState } from './store/map.reducer'
+import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 
 // Map Helpers
 import {
@@ -75,6 +78,7 @@ type CdcMapComponent = {
   navigationHandler: Function
   setSharedFilter: Function
   setSharedFilterValue: Function
+  datasets?: Datasets
 }
 
 const CdcMapComponent: React.FC<CdcMapComponent> = ({
@@ -86,8 +90,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   setSharedFilter,
   setSharedFilterValue,
   link,
+  setConfig: setParentConfig,
   loadConfig,
-  setConfig: setParentConfig
+  datasets
 }) => {
   const initialState = getInitialState(configObj)
 
@@ -144,7 +149,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   const _setRuntimeData = (data: any) => {
-    setRuntimeData(data)
+    const _newFilters = addValuesToFilters(data, [])
+    setConfig({ ...config, filters: _newFilters })
+    if (config) {
+      setRuntimeData(data)
+    } else {
+      setRuntimeFilters(data)
+    }
   }
   const transform = new DataTransform()
 
@@ -157,7 +168,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const tooltipRef = useRef(null)
 
   // IDs
-  const imageId = useId()
+  const imageId = useMemo(() => `download-id-${Math.random().toString(36).substr(2, 9)}`, [])
   const legendId = useId()
   const mapId = useId()
   const tooltipId = 'test'
@@ -273,6 +284,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       primary: config.columns.primary.name,
       mapPosition: config.mapPosition,
       map: config.map,
+      table: config.table,
       ...runtimeFilters
     })
 
@@ -283,7 +295,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
         { ...config, data: configObj.data },
         filters || runtimeFilters,
         hashData,
-        isCategoryLegend
+        isCategoryLegend,
+        config.table.showNonGeoData
       )
       setRuntimeData(newRuntimeData)
     } else {
@@ -402,7 +415,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
           imageId={imageId}
           showEditorPanel={config.showEditorPanel}
         >
-          {isEditor && <EditorPanel />}
+          {isEditor && <EditorPanel datasets={datasets} />}
           <Layout.Responsive isEditor={isEditor}>
             {requiredColumns?.length > 0 && (
               <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
@@ -428,7 +441,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     config={config}
                     setConfig={setConfig}
                     filteredData={runtimeFilters}
-                    setFilteredData={_setRuntimeData}
+                    setFilters={_setRuntimeData}
                     dimensions={dimensions}
                     standaloneMap={!config}
                   />
@@ -463,8 +476,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                           /* logo is handled in UsaMap.State when applicable */
                           // prettier-ignore
                           'data' === general.type && logo && ('us' !== geoType || 'us-geocode' === general.type) && (
-                          <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
-                        )
+                            <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
+                          )
                         }
                       </>
                     )}
@@ -584,6 +597,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 display: 'none' // can't use d-none here
               }}
             ></div>
+            <FootnotesStandAlone config={config.footnotes} filters={config.filters?.filter(f => f.filterFootnotes)} />
           </Layout.Responsive>
         </Layout.VisualizationWrapper>
       </MapDispatchContext.Provider>

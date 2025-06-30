@@ -89,6 +89,11 @@ export default {
   topAxis: {
     hasLine: false
   },
+  brush: {
+    isActive: false,
+    isBrushing: false,
+    data: []
+  },
   isLegendValue: false,
   barThickness: 0.35,
   barHeight: 25,
@@ -120,7 +125,8 @@ export default {
     maxTickRotation: 0,
     padding: 5,
     showYearsOnce: false,
-    sortByRecentDate: false
+    sortByRecentDate: false,
+    brushActive: false
   },
   table: {
     label: 'Data Table',
@@ -176,10 +182,7 @@ export default {
     position: 'right',
     orderedValues: []
   },
-  brush: {
-    height: 45,
-    active: false
-  },
+
   exclusions: {
     active: false,
     keys: []

@@ -11,7 +11,6 @@ import {
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
 import { useDebounce } from 'use-debounce'
 import _ from 'lodash'
-// import ReactTags from 'react-tag-autocomplete'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import Panels from './Panels'
 import Layout from '@cdc/core/components/Layout'
@@ -47,8 +46,14 @@ import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/In
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs, HEADER_COLORS } from '../../../helpers'
 import './editorPanel.styles.css'
+import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
+import { Datasets } from '@cdc/core/types/DataSet'
 
-const EditorPanel = () => {
+type MapEditorPanelProps = {
+  datasets?: Datasets
+}
+
+const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const {
     setParentConfig,
     isDashboard,
@@ -2454,20 +2459,17 @@ const EditorPanel = () => {
                       <DynamicDesc value={legend.descriptions[String(activeFilterValueForDescription)]} />
                     </label>
                     <label>
-                      <select
+                      <Select
+                        label='Filter Value'
                         value={String(activeFilterValueForDescription)}
+                        options={filterValueOptionList.map(arr => ({
+                          value: arr,
+                          label: displayFilterLegendValue(arr)
+                        }))}
                         onChange={event => {
                           handleEditorChanges('changeActiveFilterValue', event.target.value)
                         }}
-                      >
-                        {filterValueOptionList.map((arr, i) => {
-                          return (
-                            <option value={arr} key={i}>
-                              {displayFilterLegendValue(arr)}
-                            </option>
-                          )
-                        })}
-                      </select>
+                      />
                     </label>
                   </React.Fragment>
                 )}
@@ -2529,16 +2531,30 @@ const EditorPanel = () => {
             </AccordionItem>
           )}
           {'navigation' !== config.general.type && (
-            <AccordionItem>
-              {' '}
-              {/* Filters */}
-              <AccordionItemHeading>
-                <AccordionItemButton>Filters</AccordionItemButton>
-              </AccordionItemHeading>
-              <AccordionItemPanel>
-                <VizFilterEditor config={config} updateField={updateField} rawData={config.data} />
-              </AccordionItemPanel>
-            </AccordionItem>
+            <>
+              <AccordionItem>
+                {/* Filters */}
+                <AccordionItemHeading>
+                  <AccordionItemButton>Filters</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <VizFilterEditor
+                    config={config}
+                    updateField={updateField}
+                    rawData={config.data}
+                    hasFootnotes={isDashboard}
+                  />
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Footnotes</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />
+                </AccordionItemPanel>
+              </AccordionItem>
+            </>
           )}
           {'navigation' !== config.general.type && (
             <AccordionItem>
@@ -2605,6 +2621,35 @@ const EditorPanel = () => {
                           Data tables are required for 508 compliance. When choosing to hide this data table, replace
                           with your own version.
                         </p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  </span>
+                </label>
+                <label className='checkbox'>
+                  <input
+                    type='checkbox'
+                    checked={config.table.showNonGeoData}
+                    onChange={event => {
+                      setConfig({
+                        ...config,
+                        table: {
+                          ...config.table,
+                          showNonGeoData: event.target.checked
+                        }
+                      })
+                    }}
+                  />
+                  <span className='edit-label column-heading'>
+                    Show Non Geographic Data
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon
+                          display='question'
+                          style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                        />
+                      </Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>Show any data not associated with a geographic location</p>
                       </Tooltip.Content>
                     </Tooltip>
                   </span>

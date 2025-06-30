@@ -10,3 +10,5 @@ export type DataSet = ConfigureData & {
   dataFileSourceType: string
   loadQueryParam?: string // fetched from the browser's query string and appended to the dataUrl on load.
 }
+
+export type Datasets = Record<string, DataSet>

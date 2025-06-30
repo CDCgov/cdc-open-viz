@@ -6,7 +6,6 @@ import { AnyVisualization } from '@cdc/core/types/Visualization'
 import Footnotes from '@cdc/core/types/Footnotes'
 import { SharedFilter } from '../types/SharedFilter'
 
-type ADD_FOOTNOTE = Action<'ADD_FOOTNOTE', { id: string; rowIndex: number; config: Footnotes }>
 type ADD_VISUALIZATION = Action<'ADD_VISUALIZATION', { rowIdx: number; colIdx: number; newViz: AnyVisualization }>
 type APPLY_CONFIG = Action<'APPLY_CONFIG', [Config, Object?]>
 type DELETE_WIDGET = Action<'DELETE_WIDGET', { uid: string }>
@@ -36,7 +35,6 @@ type UPDATE_ROW = Action<'UPDATE_ROW', { rowIndex: number; rowData: Partial<Conf
 type UPDATE_TOGGLE_NAME = Action<'UPDATE_TOGGLE_NAME', { rowIndex: number; columnIndex: number; toggleName: string }>
 
 type DashboardActions =
-  | ADD_FOOTNOTE
   | ADD_VISUALIZATION
   | APPLY_CONFIG
   | ADD_NEW_DASHBOARD

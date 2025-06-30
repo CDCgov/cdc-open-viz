@@ -9,7 +9,7 @@ import _ from 'lodash'
 
 type HeaderProps = {
   back?: any
-  subEditor?: any
+  subEditor?: boolean
   visualizationKey?: string
 }
 
@@ -17,7 +17,7 @@ const Header = (props: HeaderProps) => {
   const tabs: Tab[] = ['Dashboard Description', 'Data Table Settings', 'Dashboard Preview']
   const { visualizationKey, subEditor } = props
   const { config, setParentConfig, tabSelected, data } = useContext(DashboardContext)
-  if (!config) return null
+
   const dispatch = useContext(DashboardDispatchContext)
   const back = () => {
     if (!visualizationKey) return
@@ -81,7 +81,7 @@ const Header = (props: HeaderProps) => {
   }
 
   const multiInitialized = !!config.multiDashboards
-
+  if (!config) return null
   return (
     <div aria-level={2} role='heading' className={`editor-heading${subEditor ? ' sub-dashboard-viz' : ''}`}>
       {subEditor ? (
@@ -96,14 +96,12 @@ const Header = (props: HeaderProps) => {
             multidashboard
           </span>
           <br />
-          {
-            <input
-              type='text'
-              placeholder='Enter Dashboard Name Here'
-              defaultValue={config.dashboard?.title}
-              onChange={e => changeConfigValue('dashboard', 'title', e.target.value)}
-            />
-          }
+          <input
+            type='text'
+            placeholder='Enter Dashboard Name Here'
+            defaultValue={config.dashboard?.title}
+            onChange={e => changeConfigValue('dashboard', 'title', e.target.value)}
+          />
         </div>
       )}
       {!subEditor && (

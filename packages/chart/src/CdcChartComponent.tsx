@@ -71,9 +71,16 @@ import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
 import { getComboChartConfig } from './helpers/getComboChartConfig'
 import { getExcludedData } from './helpers/getExcludedData'
 import { getColorScale } from './helpers/getColorScale'
+import { getTransformedData } from './helpers/getTransformedData'
+import { getPiePercent } from './helpers/getPiePercent'
+
 // styles
 import './scss/main.scss'
 import { getInitialState, reducer } from './store/chart.reducer'
+import { VizFilter } from '@cdc/core/types/VizFilter'
+import { getNewRuntime } from './helpers/getNewRuntime'
+import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
+import { Datasets } from '@cdc/core/types/DataSet'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -87,6 +94,7 @@ interface CdcChartProps {
   setSharedFilter?: (filter: any) => void
   setSharedFilterValue?: (value: any) => void
   dashboardConfig?: DashboardConfig
+  datasets?: Datasets
 }
 const CdcChart: React.FC<CdcChartProps> = ({
   config: configObj,
@@ -98,7 +106,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   link,
   setSharedFilter,
   setSharedFilterValue,
-  dashboardConfig
+  dashboardConfig,
+  datasets
 }) => {
   const transform = new DataTransform()
   const initialState = getInitialState(configObj)
@@ -130,10 +139,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
   }
 
-  const setFiltersData = (filteredData: object[]): void => {
-    dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
-  }
-
   const legendRef = useRef(null)
   const parentRef = useRef(null)
 
@@ -160,7 +165,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   const convertLineToBarGraph = isConvertLineToBarGraph(config, filteredData)
 
-  const prepareConfig = async (loadedConfig: ChartConfig) => {
+  const prepareConfig = (loadedConfig: ChartConfig) => {
     let newConfig = _.defaultsDeep(loadedConfig, defaults)
     _.defaultsDeep(newConfig, {
       table: { showVertical: false }
@@ -342,6 +347,30 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
   }
 
+  const setFilters = (newFilters: VizFilter[]) => {
+    if (!config.dynamicSeries) {
+      const _newFilters = addValuesToFilters(newFilters, excludedData)
+      setConfig({
+        ...config,
+        filters: _newFilters
+      })
+    }
+
+    if (config.filterBehavior === 'Filter Change' || config.filterBehavior === 'Apply Button') {
+      const newFilteredData = filterVizData(newFilters, excludedData)
+
+      dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+      if (config.dynamicSeries) {
+        const runtime = getNewRuntime(config, newFilteredData)
+        setConfig({
+          ...config,
+          filters: newFilters,
+          runtime
+        })
+      }
+    }
+  }
+
   // Observes changes to outermost container and changes viewport size in state
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -380,7 +409,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       if (newConfig.dataUrl && !urlFilters) {
         // handle urls with spaces in the name.
         if (newConfig.dataUrl) newConfig.dataUrl = `${newConfig.dataUrl}`
-        let newData = await fetchRemoteData(newConfig.dataUrl, 'Chart')
+        let newData = await fetchRemoteData(newConfig.dataUrl)
 
         if (newData && newConfig.dataDescription) {
           newData = transform.autoStandardize(newData)
@@ -401,12 +430,18 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
     return newConfig
   }
+
   useEffect(() => {
     const load = async () => {
       try {
         if (configObj) {
           const preparedConfig = await prepareConfig(configObj)
           const preppedData = await prepareData(preparedConfig)
+
+          if (preparedConfig?.formattedData?.length) {
+            preppedData.data = preparedConfig.formattedData
+          }
+
           dispatch({ type: 'SET_STATE_DATA', payload: preppedData.data })
           dispatch({ type: 'SET_EXCLUDED_DATA', payload: preppedData.data })
           updateConfig(preparedConfig, preppedData.data)
@@ -493,7 +528,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = (label: Label): void => {
-    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && config.visualizationType !== 'Forecasting') {
+    if (
+      seriesHighlight.length + 1 === config.runtime.seriesKeys.length &&
+      config.visualizationType !== 'Forecasting' &&
+      !seriesHighlight.includes(label.datum)
+    ) {
       return handleShowAll()
     }
 
@@ -591,8 +630,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         rightSuffix,
         bottomPrefix,
         bottomSuffix,
-        bottomAbbreviated,
-        onlyShowTopPrefixSuffix
+        bottomAbbreviated
       }
     } = config
 
@@ -685,9 +723,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (addColPrefix && axis === 'left') {
       result = addColPrefix + result
     } else {
-      // if onlyShowTopPrefixSuffix only show top prefix
-      const suppressAllButLast = onlyShowTopPrefixSuffix && length - 1 !== index
-      if (prefix && axis === 'left' && !suppressAllButLast) {
+      if (prefix && axis === 'left') {
         result += prefix
       }
     }
@@ -706,7 +742,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (addColSuffix && axis === 'left') {
       result += addColSuffix
     } else {
-      if (suffix && axis === 'left' && !onlyShowTopPrefixSuffix) {
+      if (suffix && axis === 'left') {
         result += suffix
       }
     }
@@ -761,6 +797,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const getTableRuntimeData = () => {
     if (visualizationType === 'Sankey') return config?.data?.[0]?.tableData
     const data = filteredData || excludedData
+    if (config.visualizationType === 'Pie' && !config.dataFormat?.showPiePercent) {
+      return getPiePercent(data, config?.yAxis?.dataKey)
+    }
+
     const dynamicSeries = config.series.find(series => !!series.dynamicCategory)
     if (!dynamicSeries) return data
     const usedColumns = Object.values(config.columns)
@@ -826,7 +866,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     )
     body = (
       <>
-        {isEditor && <EditorPanel />}
+        {isEditor && <EditorPanel datasets={datasets} />}
         <Layout.Responsive isEditor={isEditor}>
           {config.newViz && <Confirm updateConfig={updateConfig} config={config} />}
           {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && (
@@ -860,11 +900,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
                   <Filters
                     config={config}
-                    setConfig={setConfig}
-                    setFilteredData={setFiltersData}
-                    filteredData={filteredData}
+                    setFilters={setFilters}
                     excludedData={excludedData}
-                    filterData={filterVizData}
                     dimensions={dimensions}
                   />
                 )}
@@ -941,11 +978,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       <>
                         <Filters
                           config={config}
-                          setConfig={setConfig}
-                          setFilteredData={setFiltersData}
-                          filteredData={filteredData}
+                          setFilters={setFilters}
                           excludedData={excludedData}
-                          filterData={filterVizData}
                           dimensions={dimensions}
                         />
                         {config?.introText && (
@@ -1016,7 +1050,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
                   <DataTable
                     /* changing the "key" will force the table to re-render
-                    when the default sort changes while editing */
+                      when the default sort changes while editing */
                     key={dataTableDefaultSortBy}
                     config={pivotDynamicSeries(config)}
                     rawData={
@@ -1042,8 +1076,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 )}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
-                {config?.footnotes && <section className='footnotes pt-2 mt-4'>{parse(config.footnotes)}</section>}
+                {config?.legacyFootnotes && (
+                  <section className='footnotes pt-2 mt-4'>{parse(config.legacyFootnotes)}</section>
+                )}
               </div>
+              <FootnotesStandAlone
+                config={configObj.footnotes}
+                filters={config.filters?.filter(f => f.filterFootnotes)}
+              />
             </div>
           )}
         </Layout.Responsive>
@@ -1101,7 +1141,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     setSharedFilterValue,
     svgRef,
     tableData: filteredData || excludedData,
-    transformedData: clean(filteredData || excludedData),
+    transformedData: getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean }),
     twoColorPalette,
     unfilteredData: _.cloneDeep(stateData),
     updateConfig

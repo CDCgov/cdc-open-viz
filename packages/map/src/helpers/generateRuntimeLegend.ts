@@ -1,6 +1,7 @@
 import { useCallback, useContext } from 'react'
 import ConfigContext from '../context'
 import {
+  addUIDs,
   applyColorToLegend,
   getGeoFillColor,
   hashObj,
@@ -53,10 +54,14 @@ export const generateRuntimeLegend = (
     const newLegendMemo = new Map() // Reset memoization
     const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
     const countryKeys = Object.keys(supportedCountries)
-    const { data, legend, columns, general } = configObj
+    const { legend, columns, general } = configObj
     const primaryColName = columns.primary.name
     const isBubble = general.type === 'bubble'
     const categoricalCol = columns.categorical ? columns.categorical.name : undefined
+
+    // filter out rows without a geo column
+    addUIDs(configObj, configObj.columns.geo.name)
+    const data = configObj.data.filter(row => row.uid) // Filter out rows without UIDs
 
     const result = {
       fromHash: null,
@@ -81,69 +86,44 @@ export const generateRuntimeLegend = (
     let specialClasses = 0
     let specialClassesHash = {}
 
+    // Special classes
     if (legend.specialClasses.length) {
       if (typeof legend.specialClasses[0] === 'object') {
         legend.specialClasses.forEach(specialClass => {
-          const val = String(specialClass.value)
-          if (undefined === specialClassesHash[val]) {
-            specialClassesHash[val] = true
-            result.items.push({
-              special: true,
-              value: val,
-              label: specialClass.label
-            })
-            result.items[result.items.length - 1].color = applyColorToLegend(
-              result.items.length - 1,
-              configObj,
-              result.items
-            )
-            specialClasses += 1
-          }
-          // Optionally, still map any rows that match this special class
-          dataSet.forEach(row => {
-            const rowVal = String(row[specialClass.key])
-            if (rowVal === val) {
-              let specialColor = result.items.findIndex(p => p.value === val)
-              newLegendMemo.set(hashObj(row), specialColor)
-            }
-          })
-        })
-      } else {
-        dataSet = dataSet.filter(row => {
-          const val = row[primaryColName]
+          dataSet = dataSet.filter(row => {
+            const val = String(row[specialClass.key])
 
-          if (legend.specialClasses.includes(val)) {
-            // apply the special color to the legend
-            if (undefined === specialClassesHash[val]) {
-              specialClassesHash[val] = true
+            if (specialClass.value === val) {
+              if (undefined === specialClassesHash[val]) {
+                specialClassesHash[val] = true
 
-              result.items.push({
-                special: true,
-                value: val
-              })
+                result.items.push({
+                  special: true,
+                  value: val,
+                  label: specialClass.label
+                })
 
-              result.items[result.items.length - 1].color = applyColorToLegend(
-                result.items.length - 1,
-                configObj,
-                result.items
-              )
+                result.items[result.items.length - 1].color = applyColorToLegend(
+                  result.items.length - 1,
+                  configObj,
+                  result.items
+                )
 
-              specialClasses += 1
-            }
+                specialClasses += 1
+              }
 
-            let specialColor = 0
+              let specialColor: number
 
-            // color the configObj if val is in row
-            if (Object.values(row).includes(val)) {
+              // color the configObj if val is in row
               specialColor = result.items.findIndex(p => p.value === val)
+
+              newLegendMemo.set(hashObj(row), specialColor)
+
+              return false
             }
 
-            newLegendMemo.set(hashObj(row), specialColor)
-
-            return false
-          }
-
-          return true
+            return true
+          })
         })
       }
     }
@@ -403,6 +383,12 @@ export const generateRuntimeLegend = (
               min = 1
             }
 
+            // For non-first ranges, add small increment to prevent overlap
+            if (index > 0 && !legend.separateZero) {
+              const decimalPlace = Number(configObj?.columns?.primary?.roundToPlace) || 1
+              min = Number(cachedBreaks[index]) + Math.pow(10, -decimalPlace)
+            }
+
             return min
           }
 
@@ -411,14 +397,14 @@ export const generateRuntimeLegend = (
           }
 
           const setMax = index => {
-            let max = Number(breaks[index + 1]) - getDecimalPlace(Number(configObj?.columns?.primary?.roundToPlace))
+            let max = Number(breaks[index + 1])
 
             if (index === 0 && legend.separateZero) {
               max = 0
             }
 
             if (index + 1 === breaks.length) {
-              max = domainNums[domainNums.length - 1]
+              max = Number(domainNums[domainNums.length - 1])
             }
 
             return max
@@ -443,10 +429,35 @@ export const generateRuntimeLegend = (
 
             if (result.items?.[updated]?.min === undefined || result.items?.[updated]?.max === undefined) return
 
-            if (number >= result?.items?.[updated].min && number <= result?.items?.[updated].max) {
-              newLegendMemo.set(hashObj(row), updated)
+            // Check if this row hasn't been assigned yet to prevent double assignment
+            if (!newLegendMemo.has(hashObj(row))) {
+              if (number >= result.items[updated].min && number <= result.items[updated].max) {
+                newLegendMemo.set(hashObj(row), updated)
+              }
             }
           })
+        })
+
+        // Final pass: handle any unassigned rows
+        dataSet.forEach(row => {
+          if (!newLegendMemo.has(hashObj(row))) {
+            let number = row[columns.primary.name]
+            let assigned = false
+
+            // Find the correct range for this value - ranges don't overlap anymore
+            for (let itemIndex = 0; itemIndex < result.items.length; itemIndex++) {
+              const item = result.items[itemIndex]
+
+              if (item.min === undefined || item.max === undefined) continue
+
+              // Simple range check since ranges don't overlap
+              if (number >= item.min && number <= item.max) {
+                newLegendMemo.set(hashObj(row), itemIndex)
+                assigned = true
+                break
+              }
+            }
+          }
         })
       }
     }
