@@ -457,8 +457,6 @@ export const generateRuntimeLegend = (
                 break
               }
             }
-
-
           }
         })
       }
