@@ -1009,10 +1009,19 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                         stroke='#000'
                       />
                     )}
-                    {yScale.domain()[0] < 0 && (
+                    {orientation === 'vertical' && yScale.domain()[0] < 0 && (
+                      // draw from the Left of the chart …
                       <Line
                         from={{ x: props.axisFromPoint.x, y: yScale(0) }}
                         to={{ x: xMax, y: yScale(0) }}
+                        stroke='#333'
+                      />
+                    )}
+                    {orientation === 'horizontal' && xScale.domain()[0] < 0 && (
+                      <Line
+                        // draw from the top of the char
+                        from={{ x: xScale(0), y: 0 }}
+                        to={{ x: xScale(0), y: yMax }}
                         stroke='#333'
                       />
                     )}
@@ -1062,7 +1071,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                             !config.yAxis.hideLabel && (
                               <Text
                                 x={tick.to.x}
-                                y={yScale(tick.value) + seriesScale.bandwidth() / 2}
+                                y={yScale(tick.value) + yScale.bandwidth() / 2}
                                 transform={`rotate(${
                                   config.runtime.horizontal ? config.runtime.yAxis.tickRotation || 0 : 0
                                 }, ${tick.to.x}, ${tick.to.y})`}

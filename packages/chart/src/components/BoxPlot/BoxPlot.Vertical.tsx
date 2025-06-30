@@ -41,7 +41,7 @@ const BoxPlotVertical = ({ xScale, yScale, seriesScale }) => {
                   config.legend.behavior === 'highlight' ||
                   seriesHighlight.length === 0 ||
                   seriesHighlight.indexOf(item.dataKey) !== -1
-                const fillOpacity = isTransparent ? 0.3 : 0.5
+                const fillOpacity = isTransparent ? 0.3 : 0.7
                 return (
                   <Group key={`boxplotplot-${item.dataKey}-${index}`}>
                     {boxplot.plotNonOutlierValues &&

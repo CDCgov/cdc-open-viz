@@ -23,7 +23,8 @@ const BoxPlotHorizontal = ({ xScale, yScale, seriesScale }) => {
           const category = plot.columnCategory
 
           return config.series.map(item => {
-            const y = yScale(category)
+            const y0 = yScale(category)
+            const offset = seriesScale(item.dataKey)
             const isTransparent =
               config.legend.behavior === 'highlight' &&
               seriesHighlight.length > 0 &&
@@ -32,13 +33,13 @@ const BoxPlotHorizontal = ({ xScale, yScale, seriesScale }) => {
               config.legend.behavior === 'highlight' ||
               seriesHighlight.length === 0 ||
               seriesHighlight.indexOf(item.dataKey) !== -1
-            const fillOpacity = isTransparent ? 0.3 : 0.5
+            const fillOpacity = isTransparent ? 0.3 : 0.7
             // outlier & non-outlier arrays
             const nonOut = plot.columnNonOutliers?.[item.dataKey] || []
             const out = plot.columnOutliers?.[item.dataKey] || []
 
             return (
-              <Group key={`${category}-${item.dataKey}`} top={y}>
+              <Group key={`${category}-${item.dataKey}`} top={y0 + offset}>
                 {displayPlot && (
                   <BoxPlot
                     min={Number(plot.min[item.dataKey])}
@@ -55,7 +56,8 @@ const BoxPlotHorizontal = ({ xScale, yScale, seriesScale }) => {
                     boxProps={{
                       fill: colorScale(item.dataKey),
                       strokeWidth: config.boxplot.borders === 'true' ? 1.5 : 0,
-                      stroke: defaultColor
+                      stroke: defaultColor,
+                      fillOpacity: fillOpacity
                     }}
                     minProps={{ stroke: colorScale(item.dataKey), strokeWidth: 1, opacity: fillOpacity }}
                     maxProps={{ stroke: colorScale(item.dataKey), strokeWidth: 1, opacity: fillOpacity }}

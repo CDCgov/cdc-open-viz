@@ -9,10 +9,14 @@ const meta: Meta<typeof Chart> = {
 
 type Story = StoryObj<typeof Chart>
 
-export const BoxPlot_Multiseries: Story = {
+export const BoxPlot_Vertical: Story = {
   args: {
-    config: boxPlotConfig,
-    isEditor: false
+    config: {
+      ...boxPlotConfig,
+      orientation: 'vertical',
+      title: 'Vertical Multiseries Box Plot',
+      isEditor: false
+    }
   }
 }
 
@@ -21,6 +25,7 @@ export const BoxPlot_Horizontal: Story = {
     config: {
       ...boxPlotConfig,
       orientation: 'horizontal',
+      title: 'Horizontal Multiseries Box Plot',
       yAxis: { ...boxPlotConfig.yAxis, labelPlacement: 'Above Bar' }
     },
     isEditor: false
