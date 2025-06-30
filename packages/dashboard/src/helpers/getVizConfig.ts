@@ -88,17 +88,17 @@ export const getVizConfig = (
 
   if (filteredDataOverride) {
     visualizationConfig.data = filteredDataOverride
+    if (visualizationConfig.formattedData) {
+      visualizationConfig.formattedData = filteredDataOverride
+    }
   }
-
   if (visualizationConfig.footnotes) {
     const visConfigWithFootnotes = getFootnotesVizConfig(visualizationConfig, rowNumber, config)
     if (multiVizColumn && filteredDataOverride) {
       const vizCategory = filteredDataOverride[0][multiVizColumn]
       // the multiViz filtering filtering is applied after the dashboard filters
 
-      const categoryFootnote = visConfigWithFootnotes['footnotes']['data'].filter(
-        d => d[multiVizColumn] === vizCategory
-      )
+      const categoryFootnote = visConfigWithFootnotes.footnotes.data.filter(d => d[multiVizColumn] === vizCategory)
       _.set(visConfigWithFootnotes, 'footnotes.data', categoryFootnote)
     }
     return visConfigWithFootnotes

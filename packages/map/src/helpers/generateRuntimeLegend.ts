@@ -383,6 +383,12 @@ export const generateRuntimeLegend = (
               min = 1
             }
 
+            // For non-first ranges, add small increment to prevent overlap
+            if (index > 0 && !legend.separateZero) {
+              const decimalPlace = Number(configObj?.columns?.primary?.roundToPlace) || 1
+              min = Number(cachedBreaks[index]) + Math.pow(10, -decimalPlace)
+            }
+
             return min
           }
 
@@ -391,14 +397,14 @@ export const generateRuntimeLegend = (
           }
 
           const setMax = index => {
-            let max = Number(breaks[index + 1]) - getDecimalPlace(Number(configObj?.columns?.primary?.roundToPlace))
+            let max = Number(breaks[index + 1])
 
             if (index === 0 && legend.separateZero) {
               max = 0
             }
 
             if (index + 1 === breaks.length) {
-              max = domainNums[domainNums.length - 1]
+              max = Number(domainNums[domainNums.length - 1])
             }
 
             return max
@@ -423,10 +429,35 @@ export const generateRuntimeLegend = (
 
             if (result.items?.[updated]?.min === undefined || result.items?.[updated]?.max === undefined) return
 
-            if (number >= result?.items?.[updated].min && number <= result?.items?.[updated].max) {
-              newLegendMemo.set(hashObj(row), updated)
+            // Check if this row hasn't been assigned yet to prevent double assignment
+            if (!newLegendMemo.has(hashObj(row))) {
+              if (number >= result.items[updated].min && number <= result.items[updated].max) {
+                newLegendMemo.set(hashObj(row), updated)
+              }
             }
           })
+        })
+
+        // Final pass: handle any unassigned rows
+        dataSet.forEach(row => {
+          if (!newLegendMemo.has(hashObj(row))) {
+            let number = row[columns.primary.name]
+            let assigned = false
+
+            // Find the correct range for this value - ranges don't overlap anymore
+            for (let itemIndex = 0; itemIndex < result.items.length; itemIndex++) {
+              const item = result.items[itemIndex]
+
+              if (item.min === undefined || item.max === undefined) continue
+
+              // Simple range check since ranges don't overlap
+              if (number >= item.min && number <= item.max) {
+                newLegendMemo.set(hashObj(row), itemIndex)
+                assigned = true
+                break
+              }
+            }
+          }
         })
       }
     }
