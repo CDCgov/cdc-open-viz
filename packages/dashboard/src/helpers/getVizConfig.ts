@@ -27,7 +27,7 @@ export const getFootnotesVizConfig = (
     _.set(newConfig, 'footnotes.data', data)
   }
 
-  return visualizationConfig
+  return newConfig
 }
 
 export const getVizConfig = (
