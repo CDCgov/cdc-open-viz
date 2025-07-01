@@ -79,13 +79,18 @@ const useScales = (properties: useScaleProps) => {
     xScale = composeScaleBand(xAxisDataMappedSorted, [0, xMax], 1 - config.barThickness)
   }
 
+  // handle Linear scaled viz
+  if (config.xAxis.type === 'date' && !isHorizontal) {
+    const sorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
+
+    xScale = composeScaleBand(sorted, [0, xMax], 1 - config.barThickness)
+    xScale.type = scaleTypes.BAND
+  }
+
   if (xAxis.type === 'date-time' || xAxis.type === 'continuous') {
     let xAxisMin = Math.min(...xAxisDataMapped.map(Number))
     let xAxisMax = Math.max(...xAxisDataMapped.map(Number))
     let paddingRatio = config.xAxis.padding ? config.xAxis.padding * 0.01 : 0
-    if (config.brush.active) {
-      paddingRatio = config.barThickness * 0.2
-    }
 
     xAxisMin -= paddingRatio * (xAxisMax - xAxisMin)
     xAxisMax += visualizationType === 'Line' ? 0 : paddingRatio * (xAxisMax - xAxisMin)

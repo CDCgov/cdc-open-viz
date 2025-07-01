@@ -48,9 +48,8 @@ const ChartHeader = ({
     if (columnHeaderText === notApplicableText) return
 
     return (
-      <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${
-        sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
-      }  order`}</span>
+      <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
+        }  order`}</span>
     )
   }
 
@@ -121,8 +120,11 @@ const ChartHeader = ({
     return (
       <tr>
         {['__series__', ...Object.keys(data)].slice(sliceVal).map((row, index) => {
+          const rightAxisItems = config.series?.filter(item => item?.axis === 'Right') || []
+          const rightAxisItemsMap = new Map(rightAxisItems.map(item => [item.dataKey, item]))
+
           let column = config.xAxis?.dataKey
-          let text = row !== '__series__' ? getChartCellValue(row, column, config, data) : '__series__'
+          let text = row !== '__series__' ? getChartCellValue(row, column, config, data, rightAxisItemsMap) : '__series__'
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.colIndex === index ? sortBy.asc : undefined
           const isSortedCol = index === sortBy.colIndex && !hasRowType
