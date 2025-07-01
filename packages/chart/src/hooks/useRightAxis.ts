@@ -2,7 +2,7 @@ import { scaleLinear } from '@visx/scale'
 import useReduceData from './useReduceData'
 import { TOP_PADDING } from './useScales'
 
-export default function useRightAxis({ config, yMax = 0, data = [], updateConfig }) {
+export default function useRightAxis({ config, yMax = 0, data = [] }) {
   const hasRightAxis = config.visualizationType === 'Combo' && config.orientation === 'vertical'
   const rightSeriesKeys =
     config.series && config.series.filter(series => series.axis === 'Right').map(key => key.dataKey)

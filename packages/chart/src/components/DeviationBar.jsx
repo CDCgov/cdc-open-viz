@@ -15,7 +15,6 @@ export default function DeviationBar({ height, xScale }) {
     config,
     formatNumber,
     twoColorPalette,
-    updateConfig,
     parseDate,
     formatDate,
     currentViewport

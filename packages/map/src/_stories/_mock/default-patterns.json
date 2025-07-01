@@ -146,10 +146,7 @@
     "additionalCityStyles": []
   },
   "mapPosition": {
-    "coordinates": [
-      0,
-      30
-    ],
+    "coordinates": [0, 30],
     "zoom": 1
   },
   "map": {
@@ -193,6 +190,12 @@
   },
   "usingWidgetLoader": true,
   "data": [
+    {
+      "STATE": "Non-Geo Data",
+      "Rate": 1000,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
     {
       "STATE": "AL",
       "Rate": 1000,

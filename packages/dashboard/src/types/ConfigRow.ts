@@ -16,5 +16,4 @@ export type ConfigRow = {
   toggle?: boolean
   equalHeight?: boolean
   multiVizColumn?: string
-  footnotesId?: string // id for the footnotes in the vizConfig section
 } & ConfigureData

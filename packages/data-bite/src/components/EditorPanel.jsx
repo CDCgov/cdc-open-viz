@@ -1,4 +1,4 @@
-import React, { memo, useContext, useEffect, useState } from 'react'
+import { memo, useContext, useEffect, useState } from 'react'
 import _ from 'lodash'
 import {
   Accordion,
@@ -8,177 +8,16 @@ import {
   AccordionItemPanel
 } from 'react-accessible-accordion'
 
-import { useDebounce } from 'use-debounce'
 import Context from '../context'
 import WarningImage from '@cdc/core/assets/icon-warning-circle.svg'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
-import { BITE_LOCATIONS, DATA_FUNCTIONS, IMAGE_POSITIONS, DATA_OPERATORS } from '../CdcDataBite'
+import { BITE_LOCATIONS, DATA_FUNCTIONS, IMAGE_POSITIONS, DATA_OPERATORS, HEADER_COLORS } from './../constants'
 import Layout from '@cdc/core/components/Layout'
-
-const TextField = memo(
-  ({
-    label,
-    section = null,
-    subsection = null,
-    fieldName,
-    updateField,
-    value: stateValue,
-    tooltip,
-    type = 'input',
-    i = null,
-    min = null,
-    max = null,
-    ...attributes
-  }) => {
-    const [value, setValue] = useState(stateValue)
-
-    const [debouncedValue] = useDebounce(value, 500)
-
-    useEffect(() => {
-      if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
-        updateField(section, subsection, fieldName, debouncedValue, i)
-      }
-    }, [debouncedValue, section, subsection, fieldName, i, stateValue, updateField])
-
-    let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
-
-    const onChange = e => {
-      //TODO: This block gives a warning/error in the console, but it still works.
-      if ('number' !== type || min === null) {
-        setValue(e.target.value)
-      } else {
-        if (
-          !e.target.value ||
-          (parseFloat(min) <= parseFloat(e.target.value)) & (parseFloat(max) >= parseFloat(e.target.value))
-        ) {
-          setValue(e.target.value)
-        } else {
-          setValue(min.toString())
-        }
-      }
-    }
-
-    let formElement = <input type='text' name={name} onChange={onChange} {...attributes} value={value} />
-
-    if ('textarea' === type) {
-      formElement = <textarea name={name} onChange={onChange} {...attributes} value={value}></textarea>
-    }
-
-    if ('number' === type) {
-      formElement = <input type='number' name={name} onChange={onChange} {...attributes} value={value} />
-    }
-
-    return (
-      <>
-        {label && label.length > 0 && (
-          <label>
-            <span className='edit-label column-heading'>
-              {label}
-              {tooltip}
-            </span>
-            {formElement}
-          </label>
-        )}
-        {(!label || label.length === 0) && formElement}
-      </>
-    )
-  }
-)
-
-const CheckBox = memo(
-  ({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
-    <label className='checkbox'>
-      <input
-        type='checkbox'
-        name={fieldName}
-        checked={value}
-        onChange={() => {
-          updateField(section, subsection, fieldName, !value)
-        }}
-        {...attributes}
-      />
-      <span className='edit-label column-heading'>{label}</span>
-      <span className='cove-icon'>{tooltip}</span>
-    </label>
-  )
-)
-
-const Select = memo(
-  ({
-    label,
-    value,
-    options,
-    fieldName,
-    section = null,
-    subsection = null,
-    required = false,
-    updateField,
-    initial: initialValue,
-    ...attributes
-  }) => {
-    let optionsJsx = ''
-    if (Array.isArray(options)) {
-      //Handle basic array
-      optionsJsx = options.map(optionName => (
-        <option value={optionName} key={optionName}>
-          {optionName}
-        </option>
-      ))
-    } else {
-      //Handle object with value/name pairs
-      optionsJsx = []
-      for (const [optionValue, optionName] of Object.entries(options)) {
-        optionsJsx.push(
-          <option value={optionValue} key={optionValue}>
-            {optionName}
-          </option>
-        )
-      }
-    }
-
-    if (initialValue) {
-      optionsJsx.unshift(
-        <option value='' key='initial'>
-          {initialValue}
-        </option>
-      )
-    }
-
-    return (
-      <label>
-        <span className='edit-label'>{label}</span>
-        <select
-          className={required && !value ? 'warning' : ''}
-          name={fieldName}
-          value={value}
-          onChange={event => {
-            updateField(section, subsection, fieldName, event.target.value)
-          }}
-          {...attributes}
-        >
-          {optionsJsx}
-        </select>
-      </label>
-    )
-  }
-)
-
-const headerColors = [
-  'theme-blue',
-  'theme-purple',
-  'theme-brown',
-  'theme-teal',
-  'theme-pink',
-  'theme-orange',
-  'theme-slate',
-  'theme-indigo',
-  'theme-cyan',
-  'theme-green',
-  'theme-amber'
-]
+import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
+import Button from '@cdc/core/components/elements/Button'
 
 const EditorPanel = memo(() => {
   const { config, updateConfig, loading, data, setParentConfig, isDashboard, isEditor } = useContext(Context)
@@ -347,7 +186,7 @@ const EditorPanel = memo(() => {
                     fieldName='biteStyle'
                     label='Data Bite Style'
                     updateField={updateField}
-                    options={BITE_LOCATIONS}
+                    options={Object.entries(BITE_LOCATIONS).map(([key, value]) => ({ value: key, label: value }))}
                     initial='Select'
                   />
                   <TextField
@@ -430,7 +269,7 @@ const EditorPanel = memo(() => {
                         updateField={updateField}
                         initial='Select'
                         required={true}
-                        options={getColumns()}
+                        options={getColumns() ? Array.from(getColumns()) : []}
                       />
                       <Select
                         value={config.dataFunction || ''}
@@ -439,7 +278,13 @@ const EditorPanel = memo(() => {
                         updateField={updateField}
                         initial='Select'
                         required={true}
-                        options={DATA_FUNCTIONS}
+                        options={
+                          Array.isArray(DATA_FUNCTIONS)
+                            ? DATA_FUNCTIONS
+                            : DATA_FUNCTIONS
+                            ? Object.values(DATA_FUNCTIONS)
+                            : []
+                        }
                       />
                     </li>
                   </ul>
@@ -510,45 +355,33 @@ const EditorPanel = memo(() => {
                         <fieldset className='edit-block' key={index}>
                           <button
                             type='button'
-                            className='remove-column'
+                            className='btn btn-danger'
                             onClick={() => {
                               removeFilter(index)
                             }}
                           >
                             Remove
                           </button>
-                          <label>
-                            <span className='edit-label column-heading'>Column</span>
-                            <select
-                              value={filter.columnName ? filter.columnName : ''}
-                              onChange={e => {
-                                updateFilterProp('columnName', index, e.target.value)
-                              }}
-                            >
-                              <option value=''>- Select Option -</option>
-                              {getColumns().map((dataKey, index) => (
-                                <option value={dataKey} key={index}>
-                                  {dataKey}
-                                </option>
-                              ))}
-                            </select>
-                          </label>
-                          <label>
-                            <span className='edit-label column-heading'>Column Value</span>
-                            <select
-                              value={filter.columnValue}
-                              onChange={e => {
-                                updateFilterProp('columnValue', index, e.target.value)
-                              }}
-                            >
-                              <option value=''>- Select Option -</option>
-                              {getFilterColumnValues(index).map((dataKey, index) => (
-                                <option value={dataKey} key={index}>
-                                  {dataKey}
-                                </option>
-                              ))}
-                            </select>
-                          </label>
+                          <Select
+                            value={filter.columnName ? filter.columnName : ''}
+                            fieldName='columnName'
+                            label={'Column Name'}
+                            updateField={(section, subsection, fieldName, value) =>
+                              updateFilterProp(fieldName, index, value)
+                            }
+                            options={getColumns()}
+                            initial='- Select Option -'
+                          />
+                          <Select
+                            value={filter.columnValue || ''}
+                            fieldName='columnValue'
+                            label='Column Value'
+                            updateField={(section, subsection, fieldName, value) =>
+                              updateFilterProp(fieldName, index, value)
+                            }
+                            options={Array.isArray(getFilterColumnValues(index)) ? getFilterColumnValues(index) : []}
+                            initial='- Select Option -'
+                          />
                         </fieldset>
                       ))}
                     </ul>
@@ -560,9 +393,9 @@ const EditorPanel = memo(() => {
                       </fieldset>
                     </div>
                   )}
-                  <button type='button' onClick={addNewFilter} className='btn btn-primary full-width'>
+                  <Button type='button' onClick={addNewFilter} className='btn btn-primary full-width mt-3'>
                     Add Filter
-                  </button>
+                  </Button>
                 </AccordionItemPanel>
               </AccordionItem>
 
@@ -629,11 +462,12 @@ const EditorPanel = memo(() => {
                   <label>
                     <span className='edit-label'>Theme</span>
                     <ul className='color-palette'>
-                      {headerColors.map(palette => (
-                        <li
+                      {HEADER_COLORS.map(palette => (
+                        <button
                           title={palette}
                           key={palette}
-                          onClick={() => {
+                          onClick={e => {
+                            e.preventDefault()
                             updateConfig({ ...config, theme: palette })
                           }}
                           className={config.theme === palette ? 'selected ' + palette : palette}

@@ -23,6 +23,7 @@ import { useEditorPanelContext } from '../../EditorPanelContext.js'
 import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 import { LineChartConfig } from '../../../../types/ChartConfig'
+import './panelVisual.styles.css'
 
 const PanelVisual: FC<PanelProps> = props => {
   const { config, updateConfig, colorPalettes, twoColorPalette } = useContext<ChartContext>(ConfigContext)
@@ -45,7 +46,7 @@ const PanelVisual: FC<PanelProps> = props => {
   const { twoColorPalettes, sequential, nonSequential, accessibleColors } = useColorPalette(config, updateConfig)
 
   const updateColor = (property, _value) => {
-    console.log('value', _value)
+    console.error('value', _value)
     if (property === 'storyNodeFontColor') {
       updateConfig({
         ...config,
