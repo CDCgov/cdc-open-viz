@@ -32,10 +32,10 @@
     "@cdc/map": "^4.25.5-1",
     "@cdc/markup-include": "^4.25.5-1",
     "@cdc/waffle-chart": "^4.25.5-1",
-    "axios": "^1.6.0",
-    "d3": "^7.0.0",
-    "react-dropzone": "^11.2.4",
-    "use-debounce": "^5.2.0"
+    "axios": "^1.9.0",
+    "d3": "^7.9.0",
+    "react-dropzone": "^14.3.8",
+    "use-debounce": "^10.0.5"
   },
   "peerDependencies": {
     "react": "^18.2.0",

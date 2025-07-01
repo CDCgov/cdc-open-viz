@@ -12,7 +12,6 @@ export type TransformedData = {
 
 type SharedChartContext = {
   animatedChart?: boolean
-  brushConfig: { data: []; isBrushing: boolean; isActive: boolean }
   capitalize: (value: string) => string
   clean: Function
   colorScale?: ColorScale
@@ -31,7 +30,6 @@ type SharedChartContext = {
   legendIsolateValues?: string[]
   legendRef?: React.RefObject<HTMLDivElement>
   parentRef?: React.RefObject<HTMLDivElement>
-  setBrushConfig: Function
   setLegendIsolateValues?: Function
   svgRef?: React.RefObject<SVGSVGElement>
 }

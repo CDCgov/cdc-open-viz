@@ -5,6 +5,7 @@ import { ReactNode } from 'react'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import _ from 'lodash'
 import { applyLegendToRow } from '@cdc/map/src/helpers/applyLegendToRow'
+import { hashObj } from '@cdc/map/src/helpers'
 
 type MapRowsProps = DataTableProps & {
   rows: string[]
@@ -93,6 +94,7 @@ const mapCellArray = ({
           }
 
           const legendColor = applyLegendToRow(rowObj, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+          const noColor = !legendMemo.current.has(hashObj(rowObj))
 
           if (!legendColor) {
             console.error('No legend color found') // eslint-disable-line no-console
@@ -100,9 +102,15 @@ const mapCellArray = ({
           const labelValue = getGeoLabel(config, row, formatLegendLocation, displayGeoName)
           const mapZoomHandler =
             type === 'bubble' && allowMapZoom && geoType === 'world' ? () => setFilteredCountryCode(row) : undefined
+
+          const validColor = legendColor && legendColor.length > 0 && !noColor
           return (
             <div className='col-12'>
-              {legendColor && legendColor.length > 0 && <LegendShape fill={legendColor[0]} />}
+              {validColor ? (
+                <LegendShape fill={legendColor[0]} />
+              ) : (
+                <div className='d-inline-block me-2' style={{ width: '1rem', height: '1rem' }} />
+              )}
               <CellAnchor
                 markup={labelValue}
                 row={rowObj}

@@ -15,49 +15,55 @@ const meta: Meta<typeof Chart> = {
 
 type Story = StoryObj<typeof Chart>
 
-export const Top_Suffix: Story = {
+export const Inline_Label: Story = {
   args: {
     config: editConfigKeys(barConfig, [
-      { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
-      { path: ['dataFormat', 'suffix'], value: ' Somethings per Something' },
+      { path: ['yAxis', 'inlineLabel'], value: ' Somethings per Something' },
+      { path: ['yAxis', 'gridLines'], value: true }
+    ])
+  }
+}
+export const Inline_Label_With_Suffix: Story = {
+  args: {
+    config: editConfigKeys(barConfig, [
+      { path: ['yAxis', 'inlineLabel'], value: ' Somethings per Something' },
+      { path: ['dataFormat', 'suffix'], value: '%' },
       { path: ['yAxis', 'gridLines'], value: true }
     ])
   }
 }
 
-export const Top_Suffix_Worst_Case: Story = {
+export const Inline_Label_Worst_Case: Story = {
   args: {
-    config: editConfigKeys(annotationConfig, [
-      { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
-      { path: ['dataFormat', 'suffix'], value: ' Somethings per Something' }
-    ])
+    config: editConfigKeys(annotationConfig, [{ path: ['yAxis', 'inlineLabel'], value: ' Somethings per Something' }])
   }
 }
 
-export const Top_Suffix_With_Options: Story = {
+export const Inline_Label_With_Options: Story = {
   args: {
     config: editConfigKeys(annotationConfig, [
-      { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
+      { path: ['yAxis', 'inlineLabel'], value: ' units' },
+      { path: ['dataFormat', 'suffix'], value: '' },
       { path: ['yAxis', 'tickRotation'], value: 45 },
       { path: ['yAxis', 'tickLabelColor'], value: 'red' }
     ])
   }
 }
 
-export const Top_Suffix_No_Space: Story = {
+export const Inline_Label_No_Space: Story = {
   args: {
     config: editConfigKeys(annotationConfig, [
-      { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
-      { path: ['dataFormat', 'suffix'], value: 'lbs' }
+      { path: ['yAxis', 'inlineLabel'], value: 'lbs' },
+      { path: ['dataFormat', 'suffix'], value: '' }
     ])
   }
 }
 
-export const Top_Suffix_With_Space: Story = {
+export const Inline_Label_With_Space: Story = {
   args: {
     config: editConfigKeys(annotationConfig, [
-      { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
-      { path: ['dataFormat', 'suffix'], value: 'lbs of something' }
+      { path: ['yAxis', 'inlineLabel'], value: 'lbs of something' },
+      { path: ['dataFormat', 'suffix'], value: '' }
     ])
   }
 }
@@ -67,15 +73,7 @@ export const Suffix: Story = {
     config: annotationConfig
   }
 }
-export const Top_Prefix: Story = {
-  args: {
-    config: editConfigKeys(annotationConfig, [
-      { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
-      { path: ['dataFormat', 'prefix'], value: '$' },
-      { path: ['dataFormat', 'suffix'], value: '' }
-    ])
-  }
-}
+
 export const Prefix: Story = {
   args: {
     config: editConfigKeys(areaPrefix, [
@@ -85,10 +83,10 @@ export const Prefix: Story = {
   }
 }
 
-export const Top_Prefix_And_Suffix: Story = {
+export const Prefix_Suffix_And_Inline_Title: Story = {
   args: {
     config: editConfigKeys(annotationConfig, [
-      { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
+      { path: ['yAxis', 'inlineLabel'], value: 'lbs of something' },
       { path: ['dataFormat', 'prefix'], value: '$' }
     ])
   }
@@ -102,11 +100,11 @@ export const Horizontal_Bar: Story = {
   }
 }
 
-export const Top_Suffix_On_Line: Story = {
+export const Inline_Title_On_Line: Story = {
   args: {
     config: editConfigKeys(barConfig, [
-      { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
-      { path: ['dataFormat', 'suffix'], value: ' Somethings per Something' },
+      { path: ['yAxis', 'inlineLabel'], value: 'lbs of something' },
+      { path: ['dataFormat', 'suffix'], value: '' },
       { path: ['yAxis', 'gridLines'], value: true },
       { path: ['yAxis', 'labelsAboveGridlines'], value: true },
       { path: ['yAxis', 'hideAxis'], value: true }
@@ -128,9 +126,8 @@ export const Values_On_Line_All_Suffix: Story = {
 export const Values_on_Line_Top_Suffix_Only_Area_Worst_Case: Story = {
   args: {
     config: editConfigKeys(annotationConfig, [
-      { path: ['dataFormat', 'onlyShowTopPrefixSuffix'], value: true },
+      { path: ['yAxis', 'inlineLabel'], value: ' of something' },
       { path: ['dataFormat', 'prefix'], value: 'pre' },
-      { path: ['dataFormat', 'suffix'], value: ' Somethings per Something' },
       { path: ['yAxis', 'labelsAboveGridlines'], value: true },
       { path: ['yAxis', 'gridLines'], value: true }
     ])

@@ -1,0 +1,428 @@
+{
+    "general": {
+        "geoType": "us",
+        "geoBorderColor": "darkGray",
+        "showTitle": false,
+        "showSidebar": true,
+        "showDownloadButton": false,
+        "showDownloadMediaButton": false,
+        "displayAsHex": true,
+        "displayStateLabels": false,
+        "territoriesLabel": "Territories",
+        "language": "en",
+        "hasRegions": false,
+        "expandDataTable": false,
+        "fullBorder": false,
+        "type": "data",
+        "palette": {
+            "isReversed": true
+        },
+        "geoLabelOverride": "",
+        "convertFipsCodes": true,
+        "allowMapZoom": true,
+        "hideGeoColumnInTooltip": false,
+        "hidePrimaryColumnInTooltip": false,
+        "superTitle": "",
+        "equalNumberOptIn": true,
+        "navigationTarget": "_self",
+        "noStateFoundMessage": "Map Unavailable",
+        "annotationDropdownText": "Annotations",
+        "headerColor": "theme-blue",
+        "title": "",
+        "territoriesAlwaysShow": false,
+        "statePicked": {
+            "fipsCode": "01",
+            "stateName": "Alabama"
+        }
+    },
+    "type": "map",
+    "customColors": [
+        "red",
+        "#edf8fb",
+        "yellow",
+        "#b3cde3",
+        "green",
+        "#8c96c6",
+        "#8856a7",
+        "#810f7c",
+        "pink"
+    ],
+    "columns": {
+        "geo": {
+            "name": "state",
+            "label": "Location",
+            "tooltip": false,
+            "dataTable": true
+        },
+        "primary": {
+            "dataTable": true,
+            "tooltip": true,
+            "prefix": "",
+            "suffix": "%",
+            "name": "value",
+            "label": "",
+            "roundToPlace": 1
+        },
+        "navigate": {
+            "name": ""
+        },
+        "latitude": {
+            "name": ""
+        },
+        "longitude": {
+            "name": ""
+        }
+    },
+    "legend": {
+        "descriptions": {},
+        "specialClasses": [
+            {
+                "key": "value",
+                "value": "",
+                "label": "No data"
+            }
+        ],
+        "unified": false,
+        "singleColumn": false,
+        "dynamicDescription": false,
+        "type": "equalnumber",
+        "numberOfItems": 5,
+        "position": "side",
+        "title": "Legend",
+        "singleRow": false,
+        "verticalSorted": false,
+        "showSpecialClassesLast": true,
+        "categoryValuesOrder": [
+            "No",
+            "Yes"
+        ]
+    },
+    "filters": [],
+    "table": {
+        "wrapColumns": false,
+        "label": "Data Table",
+        "expanded": false,
+        "limitHeight": false,
+        "height": "",
+        "caption": "",
+        "showDownloadUrl": false,
+        "showDataTableLink": false,
+        "showFullGeoNameInCSV": false,
+        "forceDisplay": false,
+        "download": true,
+        "indexLabel": "",
+        "showDownloadLinkBelow": true,
+        "cellMinWidth": "0"
+    },
+    "tooltips": {
+        "appearanceType": "hover",
+        "linkLabel": "Learn More",
+        "capitalizeLabels": true,
+        "opacity": 90
+    },
+    "visual": {
+        "minBubbleSize": 1,
+        "maxBubbleSize": 20,
+        "extraBubbleBorder": false,
+        "cityStyle": "circle",
+        "cityStyleLabel": "",
+        "showBubbleZeros": false,
+        "additionalCityStyles": [],
+        "geoCodeCircleSize": 8
+    },
+    "mapPosition": {
+        "coordinates": [
+            0,
+            30
+        ],
+        "zoom": 1
+    },
+    "map": {
+        "layers": [],
+        "patterns": []
+    },
+    "filterBehavior": "Filter Change",
+    "dataTable": {
+        "title": "Data Table",
+        "forceDisplay": true,
+        "caption": "Lorem Ipsum - Text added to Data Table Caption",
+        "limitHeight": true,
+        "height": "100"
+    },
+    "orientation": null,
+    "visualizationSubType": null,
+    "validated": "4.24.3",
+    "version": "4.24.12",
+    "data": [
+        {
+            "state": "New Mexico",
+            "stratification": "Total",
+            "value": 80.2
+        },
+        {
+            "state": "Pennsylvania",
+            "stratification": "Total",
+            "value": 29.8
+        },
+        {
+            "state": "Alabama",
+            "stratification": "Total",
+            "value": 18.2
+        },
+        {
+            "state": "Connecticut",
+            "stratification": "Total",
+            "value": 53.5
+        },
+        {
+            "state": "Massachusetts",
+            "stratification": "Total",
+            "value": 36.6
+        },
+        {
+            "state": "Rhode Island",
+            "stratification": "Total",
+            "value": 95.9
+        },
+        {
+            "state": "Tennessee",
+            "stratification": "Total",
+            "value": 14.8
+        },
+        {
+            "state": "Hawaii",
+            "stratification": "Total",
+            "value": 12.1
+        },
+        {
+            "state": "Kentucky",
+            "stratification": "Total",
+            "value": 15.4
+        },
+        {
+            "state": "Alaska",
+            "stratification": "Total",
+            "value": 20.8
+        },
+        {
+            "state": "Michigan",
+            "stratification": "Total",
+            "value": 32.9
+        },
+        {
+            "state": "North Dakota",
+            "stratification": "Total",
+            "value": 12
+        },
+        {
+            "state": "Iowa",
+            "stratification": "Total",
+            "value": 8.8
+        },
+        {
+            "state": "Nebraska",
+            "stratification": "Total",
+            "value": 14.7
+        },
+        {
+            "state": "West Virginia",
+            "stratification": "Total",
+            "value": 20.4
+        },
+        {
+            "state": "Ohio",
+            "stratification": "Total",
+            "value": 23
+        },
+        {
+            "state": "Montana",
+            "stratification": "Total",
+            "value": 40.2
+        },
+        {
+            "state": "Vermont",
+            "stratification": "Total",
+            "value": 11.1
+        },
+        {
+            "state": "Oregon",
+            "stratification": "Total",
+            "value": 17.5
+        },
+        {
+            "state": "Florida",
+            "stratification": "Total",
+            "value": 31.5
+        },
+        {
+            "state": "California",
+            "stratification": "Total",
+            "value": 40.9
+        },
+        {
+            "state": "Colorado",
+            "stratification": "Total",
+            "value": 35.1
+        },
+        {
+            "state": "Arizona",
+            "stratification": "Total",
+            "value": 6.4
+        },
+        {
+            "state": "Georgia",
+            "stratification": "Total",
+            "value": 32.6
+        },
+        {
+            "state": "Virgin Islands",
+            "stratification": "Total",
+            "value": 0
+        },
+        {
+            "state": "Puerto Rico",
+            "stratification": "Total",
+            "value": 0.8
+        },
+        {
+            "state": "New Jersey",
+            "stratification": "Total",
+            "value": 28.4
+        },
+        {
+            "state": "Wisconsin",
+            "stratification": "Total",
+            "value": 21.1
+        },
+        {
+            "state": "Idaho",
+            "stratification": "Total",
+            "value": 9.8
+        },
+        {
+            "state": "Missouri",
+            "stratification": "Total",
+            "value": 20.8
+        },
+        {
+            "state": "Mississippi",
+            "stratification": "Total",
+            "value": 65.4
+        },
+        {
+            "state": "New York",
+            "stratification": "Total",
+            "value": 35.1
+        },
+        {
+            "state": "South Dakota",
+            "stratification": "Total",
+            "value": 4.6
+        },
+        {
+            "state": "Nevada",
+            "stratification": "Total",
+            "value": 13.8
+        },
+        {
+            "state": "Washington",
+            "stratification": "Total",
+            "value": 22.6
+        },
+        {
+            "state": "Indiana",
+            "stratification": "Total",
+            "value": 32.1
+        },
+        {
+            "state": "Oklahoma",
+            "stratification": "Total",
+            "value": 31.3
+        },
+        {
+            "state": "Maine",
+            "stratification": "Total",
+            "value": 16.9
+        },
+        {
+            "state": "Maryland",
+            "stratification": "Total",
+            "value": 23.5
+        },
+        {
+            "state": "Arkansas",
+            "stratification": "Total",
+            "value": 31.9
+        },
+        {
+            "state": "Wyoming",
+            "stratification": "Total",
+            "value": 2.3
+        },
+        {
+            "state": "New Hampshire",
+            "stratification": "Total",
+            "value": 51.7
+        },
+        {
+            "state": "Texas",
+            "stratification": "Total",
+            "value": 16.9
+        },
+        {
+            "state": "Guam",
+            "stratification": "Total",
+            "value": 0
+        },
+        {
+            "state": "Delaware",
+            "stratification": "Total",
+            "value": 83.4
+        },
+        {
+            "state": "Utah",
+            "stratification": "Total",
+            "value": 10
+        },
+        {
+            "state": "North Carolina",
+            "stratification": "Total",
+            "value": 35.7
+        },
+        {
+            "state": "South Carolina",
+            "stratification": "Total",
+            "value": 47.5
+        },
+        {
+            "state": "District of Columbia",
+            "stratification": "Total",
+            "value": 48.2
+        },
+        {
+            "state": "Louisiana",
+            "stratification": "Total",
+            "value": 56.8
+        },
+        {
+            "state": "Kansas",
+            "stratification": "Total",
+            "value": 52.9
+        },
+        {
+            "state": "Illinois",
+            "stratification": "Total",
+            "value": 25.8
+        },
+        {
+            "state": "Virginia",
+            "stratification": "Total",
+            "value": 13.8
+        },
+        {
+            "state": "Minnesota",
+            "stratification": "Total",
+            "value": 22
+        }
+    ]
+}

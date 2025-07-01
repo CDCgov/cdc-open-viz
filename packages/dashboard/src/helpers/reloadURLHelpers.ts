@@ -31,8 +31,11 @@ type GetDatasetKeysParams = Pick<DashboardConfig, 'visualizations' | 'datasets' 
 export const getDatasetKeys = ({ visualizations, datasets, rows }: GetDatasetKeysParams): string[] => {
   const vizDataKeys = Object.values(visualizations).map(viz => viz.dataKey)
   const rowDataKeys = rows.map(row => row.dataKey)
+  const footnoteDataKeys = Object.values(visualizations)
+    .map(viz => viz.footnotes?.dataKey)
+    .filter(Boolean)
   // ensure to only load datasets for the specific dashboard tab.
-  const datasetsUsedByDashboard = _.uniq([...vizDataKeys, ...rowDataKeys])
+  const datasetsUsedByDashboard = _.uniq([...vizDataKeys, ...rowDataKeys, ...footnoteDataKeys])
   return Object.keys(datasets).filter(datasetKey => datasetsUsedByDashboard.includes(datasetKey))
 }
 
@@ -111,17 +114,11 @@ export const filterUsedByDataUrl = (
 ) => {
   if (!filter.usedBy || !filter.usedBy.length) return true
   const vizUsingFilters = filter.usedBy?.map(vizOrRowKey => visualizations[vizOrRowKey] || rows[vizOrRowKey])
-  // push any footnotes which are using the filter also
-  const vizRowLookup = getVizRowColumnLocator(rows) // ensure we have the footnotesId in the rows
-  filter.usedBy?.forEach(vizOrRowKey => {
-    const vizLookup = vizRowLookup[vizOrRowKey] // if found vizOrRowKey is a viz key
-    const row = rows[vizLookup?.row || vizOrRowKey]
-    if (row?.footnotesId) {
-      // if the widget is using the filter and the widget is on this row and the row has a footnoteId
-      // then the footnote's endpoint should be filtered by the filter
-      vizUsingFilters.push(visualizations[row.footnotesId])
-    }
-  })
 
-  return vizUsingFilters?.some(viz => viz?.dataKey === datasetKey)
+  return vizUsingFilters?.some(viz => {
+    const usedByViz = viz?.dataKey === datasetKey
+    // datasetKey might be a key to a dynamic footnotes URL
+    const usedByVizFootnote = viz?.footnotes?.dataKey === datasetKey
+    return usedByViz || usedByVizFootnote
+  })
 }

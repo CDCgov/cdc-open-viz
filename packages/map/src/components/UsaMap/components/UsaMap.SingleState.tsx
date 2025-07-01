@@ -23,25 +23,28 @@ import { titleCase, handleMapAriaLabels, getGeoStrokeColor, MAX_ZOOM_LEVEL } fro
 import { getTopoData, getCurrentTopoYear, isTopoReady } from '../helpers/map'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import { SVG_WIDTH, SVG_HEIGHT, SVG_PADDING, SVG_VIEWBOX } from '../../../helpers'
+import _ from 'lodash'
+import { getStatePicked } from '../../../helpers/getStatePicked'
 
-const SingleStateMap = () => {
+const SingleStateMap: React.FC = () => {
   const {
     config,
     setSharedFilterValue,
     isFilterValueSupported,
     runtimeFilters,
+    runtimeData,
     tooltipId,
     position,
-    stateToShow,
     topoData,
     scale,
-    translate,
-    legendMemo,
-    legendSpecialClassLastMemo
+    translate
   } = useContext<MapContext>(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
-  const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection, statePicked } = useStateZoom(topoData)
+  const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection } = useStateZoom(topoData)
+  const statePicked = getStatePicked(config, runtimeData)
+  const stateToShow = topoData?.states?.find(s => s.properties.name === statePicked.stateName)
+
   const { geoClickHandler } = useGeoClickHandler()
 
   const cityListProjection = geoAlbersUsaTerritories()
@@ -49,11 +52,6 @@ const SingleStateMap = () => {
     .scale(1)
   const geoStrokeColor = getGeoStrokeColor(config)
   const path = geoPath().projection(projection)
-
-  useEffect(() => {
-    const stateToShow = topoData?.states?.find(s => s.properties.name === config.general.statePicked.stateName)
-    dispatch({ type: 'SET_STATE_TO_SHOW', payload: stateToShow })
-  }, [statePicked])
 
   useEffect(() => {
     let currentYear = getCurrentTopoYear(config, runtimeFilters)
@@ -75,7 +73,7 @@ const SingleStateMap = () => {
 
   const checkForNoData = () => {
     // If no statePicked, return true
-    if (!config.general.statePicked.fipsCode) return true
+    if (!statePicked.fipsCode) return true
   }
 
   // Constructs and displays markup for all geos on the map (except territories right now)
@@ -123,7 +121,7 @@ const SingleStateMap = () => {
   }
   return (
     <ErrorBoundary component='SingleStateMap'>
-      {statePicked && config.general.allowMapZoom && config.general.statePicked.fipsCode && (
+      {statePicked && config.general.allowMapZoom && statePicked.fipsCode && (
         <svg
           viewBox={SVG_VIEWBOX}
           preserveAspectRatio='xMinYMin'
@@ -152,7 +150,7 @@ const SingleStateMap = () => {
               data={[
                 {
                   states: topoData?.states,
-                  counties: topoData.counties.filter(c => c.id.substring(0, 2) === config.general.statePicked.fipsCode)
+                  counties: topoData.counties.filter(c => c.id.substring(0, 2) === statePicked.fipsCode)
                 }
               ]}
               projection={geoAlbersUsaTerritories}
@@ -184,7 +182,7 @@ const SingleStateMap = () => {
           </ZoomableGroup>
         </svg>
       )}
-      {statePicked && !config.general.allowMapZoom && config.general.statePicked.fipsCode && (
+      {statePicked && !config.general.allowMapZoom && statePicked.fipsCode && (
         <svg
           viewBox={SVG_VIEWBOX}
           preserveAspectRatio='xMinYMin'
@@ -203,7 +201,7 @@ const SingleStateMap = () => {
             data={[
               {
                 states: topoData?.states,
-                counties: topoData.counties.filter(c => c.id.substring(0, 2) === config.general.statePicked.fipsCode)
+                counties: topoData.counties.filter(c => c.id.substring(0, 2) === statePicked.fipsCode)
               }
             ]}
             projection={geoAlbersUsaTerritories}
@@ -215,7 +213,7 @@ const SingleStateMap = () => {
               stateToShow
             ]}
           >
-            {({ features, projection }) => {
+            {({ features }) => {
               return (
                 <g
                   id='mapGroup'
@@ -226,7 +224,7 @@ const SingleStateMap = () => {
                   data-scale=''
                   key='countyMapGroup'
                 >
-                  {constructGeoJsx(features, projection)}
+                  {constructGeoJsx(features)}
                 </g>
               )
             }}
