@@ -10,6 +10,7 @@ import { FilterBehavior } from './FilterBehavior'
 import { General } from './General'
 import { Runtime } from './Runtime'
 import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
+import Footnotes from './Footnotes'
 
 // This was originally created as a catchall for the different types of visualizations.
 // Currently it includes properties that ares specific to one Visualization type.
@@ -26,7 +27,6 @@ type DeprecatedVisualizationType = {
   filters: VizFilter[]
   general: General
   legend: Legend
-  multiDashboards?: any[]
   newViz: boolean
   isResponsiveTicks: boolean
   openModal?: boolean
@@ -37,17 +37,7 @@ type DeprecatedVisualizationType = {
   table: Table
   theme: string
   title: string
-  type:
-    | 'dashboard'
-    | 'chart'
-    | 'footnotes'
-    | 'map'
-    | 'data-bite'
-    | 'waffle-chart'
-    | 'markup-include'
-    | 'filtered-text'
-    | 'table'
-    | 'navigation'
+  type: 'chart' | 'map' | 'data-bite' | 'waffle-chart' | 'markup-include' | 'filtered-text' | 'table' | 'navigation'
   usesSharedFilter?: any
   visualizationSubType: string
   visualizationType: string
@@ -65,6 +55,7 @@ export type CommonVisualizationProperties = Partial<StatefulProperties> & {
   uid?: string | number // this is the actual key of the visualization object
   visualizationType?: string
   filterBehavior: FilterBehavior
+  footnotes?: Footnotes
 } & Partial<ConfigureData>
 
 export type Visualization = DeprecatedVisualizationType & CommonVisualizationProperties

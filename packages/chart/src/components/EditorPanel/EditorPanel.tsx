@@ -44,6 +44,9 @@ import EditorPanelContext from './EditorPanelContext'
 import _ from 'lodash'
 import { adjustedSymbols as symbolCodes } from '@cdc/core/helpers/footnoteSymbols'
 import { updateFieldRankByValue } from './helpers/updateFieldRankByValue'
+import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
+import { Datasets } from '@cdc/core/types/DataSet'
+import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
 interface PreliminaryProps {
   config: ChartConfig
@@ -590,7 +593,11 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
   )
 }
 
-const EditorPanel = () => {
+type ChartEditorPanelProps = {
+  datasets?: Datasets
+}
+
+const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   const {
     config,
     updateConfig,
@@ -737,9 +744,10 @@ const EditorPanel = () => {
     }
   }
 
-  const updateField = (section, subsection, fieldName, newValue) => {
+  const updateField = updateFieldFactory(config, updateConfig)
+  const updateFieldDeprecated = (section, subsection, fieldName, newValue) => {
     if (isDebug)
-      console.log(
+      console.error(
         '#COVE: CHART: EditorPanel: section, subsection, fieldName, newValue',
         section,
         subsection,
@@ -812,10 +820,6 @@ const EditorPanel = () => {
 
   const [displayPanel, setDisplayPanel] = useState(true)
   const [displayViewportOverrides, setDisplayViewportOverrides] = useState(false)
-
-  if (isLoading) {
-    return null
-  }
 
   const setLollipopShape = shape => {
     updateConfig({
@@ -963,6 +967,18 @@ const EditorPanel = () => {
       showEditorPanel: !displayPanel
     })
   }
+
+  // prettier-ignore
+  const {
+      highlightedBarValues,
+      highlightedSeriesValues,
+      handleUpdateHighlightedBar,
+      handleAddNewHighlightedBar,
+      handleRemoveHighlightedBar,
+      handleUpdateHighlightedBarColor,
+      handleHighlightedBarLegendLabel,
+      handleUpdateHighlightedBorderWidth
+     } = useHighlightedBars(config, updateConfig)
 
   const convertStateToConfig = () => {
     let strippedState = _.cloneDeep(config)
@@ -1177,7 +1193,7 @@ const EditorPanel = () => {
   if (isDebug && config?.series?.length === 0) {
     let setdatacol = setDataColumn()
     if (setdatacol !== '') addNewSeries(setdatacol)
-    if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
+    if (isDebug) console.error('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
   const chartsWithOptions = [
@@ -1295,18 +1311,6 @@ const EditorPanel = () => {
     }
   }
 
-  // prettier-ignore
-  const {
-    highlightedBarValues,
-    highlightedSeriesValues,
-    handleUpdateHighlightedBar,
-    handleAddNewHighlightedBar,
-    handleRemoveHighlightedBar,
-    handleUpdateHighlightedBarColor,
-    handleHighlightedBarLegendLabel,
-    handleUpdateHighlightedBorderWidth
-   } = useHighlightedBars(config, updateConfig)
-
   const updateSeriesTooltip = (column, event) => {
     let updatedColumns = config.columns
 
@@ -1364,7 +1368,7 @@ const EditorPanel = () => {
     handleSeriesChange,
     handleAddNewHighlightedBar,
     setCategoryAxis,
-    updateField,
+    updateField: updateFieldDeprecated,
     warningMsg,
     highlightedBarValues,
     handleHighlightedBarLegendLabel,
@@ -1375,6 +1379,13 @@ const EditorPanel = () => {
     handleUpdateHighlightedBorderWidth,
     handleUpdateHighlightedBarColor,
     setLollipopShape
+  }
+  if (isLoading) {
+    return <></>
+  }
+
+  if (isLoading) {
+    return null
   }
 
   return (
@@ -1410,7 +1421,7 @@ const EditorPanel = () => {
                         value={config.dynamicSeries}
                         fieldName='dynamicSeries'
                         label='Dynamically generate series'
-                        updateField={updateField}
+                        updateField={updateFieldDeprecated}
                       />
                     )} */}
                     {config.dynamicSeries && config.visualizationType === 'Line' && (
@@ -1419,7 +1430,7 @@ const EditorPanel = () => {
                         value={config.dynamicSeriesType}
                         label='Series Type'
                         initial='Select'
-                        updateField={updateField}
+                        updateField={updateFieldDeprecated}
                         options={['Line', 'dashed-sm', 'dashed-md', 'dashed-lg']}
                       />
                     )}
@@ -1431,7 +1442,7 @@ const EditorPanel = () => {
                           value={config.dynamicSeriesLineType ? config.dynamicSeriesLineType : 'curveLinear'}
                           label='Line Type'
                           initial='Select'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                           options={Object.keys(approvedCurveTypes).map(curveName => approvedCurveTypes[curveName])}
                         />
                       )}
@@ -1512,7 +1523,7 @@ const EditorPanel = () => {
                               section='confidenceKeys'
                               fieldName='upper'
                               label='Upper'
-                              updateField={updateField}
+                              updateField={updateFieldDeprecated}
                               initial='Select'
                               options={getColumns()}
                             />
@@ -1521,7 +1532,7 @@ const EditorPanel = () => {
                               section='confidenceKeys'
                               fieldName='lower'
                               label='Lower'
-                              updateField={updateField}
+                              updateField={updateFieldDeprecated}
                               initial='Select'
                               options={getColumns()}
                             />
@@ -1574,7 +1585,7 @@ const EditorPanel = () => {
                       label='Data Column'
                       initial='Select'
                       required={true}
-                      updateField={updateField}
+                      updateField={updateFieldDeprecated}
                       options={getColumns(false)}
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
@@ -1635,7 +1646,45 @@ const EditorPanel = () => {
                         section='yAxis'
                         fieldName='label'
                         label='Label'
+                        updateField={updateFieldDeprecated}
+                        maxLength={35}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>35 character limit</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                      <TextField
+                        display={!visHasCategoricalAxis()}
+                        value={config.yAxis.inlineLabel}
+                        section='yAxis'
+                        fieldName='inlineLabel'
+                        label='Inline Label'
                         updateField={updateField}
+                        maxLength={35}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>35 character limit</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                      <TextField
+                        display={!visHasCategoricalAxis()}
+                        value={config.yAxis.inlineLabel}
+                        section='yAxis'
+                        fieldName='inlineLabel'
+                        label='Inline Label'
+                        updateField={updateFieldDeprecated}
                         maxLength={35}
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
@@ -1655,7 +1704,7 @@ const EditorPanel = () => {
                             value={config.isLegendValue}
                             fieldName='isLegendValue'
                             label='Use Legend Value in Hover'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                           />
                         )}
 
@@ -1684,7 +1733,7 @@ const EditorPanel = () => {
                             </Tooltip.Content>
                           </Tooltip>
                         }
-                        updateField={updateField}
+                        updateField={updateFieldDeprecated}
                       />
                       <TextField
                         value={config.yAxis.size}
@@ -1693,7 +1742,7 @@ const EditorPanel = () => {
                         fieldName='size'
                         label={config.orientation === 'horizontal' ? 'Size (Height)' : 'Size (Width)'}
                         className='number-narrow'
-                        updateField={updateField}
+                        updateField={updateFieldDeprecated}
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
@@ -1716,14 +1765,14 @@ const EditorPanel = () => {
                         label='Label offset'
                         type='number'
                         className='number-narrow'
-                        updateField={updateField}
+                        updateField={updateFieldDeprecated}
                       />
                       {config.orientation === 'horizontal' && (
                         <CheckBox
                           value={config.isResponsiveTicks}
                           fieldName='isResponsiveTicks'
                           label='Use Responsive Ticks'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                         />
                       )}
                       {(config.orientation === 'vertical' || !config.isResponsiveTicks) && (
@@ -1736,7 +1785,7 @@ const EditorPanel = () => {
                           fieldName='tickRotation'
                           label='Tick rotation (Degrees)'
                           className='number-narrow'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                         />
                       )}
                       {config.isResponsiveTicks && config.orientation === 'horizontal' && (
@@ -1748,7 +1797,7 @@ const EditorPanel = () => {
                           fieldName='maxTickRotation'
                           label='Max Tick Rotation'
                           className='number-narrow'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                           tooltip={
                             <Tooltip style={{ textTransform: 'none' }}>
                               <Tooltip.Target>
@@ -1766,14 +1815,14 @@ const EditorPanel = () => {
                       )}
 
                       {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
-                      {/* <TextField value={config.yAxis.axisPadding} type='number' max={10} min={0} section='yAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
+                      {/* <TextField value={config.yAxis.axisPadding} type='number' max={10} min={0} section='yAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateFieldDeprecated} /> */}
                       {visSupportsValueAxisGridLines() && (
                         <CheckBox
                           value={config.yAxis.gridLines}
                           section='yAxis'
                           fieldName='gridLines'
                           label='Show Gridlines'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                         />
                       )}
                       {visSupportsValueAxisGridLines() && (
@@ -1782,7 +1831,7 @@ const EditorPanel = () => {
                           section='yAxis'
                           fieldName='labelsAboveGridlines'
                           label='Tick labels above gridlines'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                           disabled={!config.yAxis.gridLines}
                           title={!config.yAxis.gridLines ? 'Show gridlines to enable' : ''}
                         />
@@ -1793,7 +1842,7 @@ const EditorPanel = () => {
                           section='yAxis'
                           fieldName='enablePadding'
                           label='Add Padding to Value Axis Scale'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                         />
                       )}
                       {config.yAxis.enablePadding && visSupportsYPadding() && (
@@ -1803,7 +1852,7 @@ const EditorPanel = () => {
                           fieldName='scalePadding'
                           label='Padding Percentage'
                           className='number-narrow'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                           value={config.yAxis.scalePadding}
                         />
                       )}
@@ -1815,7 +1864,7 @@ const EditorPanel = () => {
                     section='dataFormat'
                     fieldName='commas'
                     label='Add commas'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
@@ -1836,7 +1885,7 @@ const EditorPanel = () => {
                     section='dataFormat'
                     fieldName='abbreviated'
                     label='Abbreviate Axis Values'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
@@ -1851,6 +1900,31 @@ const EditorPanel = () => {
                       </Tooltip>
                     }
                   />
+                  <CheckBox
+                    display={config.visualizationType === 'Pie'}
+                    value={config.dataFormat.showPiePercent}
+                    section='dataFormat'
+                    fieldName='showPiePercent'
+                    label='Display Value From Data'
+                    updateField={updateFieldDeprecated}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display='question'
+                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content className='text-start'>
+                          <p className='mb-2'>
+                            When enabled, pie slices are drawn using the exact values from your data as percentages. For
+                            example, 25 means 25%. If the sum of values below 100 will be supplemented to complete the
+                            pie. Feature is disabled if the sum of values is above 100
+                          </p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                   <TextField
                     value={config.dataFormat.roundTo ? config.dataFormat.roundTo : 0}
                     type='number'
@@ -1858,7 +1932,7 @@ const EditorPanel = () => {
                     fieldName='roundTo'
                     label='Round to decimal point'
                     className='number-narrow'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     min={0}
                   />{' '}
                   <div className='two-col-inputs'>
@@ -1867,7 +1941,7 @@ const EditorPanel = () => {
                       section='dataFormat'
                       fieldName='prefix'
                       label='Prefix'
-                      updateField={updateField}
+                      updateField={updateFieldDeprecated}
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
@@ -1889,7 +1963,7 @@ const EditorPanel = () => {
                       section='dataFormat'
                       fieldName='suffix'
                       label='Suffix'
-                      updateField={updateField}
+                      updateField={updateFieldDeprecated}
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
@@ -1915,7 +1989,7 @@ const EditorPanel = () => {
                           section='xAxis'
                           fieldName='hideAxis'
                           label='Hide Axis'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                         />
                       )}
                       {visSupportsValueAxisLabels() && (
@@ -1924,7 +1998,7 @@ const EditorPanel = () => {
                           section='xAxis'
                           fieldName='hideLabel'
                           label='Hide Tick Labels'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                         />
                       )}
                       {visSupportsValueAxisTicks() && (
@@ -1933,7 +2007,7 @@ const EditorPanel = () => {
                           section='xAxis'
                           fieldName='hideTicks'
                           label='Hide Ticks'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                         />
                       )}
                       {visSupportsValueAxisMax() && (
@@ -1944,7 +2018,7 @@ const EditorPanel = () => {
                           label='max value'
                           type='number'
                           placeholder='Auto'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                         />
                       )}
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
@@ -1956,7 +2030,7 @@ const EditorPanel = () => {
                           type='number'
                           label='min value'
                           placeholder='Auto'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                         />
                       )}
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
@@ -1969,7 +2043,7 @@ const EditorPanel = () => {
                             type='number'
                             label='Deviation point'
                             placeholder='Auto'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                           />
                           <TextField
                             value={config.xAxis.targetLabel || 'Target'}
@@ -1977,14 +2051,14 @@ const EditorPanel = () => {
                             fieldName='targetLabel'
                             type='text'
                             label='Deviation point Label'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                           />
                           <CheckBox
                             value={config.xAxis.showTargetLabel}
                             section='xAxis'
                             fieldName='showTargetLabel'
                             label='Show Deviation point label'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                           />
                         </>
                       )}
@@ -1994,19 +2068,11 @@ const EditorPanel = () => {
                       <>
                         <CheckBox
                           display={!visHasCategoricalAxis()}
-                          value={config.dataFormat.onlyShowTopPrefixSuffix}
-                          section='dataFormat'
-                          fieldName='onlyShowTopPrefixSuffix'
-                          label='Only Show Top Prefix/Suffix'
-                          updateField={updateField}
-                        />
-                        <CheckBox
-                          display={!visHasCategoricalAxis()}
                           value={config.yAxis.hideAxis}
                           section='yAxis'
                           fieldName='hideAxis'
                           label='Hide Axis'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                         />
                         <CheckBox
                           display={!visHasCategoricalAxis()}
@@ -2014,7 +2080,7 @@ const EditorPanel = () => {
                           section='yAxis'
                           fieldName='hideLabel'
                           label='Hide Tick Labels'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                         />
                         <CheckBox
                           display={!visHasCategoricalAxis()}
@@ -2022,7 +2088,7 @@ const EditorPanel = () => {
                           section='yAxis'
                           fieldName='hideTicks'
                           label='Hide Ticks'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                         />
 
                         <TextField
@@ -2032,7 +2098,7 @@ const EditorPanel = () => {
                           type='number'
                           label='left axis max value'
                           placeholder='Auto'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                         />
                         <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
                         {config.visualizationType !== 'Area Chart' && config.visualizationSubType !== 'stacked' && (
@@ -2044,7 +2110,7 @@ const EditorPanel = () => {
                               type='number'
                               label='left axis min value'
                               placeholder='Auto'
-                              updateField={updateField}
+                              updateField={updateFieldDeprecated}
                             />
                             <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                           </>
@@ -2319,7 +2385,7 @@ const EditorPanel = () => {
                     section='yAxis'
                     fieldName='rightLabel'
                     label='Label'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     maxLength={35}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
@@ -2340,7 +2406,7 @@ const EditorPanel = () => {
                     fieldName='rightNumTicks'
                     label='Number of ticks'
                     className='number-narrow'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                   />
                   <TextField
                     value={config.yAxis.rightAxisSize}
@@ -2349,7 +2415,7 @@ const EditorPanel = () => {
                     fieldName='rightAxisSize'
                     label='Size (Width)'
                     className='number-narrow'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                   />
                   <TextField
                     value={config.yAxis.rightLabelOffsetSize}
@@ -2358,7 +2424,7 @@ const EditorPanel = () => {
                     fieldName='rightLabelOffsetSize'
                     label='Label Offset'
                     className='number-narrow'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                   />
 
                   <span className='divider-heading'>Number Formatting</span>
@@ -2367,7 +2433,7 @@ const EditorPanel = () => {
                     section='dataFormat'
                     fieldName='rightCommas'
                     label='Add commas'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                   />
                   <TextField
                     value={config.dataFormat.rightRoundTo}
@@ -2376,7 +2442,7 @@ const EditorPanel = () => {
                     fieldName='rightRoundTo'
                     label='Round to decimal point'
                     className='number-narrow'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     min={0}
                   />
                   <div className='two-col-inputs'>
@@ -2385,7 +2451,7 @@ const EditorPanel = () => {
                       section='dataFormat'
                       fieldName='rightPrefix'
                       label='Prefix'
-                      updateField={updateField}
+                      updateField={updateFieldDeprecated}
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
@@ -2407,7 +2473,7 @@ const EditorPanel = () => {
                       section='dataFormat'
                       fieldName='rightSuffix'
                       label='Suffix'
-                      updateField={updateField}
+                      updateField={updateFieldDeprecated}
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
@@ -2431,21 +2497,21 @@ const EditorPanel = () => {
                     section='yAxis'
                     fieldName='rightHideAxis'
                     label='Hide Axis'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                   />
                   <CheckBox
                     value={config.yAxis.rightHideLabel}
                     section='yAxis'
                     fieldName='rightHideLabel'
                     label='Hide Tick Labels'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                   />
                   <CheckBox
                     value={config.yAxis.rightHideTicks}
                     section='yAxis'
                     fieldName='rightHideTicks'
                     label='Hide Ticks'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                   />
 
                   <TextField
@@ -2455,7 +2521,7 @@ const EditorPanel = () => {
                     type='number'
                     label='right axis max value'
                     placeholder='Auto'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                   />
                   <span style={{ color: 'red', display: 'block' }}>{warningMsg.rightMaxMessage}</span>
                   <TextField
@@ -2465,7 +2531,7 @@ const EditorPanel = () => {
                     type='number'
                     label='right axis min value'
                     placeholder='Auto'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                   />
                   <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                 </AccordionItemPanel>
@@ -2526,7 +2592,7 @@ const EditorPanel = () => {
                             section='xAxis'
                             fieldName='manual'
                             label='Manual Ticks'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                           />
                           <CheckBox
                             display={config.xAxis.type !== 'categorical'}
@@ -2534,7 +2600,7 @@ const EditorPanel = () => {
                             section='xAxis'
                             fieldName='sortByRecentDate'
                             label='Show dates newest to oldest'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                           />
 
                           {visSupportsDateCategoryAxisPadding() && (
@@ -2546,7 +2612,7 @@ const EditorPanel = () => {
                               fieldName='padding'
                               label={'Padding (Percent)'}
                               className='number-narrow'
-                              updateField={updateField}
+                              updateField={updateFieldDeprecated}
                               tooltip={
                                 <Tooltip style={{ textTransform: 'none' }}>
                                   <Tooltip.Target>
@@ -2571,7 +2637,7 @@ const EditorPanel = () => {
                         label='Data Key'
                         initial='Select'
                         required={true}
-                        updateField={updateField}
+                        updateField={updateFieldDeprecated}
                         options={getColumns(false)}
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
@@ -2595,7 +2661,7 @@ const EditorPanel = () => {
                       label='Segment Labels'
                       initial='Select'
                       required={true}
-                      updateField={updateField}
+                      updateField={updateFieldDeprecated}
                       options={getColumns(false)}
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
@@ -2620,7 +2686,7 @@ const EditorPanel = () => {
                         section='xAxis'
                         fieldName='label'
                         label='Label'
-                        updateField={updateField}
+                        updateField={updateFieldDeprecated}
                         maxLength={35}
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
@@ -2641,7 +2707,7 @@ const EditorPanel = () => {
                             section='dataFormat'
                             fieldName='bottomPrefix'
                             label='Prefix'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
@@ -2662,7 +2728,7 @@ const EditorPanel = () => {
                             section='dataFormat'
                             fieldName='bottomSuffix'
                             label='Suffix'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
@@ -2683,7 +2749,7 @@ const EditorPanel = () => {
                             section='dataFormat'
                             fieldName='bottomAbbreviated'
                             label='Abbreviate Axis Values'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
@@ -2732,7 +2798,7 @@ const EditorPanel = () => {
                             fieldName='dateParseFormat'
                             placeholder='Ex. %Y-%m-%d'
                             label='Date Parse Format'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                           />
                           <TextField
                             tooltip={
@@ -2756,7 +2822,7 @@ const EditorPanel = () => {
                             fieldName='dateDisplayFormat'
                             placeholder='Ex. %Y-%m-%d'
                             label='AXIS DATE DISPLAY FORMAT'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                           />
                           <TextField
                             tooltip={
@@ -2780,7 +2846,7 @@ const EditorPanel = () => {
                             fieldName='dateDisplayFormat'
                             placeholder='Ex. %Y-%m-%d'
                             label='DATA TABLE DATE DISPLAY FORMAT'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                           />
                           <TextField
                             tooltip={
@@ -2804,7 +2870,7 @@ const EditorPanel = () => {
                             fieldName='dateDisplayFormat'
                             placeholder='Ex. %Y-%m-%d'
                             label='HOVER DATE DISPLAY FORMAT'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                           />
                         </>
                       )}
@@ -2833,7 +2899,7 @@ const EditorPanel = () => {
                             </Tooltip.Content>
                           </Tooltip>
                         }
-                        updateField={updateField}
+                        updateField={updateFieldDeprecated}
                       />
                       <CheckBox
                         value={config.xAxis.showYearsOnce}
@@ -2856,15 +2922,15 @@ const EditorPanel = () => {
                             </Tooltip.Content>
                           </Tooltip>
                         }
-                        updateField={updateField}
+                        updateField={updateFieldDeprecated}
                       />
                       {visHasBrushChart() && (
                         <CheckBox
-                          value={config.brush?.active}
+                          value={config.brush.active}
                           section='brush'
                           fieldName='active'
                           label='Brush Slider '
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                           tooltip={
                             <Tooltip style={{ textTransform: 'none' }}>
                               <Tooltip.Target>
@@ -2919,7 +2985,7 @@ const EditorPanel = () => {
                                 section='exclusions'
                                 fieldName='dateStart'
                                 label='Start Date'
-                                updateField={updateField}
+                                updateField={updateFieldDeprecated}
                                 value={config.exclusions.dateStart || ''}
                               />
                               <TextField
@@ -2927,7 +2993,7 @@ const EditorPanel = () => {
                                 section='exclusions'
                                 fieldName='dateEnd'
                                 label='End Date'
-                                updateField={updateField}
+                                updateField={updateFieldDeprecated}
                                 value={config.exclusions.dateEnd || ''}
                               />
                             </>
@@ -2948,7 +3014,7 @@ const EditorPanel = () => {
                               fieldName='manualStep'
                               label='Step count'
                               className='number-narrow'
-                              updateField={updateField}
+                              updateField={updateFieldDeprecated}
                               tooltip={
                                 <Tooltip style={{ textTransform: 'none' }}>
                                   <Tooltip.Target>
@@ -3015,7 +3081,7 @@ const EditorPanel = () => {
                               fieldName='numTicks'
                               label='Number of ticks'
                               className='number-narrow'
-                              updateField={updateField}
+                              updateField={updateFieldDeprecated}
                               tooltip={
                                 <Tooltip style={{ textTransform: 'none' }}>
                                   <Tooltip.Target>
@@ -3079,7 +3145,7 @@ const EditorPanel = () => {
                           fieldName='size'
                           label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'}
                           className='number-narrow'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                         />
                       )}
                       {config.orientation === 'horizontal' && (
@@ -3090,12 +3156,12 @@ const EditorPanel = () => {
                           label='Label offset'
                           type='number'
                           className='number-narrow'
-                          updateField={updateField}
+                          updateField={updateFieldDeprecated}
                         />
                       )}
 
                       {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
-                      {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
+                      {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateFieldDeprecated} /> */}
                       {(config.xAxis.type === 'continuous' || config.forestPlot.type === 'Logarithmic') && (
                         <>
                           <CheckBox
@@ -3103,7 +3169,7 @@ const EditorPanel = () => {
                             section='dataFormat'
                             fieldName='bottomCommas'
                             label='Add commas'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                           />
                           <TextField
                             value={config.dataFormat.bottomRoundTo}
@@ -3112,7 +3178,7 @@ const EditorPanel = () => {
                             fieldName='bottomRoundTo'
                             label='Round to decimal point'
                             className='number-narrow'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                             min={0}
                           />
                         </>
@@ -3124,7 +3190,7 @@ const EditorPanel = () => {
                             value={config.isResponsiveTicks}
                             fieldName='isResponsiveTicks'
                             label='Use Responsive Ticks'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                           />
                         )}
                       {(config.orientation === 'horizontal' || !config.isResponsiveTicks) &&
@@ -3137,7 +3203,7 @@ const EditorPanel = () => {
                             fieldName='tickRotation'
                             label='Tick rotation (Degrees)'
                             className='number-narrow'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                           />
                         )}
                       {config.orientation === 'vertical' &&
@@ -3151,7 +3217,7 @@ const EditorPanel = () => {
                             fieldName='maxTickRotation'
                             label='Max Tick Rotation'
                             className='number-narrow'
-                            updateField={updateField}
+                            updateField={updateFieldDeprecated}
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
@@ -3178,7 +3244,7 @@ const EditorPanel = () => {
                               section='yAxis'
                               fieldName='hideAxis'
                               label='Hide Axis'
-                              updateField={updateField}
+                              updateField={updateFieldDeprecated}
                             />
                           )}
                           {visSupportsDateCategoryAxisLabel() && (
@@ -3187,7 +3253,7 @@ const EditorPanel = () => {
                               section='yAxis'
                               fieldName='hideLabel'
                               label='Hide Tick Labels'
-                              updateField={updateField}
+                              updateField={updateFieldDeprecated}
                             />
                           )}
                         </>
@@ -3199,7 +3265,7 @@ const EditorPanel = () => {
                               section='xAxis'
                               fieldName='hideAxis'
                               label='Hide Axis'
-                              updateField={updateField}
+                              updateField={updateFieldDeprecated}
                             />
                           )}
                           {visSupportsDateCategoryAxisLabel() && (
@@ -3208,7 +3274,7 @@ const EditorPanel = () => {
                               section='xAxis'
                               fieldName='hideLabel'
                               label='Hide Tick Labels'
-                              updateField={updateField}
+                              updateField={updateFieldDeprecated}
                             />
                           )}
                           {visSupportsDateCategoryAxisTicks() && (
@@ -3217,7 +3283,7 @@ const EditorPanel = () => {
                               section='xAxis'
                               fieldName='hideTicks'
                               label='Hide Ticks'
-                              updateField={updateField}
+                              updateField={updateFieldDeprecated}
                             />
                           )}
                         </>
@@ -3304,7 +3370,7 @@ const EditorPanel = () => {
                         section='exclusions'
                         fieldName='active'
                         label={'Exclude one or more values'}
-                        updateField={updateField}
+                        updateField={updateFieldDeprecated}
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
@@ -3357,7 +3423,7 @@ const EditorPanel = () => {
                       type='number'
                       label='min value'
                       placeholder='Auto'
-                      updateField={updateField}
+                      updateField={updateFieldDeprecated}
                     />
                   )}
 
@@ -3369,7 +3435,7 @@ const EditorPanel = () => {
                       type='number'
                       label='max value'
                       placeholder='Auto'
-                      updateField={updateField}
+                      updateField={updateFieldDeprecated}
                     />
                   )}
 
@@ -3640,7 +3706,11 @@ const EditorPanel = () => {
                   <AccordionItemButton>Columns</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <ColumnsEditor config={config} updateField={updateField} deleteColumn={removeAdditionalColumn} />{' '}
+                  <ColumnsEditor
+                    config={config}
+                    updateField={updateFieldDeprecated}
+                    deleteColumn={removeAdditionalColumn}
+                  />{' '}
                 </AccordionItemPanel>
               </AccordionItem>
             )}
@@ -3656,7 +3726,7 @@ const EditorPanel = () => {
                     section='legend'
                     fieldName='position'
                     label='Position'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     options={['right', 'left', 'bottom', 'top']}
                   />
                   {(config.legend.position === 'left' ||
@@ -3690,7 +3760,7 @@ const EditorPanel = () => {
                     section='legend'
                     fieldName='style'
                     label='Legend Style'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     options={getLegendStyleOptions('style')}
                   />
 
@@ -3700,7 +3770,7 @@ const EditorPanel = () => {
                     fieldName='groupBy'
                     initial='Select'
                     label='Legend Group By:'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     options={getLegendStyleOptions('groupBy')}
                   />
 
@@ -3723,7 +3793,7 @@ const EditorPanel = () => {
                     section='legend'
                     fieldName='hasShape'
                     label='Shapes'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                   />
 
                   <Select
@@ -3732,7 +3802,7 @@ const EditorPanel = () => {
                     section='legend'
                     fieldName='subStyle'
                     label='Gradient Style'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     options={getLegendStyleOptions('subStyle')}
                   />
                   <TextField
@@ -3743,7 +3813,7 @@ const EditorPanel = () => {
                     section='legend'
                     fieldName='tickRotation'
                     label='Tick Rotation (Degrees)'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                   />
 
                   <CheckBox
@@ -3752,7 +3822,7 @@ const EditorPanel = () => {
                     section='legend'
                     fieldName='hideSuppressedLabels'
                     label='Hide Suppressed Labels'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
@@ -3776,7 +3846,7 @@ const EditorPanel = () => {
                     section='legend'
                     fieldName='hideSuppressionLink'
                     label='Hide Suppression Definition Link'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
@@ -3793,8 +3863,8 @@ const EditorPanel = () => {
                   />
                   {/* {config.visualizationType === 'Box Plot' &&
                     <>
-                      <CheckBox value={config.boxplot.legend.displayHowToReadText} fieldName='displayHowToReadText' section='boxplot' subsection='legend' label='Display How To Read Text' updateField={updateField} />
-                      <TextField type='textarea' value={config.boxplot.legend.howToReadText} updateField={updateField} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
+                      <CheckBox value={config.boxplot.legend.displayHowToReadText} fieldName='displayHowToReadText' section='boxplot' subsection='legend' label='Display How To Read Text' updateField={updateFieldDeprecated} />
+                      <TextField type='textarea' value={config.boxplot.legend.howToReadText} updateField={updateFieldDeprecated} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
                     </>
                   } */}
                   <Select
@@ -3813,7 +3883,7 @@ const EditorPanel = () => {
                     fieldName='colorCode'
                     label='Color code by category'
                     initial='Select'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     options={getDataValueOptions(data)}
                   />
                   {visHasLegendAxisAlign() && (
@@ -3822,7 +3892,7 @@ const EditorPanel = () => {
                       fieldName='axisAlign'
                       section='legend'
                       label='Align to Axis on Isolate'
-                      updateField={updateField}
+                      updateField={updateFieldDeprecated}
                     />
                   )}
                   {config.legend.behavior === 'highlight' && config.tooltips.singleSeries && (
@@ -3831,7 +3901,7 @@ const EditorPanel = () => {
                       section='legend'
                       fieldName='highlightOnHover'
                       label='HIGHLIGHT DATA SERIES ON HOVER'
-                      updateField={updateField}
+                      updateField={updateFieldDeprecated}
                     />
                   )}
                   {/* start: isolated values */}
@@ -3862,7 +3932,7 @@ const EditorPanel = () => {
                                 event.preventDefault()
                                 const updatedSeriesHighlight = [...config.legend.seriesHighlight]
                                 updatedSeriesHighlight.splice(i, 1)
-                                updateField('legend', null, 'seriesHighlight', updatedSeriesHighlight)
+                                updateFieldDeprecated('legend', null, 'seriesHighlight', updatedSeriesHighlight)
                                 if (!updatedSeriesHighlight.length) {
                                   handleShowAll()
                                 }
@@ -3910,7 +3980,7 @@ const EditorPanel = () => {
                     section='legend'
                     fieldName='reverseLabelOrder'
                     label='Reverse Labels'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                   />
                   <CheckBox
                     display={!config.legend.hide}
@@ -3923,7 +3993,7 @@ const EditorPanel = () => {
                     subsection='hideBorder'
                     fieldName={['left', 'right'].includes(config.legend.position) ? 'side' : 'topBottom'}
                     label='Hide Legend Box'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
@@ -3948,7 +4018,7 @@ const EditorPanel = () => {
                     section='legend'
                     fieldName='singleRow'
                     label='Single Row Legend'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                   />
                   <CheckBox
                     display={
@@ -3962,14 +4032,14 @@ const EditorPanel = () => {
                     section='legend'
                     fieldName='verticalSorted'
                     label='Vertical sorted Legend'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                   />
                   <CheckBox
                     value={config.legend.hide ? true : false}
                     section='legend'
                     fieldName='hide'
                     label='Hide Legend'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
@@ -3989,12 +4059,12 @@ const EditorPanel = () => {
                     section='legend'
                     fieldName='label'
                     label='Title'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                   />
                   <TextField
                     type='textarea'
                     value={config.legend.description}
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     section='legend'
                     fieldName='description'
                     label='Legend Description'
@@ -4004,7 +4074,7 @@ const EditorPanel = () => {
                     section='legend'
                     fieldName='unified'
                     label='Unified Legend'
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
@@ -4026,14 +4096,29 @@ const EditorPanel = () => {
               </AccordionItem>
             )}
             {visSupportsFilters() && (
-              <AccordionItem>
-                <AccordionItemHeading>
-                  <AccordionItemButton>Filters</AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  <VizFilterEditor config={config} updateField={updateField} rawData={rawData} />
-                </AccordionItemPanel>
-              </AccordionItem>
+              <>
+                <AccordionItem>
+                  <AccordionItemHeading>
+                    <AccordionItemButton>Filters</AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                    <VizFilterEditor
+                      config={config}
+                      updateField={updateField}
+                      rawData={rawData}
+                      hasFootnotes={isDashboard}
+                    />
+                  </AccordionItemPanel>
+                </AccordionItem>
+                <AccordionItem>
+                  <AccordionItemHeading>
+                    <AccordionItemButton>Footnotes</AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                    <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />
+                  </AccordionItemPanel>
+                </AccordionItem>
+              </>
             )}
             <Panels.Visual name='Visual' />
             {/* Spark Line has no data table */}
@@ -4046,7 +4131,7 @@ const EditorPanel = () => {
                   <DataTableEditor
                     config={config}
                     columns={Object.keys(data[0] || {})}
-                    updateField={updateField}
+                    updateField={updateFieldDeprecated}
                     isDashboard={isDashboard}
                     isLoadedFromUrl={isLoadedFromUrl}
                   />{' '}

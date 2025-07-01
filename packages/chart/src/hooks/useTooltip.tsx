@@ -1,5 +1,6 @@
 import { useContext } from 'react'
 // Local imports
+import parse from 'html-react-parser'
 import ConfigContext from '../ConfigContext'
 import { type ChartContext } from '../types/ChartContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
@@ -120,16 +121,25 @@ export const useTooltip = props => {
       const pieData = additionalChartData?.data ?? {}
       const startAngle = additionalChartData?.startAngle ?? 0
       const endAngle = additionalChartData?.endAngle ?? 0
+      const actualPieValue = Number(additionalChartData.data[config?.yAxis?.dataKey])
 
       const degrees = ((endAngle - startAngle) * 180) / Math.PI
       const pctOf360 = (degrees / 360) * 100
-      const pctString = pctOf360.toFixed(roundTo) + '%'
+      const pctString = value => value.toFixed(roundTo) + '%'
+      const showPiePercent = config.dataFormat.showPiePercent || false
 
-      tooltipItems.push(
-        [config.xAxis.dataKey, pieData[config.xAxis.dataKey]],
-        [config.runtime.yAxis.dataKey, formatNumber(pieData[config.runtime.yAxis.dataKey])],
-        ['Percent', pctString]
-      )
+      if (showPiePercent && pieData[config.xAxis.dataKey] === 'Calculated Area') {
+        tooltipItems.push(['', 'Calculated Area'])
+      } else {
+        tooltipItems.push(
+          [config.xAxis.dataKey, pieData[config.xAxis.dataKey]],
+          [
+            config.runtime.yAxis.dataKey,
+            showPiePercent ? pctString(actualPieValue) : formatNumber(pieData[config.runtime.yAxis.dataKey])
+          ],
+          showPiePercent ? [] : ['Percent', pctString(pctOf360)]
+        )
+      }
     }
 
     if (visualizationType === 'Forest Plot') {
@@ -188,6 +198,8 @@ export const useTooltip = props => {
           }
         })
       } else {
+        const dynamicSeries = config.series.find(s => s.dynamicCategory)
+
         // Show Only the Hovered Series in Tooltip
         const dataColumn = resolvedScaleValues[0]
         const [seriesKey, value] = findDataKeyByThreshold(y, dataColumn)
@@ -198,7 +210,7 @@ export const useTooltip = props => {
           tooltipItems.push([config.xAxis.dataKey, closestXScaleValue || xVal])
           const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
           tooltipItems.push([seriesKey, formattedValue])
-        } else {
+        } else if (dynamicSeries) {
           Object.keys(dataColumn).forEach(key => {
             tooltipItems.push([key, dataColumn[key]])
           })
@@ -546,7 +558,9 @@ export const useTooltip = props => {
           config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ` : ''
         )} ${config.xAxis.type === 'date' ? formattedDate : value}`}</li>
       )
-
+    if (visualizationType === 'Pie' && config.dataFormat.showPiePercent && value === 'Calculated Area') {
+      return <li className='tooltip-heading'>{`${capitalize('Calculated Area')} `}</li>
+    }
     if (key === config.xAxis.dataKey)
       return (
         <li className='tooltip-heading'>{`${capitalize(
@@ -571,14 +585,14 @@ export const useTooltip = props => {
     let newValue = label || value
     const style = displayGray ? { color: '#8b8b8a' } : {}
 
-    if (index == 1 && config.dataFormat.onlyShowTopPrefixSuffix) {
+    if (index == 1 && config.yAxis?.inlineLabel) {
       newValue = `${config.dataFormat.prefix}${newValue}${config.dataFormat.suffix}`
     }
     const activeLabel = getSeriesNameFromLabel(key)
     const displayText = activeLabel ? `${activeLabel}: ${newValue}` : newValue
 
     return (
-      <li style={style} className='tooltip-body'>
+      <li style={style} className='tooltip-body mb-1'>
         {displayText}
       </li>
     )

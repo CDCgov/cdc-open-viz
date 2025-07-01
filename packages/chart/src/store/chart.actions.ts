@@ -1,10 +1,6 @@
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { ChartConfig } from '../types/ChartConfig'
-
-type Action<T, P = undefined, R = undefined> = {
-  type: T
-  payload?: P
-}
+import { Action } from '@cdc/core/types/Action'
 
 // Action Types
 type SET_CONFIG = Action<'SET_CONFIG', ChartConfig>
@@ -34,7 +30,7 @@ type ChartActions =
   | SET_CONTAINER
   | SET_LOADED_EVENT
   | SET_DRAG_ANNOTATIONS
-  | SET_BRUSH_CONFIG
   | SET_LOADING
+  | SET_BRUSH_CONFIG
 
 export default ChartActions
