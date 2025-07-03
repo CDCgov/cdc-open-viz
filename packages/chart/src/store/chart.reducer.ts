@@ -18,11 +18,7 @@ type ChartState = {
   coveLoadedEventRan: boolean
   isDraggingAnnotation: boolean
   imageId: string
-  brushConfig: {
-    data: object[]
-    isActive: boolean
-    isBrushing: boolean
-  }
+  brushData: object[] | []
 }
 
 export const getInitialState = (configObj: ChartConfig): ChartState => {
@@ -41,11 +37,7 @@ export const getInitialState = (configObj: ChartConfig): ChartState => {
     coveLoadedEventRan: false,
     isDraggingAnnotation: false,
     imageId: `cove-${Math.random().toString(16).slice(-4)}`,
-    brushConfig: {
-      data: [],
-      isActive: false,
-      isBrushing: false
-    }
+    brushData: []
   }
 }
 
@@ -77,7 +69,7 @@ export const reducer = (state: ChartState, action: ChartActions): ChartState => 
       return { ...state, coveLoadedEventRan: action.payload }
     case 'SET_DRAG_ANNOTATIONS':
       return { ...state, isDraggingAnnotation: action.payload }
-    case 'SET_BRUSH_CONFIG':
-      return { ...state, brushConfig: action.payload }
+    case 'SET_BRUSH_DATA':
+      return { ...state, brushData: action.payload }
   }
 }

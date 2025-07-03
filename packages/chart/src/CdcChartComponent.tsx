@@ -124,8 +124,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     coveLoadedEventRan,
     imageId,
     seriesHighlight,
-    colorScale,
-    brushConfig
+    colorScale
   } = state
   const { description, visualizationType } = config
   const svgRef = useRef(null)
@@ -840,7 +839,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (legend?.hide) classes.push('legend-hidden')
     if (lineDatapointClass) classes.push(lineDatapointClass)
     if (!config.barHasBorder) classes.push('chart-bar--no-border')
-    if (config.brush?.active && dashboardConfig?.type === 'dashboard' && (!isLegendOnBottom || legend.hide))
+    if (config.xAxis.brushActive && dashboardConfig?.type === 'dashboard' && (!isLegendOnBottom || legend.hide))
       classes.push('dashboard-brush')
     classes.push(...contentClasses)
     return classes
@@ -851,8 +850,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
 
     if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
-    if (config.brush?.active && !isLegendOnBottom) classes.push('subtext--brush-active ')
-    if (config.brush?.active && config.legend.hide) classes.push('subtext--brush-active ')
+    if (config.xAxis.brushActive && !isLegendOnBottom) classes.push('subtext--brush-active ')
+    if (config.xAxis.brushActive && config.legend.hide) classes.push('subtext--brush-active ')
     return classes
   }
 
@@ -1102,7 +1101,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   const contextValues = {
     ...state,
-    brushConfig,
     capitalize,
     convertLineToBarGraph,
     clean,
