@@ -11,8 +11,7 @@ import _ from 'lodash'
 
 // CDC Components
 import { isDateScale } from '@cdc/core/helpers/cove/date'
-import BrushChart from './BrushChart'
-import { AreaChart, AreaChartStacked } from './AreaChart'
+import { AreaChartStacked } from './AreaChart'
 import BarChart from './BarChart'
 import ConfigContext from '../ConfigContext'
 import BoxPlot from './BoxPlot'
@@ -43,6 +42,8 @@ import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
+import HoverLine from './HoverLine/HoverLine'
+import BrushChart from './BrushChart'
 
 type LinearChartProps = {
   parentWidth: number
@@ -59,10 +60,23 @@ const AXIS_LABEL_FONT_SIZE = 18
 const AXIS_LABEL_FONT_SIZE_SMALL = 14
 const TICK_LABEL_MARGIN_RIGHT = 4.5
 
+type TooltipData = {
+  dataXPosition?: number
+  dataYPosition?: number
+}
+
+type UseTooltipReturn<T = TooltipData> = {
+  tooltipData: T | null
+  showTooltip: (tooltipData: T) => void
+  hideTooltip: () => void
+  tooltipOpen: boolean
+  tooltipLeft: number | null
+  tooltipTop: number | null
+}
+
 const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, parentWidth }, svgRef) => {
   // prettier-ignore
   const {
-    brushConfig,
     colorScale,
     config,
     convertLineToBarGraph,
@@ -79,8 +93,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     parentRef,
     tableData,
     transformedData: data,
-    updateConfig,
     seriesHighlight,
+    brushConfig
   } = useContext(ConfigContext)
 
   // CONFIG
@@ -99,14 +113,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     dataFormat,
     debugSvg
   } = config
-  const { suffix, onlyShowTopPrefixSuffix } = dataFormat
-  const { labelsAboveGridlines, hideAxis } = config.yAxis
+  const { labelsAboveGridlines, hideAxis, inlineLabel } = config.yAxis
 
   // HOOKS  % STATES
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
   const { visSupportsReactTooltip } = useEditorPermissions()
   const { hasTopAxis } = getTopAxis(config)
   const [animatedChart, setAnimatedChart] = useState(false)
+  const [showHoverLine, setShowHoverLine] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
   const [yAxisAutoPadding, setYAxisAutoPadding] = useState(0)
@@ -121,6 +135,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const xAxisTitleRef = useRef(null)
   const lastMaxValue = useRef(maxValue)
   const gridLineRefs = useRef([])
+  const tooltipRef = useRef(null)
 
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
@@ -132,8 +147,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   const isForestPlot = visualizationType === 'Forest Plot'
   const isDateTime = config.xAxis.type === 'date-time'
-  const suffixHasNoSpace = !suffix.includes(' ')
-  const labelsOverflow = onlyShowTopPrefixSuffix && !suffixHasNoSpace
+  const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
+  const labelsOverflow = inlineLabel && !inlineLabelHasNoSpace
   const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
   const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
   const tickLabelFontSize = isMobileHeightViewport(currentViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
@@ -218,7 +233,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     yMax
   }
   const { min, max, leftMax, rightMax } = useMinMax(properties)
-  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
+  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
   const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleAnnotation } = useScales({
     ...properties,
     min,
@@ -238,7 +253,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const handleNumTicks = isForestPlot ? config.data.length : yTickCount
 
   // Tooltip Helpers
-  const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip()
+
+  const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } =
+    useTooltip<UseTooltipReturn<TooltipData>>()
 
   // prettier-ignore
   const {
@@ -247,11 +264,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleTooltipMouseOff,
     TooltipListItem,
   } = useCoveTooltip({
-      xScale,
-      yScale,
-      seriesScale,
-      showTooltip,
-      hideTooltip
+    xScale,
+    yScale,
+    seriesScale,
+    showTooltip,
+    hideTooltip
   })
   // get the number of months between the first and last date
   const { dataKey } = runtime.xAxis
@@ -375,7 +392,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     if (!suffixEl) return setSuffixWidth(0)
     const suffixElWidth = suffixEl.getBBox().width
     setSuffixWidth(suffixElWidth)
-  }, [config.dataFormat.suffix, config.dataFormat.onlyShowTopPrefixSuffix])
+  }, [config.dataFormat.suffix, inlineLabel])
 
   // forest plot x-axis label positioning
   useEffect(() => {
@@ -401,11 +418,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const topLabelOnGridline = topYLabelRef.current && yAxis.labelsAboveGridlines
 
     // Heights to add
-
     const brushHeight = brush?.active ? brush?.height + brush?.height : 0
+    const brushHeightWithMargin = config.brush?.active ? brushHeight + brushHeight : 0
     const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
     const topLabelOnGridlineHeight = topLabelOnGridline ? topYLabelRef.current.getBBox().height : 0
-    const additionalHeight = axisBottomHeight + brushHeight + forestRowsHeight + topLabelOnGridlineHeight
+    const additionalHeight = axisBottomHeight + brushHeightWithMargin + forestRowsHeight + topLabelOnGridlineHeight
     const newHeight = initialHeight + additionalHeight
     if (!parentRef.current) return
 
@@ -470,6 +487,23 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     d3 still doesn't show the tick. we add 0.1 to ensure to tip it over the edge */
     setYAxisAutoPadding(newPadding * 100 + 0.1)
   }, [maxValue, labelsOverflow, yScale, handleNumTicks])
+
+  useEffect(() => {
+    if (!tooltipOpen) return
+    if (!tooltipRef.current) return
+
+    const { dataXPosition } = tooltipData as { [key: string]: number }
+
+    if (!dataXPosition) return
+
+    const { width: tooltipWidth } = tooltipRef.current.node.getBoundingClientRect()
+
+    const rightSideRemainingSpace = parentWidth - dataXPosition
+
+    const rightSide = rightSideRemainingSpace <= tooltipWidth && dataXPosition > parentWidth / 2 - 10
+    const maxWidth = rightSide ? dataXPosition - 10 : parentWidth - (dataXPosition + 6)
+    tooltipRef.current.node.style.maxWidth = `${maxWidth}px`
+  }, [tooltipOpen, tooltipData])
 
   // Render Functions
   const generatePairedBarAxis = () => {
@@ -629,12 +663,13 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           onMouseMove={onMouseMove}
           width={parentWidth + config.yAxis.rightAxisSize}
           height={isNoDataAvailable ? 1 : parentHeight}
-          className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${
-            debugSvg && 'debug'
-          } ${isDraggingAnnotation && 'dragging-annotation'}`}
+          className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'
+            } ${isDraggingAnnotation && 'dragging-annotation'}`}
           role='img'
           aria-label={handleChartAriaLabels(config)}
           style={{ overflow: 'visible' }}
+          onMouseLeave={() => setShowHoverLine(false)}
+          onMouseEnter={() => setShowHoverLine(true)}
         >
           {!isDraggingAnnotation && <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>}{' '}
           {/* GRID LINES */}
@@ -722,20 +757,20 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           )}
           {((visualizationType === 'Area Chart' && config.visualizationSubType === 'stacked') ||
             visualizationType === 'Combo') && (
-            <AreaChartStacked
-              xScale={xScale}
-              yScale={yScale}
-              yMax={yMax}
-              xMax={xMax}
-              chartRef={svgRef}
-              width={xMax}
-              height={yMax}
-              handleTooltipMouseOver={handleTooltipMouseOver}
-              handleTooltipMouseOff={handleTooltipMouseOff}
-              tooltipData={tooltipData}
-              showTooltip={showTooltip}
-            />
-          )}
+              <AreaChartStacked
+                xScale={xScale}
+                yScale={yScale}
+                yMax={yMax}
+                xMax={xMax}
+                chartRef={svgRef}
+                width={xMax}
+                height={yMax}
+                handleTooltipMouseOver={handleTooltipMouseOver}
+                handleTooltipMouseOff={handleTooltipMouseOff}
+                tooltipData={tooltipData}
+                showTooltip={showTooltip}
+              />
+            )}
           {(visualizationType === 'Bar' || visualizationType === 'Combo' || convertLineToBarGraph) && (
             <BarChart
               xScale={xScale}
@@ -771,6 +806,27 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               showTooltip={showTooltip}
             />
           )}
+          {/* Line chart */}
+          {/* TODO: Make this just line or combo? */}
+          {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(
+            visualizationType
+          ) &&
+            !convertLineToBarGraph && (
+              <>
+                <LineChart
+                  xScale={xScale}
+                  yScale={yScale}
+                  getXAxisData={getXAxisData}
+                  getYAxisData={getYAxisData}
+                  xMax={xMax}
+                  yMax={yMax}
+                  seriesStyle={config.runtime.series}
+                  tooltipData={tooltipData}
+                  handleTooltipMouseOver={handleTooltipMouseOver}
+                  handleTooltipMouseOff={handleTooltipMouseOff}
+                />
+              </>
+            )}
           {(visualizationType === 'Forecasting' || visualizationType === 'Combo') && (
             <Forecasting
               showTooltip={showTooltip}
@@ -778,13 +834,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               xScale={xScale}
               yScale={yScale}
               width={xMax}
-              le
               height={yMax}
               xScaleNoPadding={xScaleNoPadding}
               chartRef={svgRef}
               handleTooltipMouseOver={handleTooltipMouseOver}
               handleTooltipMouseOff={handleTooltipMouseOff}
-              isBrush={false}
             />
           )}
           {visualizationType === 'Forest Plot' && (
@@ -855,7 +909,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   strokeDasharray={handleLineType(anchor.lineStyle)}
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   className='anchor-y'
-                  from={{ x: 0 + padding, y: position - middleOffset}}
+                  from={{ x: 0 + padding, y: position - middleOffset }}
                   to={{ x: width - config.yAxis.rightAxisSize, y: position - middleOffset }}
                 />
               )
@@ -887,14 +941,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               return (
                 // prettier-ignore
                 <Line
-                key={`xAxis-${anchor.value}--${index}`}
-                strokeDasharray={handleLineType(anchor.lineStyle)}
-                stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                className='anchor-x'
-                from={{ x: Number(anchorPosition) + Number(padding), y: 0 }}
-                to={{ x: Number(anchorPosition) + Number(padding), y: yMax }}
-              />
+                  key={`xAxis-${anchor.value}--${index}`}
+                  strokeDasharray={handleLineType(anchor.lineStyle)}
+                  stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                  fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                  className='anchor-x'
+                  from={{ x: Number(anchorPosition) + Number(padding), y: 0 }}
+                  to={{ x: Number(anchorPosition) + Number(padding), y: yMax }}
+                />
               )
             })}
           {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}
@@ -921,35 +975,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               {config.chartMessage.noData}
             </Text>
           )}
-          {config.visual.horizontalHoverLine && tooltipData && (
-            <Group
-              key={`tooltipLine-horizontal${point.y}${point.x}`}
-              className='horizontal-tooltip-line'
-              left={config.yAxis.size ? config.yAxis.size : 0}
-            >
-              <Line
-                from={{ x: 0, y: point.y }}
-                to={{ x: xMax, y: point.y }}
-                stroke={'black'}
-                strokeWidth={1}
-                pointerEvents='none'
-                strokeDasharray='5,5'
-                className='horizontal-tooltip-line'
-              />
-            </Group>
-          )}
-          {config.visual.verticalHoverLine && tooltipData && (
-            <Group key={`tooltipLine-vertical${point.y}${point.x}`} className='vertical-tooltip-line'>
-              <Line
-                from={{ x: point.x, y: 0 }}
-                to={{ x: point.x, y: yMax }}
-                stroke={'black'}
-                strokeWidth={1}
-                pointerEvents='none'
-                strokeDasharray='5,5'
-                className='vertical-tooltip-line'
-              />
-            </Group>
+          {showHoverLine && (
+            <>
+              <HoverLine xMax={xMax} yMax={yMax} point={point} tooltipData={tooltipData} orientation='horizontal' />
+              <HoverLine xMax={xMax} yMax={yMax} point={point} tooltipData={tooltipData} orientation='vertical' />
+            </>
           )}
           <Group left={Number(config.runtime.yAxis.size)}>
             <Annotation.Draggable
@@ -988,10 +1018,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                         to={
                           runtime.horizontal
                             ? {
-                                x: 0,
-                                y:
-                                  config.visualizationType === 'Forest Plot' ? parentHeight : Number(heights.horizontal)
-                              }
+                              x: 0,
+                              y:
+                                config.visualizationType === 'Forest Plot' ? parentHeight : Number(heights.horizontal)
+                            }
                             : props.axisToPoint
                         }
                         stroke='#000'
@@ -1021,15 +1051,18 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
                       // Vertical value/suffix vars
                       const lastTick = props.ticks.length - 1 === i
-                      const hideTopTick = lastTick && onlyShowTopPrefixSuffix && suffix && !suffixHasNoSpace
+                      const useInlineLabel = lastTick && inlineLabel
+                      const hideTopTick = lastTick && inlineLabel && !inlineLabelHasNoSpace
                       const valueOnLinePadding = hideAxis ? -8 : -12
                       const labelXPadding = labelsAboveGridlines ? valueOnLinePadding : TICK_LABEL_MARGIN_RIGHT
                       const labelYPadding = labelsAboveGridlines ? 4 : 0
                       const labelX = tick.to.x - labelXPadding
                       const labelY = tick.to.y - labelYPadding
                       const labelVerticalAnchor = labelsAboveGridlines ? 'end' : 'middle'
-                      const combineDomSuffixWithValue =
-                        onlyShowTopPrefixSuffix && labelsAboveGridlines && suffix && lastTick
+                      const combineDomInlineLabelWithValue = inlineLabel && labelsAboveGridlines && lastTick
+                      const formattedValue = useInlineLabel
+                        ? tick.formattedValue.replace(config.dataFormat.suffix, '')
+                        : tick.formattedValue
 
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
@@ -1049,13 +1082,12 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                             config.yAxis.labelPlacement === 'On Date/Category Axis' &&
                             !config.yAxis.hideLabel && (
                               <Text
-                                transform={`translate(${tick.to.x - 5}, ${
-                                  config.isLollipopChart
+                                transform={`translate(${tick.to.x - 5}, ${config.isLollipopChart
                                     ? tick.to.y - minY
                                     : tick.to.y -
-                                      minY +
-                                      (Number(config.barHeight * config.runtime.series.length) - barMinHeight) / 2
-                                }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation || 0 : 0})`}
+                                    minY +
+                                    (Number(config.barHeight * config.runtime.series.length) - barMinHeight) / 2
+                                  }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation || 0 : 0})`}
                                 verticalAnchor={'start'}
                                 textAnchor={'end'}
                                 fontSize={tickLabelFontSize}
@@ -1069,9 +1101,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                             config.yAxis.labelPlacement === 'On Date/Category Axis' &&
                             !config.yAxis.hideLabel && (
                               <Text
-                                transform={`translate(${tick.to.x - 5}, ${
-                                  tick.to.y - minY + (Number(config.barHeight) - barMinHeight) / 2
-                                }) rotate(-${runtime.horizontal ? runtime.yAxis.tickRotation : 0})`}
+                                transform={`translate(${tick.to.x - 5}, ${tick.to.y - minY + (Number(config.barHeight) - barMinHeight) / 2
+                                  }) rotate(-${runtime.horizontal ? runtime.yAxis.tickRotation : 0})`}
                                 verticalAnchor={'start'}
                                 textAnchor={'end'}
                                 fontSize={tickLabelFontSize}
@@ -1084,9 +1115,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                             visualizationType === 'Paired Bar' &&
                             !config.yAxis.hideLabel && (
                               <Text
-                                transform={`translate(${tick.to.x - 5}, ${
-                                  tick.to.y - minY + Number(config.barHeight) / 2
-                                }) rotate(-${runtime.horizontal ? runtime.yAxis.tickRotation : 0})`}
+                                transform={`translate(${tick.to.x - 5}, ${tick.to.y - minY + Number(config.barHeight) / 2
+                                  }) rotate(-${runtime.horizontal ? runtime.yAxis.tickRotation : 0})`}
                                 textAnchor={'end'}
                                 verticalAnchor='middle'
                                 fontSize={tickLabelFontSize}
@@ -1098,11 +1128,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                             visualizationType === 'Deviation Bar' &&
                             !config.yAxis.hideLabel && (
                               <Text
-                                transform={`translate(${tick.to.x - 5}, ${
-                                  config.isLollipopChart
+                                transform={`translate(${tick.to.x - 5}, ${config.isLollipopChart
                                     ? tick.to.y - minY + 2
                                     : tick.to.y - minY + Number(config.barHeight) / 2
-                                }) rotate(-${runtime.horizontal ? runtime.yAxis.tickRotation : 0})`}
+                                  }) rotate(-${runtime.horizontal ? runtime.yAxis.tickRotation : 0})`}
                                 textAnchor={'end'}
                                 verticalAnchor='middle'
                                 fontSize={tickLabelFontSize}
@@ -1133,14 +1162,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                   seriesHighlight.includes(
                                     config.runtime.seriesLabelsAll[tick.formattedValue - 1]
                                   )) && (
-                                  <rect
-                                    x={0 - Number(config.yAxis.size)}
-                                    y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)}
-                                    width={Number(config.yAxis.size) + xScale(xScale.domain()[0])}
-                                    height='2'
-                                    fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])}
-                                  />
-                                )}
+                                    <rect
+                                      x={0 - Number(config.yAxis.size)}
+                                      y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)}
+                                      width={Number(config.yAxis.size) + xScale(xScale.domain()[0])}
+                                      height='2'
+                                      fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])}
+                                    />
+                                  )}
                               </>
                             )}
                           {orientation === 'vertical' &&
@@ -1148,11 +1177,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                             visualizationType !== 'Bump Chart' &&
                             !config.yAxis.hideLabel && (
                               <>
-                                {/* TOP ONLY SUFFIX: Dom suffix for 'show only top suffix' behavior */}
-                                {/* top suffix is shown alone and is allowed to 'overflow' to the right */}
-                                {/* SPECIAL ONE CHAR CASE: a one character top-only suffix does not overflow */}
+                                {/* INLINE LABEL BEHAVIOR: Dom suffix for 'inlineLabel' behavior */}
+                                {/* inline label is shown alone and is allowed to 'overflow' to the right */}
+                                {/* SPECIAL ONE CHAR CASE: a one character inlineLabel does not overflow */}
                                 {/* IF VALUES ON LINE: suffix is combined with value to avoid having to calculate varying (now left-aligned) value widths */}
-                                {onlyShowTopPrefixSuffix && lastTick && !labelsAboveGridlines && (
+                                {inlineLabel && lastTick && !labelsAboveGridlines && (
                                   <BlurStrokeText
                                     innerRef={suffixRef}
                                     display={isLogarithmicAxis ? showTicks : 'block'}
@@ -1161,7 +1190,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                     y={labelY}
                                     angle={-Number(config.yAxis.tickRotation) || 0}
                                     verticalAnchor={labelVerticalAnchor}
-                                    textAnchor={suffixHasNoSpace ? 'end' : 'start'}
+                                    textAnchor={inlineLabelHasNoSpace ? 'end' : 'start'}
                                     fill={config.yAxis.tickLabelColor}
                                     stroke={'#fff'}
                                     paintOrder={'stroke'} // keeps stroke under fill
@@ -1169,7 +1198,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                     style={{ whiteSpace: 'pre-wrap' }} // prevents leading spaces from being trimmed
                                     fontSize={tickLabelFontSize}
                                   >
-                                    {suffix}
+                                    {inlineLabel}
                                   </BlurStrokeText>
                                 )}
 
@@ -1178,7 +1207,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                   innerRef={el => lastTick && (topYLabelRef.current = el)}
                                   display={isLogarithmicAxis ? showTicks : 'block'}
                                   dx={isLogarithmicAxis ? -6 : 0}
-                                  x={suffixHasNoSpace ? labelX - suffixWidth : labelX}
+                                  x={inlineLabelHasNoSpace ? labelX - suffixWidth : labelX}
                                   y={labelY + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                                   angle={-Number(config.yAxis.tickRotation) || 0}
                                   verticalAnchor={config.runtime.horizontal ? 'start' : labelVerticalAnchor}
@@ -1191,7 +1220,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                   style={{ whiteSpace: 'pre-wrap' }} // prevents leading spaces from being trimmed
                                   fontSize={tickLabelFontSize}
                                 >
-                                  {`${tick.formattedValue}${combineDomSuffixWithValue ? suffix : ''}`}
+                                  {`${formattedValue}${combineDomInlineLabelWithValue ? inlineLabel : ''}`}
                                 </BlurStrokeText>
                               </>
                             )}
@@ -1283,9 +1312,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       className='y-label'
                       textAnchor='middle'
                       verticalAnchor='start'
-                      transform={`translate(${
-                        config.yAxis.rightLabelOffsetSize ? config.yAxis.rightLabelOffsetSize : 0
-                      }, ${axisCenter}) rotate(-90)`}
+                      transform={`translate(${config.yAxis.rightLabelOffsetSize ? config.yAxis.rightLabelOffsetSize : 0
+                        }, ${axisCenter}) rotate(-90)`}
                       fontWeight='bold'
                       fill={config.yAxis.rightAxisLabelColor}
                       fontSize={axisLabelFontSize}
@@ -1317,8 +1345,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 runtime.horizontal && config.visualizationType !== 'Forest Plot'
                   ? Number(heights.horizontal) + Number(config.xAxis.axisPadding)
                   : config.visualizationType === 'Forest Plot'
-                  ? yMax + Number(config.xAxis.axisPadding)
-                  : yMax
+                    ? yMax + Number(config.xAxis.axisPadding)
+                    : yMax
               }
               left={config.visualizationType !== 'Forest Plot' ? Number(runtime.yAxis.size) : 0}
               label={config[section].label}
@@ -1331,8 +1359,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 config.runtime.xAxis.manual
                   ? getTickValues(xAxisDataMapped, xScale, isDateTime ? xTickCount : getManualStep(), config)
                   : config.runtime.xAxis.type === 'date'
-                  ? xAxisDataMapped
-                  : undefined
+                    ? xAxisDataMapped
+                    : undefined
               }
             >
               {props => {
@@ -1358,14 +1386,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 // filter out every [distanceBetweenTicks] tick starting from the end, so the last tick is always labeled
                 const filteredTicks = useDateSpanMonths
                   ? [...props.ticks]
-                      .reverse()
-                      .filter((_, i) => i % distanceBetweenTicks === 0)
-                      .reverse()
-                      .map((tick, i, arr) => ({
-                        ...tick,
-                        // reformat in case showYearsOnce, since first month of year may have changed
-                        formattedValue: handleBottomTickFormatting(tick.value, i, arr)
-                      }))
+                    .reverse()
+                    .filter((_, i) => i % distanceBetweenTicks === 0)
+                    .reverse()
+                    .map((tick, i, arr) => ({
+                      ...tick,
+                      // reformat in case showYearsOnce, since first month of year may have changed
+                      formattedValue: handleBottomTickFormatting(tick.value, i, arr)
+                    }))
                   : props.ticks
 
                 const axisMaxHeight = bottomLabelStart + BOTTOM_LABEL_PADDING
@@ -1495,13 +1523,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           showTooltip &&
           !tooltipData?.data?.some(subArray => subArray.some(item => item === undefined)) &&
           tooltipData.dataYPosition &&
-          tooltipData.dataXPosition && (
+          tooltipData.dataXPosition &&
+          !config.tooltips.singleSeries && (
             <>
-              <style>{`.tooltip {background-color: rgba(255,255,255, ${
-                config.tooltips.opacity / 100
-              }) !important;`}</style>
+              <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100
+                }) !important;`}</style>
               <style>{`.tooltip {max-width:300px} !important; word-wrap: break-word; `}</style>
               <TooltipWithBounds
+                ref={tooltipRef}
                 key={Math.random()}
                 className={'tooltip cdc-open-viz-module'}
                 left={tooltipLeft}
@@ -1525,7 +1554,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
           />
         )}
-        {visSupportsReactTooltip() && !isDraggingAnnotation && (
+        {!isDraggingAnnotation && (
           <ReactTooltip
             id={`cdc-open-viz-tooltip-${runtime.uniqueId}`}
             variant='light'

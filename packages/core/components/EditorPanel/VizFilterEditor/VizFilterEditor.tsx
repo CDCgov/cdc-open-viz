@@ -19,9 +19,10 @@ type VizFilterProps = {
   config: Visualization
   updateField: UpdateFieldFunc<string | VizFilter[] | VizFilter>
   rawData: Object[]
+  hasFootnotes?: boolean
 }
 
-const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawData }) => {
+const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawData, hasFootnotes }) => {
   const openControls = useState({})
   const dataColumns = useMemo(() => {
     return _.uniq(_.flatten(rawData?.map(row => Object.keys(row))))
@@ -171,20 +172,6 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                     options={filterStyleOptions}
                   />
 
-                  <Select
-                    value={filter.defaultValue}
-                    options={
-                      filter.resetLabel
-                        ? [filter.resetLabel, ...config.filters?.[filterIndex].values]
-                        : config.filters?.[filterIndex].values
-                    }
-                    updateField={(_section, _subSection, _key, value) => {
-                      updateFilterDefaultValue(filterIndex, value)
-                    }}
-                    label='Filter Default Value'
-                    initial='Select'
-                  />
-
                   {filter.filterStyle !== 'nested-dropdown' ? (
                     <>
                       <Select
@@ -196,16 +183,21 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                         initial='- Select Option -'
                       />
 
-                      <label>
-                        <span className='edit-showDropdown column-heading'>Show Filter Input</span>
-                        <input
-                          type='checkbox'
-                          checked={filter.showDropdown === undefined ? true : filter.showDropdown}
-                          onChange={e => {
-                            updateFilterProp('showDropdown', filterIndex, e.target.checked)
+                      {filter.columnName && (
+                        <Select
+                          value={filter.defaultValue}
+                          options={
+                            filter.resetLabel
+                              ? [filter.resetLabel, ...config.filters?.[filterIndex].values]
+                              : config.filters?.[filterIndex].values
+                          }
+                          updateField={(_section, _subSection, _key, value) => {
+                            updateFilterDefaultValue(filterIndex, value)
                           }}
+                          label='Filter Default Value'
+                          initial='Select'
                         />
-                      </label>
+                      )}
 
                       <label>
                         <span className='edit-label column-heading'>Label</span>
@@ -240,17 +232,6 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                         />
                       )}
 
-                      <label>
-                        <span className='edit-label column-heading'>Default Value Set By Query String Parameter</span>
-                        <input
-                          type='text'
-                          value={filter.setByQueryParameter}
-                          onChange={e => {
-                            updateFilterProp('setByQueryParameter', filterIndex, e.target.value)
-                          }}
-                        />
-                      </label>
-
                       <Select
                         value={filter.order || 'asc'}
                         fieldName='order'
@@ -278,6 +259,27 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                           options={dataColumns}
                         />
                       )}
+                      <label>
+                        <span className='edit-label column-heading'>Default Value Set By Query String Parameter</span>
+                        <input
+                          type='text'
+                          value={filter.setByQueryParameter}
+                          onChange={e => {
+                            updateFilterProp('setByQueryParameter', filterIndex, e.target.value)
+                          }}
+                        />
+                      </label>
+
+                      <label>
+                        <input
+                          type='checkbox'
+                          checked={filter.showDropdown === undefined ? true : filter.showDropdown}
+                          onChange={e => {
+                            updateFilterProp('showDropdown', filterIndex, e.target.checked)
+                          }}
+                        />
+                        <span className='edit-showDropdown column-heading'>Show Filter</span>
+                      </label>
                     </>
                   ) : (
                     <NestedDropdownEditor
@@ -290,6 +292,18 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                       updateField={updateField}
                       updateFilterStyle={updateFilterStyle}
                     />
+                  )}
+                  {hasFootnotes && (
+                    <label>
+                      <input
+                        type='checkbox'
+                        checked={!!filter.filterFootnotes}
+                        onChange={e => {
+                          updateFilterProp('filterFootnotes', filterIndex, e.target.checked)
+                        }}
+                      />
+                      <span className='edit-showDropdown column-heading'>Filter Footnotes</span>
+                    </label>
                   )}
                   <label>
                     <span className='edit-label column-heading'>

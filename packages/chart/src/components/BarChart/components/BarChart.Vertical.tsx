@@ -52,8 +52,7 @@ export const BarChartVertical = () => {
     parseDate,
     seriesHighlight,
     setSharedFilter,
-    transformedData,
-    brushConfig
+    transformedData
   } = useContext<ChartContext>(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
@@ -66,10 +65,6 @@ export const BarChartVertical = () => {
   // if suppression active use table data (filtere | excluded) but non cleaned
   if (isSuppressionActive) {
     data = tableData
-  }
-  // if brush active use brush data (filtered|excluded) not cleaned
-  if (brushConfig.data.length) {
-    data = brushConfig.data
   }
 
   const hasConfidenceInterval =
@@ -190,7 +185,7 @@ export const BarChartVertical = () => {
                     ? barBorderWidth
                     : 0
 
-                  const barDefaultLabel = isSuppressed || !config.labels ? '' : yAxisValue
+                  const barDefaultLabel = isSuppressed || absentDataLabel || !config.labels ? '' : yAxisValue
                   const barY = getBarY(defaultBarY, yScale(scaleVal))
                   const displaylollipopShape = testZeroValue(bar.value) ? 'none' : 'block'
                   const getBarBackgroundColor = (barColor: string, filteredOutColor?: string): string => {
@@ -292,6 +287,7 @@ export const BarChartVertical = () => {
                             cursor: dashboardConfig ? 'pointer' : 'default'
                           }
                         })}
+
                         {config.preliminaryData.map((pd, index) => {
                           // check if user selected column
                           const selectedSuppressionColumn = !pd.column || pd.column === bar.key
@@ -335,7 +331,6 @@ export const BarChartVertical = () => {
                             </Text>
                           )
                         })}
-
                         <Text // prettier-ignore
                           display={displayBar ? 'block' : 'none'}
                           opacity={transparentBar ? 0.5 : 1}
@@ -357,7 +352,6 @@ export const BarChartVertical = () => {
                         >
                           {absentDataLabel}
                         </Text>
-
                         {config.isLollipopChart && config.lollipopShape === 'circle' && (
                           <circle
                             display={displaylollipopShape}

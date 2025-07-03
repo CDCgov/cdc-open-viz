@@ -9,7 +9,6 @@ import {
 
 import { SUPPORTED_DC_NAMES, GEO_TYPES, GEOCODE_TYPES } from './constants'
 import { DataRow, MapConfig } from '../types/MapConfig'
-import { memoize } from 'lodash'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -65,8 +64,8 @@ const handleUSLocation = (row: DataRow, geoColumn: string, displayAsHex: boolean
     uid = memoizedFindUID(geoName, 'territory')
   }
 
-  if (!uid) uid = findCityUID(geoName)
   if (!uid) uid = handleDCDisplay(geoName, displayAsHex)
+  if (!uid) uid = findCityUID(geoName)
 
   return uid
 }
@@ -108,7 +107,9 @@ export const addUIDs = (configObj: MapConfig, fromColumn: string) => {
 
   data.forEach(row => {
     let uid = null
-    row.uid = null // Reset existing UID
+    if (row.uid) {
+      row.uid = null // Reset existing UID
+    }
 
     if (!geo.name) return
 
