@@ -44,7 +44,7 @@ export interface PreliminaryDataItem {
   iconCode: string
   label: string
   lineCode: string
-  seriesKey: string
+  seriesKeys: string[]
   style: string
   symbol: string
   type: 'effect' | 'suppression'
