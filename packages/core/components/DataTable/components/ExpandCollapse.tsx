@@ -1,6 +1,13 @@
 import Icon from '../../ui/Icon'
 
-const ExpandCollapse = ({ expanded, setExpanded, tableTitle, fontSize, viewport }) => {
+interface ExpandCollapseProps {
+  expanded: boolean
+  setExpanded: (expanded: boolean) => void
+  tableTitle: string
+  end?: boolean
+}
+
+const ExpandCollapse = ({ expanded, setExpanded, tableTitle, end }: ExpandCollapseProps) => {
   return (
     <div
       role='button'
@@ -16,7 +23,7 @@ const ExpandCollapse = ({ expanded, setExpanded, tableTitle, fontSize, viewport 
       }}
     >
       <Icon display={expanded ? 'minus' : 'plus'} base />
-      {tableTitle}
+      {`${tableTitle}${end ? ` (end)` : ''}`}
     </div>
   )
 }
