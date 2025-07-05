@@ -59,7 +59,9 @@ export const BarChartHorizontal = () => {
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
-  const hasConfidenceInterval = Object.keys(config.confidenceKeys).length > 0
+  const hasConfidenceInterval = [config.confidenceKeys?.upper, config.confidenceKeys?.lower].every(
+    v => v != null && String(v).trim() !== ''
+  )
 
   const _data = getBarData(config, data, hasConfidenceInterval)
 
@@ -311,6 +313,21 @@ export const BarChartHorizontal = () => {
                             dx={textPadding}
                             verticalAnchor='middle'
                             textAnchor={textAnchor}
+                          >
+                            {testZeroValue(bar.value) ? '' : barDefaultLabel}
+                          </Text>
+                        )}
+
+                        {!config.isLollipopChart && hasConfidenceInterval && (
+                          <Text // prettier-ignore
+                            display={displayBar ? 'block' : 'none'}
+                            x={bar.value < 0 ? bar.y + barWidth : bar.y - barWidth}
+                            opacity={transparentBar ? 0.5 : 1}
+                            y={config.barHeight / 2 + config.barHeight * bar.index}
+                            fill={labelColor}
+                            dx={-textPadding}
+                            verticalAnchor='middle'
+                            textAnchor={bar.value < 0 ? 'end' : 'start'}
                           >
                             {testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
