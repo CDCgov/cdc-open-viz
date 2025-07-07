@@ -15,17 +15,8 @@ export const countNumOfTicks = ({ axis, max, runtime, currentViewport, isHorizon
         ? undefined
         : !isHorizontal && numTicks && numTicks
     // to fix edge case of small numbers with decimals
-    if (tickCount === undefined && !config.dataFormat.roundTo) {
-      // then it is set to Auto
-      if (Number(max) <= 3) {
-        tickCount = 2
-      } else {
-        tickCount = 4 // same default as standalone components
-      }
-    }
-    if (Number(tickCount) > Number(max) && !isHorizontal) {
-      // cap it and round it so its an integer
-      tickCount = Math.max(2, Number(min) < 0 ? Math.round(max) * 2 : Math.round(max))
+    if (tickCount === undefined) {
+      tickCount = 4 // same default as standalone components
     }
   }
 
@@ -38,14 +29,8 @@ export const countNumOfTicks = ({ axis, max, runtime, currentViewport, isHorizon
         : !isHorizontal && !numTicks
         ? undefined
         : !isHorizontal && numTicks && numTicks
-    if (isHorizontal && tickCount === undefined && !config.dataFormat.roundTo) {
-      // then it is set to Auto
-      // - check for small numbers situation
-      if (max <= 3) {
-        tickCount = 2
-      } else {
-        tickCount = 4 // same default as standalone components
-      }
+    if (isHorizontal && tickCount === undefined) {
+      tickCount = 4 // same default as standalone components
     }
 
     if (config.visualizationType === 'Forest Plot') {

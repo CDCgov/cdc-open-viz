@@ -17,19 +17,19 @@ export const createStyles = (props: StyleProps): Style[] => {
 
   const dynamicSeriesKey = dynamicCategory ? originalSeriesKey : seriesKey
   const validPreliminaryData: PreliminaryDataItem[] = preliminaryData.filter(
-    pd => pd.seriesKey && pd.column && pd.value && pd.type && pd.style && pd.type === 'effect'
+    pd => pd.seriesKeys?.length && pd.column && pd.value && pd.type && pd.style && pd.type === 'effect'
   )
   const isEffectLine = (pd, dataPoint) => {
     if (dynamicCategory) {
       return (
         pd.type === 'effect' &&
         pd.style !== 'Open Circles' &&
-        pd.seriesKey === seriesKey &&
+        pd.seriesKeys.includes(seriesKey) &&
         String(dataPoint[dynamicSeriesKey]) === String(pd.value)
       )
     } else {
       return (
-        pd.seriesKey === seriesKey &&
+        pd.seriesKeys.includes(seriesKey) &&
         dataPoint[pd.column] === pd.value &&
         pd.type === 'effect' &&
         pd.style !== 'Open Circles'
@@ -71,11 +71,11 @@ export const filterCircles = (
 ): DataItem[] => {
   // Filter and map preliminaryData to get circlesFiltered
   const circlesFiltered = preliminaryData
-    ?.filter(item => item.style.includes('Circles') && item.type === 'effect')
+    ?.filter(item => item.style.includes('Circles') && item.type === 'effect' && item.seriesKeys?.length)
     .map(item => ({
       column: item.column,
       value: item.value,
-      seriesKey: item.seriesKey,
+      seriesKeys: item.seriesKeys,
       circleSize: item.circleSize,
       style: item.style
     }))
@@ -85,7 +85,7 @@ export const filterCircles = (
     circlesFiltered.forEach(fc => {
       if (
         item[fc.column] === fc.value &&
-        fc.seriesKey === seriesKey &&
+        fc.seriesKeys.includes(seriesKey) &&
         item[seriesKey] &&
         fc.style === 'Open Circles'
       ) {
@@ -98,7 +98,7 @@ export const filterCircles = (
       }
       if (
         (!fc.value || item[fc.column] === fc.value) &&
-        fc.seriesKey === seriesKey &&
+        fc.seriesKeys.includes(seriesKey) &&
         item[seriesKey] &&
         fc.style === 'Filled Circles'
       ) {
