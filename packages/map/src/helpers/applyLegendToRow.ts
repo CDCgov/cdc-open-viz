@@ -36,13 +36,12 @@ export const applyLegendToRow = (
     }
 
     const idx = legendMemo.current.get(hash)!
-    const disabledIdx = showSpecialClassesLast ? legendSpecialClassLastMemo.current.get(hash) ?? idx : idx
 
-    if (runtimeLegend.items?.[disabledIdx]?.disabled) {
+    if (runtimeLegend.items?.[idx]?.disabled) {
       return generateColorsArray()
     }
 
-    // Get the legend item directly by index instead of searching by bin
+    // Use the index from legendMemo which should already be updated for reordered items
     const legendItem = runtimeLegend.items?.[idx]
     const legendBinColor = legendItem?.color
 
