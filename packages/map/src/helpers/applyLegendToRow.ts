@@ -29,7 +29,7 @@ export const applyLegendToRow = (
       return generateColorsArray(mapColorPalette[3])
     }
 
-    const hash = hashObj(rowObj)
+    const hash = String(hashObj(rowObj))
 
     if (!legendMemo.current.has(hash)) {
       return generateColorsArray()
@@ -42,8 +42,11 @@ export const applyLegendToRow = (
       return generateColorsArray()
     }
 
-    const legendBinColor = runtimeLegend.items.find(o => o.bin === idx)?.color
-    return generateColorsArray(legendBinColor, runtimeLegend.items[idx]?.special)
+    // Get the legend item directly by index instead of searching by bin
+    const legendItem = runtimeLegend.items?.[idx]
+    const legendBinColor = legendItem?.color
+
+    return generateColorsArray(legendBinColor, legendItem?.special)
   } catch (e) {
     console.error('COVE: ', e)
     return null
