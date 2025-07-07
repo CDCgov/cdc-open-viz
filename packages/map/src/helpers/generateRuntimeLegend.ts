@@ -33,6 +33,16 @@ export type GeneratedLegend = {
   items: LegendItem[] | []
 }
 
+// Helper function to convert and round values consistently
+const convertAndRoundValue = (value: any, roundToPlace: number): number => {
+  const num = Number(value)
+  if (isNaN(num)) return NaN
+
+  // Apply rounding to handle floating-point precision issues
+  const factor = Math.pow(10, roundToPlace)
+  return Math.round(num * factor) / factor
+}
+
 export const generateRuntimeLegend = (
   configObj,
   runtimeData: object[],
@@ -79,7 +89,8 @@ export const generateRuntimeLegend = (
     // Unified will base the legend off ALL the data maps received. Otherwise, it will use
     let dataSet = legend.unified ? data : Object?.values(runtimeData)
 
-    let domainNums = Array.from(new Set(dataSet?.map(item => item[configObj.columns.primary.name])))
+    const roundToPlace = Number(columns?.primary?.roundToPlace) || 1
+    let domainNums = Array.from(new Set(dataSet?.map(item => convertAndRoundValue(item[configObj.columns.primary.name], roundToPlace))))
       .filter(d => typeof d === 'number' && !isNaN(d))
       .sort((a, b) => (a as number) - (b as number))
 
@@ -373,18 +384,18 @@ export const generateRuntimeLegend = (
           // backwards compatibility
           if (columns?.primary?.roundToPlace !== undefined && general?.equalNumberOptIn) {
             return _.uniq(
-              dataSet.map(item => Number(item[columns.primary.name]).toFixed(Number(columns?.primary?.roundToPlace)))
+              dataSet.map(item => convertAndRoundValue(item[columns.primary.name], Number(columns?.primary?.roundToPlace)))
             )
           }
-          return _.uniq(dataSet.map(item => Math.round(Number(item[columns.primary.name]))))
+          return _.uniq(dataSet.map(item => convertAndRoundValue(item[columns.primary.name], roundToPlace)))
         }
 
         const getBreaks = scale => {
           // backwards compatibility
           if (columns?.primary?.roundToPlace !== undefined && general?.equalNumberOptIn) {
-            return scale.quantiles().map(b => Number(b)?.toFixed(Number(columns?.primary?.roundToPlace)))
+            return scale.quantiles().map(b => convertAndRoundValue(b, Number(columns?.primary?.roundToPlace)))
           }
-          return scale.quantiles().map(item => Number(Math.round(item)))
+          return scale.quantiles().map(item => convertAndRoundValue(item, roundToPlace))
         }
 
         let scale = d3
@@ -421,10 +432,10 @@ export const generateRuntimeLegend = (
             // For non-first ranges, add small increment to prevent overlap
             if (index > 0 && !legend.separateZero) {
               const decimalPlace = Number(configObj?.columns?.primary?.roundToPlace) || 1
-              min = Number(cachedBreaks[index]) + Math.pow(10, -decimalPlace)
+              min = convertAndRoundValue(Number(cachedBreaks[index]) + Math.pow(10, -decimalPlace), decimalPlace)
             }
 
-            return min
+            return convertAndRoundValue(min, roundToPlace)
           }
 
           const getDecimalPlace = n => {
@@ -442,7 +453,7 @@ export const generateRuntimeLegend = (
               max = Number(domainNums[domainNums.length - 1])
             }
 
-            return max
+            return convertAndRoundValue(max, roundToPlace)
           }
 
           let min = setMin(index)
@@ -454,7 +465,7 @@ export const generateRuntimeLegend = (
           })
 
           dataSet.forEach(row => {
-            let number = row[columns.primary.name]
+            let number = convertAndRoundValue(row[columns.primary.name], roundToPlace)
             let updated = result.items.length - 1
 
             if (result.items?.[updated]?.min === undefined || result.items?.[updated]?.max === undefined) return
@@ -471,7 +482,7 @@ export const generateRuntimeLegend = (
         // Final pass: handle any unassigned rows
         dataSet.forEach(row => {
           if (!newLegendMemo.has(String(hashObj(row)))) {
-            let number = row[columns.primary.name]
+            let number = convertAndRoundValue(row[columns.primary.name], roundToPlace)
             let assigned = false
 
             // Find the correct range for this value - check both boundaries

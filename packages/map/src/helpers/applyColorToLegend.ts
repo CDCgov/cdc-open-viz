@@ -61,8 +61,11 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
       : Object.keys(colorDistributions).length
   const distributionArray = colorDistributions[amt] ?? []
 
-  const specificColor =
-    distributionArray[legendIdx - actualSpecialClassCount] ?? mapColorPalette[colorIdx] ?? mapColorPalette.at(-1)
+  const distributionIndex = distributionArray[legendIdx - actualSpecialClassCount]
 
-  return mapColorPalette[specificColor]
+  if (distributionIndex !== undefined) {
+    return mapColorPalette[distributionIndex]
+  }
+
+  return mapColorPalette[colorIdx] ?? mapColorPalette.at(-1)
 }
