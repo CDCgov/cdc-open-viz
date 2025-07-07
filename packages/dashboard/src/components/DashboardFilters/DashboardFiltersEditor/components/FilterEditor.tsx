@@ -554,17 +554,6 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                   )}
 
                   <label>
-                    <input
-                      type='checkbox'
-                      checked={!!filter.filterFootnotes}
-                      onChange={e => {
-                        updateFilterProp('filterFootnotes', e.target.checked)
-                      }}
-                    />
-                    <span className='edit-showDropdown column-heading'>Filter Footnotes</span>
-                  </label>
-
-                  <label>
                     <span className='edit-label column-heading'>Show Dropdown</span>
                     <input
                       type='checkbox'

@@ -24,7 +24,6 @@ export type SharedFilter = FilterBase & {
   tier?: number
   // value to use when the filter loads
   defaultValue?: string
-  filterFootnotes: boolean
   /**
    * How to format the end file name when filter.filterBy is set to "File Name"
    *
