@@ -415,6 +415,7 @@ export const generateRuntimeLegend = (
         }
 
         // eslint-disable-next-line array-callback-return
+        let previousMax = null
         cachedBreaks.map((item, index) => {
           const setMin = index => {
             let min = cachedBreaks[index]
@@ -429,10 +430,10 @@ export const generateRuntimeLegend = (
               min = 1
             }
 
-            // For non-first ranges, add small increment to prevent overlap
-            if (index > 0 && !legend.separateZero) {
+            // For non-first ranges, use the previous max + small increment to prevent overlap
+            if (index > 0 && !legend.separateZero && previousMax !== null) {
               const decimalPlace = Number(configObj?.columns?.primary?.roundToPlace) || 1
-              min = convertAndRoundValue(Number(cachedBreaks[index]) + Math.pow(10, -decimalPlace), decimalPlace)
+              min = convertAndRoundValue(previousMax + Math.pow(10, -decimalPlace), decimalPlace)
             }
 
             return convertAndRoundValue(min, roundToPlace)
@@ -458,6 +459,9 @@ export const generateRuntimeLegend = (
 
           let min = setMin(index)
           let max = setMax(index)
+
+          // Store the max value for the next iteration
+          previousMax = max
 
           result.items.push({
             min,
