@@ -267,29 +267,32 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     dispatch({ type: 'SET_SHARED_FILTERS', payload: newConfig.dashboard.sharedFilters })
   }
 
-  const setEventData = ({ detail }) => {
+  const setEventData = ({ detail }, data, filteredData) => {
+    // eslint-disable-next-line no-console
+    console.log('Event: cove_set_data', detail)
     try {
       const newDatasets = Object.keys(detail).reduce((acc, key) => {
-        if (state.data[key] !== undefined) {
+        if (data[key] !== undefined) {
           acc[key] = detail[key]
         }
         return acc
       }, {})
-      const newConfig = { ...state, data: { ...state.data, ...newDatasets } }
-      const newFilteredData = getFilteredData(newConfig, _.cloneDeep(state.filteredData))
+      const newConfig = { ...state, data: { ...data, ...newDatasets } }
+      const newFilteredData = getFilteredData(newConfig, _.cloneDeep(filteredData))
       dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
-      dispatch({ type: 'SET_DATA', payload: { ...state.data, ...newDatasets } })
+      dispatch({ type: 'SET_DATA', payload: { ...data, ...newDatasets } })
     } catch (e) {
       console.error('Error setting event data: ', e)
     }
   }
 
   useEffect(() => {
-    subscribe('cove_set_data', setEventData)
+    const eventCallback = e => setEventData(e, state.data, state.filteredData)
+    subscribe('cove_set_data', eventCallback)
     return () => {
-      unsubscribe('cove_set_data', setEventData)
+      unsubscribe('cove_set_data', eventCallback)
     }
-  }, [])
+  }, [state.data, state.filteredData])
 
   useEffect(() => {
     const { config } = state
