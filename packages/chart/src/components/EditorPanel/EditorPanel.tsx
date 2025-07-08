@@ -752,7 +752,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   const updateField = updateFieldFactory(config, updateConfig)
   const updateFieldDeprecated = (section, subsection, fieldName, newValue) => {
     if (isDebug)
-      console.log(
+      console.error(
         '#COVE: CHART: EditorPanel: section, subsection, fieldName, newValue',
         section,
         subsection,
