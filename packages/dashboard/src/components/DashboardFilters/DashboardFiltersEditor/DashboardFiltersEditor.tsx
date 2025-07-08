@@ -11,7 +11,6 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import FieldSetWrapper from '@cdc/core/components/EditorPanel/FieldSetWrapper'
 import FilterEditor from './components/FilterEditor'
-import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { DashboardContext, DashboardDispatchContext } from '../../../DashboardContext'
 import _ from 'lodash'
 import { DashboardFilters } from '../../../types/DashboardFilters'
@@ -118,7 +117,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
 
   const removeFilter = index => {
     const [newSharedFilters, newVisualizations] = removeDashboardFilter(index, sharedFilters, visualizations)
-    const dashboard = {...config.dashboard, sharedFilters: newSharedFilters}
+    const dashboard = { ...config.dashboard, sharedFilters: newSharedFilters }
     dispatch({ type: 'SET_CONFIG', payload: { dashboard, visualizations: newVisualizations } })
   }
 
