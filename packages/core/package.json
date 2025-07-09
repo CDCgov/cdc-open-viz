@@ -1,6 +1,6 @@
 {
   "name": "@cdc/core",
-  "version": "4.25.6",
+  "version": "4.25.6-1",
   "description": "Core components, styles, hooks, and helpers, for the CDC Open Visualization project",
   "moduleName": "CdcCore",
   "main": "dist/cdccore",
