@@ -1,6 +1,6 @@
 {
   "name": "@cdc/data-bite",
-  "version": "4.25.5-1",
+  "version": "4.25.6",
   "description": "React component for displaying a single piece of data in a card module",
   "moduleName": "CdcDataBite",
   "main": "dist/cdcdatabite",
@@ -27,7 +27,7 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
   "dependencies": {
-    "@cdc/core": "^4.25.5-1",
+    "@cdc/core": "^4.25.6",
     "chroma": "0.0.1",
     "react-accessible-accordion": "^3.3.4"
   },
@@ -35,5 +35,5 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "gitHead": "f600807a95d9689aeb74f2408b238468b5ff6c01"
+  "gitHead": "6097de1ff814001880d9ac64bd66becdc092d63c"
 }
