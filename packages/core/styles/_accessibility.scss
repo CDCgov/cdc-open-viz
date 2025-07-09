@@ -1,0 +1,8 @@
+// Only frontend styles are applied in WCMS/TP
+// This helps match those styles when viewing in the editor
+.modal.cdc-cove-editor *:focus-visible,
+.cdc-open-viz-module *:focus-visible {
+  outline: dashed 2px rgb(0, 122, 153) !important;
+  outline-offset: 3px !important;
+  border-radius: 6px !important;
+}
