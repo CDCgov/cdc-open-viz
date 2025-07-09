@@ -21,7 +21,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "dompurify": "^3.2.6",
+    "dompurify": "^3.2.4",
     "html2canvas": "^1.4.1",
     "json-edit-react": "^1.27.0",
     "prop-types": "^15.8.1",
