@@ -20,6 +20,7 @@ import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
 import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
+import MultiSelect from '@cdc/core/components/MultiSelect'
 import { viewports } from '@cdc/core/helpers/getViewport'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
@@ -109,7 +110,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
     let preliminaryData = config.preliminaryData ? [...config.preliminaryData] : []
     const defaultValues = {
       type: defaultType,
-      seriesKey: '',
+      seriesKeys: [],
       label: 'Suppressed',
       column: '',
       value: '',
@@ -159,7 +160,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
               displayTable,
               displayTooltip,
               label,
-              seriesKey,
+              seriesKeys,
               style,
               symbol,
               type,
@@ -384,14 +385,18 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                   </>
                 ) : (
                   <>
-                    <Select
-                      value={seriesKey}
-                      initial='Select'
-                      fieldName='seriesKey'
-                      label='ASSOCIATE TO SERIES'
-                      updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                      options={config.runtime.lineSeriesKeys ?? config.runtime?.seriesKeys}
-                    />
+                    <label>
+                      <span className='edit-label'>ASSOCIATE TO THESE SERIES</span>
+                      <MultiSelect
+                        fieldName='seriesKeys'
+                        updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                        options={(config.runtime.lineSeriesKeys ?? config.runtime?.seriesKeys).map(c => ({
+                          label: c,
+                          value: c
+                        }))}
+                        selected={seriesKeys}
+                      />
+                    </label>
                     <Select
                       value={column}
                       initial='Select'
@@ -747,7 +752,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   const updateField = updateFieldFactory(config, updateConfig)
   const updateFieldDeprecated = (section, subsection, fieldName, newValue) => {
     if (isDebug)
-      console.error(
+      console.log(
         '#COVE: CHART: EditorPanel: section, subsection, fieldName, newValue',
         section,
         subsection,
@@ -1193,7 +1198,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   if (isDebug && config?.series?.length === 0) {
     let setdatacol = setDataColumn()
     if (setdatacol !== '') addNewSeries(setdatacol)
-    if (isDebug) console.error('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
+    if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
   const chartsWithOptions = [
@@ -2926,7 +2931,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       />
                       {visHasBrushChart() && (
                         <CheckBox
-                          value={config.brush?.active}
+                          value={config.brush.active}
                           section='brush'
                           fieldName='active'
                           label='Brush Slider '

@@ -44,7 +44,7 @@ export interface PreliminaryDataItem {
   iconCode: string
   label: string
   lineCode: string
-  seriesKey: string
+  seriesKeys: string[]
   style: string
   symbol: string
   type: 'effect' | 'suppression'
@@ -122,7 +122,8 @@ export type AllChartsConfig = {
   boxplot: BoxPlot
   brush: {
     active: boolean
-    height: number
+    data: object[]
+    isBrushing: boolean
   }
   chartMessage: { noData?: string }
   color: string

@@ -1,3 +1,5 @@
+import { VisualizationType } from './../../../../node_modules/@cdc/chart/src/types/ChartConfig'
+import { Visualization } from '@cdc/core/types/Visualization'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 
 const abbreviateNumber = num => {

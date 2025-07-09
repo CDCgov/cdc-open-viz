@@ -121,18 +121,23 @@ export const useTooltip = props => {
       const pieData = additionalChartData?.data ?? {}
       const startAngle = additionalChartData?.startAngle ?? 0
       const endAngle = additionalChartData?.endAngle ?? 0
+      const actualPieValue = Number(additionalChartData.data[config?.yAxis?.dataKey])
 
       const degrees = ((endAngle - startAngle) * 180) / Math.PI
       const pctOf360 = (degrees / 360) * 100
-      const pctString = pctOf360.toFixed(roundTo) + '%'
+      const pctString = value => value.toFixed(roundTo) + '%'
+      const showPiePercent = config.dataFormat.showPiePercent || false
 
-      if (config.dataFormat.showPiePercent && pieData[config.xAxis.dataKey] === 'Calculated Area') {
+      if (showPiePercent && pieData[config.xAxis.dataKey] === 'Calculated Area') {
         tooltipItems.push(['', 'Calculated Area'])
       } else {
         tooltipItems.push(
           [config.xAxis.dataKey, pieData[config.xAxis.dataKey]],
-          [config.runtime.yAxis.dataKey, formatNumber(pieData[config.runtime.yAxis.dataKey])],
-          ['Percent', pctString]
+          [
+            config.runtime.yAxis.dataKey,
+            showPiePercent ? pctString(actualPieValue) : formatNumber(pieData[config.runtime.yAxis.dataKey])
+          ],
+          showPiePercent ? [] : ['Percent', pctString(pctOf360)]
         )
       }
     }
@@ -193,6 +198,8 @@ export const useTooltip = props => {
           }
         })
       } else {
+        const dynamicSeries = config.series.find(s => s.dynamicCategory)
+
         // Show Only the Hovered Series in Tooltip
         const dataColumn = resolvedScaleValues[0]
         const [seriesKey, value] = findDataKeyByThreshold(y, dataColumn)
@@ -203,7 +210,7 @@ export const useTooltip = props => {
           tooltipItems.push([config.xAxis.dataKey, closestXScaleValue || xVal])
           const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
           tooltipItems.push([seriesKey, formattedValue])
-        } else {
+        } else if (dynamicSeries) {
           Object.keys(dataColumn).forEach(key => {
             tooltipItems.push([key, dataColumn[key]])
           })

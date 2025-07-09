@@ -59,11 +59,7 @@ export const BarChartHorizontal = () => {
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
-  const hasConfidenceInterval =
-    config.confidenceKeys.upper &&
-    config.confidenceKeys.lower &&
-    config.confidenceKeys.upper !== '' &&
-    config.confidenceKeys.lower !== ''
+  const hasConfidenceInterval = Object.keys(config.confidenceKeys).length > 0
 
   const _data = getBarData(config, data, hasConfidenceInterval)
 
@@ -232,8 +228,6 @@ export const BarChartHorizontal = () => {
                     const d = datum[config.confidenceKeys[position]]
                     return xScale(d)
                   })
-                  const labelX = bar.y
-                  const overlapWithCI = hasConfidenceInterval && labelX >= lowerPos && labelX <= upperPos
 
                   return (
                     <Group display={hideGroup} key={`${barGroup.index}--${index}`}>
@@ -267,19 +261,7 @@ export const BarChartHorizontal = () => {
                             display: displayBar ? 'block' : 'none'
                           }
                         })}
-                        {/* Invisible hit-area for N/A bars */}
-                        {(isSuppressed || absentDataLabel) && (
-                          <rect
-                            x={barX}
-                            y={barY - barHeight * 20}
-                            width={numbericBarHeight * 20}
-                            height={barWidth * 20}
-                            fill='transparent'
-                            tooltipHtml={tooltip}
-                            tooltipId={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                            onMouseOver={e => onMouseOverBar(xAxisValue, bar.key, e, data)}
-                          />
-                        )}
+
                         {config.preliminaryData?.map((pd, index) => {
                           // check if user selected column
                           const selectedSuppressionColumn = !pd.column || pd.column === bar.key
@@ -324,12 +306,8 @@ export const BarChartHorizontal = () => {
                             display={displayBar ? 'block' : 'none'}
                             x={bar.y}
                             opacity={transparentBar ? 0.5 : 1}
-                            y={
-                              hasConfidenceInterval && overlapWithCI
-                                ? config.barHeight * bar.index
-                                : config.barHeight / 2 + config.barHeight * bar.index
-                            }
-                            fill={hasConfidenceInterval && overlapWithCI ? '#000' : labelColor}
+                            y={config.barHeight / 2 + config.barHeight * bar.index}
+                            fill={labelColor}
                             dx={textPadding}
                             verticalAnchor='middle'
                             textAnchor={textAnchor}

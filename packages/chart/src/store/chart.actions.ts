@@ -30,7 +30,7 @@ type ChartActions =
   | SET_CONTAINER
   | SET_LOADED_EVENT
   | SET_DRAG_ANNOTATIONS
-  | SET_BRUSH_CONFIG
   | SET_LOADING
+  | SET_BRUSH_CONFIG
 
 export default ChartActions
