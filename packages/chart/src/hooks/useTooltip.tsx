@@ -153,7 +153,7 @@ export const useTooltip = props => {
         const position = seriesObj?.axis ? String(seriesObj.axis).toLowerCase() : 'left'
         return position
       }
-      if (!config.tooltips.singleSeries || visualizationType === 'Line') {
+      if (!config.tooltips.singleSeries && visualizationType === 'Line') {
         tooltipItems.push(
           ...getIncludedTooltipSeries()
             ?.filter(seriesKey => {
@@ -197,7 +197,8 @@ export const useTooltip = props => {
             }
           }
         })
-      } else {
+      }
+      if (config.tooltips.singleSeries && visualizationType === 'Line') {
         const dynamicSeries = config.series.find(s => s.dynamicCategory)
 
         // Show Only the Hovered Series in Tooltip

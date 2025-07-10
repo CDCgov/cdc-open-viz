@@ -1530,7 +1530,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           !tooltipData?.data?.some(subArray => subArray.some(item => item === undefined)) &&
           tooltipData.dataYPosition &&
           tooltipData.dataXPosition &&
-          !config.tooltips.singleSeries && (
+          !(!config.tooltips.singleSeries && visualizationType === 'Line') && (
             <>
               <style>{`.tooltip {background-color: rgba(255,255,255, ${
                 config.tooltips.opacity / 100
