@@ -289,7 +289,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     if (config.data && !config.data[index] && visualizationType === 'Forest Plot') return
     if (config.visualizationType === 'Forest Plot') return config.data[index][config.xAxis.dataKey]
     if (isDateScale(runtime.yAxis)) return formatDate(parseDate(tick))
-    if (orientation === 'vertical' && max - min < 3)
+    if (orientation === 'vertical' && max - min < 3 && !config.dataFormat?.roundTo)
       return formatNumber(tick, 'left', shouldAbbreviate, false, false, '1', { index, length: ticks.length })
     if (orientation === 'vertical') {
       // TODO suggestion: pass all options as object key/values to allow for more flexibility

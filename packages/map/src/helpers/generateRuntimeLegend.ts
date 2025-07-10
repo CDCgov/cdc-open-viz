@@ -444,18 +444,36 @@ export const generateRuntimeLegend = (
             let number = row[columns.primary.name]
             let assigned = false
 
-            // Find the correct range for this value - ranges don't overlap anymore
+            // Find the correct range for this value - check both boundaries
             for (let itemIndex = 0; itemIndex < result.items.length; itemIndex++) {
               const item = result.items[itemIndex]
 
               if (item.min === undefined || item.max === undefined) continue
 
-              // Simple range check since ranges don't overlap
+              // Check if value falls within range (inclusive of both min and max)
               if (number >= item.min && number <= item.max) {
                 newLegendMemo.set(hashObj(row), itemIndex)
                 assigned = true
                 break
               }
+            }
+
+            // Fallback: if still not assigned, assign to closest range
+            if (!assigned) {
+              console.error('Value not assigned to any range:', number, 'assigning to closest range')
+              let closestIndex = 0
+              let minDistance = Math.abs(number - (result.items[0].min + result.items[0].max) / 2)
+
+              for (let i = 1; i < result.items.length; i++) {
+                const midpoint = (result.items[i].min + result.items[i].max) / 2
+                const distance = Math.abs(number - midpoint)
+                if (distance < minDistance) {
+                  minDistance = distance
+                  closestIndex = i
+                }
+              }
+
+              newLegendMemo.set(hashObj(row), closestIndex)
             }
           }
         })
