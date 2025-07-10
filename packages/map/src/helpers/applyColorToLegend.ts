@@ -52,9 +52,9 @@ export const applyColorToLegend = (legendItemIndex: number, config: MapConfig, r
     rowDistributionIndex ?? colorPalette[regularItemColorIndex] ?? colorPalette.at(-1)
 
   // Check if specificColor is a string (e.g., a valid color code)
-  if (typeof colorValue === 'string') {
-    return colorValue
-  }
+  // if (typeof colorValue === 'string') {
+  //   return colorValue
+  // }
 
   // Otherwise, use specificColor as an index for mapColorPalette
   return colorPalette[colorValue]

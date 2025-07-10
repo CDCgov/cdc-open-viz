@@ -258,11 +258,13 @@ export const generateRuntimeLegend = (
 
           if (originalData) {
             // Use the original index for color calculation to maintain proper color sequence
-            const appliedColor = applyColorToLegend(originalData.originalIndex, configObj, originalCategoricalItems.map(o => o.item))
+            const contextArray = originalCategoricalItems.slice(0, originalData.originalIndex + 1).map(o => o.item)
+            const appliedColor = applyColorToLegend(originalData.originalIndex, configObj, contextArray)
             result.items[i].color = appliedColor
           } else {
             // Fallback: apply color normally
-            const appliedColor = applyColorToLegend(i, configObj, result.items)
+            const contextArray = result.items.slice(0, i + 1)
+            const appliedColor = applyColorToLegend(i, configObj, contextArray)
             result.items[i].color = appliedColor
           }
         }
@@ -271,7 +273,9 @@ export const generateRuntimeLegend = (
         legendMemo.current = newLegendMemo
 
         for (let i = 0; i < result.items.length; i++) {
-          const appliedColor = applyColorToLegend(i, configObj, result.items)
+          // Create a context array that simulates the original incremental state
+          const contextArray = result.items.slice(0, i + 1)
+          const appliedColor = applyColorToLegend(i, configObj, contextArray)
           result.items[i].color = appliedColor
         }
       }
@@ -660,11 +664,13 @@ export const generateRuntimeLegend = (
 
         if (originalData) {
           // Use the original index for color calculation to maintain proper color sequence
-          const appliedColor = applyColorToLegend(originalData.originalIndex, configObj, originalItems.map(o => o.item))
+          const contextArray = originalItems.slice(0, originalData.originalIndex + 1).map(o => o.item)
+          const appliedColor = applyColorToLegend(originalData.originalIndex, configObj, contextArray)
           result.items[i].color = appliedColor
         } else {
           // Fallback: apply color normally
-          const appliedColor = applyColorToLegend(i, configObj, result.items)
+          const contextArray = result.items.slice(0, i + 1)
+          const appliedColor = applyColorToLegend(i, configObj, contextArray)
           result.items[i].color = appliedColor
         }
       }
@@ -684,11 +690,11 @@ export const generateRuntimeLegend = (
         }
       })
     } else {
-      // Simple case: no special sorting, just apply colors normally
       legendMemo.current = newLegendMemo
 
       for (let i = 0; i < result.items.length; i++) {
-        const appliedColor = applyColorToLegend(i, configObj, result.items)
+        const contextArray = result.items.slice(0, i + 1)
+        const appliedColor = applyColorToLegend(i, configObj, contextArray)
         result.items[i].color = appliedColor
       }
     }
