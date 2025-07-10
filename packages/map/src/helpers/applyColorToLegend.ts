@@ -47,13 +47,9 @@ export const applyColorToLegend = (legendItemIndex: number, config: MapConfig, r
   const colorDistributionArray = colorDistributions[legendItemCount] ?? []
 
   const rowDistributionIndex = colorDistributionArray[legendItemIndex - specialClasses.length]
-  // Only increment if the original index points to "gray" and we have custom colors
-  const finalDistributionIndex = rowDistributionIndex !== undefined ?
-    (customColors && (rowDistributionIndex === 0 || rowDistributionIndex === 2 || rowDistributionIndex === 4) ?
-      rowDistributionIndex + 1 : rowDistributionIndex) : undefined
 
   const colorValue =
-    finalDistributionIndex ?? colorPalette[regularItemColorIndex] ?? colorPalette.at(-1)
+    rowDistributionIndex ?? colorPalette[regularItemColorIndex] ?? colorPalette.at(-1)
 
   // Check if specificColor is a string (e.g., a valid color code)
   if (typeof colorValue === 'string') {
