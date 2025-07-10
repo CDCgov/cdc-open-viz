@@ -1062,8 +1062,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       const labelVerticalAnchor = labelsAboveGridlines ? 'end' : 'middle'
                       const combineDomInlineLabelWithValue = inlineLabel && labelsAboveGridlines && lastTick
                       const formattedValue = useInlineLabel
-                        ? tick.formattedValue.replace(config.dataFormat.suffix, '')
-                        : tick.formattedValue
+                        ? String(tick?.formattedValue || '').replace(config.dataFormat.suffix, '')
+                        : tick?.formattedValue
 
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
