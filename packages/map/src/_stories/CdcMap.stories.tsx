@@ -83,7 +83,8 @@ export const Bubble_Map: Story = {
 
 export const HHS_Region_Map: Story = {
   args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-hhs-regions-data.json'
+    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-hhs-regions-data.json',
+    isEditor: true
   }
 }
 

@@ -194,8 +194,6 @@ export const generateRuntimeLegend = (
         }
       })
 
-      // Colors will be applied later after sorting
-
       // before returning the legend result
       // add property for bin number and set to index location
       setBinNumbers(result)
@@ -565,7 +563,6 @@ export const generateRuntimeLegend = (
 
         result.items.push(range)
 
-        // Color will be applied later after sorting
       }
     }
 

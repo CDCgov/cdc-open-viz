@@ -7,57 +7,59 @@ type LegendItem = {
   special: boolean
 }
 
-/**
- * applyColorToLegend
- * @param legendIdx legend item index
- * @param config chart config
- * @param result hash of legend items
- * @returns string - the corresponding color for the legend item
- */
-export const applyColorToLegend = (legendIdx: number, config: MapConfig, result: LegendItem[] = []): string => {
+//  Applies color to a legend item based on its index and special classes.
+export const applyColorToLegend = (legendItemIndex: number, config: MapConfig, result: LegendItem[] = []): string => {
   if (!config) throw new Error('Config is required')
 
   const { legend, customColors, general, color } = config
   const { geoType, palette } = general
   const specialClasses = legend?.specialClasses ?? []
-  const mapColorPalette = customColors ?? colorPalettes[color] ?? colorPalettes['bluegreen']
+  const colorPalette = customColors ?? colorPalettes[color] ?? colorPalettes['bluegreen']
 
   // Handle Region Maps need for a 10th color
-  if (geoType === 'us-region' && mapColorPalette.length < 10 && mapColorPalette.length > 8) {
-    const newColor = chroma(mapColorPalette[palette.isReversed ? 0 : 8])
+  if (geoType === 'us-region' && colorPalette.length < 10 && colorPalette.length > 8) {
+    const darkenedColor = chroma(colorPalette[palette.isReversed ? 0 : 8])
       .darken(0.75)
       .hex()
-    palette.isReversed ? mapColorPalette.unshift(newColor) : mapColorPalette.push(newColor)
+    palette.isReversed ? colorPalette.unshift(darkenedColor) : colorPalette.push(darkenedColor)
   }
 
-  const colorIdx = legendIdx - specialClasses.length
+  const regularItemColorIndex = legendItemIndex - specialClasses.length
 
   // Handle special classes coloring
-  if (result[legendIdx]?.special) {
+  if (result[legendItemIndex]?.special) {
     const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses.length)
-    return specialClassColors[legendIdx]
+    return specialClassColors[legendItemIndex]
   }
 
   // Use qualitative color palettes directly
-  if (color.includes('qualitative')) return mapColorPalette[colorIdx]
+  if (color.includes('qualitative')) {
+    const safeIndex = Math.max(0, Math.min(regularItemColorIndex, colorPalette.length - 1))
+    return colorPalette[safeIndex]
+  }
 
   // Determine color distribution
-  const amt =
+  const legendItemCount =
     Math.max(result.length - specialClasses.length, 1) < 10
       ? Math.max(result.length - specialClasses.length, 1)
       : Object.keys(colorDistributions).length
-  const distributionArray = colorDistributions[amt] ?? []
 
-  const distributionIndex = distributionArray[legendIdx - specialClasses.length]
+  const colorDistributionArray = colorDistributions[legendItemCount] ?? []
+
+  const rowDistributionIndex = colorDistributionArray[legendItemIndex - specialClasses.length]
   // Only increment if the original index points to "gray" and we have custom colors
-  const adjustedDistributionIndex = distributionIndex !== undefined ?
-    (customColors && (distributionIndex === 0 || distributionIndex === 2 || distributionIndex === 4) ?
-      distributionIndex + 1 : distributionIndex) : undefined
+  const finalDistributionIndex = rowDistributionIndex !== undefined ?
+    (customColors && (rowDistributionIndex === 0 || rowDistributionIndex === 2 || rowDistributionIndex === 4) ?
+      rowDistributionIndex + 1 : rowDistributionIndex) : undefined
 
-  const specificColor =
-    adjustedDistributionIndex ?? mapColorPalette[colorIdx] ?? mapColorPalette.at(-1)
+  const colorValue =
+    finalDistributionIndex ?? colorPalette[regularItemColorIndex] ?? colorPalette.at(-1)
 
+  // Check if specificColor is a string (e.g., a valid color code)
+  if (typeof colorValue === 'string') {
+    return colorValue
+  }
 
-
-  return mapColorPalette[specificColor]
+  // Otherwise, use specificColor as an index for mapColorPalette
+  return colorPalette[colorValue]
 }

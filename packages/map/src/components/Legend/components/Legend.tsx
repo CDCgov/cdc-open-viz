@@ -94,7 +94,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           label: parse(legendLabel),
           disabled: entry.disabled,
           special: entry.hasOwnProperty('special'),
-          value: [entry.min, entry.max]
+          value: legend.type === 'category' ? entry.value : [entry.min, entry.max],
+          categoryValue: legend.type === 'category' ? entry.value : undefined
         }
       })
     } catch (e) {
@@ -133,7 +134,11 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             return runtimeItem.value === (runtimeItem.label || runtimeItem.value) ||
               runtimeItem.label === (item.label?.props?.children || item.label)
           } else if (!item.special && !runtimeItem.special) {
-            // For regular items, match by min/max values
+            // For categorical/qualitative items, match by single value
+            if (config.legend.type === 'category' && item.categoryValue !== undefined) {
+              return runtimeItem.value === item.categoryValue
+            }
+            // For numeric items, match by min/max values
             return runtimeItem.min === item.value[0] && runtimeItem.max === item.value[1]
           }
           return false
