@@ -30,12 +30,14 @@ import CategoricalYAxis from './Axis/Categorical.Axis'
 import { isLegendWrapViewport, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { calcInitialHeight, handleAutoPaddingRight } from '../helpers/sizeHelpers'
+import { filterAndShiftLinearDateTicks } from '../helpers/filterAndShiftLinearDateTicks'
 
 // Hooks
 import useMinMax from '../hooks/useMinMax'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
-import useScales, { getTickValues, filterAndShiftLinearDateTicks } from '../hooks/useScales'
+import useScales, { getTickValues } from '../hooks/useScales'
+
 import getTopAxis from '../helpers/getTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
