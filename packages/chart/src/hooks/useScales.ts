@@ -8,12 +8,12 @@ import {
   scaleTime,
   getTicks
 } from '@visx/scale'
-import { useContext } from 'react'
+import { useContext, useMemo } from 'react'
 import ConfigContext from '../ConfigContext'
 import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
 import _ from 'lodash'
-
+import { extent } from 'd3-array'
 const scaleTypes = {
   TIME: 'time',
   LOG: 'log',
@@ -38,12 +38,19 @@ const useScales = (properties: useScaleProps) => {
   let { xAxisDataMapped, xMax, yMax, min, max, config, data } = properties
 
   const { rawData, dimensions } = useContext<ChartContext>(ConfigContext)
-
+  const sortByRecentDate = config.xAxis.sortByRecentDate
   const [screenWidth] = dimensions
   const seriesDomain = config.runtime.barSeriesKeys || config.runtime.seriesKeys
   const xAxisType = config.runtime.xAxis.type
   const isHorizontal = config.orientation === 'horizontal'
   const { visualizationType, xAxis, forestPlot } = config
+  const sortedTs = useMemo(
+    () =>
+      sortByRecentDate
+        ? [...xAxisDataMapped].sort((a, b) => Number(b) - Number(a))
+        : [...xAxisDataMapped].sort((a, b) => Number(a) - Number(b)),
+    [xAxisDataMapped, sortByRecentDate]
+  ).map(Number)
 
   //  define scales
   let xScale = null
@@ -75,15 +82,7 @@ const useScales = (properties: useScaleProps) => {
 
   // handle Linear scaled viz
   if (config.xAxis.type === 'date' && !isHorizontal) {
-    const xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
-    xScale = composeScaleBand(xAxisDataMappedSorted, [0, xMax], 1 - config.barThickness)
-  }
-
-  // handle Linear scaled viz
-  if (config.xAxis.type === 'date' && !isHorizontal) {
-    const sorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
-
-    xScale = composeScaleBand(sorted, [0, xMax], 1 - config.barThickness)
+    xScale = composeScaleBand(sortedTs, [0, xMax], 1 - config.barThickness)
     xScale.type = scaleTypes.BAND
   }
 
@@ -94,7 +93,7 @@ const useScales = (properties: useScaleProps) => {
 
     xAxisMin -= paddingRatio * (xAxisMax - xAxisMin)
     xAxisMax += visualizationType === 'Line' ? 0 : paddingRatio * (xAxisMax - xAxisMin)
-    const range = config.xAxis.sortByRecentDate ? [xMax, 0] : [0, xMax]
+    const range = sortByRecentDate ? [xMax, 0] : [0, xMax]
     xScale = scaleTime({
       domain: [xAxisMin, xAxisMax],
       range: range
@@ -103,10 +102,9 @@ const useScales = (properties: useScaleProps) => {
     xScale.type = scaleTypes.TIME
 
     let minDistance = Number.MAX_VALUE
-    let xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
 
-    for (let i = 0; i < xAxisDataMappedSorted.length - 1; i++) {
-      let distance = xScale(xAxisDataMappedSorted[i + 1]) - xScale(xAxisDataMappedSorted[i])
+    for (let i = 0; i < sortedTs.length - 1; i++) {
+      let distance = xScale(sortedTs[i + 1]) - xScale(sortedTs[i])
 
       if (distance < minDistance) minDistance = distance
     }
@@ -116,6 +114,20 @@ const useScales = (properties: useScaleProps) => {
     }
 
     seriesScale = composeScaleBand(seriesDomain, [0, (config.barThickness || 1) * minDistance], 0)
+  }
+
+  // handle are chart
+  if (config.visualizationType === 'Area Chart') {
+    if (config.xAxis.type === 'date') {
+      const [xAxisMin, xAxisMax] = extent(sortedTs) as [number, number]
+      const domain: [number, number] = sortByRecentDate ? [xAxisMin, xAxisMax] : [xAxisMax, xAxisMin]
+      xScale = buildTimeScale(domain, [0, xMax])
+      xScale.type = scaleTypes.TIME
+    }
+    if (config.xAxis.type === 'categorical') {
+      xScale = composeScalePoint(xAxisDataMapped, [0, xMax], 0)
+      xScale.type = scaleTypes.POINT
+    }
   }
 
   // handle Deviation bar
@@ -352,28 +364,6 @@ export const getTickValues = (xAxisDataMapped, xScale, num, config) => {
   }
 }
 
-// Ensure that the last tick is shown for charts with a "Date (Linear Scale)" scale
-export const filterAndShiftLinearDateTicks = (config, axisProps, xAxisDataMapped, formatDate) => {
-  let ticks = axisProps.ticks
-  const filteredTickValues = getTicks(axisProps.scale, axisProps.numTicks)
-  if (filteredTickValues.length < xAxisDataMapped.length) {
-    let shift = 0
-    const lastIdx = xAxisDataMapped.indexOf(filteredTickValues[filteredTickValues.length - 1])
-    if (lastIdx < xAxisDataMapped.length - 1) {
-      shift = !config.xAxis.sortByRecentDate
-        ? xAxisDataMapped.length - 1 - lastIdx
-        : xAxisDataMapped.indexOf(filteredTickValues[0]) * -1
-    }
-    ticks = filteredTickValues.map(value => {
-      return axisProps.ticks[axisProps.ticks.findIndex(tick => tick.value === value) + shift]
-    })
-  }
-  ticks.forEach((tick, i) => {
-    tick.formattedValue = formatDate(tick.value, i, ticks)
-  })
-  return ticks
-}
-
 /// helper functions
 const composeXScale = ({ min, max, xMax, config }) => {
   // Adjust min value if using logarithmic scale
@@ -453,4 +443,8 @@ const sortXAxisData = (xAxisData, sortByRecentDate) => {
     // Sort from oldest to newest
     return xAxisData.sort((a, b) => Number(a) - Number(b))
   }
+}
+
+const buildTimeScale = (domain: [number, number], range: [number, number], options: { clamp?: boolean } = {}) => {
+  return scaleTime<number>({ domain, range, clamp: options.clamp }).rangeRound(range)
 }
