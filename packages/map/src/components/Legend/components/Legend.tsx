@@ -130,9 +130,11 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
         return runtimeLegend.items.findIndex(runtimeItem => {
           if (item.special && runtimeItem.special) {
-            // For special classes, match by value or label
-            return runtimeItem.value === (runtimeItem.label || runtimeItem.value) ||
-              runtimeItem.label === (item.label?.props?.children || item.label)
+            // For special classes, match by label (since formatted item label comes from runtime item)
+            const runtimeLabel = runtimeItem.label || runtimeItem.value
+            const itemLabel = typeof item.label === 'string' ? item.label :
+              (item.label?.props?.children || item.label)
+            return runtimeLabel === itemLabel
           } else if (!item.special && !runtimeItem.special) {
             // For categorical/qualitative items, match by single value
             if (config.legend.type === 'category' && item.categoryValue !== undefined) {
