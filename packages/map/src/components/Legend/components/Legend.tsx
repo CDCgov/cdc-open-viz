@@ -141,7 +141,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               return runtimeItem.value === item.categoryValue
             }
             // For numeric items, match by min/max values
-            return runtimeItem.min === item.value[0] && runtimeItem.max === item.value[1]
+            return runtimeItem.min === item.value?.[0] && runtimeItem.max === item.value?.[1]
           }
           return false
         })
