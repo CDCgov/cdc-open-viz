@@ -460,7 +460,7 @@ export const generateRuntimeLegend = (
 
             // Fallback: if still not assigned, assign to closest range
             if (!assigned) {
-              console.error('Value not assigned to any range:', number, 'assigning to closest range')
+              console.warn('Value not assigned to any range:', number, 'assigning to closest range')
               let closestIndex = 0
               let minDistance = Math.abs(number - (result.items[0].min + result.items[0].max) / 2)
 
