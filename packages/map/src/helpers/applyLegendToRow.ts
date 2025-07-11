@@ -29,21 +29,23 @@ export const applyLegendToRow = (
       return generateColorsArray(mapColorPalette[3])
     }
 
-    const hash = hashObj(rowObj)
+    const hash = String(hashObj(rowObj))
 
     if (!legendMemo.current.has(hash)) {
       return generateColorsArray()
     }
 
     const idx = legendMemo.current.get(hash)!
-    const disabledIdx = showSpecialClassesLast ? legendSpecialClassLastMemo.current.get(hash) ?? idx : idx
 
-    if (runtimeLegend.items?.[disabledIdx]?.disabled) {
+    if (runtimeLegend.items?.[idx]?.disabled) {
       return generateColorsArray()
     }
 
-    const legendBinColor = runtimeLegend.items.find(o => o.bin === idx)?.color
-    return generateColorsArray(legendBinColor, runtimeLegend.items[idx]?.special)
+    // Use the index from legendMemo which should already be updated for reordered items
+    const legendItem = runtimeLegend.items?.[idx]
+    const legendBinColor = legendItem?.color
+
+    return generateColorsArray(legendBinColor, legendItem?.special)
   } catch (e) {
     console.error('COVE: ', e)
     return null
