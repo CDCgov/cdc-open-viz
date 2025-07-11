@@ -14,7 +14,8 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 import { AreaChartStacked } from './AreaChart'
 import BarChart from './BarChart'
 import ConfigContext from '../ConfigContext'
-import BoxPlot from './BoxPlot'
+import BoxPlotVertical from './BoxPlot/BoxPlot.Vertical'
+import BoxPlotHorizontal from './BoxPlot/BoxPlot.Horizontal'
 import ScatterPlot from './ScatterPlot'
 import DeviationBar from './DeviationBar'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -31,12 +32,14 @@ import BrushChart from './Brush/BrushController'
 import { isLegendWrapViewport, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { calcInitialHeight, handleAutoPaddingRight } from '../helpers/sizeHelpers'
+import { filterAndShiftLinearDateTicks } from '../helpers/filterAndShiftLinearDateTicks'
 
 // Hooks
 import useMinMax from '../hooks/useMinMax'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
-import useScales, { getTickValues, filterAndShiftLinearDateTicks } from '../hooks/useScales'
+import useScales, { getTickValues } from '../hooks/useScales'
+
 import getTopAxis from '../helpers/getTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
@@ -751,8 +754,19 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               showTooltip={showTooltip}
             />
           )}
-          {visualizationType === 'Box Plot' && (
-            <BoxPlot
+          {visualizationType === 'Box Plot' && config.orientation === 'vertical' && (
+            <BoxPlotVertical
+              seriesScale={seriesScale}
+              xMax={xMax}
+              yMax={yMax}
+              min={min}
+              max={max}
+              xScale={xScale}
+              yScale={yScale}
+            />
+          )}
+          {visualizationType === 'Box Plot' && config.orientation === 'horizontal' && (
+            <BoxPlotHorizontal
               seriesScale={seriesScale}
               xMax={xMax}
               yMax={yMax}
@@ -1034,10 +1048,19 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                         stroke='#000'
                       />
                     )}
-                    {yScale.domain()[0] < 0 && (
+                    {orientation === 'vertical' && yScale.domain()[0] < 0 && (
+                      // draw from the Left of the chart …
                       <Line
                         from={{ x: props.axisFromPoint.x, y: yScale(0) }}
                         to={{ x: xMax, y: yScale(0) }}
+                        stroke='#333'
+                      />
+                    )}
+                    {orientation === 'horizontal' && xScale.domain()[0] < 0 && (
+                      <Line
+                        // draw from the top of the char
+                        from={{ x: xScale(0), y: 0 }}
+                        to={{ x: xScale(0), y: yMax }}
                         stroke='#333'
                       />
                     )}
@@ -1068,8 +1091,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       const labelVerticalAnchor = labelsAboveGridlines ? 'end' : 'middle'
                       const combineDomInlineLabelWithValue = inlineLabel && labelsAboveGridlines && lastTick
                       const formattedValue = useInlineLabel
-                        ? String(tick.formattedValue).replace(config.dataFormat.suffix, '')
-                        : tick.formattedValue
+
+                        ? String(tick?.formattedValue || '').replace(config.dataFormat.suffix, '')
+                        : tick?.formattedValue
+
 
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
@@ -1085,6 +1110,25 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                           )}
 
                           {orientation === 'horizontal' &&
+                            visualizationType === 'Box Plot' &&
+                            config.yAxis.labelPlacement === 'On Date/Category Axis' &&
+                            !config.yAxis.hideLabel && (
+                              <Text
+                                x={tick.to.x}
+                                y={yScale(tick.value) + yScale.bandwidth() / 2}
+                                transform={`rotate(${
+                                  config.orientation === 'horizontal' ? config.runtime.yAxis.tickRotation || 0 : 0
+                                }, ${tick.to.x}, ${tick.to.y})`}
+                                verticalAnchor={'middle'}
+                                textAnchor={'end'}
+                                fontSize={tickLabelFontSize}
+                              >
+                                {tick.formattedValue}
+                              </Text>
+                            )}
+
+                          {orientation === 'horizontal' &&
+                            visualizationType !== 'Box Plot' &&
                             visualizationSubType !== 'stacked' &&
                             config.yAxis.labelPlacement === 'On Date/Category Axis' &&
                             !config.yAxis.hideLabel && (
@@ -1536,7 +1580,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           !tooltipData?.data?.some(subArray => subArray.some(item => item === undefined)) &&
           tooltipData.dataYPosition &&
           tooltipData.dataXPosition &&
-          !config.tooltips.singleSeries && (
+          !(!config.tooltips.singleSeries && visualizationType === 'Line') && (
             <>
               <style>{`.tooltip {background-color: rgba(255,255,255, ${
                 config.tooltips.opacity / 100

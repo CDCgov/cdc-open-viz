@@ -8,12 +8,12 @@ import {
   scaleTime,
   getTicks
 } from '@visx/scale'
-import { useContext } from 'react'
+import { useContext, useMemo } from 'react'
 import ConfigContext from '../ConfigContext'
 import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
 import _ from 'lodash'
-
+import { extent } from 'd3-array'
 const scaleTypes = {
   TIME: 'time',
   LOG: 'log',
@@ -38,12 +38,19 @@ const useScales = (properties: useScaleProps) => {
   let { xAxisDataMapped, xMax, yMax, min, max, config, data } = properties
 
   const { rawData, dimensions } = useContext<ChartContext>(ConfigContext)
-
+  const sortByRecentDate = config.xAxis.sortByRecentDate
   const [screenWidth] = dimensions
   const seriesDomain = config.runtime.barSeriesKeys || config.runtime.seriesKeys
   const xAxisType = config.runtime.xAxis.type
   const isHorizontal = config.orientation === 'horizontal'
   const { visualizationType, xAxis, forestPlot } = config
+  const sortedTs = useMemo(
+    () =>
+      sortByRecentDate
+        ? [...xAxisDataMapped].sort((a, b) => Number(b) - Number(a))
+        : [...xAxisDataMapped].sort((a, b) => Number(a) - Number(b)),
+    [xAxisDataMapped, sortByRecentDate]
+  ).map(Number)
 
   //  define scales
   let xScale = null
@@ -75,15 +82,7 @@ const useScales = (properties: useScaleProps) => {
 
   // handle Linear scaled viz
   if (config.xAxis.type === 'date' && !isHorizontal) {
-    const xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
-    xScale = composeScaleBand(xAxisDataMappedSorted, [0, xMax], 1 - config.barThickness)
-  }
-
-  // handle Linear scaled viz
-  if (config.xAxis.type === 'date' && !isHorizontal) {
-    const sorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
-
-    xScale = composeScaleBand(sorted, [0, xMax], 1 - config.barThickness)
+    xScale = composeScaleBand(sortedTs, [0, xMax], 1 - config.barThickness)
     xScale.type = scaleTypes.BAND
   }
 
@@ -94,7 +93,7 @@ const useScales = (properties: useScaleProps) => {
 
     xAxisMin -= paddingRatio * (xAxisMax - xAxisMin)
     xAxisMax += visualizationType === 'Line' ? 0 : paddingRatio * (xAxisMax - xAxisMin)
-    const range = config.xAxis.sortByRecentDate ? [xMax, 0] : [0, xMax]
+    const range = sortByRecentDate ? [xMax, 0] : [0, xMax]
     xScale = scaleTime({
       domain: [xAxisMin, xAxisMax],
       range: range
@@ -103,10 +102,9 @@ const useScales = (properties: useScaleProps) => {
     xScale.type = scaleTypes.TIME
 
     let minDistance = Number.MAX_VALUE
-    let xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
 
-    for (let i = 0; i < xAxisDataMappedSorted.length - 1; i++) {
-      let distance = xScale(xAxisDataMappedSorted[i + 1]) - xScale(xAxisDataMappedSorted[i])
+    for (let i = 0; i < sortedTs.length - 1; i++) {
+      let distance = xScale(sortedTs[i + 1]) - xScale(sortedTs[i])
 
       if (distance < minDistance) minDistance = distance
     }
@@ -117,6 +115,20 @@ const useScales = (properties: useScaleProps) => {
     const barThickness = config.xAxis.brushActive ? 0.3 : config.barThickness
 
     seriesScale = composeScaleBand(seriesDomain, [0, barThickness * minDistance], 0)
+  }
+
+  // handle are chart
+  if (config.visualizationType === 'Area Chart') {
+    if (config.xAxis.type === 'date') {
+      const [xAxisMin, xAxisMax] = extent(sortedTs) as [number, number]
+      const domain: [number, number] = sortByRecentDate ? [xAxisMin, xAxisMax] : [xAxisMax, xAxisMin]
+      xScale = buildTimeScale(domain, [0, xMax])
+      xScale.type = scaleTypes.TIME
+    }
+    if (config.xAxis.type === 'categorical') {
+      xScale = composeScalePoint(xAxisDataMapped, [0, xMax], 0)
+      xScale.type = scaleTypes.POINT
+    }
   }
 
   // handle Deviation bar
@@ -152,46 +164,61 @@ const useScales = (properties: useScaleProps) => {
     }
   }
 
-  // handle Box plot
   if (visualizationType === 'Box Plot') {
-    const allOutliers = []
-    const hasOutliers =
-      config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) &&
-      !config.boxplot.hideOutliers
+    const {
+      boxplot: { plots, hideOutliers },
+      xAxis: { dataKey },
+      orientation,
+      runtime: { seriesKeys },
+      series,
+      barThickness
+    } = config
 
-    // check if outliers are lower
-    if (hasOutliers) {
-      let outlierMin = Math.min(...allOutliers)
-      let outlierMax = Math.max(...allOutliers)
-
-      // check if outliers exceed standard bounds
-      if (outlierMin < min) min = outlierMin
-      if (outlierMax > max) max = outlierMax
+    // 1) merge outliers + fences
+    let lo = min,
+      hi = max
+    for (const { columnOutliers = [], columnLowerBounds: lb, columnUpperBounds: ub } of plots) {
+      if (!hideOutliers && columnOutliers.length) {
+        lo = Math.min(lo, ...columnOutliers)
+        hi = Math.max(hi, ...columnOutliers)
+      }
+      lo = Math.min(lo, lb)
+      hi = Math.max(hi, ub)
     }
+    ;[min, max] = [lo, hi]
 
-    // check fences for max/min
-    let lowestFence = Math.min(...config.boxplot.plots.map(item => item.columnLowerBounds))
-    let highestFence = Math.max(...config.boxplot.plots.map(item => item.columnUpperBounds))
+    // 2) unique categories
+    const cats = Array.from(new Set(data.map(d => d[dataKey])))
 
-    if (lowestFence < min) min = lowestFence
-    if (highestFence > max) max = highestFence
+    if (orientation === 'horizontal') {
+      xScale = scaleLinear({
+        domain: [min, max],
+        range: [0, xMax],
+        nice: true,
+        clamp: true
+      })
+      yScale = scaleBand({
+        domain: cats,
+        range: [0, yMax]
+      })
+      seriesScale = scaleBand({
+        domain: seriesKeys,
+        range: [0, yScale.bandwidth()],
+        padding: Number(config.barHeight) / 100
+      })
+    } else {
+      xScale = composeScaleBand(cats, [0, xMax], 1 - barThickness)
+      xScale.type = scaleTypes.BAND
 
-    // Set Scales
+      // numeric → Y
+      yScale = composeYScale({ min, max, yMax, config, leftMax: 0 })
 
-    const categories = _.uniq(data.map(d => d[config.xAxis.dataKey]))
-    const range = [0, config.barThickness * 100 || 1]
-    const domain = _.map(config.series, 'dataKey')
-    yScale = scaleLinear({
-      range: [yMax, 0],
-      round: true,
-      domain: [min, max]
-    })
-    xScale = scaleBand({
-      range: [0, xMax],
-      domain: categories
-    })
-    xScale.type = scaleTypes.BAND
-    seriesScale = composeScaleBand(domain, range)
+      seriesScale = composeScaleBand(
+        series.map(s => s.dataKey),
+        [0, xScale.bandwidth()],
+        0
+      )
+    }
   }
 
   // handle Paired bar
@@ -353,28 +380,6 @@ export const getTickValues = (xAxisDataMapped, xScale, num, config) => {
   }
 }
 
-// Ensure that the last tick is shown for charts with a "Date (Linear Scale)" scale
-export const filterAndShiftLinearDateTicks = (config, axisProps, xAxisDataMapped, formatDate) => {
-  let ticks = axisProps.ticks
-  const filteredTickValues = getTicks(axisProps.scale, axisProps.numTicks)
-  if (filteredTickValues.length < xAxisDataMapped.length) {
-    let shift = 0
-    const lastIdx = xAxisDataMapped.indexOf(filteredTickValues[filteredTickValues.length - 1])
-    if (lastIdx < xAxisDataMapped.length - 1) {
-      shift = !config.xAxis.sortByRecentDate
-        ? xAxisDataMapped.length - 1 - lastIdx
-        : xAxisDataMapped.indexOf(filteredTickValues[0]) * -1
-    }
-    ticks = filteredTickValues.map(value => {
-      return axisProps.ticks[axisProps.ticks.findIndex(tick => tick.value === value) + shift]
-    })
-  }
-  ticks.forEach((tick, i) => {
-    tick.formattedValue = formatDate(tick.value, i, ticks)
-  })
-  return ticks
-}
-
 /// helper functions
 const composeXScale = ({ min, max, xMax, config }) => {
   // Adjust min value if using logarithmic scale
@@ -454,4 +459,8 @@ const sortXAxisData = (xAxisData, sortByRecentDate) => {
     // Sort from oldest to newest
     return xAxisData.sort((a, b) => Number(a) - Number(b))
   }
+}
+
+const buildTimeScale = (domain: [number, number], range: [number, number], options: { clamp?: boolean } = {}) => {
+  return scaleTime<number>({ domain, range, clamp: options.clamp }).rangeRound(range)
 }
