@@ -14,7 +14,8 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 import { AreaChartStacked } from './AreaChart'
 import BarChart from './BarChart'
 import ConfigContext from '../ConfigContext'
-import BoxPlot from './BoxPlot'
+import BoxPlotVertical from './BoxPlot/BoxPlot.Vertical'
+import BoxPlotHorizontal from './BoxPlot/BoxPlot.Horizontal'
 import ScatterPlot from './ScatterPlot'
 import DeviationBar from './DeviationBar'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -747,8 +748,19 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               showTooltip={showTooltip}
             />
           )}
-          {visualizationType === 'Box Plot' && (
-            <BoxPlot
+          {visualizationType === 'Box Plot' && config.orientation === 'vertical' && (
+            <BoxPlotVertical
+              seriesScale={seriesScale}
+              xMax={xMax}
+              yMax={yMax}
+              min={min}
+              max={max}
+              xScale={xScale}
+              yScale={yScale}
+            />
+          )}
+          {visualizationType === 'Box Plot' && config.orientation === 'horizontal' && (
+            <BoxPlotHorizontal
               seriesScale={seriesScale}
               xMax={xMax}
               yMax={yMax}
@@ -1030,10 +1042,19 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                         stroke='#000'
                       />
                     )}
-                    {yScale.domain()[0] < 0 && (
+                    {orientation === 'vertical' && yScale.domain()[0] < 0 && (
+                      // draw from the Left of the chart …
                       <Line
                         from={{ x: props.axisFromPoint.x, y: yScale(0) }}
                         to={{ x: xMax, y: yScale(0) }}
+                        stroke='#333'
+                      />
+                    )}
+                    {orientation === 'horizontal' && xScale.domain()[0] < 0 && (
+                      <Line
+                        // draw from the top of the char
+                        from={{ x: xScale(0), y: 0 }}
+                        to={{ x: xScale(0), y: yMax }}
                         stroke='#333'
                       />
                     )}
@@ -1081,6 +1102,25 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                           )}
 
                           {orientation === 'horizontal' &&
+                            visualizationType === 'Box Plot' &&
+                            config.yAxis.labelPlacement === 'On Date/Category Axis' &&
+                            !config.yAxis.hideLabel && (
+                              <Text
+                                x={tick.to.x}
+                                y={yScale(tick.value) + yScale.bandwidth() / 2}
+                                transform={`rotate(${
+                                  config.orientation === 'horizontal' ? config.runtime.yAxis.tickRotation || 0 : 0
+                                }, ${tick.to.x}, ${tick.to.y})`}
+                                verticalAnchor={'middle'}
+                                textAnchor={'end'}
+                                fontSize={tickLabelFontSize}
+                              >
+                                {tick.formattedValue}
+                              </Text>
+                            )}
+
+                          {orientation === 'horizontal' &&
+                            visualizationType !== 'Box Plot' &&
                             visualizationSubType !== 'stacked' &&
                             config.yAxis.labelPlacement === 'On Date/Category Axis' &&
                             !config.yAxis.hideLabel && (

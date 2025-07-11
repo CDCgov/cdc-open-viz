@@ -462,7 +462,7 @@ export const generateRuntimeLegend = (
             if (!assigned) {
               console.warn('Value not assigned to any range:', number, 'assigning to closest range')
               let closestIndex = 0
-              let minDistance = Math.abs(number - ((result.items[0].min + result.items[0].max) / 2))
+              let minDistance = Math.abs(number - (result.items[0].min + result.items[0].max) / 2)
 
               for (let i = 1; i < result.items.length; i++) {
                 const midpoint = (result.items[i].min + result.items[i].max) / 2
