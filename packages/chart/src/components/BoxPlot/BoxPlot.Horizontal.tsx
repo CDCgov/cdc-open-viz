@@ -67,9 +67,9 @@ const BoxPlotHorizontal = ({ xScale, yScale, seriesScale }) => {
                     }
                     outlierProps={{
                       style: {
-                        fill: 'green',
+                        fill: colorScale(item.dataKey),
                         opacity: 1,
-                        stroke: 'green'
+                        stroke: defaultColor
                       }
                     }}
                     container
