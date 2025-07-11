@@ -1107,7 +1107,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                 x={tick.to.x}
                                 y={yScale(tick.value) + yScale.bandwidth() / 2}
                                 transform={`rotate(${
-                                  config.runtime.horizontal ? config.runtime.yAxis.tickRotation || 0 : 0
+                                  config.orientation === 'horizontal' ? config.runtime.yAxis.tickRotation || 0 : 0
                                 }, ${tick.to.x}, ${tick.to.y})`}
                                 verticalAnchor={'middle'}
                                 textAnchor={'end'}
