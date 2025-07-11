@@ -59,8 +59,8 @@ const BoxPlotHorizontal = ({ xScale, yScale, seriesScale }) => {
                       stroke: defaultColor,
                       fillOpacity: fillOpacity
                     }}
-                    minProps={{ stroke: colorScale(item.dataKey), strokeWidth: 1, opacity: fillOpacity }}
-                    maxProps={{ stroke: colorScale(item.dataKey), strokeWidth: 1, opacity: fillOpacity }}
+                    minProps={{ stroke: defaultColor, strokeWidth: 1, opacity: fillOpacity }}
+                    maxProps={{ stroke: defaultColor, strokeWidth: 1, opacity: fillOpacity }}
                     medianProps={{ stroke: defaultColor, strokeWidth: 1, opacity: fillOpacity }}
                     outliers={
                       config.boxplot.plotOutlierValues ? _.map(plot.columnOutliers[item.dataKey], item => item) : []
