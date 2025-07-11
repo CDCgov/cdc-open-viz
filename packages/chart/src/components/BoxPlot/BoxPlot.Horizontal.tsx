@@ -18,7 +18,7 @@ const BoxPlotHorizontal = ({ xScale, yScale, seriesScale }) => {
 
   return (
     <ErrorBoundary component='BoxPlot Horizontal'>
-      <Group left={yOffset} top={0} className='boxplot murraddd'>
+      <Group left={yOffset} top={0} className='boxplot'>
         {plots.map(plot => {
           const category = plot.columnCategory
 
