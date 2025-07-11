@@ -81,7 +81,6 @@ const Header = (props: HeaderProps) => {
   }
 
   const multiInitialized = !!config.multiDashboards
-  if (!config) return null
   return (
     <div aria-level={2} role='heading' className={`editor-heading${subEditor ? ' sub-dashboard-viz' : ''}`}>
       {subEditor ? (
