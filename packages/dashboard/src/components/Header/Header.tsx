@@ -17,7 +17,6 @@ const Header = (props: HeaderProps) => {
   const tabs: Tab[] = ['Dashboard Description', 'Data Table Settings', 'Dashboard Preview']
   const { visualizationKey, subEditor } = props
   const { config, setParentConfig, tabSelected, data } = useContext(DashboardContext)
-
   const dispatch = useContext(DashboardDispatchContext)
   const back = () => {
     if (!visualizationKey) return
@@ -79,6 +78,8 @@ const Header = (props: HeaderProps) => {
       dispatch({ type: 'INITIALIZE_MULTIDASHBOARDS' })
     }
   }
+
+  if (!config) return null
 
   const multiInitialized = !!config.multiDashboards
   return (
