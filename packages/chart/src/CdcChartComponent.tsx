@@ -261,6 +261,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       const [plots, categories] = getBoxPlotConfig(newConfig, stateData)
       newConfig.boxplot['categories'] = categories
       newConfig.boxplot.plots = plots
+      newConfig.yAxis.labelPlacement = 'On Date/Category Axis'
     }
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {
       newConfig.runtime = getComboChartConfig(newConfig)
@@ -286,7 +287,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     if (
-      (newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') ||
+      ((newConfig.visualizationType === 'Bar' || newConfig.visualizationType === 'Box Plot') &&
+        newConfig.orientation === 'horizontal') ||
       ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)
     ) {
       newConfig.runtime.xAxis = _.cloneDeep(newConfig.yAxis.yAxis || newConfig.yAxis)
@@ -298,7 +300,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       // remove after  COVE supports categorical axis on horizonatal bars
       newConfig.yAxis.type = newConfig.yAxis.type === 'categorical' ? 'linear' : newConfig.yAxis.type
     } else if (
-      ['Box Plot', 'Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType) &&
+      ['Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType) &&
       !convertLineToBarGraph
     ) {
       newConfig.runtime.xAxis = newConfig.xAxis
@@ -862,7 +864,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
         {config.dataKey} (Go to Table)
       </a>
     )
-
     body = (
       <>
         {isEditor && <EditorPanel datasets={datasets} />}
