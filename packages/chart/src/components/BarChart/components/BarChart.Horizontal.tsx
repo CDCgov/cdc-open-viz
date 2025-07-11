@@ -303,7 +303,7 @@ export const BarChartHorizontal = () => {
                           )
                         })}
 
-                        {!config.isLollipopChart && (
+                        {!config.isLollipopChart && !hasConfidenceInterval && (
                           <Text // prettier-ignore
                             display={displayBar ? 'block' : 'none'}
                             x={bar.y}
