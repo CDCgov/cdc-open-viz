@@ -110,8 +110,6 @@ export const parseVegaConfig = vegaConfig => {
   try {
     vegaConfig = vegaLiteCompile(vegaConfig).spec
   } catch {}
-  console.log('------------- vega config -------------')
-  console.log(vegaConfig)
   return vegaConfig
 }
 
@@ -252,8 +250,6 @@ export const extractCoveData = vegaConfig => {
     }
   }
 
-  console.log('------------- cove data -------------')
-  console.log(data)
   return data
 }
 
@@ -563,9 +559,6 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
     config.data = data
     config = loadedVegaConfigData(config)
   }
-
-  console.log('------------- cove config -------------')
-  console.log(config)
 
   return config
 }
