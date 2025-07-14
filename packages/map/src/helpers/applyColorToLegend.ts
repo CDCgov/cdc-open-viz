@@ -41,10 +41,10 @@ export const applyColorToLegend = (legendItemIndex: number, config: MapConfig, r
     const distributionArray = colorDistributions[amt] ?? []
 
     const specificColor =
-      distributionArray[legendItemIndex - specialClasses.length] ?? colorPalette[regularItemColorIndex] ?? colorPalette.at(-1)
+      distributionArray[legendItemIndex - specialClasses.length] ?? colorPalette.at(-1)
 
     // If specificColor is a number, use it as an index; otherwise return the color directly
-    return typeof specificColor === 'string' ? specificColor : colorPalette[specificColor]
+    return colorPalette[specificColor] ?? '#fff'
   }
 
   // Use qualitative color palettes directly
