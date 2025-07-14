@@ -379,25 +379,22 @@ export const generateRuntimeLegend = (
           numberOfRows -= chunkAmt
         }
       } else {
+        // Use the appropriate rounding precision
+        const roundingPrecision = general?.equalNumberOptIn && columns?.primary?.roundToPlace !== undefined
+          ? Number(columns.primary.roundToPlace)
+          : roundToPlace
+
         let colors = colorPalettes[configObj.color]
         let colorRange = colors.slice(0, legend.numberOfItems)
 
         const getDomain = () => {
-          // backwards compatibility
-          if (columns?.primary?.roundToPlace !== undefined && general?.equalNumberOptIn) {
-            return _.uniq(
-              dataSet.map(item => convertAndRoundValue(item[columns.primary.name], Number(columns?.primary?.roundToPlace)))
-            )
-          }
-          return _.uniq(dataSet.map(item => convertAndRoundValue(item[columns.primary.name], roundToPlace)))
+          return _.uniq(
+            dataSet.map(item => convertAndRoundValue(item[columns.primary.name], roundingPrecision))
+          )
         }
 
         const getBreaks = scale => {
-          // backwards compatibility
-          if (columns?.primary?.roundToPlace !== undefined && general?.equalNumberOptIn) {
-            return scale.quantiles().map(b => convertAndRoundValue(b, Number(columns?.primary?.roundToPlace)))
-          }
-          return scale.quantiles().map(item => convertAndRoundValue(item, roundToPlace))
+          return scale.quantiles().map(b => convertAndRoundValue(b, roundingPrecision))
         }
 
         let scale = d3
@@ -411,84 +408,125 @@ export const generateRuntimeLegend = (
           cachedBreaks = breaks
         }
 
-        // if separating zero force it into breaks
-        if (cachedBreaks[0] !== 0) {
-          cachedBreaks.unshift(0)
+        // Handle separateZero logic: if separating zero and it's not already included, add it
+        if (legend.separateZero) {
+          // Add zero bucket first if separating zero
+          result.items.push({
+            min: 0,
+            max: 0
+          })
+
+          // Assign all zero values to this bucket
+          dataSet.forEach(row => {
+            let number = convertAndRoundValue(row[columns.primary.name], roundingPrecision)
+            if (number === 0) {
+              newLegendMemo.set(String(hashObj(row)), 0)
+            }
+          })
         }
 
-        // eslint-disable-next-line array-callback-return
-        let previousMax = null
-        cachedBreaks.map((item, index) => {
-          const setMin = index => {
-            let min = cachedBreaks[index]
+        // Create quantile breaks for non-zero values (or all values if not separating zero)
+        const dataForBreaks = legend.separateZero
+          ? dataSet.filter(row => convertAndRoundValue(row[columns.primary.name], roundingPrecision) !== 0)
+          : dataSet
 
-            // if first break is a seperated zero, min is zero
-            if (index === 0 && legend.separateZero) {
-              min = 0
-            }
-
-            // if we're on the second break, and separating out zero, increment min to 1.
-            if (index === 1 && legend.separateZero) {
-              min = 1
-            }
-
-            // For non-first ranges, use the previous max + small increment to prevent overlap
-            if (index > 0 && !legend.separateZero && previousMax !== null) {
-              const decimalPlace = Number(configObj?.columns?.primary?.roundToPlace) || 1
-              min = convertAndRoundValue(previousMax + Math.pow(10, -decimalPlace), decimalPlace)
-            }
-
-            return convertAndRoundValue(min, roundToPlace)
+        if (dataForBreaks.length > 0) {
+          // Recalculate scale and breaks for non-zero data
+          const getNonZeroDomain = () => {
+            return _.uniq(
+              dataForBreaks.map(item => convertAndRoundValue(item[columns.primary.name], roundingPrecision))
+            ).sort((a: number, b: number) => a - b)
           }
 
-          const getDecimalPlace = n => {
-            return Math.pow(10, -n)
-          }
+          const nonZeroDomain = getNonZeroDomain()
+          const numberOfBuckets = legend.separateZero ? legend.numberOfItems - 1 : legend.numberOfItems
 
-          const setMax = index => {
-            let max = Number(breaks[index + 1])
+          if (nonZeroDomain.length > 0 && numberOfBuckets > 0) {
+            let nonZeroScale = d3
+              .scaleQuantile()
+              .domain(nonZeroDomain)
+              .range(colorPalettes[configObj.color].slice(0, numberOfBuckets))
 
-            if (index === 0 && legend.separateZero) {
-              max = 0
-            }
+            const quantileBreaks = nonZeroScale.quantiles().map(b => convertAndRoundValue(b, roundingPrecision))
 
-            if (index + 1 === breaks.length) {
-              max = Number(domainNums[domainNums.length - 1])
-            }
+            // Create buckets based on quantile breaks
+            const createBuckets = () => {
+              const buckets = []
+              const sortedDomain = nonZeroDomain.sort((a: number, b: number) => a - b)
 
-            return convertAndRoundValue(max, roundToPlace)
-          }
+              if (quantileBreaks.length === 0) {
+                // Single bucket case
+                buckets.push({
+                  min: sortedDomain[0],
+                  max: sortedDomain[sortedDomain.length - 1]
+                })
+              } else {
+                // First bucket: min value to first break
+                buckets.push({
+                  min: sortedDomain[0],
+                  max: quantileBreaks[0]
+                })
 
-          let min = setMin(index)
-          let max = setMax(index)
+                // Middle buckets: previous break + increment to current break
+                for (let i = 1; i < quantileBreaks.length; i++) {
+                  const increment = Math.pow(10, -roundingPrecision)
+                  buckets.push({
+                    min: convertAndRoundValue(quantileBreaks[i - 1] + increment, roundingPrecision),
+                    max: quantileBreaks[i]
+                  })
+                }
 
-          // Store the max value for the next iteration
-          previousMax = max
-
-          result.items.push({
-            min,
-            max
-          })
-
-          dataSet.forEach(row => {
-            let number = convertAndRoundValue(row[columns.primary.name], roundToPlace)
-            let updated = result.items.length - 1
-
-            if (result.items?.[updated]?.min === undefined || result.items?.[updated]?.max === undefined) return
-
-            // Check if this row hasn't been assigned yet to prevent double assignment
-            if (!newLegendMemo.has(String(hashObj(row)))) {
-              if (number >= result.items[updated].min && number <= result.items[updated].max) {
-                newLegendMemo.set(String(hashObj(row)), updated)
+                // Last bucket: last break + increment to max value
+                if (quantileBreaks.length > 0) {
+                  const increment = Math.pow(10, -roundingPrecision)
+                  buckets.push({
+                    min: convertAndRoundValue(quantileBreaks[quantileBreaks.length - 1] + increment, roundingPrecision),
+                    max: sortedDomain[sortedDomain.length - 1]
+                  })
+                }
               }
+
+              return buckets
             }
-          })
-        })
+
+            const buckets = createBuckets()
+
+            // Add buckets to result
+            buckets.forEach(bucket => {
+              result.items.push(bucket)
+            })
+
+            // Assign non-zero values to appropriate buckets
+            dataForBreaks.forEach(row => {
+              let number = convertAndRoundValue(row[columns.primary.name], roundingPrecision)
+              let assigned = false
+
+              for (let itemIndex = legend.separateZero ? 1 : 0; itemIndex < result.items.length; itemIndex++) {
+                const item = result.items[itemIndex]
+
+                if (item.min === undefined || item.max === undefined) continue
+
+                if (number >= item.min && number <= item.max) {
+                  newLegendMemo.set(String(hashObj(row)), itemIndex)
+                  assigned = true
+                  break
+                }
+              }
+
+              // Fallback assignment if not assigned
+              if (!assigned) {
+                console.warn('Non-zero value not assigned to any range:', number)
+                const fallbackIndex = legend.separateZero ? 1 : 0
+                newLegendMemo.set(String(hashObj(row)), fallbackIndex)
+              }
+            })
+          }
+        }
 
         // Final pass: handle any unassigned rows
         dataSet.forEach(row => {
           if (!newLegendMemo.has(String(hashObj(row)))) {
-            let number = convertAndRoundValue(row[columns.primary.name], roundToPlace)
+            let number = convertAndRoundValue(row[columns.primary.name], roundingPrecision)
             let assigned = false
 
             // Find the correct range for this value - check both boundaries
