@@ -29,7 +29,9 @@
     "react-select": "^5.3.1",
     "react-tooltip": "5.8.2-beta.3",
     "sass": "^1.89.2",
-    "use-debounce": "^10.0.5"
+    "use-debounce": "^10.0.5",
+    "vega": "^6.1.0",
+    "vega-lite": "^6.1.0"
   },
   "peerDependencies": {
     "react": "^18.2.0",
