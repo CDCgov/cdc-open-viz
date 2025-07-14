@@ -35,6 +35,18 @@ export const applyColorToLegend = (legendItemIndex: number, config: MapConfig, r
     return specialClassColors[legendItemIndex]
   }
 
+  // For categorical maps with custom colors, use color distribution logic
+  if (config.legend?.type === 'category' && customColors) {
+    const amt = config.legend.additionalCategories?.length ?? 10
+    const distributionArray = colorDistributions[amt] ?? []
+
+    const specificColor =
+      distributionArray[legendItemIndex - specialClasses.length] ?? colorPalette[regularItemColorIndex] ?? colorPalette.at(-1)
+
+    // If specificColor is a number, use it as an index; otherwise return the color directly
+    return typeof specificColor === 'string' ? specificColor : colorPalette[specificColor]
+  }
+
   // Use qualitative color palettes directly
   if (color.includes('qualitative')) {
     const safeIndex = Math.max(0, Math.min(regularItemColorIndex, colorPalette.length - 1))
@@ -54,10 +66,10 @@ export const applyColorToLegend = (legendItemIndex: number, config: MapConfig, r
   const colorValue =
     rowDistributionIndex ?? colorPalette[regularItemColorIndex] ?? colorPalette.at(-1)
 
-  // Check if specificColor is a string (e.g., a valid color code)
-  // if (typeof colorValue === 'string') {
-  //   return colorValue
-  // }
+  // Check if specificColor is a string(e.g., a valid color code)
+  if (typeof colorValue === 'string' && config.legend?.type === 'category' && customColors) {
+    return colorValue
+  }
 
   // Otherwise, use specificColor as an index for mapColorPalette
   return colorPalette[colorValue]
