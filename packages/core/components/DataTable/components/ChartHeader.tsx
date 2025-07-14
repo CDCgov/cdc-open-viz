@@ -75,7 +75,7 @@ const ChartHeader = ({
     return (
       <tr>
         {dataSeriesColumns.map((column, index) => {
-          const text = parse(getSeriesName(column, config))
+          const text = parse(getSeriesName(column.toString(), config))
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
           const isSortedCol = column === sortBy.column && !hasRowType

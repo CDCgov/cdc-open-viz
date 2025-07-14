@@ -65,6 +65,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import EditorContext from '../../editor/src/ConfigContext'
 import { EDITOR_WIDTH } from '@cdc/core/helpers/constants'
+import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 // Local helpers
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
 import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
@@ -409,6 +410,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
         // handle urls with spaces in the name.
         if (newConfig.dataUrl) newConfig.dataUrl = `${newConfig.dataUrl}`
         let newData = await fetchRemoteData(newConfig.dataUrl)
+
+        if (newConfig.vegaConfig) {
+          newData = extractCoveData(updateVegaData(newConfig.vegaConfig, newData))
+        }
 
         if (newData && newConfig.dataDescription) {
           newData = transform.autoStandardize(newData)
