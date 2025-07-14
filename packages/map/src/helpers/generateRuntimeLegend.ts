@@ -303,28 +303,26 @@ export const generateRuntimeLegend = (
     if (true === legend.separateZero && !general.equalNumberOptIn) {
       let addLegendItem = false
 
+      // First, add the zero bucket
+      result.items.push({
+        min: 0,
+        max: 0
+      })
+
+      // Then process zero values and assign them to the zero bucket (index 0)
       for (let i = 0; i < dataSet.length; i++) {
         if (dataSet[i][primaryColName] === 0) {
           addLegendItem = true
 
           let row = dataSet.splice(i, 1)[0]
 
-          newLegendMemo.set(String(hashObj(row)), result.items.length)
+          newLegendMemo.set(String(hashObj(row)), 0) // Assign to the zero bucket at index 0
           i--
         }
       }
 
       if (addLegendItem) {
         legendNumber -= 1 // This zero takes up one legend item
-
-        // Add new legend item
-        result.items.push({
-          min: 0,
-          max: 0
-        })
-
-        let lastIdx = result.items.length - 1
-
       }
     }
 
