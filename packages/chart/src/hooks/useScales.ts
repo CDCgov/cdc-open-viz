@@ -147,44 +147,50 @@ const useScales = (properties: useScaleProps) => {
 
   // handle Box plot
   if (visualizationType === 'Box Plot') {
-    const allOutliers = []
-    const hasOutliers =
-      config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) &&
-      !config.boxplot.hideOutliers
+    const {
+      boxplot: { plots, hideOutliers },
+      xAxis: { dataKey },
+      orientation,
+      runtime: { seriesKeys },
+      series,
+      barThickness
+    } = config
 
-    // check if outliers are lower
-    if (hasOutliers) {
-      let outlierMin = Math.min(...allOutliers)
-      let outlierMax = Math.max(...allOutliers)
-
-      // check if outliers exceed standard bounds
-      if (outlierMin < min) min = outlierMin
-      if (outlierMax > max) max = outlierMax
+    // 1) merge outliers + fences
+    let lo = min,
+      hi = max
+    for (const { columnOutliers = [], columnLowerBounds: lb, columnUpperBounds: ub } of plots) {
+      if (!hideOutliers && columnOutliers.length) {
+        lo = Math.min(lo, ...columnOutliers)
+        hi = Math.max(hi, ...columnOutliers)
+      }
+      lo = Math.min(lo, lb)
+      hi = Math.max(hi, ub)
     }
+    ;[min, max] = [lo, hi]
 
-    // check fences for max/min
-    let lowestFence = Math.min(...config.boxplot.plots.map(item => item.columnLowerBounds))
-    let highestFence = Math.max(...config.boxplot.plots.map(item => item.columnUpperBounds))
+    // 2) unique categories
+    const cats = Array.from(new Set(data.map(d => d[dataKey])))
 
-    if (lowestFence < min) min = lowestFence
-    if (highestFence > max) max = highestFence
+    if (orientation === 'horizontal') {
+      xScale = composeXScale({ min, max, xMax, config })
+      xScale.type = scaleTypes.LINEAR
 
-    // Set Scales
+      yScale = composeScaleBand(cats, [0, yMax], 0.4)
+      seriesScale = composeScaleBand(seriesKeys, [0, yScale.bandwidth()], 0.3)
+    } else {
+      xScale = composeScaleBand(cats, [0, xMax], 1 - barThickness)
+      xScale.type = scaleTypes.BAND
 
-    const categories = _.uniq(data.map(d => d[config.xAxis.dataKey]))
-    const range = [0, config.barThickness * 100 || 1]
-    const domain = _.map(config.series, 'dataKey')
-    yScale = scaleLinear({
-      range: [yMax, 0],
-      round: true,
-      domain: [min, max]
-    })
-    xScale = scaleBand({
-      range: [0, xMax],
-      domain: categories
-    })
-    xScale.type = scaleTypes.BAND
-    seriesScale = composeScaleBand(domain, range)
+      // numeric → Y
+      yScale = composeYScale({ min, max, yMax, config, leftMax: 0 })
+
+      seriesScale = composeScaleBand(
+        series.map(s => s.dataKey),
+        [0, xScale.bandwidth()],
+        0
+      )
+    }
   }
 
   // handle Paired bar
