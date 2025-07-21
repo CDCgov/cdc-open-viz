@@ -76,6 +76,7 @@ export const getVizConfig = (
 
   if (filteredDataOverride) {
     visualizationConfig.data = filteredDataOverride
+    visualizationConfig.formattedData = filteredDataOverride
   }
 
   if (visualizationConfig.footnotes) {
