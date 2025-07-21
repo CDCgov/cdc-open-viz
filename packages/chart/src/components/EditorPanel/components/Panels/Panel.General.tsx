@@ -435,9 +435,9 @@ const PanelGeneral: FC<PanelProps> = props => {
         {visSupportsFootnotes() && (
           <TextField
             type='textarea'
-            value={config.footnotes}
+            value={config.legacyFootnotes}
             updateField={updateField}
-            fieldName='footnotes'
+            fieldName='legacyFootnotes'
             label='Footnotes'
             tooltip={
               <Tooltip style={{ textTransform: 'none' }}>

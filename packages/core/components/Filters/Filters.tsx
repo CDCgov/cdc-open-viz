@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useId } from 'react'
 import _ from 'lodash'
+import parse from 'html-react-parser'
 
 // CDC
 import Button from '../elements/Button'
@@ -13,8 +14,6 @@ import { getNestedOptions } from './helpers/getNestedOptions'
 import { getWrappingStatuses } from './helpers/filterWrapping'
 import { handleSorting } from './helpers/handleSorting'
 import { getChangedFilters } from './helpers/getChangedFilters'
-import { getNewRuntime } from './helpers/getNewRuntime'
-import { filterVizData } from '../../helpers/filterVizData'
 import { getQueryParams, updateQueryString } from '../../helpers/queryStringUtils'
 import { applyQueuedActive } from './helpers/applyQueuedActive'
 import Tabs from './components/Tabs'
@@ -40,25 +39,19 @@ const BUTTON_TEXT = {
 }
 
 type FilterProps = {
-  filteredData: Object[]
-  dimensions: DimensionsType
+  dimensions?: DimensionsType
   config: Visualization
-  // function for updating the runtime filters
-  setFilteredData: Function
-  // updating function for setting fitlerBehavior
-  setConfig: Function
+  setFilters: Function
   standaloneMap?: boolean
   excludedData?: Object[]
-  getUniqueValues: Function
+  getUniqueValues?: Function
 }
 
 const Filters: React.FC<FilterProps> = ({
   config: visualizationConfig,
-  filteredData,
   dimensions,
   standaloneMap,
-  setConfig,
-  setFilteredData,
+  setFilters,
   excludedData,
   getUniqueValues
 }) => {
@@ -82,7 +75,7 @@ const Filters: React.FC<FilterProps> = ({
   // end of Handle Wrapping Filters
 
   const initialActiveFilters = useMemo(() => {
-    if (!filteredData) return []
+    //if (!filteredData) return []
     return filters.map(filter => filter.active)
   }, [])
 
@@ -92,36 +85,10 @@ const Filters: React.FC<FilterProps> = ({
   }, [filters])
 
   const changeFilterActive = (index, value) => {
-    let newFilters = standaloneMap ? [...filteredData] : [...visualizationConfig.filters]
+    if (filterBehavior === 'Apply Button') setShowApplyButton(true)
 
-    newFilters = getChangedFilters(newFilters, index, value, visualizationConfig.filterBehavior)
-    if (visualizationConfig.filterBehavior === 'Apply Button') setShowApplyButton(true)
-
-    if (!visualizationConfig.dynamicSeries) {
-      const _newFilters = addValuesToFilters(newFilters, excludedData)
-      setConfig({
-        ...visualizationConfig,
-        filters: _newFilters
-      })
-    }
-
-    if (visualizationConfig.filterBehavior === 'Filter Change') {
-      if (standaloneMap) {
-        setFilteredData(newFilters)
-      } else {
-        const newFilteredData = filterVizData(newFilters, excludedData)
-        setFilteredData(newFilteredData)
-
-        if (visualizationConfig.dynamicSeries) {
-          const runtime = getNewRuntime(visualizationConfig, newFilteredData)
-          setConfig({
-            ...visualizationConfig,
-            filters: newFilters,
-            runtime
-          })
-        }
-      }
-    }
+    const newFilters = getChangedFilters([...filters], index, value, filterBehavior)
+    setFilters(newFilters)
   }
 
   const handleApplyButton = newFilters => {
@@ -140,19 +107,13 @@ const Filters: React.FC<FilterProps> = ({
       updateQueryString(queryParams)
     }
 
-    setConfig({ ...visualizationConfig, filters: newFilters })
-
-    if (standaloneMap) {
-      setFilteredData(newFilters, excludedData)
-    } else {
-      setFilteredData(filterVizData(newFilters, excludedData))
-    }
+    setFilters(newFilters)
 
     setShowApplyButton(false)
   }
 
   const handleReset = e => {
-    let newFilters = [...visualizationConfig.filters]
+    let newFilters = [...filters]
     e.preventDefault()
 
     // reset to first item in values array.
@@ -175,18 +136,12 @@ const Filters: React.FC<FilterProps> = ({
       updateQueryString(queryParams)
     }
 
-    setConfig({ ...visualizationConfig, filters: newFilters })
-
-    if (standaloneMap) {
-      setFilteredData(newFilters, excludedData)
-    } else {
-      setFilteredData(filterVizData(newFilters, excludedData))
-    }
+    setFilters(newFilters)
   }
 
   const mobileFilterStyle = useMemo(() => {
-    if (!dimensions) false
-    const [width] = dimensions || []
+    if (!dimensions) return false
+    const [width] = dimensions
     const isMobile = Number(width) < 768
     const isTabSimple = filters?.some(filter => filter.filterStyle === VIZ_FILTER_STYLE.tabSimple)
 
@@ -195,13 +150,12 @@ const Filters: React.FC<FilterProps> = ({
 
   const vizFiltersWithValues = useMemo(() => {
     // Here charts is using config.filters where maps is using a runtime value
-    let vizfilters = standaloneMap ? filteredData : filters
-    if (!vizfilters) return []
-    if (vizfilters.fromHash) delete vizfilters.fromHash // support for Maps config
-    return addValuesToFilters(vizfilters as VizFilter[], visualizationConfig.data)
-  }, [filters, filteredData])
+    if (!filters) return []
+    if (filters.fromHash) delete filters.fromHash // support for Maps config
+    return addValuesToFilters(filters as VizFilter[], visualizationConfig.data)
+  }, [filters])
 
-  if (visualizationConfig?.filters?.length === 0) return
+  if (visualizationConfig?.filters?.length === 0) return <></>
 
   const getClasses = () => {
     const { visualizationType, legend } = visualizationConfig || {}
@@ -220,13 +174,14 @@ const Filters: React.FC<FilterProps> = ({
   return (
     <section className={getClasses().join(' ')}>
       {visualizationConfig.filterIntro && (
-        <p className='filters-section__intro-text mb-3'>{visualizationConfig.filterIntro}</p>
+        <p className='filters-section__intro-text mb-3'>{parse(visualizationConfig.filterIntro)}</p>
       )}
       <div className='d-flex flex-wrap w-100 filters-section__wrapper align-items-end'>
         <>
           {vizFiltersWithValues.map((singleFilter: VizFilter, outerIndex) => {
             if (singleFilter.showDropdown === false) return
             const { label, filterStyle, columnName } = singleFilter as VizFilter
+            const [nestedActiveGroup, nestedActiveSubGroup] = getNestedGroup(singleFilter)
 
             handleSorting(singleFilter)
 
@@ -239,7 +194,6 @@ const Filters: React.FC<FilterProps> = ({
             const { isDropdown } = wrappingFilters[columnName] || {}
             const showDefaultDropdown =
               ((filterStyle === 'dropdown' || mobileFilterStyle) && !mobileExempt) || isDropdown
-            const [nestedActiveGroup, nestedActiveSubGroup] = getNestedGroup(singleFilter)
             const hideLabelMargin = singleFilter.filterStyle === 'tab-simple' && !showDefaultDropdown
             return (
               <div
@@ -249,7 +203,7 @@ const Filters: React.FC<FilterProps> = ({
               >
                 {label && (
                   <label
-                    className={`font-weight-bold mb-${hideLabelMargin ? '0' : '2'}`}
+                    className={`font-weight-bold fw-bold mb-${hideLabelMargin ? '0' : '2'}`}
                     htmlFor={`filter-${outerIndex}`}
                   >
                     {label}
@@ -284,7 +238,11 @@ const Filters: React.FC<FilterProps> = ({
                   <MultiSelect
                     options={singleFilter.values.map(v => ({ value: v, label: v }))}
                     fieldName={outerIndex}
-                    updateField={(_section, _subSection, fieldName, value) => changeFilterActive(fieldName, value)}
+                    updateField={(_section, _subSection, fieldName, value) => {
+                      const defaultSelection = singleFilter.defaultValue || [singleFilter.values[0]]
+                      const selection = value?.length ? value : defaultSelection
+                      changeFilterActive(fieldName, selection)
+                    }}
                     selected={singleFilter.active as string[]}
                     limit={(singleFilter as MultiSelectFilter).selectLimit || 5}
                   />

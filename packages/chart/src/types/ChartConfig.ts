@@ -16,6 +16,7 @@ import { Region } from '@cdc/core/types/Region'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { Version } from '@cdc/core/types/Version'
+import Footnotes from '@cdc/core/types/Footnotes'
 
 export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 export type ChartColumns = Record<string, Column>
@@ -43,7 +44,7 @@ export interface PreliminaryDataItem {
   iconCode: string
   label: string
   lineCode: string
-  seriesKey: string
+  seriesKeys: string[]
   style: string
   symbol: string
   type: 'effect' | 'suppression'
@@ -69,7 +70,7 @@ type DataFormat = {
   rightSuffix: string
   roundTo: number
   suffix: string
-  onlyShowTopPrefixSuffix?: boolean
+  showPiePercent: boolean
 }
 
 type Exclusions = {
@@ -121,7 +122,8 @@ export type AllChartsConfig = {
   boxplot: BoxPlot
   brush: {
     active: boolean
-    height: number
+    data: object[]
+    isBrushing: boolean
   }
   chartMessage: { noData?: string }
   color: string
@@ -140,7 +142,8 @@ export type AllChartsConfig = {
   exclusions: Exclusions
   filters: VizFilter[]
   filterBehavior: FilterBehavior
-  footnotes: string
+  legacyFootnotes: string // this footnote functionality should be moved to the Footnotes component
+  footnotes: Footnotes
   forestPlot: ForestPlotConfigSettings
   formattedData: Object[] & { urlFiltered: boolean }
   heights: {

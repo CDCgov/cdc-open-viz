@@ -9,6 +9,7 @@ import pairedBar from './_mock/paired-bar.json'
 import horizontalBarConfig from './_mock/horizontal_bar.json'
 import barChartLabels from './_mock/barchart_labels.mock.json'
 import pieConfig from './_mock/pie_with_data.json'
+import pieCalculatedArea from './_mock/pie_calculated_area.json'
 import boxPlotConfig from './_mock/boxplot_multiseries.json'
 import areaChartStacked from './_mock/area_chart_stacked.json'
 import multipleLines from './_mock/short_dates.json'
@@ -68,6 +69,11 @@ export const BarChart_Labels: Story = {
 export const Pie: Story = {
   args: {
     config: pieConfig
+  }
+}
+export const Pie_Calculated_Area: Story = {
+  args: {
+    config: pieCalculatedArea
   }
 }
 

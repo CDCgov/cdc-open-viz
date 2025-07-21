@@ -8,7 +8,8 @@ const generateRuntimeData = (
   configObj: MapConfig,
   filters: VizFilter[],
   hash: number,
-  isCategoryLegend: boolean
+  isCategoryLegend: boolean,
+  keepNoUidRows = false
 ): {
   [uid: string]: DataRow
 } => {
@@ -23,7 +24,10 @@ const generateRuntimeData = (
     addUIDs(configObj, configObj.columns.geo.name)
 
     configObj.data.forEach((row: DataRow) => {
-      if (undefined === row.uid) return false // No UID for this row, we can't use for mapping
+      if (!row.uid) {
+        if (!keepNoUidRows) return false // No UID for this row, we can't use for mapping
+        row.uid = row[configObj.columns.geo.name]
+      }
       const configPrimaryName = configObj.columns.primary.name
       const value = row[configPrimaryName]
       const categoryLegend = typeof value === 'string' && isCategoryLegend

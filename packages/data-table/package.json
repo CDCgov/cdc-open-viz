@@ -1,0 +1,42 @@
+{
+  "name": "@cdc/data-table",
+  "version": "4.25.6",
+  "description": "React standalone data table component",
+  "moduleName": "CdcDataTable",
+  "main": "dist/cdcdatatable",
+  "type": "module",
+  "scripts": {
+    "start": "vite --open",
+    "build": "vite build",
+    "preview": "vite preview",
+    "graph": "nx graph",
+    "prepublishOnly": "lerna run --scope @cdc/data-table build",
+    "test": "vitest run --reporter verbose",
+    "test-watch": "vitest watch --reporter verbose",
+    "test-watch:ui": "vitest --ui"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CDCgov/cdc-open-viz",
+    "directory": "packages/data-table"
+  },
+  "author": "Monroe <35408073+Mgetz10@users.noreply.github.com>",
+  "bugs": {
+    "url": "https://github.com/CDCgov/cdc-open-viz/issues"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@cdc/core": "^4.25.3",
+    "chroma": "0.0.1",
+    "chroma-js": "^2.1.0",
+    "html-react-parser": "^3.0.8",
+    "papaparse": "^5.3.0",
+    "react-accessible-accordion": "^3.3.4",
+    "whatwg-fetch": "^3.6.2"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "gitHead": "6097de1ff814001880d9ac64bd66becdc092d63c"
+}
