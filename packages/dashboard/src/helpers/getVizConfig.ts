@@ -95,10 +95,11 @@ export const getVizConfig = (
   const isMarkupUsed = filters.some(f => f?.usedBy?.includes(visualizationKey))
   const isFilteredTextUsed = filters.some(f => f?.usedBy?.includes(visualizationKey))
 
-  if (
-    visualizationKey.startsWith('markup-include') ||
-    (visualizationKey.startsWith('filtered-text') && isResetActive && (isMarkupUsed || isFilteredTextUsed))
-  ) {
+  if (visualizationKey.startsWith('markup-include') && isResetActive && isMarkupUsed) {
+    visualizationConfig.data = []
+    visualizationConfig.formattedData = []
+  }
+  if (visualizationKey.startsWith('filtered-text') && isResetActive && isFilteredTextUsed) {
     visualizationConfig.data = []
     visualizationConfig.formattedData = []
   }
