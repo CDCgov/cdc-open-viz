@@ -177,9 +177,6 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   result += num
 
   if (!inlineLabel || addColSuffix) {
-    if (config.visualizationType === 'Pie') {
-      result = `${result}%`
-    }
     if (addColSuffix !== undefined && axis === 'left') {
       result += addColSuffix
     } else {

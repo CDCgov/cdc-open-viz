@@ -3,7 +3,6 @@ import { type Action } from '@cdc/core/types/Action'
 import { Tab } from '../types/Tab'
 import { ConfigRow } from '../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
-import Footnotes from '@cdc/core/types/Footnotes'
 import { SharedFilter } from '../types/SharedFilter'
 
 type ADD_VISUALIZATION = Action<'ADD_VISUALIZATION', { rowIdx: number; colIdx: number; newViz: AnyVisualization }>

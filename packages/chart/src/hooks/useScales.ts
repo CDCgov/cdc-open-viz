@@ -44,7 +44,7 @@ const useScales = (properties: useScaleProps) => {
   const xAxisType = config.runtime.xAxis.type
   const isHorizontal = config.orientation === 'horizontal'
   const { visualizationType, xAxis, forestPlot } = config
-
+  const paddingRange = ['Area Chart', 'Forecasting'].includes(config.visualizationType) ? 1 : 1 - config.barThickness
   //  define scales
   let xScale = null
   let yScale = null
@@ -68,22 +68,16 @@ const useScales = (properties: useScaleProps) => {
 
   // handle  Vertical bars
   if (!isHorizontal) {
-    xScale = composeScaleBand(xAxisDataMapped, [0, xMax], 1 - config.barThickness)
+    xScale = composeScaleBand(xAxisDataMapped, [0, xMax], paddingRange)
     yScale = composeYScale(properties)
     seriesScale = composeScaleBand(seriesDomain, [0, xScale.bandwidth()], 0)
   }
 
   // handle Linear scaled viz
   if (config.xAxis.type === 'date' && !isHorizontal) {
-    const xAxisDataMappedSorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
-    xScale = composeScaleBand(xAxisDataMappedSorted, [0, xMax], 1 - config.barThickness)
-  }
-
-  // handle Linear scaled viz
-  if (config.xAxis.type === 'date' && !isHorizontal) {
     const sorted = sortXAxisData(xAxisDataMapped, config.xAxis.sortByRecentDate)
 
-    xScale = composeScaleBand(sorted, [0, xMax], 1 - config.barThickness)
+    xScale = composeScaleBand(sorted, [0, xMax], paddingRange)
     xScale.type = scaleTypes.BAND
   }
 

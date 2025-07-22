@@ -1,3 +1,5 @@
+@import '@cdc/core/styles/accessibility';
+
 @mixin breakpoint($class) {
   @if $class == xs {
     @media (max-width: 767px) {
@@ -511,10 +513,6 @@
         }
       }
     }
-  }
-
-  [tabindex]:focus-visible {
-    outline: 2px solid rgb(0, 95, 204) !important;
   }
 
   // ANIMATIONS

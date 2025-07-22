@@ -65,6 +65,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import EditorContext from '../../editor/src/ConfigContext'
 import { EDITOR_WIDTH } from '@cdc/core/helpers/constants'
+import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 // Local helpers
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
 import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
@@ -124,8 +125,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     coveLoadedEventRan,
     imageId,
     seriesHighlight,
-    colorScale,
-    brushConfig
+    colorScale
   } = state
   const { description, visualizationType } = config
   const svgRef = useRef(null)
@@ -261,6 +261,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       const [plots, categories] = getBoxPlotConfig(newConfig, stateData)
       newConfig.boxplot['categories'] = categories
       newConfig.boxplot.plots = plots
+      newConfig.yAxis.labelPlacement = 'On Date/Category Axis'
     }
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {
       newConfig.runtime = getComboChartConfig(newConfig)
@@ -286,7 +287,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     if (
-      (newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') ||
+      ((newConfig.visualizationType === 'Bar' || newConfig.visualizationType === 'Box Plot') &&
+        newConfig.orientation === 'horizontal') ||
       ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)
     ) {
       newConfig.runtime.xAxis = _.cloneDeep(newConfig.yAxis.yAxis || newConfig.yAxis)
@@ -298,7 +300,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       // remove after  COVE supports categorical axis on horizonatal bars
       newConfig.yAxis.type = newConfig.yAxis.type === 'categorical' ? 'linear' : newConfig.yAxis.type
     } else if (
-      ['Box Plot', 'Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType) &&
+      ['Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType) &&
       !convertLineToBarGraph
     ) {
       newConfig.runtime.xAxis = newConfig.xAxis
@@ -408,6 +410,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
         // handle urls with spaces in the name.
         if (newConfig.dataUrl) newConfig.dataUrl = `${newConfig.dataUrl}`
         let newData = await fetchRemoteData(newConfig.dataUrl)
+
+        if (newConfig.vegaConfig) {
+          newData = extractCoveData(updateVegaData(newConfig.vegaConfig, newData))
+        }
 
         if (newData && newConfig.dataDescription) {
           newData = transform.autoStandardize(newData)
@@ -840,7 +846,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (legend?.hide) classes.push('legend-hidden')
     if (lineDatapointClass) classes.push(lineDatapointClass)
     if (!config.barHasBorder) classes.push('chart-bar--no-border')
-    if (config.brush?.active && dashboardConfig?.type === 'dashboard' && (!isLegendOnBottom || legend.hide))
+    if (config.xAxis.brushActive && dashboardConfig?.type === 'dashboard' && (!isLegendOnBottom || legend.hide))
       classes.push('dashboard-brush')
     classes.push(...contentClasses)
     return classes
@@ -851,8 +857,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
 
     if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
-    if (config.brush?.active && !isLegendOnBottom) classes.push('subtext--brush-active ')
-    if (config.brush?.active && config.legend.hide) classes.push('subtext--brush-active ')
+    if (config.xAxis.brushActive && !isLegendOnBottom) classes.push('subtext--brush-active ')
+    if (config.xAxis.brushActive && config.legend.hide) classes.push('subtext--brush-active ')
     return classes
   }
 
@@ -862,7 +868,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
         {config.dataKey} (Go to Table)
       </a>
     )
-
     body = (
       <>
         {isEditor && <EditorPanel datasets={datasets} />}
@@ -1102,7 +1107,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   const contextValues = {
     ...state,
-    brushConfig,
     capitalize,
     convertLineToBarGraph,
     clean,
