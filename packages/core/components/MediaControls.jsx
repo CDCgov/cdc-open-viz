@@ -75,10 +75,19 @@ const generateMedia = (state, type, elementToCapture) => {
 
   switch (type) {
     case 'image':
+      const container = document.createElement('div')
+
+      // On screenshots without a title (like some charts), add padding around the chart svg
+      if (!state.showTitle) {
+        container.style.padding = '35px'
+      }
+      container.appendChild(baseSvg.cloneNode(true)) // Clone baseSvg to avoid modifying the original
+
       const downloadImage = async () => {
+        document.body.appendChild(container) // Append container to the DOM
         import(/* webpackChunkName: "html2canvas" */ 'html2canvas').then(mod => {
           mod
-            .default(baseSvg, {
+            .default(container, {
               ignoreElements: el =>
                 el.className?.indexOf &&
                 el.className.search(/download-buttons|download-links|data-table-container/) !== -1
@@ -113,14 +122,6 @@ const generateMedia = (state, type, elementToCapture) => {
       console.warn("COVE: generateMedia param 2 type must be 'image' or 'pdf'")
       break
   }
-}
-
-// Handles different state theme locations between components
-// Apparently some packages use state.headerColor where others use state.theme
-const handleTheme = state => {
-  if (state?.headerColor) return state.headerColor // ie. maps
-  if (state?.theme) return state.theme // ie. charts
-  return 'theme-notFound'
 }
 
 // Download CSV
