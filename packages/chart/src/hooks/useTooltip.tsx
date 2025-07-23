@@ -286,10 +286,11 @@ export const useTooltip = props => {
       let minDistance = Number.MAX_VALUE
       let offset = x
 
+      const barThicknessOffset = config.xAxis.type === 'date' ? xScale.bandwidth() / 2 : 0
       data.forEach(d => {
         const xPosition = isDateScale(xAxis) ? xScale(parseDate(d[xAxis.dataKey])) : xScale(d[xAxis.dataKey])
         let bwOffset = config.barHeight
-        const distance = Math.abs(Number(xPosition - offset + (isClick ? bwOffset * 2 : 0)))
+        const distance = Math.abs(Number(xPosition + barThicknessOffset - offset + (isClick ? bwOffset * 2 : 0)))
 
         if (distance <= minDistance) {
           minDistance = distance
