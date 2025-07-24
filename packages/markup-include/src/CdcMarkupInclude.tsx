@@ -60,6 +60,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config || {})
   const { contentEditor, theme } = config || {}
+  const { showNoDataMessage, allowHideSection, noDataMessageText } = contentEditor || {}
   const data = configObj?.data
 
   const { inlineHTML, markupVariables, srcUrl, title, useInlineHTML } = contentEditor || {}
@@ -166,6 +167,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   }
 
   const emptyVariableChecker = []
+  const noDataMessageChecker = []
 
   const convertVariablesInMarkup = inlineMarkup => {
     if (_.isEmpty(markupVariables)) return inlineMarkup
@@ -200,9 +202,14 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
       if (length > 2) {
         variableValues[length - 1] = `${listConjunction} ${variableValues[length - 1]}`
       }
+
       variableDisplay.push(variableValues.join(', '))
 
       const finalDisplay = variableDisplay[0]
+
+      if (showNoDataMessage && finalDisplay === '') {
+        noDataMessageChecker.push(true)
+      }
 
       if (finalDisplay === '' && contentEditor.allowHideSection) {
         emptyVariableChecker.push(true)
@@ -251,11 +258,13 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const markup = useInlineHTML ? convertVariablesInMarkup(inlineHTML) : parseBodyMarkup(urlMarkup)
 
   const hideMarkupInclude = contentEditor?.allowHideSection && emptyVariableChecker.length > 0 && !isEditor
+  const _showNoDataMessage = showNoDataMessage && noDataMessageChecker.length > 0 && !isEditor
 
   if (loading === false) {
     content = (
       <>
         {isEditor && <EditorPanel datasets={datasets} />}
+
         {!hideMarkupInclude && (
           <Layout.Responsive isEditor={isEditor}>
             <div className='markup-include-content-container cove-component__content no-borders'>
@@ -263,8 +272,13 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
                 <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
                 <div className={`${innerContainerClasses.join(' ')}`}>
                   <div className='cove-component__content-wrap'>
-                    {!markupError && <Markup allowElements={!!urlMarkup} content={markup} />}
-                    {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
+                    {_showNoDataMessage && (
+                      <div className='no-data-message'>
+                        <p>{`${noDataMessageText}`}</p>
+                      </div>
+                    )}
+                    {!markupError && !_showNoDataMessage && <Markup allowElements={!!urlMarkup} content={markup} />}
+                    {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
                   </div>
                 </div>
               </div>

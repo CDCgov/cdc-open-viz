@@ -1,0 +1,206 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": [
+      {
+        "key": "New Dashboard Filter 1",
+        "showDropdown": true,
+        "values": [
+          "Hispanic or Latino",
+          "Non-Hispanic American Indian",
+          "Non-Hispanic Asian or Pacific Islander",
+          "Non-Hispanic Black",
+          "Non-Hispanic White"
+        ],
+        "type": "datafilter",
+        "orderedValues": [
+          "Hispanic or Latino",
+          "Non-Hispanic American Indian",
+          "Non-Hispanic Asian or Pacific Islander",
+          "Non-Hispanic Black",
+          "Non-Hispanic White"
+        ],
+        "columnName": "Race",
+        "tier": 1
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboardFilters1753133899539"
+        }
+      ],
+      "uuid": 1753133896802
+    },
+    {
+      "uuid": 1753133896802,
+      "toggle": "__​undefined__",
+      "equalHeight": "__​undefined__",
+      "columns": [
+        {
+          "width": 12,
+          "widget": "markup-include1753133736118"
+        },
+        {},
+        {}
+      ]
+    }
+  ],
+  "visualizations": {
+    "markup-include1753133736118": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "openModal": false,
+      "uid": "markup-include1753133736118",
+      "type": "markup-include",
+      "contentEditor": {
+        "inlineHTML": "test {{some_variable}}",
+        "markupVariables": [
+          {
+            "columnName": "Age-adjusted rate",
+            "conditions": [
+              {
+                "columnName": "Race",
+                "isOrIsNotEqualTo": "is",
+                "value": "Hispanic or Latino"
+              }
+            ],
+            "name": "some_variable",
+            "tag": "{{some_variable}}",
+            "addCommas": "__​undefined__"
+          }
+        ],
+        "showHeader": true,
+        "srcUrl": "#example",
+        "title": "Markup Include",
+        "useInlineHTML": true,
+        "allowHideSection": false,
+        "showNoDataMessage": true
+      },
+      "theme": "theme-blue",
+      "visual": {
+        "border": false,
+        "accent": false,
+        "background": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false
+      },
+      "showEditorPanel": true,
+      "visualizationType": "markup-include",
+      "version": "4.25.7",
+      "migrations": {
+        "addColorMigration": true
+      },
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "dataKey": "valid-data-chart.csv"
+    },
+    "dashboardFilters1753133899539": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "newViz": true,
+      "openModal": true,
+      "uid": "dashboardFilters1753133899539",
+      "type": "dashboardFilters",
+      "sharedFilterIndexes": [
+        0
+      ],
+      "visualizationType": "dashboardFilters"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showDownloadLinkBelow": true,
+    "showVertical": true
+  },
+  "errors": [],
+  "currentViewport": "lg",
+  "id": 15,
+  "category": "General",
+  "label": "Dashboard",
+  "type": "dashboard",
+  "subType": null,
+  "orientation": null,
+  "icon": {
+    "key": null,
+    "ref": null,
+    "props": {},
+    "_owner": null,
+    "_store": {}
+  },
+  "content": "Present multiple data visualizations with shared filter controls.",
+  "datasets": {
+    "valid-data-chart.csv": {
+      "data": [
+        {
+          "Race": "Hispanic or Latino",
+          "Age-adjusted rate": "644.2"
+        },
+        {
+          "Race": "Non-Hispanic American Indian",
+          "Age-adjusted rate": "636.1"
+        },
+        {
+          "Race": "Non-Hispanic Black",
+          "Age-adjusted rate": "563.7"
+        },
+        {
+          "Race": "Non-Hispanic Asian or Pacific Islander",
+          "Age-adjusted rate": "202.5"
+        },
+        {
+          "Race": "Non-Hispanic White",
+          "Age-adjusted rate": "183.6"
+        }
+      ],
+      "dataFileSize": 178,
+      "dataFileName": "valid-data-chart.csv",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "CSV",
+      "preview": true
+    }
+  },
+  "visualizationType": null,
+  "activeVizButtonID": 15,
+  "version": "4.25.7",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "data": [
+    {
+      "Race": "Hispanic or Latino",
+      "Age-adjusted rate": "644.2"
+    },
+    {
+      "Race": "Non-Hispanic American Indian",
+      "Age-adjusted rate": "636.1"
+    },
+    {
+      "Race": "Non-Hispanic Black",
+      "Age-adjusted rate": "563.7"
+    },
+    {
+      "Race": "Non-Hispanic Asian or Pacific Islander",
+      "Age-adjusted rate": "202.5"
+    },
+    {
+      "Race": "Non-Hispanic White",
+      "Age-adjusted rate": "183.6"
+    }
+  ],
+  "dataFileName": "valid-data-chart.csv",
+  "dataFileSourceType": "file",
+  "formattedData": "__​undefined__",
+  "dataDescription": {
+    "horizontal": false
+  },
+  "runtime": {},
+  "uuid": 1753133895902
+}

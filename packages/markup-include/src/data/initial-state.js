@@ -5,7 +5,9 @@ export default {
     showHeader: true,
     srcUrl: '#example',
     title: 'Markup Include',
-    useInlineHTML: false
+    useInlineHTML: false,
+    showNoDataMessage: false,
+    noDataMessageText: 'No Data Available'
   },
   data: [],
   legend: {},

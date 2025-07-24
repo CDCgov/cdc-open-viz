@@ -11,6 +11,8 @@ export type Config = {
     srcUrl: string
     title: string
     useInlineHTML: boolean
+    showNoDataMessage: boolean
+    noDataMessageText: string
   }
   data?: Object[]
   legend: {}
