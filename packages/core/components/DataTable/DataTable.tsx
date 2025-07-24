@@ -150,7 +150,7 @@ const DataTable = (props: DataTableProps) => {
           dataA = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[a][config.xAxis.dataKey])
           dataB = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[b][config.xAxis.dataKey])
         }
-        return dataA && dataB ? customSort(dataA, dataB, sortBy, config) : 0
+        return dataA || dataB ? customSort(dataA, dataB, sortBy, config) : 0
       })
       : rawRows
 
