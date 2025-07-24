@@ -89,6 +89,21 @@ export const getVizConfig = (
     }
     return visConfigWithFootnotes
   }
+  // for markup-include & filtered text reset data on Reset Value on Filters
+  const filters = config.dashboard.sharedFilters
+
+  const isResetActive = filters.some(f => f?.resetLabel && f?.resetLabel === f?.active)
+  const isMarkupUsed = filters.some(f => f?.usedBy?.includes(visualizationKey))
+  const isFilteredTextUsed = filters.some(f => f?.usedBy?.includes(visualizationKey))
+
+  if (visualizationKey.startsWith('markup-include') && isResetActive && isMarkupUsed) {
+    visualizationConfig.data = []
+    visualizationConfig.formattedData = []
+  }
+  if (visualizationKey.startsWith('filtered-text') && isResetActive && isFilteredTextUsed) {
+    visualizationConfig.data = []
+    visualizationConfig.formattedData = []
+  }
 
   return visualizationConfig as AnyVisualization
 }
