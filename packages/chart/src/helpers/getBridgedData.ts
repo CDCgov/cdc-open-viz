@@ -2,6 +2,7 @@ export const getBridgedData = (stageKey: string, stageColumn: string, data: Reco
   const allStages: string[] = Array.from(new Set(data.map(d => d?.[stageColumn]).filter(Boolean)))
 
   const stageIndex: number = allStages.indexOf(stageKey)
+  if (stageIndex === -1) return []
   const currentStage = data.filter(d => d?.[stageColumn] === stageKey)
   const nextKey = allStages[stageIndex + 1]
   if (nextKey) {
