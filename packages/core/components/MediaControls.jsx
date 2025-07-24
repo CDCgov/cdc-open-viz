@@ -76,10 +76,12 @@ const generateMedia = (state, type, elementToCapture) => {
   switch (type) {
     case 'image':
       const container = document.createElement('div')
-
       // On screenshots without a title (like some charts), add padding around the chart svg
-      if (!state.showTitle) {
-        container.style.padding = '35px'
+      const parent = container.parentElement
+      if (parent) {
+        if (!state.showTitle) {
+          container.style.padding = '35px'
+        }
       }
       container.appendChild(baseSvg.cloneNode(true)) // Clone baseSvg to avoid modifying the original
 
