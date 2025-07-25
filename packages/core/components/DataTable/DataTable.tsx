@@ -295,6 +295,7 @@ const DataTable = (props: DataTableProps) => {
       )
       : {}
 
+    const showCollapseButton = config.table.collapsible !== false && useBottomExpandCollapse
     const TableMediaControls = ({ belowTable }) => {
       const hasDownloadLink = config.table.download
       return (
@@ -353,8 +354,9 @@ const DataTable = (props: DataTableProps) => {
                 )
               }
               tableOptions={{
-                className: `table table-striped table-width-unset ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${isVertical ? '' : ' horizontal'
-                  }`,
+                className: `table table-striped table-width-unset ${
+                  expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
+                }${isVertical ? '' : ' horizontal'}`,
                 'aria-live': 'assertive',
                 'aria-rowcount': config?.data?.length ? config.data.length : -1,
                 hidden: !expanded,
@@ -386,11 +388,18 @@ const DataTable = (props: DataTableProps) => {
                 />
               )}
           </div>
-          {config.table.collapsible !== false && useBottomExpandCollapse && (
-            <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} end />
-          )}
         </section>
-        {config.table.showDownloadLinkBelow && <TableMediaControls belowTable={true} />}
+        <div className={`w-100 d-flex ${showCollapseButton ? 'justify-content-between' : 'justify-content-end'}`}>
+          {config.table.showDownloadLinkBelow && <TableMediaControls belowTable={true} />}
+          {showCollapseButton && (
+            <button
+              className='border-0 bg-transparent text-decoration-underline mt-2'
+              style={{ color: 'var(--colors-link-blue)', fontSize: '0.772rem', textUnderlineOffset: '6px' }}
+            >
+              - Collapse table
+            </button>
+          )}
+        </div>
         <div id={skipId} className='cdcdataviz-sr-only'>
           Skipped data table.
         </div>
