@@ -247,7 +247,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
             value={config.table.showDownloadLinkBelow}
             fieldName='showDownloadLinkBelow'
             className='ms-4'
-            label='Show Link Below Table'
+            label='Show collapse below table'
             section='table'
             updateField={updateField}
           />
