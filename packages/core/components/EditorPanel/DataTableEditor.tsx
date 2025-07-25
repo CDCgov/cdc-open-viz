@@ -225,6 +225,15 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           updateField={updateField}
         />
       )}
+      {config.table.collapsible !== false && (
+        <CheckBox
+          value={config.table.showBottomCollapse}
+          fieldName='showBottomCollapse'
+          label=' Show Collapse Button Under Table'
+          section='table'
+          updateField={updateField}
+        />
+      )}
       <CheckBox
         value={config.table.download}
         fieldName='download'
