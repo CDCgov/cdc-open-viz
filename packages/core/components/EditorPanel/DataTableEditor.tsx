@@ -229,7 +229,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
         <CheckBox
           value={config.table.showBottomCollapse}
           fieldName='showBottomCollapse'
-          label=' Show Collapse Button Under Table'
+          label='Show collapse below table'
           section='table'
           updateField={updateField}
         />
@@ -247,7 +247,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
             value={config.table.showDownloadLinkBelow}
             fieldName='showDownloadLinkBelow'
             className='ms-4'
-            label='Show collapse below table'
+            label='Show Link Below Table'
             section='table'
             updateField={updateField}
           />
