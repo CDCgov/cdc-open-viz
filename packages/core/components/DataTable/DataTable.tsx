@@ -26,8 +26,6 @@ import './data-table.css'
 import _ from 'lodash'
 import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
 
-const USE_BOTTOM_COLLAPSE_THRESHOLD = 20
-
 export type DataTableProps = {
   colorScale?: Function
   columns?: Record<string, Column>
@@ -281,8 +279,7 @@ const DataTable = (props: DataTableProps) => {
         ? mapCellMatrix({ ...props, rows, wrapColumns, runtimeData, viewport })
         : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
 
-    const useBottomExpandCollapse =
-      expanded && Array.isArray(childrenMatrix) && childrenMatrix.length >= USE_BOTTOM_COLLAPSE_THRESHOLD
+    const useBottomExpandCollapse = config.table.showBottomCollapse && expanded && Array.isArray(childrenMatrix)
 
     // If every value in a column is a number, record the column index so the header and cells can be right-aligned
     const rightAlignedCols = childrenMatrix.length
@@ -395,6 +392,7 @@ const DataTable = (props: DataTableProps) => {
             <button
               className='border-0 bg-transparent text-decoration-underline mt-2'
               style={{ color: 'var(--colors-link-blue)', fontSize: '0.772rem', textUnderlineOffset: '6px' }}
+              onClick={() => setExpanded(false)}
             >
               - Collapse table
             </button>
