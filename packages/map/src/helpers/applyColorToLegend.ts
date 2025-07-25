@@ -40,8 +40,7 @@ export const applyColorToLegend = (legendItemIndex: number, config: MapConfig, r
     const amt = config.legend.additionalCategories?.length ?? 10
     const distributionArray = colorDistributions[amt] ?? []
 
-    const specificColor =
-      distributionArray[legendItemIndex - specialClasses.length] ?? colorPalette.at(-1)
+    const specificColor = distributionArray[legendItemIndex - specialClasses.length] ?? colorPalette.at(-1)
 
     // If specificColor is a number, use it as an index; otherwise return the color directly
     return colorPalette[specificColor] ?? '#fff'
@@ -63,8 +62,7 @@ export const applyColorToLegend = (legendItemIndex: number, config: MapConfig, r
 
   const rowDistributionIndex = colorDistributionArray[legendItemIndex - actualSpecialClassesCount]
 
-  const colorValue =
-    rowDistributionIndex ?? colorPalette[regularItemColorIndex] ?? colorPalette.at(-1)
+  const colorValue = rowDistributionIndex ?? colorPalette[regularItemColorIndex] ?? colorPalette.at(-1)
 
   // Check if specificColor is a string(e.g., a valid color code)
   if (typeof colorValue === 'string' && config.legend?.type === 'category' && customColors) {
