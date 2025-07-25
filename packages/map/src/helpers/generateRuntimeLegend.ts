@@ -90,7 +90,9 @@ export const generateRuntimeLegend = (
     let dataSet = legend.unified ? data : Object?.values(runtimeData)
 
     const roundToPlace = Number(columns?.primary?.roundToPlace) || 1
-    let domainNums = Array.from(new Set(dataSet?.map(item => convertAndRoundValue(item[configObj.columns.primary.name], roundToPlace))))
+    let domainNums = Array.from(
+      new Set(dataSet?.map(item => convertAndRoundValue(item[configObj.columns.primary.name], roundToPlace)))
+    )
       .filter(d => typeof d === 'number' && !isNaN(d))
       .sort((a, b) => (a as number) - (b as number))
 
@@ -113,7 +115,6 @@ export const generateRuntimeLegend = (
                   value: val,
                   label: specialClass.label
                 })
-
 
                 specialClasses += 1
               }
@@ -372,23 +373,21 @@ export const generateRuntimeLegend = (
             max
           })
 
-
           changingNumber -= 1
           numberOfRows -= chunkAmt
         }
       } else {
         // Use the appropriate rounding precision
-        const roundingPrecision = general?.equalNumberOptIn && columns?.primary?.roundToPlace !== undefined
-          ? Number(columns.primary.roundToPlace)
-          : roundToPlace
+        const roundingPrecision =
+          general?.equalNumberOptIn && columns?.primary?.roundToPlace !== undefined
+            ? Number(columns.primary.roundToPlace)
+            : roundToPlace
 
         let colors = colorPalettes[configObj.color]
         let colorRange = colors.slice(0, legend.numberOfItems)
 
         const getDomain = () => {
-          return _.uniq(
-            dataSet.map(item => convertAndRoundValue(item[columns.primary.name], roundingPrecision))
-          )
+          return _.uniq(dataSet.map(item => convertAndRoundValue(item[columns.primary.name], roundingPrecision)))
         }
 
         const getBreaks = scale => {
@@ -602,7 +601,6 @@ export const generateRuntimeLegend = (
         }
 
         result.items.push(range)
-
       }
     }
 
@@ -665,9 +663,7 @@ export const generateRuntimeLegend = (
           const originalItem = originalItems[originalIndex]?.item
           if (originalItem?.special) {
             // Find the special class in its new position
-            const specialIndex = result.items.findIndex(item =>
-              item.special && item.value === originalItem.value
-            )
+            const specialIndex = result.items.findIndex(item => item.special && item.value === originalItem.value)
             if (specialIndex !== -1) {
               updatedLegendMemo.set(rowHash, specialIndex)
             } else {

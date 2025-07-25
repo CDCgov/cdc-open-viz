@@ -5,6 +5,7 @@ import ScreenReaderText from '@cdc/core/components/elements/ScreenReaderText'
 import { SortIcon } from './SortIcon'
 import { getNewSortBy } from '../helpers/getNewSortBy'
 import parse from 'html-react-parser'
+import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 
 type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; hasRowType?; viewport; rightAlignedCols }
 
@@ -48,20 +49,30 @@ const ChartHeader = ({
     if (columnHeaderText === notApplicableText) return
 
     return (
-      <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
-        }  order`}</span>
+      <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${
+        sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
+      }  order`}</span>
     )
   }
 
-  const ColumnHeadingText = ({ column, text, config }) => {
+  const ColumnHeadingText = ({ text, config }: { text: string; config: ChartConfig }) => {
+    const notApplicableText = 'Not Applicable'
     if (text === '_pivotedFrom') return ''
-    let notApplicableText = 'Not Applicable'
-    if (text === '__series__' && config.table.indexLabel) return `${config.table.indexLabel} `
-    if (text === '__series__' && !config.table.indexLabel)
-      return <ScreenReaderText as='span'>{notApplicableText}</ScreenReaderText>
-    return text
-  }
+    if (text === '__series__') {
+      if (config.table.indexLabel) {
+        return parse(String(config.table.indexLabel))
+      } else {
+        return <ScreenReaderText as='span'>{notApplicableText}</ScreenReaderText>
+      }
+    }
 
+    //  handle any unexpected values
+    if (typeof text !== 'string') {
+      return parse('')
+    }
+
+    return parse(text)
+  }
   if (isVertical) {
     if (hasRowType) {
       // find the row type column and place it at the beginning of the array
@@ -75,7 +86,7 @@ const ChartHeader = ({
     return (
       <tr>
         {dataSeriesColumns.map((column, index) => {
-          const text = parse(getSeriesName(column.toString(), config))
+          const text = getSeriesName(column, config)
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
           const isSortedCol = column === sortBy.column && !hasRowType
@@ -124,7 +135,8 @@ const ChartHeader = ({
           const rightAxisItemsMap = new Map(rightAxisItems.map(item => [item.dataKey, item]))
 
           let column = config.xAxis?.dataKey
-          let text = row !== '__series__' ? getChartCellValue(row, column, config, data, rightAxisItemsMap) : '__series__'
+          let text =
+            row !== '__series__' ? getChartCellValue(row, column, config, data, rightAxisItemsMap) : '__series__'
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.colIndex === index ? sortBy.asc : undefined
           const isSortedCol = index === sortBy.colIndex && !hasRowType
