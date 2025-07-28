@@ -164,6 +164,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             }
           }}
           tabIndex={0}
+          role='button'
         >
           <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
           <span>{item.label}</span>
