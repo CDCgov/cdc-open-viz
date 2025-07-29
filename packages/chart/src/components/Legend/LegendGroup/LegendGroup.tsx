@@ -83,6 +83,7 @@ const LegendGroup = ({ formatLabels }) => {
                         }}
                         key={`legend-item-${i}`}
                         tabIndex={0}
+                        role='button'
                       >
                         <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} fill={label.value} />
                         <LegendLabel align='left' margin='0'>
