@@ -33,7 +33,7 @@ export const calculateBoxPlotStats = (values: number[]) => {
   if (!values || values.length === 0) return {}
 
   // Sort the values
-  const sortedValues = _.sortBy(values)
+  const sortedValues = _.sortBy(values.map(v => Number(v)))
 
   // Quartiles
   const firstQuartile = d3.quantile(sortedValues, 0.25) ?? 0
@@ -45,18 +45,28 @@ export const calculateBoxPlotStats = (values: number[]) => {
   // Outlier Bounds
   const lowerBound = firstQuartile - 1.5 * iqr
   const upperBound = thirdQuartile + 1.5 * iqr
+  // const lowerFence = q1 - 1.5 * iqr
+  // const upperFence = q3 + 1.5 * iqr
 
   // Non-Outlier Values
   const nonOutliers = sortedValues.filter(value => value >= lowerBound && value <= upperBound)
-
+  // **Outliers** =
+  const outliers = sortedValues.filter(v => v < lowerBound || v > upperBound)
+  const whiskerMax =
+    sortedValues
+      .slice()
+      .reverse()
+      .find(v => v <= upperBound) ?? thirdQuartile
+  const whiskerMin = nonOutliers.length > 0 ? nonOutliers[0] : firstQuartile
   // Calculate Box Plot Stats
   return {
-    min: d3.min(nonOutliers), // Smallest non-outlier value
-    max: d3.max(nonOutliers), // Largest non-outlier value
-    median: d3.median(sortedValues), // Median of all values
+    min: whiskerMin,
+    max: whiskerMax,
+    median: d3.median(sortedValues),
     firstQuartile,
     thirdQuartile,
-    iqr
+    iqr,
+    outliers
   }
 }
 
@@ -109,16 +119,26 @@ export const createPlots = (data, config) => {
 
       // Calculate outliers and non-outliers for each series key
       Object.keys(keyValues).forEach(key => {
-        const values = keyValues[key]
+        const raw = keyValues[key] ?? []
+
+        // 2) normalize → trim, drop empties/non-numbers, coerce to Number
+        const cleaned: number[] = raw
+          .map(v => (typeof v === 'string' ? v.trim() : v)) // trim strings
+          .filter(v => v != null && v !== '' && !isNaN(+v)) // drop null/''/non-nums
+          .map(v => +v)
+
+        if (cleaned.length === 0) {
+          return
+        }
 
         // Calculate box plot statistics
-        const { firstQuartile, thirdQuartile, min, max, median, iqr } = calculateBoxPlotStats(values)
+        const { firstQuartile, thirdQuartile, min, max, median, iqr, outliers } = calculateBoxPlotStats(cleaned)
         // Calculate outliers and non-outliers
-        columnOutliers[key] = calculateOutliers(values, firstQuartile, thirdQuartile).map(Number)
-        columnNonOutliers[key] = calculateNonOutliers(values, firstQuartile, thirdQuartile).map(Number)
+        columnOutliers[key] = calculateOutliers(cleaned, firstQuartile, thirdQuartile).map(Number)
+        columnNonOutliers[key] = calculateNonOutliers(cleaned, firstQuartile, thirdQuartile).map(Number)
         columnMedian[key] = median
-        columnMin[key] = min
-        columnMax[key] = max
+        columnMin[key] = Number(min)
+        columnMax[key] = Number(max)
         columnQ1[key] = firstQuartile
         columnQ3[key] = thirdQuartile
         columnIqr[key] = iqr

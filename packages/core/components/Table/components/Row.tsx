@@ -1,6 +1,7 @@
-import { ReactNode, FC } from 'react'
+import React, { ReactNode, FC } from 'react'
 import Cell from './Cell'
 import { PreliminaryDataItem } from '@cdc/chart/src/types/ChartConfig'
+import parse from 'html-react-parser'
 
 type RowProps = {
   childRow: ReactNode[]
@@ -15,18 +16,11 @@ type RowProps = {
 }
 
 const Row: FC<RowProps> = props => {
-  const {
-    childRow,
-    rowKey,
-    wrapColumns,
-    cellMinWidth = 0,
-    isTotal,
-    viewport,
-    preliminaryData,
-    rightAlignedCols
-  } = props
+  const { childRow, rowKey, wrapColumns, cellMinWidth = 0, isTotal, preliminaryData, rightAlignedCols } = props
   const whiteSpace = wrapColumns ? 'unset' : 'nowrap'
   const minWidth = cellMinWidth + 'px'
+  const isHtmlString = (str: any): str is string => typeof str === 'string' && /<\/?[a-z][\s\S]*>/i.test(str)
+  const isReactNode = (val: any): boolean => React.isValidElement(val) || typeof val === 'object'
 
   return (
     <tr>
@@ -38,6 +32,15 @@ const Row: FC<RowProps> = props => {
           {}
 
         const textAlign = rightAlignedCols && rightAlignedCols[i] ? 'right' : ''
+        // handle Parsing
+        let content: ReactNode
+        if (isHtmlString(child)) {
+          content = parse(child)
+        } else if (isReactNode(child)) {
+          content = child
+        } else {
+          content = child
+        }
 
         return (
           <Cell
@@ -46,7 +49,7 @@ const Row: FC<RowProps> = props => {
             style={{ whiteSpace, minWidth, textAlign, textOverflow: 'ellipsis', ...style }}
             isBold={isTotal}
           >
-            {child}
+            {content}
           </Cell>
         )
       })}

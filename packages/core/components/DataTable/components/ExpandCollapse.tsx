@@ -1,4 +1,5 @@
 import Icon from '../../ui/Icon'
+import parse from 'html-react-parser'
 
 const ExpandCollapse = ({ expanded, setExpanded, tableTitle, fontSize, viewport }) => {
   return (
@@ -16,7 +17,7 @@ const ExpandCollapse = ({ expanded, setExpanded, tableTitle, fontSize, viewport 
       }}
     >
       <Icon display={expanded ? 'minus' : 'plus'} base />
-      {tableTitle}
+      {parse(tableTitle)}
     </div>
   )
 }

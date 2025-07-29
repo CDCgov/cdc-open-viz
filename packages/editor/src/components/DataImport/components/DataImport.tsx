@@ -32,6 +32,13 @@ import { supportedDataTypes } from '../helpers/supportedDataTypes'
 import { getFileExtension } from '../helpers/getFileExtension'
 import { parseTextByMimeType } from '../helpers/parseTextByMimeType'
 import { getMimeType } from '../helpers/getMimeType'
+import {
+  extractCoveData,
+  getSampleVegaJson,
+  loadedVegaConfigData,
+  parseVegaConfig,
+  updateVegaData
+} from '@cdc/core/helpers/vegaConfig'
 
 const DataImport = () => {
   const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)
@@ -49,10 +56,11 @@ const DataImport = () => {
     config.dataFileSourceType === 'url' ? config.dataFileName : config.dataUrl || ''
   )
 
-  const [keepURL, setKeepURL] = useState(!!config.dataUrl)
+  const [keepURL, setKeepURL] = useState(!!config.dataUrl || !!config.vegaType)
   const [addingDataset, setAddingDataset] = useState(config.type === 'dashboard' || !config.data)
   const [editingDataset, _setEditingDataset] = useState<string>(undefined)
-  const [newDatasetName, setNewDatasetName] = useState<string>(undefined)
+  const [newDatasetName, setNewDatasetName] = useState<string>(config.vegaType ? 'vega_data' : undefined)
+  const [pastedConfig, setPastedConfig] = useState<string>(undefined)
   const setEditingDataset = (datasetKey: string) => {
     _setEditingDataset(datasetKey)
     setNewDatasetName(datasetKey)
@@ -69,7 +77,8 @@ const DataImport = () => {
     })
 
     // Is the X Axis still in the dataset?
-    if (newData.columns.indexOf(oldAxisX) < 0) return false
+    const columns = newData.columns || Object.keys(newData[0])
+    if (columns.indexOf(oldAxisX) < 0) return false
 
     return true
   }
@@ -214,7 +223,10 @@ const DataImport = () => {
 
       // Validate parsed data and set if no issues.
       try {
-        const result = parseTextByMimeType(this.result.toString(), mimeType, externalURL, setErrors)
+        let result = parseTextByMimeType(this.result.toString(), mimeType, externalURL, setErrors)
+        if (config.vegaConfig) {
+          return updateDataFromVegaData(result, fileSource, fileSourceType)
+        }
         const text = transform.autoStandardize(result)
         if (config.data && config.series) {
           if (dataExists(text, config.series, config?.xAxis.dataKey)) {
@@ -320,7 +332,7 @@ const DataImport = () => {
           />
         </label>
         <label htmlFor='external-datas' className='col-12 mt-2'>
-          <span>URL</span>
+          <span>URL </span>
           <textarea
             id='external-datas'
             className='form-control'
@@ -341,7 +353,7 @@ const DataImport = () => {
           />{' '}
           Always load from URL (normally will only pull once)
         </label>
-        <div className='d-flex justify-content-end mt-2'>
+        <div className='d-flex justify-content-end mt-2 mb-3'>
           <button
             className='btn btn-primary px-4'
             type='submit'
@@ -416,6 +428,30 @@ const DataImport = () => {
     setEditingDataset(undefined)
     if (!datasetKeys.length) setAddingDataset(true)
     dispatch({ type: 'DELETE_DASHBOARD_DATASET', payload: { datasetKey } })
+  }
+
+  const updateDataFromVegaConfig = pastedConfig => {
+    const vegaConfig = parseVegaConfig(JSON.parse(pastedConfig))
+    const newData = extractCoveData(vegaConfig)
+    let newConfig = {
+      ...config,
+      data: newData
+    }
+    loadedVegaConfigData(newConfig)
+    setConfig(newConfig)
+  }
+
+  const updateDataFromVegaData = (vegaData, fileSource, fileSourceType) => {
+    const newData = extractCoveData(updateVegaData(config.vegaConfig, vegaData))
+    let newConfig = {
+      ...config,
+      dataFileName: fileSource,
+      dataFileSourceType: fileSourceType,
+      dataUrl: fileSourceType === 'url' ? fileSource : null,
+      data: newData
+    }
+    loadedVegaConfigData(newConfig)
+    setConfig(newConfig)
   }
 
   let configureData,
@@ -654,7 +690,7 @@ const DataImport = () => {
 
         {configureData?.data && (
           <>
-            {config.type !== 'dashboard' && (
+            {config.type !== 'dashboard' && !config.vegaType && (
               <>
                 <div className='heading-3'>Data Source</div>
                 <div className='file-loaded-area'>
@@ -691,6 +727,98 @@ const DataImport = () => {
                     </>
                   )}
                 </div>
+              </>
+            )}
+
+            {config.vegaType && (
+              <>
+                <div className='heading-3'>Update Dataset</div>
+                <Tabs startingTab={0}>
+                  <TabPane title='Update with Vega config' icon={<FileUploadIcon className='inline-icon' />}>
+                    <div>
+                      <label htmlFor='uploadConfig'>Paste full Vega configuration JSON:</label>
+
+                      <textarea
+                        id='pasteConfig'
+                        className='w-100 mb-2'
+                        onChange={e => setPastedConfig(e.target.value)}
+                        placeholder='{ }'
+                      />
+                      <div className='mb-3 d-flex justify-content-end'>
+                        <button
+                          className='btn btn-primary px-4'
+                          type='submit'
+                          id='load-data'
+                          disabled={!pastedConfig}
+                          onClick={() => updateDataFromVegaConfig(pastedConfig)}
+                        >
+                          Save & Load
+                        </button>
+                      </div>
+                    </div>
+                  </TabPane>
+                  <TabPane title='Update with JSON data' icon={<LinkIcon className='inline-icon' />}>
+                    <div>
+                      To change this chart to use a JSON file as its data source, the file should be formatted like this
+                      sample:
+                      <pre style={{ backgroundColor: '#f2f2f2', fontFamily: 'monospace' }}>
+                        {getSampleVegaJson(config.vegaConfig)}
+                      </pre>
+                    </div>
+                    <div>&nbsp;</div>
+                    <div>Upload JSON file:</div>
+                    <div className='data-source-options'>
+                      <div
+                        className={
+                          isDragActive2
+                            ? 'drag-active cdcdataviz-file-selector loaded-file'
+                            : 'cdcdataviz-file-selector loaded-file'
+                        }
+                        {...getRootProps2()}
+                      >
+                        <input {...getInputProps2()} />
+                        {isDragActive2 ? (
+                          <p>Drop file here</p>
+                        ) : (
+                          <p>
+                            <FileUploadIcon /> <span>{config.dataFileName ?? 'Replace data file'}</span>
+                          </p>
+                        )}
+                      </div>
+                      <div className='link link-replace' {...getRootProps2()}>
+                        <input {...getInputProps2()} />
+                        <p>
+                          <span>Replace file</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <label htmlFor='external-datas' className='col-12 mt-2'>
+                      <span>Or connect chart to URL:</span>
+                      <textarea
+                        id='external-datas'
+                        className='form-control'
+                        placeholder='e.g., https://data.cdc.gov/resources/file.json'
+                        aria-label='Load data from external URL'
+                        aria-describedby='load-data'
+                        rows={2}
+                        value={externalURL}
+                        onChange={e => setExternalURL(e.target.value)}
+                      />
+                    </label>
+                    <div className='d-flex justify-content-end mt-2 mb-3'>
+                      <button
+                        className='btn btn-primary px-4'
+                        type='submit'
+                        id='load-data'
+                        disabled={!newDatasetName || !externalURL}
+                        onClick={() => loadData(null, externalURL, editingDataset)}
+                      >
+                        Save & Load
+                      </button>
+                    </div>
+                  </TabPane>
+                </Tabs>
               </>
             )}
 

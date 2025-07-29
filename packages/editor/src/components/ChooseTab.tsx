@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import '../scss/choose-vis-tab.scss'
 
 import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
@@ -28,6 +28,15 @@ import EpiChartIcon from '@cdc/core/assets/icon-epi-chart.svg'
 import TableIcon from '@cdc/core/assets/icon-table.svg'
 import Icon from '@cdc/core/components/ui/Icon'
 
+import {
+  convertVegaConfig,
+  getVegaConfigType,
+  getVegaErrors,
+  getVegaWarnings,
+  isVegaConfig,
+  parseVegaConfig
+} from '@cdc/core/helpers/vegaConfig'
+
 interface ButtonProps {
   icon: React.ReactElement
   id: number
@@ -41,6 +50,8 @@ interface ButtonProps {
 const ChooseTab: React.FC = (): JSX.Element => {
   const { config, tempConfig } = useContext(ConfigContext)
 
+  const [pastedConfig, setPastedConfig] = useState('')
+
   const dispatch = useContext(EditorDispatchContext)
   const rowLabels = ['General', , 'Charts', 'Maps']
 
@@ -49,15 +60,55 @@ const ChooseTab: React.FC = (): JSX.Element => {
     const reader = new FileReader()
     reader.onload = e => {
       const text = e.target.result
-      try {
-        const newConfig = JSON.parse(text as string)
-        dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
-        dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
-      } catch (e) {
-        alert('Invalid JSON')
-      }
+      importConfig(text as string)
     }
     reader.readAsText(file)
+  }
+
+  const importConfig = text => {
+    let newConfig
+    try {
+      newConfig = JSON.parse(text)
+    } catch (e) {
+      alert('The JSON that was entered is invalid.')
+      throw new Error()
+    }
+
+    const isVega = isVegaConfig(newConfig)
+    if (isVega) {
+      newConfig = importVegaConfig(newConfig)
+    }
+
+    dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
+    dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: isVega && newConfig.data?.length ? 2 : 1 })
+  }
+
+  const importVegaConfig = newConfig => {
+    let vegaErrors
+    try {
+      const vegaConfig = parseVegaConfig(newConfig)
+      vegaErrors = getVegaErrors(newConfig, vegaConfig)
+      if (vegaErrors.length === 0) {
+        const configType = getVegaConfigType(vegaConfig)
+        const configSubType = configType === 'Map' ? 'United States (State- or County-Level)' : configType
+        const button = buttons.find(b => b.label === configSubType)
+        const coveConfig = generateNewConfig(JSON.parse(JSON.stringify(button)))
+        const vegaWarnings = getVegaWarnings(newConfig, vegaConfig)
+        const config = convertVegaConfig(configType, vegaConfig, coveConfig)
+        if (vegaWarnings.length) {
+          alert(vegaWarnings.join('\n\n'))
+        }
+        return config
+      }
+    } catch {
+      vegaErrors = [
+        'An unknown error occurred while importing this Vega config. Reach out to the COVE team if you think it should be supported.'
+      ]
+    }
+
+    const errorText = vegaErrors.join('\n\n')
+    alert(errorText)
+    throw new Error(errorText)
   }
 
   const generateNewConfig = props => {
@@ -180,7 +231,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
       <hr />
       <div className='form-group'>
         <label htmlFor='uploadConfig'>
-          Upload Custom Configuration{' '}
+          Select configuration file{' '}
           <Tooltip style={{ textTransform: 'none' }}>
             <Tooltip.Target>
               <Icon display='warningCircle' style={{ marginLeft: '0.5rem' }} />
@@ -197,6 +248,27 @@ const ChooseTab: React.FC = (): JSX.Element => {
           id='uploadConfig'
           onChange={handleUpload}
         />
+        <div className='d-flex align-items-start mt-1'>
+          <label htmlFor='uploadConfig'>or paste configuration JSON</label>
+          <textarea
+            id='pasteConfig'
+            className='ms-2 '
+            onChange={e => {
+              setPastedConfig(e.target.value)
+            }}
+            placeholder='{ }'
+            value={pastedConfig}
+          />
+          <button
+            className='btn btn-primary px-4 ms-2'
+            type='submit'
+            id='load-data'
+            disabled={!pastedConfig}
+            onClick={() => importConfig(pastedConfig)}
+          >
+            Load
+          </button>
+        </div>
       </div>
     </div>
   )

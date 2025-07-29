@@ -3,9 +3,14 @@
   min-width: 100%;
 }
 
-.collapsed + .table-container {
+.bs4 .table.table-width-unset {
+  width: unset;
+}
+
+.collapsed+.table-container {
   border-bottom: none;
 }
+
 .table-container {
   overflow-x: auto;
   border-right: 1px solid var(--lightGray);
@@ -33,6 +38,7 @@
 }
 
 table.horizontal {
+
   th,
   td {
     min-width: 200px;
@@ -47,6 +53,7 @@ table.data-table {
   border-collapse: collapse;
   appearance: none;
   table-layout: fixed;
+
   * {
     box-sizing: border-box;
   }
@@ -67,8 +74,10 @@ table.data-table {
       background: none;
     }
   }
+
   thead {
     color: #fff;
+
     .resizer {
       cursor: e-resize;
       width: 10px;
@@ -78,9 +87,11 @@ table.data-table {
       right: 0;
       touch-action: none;
     }
+
     tr {
       text-align: left;
     }
+
     th,
     td {
       padding: 0.5em 0.7em;
@@ -108,8 +119,11 @@ table.data-table {
       background-color: var(--tertiary) !important;
       font-weight: bold;
     }
+
     border-bottom: solid 1px #e5e5e5;
-    min-width: 100%; /* Needed to fill content up*/
+    min-width: 100%;
+
+    /* Needed to fill content up*/
     &:last-child {
       border-bottom: 0;
     }
@@ -120,6 +134,7 @@ table.data-table {
     padding: 0.3em 0.7em;
     border-right: 1px solid rgba(0, 0, 0, 0.1);
     white-space: nowrap;
+
     &:last-child {
       border-right: 0 !important;
     }
@@ -127,6 +142,7 @@ table.data-table {
 
   td {
     position: relative;
+
     svg {
       margin-left: 1rem;
     }
@@ -148,6 +164,7 @@ table.data-table {
     text-decoration: underline;
     cursor: pointer;
     color: #075290;
+
     svg {
       max-width: 13px;
       vertical-align: baseline;
@@ -163,6 +180,7 @@ table.data-table {
 
 .no-data {
   position: relative;
+
   .no-data-message {
     background: rgba(255, 255, 255, 0.5);
     top: 0;
@@ -175,18 +193,22 @@ table.data-table {
     align-items: center;
     justify-content: center;
     z-index: 7;
+
     :is(h3) {
       font-size: 1.3rem;
       font-weight: 600;
       margin-bottom: 0.3rem;
     }
   }
+
   tr:hover {
     background: #fff;
   }
+
   th,
   td {
     width: 50%;
+
     &::before {
       content: '\00a0';
     }
@@ -197,15 +219,19 @@ table.data-table {
   margin: 1rem 0;
   display: flex;
   align-items: center;
+
   ul {
     list-style: none;
     margin: 0 1rem 0 0;
     display: flex;
-    li + li {
+
+    li+li {
       margin-left: 0.3rem;
     }
+
     button {
       background: var(--mediumGray);
+
       &:hover {
         background: lighten(var(--mediumGray), 5%);
       }
@@ -219,6 +245,7 @@ table.data-table {
       background: var(--mediumGray);
       opacity: 0.3;
       cursor: default;
+
       &:hover {
         background: var(--mediumGray);
       }
@@ -232,10 +259,12 @@ table.data-table {
   text-decoration: none;
   transition: 0.3s all;
   margin: 1em 0;
+
   &:hover {
     transition: 0.3s all;
   }
 }
+
 .cove,
 .cdc-open-viz-module {
   .download-links a:not(:last-child) {

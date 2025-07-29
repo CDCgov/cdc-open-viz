@@ -288,6 +288,21 @@ export const BarChartVertical = () => {
                           }
                         })}
 
+                        {(absentDataLabel || isSuppressed) && (
+                          <rect
+                            x={barX}
+                            y={0}
+                            width={barWidth}
+                            height={yMax}
+                            fill='transparent'
+                            data-tooltip-place='top'
+                            data-tooltip-offset='{"top":3}'
+                            style={{ pointerEvents: 'all', cursor: 'pointer' }}
+                            data-tooltip-html={tooltip}
+                            data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                          />
+                        )}
+
                         {config.preliminaryData.map((pd, index) => {
                           // check if user selected column
                           const selectedSuppressionColumn = !pd.column || pd.column === bar.key

@@ -59,7 +59,9 @@ export const BarChartHorizontal = () => {
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
-  const hasConfidenceInterval = Object.keys(config.confidenceKeys).length > 0
+  const hasConfidenceInterval = [config.confidenceKeys?.upper, config.confidenceKeys?.lower].every(
+    v => v != null && String(v).trim() !== ''
+  )
 
   const _data = getBarData(config, data, hasConfidenceInterval)
 
@@ -262,6 +264,21 @@ export const BarChartHorizontal = () => {
                           }
                         })}
 
+                        {(absentDataLabel || isSuppressed) && (
+                          <rect
+                            x={barX}
+                            y={0}
+                            width={yMax}
+                            height={numbericBarHeight}
+                            fill='transparent'
+                            data-tooltip-place='top'
+                            data-tooltip-offset='{"top":3}'
+                            style={{ pointerEvents: 'all', cursor: 'pointer' }}
+                            data-tooltip-html={tooltip}
+                            data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                          />
+                        )}
+
                         {config.preliminaryData?.map((pd, index) => {
                           // check if user selected column
                           const selectedSuppressionColumn = !pd.column || pd.column === bar.key
@@ -301,7 +318,7 @@ export const BarChartHorizontal = () => {
                           )
                         })}
 
-                        {!config.isLollipopChart && (
+                        {!config.isLollipopChart && !hasConfidenceInterval && (
                           <Text // prettier-ignore
                             display={displayBar ? 'block' : 'none'}
                             x={bar.y}
@@ -311,6 +328,21 @@ export const BarChartHorizontal = () => {
                             dx={textPadding}
                             verticalAnchor='middle'
                             textAnchor={textAnchor}
+                          >
+                            {testZeroValue(bar.value) ? '' : barDefaultLabel}
+                          </Text>
+                        )}
+
+                        {!config.isLollipopChart && hasConfidenceInterval && (
+                          <Text // prettier-ignore
+                            display={displayBar ? 'block' : 'none'}
+                            x={bar.value < 0 ? bar.y + barWidth : bar.y - barWidth}
+                            opacity={transparentBar ? 0.5 : 1}
+                            y={config.barHeight / 2 + config.barHeight * bar.index}
+                            fill={labelColor}
+                            dx={-textPadding}
+                            verticalAnchor='middle'
+                            textAnchor={bar.value < 0 ? 'end' : 'start'}
                           >
                             {testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
