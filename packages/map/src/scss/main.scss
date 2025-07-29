@@ -1,8 +1,8 @@
 @import 'mixins';
 @import 'editor-panel';
+@import '@cdc/core/styles/accessibility';
 
 .type-map--has-error {
-
   .waiting {
     display: flex;
     overflow: hidden !important;

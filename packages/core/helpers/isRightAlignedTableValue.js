@@ -3,7 +3,7 @@ import { footnotesSymbols } from '@cdc/core/helpers/footnoteSymbols'
 const numericStrings = ['N/A', 'NA', '', 'Suppressed'].concat(footnotesSymbols.map(s => s[0]))
 
 export default function isRightAlignedTableValue(value = '') {
-  if (!value) return false
+  if (!value) return true
   if (typeof value === 'number') {
     return !Number.isNaN(value)
   }
