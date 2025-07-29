@@ -120,7 +120,7 @@ const BrushChart = ({ xMax, yMax }: BrushChartProps) => {
       svg.call(brushHandle, selection, formattedStartDate, formattedEndDate)
 
       const payload = {
-        active: config.brush.active,
+        active: config.xAxis.brushActive,
         isBrushing: isUserBrushing,
         data: finalData
       }

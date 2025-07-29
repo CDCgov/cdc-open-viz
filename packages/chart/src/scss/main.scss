@@ -1,3 +1,5 @@
+@import '@cdc/core/styles/accessibility';
+
 @mixin breakpoint($class) {
   @if $class == xs {
     @media (max-width: 767px) {
@@ -738,12 +740,4 @@
 
 .cdc-open-viz-module .debug {
   border: 2px solid red;
-}
-
-// Only frontend styles are applied in WCMS/TP
-// This helps match those styles when viewing in the editor
-.modal.cdc-cove-editor *:focus-visible,
-.cdc-open-viz-module *:focus-visible {
-  outline: dashed 2px rgba(255, 102, 1, 0.9) !important;
-  outline-offset: 3px !important;
 }

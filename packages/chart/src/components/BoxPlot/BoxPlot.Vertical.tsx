@@ -8,7 +8,7 @@ import { handleTooltip, createPlots } from './helpers/index'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import _ from 'lodash'
 
-const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
+const BoxPlotVertical = ({ xScale, yScale, seriesScale }) => {
   const { config, colorScale, seriesHighlight, transformedData: data } = useContext(ConfigContext)
   const { boxplot } = config
 
@@ -21,7 +21,7 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
   const color_0 = _.get(colorPalettesChart, [config.palette, 0], '#000')
   const plots = createPlots(data, config)
   return (
-    <ErrorBoundary component='BoxPlot'>
+    <ErrorBoundary component='BoxPlot Vertical'>
       <Group left={Number(config.yAxis.size)} className='boxplot' key={`boxplot-group`}>
         {plots.map((d, i) => {
           const offset = boxWidth - constrainedWidth
@@ -41,7 +41,7 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
                   config.legend.behavior === 'highlight' ||
                   seriesHighlight.length === 0 ||
                   seriesHighlight.indexOf(item.dataKey) !== -1
-                const fillOpacity = isTransparent ? 0.3 : 0.5
+                const fillOpacity = isTransparent ? 0.3 : 0.7
                 return (
                   <Group key={`boxplotplot-${item.dataKey}-${index}`}>
                     {boxplot.plotNonOutlierValues &&
@@ -131,4 +131,4 @@ const CoveBoxPlot = ({ xScale, yScale, seriesScale }) => {
   )
 }
 
-export default CoveBoxPlot
+export default BoxPlotVertical

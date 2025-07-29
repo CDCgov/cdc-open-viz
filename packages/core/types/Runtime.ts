@@ -1,12 +1,6 @@
 import { Axis } from './Axis'
+import { ForecastingSeriesKey } from './ForecastingSeriesKey'
 import { Series } from './Series'
-
-export type ForecastingSeriesKey = {
-  stages: {
-    key: string
-    color: string
-  }[]
-}
 
 export type Runtime = {
   barSeriesKeys?: string[]
