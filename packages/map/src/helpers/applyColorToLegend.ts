@@ -35,6 +35,17 @@ export const applyColorToLegend = (legendItemIndex: number, config: MapConfig, r
     return specialClassColors[legendItemIndex]
   }
 
+  // For categorical maps with custom colors, use color distribution logic
+  if (config.legend?.type === 'category' && customColors) {
+    const amt = config.legend.additionalCategories?.length ?? 10
+    const distributionArray = colorDistributions[amt] ?? []
+
+    const specificColor = distributionArray[legendItemIndex - specialClasses.length] ?? colorPalette.at(-1)
+
+    // If specificColor is a number, use it as an index; otherwise return the color directly
+    return colorPalette[specificColor] ?? '#fff'
+  }
+
   // Use qualitative color palettes directly
   if (color.includes('qualitative')) {
     const safeIndex = Math.max(0, Math.min(regularItemColorIndex, colorPalette.length - 1))
