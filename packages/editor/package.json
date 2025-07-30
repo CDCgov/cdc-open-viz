@@ -1,6 +1,6 @@
 {
   "name": "@cdc/editor",
-  "version": "4.25.7",
+  "version": "4.25.7-2",
   "description": "React component for generating a new component entry",
   "moduleName": "CdcEditor",
   "main": "dist/cdceditor",
@@ -27,9 +27,9 @@
   "dependencies": {
     "@cdc/chart": "^4.25.7",
     "@cdc/core": "^4.25.7",
-    "@cdc/dashboard": "^4.25.7",
+    "@cdc/dashboard": "^4.25.7-2",
     "@cdc/data-bite": "^4.25.7",
-    "@cdc/map": "^4.25.7",
+    "@cdc/map": "^4.25.7-2",
     "@cdc/markup-include": "^4.25.7",
     "@cdc/waffle-chart": "^4.25.7",
     "axios": "^1.9.0",

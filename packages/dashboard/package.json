@@ -1,6 +1,6 @@
 {
   "name": "@cdc/dashboard",
-  "version": "4.25.7",
+  "version": "4.25.7-2",
   "description": "React component for combining multiple visualizations into a single dashboard",
   "moduleName": "CdcDashboard",
   "main": "dist/cdcdashboard",
@@ -31,7 +31,7 @@
     "@cdc/core": "^4.25.7",
     "@cdc/data-bite": "^4.25.7",
     "@cdc/filtered-text": "^4.25.7",
-    "@cdc/map": "^4.25.7",
+    "@cdc/map": "^4.25.7-2",
     "@cdc/markup-include": "^4.25.7",
     "@cdc/waffle-chart": "^4.25.7",
     "js-base64": "^2.5.2",
