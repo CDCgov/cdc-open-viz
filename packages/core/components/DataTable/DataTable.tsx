@@ -390,7 +390,7 @@ const DataTable = (props: DataTableProps) => {
               )}
           </div>
         </section>
-        <div className={`w-100 d-flex justify-content-between`}>
+        <div className={`w-100 d-flex ${showCollapseButton ? 'justify-content-between' : 'justify-content-end'}`}>
           {showCollapseButton && (
             <button
               className='border-0 bg-transparent text-decoration-underline mt-2'
