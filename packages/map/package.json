@@ -1,6 +1,6 @@
 {
   "name": "@cdc/map",
-  "version": "4.25.7",
+  "version": "4.25.7-2",
   "description": "React component for visualizing tabular data on a map of the United States or the world.",
   "moduleName": "CdcMap",
   "main": "dist/cdcmap",
