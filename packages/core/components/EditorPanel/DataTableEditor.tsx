@@ -216,7 +216,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
         section='table'
         updateField={updateField}
       />
-      {config.table.collapsible !== false && (
+      {config.table.collapsible && (
         <CheckBox
           value={config.table.expanded}
           fieldName='expanded'
@@ -225,7 +225,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           updateField={updateField}
         />
       )}
-      {config.table.collapsible !== false && (
+      {config.table.collapsible && (
         <CheckBox
           value={config.table.showBottomCollapse}
           fieldName='showBottomCollapse'
