@@ -226,7 +226,7 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
                   />
 
                   <CheckBox
-                    value={showNoDataMessage}
+                    value={contentEditor.showNoDataMessage}
                     section='contentEditor'
                     fieldName='showNoDataMessage'
                     label='Add No Data Message'
