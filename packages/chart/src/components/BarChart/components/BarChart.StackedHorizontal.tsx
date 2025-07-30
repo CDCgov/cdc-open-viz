@@ -137,7 +137,7 @@ const BarChartStackedHorizontal = () => {
                           <Text
                             x={`${bar.x + (config.isLollipopChart ? 15 : 5)}`} // padding
                             y={bar.y + bar.height * 1.2}
-                            fill={'#000000'}
+                            fill={APP_FONT_COLOR}
                             textAnchor='start'
                             verticalAnchor='start'
                           >

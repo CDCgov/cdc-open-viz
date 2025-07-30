@@ -159,7 +159,7 @@ export const BarChartVertical = () => {
                     yAxisValue
                   })
                   // configure colors
-                  let labelColor = '#000000'
+                  let labelColor = APP_FONT_COLOR
                   labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor) // Set if background is transparent'
                   const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                   const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
@@ -353,6 +353,7 @@ export const BarChartVertical = () => {
                           y={barY - BAR_LABEL_PADDING}
                           fill={labelColor}
                           textAnchor='middle'
+                          fontSize={16}
                         >
                           {testZeroValue(bar.value) ? '' : barDefaultLabel}
                         </Text>

@@ -166,7 +166,7 @@ export const BarChartHorizontal = () => {
                     </li></ul>`
 
                   // configure colors
-                  let labelColor = '#000000'
+                  let labelColor = APP_FONT_COLOR
                   labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor) // Set if background is transparent'
                   let barColor =
                     config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key]
@@ -366,7 +366,7 @@ export const BarChartHorizontal = () => {
                             display={displayBar ? 'block' : 'none'}
                             x={bar.y}
                             y={0}
-                            fill={'#000000'}
+                            fill={APP_FONT_COLOR}
                             dx={textPaddingLollipop}
                             textAnchor={textAnchorLollipop}
                             verticalAnchor='middle'
