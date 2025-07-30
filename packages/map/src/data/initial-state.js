@@ -91,7 +91,8 @@ export default {
     forceDisplay: true,
     download: false,
     indexLabel: '',
-    cellMinWidth: '0'
+    cellMinWidth: '0',
+    collapsible: true
   },
   tooltips: {
     appearanceType: 'hover',

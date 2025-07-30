@@ -279,6 +279,8 @@ const DataTable = (props: DataTableProps) => {
         ? mapCellMatrix({ ...props, rows, wrapColumns, runtimeData, viewport })
         : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
 
+    const useBottomExpandCollapse = config.table.showBottomCollapse && expanded && Array.isArray(childrenMatrix)
+
     // If every value in a column is a number, record the column index so the header and cells can be right-aligned
     const rightAlignedCols = childrenMatrix.length
       ? Object.fromEntries(
@@ -290,6 +292,7 @@ const DataTable = (props: DataTableProps) => {
       )
       : {}
 
+    const showCollapseButton = config.table.collapsible !== false && useBottomExpandCollapse
     const TableMediaControls = ({ belowTable }) => {
       const hasDownloadLink = config.table.download
       return (
@@ -308,11 +311,15 @@ const DataTable = (props: DataTableProps) => {
 
     return (
       <ErrorBoundary component='DataTable'>
-        {!config.table.showDownloadLinkBelow && <TableMediaControls />}
+        {!config.table.showDownloadLinkBelow && (
+          <div className='w-100 d-flex justify-content-end'>
+            <TableMediaControls />
+          </div>
+        )}
         <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           {config.table.collapsible !== false && (
-            <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} viewport={viewport} />
+            <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
           )}
           <div className='table-container' style={limitHeight}>
             <Table
@@ -348,8 +355,9 @@ const DataTable = (props: DataTableProps) => {
                 )
               }
               tableOptions={{
-                className: `table table-striped table-width-unset ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${isVertical ? '' : ' horizontal'
-                  }`,
+                className: `table table-striped table-width-unset ${
+                  expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
+                }${isVertical ? '' : ' horizontal'}`,
                 'aria-live': 'assertive',
                 'aria-rowcount': config?.data?.length ? config.data.length : -1,
                 hidden: !expanded,
@@ -382,7 +390,18 @@ const DataTable = (props: DataTableProps) => {
               )}
           </div>
         </section>
-        {config.table.showDownloadLinkBelow && <TableMediaControls belowTable={true} />}
+        <div className={`w-100 d-flex ${showCollapseButton ? 'justify-content-between' : 'justify-content-end'}`}>
+          {showCollapseButton && (
+            <button
+              className='border-0 bg-transparent text-decoration-underline mt-2'
+              style={{ color: 'var(--colors-link-blue)', fontSize: '0.772rem', textUnderlineOffset: '6px' }}
+              onClick={() => setExpanded(false)}
+            >
+              - Collapse table
+            </button>
+          )}
+          {config.table.showDownloadLinkBelow && <TableMediaControls belowTable={true} />}
+        </div>
         <div id={skipId} className='cdcdataviz-sr-only'>
           Skipped data table.
         </div>
