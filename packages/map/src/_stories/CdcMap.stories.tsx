@@ -5,7 +5,6 @@ import SingleStateWithFilters from './_mock/DEV-8942.json'
 import exampleCityState from './_mock/example-city-state.json'
 import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
 import exampleLegendBins from './_mock/legend-bins.json'
-import floatingPoint from './_mock/floating-point.json'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map',
@@ -36,7 +35,6 @@ export const Equal_Number_Map: Story = {
 
 export const Scale_Based: Story = {
   args: {
-    isEditor: true,
     configUrl:
       'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Scale-Based-Categorical-Map-With-Special-Classes.json'
   }
@@ -85,8 +83,7 @@ export const Bubble_Map: Story = {
 
 export const HHS_Region_Map: Story = {
   args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-hhs-regions-data.json',
-    isEditor: true
+    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-hhs-regions-data.json'
   }
 }
 
@@ -163,13 +160,6 @@ export const Custom_Color_Distributions_With_Update_Needed: Story = {
 export const Legend_Bins: Story = {
   args: {
     config: exampleLegendBins,
-    isEditor: true
-  }
-}
-
-export const Legend_Bins_Starting_Point_Fix: Story = {
-  args: {
-    config: floatingPoint,
     isEditor: true
   }
 }
