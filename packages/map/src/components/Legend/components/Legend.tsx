@@ -94,8 +94,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           label: parse(legendLabel),
           disabled: entry.disabled,
           special: entry.hasOwnProperty('special'),
-          value: legend.type === 'category' ? entry.value : [entry.min, entry.max],
-          categoryValue: legend.type === 'category' ? entry.value : undefined
+          value: [entry.min, entry.max]
         }
       })
     } catch (e) {
@@ -123,44 +122,16 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         dispatch({ type: 'SET_ACCESSIBLE_STATUS', payload: message })
       }
 
-      // Find the correct runtime index for toggling
-      // This is needed because special classes may have been moved to the end
-      const findRuntimeIndex = () => {
-        if (!runtimeLegend.items) return idx
-
-        return runtimeLegend.items.findIndex(runtimeItem => {
-          if (item.special && runtimeItem.special) {
-            // For special classes, match by label (since formatted item label comes from runtime item)
-            const runtimeLabel = runtimeItem.label || runtimeItem.value
-            const itemLabel = typeof item.label === 'string' ? item.label : item.label?.props?.children || item.label
-            return runtimeLabel === itemLabel
-          } else if (!item.special && !runtimeItem.special) {
-            // For categorical/qualitative items, match by single value
-            if (config.legend.type === 'category' && item.categoryValue !== undefined) {
-              return runtimeItem.value === item.categoryValue
-            }
-            // For numeric items, match by min/max values
-            return runtimeItem.min === item.value?.[0] && runtimeItem.max === item.value?.[1]
-          }
-          return false
-        })
-      }
-
-      const runtimeIndex = findRuntimeIndex()
-      const safeRuntimeIndex = runtimeIndex >= 0 ? runtimeIndex : idx
-
       return (
         <li
           className={handleListItemClass()}
           key={idx}
           title={`Legend item ${item.label} - Click to disable`}
-          onClick={() =>
-            toggleLegendActive(safeRuntimeIndex, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)
-          }
+          onClick={() => toggleLegendActive(idx, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)}
           onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault()
-              toggleLegendActive(safeRuntimeIndex, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)
+              toggleLegendActive(idx, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)
             }
           }}
           tabIndex={0}
@@ -343,41 +314,41 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
             {((config.visual.additionalCityStyles && config.visual.additionalCityStyles.some(c => c.label)) ||
               config.visual.cityStyleLabel) && (
-              <>
-                <hr />
-                <div className={legendClasses.div.join(' ') || ''}>
-                  {config.visual.cityStyleLabel && (
-                    <div>
-                      <svg>
-                        <Group
-                          top={
-                            config.visual.cityStyle === 'pin' ? 19 : config.visual.cityStyle === 'triangle' ? 13 : 11
-                          }
-                          left={10}
-                        >
-                          {cityStyleShapes[config.visual.cityStyle.toLowerCase()]}
-                        </Group>
-                      </svg>
-                      <p>{config.visual.cityStyleLabel}</p>
-                    </div>
-                  )}
+                <>
+                  <hr />
+                  <div className={legendClasses.div.join(' ') || ''}>
+                    {config.visual.cityStyleLabel && (
+                      <div>
+                        <svg>
+                          <Group
+                            top={
+                              config.visual.cityStyle === 'pin' ? 19 : config.visual.cityStyle === 'triangle' ? 13 : 11
+                            }
+                            left={10}
+                          >
+                            {cityStyleShapes[config.visual.cityStyle.toLowerCase()]}
+                          </Group>
+                        </svg>
+                        <p>{config.visual.cityStyleLabel}</p>
+                      </div>
+                    )}
 
-                  {config.visual.additionalCityStyles.map(
-                    ({ shape, label }) =>
-                      label && (
-                        <div>
-                          <svg>
-                            <Group top={shape === 'Pin' ? 19 : shape === 'Triangle' ? 13 : 11} left={10}>
-                              {cityStyleShapes[shape.toLowerCase()]}
-                            </Group>
-                          </svg>
-                          <p>{label}</p>
-                        </div>
-                      )
-                  )}
-                </div>
-              </>
-            )}
+                    {config.visual.additionalCityStyles.map(
+                      ({ shape, label }) =>
+                        label && (
+                          <div>
+                            <svg>
+                              <Group top={shape === 'Pin' ? 19 : shape === 'Triangle' ? 13 : 11} left={10}>
+                                {cityStyleShapes[shape.toLowerCase()]}
+                              </Group>
+                            </svg>
+                            <p>{label}</p>
+                          </div>
+                        )
+                    )}
+                  </div>
+                </>
+              )}
             {runtimeLegend.disabledAmt > 0 && (
               <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
                 Show All
