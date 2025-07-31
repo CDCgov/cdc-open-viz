@@ -2,6 +2,7 @@ import { setBinNumbers, sortSpecialClassesLast } from '.'
 
 // Types
 import { GeneratedLegend, LegendConfig, LegendState } from './../types/legendTypes'
+import { MapConfig } from '../types/MapConfig'
 
 // Utilities
 import { validateInputs } from './utils/validateInputs'
@@ -15,22 +16,16 @@ import { generateEqualNumberLegend } from './handlers/equalNumberLegend'
 import { generateEqualIntervalLegend } from './handlers/equalIntervalLegend'
 import { processSeparateZero } from './handlers/separateZero'
 
-import { supportedCountries } from '../data/supported-geos'
-import { MapConfig } from '../types/MapConfig'
-
 const initializeLegendState = (
   configObj: MapConfig,
   runtimeData: object[],
   hash: string,
   runtimeFilters: object[]
 ): LegendState => {
-  const { legend, columns, general } = configObj
+  const { legend, columns } = configObj
   const primaryColName = columns.primary.name
-
-  // Define variables..
   const newLegendMemo = new Map() // Reset memoization
   const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
-
   const dataSet = prepareDataSet(configObj, runtimeData)
 
   const result: GeneratedLegend = {
@@ -103,7 +98,7 @@ export const generateRuntimeLegend = (
   legendSpecialClassLastMemo: React.MutableRefObject<Map<string, number>>
 ): GeneratedLegend | [] => {
   try {
-    // 1. Validation
+    // Run validation checks
     validateInputs({
       configObj,
       runtimeData,
@@ -112,57 +107,46 @@ export const generateRuntimeLegend = (
       legendSpecialClassLastMemo
     })
 
-    debugger
-
-    // 2. Initialize state
-    const state = initializeLegendState(configObj, runtimeData, hash, runtimeFilters)
-
-    // 3. Get data references
+    // Iniialize the legend state & defined variables
+    const legendState = initializeLegendState(configObj, runtimeData, hash, runtimeFilters)
     const { legend, columns, general } = configObj
     const primaryColName = columns.primary.name
     const data = configObj.data.filter(row => row.uid) // Filtered data with UIDs
+    const domainNums = getDomainNumbers(legendState.dataSet, primaryColName)
 
-    // 4. Get domain numbers for later use
-    const domainNums = getDomainNumbers(state.dataSet, primaryColName)
+    processSpecialClasses(legendState, configObj, data)
 
-    // 5. Process special classes first
-    processSpecialClasses(state, configObj, data)
-
-    // 6. Handle legend generation by type
+    // Handle category legends
     if (legend.type === 'category') {
-      generateCategoryLegend(state, configObj, data)
-
-      legendMemo.current = state.newLegendMemo
-      finalizeLegendItems(state.result, legend)
-
+      generateCategoryLegend(legendState, configObj, data)
+      legendMemo.current = legendState.newLegendMemo
+      finalizeLegendItems(legendState.result, legend)
       const assignSpecialClassLastIndex = (value, key) => {
-        const newIndex = state.result.items.findIndex(d => d.bin === value)
-        state.newLegendSpecialClassLastMemo.set(key, newIndex)
+        const newIndex = legendState.result.items.findIndex(d => d.bin === value)
+        legendState.newLegendSpecialClassLastMemo.set(key, newIndex)
       }
-
-      state.newLegendMemo.forEach(assignSpecialClassLastIndex)
-      legendSpecialClassLastMemo.current = state.newLegendSpecialClassLastMemo
-
-      return state.result
+      legendState.newLegendMemo.forEach(assignSpecialClassLastIndex)
+      legendSpecialClassLastMemo.current = legendState.newLegendSpecialClassLastMemo
+      return legendState.result
     }
 
-    // 7. Handle separate zero for non-category legends
-    processSeparateZero(state, configObj)
+    // Separate zero for non-category legends
+    processSeparateZero(legendState, configObj)
 
-    // 8. Sort dataset for equal number/interval processing
-    state.dataSet = sortDataSet(state.dataSet, primaryColName, general.type)
+    // Sort dataset for equal number/interval processing
+    legendState.dataSet = sortDataSet(legendState.dataSet, primaryColName, general.type)
 
-    // 9. Generate legend based on type
+    // Generate legend based on type
     if (legend.type === 'equalnumber') {
-      generateEqualNumberLegend(state, configObj, domainNums)
+      generateEqualNumberLegend(legendState, configObj, domainNums)
     } else if (legend.type === 'equalinterval') {
-      generateEqualIntervalLegend(state, configObj, setConfig)
+      generateEqualIntervalLegend(legendState, configObj, setConfig)
     }
 
-    // 10. Finalize and return
-    finalizeState(state, configObj, runtimeData, data, legendMemo, legendSpecialClassLastMemo)
+    // Finalize and return
+    finalizeState(legendState, configObj, runtimeData, data, legendMemo, legendSpecialClassLastMemo)
 
-    return state.result
+    return legendState.result
   } catch (e) {
     console.error(e)
     return []
