@@ -9,6 +9,7 @@ import EditorContext from '@cdc/editor/src/ConfigContext'
 import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 import { MapConfig } from './types/MapConfig'
 import _, { set } from 'lodash'
+import { formatEventLabel, publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type CdcMapProps = {
   config: MapConfig
@@ -99,6 +100,13 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
     setTimeout(() => {
       setConfig(processedConfig)
+      console.log('Map config loaded:', processedConfig)
+      publishAnalyticsEvent(
+        'visualization_loaded',
+        'load',
+        formatEventLabel(processedConfig),
+        processedConfig.type,
+      )
       setLoading(false)
     }, 10)
   }

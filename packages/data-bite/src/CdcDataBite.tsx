@@ -45,6 +45,7 @@ import {
 
 // styles
 import './scss/main.scss'
+import { formatEventLabel, publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type CdcDataBiteProps = {
   config: Config
@@ -145,6 +146,12 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     const processedConfig = { ...coveUpdateWorker(response) }
 
     updateConfig({ ...defaults, ...processedConfig })
+    publishAnalyticsEvent(
+      'visualization_loaded',
+      'load',
+      formatEventLabel(processedConfig),
+      processedConfig.type,
+    )
     dispatch({ type: 'SET_LOADING', payload: false })
   }
 

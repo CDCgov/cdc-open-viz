@@ -1,5 +1,6 @@
 import React from 'react'
 // import html2pdf from 'html2pdf.js'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 const buttonText = {
   pdf: 'Download PDF',
@@ -34,6 +35,7 @@ const saveImageAs = (uri, filename) => {
 }
 
 const generateMedia = (state, type, elementToCapture) => {
+
   // Identify Selector
   const baseSvg = document.querySelector(`[data-download-id=${elementToCapture}]`)
 
@@ -89,6 +91,11 @@ const generateMedia = (state, type, elementToCapture) => {
         })
       }
       downloadImage()
+      publishAnalyticsEvent(
+        'COVE_IMAGE_DOWNLOADED',
+        'click',
+        'unknown',
+      )
       return
     case 'pdf':
       // let opt = {

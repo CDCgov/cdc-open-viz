@@ -82,6 +82,7 @@ import { VizFilter } from '@cdc/core/types/VizFilter'
 import { getNewRuntime } from './helpers/getNewRuntime'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import { Datasets } from '@cdc/core/types/DataSet'
+import { formatEventLabel, publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -465,6 +466,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (container && !isLoading && !_.isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_LOADED_EVENT', payload: true })
+      publishAnalyticsEvent(
+        'visualization_loaded',
+        'load',
+        formatEventLabel(config),
+        config.type
+      )
     }
   }, [container, config, isLoading]) // eslint-disable-line
 
@@ -926,8 +933,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           legend.position === 'top' ||
                           visualizationType === 'Sankey' ||
                           visualizationType === 'Spark Line'
-                        ? 'w-100'
-                        : 'w-75'
+                          ? 'w-100'
+                          : 'w-75'
                     }
                   >
                     {/* All charts with LinearChart */}
@@ -963,7 +970,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                               const labelMargin = 120
                               const widthReduction =
                                 config.showLineSeriesLabels &&
-                                (config.legend.position !== 'right' || config.legend.hide)
+                                  (config.legend.position !== 'right' || config.legend.hide)
                                   ? labelMargin
                                   : 0
                               return (
@@ -1052,32 +1059,32 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   config.visualizationType !== 'Spark Line' &&
                   config.visualizationType !== 'Sankey') ||
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
-                  <DataTable
-                    /* changing the "key" will force the table to re-render
-                      when the default sort changes while editing */
-                    key={dataTableDefaultSortBy}
-                    config={pivotDynamicSeries(config)}
-                    rawData={
-                      config.visualizationType === 'Sankey'
-                        ? config?.data?.[0]?.tableData
-                        : config.table.customTableConfig
-                        ? filterVizData(config.filters, config.data)
-                        : config.data
-                    }
-                    runtimeData={getTableRuntimeData()}
-                    expandDataTable={config.table.expanded}
-                    columns={config.columns}
-                    defaultSortBy={dataTableDefaultSortBy}
-                    displayGeoName={name => name}
-                    applyLegendToRow={applyLegendToRow}
-                    tableTitle={config.table.label}
-                    indexTitle={config.table.indexLabel}
-                    vizTitle={title}
-                    viewport={currentViewport}
-                    tabbingId={handleChartTabbing(config, legendId)}
-                    colorScale={colorScale}
-                  />
-                )}
+                    <DataTable
+                      /* changing the "key" will force the table to re-render
+                        when the default sort changes while editing */
+                      key={dataTableDefaultSortBy}
+                      config={pivotDynamicSeries(config)}
+                      rawData={
+                        config.visualizationType === 'Sankey'
+                          ? config?.data?.[0]?.tableData
+                          : config.table.customTableConfig
+                            ? filterVizData(config.filters, config.data)
+                            : config.data
+                      }
+                      runtimeData={getTableRuntimeData()}
+                      expandDataTable={config.table.expanded}
+                      columns={config.columns}
+                      defaultSortBy={dataTableDefaultSortBy}
+                      displayGeoName={name => name}
+                      applyLegendToRow={applyLegendToRow}
+                      tableTitle={config.table.label}
+                      indexTitle={config.table.indexLabel}
+                      vizTitle={title}
+                      viewport={currentViewport}
+                      tabbingId={handleChartTabbing(config, legendId)}
+                      colorScale={colorScale}
+                    />
+                  )}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
                 {config?.legacyFootnotes && (

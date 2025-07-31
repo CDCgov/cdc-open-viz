@@ -1,4 +1,5 @@
 import Papa from 'papaparse'
+import { publishAnalyticsEvent } from '../helpers/metrics/helpers'
 
 type DownloadButtonProps = {
   rawData: Object
@@ -22,6 +23,10 @@ const DownloadButton = ({ rawData, fileName, headerColor, skipId }: DownloadButt
       //@ts-ignore
       navigator.msSaveBlob(blob, fileName)
     }
+    publishAnalyticsEvent('COVE_CSV_DOWNLOADED',
+      'click',
+      'unknown',
+    )
   }
 
   return (
