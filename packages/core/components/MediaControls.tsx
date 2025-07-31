@@ -1,5 +1,6 @@
 import React from 'react'
 // import html2pdf from 'html2pdf.js'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 const buttonText = {
   pdf: 'Download PDF',
@@ -33,7 +34,7 @@ const saveImageAs = (uri, filename) => {
   }
 }
 
-const generateMedia = (state, type, elementToCapture) => {
+const generateMedia = (state, type, elementToCapture, configUrl) => {
   // Identify Selector
   const baseSvg = document.querySelector(`[data-download-id=${elementToCapture}]`)
 
@@ -73,6 +74,8 @@ const generateMedia = (state, type, elementToCapture) => {
   const date = new Date()
   const filename = handleFileName(state)
 
+  console.log('configUrl', configUrl)
+
   switch (type) {
     case 'image':
       const downloadImage = async () => {
@@ -85,10 +88,12 @@ const generateMedia = (state, type, elementToCapture) => {
             })
             .then(canvas => {
               saveImageAs(canvas.toDataURL(), filename + '.png')
+              publishAnalyticsEvent(`${state.type}_image_downloaded`, 'click', configUrl, `${state.type}`)
             })
         })
       }
       downloadImage()
+
       return
     case 'pdf':
       // let opt = {
@@ -115,22 +120,13 @@ const generateMedia = (state, type, elementToCapture) => {
   }
 }
 
-// Handles different state theme locations between components
-// Apparently some packages use state.headerColor where others use state.theme
-const handleTheme = state => {
-  if (state?.headerColor) return state.headerColor // ie. maps
-  if (state?.theme) return state.theme // ie. charts
-  return 'theme-notFound'
-}
-
-// Download CSV
-const Button = ({ state, text, type, title, elementToCapture }) => {
+const Button = ({ state, text, type, title, elementToCapture, configUrl }) => {
   const buttonClasses = ['btn', 'btn-primary']
   return (
     <button
       className={buttonClasses.join(' ')}
       title={title}
-      onClick={() => generateMedia(state, type, elementToCapture)}
+      onClick={() => generateMedia(state, type, elementToCapture, configUrl)}
       style={{ lineHeight: '1.4em' }}
     >
       {buttonText[type]}
@@ -139,12 +135,19 @@ const Button = ({ state, text, type, title, elementToCapture }) => {
 }
 
 // Link to CSV/JSON data
-const Link = ({ config, dashboardDataConfig }) => {
+const Link = ({ config, dashboardDataConfig, configUrl }) => {
   let dataConfig = dashboardDataConfig || config
   // Handles Maps & Charts
   if (dataConfig.dataFileSourceType === 'url' && dataConfig.dataFileName && config.table.showDownloadUrl) {
     return (
-      <a href={dataConfig.dataFileName} title={buttonText.link} target='_blank'>
+      <a
+        href={dataConfig.dataFileName}
+        title={buttonText.link}
+        target='_blank'
+        onClick={() => {
+          publishAnalyticsEvent('data_viewed', 'click', `${unknown}`)
+        }}
+      >
         {buttonText.link}
       </a>
     )
@@ -152,7 +155,14 @@ const Link = ({ config, dashboardDataConfig }) => {
 
   // Handles Dashboards
   return config?.table?.showDownloadUrl && dataConfig.dataUrl ? (
-    <a href={dataConfig.dataUrl} title='Link to view full data set' target='_blank'>
+    <a
+      href={dataConfig.dataUrl}
+      title='Link to view full data set'
+      target='_blank'
+      onClick={() => {
+        publishAnalyticsEvent('data_viewed', 'click', `${configUrl}`)
+      }}
+    >
       {buttonText.link}
     </a>
   ) : null

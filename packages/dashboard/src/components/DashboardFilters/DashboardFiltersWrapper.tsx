@@ -15,6 +15,7 @@ import * as apiFilterHelpers from '../../helpers/apiFilterHelpers'
 import { applyQueuedActive } from '@cdc/core/components/Filters/helpers/applyQueuedActive'
 import './dashboardfilter.styles.css'
 import { updateChildFilters } from '../../helpers/updateChildFilters'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
 
@@ -32,6 +33,7 @@ type DashboardFiltersProps = {
   isEditor?: boolean
   setConfig: (config: DashboardFilters) => void
   currentViewport?: ViewPort
+  configUrl: string
 }
 
 const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
@@ -39,7 +41,8 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   visualizationConfig,
   setConfig: updateConfig,
   currentViewport,
-  isEditor = false
+  isEditor = false,
+  configUrl
 }) => {
   const state = useContext(DashboardContext)
   const { config: dashboardConfig, reloadURLData, loadAPIFilters, setAPIFilterDropdowns, setAPILoading } = state
@@ -103,6 +106,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       newConfig.dashboard.sharedFilters,
       visualizationConfig
     )
+
+
+    publishAnalyticsEvent('dashboard_filter_changed', 'change', `${configUrl}|key_${newSharedFilters?.[index]?.key}|value_${value}`, 'dashboard')
 
     // sets the active filter option that the user just selected.
     dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
@@ -175,9 +181,8 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       {!displayNone && (
         <Layout.Responsive isEditor={isEditor}>
           <div
-            className={`${
-              isEditor ? ' is-editor' : ''
-            } cove-component__content col-12 cove-dashboard-filters-container`}
+            className={`${isEditor ? ' is-editor' : ''
+              } cove-component__content col-12 cove-dashboard-filters-container`}
           >
             <Filters
               show={visualizationConfig?.sharedFilterIndexes?.map(Number)}

@@ -17,6 +17,7 @@ import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import LegendLineShape from './LegendLine.Shape'
 import LegendGroup from './LegendGroup'
 import { getSeriesWithData } from '../../helpers/dataHelpers'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 const LEGEND_PADDING = 36
 
@@ -32,6 +33,7 @@ export interface LegendProps {
   skipId: string
   dimensions: DimensionsType // for responsive width legend
   transformedData: any
+  configUrl: string
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
@@ -47,7 +49,8 @@ const Legend: React.FC<LegendProps> = forwardRef(
       formatLabels,
       skipId = 'legend',
       dimensions,
-      transformedData: data
+      transformedData: data,
+      configUrl
     },
     ref
   ) => {
@@ -137,11 +140,23 @@ const Legend: React.FC<LegendProps> = forwardRef(
                           onKeyDown={e => {
                             if (e.key === 'Enter') {
                               e.preventDefault()
+                              publishAnalyticsEvent(
+                                `chart_legend_item_toggled--${legend.behavior}-mode`,
+                                'keydown',
+                                `${configUrl}|${label.text}`,
+                                'chart'
+                              )
                               highlight(label)
                             }
                           }}
                           onClick={e => {
                             e.preventDefault()
+                            publishAnalyticsEvent(
+                              `chart_legend_item_toggled--${legend.behavior}-mode`,
+                              'click',
+                              `${configUrl}|${label.text}`,
+                              'chart'
+                            )
                             highlight(label)
                           }}
                           role='button'

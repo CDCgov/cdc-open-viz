@@ -6,6 +6,7 @@ import { geoPath, GeoPath } from 'd3-geo'
 import { getFilterControllingStatePicked } from '../components/UsaMap/helpers/map'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
 import { SVG_HEIGHT, SVG_WIDTH, SVG_PADDING } from '../helpers'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import _ from 'lodash'
 
 interface StateData {
@@ -18,7 +19,7 @@ interface StateData {
 }
 
 const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
-  const { config, runtimeData, position } = useContext<MapContext>(ConfigContext)
+  const { config, runtimeData, position, configUrl } = useContext<MapContext>(ConfigContext)
   const statePicked = getFilterControllingStatePicked(config, runtimeData)
   const dispatch = useContext(MapDispatchContext)
 
@@ -84,6 +85,8 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
         _prevPosition.coordinates[0] !== 0 && _prevPosition.coordinates[1] !== 0
           ? _prevPosition.coordinates
           : stateCenter
+      publishAnalyticsEvent('map_zoomed_in', 'click', `${configUrl}|${newZoom}|${newCoordinates}`, 'map')
+
     } else if (zoomFunction === 'zoomOut' && _prevPosition.zoom > 1) {
       newZoom = _prevPosition.zoom / 1.5
       newCoordinates =
@@ -100,6 +103,7 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     if (zoomFunction === 'reset') {
       dispatch({ type: 'SET_TRANSLATE', payload: [0, 0] }) // needed for state switcher
       dispatch({ type: 'SET_SCALE', payload: 1 }) // needed for state switcher
+      publishAnalyticsEvent('map_reset_zoom_level', 'click', configUrl, 'map')
     }
   }
 

@@ -14,6 +14,7 @@ import { coveUpdateWorker } from '@cdc/core/helpers/coveUpdateWorker'
 import _ from 'lodash'
 import { getQueryParams } from '@cdc/core/helpers/queryStringUtils'
 import EditorContext from '../../editor/src/ConfigContext'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type MultiDashboardProps = Omit<WCMSProps, 'configUrl'> & {
   configUrl?: string
@@ -51,6 +52,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, isEdi
     const { newConfig, datasets } =
       selected !== null ? await loadMultiDashboard(_config, selected) : await loadSingleDashboard(_config)
     setInitial(formatInitialState(newConfig, datasets))
+    publishAnalyticsEvent('dashboard_loaded', 'load', configUrl, 'dashboard')
   }
 
   useEffect(() => {
@@ -138,7 +140,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, isEdi
   }
 
   if (!initial) return <Loading />
-  return <CdcDashboard isEditor={isEditor} isDebug={isDebug} initialState={initial} />
+  return <CdcDashboard isEditor={isEditor} isDebug={isDebug} initialState={initial} configUrl={configUrl} />
 }
 
 export default MultiDashboardWrapper

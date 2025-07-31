@@ -24,6 +24,7 @@ import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
 import { resetLegendToggles } from '../../../helpers'
 import { MapContext } from '../../../types/MapContext'
 import LegendGroup from './LegendGroup/Legend.Group'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 const LEGEND_PADDING = 30
 
@@ -32,10 +33,11 @@ type LegendProps = {
   dimensions: DimensionsType
   containerWidthPadding: number
   currentViewport: ViewPort
+  configUrl: string
 }
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
-  const { skipId, containerWidthPadding } = props
+  const { skipId, containerWidthPadding, configUrl } = props
 
   const {
     config,
@@ -127,11 +129,25 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           className={handleListItemClass()}
           key={idx}
           title={`Legend item ${item.label} - Click to disable`}
-          onClick={() => toggleLegendActive(idx, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)}
+          onClick={() => {
+            toggleLegendActive(idx, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)
+            publishAnalyticsEvent(
+              `map_legend_item_toggled--isolate-mode`,
+              'click',
+              `${configUrl}|${item.label}`,
+              'map'
+            )
+          }}
           onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault()
               toggleLegendActive(idx, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)
+              publishAnalyticsEvent(
+                `map_legend_item_toggled--isolate-mode`,
+                'keydown',
+                `${configUrl}|${item.label}`,
+                'map'
+              )
             }
           }}
           tabIndex={0}
@@ -224,6 +240,12 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     if (e) {
       e.preventDefault()
     }
+    publishAnalyticsEvent(
+      'map_legend_reset',
+      'click',
+      configUrl,
+      'map'
+    )
     resetLegendToggles(runtimeLegend, setRuntimeLegend)
     dispatch({
       type: 'SET_ACCESSIBLE_STATUS',

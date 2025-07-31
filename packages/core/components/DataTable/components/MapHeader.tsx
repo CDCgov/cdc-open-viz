@@ -2,10 +2,12 @@ import { DataTableProps } from '../DataTable'
 import ScreenReaderText from '../../elements/ScreenReaderText'
 import { SortIcon } from './SortIcon'
 import { getNewSortBy } from '../helpers/getNewSortBy'
+import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
 
 type MapHeaderProps = DataTableProps & {
   sortBy: { column; asc }
   setSortBy: Function
+  configUrl: string
 }
 
 const ColumnHeadingText = ({ text, config }) => {
@@ -16,7 +18,7 @@ const ColumnHeadingText = ({ text, config }) => {
   return text
 }
 
-const MapHeader = ({ columns, config, indexTitle, sortBy, setSortBy, rightAlignedCols }: MapHeaderProps) => {
+const MapHeader = ({ columns, config, indexTitle, sortBy, setSortBy, rightAlignedCols, configUrl }: MapHeaderProps) => {
   return (
     <tr>
       {Object.keys(columns)
@@ -46,6 +48,11 @@ const MapHeader = ({ columns, config, indexTitle, sortBy, setSortBy, rightAligne
               role='columnheader'
               scope='col'
               onClick={() => {
+                publishAnalyticsEvent(
+                  `data_table_sort_by|${newSortBy.column}|${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'undefined'}`,
+                  'click',
+                  configUrl
+                )
                 setSortBy(newSortBy)
               }}
               onKeyDown={e => {
@@ -62,9 +69,8 @@ const MapHeader = ({ columns, config, indexTitle, sortBy, setSortBy, rightAligne
             >
               <ColumnHeadingText text={text} config={config} column={column} />
               <SortIcon ascending={sortByAsc} />
-              <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${
-                sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
-              } order`}</span>
+              <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
+                } order`}</span>
             </th>
           )
         })}

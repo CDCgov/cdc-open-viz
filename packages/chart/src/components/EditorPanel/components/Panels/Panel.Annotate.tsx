@@ -67,8 +67,8 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         config.xAxis.type === 'date'
           ? new Date(config?.data?.[0]?.[config.xAxis.dataKey]).getTime()
           : config.xAxis.type === 'categorical'
-          ? '1/15/2016'
-          : '',
+            ? '1/15/2016'
+            : '',
       yKey: '',
       dx: 20,
       dy: -20,

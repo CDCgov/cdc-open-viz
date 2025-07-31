@@ -42,7 +42,6 @@ import MultiTabs from './components/MultiConfigTabs'
 import _ from 'lodash'
 import EditorContext from '../../editor/src/ConfigContext'
 import { APIFilterDropdowns } from './components/DashboardFilters'
-import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import VisualizationRow from './components/VisualizationRow'
 import { getVizConfig } from './helpers/getVizConfig'
@@ -52,7 +51,6 @@ import Layout from '@cdc/core/components/Layout'
 import * as reloadURLHelpers from './helpers/reloadURLHelpers'
 import { addValuesToDashboardFilters } from './helpers/addValuesToDashboardFilters'
 import { DashboardFilters } from './types/DashboardFilters'
-import DashboardSharedFilters from './components/DashboardFilters'
 import { loadAPIFiltersFactory } from './helpers/loadAPIFilters'
 import Loader from '@cdc/core/components/Loader'
 import Alert from '@cdc/core/components/Alert'
@@ -64,7 +62,7 @@ type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
 }
 
-export default function CdcDashboard({ initialState, isEditor = false, isDebug = false }: DashboardProps) {
+export default function CdcDashboard({ initialState, isEditor = false, isDebug = false, configUrl }: DashboardProps) {
   const [state, dispatch] = useReducer(dashboardReducer, initialState)
   const [errorMessages, dispatchErrorMessages] = useReducer(errorMessagesReducer, [])
   const editorContext = useContext(EditorContext)
@@ -397,6 +395,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
               setSharedFilter={setSharedFilter}
               apiFilterDropdowns={apiFilterDropdowns}
               state={state}
+              configUrl={configUrl}
             />
           </>
         )
@@ -461,6 +460,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                 apiFilterDropdowns={apiFilterDropdowns}
                 currentViewport={currentViewport}
                 inNoDataState={inNoDataState}
+                configUrl={configUrl}
                 isLastRow={index === filteredRows.length - 1}
               />
             ))}
@@ -476,6 +476,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                   state={config}
                   text='Download Dashboard Image'
                   elementToCapture={imageId}
+                  configUrl={configUrl}
                 />
               )}
               {config.table?.downloadPdfButton && (
@@ -485,6 +486,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                   state={config}
                   text='Download Dashboard PDF'
                   elementToCapture={imageId}
+                  configUrl={configUrl}
                 />
               )}
             </section>
@@ -503,6 +505,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                 imageRef={imageId}
                 isDebug={isDebug}
                 isEditor={isEditor}
+                configUrl={configUrl}
               />
             )}
             {config.table?.show &&
@@ -554,6 +557,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                       tableTitle={datasetKey}
                       viewport={currentViewport}
                       tabbingId={datasetKey}
+                      configUrl={configUrl}
                     />
                   </div>
                 )

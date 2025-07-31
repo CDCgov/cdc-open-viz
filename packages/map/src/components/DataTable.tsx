@@ -12,6 +12,7 @@ import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Loading from '@cdc/core/components/Loading'
 import { navigationHandler } from '../helpers'
 import ConfigContext, { MapDispatchContext } from '../context'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
@@ -29,7 +30,8 @@ const DataTable = props => {
     applyLegendToRow,
     displayGeoName,
     formatLegendLocation,
-    tabbingId
+    tabbingId,
+    configUrl
   } = props
 
   const dispatch = useContext(MapDispatchContext)
@@ -176,7 +178,15 @@ const DataTable = props => {
       <a
         download={fileName}
         type='button'
-        onClick={saveBlob}
+        onClick={() => {
+          saveBlob
+          publishAnalyticsEvent(
+            'data_downloaded',
+            'click',
+            configUrl,
+
+          )
+        }}
         href={URL.createObjectURL(blob)}
         aria-label='Download this data in a CSV file format.'
         className={`${headerColor} no-border`}
@@ -192,7 +202,7 @@ const DataTable = props => {
   const TableMediaControls = ({ belowTable }) => {
     return (
       <MediaControls.Section classes={['download-links']}>
-        <MediaControls.Link config={state} />
+        <MediaControls.Link config={state} configUrl={configUrl} />
         {state.table.download && <DownloadButton />}
       </MediaControls.Section>
     )
@@ -307,9 +317,8 @@ const DataTable = props => {
                           : null)}
                       >
                         {text}
-                        <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${
-                          sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
-                        } order`}</span>
+                        <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
+                          } order`}</span>
                       </th>
                     )
                   })}
@@ -353,8 +362,8 @@ const DataTable = props => {
                             role='gridcell'
                             onClick={e =>
                               state.general.type === 'bubble' &&
-                              state.general.allowMapZoom &&
-                              state.general.geoType === 'world'
+                                state.general.allowMapZoom &&
+                                state.general.geoType === 'world'
                                 ? dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: row })
                                 : true
                             }

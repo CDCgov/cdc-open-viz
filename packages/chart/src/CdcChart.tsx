@@ -89,7 +89,7 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug
 
   if (isLoading) return <Loading />
 
-  return <CdcChart config={config} isEditor={isEditor} isDebug={isDebug} />
+  return <CdcChart config={config} isEditor={isEditor} isDebug={isDebug} configUrl={configUrl} />
 }
 
 export default CdcChartWrapper

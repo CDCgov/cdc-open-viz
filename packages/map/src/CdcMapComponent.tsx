@@ -68,6 +68,7 @@ import EditorContext from '@cdc/editor/src/ConfigContext'
 import MapActions from './store/map.actions'
 import _ from 'lodash'
 import useModal from './hooks/useModal'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type CdcMapComponent = {
   config: MapConfig
@@ -79,6 +80,7 @@ type CdcMapComponent = {
   setSharedFilter: Function
   setSharedFilterValue: Function
   datasets?: Datasets
+  configUrl: string
 }
 
 const CdcMapComponent: React.FC<CdcMapComponent> = ({
@@ -92,7 +94,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   link,
   setConfig: setParentConfig,
   loadConfig,
-  datasets
+  datasets,
+  configUrl
 }) => {
   const initialState = getInitialState(configObj)
 
@@ -253,7 +256,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     if (svgEl && svgEl.childNodes.length > 0) {
       publish('cove_loaded', { config })
       dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
-      return () => {}
+      return () => { }
     }
 
     // Fallback to observer for async SVG rendering
@@ -411,7 +414,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     topoData,
     translate,
     isDraggingAnnotation,
-    loadConfig
+    loadConfig,
+    configUrl
   }
 
   if (!config.data) return <></>
@@ -420,7 +424,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   // this only shows in Dashboard config mode and only if Show Table is also set
   const tableLink = (
-    <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
+    <a href={`#data-table-${config.dataKey}`} className='margin-left-href' onClick={() => {
+      publishAnalyticsEvent('link_to_data_table_click', 'click', `${configUrl}|#data-table-${config.dataKey}`, 'map')
+    }}>
       {config.dataKey} (Go to Table)
     </a>
   )
@@ -471,6 +477,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     setFilters={_setRuntimeData}
                     dimensions={dimensions}
                     standaloneMap={!config}
+                    configUrl={configUrl}
                   />
                 )}
 
@@ -517,6 +524,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       skipId={tabId}
                       containerWidthPadding={0}
                       currentViewport={currentViewport}
+                      configUrl={configUrl}
                     />
                   )}
                 </div>
@@ -545,6 +553,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       type='image'
                       state={config}
                       elementToCapture={imageId}
+                      configUrl={configUrl}
                     />
                   )}
                   {showDownloadPdfButton && (
@@ -553,6 +562,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       title='Download Chart as PDF'
                       type='pdf'
                       state={config}
+                      configUrl={configUrl}
                       elementToCapture={imageId}
                     />
                   )}
@@ -588,6 +598,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       tableTitle={table.label}
                       vizTitle={general.title}
                       wrapColumns={table.wrapColumns}
+                      configUrl={configUrl}
                     />
                   )}
 
@@ -607,9 +618,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 <ReactTooltip
                   id={`tooltip__${tooltipId}`}
                   float={true}
-                  className={`${
-                    tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'
-                  }`}
+                  className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'
+                    }`}
                   style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
                 />
               )}

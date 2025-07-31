@@ -52,6 +52,7 @@ export type DataTableProps = {
   vizTitle?: string
   // determines if columns should be wrapped in the table
   wrapColumns?: boolean
+  configUrl?: string
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
@@ -71,7 +72,8 @@ const DataTable = (props: DataTableProps) => {
     tableTitle,
     viewport,
     vizTitle,
-    wrapColumns
+    wrapColumns,
+    configUrl
   } = props
   const runtimeData = useMemo(() => {
     const data = removeNullColumns(parentRuntimeData)
@@ -297,12 +299,13 @@ const DataTable = (props: DataTableProps) => {
       const hasDownloadLink = config.table.download
       return (
         <MediaControls.Section classes={getMediaControlsClasses(belowTable, hasDownloadLink)}>
-          <MediaControls.Link config={config} dashboardDataConfig={dataConfig} />
+          <MediaControls.Link config={config} dashboardDataConfig={dataConfig} configUrl={configUrl} />
           {hasDownloadLink && (
             <DownloadButton
               rawData={getDownloadData()}
               fileName={`${vizTitle || 'data-table'}.csv`}
               headerColor={headerColor}
+              configUrl={configUrl}
             />
           )}
         </MediaControls.Section>
@@ -319,7 +322,7 @@ const DataTable = (props: DataTableProps) => {
         <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           {config.table.collapsible !== false && (
-            <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
+            <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} config={config} configUrl={configUrl} />
           )}
           <div className='table-container' style={limitHeight}>
             <Table
@@ -340,6 +343,7 @@ const DataTable = (props: DataTableProps) => {
                     sortBy={sortBy}
                     setSortBy={setSortBy}
                     rightAlignedCols={rightAlignedCols}
+                    configUrl={configUrl}
                   />
                 ) : (
                   <ChartHeader
@@ -351,13 +355,13 @@ const DataTable = (props: DataTableProps) => {
                     setSortBy={setSortBy}
                     viewport={viewport}
                     rightAlignedCols={rightAlignedCols}
+                    configUrl={configUrl}
                   />
                 )
               }
               tableOptions={{
-                className: `table table-striped table-width-unset ${
-                  expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
-                }${isVertical ? '' : ' horizontal'}`,
+                className: `table table-striped table-width-unset ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
+                  }${isVertical ? '' : ' horizontal'}`,
                 'aria-live': 'assertive',
                 'aria-rowcount': config?.data?.length ? config.data.length : -1,
                 hidden: !expanded,
@@ -413,7 +417,7 @@ const DataTable = (props: DataTableProps) => {
       <ErrorBoundary component='DataTable'>
         <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
-          <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
+          <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} configUrl={configUrl} />
           <div className='table-container' style={limitHeight}>
             <Table
               viewport={viewport}

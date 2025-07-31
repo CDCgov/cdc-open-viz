@@ -21,7 +21,8 @@ const Legend = forwardRef((props, ref) => {
     transformedData
   } = useContext(ConfigContext)
   if (!config.legend) return null
-  // create fn to reverse labels while legend is Bottom.  Legend-right , legend-left works by default.
+  // create fn to reverse labels while legend is Bottom.  Legend-right , legend-left works by default
+  const { configUrl } = props
 
   const createLegendLabels = createFormatLabels(config, tableData, data, colorScale)
 
@@ -40,6 +41,7 @@ const Legend = forwardRef((props, ref) => {
         handleShowAll={handleShowAll}
         currentViewport={currentViewport}
         formatLabels={createLegendLabels}
+        configUrl={configUrl}
       />
     </Fragment>
   )
