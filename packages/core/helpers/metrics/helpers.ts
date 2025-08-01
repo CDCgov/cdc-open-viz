@@ -10,8 +10,8 @@ export type ANALYTICS_EVENT_TYPES =
     | `legend_item_toggled--${string}-mode`
     | `legend_item_toggled--${string}-mode`
     | 'legend_reset'
-    | 'image_downloaded'
-    | 'csv_downloaded'
+    | `${COVE_VISUALIZATION_TYPES}_image_downloaded`
+    | `${COVE_VISUALIZATION_TYPES}_csv_downloaded`
     | 'data_table_toggled'
     | `data_table_sort_by_${string}`
     | `${COVE_VISUALIZATION_TYPES}_reset_zoom_level`

@@ -91,6 +91,11 @@ const generateMedia = (state, type, elementToCapture) => {
         })
       }
       downloadImage()
+      publishAnalyticsEvent(
+        `${state.type}_image_downloaded`,
+        'click',
+        `${state?.dataFileName || 'unknown'}`,
+      )
 
       return
     case 'pdf':
