@@ -1,3 +1,5 @@
+import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
+import { Visualization } from '../../../types/Visualization'
 import Icon from '../../ui/Icon'
 import parse from 'html-react-parser'
 
@@ -5,14 +7,20 @@ interface ExpandCollapseProps {
   expanded: boolean
   setExpanded: (expanded: boolean) => void
   tableTitle: string
+  config?: Visualization
 }
 
-const ExpandCollapse = ({ expanded, setExpanded, tableTitle }: ExpandCollapseProps) => {
+const ExpandCollapse = ({ expanded, setExpanded, tableTitle, config }: ExpandCollapseProps) => {
   return (
     <div
       role='button'
       className={expanded ? 'data-table-heading p-3' : 'collapsed data-table-heading p-3'}
       onClick={() => {
+        publishAnalyticsEvent(
+          'data_table_toggled',
+          'click',
+          config?.dataFileName || 'unknown',
+        )
         setExpanded(!expanded)
       }}
       tabIndex={0}

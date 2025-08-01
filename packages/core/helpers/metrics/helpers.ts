@@ -10,6 +10,8 @@ export type ANALYTICS_EVENT_TYPES =
     | 'legend_reset'
     | 'image_downloaded'
     | 'csv_downloaded'
+    | 'data_table_toggled'
+    | `data_table_sort_by_${string}`
 
 /**
  * Retrieves the version of the package from its package.json file.
@@ -65,7 +67,10 @@ export const publishAnalyticsEvent = (
     additionalDetails?: Object
 ) => {
 
-    // Publish the analytics event
+    // Added check if we ever need to disable analytics
+    const ANALYTICS_POWERED_ON = true
+    if (!ANALYTICS_POWERED_ON) return
+
     return publish('cove:analytics', {
         eventType,
         eventAction,

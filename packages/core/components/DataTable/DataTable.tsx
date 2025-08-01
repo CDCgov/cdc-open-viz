@@ -319,7 +319,7 @@ const DataTable = (props: DataTableProps) => {
         <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           {config.table.collapsible !== false && (
-            <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
+            <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} config={config} />
           )}
           <div className='table-container' style={limitHeight}>
             <Table
@@ -355,9 +355,8 @@ const DataTable = (props: DataTableProps) => {
                 )
               }
               tableOptions={{
-                className: `table table-striped table-width-unset ${
-                  expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
-                }${isVertical ? '' : ' horizontal'}`,
+                className: `table table-striped table-width-unset ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
+                  }${isVertical ? '' : ' horizontal'}`,
                 'aria-live': 'assertive',
                 'aria-rowcount': config?.data?.length ? config.data.length : -1,
                 hidden: !expanded,
