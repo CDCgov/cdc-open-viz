@@ -561,6 +561,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
     } catch (e) {
       console.error('COVE:', e.message)
     }
+    publishAnalyticsEvent(
+      'legend_reset',
+      'click',
+      `${config.dataFileName || 'unknown'}`,
+      'chart'
+    )
     dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [] })
   }
 
