@@ -11,9 +11,18 @@ export const getFootnotesVizConfig = (vizConfig: AnyVisualization, config: Multi
 
   const data = config.datasets[vizConfig.footnotes.dataKey]?.data ?? []
 
-  const filters = config?.dashboard?.sharedFilters
-  if (filters.length === 0) return vizConfig
-  vizConfig.footnotes.data = filters.length ? filterData(filters, data) : data
+  const sharedfilters = config?.dashboard?.sharedFilters
+  if (sharedfilters.length === 0) return vizConfig
+
+  if (sharedfilters.length) {
+    if (!filterData(sharedfilters, data).length) {
+      vizConfig.footnotes.data = data
+    } else {
+      vizConfig.footnotes.data = filterData(sharedfilters, data)
+    }
+  } else {
+    vizConfig.footnotes.data = data
+  }
 
   return vizConfig
 }
