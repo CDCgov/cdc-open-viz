@@ -6,7 +6,8 @@ export type ANALYTICS_EVENT_ACTIONS = 'click' | 'toggle' | 'none' | 'keydown' | 
 export type ANALYTICS_EVENT_LABEL = string
 export type ANALYTICS_EVENT_TYPES =
     'visualization_loaded'
-    | 'legend_item_toggled'
+    | `legend_item_toggled--${string}-mode`
+    | `legend_item_toggled--${string}-mode`
     | 'legend_reset'
     | 'image_downloaded'
     | 'csv_downloaded'

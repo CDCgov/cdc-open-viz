@@ -17,6 +17,7 @@ import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import LegendLineShape from './LegendLine.Shape'
 import LegendGroup from './LegendGroup'
 import { getSeriesWithData } from '../../helpers/dataHelpers'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 const LEGEND_PADDING = 36
 
@@ -137,85 +138,100 @@ const Legend: React.FC<LegendProps> = forwardRef(
                           onKeyDown={e => {
                             if (e.key === 'Enter') {
                               e.preventDefault()
+                              publishAnalyticsEvent(
+                                `legend_item_toggled--${legend.behavior}-mode`,
+                                'keydown',
+                                `${config?.dataFileName || 'unknown'}`,
+                                'chart'
+                              )
                               highlight(label)
                             }
                           }}
                           onClick={e => {
                             e.preventDefault()
-                            highlight(label)
-                          }}
-                          role='button'
+                            publishAnalyticsEvent(
+                              `legend_item_toggled--${legend.behavior}-mode`,
+                              'click',
+                              `${config?.dataFileName || 'unknown'}`,
+                              'chart'
+                            )
+                            )
+                      highlight(label)
+                    }}
+                  role='button'
                         >
-                          <>
-                            {config.visualizationType === 'Line' && config.legend.style === 'lines' ? (
-                              <React.Fragment>
-                                <LegendLineShape index={i} label={label} config={config} />
-                              </React.Fragment>
-                            ) : (
-                              <>
-                                <LegendShape
-                                  shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
-                                  fill={label.value}
-                                />
-                              </>
-                            )}
-                          </>
-                          <LegendLabel align='left' className='m-0'>
-                            {parse(label.text)}
-                          </LegendLabel>
-                        </LegendItem>
-                      )
-                    })}
-
-                  {highLightedLegendItems.map((bar, i) => {
-                    // if duplicates only return first item
-                    let className = 'legend-item'
-                    let itemName = bar.legendLabel
-
-                    if (!itemName) return false
-                    if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                      className += ' inactive'
-                    }
-
-                    return (
-                      <LegendItem
-                        className={className}
-                        tabIndex={0}
-                        key={`legend-quantile-${i}`}
-                        onKeyDown={e => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault()
-                            highlight(bar.legendLabel)
-                          }
-                        }}
-                        onClick={e => {
-                          e.preventDefault()
-                          highlight(bar.legendLabel)
-                        }}
-                      >
+                  <>
+                    {config.visualizationType === 'Line' && config.legend.style === 'lines' ? (
+                      <React.Fragment>
+                        <LegendLineShape index={i} label={label} config={config} />
+                      </React.Fragment>
+                    ) : (
+                      <>
                         <LegendShape
                           shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
-                          style={{ borderRadius: '0px' }}
-                          fill='transparent'
-                          borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`}
-                        />{' '}
-                        <LegendLabel align='left'>{bar.legendLabel ? bar.legendLabel : bar.value}</LegendLabel>
-                      </LegendItem>
-                    )
-                  })}
-                </div>
+                          fill={label.value}
+                        />
+                      </>
+                    )}
+                  </>
+                  <LegendLabel align='left' className='m-0'>
+                    {parse(label.text)}
+                  </LegendLabel>
+                </LegendItem>
+                )
+                    })}
+
+                {highLightedLegendItems.map((bar, i) => {
+                  // if duplicates only return first item
+                  let className = 'legend-item'
+                  let itemName = bar.legendLabel
+
+                  if (!itemName) return false
+                  if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
+                    className += ' inactive'
+                  }
+
+                  return (
+                    <LegendItem
+                      className={className}
+                      tabIndex={0}
+                      key={`legend-quantile-${i}`}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          highlight(bar.legendLabel)
+                        }
+                      }}
+                      onClick={e => {
+                        e.preventDefault()
+                        highlight(bar.legendLabel)
+                      }}
+                    >
+                      <LegendShape
+                        shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
+                        style={{ borderRadius: '0px' }}
+                        fill='transparent'
+                        borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`}
+                      />{' '}
+                      <LegendLabel align='left'>{bar.legendLabel ? bar.legendLabel : bar.value}</LegendLabel>
+                    </LegendItem>
+                  )
+                })}
+              </div >
 
                 <LegendSuppression config={config} isLegendBottom={isLegendBottom} />
               </>
-            )
+        )
           }}
-        </LegendOrdinal>
-        {seriesHighlight.length > 0 && (
-          <Button onClick={labels => handleShowAll(labels)} style={{ marginTop: '1rem' }}>
-            Show All
-          </Button>
-        )}
-      </aside>
+      </LegendOrdinal>
+        {
+      seriesHighlight.length > 0 && (
+        <Button onClick={labels => handleShowAll(labels)} style={{ marginTop: '1rem' }}>
+          Show All
+        </Button>
+      )
+    }
+      </aside >
     )
   }
 )
