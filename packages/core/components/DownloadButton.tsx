@@ -1,4 +1,5 @@
 import Papa from 'papaparse'
+import { publishAnalyticsEvent } from '../helpers/metrics/helpers'
 
 type DownloadButtonProps = {
   rawData: Object

@@ -24,6 +24,7 @@ import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
 import { resetLegendToggles } from '../../../helpers'
 import { MapContext } from '../../../types/MapContext'
 import LegendGroup from './LegendGroup/Legend.Group'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 const LEGEND_PADDING = 30
 
@@ -224,6 +225,12 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     if (e) {
       e.preventDefault()
     }
+    publishAnalyticsEvent(
+      'legend_reset',
+      'click',
+      `${config.dataFileName || 'unknown'}`,
+      'map'
+    )
     resetLegendToggles(runtimeLegend, setRuntimeLegend)
     dispatch({
       type: 'SET_ACCESSIBLE_STATUS',

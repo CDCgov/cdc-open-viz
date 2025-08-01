@@ -27,6 +27,8 @@ import generateRuntimeData from '../../helpers/generateRuntimeData'
 import { applyLegendToRow } from '../../helpers/applyLegendToRow'
 
 import './worldMap.styles.css'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { publish } from '@cdc/core/helpers/events'
 
 let projection = geoMercator()
 
@@ -65,21 +67,46 @@ const WorldMap = () => {
 
   const handleReset = () => {
     const newRuntimeData = generateRuntimeData(config)
+    publishAnalyticsEvent(
+      'map_reset_zoom_level',
+      'click',
+      `${config.dataFileName || 'unknown'}`,
+      'map'
+    )
     dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
     dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
     setRuntimeData(newRuntimeData)
   }
+
   const handleZoomIn = position => {
+    publishAnalyticsEvent(
+      'map_zoomed_in',
+      'click',
+      `${config.dataFileName || 'unknown'}`,
+      'map'
+    )
     if (position.zoom >= 4) return
     dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: position.zoom * 1.5 } })
   }
 
   const handleZoomOut = position => {
+    publishAnalyticsEvent(
+      'map_zoomed_out',
+      'click',
+      `${config.dataFileName || 'unknown'}`,
+      'map'
+    )
     if (position.zoom <= 1) return
     dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: position.zoom / 1.5 } })
   }
 
   const handleMoveEnd = position => {
+    publishAnalyticsEvent(
+      'map_panned',
+      'drag',
+      `${config.dataFileName || 'unknown'}`,
+      'map'
+    )
     dispatch({ type: 'SET_POSITION', payload: position })
   }
 
@@ -91,8 +118,8 @@ const WorldMap = () => {
         geo.properties.state && data[geo.properties.state]
           ? geo.properties.state
           : geo.properties.name
-          ? geo.properties.name
-          : geo.properties.iso
+            ? geo.properties.name
+            : geo.properties.iso
 
       const additionalData = {
         name: geo.properties.name

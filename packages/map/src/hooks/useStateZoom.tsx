@@ -6,6 +6,7 @@ import { geoPath, GeoPath } from 'd3-geo'
 import { getFilterControllingStatePicked } from '../components/UsaMap/helpers/map'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
 import { SVG_HEIGHT, SVG_WIDTH, SVG_PADDING } from '../helpers'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import _ from 'lodash'
 
 interface StateData {
@@ -98,6 +99,12 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     dispatch({ type: 'SET_POSITION', payload: { coordinates: newCoordinates, zoom: newZoom } })
 
     if (zoomFunction === 'reset') {
+      publishAnalyticsEvent(
+        'map_reset_zoom_level',
+        'click',
+        `${config.dataFileName || 'unknown'}`,
+        'map'
+      )
       dispatch({ type: 'SET_TRANSLATE', payload: [0, 0] }) // needed for state switcher
       dispatch({ type: 'SET_SCALE', payload: 1 }) // needed for state switcher
     }

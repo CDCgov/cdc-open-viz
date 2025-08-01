@@ -6,6 +6,7 @@ import { SortIcon } from './SortIcon'
 import { getNewSortBy } from '../helpers/getNewSortBy'
 import parse from 'html-react-parser'
 import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
+import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
 
 type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; hasRowType?; viewport; rightAlignedCols }
 
@@ -49,9 +50,8 @@ const ChartHeader = ({
     if (columnHeaderText === notApplicableText) return
 
     return (
-      <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${
-        sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
-      }  order`}</span>
+      <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
+        }  order`}</span>
     )
   }
 
@@ -104,6 +104,12 @@ const ChartHeader = ({
               scope='col'
               onClick={() => {
                 if (hasRowType) return
+                publishAnalyticsEvent(
+                  `data_table_sort_by_${newSortBy}`,
+                  'click',
+                  `${config.dataFileName || 'unknown'}`,
+                  'chart'
+                )
                 setSortBy(newSortBy)
               }}
               onKeyDown={e => {
