@@ -14,6 +14,7 @@ import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import { MapConfig } from '../../../types/MapConfig'
 import { DEFAULT_MAP_BACKGROUND } from '../../../helpers/constants'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -210,6 +211,12 @@ const CountyMap = () => {
   const lineWidth = 1
 
   const onReset = () => {
+    publishAnalyticsEvent(
+      'map_reset_zoom_level',
+      'click',
+      `${config.dataFileName || 'unknown'}`,
+      'map'
+    )
     setConfig({
       ...config,
       mapPosition: { coordinates: [0, 30], zoom: 1 }

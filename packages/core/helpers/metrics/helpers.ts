@@ -1,8 +1,9 @@
 import { publish } from "../events"
 import packageJson from '../../package.json'
 
+
 export type COVE_VISUALIZATION_TYPES = 'map' | 'chart' | 'data-table' | 'markup-include' | 'waffle-chart' | 'dashboard' | 'filtered-text' | 'data-bite' | 'unknown'
-export type ANALYTICS_EVENT_ACTIONS = 'click' | 'toggle' | 'none' | 'keydown' | 'load' | 'unknown'
+export type ANALYTICS_EVENT_ACTIONS = 'click' | 'drag' | 'toggle' | 'none' | 'keydown' | 'load' | 'unknown'
 export type ANALYTICS_EVENT_LABEL = string
 export type ANALYTICS_EVENT_TYPES =
     'visualization_loaded'
@@ -13,6 +14,10 @@ export type ANALYTICS_EVENT_TYPES =
     | 'csv_downloaded'
     | 'data_table_toggled'
     | `data_table_sort_by_${string}`
+    | `${COVE_VISUALIZATION_TYPES}_reset_zoom_level`
+    | `${COVE_VISUALIZATION_TYPES}_zoomed_in`
+    | `${COVE_VISUALIZATION_TYPES}_zoomed_out`
+    | `${COVE_VISUALIZATION_TYPES}_panned`
 
 /**
  * Retrieves the version of the package from its package.json file.
