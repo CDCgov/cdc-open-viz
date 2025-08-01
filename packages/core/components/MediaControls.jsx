@@ -91,11 +91,7 @@ const generateMedia = (state, type, elementToCapture) => {
         })
       }
       downloadImage()
-      publishAnalyticsEvent(
-        'COVE_IMAGE_DOWNLOADED',
-        'click',
-        'unknown',
-      )
+
       return
     case 'pdf':
       // let opt = {

@@ -246,13 +246,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     if (config && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
-      publishAnalyticsEvent(
-        'visualization_loaded',
-        'load',
-        formatEventLabel(config),
-        config.type
-      )
-
+      publishAnalyticsEvent('visualization_loaded', 'load', formatEventLabel(config), 'markup-include')
     }
   }, [config, container])
 

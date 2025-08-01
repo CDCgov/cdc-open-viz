@@ -1,7 +1,7 @@
 import { publish } from "../events"
 import packageJson from '../../package.json'
 
-export type COVE_VISUALIZATION_TYPES = 'map' | 'chart' | 'data_table' | 'markup-include' | 'waffle-chart' | 'dashboard' | 'filtered-text' | 'data-bite' | 'unknown'
+export type COVE_VISUALIZATION_TYPES = 'map' | 'chart' | 'data-table' | 'markup-include' | 'waffle-chart' | 'dashboard' | 'filtered-text' | 'data-bite' | 'unknown'
 export type ANALYTICS_EVENT_ACTIONS = 'click' | 'toggle' | 'none' | 'keydown' | 'load' | 'unknown'
 export type ANALYTICS_EVENT_LABEL = string
 export type ANALYTICS_EVENT_TYPES =
@@ -75,9 +75,3 @@ export const publishAnalyticsEvent = (
         ...additionalDetails || {}
     })
 }
-
-// _satellite.track('interaction', {
-//     interactionType: "o",
-//     interactionValue: "cove|csv_downloaded|clicked",
-//     label: viz_dataFileName|viz_title,
-// })
