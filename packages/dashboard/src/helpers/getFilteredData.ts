@@ -5,14 +5,21 @@ import { filterData } from './filterData'
 import { getFormattedData } from './getFormattedData'
 import { getVizKeys } from './getVizKeys'
 
-export const getApplicableFilters = (dashboard: Dashboard, key: string | number): false | SharedFilter[] => {
-  const c = dashboard.sharedFilters?.filter(
-    sharedFilter =>
-      (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(`${key}`) !== -1) || sharedFilter.usedBy?.indexOf(key) !== -1
-  )
-  return c?.length > 0 ? c : false
-}
+export const getApplicableFilters = (dashboard: Dashboard, visualizationKey: string): SharedFilter[] | false => {
+  if (!dashboard || !Array.isArray(dashboard.sharedFilters)) {
+    return false
+  }
 
+  const stringKey = String(visualizationKey)
+
+  const applicableFilters = dashboard.sharedFilters.filter(filter => {
+    const usedBy = filter?.usedBy
+
+    return Array.isArray(usedBy) && usedBy.includes(stringKey)
+  })
+
+  return applicableFilters.length > 0 ? applicableFilters : false
+}
 export const getFilteredData = (
   state: DashboardState,
   initialFilteredData?: Record<string, any>,
