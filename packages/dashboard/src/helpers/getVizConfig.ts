@@ -3,28 +3,24 @@ import { MultiDashboardConfig } from '../types/MultiDashboard'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { filterData } from './filterData'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { getApplicableFilters } from './getFilteredData'
 
 const transform = new DataTransform()
 
-export const getFootnotesVizConfig = (vizConfig: AnyVisualization, config: MultiDashboardConfig) => {
-  if (!vizConfig?.footnotes) return vizConfig
+export const getFootnotesVizConfig = (
+  visualizationConfig: AnyVisualization,
+  visualizationKey: string,
+  config: MultiDashboardConfig
+) => {
+  if (!visualizationConfig?.footnotes) return visualizationConfig
+  const data = _.cloneDeep(config.datasets[visualizationConfig.footnotes.dataKey]?.data)
+  const dataColumns = Object.keys(data[0] || {})
+  const applicableFilters = getApplicableFilters(config.dashboard, visualizationKey) || []
+  const columnMatchingFilters = applicableFilters.filter(filter => dataColumns.includes(filter.columnName))
+  const updatedVizConfig = { ...visualizationConfig }
+  updatedVizConfig.footnotes.data = columnMatchingFilters.length ? filterData(columnMatchingFilters, data) : data
 
-  const data = config.datasets[vizConfig.footnotes.dataKey]?.data ?? []
-
-  const sharedfilters = config?.dashboard?.sharedFilters
-  if (sharedfilters.length === 0) return vizConfig
-
-  if (sharedfilters.length) {
-    if (!filterData(sharedfilters, data).length) {
-      vizConfig.footnotes.data = data
-    } else {
-      vizConfig.footnotes.data = filterData(sharedfilters, data)
-    }
-  } else {
-    vizConfig.footnotes.data = data
-  }
-
-  return vizConfig
+  return updatedVizConfig
 }
 
 export const getVizConfig = (
@@ -89,7 +85,7 @@ export const getVizConfig = (
   }
 
   if (visualizationConfig.footnotes) {
-    const visConfigWithFootnotes = getFootnotesVizConfig(visualizationConfig, config)
+    const visConfigWithFootnotes = getFootnotesVizConfig(visualizationConfig, visualizationKey, config)
     if (multiVizColumn && filteredDataOverride) {
       const vizCategory = filteredDataOverride[0][multiVizColumn]
       // the multiViz filtering filtering is applied after the dashboard filters
