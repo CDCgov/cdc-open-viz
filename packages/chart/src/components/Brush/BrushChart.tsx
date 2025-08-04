@@ -7,7 +7,7 @@ import { Text } from '@visx/text'
 import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
-export interface ZoomBrushProps {
+export interface BrushChart {
   xMax: number
   yMax: number
   brushPosition: { start: { x: number }; end: { x: number } }
@@ -15,7 +15,7 @@ export interface ZoomBrushProps {
   brushKey: number
 }
 
-const ZoomBrush: FC<ZoomBrushProps> = ({ xMax, yMax, brushPosition, onBrushChange, brushKey }) => {
+const BrushChart: FC<ZoomBrushProps> = ({ xMax, yMax, brushPosition, onBrushChange, brushKey }) => {
   const { tableData, config, parseDate, dashboardConfig } = useContext(ConfigContext)
   const brushRef = useRef(null)
   const dataKey = config.xAxis.dataKey
@@ -70,4 +70,4 @@ const ZoomBrush: FC<ZoomBrushProps> = ({ xMax, yMax, brushPosition, onBrushChang
   )
 }
 
-export default ZoomBrush
+export default BrushChart

@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react'
 import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
-import ZoomBrush from './BrushChart'
+import BrushChart from './BrushChart'
 const BrushController = ({ yMax, xMax }) => {
   const { tableData, config, parseDate, dashboardConfig } = useContext(ConfigContext)
   const dataKey = config.xAxis.dataKey
@@ -14,7 +14,8 @@ const BrushController = ({ yMax, xMax }) => {
   })
 
   const handleBrushChange = (bounds: any) => {
-    const selected = bounds.xValues || []
+    if (!bounds) return dispatch({ type: 'SET_BRUSH_DATA', payload: [] })
+    const selected = bounds?.xValues || []
     const filteredData = tableData.filter(row => selected.includes(row[dataKey]))
     dispatch({ type: 'SET_BRUSH_DATA', payload: filteredData })
   }
@@ -27,7 +28,7 @@ const BrushController = ({ yMax, xMax }) => {
   }, [config.filters, config.exclusions, config.brush?.active, isDashboardFilters])
 
   return (
-    <ZoomBrush
+    <BrushChart
       xMax={xMax}
       yMax={yMax}
       brushPosition={brushPosition}
