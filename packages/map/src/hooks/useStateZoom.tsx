@@ -3,7 +3,7 @@ import ConfigContext, { MapDispatchContext } from '../context'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import { MapContext } from '../types/MapContext'
 import { geoPath, GeoPath } from 'd3-geo'
-import { getFilterControllingStatePicked } from '../components/UsaMap/helpers/map'
+import { getFilterControllingStatesPicked } from '../components/UsaMap/helpers/map'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
 import { SVG_HEIGHT, SVG_WIDTH, SVG_PADDING } from '../helpers'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
@@ -20,45 +20,64 @@ interface StateData {
 
 const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
   const { config, runtimeData, position, interactionLabel } = useContext<MapContext>(ConfigContext)
-  const statePicked = getFilterControllingStatePicked(config, runtimeData)
+  const statesPicked = getFilterControllingStatesPicked(config, runtimeData)
   const dispatch = useContext(MapDispatchContext)
 
   useEffect(() => {
-    const fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === statePicked)
-    const stateName = statePicked
-    const stateData = { fipsCode, stateName }
+    const statesData = statesPicked.map(state => ({
+      fipsCode: Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === state),
+      stateName: state
+    }))
     const newConfig = _.cloneDeep(config)
-    newConfig.general.statePicked = stateData
-    const stateToShow = topoData?.states?.find(s => s.properties.name === statePicked)
+    newConfig.general.statesPicked = statesData
+    const statesToShow = topoData?.states?.filter(s => statesPicked.includes(s.properties.name))
 
     dispatch({ type: 'SET_SCALE', payload: 1 })
     dispatch({ type: 'SET_TRANSLATE', payload: [0, 0] })
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
-    dispatch({ type: 'SET_STATE_TO_SHOW', payload: stateToShow })
+    dispatch({ type: 'SET_STATES_TO_SHOW', payload: statesToShow })
   }, [topoData])
 
   useEffect(() => {
-    const fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === statePicked)
-    const stateName = statePicked
-    const stateData = { fipsCode, stateName }
+    const currentStatesPicked = config.general.statesPicked.map(state => state.stateName)
+
+    const alreadySet =
+      currentStatesPicked.length === statesPicked.length &&
+      currentStatesPicked.every((s: string) => statesPicked.includes(s))
+
+    if (alreadySet) return
+
+    const statesData = statesPicked.map(state => ({
+      fipsCode: Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === state),
+      stateName: state
+    }))
+
     const newConfig = _.cloneDeep(config)
-    newConfig.general.statePicked = stateData
+    newConfig.general.statesPicked = statesData
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
     setScaleAndTranslate('reset')
-  }, [statePicked])
+  }, [statesPicked])
 
   // TODO: same as city list projection?
   const projection = geoAlbersUsaTerritories()
     .translate([SVG_WIDTH / 2, SVG_HEIGHT / 2])
     .scale(1)
 
-  const _statePickedData = topoData?.states?.find(s => s.properties.name === statePicked)
+  const _statesPickedData = topoData?.states?.filter(s => statesPicked.includes(s.properties.name))
+
+  const combinedData = _statesPickedData?.reduce(
+    (acc, state) => {
+      acc.features.push(state)
+      return acc
+    },
+    { type: 'FeatureCollection', features: [] }
+  )
   const newProjection = projection.fitExtent(
     [
       [SVG_PADDING, SVG_PADDING],
       [SVG_WIDTH - SVG_PADDING, SVG_HEIGHT - SVG_PADDING]
     ],
-    _statePickedData
+    combinedData
   )
 
   // Work for centering the state.
@@ -67,11 +86,11 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
   y = y - SVG_HEIGHT / 2
 
   const path: GeoPath = geoPath().projection(projection)
-  const featureCenter = path.centroid(_statePickedData)
+  const featureCenter = path.centroid(combinedData)
   const stateCenter = newProjection.invert(featureCenter)
 
   const switchState = () => {
-    dispatch({ type: 'SET_STATE_TO_SHOW', payload: _statePickedData })
+    dispatch({ type: 'SET_STATES_TO_SHOW', payload: _statesPickedData })
     setScaleAndTranslate('reset')
   }
 
@@ -123,7 +142,7 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
   }
 
   return {
-    statePicked,
+    statesPicked,
     setScaleAndTranslate,
     switchState,
     handleZoomIn,

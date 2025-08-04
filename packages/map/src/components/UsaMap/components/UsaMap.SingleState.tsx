@@ -24,7 +24,7 @@ import { getTopoData, getCurrentTopoYear, isTopoReady } from '../helpers/map'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import { SVG_WIDTH, SVG_HEIGHT, SVG_PADDING, SVG_VIEWBOX } from '../../../helpers'
 import _ from 'lodash'
-import { getStatePicked } from '../../../helpers/getStatePicked'
+import { getStatesPicked } from '../../../helpers/getStatesPicked'
 
 const SingleStateMap: React.FC = () => {
   const {
@@ -42,8 +42,8 @@ const SingleStateMap: React.FC = () => {
 
   const dispatch = useContext(MapDispatchContext)
   const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection } = useStateZoom(topoData)
-  const statePicked = getStatePicked(config, runtimeData)
-  const stateToShow = topoData?.states?.find(s => s.properties.name === statePicked.stateName)
+  const statesPicked = getStatesPicked(config, runtimeData)
+  const statesToShow = topoData?.states?.find(s => statesPicked.map(sp => sp.stateName).includes(s.properties.name))
 
   const { geoClickHandler } = useGeoClickHandler()
 
@@ -72,8 +72,8 @@ const SingleStateMap: React.FC = () => {
   }
 
   const checkForNoData = () => {
-    // If no statePicked, return true
-    if (!statePicked.fipsCode) return true
+    // If no statesPicked, return true
+    if (statesPicked?.every(sp => !sp.fipsCode)) return true
   }
 
   // Constructs and displays markup for all geos on the map (except territories right now)
@@ -81,17 +81,6 @@ const SingleStateMap: React.FC = () => {
     const counties = geographies[0].feature.counties
 
     let geosJsx = []
-
-    // Push config lines
-    geosJsx.push(
-      // prettier-ignore
-      <SingleState.StateOutput
-        topoData={topoData}
-        path={path}
-        scale={scale}
-      />
-    )
-
     // Push county lines
     geosJsx.push(
       // prettier-ignore
@@ -101,6 +90,15 @@ const SingleStateMap: React.FC = () => {
         geoStrokeColor={geoStrokeColor}
         tooltipId={tooltipId}
         path={path}
+      />
+    )
+    // Push config lines
+    geosJsx.push(
+      // prettier-ignore
+      <SingleState.StateOutput
+        topoData={topoData}
+        path={path}
+        scale={scale}
       />
     )
 
@@ -121,7 +119,7 @@ const SingleStateMap: React.FC = () => {
   }
   return (
     <ErrorBoundary component='SingleStateMap'>
-      {statePicked && config.general.allowMapZoom && statePicked.fipsCode && (
+      {statesPicked.length && config.general.allowMapZoom && statesPicked.some(sp => sp.fipsCode) && (
         <svg
           viewBox={SVG_VIEWBOX}
           preserveAspectRatio='xMinYMin'
@@ -150,7 +148,9 @@ const SingleStateMap: React.FC = () => {
               data={[
                 {
                   states: topoData?.states,
-                  counties: topoData.counties.filter(c => c.id.substring(0, 2) === statePicked.fipsCode)
+                  counties: topoData.counties.filter(c =>
+                    statesPicked.map(sp => sp.fipsCode).includes(c.id.substring(0, 2))
+                  )
                 }
               ]}
               projection={geoAlbersUsaTerritories}
@@ -159,7 +159,7 @@ const SingleStateMap: React.FC = () => {
                   [SVG_PADDING, SVG_PADDING],
                   [SVG_WIDTH - SVG_PADDING, SVG_HEIGHT - SVG_PADDING]
                 ],
-                stateToShow
+                statesToShow
               ]}
             >
               {({ features, projection }) => {
@@ -182,7 +182,7 @@ const SingleStateMap: React.FC = () => {
           </ZoomableGroup>
         </svg>
       )}
-      {statePicked && !config.general.allowMapZoom && statePicked.fipsCode && (
+      {statesPicked && !config.general.allowMapZoom && statesPicked.some(sp => sp.fipsCode) && (
         <svg
           viewBox={SVG_VIEWBOX}
           preserveAspectRatio='xMinYMin'
@@ -201,7 +201,9 @@ const SingleStateMap: React.FC = () => {
             data={[
               {
                 states: topoData?.states,
-                counties: topoData.counties.filter(c => c.id.substring(0, 2) === statePicked.fipsCode)
+                counties: topoData.counties.filter(c =>
+                  statesPicked.map(sp => sp.fipsCode).includes(c.id.substring(0, 2))
+                )
               }
             ]}
             projection={geoAlbersUsaTerritories}
@@ -210,7 +212,7 @@ const SingleStateMap: React.FC = () => {
                 [SVG_PADDING, SVG_PADDING],
                 [SVG_WIDTH - SVG_PADDING, SVG_HEIGHT - SVG_PADDING]
               ],
-              stateToShow
+              statesToShow
             ]}
           >
             {({ features }) => {

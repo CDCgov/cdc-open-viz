@@ -30,10 +30,25 @@ export const updateAxisColors = config => {
   }
 }
 
+export const updateStatePickedToStatesPicked = config => {
+  if (config.type === 'map') {
+    if (config.general?.statePicked) {
+      config.general.statesPicked = [{ ...config.general.statePicked }]
+      delete config.general.statePicked
+    }
+  }
+  if (config.type === 'dashboard') {
+    Object.values(config.visualizations).forEach(visualization => {
+      updateStatePickedToStatesPicked(visualization)
+    })
+  }
+}
+
 const update_4_25_8 = config => {
   const ver = '4.25.8'
   const newConfig = _.cloneDeep(config)
   updateAxisColors(newConfig)
+  updateStatePickedToStatesPicked(newConfig)
   newConfig.version = ver
   return newConfig
 }

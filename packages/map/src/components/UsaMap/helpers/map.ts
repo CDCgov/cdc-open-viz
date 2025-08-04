@@ -96,15 +96,17 @@ export const hasMoreThanFromHash = (data: { [key: string]: any }): boolean => {
   return otherKeys.length > 0
 }
 
-export const getFilterControllingStatePicked = (state, runtimeData) => {
-  if (!state.general.filterControlsStatePicked || !runtimeData) {
-    const statePicked = state?.general?.statePicked?.stateName
-    return statePicked
+export const getFilterControllingStatesPicked = (state, runtimeData) => {
+  if (!state.general.filterControlsStatesPicked || !runtimeData) {
+    const statesPicked = state?.general?.statesPicked?.map(sp => sp.stateName)
+    return statesPicked
   } else {
     if (hasMoreThanFromHash(runtimeData)) {
-      let statePickedFromFilter = Object.values(runtimeData)?.map(s => s[state.general.filterControlsStatePicked])?.[0]
-      const statePicked = statePickedFromFilter || state.general.statePicked.stateName || 'Alabama'
-      return statePicked
+      let statesPickedFromFilter = Object.values(runtimeData)?.map(
+        s => s[state.general.filterControlsStatesPicked]
+      )?.[0]
+      const statesPicked = statesPickedFromFilter || state.general.statesPicked.stateName || 'Alabama'
+      return statesPicked
     }
     return null
   }
