@@ -9,18 +9,22 @@ const transform = new DataTransform()
 
 export const getFootnotesVizConfig = (
   visualizationConfig: AnyVisualization,
-  visualizationKey: string,
+  vizKey: string,
   config: MultiDashboardConfig
 ) => {
   if (!visualizationConfig?.footnotes) return visualizationConfig
   const data = _.cloneDeep(config.datasets[visualizationConfig.footnotes.dataKey]?.data)
-  const dataColumns = Object.keys(data[0] || {})
-  const applicableFilters = getApplicableFilters(config.dashboard, visualizationKey) || []
-  const columnMatchingFilters = applicableFilters.filter(filter => dataColumns.includes(filter.columnName))
-  const updatedVizConfig = { ...visualizationConfig }
-  updatedVizConfig.footnotes.data = columnMatchingFilters.length ? filterData(columnMatchingFilters, data) : data
+  const dataColumns = data?.length ? Object.keys(data[0]) : []
+  const filters = (getApplicableFilters(config.dashboard, vizKey) || []).filter(filter =>
+    dataColumns.includes(filter.columnName)
+  )
+  if (filters.length) {
+    visualizationConfig.footnotes.data = filterData(filters, data)
+  } else {
+    visualizationConfig.footnotes.data = data
+  }
 
-  return updatedVizConfig
+  return visualizationConfig
 }
 
 export const getVizConfig = (
