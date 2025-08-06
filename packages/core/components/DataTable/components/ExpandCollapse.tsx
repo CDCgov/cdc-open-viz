@@ -8,16 +8,16 @@ interface ExpandCollapseProps {
   setExpanded: (expanded: boolean) => void
   tableTitle: string
   config?: Visualization
-  configUrl?: string
+  interactionLabel?: string
 }
 
-const ExpandCollapse = ({ expanded, setExpanded, tableTitle, config, configUrl = 'unknown' }: ExpandCollapseProps) => {
+const ExpandCollapse = ({ expanded, setExpanded, tableTitle, config, interactionLabel = '' }: ExpandCollapseProps) => {
   return (
     <div
       role='button'
       className={expanded ? 'data-table-heading p-3' : 'collapsed data-table-heading p-3'}
       onClick={() => {
-        publishAnalyticsEvent('data_table_toggled', 'click', configUrl, config.type || 'unknown')
+        publishAnalyticsEvent('data_table_toggled', 'click', interactionLabel, config.type || 'unknown')
         setExpanded(!expanded)
       }}
       tabIndex={0}

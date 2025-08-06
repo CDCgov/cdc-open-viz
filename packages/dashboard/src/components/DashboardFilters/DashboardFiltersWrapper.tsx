@@ -33,7 +33,7 @@ type DashboardFiltersProps = {
   isEditor?: boolean
   setConfig: (config: DashboardFilters) => void
   currentViewport?: ViewPort
-  configUrl: string
+  interactionLabel: string
 }
 
 const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
@@ -42,7 +42,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   setConfig: updateConfig,
   currentViewport,
   isEditor = false,
-  configUrl
+  interactionLabel = ''
 }) => {
   const state = useContext(DashboardContext)
   const { config: dashboardConfig, reloadURLData, loadAPIFilters, setAPIFilterDropdowns, setAPILoading } = state
@@ -107,8 +107,12 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       visualizationConfig
     )
 
-
-    publishAnalyticsEvent('dashboard_filter_changed', 'change', `${configUrl}|key_${newSharedFilters?.[index]?.key}|value_${value}`, 'dashboard')
+    publishAnalyticsEvent(
+      'dashboard_filter_changed',
+      'change',
+      `${interactionLabel}|key_${newSharedFilters?.[index]?.key}|value_${value}`,
+      'dashboard'
+    )
 
     // sets the active filter option that the user just selected.
     dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
@@ -181,8 +185,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       {!displayNone && (
         <Layout.Responsive isEditor={isEditor}>
           <div
-            className={`${isEditor ? ' is-editor' : ''
-              } cove-component__content col-12 cove-dashboard-filters-container`}
+            className={`${
+              isEditor ? ' is-editor' : ''
+            } cove-component__content col-12 cove-dashboard-filters-container`}
           >
             <Filters
               show={visualizationConfig?.sharedFilterIndexes?.map(Number)}

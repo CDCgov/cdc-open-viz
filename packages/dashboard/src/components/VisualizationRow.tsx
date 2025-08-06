@@ -67,7 +67,7 @@ type VizRowProps = {
   currentViewport: ViewPort
   isLastRow: boolean
   setAllExpanded?: (expanded: boolean) => void
-  configUrl: StringConstructor
+  interactionLabel: string
 }
 
 const VisualizationRow: React.FC<VizRowProps> = ({
@@ -83,7 +83,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   currentViewport,
   isLastRow,
   setAllExpanded,
-  configUrl
+  interactionLabel = ''
 }) => {
   const { config, filteredData: dashboardFilteredData, data: rawData } = useContext(DashboardContext)
   const [toggledRow, setToggled] = React.useState<number>(0)
@@ -154,7 +154,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               currentViewport={currentViewport}
               inNoDataState={inNoDataState}
               isLastRow={isLastRow}
-              configUrl={configUrl}
+              interactionLabel={interactionLabel}
             />
           )
         })}
@@ -190,9 +190,18 @@ const VisualizationRow: React.FC<VizRowProps> = ({
             ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget)[0].active
             : undefined
           const tableLink = (
-            <a href={`#data-table-${dataKey}`} className='margin-left-href' onClick={() => {
-              publishAnalyticsEvent(`link_to_data_table_click`, 'click', `${configUrl}|#data-table-${dataKey}`, visualizationConfig.type)
-            }}>
+            <a
+              href={`#data-table-${dataKey}`}
+              className='margin-left-href'
+              onClick={() => {
+                publishAnalyticsEvent(
+                  `link_to_data_table_click`,
+                  'click',
+                  `${interactionLabel}|#data-table-${dataKey}`,
+                  visualizationConfig.type
+                )
+              }}
+            >
               {dataKey} (Go to Table)
             </a>
           )
@@ -208,11 +217,12 @@ const VisualizationRow: React.FC<VizRowProps> = ({
             type === 'dashboardFilters' &&
             sharedFilterIndexes &&
             sharedFilterIndexes.filter(idx => config.dashboard.sharedFilters?.[idx]?.showDropdown === false).length ===
-            sharedFilterIndexes.length
+              sharedFilterIndexes.length
           const hasMarginBottom = !isLastRow && !hiddenDashboardFilters
 
-          const vizWrapperClass = `col-12 col-md-${col.width}${!shouldShow ? ' d-none' : ''}${hideVisualization ? ' hide-parent-visualization' : hasMarginBottom ? ' mb-4' : ''
-            }`
+          const vizWrapperClass = `col-12 col-md-${col.width}${!shouldShow ? ' d-none' : ''}${
+            hideVisualization ? ' hide-parent-visualization' : hasMarginBottom ? ' mb-4' : ''
+          }`
           const link =
             config.table && config.table.show && config.datasets && table && table.showDataTableLink
               ? tableLink
@@ -238,7 +248,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
                   isDashboard={true}
                   link={link}
-                  configUrl={configUrl}
+                  interactionLabel={interactionLabel}
                 />
               )}
               {type === 'map' && (
@@ -254,7 +264,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   isDashboard={true}
                   link={link}
                   dataset={config.datasets}
-                  configUrl={configUrl}
+                  interactionLabel={interactionLabel}
                 />
               )}
               {type === 'data-bite' && (
@@ -275,7 +285,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                     updateChildConfig(col.widget, newConfig)
                   }}
                   isDashboard={true}
-                  configUrl={link}
+                  interactionLabel={link}
                 />
               )}
               {type === 'markup-include' && (
@@ -307,7 +317,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   visualizationConfig={visualizationConfig as DashboardFilters}
                   apiFilterDropdowns={apiFilterDropdowns}
                   currentViewport={currentViewport}
-                  configUrl={configUrl}
+                  interactionLabel={interactionLabel}
                 />
               )}
               {type === 'table' && (
@@ -319,7 +329,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   visualizationKey={col.widget}
                   config={visualizationConfig as TableConfig}
                   viewport={currentViewport}
-                  configUrl={configUrl}
+                  interactionLabel={interactionLabel}
                 />
               )}
             </VisualizationWrapper>

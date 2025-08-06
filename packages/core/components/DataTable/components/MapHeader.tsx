@@ -7,7 +7,7 @@ import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
 type MapHeaderProps = DataTableProps & {
   sortBy: { column; asc }
   setSortBy: Function
-  configUrl: string
+  interactionLabel: string
 }
 
 const ColumnHeadingText = ({ text, config }) => {
@@ -18,7 +18,15 @@ const ColumnHeadingText = ({ text, config }) => {
   return text
 }
 
-const MapHeader = ({ columns, config, indexTitle, sortBy, setSortBy, rightAlignedCols, configUrl }: MapHeaderProps) => {
+const MapHeader = ({
+  columns,
+  config,
+  indexTitle,
+  sortBy,
+  setSortBy,
+  rightAlignedCols,
+  interactionLabel = ''
+}: MapHeaderProps) => {
   return (
     <tr>
       {Object.keys(columns)
@@ -49,9 +57,11 @@ const MapHeader = ({ columns, config, indexTitle, sortBy, setSortBy, rightAligne
               scope='col'
               onClick={() => {
                 publishAnalyticsEvent(
-                  `data_table_sort_by|${newSortBy.column}|${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'undefined'}`,
+                  `data_table_sort_by|${newSortBy.column}|${
+                    newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'undefined'
+                  }`,
                   'click',
-                  configUrl
+                  interactionLabel
                 )
                 setSortBy(newSortBy)
               }}
@@ -69,8 +79,9 @@ const MapHeader = ({ columns, config, indexTitle, sortBy, setSortBy, rightAligne
             >
               <ColumnHeadingText text={text} config={config} column={column} />
               <SortIcon ascending={sortByAsc} />
-              <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
-                } order`}</span>
+              <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${
+                sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
+              } order`}</span>
             </th>
           )
         })}

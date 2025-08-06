@@ -3,7 +3,7 @@ import ConfigContext from '../context'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoName, mapTabbingID }) => {
-  const { configUrl } = useContext(ConfigContext)
+  const { interactionLabel } = useContext(ConfigContext)
   const [activeGeo, setActiveGeo] = useState('')
   const [dropdownItems, setDropdownItems] = useState({})
 
@@ -12,7 +12,7 @@ const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoN
     if (activeGeo !== '') {
       const urlString = data[dropdownItems[activeGeo]][columns.navigate.name]
 
-      publishAnalyticsEvent('map_navigation_menu', 'submit', `${configUrl}|${urlString}`)
+      publishAnalyticsEvent('map_navigation_menu', 'submit', `${interactionLabel}|${urlString}`)
 
       navigationHandler(urlString)
     }

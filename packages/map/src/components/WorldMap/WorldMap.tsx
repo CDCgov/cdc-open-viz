@@ -42,7 +42,7 @@ const WorldMap = () => {
     runtimeLegend,
     legendMemo,
     legendSpecialClassLastMemo,
-    configUrl
+    interactionLabel
   } = useContext(ConfigContext)
 
   const { type, allowMapZoom } = config.general
@@ -67,7 +67,7 @@ const WorldMap = () => {
 
   const handleReset = () => {
     const newRuntimeData = generateRuntimeData(config)
-    publishAnalyticsEvent('map_reset_zoom_level', 'click', configUrl, 'map')
+    publishAnalyticsEvent('map_reset_zoom_level', 'click', interactionLabel, 'map')
     dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
     dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
     setRuntimeData(newRuntimeData)
@@ -75,18 +75,28 @@ const WorldMap = () => {
 
   const handleZoomIn = position => {
     if (position.zoom >= 4) return
-    publishAnalyticsEvent('map_zoomed_in', 'click', `configUrl|zoom_level_${Math.floor(position.zoom * 1.5)}|${position.coordinates}`, 'map')
+    publishAnalyticsEvent(
+      'map_zoomed_in',
+      'click',
+      `${interactionLabel}|zoom_level_${Math.floor(position.zoom * 1.5)}|${position.coordinates}`,
+      'map'
+    )
     dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: position.zoom * 1.5 } })
   }
 
   const handleZoomOut = position => {
     if (position.zoom <= 1) return
-    publishAnalyticsEvent('map_zoomed_out', 'click', `configUrl|zoom_level_${Math.floor(position.zoom / 1.5)}|${position.coordinates}`, 'map')
+    publishAnalyticsEvent(
+      'map_zoomed_out',
+      'click',
+      `${interactionLabel}|zoom_level_${Math.floor(position.zoom / 1.5)}|${position.coordinates}`,
+      'map'
+    )
     dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: position.zoom / 1.5 } })
   }
 
   const handleMoveEnd = position => {
-    publishAnalyticsEvent('map_panned', 'drag', configUrl, 'map')
+    publishAnalyticsEvent('map_panned', 'drag', interactionLabel, 'map')
     dispatch({ type: 'SET_POSITION', payload: position })
   }
 
@@ -98,8 +108,8 @@ const WorldMap = () => {
         geo.properties.state && data[geo.properties.state]
           ? geo.properties.state
           : geo.properties.name
-            ? geo.properties.name
-            : geo.properties.iso
+          ? geo.properties.name
+          : geo.properties.iso
 
       const additionalData = {
         name: geo.properties.name

@@ -97,7 +97,7 @@ interface CdcChartProps {
   setSharedFilterValue?: (value: any) => void
   dashboardConfig?: DashboardConfig
   datasets?: Datasets
-  configUrl: string
+  interactionLabel: string
 }
 const CdcChart: React.FC<CdcChartProps> = ({
   config: configObj,
@@ -111,7 +111,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   setSharedFilterValue,
   dashboardConfig,
   datasets,
-  configUrl
+  interactionLabel
 }) => {
   const transform = new DataTransform()
   const initialState = getInitialState(configObj)
@@ -468,7 +468,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (container && !isLoading && !_.isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_LOADED_EVENT', payload: true })
-      publishAnalyticsEvent('chart_loaded', 'load', configUrl, 'chart')
+      publishAnalyticsEvent('chart_loaded', 'load', interactionLabel, 'chart')
     }
   }, [container, config, isLoading]) // eslint-disable-line
 
@@ -558,7 +558,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     } catch (e) {
       console.error('COVE:', e.message)
     }
-    publishAnalyticsEvent('chart_legend_reset', 'click', configUrl, 'chart')
+    publishAnalyticsEvent('chart_legend_reset', 'click', interactionLabel, 'chart')
     dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [] })
   }
 
@@ -912,7 +912,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     setFilters={setFilters}
                     excludedData={excludedData}
                     dimensions={dimensions}
-                    configUrl={configUrl}
+                    interactionLabel={interactionLabel}
                   />
                 )}
                 <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
@@ -932,8 +932,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           legend.position === 'top' ||
                           visualizationType === 'Sankey' ||
                           visualizationType === 'Spark Line'
-                          ? 'w-100'
-                          : 'w-75'
+                        ? 'w-100'
+                        : 'w-75'
                     }
                   >
                     {/* All charts with LinearChart */}
@@ -969,7 +969,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                               const labelMargin = 120
                               const widthReduction =
                                 config.showLineSeriesLabels &&
-                                  (config.legend.position !== 'right' || config.legend.hide)
+                                (config.legend.position !== 'right' || config.legend.hide)
                                   ? labelMargin
                                   : 0
                               return (
@@ -991,7 +991,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           setFilters={setFilters}
                           excludedData={excludedData}
                           dimensions={dimensions}
-                          configUrl={configUrl}
+                          interactionLabel={interactionLabel}
                         />
                         {config?.introText && (
                           <section className='introText mb-4' style={{ padding: '0px 0 35px' }}>
@@ -1019,7 +1019,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {!config.legend.hide &&
                     config.visualizationType !== 'Spark Line' &&
                     config.visualizationType !== 'Sankey' && (
-                      <Legend ref={legendRef} skipId={handleChartTabbing(config, legendId)} configUrl={configUrl} />
+                      <Legend
+                        ref={legendRef}
+                        skipId={handleChartTabbing(config, legendId)}
+                        interactionLabel={interactionLabel}
+                      />
                     )}
                 </LegendWrapper>
                 {/* Link */}
@@ -1041,7 +1045,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       type='image'
                       state={config}
                       elementToCapture={imageId}
-                      configUrl={configUrl}
+                      interactionLabel={interactionLabel}
                     />
                   )}
                   {config.table.showDownloadPdfButton && (
@@ -1051,8 +1055,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       type='pdf'
                       state={config}
                       elementToCapture={imageId}
-                      configUrl={configUrl}
-
+                      interactionLabel={interactionLabel}
                     />
                   )}
                 </MediaControls.Section>
@@ -1062,33 +1065,33 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   config.visualizationType !== 'Spark Line' &&
                   config.visualizationType !== 'Sankey') ||
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
-                    <DataTable
-                      /* changing the "key" will force the table to re-render
+                  <DataTable
+                    /* changing the "key" will force the table to re-render
                           when the default sort changes while editing */
-                      key={dataTableDefaultSortBy}
-                      config={pivotDynamicSeries(config)}
-                      rawData={
-                        config.visualizationType === 'Sankey'
-                          ? config?.data?.[0]?.tableData
-                          : config.table.customTableConfig
-                            ? filterVizData(config.filters, config.data)
-                            : config.data
-                      }
-                      runtimeData={getTableRuntimeData()}
-                      expandDataTable={config.table.expanded}
-                      columns={config.columns}
-                      defaultSortBy={dataTableDefaultSortBy}
-                      displayGeoName={name => name}
-                      applyLegendToRow={applyLegendToRow}
-                      tableTitle={config.table.label}
-                      indexTitle={config.table.indexLabel}
-                      vizTitle={title}
-                      viewport={currentViewport}
-                      tabbingId={handleChartTabbing(config, legendId)}
-                      colorScale={colorScale}
-                      configUrl={configUrl}
-                    />
-                  )}
+                    key={dataTableDefaultSortBy}
+                    config={pivotDynamicSeries(config)}
+                    rawData={
+                      config.visualizationType === 'Sankey'
+                        ? config?.data?.[0]?.tableData
+                        : config.table.customTableConfig
+                        ? filterVizData(config.filters, config.data)
+                        : config.data
+                    }
+                    runtimeData={getTableRuntimeData()}
+                    expandDataTable={config.table.expanded}
+                    columns={config.columns}
+                    defaultSortBy={dataTableDefaultSortBy}
+                    displayGeoName={name => name}
+                    applyLegendToRow={applyLegendToRow}
+                    tableTitle={config.table.label}
+                    indexTitle={config.table.indexLabel}
+                    vizTitle={title}
+                    viewport={currentViewport}
+                    tabbingId={handleChartTabbing(config, legendId)}
+                    colorScale={colorScale}
+                    interactionLabel={interactionLabel}
+                  />
+                )}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
                 {config?.legacyFootnotes && (

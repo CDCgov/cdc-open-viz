@@ -33,7 +33,7 @@ export interface LegendProps {
   skipId: string
   dimensions: DimensionsType // for responsive width legend
   transformedData: any
-  configUrl: string
+  interactionLabel: string
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
@@ -50,7 +50,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
       skipId = 'legend',
       dimensions,
       transformedData: data,
-      configUrl
+      interactionLabel = ''
     },
     ref
   ) => {
@@ -143,7 +143,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                               publishAnalyticsEvent(
                                 `chart_legend_item_toggled--${legend.behavior}-mode`,
                                 'keydown',
-                                `${configUrl}|${label.text}`,
+                                `${interactionLabel}|${label.text}`,
                                 'chart'
                               )
                               highlight(label)
@@ -154,7 +154,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                             publishAnalyticsEvent(
                               `chart_legend_item_toggled--${legend.behavior}-mode`,
                               'click',
-                              `${configUrl}|${label.text}`,
+                              `${interactionLabel}|${label.text}`,
                               'chart'
                             )
                             highlight(label)

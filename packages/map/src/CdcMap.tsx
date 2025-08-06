@@ -20,6 +20,7 @@ type CdcMapProps = {
   logo?: string
   navigationHandler: Function
   setConfig: Function
+  interactionLabel?: string
 }
 
 const CdcMap: React.FC<CdcMapProps> = ({
@@ -29,7 +30,8 @@ const CdcMap: React.FC<CdcMapProps> = ({
   configUrl,
   logo = '',
   link,
-  config: editorsConfig
+  config: editorsConfig,
+  interactionLabel = ''
 }) => {
   const editorContext = useContext(EditorContext)
   const [config, _setConfig] = useState(editorsConfig ?? null)
@@ -117,7 +119,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
   useEffect(() => {
     init()
-    publishAnalyticsEvent('map_loaded', 'load', configUrl, 'map')
+    publishAnalyticsEvent('map_loaded', 'load', interactionLabel, 'map')
   }, [])
 
   useEffect(() => {
@@ -139,7 +141,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
       logo={logo}
       link={link}
       loadConfig={loadConfig}
-      configUrl={configUrl}
+      interactionLabel={interactionLabel}
     />
   )
 }

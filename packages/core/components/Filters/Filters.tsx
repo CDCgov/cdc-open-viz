@@ -41,7 +41,7 @@ type FilterProps = {
   setFilters: Function
   standaloneMap?: boolean
   excludedData?: Object[]
-  configUrl?: string
+  interactionLabel?: string
 }
 
 const Filters: React.FC<FilterProps> = ({
@@ -50,7 +50,7 @@ const Filters: React.FC<FilterProps> = ({
   standaloneMap,
   setFilters,
   excludedData,
-  configUrl
+  interactionLabel = ''
 }) => {
   const { filters, general, theme, filterBehavior } = visualizationConfig
   const [showApplyButton, setShowApplyButton] = useState(false)
@@ -90,7 +90,7 @@ const Filters: React.FC<FilterProps> = ({
     publishAnalyticsEvent(
       `${visualizationConfig.type}_filter_changed`,
       'click',
-      `${configUrl}|key_${newFilters?.[index]?.columnName}|value_${newFilters?.[index]?.active}`,
+      `${interactionLabel}|key_${newFilters?.[index]?.columnName}|value_${newFilters?.[index]?.active}`,
       visualizationConfig.type
     )
   }
@@ -116,7 +116,7 @@ const Filters: React.FC<FilterProps> = ({
     publishAnalyticsEvent(
       `${visualizationConfig.type}_filter_applied`,
       'click',
-      `${configUrl}|${newFilters.map(f => f.active)}`,
+      `${interactionLabel}|${newFilters.map(f => f.active)}`,
       visualizationConfig.type
     )
 
@@ -148,7 +148,12 @@ const Filters: React.FC<FilterProps> = ({
     }
 
     setFilters(newFilters)
-    publishAnalyticsEvent(`${visualizationConfig.type}_filter_reset`, 'click', `${configUrl}`, visualizationConfig.type)
+    publishAnalyticsEvent(
+      `${visualizationConfig.type}_filter_reset`,
+      'click',
+      `${interactionLabel}`,
+      visualizationConfig.type
+    )
   }
 
   const mobileFilterStyle = useMemo(() => {

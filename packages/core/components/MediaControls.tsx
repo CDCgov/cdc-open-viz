@@ -34,7 +34,7 @@ const saveImageAs = (uri, filename) => {
   }
 }
 
-const generateMedia = (state, type, elementToCapture, configUrl) => {
+const generateMedia = (state, type, elementToCapture, interactionLabel) => {
   // Identify Selector
   const baseSvg = document.querySelector(`[data-download-id=${elementToCapture}]`)
 
@@ -74,8 +74,6 @@ const generateMedia = (state, type, elementToCapture, configUrl) => {
   const date = new Date()
   const filename = handleFileName(state)
 
-  console.log('configUrl', configUrl)
-
   switch (type) {
     case 'image':
       const downloadImage = async () => {
@@ -88,7 +86,7 @@ const generateMedia = (state, type, elementToCapture, configUrl) => {
             })
             .then(canvas => {
               saveImageAs(canvas.toDataURL(), filename + '.png')
-              publishAnalyticsEvent(`${state.type}_image_downloaded`, 'click', configUrl, `${state.type}`)
+              publishAnalyticsEvent(`${state.type}_image_downloaded`, 'click', interactionLabel, `${state.type}`)
             })
         })
       }
@@ -120,13 +118,13 @@ const generateMedia = (state, type, elementToCapture, configUrl) => {
   }
 }
 
-const Button = ({ state, text, type, title, elementToCapture, configUrl }) => {
+const Button = ({ state, text, type, title, elementToCapture, interactionLabel = '' }) => {
   const buttonClasses = ['btn', 'btn-primary']
   return (
     <button
       className={buttonClasses.join(' ')}
       title={title}
-      onClick={() => generateMedia(state, type, elementToCapture, configUrl)}
+      onClick={() => generateMedia(state, type, elementToCapture, interactionLabel)}
       style={{ lineHeight: '1.4em' }}
     >
       {buttonText[type]}
@@ -135,7 +133,7 @@ const Button = ({ state, text, type, title, elementToCapture, configUrl }) => {
 }
 
 // Link to CSV/JSON data
-const Link = ({ config, dashboardDataConfig, configUrl }) => {
+const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
   let dataConfig = dashboardDataConfig || config
   // Handles Maps & Charts
   if (dataConfig.dataFileSourceType === 'url' && dataConfig.dataFileName && config.table.showDownloadUrl) {
@@ -160,7 +158,7 @@ const Link = ({ config, dashboardDataConfig, configUrl }) => {
       title='Link to view full data set'
       target='_blank'
       onClick={() => {
-        publishAnalyticsEvent('data_viewed', 'click', `${configUrl}`)
+        publishAnalyticsEvent('data_viewed', 'click', `${interactionLabel}`)
       }}
     >
       {buttonText.link}

@@ -14,7 +14,6 @@ import { navigationHandler } from '../helpers'
 import ConfigContext, { MapDispatchContext } from '../context'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
   const {
     state,
@@ -31,7 +30,7 @@ const DataTable = props => {
     displayGeoName,
     formatLegendLocation,
     tabbingId,
-    configUrl
+    interactionLabel
   } = props
 
   const dispatch = useContext(MapDispatchContext)
@@ -180,12 +179,7 @@ const DataTable = props => {
         type='button'
         onClick={() => {
           saveBlob
-          publishAnalyticsEvent(
-            'data_downloaded',
-            'click',
-            configUrl,
-
-          )
+          publishAnalyticsEvent('data_downloaded', 'click', interactionLabel)
         }}
         href={URL.createObjectURL(blob)}
         aria-label='Download this data in a CSV file format.'
@@ -202,7 +196,7 @@ const DataTable = props => {
   const TableMediaControls = ({ belowTable }) => {
     return (
       <MediaControls.Section classes={['download-links']}>
-        <MediaControls.Link config={state} configUrl={configUrl} />
+        <MediaControls.Link config={state} interactionLabel={interactionLabel} />
         {state.table.download && <DownloadButton />}
       </MediaControls.Section>
     )
@@ -317,8 +311,9 @@ const DataTable = props => {
                           : null)}
                       >
                         {text}
-                        <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
-                          } order`}</span>
+                        <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${
+                          sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
+                        } order`}</span>
                       </th>
                     )
                   })}
@@ -362,8 +357,8 @@ const DataTable = props => {
                             role='gridcell'
                             onClick={e =>
                               state.general.type === 'bubble' &&
-                                state.general.allowMapZoom &&
-                                state.general.geoType === 'world'
+                              state.general.allowMapZoom &&
+                              state.general.geoType === 'world'
                                 ? dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: row })
                                 : true
                             }

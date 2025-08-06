@@ -80,7 +80,7 @@ type CdcMapComponent = {
   setSharedFilter: Function
   setSharedFilterValue: Function
   datasets?: Datasets
-  configUrl: string
+  interactionLabel: string
 }
 
 const CdcMapComponent: React.FC<CdcMapComponent> = ({
@@ -95,7 +95,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   setConfig: setParentConfig,
   loadConfig,
   datasets,
-  configUrl
+  interactionLabel = ''
 }) => {
   const initialState = getInitialState(configObj)
 
@@ -256,7 +256,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     if (svgEl && svgEl.childNodes.length > 0) {
       publish('cove_loaded', { config })
       dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
-      return () => { }
+      return () => {}
     }
 
     // Fallback to observer for async SVG rendering
@@ -415,7 +415,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     translate,
     isDraggingAnnotation,
     loadConfig,
-    configUrl
+    interactionLabel
   }
 
   if (!config.data) return <></>
@@ -424,11 +424,15 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   // this only shows in Dashboard config mode and only if Show Table is also set
   const tableLink = (
-    <a href={`#data-table-${config.dataKey}`} className='margin-left-href' onClick={() => {
-      publishAnalyticsEvent('link_to_data_table_click', 'click', `${configUrl}|#data-table-${config.dataKey}`, 'map')
-    }}>
+    <a
+      href={`#data-table-${config.dataKey}`}
+      className='margin-left-href'
+      onClick={() => {
+        publishAnalyticsEvent('link_to_data_table_click', 'click', `${interactionLabel}|#data-table-${config.dataKey}`, 'map')
+      }}
+    >
       {config.dataKey} (Go to Table)
-    </a>
+    </a>l
   )
 
   const sectionClassNames = () => {
@@ -477,7 +481,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     setFilters={_setRuntimeData}
                     dimensions={dimensions}
                     standaloneMap={!config}
-                    configUrl={configUrl}
+                    interactionLabel={interactionLabel}
                   />
                 )}
 
@@ -524,7 +528,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       skipId={tabId}
                       containerWidthPadding={0}
                       currentViewport={currentViewport}
-                      configUrl={configUrl}
+                      interactionLabel={interactionLabel}
                     />
                   )}
                 </div>
@@ -553,7 +557,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       type='image'
                       state={config}
                       elementToCapture={imageId}
-                      configUrl={configUrl}
+                      interactionLabel={interactionLabel}
                     />
                   )}
                   {showDownloadPdfButton && (
@@ -562,7 +566,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       title='Download Chart as PDF'
                       type='pdf'
                       state={config}
-                      configUrl={configUrl}
+                      interactionLabel={interactionLabel}
                       elementToCapture={imageId}
                     />
                   )}
@@ -598,7 +602,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       tableTitle={table.label}
                       vizTitle={general.title}
                       wrapColumns={table.wrapColumns}
-                      configUrl={configUrl}
+                      interactionLabel={interactionLabel}
                     />
                   )}
 
@@ -618,8 +622,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 <ReactTooltip
                   id={`tooltip__${tooltipId}`}
                   float={true}
-                  className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'
-                    }`}
+                  className={`${
+                    tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'
+                  }`}
                   style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
                 />
               )}

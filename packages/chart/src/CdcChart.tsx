@@ -14,9 +14,16 @@ interface CdcChartProps {
   isEditor?: boolean
   isDebug?: boolean
   config?: ChartConfig
+  interactionLabel?: string
 }
 
-const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug, config: editorsConfig }) => {
+const CdcChartWrapper: React.FC<CdcChartProps> = ({
+  configUrl,
+  isEditor,
+  isDebug,
+  config: editorsConfig,
+  interactionLabel = ''
+}) => {
   const editorContext = useContext(EditorContext)
   const [config, _setConfig] = useState<ChartConfig>({} as ChartConfig)
   const setConfig = newConfig => {
@@ -89,7 +96,7 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug
 
   if (isLoading) return <Loading />
 
-  return <CdcChart config={config} isEditor={isEditor} isDebug={isDebug} configUrl={configUrl} />
+  return <CdcChart config={config} isEditor={isEditor} isDebug={isDebug} interactionLabel={interactionLabel} />
 }
 
 export default CdcChartWrapper

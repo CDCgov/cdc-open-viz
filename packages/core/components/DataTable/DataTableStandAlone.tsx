@@ -18,7 +18,7 @@ type StandAloneProps = {
   isEditor?: boolean
   updateConfig?: (Visualization) => void
   datasets?: Datasets
-  configUrl?: string
+  interactionLabel?: string
 }
 
 const DataTableStandAlone: React.FC<StandAloneProps> = ({
@@ -28,7 +28,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
   viewport,
   isEditor,
   datasets,
-  configUrl
+  interactionLabel = ''
 }) => {
   const [filteredData, setFilteredData] = useState<Record<string, any>[]>(
     filterVizData(config.filters, config.formattedData || config.data)
@@ -71,7 +71,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
         tabbingId={visualizationKey}
         tableTitle={config.table.label}
         viewport={viewport || 'lg'}
-        configUrl={configUrl}
+        interactionLabel={interactionLabel}
       />
       <FootnotesStandAlone config={config.footnotes} filters={config.filters?.filter(f => f.filterFootnotes)} />
     </>

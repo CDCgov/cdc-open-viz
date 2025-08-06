@@ -37,6 +37,7 @@ type CdcWaffleChartProps = {
   isEditor?: boolean
   link?: string
   setConfig?: () => void
+  interactionLabel?: string
 }
 
 const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateConfig }) => {
@@ -402,8 +403,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
           )}
           {config.visualizationType !== 'Gauge' && (
             <div
-              className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''
-                }`}
+              className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${
+                config.overallFontSize ? ' font-' + config.overallFontSize : ''
+              }`}
             >
               <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
                 <svg width={setRatio()} height={setRatio()}>
@@ -438,7 +440,8 @@ const CdcWaffleChart = ({
   config: configObj,
   isDashboard = false,
   isEditor = false,
-  setConfig: setParentConfig
+  setConfig: setParentConfig,
+  interactionLabel = ''
 }: CdcWaffleChartProps) => {
   // Default States
   const [state, dispatch] = useReducer(chartReducer, {
@@ -506,7 +509,7 @@ const CdcWaffleChart = ({
   useEffect(() => {
     if (config && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: config })
-      publishAnalyticsEvent('waffle-chart_loaded', 'load', configUrl, 'waffle-chart')
+      publishAnalyticsEvent('waffle-chart_loaded', 'load', interactionLabel, 'waffle-chart')
       dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
     }
   }, [config, container])

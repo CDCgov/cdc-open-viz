@@ -19,9 +19,16 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 type MultiDashboardProps = Omit<WCMSProps, 'configUrl'> & {
   configUrl?: string
   config?: MultiDashboardConfig
+  interactionLabel?: string
 }
 
-const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, isEditor, isDebug, config }) => {
+const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
+  configUrl,
+  isEditor,
+  isDebug,
+  config,
+  interactionLabel = ''
+}) => {
   const [initial, setInitial] = useState<InitialState>(undefined)
   const editorContext = useContext(EditorContext)
 
@@ -52,7 +59,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, isEdi
     const { newConfig, datasets } =
       selected !== null ? await loadMultiDashboard(_config, selected) : await loadSingleDashboard(_config)
     setInitial(formatInitialState(newConfig, datasets))
-    publishAnalyticsEvent('dashboard_loaded', 'load', configUrl, 'dashboard')
+    publishAnalyticsEvent('dashboard_loaded', 'load', interactionLabel, 'dashboard')
   }
 
   useEffect(() => {
