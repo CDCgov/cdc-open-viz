@@ -1,21 +1,21 @@
 import _ from 'lodash'
 import { MultiDashboardConfig } from '../types/MultiDashboard'
 import DataTransform from '@cdc/core/helpers/DataTransform'
+import { getApplicableFilters } from './getFilteredData'
 import { filterData } from './filterData'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
-import { getApplicableFilters } from './getFilteredData'
 
 const transform = new DataTransform()
 
 export const getFootnotesVizConfig = (
   visualizationConfig: AnyVisualization,
-  vizKey: string,
+  rowNumber: number,
   config: MultiDashboardConfig
 ) => {
   if (!visualizationConfig?.footnotes) return visualizationConfig
   const data = _.cloneDeep(config.datasets[visualizationConfig.footnotes.dataKey]?.data)
   const dataColumns = data?.length ? Object.keys(data[0]) : []
-  const filters = (getApplicableFilters(config.dashboard, vizKey) || []).filter(filter =>
+  const filters = (getApplicableFilters(config.dashboard, rowNumber) || []).filter(filter =>
     dataColumns.includes(filter.columnName)
   )
   if (filters.length) {
@@ -85,11 +85,10 @@ export const getVizConfig = (
 
   if (filteredDataOverride) {
     visualizationConfig.data = filteredDataOverride
-    visualizationConfig.formattedData = filteredDataOverride
   }
 
   if (visualizationConfig.footnotes) {
-    const visConfigWithFootnotes = getFootnotesVizConfig(visualizationConfig, visualizationKey, config)
+    const visConfigWithFootnotes = getFootnotesVizConfig(visualizationConfig, rowNumber, config)
     if (multiVizColumn && filteredDataOverride) {
       const vizCategory = filteredDataOverride[0][multiVizColumn]
       // the multiViz filtering filtering is applied after the dashboard filters
