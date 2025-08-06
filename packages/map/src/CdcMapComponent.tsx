@@ -428,11 +428,16 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       href={`#data-table-${config.dataKey}`}
       className='margin-left-href'
       onClick={() => {
-        publishAnalyticsEvent('link_to_data_table_click', 'click', `${interactionLabel}|#data-table-${config.dataKey}`, 'map')
+        publishAnalyticsEvent(
+          'link_to_data_table_click',
+          'click',
+          `${interactionLabel}|#data-table-${config.dataKey}`,
+          'map'
+        )
       }}
     >
       {config.dataKey} (Go to Table)
-    </a>l
+    </a>
   )
 
   const sectionClassNames = () => {

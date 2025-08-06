@@ -33,11 +33,11 @@ type LegendProps = {
   dimensions: DimensionsType
   containerWidthPadding: number
   currentViewport: ViewPort
-  configUrl: string
+  interactionLabel: string
 }
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
-  const { skipId, containerWidthPadding, configUrl } = props
+  const { skipId, containerWidthPadding, interactionLabel } = props
 
   const {
     config,
@@ -134,7 +134,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             publishAnalyticsEvent(
               `map_legend_item_toggled--isolate-mode`,
               'click',
-              `${configUrl}|${item.label}`,
+              `${interactionLabel}|${item.label}`,
               'map'
             )
           }}
@@ -145,7 +145,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               publishAnalyticsEvent(
                 `map_legend_item_toggled--isolate-mode`,
                 'keydown',
-                `${configUrl}|${item.label}`,
+                `${interactionLabel}|${item.label}`,
                 'map'
               )
             }
@@ -240,12 +240,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     if (e) {
       e.preventDefault()
     }
-    publishAnalyticsEvent(
-      'map_legend_reset',
-      'click',
-      configUrl,
-      'map'
-    )
+    publishAnalyticsEvent('map_legend_reset', 'click', interactionLabel, 'map')
     resetLegendToggles(runtimeLegend, setRuntimeLegend)
     dispatch({
       type: 'SET_ACCESSIBLE_STATUS',
@@ -336,41 +331,41 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
             {((config.visual.additionalCityStyles && config.visual.additionalCityStyles.some(c => c.label)) ||
               config.visual.cityStyleLabel) && (
-                <>
-                  <hr />
-                  <div className={legendClasses.div.join(' ') || ''}>
-                    {config.visual.cityStyleLabel && (
-                      <div>
-                        <svg>
-                          <Group
-                            top={
-                              config.visual.cityStyle === 'pin' ? 19 : config.visual.cityStyle === 'triangle' ? 13 : 11
-                            }
-                            left={10}
-                          >
-                            {cityStyleShapes[config.visual.cityStyle.toLowerCase()]}
-                          </Group>
-                        </svg>
-                        <p>{config.visual.cityStyleLabel}</p>
-                      </div>
-                    )}
+              <>
+                <hr />
+                <div className={legendClasses.div.join(' ') || ''}>
+                  {config.visual.cityStyleLabel && (
+                    <div>
+                      <svg>
+                        <Group
+                          top={
+                            config.visual.cityStyle === 'pin' ? 19 : config.visual.cityStyle === 'triangle' ? 13 : 11
+                          }
+                          left={10}
+                        >
+                          {cityStyleShapes[config.visual.cityStyle.toLowerCase()]}
+                        </Group>
+                      </svg>
+                      <p>{config.visual.cityStyleLabel}</p>
+                    </div>
+                  )}
 
-                    {config.visual.additionalCityStyles.map(
-                      ({ shape, label }) =>
-                        label && (
-                          <div>
-                            <svg>
-                              <Group top={shape === 'Pin' ? 19 : shape === 'Triangle' ? 13 : 11} left={10}>
-                                {cityStyleShapes[shape.toLowerCase()]}
-                              </Group>
-                            </svg>
-                            <p>{label}</p>
-                          </div>
-                        )
-                    )}
-                  </div>
-                </>
-              )}
+                  {config.visual.additionalCityStyles.map(
+                    ({ shape, label }) =>
+                      label && (
+                        <div>
+                          <svg>
+                            <Group top={shape === 'Pin' ? 19 : shape === 'Triangle' ? 13 : 11} left={10}>
+                              {cityStyleShapes[shape.toLowerCase()]}
+                            </Group>
+                          </svg>
+                          <p>{label}</p>
+                        </div>
+                      )
+                  )}
+                </div>
+              </>
+            )}
             {runtimeLegend.disabledAmt > 0 && (
               <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
                 Show All

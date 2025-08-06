@@ -120,7 +120,6 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
           interactionLabel={interactionLabel}
         />
       )
-
     case 'dashboardFilters':
       return (
         <DashboardSharedFilters

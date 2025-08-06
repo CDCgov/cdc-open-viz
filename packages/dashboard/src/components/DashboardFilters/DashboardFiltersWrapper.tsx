@@ -107,6 +107,8 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       visualizationConfig
     )
 
+    console.log('interactionLabel', interactionLabel || 'no')
+
     publishAnalyticsEvent(
       'dashboard_filter_changed',
       'change',

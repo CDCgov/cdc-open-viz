@@ -51,7 +51,6 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
     const versionedConfig = coveUpdateWorker(config)
     return { ...initialState, config: versionedConfig, filteredData, data: datasets }
   }
-
   const loadConfig = async () => {
     const _config: MultiDashboardConfig = config || editorContext.config || (await (await fetch(configUrl)).json())
     const selected = getSelectedConfig(_config)
@@ -147,7 +146,9 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
   }
 
   if (!initial) return <Loading />
-  return <CdcDashboard isEditor={isEditor} isDebug={isDebug} initialState={initial} configUrl={configUrl} />
+  return (
+    <CdcDashboard isEditor={isEditor} isDebug={isDebug} initialState={initial} interactionLabel={interactionLabel} />
+  )
 }
 
 export default MultiDashboardWrapper

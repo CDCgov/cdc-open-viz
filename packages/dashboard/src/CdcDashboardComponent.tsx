@@ -60,9 +60,14 @@ import DashboardEditors from './components/DashboardEditors'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
-}
+} & { interactionLabel: string }
 
-export default function CdcDashboard({ initialState, isEditor = false, isDebug = false, configUrl }: DashboardProps) {
+export default function CdcDashboard({
+  initialState,
+  isEditor = false,
+  isDebug = false,
+  interactionLabel = ''
+}: DashboardProps) {
   const [state, dispatch] = useReducer(dashboardReducer, initialState)
   const [errorMessages, dispatchErrorMessages] = useReducer(errorMessagesReducer, [])
   const editorContext = useContext(EditorContext)
@@ -395,7 +400,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
               setSharedFilter={setSharedFilter}
               apiFilterDropdowns={apiFilterDropdowns}
               state={state}
-              configUrl={configUrl}
+              interactionLabel={interactionLabel}
             />
           </>
         )
@@ -460,7 +465,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                 apiFilterDropdowns={apiFilterDropdowns}
                 currentViewport={currentViewport}
                 inNoDataState={inNoDataState}
-                configUrl={configUrl}
+                interactionLabel={interactionLabel}
                 isLastRow={index === filteredRows.length - 1}
               />
             ))}
@@ -476,7 +481,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                   state={config}
                   text='Download Dashboard Image'
                   elementToCapture={imageId}
-                  configUrl={configUrl}
+                  interactionLabel={interactionLabel}
                 />
               )}
               {config.table?.downloadPdfButton && (
@@ -486,7 +491,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                   state={config}
                   text='Download Dashboard PDF'
                   elementToCapture={imageId}
-                  configUrl={configUrl}
+                  interactionLabel={interactionLabel}
                 />
               )}
             </section>
@@ -505,7 +510,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                 imageRef={imageId}
                 isDebug={isDebug}
                 isEditor={isEditor}
-                configUrl={configUrl}
+                interactionLabel={interactionLabel}
               />
             )}
             {config.table?.show &&
@@ -557,7 +562,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                       tableTitle={datasetKey}
                       viewport={currentViewport}
                       tabbingId={datasetKey}
-                      configUrl={configUrl}
+                      interactionLabel={interactionLabel}
                     />
                   </div>
                 )

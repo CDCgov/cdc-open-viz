@@ -20,7 +20,13 @@ export default function ConfigureTab({ containerEl }) {
     case 'map':
       return (
         <ErrorBoundary component='CdcMap'>
-          <CdcMap isEditor={true} config={config} containerEl={containerEl} setConfig={setTempConfig} configUrl={configUrl} />
+          <CdcMap
+            isEditor={true}
+            config={config}
+            containerEl={containerEl}
+            setConfig={setTempConfig}
+            configUrl={configUrl}
+          />
         </ErrorBoundary>
       )
     case 'waffle-chart':

@@ -140,6 +140,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
           const dataValue = dataGroups[groupName]
           const _row = _.cloneDeep(row) // clone the row to avoid mutating the original row
           _row.multiVizColumn = undefined // reset the multiVizColumn to avoid passing it to the child components
+          console.log('testing')
           return (
             <VisualizationRow
               key={`row__${index}__${groupName}`}
