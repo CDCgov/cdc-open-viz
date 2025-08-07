@@ -76,10 +76,21 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
 
   switch (type) {
     case 'image':
+      const container = document.createElement('div')
+      // On screenshots without a title (like some charts), add padding around the chart svg
+      const parent = container.parentElement
+      if (parent) {
+        if (!state.showTitle) {
+          container.style.padding = '35px'
+        }
+      }
+      container.appendChild(baseSvg.cloneNode(true)) // Clone baseSvg to avoid modifying the original
+
       const downloadImage = async () => {
+        document.body.appendChild(container) // Append container to the DOM
         import(/* webpackChunkName: "html2canvas" */ 'html2canvas').then(mod => {
           mod
-            .default(baseSvg, {
+            .default(container, {
               ignoreElements: el =>
                 el.className?.indexOf &&
                 el.className.search(/download-buttons|download-links|data-table-container/) !== -1
