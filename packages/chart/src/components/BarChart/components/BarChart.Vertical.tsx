@@ -124,12 +124,11 @@ export const BarChartVertical = () => {
                     seriesHighlight.length === 0 ||
                     seriesHighlight.indexOf(bar.key) !== -1
 
-                  const MINIMUM_BAR_HEIGHT = 3
-
                   let barGroupWidth = seriesScale.range()[1] - seriesScale.range()[0]
                   let defaultBarHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
                   let defaultBarY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
 
+                  const MINIMUM_BAR_HEIGHT = 3
                   if (
                     bar.value >= 0 &&
                     isNumber(bar.value) &&
@@ -139,6 +138,7 @@ export const BarChartVertical = () => {
                     defaultBarHeight = MINIMUM_BAR_HEIGHT
                     defaultBarY = yScale(0) - MINIMUM_BAR_HEIGHT
                   }
+
                   let barWidth = config.isLollipopChart ? lollipopBarWidth : seriesScale.bandwidth()
                   let barX =
                     bar.x +
