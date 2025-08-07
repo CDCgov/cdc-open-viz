@@ -18,7 +18,7 @@ import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from
 import { Group } from '@visx/group'
 import './index.scss'
 import { type ViewPort } from '@cdc/core/types/ViewPort'
-import { isBelowBreakpoint, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
+import { isBelowBreakpoint, isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
 import { resetLegendToggles } from '../../../helpers'
@@ -106,7 +106,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const legendList = (patternsOnly = false) => {
     const formattedItems = patternsOnly ? [] : getFormattedLegendItems()
-    const patternsOnlyFont = isMobileHeightViewport(viewport) ? '12px' : '14px'
+    const patternsOnlyFont = isMobileFontViewport(viewport) ? '12px' : '14px'
     const hasDisabledItems = formattedItems.some(item => item.disabled)
     let legendItems
 

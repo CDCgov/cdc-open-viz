@@ -16,6 +16,7 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 import isNumber from '@cdc/core/helpers/isNumber'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 // Third party libraries
 import chroma from 'chroma-js'
 // Types
@@ -45,6 +46,7 @@ export const BarChartVertical = () => {
   const {
     colorScale,
     config,
+    currentViewport,
     dashboardConfig,
     tableData,
     formatDate,
@@ -122,9 +124,21 @@ export const BarChartVertical = () => {
                     seriesHighlight.length === 0 ||
                     seriesHighlight.indexOf(bar.key) !== -1
 
+                  const MINIMUM_BAR_HEIGHT = 3
+
                   let barGroupWidth = seriesScale.range()[1] - seriesScale.range()[0]
-                  const defaultBarHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
-                  const defaultBarY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
+                  let defaultBarHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
+                  let defaultBarY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
+
+                  if (
+                    bar.value >= 0 &&
+                    isNumber(bar.value) &&
+                    barGroup.bars.length === 1 &&
+                    defaultBarHeight < MINIMUM_BAR_HEIGHT
+                  ) {
+                    defaultBarHeight = MINIMUM_BAR_HEIGHT
+                    defaultBarY = yScale(0) - MINIMUM_BAR_HEIGHT
+                  }
                   let barWidth = config.isLollipopChart ? lollipopBarWidth : seriesScale.bandwidth()
                   let barX =
                     bar.x +
@@ -254,6 +268,8 @@ export const BarChartVertical = () => {
 
                   const BAR_LABEL_PADDING = 10
 
+                  const LABEL_FONT_SIZE = isMobileFontViewport(currentViewport) ? 13 : 16
+
                   return (
                     <Group display={hideGroup} key={`${barGroup.index}--${index}`}>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
@@ -353,7 +369,7 @@ export const BarChartVertical = () => {
                           y={barY - BAR_LABEL_PADDING}
                           fill={labelColor}
                           textAnchor='middle'
-                          fontSize={16}
+                          fontSize={LABEL_FONT_SIZE}
                         >
                           {testZeroValue(bar.value) ? '' : barDefaultLabel}
                         </Text>
@@ -364,7 +380,7 @@ export const BarChartVertical = () => {
                           y={barY - BAR_LABEL_PADDING}
                           fill={labelColor}
                           textAnchor='middle'
-                          fontSize={config.isLollipopChart ? null : barWidth / 2}
+                          fontSize={config.isLollipopChart ? null : LABEL_FONT_SIZE}
                         >
                           {absentDataLabel}
                         </Text>
