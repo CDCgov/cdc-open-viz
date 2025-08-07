@@ -52,9 +52,9 @@ export type DataTableProps = {
   vizTitle?: string
   // determines if columns should be wrapped in the table
   wrapColumns?: boolean
+  interactionLabel?: string
 }
 
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = (props: DataTableProps) => {
   const {
     columns,
@@ -71,7 +71,8 @@ const DataTable = (props: DataTableProps) => {
     tableTitle,
     viewport,
     vizTitle,
-    wrapColumns
+    wrapColumns,
+    interactionLabel = ''
   } = props
   const runtimeData = useMemo(() => {
     const data = removeNullColumns(parentRuntimeData)
@@ -135,23 +136,23 @@ const DataTable = (props: DataTableProps) => {
   const rows =
     isVertical && sortBy.column
       ? rawRows.sort((a, b) => {
-        let dataA
-        let dataB
-        if (config.type === 'map' && config.columns) {
-          const sortByColName = config.columns[sortBy.column].name
-          dataA = runtimeData[a][sortByColName]
-          dataB = runtimeData[b][sortByColName]
-        }
-        if (['chart', 'dashboard', 'table'].includes(config.type)) {
-          dataA = runtimeData[a][sortBy.column]
-          dataB = runtimeData[b][sortBy.column]
-        }
-        if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
-          dataA = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[a][config.xAxis.dataKey])
-          dataB = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[b][config.xAxis.dataKey])
-        }
-        return dataA || dataB ? customSort(dataA, dataB, sortBy, config) : 0
-      })
+          let dataA
+          let dataB
+          if (config.type === 'map' && config.columns) {
+            const sortByColName = config.columns[sortBy.column].name
+            dataA = runtimeData[a][sortByColName]
+            dataB = runtimeData[b][sortByColName]
+          }
+          if (['chart', 'dashboard', 'table'].includes(config.type)) {
+            dataA = runtimeData[a][sortBy.column]
+            dataB = runtimeData[b][sortBy.column]
+          }
+          if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
+            dataA = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[a][config.xAxis.dataKey])
+            dataB = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[b][config.xAxis.dataKey])
+          }
+          return dataA || dataB ? customSort(dataA, dataB, sortBy, config) : 0
+        })
       : rawRows
 
   const limitHeight = {
@@ -230,17 +231,17 @@ const DataTable = (props: DataTableProps) => {
       const visibleData =
         config.type === 'map'
           ? getMapRowData(
-            rows,
-            columns,
-            config,
-            formatLegendLocation,
-            runtimeData as Record<string, Object>,
-            displayGeoName,
-            filterColumns
-          )
+              rows,
+              columns,
+              config,
+              formatLegendLocation,
+              runtimeData as Record<string, Object>,
+              displayGeoName,
+              filterColumns
+            )
           : runtimeData.map(d => {
-            return _.pick(d, [...filterColumns, ...dataSeriesColumns])
-          })
+              return _.pick(d, [...filterColumns, ...dataSeriesColumns])
+            })
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
 
       // only use fullGeoName on County maps and no other
@@ -284,12 +285,12 @@ const DataTable = (props: DataTableProps) => {
     // If every value in a column is a number, record the column index so the header and cells can be right-aligned
     const rightAlignedCols = childrenMatrix.length
       ? Object.fromEntries(
-        Object.keys(childrenMatrix[0])
-          .filter(
-            i => childrenMatrix.filter(row => isRightAlignedTableValue(row[i])).length === childrenMatrix.length
-          )
-          .map(x => [x, true])
-      )
+          Object.keys(childrenMatrix[0])
+            .filter(
+              i => childrenMatrix.filter(row => isRightAlignedTableValue(row[i])).length === childrenMatrix.length
+            )
+            .map(x => [x, true])
+        )
       : {}
 
     const showCollapseButton = config.table.collapsible !== false && useBottomExpandCollapse
@@ -297,12 +298,13 @@ const DataTable = (props: DataTableProps) => {
       const hasDownloadLink = config.table.download
       return (
         <MediaControls.Section classes={getMediaControlsClasses(belowTable, hasDownloadLink)}>
-          <MediaControls.Link config={config} dashboardDataConfig={dataConfig} />
+          <MediaControls.Link config={config} dashboardDataConfig={dataConfig} interactionLabel={interactionLabel} />
           {hasDownloadLink && (
             <DownloadButton
               rawData={getDownloadData()}
               fileName={`${vizTitle || 'data-table'}.csv`}
               headerColor={headerColor}
+              interactionLabel={interactionLabel}
             />
           )}
         </MediaControls.Section>
@@ -319,7 +321,13 @@ const DataTable = (props: DataTableProps) => {
         <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           {config.table.collapsible !== false && (
-            <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
+            <ExpandCollapse
+              expanded={expanded}
+              setExpanded={setExpanded}
+              tableTitle={tableTitle}
+              config={config}
+              interactionLabel={interactionLabel}
+            />
           )}
           <div className='table-container' style={limitHeight}>
             <Table
@@ -340,6 +348,7 @@ const DataTable = (props: DataTableProps) => {
                     sortBy={sortBy}
                     setSortBy={setSortBy}
                     rightAlignedCols={rightAlignedCols}
+                    interactionLabel={interactionLabel}
                   />
                 ) : (
                   <ChartHeader
@@ -351,6 +360,7 @@ const DataTable = (props: DataTableProps) => {
                     setSortBy={setSortBy}
                     viewport={viewport}
                     rightAlignedCols={rightAlignedCols}
+                    interactionLabel={interactionLabel}
                   />
                 )
               }
@@ -413,7 +423,12 @@ const DataTable = (props: DataTableProps) => {
       <ErrorBoundary component='DataTable'>
         <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
-          <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
+          <ExpandCollapse
+            expanded={expanded}
+            setExpanded={setExpanded}
+            tableTitle={tableTitle}
+            interactionLabel={interactionLabel}
+          />
           <div className='table-container' style={limitHeight}>
             <Table
               viewport={viewport}

@@ -38,6 +38,7 @@ type MapContext = {
   translate
   scale
   annotations
+  interactionLabel?: string
 }
 
 export const MapDispatchContext = createContext<Dispatch<MapActions>>(() => {})

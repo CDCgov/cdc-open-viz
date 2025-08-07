@@ -15,7 +15,11 @@ let domContainer = document.getElementsByClassName('react-container')[0]
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
     <GlobalContextProvider>
-      <CdcMarkupInclude configUrl={domContainer.attributes['data-config'].value} isEditor={isEditor} />
+      <CdcMarkupInclude
+        configUrl={domContainer.attributes['data-config'].value}
+        interactionLabel={domContainer.attributes['data-config'].value}
+        isEditor={isEditor}
+      />
     </GlobalContextProvider>
   </React.StrictMode>
 )

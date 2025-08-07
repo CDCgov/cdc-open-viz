@@ -6,8 +6,19 @@ import { SortIcon } from './SortIcon'
 import { getNewSortBy } from '../helpers/getNewSortBy'
 import parse from 'html-react-parser'
 import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
+import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
 
-type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; hasRowType?; viewport; rightAlignedCols }
+type ChartHeaderProps = {
+  data
+  isVertical
+  config
+  setSortBy
+  sortBy
+  hasRowType?
+  viewport
+  rightAlignedCols
+  interactionLabel: string
+}
 
 const ChartHeader = ({
   data,
@@ -17,7 +28,8 @@ const ChartHeader = ({
   sortBy,
   hasRowType,
   viewport,
-  rightAlignedCols
+  rightAlignedCols,
+  interactionLabel
 }: ChartHeaderProps) => {
   const groupBy = config.table?.groupBy
   if (!data) return
@@ -104,6 +116,13 @@ const ChartHeader = ({
               scope='col'
               onClick={() => {
                 if (hasRowType) return
+                publishAnalyticsEvent(
+                  `data_table_sort_by|${newSortBy.column}|${
+                    newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'undefined'
+                  }`,
+                  'click',
+                  interactionLabel
+                )
                 setSortBy(newSortBy)
               }}
               onKeyDown={e => {

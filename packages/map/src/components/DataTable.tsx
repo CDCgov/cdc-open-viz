@@ -12,8 +12,8 @@ import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Loading from '@cdc/core/components/Loading'
 import { navigationHandler } from '../helpers'
 import ConfigContext, { MapDispatchContext } from '../context'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
   const {
     state,
@@ -29,7 +29,8 @@ const DataTable = props => {
     applyLegendToRow,
     displayGeoName,
     formatLegendLocation,
-    tabbingId
+    tabbingId,
+    interactionLabel
   } = props
 
   const dispatch = useContext(MapDispatchContext)
@@ -176,7 +177,10 @@ const DataTable = props => {
       <a
         download={fileName}
         type='button'
-        onClick={saveBlob}
+        onClick={() => {
+          saveBlob
+          publishAnalyticsEvent('data_downloaded', 'click', interactionLabel)
+        }}
         href={URL.createObjectURL(blob)}
         aria-label='Download this data in a CSV file format.'
         className={`${headerColor} no-border`}
@@ -192,7 +196,7 @@ const DataTable = props => {
   const TableMediaControls = ({ belowTable }) => {
     return (
       <MediaControls.Section classes={['download-links']}>
-        <MediaControls.Link config={state} />
+        <MediaControls.Link config={state} interactionLabel={interactionLabel} />
         {state.table.download && <DownloadButton />}
       </MediaControls.Section>
     )
