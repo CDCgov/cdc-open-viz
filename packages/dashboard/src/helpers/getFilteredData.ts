@@ -7,12 +7,10 @@ import { getVizKeys } from './getVizKeys'
 
 export const getApplicableFilters = (dashboard: Dashboard, key: string | number): false | SharedFilter[] => {
   const c = dashboard.sharedFilters?.filter(
-    sharedFilter =>
-      (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(`${key}`) !== -1) || sharedFilter.usedBy?.indexOf(key) !== -1
+    sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(`${key}`) !== -1
   )
   return c?.length > 0 ? c : false
 }
-
 export const getFilteredData = (
   state: DashboardState,
   initialFilteredData?: Record<string, any>,
