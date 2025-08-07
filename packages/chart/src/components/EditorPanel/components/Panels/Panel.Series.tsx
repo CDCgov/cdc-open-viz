@@ -281,6 +281,7 @@ const SeriesDropdownConfidenceInterval = props => {
   const { config, updateConfig } = useContext(ConfigContext)
   const { series, index } = props
   const { getColumns } = useContext(SeriesContext)
+
   if (series.type !== 'Forecasting') return
 
   return (
@@ -289,18 +290,6 @@ const SeriesDropdownConfidenceInterval = props => {
       <fieldset>
         <Accordion allowZeroExpanded>
           {series?.confidenceIntervals?.map((ciGroup, ciIndex) => {
-            const showInTooltip = ciGroup.showInTooltip ? ciGroup.showInTooltip : false
-
-            const updateShowInTooltip = (e, seriesIndex, ciIndex) => {
-              e.preventDefault()
-              let copiedSeries = [...config.series]
-              copiedSeries[seriesIndex].confidenceIntervals[ciIndex].showInTooltip = !showInTooltip
-              updateConfig({
-                ...config,
-                series: copiedSeries
-              })
-            }
-
             return (
               <AccordionItem className='series-item series-item--chart' key={`${ciIndex}`}>
                 <AccordionItemHeading className='series-item__title'>
@@ -312,6 +301,7 @@ const SeriesDropdownConfidenceInterval = props => {
                         onClick={e => {
                           e.preventDefault()
                           const copiedIndex = [...config.series[index].confidenceIntervals]
+
                           copiedIndex.splice(ciIndex, 1)
                           const copyOfSeries = [...config.series] // copy the entire series array
                           copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: [...copiedIndex] }
@@ -327,28 +317,6 @@ const SeriesDropdownConfidenceInterval = props => {
                   </>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <div className='input-group'>
-                    <label htmlFor='showInTooltip'>Show In Tooltip</label>
-                    <div
-                      className={'cove-input__checkbox--small'}
-                      onClick={e => updateShowInTooltip(e, index, ciIndex)}
-                    >
-                      <div
-                        className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`}
-                        style={{ backgroundColor: '' }}
-                      >
-                        {showInTooltip && <Check className='' style={{ fill: '#025eaa' }} />}
-                      </div>
-                      <input
-                        className='cove-input--hidden'
-                        type='checkbox'
-                        name={'showInTooltip'}
-                        checked={showInTooltip ? showInTooltip : false}
-                        readOnly
-                      />
-                    </div>
-                  </div>
-
                   <InputSelect
                     initial='Select an option'
                     value={

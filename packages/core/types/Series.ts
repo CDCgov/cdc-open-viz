@@ -5,4 +5,8 @@ export type Series = {
   type: string
   tooltip: boolean
   dynamicCategory?: string
+  confidenceIntervals?: {
+    high: string
+    low: string
+  }[]
 }[]
