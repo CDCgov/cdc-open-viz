@@ -12,7 +12,7 @@ import MultiDashboardWrapper from '@cdc/dashboard/src/CdcDashboard'
 import CdcDataTable from '../../../data-table/src/CdcDataTable'
 
 export default function ConfigureTab({ containerEl }) {
-  const { config, setTempConfig, isDebug } = useContext(ConfigContext)
+  const { config, setTempConfig, isDebug, configUrl } = useContext(ConfigContext)
 
   let { type } = config
 
@@ -20,7 +20,13 @@ export default function ConfigureTab({ containerEl }) {
     case 'map':
       return (
         <ErrorBoundary component='CdcMap'>
-          <CdcMap isEditor={true} config={config} containerEl={containerEl} setConfig={setTempConfig} />
+          <CdcMap
+            isEditor={true}
+            config={config}
+            containerEl={containerEl}
+            setConfig={setTempConfig}
+            configUrl={configUrl}
+          />
         </ErrorBoundary>
       )
     case 'waffle-chart':
@@ -41,7 +47,7 @@ export default function ConfigureTab({ containerEl }) {
     case 'dashboard':
       return (
         <ErrorBoundary component='CdcDashboard'>
-          <MultiDashboardWrapper isEditor={true} isDebug={isDebug} />
+          <MultiDashboardWrapper isEditor={true} isDebug={isDebug} configUrl={configUrl} />
         </ErrorBoundary>
       )
     case 'data-bite':

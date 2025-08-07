@@ -49,4 +49,5 @@ export type MapContext = {
   topoData: object
   runtimeData: Object[]
   tooltipId: string
+  interactionLabel?: string
 }

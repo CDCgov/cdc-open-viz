@@ -15,6 +15,7 @@ import * as apiFilterHelpers from '../../helpers/apiFilterHelpers'
 import { applyQueuedActive } from '@cdc/core/components/Filters/helpers/applyQueuedActive'
 import './dashboardfilter.styles.css'
 import { updateChildFilters } from '../../helpers/updateChildFilters'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
 
@@ -32,6 +33,7 @@ type DashboardFiltersProps = {
   isEditor?: boolean
   setConfig: (config: DashboardFilters) => void
   currentViewport?: ViewPort
+  interactionLabel: string
 }
 
 const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
@@ -39,7 +41,8 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   visualizationConfig,
   setConfig: updateConfig,
   currentViewport,
-  isEditor = false
+  isEditor = false,
+  interactionLabel = ''
 }) => {
   const state = useContext(DashboardContext)
   const { config: dashboardConfig, reloadURLData, loadAPIFilters, setAPIFilterDropdowns, setAPILoading } = state
@@ -102,6 +105,15 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       value,
       newConfig.dashboard.sharedFilters,
       visualizationConfig
+    )
+
+    console.log('interactionLabel', interactionLabel || 'no')
+
+    publishAnalyticsEvent(
+      'dashboard_filter_changed',
+      'change',
+      `${interactionLabel}|key_${newSharedFilters?.[index]?.key}|value_${value}`,
+      'dashboard'
     )
 
     // sets the active filter option that the user just selected.

@@ -42,7 +42,6 @@ import MultiTabs from './components/MultiConfigTabs'
 import _ from 'lodash'
 import EditorContext from '../../editor/src/ConfigContext'
 import { APIFilterDropdowns } from './components/DashboardFilters'
-import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import VisualizationRow from './components/VisualizationRow'
 import { getVizConfig } from './helpers/getVizConfig'
@@ -52,7 +51,6 @@ import Layout from '@cdc/core/components/Layout'
 import * as reloadURLHelpers from './helpers/reloadURLHelpers'
 import { addValuesToDashboardFilters } from './helpers/addValuesToDashboardFilters'
 import { DashboardFilters } from './types/DashboardFilters'
-import DashboardSharedFilters from './components/DashboardFilters'
 import { loadAPIFiltersFactory } from './helpers/loadAPIFilters'
 import Loader from '@cdc/core/components/Loader'
 import Alert from '@cdc/core/components/Alert'
@@ -62,9 +60,14 @@ import DashboardEditors from './components/DashboardEditors'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
-}
+} & { interactionLabel: string }
 
-export default function CdcDashboard({ initialState, isEditor = false, isDebug = false }: DashboardProps) {
+export default function CdcDashboard({
+  initialState,
+  isEditor = false,
+  isDebug = false,
+  interactionLabel = ''
+}: DashboardProps) {
   const [state, dispatch] = useReducer(dashboardReducer, initialState)
   const [errorMessages, dispatchErrorMessages] = useReducer(errorMessagesReducer, [])
   const editorContext = useContext(EditorContext)
@@ -397,6 +400,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
               setSharedFilter={setSharedFilter}
               apiFilterDropdowns={apiFilterDropdowns}
               state={state}
+              interactionLabel={interactionLabel}
             />
           </>
         )
@@ -461,6 +465,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                 apiFilterDropdowns={apiFilterDropdowns}
                 currentViewport={currentViewport}
                 inNoDataState={inNoDataState}
+                interactionLabel={interactionLabel}
                 isLastRow={index === filteredRows.length - 1}
               />
             ))}
@@ -476,6 +481,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                   state={config}
                   text='Download Dashboard Image'
                   elementToCapture={imageId}
+                  interactionLabel={interactionLabel}
                 />
               )}
               {config.table?.downloadPdfButton && (
@@ -485,6 +491,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                   state={config}
                   text='Download Dashboard PDF'
                   elementToCapture={imageId}
+                  interactionLabel={interactionLabel}
                 />
               )}
             </section>
@@ -503,6 +510,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                 imageRef={imageId}
                 isDebug={isDebug}
                 isEditor={isEditor}
+                interactionLabel={interactionLabel}
               />
             )}
             {config.table?.show &&
@@ -554,6 +562,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                       tableTitle={datasetKey}
                       viewport={currentViewport}
                       tabbingId={datasetKey}
+                      interactionLabel={interactionLabel}
                     />
                   </div>
                 )

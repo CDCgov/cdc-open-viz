@@ -12,6 +12,11 @@ let domContainer = document.getElementsByClassName('react-container')[0]
 
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
-    <CdcMap isEditor={isEditor} configUrl={domContainer.attributes['data-config'].value} containerEl={domContainer} />
+    <CdcMap
+      isEditor={isEditor}
+      configUrl={domContainer.attributes['data-config'].value}
+      interactionLabel={domContainer.attributes['data-config'].value}
+      containerEl={domContainer}
+    />
   </React.StrictMode>
 )
