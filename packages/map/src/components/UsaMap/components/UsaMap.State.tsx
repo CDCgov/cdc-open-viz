@@ -42,6 +42,7 @@ import {
   SVG_WIDTH,
   hashObj
 } from '../../../helpers'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
@@ -80,7 +81,8 @@ const UsaMap = () => {
     legendSpecialClassLastMemo,
     currentViewport,
     translate,
-    runtimeLegend
+    runtimeLegend,
+    interactionLabel
   } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
@@ -435,7 +437,13 @@ const UsaMap = () => {
             <g
               className='geo-group'
               style={styles}
-              onClick={() => geoClickHandler(geoDisplayName, geoData)}
+              onClick={() => {
+                geoClickHandler(geoDisplayName, geoData)
+                publishAnalyticsEvent('map_tooltip', 'click', `${interactionLabel}|key_${geoDisplayName}`, 'map')
+              }}
+              onMouseOver={() => {
+                publishAnalyticsEvent('map_tooltip', 'hover', `${interactionLabel}|key_${geoDisplayName}`, 'map')
+              }}
               id={geoName}
               data-tooltip-id={`tooltip__${tooltipId}`}
               data-tooltip-html={tooltip}

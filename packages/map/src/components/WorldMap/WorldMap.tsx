@@ -108,8 +108,8 @@ const WorldMap = () => {
         geo.properties.state && data[geo.properties.state]
           ? geo.properties.state
           : geo.properties.name
-          ? geo.properties.name
-          : geo.properties.iso
+            ? geo.properties.name
+            : geo.properties.iso
 
       const additionalData = {
         name: geo.properties.name
@@ -168,10 +168,17 @@ const WorldMap = () => {
             path={path}
             stroke={geoStrokeColor}
             strokeWidth={strokeWidth}
-            onClick={() => geoClickHandler(geoDisplayName, geoData)}
+            onClick={() => {
+              geoClickHandler(geoDisplayName, geoData)
+              publishAnalyticsEvent('map_tooltip', 'click', `${interactionLabel}|${geoDisplayName}`, 'map')
+            }}
             data-tooltip-id={`tooltip__${tooltipId}`}
             data-tooltip-html={toolTip}
             tabIndex={-1}
+            onMouseEnter={() => {
+              publishAnalyticsEvent('map_tooltip', 'hover', `${interactionLabel}|${geoDisplayName}`, 'map')
+            }}
+
           />
         )
       }
@@ -180,6 +187,9 @@ const WorldMap = () => {
       return (
         <Geo
           additionaldata={JSON.stringify(additionalData)}
+          onMouseEnter={() => {
+            publishAnalyticsEvent('map_tooltip', 'hover', `${interactionLabel}|${geoDisplayName}`, 'map')
+          }}
           geodata={JSON.stringify(geoData)}
           key={i + '-geo'}
           stroke={geoStrokeColor}
@@ -188,6 +198,9 @@ const WorldMap = () => {
           path={path}
           data-tooltip-id={`tooltip__${tooltipId}`}
           data-tooltip-html={toolTip}
+          onClick={() => {
+            publishAnalyticsEvent('map_tooltip', 'click', `${interactionLabel}|${geoDisplayName}`, 'map')
+          }}
         />
       )
     })

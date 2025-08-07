@@ -1,9 +1,10 @@
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import ConfigContext, { MapDispatchContext } from '../context'
 import { navigationHandler } from '../helpers'
 import { useContext } from 'react'
 
 const useGeoClickHandler = () => {
-  const { config: state, setConfig, setSharedFilter, customNavigationHandler } = useContext(ConfigContext)
+  const { config: state, setConfig, setSharedFilter, customNavigationHandler, interactionLabel } = useContext(ConfigContext)
   const dispatch = useContext(MapDispatchContext)
 
   const geoClickHandler = (geoDisplayName: string, geoData: object): void => {
@@ -29,6 +30,8 @@ const useGeoClickHandler = () => {
         keyedData: geoData
       }
       dispatch({ type: 'SET_MODAL', payload: modalData })
+      publishAnalyticsEvent('map_tooltip', 'click', `${interactionLabel}|${geoDisplayName}`, 'map')
+
 
       return
     }
@@ -36,6 +39,7 @@ const useGeoClickHandler = () => {
     // Otherwise if this item has a link specified for it, do regular navigation.
     if (state.columns.navigate && geoData[state.columns.navigate.name]) {
       navigationHandler(state.general.navigationTarget, geoData[state.columns.navigate.name], customNavigationHandler)
+      publishAnalyticsEvent('map_tooltip', 'click', `${interactionLabel}|${geoDisplayName}`, 'map')
     }
   }
 

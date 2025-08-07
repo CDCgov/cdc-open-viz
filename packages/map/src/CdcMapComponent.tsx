@@ -256,7 +256,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     if (svgEl && svgEl.childNodes.length > 0) {
       publish('cove_loaded', { config })
       dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
-      return () => {}
+      return () => { }
     }
 
     // Fallback to observer for async SVG rendering
@@ -627,9 +627,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 <ReactTooltip
                   id={`tooltip__${tooltipId}`}
                   float={true}
-                  className={`${
-                    tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'
-                  }`}
+                  className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'
+                    }`}
                   style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
                 />
               )}

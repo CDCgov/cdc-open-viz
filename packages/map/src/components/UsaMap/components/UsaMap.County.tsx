@@ -259,8 +259,7 @@ const CountyMap = () => {
         if (county && data[county.id]) {
           geoClickHandler(displayGeoName(county.id), data[county.id])
           const countyToState = topoData.states.find(state => state.id === county.id.slice(0, 2))
-
-          publishAnalyticsEvent('map_county_clicked', 'click', `${interactionLabel}|${displayGeoName(county.id)}, ${countyToState?.properties.name}|${county.id}`, 'map')
+          publishAnalyticsEvent('map_tooltip', 'click', `${interactionLabel}|${displayGeoName(county.id)}, ${countyToState?.properties.name}|${county.id}`, 'map')
         }
       }
 
@@ -404,7 +403,7 @@ const CountyMap = () => {
           }
           tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(county.id), data[county.id])
           const countyToState = topoData.states.find(state => state.id === county.id.slice(0, 2))
-          publishAnalyticsEvent('map_county_tooltip_displayed', 'hover', `${interactionLabel}|${displayGeoName(county.id)}, ${countyToState?.properties.name}|${county.id}`, 'map')
+          publishAnalyticsEvent('map_tooltip', 'hover', `${interactionLabel}|${displayGeoName(county.id)}, ${countyToState?.properties.name}|${county.id}`, 'map')
 
           tooltipRef.current.setAttribute('data-index', countyIndex)
         } else {

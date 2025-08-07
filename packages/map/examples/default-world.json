@@ -1,18 +1,40 @@
 {
-	"defaultData": true,
+	"annotations": [],
 	"general": {
-		"title": "Default World Map",
-		"subtext": "",
-		"type": "bubble",
-		"geoType": "world",
-		"headerColor": "theme-blue",
+		"navigationTarget": "_self",
+		"noStateFoundMessage": "Map Unavailable",
+		"annotationDropdownText": "Annotations",
 		"geoBorderColor": "darkGray",
-		"showSidebar": true,
+		"headerColor": "theme-blue",
+		"title": "Default World Map",
 		"showTitle": true,
-		"showDownloadButton": true,
-		"expandDataTable": true,
+		"showSidebar": true,
+		"showDownloadMediaButton": false,
+		"displayAsHex": false,
+		"displayStateLabels": true,
+		"territoriesAlwaysShow": false,
+		"language": "en",
+		"geoType": "world",
+		"geoLabelOverride": "",
+		"hasRegions": false,
+		"fullBorder": false,
+		"type": "data",
+		"convertFipsCodes": true,
+		"palette": {
+			"isReversed": false
+		},
+		"allowMapZoom": true,
+		"hideGeoColumnInTooltip": false,
+		"hidePrimaryColumnInTooltip": false,
+		"statePicked": {
+			"fipsCode": "01",
+			"stateName": "Alabama"
+		},
+		"subtext": "",
+		"expandDataTable": false,
 		"equalNumberOptIn": true
 	},
+	"type": "map",
 	"color": "pinkpurple",
 	"columns": {
 		"geo": {
@@ -22,28 +44,55 @@
 			"dataTable": true
 		},
 		"primary": {
-			"name": "Data",
-			"label": "Data Label",
+			"dataTable": true,
+			"tooltip": true,
 			"prefix": "",
 			"suffix": "%",
-			"dataTable": true,
-			"tooltip": true
+			"name": "Data",
+			"label": "Data Label",
+			"roundToPlace": 0
 		},
 		"navigate": {
-			"name": "Link",
+			"name": "Select Option",
 			"tooltip": false,
 			"dataTable": false
+		},
+		"latitude": {
+			"name": ""
+		},
+		"longitude": {
+			"name": ""
 		}
 	},
 	"legend": {
+		"descriptions": {},
+		"specialClasses": [
+			{
+				"key": "Data",
+				"value": "N/A",
+				"label": "N/A"
+			}
+		],
+		"unified": false,
+		"singleColumn": false,
+		"singleRow": false,
+		"verticalSorted": false,
+		"showSpecialClassesLast": false,
+		"dynamicDescription": false,
+		"type": "equalnumber",
 		"numberOfItems": 3,
 		"position": "side",
 		"title": "Legend Title",
+		"style": "circles",
+		"subStyle": "linear blocks",
+		"tickRotation": "",
+		"singleColumnLegend": false,
+		"hideBorder": false,
+		"groupBy": "",
 		"description": "Legend Text",
-		"type": "equalnumber",
-		"specialClasses": ["N/A"],
 		"separateZero": true
 	},
+	"filters": [],
 	"data": [
 		{
 			"Country": "Atlanta",
@@ -1493,5 +1542,76 @@
 			"Link": "https://cdc.gov/",
 			"Sample Categories": ""
 		}
-	]
+	],
+	"table": {
+		"wrapColumns": false,
+		"label": "Data Table",
+		"expanded": false,
+		"limitHeight": false,
+		"height": "",
+		"caption": "",
+		"showDownloadUrl": false,
+		"showDataTableLink": true,
+		"showDownloadLinkBelow": true,
+		"showFullGeoNameInCSV": false,
+		"forceDisplay": true,
+		"download": true,
+		"indexLabel": "",
+		"cellMinWidth": "0",
+		"collapsible": true
+	},
+	"tooltips": {
+		"appearanceType": "hover",
+		"linkLabel": "Learn More",
+		"capitalizeLabels": true,
+		"opacity": 90
+	},
+	"runtime": {
+		"editorErrorMessage": []
+	},
+	"visual": {
+		"minBubbleSize": 1,
+		"maxBubbleSize": 20,
+		"extraBubbleBorder": false,
+		"cityStyle": "circle",
+		"cityStyleLabel": "",
+		"showBubbleZeros": false,
+		"additionalCityStyles": [],
+		"geoCodeCircleSize": 8
+	},
+	"mapPosition": {
+		"coordinates": [
+			0,
+			30
+		],
+		"zoom": 1
+	},
+	"map": {
+		"layers": [],
+		"patterns": []
+	},
+	"hexMap": {
+		"type": "",
+		"shapeGroups": [
+			{
+				"legendTitle": "",
+				"legendDescription": "",
+				"items": [
+					{
+						"key": "",
+						"shape": "Arrow Up",
+						"column": "",
+						"operator": "=",
+						"value": ""
+					}
+				]
+			}
+		]
+	},
+	"filterBehavior": "Filter Change",
+	"filterIntro": "",
+	"version": "4.25.7",
+	"migrations": {
+		"addColorMigration": true
+	}
 }
