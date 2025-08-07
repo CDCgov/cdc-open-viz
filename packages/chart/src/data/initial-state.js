@@ -138,7 +138,8 @@ export default {
     showVertical: true,
     dateDisplayFormat: '',
     showMissingDataLabel: true,
-    showSuppressedSymbol: true
+    showSuppressedSymbol: true,
+    collapsible: true
   },
   orientation: 'vertical',
   color: 'pinkpurple',
