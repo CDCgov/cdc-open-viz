@@ -15,7 +15,7 @@ let domContainer = document.getElementsByClassName('react-container')[0]
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
     <CdcChart
-      interactionLabel={domContainer.attributes['data-interaction-label'].value}
+      interactionLabel={domContainer.attributes['data-config']?.value}
       configUrl={domContainer.attributes['data-config'].value}
       isEditor={isEditor}
       isDebug={isDebug}
