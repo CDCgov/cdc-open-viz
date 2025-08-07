@@ -140,7 +140,7 @@ const CountyMap = () => {
     tooltipRef,
     legendMemo,
     legendSpecialClassLastMemo,
-    configUrl
+    interactionLabel
   } = useContext(ConfigContext)
 
   // CREATE STATE LINES
@@ -212,7 +212,7 @@ const CountyMap = () => {
   const lineWidth = 1
 
   const onReset = () => {
-    publishAnalyticsEvent('map_reset_zoom_level', 'click', configUrl, 'map')
+    publishAnalyticsEvent('map_reset_zoom_level', 'click', interactionLabel, 'map')
     setConfig({
       ...config,
       mapPosition: { coordinates: [0, 30], zoom: 1 }
@@ -258,6 +258,9 @@ const CountyMap = () => {
         }
         if (county && data[county.id]) {
           geoClickHandler(displayGeoName(county.id), data[county.id])
+          const countyToState = topoData.states.find(state => state.id === county.id.slice(0, 2))
+
+          publishAnalyticsEvent('map_county_clicked', 'click', `${interactionLabel}|${displayGeoName(county.id)}, ${countyToState?.properties.name}|${county.id}`, 'map')
         }
       }
 
@@ -271,7 +274,7 @@ const CountyMap = () => {
 
       // Redraw with focus on state
       setFocus({ id: clickedState.id, index: focusIndex, center: geoCentroid(clickedState), feature: clickedState })
-      publishAnalyticsEvent('map_zoomed_in', 'click', `${configUrl}|zoom_level_3|${clickedState.properties.name}`, 'map')
+      publishAnalyticsEvent('map_zoomed_in', 'click', `${interactionLabel}|zoom_level_3|${clickedState.properties.name}`, 'map')
 
     }
     if (config.general.type === 'us-geocode') {
@@ -295,6 +298,7 @@ const CountyMap = () => {
   }
 
   const canvasHover = e => {
+
     if (
       !tooltipRef.current ||
       config.tooltips.appearanceType !== 'hover' ||
@@ -399,10 +403,14 @@ const CountyMap = () => {
             tooltipRef.current.style.left = tooltipX + 5 + 'px'
           }
           tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(county.id), data[county.id])
+          const countyToState = topoData.states.find(state => state.id === county.id.slice(0, 2))
+          publishAnalyticsEvent('map_county_tooltip_displayed', 'hover', `${interactionLabel}|${displayGeoName(county.id)}, ${countyToState?.properties.name}|${county.id}`, 'map')
+
           tooltipRef.current.setAttribute('data-index', countyIndex)
         } else {
           tooltipRef.current.style.display = 'none'
           tooltipRef.current.setAttribute('data-index', null)
+
         }
       }
     } else {
