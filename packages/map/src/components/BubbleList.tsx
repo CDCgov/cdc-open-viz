@@ -11,13 +11,14 @@ import { geoMercator, geoAlbersUsa, type GeoProjection } from 'd3-geo'
 import { getColumnNames } from '../helpers/getColumnNames'
 import { MapContext } from '../types/MapContext'
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type BubbleListProps = {
   customProjection?: GeoProjection
 }
 
 export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
-  const { config, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, runtimeData, runtimeLegend } =
+  const { config, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, runtimeData, runtimeLegend, interactionLabel } =
     useContext<MapContext>(ConfigContext)
   const { columns, data, general, visual } = config
   const { geoType, allowMapZoom } = general
@@ -102,6 +103,12 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
           <>
             <circle
               tabIndex={-1}
+              onClick={() => {
+                publishAnalyticsEvent('map_tooltip', 'click', `${interactionLabel}|${countryName}`, 'map')
+              }}
+              onMouseOver={() => {
+                publishAnalyticsEvent('map_tooltip', 'hover', `${interactionLabel}|${countryName}`, 'map')
+              }}
               key={`circle-${countryName.replace(' ', '')}`}
               className={`bubble country--${countryName}`}
               cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0}

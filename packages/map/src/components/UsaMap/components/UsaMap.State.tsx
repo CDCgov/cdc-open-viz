@@ -439,10 +439,10 @@ const UsaMap = () => {
               style={styles}
               onClick={() => {
                 geoClickHandler(geoDisplayName, geoData)
-                publishAnalyticsEvent('map_tooltip', 'click', `${interactionLabel}|key_${geoDisplayName}`, 'map')
+                publishAnalyticsEvent('map_tooltip', 'click', `${interactionLabel}|${geoDisplayName}`, 'map')
               }}
               onMouseOver={() => {
-                publishAnalyticsEvent('map_tooltip', 'hover', `${interactionLabel}|key_${geoDisplayName}`, 'map')
+                publishAnalyticsEvent('map_tooltip', 'hover', `${interactionLabel}|${geoDisplayName}`, 'map')
               }}
               id={geoName}
               data-tooltip-id={`tooltip__${tooltipId}`}

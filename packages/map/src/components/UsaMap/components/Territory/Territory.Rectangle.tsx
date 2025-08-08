@@ -5,6 +5,7 @@ import { type MapContext } from '../../../../types/MapContext'
 import { patternSizes } from '../../helpers/patternSizes'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { type TerritoryShape } from './TerritoryShape'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 const TerritoryRectangle: React.FC<TerritoryShape> = ({
   dataTooltipId,
@@ -20,7 +21,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
   backgroundColor,
   ...props
 }) => {
-  const { config } = useContext<MapContext>(ConfigContext)
+  const { config, interactionLabel } = useContext<MapContext>(ConfigContext)
   const { territoryData, ...otherProps } = props
   const rectanglePath =
     'M42,0.5 C42.8284271,0.5 43.5,1.17157288 43.5,2 L43.5,2 L43.5,26 C43.5,26.8284271 42.8284271,27.5 42,27.5 L42,27.5 L3,27.5 C2.17157288,27.5 1.5,26.8284271 1.5,26 L1.5,26 L1.5,2 C1.5,1.17157288 2.17157288,0.5 3,0.5 L3,0.5 Z'
@@ -34,6 +35,8 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
         onClick={handleShapeClick}
         data-tooltip-id={dataTooltipId}
         data-tooltip-html={dataTooltipHtml}
+        onMouseEnter={() => publishAnalyticsEvent('map_tooltip', 'hover', `${interactionLabel}|${label}`, 'map')}
+        onClick={() => publishAnalyticsEvent('map_tooltip', 'click', `${interactionLabel}|${label}`, 'map')}
       >
         <path stroke={stroke} strokeWidth={strokeWidth} d={rectanglePath} {...otherProps} />
         <text

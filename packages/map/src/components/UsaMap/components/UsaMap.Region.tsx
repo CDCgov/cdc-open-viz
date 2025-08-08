@@ -219,7 +219,7 @@ const UsaRegionMap = () => {
             data-tooltip-id={`tooltip__${tooltipId}`}
             data-tooltip-html={toolTip}
             tabIndex={-1}
-            onMouseMove={() => publishAnalyticsEvent('map_tooltip', 'hover', `${interactionLabel}|${geoDisplayName}`, 'map')}
+            onMouseEnter={() => publishAnalyticsEvent('map_tooltip', 'hover', `${interactionLabel}|${geoDisplayName}`, 'map')}
           >
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1} d={path} />
             <g id={`region-${index + 1}-label`}>

@@ -9,6 +9,7 @@ import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import { applyLegendToRow } from '../helpers/applyLegendToRow'
 import { getColumnNames } from '../helpers/getColumnNames'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type CityListProps = {
   setSharedFilterValue: string
@@ -25,7 +26,8 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     position,
     legendMemo,
     legendSpecialClassLastMemo,
-    runtimeLegend
+    runtimeLegend,
+    interactionLabel
   } = useContext(ConfigContext)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
@@ -37,10 +39,10 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
 
   const citiesData = runtimeData
     ? Object.keys(runtimeData).reduce((acc, key) => {
-        const city = runtimeData[key]
-        acc[city[geoColumnName]] = city
-        return acc
-      }, {})
+      const city = runtimeData[key]
+      acc[city[geoColumnName]] = city
+      return acc
+    }, {})
     : {}
 
   if (config.general.type === 'bubble') {
@@ -76,8 +78,8 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     const legendColors = geoData
       ? applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
       : runtimeData[city]
-      ? applyLegendToRow(runtimeData[city], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
-      : false
+        ? applyLegendToRow(runtimeData[city], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+        : false
 
     if (legendColors === false) {
       return true
@@ -98,13 +100,20 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
         className='marker'
         d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
         title='Select for more information'
-        onClick={() => geoClickHandler(cityDisplayName, geoData)}
+        onClick={() => {
+          geoClickHandler(cityDisplayName, geoData)
+          publishAnalyticsEvent('map_tooltip', 'click', `${interactionLabel}|${geoData[geoColumnName]}`, 'map')
+
+        }}
         data-tooltip-id={`tooltip__${tooltipId}`}
         data-tooltip-html={toolTip}
         transform={`scale(${radius / 7.5})`}
         stroke={geoStrokeColor}
         strokeWidth={'2px'}
         tabIndex='-1'
+        onMouseEnter={() =>
+          publishAnalyticsEvent('map_tooltip', 'hover', `${interactionLabel}|${geoData[geoColumnName]}`, 'map')
+        }
         {...additionalProps}
       />
     )
@@ -140,9 +149,8 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
         _statePickedData
       )
       let coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
-      transform = `translate(${newProjection(coords)}) scale(${
-        config.visual.geoCodeCircleSize / (position.zoom > 1 ? position.zoom : 1)
-      })`
+      transform = `translate(${newProjection(coords)}) scale(${config.visual.geoCodeCircleSize / (position.zoom > 1 ? position.zoom : 1)
+        })`
       needsPointer = true
     }
 
@@ -155,9 +163,9 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       opacity: !isFilterValueSupported || (isFilterValueSupported && city === setSharedFilterValue) ? 1 : 0.5,
       stroke:
         setSharedFilterValue &&
-        isFilterValueSupported &&
-        runtimeData[city] &&
-        runtimeData[city][config.columns.geo.name] === setSharedFilterValue
+          isFilterValueSupported &&
+          runtimeData[city] &&
+          runtimeData[city][config.columns.geo.name] === setSharedFilterValue
           ? 'rgba(0, 0, 0, 1)'
           : 'rgba(0, 0, 0, 0.4)',
       '&:hover': {
@@ -180,7 +188,13 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     }
 
     const shapeProps = {
-      onClick: () => geoClickHandler(cityDisplayName, geoData),
+      onClick: () => {
+        geoClickHandler(cityDisplayName, geoData)
+        publishAnalyticsEvent('map_tooltip', 'click', `${interactionLabel}|${geoData[primaryColumnName]}`, 'map')
+      },
+      onMouseEnter: () => {
+        publishAnalyticsEvent('map_tooltip', 'hover', `${interactionLabel}|${geoData[geoColumnName]}`, 'map')
+      },
       size: config.general.type === 'bubble' ? size(geoData[primaryColumnName]) : radius * 30,
       title: 'Select for more information',
       'data-tooltip-id': `tooltip__${tooltipId}`,
