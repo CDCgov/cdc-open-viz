@@ -10,6 +10,7 @@ import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
 import _ from 'lodash'
 import { getHorizontalBarHeights } from '../components/BarChart/helpers/getBarHeights'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 export const useTooltip = props => {
   const {
@@ -25,6 +26,7 @@ export const useTooltip = props => {
   } = useContext<ChartContext>(ConfigContext)
   const { xScale, yScale, seriesScale, showTooltip, hideTooltip } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
+  const { interactionLabel } = useContext(ConfigContext)
 
   const Y_AXIS_SIZE = Number(config.yAxis.size || 0)
 
@@ -55,7 +57,6 @@ export const useTooltip = props => {
         }
       }
     }
-
     // Return null if no matching data is found
     return [hoveredKey, hoveredValue]
   }
@@ -98,8 +99,8 @@ export const useTooltip = props => {
       const columnData =
         config.tooltips.singleSeries && visualizationType === 'Line'
           ? resolvedScaleValues.filter(
-              value => value[config.runtime.series[0].dynamicCategory] === singleSeriesValue
-            )[0][colKey]
+            value => value[config.runtime.series[0].dynamicCategory] === singleSeriesValue
+          )[0][colKey]
           : resolvedScaleValues[0]?.[colKey]
       const closestValue = config.visualizationType === 'Pie' ? pieColumnData : columnData
 
@@ -230,6 +231,7 @@ export const useTooltip = props => {
         dataYPosition
       }
     }
+    publishAnalyticsEvent('chart_tooltip', 'hover', `${interactionLabel}`, 'chart')
     showTooltip(tooltipInformation)
   }
 
@@ -542,9 +544,8 @@ export const useTooltip = props => {
     if (visualizationType === 'Forest Plot') {
       if (key === config.xAxis.dataKey)
         return (
-          <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${
-            isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value
-          }`}</li>
+          <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value
+            }`}</li>
         )
       return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
     }
