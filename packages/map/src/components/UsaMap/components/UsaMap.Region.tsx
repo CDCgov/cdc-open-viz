@@ -20,6 +20,7 @@ import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import './UsaMap.Region.styles.css'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type TerritoryRectProps = {
   posX?: number
@@ -51,7 +52,7 @@ const Rect: React.FC<RectProps> = ({ label, text, stroke, strokeWidth, ...props 
 }
 
 const UsaRegionMap = () => {
-  const { data, config, tooltipId, legendMemo, legendSpecialClassLastMemo, runtimeLegend } = useContext(ConfigContext)
+  const { data, config, tooltipId, legendMemo, legendSpecialClassLastMemo, runtimeLegend, interactionLabel } = useContext(ConfigContext)
   const [focusedStates, setFocusedStates] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
@@ -211,10 +212,14 @@ const UsaRegionMap = () => {
             key={key}
             className='geo-group'
             style={styles}
-            onClick={() => geoClickHandler(geoDisplayName, geoData)}
+            onClick={() => {
+              geoClickHandler(geoDisplayName, geoData)
+              publishAnalyticsEvent('map_tooltip', 'click', `${interactionLabel}|${geoDisplayName}`, 'map')
+            }}
             data-tooltip-id={`tooltip__${tooltipId}`}
             data-tooltip-html={toolTip}
             tabIndex={-1}
+            onMouseMove={() => publishAnalyticsEvent('map_tooltip', 'hover', `${interactionLabel}|${geoDisplayName}`, 'map')}
           >
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1} d={path} />
             <g id={`region-${index + 1}-label`}>
