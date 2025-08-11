@@ -13,9 +13,7 @@ const Modal = () => {
 
   return (
     <section
-      className={
-        capitalizeLabels ? 'modal-content tooltip capitalize ' + viewport : 'modal-content tooltip ' + viewport
-      }
+      className={capitalizeLabels ? 'modal-content tooltip ' + viewport : 'modal-content tooltip ' + viewport}
       aria-hidden='true'
     >
       <div className='content'>{tooltip}</div>
