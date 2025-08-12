@@ -176,7 +176,6 @@ export type MapConfig = Visualization & {
   tooltips: {
     appearanceType: 'hover' | 'click'
     linkLabel: string
-    capitalizeLabels: boolean
     opacity: number
   }
   runtime: {

@@ -97,7 +97,6 @@ export default {
   tooltips: {
     appearanceType: 'hover',
     linkLabel: 'Learn More',
-    capitalizeLabels: true,
     opacity: 90
   },
   runtime: {
