@@ -16,6 +16,7 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 import isNumber from '@cdc/core/helpers/isNumber'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 // Third party libraries
 import chroma from 'chroma-js'
 // Types
@@ -45,6 +46,7 @@ export const BarChartVertical = () => {
   const {
     colorScale,
     config,
+    currentViewport,
     dashboardConfig,
     tableData,
     formatDate,
@@ -123,8 +125,20 @@ export const BarChartVertical = () => {
                     seriesHighlight.indexOf(bar.key) !== -1
 
                   let barGroupWidth = seriesScale.range()[1] - seriesScale.range()[0]
-                  const defaultBarHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
-                  const defaultBarY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
+                  let defaultBarHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
+                  let defaultBarY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
+
+                  const MINIMUM_BAR_HEIGHT = 3
+                  if (
+                    bar.value >= 0 &&
+                    isNumber(bar.value) &&
+                    barGroup.bars.length === 1 &&
+                    defaultBarHeight < MINIMUM_BAR_HEIGHT
+                  ) {
+                    defaultBarHeight = MINIMUM_BAR_HEIGHT
+                    defaultBarY = yScale(0) - MINIMUM_BAR_HEIGHT
+                  }
+
                   let barWidth = config.isLollipopChart ? lollipopBarWidth : seriesScale.bandwidth()
                   let barX =
                     bar.x +
@@ -159,7 +173,7 @@ export const BarChartVertical = () => {
                     yAxisValue
                   })
                   // configure colors
-                  let labelColor = '#000000'
+                  let labelColor = APP_FONT_COLOR
                   labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor) // Set if background is transparent'
                   const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                   const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
@@ -253,6 +267,8 @@ export const BarChartVertical = () => {
                   // End Confidence Interval Variables
 
                   const BAR_LABEL_PADDING = 10
+
+                  const LABEL_FONT_SIZE = isMobileFontViewport(currentViewport) ? 13 : 16
 
                   return (
                     <Group display={hideGroup} key={`${barGroup.index}--${index}`}>
@@ -353,6 +369,7 @@ export const BarChartVertical = () => {
                           y={barY - BAR_LABEL_PADDING}
                           fill={labelColor}
                           textAnchor='middle'
+                          fontSize={LABEL_FONT_SIZE}
                         >
                           {testZeroValue(bar.value) ? '' : barDefaultLabel}
                         </Text>
@@ -363,7 +380,7 @@ export const BarChartVertical = () => {
                           y={barY - BAR_LABEL_PADDING}
                           fill={labelColor}
                           textAnchor='middle'
-                          fontSize={config.isLollipopChart ? null : barWidth / 2}
+                          fontSize={config.isLollipopChart ? null : LABEL_FONT_SIZE}
                         >
                           {absentDataLabel}
                         </Text>
