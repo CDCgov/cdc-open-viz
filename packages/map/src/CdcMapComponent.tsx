@@ -627,9 +627,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 <ReactTooltip
                   id={`tooltip__${tooltipId}`}
                   float={true}
-                  className={`${
-                    tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'
-                  }`}
+                  className={`tooltip tooltip-test`}
                   style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
                 />
               )}

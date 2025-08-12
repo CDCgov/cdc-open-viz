@@ -656,15 +656,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           }
         })
         break
-      case 'capitalizeLabels':
-        setConfig({
-          ...config,
-          tooltips: {
-            ...config.tooltips,
-            capitalizeLabels: value
-          }
-        })
-        break
       case 'showDataTable':
         setConfig({
           ...config,
@@ -2872,16 +2863,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   updateField={updateField}
                 />
               )}
-              <label className='checkbox'>
-                <input
-                  type='checkbox'
-                  checked={config.tooltips.capitalizeLabels}
-                  onChange={event => {
-                    handleEditorChanges('capitalizeLabels', event.target.checked)
-                  }}
-                />
-                <span className='edit-label'>Capitalize text inside tooltip</span>
-              </label>
             </AccordionItemPanel>
           </AccordionItem>
           <AccordionItem>
