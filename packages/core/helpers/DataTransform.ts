@@ -20,7 +20,7 @@ export class DataTransform {
 
     // Empty data
     if (!data || 0 === data.length) {
-      errorsFound.push(this.constants.errorMessageEmtpyData)
+      errorsFound.push(this.constants.errorMessageEmptyData)
     }
 
     // Does it have the correct data structure?
