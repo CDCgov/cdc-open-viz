@@ -6,7 +6,7 @@ export class DataTransform {
   constants: any
   constructor() {
     this.constants = {
-      errorMessageEmtpyData: 'Your data file is empty.',
+      errorMessageEmptyData: 'Your data file is empty.',
       errorMessageFormat: 'Your datatype is not supported.',
       descriptionHeader: 1,
       descriptionRoot: 2,
@@ -20,7 +20,7 @@ export class DataTransform {
 
     // Empty data
     if (!data || 0 === data.length) {
-      errorsFound.push(this.constants.errorMessageEmptyData)
+      errorsFound.push(this.constants.errorMessageEmtpyData)
     }
 
     // Does it have the correct data structure?

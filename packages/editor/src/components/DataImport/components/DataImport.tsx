@@ -275,6 +275,10 @@ const DataImport = () => {
     if (config.type === 'dashboard') {
       let dataDescription = { ...config.datasets[datasetKey].dataDescription, [key]: value }
       let formattedData = transform.developerStandardize(config.datasets[datasetKey].data, dataDescription)
+      // Prevent undefined from corrupting the array structure
+      if (formattedData === undefined) {
+        formattedData = config.datasets[datasetKey].data || []
+      }
 
       let newDatasets = { ...config.datasets }
       newDatasets[datasetKey] = { ...newDatasets[datasetKey], dataDescription, formattedData }
@@ -283,6 +287,10 @@ const DataImport = () => {
     } else {
       let dataDescription = { ...config.dataDescription, [key]: value }
       let formattedData = transform.developerStandardize(config.data, dataDescription)
+      // Prevent undefined from corrupting the array structure
+      if (formattedData === undefined) {
+        formattedData = config.data || []
+      }
 
       setConfig({ ...config, formattedData, dataDescription })
     }
