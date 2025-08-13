@@ -21,7 +21,7 @@ export const getFootnotesVizConfig = (
   )
   // check if shared filters has viz key
   const sharedFilters = config.dashboard.sharedFilters
-  const matchingFilters = sharedFilters.filter(f => f.usedBy.includes(visualizationKey))
+  const matchingFilters = sharedFilters.filter(f => f.usedBy?.includes(visualizationKey))
 
   if (matchingFilters.length) {
     visualizationConfig.footnotes.data = filterData(matchingFilters, data)
