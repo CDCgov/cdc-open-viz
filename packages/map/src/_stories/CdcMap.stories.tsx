@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import CdcMap from '../CdcMap'
 import EqualNumberOptInExample from './_mock/DEV-7286.json'
+import MultiState from './_mock/multi-state.json'
 import SingleStateWithFilters from './_mock/DEV-8942.json'
 import exampleCityState from './_mock/example-city-state.json'
 import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
@@ -72,6 +73,12 @@ export const County_Map: Story = {
 export const Single_State: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-data-map-counties.json'
+  }
+}
+
+export const Multi_State: Story = {
+  args: {
+    config: MultiState
   }
 }
 

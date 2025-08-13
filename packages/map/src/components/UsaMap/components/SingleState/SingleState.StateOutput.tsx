@@ -1,7 +1,7 @@
 import { useContext } from 'react'
-import { mesh, Topology } from 'topojson-client'
+import { Topology } from 'topojson-client'
 import ConfigContext from '../../../../context'
-import { getGeoFillColor, getGeoStrokeColor } from '../../../../helpers/colors'
+import { getGeoStrokeColor } from '../../../../helpers/colors'
 
 type StateOutputProps = {
   topoData: Topology
@@ -9,29 +9,28 @@ type StateOutputProps = {
   scale: any
 }
 
-const StateOutput: React.FC<StateOutputProps> = ({ topoData, path, scale, stateToShow }: StateOutputProps) => {
+const StateOutput: React.FC<StateOutputProps> = ({ topoData, path, scale }: StateOutputProps) => {
   const { config } = useContext(ConfigContext)
-  if (!topoData?.objects?.states) return null
-  let geo = topoData.objects.states.geometries.filter(s => {
-    return s.properties.name === config.general.statePicked.stateName
+  if (!topoData?.states) return null
+  const statesPicked = topoData.states.filter(s => {
+    return config.general.statesPicked.map(sp => sp.stateName).includes(s.properties.name)
   })
 
   const geoStrokeColor = getGeoStrokeColor(config)
-  const geoFillColor = getGeoFillColor(config)
 
-  let stateLines = path(mesh(topoData, geo[0]))
+  const stateLines = statesPicked.map(s => path(s.geometry))
 
-  return (
+  return stateLines.map((line, index) => (
     <g
-      key={'single-state'}
-      className='single-state'
-      style={{ fill: geoFillColor }}
+      key={`single-state-${index}`}
+      className='single-state pe-none'
+      style={{ fill: 'transparent' }}
       stroke={geoStrokeColor}
-      strokeWidth={0.95 / scale}
+      strokeWidth={2 / scale}
     >
-      <path tabIndex={-1} className='state-path' d={stateLines} />
+      <path tabIndex={-1} className='state-path' d={line} />
     </g>
-  )
+  ))
 }
 
 export default StateOutput
