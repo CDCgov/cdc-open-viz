@@ -10,7 +10,8 @@ const transform = new DataTransform()
 export const getFootnotesVizConfig = (
   visualizationConfig: AnyVisualization,
   rowNumber: number,
-  config: MultiDashboardConfig
+  config: MultiDashboardConfig,
+  visualizationKey: string
 ) => {
   if (!visualizationConfig?.footnotes) return visualizationConfig
   const data = _.cloneDeep(config.datasets[visualizationConfig.footnotes.dataKey]?.data)
@@ -18,8 +19,12 @@ export const getFootnotesVizConfig = (
   const filters = (getApplicableFilters(config.dashboard, rowNumber) || []).filter(filter =>
     dataColumns.includes(filter.columnName)
   )
-  if (filters.length) {
-    visualizationConfig.footnotes.data = filterData(filters, data)
+  // check if shared filters has viz key
+  const sharedFilters = config.dashboard.sharedFilters
+  const matchingFilters = sharedFilters.filter(f => f.usedBy?.includes(visualizationKey))
+
+  if (matchingFilters.length) {
+    visualizationConfig.footnotes.data = filterData(matchingFilters, data)
   } else {
     visualizationConfig.footnotes.data = data
   }
