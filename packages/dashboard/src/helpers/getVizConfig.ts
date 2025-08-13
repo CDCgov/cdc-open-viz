@@ -93,12 +93,14 @@ export const getVizConfig = (
   }
 
   if (visualizationConfig.footnotes) {
-    const visConfigWithFootnotes = getFootnotesVizConfig(visualizationConfig, rowNumber, config)
-    if (multiVizColumn && filteredDataOverride) {
-      const vizCategory = filteredDataOverride[0][multiVizColumn]
-      // the multiViz filtering filtering is applied after the dashboard filters
-      const categoryFootnote = visConfigWithFootnotes.footnotes.data.filter(d => d[multiVizColumn] === vizCategory)
-      visConfigWithFootnotes.footnotes.data = categoryFootnote
+    const visConfigWithFootnotes = getFootnotesVizConfig(visualizationConfig, rowNumber, config, visualizationKey)
+    if (multiVizColumn && filteredDataOverride && filteredDataOverride.length > 0) {
+      const vizCategory = filteredDataOverride?.[0]?.[multiVizColumn]
+      // the multiViz filtering is applied after the dashboard filters
+      if (vizCategory !== undefined && visConfigWithFootnotes.footnotes.data) {
+        const categoryFootnote = visConfigWithFootnotes.footnotes.data.filter(d => d[multiVizColumn] === vizCategory)
+        visConfigWithFootnotes.footnotes.data = categoryFootnote
+      }
     }
     return visConfigWithFootnotes
   }

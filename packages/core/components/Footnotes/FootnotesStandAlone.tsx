@@ -14,7 +14,8 @@ const FootnotesStandAlone: React.FC<StandAloneProps> = ({ config, filters }) => 
   if (!config) return null
   // get the api footnotes from the config
   const apiFootnotes = useMemo(() => {
-    const configData = filterVizData(filters, config.data)
+    // If filters exist and should filter footnotes, apply them, otherwise use data as-is
+    const configData = filters && filters.length > 0 ? filterVizData(filters, config.data) : config.data
     if (configData && config.dataKey && config.dynamicFootnotes) {
       const { symbolColumn, textColumn, orderColumn } = config.dynamicFootnotes
       const _data = configData.map(row => _.pick(row, [symbolColumn, textColumn, orderColumn]))
