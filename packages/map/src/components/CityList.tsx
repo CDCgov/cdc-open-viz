@@ -3,7 +3,7 @@ import { scaleLinear } from 'd3-scale'
 import { GlyphCircle, GlyphDiamond, GlyphSquare, GlyphStar, GlyphTriangle } from '@visx/glyph'
 import ConfigContext from '../context'
 import { supportedCities } from '../data/supported-geos'
-import { getFilterControllingStatePicked } from './UsaMap/helpers/map'
+import { getFilterControllingStatesPicked } from './UsaMap/helpers/map'
 import { displayGeoName, getGeoStrokeColor, SVG_HEIGHT, SVG_PADDING, SVG_WIDTH, titleCase } from '../helpers'
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
@@ -129,15 +129,15 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     }
 
     if (geoData?.[longitudeColumnName] && geoData?.[latitudeColumnName] && config.general.geoType === 'single-state') {
-      const statePicked = getFilterControllingStatePicked(config, runtimeData)
-      const _statePickedData = topoData?.states?.find(s => s.properties.name === statePicked)
+      const statesPicked = getFilterControllingStatesPicked(config, runtimeData)
+      const _statesPickedData = topoData?.states?.find(s => statesPicked.includes(s.properties.name))
 
       const newProjection = projection.fitExtent(
         [
           [SVG_PADDING, SVG_PADDING],
           [SVG_WIDTH - SVG_PADDING, SVG_HEIGHT - SVG_PADDING]
         ],
-        _statePickedData
+        _statesPickedData
       )
       let coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
       transform = `translate(${newProjection(coords)}) scale(${

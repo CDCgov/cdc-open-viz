@@ -26,10 +26,12 @@ export default {
     allowMapZoom: true,
     hideGeoColumnInTooltip: false,
     hidePrimaryColumnInTooltip: false,
-    statePicked: {
-      fipsCode: '01',
-      stateName: 'Alabama'
-    }
+    statesPicked: [
+      {
+        fipsCode: '01',
+        stateName: 'Alabama'
+      }
+    ]
   },
   type: 'map',
   color: 'pinkpurple',
