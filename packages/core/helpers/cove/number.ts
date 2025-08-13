@@ -192,10 +192,6 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
     }
   }
   if (config.visualizationType === 'Pie') {
-    // check if suffix added by user
-    if (suffix && suffix.trim() === '%') {
-      result = result
-    }
     // add default suffix
     if (!suffix) {
       result += '%'
