@@ -1,6 +1,6 @@
 {
   "name": "@cdc/chart",
-  "version": "4.25.6-2",
+  "version": "4.25.7",
   "description": "React component for visualizing tabular data in various types of charts",
   "moduleName": "CdcChart",
   "main": "dist/cdcchart",
@@ -26,7 +26,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@cdc/core": "^4.25.6-1",
+    "@cdc/core": "^4.25.7",
     "@hello-pangea/dnd": "^16.2.0",
     "@react-spring/web": "^9.7.5",
     "@visx/axis": "3.12.0",
