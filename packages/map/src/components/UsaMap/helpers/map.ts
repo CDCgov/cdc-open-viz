@@ -98,16 +98,22 @@ export const hasMoreThanFromHash = (data: { [key: string]: any }): boolean => {
 
 export const getFilterControllingStatesPicked = (state, runtimeData) => {
   if (!state.general.filterControlsStatesPicked || !runtimeData) {
-    const statesPicked = state?.general?.statesPicked?.map(sp => sp.stateName)
-    return statesPicked
+    return state?.general?.statesPicked?.map(sp => sp.stateName) || []
   } else {
     if (hasMoreThanFromHash(runtimeData)) {
       let statesPickedFromFilter = Object.values(runtimeData)?.map(
         s => s[state.general.filterControlsStatesPicked]
       )?.[0]
-      const statesPicked = statesPickedFromFilter || state.general.statesPicked.stateName || 'Alabama'
-      return statesPicked
+
+      // Only need to check if filter result is an array since it could be a single value
+      if (Array.isArray(statesPickedFromFilter)) {
+        return statesPickedFromFilter
+      } else if (statesPickedFromFilter) {
+        return [statesPickedFromFilter]
+      } else {
+        return state?.general?.statesPicked?.map(sp => sp.stateName) || ['Alabama']
+      }
     }
-    return null
+    return state?.general?.statesPicked?.map(sp => sp.stateName) || []
   }
 }

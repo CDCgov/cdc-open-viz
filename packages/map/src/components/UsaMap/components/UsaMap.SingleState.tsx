@@ -1,4 +1,4 @@
-import { useEffect, memo, useContext } from 'react'
+import { useEffect, memo, useContext, useMemo } from 'react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { geoPath } from 'd3-geo'
 import { CustomProjection } from '@visx/geo'
@@ -42,7 +42,16 @@ const SingleStateMap: React.FC = () => {
 
   const dispatch = useContext(MapDispatchContext)
   const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection } = useStateZoom(topoData)
-  const statesPicked = getStatesPicked(config, runtimeData)
+
+  // Memoize statesPicked to prevent creating new arrays on every render
+  const statesPicked = useMemo(() => {
+    return getStatesPicked(config, runtimeData)
+  }, [
+    config.general.statesPicked?.length,
+    config.general.statesPicked?.[0]?.stateName
+    // Don't include runtimeData as it causes excessive re-renders
+  ])
+
   const statesToShow = topoData?.states?.find(s => statesPicked.map(sp => sp.stateName).includes(s.properties.name))
 
   const { geoClickHandler } = useGeoClickHandler()
@@ -61,7 +70,7 @@ const SingleStateMap: React.FC = () => {
         dispatch({ type: 'SET_TOPO_DATA', payload: response })
       })
     }
-  }, [config.general.countyCensusYear, config.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
+  }, [runtimeFilters?.length, topoData?.year])
 
   if (!isTopoReady(topoData, config, runtimeFilters)) {
     return (
