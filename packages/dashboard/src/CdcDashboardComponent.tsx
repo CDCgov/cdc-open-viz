@@ -515,58 +515,68 @@ export default function CdcDashboard({
             )}
             {config.table?.show &&
               config.datasets &&
-              Object.keys(config.datasets).map(datasetKey => {
-                //For each dataset, find any shared filters that apply to all visualizations using the dataset
+              Object.keys(config.datasets)
+                .map(datasetKey => {
+                  //For each dataset, find any shared filters that apply to all visualizations using the dataset
 
-                //Gets list of visuailzations using the dataset
-                const vizKeysUsingDataset: string[] = getVizKeys(config).filter(visualizationKey => {
-                  return config.visualizations[visualizationKey].dataKey === datasetKey
-                })
+                  // Get the active dashboard configuration (for multidashboard support)
+                  const activeConfig = config.multiDashboards ? config.multiDashboards[config.activeDashboard] : config
 
-                //Checks shared filters against list to see if all visualizations are represented
-                let applicableFilters: SharedFilter[] = []
-                config.dashboard.sharedFilters?.forEach(sharedFilter => {
-                  let allMatch = true
-                  vizKeysUsingDataset.forEach(visualizationKey => {
-                    if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) === -1) {
-                      allMatch = false
+                  //Gets list of visuailzations using the dataset (only from current dashboard tab)
+                  const vizKeysUsingDataset: string[] = getVizKeys(activeConfig).filter(visualizationKey => {
+                    return activeConfig.visualizations[visualizationKey].dataKey === datasetKey
+                  })
+
+                  // Skip this dataset if no visualizations in the current dashboard use it
+                  if (vizKeysUsingDataset.length === 0) {
+                    return null
+                  }
+
+                  //Checks shared filters against list to see if all visualizations are represented
+                  let applicableFilters: SharedFilter[] = []
+                  activeConfig.dashboard.sharedFilters?.forEach(sharedFilter => {
+                    let allMatch = true
+                    vizKeysUsingDataset.forEach(visualizationKey => {
+                      if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) === -1) {
+                        allMatch = false
+                      }
+                    })
+                    if (allMatch) {
+                      applicableFilters.push(sharedFilter)
                     }
                   })
-                  if (allMatch) {
-                    applicableFilters.push(sharedFilter)
-                  }
-                })
 
-                //Applys any applicable filters to the Table
-                const filteredTableData =
-                  applicableFilters.length > 0
-                    ? filterData(applicableFilters, config.datasets[datasetKey].data)
-                    : undefined
-                return (
-                  <div
-                    className='multi-table-container'
-                    id={`data-table-${datasetKey}`}
-                    key={`data-table-${datasetKey}`}
-                  >
-                    <DataTable
-                      config={config as TableConfig}
-                      dataConfig={config.datasets[datasetKey]}
-                      rawData={config.datasets[datasetKey].data?.[0]?.tableData || config.datasets[datasetKey].data}
-                      runtimeData={
-                        config.datasets[datasetKey].data?.[0]?.tableData ||
-                        filteredTableData ||
-                        config.datasets[datasetKey].data ||
-                        []
-                      }
-                      expandDataTable={config.table.expanded}
-                      tableTitle={datasetKey}
-                      viewport={currentViewport}
-                      tabbingId={datasetKey}
-                      interactionLabel={interactionLabel}
-                    />
-                  </div>
-                )
-              })}
+                  //Applys any applicable filters to the Table
+                  const filteredTableData =
+                    applicableFilters.length > 0
+                      ? filterData(applicableFilters, config.datasets[datasetKey].data)
+                      : undefined
+                  return (
+                    <div
+                      className='multi-table-container'
+                      id={`data-table-${datasetKey}`}
+                      key={`data-table-${datasetKey}`}
+                    >
+                      <DataTable
+                        config={config as TableConfig}
+                        dataConfig={config.datasets[datasetKey]}
+                        rawData={config.datasets[datasetKey].data?.[0]?.tableData || config.datasets[datasetKey].data}
+                        runtimeData={
+                          config.datasets[datasetKey].data?.[0]?.tableData ||
+                          filteredTableData ||
+                          config.datasets[datasetKey].data ||
+                          []
+                        }
+                        expandDataTable={config.table.expanded}
+                        tableTitle={datasetKey}
+                        viewport={currentViewport}
+                        tabbingId={datasetKey}
+                        interactionLabel={interactionLabel}
+                      />
+                    </div>
+                  )
+                })
+                .filter(Boolean)}
           </div>
         </Layout.Responsive>
       </>
