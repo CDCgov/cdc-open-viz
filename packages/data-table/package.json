@@ -1,6 +1,6 @@
 {
   "name": "@cdc/data-table",
-  "version": "4.25.6-1",
+  "version": "4.25.7",
   "description": "React standalone data table component",
   "moduleName": "CdcDataTable",
   "main": "dist/cdcdatatable",
@@ -26,7 +26,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@cdc/core": "^4.25.6-1",
+    "@cdc/core": "^4.25.7",
     "chroma": "0.0.1",
     "chroma-js": "^2.1.0",
     "html-react-parser": "^3.0.8",
