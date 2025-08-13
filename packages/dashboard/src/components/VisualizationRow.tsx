@@ -139,8 +139,9 @@ const VisualizationRow: React.FC<VizRowProps> = ({
         {Object.keys(dataGroups).map(groupName => {
           const dataValue = dataGroups[groupName]
           const _row = _.cloneDeep(row) // clone the row to avoid mutating the original row
+          const originalMultiVizColumn = _row.multiVizColumn // store original value before clearing
           _row.multiVizColumn = undefined // reset the multiVizColumn to avoid passing it to the child components
-          console.log('testing')
+          _row.originalMultiVizColumn = originalMultiVizColumn // store for footnote filtering
           return (
             <VisualizationRow
               key={`row__${index}__${groupName}`}
@@ -179,7 +180,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
             rawData,
             dashboardFilteredData,
             filteredDataOverride,
-            row.multiVizColumn
+            row.multiVizColumn || row.originalMultiVizColumn
           )
 
           const { type, sharedFilterIndexes, filterBehavior, table, dataKey } = visualizationConfig
