@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ViewPort } from '../../types/ViewPort'
 import Footnotes from '../../types/Footnotes'
 import EditorWrapper from '../EditorWrapper/EditorWrapper'
@@ -30,20 +30,23 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
   datasets,
   interactionLabel = ''
 }) => {
+
+
+  // Use config.data (which may be filtered by multiVizColumn) over formattedData
+  const baseData = config.data || config.formattedData || []
   const [filteredData, setFilteredData] = useState<Record<string, any>[]>(
-    filterVizData(config.filters, config.formattedData || config.data)
+    filterVizData(config.filters, baseData)
   )
 
   useEffect(() => {
-    // when using editor changes to filter should update the data
-    const filters = addValuesToFilters(config.filters, config.data)
-    setFilteredData(filterVizData(filters, config?.formattedData?.length > 0 ? config.formattedData : config.data))
-  }, [config.filters])
+    const filters = addValuesToFilters(config.filters, baseData)
+    setFilteredData(filterVizData(filters, baseData))
+  }, [config.filters, config.data, config.formattedData])
 
   const setFilters = (newFilters: any) => {
-    const filters = addValuesToFilters(newFilters, config.data)
+    const filters = addValuesToFilters(newFilters, baseData)
     updateConfig({ ...config, filters })
-    setFilteredData(filterVizData(filters, config?.formattedData?.length > 0 ? config.formattedData : config.data))
+    setFilteredData(filterVizData(filters, baseData))
   }
 
   if (isEditor)
