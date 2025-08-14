@@ -26,7 +26,9 @@ export const getFootnotesVizConfig = (
   if (matchingFilters.length) {
     visualizationConfig.footnotes.data = filterData(matchingFilters, data)
   } else {
-    visualizationConfig.footnotes.data = data
+    if (visualizationConfig.footnotes.data) {
+      visualizationConfig.footnotes.data = data
+    }
   }
 
   return visualizationConfig
