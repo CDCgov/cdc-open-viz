@@ -119,10 +119,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         return classes.join(' ')
       }
 
-      const setAccessibleStatus = (message: string) => {
-        dispatch({ type: 'SET_ACCESSIBLE_STATUS', payload: message })
-      }
-
       return (
         <li
           className={handleListItemClass()}
