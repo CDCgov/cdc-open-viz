@@ -21,7 +21,6 @@ export type MapContext = {
   handleCircleClick: Function
   handleDragStateChange: Function
   isDraggingAnnotation: boolean
-  innerContainerRef: RefObject<HTMLDivElement>
   isDashboard: boolean
   isEditor: boolean
   isFilterValueSupported: boolean
