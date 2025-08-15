@@ -9,7 +9,7 @@ type MapContext = {
   tooltipRef
   containerEl
   applyLegendToRow
-  data
+  runtimeData
   displayGeoName
   filteredCountryCode
   generateColorsArray

@@ -274,7 +274,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     content: modal,
     currentViewport,
     customNavigationHandler,
-    data: runtimeData,
     dimensions,
     filteredCountryCode,
     innerContainerRef,

@@ -15,7 +15,8 @@ interface CountyOutputProps {
 }
 
 const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoStrokeColor, tooltipId }) => {
-  const { config, data, legendMemo, legendSpecialClassLastMemo, runtimeLegend } = useContext<MapContext>(ConfigContext)
+  const { config, runtimeData, legendMemo, legendSpecialClassLastMemo, runtimeLegend } =
+    useContext<MapContext>(ConfigContext)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const geoFillColor = getGeoFillColor(config)
   const { geoClickHandler } = useGeoClickHandler()
@@ -30,7 +31,7 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
 
         const countyPath = path(county)
 
-        const geoData = data[county.id]
+        const geoData = runtimeData[county.id]
         let legendColors
 
         // Once we receive data for this geographic item, setup variables.

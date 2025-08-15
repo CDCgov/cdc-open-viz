@@ -51,7 +51,8 @@ const Rect: React.FC<RectProps> = ({ label, text, stroke, strokeWidth, ...props 
 }
 
 const UsaRegionMap = () => {
-  const { data, config, tooltipId, legendMemo, legendSpecialClassLastMemo, runtimeLegend } = useContext(ConfigContext)
+  const { runtimeData, config, tooltipId, legendMemo, legendSpecialClassLastMemo, runtimeLegend } =
+    useContext(ConfigContext)
   const [focusedStates, setFocusedStates] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
@@ -75,10 +76,10 @@ const UsaRegionMap = () => {
 
   useEffect(() => {
     // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
-    const territoriesList = territoriesKeys.filter(key => data[key])
+    const territoriesList = territoriesKeys.filter(key => runtimeData[key])
 
     setTerritoriesData(territoriesList)
-  }, [data])
+  }, [runtimeData])
 
   if (!focusedStates) {
     return <></>
@@ -90,7 +91,7 @@ const UsaRegionMap = () => {
   const territories = territoriesData.map(territory => {
     const Shape = Rect
 
-    const territoryData = data[territory]
+    const territoryData = runtimeData[territory]
 
     let toolTip: string
 
@@ -162,7 +163,7 @@ const UsaRegionMap = () => {
 
       if (!geoKey) return
 
-      const geoData = data[geoKey]
+      const geoData = runtimeData[geoKey]
 
       let legendColors
       // Once we receive data for this geographic item, setup variables.

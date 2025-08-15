@@ -34,7 +34,7 @@ let projection = geoMercator()
 const WorldMap = () => {
   // prettier-ignore
   const {
-    data,
+    runtimeData,
     position,
     config,
     tooltipId,
@@ -104,7 +104,7 @@ const WorldMap = () => {
       // If the geo.properties.config value is found in the data use that, otherwise fall back to geo.properties.iso
       const dataHasStateName = config.data.some(d => d[config.columns.geo.name] === geo.properties.state)
       const geoKey =
-        geo.properties.state && data[geo.properties.state]
+        geo.properties.state && runtimeData[geo.properties.state]
           ? geo.properties.state
           : geo.properties.name
           ? geo.properties.name
@@ -115,7 +115,7 @@ const WorldMap = () => {
       }
       if (!geoKey) return null
 
-      let geoData = data[geoKey]
+      let geoData = runtimeData[geoKey]
 
       const geoDisplayName = displayGeoName(supportedCountries[geoKey]?.[0])
       let legendColors
