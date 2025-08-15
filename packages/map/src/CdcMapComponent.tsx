@@ -46,6 +46,7 @@ import {
 } from './helpers'
 import generateRuntimeLegend from './helpers/generateRuntimeLegend'
 import generateRuntimeData from './helpers/generateRuntimeData'
+import { LOGO_MAX_WIDTH, CSV_PARSE_CONFIG } from './helpers/constants'
 
 // Child Components
 import Annotation from './components/Annotation'
@@ -201,12 +202,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
           data = await fetch(dataUrlFinal)
             .then(response => response.text())
             .then(responseText => {
-              const parsedCsv = Papa.parse(responseText, {
-                header: true,
-                dynamicTyping: true,
-                skipEmptyLines: true,
-                encoding: 'utf-8'
-              })
+              const parsedCsv = Papa.parse(responseText, CSV_PARSE_CONFIG)
               return parsedCsv.data
             })
         } else if ('json' === ext || isSolrJson(dataUrlFinal)) {
@@ -504,7 +500,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                           /* logo is handled in UsaMap.State when applicable */
                           // prettier-ignore
                           'data' === general.type && logo && ('us' !== geoType || 'us-geocode' === general.type) && (
-                            <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
+                            <img src={logo} alt='' className='map-logo' style={{ maxWidth: LOGO_MAX_WIDTH }} />
                           )
                         }
                       </>
