@@ -7,6 +7,7 @@ import Loading from '@cdc/core/components/Loading'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
+import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { drawShape, createShapeProperties } from '../helpers/shapes'
 import { getGeoStrokeColor, handleMapAriaLabels, displayGeoName } from '../../../helpers'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
@@ -138,10 +139,10 @@ const CountyMap = () => {
     config,
     tooltipId,
     tooltipRef,
-    legendMemo,
-    legendSpecialClassLastMemo,
     configUrl
   } = useContext(ConfigContext)
+
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
   // CREATE STATE LINES
   const geoStrokeColor = getGeoStrokeColor(config)

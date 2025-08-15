@@ -3,6 +3,7 @@ import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
 import ConfigContext, { MapDispatchContext } from '../context'
+import { useLegendMemoContext } from '../context/LegendMemoContext'
 import { type Coordinate, DataRow } from '../types/MapConfig'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import { applyLegendToRow } from '../helpers/applyLegendToRow'
@@ -17,8 +18,8 @@ type BubbleListProps = {
 }
 
 export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
-  const { config, tooltipId, legendMemo, legendSpecialClassLastMemo, runtimeData, runtimeLegend } =
-    useContext<MapContext>(ConfigContext)
+  const { config, tooltipId, runtimeData, runtimeLegend } = useContext<MapContext>(ConfigContext)
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const { columns, data, general, visual } = config
   const { geoType, allowMapZoom } = general
   const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder } = visual

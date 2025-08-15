@@ -3,6 +3,7 @@ import { geoMercator } from 'd3-geo'
 import { Mercator } from '@visx/geo'
 import { feature } from 'topojson-client'
 import ConfigContext, { MapDispatchContext } from '../../context'
+import { useLegendMemoContext } from '../../context/LegendMemoContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ZoomableGroup from '../ZoomableGroup'
 import Geo from '../Geo'
@@ -39,10 +40,10 @@ const WorldMap = () => {
     config,
     tooltipId,
     runtimeLegend,
-    legendMemo,
-    legendSpecialClassLastMemo,
     interactionLabel
   } = useContext(ConfigContext)
+
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
   const { type, allowMapZoom } = config.general
 

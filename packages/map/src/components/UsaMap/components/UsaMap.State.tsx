@@ -20,6 +20,7 @@ import Annotation from '../../Annotation'
 import Territory from './Territory'
 
 import ConfigContext, { MapDispatchContext } from '../../../context'
+import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { MapContext } from '../../../types/MapContext'
 import { checkColorContrast, getContrastColor, outlinedTextColor } from '@cdc/core/helpers/cove/accessibility'
 import TerritoriesSection from './TerritoriesSection'
@@ -76,12 +77,12 @@ const UsaMap = () => {
     tooltipId,
     mapId,
     logo,
-    legendMemo,
-    legendSpecialClassLastMemo,
     currentViewport,
     translate,
     runtimeLegend
   } = useContext<MapContext>(ConfigContext)
+
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
   let isFilterValueSupported = false
   const { general, columns, tooltips, hexMap, map, annotations } = config

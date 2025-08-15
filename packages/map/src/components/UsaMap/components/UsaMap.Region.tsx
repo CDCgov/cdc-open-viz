@@ -8,6 +8,7 @@ import { Mercator } from '@visx/geo'
 // Cdc Components
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../../../context'
+import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import Annotation from '../../Annotation'
 
 // Data
@@ -51,8 +52,8 @@ const Rect: React.FC<RectProps> = ({ label, text, stroke, strokeWidth, ...props 
 }
 
 const UsaRegionMap = () => {
-  const { runtimeData, config, tooltipId, legendMemo, legendSpecialClassLastMemo, runtimeLegend } =
-    useContext(ConfigContext)
+  const { runtimeData, config, tooltipId, runtimeLegend } = useContext(ConfigContext)
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const [focusedStates, setFocusedStates] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()

@@ -31,8 +31,6 @@ export type MapContext = {
   position: 'side' | 'top' | 'bottom'
   resetLegendToggles: Function
   runtimeFilters: Function
-  legendMemo: Function
-  legendSpecialClassLastMemo: Function
   runtimeLegend
   setParentConfig: Function
   setRuntimeData: Function
