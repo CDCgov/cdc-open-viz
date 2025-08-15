@@ -58,14 +58,14 @@ const ChooseTab: React.FC = (): JSX.Element => {
   const handleUpload = e => {
     const file = e.target.files[0]
     const reader = new FileReader()
-    reader.onload = e => {
+    reader.onload = async e => {
       const text = e.target.result
-      importConfig(text as string)
+      await importConfig(text as string)
     }
     reader.readAsText(file)
   }
 
-  const importConfig = text => {
+  const importConfig = async text => {
     let newConfig
     try {
       newConfig = JSON.parse(text)
@@ -76,25 +76,25 @@ const ChooseTab: React.FC = (): JSX.Element => {
 
     const isVega = isVegaConfig(newConfig)
     if (isVega) {
-      newConfig = importVegaConfig(newConfig)
+      newConfig = await importVegaConfig(newConfig)
     }
 
     dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
     dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: isVega && newConfig.data?.length ? 2 : 1 })
   }
 
-  const importVegaConfig = newConfig => {
+  const importVegaConfig = async newConfig => {
     let vegaErrors
     try {
-      const vegaConfig = parseVegaConfig(newConfig)
-      vegaErrors = getVegaErrors(newConfig, vegaConfig)
+      const vegaConfig = await parseVegaConfig(newConfig)
+      vegaErrors = await getVegaErrors(newConfig, vegaConfig)
       if (vegaErrors.length === 0) {
-        const configType = getVegaConfigType(vegaConfig)
+        const configType = await getVegaConfigType(vegaConfig)
         const configSubType = configType === 'Map' ? 'United States (State- or County-Level)' : configType
         const button = buttons.find(b => b.label === configSubType)
         const coveConfig = generateNewConfig(JSON.parse(JSON.stringify(button)))
-        const vegaWarnings = getVegaWarnings(newConfig, vegaConfig)
-        const config = convertVegaConfig(configType, vegaConfig, coveConfig)
+        const vegaWarnings = await getVegaWarnings(newConfig, vegaConfig)
+        const config = await convertVegaConfig(configType, vegaConfig, coveConfig)
         if (vegaWarnings.length) {
           alert(vegaWarnings.join('\n\n'))
         }
@@ -264,7 +264,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
             type='submit'
             id='load-data'
             disabled={!pastedConfig}
-            onClick={() => importConfig(pastedConfig)}
+            onClick={async () => await importConfig(pastedConfig)}
           >
             Load
           </button>
