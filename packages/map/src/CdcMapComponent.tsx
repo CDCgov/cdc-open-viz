@@ -80,6 +80,8 @@ type CdcMapComponent = {
   navigationHandler: Function
   setSharedFilter: Function
   setSharedFilterValue: Function
+  setConfig?: Function
+  loadConfig?: Function
   datasets?: Datasets
   interactionLabel: string
 }
@@ -183,14 +185,17 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
       if (!isUpdateNeeded) return
 
-      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
-        .map((param, i) => {
-          let qs = i === 0 ? '?' : '&'
-          qs += param + '='
-          qs += qsParams[param]
-          return qs
-        })
-        .join('')}`
+      const buildQueryString = (params: Record<string, string>) =>
+        Object.keys(params)
+          .map((param, i) => {
+            let qs = i === 0 ? '?' : '&'
+            qs += param + '='
+            qs += params[param]
+            return qs
+          })
+          .join('')
+
+      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${buildQueryString(qsParams)}`
 
       let data
 
@@ -421,9 +426,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     </a>
   )
 
-  const sectionClassNames = () => {
-    const classes = ['cove-component__content', 'cdc-map-inner-container', `${currentViewport}`, `${headerColor}`]
-    if (config?.runtime?.editorErrorMessage.length > 0) classes.push('type-map--has-error')
+  const buildSectionClassNames = (viewport: string, headerColor: string, hasError: boolean) => {
+    const classes = ['cove-component__content', 'cdc-map-inner-container', viewport, headerColor]
+    if (hasError) classes.push('type-map--has-error')
     return classes.join(' ')
   }
 
@@ -444,7 +449,15 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
               <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
             )}
             {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
-              <section className={sectionClassNames()} aria-label={'Map: ' + title} ref={innerContainerRef}>
+              <section
+                className={buildSectionClassNames(
+                  currentViewport,
+                  headerColor,
+                  config?.runtime?.editorErrorMessage.length > 0
+                )}
+                aria-label={'Map: ' + title}
+                ref={innerContainerRef}
+              >
                 {config?.runtime?.editorErrorMessage.length > 0 && <Error />}
                 <Title
                   title={title}
@@ -558,39 +571,46 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   )}
                 </MediaControls.Section>
 
-                {config?.runtime?.editorErrorMessage.length === 0 &&
-                  true === table.forceDisplay &&
-                  general.type !== 'navigation' &&
-                  false === loading && (
-                    <DataTable
-                      columns={columns}
-                      config={config}
-                      currentViewport={currentViewport}
-                      displayGeoName={displayGeoName}
-                      expandDataTable={table.expanded}
-                      formatLegendLocation={key =>
-                        formatLegendLocation(key, runtimeData?.[key]?.[config.columns.geo.name])
-                      }
-                      headerColor={general.headerColor}
-                      imageRef={imageId}
-                      indexTitle={table.indexLabel}
-                      innerContainerRef={innerContainerRef}
-                      legendMemo={legendMemo}
-                      legendSpecialClassLastMemo={legendSpecialClassLastMemo}
-                      navigationHandler={navigationHandler}
-                      outerContainerRef={outerContainerRef}
-                      rawData={config.data}
-                      runtimeData={runtimeData}
-                      runtimeLegend={runtimeLegend}
-                      showDownloadImgButton={showDownloadImgButton}
-                      showDownloadPdfButton={showDownloadPdfButton}
-                      tabbingId={tabId}
-                      tableTitle={table.label}
-                      vizTitle={general.title}
-                      wrapColumns={table.wrapColumns}
-                      interactionLabel={interactionLabel}
-                    />
-                  )}
+                {(() => {
+                  const shouldShowDataTable =
+                    !config?.runtime?.editorErrorMessage.length &&
+                    table.forceDisplay &&
+                    general.type !== 'navigation' &&
+                    !loading
+
+                  return (
+                    shouldShowDataTable && (
+                      <DataTable
+                        columns={columns}
+                        config={config}
+                        currentViewport={currentViewport}
+                        displayGeoName={displayGeoName}
+                        expandDataTable={table.expanded}
+                        formatLegendLocation={key =>
+                          formatLegendLocation(key, runtimeData?.[key]?.[config.columns.geo.name])
+                        }
+                        headerColor={general.headerColor}
+                        imageRef={imageId}
+                        indexTitle={table.indexLabel}
+                        innerContainerRef={innerContainerRef}
+                        legendMemo={legendMemo}
+                        legendSpecialClassLastMemo={legendSpecialClassLastMemo}
+                        navigationHandler={navigationHandler}
+                        outerContainerRef={outerContainerRef}
+                        rawData={config.data}
+                        runtimeData={runtimeData}
+                        runtimeLegend={runtimeLegend}
+                        showDownloadImgButton={showDownloadImgButton}
+                        showDownloadPdfButton={showDownloadPdfButton}
+                        tabbingId={tabId}
+                        tableTitle={table.label}
+                        vizTitle={general.title}
+                        wrapColumns={table.wrapColumns}
+                        interactionLabel={interactionLabel}
+                      />
+                    )
+                  )
+                })()}
 
                 {config.annotations?.length > 0 && <Annotation.Dropdown />}
 
