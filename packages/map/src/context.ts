@@ -26,9 +26,6 @@ type MapContext = {
   runtimeFilters
   runtimeLegend
   setParentConfig
-  setRuntimeData
-  setRuntimeFilters
-  setRuntimeLegend
   setSharedFilterValue
   setConfig: Function
   config: MapConfig

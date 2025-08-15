@@ -139,25 +139,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     setConfig(_newConfig)
   }, [configObj.data]) // eslint-disable-line
 
-  const setRuntimeData = (data: RuntimeData) => {
-    dispatch({ type: 'SET_RUNTIME_DATA', payload: data })
-  }
-
-  const setRuntimeFilters = (filters: VizFilter[]) => {
-    dispatch({ type: 'SET_RUNTIME_FILTERS', payload: filters })
-  }
-
-  const setRuntimeLegend = legend => {
-    dispatch({ type: 'SET_RUNTIME_LEGEND', payload: legend })
-  }
-
   const _setRuntimeData = (data: any) => {
     const _newFilters = addValuesToFilters(data, [])
     setConfig({ ...config, filters: _newFilters })
     if (config) {
-      setRuntimeData(data)
+      dispatch({ type: 'SET_RUNTIME_DATA', payload: data })
     } else {
-      setRuntimeFilters(data)
+      dispatch({ type: 'SET_RUNTIME_FILTERS', payload: data })
     }
   }
   const transform = new DataTransform()
@@ -299,7 +287,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
             filters[index].active = queryStringFilterValue
           }
         })
-        setRuntimeFilters(filters)
+        dispatch({ type: 'SET_RUNTIME_FILTERS', payload: filters })
       }
     }
 
@@ -328,7 +316,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
         isCategoryLegend,
         config.table.showNonGeoData
       )
-      setRuntimeData(newRuntimeData)
+      dispatch({ type: 'SET_RUNTIME_DATA', payload: newRuntimeData })
     } else {
       if (hashLegend !== runtimeLegend?.fromHash && undefined === runtimeData?.init) {
         const legend = generateRuntimeLegend(
@@ -340,7 +328,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
           legendMemo,
           legendSpecialClassLastMemo
         )
-        setRuntimeLegend(legend)
+        dispatch({ type: 'SET_RUNTIME_LEGEND', payload: legend })
       }
     }
   }, [config, configObj.data])
@@ -356,7 +344,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       legendMemo,
       legendSpecialClassLastMemo
     )
-    setRuntimeLegend(legend)
+    dispatch({ type: 'SET_RUNTIME_LEGEND', payload: legend })
   }, [runtimeData, config, runtimeFilters])
 
   useEffect(() => {
@@ -402,9 +390,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeLegend,
     scale,
     setConfig,
-    setRuntimeData,
-    setRuntimeFilters,
-    setRuntimeLegend,
     setSharedFilter,
     setSharedFilterValue,
     config,

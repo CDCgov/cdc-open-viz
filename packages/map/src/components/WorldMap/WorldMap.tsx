@@ -36,7 +36,6 @@ const WorldMap = () => {
   const {
     data,
     position,
-    setRuntimeData,
     config,
     tooltipId,
     runtimeLegend,
@@ -70,7 +69,7 @@ const WorldMap = () => {
     publishAnalyticsEvent('map_reset_zoom_level', 'click', interactionLabel, 'map')
     dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
     dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
-    setRuntimeData(newRuntimeData)
+    dispatch({ type: 'SET_RUNTIME_DATA', payload: newRuntimeData })
   }
 
   const handleZoomIn = position => {

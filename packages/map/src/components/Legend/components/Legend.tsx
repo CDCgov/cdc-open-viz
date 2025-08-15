@@ -45,8 +45,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     dimensions,
     mapId,
     runtimeFilters,
-    runtimeLegend,
-    setRuntimeLegend
+    runtimeLegend
   } = useContext<MapContext>(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
@@ -130,7 +129,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           key={idx}
           title={`Legend item ${item.label} - Click to disable`}
           onClick={() => {
-            toggleLegendActive(idx, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)
+            toggleLegendActive(idx, item.label, runtimeLegend, dispatch)
             publishAnalyticsEvent(
               `map_legend_item_toggled--isolate-mode`,
               'click',
@@ -141,7 +140,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault()
-              toggleLegendActive(idx, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)
+              toggleLegendActive(idx, item.label, runtimeLegend, dispatch)
               publishAnalyticsEvent(
                 `map_legend_item_toggled--isolate-mode`,
                 'keydown',
@@ -241,7 +240,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       e.preventDefault()
     }
     publishAnalyticsEvent('map_legend_reset', 'click', interactionLabel, 'map')
-    resetLegendToggles(runtimeLegend, setRuntimeLegend)
+    resetLegendToggles(runtimeLegend, dispatch)
     dispatch({
       type: 'SET_ACCESSIBLE_STATUS',
       payload: 'Legend has been reset, please reference the data table to see updated values.'

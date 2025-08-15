@@ -37,8 +37,6 @@ export type MapContext = {
   runtimeLegend
   setParentConfig: Function
   setRuntimeData: Function
-  setRuntimeFilters: Function
-  setRuntimeLegend: Function
   setSharedFilterValue: Function
   setConfig: (newState: MapConfig) => MapConfig
   config: MapConfig

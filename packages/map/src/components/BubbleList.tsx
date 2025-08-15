@@ -17,7 +17,7 @@ type BubbleListProps = {
 }
 
 export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
-  const { config, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, runtimeData, runtimeLegend } =
+  const { config, tooltipId, legendMemo, legendSpecialClassLastMemo, runtimeData, runtimeLegend } =
     useContext<MapContext>(ConfigContext)
   const { columns, data, general, visual } = config
   const { geoType, allowMapZoom } = general
@@ -65,7 +65,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
     dispatch({ type: 'SET_POSITION', payload: { coordinates: reversedCoordinates, zoom: 3 } })
 
     // ...and show the data for the clicked country
-    setRuntimeData(_tempRuntimeData)
+    dispatch({ type: 'SET_RUNTIME_DATA', payload: _tempRuntimeData })
   }
 
   const sortedRuntimeData: DataRow = Object.values(runtimeData).sort((a, b) =>
