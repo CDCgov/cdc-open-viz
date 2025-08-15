@@ -159,7 +159,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const tooltipRef = useRef(null)
 
   // IDs
-  const imageId = useMemo(() => `download-id-${Math.random().toString(36).substr(2, 9)}`, [])
+  const imageId = useMemo(() => `download-id-${Math.random().toString(36).substring(2, 11)}`, [])
   const legendId = useId()
   const mapId = useId()
   const tooltipId = 'test'
