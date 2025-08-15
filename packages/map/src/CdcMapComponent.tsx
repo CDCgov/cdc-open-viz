@@ -162,7 +162,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const imageId = useMemo(() => `download-id-${Math.random().toString(36).substring(2, 11)}`, [])
   const legendId = useId()
   const mapId = useId()
-  const tooltipId = 'test'
+  const tooltipId = 'tooltipId'
 
   // hooks
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
