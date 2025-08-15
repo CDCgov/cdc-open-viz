@@ -2,7 +2,6 @@
 import React, { useEffect, useRef, useId, useReducer, useContext, useMemo } from 'react'
 import 'whatwg-fetch'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
-import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 
@@ -25,10 +24,7 @@ import './scss/main.scss'
 import './cdcMapComponent.styles.css'
 
 // Core Helpers
-import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
-import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
-import { publish } from '@cdc/core/helpers/events'
 import { generateRuntimeFilters } from './helpers/generateRuntimeFilters'
 import { type MapReducerType, MapState } from './store/map.reducer'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
@@ -46,7 +42,11 @@ import {
 } from './helpers'
 import generateRuntimeLegend from './helpers/generateRuntimeLegend'
 import generateRuntimeData from './helpers/generateRuntimeData'
-import { LOGO_MAX_WIDTH, CSV_PARSE_CONFIG } from './helpers/constants'
+import { LOGO_MAX_WIDTH } from './helpers/constants'
+import { reloadURLData } from './helpers/urlDataHelpers'
+import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'
+import { buildSectionClassNames } from './helpers/componentHelpers'
+import { shouldShowDataTable } from './helpers/dataTableHelpers'
 
 // Child Components
 import Annotation from './components/Annotation'
@@ -151,7 +151,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       dispatch({ type: 'SET_RUNTIME_FILTERS', payload: data })
     }
   }
-  const transform = new DataTransform()
 
   // Refs
   const innerContainerRef = useRef()
@@ -170,102 +169,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   // hooks
   const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
 
-  const reloadURLData = async () => {
-    if (config.dataUrl) {
-      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl, window.location.origin)
-      let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
-
-      let isUpdateNeeded = false
-      config.filters.forEach(filter => {
-        if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
-          qsParams[filter.queryParameter] = filter.active
-          isUpdateNeeded = true
-        }
-      })
-
-      if (!isUpdateNeeded) return
-
-      const buildQueryString = (params: Record<string, string>) =>
-        Object.keys(params)
-          .map((param, i) => {
-            let qs = i === 0 ? '?' : '&'
-            qs += param + '='
-            qs += params[param]
-            return qs
-          })
-          .join('')
-
-      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${buildQueryString(qsParams)}`
-
-      let data
-
-      try {
-        const regex = /(?:\.([^.]+))?$/
-
-        const ext = regex.exec(dataUrl.pathname)[1]
-        if ('csv' === ext || isSolrCsv(dataUrlFinal)) {
-          data = await fetch(dataUrlFinal)
-            .then(response => response.text())
-            .then(responseText => {
-              const parsedCsv = Papa.parse(responseText, CSV_PARSE_CONFIG)
-              return parsedCsv.data
-            })
-        } else if ('json' === ext || isSolrJson(dataUrlFinal)) {
-          data = await fetch(dataUrlFinal).then(response => response.json())
-        } else {
-          data = []
-        }
-      } catch (e) {
-        console.error(`Cannot parse URL: ${dataUrlFinal}`) // eslint-disable-line
-        console.log(e) // eslint-disable-line
-        data = []
-      }
-
-      if (config.dataDescription) {
-        data = transform.autoStandardize(data)
-        data = transform.developerStandardize(data, config.dataDescription)
-      }
-
-      const newConfig = _.cloneDeep(config)
-      newConfig.data = data
-      newConfig.runtimeDataUrl = dataUrlFinal
-
-      setConfig(newConfig)
-    }
-  }
-
-  /**
-   * Publishes 'cove_loaded' only after the map SVG is rendered in the DOM.
-   * Checks immediately, then uses a MutationObserver as a fallback for async rendering.
-   * Update the mapSvg ref if the map container changes.
-   */
-  const observeMapSvgLoaded = (mapSvgRef, config, coveLoadedHasRan, publish, dispatch) => {
-    // Immediate check in case SVG is already present
-    const svgEl = mapSvgRef.current?.querySelector('svg')
-    if (svgEl && svgEl.childNodes.length > 0) {
-      publish('cove_loaded', { config })
-      dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
-      return () => {}
-    }
-
-    // Fallback to observer for async SVG rendering
-    const observer = new MutationObserver(() => {
-      const svgEl = mapSvgRef.current?.querySelector('svg')
-      if (svgEl && svgEl.childNodes.length > 0) {
-        publish('cove_loaded', { config })
-        dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
-        observer.disconnect()
-      }
-    })
-
-    observer.observe(mapSvgRef.current, { childList: true, subtree: true })
-
-    return () => observer.disconnect()
-  }
-
   useEffect(() => {
     if (!mapSvg.current || coveLoadedHasRan) return
-    return observeMapSvgLoaded(mapSvg, config, coveLoadedHasRan, publish, dispatch)
+    return observeMapSvgLoaded(mapSvg, config, coveLoadedHasRan, dispatch)
   }, [config, loading, runtimeData, coveLoadedHasRan])
 
   useEffect(() => {
@@ -350,7 +256,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   useEffect(() => {
     if (!isDashboard) {
-      reloadURLData()
+      reloadURLData(config, setConfig)
     }
   }, [JSON.stringify(config.filters)])
 
@@ -425,12 +331,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       {config.dataKey} (Go to Table)
     </a>
   )
-
-  const buildSectionClassNames = (viewport: string, headerColor: string, hasError: boolean) => {
-    const classes = ['cove-component__content', 'cdc-map-inner-container', viewport, headerColor]
-    if (hasError) classes.push('type-map--has-error')
-    return classes.join(' ')
-  }
 
   return (
     <ConfigContext.Provider value={mapProps}>
@@ -571,46 +471,36 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   )}
                 </MediaControls.Section>
 
-                {(() => {
-                  const shouldShowDataTable =
-                    !config?.runtime?.editorErrorMessage.length &&
-                    table.forceDisplay &&
-                    general.type !== 'navigation' &&
-                    !loading
-
-                  return (
-                    shouldShowDataTable && (
-                      <DataTable
-                        columns={columns}
-                        config={config}
-                        currentViewport={currentViewport}
-                        displayGeoName={displayGeoName}
-                        expandDataTable={table.expanded}
-                        formatLegendLocation={key =>
-                          formatLegendLocation(key, runtimeData?.[key]?.[config.columns.geo.name])
-                        }
-                        headerColor={general.headerColor}
-                        imageRef={imageId}
-                        indexTitle={table.indexLabel}
-                        innerContainerRef={innerContainerRef}
-                        legendMemo={legendMemo}
-                        legendSpecialClassLastMemo={legendSpecialClassLastMemo}
-                        navigationHandler={navigationHandler}
-                        outerContainerRef={outerContainerRef}
-                        rawData={config.data}
-                        runtimeData={runtimeData}
-                        runtimeLegend={runtimeLegend}
-                        showDownloadImgButton={showDownloadImgButton}
-                        showDownloadPdfButton={showDownloadPdfButton}
-                        tabbingId={tabId}
-                        tableTitle={table.label}
-                        vizTitle={general.title}
-                        wrapColumns={table.wrapColumns}
-                        interactionLabel={interactionLabel}
-                      />
-                    )
-                  )
-                })()}
+                {shouldShowDataTable(config, table, general, loading) && (
+                  <DataTable
+                    columns={columns}
+                    config={config}
+                    currentViewport={currentViewport}
+                    displayGeoName={displayGeoName}
+                    expandDataTable={table.expanded}
+                    formatLegendLocation={key =>
+                      formatLegendLocation(key, runtimeData?.[key]?.[config.columns.geo.name])
+                    }
+                    headerColor={general.headerColor}
+                    imageRef={imageId}
+                    indexTitle={table.indexLabel}
+                    innerContainerRef={innerContainerRef}
+                    legendMemo={legendMemo}
+                    legendSpecialClassLastMemo={legendSpecialClassLastMemo}
+                    navigationHandler={navigationHandler}
+                    outerContainerRef={outerContainerRef}
+                    rawData={config.data}
+                    runtimeData={runtimeData}
+                    runtimeLegend={runtimeLegend}
+                    showDownloadImgButton={showDownloadImgButton}
+                    showDownloadPdfButton={showDownloadPdfButton}
+                    tabbingId={tabId}
+                    tableTitle={table.label}
+                    vizTitle={general.title}
+                    wrapColumns={table.wrapColumns}
+                    interactionLabel={interactionLabel}
+                  />
+                )}
 
                 {config.annotations?.length > 0 && <Annotation.Dropdown />}
 
