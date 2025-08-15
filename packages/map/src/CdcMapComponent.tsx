@@ -9,7 +9,6 @@ import 'react-tooltip/dist/react-tooltip.css'
 import DataTable from '@cdc/core/components/DataTable'
 import Filters from '@cdc/core/components/Filters'
 import Layout from '@cdc/core/components/Layout'
-import MediaControls from '@cdc/core/components/MediaControls'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Title from '@cdc/core/components/ui/Title'
 import Waiting from '@cdc/core/components/Waiting'
@@ -42,7 +41,6 @@ import {
 } from './helpers'
 import generateRuntimeLegend from './helpers/generateRuntimeLegend'
 import generateRuntimeData from './helpers/generateRuntimeData'
-import { LOGO_MAX_WIDTH } from './helpers/constants'
 import { reloadURLData } from './helpers/urlDataHelpers'
 import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'
 import { buildSectionClassNames } from './helpers/componentHelpers'
@@ -54,11 +52,9 @@ import ConfigContext, { MapDispatchContext } from './context'
 import EditorPanel from './components/EditorPanel'
 import Error from './components/EditorPanel/components/Error'
 import Legend from './components/Legend'
-import Modal from './components/Modal'
+import MapContainer from './components/MapContainer'
+import MapControls from './components/MapControls'
 import NavigationMenu from './components/NavigationMenu'
-import UsaMap from './components/UsaMap'
-import WorldMap from './components/WorldMap'
-import GoogleMap from './components/GoogleMap'
 
 // hooks
 import useResizeObserver from './hooks/useResizeObserver'
@@ -261,8 +257,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }, [JSON.stringify(config.filters)])
 
   const { general, tooltips, table, columns } = config
-  const { subtext = '', geoType } = general
-  const { showDownloadImgButton, showDownloadPdfButton, headerColor, introText } = general
+  const { subtext = '', geoType, showDownloadImgButton, showDownloadPdfButton, headerColor, introText } = general
   const { closeModal } = useModal()
 
   let title = config.general.title
@@ -395,30 +390,15 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     }
                   }}
                 >
-                  <section
-                    className='outline-none geography-container w-100 position-relative'
-                    ref={mapSvg}
-                    tabIndex='0'
-                  >
-                    {currentViewport && (
-                      <>
-                        {modal && <Modal />}
-                        {'single-state' === geoType && <UsaMap.SingleState />}
-                        {'us' === geoType && 'us-geocode' !== config.general.type && <UsaMap.State />}
-                        {'us-region' === geoType && <UsaMap.Region />}
-                        {'us-county' === geoType && <UsaMap.County />}
-                        {'world' === geoType && <WorldMap />}
-                        {'google-map' === geoType && <GoogleMap />}
-                        {
-                          /* logo is handled in UsaMap.State when applicable */
-                          // prettier-ignore
-                          'data' === general.type && logo && ('us' !== geoType || 'us-geocode' === general.type) && (
-                            <img src={logo} alt='' className='map-logo' style={{ maxWidth: LOGO_MAX_WIDTH }} />
-                          )
-                        }
-                      </>
-                    )}
-                  </section>
+                  <MapContainer
+                    config={config}
+                    modal={modal}
+                    currentViewport={currentViewport}
+                    geoType={geoType}
+                    general={general}
+                    logo={logo}
+                    mapSvgRef={mapSvg}
+                  />
 
                   {general.showSidebar && 'navigation' !== general.type && (
                     <Legend
@@ -448,28 +428,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
                 {subtext.length > 0 && <p className='subtext mt-4'>{parse(subtext)}</p>}
 
-                <MediaControls.Section classes={['download-buttons']}>
-                  {showDownloadImgButton && (
-                    <MediaControls.Button
-                      text='Download Image'
-                      title='Download Chart as Image'
-                      type='image'
-                      state={config}
-                      elementToCapture={imageId}
-                      interactionLabel={interactionLabel}
-                    />
-                  )}
-                  {showDownloadPdfButton && (
-                    <MediaControls.Button
-                      text='Download PDF'
-                      title='Download Chart as PDF'
-                      type='pdf'
-                      state={config}
-                      interactionLabel={interactionLabel}
-                      elementToCapture={imageId}
-                    />
-                  )}
-                </MediaControls.Section>
+                <MapControls config={config} imageId={imageId} interactionLabel={interactionLabel} />
 
                 {shouldShowDataTable(config, table, general, loading) && (
                   <DataTable
