@@ -65,8 +65,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     setConfig,
     config,
     tooltipId,
-    runtimeData,
-    setRuntimeData
+    runtimeData
   } = useContext<MapContext>(ConfigContext)
 
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
@@ -691,7 +690,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
         if (config) {
           const newData = generateRuntimeData(config)
-          setRuntimeData(newData)
+          dispatch({ type: 'SET_RUNTIME_DATA', payload: newData })
         }
         break
       case 'classificationType':

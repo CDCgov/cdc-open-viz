@@ -38,14 +38,19 @@ export type PatternSelection = {
   contrastCheck: boolean
 }
 
-export type GeoColumnProperties = Pick<EditorColumnProperties, 'name' | 'label' | 'tooltip' | 'dataTable'>
-export type LatitudeColumnProperties = Pick<EditorColumnProperties, 'name'>
-export type LongitudeColumnProperties = Pick<EditorColumnProperties, 'name'>
-export type NavigateColumnProperties = Pick<EditorColumnProperties, 'name'>
-export type PrimaryColumnProperties = Pick<
-  EditorColumnProperties,
-  'dataTable' | 'label' | 'name' | 'prefix' | 'suffix' | 'tooltip'
->
+// Base column properties with name required, all others optional
+export type BaseColumnProperties = Pick<EditorColumnProperties, 'name'> &
+  Partial<Pick<EditorColumnProperties, 'label' | 'tooltip' | 'dataTable' | 'prefix' | 'suffix'>>
+
+// Simple column type for name-only columns
+export type SimpleColumnProperties = Pick<EditorColumnProperties, 'name'>
+
+// Specific column types for better semantics
+export type GeoColumnProperties = BaseColumnProperties
+export type LatitudeColumnProperties = SimpleColumnProperties
+export type LongitudeColumnProperties = SimpleColumnProperties
+export type NavigateColumnProperties = SimpleColumnProperties
+export type PrimaryColumnProperties = BaseColumnProperties
 
 export type LegendShapeItem = {
   column: string

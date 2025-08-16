@@ -17,7 +17,7 @@ interface GroupedData {
 }
 
 const LegendGroup = ({ legendItems }) => {
-  const { runtimeLegend, setRuntimeLegend, config } = useContext(ConfigContext)
+  const { runtimeLegend, config } = useContext(ConfigContext)
   const dispatch = useContext(MapDispatchContext)
   const groupLegendItems = (items: LegendItem[], data: object[], groupByKey: string): GroupedData => {
     if (!groupByKey || !data || !items) return {}
@@ -59,10 +59,13 @@ const LegendGroup = ({ legendItems }) => {
     const wasDisabled = runtimeLegend.items.find(i => i.value === item.label)?.disabled
     const delta = wasDisabled ? -1 : 1
 
-    setRuntimeLegend({
-      ...runtimeLegend,
-      items: newItems,
-      disabledAmt: (runtimeLegend.disabledAmt ?? 0) + delta
+    dispatch({
+      type: 'SET_RUNTIME_LEGEND',
+      payload: {
+        ...runtimeLegend,
+        items: newItems,
+        disabledAmt: (runtimeLegend.disabledAmt ?? 0) + delta
+      }
     })
     const message = `${wasDisabled ? 'Enabled' : 'Disabled'} legend item ${
       item.label
@@ -109,7 +112,7 @@ const LegendGroup = ({ legendItems }) => {
                   onKeyDown={e => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault()
-                      toggleLegendActive(index, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)
+                      toggleLegendActive(index, item.label, runtimeLegend, dispatch)
                     }
                   }}
                 >
