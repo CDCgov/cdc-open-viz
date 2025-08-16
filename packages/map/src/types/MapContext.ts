@@ -2,7 +2,6 @@ import { DataRow, type MapConfig } from './MapConfig'
 import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { VizFilter } from '@cdc/core/types/VizFilter'
-import { type RefObject } from 'react'
 
 export type MapContext = {
   currentViewport: ViewPort

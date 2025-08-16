@@ -19,7 +19,7 @@ type CityListProps = {
 }
 
 const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValueSupported, tooltipId, projection }) => {
-  const { config, topoData, data: runtimeData, position, runtimeLegend } = useContext(ConfigContext)
+  const { config, topoData, runtimeData, position, runtimeLegend } = useContext(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
