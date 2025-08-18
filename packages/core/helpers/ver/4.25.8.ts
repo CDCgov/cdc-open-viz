@@ -36,6 +36,11 @@ export const updateStatePickedToStatesPicked = config => {
       config.general.statesPicked = [{ ...config.general.statePicked }]
       delete config.general.statePicked
     }
+    // Also migrate the property name for filter controls
+    if (config.general?.filterControlsStatePicked) {
+      config.general.filterControlsStatesPicked = config.general.filterControlsStatePicked
+      delete config.general.filterControlsStatePicked
+    }
   }
   if (config.type === 'dashboard') {
     Object.values(config.visualizations).forEach(visualization => {
