@@ -124,12 +124,10 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     const newConfig = { ...config }
     newConfig.general = { ...config.general, statesPicked: statesData }
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
-    setScaleAndTranslate('reset')
-  }, [statesPicked, statesData, setScaleAndTranslate, dispatch])
+  }, [statesPicked, statesData, dispatch])
 
   const switchState = useCallback(() => {
     dispatch({ type: 'SET_STATES_TO_SHOW', payload: statesPicked })
-    setScaleAndTranslate('reset')
   }, [statesPicked, setScaleAndTranslate, dispatch])
 
   const handleZoomIn = useCallback(() => {
