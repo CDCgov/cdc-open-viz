@@ -20,3 +20,10 @@ export { titleCase } from './titleCase'
 export { validateFipsCodeLength } from './validateFipsCodeLength'
 export { getMapContainerClasses } from './getMapContainerClasses'
 export { SVG_HEIGHT, SVG_WIDTH, SVG_PADDING, SVG_VIEWBOX, HEADER_COLORS, MAX_ZOOM_LEVEL } from './constants'
+
+// Legend processing helpers
+export { initializeLegendResult, finalizeLegend } from './legendUtils'
+export { processSpecialClasses, processSeparateZero, prepareNumericData } from './legendDataProcessing'
+export { generateCategoryLegend } from './legendCategoryHandler'
+export { generateEqualNumberLegendOld, generateEqualNumberLegendNew } from './legendEqualNumberHandler'
+export { generateEqualIntervalLegend } from './legendEqualIntervalHandler'

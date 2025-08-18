@@ -45,7 +45,9 @@ export type NavigateColumnProperties = Pick<EditorColumnProperties, 'name'>
 export type PrimaryColumnProperties = Pick<
   EditorColumnProperties,
   'dataTable' | 'label' | 'name' | 'prefix' | 'suffix' | 'tooltip'
->
+> & {
+  roundToPlace?: number
+}
 
 export type LegendShapeItem = {
   column: string
