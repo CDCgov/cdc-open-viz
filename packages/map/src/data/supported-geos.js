@@ -1,5 +1,21 @@
 import supportedCountiesJSON from './supported-counties.json'
 
+/**
+ * US States Lookup Table
+ *
+ * Maps ISO 3166-2 state codes to arrays of supported name variations.
+ * Used for normalizing US state data and converting between different naming formats.
+ *
+ * Structure: { 'US-XX': ['FULL_NAME', 'XX'] }
+ * - Key: ISO 3166-2 state code (e.g., 'US-CA')
+ * - Value: [0] = Full uppercase state name, [1] = Two-letter abbreviation
+ *
+ * Used in:
+ * - addUIDs.ts: Match user state data to standardized UIDs
+ * - displayGeoName.ts: Convert state codes to display names
+ * - UsaMap.State.tsx: State-level map rendering
+ * - EditorPanel.tsx: Geography selection interface
+ */
 export const supportedStates = {
   // States
   'US-AL': ['ALABAMA', 'AL'],
@@ -55,6 +71,20 @@ export const supportedStates = {
   'US-WY': ['WYOMING', 'WY']
 }
 
+/**
+ * US Regions Lookup Table
+ *
+ * Maps US federal regions (HHS regions) to supported name variations.
+ * Used for regional-level data visualization and aggregation.
+ *
+ * Structure: { 'region N': ['REGION N', 'RN'] }
+ * - Key: Lowercase region identifier
+ * - Value: [0] = Uppercase region name, [1] = Region abbreviation
+ *
+ * Used in:
+ * - addUIDs.ts: Match regional data to region identifiers
+ * - Regional map visualizations
+ */
 export const supportedRegions = {
   'region 1': ['REGION 1', 'R1'],
   'region 2': ['REGION 2', 'R2'],
@@ -68,6 +98,20 @@ export const supportedRegions = {
   'region 10': ['REGION 10', 'R10']
 }
 
+/**
+ * State Name to ISO Code Mapping
+ *
+ * Maps proper case state names to their corresponding ISO 3166-2 codes.
+ * Provides reverse lookup capability for the supportedStates table.
+ *
+ * Structure: { 'State Name': 'US-XX' }
+ * - Key: Proper case state name (e.g., 'California')
+ * - Value: ISO 3166-2 state code (e.g., 'US-CA')
+ *
+ * Used in:
+ * - Data processing when state names need to be converted to ISO codes
+ * - Validation and normalization of state data
+ */
 export const stateToIso = {
   // States
   Alabama: 'US-AL',
@@ -122,6 +166,22 @@ export const stateToIso = {
   Wyoming: 'US-WY'
 }
 
+/**
+ * State FIPS Code to Two-Letter Abbreviation Mapping
+ *
+ * Maps FIPS (Federal Information Processing Standards) state codes to two-letter abbreviations.
+ * FIPS codes are numeric identifiers used by the US Census Bureau and other federal agencies.
+ *
+ * Structure: { 'XX': 'YY' } or { XX: 'YY' }
+ * - Key: FIPS code as string or number (e.g., '06' or 6)
+ * - Value: Two-letter state/territory abbreviation (e.g., 'CA')
+ *
+ * Note: Includes US territories (AS, GU, MP, PR, VI) with FIPS codes 60+
+ *
+ * Used in:
+ * - formatLegendLocation.ts: Convert county FIPS codes to state abbreviations
+ * - County-level data processing where state context is needed
+ */
 export const stateFipsToTwoDigit = {
   ['01']: 'AL', // eslint-disable-line
   ['02']: 'AK', // eslint-disable-line
@@ -181,6 +241,22 @@ export const stateFipsToTwoDigit = {
   78: 'VI'
 }
 
+/**
+ * State FIPS Code to Full Name Mapping
+ *
+ * Maps FIPS state codes to their full proper case names.
+ * Comprehensive lookup including all 50 states, DC, and US territories.
+ *
+ * Structure: { 'XX': 'Full State Name' } or { XX: 'Full State Name' }
+ * - Key: FIPS code as string or number
+ * - Value: Full proper case state/territory name
+ *
+ * Used in:
+ * - useStateZoom.tsx: State identification for zoom functionality
+ * - getStatesPicked.ts: State selection processing
+ * - useApplyTooltipsToGeo.tsx: Tooltip content generation
+ * - EditorPanel.tsx: Geographic selection interfaces
+ */
 export const supportedStatesFipsCodes = {
   '01': 'Alabama',
   '02': 'Alaska',
@@ -240,6 +316,28 @@ export const supportedStatesFipsCodes = {
   78: 'United States Virgin Islands'
 }
 
+/**
+ * World Countries Lookup Table
+ *
+ * Maps ISO 3166-1 alpha-3 country codes to arrays of supported name variations.
+ * Comprehensive international geography support for world maps.
+ *
+ * Structure: { 'XXX': ['Name Variation 1', 'Name Variation 2', ...] }
+ * - Key: ISO 3166-1 alpha-3 country code (e.g., 'USA', 'GBR', 'CHN')
+ * - Value: Array of alternative country names and common variations
+ *
+ * Features:
+ * - Multiple name variations per country (official names, common names, abbreviations)
+ * - Special territories and dependencies included
+ * - Handles disputed territories and special cases
+ * - Supports historical and alternative country names
+ *
+ * Used in:
+ * - WorldMap.tsx: International map rendering and interaction
+ * - addUIDs.ts: Match international geographic data
+ * - displayGeoName.ts: Convert country codes to display names
+ * - generateRuntimeLegend.ts: Legend generation for world maps
+ */
 export const supportedCountries = {
   AFG: ['Afghanistan'],
   ALA: ['Åland', 'Åland Islands'],
@@ -521,6 +619,25 @@ export const supportedCountries = {
   'US-HI': ['Hawaii']
 }
 
+/**
+ * US Territories Lookup Table
+ *
+ * Maps US territory identifiers to arrays of supported name variations.
+ * Covers US territories, freely associated states, and commonwealths.
+ *
+ * Structure: { 'US-XX': ['FULL_NAME', 'XX', ...] }
+ * - Key: ISO-style territory identifier (following US-XX pattern)
+ * - Value: [0] = Full uppercase territory name, [1] = Abbreviation, [...] = Variations
+ *
+ * Note: Some keys (US-FM, US-PW, US-MH) are not official ISO codes but follow
+ * the pattern for consistency with the Freely Associated States.
+ *
+ * Used in:
+ * - addUIDs.ts: Match territory data to identifiers
+ * - displayGeoName.ts: Convert territory codes to display names
+ * - UsaMap.Region.tsx: Territory rendering on regional maps
+ * - UsaMap.State.tsx: Territory handling in state-level maps
+ */
 export const supportedTerritories = {
   'US-AS': ['AMERICAN SAMOA', 'AS'],
   'US-GU': ['GUAM', 'GU'],
@@ -532,8 +649,31 @@ export const supportedTerritories = {
   'US-MH': ['MARSHALL ISLANDS', 'MH', 'RMI'] // Note: Key is not an official ISO code
 }
 
-// ! INFO: coordinates are [negative longitude, latitude]
-// ie. Albuquerque coordinates are actually [35, 106]
+/**
+ * US Cities Coordinate Lookup Table
+ *
+ * Maps city names to their geographic coordinates for location-based mapping.
+ * Includes cities, tribal health organizations, and other geographic entities.
+ *
+ * Structure: { 'CITY_NAME': [longitude, latitude] }
+ * - Key: Uppercase city name, often with state (e.g., 'ALBANY, NEW YORK')
+ * - Value: [longitude, latitude] coordinate pair
+ *
+ * Coordinate Format:
+ * - Longitude: Negative values for locations west of Prime Meridian
+ * - Latitude: Positive values for locations north of Equator
+ * - Format: [longitude, latitude] (NOTE: longitude comes first, opposite of lat/lng)
+ *
+ * Special Entries:
+ * - Tribal health organizations and consortiums
+ * - Multi-state metropolitan areas
+ * - Federal districts and territories
+ *
+ * Used in:
+ * - addUIDs.ts: Match city-based geographic data
+ * - CityList.tsx: City selection and display functionality
+ * - Location-based map features requiring precise coordinates
+ */
 // prettier-ignore
 export const supportedCities = {
   'ALASKA NATIVE TRIBAL HEALTH CONSORTIUM': [-149.8067, 61.1827],
@@ -724,4 +864,47 @@ export const supportedCities = {
   'YUKON-KUSKOKWIM HEALTH CORPORATION': [-161.7849, 60.7881]
 };
 
+/**
+ * US Counties Lookup Table
+ *
+ * Maps 5-digit FIPS county codes to county names.
+ * Imported from external JSON file for maintainability and size management.
+ *
+ * Structure: { 'SSCCC': 'County Name' }
+ * - Key: 5-digit FIPS code where SS = state FIPS, CCC = county FIPS
+ * - Value: County name in proper case
+ *
+ * Coverage:
+ * - All 3,143+ US counties and county-equivalents
+ * - Includes parishes (Louisiana), boroughs (Alaska), independent cities (Virginia)
+ * - Census areas, municipalities, and other county-level entities
+ *
+ * Used in:
+ * - addUIDs.ts: Match county FIPS codes to identifiers
+ * - formatLegendLocation.ts: Display county names in legends with state context
+ * - displayGeoName.ts: Convert county codes to display names
+ * - County-level map rendering and data processing
+ */
 export const supportedCounties = supportedCountiesJSON
+
+/**
+ * Pre-computed Key Arrays
+ *
+ * Performance optimization: Pre-compute key arrays to avoid repeated Object.keys() calls
+ * in performance-critical functions like displayGeoName() and addUIDs().
+ *
+ * Used by:
+ * - displayGeoName.ts: Geographic name resolution
+ * - addUIDs.ts: Geographic data processing
+ * - generateRuntimeLegend.ts: Legend generation
+ * - formatLegendLocation.ts: Legend formatting
+ */
+export const stateKeys = Object.keys(supportedStates)
+export const territoryKeys = Object.keys(supportedTerritories)
+export const regionKeys = Object.keys(supportedRegions)
+export const countryKeys = Object.keys(supportedCountries)
+export const countyKeys = Object.keys(supportedCounties)
+export const cityKeys = Object.keys(supportedCities)
+
+// Pre-computed Sets for O(1) lookup performance
+export const countyKeySet = new Set(countyKeys)
