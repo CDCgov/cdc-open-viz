@@ -1,0 +1,255 @@
+import { Meta, ColorPalette, ColorItem } from '@storybook/blocks'
+import { mapColorPalettesV1, mapColorPalettesV2 } from '@cdc/core/data/colorPalettes'
+
+<Meta title="Design Systems/Color Palette Migration" />
+
+# Color Palette Migration: V1 to V2
+
+This story shows the evolution from v1 to v2 color palettes side by side. This comparison helps visualize how each v1 palette translates to the new v2 palette.
+
+## Blue Palettes
+
+### Sequential Blue 2 (MPX) → Sequential Single Hue Blue
+<ColorPalette>
+  <ColorItem
+    title="V1: Sequential Blue 2 (MPX)"
+    colors={mapColorPalettesV1['sequential-blue-2(MPX)']}
+  />
+  <ColorItem
+    title="V2: Sequential Single Hue Blue"
+    colors={mapColorPalettesV2.sequential_single_hue_blue}
+  />
+</ColorPalette>
+
+### Green Blue → Sequential Single Hue Blue
+<ColorPalette>
+  <ColorItem
+    title="V1: Green Blue"
+    colors={mapColorPalettesV1.greenblue}
+  />
+  <ColorItem
+    title="V2: Sequential Single Hue Blue"
+    colors={mapColorPalettesV2.sequential_single_hue_blue}
+  />
+</ColorPalette>
+
+### Blue Green → Sequential Single Hue Teal
+<ColorPalette>
+  <ColorItem
+    title="V1: Blue Green"
+    colors={mapColorPalettesV1.bluegreen}
+  />
+  <ColorItem
+    title="V2: Sequential Single Hue Teal"
+    colors={mapColorPalettesV2.sequential_single_hue_teal}
+  />
+</ColorPalette>
+
+## Green Palettes
+
+### New V2: Sequential Single Hue Green
+<ColorPalette>
+  <ColorItem
+    title="V2: Sequential Single Hue Green (New)"
+    colors={mapColorPalettesV2.sequential_single_hue_green}
+  />
+</ColorPalette>
+
+## Purple Palettes
+
+### Pink Purple → Sequential Single Hue Purple
+<ColorPalette>
+  <ColorItem
+    title="V1: Pink Purple"
+    colors={mapColorPalettesV1.pinkpurple}
+  />
+  <ColorItem
+    title="V2: Sequential Single Hue Purple"
+    colors={mapColorPalettesV2.sequential_single_hue_purple}
+  />
+</ColorPalette>
+
+## Orange/Red Palettes
+
+### Yellow Orange Red → Sequential Single Hue Orange
+<ColorPalette>
+  <ColorItem
+    title="V1: Yellow Orange Red"
+    colors={mapColorPalettesV1.yelloworangered}
+  />
+  <ColorItem
+    title="V2: Sequential Single Hue Orange"
+    colors={mapColorPalettesV2.sequential_single_hue_orange}
+  />
+</ColorPalette>
+
+### Yellow Orange Brown → Sequential Single Hue Orange
+<ColorPalette>
+  <ColorItem
+    title="V1: Yellow Orange Brown"
+    colors={mapColorPalettesV1.yelloworangebrown}
+  />
+  <ColorItem
+    title="V2: Sequential Single Hue Orange"
+    colors={mapColorPalettesV2.sequential_single_hue_orange}
+  />
+</ColorPalette>
+
+### Orange Red → Sequential Single Hue Orange
+<ColorPalette>
+  <ColorItem
+    title="V1: Orange Red"
+    colors={mapColorPalettesV1.orangered}
+  />
+  <ColorItem
+    title="V2: Sequential Single Hue Orange"
+    colors={mapColorPalettesV2.sequential_single_hue_orange}
+  />
+</ColorPalette>
+
+### Red → Sequential Single Hue Orange
+<ColorPalette>
+  <ColorItem
+    title="V1: Red"
+    colors={mapColorPalettesV1.red}
+  />
+  <ColorItem
+    title="V2: Sequential Single Hue Orange"
+    colors={mapColorPalettesV2.sequential_single_hue_orange}
+  />
+</ColorPalette>
+
+### Sequential Orange (MPX) → Sequential Single Hue Orange
+<ColorPalette>
+  <ColorItem
+    title="V1: Sequential Orange (MPX)"
+    colors={mapColorPalettesV1['sequential-orange(MPX)']}
+  />
+  <ColorItem
+    title="V2: Sequential Single Hue Orange"
+    colors={mapColorPalettesV2.sequential_single_hue_orange}
+  />
+</ColorPalette>
+
+## Diverging Palettes
+
+### Yellow Purple → Divergent Blue Purple Center
+<ColorPalette>
+  <ColorItem
+    title="V1: Yellow Purple"
+    colors={mapColorPalettesV1.yellowpurple}
+  />
+  <ColorItem
+    title="V2: Divergent Blue Purple Center"
+    colors={mapColorPalettesV2.divergent_blue_purple_center}
+  />
+</ColorPalette>
+
+### New V2 Diverging Palettes
+<ColorPalette>
+  <ColorItem
+    title="V2: Divergent Blue Teal Center (New)"
+    colors={mapColorPalettesV2.divergent_blue_teal_center}
+  />
+  <ColorItem
+    title="V2: Divergent Green Orange Yellow (New)"
+    colors={mapColorPalettesV2.divergent_green_orange_yellow}
+  />
+  <ColorItem
+    title="V2: Heat Map (New)"
+    colors={mapColorPalettesV2.heat_map}
+  />
+</ColorPalette>
+
+## Categorical/Qualitative Palettes
+
+### Qualitative 1 → Qualitative
+<ColorPalette>
+  <ColorItem
+    title="V1: Qualitative 1"
+    colors={mapColorPalettesV1.qualitative1}
+  />
+  <ColorItem
+    title="V2: Qualitative"
+    colors={mapColorPalettesV2.qualitative}
+  />
+</ColorPalette>
+
+### Qualitative 2 → Qualitative
+<ColorPalette>
+  <ColorItem
+    title="V1: Qualitative 2"
+    colors={mapColorPalettesV1.qualitative2}
+  />
+  <ColorItem
+    title="V2: Qualitative"
+    colors={mapColorPalettesV2.qualitative}
+  />
+</ColorPalette>
+
+### Qualitative 3 → Qualitative
+<ColorPalette>
+  <ColorItem
+    title="V1: Qualitative 3"
+    colors={mapColorPalettesV1.qualitative3}
+  />
+  <ColorItem
+    title="V2: Qualitative"
+    colors={mapColorPalettesV2.qualitative}
+  />
+</ColorPalette>
+
+### Qualitative 4 → Qualitative
+<ColorPalette>
+  <ColorItem
+    title="V1: Qualitative 4"
+    colors={mapColorPalettesV1.qualitative4}
+  />
+  <ColorItem
+    title="V2: Qualitative"
+    colors={mapColorPalettesV2.qualitative}
+  />
+</ColorPalette>
+
+### Colorblind Safe → Qualitative
+<ColorPalette>
+  <ColorItem
+    title="V1: Colorblind Safe"
+    colors={mapColorPalettesV1.colorblindsafe}
+  />
+  <ColorItem
+    title="V2: Qualitative (Colorblind-friendly)"
+    colors={mapColorPalettesV2.qualitative}
+  />
+</ColorPalette>
+
+## New V2 Palettes
+
+These are new palettes introduced in V2 that don't have direct V1 equivalents:
+
+<ColorPalette>
+  <ColorItem
+    title="V2: Sequential Single Hue Green"
+    colors={mapColorPalettesV2.sequential_single_hue_green}
+  />
+  <ColorItem
+    title="V2: Divergent Blue Teal Center"
+    colors={mapColorPalettesV2.divergent_blue_teal_center}
+  />
+  <ColorItem
+    title="V2: Divergent Green Orange Yellow"
+    colors={mapColorPalettesV2.divergent_green_orange_yellow}
+  />
+  <ColorItem
+    title="V2: Heat Map"
+    colors={mapColorPalettesV2.heat_map}
+  />
+</ColorPalette>
+
+## Migration Notes
+
+- **Sequential palettes**: V1 had many specific sequential palettes that map to broader single-hue categories in V2
+- **Qualitative palettes**: V1 had 4 different qualitative sets that all map to a single, refined qualitative palette in V2
+- **Divergent palettes**: V2 introduces new divergent palettes for better data representation
+- **Heat maps**: V2 adds a dedicated heat map palette for specialized visualizations
+- **Colorblind accessibility**: Both versions maintain colorblind-safe options
