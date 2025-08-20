@@ -21,7 +21,9 @@ export default {
     type: 'data',
     convertFipsCodes: true,
     palette: {
-      isReversed: false
+      isReversed: false,
+      version: '1.0',
+      name: 'pinkpurple'
     },
     allowMapZoom: true,
     hideGeoColumnInTooltip: false,

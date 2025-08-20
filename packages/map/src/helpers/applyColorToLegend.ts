@@ -17,8 +17,9 @@ type LegendItem = {
 export const applyColorToLegend = (legendIdx: number, config: MapConfig, result: LegendItem[] = []): string => {
   if (!config) throw new Error('Config is required')
 
-  const { legend, customColors, general, color } = config
+  const { legend, customColors, general } = config
   const { geoType, palette } = general
+  const { name: color } = palette
   const specialClasses = legend?.specialClasses ?? []
   const mapColorPalette = customColors ?? colorPalettes[color] ?? colorPalettes['bluegreen']
 

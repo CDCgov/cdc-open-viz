@@ -2942,16 +2942,17 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 label='Use selected palette in reverse order'
                 onClick={() => {
                   const _state = _.cloneDeep(config)
+                  const { name: currentPaletteName } = config.general.palette
                   _state.general.palette.isReversed = !_state.general.palette.isReversed
                   let paletteName = ''
-                  if (_state.general.palette.isReversed && !config.color.endsWith('reverse')) {
-                    paletteName = config.color + 'reverse'
+                  if (_state.general.palette.isReversed && !currentPaletteName.endsWith('reverse')) {
+                    paletteName = currentPaletteName + 'reverse'
                   }
-                  if (!_state.general.palette.isReversed && config.color.endsWith('reverse')) {
-                    paletteName = config.color.slice(0, -7)
+                  if (!_state.general.palette.isReversed && currentPaletteName.endsWith('reverse')) {
+                    paletteName = currentPaletteName.slice(0, -7)
                   }
                   if (paletteName) {
-                    _state.color = paletteName
+                    _state.general.palette.name = paletteName
                   }
                   setConfig(_state)
                 }}
@@ -2978,10 +2979,10 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       key={palette}
                       onClick={() => {
                         const _newConfig = _.cloneDeep(config)
-                        _newConfig.color = palette
+                        _newConfig.general.palette.name = palette
                         setConfig(_newConfig)
                       }}
-                      className={config.color === palette ? 'selected' : ''}
+                      className={config.general.palette.name === palette ? 'selected' : ''}
                     >
                       <span style={colorOne}></span>
                       <span style={colorTwo}></span>
@@ -3015,10 +3016,10 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       key={palette}
                       onClick={() => {
                         const _newConfig = _.cloneDeep(config)
-                        _newConfig.color = palette
+                        _newConfig.general.palette.name = palette
                         setConfig(_newConfig)
                       }}
-                      className={config.color === palette ? 'selected' : ''}
+                      className={config.general.palette.name === palette ? 'selected' : ''}
                     >
                       <span style={colorOne}></span>
                       <span style={colorTwo}></span>
@@ -3051,9 +3052,9 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       title={palette}
                       key={palette}
                       onClick={() => {
-                        handleEditorChanges('color', palette)
+                        handleEditorChanges('general.palette.name', palette)
                       }}
-                      className={config.color === palette ? 'selected' : ''}
+                      className={config.general.palette.name === palette ? 'selected' : ''}
                     >
                       <span style={colorOne}></span>
                       <span style={colorTwo}></span>

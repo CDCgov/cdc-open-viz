@@ -2,11 +2,12 @@ import { hashObj } from './hashObj'
 import { MapConfig } from '../types/MapConfig'
 
 export const generateRuntimeLegendHash = (config: MapConfig, runtimeFilters) => {
+  const { name: paletteName } = config.general.palette
   return hashObj({
     unified: config.legend.unified ?? false,
     equalNumberOptIn: config.general.equalNumberOptIn ?? false,
     specialClassesLast: config.legend.showSpecialClassesLast ?? false,
-    color: config.color,
+    color: paletteName,
     customColors: config.customColors,
     numberOfItems: config.legend.numberOfItems,
     type: config.legend.type,
@@ -16,6 +17,7 @@ export const generateRuntimeLegendHash = (config: MapConfig, runtimeFilters) => 
     specialClasses: config.legend.specialClasses,
     geoType: config.general.geoType,
     data: config.data,
+    palette: config.general.palette,
     filters: {
       ...config.filters
     },

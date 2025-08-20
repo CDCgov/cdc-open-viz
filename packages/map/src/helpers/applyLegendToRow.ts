@@ -14,8 +14,9 @@ export const applyLegendToRow = (
 ): string[] => {
   if (!config) return null
 
-  const { general, color, legend } = config
+  const { general, legend } = config
   const { type } = general
+  const { name: color } = general.palette
   const { showSpecialClassesLast } = legend
 
   try {
