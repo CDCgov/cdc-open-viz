@@ -14,7 +14,7 @@ import _ from 'lodash'
 import * as d3 from 'd3'
 
 // Cdc
-import colorPalettes from '@cdc/core/data/colorPalettes'
+import { mapColorPalettesV1 as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { supportedCountries } from '../data/supported-geos'
 
 type LegendItem = {

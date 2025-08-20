@@ -16,7 +16,7 @@ import Panels from './Panels'
 import Layout from '@cdc/core/components/Layout'
 
 // Data
-import colorPalettes from '@cdc/core/data/colorPalettes'
+import { mapColorPalettesV1 as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { supportedStatesFipsCodes } from '../../../data/supported-geos.js'
 
 // Components - Core

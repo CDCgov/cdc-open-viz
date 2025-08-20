@@ -1,5 +1,5 @@
 import { generateColorsArray, hashObj } from '../helpers'
-import colorPalettes from '@cdc/core/data/colorPalettes'
+import { mapColorPalettesV1 as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { MapConfig } from '../types/MapConfig'
 import { type RuntimeLegend } from '../types/runtimeLegend'
 
