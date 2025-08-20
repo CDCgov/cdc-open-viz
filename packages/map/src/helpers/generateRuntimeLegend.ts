@@ -14,8 +14,9 @@ import _ from 'lodash'
 import * as d3 from 'd3'
 
 // Cdc
-import { mapColorPalettesV1 as colorPalettes } from '@cdc/core/data/colorPalettes'
+import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { supportedCountries } from '../data/supported-geos'
+import { getMapColorPaletteVersion } from './getMapColorPaletteVersion'
 
 type LegendItem = {
   special?: boolean
@@ -331,7 +332,7 @@ export const generateRuntimeLegend = (
           numberOfRows -= chunkAmt
         }
       } else {
-        let colors = colorPalettes[configObj.color]
+        let colors = colorPalettes?.[`v${getMapColorPaletteVersion(configObj)}`]?.[configObj.color]
         let colorRange = colors.slice(0, legend.numberOfItems)
 
         const getDomain = () => {

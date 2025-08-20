@@ -1,7 +1,8 @@
-import { mapColorPalettesV1 as colorPalettes } from '@cdc/core/data/colorPalettes'
+import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import chroma from 'chroma-js'
 import { type MapConfig } from '@cdc/map/src/types/MapConfig'
 import { colorDistributions } from './colorDistributions'
+import { getMapColorPaletteVersion } from './getMapColorPaletteVersion'
 
 type LegendItem = {
   special: boolean
@@ -21,7 +22,7 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
   const { geoType, palette } = general
   const { name: color } = palette
   const specialClasses = legend?.specialClasses ?? []
-  const mapColorPalette = customColors ?? colorPalettes[color] ?? colorPalettes['bluegreen']
+  const mapColorPalette = customColors ?? colorPalettes?.[`v${getMapColorPaletteVersion(config)}`]?.[color] ?? colorPalettes.v1['bluegreen']
 
   // Handle Region Maps need for a 10th color
   if (geoType === 'us-region' && mapColorPalette.length < 10 && mapColorPalette.length > 8) {

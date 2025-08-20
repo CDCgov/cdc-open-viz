@@ -1,7 +1,8 @@
 import { generateColorsArray, hashObj } from '../helpers'
-import { mapColorPalettesV1 as colorPalettes } from '@cdc/core/data/colorPalettes'
+import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { MapConfig } from '../types/MapConfig'
 import { type RuntimeLegend } from '../types/runtimeLegend'
+import { getMapColorPaletteVersion } from './getMapColorPaletteVersion'
 
 type Memo<T> = { current: Map<string, T> }
 
@@ -26,7 +27,7 @@ export const applyLegendToRow = (
     }
 
     if (type === 'navigation') {
-      const mapColorPalette = colorPalettes[color] ?? colorPalettes['bluegreenreverse']
+      const mapColorPalette = colorPalettes[`v${getMapColorPaletteVersion(config)}`]?.[color] ?? colorPalettes.v1['bluegreenreverse']
       return generateColorsArray(mapColorPalette[3])
     }
 

@@ -14,8 +14,6 @@ const updateMapColorMigrations = config => {
             delete config.color
         }
 
-        // Set Palette Version...
-        config.general.palette.version = '2.0'
 
     }
 
