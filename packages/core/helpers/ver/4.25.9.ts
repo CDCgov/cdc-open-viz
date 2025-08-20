@@ -9,8 +9,14 @@ const updateMapColorMigrations = config => {
             config.general = config.general || {}
             config.general.palette = config.general.palette || {}
             config.general.palette.name = config.color
-            config.general.palette.backups = config.general.palette.backups || []
-            config.general.palette.backups.push({ name: config.color, version: '1.0', isReversed: config.general.palette.isReversed })
+
+            // Save a backup if version is 1.0
+            if (config.general.palette.version === '1.0') {
+                config.general.palette.backups = config.general.palette.backups || []
+                config.general.palette.backups.push({ name: config.color, version: '1.0', isReversed: config.general.palette.isReversed })
+            }
+
+            // Remove old color property
             delete config.color
         }
 
