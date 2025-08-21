@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import { BarStack } from '@visx/shape'
 import { Group } from '@visx/group'
+import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import BarChartContext from './context'
 import Regions from '../../Regions'
 import { addMinimumBarHeights } from '../helpers'
@@ -30,10 +31,78 @@ const BarChartStackedVertical = () => {
   const isDateAxisType = config.runtime.xAxis.type === 'date-time' || config.runtime.xAxis.type === 'date'
   const isDateTimeScaleAxisType = config.runtime.xAxis.type === 'date-time'
 
+  // Pattern helper function
+  const renderPatternDefs = () => {
+    if (!config.legend.patterns || Object.keys(config.legend.patterns).length === 0) {
+      return null
+    }
+
+    return (
+      <defs>
+        {Object.entries(config.legend.patterns).map(([key, pattern]) => {
+          const patternId = `chart-pattern-${key}`
+          const size = config.legend.patternSize || 8
+
+          switch (pattern.shape) {
+            case 'circles':
+              return (
+                <PatternCircles
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  fill={pattern.color}
+                  radius={1.25}
+                />
+              )
+            case 'lines':
+              return (
+                <PatternLines
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
+                  orientation={['horizontal']}
+                />
+              )
+            case 'diagonalLines':
+              return (
+                <PatternLines
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
+                  orientation={['diagonalRightToLeft']}
+                />
+              )
+            case 'waves':
+              return (
+                <PatternWaves
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  fill={pattern.color}
+                  strokeWidth={0.25}
+                />
+              )
+            default:
+              return null
+          }
+        })}
+      </defs>
+    )
+  }
+
   return (
     config.visualizationSubType === 'stacked' &&
     !isHorizontal && (
       <>
+        {renderPatternDefs()}
         <BarStack
           data={data}
           keys={barStackedSeriesKeys}
@@ -80,6 +149,24 @@ const BarChartStackedVertical = () => {
 
                   setBarWidth(barThickness)
 
+                  // Check if this bar should use a pattern
+                  const getPatternUrl = (): string | null => {
+                    if (!config.legend.patterns || !config.legend.patternField) {
+                      return null
+                    }
+
+                    const patternFieldValue = bar.bar.data[config.legend.patternField]
+                    const pattern = config.legend.patterns[patternFieldValue]
+
+                    if (pattern) {
+                      return `url(#chart-pattern-${patternFieldValue})`
+                    }
+
+                    return null
+                  }
+
+                  const patternUrl = getPatternUrl()
+
                   return (
                     <Group key={`${barStack.index}--${bar.index}--${orientation}`}>
                       <Group
@@ -87,6 +174,7 @@ const BarChartStackedVertical = () => {
                         id={`barStack${barStack.index}-${bar.index}`}
                         className='stack vertical'
                       >
+                        {/* Base colored bar */}
                         {createBarElement({
                           config: config,
                           seriesHighlight,
@@ -117,6 +205,34 @@ const BarChartStackedVertical = () => {
                             display: displayBar ? 'block' : 'none'
                           }
                         })}
+
+                        {/* Pattern overlay if pattern exists */}
+                        {patternUrl &&
+                          createBarElement({
+                            config: config,
+                            seriesHighlight,
+                            index: barStack.index,
+                            background: patternUrl, // Use pattern as background
+                            borderColor: 'transparent',
+                            borderStyle: 'none',
+                            borderWidth: '0px',
+                            width: barThickness,
+                            height: bar.height,
+                            x: barX,
+                            y: bar.y,
+                            onMouseOver: () => {}, // No interaction
+                            onMouseLeave: () => {}, // No interaction
+                            tooltipHtml: '',
+                            tooltipId: '',
+                            onClick: () => {}, // No interaction
+                            styleOverrides: {
+                              animationDelay: `${barStack.index * 0.5}s`,
+                              transformOrigin: `${barThickness / 2}px ${bar.y + bar.height}px`,
+                              opacity: transparentBar ? 0.2 : 1,
+                              display: displayBar ? 'block' : 'none',
+                              pointerEvents: 'none' // Let clicks pass through to base bar
+                            }
+                          })}
                       </Group>
                     </Group>
                   )
@@ -124,7 +240,18 @@ const BarChartStackedVertical = () => {
               })
           }}
         </BarStack>
-        <Regions xScale={xScale} yMax={yMax} barWidth={barWidth} totalBarsInGroup={1} />
+        <Regions
+          xScale={xScale}
+          yMax={yMax}
+          barWidth={barWidth}
+          totalBarsInGroup={1}
+          handleTooltipMouseOff={() => {}}
+          handleTooltipMouseOver={() => {}}
+          handleTooltipClick={() => {}}
+          tooltipData={null}
+          showTooltip={() => {}}
+          hideTooltip={() => {}}
+        />
       </>
     )
   )
