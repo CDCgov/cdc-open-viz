@@ -904,6 +904,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     let sequential = []
     let nonSequential = []
     let accessibleColors = []
+    const v2Palette = config.general.palette.version === '2.0'
     for (let paletteName in colorPalettes) {
       if (!isReversed) {
         if (paletteName.includes('qualitative') && !paletteName.endsWith('reverse')) {
@@ -912,7 +913,23 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
         if (paletteName.includes('colorblindsafe') && !paletteName.endsWith('reverse')) {
           accessibleColors.push(paletteName)
         }
+
+        if (v2Palette && paletteName.includes('sequential')) {
+          sequential.push(paletteName)
+        }
+
+        if (v2Palette && paletteName.includes('divergent')) {
+          nonSequential.push(paletteName)
+        }
+
         if (
+          v2Palette &&
+          (paletteName.includes('heat_map') || paletteName.includes('qualitative'))
+        ) {
+          accessibleColors.push(paletteName)
+        }
+
+        if (!v2Palette &&
           !paletteName.includes('qualitative') &&
           !paletteName.includes('colorblindsafe') &&
           !paletteName.endsWith('reverse')
@@ -2979,6 +2996,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       onClick={() => {
                         const _newConfig = _.cloneDeep(config)
                         _newConfig.general.palette.name = palette
+                        _newConfig.general.palette.version = '2.0'
                         setConfig(_newConfig)
                       }}
                       className={config.general.palette.name === palette ? 'selected' : ''}
@@ -3016,6 +3034,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       onClick={() => {
                         const _newConfig = _.cloneDeep(config)
                         _newConfig.general.palette.name = palette
+                        _newConfig.general.palette.version = '2.0'
                         setConfig(_newConfig)
                       }}
                       className={config.general.palette.name === palette ? 'selected' : ''}
@@ -3051,8 +3070,12 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       title={palette}
                       key={palette}
                       onClick={() => {
-                        handleEditorChanges('general.palette.name', palette)
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.general.palette.name = palette
+                        _newConfig.general.palette.version = '2.0'
+                        setConfig(_newConfig)
                       }}
+
                       className={config.general.palette.name === palette ? 'selected' : ''}
                     >
                       <span style={colorOne}></span>
