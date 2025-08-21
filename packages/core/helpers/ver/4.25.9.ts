@@ -48,25 +48,6 @@ const updateMapColorMigrations = config => {
             delete config.color
         }
 
-        // // Migrate v1 to v2 palette names
-        // if (config.general?.palette?.name && (!config.general?.palette?.version || config.general.palette.version === '1.0')) {
-        //     const v1PaletteName = config.general.palette.name
-        //     const v2PaletteName = v1ToV2PaletteMigration[v1PaletteName]
-
-        //     if (v2PaletteName) {
-        //         // Save backup before migration
-        //         config.general.palette.backups = config.general.palette.backups || []
-        //         config.general.palette.backups.push({
-        //             name: v1PaletteName,
-        //             version: '1.0',
-        //             isReversed: config.general.palette.isReversed
-        //         })
-
-        //         // Update to v2 palette name and version
-        //         config.general.palette.name = v2PaletteName
-        //         config.general.palette.version = '2.0'
-        //     }
-        // }
 
     }
 

@@ -2999,7 +2999,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         _newConfig.general.palette.version = '2.0'
                         setConfig(_newConfig)
                       }}
-                      className={config.general.palette.name === palette ? 'selected' : ''}
+                      className={(config.general.palette.name || '') === palette ? 'selected' : ''}
                     >
                       <span style={colorOne}></span>
                       <span style={colorTwo}></span>
@@ -3037,7 +3037,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         _newConfig.general.palette.version = '2.0'
                         setConfig(_newConfig)
                       }}
-                      className={config.general.palette.name === palette ? 'selected' : ''}
+                      className={(config.general.palette.name || '') === palette ? 'selected' : ''}
                     >
                       <span style={colorOne}></span>
                       <span style={colorTwo}></span>
@@ -3076,7 +3076,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         setConfig(_newConfig)
                       }}
 
-                      className={config.general.palette.name === palette ? 'selected' : ''}
+                      className={(config.general.palette.name || '') === palette ? 'selected' : ''}
                     >
                       <span style={colorOne}></span>
                       <span style={colorTwo}></span>
