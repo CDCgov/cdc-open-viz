@@ -43,10 +43,11 @@ export type MapContext = {
   setConfig: (newState: MapConfig) => MapConfig
   config: MapConfig
   viewport: ViewPort
-  stateToShow: string
+  statesToShow: string[]
   scale: number
   translate: [number, number]
   topoData: object
   runtimeData: Object[]
   tooltipId: string
+  interactionLabel?: string
 }

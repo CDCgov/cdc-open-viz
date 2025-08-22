@@ -8,7 +8,8 @@ import { addUIDs, validateFipsCodeLength } from './helpers'
 import EditorContext from '@cdc/editor/src/ConfigContext'
 import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 import { MapConfig } from './types/MapConfig'
-import _, { set } from 'lodash'
+import _ from 'lodash'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type CdcMapProps = {
   config: MapConfig
@@ -19,6 +20,7 @@ type CdcMapProps = {
   logo?: string
   navigationHandler: Function
   setConfig: Function
+  interactionLabel?: string
 }
 
 const CdcMap: React.FC<CdcMapProps> = ({
@@ -28,7 +30,8 @@ const CdcMap: React.FC<CdcMapProps> = ({
   configUrl,
   logo = '',
   link,
-  config: editorsConfig
+  config: editorsConfig,
+  interactionLabel = ''
 }) => {
   const editorContext = useContext(EditorContext)
   const [config, _setConfig] = useState(editorsConfig ?? null)
@@ -116,6 +119,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
   useEffect(() => {
     init()
+    publishAnalyticsEvent('map_loaded', 'load', interactionLabel, 'map')
   }, [])
 
   useEffect(() => {
@@ -137,6 +141,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
       logo={logo}
       link={link}
       loadConfig={loadConfig}
+      interactionLabel={interactionLabel}
     />
   )
 }

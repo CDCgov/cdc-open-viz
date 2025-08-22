@@ -127,10 +127,10 @@ export type MapConfig = Visualization & {
     showDownloadPdfButton: boolean
     showSidebar: boolean
     showTitle: boolean
-    statePicked: {
+    statesPicked: {
       fipsCode: string
       stateName: string
-    }
+    }[]
     territoriesAlwaysShow: boolean
     territoriesLabel: string
     title: string
@@ -176,7 +176,6 @@ export type MapConfig = Visualization & {
   tooltips: {
     appearanceType: 'hover' | 'click'
     linkLabel: string
-    capitalizeLabels: boolean
     opacity: number
   }
   runtime: {

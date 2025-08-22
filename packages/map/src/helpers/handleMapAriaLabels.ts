@@ -3,7 +3,7 @@ export const handleMapAriaLabels = (state: MapConfig = '', testing = false) => {
   try {
     if (!state.general.geoType) throw Error('handleMapAriaLabels: no geoType found in state')
     const {
-      general: { title, geoType, statePicked }
+      general: { title, geoType, statesPicked }
     } = state
     let ariaLabel = ''
     switch (geoType) {
@@ -17,7 +17,7 @@ export const handleMapAriaLabels = (state: MapConfig = '', testing = false) => {
         ariaLabel += `United States county map`
         break
       case 'single-state':
-        ariaLabel += `${statePicked.stateName} county map`
+        ariaLabel += `${statesPicked.map(sp => sp.stateName).join(', ')} county map`
         break
       case 'us-region':
         ariaLabel += `United States HHS Region map`

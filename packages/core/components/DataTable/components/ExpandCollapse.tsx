@@ -1,12 +1,23 @@
+import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
+import { Visualization } from '../../../types/Visualization'
 import Icon from '../../ui/Icon'
 import parse from 'html-react-parser'
 
-const ExpandCollapse = ({ expanded, setExpanded, tableTitle, fontSize, viewport }) => {
+interface ExpandCollapseProps {
+  expanded: boolean
+  setExpanded: (expanded: boolean) => void
+  tableTitle: string
+  config?: Visualization
+  interactionLabel?: string
+}
+
+const ExpandCollapse = ({ expanded, setExpanded, tableTitle, config, interactionLabel = '' }: ExpandCollapseProps) => {
   return (
     <div
       role='button'
       className={expanded ? 'data-table-heading p-3' : 'collapsed data-table-heading p-3'}
       onClick={() => {
+        publishAnalyticsEvent('data_table_toggled', 'click', interactionLabel, config.type || 'unknown')
         setExpanded(!expanded)
       }}
       tabIndex={0}

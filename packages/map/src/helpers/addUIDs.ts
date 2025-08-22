@@ -4,19 +4,19 @@ import {
   supportedCountries,
   supportedRegions,
   supportedStates,
-  supportedTerritories
+  supportedTerritories,
+  stateKeys,
+  territoryKeys,
+  regionKeys,
+  countryKeys,
+  countyKeys,
+  cityKeys
 } from './../data/supported-geos'
 
 import { SUPPORTED_DC_NAMES, GEO_TYPES, GEOCODE_TYPES } from './constants'
 import { DataRow, MapConfig } from '../types/MapConfig'
 
-// Data props
-const stateKeys = Object.keys(supportedStates)
-const territoryKeys = Object.keys(supportedTerritories)
-const regionKeys = Object.keys(supportedRegions)
-const countryKeys = Object.keys(supportedCountries)
-const countyKeys = Object.keys(supportedCounties)
-const cityKeys = Object.keys(supportedCities)
+// Note: Key arrays are now imported from supported-geos for better performance
 
 const geoLookups: Record<string, GeoLookup> = {
   state: { keys: stateKeys, data: supportedStates },
