@@ -1,31 +1,18 @@
 import _ from 'lodash'
 
-// Mapping from v1 to v2 color palette names
-const v1ToV2PaletteMigration = {
-    // Blue palettes
-    'sequential-blue-2(MPX)': 'sequential_single_hue_blue',
-    'greenblue': 'sequential_single_hue_blue',
-    'bluegreen': 'sequential_single_hue_teal',
-
-    // Purple palettes
-    'pinkpurple': 'sequential_single_hue_purple',
-
-    // Orange/Red palettes
-    'yelloworangered': 'sequential_single_hue_orange',
-    'yelloworangebrown': 'sequential_single_hue_orange',
-    'orangered': 'sequential_single_hue_orange',
-    'red': 'sequential_single_hue_orange',
-    'sequential-orange(MPX)': 'sequential_single_hue_orange',
-
-    // Diverging palettes
-    'yellowpurple': 'divergent_blue_purple_center',
-
-    // Qualitative palettes
-    'qualitative1': 'qualitative',
-    'qualitative2': 'qualitative',
-    'qualitative3': 'qualitative',
-    'qualitative4': 'qualitative',
-    'colorblindsafe': 'qualitative'
+// Palette name migrations for v1 map palettes
+const paletteNameMigrations = {
+  'yelloworangered': 'sequential_yellow_orange_red',
+  'yelloworangebrown': 'sequential_yellow_orange_brown', 
+  'pinkpurple': 'sequential_pink_purple',
+  'bluegreen': 'sequential_blue_green',
+  'orangered': 'sequential_orange_red',
+  'red': 'sequential_red',
+  'greenblue': 'sequential_green_blue',
+  'yellowpurple': 'divergent_yellow_purple',
+  'qualitative9': 'qualitative_earth_tones',
+  'sequential-blue-2(MPX)': 'sequential_blue_extended',
+  'sequential-orange(MPX)': 'sequential_orange_extended'
 }
 
 // On maps move config.color to config.general.colorPalettes.colorName
@@ -46,6 +33,11 @@ const updateMapColorMigrations = config => {
 
             // Remove old color property
             delete config.color
+        }
+
+        // Migrate old palette names to new ones
+        if (config.general?.palette?.name && paletteNameMigrations[config.general.palette.name]) {
+            config.general.palette.name = paletteNameMigrations[config.general.palette.name]
         }
 
 
