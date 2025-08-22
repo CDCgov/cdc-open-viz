@@ -98,13 +98,15 @@ export type Legend = CoreLegend & {
   separators?: string
   patterns?: {
     [key: string]: {
-      label: string
-      color: string
-      shape: string
+      label?: string
+      color?: string
+      shape?: string
+      dataKey?: string
+      dataValue?: string
+      contrastCheck?: boolean
     }
   }
   patternSize?: number
-  patternField?: string
 }
 
 type Visual = {

@@ -24,14 +24,15 @@ const PanelPatternSettings: FC<PanelProps> = props => {
     label?: string
     color?: string
     shape?: 'circles' | 'lines' | 'diagonalLines' | 'waves'
+    dataKey?: string
+    dataValue?: string
     contrastCheck?: boolean
   }
 
   // Safe legend reference with defaults to avoid crashes when legend is undefined
-  const legendCfg = (config.legend || { patterns: {}, patternSize: 8, patternField: '' }) as {
+  const legendCfg = (config.legend || { patterns: {}, patternSize: 8 }) as {
     patterns: Record<string, LegendPattern>
     patternSize: number
-    patternField: string
   }
 
   const patternTypes = [
@@ -67,17 +68,17 @@ const PanelPatternSettings: FC<PanelProps> = props => {
     }
   }
 
-  // Get unique values from the pattern field for dropdown options
-  const getPatternFieldOptions = () => {
-    if (!legendCfg.patternField || !Array.isArray(transformedData) || transformedData.length === 0) {
+  // Get unique values from a specific data field for dropdown options
+  const getDataValueOptions = (dataKey: string) => {
+    if (!dataKey || !Array.isArray(transformedData) || transformedData.length === 0) {
       return []
     }
 
-    const uniqueValues = Array.from(new Set(transformedData.map(row => row[legendCfg.patternField])))
+    const uniqueValues = Array.from(new Set(transformedData.map(row => row[dataKey])))
       .filter(val => val !== undefined && val !== null && val !== '')
       .sort()
 
-    return uniqueValues.map(value => ({ value, label: value }))
+    return uniqueValues.map(value => ({ value: String(value), label: String(value) }))
   }
 
   const getFieldOptions = () => {
@@ -155,7 +156,6 @@ const PanelPatternSettings: FC<PanelProps> = props => {
   }
 
   const fieldOptions = getFieldOptions()
-  const patternFieldOptions = getPatternFieldOptions()
   const currentPatterns: Record<string, LegendPattern> = legendCfg.patterns || {}
 
   // Check if all patterns pass contrast requirements
@@ -169,13 +169,16 @@ const PanelPatternSettings: FC<PanelProps> = props => {
     // For charts, we'll add a default pattern that users can configure
     const newPatternKey = `Pattern${Object.keys(currentPatterns).length + 1}`
     const defaultColor = '#000000'
+    const defaultDataKey = fieldOptions.length > 0 ? fieldOptions[0].value : ''
 
     const newPatterns = {
       ...currentPatterns,
       [newPatternKey]: {
         label: newPatternKey,
         color: defaultColor,
-        shape: 'circles',
+        shape: 'circles' as const,
+        dataKey: defaultDataKey,
+        dataValue: '',
         contrastCheck: performContrastCheck(newPatternKey, defaultColor)
       }
     }
@@ -249,17 +252,6 @@ const PanelPatternSettings: FC<PanelProps> = props => {
     })
   }
 
-  const handlePatternFieldChange = (value: string) => {
-    updateConfig({
-      ...config,
-      legend: {
-        ...(config.legend || {}),
-        patternField: value,
-        patterns: {}
-      }
-    })
-  }
-
   const handlePatternSizeChange = (value: string) => {
     const numericSize = getPatternSizeNumeric(value)
     updateConfig({
@@ -291,13 +283,14 @@ const PanelPatternSettings: FC<PanelProps> = props => {
         {/* Individual Pattern Configurations */}
         {Object.entries(currentPatterns).map(([patternKey, pattern], index) => {
           const p: LegendPattern = pattern || {}
+          const dataValueOptions = p.dataKey ? getDataValueOptions(p.dataKey) : []
 
           return (
             <Accordion allowZeroExpanded key={`pattern-accordion-${index}`}>
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    {legendCfg.patternField ? `${legendCfg.patternField}: ${patternKey}` : 'Select Column'}
+                    {p.dataKey && p.dataValue ? `${p.dataKey}: ${p.dataValue}` : `Pattern ${index + 1}`}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
@@ -314,16 +307,34 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                   <label htmlFor={`pattern-datakey-${patternKey}`}>Data Key:</label>
                   <select
                     id={`pattern-datakey-${patternKey}`}
-                    value={legendCfg.patternField || 'Select'}
-                    onChange={e => handlePatternFieldChange(e.target.value)}
+                    value={p.dataKey || 'Select'}
+                    onChange={e => handlePatternUpdate(patternKey, 'dataKey', e.target.value)}
                   >
-                    <option value='Select'>Select</option>
+                    <option value='Select'>Select Data Key</option>
                     {fieldOptions.map((option, index) => (
                       <option value={option.value} key={index}>
                         {option.label}
                       </option>
                     ))}
                   </select>
+
+                  {p.dataKey && (
+                    <>
+                      <label htmlFor={`pattern-datavalue-${patternKey}`}>Data Value:</label>
+                      <select
+                        id={`pattern-datavalue-${patternKey}`}
+                        value={p.dataValue || 'Select'}
+                        onChange={e => handlePatternUpdate(patternKey, 'dataValue', e.target.value)}
+                      >
+                        <option value='Select'>Select Data Value</option>
+                        {dataValueOptions.map((option, index) => (
+                          <option value={option.value} key={index}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </>
+                  )}
 
                   <label htmlFor={`pattern-datavalue-${patternKey}`}>
                     Data Value:

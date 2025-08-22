@@ -322,15 +322,18 @@ export const BarChartVertical = () => {
 
                   // Check if this bar should use a pattern
                   const getPatternUrl = (): string | null => {
-                    if (!config.legend.patterns || !config.legend.patternField) {
+                    if (!config.legend.patterns || Object.keys(config.legend.patterns).length === 0) {
                       return null
                     }
 
-                    const patternFieldValue = datum[config.legend.patternField]
-                    const pattern = config.legend.patterns[patternFieldValue]
-
-                    if (pattern) {
-                      return `url(#chart-pattern-${patternFieldValue})`
+                    // Find a pattern that matches this data point
+                    for (const [patternKey, pattern] of Object.entries(config.legend.patterns)) {
+                      if (pattern.dataKey && pattern.dataValue) {
+                        const dataFieldValue = datum[pattern.dataKey]
+                        if (String(dataFieldValue) === String(pattern.dataValue)) {
+                          return `url(#chart-pattern-${patternKey})`
+                        }
+                      }
                     }
 
                     return null
@@ -395,20 +398,30 @@ export const BarChartVertical = () => {
                         })}
 
                         {/* Pattern overlay if pattern exists */}
-                        {patternUrl && (
-                          <rect
-                            x={barX}
-                            y={barY}
-                            width={barWidth}
-                            height={barHeight}
-                            fill={patternUrl}
-                            style={{
+                        {patternUrl &&
+                          createBarElement({
+                            config: config,
+                            index: newIndex,
+                            background: patternUrl, // Use pattern as background
+                            borderColor: 'transparent',
+                            borderStyle: 'none',
+                            borderWidth: '0px',
+                            width: barWidth,
+                            height: barHeight,
+                            x: barX,
+                            y: barY,
+                            onMouseOver: () => {}, // No interaction
+                            onMouseLeave: () => {}, // No interaction
+                            tooltipHtml: '',
+                            tooltipId: '',
+                            onClick: () => {}, // No interaction
+                            styleOverrides: {
+                              transformOrigin: `0 ${barY + barHeight}px`,
                               opacity: transparentBar ? 0.2 : 1,
                               display: displayBar ? 'block' : 'none',
                               pointerEvents: 'none' // Let clicks pass through to base bar
-                            }}
-                          />
-                        )}
+                            }
+                          })}
 
                         {(absentDataLabel || isSuppressed) && (
                           <rect

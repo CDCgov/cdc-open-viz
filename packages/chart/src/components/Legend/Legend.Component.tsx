@@ -224,7 +224,11 @@ const Legend: React.FC<LegendProps> = forwardRef(
 
                 {/* Pattern Legend Items */}
                 {config.legend.patterns && Object.keys(config.legend.patterns).length > 0 && (
-                  <div className='legend-patterns' style={{ marginTop: '1rem' }}>
+                  <div
+                    className={`legend-patterns d-flex ${
+                      ['top', 'bottom'].includes(config.legend.position) ? 'flex-row flex-wrap' : 'flex-column'
+                    }`}
+                  >
                     {Object.entries(config.legend.patterns).map(([key, pattern]) => {
                       const patternId = `legend-pattern-${key}`
                       const size = config.legend.patternSize || 8
@@ -234,11 +238,11 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       return (
                         <LegendItem
                           key={patternId}
-                          className='legend-item legend-item--pattern'
+                          className='legend-item legend-item--pattern d-flex align-items-center'
                           tabIndex={0}
                           role='button'
                         >
-                          <span style={{ marginRight: '10px' }}>
+                          <span className='me-2'>
                             <svg width={legendSize} height={legendSize}>
                               <defs>
                                 {pattern.shape === 'circles' && (

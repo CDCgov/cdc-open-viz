@@ -166,15 +166,18 @@ const BarChartStackedHorizontal = () => {
 
                 // Check if this bar should use a pattern
                 const getPatternUrl = (): string | null => {
-                  if (!config.legend.patterns || !config.legend.patternField) {
+                  if (!config.legend.patterns || Object.keys(config.legend.patterns).length === 0) {
                     return null
                   }
 
-                  const patternFieldValue = data[bar.index][config.legend.patternField]
-                  const pattern = config.legend.patterns[patternFieldValue]
-
-                  if (pattern) {
-                    return `url(#chart-pattern-${patternFieldValue})`
+                  // Find a pattern that matches this data point
+                  for (const [patternKey, pattern] of Object.entries(config.legend.patterns)) {
+                    if (pattern.dataKey && pattern.dataValue) {
+                      const dataFieldValue = data[bar.index][pattern.dataKey]
+                      if (String(dataFieldValue) === String(pattern.dataValue)) {
+                        return `url(#chart-pattern-${patternKey})`
+                      }
+                    }
                   }
 
                   return null
