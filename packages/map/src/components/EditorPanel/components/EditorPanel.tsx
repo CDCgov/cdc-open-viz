@@ -2942,7 +2942,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       onClick={() => {
                         const _newConfig = _.cloneDeep(config)
                         _newConfig.general.palette.name = palette
-                        _newConfig.general.palette.version = '1.0'
+                        _newConfig.general.palette.version = '2.0'
                         setConfig(_newConfig)
                       }}
                       className={(config.general.palette.name || '') === palette ? 'selected' : ''}
@@ -2980,7 +2980,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       onClick={() => {
                         const _newConfig = _.cloneDeep(config)
                         _newConfig.general.palette.name = palette
-                        _newConfig.general.palette.version = '1.0'
+                        _newConfig.general.palette.version = '2.0'
                         setConfig(_newConfig)
                       }}
                       className={(config.general.palette.name || '') === palette ? 'selected' : ''}
@@ -3018,7 +3018,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       onClick={() => {
                         const _newConfig = _.cloneDeep(config)
                         _newConfig.general.palette.name = palette
-                        _newConfig.general.palette.version = '1.0'
+                        _newConfig.general.palette.version = '2.0'
                         setConfig(_newConfig)
                       }}
                       className={(config.general.palette.name || '') === palette ? 'selected' : ''}

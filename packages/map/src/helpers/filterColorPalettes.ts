@@ -21,7 +21,7 @@ export const filterColorPalettes = ({ isReversed, colorPalettes, config }) => {
     const handleV2Palette = () => {
       if (isReversed !== isReversedPalette) return
 
-      if (paletteName.includes('qualitative')) {
+      if (paletteName.includes('divergent')) {
         nonSequential.push(paletteName)
       } else if (paletteName.includes('colorblindsafe')) {
         accessibleColors.push(paletteName)
