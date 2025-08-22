@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useMemo } from 'react'
 import { filterColorPalettes } from '../../../helpers/filterColorPalettes'
 
 // Third Party
@@ -17,7 +17,7 @@ import Panels from './Panels'
 import Layout from '@cdc/core/components/Layout'
 
 // Data
-import { mapColorPalettesV1 as colorPalettes } from '@cdc/core/data/colorPalettes'
+import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { supportedStatesFipsCodes } from '../../../data/supported-geos.js'
 
 // Components - Core
@@ -50,6 +50,8 @@ import './editorPanel.styles.css'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'
+import { migratePaletteName } from '../../../helpers/migratePaletteName'
+import { getMapColorPaletteVersion } from '../../../helpers/getMapColorPaletteVersion'
 
 type MapEditorPanelProps = {
   datasets?: Datasets
@@ -901,7 +903,10 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
   const isReversed = config.general.palette.isReversed
 
-  const [sequential, nonSequential, accessibleColors] = filterColorPalettes({ isReversed, colorPalettes, config })
+  const [sequential, nonSequential, accessibleColors] = useMemo(
+    () => filterColorPalettes({ isReversed, colorPalettes, config }),
+    [isReversed, colorPalettes, config.general.palette.version]
+  )
 
   useEffect(() => {
     setLoadedDefault(config.defaultData)
@@ -2923,16 +2928,17 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <span>Sequential</span>
               <ul className='color-palette'>
                 {sequential.map(palette => {
+                  const paletteAccessor = colorPalettes?.[`v${getMapColorPaletteVersion(config)}`] || colorPalettes
                   const colorOne = {
-                    backgroundColor: colorPalettes[palette][2]
+                    backgroundColor: paletteAccessor[palette][2]
                   }
 
                   const colorTwo = {
-                    backgroundColor: colorPalettes[palette][4]
+                    backgroundColor: paletteAccessor[palette][4]
                   }
 
                   const colorThree = {
-                    backgroundColor: colorPalettes[palette][6]
+                    backgroundColor: paletteAccessor[palette][6]
                   }
 
                   return (
@@ -2941,11 +2947,13 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       key={palette}
                       onClick={() => {
                         const _newConfig = _.cloneDeep(config)
-                        _newConfig.general.palette.name = palette
-                        _newConfig.general.palette.version = '2.0'
+                        _newConfig.general.palette.name = migratePaletteName(palette)
+                        if (config.general.palette.version === '1.0' || !config.general.palette.version) {
+                          _newConfig.general.palette.version = '2.0'
+                        }
                         setConfig(_newConfig)
                       }}
-                      className={(config.general.palette.name || '') === palette ? 'selected' : ''}
+                      className={(config.general.palette.name || '') === migratePaletteName(palette) ? 'selected' : ''}
                     >
                       <span style={colorOne}></span>
                       <span style={colorTwo}></span>
@@ -2957,20 +2965,21 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <span>Non-Sequential</span>
               <ul className='color-palette'>
                 {nonSequential.map(palette => {
+                  const paletteAccessor = colorPalettes?.[`v${getMapColorPaletteVersion(config)}`] || colorPalettes
                   const colorOne = {
-                    backgroundColor: colorPalettes[palette][2]
+                    backgroundColor: paletteAccessor[palette][2]
                   }
 
                   const colorTwo = {
-                    backgroundColor: colorPalettes[palette][4]
+                    backgroundColor: paletteAccessor[palette][4]
                   }
 
                   const colorThree = {
-                    backgroundColor: colorPalettes[palette][6]
+                    backgroundColor: paletteAccessor[palette][6]
                   }
 
                   // hide palettes with too few colors for region maps
-                  if (colorPalettes[palette].length <= 8 && config.general.geoType === 'us-region') {
+                  if (paletteAccessor[palette].length <= 8 && config.general.geoType === 'us-region') {
                     return ''
                   }
                   return (
@@ -2979,8 +2988,10 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       key={palette}
                       onClick={() => {
                         const _newConfig = _.cloneDeep(config)
-                        _newConfig.general.palette.name = palette
-                        _newConfig.general.palette.version = '2.0'
+                        _newConfig.general.palette.name = migratePaletteName(palette)
+                        if (config.general.palette.version === '1.0' || !config.general.palette.version) {
+                          _newConfig.general.palette.version = '2.0'
+                        }
                         setConfig(_newConfig)
                       }}
                       className={(config.general.palette.name || '') === palette ? 'selected' : ''}
@@ -2995,20 +3006,21 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <span>Colorblind Safe</span>
               <ul className='color-palette'>
                 {accessibleColors.map(palette => {
+                  const paletteAccessor = colorPalettes?.[`v${getMapColorPaletteVersion(config)}`] || colorPalettes
                   const colorOne = {
-                    backgroundColor: colorPalettes[palette][2]
+                    backgroundColor: paletteAccessor[palette][2]
                   }
 
                   const colorTwo = {
-                    backgroundColor: colorPalettes[palette][4]
+                    backgroundColor: paletteAccessor[palette][4]
                   }
 
                   const colorThree = {
-                    backgroundColor: colorPalettes[palette][6]
+                    backgroundColor: paletteAccessor[palette][6]
                   }
 
                   // hide palettes with too few colors for region maps
-                  if (colorPalettes[palette].length <= 8 && config.general.geoType === 'us-region') {
+                  if (paletteAccessor[palette].length <= 8 && config.general.geoType === 'us-region') {
                     return ''
                   }
                   return (
@@ -3017,8 +3029,10 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       key={palette}
                       onClick={() => {
                         const _newConfig = _.cloneDeep(config)
-                        _newConfig.general.palette.name = palette
-                        _newConfig.general.palette.version = '2.0'
+                        _newConfig.general.palette.name = migratePaletteName(palette)
+                        if (config.general.palette.version === '1.0' || !config.general.palette.version) {
+                          _newConfig.general.palette.version = '2.0'
+                        }
                         setConfig(_newConfig)
                       }}
                       className={(config.general.palette.name || '') === palette ? 'selected' : ''}

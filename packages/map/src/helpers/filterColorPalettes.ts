@@ -1,12 +1,14 @@
-export const filterColorPalettes = ({ isReversed, colorPalettes, config }) => {
-  const sequential = []
-  const nonSequential = []
-  const accessibleColors = []
+import { getMapColorPaletteVersion } from './getMapColorPaletteVersion'
 
-  for (const paletteName in colorPalettes) {
+export const filterColorPalettes = ({ isReversed, colorPalettes, config }) => {
+  let sequential = []
+  let nonSequential = []
+  let accessibleColors = []
+
+  for (const paletteName in colorPalettes?.[`v${getMapColorPaletteVersion(config)}`]) {
     const isReversedPalette = paletteName.endsWith('reverse')
 
-    const handleV1Palette = () => {
+    const handleV1Palette = paletteName => {
       if (isReversed !== isReversedPalette) return
 
       if (paletteName.includes('qualitative')) {
@@ -18,12 +20,12 @@ export const filterColorPalettes = ({ isReversed, colorPalettes, config }) => {
       }
     }
 
-    const handleV2Palette = () => {
+    const handleV2Palette = paletteName => {
       if (isReversed !== isReversedPalette) return
 
       if (paletteName.includes('divergent')) {
         nonSequential.push(paletteName)
-      } else if (paletteName.includes('colorblindsafe')) {
+      } else if (paletteName.includes('colorblindsafe') || paletteName.includes('qualitative')) {
         accessibleColors.push(paletteName)
       } else {
         sequential.push(paletteName)
@@ -31,13 +33,14 @@ export const filterColorPalettes = ({ isReversed, colorPalettes, config }) => {
     }
 
     if (config.general.palette.version === '1.0') {
-      handleV1Palette()
+      // empty sequential palette
+      handleV1Palette(paletteName)
     }
 
     if (config.general.palette.version === '2.0') {
-      handleV2Palette()
+      // empty sequential palette
+      handleV2Palette(paletteName)
     }
   }
-
   return [sequential, nonSequential, accessibleColors]
 }
