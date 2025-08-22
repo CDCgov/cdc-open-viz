@@ -45,6 +45,7 @@ import {
 
 // styles
 import './scss/main.scss'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type CdcDataBiteProps = {
   config: Config
@@ -53,6 +54,7 @@ type CdcDataBiteProps = {
   isEditor: boolean
   setConfig: () => {}
   link: any
+  interactionLabel: string
 }
 
 const CdcDataBite = (props: CdcDataBiteProps) => {
@@ -62,7 +64,8 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     isDashboard = false,
     isEditor = false,
     setConfig: setParentConfig,
-    link
+    link,
+    interactionLabel = ''
   } = props
 
   const initialState = {
@@ -145,6 +148,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     const processedConfig = { ...coveUpdateWorker(response) }
 
     updateConfig({ ...defaults, ...processedConfig })
+    publishAnalyticsEvent('data-bite_loaded', 'load', interactionLabel, 'data-bite')
     dispatch({ type: 'SET_LOADING', payload: false })
   }
 

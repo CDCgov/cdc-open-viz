@@ -29,7 +29,7 @@ import CategoricalYAxis from './Axis/Categorical.Axis'
 import BrushChart from './Brush/BrushController'
 
 // Helpers
-import { isLegendWrapViewport, isMobileHeightViewport } from '@cdc/core/helpers/viewports'
+import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { calcInitialHeight, handleAutoPaddingRight } from '../helpers/sizeHelpers'
 import { filterAndShiftLinearDateTicks } from '../helpers/filterAndShiftLinearDateTicks'
@@ -97,7 +97,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     tableData,
     transformedData: data,
     seriesHighlight,
-    
+
   } = useContext(ConfigContext)
 
   // CONFIG
@@ -154,8 +154,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const labelsOverflow = inlineLabel && !inlineLabelHasNoSpace
   const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
   const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
-  const tickLabelFontSize = isMobileHeightViewport(currentViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
-  const axisLabelFontSize = isMobileHeightViewport(currentViewport) ? AXIS_LABEL_FONT_SIZE_SMALL : AXIS_LABEL_FONT_SIZE
+  const tickLabelFontSize = isMobileFontViewport(currentViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
+  const axisLabelFontSize = isMobileFontViewport(currentViewport) ? AXIS_LABEL_FONT_SIZE_SMALL : AXIS_LABEL_FONT_SIZE
   const GET_TEXT_WIDTH_FONT = `normal ${tickLabelFontSize}px Nunito, sans-serif`
 
   // zero if not forest plot

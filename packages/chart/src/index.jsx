@@ -14,6 +14,11 @@ let domContainer = document.getElementsByClassName('react-container')[0]
 
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
-    <CdcChart configUrl={domContainer.attributes['data-config'].value} isEditor={isEditor} isDebug={isDebug} />
+    <CdcChart
+      interactionLabel={domContainer.attributes['data-config']?.value}
+      configUrl={domContainer.attributes['data-config'].value}
+      isEditor={isEditor}
+      isDebug={isDebug}
+    />
   </React.StrictMode>
 )

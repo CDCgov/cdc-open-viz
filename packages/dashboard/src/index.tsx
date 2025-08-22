@@ -15,6 +15,7 @@ ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
     <MultiDashboardWrapper
       configUrl={domContainer.attributes['data-config'].value}
+      interactionLabel={domContainer.attributes['data-config'].value}
       isEditor={isEditor}
       isDebug={isDebug}
     />

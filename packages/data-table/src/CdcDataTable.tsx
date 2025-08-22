@@ -164,6 +164,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
           viewport={currentViewport}
           tabbingId={'dataTableSection'}
           expandDataTable={expanded}
+          configUrl={configUrl}
         />
       </div>
     </Layout.VisualizationWrapper>

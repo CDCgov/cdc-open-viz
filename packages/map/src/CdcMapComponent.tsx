@@ -68,6 +68,7 @@ import EditorContext from '@cdc/editor/src/ConfigContext'
 import MapActions from './store/map.actions'
 import _ from 'lodash'
 import useModal from './hooks/useModal'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type CdcMapComponent = {
   config: MapConfig
@@ -79,6 +80,7 @@ type CdcMapComponent = {
   setSharedFilter: Function
   setSharedFilterValue: Function
   datasets?: Datasets
+  interactionLabel: string
 }
 
 const CdcMapComponent: React.FC<CdcMapComponent> = ({
@@ -92,7 +94,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   link,
   setConfig: setParentConfig,
   loadConfig,
-  datasets
+  datasets,
+  interactionLabel = ''
 }) => {
   const initialState = getInitialState(configObj)
 
@@ -112,7 +115,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     scale,
     translate,
     projection,
-    stateToShow,
+    statesToShow,
     requiredColumns,
     topoData,
     coveLoadedHasRan,
@@ -405,13 +408,14 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     setSharedFilter,
     setSharedFilterValue,
     config,
-    stateToShow,
+    statesToShow,
     tooltipId,
     tooltipRef,
     topoData,
     translate,
     isDraggingAnnotation,
-    loadConfig
+    loadConfig,
+    interactionLabel
   }
 
   if (!config.data) return <></>
@@ -420,7 +424,18 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   // this only shows in Dashboard config mode and only if Show Table is also set
   const tableLink = (
-    <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
+    <a
+      href={`#data-table-${config.dataKey}`}
+      className='margin-left-href'
+      onClick={() => {
+        publishAnalyticsEvent(
+          'link_to_data_table_click',
+          'click',
+          `${interactionLabel}|#data-table-${config.dataKey}`,
+          'map'
+        )
+      }}
+    >
       {config.dataKey} (Go to Table)
     </a>
   )
@@ -471,6 +486,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     setFilters={_setRuntimeData}
                     dimensions={dimensions}
                     standaloneMap={!config}
+                    interactionLabel={interactionLabel}
                   />
                 )}
 
@@ -517,6 +533,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       skipId={tabId}
                       containerWidthPadding={0}
                       currentViewport={currentViewport}
+                      interactionLabel={interactionLabel}
                     />
                   )}
                 </div>
@@ -545,6 +562,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       type='image'
                       state={config}
                       elementToCapture={imageId}
+                      interactionLabel={interactionLabel}
                     />
                   )}
                   {showDownloadPdfButton && (
@@ -553,6 +571,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       title='Download Chart as PDF'
                       type='pdf'
                       state={config}
+                      interactionLabel={interactionLabel}
                       elementToCapture={imageId}
                     />
                   )}
@@ -588,6 +607,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       tableTitle={table.label}
                       vizTitle={general.title}
                       wrapColumns={table.wrapColumns}
+                      interactionLabel={interactionLabel}
                     />
                   )}
 
@@ -607,9 +627,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 <ReactTooltip
                   id={`tooltip__${tooltipId}`}
                   float={true}
-                  className={`${
-                    tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'
-                  }`}
+                  className={`tooltip tooltip-test`}
                   style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
                 />
               )}

@@ -24,7 +24,7 @@ export const getInitialState = (configObj = {}): MapState => {
     runtimeData: { init: true },
     runtimeFilters: [],
     runtimeLegend: [],
-    stateToShow: ''
+    statesToShow: []
   }
 }
 
@@ -46,7 +46,7 @@ export type MapState = {
   runtimeData: object
   runtimeFilters: object[]
   runtimeLegend: object[]
-  stateToShow: string
+  statesToShow: string[]
   dataUrl: string
 }
 
@@ -84,8 +84,8 @@ const reducer = (state: MapState, action: MapActions): MapState => {
       return { ...state, runtimeFilters: action.payload }
     case 'SET_RUNTIME_LEGEND':
       return { ...state, runtimeLegend: action.payload }
-    case 'SET_STATE_TO_SHOW':
-      return { ...state, stateToShow: action.payload }
+    case 'SET_STATES_TO_SHOW':
+      return { ...state, statesToShow: action.payload }
     default:
       return state
   }

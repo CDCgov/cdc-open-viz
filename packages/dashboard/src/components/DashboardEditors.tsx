@@ -19,6 +19,7 @@ type DashboardEditorProps = {
   setSharedFilter?: Function
   apiFilterDropdowns?: APIFilterDropdowns
   state: DashboardState
+  interactionLabel: string
 }
 
 const DashboardEditors: React.FC<DashboardEditorProps> = ({
@@ -28,7 +29,8 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
   isDebug,
   setSharedFilter,
   apiFilterDropdowns,
-  state
+  state,
+  interactionLabel = ''
 }) => {
   const setsSharedFilter =
     state.config.dashboard.sharedFilters &&
@@ -66,6 +68,7 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
           showLoader={false}
           dashboardConfig={state.config}
           datasets={state.config.datasets}
+          interactionLabel={interactionLabel}
         />
       )
 
@@ -77,6 +80,7 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
           isEditor={true}
           setConfig={_updateConfig}
           isDashboard={true}
+          interactionLabel={interactionLabel}
         />
       )
 
@@ -88,6 +92,7 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
           isEditor={true}
           setConfig={_updateConfig}
           isDashboard={true}
+          interactionLabel={interactionLabel}
         />
       )
 
@@ -100,6 +105,7 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
           setConfig={_updateConfig}
           isDashboard={true}
           datasets={state.config.datasets}
+          interactionLabel={interactionLabel}
         />
       )
 
@@ -111,9 +117,9 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
           isEditor={true}
           setConfig={_updateConfig}
           isDashboard={true}
+          interactionLabel={interactionLabel}
         />
       )
-
     case 'dashboardFilters':
       return (
         <DashboardSharedFilters
@@ -121,6 +127,7 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
           visualizationConfig={visualizationConfig}
           apiFilterDropdowns={apiFilterDropdowns}
           setConfig={_updateConfig}
+          interactionLabel={interactionLabel}
         />
       )
 
@@ -132,6 +139,7 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
           isEditor={true}
           updateConfig={_updateConfig}
           datasets={state.config.datasets}
+          interactionLabel={interactionLabel}
         />
       )
 

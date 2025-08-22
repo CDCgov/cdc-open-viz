@@ -1,5 +1,14 @@
 import { titleCase } from './titleCase'
-import { supportedStates, supportedTerritories, supportedCountries, supportedCounties } from '../data/supported-geos'
+import {
+  supportedStates,
+  supportedTerritories,
+  supportedCountries,
+  supportedCounties,
+  stateKeys,
+  territoryKeys,
+  countryKeys,
+  countyKeys
+} from '../data/supported-geos'
 
 /**
  * Converts a geographic key to its display name.
@@ -10,10 +19,6 @@ import { supportedStates, supportedTerritories, supportedCountries, supportedCou
  */
 export const displayGeoName = (key: string, convertFipsCodes = true): string => {
   if (!convertFipsCodes) return key
-  const stateKeys = Object.keys(supportedStates)
-  const territoryKeys = Object.keys(supportedTerritories)
-  const countryKeys = Object.keys(supportedCountries)
-  const countyKeys = Object.keys(supportedCounties)
   let value = key
 
   // Map to first item in values array which is the preferred label
@@ -44,7 +49,7 @@ export const displayGeoName = (key: string, convertFipsCodes = true): string => 
     Congo: 'Republic of the Congo'
   }
 
-  if (true === Object.keys(dict).includes(value)) {
+  if (Object.keys(dict).includes(value)) {
     value = dict[value]
   }
   // if you get here and it's 2 letters then DONT titleCase state abbreviations like "AL"

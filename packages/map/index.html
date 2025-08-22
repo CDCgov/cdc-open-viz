@@ -1,41 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <style type="text/css">
+      body {
+        margin: 0;
+        border-top: none !important;
+      }
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <style type="text/css">
-    body {
-      margin: 0;
-      border-top: none !important;
-    }
+      .cdc-map-outer-container {
+        min-height: 100vh;
+      }
+    </style>
+    <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
 
-    .cdc-map-outer-container {
-      min-height: 100vh;
-    }
-  </style>
-  <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
+    <!-- This is temporary and for testing until Nunito/900 is added to TP -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@900&display=swap" rel="stylesheet" />
+    <style type="text/css">
+      @font-face {
+        font-family: 'Nunito';
+        font-weight: 900;
+        font-display: swap;
+        src: url('https://app.unpkg.com/@fontsource/nunito@5.0.18/files/files/nunito-latin-900-normal.woff2')
+          format('woff2');
+      }
+    </style>
+  </head>
 
-  <!-- This is temporary and for testing until Nunito/900 is added to TP -->
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@900&display=swap" rel="stylesheet" />
-  <style type="text/css">
-    @font-face {
-      font-family: 'Nunito';
-      font-weight: 900;
-      font-display: swap;
-      src: url('https://app.unpkg.com/@fontsource/nunito@5.0.18/files/files/nunito-latin-900-normal.woff2') format('woff2');
-    }
-  </style>
-</head>
+  <body>
+    <!-- DEFAULT EXAMPLES -->
+    <div class="react-container" data-config="/examples/default-world.json"></div>
 
-<body>
-  <!-- DEFAULT EXAMPLES -->
-  <div class="react-container" data-config="/examples/default-hex.json"></div>
-
-  <noscript>You need to enable JavaScript to run this app.</noscript>
-  <script type="module" src="./src/index.jsx"></script>
-  <!-- add cove_loaded listener -->
-  <!-- <script>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <script type="module" src="./src/index.jsx"></script>
+    <!-- add cove_loaded listener -->
+    <!-- <script>
     document.addEventListener('cove_loaded', function () {
       // This is a temporary fix to ensure the map loads after Cove has loaded
       // and the cdc-map-outer-container is available.
@@ -43,6 +43,5 @@
       console.log('Cove has loaded, initializing map...');
     });
   </script> -->
-</body>
-
+  </body>
 </html>

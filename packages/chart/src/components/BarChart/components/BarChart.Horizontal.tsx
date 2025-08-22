@@ -115,8 +115,14 @@ export const BarChartHorizontal = () => {
                     numbericBarHeight = 25
                   }
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(scaleVal)
-                  const defaultBarWidth = Math.abs(xScale(bar.value) - xScale(scaleVal))
+                  let defaultBarWidth = Math.abs(xScale(bar.value) - xScale(scaleVal))
                   const isPositiveBar = bar.value >= 0 && isNumber(bar.value)
+
+                  const MINIMUM_BAR_HEIGHT = 3
+                  if (isPositiveBar && barGroup.bars.length === 1 && defaultBarWidth < MINIMUM_BAR_HEIGHT) {
+                    defaultBarWidth = MINIMUM_BAR_HEIGHT
+                    barY = yScale(0) - MINIMUM_BAR_HEIGHT
+                  }
 
                   const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const yAxisValue = formatNumber(bar.value, 'left')
@@ -166,7 +172,7 @@ export const BarChartHorizontal = () => {
                     </li></ul>`
 
                   // configure colors
-                  let labelColor = '#000000'
+                  let labelColor = APP_FONT_COLOR
                   labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor) // Set if background is transparent'
                   let barColor =
                     config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key]
@@ -184,7 +190,7 @@ export const BarChartHorizontal = () => {
                   const borderColor = isHighlightedBar
                     ? highlightedBarColor
                     : config.barHasBorder === 'true'
-                    ? '#000'
+                    ? APP_FONT_COLOR
                     : 'transparent'
                   const borderWidth = isHighlightedBar
                     ? highlightedBar.borderWidth
@@ -298,7 +304,7 @@ export const BarChartHorizontal = () => {
                               : pd.symbol === 'Double Asterisk'
                               ? barHeight
                               : barHeight / 1.5
-                          const fillColor = pd.displayGray ? '#8b8b8a' : '#000'
+                          const fillColor = pd.displayGray ? '#8b8b8a' : APP_FONT_COLOR
                           return (
                             <Text // prettier-ignore
                               key={index}
@@ -366,7 +372,7 @@ export const BarChartHorizontal = () => {
                             display={displayBar ? 'block' : 'none'}
                             x={bar.y}
                             y={0}
-                            fill={'#000000'}
+                            fill={APP_FONT_COLOR}
                             dx={textPaddingLollipop}
                             textAnchor={textAnchorLollipop}
                             verticalAnchor='middle'

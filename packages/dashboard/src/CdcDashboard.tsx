@@ -14,13 +14,21 @@ import { coveUpdateWorker } from '@cdc/core/helpers/coveUpdateWorker'
 import _ from 'lodash'
 import { getQueryParams } from '@cdc/core/helpers/queryStringUtils'
 import EditorContext from '../../editor/src/ConfigContext'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type MultiDashboardProps = Omit<WCMSProps, 'configUrl'> & {
   configUrl?: string
   config?: MultiDashboardConfig
+  interactionLabel?: string
 }
 
-const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, isEditor, isDebug, config }) => {
+const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
+  configUrl,
+  isEditor,
+  isDebug,
+  config,
+  interactionLabel = ''
+}) => {
   const [initial, setInitial] = useState<InitialState>(undefined)
   const editorContext = useContext(EditorContext)
 
@@ -43,7 +51,6 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, isEdi
     const versionedConfig = coveUpdateWorker(config)
     return { ...initialState, config: versionedConfig, filteredData, data: datasets }
   }
-
   const loadConfig = async () => {
     const _config: MultiDashboardConfig = config || editorContext.config || (await (await fetch(configUrl)).json())
     const selected = getSelectedConfig(_config)
@@ -51,6 +58,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, isEdi
     const { newConfig, datasets } =
       selected !== null ? await loadMultiDashboard(_config, selected) : await loadSingleDashboard(_config)
     setInitial(formatInitialState(newConfig, datasets))
+    publishAnalyticsEvent('dashboard_loaded', 'load', interactionLabel, 'dashboard')
   }
 
   useEffect(() => {
@@ -138,7 +146,9 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, isEdi
   }
 
   if (!initial) return <Loading />
-  return <CdcDashboard isEditor={isEditor} isDebug={isDebug} initialState={initial} />
+  return (
+    <CdcDashboard isEditor={isEditor} isDebug={isDebug} initialState={initial} interactionLabel={interactionLabel} />
+  )
 }
 
 export default MultiDashboardWrapper

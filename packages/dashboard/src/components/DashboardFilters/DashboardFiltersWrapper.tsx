@@ -15,6 +15,7 @@ import * as apiFilterHelpers from '../../helpers/apiFilterHelpers'
 import { applyQueuedActive } from '@cdc/core/components/Filters/helpers/applyQueuedActive'
 import './dashboardfilter.styles.css'
 import { updateChildFilters } from '../../helpers/updateChildFilters'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
 
@@ -32,6 +33,7 @@ type DashboardFiltersProps = {
   isEditor?: boolean
   setConfig: (config: DashboardFilters) => void
   currentViewport?: ViewPort
+  interactionLabel: string
 }
 
 const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
@@ -39,7 +41,8 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   visualizationConfig,
   setConfig: updateConfig,
   currentViewport,
-  isEditor = false
+  isEditor = false,
+  interactionLabel = ''
 }) => {
   const state = useContext(DashboardContext)
   const { config: dashboardConfig, reloadURLData, loadAPIFilters, setAPIFilterDropdowns, setAPILoading } = state
@@ -47,7 +50,12 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
 
   const applyFilters = e => {
     e.preventDefault() // prevent form submission
-    const dashboardConfig = _.cloneDeep(state.config.dashboard)
+
+    const dashboardConfig = {
+      ...state.config.dashboard,
+      sharedFilters: [...state.config.dashboard.sharedFilters] // Only clone the array we need to modify
+    }
+
     const nonAutoLoadFilterIndexes = Object.values(state.config.visualizations)
       .filter(v => v.type === 'dashboardFilters')
       .reduce((acc, viz: DashboardFilters) => (!viz.autoLoad ? [...acc, viz.sharedFilterIndexes] : acc), [])
@@ -82,7 +90,15 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       }
       setAPILoading(true)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: dashboardConfig.sharedFilters })
-      dispatch({ type: 'SET_FILTERED_DATA', payload: getFilteredData(_.cloneDeep(state)) })
+
+      const stateForFiltering = {
+        ...state,
+        config: {
+          ...state.config,
+          dashboard: dashboardConfig
+        }
+      }
+      dispatch({ type: 'SET_FILTERED_DATA', payload: getFilteredData(stateForFiltering) })
       loadAPIFilters(dashboardConfig.sharedFilters, apiFilterDropdowns)
         .then(newFilters => {
           reloadURLData(newFilters)
@@ -96,12 +112,26 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   }
 
   const handleOnChange = (index: number, value: string | string[]) => {
-    const newConfig = _.cloneDeep(dashboardConfig)
+    const newConfig = {
+      ...dashboardConfig,
+      dashboard: {
+        ...dashboardConfig.dashboard,
+        sharedFilters: [...dashboardConfig.dashboard.sharedFilters] // Only clone the array we modify
+      }
+    }
+
     let [newSharedFilters, changedFilterIndexes] = changeFilterActive(
       index,
       value,
       newConfig.dashboard.sharedFilters,
       visualizationConfig
+    )
+
+    publishAnalyticsEvent(
+      'dashboard_filter_changed',
+      'change',
+      `${interactionLabel}|key_${newSharedFilters?.[index]?.key}|value_${value}`,
+      'dashboard'
     )
 
     // sets the active filter option that the user just selected.
@@ -125,9 +155,24 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         })
       } else {
         newSharedFilters[index].queuedActive = value
-        // setData to empty object because we no longer have a data state.
-        dispatch({ type: 'SET_DATA', payload: {} })
-        dispatch({ type: 'SET_FILTERED_DATA', payload: {} })
+
+        const emptyData = Object.keys(state.data).reduce((acc, key) => {
+          acc[key] = null // Use null instead of keeping empty arrays to ensure garbage collection
+          return acc
+        }, {})
+
+        const emptyFilteredData = Object.keys(state.filteredData).reduce((acc, key) => {
+          acc[key] = null
+          return acc
+        }, {})
+
+        dispatch({ type: 'SET_DATA', payload: emptyData })
+        dispatch({ type: 'SET_FILTERED_DATA', payload: emptyFilteredData })
+
+        if (window.gc && typeof window.gc === 'function') {
+          window.gc()
+        }
+
         setAPIFilterDropdowns(loadingFilterMemo)
         loadAPIFilters(newSharedFilters, loadingFilterMemo)
       }
@@ -135,8 +180,16 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       if (newSharedFilters[index].type === 'urlfilter' && newSharedFilters[index].apiFilter) {
         reloadURLData(newSharedFilters)
       } else {
-        const clonedState = _.cloneDeep(state)
-        clonedState.config.dashboard.sharedFilters = newSharedFilters
+        const clonedState = {
+          ...state,
+          config: {
+            ...state.config,
+            dashboard: {
+              ...state.config.dashboard,
+              sharedFilters: newSharedFilters
+            }
+          }
+        }
         const newFilteredData = getFilteredData(clonedState)
         dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
         dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })

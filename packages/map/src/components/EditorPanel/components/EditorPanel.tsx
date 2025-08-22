@@ -48,6 +48,7 @@ import { addUIDs, HEADER_COLORS } from '../../../helpers'
 import './editorPanel.styles.css'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
+import MultiSelect from '@cdc/core/components/MultiSelect'
 
 type MapEditorPanelProps = {
   datasets?: Datasets
@@ -656,15 +657,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           }
         })
         break
-      case 'capitalizeLabels':
-        setConfig({
-          ...config,
-          tooltips: {
-            ...config.tooltips,
-            capitalizeLabels: value
-          }
-        })
-        break
       case 'showDataTable':
         setConfig({
           ...config,
@@ -684,15 +676,16 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
         })
         break
       case 'chooseState':
-        let fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === value)
-        let stateName = value
-        let stateData = { fipsCode, stateName }
+        let stateData = value.map(state => ({
+          fipsCode: Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === state),
+          stateName: state
+        }))
 
         setConfig({
           ...config,
           general: {
             ...config.general,
-            statePicked: stateData
+            statesPicked: stateData
           }
         })
 
@@ -728,12 +721,12 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           }
         })
         break
-      case 'filterControlsStatePicked':
+      case 'filterControlsStatesPicked':
         setConfig({
           ...config,
           general: {
             ...config.general,
-            filterControlsStatePicked: value
+            filterControlsStatesPicked: value
           }
         })
         break
@@ -1198,13 +1191,13 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               {config.general.geoType === 'single-state' && runtimeData && (
                 <Select
                   label='Filter Controlling State Picked'
-                  value={config.general.filterControlsStatePicked || ''}
+                  value={config.general.filterControlsStatesPicked || ''}
                   options={[
                     { value: '', label: 'None' },
                     ...(runtimeData && columnsInData?.map(col => ({ value: col, label: col })))
                   ]}
                   onChange={event => {
-                    handleEditorChanges('filterControlsStatePicked', event.target.value)
+                    handleEditorChanges('filterControlsStatesPicked', event.target.value)
                   }}
                 />
               )}
@@ -1212,17 +1205,20 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               {/* Type */}
               {/* Select > Filter a state */}
               {config.general.geoType === 'single-state' && (
-                <Select
-                  label='State Selector'
-                  value={config.general.statePicked?.stateName || ''}
-                  options={StateOptionList().map(option => ({
-                    value: option.props.value,
-                    label: option.props.children
-                  }))}
-                  onChange={event => {
-                    handleEditorChanges('chooseState', event.target.value)
-                  }}
-                />
+                <label>
+                  <span>States Selector</span>
+                  <MultiSelect
+                    selected={config.general.statesPicked.map(state => state.stateName)}
+                    options={StateOptionList().map(option => ({
+                      value: option.props.value,
+                      label: option.props.children
+                    }))}
+                    fieldName={'statesPicked'}
+                    updateField={(_, __, ___, selectedOptions) => {
+                      handleEditorChanges('chooseState', selectedOptions)
+                    }}
+                  />
+                </label>
               )}
               {/* Type */}
               <Select
@@ -2872,16 +2868,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   updateField={updateField}
                 />
               )}
-              <label className='checkbox'>
-                <input
-                  type='checkbox'
-                  checked={config.tooltips.capitalizeLabels}
-                  onChange={event => {
-                    handleEditorChanges('capitalizeLabels', event.target.checked)
-                  }}
-                />
-                <span className='edit-label'>Capitalize text inside tooltip</span>
-              </label>
             </AccordionItemPanel>
           </AccordionItem>
           <AccordionItem>
