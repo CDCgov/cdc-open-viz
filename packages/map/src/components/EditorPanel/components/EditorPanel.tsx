@@ -52,6 +52,7 @@ import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { migratePaletteName } from '../../../helpers/migratePaletteName'
 import { getMapColorPaletteVersion } from '../../../helpers/getMapColorPaletteVersion'
+import PaletteConversionModal from '../../PaletteConversionModal'
 
 type MapEditorPanelProps = {
   datasets?: Datasets
@@ -80,6 +81,8 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const [loadedDefault, setLoadedDefault] = useState(false)
   const [displayPanel, setDisplayPanel] = useState(true)
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
+  const [showConversionModal, setShowConversionModal] = useState(false)
+  const [pendingPaletteSelection, setPendingPaletteSelection] = useState<{ palette: string, action: () => void } | null>(null)
 
   const {
     MapLayerHandlers: { handleMapLayer, handleAddLayer, handleRemoveLayer }
@@ -908,6 +911,62 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     [isReversed, colorPalettes, config.general.palette.version]
   )
 
+  // Helper function to handle palette selection with conversion prompt
+  const handlePaletteSelection = (palette: string) => {
+    const currentVersion = getMapColorPaletteVersion(config)
+    const isV1Palette = currentVersion === 1 || config.general.palette.version === '1.0' || !config.general.palette.version
+
+    const executeSelection = () => {
+      const _newConfig = _.cloneDeep(config)
+      _newConfig.general.palette.name = migratePaletteName(palette)
+      if (isV1Palette) {
+        _newConfig.general.palette.version = '2.0'
+      }
+      setConfig(_newConfig)
+    }
+
+    if (isV1Palette) {
+      setPendingPaletteSelection({ palette, action: executeSelection })
+      setShowConversionModal(true)
+    } else {
+      executeSelection()
+    }
+  }
+
+  // Modal handlers
+  const handleConversionConfirm = () => {
+    if (pendingPaletteSelection) {
+      pendingPaletteSelection.action()
+    }
+    setShowConversionModal(false)
+    setPendingPaletteSelection(null)
+  }
+
+  const handleConversionCancel = () => {
+    setShowConversionModal(false)
+    setPendingPaletteSelection(null)
+  }
+
+  const handleReturnToV1 = () => {
+    if (pendingPaletteSelection) {
+      const _newConfig = _.cloneDeep(config)
+      _newConfig.general.palette.name = pendingPaletteSelection.palette
+      _newConfig.general.palette.version = '1.0'
+      setConfig(_newConfig)
+    }
+    setShowConversionModal(false)
+    setPendingPaletteSelection(null)
+  }
+
+  // Helper function to determine if a palette should be marked as selected
+  const getPaletteClassName = (palette: string) => {
+    const currentPaletteName = config.general.palette.name || ''
+    
+    // Direct comparison since the UI filters palettes by version
+    // When v1 is selected, UI shows v1 palettes; when v2 is selected, UI shows v2 palettes
+    return currentPaletteName === palette ? 'selected' : ''
+  }
+
   useEffect(() => {
     setLoadedDefault(config.defaultData)
     columnsRequiredChecker()
@@ -1064,9 +1123,8 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 </span>
                 <ul className='geo-buttons d-grid' style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
                   <button
-                    className={`${
-                      config.general.geoType === 'us' || config.general.geoType === 'us-county' ? 'active' : ''
-                    } full-width`}
+                    className={`${config.general.geoType === 'us' || config.general.geoType === 'us-county' ? 'active' : ''
+                      } full-width`}
                     onClick={e => {
                       e.preventDefault()
                       handleEditorChanges('geoType', 'us')
@@ -2945,15 +3003,8 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     <li
                       title={palette}
                       key={palette}
-                      onClick={() => {
-                        const _newConfig = _.cloneDeep(config)
-                        _newConfig.general.palette.name = migratePaletteName(palette)
-                        if (config.general.palette.version === '1.0' || !config.general.palette.version) {
-                          _newConfig.general.palette.version = '2.0'
-                        }
-                        setConfig(_newConfig)
-                      }}
-                      className={(config.general.palette.name || '') === migratePaletteName(palette) ? 'selected' : ''}
+                      onClick={() => handlePaletteSelection(palette)}
+                      className={getPaletteClassName(palette)}
                     >
                       <span style={colorOne}></span>
                       <span style={colorTwo}></span>
@@ -2986,15 +3037,8 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     <li
                       title={palette}
                       key={palette}
-                      onClick={() => {
-                        const _newConfig = _.cloneDeep(config)
-                        _newConfig.general.palette.name = migratePaletteName(palette)
-                        if (config.general.palette.version === '1.0' || !config.general.palette.version) {
-                          _newConfig.general.palette.version = '2.0'
-                        }
-                        setConfig(_newConfig)
-                      }}
-                      className={(config.general.palette.name || '') === palette ? 'selected' : ''}
+                      onClick={() => handlePaletteSelection(palette)}
+                      className={getPaletteClassName(palette)}
                     >
                       <span style={colorOne}></span>
                       <span style={colorTwo}></span>
@@ -3027,15 +3071,8 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     <li
                       title={palette}
                       key={palette}
-                      onClick={() => {
-                        const _newConfig = _.cloneDeep(config)
-                        _newConfig.general.palette.name = migratePaletteName(palette)
-                        if (config.general.palette.version === '1.0' || !config.general.palette.version) {
-                          _newConfig.general.palette.version = '2.0'
-                        }
-                        setConfig(_newConfig)
-                      }}
-                      className={(config.general.palette.name || '') === palette ? 'selected' : ''}
+                      onClick={() => handlePaletteSelection(palette)}
+                      className={getPaletteClassName(palette)}
                     >
                       <span style={colorOne}></span>
                       <span style={colorTwo}></span>
@@ -3079,19 +3116,19 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               )}
               {(config.general.geoType === 'world' ||
                 (config.general.geoType === 'us' && config.general.type === 'bubble')) && (
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={config.visual.showBubbleZeros}
-                    onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
-                      _newConfig.visual.showBubbleZeros = event.target.checked
-                      setConfig(_newConfig)
-                    }}
-                  />
-                  <span className='edit-label'>Show Data with Zero's on Bubble Map</span>
-                </label>
-              )}
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={config.visual.showBubbleZeros}
+                      onChange={event => {
+                        const _newConfig = _.cloneDeep(config)
+                        _newConfig.visual.showBubbleZeros = event.target.checked
+                        setConfig(_newConfig)
+                      }}
+                    />
+                    <span className='edit-label'>Show Data with Zero's on Bubble Map</span>
+                  </label>
+                )}
               {(config.general.geoType === 'world' || config.general.geoType === 'single-state') && (
                 <label className='checkbox'>
                   <input
@@ -3125,42 +3162,42 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               {(config.general.geoType === 'us' ||
                 config.general.geoType === 'us-county' ||
                 config.general.geoType === 'world') && (
-                <>
-                  <label>
-                    <span className='edit-label'>Default City Style</span>
-                    <select
-                      value={config.visual.cityStyle || false}
-                      onChange={event => {
-                        handleEditorChanges('handleCityStyle', event.target.value)
-                      }}
-                    >
-                      <option value='circle'>Circle</option>
-                      <option value='pin'>Pin</option>
-                      <option value='square'>Square</option>
-                      <option value='triangle'>Triangle</option>
-                      <option value='diamond'>Diamond</option>
-                      <option value='star'>Star</option>
-                    </select>
-                  </label>
-                  <TextField
-                    value={config.visual.cityStyleLabel}
-                    section='visual'
-                    fieldName='cityStyleLabel'
-                    label='Label (Optional) '
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>When a label is provided, the default city style will appear in the legend.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                </>
-              )}
+                  <>
+                    <label>
+                      <span className='edit-label'>Default City Style</span>
+                      <select
+                        value={config.visual.cityStyle || false}
+                        onChange={event => {
+                          handleEditorChanges('handleCityStyle', event.target.value)
+                        }}
+                      >
+                        <option value='circle'>Circle</option>
+                        <option value='pin'>Pin</option>
+                        <option value='square'>Square</option>
+                        <option value='triangle'>Triangle</option>
+                        <option value='diamond'>Diamond</option>
+                        <option value='star'>Star</option>
+                      </select>
+                    </label>
+                    <TextField
+                      value={config.visual.cityStyleLabel}
+                      section='visual'
+                      fieldName='cityStyleLabel'
+                      label='Label (Optional) '
+                      updateField={updateField}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>When a label is provided, the default city style will appear in the legend.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                  </>
+                )}
               {/* <AdditionalCityStyles /> */}
               <>
                 {config.visual.additionalCityStyles.length > 0 &&
@@ -3356,6 +3393,15 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
         </Accordion>
         <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={convertStateToConfig} />
       </Layout.Sidebar>
+
+      {showConversionModal && (
+        <PaletteConversionModal
+          onConfirm={handleConversionConfirm}
+          onCancel={handleConversionCancel}
+          onReturnToV1={handleReturnToV1}
+          paletteName={pendingPaletteSelection?.palette}
+        />
+      )}
     </ErrorBoundary>
   )
 }
