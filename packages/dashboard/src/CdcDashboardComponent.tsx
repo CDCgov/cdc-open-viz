@@ -174,7 +174,7 @@ export default function CdcDashboard({
 
         const dataNeedsUpdate = reloadURLHelpers.isUpdateNeeded(filters, currentQSParams, updatedQSParams)
         const alreadyFetched = !!dataset.data
-        if (alreadyFetched) {
+        if (alreadyFetched && !newFilters && !dataNeedsUpdate) {
           dataWasFetched = true
           newData[datasetKey] = dataset.data
         } else if (!!newFilters || dataNeedsUpdate) {
@@ -327,14 +327,12 @@ export default function CdcDashboard({
       })
       if (allValuesSelected) {
         reloadURLData(newFilters)
-        setAPILoading(false)
       } else {
         setAPILoading(false)
       }
     })
   }, [isEditor, isPreview, state.config?.activeDashboard])
 
-  // MEMORY LEAK FIX: Cleanup on component unmount
   useEffect(() => {
     return () => {
       // Clear all data when component unmounts to prevent memory leaks
@@ -353,7 +351,7 @@ export default function CdcDashboard({
         }
       }
     }
-  }, []) // Empty dependency array means this only runs on unmount
+  }, [])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
     const config = _.cloneDeep(state.config)
