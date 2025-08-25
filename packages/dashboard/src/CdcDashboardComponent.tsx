@@ -166,8 +166,11 @@ export default function CdcDashboard({
         })
 
         const dataNeedsUpdate = reloadURLHelpers.isUpdateNeeded(filters, currentQSParams, updatedQSParams)
-
-        if (!!newFilters || dataNeedsUpdate) {
+        const alreadyFetched = !!dataset.data
+        if (alreadyFetched) {
+          dataWasFetched = true
+          newData[datasetKey] = dataset.data
+        } else if (!!newFilters || dataNeedsUpdate) {
           dataWasFetched = true
           const dataUrlFinal = reloadURLHelpers.getDataURL(
             { ...currentQSParams, ...updatedQSParams },
