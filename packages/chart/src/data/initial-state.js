@@ -179,7 +179,6 @@ export default {
     position: 'right',
     orderedValues: [],
     patterns: {},
-    patternSize: 8,
     patternField: ''
   },
 

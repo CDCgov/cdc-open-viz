@@ -27,12 +27,12 @@ const PanelPatternSettings: FC<PanelProps> = props => {
     dataKey?: string
     dataValue?: string
     contrastCheck?: boolean
+    patternSize?: number
   }
 
   // Safe legend reference with defaults to avoid crashes when legend is undefined
-  const legendCfg = (config.legend || { patterns: {}, patternSize: 8 }) as {
+  const legendCfg = (config.legend || { patterns: {} }) as {
     patterns: Record<string, LegendPattern>
-    patternSize: number
   }
 
   const patternTypes = [
@@ -179,6 +179,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
         shape: 'circles' as const,
         dataKey: defaultDataKey,
         dataValue: '',
+        patternSize: 8, // Default pattern size
         contrastCheck: performContrastCheck(newPatternKey, defaultColor)
       }
     }
@@ -248,17 +249,6 @@ const PanelPatternSettings: FC<PanelProps> = props => {
       legend: {
         ...(config.legend || {}),
         patterns: newPatterns
-      }
-    })
-  }
-
-  const handlePatternSizeChange = (value: string) => {
-    const numericSize = getPatternSizeNumeric(value)
-    updateConfig({
-      ...config,
-      legend: {
-        ...(config.legend || {}),
-        patternSize: numericSize
       }
     })
   }
@@ -372,8 +362,10 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                   <label htmlFor={`pattern-size-${patternKey}`}>Pattern Size:</label>
                   <select
                     id={`pattern-size-${patternKey}`}
-                    value={getPatternSizeText(legendCfg.patternSize || 8)}
-                    onChange={e => handlePatternSizeChange(e.target.value)}
+                    value={getPatternSizeText(p.patternSize || 8)}
+                    onChange={e =>
+                      handlePatternUpdate(patternKey, 'patternSize', getPatternSizeNumeric(e.target.value))
+                    }
                   >
                     {patternSizes.map((size, index) => (
                       <option value={size.value} key={index}>

@@ -247,11 +247,12 @@
       "Provisional": {
         "label": "Provisional Data",
         "color": "#000000",
-        "shape": "diagonalLines"
+        "shape": "diagonalLines",
+        "dataKey": "recon_prov",
+        "dataValue": "Provisional",
+        "patternSize": 10
       }
-    },
-    "patternSize": 8,
-    "patternField": "recon_prov"
+    }
   },
   "brush": {
     "isActive": false,

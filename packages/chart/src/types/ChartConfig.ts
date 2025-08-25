@@ -104,9 +104,9 @@ export type Legend = CoreLegend & {
       dataKey?: string
       dataValue?: string
       contrastCheck?: boolean
+      patternSize?: number
     }
   }
-  patternSize?: number
 }
 
 type Visual = {
