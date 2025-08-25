@@ -100,7 +100,10 @@ export const getVisualizationsWithFormattedData = (visualizations: Record<string
   return Object.keys(visualizations).reduce((acc, vizKey) => {
     const dataKey = visualizations[vizKey].dataKey
     if (newData[dataKey]) {
-      acc[vizKey].formattedData = newData[dataKey]
+      acc[vizKey] = {
+        ...acc[vizKey],
+        formattedData: newData[dataKey]
+      }
     }
     return acc
   }, _.cloneDeep(visualizations))
