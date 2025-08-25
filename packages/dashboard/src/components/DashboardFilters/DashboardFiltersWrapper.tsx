@@ -92,14 +92,20 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       setAPILoading(true)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: dashboardConfig.sharedFilters })
 
-      const stateForFiltering = {
-        ...state,
-        config: {
-          ...state.config,
-          dashboard: dashboardConfig
-        }
-      }
-      dispatch({ type: 'SET_FILTERED_DATA', payload: getFilteredData(stateForFiltering) })
+      // Clear data when applying filters to force fresh reload
+      const emptyData = Object.keys(state.data).reduce((acc, key) => {
+        acc[key] = []
+        return acc
+      }, {})
+
+      const emptyFilteredData = Object.keys(state.filteredData).reduce((acc, key) => {
+        acc[key] = []
+        return acc
+      }, {})
+
+      dispatch({ type: 'SET_DATA', payload: emptyData })
+      dispatch({ type: 'SET_FILTERED_DATA', payload: emptyFilteredData })
+      
       loadAPIFilters(dashboardConfig.sharedFilters, apiFilterDropdowns)
         .then(newFilters => {
           reloadURLData(newFilters)
@@ -157,23 +163,8 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       } else {
         newSharedFilters[index].queuedActive = value
 
-        const emptyData = Object.keys(state.data).reduce((acc, key) => {
-          acc[key] = null // Use null instead of keeping empty arrays to ensure garbage collection
-          return acc
-        }, {})
-
-        const emptyFilteredData = Object.keys(state.filteredData).reduce((acc, key) => {
-          acc[key] = null
-          return acc
-        }, {})
-
-        dispatch({ type: 'SET_DATA', payload: emptyData })
-        dispatch({ type: 'SET_FILTERED_DATA', payload: emptyFilteredData })
-
-        if (window.gc && typeof window.gc === 'function') {
-          window.gc()
-        }
-
+        // Don't clear data immediately - keep existing data until new data loads
+        // Only update the filter dropdowns and prepare for reload
         setAPIFilterDropdowns(loadingFilterMemo)
         loadAPIFilters(newSharedFilters, loadingFilterMemo)
       }
