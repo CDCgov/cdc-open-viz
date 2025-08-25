@@ -18,6 +18,7 @@ type ConfigCTX = DashboardState & {
   ) => Promise<SharedFilter[]>
   setAPIFilterDropdowns: (dropdowns: APIFilterDropdowns) => void
   setAPILoading: (loading: boolean) => void
+  apiLoading: boolean
 }
 
 const firstTab: Tab = 'Dashboard Description'
@@ -38,6 +39,7 @@ const initialContext: ConfigCTX = {
   reloadURLData: () => {},
   loadAPIFilters: () => Promise.resolve([]),
   isDebug: false,
+  apiLoading: false,
   config: {} as MultiDashboardConfig,
   ...initialState
 }

@@ -85,7 +85,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   setAllExpanded,
   interactionLabel = ''
 }) => {
-  const { config, filteredData: dashboardFilteredData, data: rawData } = useContext(DashboardContext)
+  const { config, filteredData: dashboardFilteredData, data: rawData, apiLoading } = useContext(DashboardContext)
   const [toggledRow, setToggled] = React.useState<number>(0)
 
   useEffect(() => {
@@ -209,7 +209,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
           )
 
           const hideVisualization =
-            inNoDataState &&
+            (inNoDataState || apiLoading) &&
             filterBehavior !== 'Apply Button' &&
             (type !== 'dashboardFilters' || applyButtonNotClicked(visualizationConfig))
 

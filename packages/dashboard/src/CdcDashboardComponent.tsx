@@ -623,7 +623,8 @@ export default function CdcDashboard({
           loadAPIFilters,
           setAPIFilterDropdowns,
           reloadURLData,
-          setAPILoading
+          setAPILoading,
+          apiLoading
         }}
       >
         <DashboardDispatchContext.Provider value={dispatch}>
