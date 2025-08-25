@@ -156,22 +156,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       } else {
         newSharedFilters[index].queuedActive = value
 
-        const emptyData = Object.keys(state.data).reduce((acc, key) => {
-          acc[key] = null // Use null instead of keeping empty arrays to ensure garbage collection
-          return acc
-        }, {})
-
-        const emptyFilteredData = Object.keys(state.filteredData).reduce((acc, key) => {
-          acc[key] = null
-          return acc
-        }, {})
-
-        dispatch({ type: 'SET_DATA', payload: emptyData })
-        dispatch({ type: 'SET_FILTERED_DATA', payload: emptyFilteredData })
-
-        if (window.gc && typeof window.gc === 'function') {
-          window.gc()
-        }
+        // setData to empty object because we no longer have a data state.
+        dispatch({ type: 'SET_DATA', payload: {} })
+        dispatch({ type: 'SET_FILTERED_DATA', payload: {} })
 
         setAPIFilterDropdowns(loadingFilterMemo)
         loadAPIFilters(newSharedFilters, loadingFilterMemo)
