@@ -27,7 +27,8 @@ export const initialState = {
   loading: false,
   filteredData: {},
   preview: false,
-  tabSelected: firstTab
+  tabSelected: firstTab,
+  filtersApplied: false
 }
 
 const initialContext: ConfigCTX = {
