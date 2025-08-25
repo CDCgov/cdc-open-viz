@@ -6,8 +6,6 @@ import ConfigContext from '../../ConfigContext'
 import { Text } from '@visx/text'
 import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
-import { isDateScale } from '@cdc/core/helpers/cove/date'
-import { BrushRef } from './types'
 export interface BrushChartProps {
   xMax: number
   yMax: number
@@ -34,10 +32,10 @@ const BrushChart: FC<BrushChartProps> = ({
   const brushheight = 25
   const DASHBOARD_MARGIN = 50
   const BRUSH_HEIGHT_MULTIPLIER = 1.5
-
+  const range = config?.xAxis?.sortByRecentDate ? [xMax, 0] : [0, xMax]
   const xScale = scaleBand<string>({
-    domain: mappedDates,
-    range: [0, xMax],
+    domain: config?.xAxis?.sortByRecentDate ? mappedDates.reverse() : mappedDates,
+    range: range,
     paddingInner: 0.1,
     paddingOuter: 0.1
   })
