@@ -1,5 +1,3 @@
-import { VisualizationType } from './../../../../node_modules/@cdc/chart/src/types/ChartConfig'
-import { Visualization } from '@cdc/core/types/Visualization'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 
 const abbreviateNumber = num => {
@@ -191,6 +189,12 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
 
     if (bottomSuffix && axis === 'bottom') {
       result += bottomSuffix
+    }
+  }
+  if (config.visualizationType === 'Pie') {
+    // add default suffix
+    if (!suffix) {
+      result += '%'
     }
   }
   if (isNegative) {

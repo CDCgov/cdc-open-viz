@@ -5,19 +5,13 @@ import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import { MapContext } from '../types/MapContext'
 
 const Modal = () => {
-  const { content, config, currentViewport: viewport } = useContext<MapContext>(ConfigContext)
-  const { capitalizeLabels } = config.tooltips
+  const { content, currentViewport: viewport } = useContext<MapContext>(ConfigContext)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const tooltip = applyTooltipsToGeo(content.geoName, content.keyedData, 'jsx')
   const dispatch = useContext(MapDispatchContext)
 
   return (
-    <section
-      className={
-        capitalizeLabels ? 'modal-content tooltip capitalize ' + viewport : 'modal-content tooltip ' + viewport
-      }
-      aria-hidden='true'
-    >
+    <section className={'modal-content tooltip ' + viewport} aria-hidden='true'>
       <div className='content'>{tooltip}</div>
       <Icon
         display='close'

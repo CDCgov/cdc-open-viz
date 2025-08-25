@@ -82,6 +82,7 @@ import { VizFilter } from '@cdc/core/types/VizFilter'
 import { getNewRuntime } from './helpers/getNewRuntime'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import { Datasets } from '@cdc/core/types/DataSet'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -96,6 +97,7 @@ interface CdcChartProps {
   setSharedFilterValue?: (value: any) => void
   dashboardConfig?: DashboardConfig
   datasets?: Datasets
+  interactionLabel: string
 }
 const CdcChart: React.FC<CdcChartProps> = ({
   config: configObj,
@@ -108,7 +110,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   setSharedFilter,
   setSharedFilterValue,
   dashboardConfig,
-  datasets
+  datasets,
+  interactionLabel
 }) => {
   const transform = new DataTransform()
   const initialState = getInitialState(configObj)
@@ -465,6 +468,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (container && !isLoading && !_.isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_LOADED_EVENT', payload: true })
+      publishAnalyticsEvent('chart_loaded', 'load', interactionLabel, 'chart')
     }
   }, [container, config, isLoading]) // eslint-disable-line
 
@@ -554,6 +558,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     } catch (e) {
       console.error('COVE:', e.message)
     }
+    publishAnalyticsEvent('chart_legend_reset', 'click', interactionLabel, 'chart')
     dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [] })
   }
 
@@ -907,6 +912,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     setFilters={setFilters}
                     excludedData={excludedData}
                     dimensions={dimensions}
+                    interactionLabel={interactionLabel}
                   />
                 )}
                 <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
@@ -985,6 +991,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           setFilters={setFilters}
                           excludedData={excludedData}
                           dimensions={dimensions}
+                          interactionLabel={interactionLabel}
                         />
                         {config?.introText && (
                           <section className='introText mb-4' style={{ padding: '0px 0 35px' }}>
@@ -1012,7 +1019,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {!config.legend.hide &&
                     config.visualizationType !== 'Spark Line' &&
                     config.visualizationType !== 'Sankey' && (
-                      <Legend ref={legendRef} skipId={handleChartTabbing(config, legendId)} />
+                      <Legend
+                        ref={legendRef}
+                        skipId={handleChartTabbing(config, legendId)}
+                        interactionLabel={interactionLabel}
+                      />
                     )}
                 </LegendWrapper>
                 {/* Link */}
@@ -1034,6 +1045,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       type='image'
                       state={config}
                       elementToCapture={imageId}
+                      interactionLabel={interactionLabel}
                     />
                   )}
                   {config.table.showDownloadPdfButton && (
@@ -1043,6 +1055,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       type='pdf'
                       state={config}
                       elementToCapture={imageId}
+                      interactionLabel={interactionLabel}
                     />
                   )}
                 </MediaControls.Section>
@@ -1054,7 +1067,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
                   <DataTable
                     /* changing the "key" will force the table to re-render
-                      when the default sort changes while editing */
+                          when the default sort changes while editing */
                     key={dataTableDefaultSortBy}
                     config={pivotDynamicSeries(config)}
                     rawData={
@@ -1076,6 +1089,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     viewport={currentViewport}
                     tabbingId={handleChartTabbing(config, legendId)}
                     colorScale={colorScale}
+                    interactionLabel={interactionLabel}
                   />
                 )}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}

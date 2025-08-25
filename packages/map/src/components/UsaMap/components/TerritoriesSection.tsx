@@ -55,7 +55,7 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
           <div className='d-flex flex-wrap' style={{ columnGap: '1.5rem' }}>
             {(usTerritories.length > 0 || config.general.territoriesAlwaysShow) && (
               <div>
-                <h5 className='territories-label'>U.S. territories</h5>
+                <span className='territories-label'>U.S. territories</span>
                 <span
                   className={`mt-2 ${isMobileViewport ? 'mb-3' : 'mb-4'} d-flex territories`}
                   style={{ minWidth: `${usTerritories.length * SVG_WIDTH + (usTerritories.length - 1) * SVG_GAP}px` }}
@@ -66,7 +66,7 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
             )}
             {(freelyAssociatedStates.length > 0 || config.general.territoriesAlwaysShow) && (
               <div>
-                <h5 className='territories-label'>Freely associated states</h5>
+                <span className='territories-label'>Freely associated states</span>
                 <span
                   className={`mt-2 ${isMobileViewport ? 'mb-3' : 'mb-4'} d-flex territories`}
                   style={{

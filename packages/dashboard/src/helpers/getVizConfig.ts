@@ -10,7 +10,8 @@ const transform = new DataTransform()
 export const getFootnotesVizConfig = (
   visualizationConfig: AnyVisualization,
   rowNumber: number,
-  config: MultiDashboardConfig
+  config: MultiDashboardConfig,
+  visualizationKey: string
 ) => {
   if (!visualizationConfig?.footnotes) return visualizationConfig
   const data = _.cloneDeep(config.datasets[visualizationConfig.footnotes.dataKey]?.data)
@@ -18,10 +19,16 @@ export const getFootnotesVizConfig = (
   const filters = (getApplicableFilters(config.dashboard, rowNumber) || []).filter(filter =>
     dataColumns.includes(filter.columnName)
   )
-  if (filters.length) {
-    visualizationConfig.footnotes.data = filterData(filters, data)
+  // check if shared filters has viz key
+  const sharedFilters = config.dashboard.sharedFilters
+  const matchingFilters = sharedFilters.filter(f => f.usedBy?.includes(visualizationKey))
+
+  if (matchingFilters.length) {
+    visualizationConfig.footnotes.data = filterData(matchingFilters, data)
   } else {
-    visualizationConfig.footnotes.data = data
+    if (visualizationConfig.footnotes.data) {
+      visualizationConfig.footnotes.data = data
+    }
   }
 
   return visualizationConfig
@@ -88,12 +95,14 @@ export const getVizConfig = (
   }
 
   if (visualizationConfig.footnotes) {
-    const visConfigWithFootnotes = getFootnotesVizConfig(visualizationConfig, rowNumber, config)
-    if (multiVizColumn && filteredDataOverride) {
-      const vizCategory = filteredDataOverride[0][multiVizColumn]
-      // the multiViz filtering filtering is applied after the dashboard filters
-      const categoryFootnote = visConfigWithFootnotes.footnotes.data.filter(d => d[multiVizColumn] === vizCategory)
-      visConfigWithFootnotes.footnotes.data = categoryFootnote
+    const visConfigWithFootnotes = getFootnotesVizConfig(visualizationConfig, rowNumber, config, visualizationKey)
+    if (multiVizColumn && filteredDataOverride && filteredDataOverride.length > 0) {
+      const vizCategory = filteredDataOverride?.[0]?.[multiVizColumn]
+      // the multiViz filtering is applied after the dashboard filters
+      if (vizCategory !== undefined && visConfigWithFootnotes.footnotes.data) {
+        const categoryFootnote = visConfigWithFootnotes.footnotes.data.filter(d => d[multiVizColumn] === vizCategory)
+        visConfigWithFootnotes.footnotes.data = categoryFootnote
+      }
     }
     return visConfigWithFootnotes
   }

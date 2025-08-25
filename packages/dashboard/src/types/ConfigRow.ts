@@ -16,4 +16,5 @@ export type ConfigRow = {
   toggle?: boolean
   equalHeight?: boolean
   multiVizColumn?: string
+  originalMultiVizColumn?: string
 } & ConfigureData

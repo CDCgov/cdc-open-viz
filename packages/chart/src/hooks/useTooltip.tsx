@@ -594,7 +594,7 @@ export const useTooltip = props => {
 
     return (
       <li style={style} className='tooltip-body mb-1'>
-        {parse(displayText)}
+        {displayText !== undefined ? parse(String(displayText)) : displayText}
       </li>
     )
   }

@@ -2,10 +2,12 @@ import { DataTableProps } from '../DataTable'
 import ScreenReaderText from '../../elements/ScreenReaderText'
 import { SortIcon } from './SortIcon'
 import { getNewSortBy } from '../helpers/getNewSortBy'
+import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
 
 type MapHeaderProps = DataTableProps & {
   sortBy: { column; asc }
   setSortBy: Function
+  interactionLabel: string
 }
 
 const ColumnHeadingText = ({ text, config }) => {
@@ -16,7 +18,15 @@ const ColumnHeadingText = ({ text, config }) => {
   return text
 }
 
-const MapHeader = ({ columns, config, indexTitle, sortBy, setSortBy, rightAlignedCols }: MapHeaderProps) => {
+const MapHeader = ({
+  columns,
+  config,
+  indexTitle,
+  sortBy,
+  setSortBy,
+  rightAlignedCols,
+  interactionLabel = ''
+}: MapHeaderProps) => {
   return (
     <tr>
       {Object.keys(columns)
@@ -46,6 +56,13 @@ const MapHeader = ({ columns, config, indexTitle, sortBy, setSortBy, rightAligne
               role='columnheader'
               scope='col'
               onClick={() => {
+                publishAnalyticsEvent(
+                  `data_table_sort_by|${newSortBy.column}|${
+                    newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'undefined'
+                  }`,
+                  'click',
+                  interactionLabel
+                )
                 setSortBy(newSortBy)
               }}
               onKeyDown={e => {

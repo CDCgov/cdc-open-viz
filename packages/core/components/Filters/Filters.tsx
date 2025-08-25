@@ -14,10 +14,12 @@ import { getNestedOptions } from './helpers/getNestedOptions'
 import { getWrappingStatuses } from './helpers/filterWrapping'
 import { handleSorting } from './helpers/handleSorting'
 import { getChangedFilters } from './helpers/getChangedFilters'
+import { getUniqueValues } from '@cdc/map/src/helpers'
 import { getQueryParams, updateQueryString } from '../../helpers/queryStringUtils'
 import { applyQueuedActive } from './helpers/applyQueuedActive'
 import Tabs from './components/Tabs'
 import Dropdown from './components/Dropdown'
+import { publishAnalyticsEvent } from '../../helpers/metrics/helpers'
 
 export const VIZ_FILTER_STYLE = {
   dropdown: 'dropdown',
@@ -33,18 +35,13 @@ export type VizFilterStyle = (typeof VIZ_FILTER_STYLE)[keyof typeof VIZ_FILTER_S
 
 export const filterStyleOptions = Object.values(VIZ_FILTER_STYLE)
 
-const BUTTON_TEXT = {
-  apply: 'Apply',
-  resetText: 'Clear Filters'
-}
-
 type FilterProps = {
   dimensions?: DimensionsType
   config: Visualization
   setFilters: Function
   standaloneMap?: boolean
   excludedData?: Object[]
-  getUniqueValues?: Function
+  interactionLabel?: string
 }
 
 const Filters: React.FC<FilterProps> = ({
@@ -53,7 +50,7 @@ const Filters: React.FC<FilterProps> = ({
   standaloneMap,
   setFilters,
   excludedData,
-  getUniqueValues
+  interactionLabel = ''
 }) => {
   const { filters, general, theme, filterBehavior } = visualizationConfig
   const [showApplyButton, setShowApplyButton] = useState(false)
@@ -89,6 +86,13 @@ const Filters: React.FC<FilterProps> = ({
 
     const newFilters = getChangedFilters([...filters], index, value, filterBehavior)
     setFilters(newFilters)
+
+    publishAnalyticsEvent(
+      `${visualizationConfig.type}_filter_changed`,
+      'click',
+      `${interactionLabel}|key_${newFilters?.[index]?.columnName}|value_${newFilters?.[index]?.active}`,
+      visualizationConfig.type
+    )
   }
 
   const handleApplyButton = newFilters => {
@@ -108,6 +112,13 @@ const Filters: React.FC<FilterProps> = ({
     }
 
     setFilters(newFilters)
+
+    publishAnalyticsEvent(
+      `${visualizationConfig.type}_filter_applied`,
+      'click',
+      `${interactionLabel}|${newFilters.map(f => f.active)}`,
+      visualizationConfig.type
+    )
 
     setShowApplyButton(false)
   }
@@ -137,6 +148,12 @@ const Filters: React.FC<FilterProps> = ({
     }
 
     setFilters(newFilters)
+    publishAnalyticsEvent(
+      `${visualizationConfig.type}_filter_reset`,
+      'click',
+      `${interactionLabel}`,
+      visualizationConfig.type
+    )
   }
 
   const mobileFilterStyle = useMemo(() => {
@@ -269,10 +286,10 @@ const Filters: React.FC<FilterProps> = ({
                 disabled={!showApplyButton}
                 className={[general?.headerColor ? general.headerColor : theme, 'apply', 'me-2'].join(' ')}
               >
-                {BUTTON_TEXT.apply}
+                Apply
               </Button>
               <Button secondary disabled={initialFiltersActive} onClick={handleReset}>
-                {BUTTON_TEXT.resetText}
+                Clear Filters
               </Button>
             </div>
           ) : (
