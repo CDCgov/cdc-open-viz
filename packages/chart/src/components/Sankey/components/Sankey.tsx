@@ -9,7 +9,7 @@ import { Text } from '@visx/text'
 // Cdc
 import './../sankey.scss'
 import 'react-tooltip/dist/react-tooltip.css'
-import ConfigContext from '@cdc/chart/src/ConfigContext'
+import ConfigContext from '../../../ConfigContext'
 import type { ChartContext } from '../../../types/ChartContext'
 import type { SankeyNode, SankeyProps } from '../types'
 import useSankeyAlert from '../useSankeyAlert'

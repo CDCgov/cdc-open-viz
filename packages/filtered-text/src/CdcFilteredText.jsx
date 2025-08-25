@@ -22,7 +22,13 @@ import parse from 'html-react-parser'
 // styles
 import './scss/main.scss'
 
-const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
+const CdcFilteredText = ({
+  config: configObj,
+  configUrl,
+  isDashboard = false,
+  isEditor = false,
+  setConfig: setParentConfig
+}) => {
   const transform = new DataTransform()
   // Default States
   const [config, setConfig] = useState(defaults)
@@ -103,7 +109,7 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
 
   //Load initial config
   useEffect(() => {
-    loadConfig().catch(err => console.log(err))
+    loadConfig().catch(err => console.error(err))
   }, []) // eslint-disable-line
 
   useEffect(() => {

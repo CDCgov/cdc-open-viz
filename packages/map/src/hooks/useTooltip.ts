@@ -1,9 +1,8 @@
-import { displayDataAsText } from '../../../core/helpers/displayDataAsText'
+import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { displayGeoName } from '../helpers/displayGeoName'
 
 const useTooltip = props => {
   const { config, supportedStatesFipsCodes } = props
-
 
   /**
    * On county maps there's a need to append the state name

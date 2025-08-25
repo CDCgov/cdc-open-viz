@@ -21,13 +21,16 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "chroma-js": "3.1.2",
     "dompurify": "^3.2.4",
     "html2canvas": "^1.4.1",
     "json-edit-react": "^1.27.0",
+    "papaparse": "5.5.2",
     "prop-types": "^15.8.1",
     "react-accessible-accordion": "^5.0.1",
     "react-select": "^5.3.1",
     "react-tooltip": "5.8.2-beta.3",
+    "resize-observer-polyfill": "^1.5.1",
     "sass": "^1.89.2",
     "use-debounce": "^10.0.5",
     "vega": "^6.1.0",
@@ -37,8 +40,13 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "gitHead": "6097de1ff814001880d9ac64bd66becdc092d63c",
+  "gitHead": "9062881d50c824ee6cdd71868bafd016a5e5694d",
   "devDependencies": {
-    "sass": "^1.79.4"
+    "sass": "^1.79.4",
+    "vite": "^4.4.11",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite-plugin-css-injected-by-js": "^2.4.0",
+    "vite-plugin-svgr": "^2.4.0",
+    "@rollup/plugin-dsv": "^3.0.2"
   }
 }

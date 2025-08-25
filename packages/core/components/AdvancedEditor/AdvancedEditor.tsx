@@ -3,7 +3,6 @@ import MapIcon from '../../assets/map-folded.svg'
 import ChartIcon from '../../assets/icon-chart-bar.svg'
 import MarkupIncludeIcon from '../../assets/icon-code.svg'
 import { FilterFunction, JsonEditor, UpdateFunction } from 'json-edit-react'
-import { formatConfigBeforeSave as stripConfig } from '../../helpers/formatConfigBeforeSave'
 import './advanced-editor-styles.css'
 import _ from 'lodash'
 import Tooltip from '../ui/Tooltip'
@@ -26,7 +25,7 @@ export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExp
   }
 
   useEffect(() => {
-    let parsedConfig = stripConfig(config)
+    let parsedConfig = config
     if (config.type !== 'dashboard') {
       parsedConfig = convertStateToConfig()
     }

@@ -1,4 +1,4 @@
-import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
+import { type ChartConfig } from '../../types/ChartConfig'
 
 export type ForestPlotProps = {
   /** xScale - scaling function for bottom axis */
