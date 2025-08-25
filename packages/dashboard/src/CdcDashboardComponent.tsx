@@ -14,6 +14,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import { DashboardContext, DashboardDispatchContext } from './DashboardContext'
 import { Visualization } from '@cdc/core/types/Visualization'
+import { hasDashboardApplyBehavior } from './helpers/hasDashboardApplyBehavior'
 
 import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
 import Loading from '@cdc/core/components/Loading'
@@ -81,10 +82,16 @@ export default function CdcDashboard({
   const isPreview = state.tabSelected === 'Dashboard Preview'
 
   const inNoDataState = useMemo(() => {
+    const hasApplyBehavior = hasDashboardApplyBehavior(state.config.visualizations)
+    
+    if (hasApplyBehavior && !state.filtersApplied) {
+      return true
+    }
+    
     const vals = reloadURLHelpers.getDatasetKeys(state.config).map(key => state.data[key])
     if (!vals.length) return true
     return vals.some(val => val === undefined)
-  }, [state.data])
+  }, [state.data, state.config.visualizations, state.filtersApplied])
 
   const vizRowColumnLocator = getVizRowColumnLocator(state.config.rows)
 

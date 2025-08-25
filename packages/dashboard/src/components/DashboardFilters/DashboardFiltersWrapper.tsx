@@ -69,6 +69,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
     })
     if (allRequiredFiltersSelected) {
       if (hasDashboardApplyBehavior(state.config.visualizations)) {
+        dispatch({ type: 'SET_FILTERS_APPLIED', payload: true })
         const queryParams = getQueryParams()
         let needsQueryUpdate = false
         dashboardConfig.sharedFilters.forEach(sharedFilter => {
