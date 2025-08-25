@@ -109,12 +109,7 @@ export default function CdcDashboard({
     const filters = newFilters || config.dashboard.sharedFilters
     const datasetKeys = reloadURLHelpers.getDatasetKeys(config)
 
-    const emptyData = {}
-    const emptyFilteredData = {}
-    dispatch({ type: 'SET_DATA', payload: emptyData })
-    dispatch({ type: 'SET_FILTERED_DATA', payload: emptyFilteredData })
-
-    const newData = {} // Start with empty object instead of cloning existing data
+    const newData = _.cloneDeep(state.data)
     const newDatasets = _.cloneDeep(config.datasets)
     let dataWasFetched = false
     let newFileName = ''
