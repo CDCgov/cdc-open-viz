@@ -70,6 +70,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
     if (allRequiredFiltersSelected) {
       if (hasDashboardApplyBehavior(state.config.visualizations)) {
         dispatch({ type: 'SET_FILTERS_APPLIED', payload: true })
+        dispatch({ type: 'SET_FILTERS_CHANGED', payload: false })
         const queryParams = getQueryParams()
         let needsQueryUpdate = false
         dashboardConfig.sharedFilters.forEach(sharedFilter => {
@@ -145,6 +146,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
     dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
 
     if (hasDashboardApplyBehavior(dashboardConfig.visualizations)) {
+      dispatch({ type: 'SET_FILTERS_CHANGED', payload: true })
       const isAutoSelectFilter = visualizationConfig.autoLoad
       const missingFilterSelections = newConfig.dashboard.sharedFilters.some(f => !f.active)
       const apiEndpoints = newSharedFilters.filter(f => f.apiFilter).map(f => f.apiFilter.apiEndpoint)

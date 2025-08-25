@@ -84,14 +84,15 @@ export default function CdcDashboard({
   const inNoDataState = useMemo(() => {
     const hasApplyBehavior = hasDashboardApplyBehavior(state.config.visualizations)
     
-    if (hasApplyBehavior && !state.filtersApplied) {
+    // Hide visualizations if apply behavior is enabled AND (filters haven't been applied OR filters have changed)
+    if (hasApplyBehavior && (!state.filtersApplied || state.filtersChanged)) {
       return true
     }
     
     const vals = reloadURLHelpers.getDatasetKeys(state.config).map(key => state.data[key])
     if (!vals.length) return true
     return vals.some(val => val === undefined)
-  }, [state.data, state.config.visualizations, state.filtersApplied])
+  }, [state.data, state.config.visualizations, state.filtersApplied, state.filtersChanged])
 
   const vizRowColumnLocator = getVizRowColumnLocator(state.config.rows)
 

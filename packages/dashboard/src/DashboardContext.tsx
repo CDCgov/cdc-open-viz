@@ -28,7 +28,8 @@ export const initialState = {
   filteredData: {},
   preview: false,
   tabSelected: firstTab,
-  filtersApplied: false
+  filtersApplied: false,
+  filtersChanged: false
 }
 
 const initialContext: ConfigCTX = {
