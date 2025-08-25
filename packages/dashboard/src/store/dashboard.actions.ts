@@ -32,6 +32,7 @@ type RESET_VISUALIZATION = Action<'RESET_VISUALIZATION', { vizKey: string }>
 type UPDATE_VISUALIZATION = Action<'UPDATE_VISUALIZATION', { vizKey: string; configureData: Partial<AnyVisualization> }>
 type UPDATE_ROW = Action<'UPDATE_ROW', { rowIndex: number; rowData: Partial<ConfigRow> }>
 type UPDATE_TOGGLE_NAME = Action<'UPDATE_TOGGLE_NAME', { rowIndex: number; columnIndex: number; toggleName: string }>
+type SET_FILTERS_APPLIED = Action<'SET_FILTERS_APPLIED', boolean>
 
 type DashboardActions =
   | ADD_VISUALIZATION
@@ -58,4 +59,5 @@ type DashboardActions =
   | UPDATE_VISUALIZATION
   | UPDATE_ROW
   | UPDATE_TOGGLE_NAME
+  | SET_FILTERS_APPLIED
 export default DashboardActions
