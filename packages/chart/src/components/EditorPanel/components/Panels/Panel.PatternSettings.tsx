@@ -310,31 +310,18 @@ const PanelPatternSettings: FC<PanelProps> = props => {
 
                   {p.dataKey && (
                     <>
-                      <label htmlFor={`pattern-datavalue-${patternKey}`}>Data Value:</label>
-                      <select
-                        id={`pattern-datavalue-${patternKey}`}
-                        value={p.dataValue || 'Select'}
-                        onChange={e => handlePatternUpdate(patternKey, 'dataValue', e.target.value)}
-                      >
-                        <option value='Select'>Select Data Value</option>
-                        {dataValueOptions.map((option, index) => (
-                          <option value={option.value} key={index}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
+                      <label htmlFor={`pattern-datavalue-${patternKey}`}>
+                        Data Value:
+                        <input
+                          type='text'
+                          id={`pattern-datavalue-${patternKey}`}
+                          value={p.dataValue || ''}
+                          onChange={e => handlePatternUpdate(patternKey, 'dataValue', e.target.value)}
+                          placeholder='Enter data value'
+                        />
+                      </label>
                     </>
                   )}
-
-                  <label htmlFor={`pattern-datavalue-${patternKey}`}>
-                    Data Value:
-                    <input
-                      type='text'
-                      id={`pattern-datavalue-${patternKey}`}
-                      value={patternKey}
-                      onChange={e => handlePatternKeyChange(patternKey, e.target.value)}
-                    />
-                  </label>
 
                   <label htmlFor={`pattern-label-${patternKey}`}>
                     Label (optional):
