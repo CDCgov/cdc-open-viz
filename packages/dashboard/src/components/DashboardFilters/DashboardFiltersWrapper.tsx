@@ -145,7 +145,10 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
     // sets the active filter option that the user just selected.
     dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
 
-    if (hasDashboardApplyBehavior(dashboardConfig.visualizations)) {
+    // Check if THIS specific filter visualization has apply behavior
+    const currentFilterHasApplyBehavior = visualizationConfig.filterBehavior === FilterBehavior.Apply
+    
+    if (currentFilterHasApplyBehavior && hasDashboardApplyBehavior(dashboardConfig.visualizations)) {
       dispatch({ type: 'SET_FILTERS_CHANGED', payload: true })
       const isAutoSelectFilter = visualizationConfig.autoLoad
       const missingFilterSelections = newConfig.dashboard.sharedFilters.some(f => !f.active)
