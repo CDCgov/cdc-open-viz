@@ -1,15 +1,16 @@
 import { describe, it, expect } from 'vitest'
 import { cleanSharedFilters } from '../formatConfigBeforeSave'
+import { DashboardConfig } from '../../types/DashboardConfig'
 
 describe('cleanSharedFilters', () => {
   it('should remove unused shared filters', () => {
-    const config: any = {
+    const config: DashboardConfig = {
       dashboard: {
         sharedFilters: [
-          { id: 1, type: 'datafilter' },
-          { id: 2, type: 'datafilter' },
-          { id: 3, type: 'datafilter' },
-          { id: 4, type: 'datafilter' }
+          { id: 1, type: 'filter1' },
+          { id: 2, type: 'filter2' },
+          { id: 3, type: 'filter3' },
+          { id: 4, type: 'filter4' }
         ]
       },
       visualizations: {
@@ -21,17 +22,17 @@ describe('cleanSharedFilters', () => {
     cleanSharedFilters(config)
 
     expect(config.dashboard.sharedFilters).toEqual([
-      { id: 1, type: 'datafilter' },
-      { id: 4, type: 'datafilter' }
+      { id: 1, type: 'filter1' },
+      { id: 4, type: 'filter4' }
     ])
   })
 
   it('should retain used shared filters and remove their active state', () => {
-    const config: any = {
+    const config: DashboardConfig = {
       dashboard: {
         sharedFilters: [
-          { id: 1, type: 'datafilter', active: 'test' },
-          { id: 2, type: 'datafilter', active: 'test' }
+          { id: 1, type: 'filter1', active: true },
+          { id: 2, type: 'filter2', active: true }
         ]
       },
       visualizations: {
@@ -43,17 +44,17 @@ describe('cleanSharedFilters', () => {
     cleanSharedFilters(config)
 
     expect(config.dashboard.sharedFilters).toEqual([
-      { id: 1, type: 'datafilter' },
-      { id: 2, type: 'datafilter' }
+      { id: 1, type: 'filter1' },
+      { id: 2, type: 'filter2' }
     ])
   })
 
   it('should remove values from urlfilter type shared filters', () => {
-    const config: any = {
+    const config: DashboardConfig = {
       dashboard: {
         sharedFilters: [
-          { id: 1, type: 'urlfilter', values: ['1', '2', '3'] },
-          { id: 2, type: 'datafilter' }
+          { id: 1, type: 'urlfilter', values: [1, 2, 3] },
+          { id: 2, type: 'filter2' }
         ]
       },
       visualizations: {

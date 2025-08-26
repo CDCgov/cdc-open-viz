@@ -4,6 +4,7 @@
   "description": "Core components, styles, hooks, and helpers, for the CDC Open Visualization project",
   "moduleName": "CdcCore",
   "main": "dist/cdccore",
+  "type": "module",
   "scripts": {
     "test": "vitest run --environment jsdom --reporter verbose",
     "test-watch": "vitest watch --reporter verbose",
